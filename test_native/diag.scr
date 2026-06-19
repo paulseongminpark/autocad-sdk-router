@@ -1,0 +1,8 @@
+(setvar "SECURELOAD" 0)
+(setvar "FILEDIA" 0)
+(arxload "D:/dev/99_tools/autocad-sdk-router/src/Ariadne.AcadNative/bin/x64/Release/Ariadne.AcadNative.arx")
+(setq f (open "D:/dev/99_tools/autocad-sdk-router/test_native/diag.txt" "w"))
+(write-line "LOADED_ARX_MODULES:" f)
+(foreach m (arx) (write-line m f))
+(close f)
+(princ)

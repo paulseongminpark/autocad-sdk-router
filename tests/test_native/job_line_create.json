@@ -1,0 +1,17 @@
+﻿{
+    "args":  {
+                 "layer":  "P2Lines",
+                 "end":  {
+                             "y":  5,
+                             "z":  0,
+                             "x":  10
+                         },
+                 "start":  {
+                               "y":  0,
+                               "z":  0,
+                               "x":  0
+                           }
+             },
+    "operation":  "write.entity.line",
+    "schema":  "ariadne.autocad_sdk_job.v1"
+}

@@ -1,0 +1,7 @@
+﻿{
+    "args":  {
+                 "name":  "P2Layer"
+             },
+    "operation":  "write.layer.create",
+    "schema":  "ariadne.autocad_sdk_job.v1"
+}

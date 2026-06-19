@@ -1,0 +1,4 @@
+﻿{
+    "operation":  "inspect.runtime.capabilities",
+    "schema":  "ariadne.autocad_sdk_job.v1"
+}

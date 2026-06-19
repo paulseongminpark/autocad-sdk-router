@@ -1,0 +1,1 @@
+{"schema":"ariadne.autocad_sdk_job.v1","operation":"write.block.insert","args":{"name":"ARIADNE_P2_BLOCK","position":{"x":25.0,"y":35.0,"z":0.0}}}

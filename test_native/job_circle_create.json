@@ -1,0 +1,1 @@
+{"schema":"ariadne.autocad_sdk_job.v1","operation":"write.entity.circle","args":{"layer":"ARIADNE_P2","center":{"x":12.0,"y":14.0,"z":0.0},"radius":3.5}}

@@ -1,0 +1,324 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Ariadne AutoCAD SDK Job",
+  "type": "object",
+  "additionalProperties": true,
+  "required": ["operation"],
+  "properties": {
+    "schema": {
+      "type": "string",
+      "const": "ariadne.autocad_sdk_job.v1"
+    },
+    "operation": {
+      "type": "string",
+      "enum": [
+        "inspect.database.summary",
+        "write.layer.create",
+        "write.entity.line",
+        "write.entity.circle",
+        "inspect.entity.count",
+        "write.xrecord.set",
+        "inspect.xrecord.get",
+        "write.xdata.set",
+        "inspect.xdata.get",
+        "write.block.simple_create",
+        "write.block.insert",
+        "inspect.block.count",
+        "write.layout.create",
+        "inspect.layout.list",
+        "inspect.xref.list",
+        "inspect.runtime.capabilities",
+        "live.reactor.enable",
+        "inspect.reactor.registry",
+        "live.reactor.disable",
+        "inspect.overrule.registry",
+        "live.overrule.enable",
+        "live.overrule.disable",
+        "inspect.jig.host_support",
+        "live.jig.point_probe",
+        "extend.customclass.create",
+        "inspect.customclass.count",
+        "extend.customobject.create",
+        "inspect.customobject.count",
+        "inspect.protocol.queryx"
+      ]
+    },
+    "write_mode": {
+      "type": "string",
+      "default": "read",
+      "enum": ["read", "write_copy", "write_original", "live_edit"]
+    },
+    "save": {
+      "type": "boolean",
+      "description": "When true, the active/original DWG is saved after a write job. write_original defaults to save=true in the command runner."
+    },
+    "args": {
+      "type": "object",
+      "default": {}
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": { "operation": { "const": "extend.customclass.create" } }
+      },
+      "then": {
+        "properties": {
+          "args": {
+            "type": "object",
+            "required": ["center", "size"],
+            "properties": {
+              "center": { "$ref": "#/$defs/point" },
+              "size": { "type": "number", "exclusiveMinimum": 0 }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": { "operation": { "const": "extend.customobject.create" } }
+      },
+      "then": {
+        "properties": {
+          "args": {
+            "type": "object",
+            "required": ["key", "value"],
+            "properties": {
+              "key": { "type": "string", "minLength": 1 },
+              "value": { "type": "integer" }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": { "operation": { "const": "write.layer.create" } }
+      },
+      "then": {
+        "properties": {
+          "args": {
+            "type": "object",
+            "required": ["name"],
+            "properties": {
+              "name": { "type": "string", "minLength": 1 },
+              "color_index": { "type": "integer", "minimum": 1, "maximum": 255 }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": { "operation": { "const": "write.entity.line" } }
+      },
+      "then": {
+        "properties": {
+          "args": {
+            "type": "object",
+            "required": ["start", "end"],
+            "properties": {
+              "layer": { "type": "string" },
+              "start": { "$ref": "#/$defs/point" },
+              "end": { "$ref": "#/$defs/point" }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": { "operation": { "const": "write.entity.circle" } }
+      },
+      "then": {
+        "properties": {
+          "args": {
+            "type": "object",
+            "required": ["center", "radius"],
+            "properties": {
+              "layer": { "type": "string" },
+              "center": { "$ref": "#/$defs/point" },
+              "radius": { "type": "number", "exclusiveMinimum": 0 }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": { "operation": { "const": "inspect.entity.count" } }
+      },
+      "then": {
+        "properties": {
+          "args": {
+            "type": "object",
+            "properties": {
+              "type": { "type": "string" }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": { "operation": { "const": "write.xrecord.set" } }
+      },
+      "then": {
+        "properties": {
+          "args": {
+            "type": "object",
+            "required": ["key", "value"],
+            "properties": {
+              "dictionary": { "type": "string", "default": "ARIADNE" },
+              "key": { "type": "string", "minLength": 1 },
+              "value": {}
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": { "operation": { "const": "inspect.xrecord.get" } }
+      },
+      "then": {
+        "properties": {
+          "args": {
+            "type": "object",
+            "required": ["key"],
+            "properties": {
+              "dictionary": { "type": "string", "default": "ARIADNE_NATIVE" },
+              "key": { "type": "string", "minLength": 1 }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": { "operation": { "const": "write.xdata.set" } }
+      },
+      "then": {
+        "properties": {
+          "args": {
+            "type": "object",
+            "required": ["app", "value"],
+            "properties": {
+              "app": { "type": "string", "minLength": 1 },
+              "value": { "type": "string" }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": { "operation": { "const": "inspect.xdata.get" } }
+      },
+      "then": {
+        "properties": {
+          "args": {
+            "type": "object",
+            "required": ["app"],
+            "properties": {
+              "app": { "type": "string", "minLength": 1 }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": { "operation": { "const": "live.jig.point_probe" } }
+      },
+      "then": {
+        "properties": {
+          "args": {
+            "type": "object",
+            "required": ["point"],
+            "properties": {
+              "point": { "$ref": "#/$defs/point" },
+              "base": { "$ref": "#/$defs/point" }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": { "operation": { "const": "write.block.simple_create" } }
+      },
+      "then": {
+        "properties": {
+          "args": {
+            "type": "object",
+            "required": ["name"],
+            "properties": {
+              "name": { "type": "string", "minLength": 1 }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": { "operation": { "const": "write.block.insert" } }
+      },
+      "then": {
+        "properties": {
+          "args": {
+            "type": "object",
+            "required": ["name", "position"],
+            "properties": {
+              "name": { "type": "string", "minLength": 1 },
+              "position": { "$ref": "#/$defs/point" }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": { "operation": { "const": "inspect.block.count" } }
+      },
+      "then": {
+        "properties": {
+          "args": {
+            "type": "object",
+            "properties": {
+              "name": { "type": "string", "minLength": 1 }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": { "operation": { "const": "write.layout.create" } }
+      },
+      "then": {
+        "properties": {
+          "args": {
+            "type": "object",
+            "required": ["name"],
+            "properties": {
+              "name": { "type": "string", "minLength": 1 }
+            }
+          }
+        }
+      }
+    }
+  ],
+  "$defs": {
+    "point": {
+      "type": "object",
+      "required": ["x", "y"],
+      "properties": {
+        "x": { "type": "number" },
+        "y": { "type": "number" },
+        "z": { "type": "number", "default": 0 }
+      }
+    }
+  }
+}

@@ -1,0 +1,8 @@
+﻿{
+    "args":  {
+                 "value":  "build",
+                 "app":  "P2_APP"
+             },
+    "operation":  "write.xdata.set",
+    "schema":  "ariadne.autocad_sdk_job.v1"
+}

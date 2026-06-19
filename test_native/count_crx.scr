@@ -1,0 +1,6 @@
+(setvar "SECURELOAD" 0)
+(setvar "FILEDIA" 0)
+(setvar "TRUSTEDPATHS" "D:\\dev\\99_tools\\autocad-sdk-router\\src\\Ariadne.AcadNative\\bin\\x64\\Release")
+(arxload "D:/dev/99_tools/autocad-sdk-router/src/Ariadne.AcadNative/bin/x64/Release/Ariadne.AcadNativeDbx.dbx")
+(arxload "D:/dev/99_tools/autocad-sdk-router/src/Ariadne.AcadNative/bin/x64/Release/Ariadne.AcadNative.crx")
+ARIADNE_NATIVE_JOB

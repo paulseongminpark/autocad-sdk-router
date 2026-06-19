@@ -1,0 +1,7 @@
+﻿{
+    "args":  {
+                 "name":  "P2_TEST_BLOCK"
+             },
+    "operation":  "write.block.simple_create",
+    "schema":  "ariadne.autocad_sdk_job.v1"
+}

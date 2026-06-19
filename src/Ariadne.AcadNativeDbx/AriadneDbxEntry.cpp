@@ -1,0 +1,85 @@
+#include "rxregsvc.h"
+
+#define ARIADNE_DBX_BUILD
+#include "AriadneDbxApi.h"
+#include "..\Ariadne.AcadNative\AriadneProbe.h"
+#include "AriadneRecord.h"
+#include "AriadneProtocol.h"
+
+#ifdef _WIN64
+#pragma comment(linker, "/export:acrxGetApiVersion,PRIVATE")
+#else
+#pragma comment(linker, "/export:_acrxGetApiVersion,PRIVATE")
+#endif
+
+extern "C" ARIADNE_DBX_API Acad::ErrorStatus ariadneCreateProbeEntity(
+    AcDbEntity*& entity,
+    double cx,
+    double cy,
+    double cz,
+    double size)
+{
+    entity = nullptr;
+    if (size <= 0.0)
+        return Acad::eInvalidInput;
+
+    AriadneProbe* probe = new AriadneProbe();
+    Acad::ErrorStatus es = probe->setCenter(AcGePoint3d(cx, cy, cz));
+    if (es == Acad::eOk)
+        es = probe->setSize(size);
+    if (es != Acad::eOk) {
+        delete probe;
+        return es;
+    }
+
+    entity = probe;
+    return Acad::eOk;
+}
+
+extern "C" ARIADNE_DBX_API bool ariadneIsProbeEntity(const AcDbEntity* entity)
+{
+    return entity != nullptr && entity->isKindOf(AriadneProbe::desc());
+}
+
+extern "C" ARIADNE_DBX_API Acad::ErrorStatus ariadneCreateRecordObject(
+    AcDbObject*& object,
+    int value)
+{
+    object = nullptr;
+    if (value < -32768 || value > 32767)
+        return Acad::eInvalidInput;
+
+    object = new AriadneRecord(static_cast<Adesk::Int16>(value));
+    return Acad::eOk;
+}
+
+extern "C" ARIADNE_DBX_API bool ariadneIsRecordObject(const AcDbObject* object)
+{
+    return object != nullptr && object->isKindOf(AriadneRecord::desc());
+}
+
+extern "C" AcRx::AppRetCode __declspec(dllexport)
+acrxEntryPoint(AcRx::AppMsgCode msg, void* pkt)
+{
+    switch (msg) {
+    case AcRx::kInitAppMsg:
+        acrxUnlockApplication(pkt);
+        acrxRegisterAppMDIAware(pkt);
+        AriadneProbe::rxInit();
+        AriadneRecord::rxInit();
+        acrxBuildClassHierarchy();
+        ariadneRegisterProbeProtocol();
+        break;
+
+    case AcRx::kUnloadAppMsg:
+        ariadneUnregisterProbeProtocol();
+        deleteAcRxClass(AriadneRecord::desc());
+        deleteAcRxClass(AriadneProbe::desc());
+        acrxBuildClassHierarchy();
+        break;
+
+    default:
+        break;
+    }
+    return AcRx::kRetOK;
+}

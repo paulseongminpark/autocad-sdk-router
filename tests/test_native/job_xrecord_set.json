@@ -1,0 +1,9 @@
+﻿{
+    "args":  {
+                 "key":  "build_marker",
+                 "value":  "p2",
+                 "dictionary":  "ARIADNE_NATIVE"
+             },
+    "operation":  "write.xrecord.set",
+    "schema":  "ariadne.autocad_sdk_job.v1"
+}

@@ -1,0 +1,4 @@
+﻿{
+    "operation":  "live.overrule.disable",
+    "schema":  "ariadne.autocad_sdk_job.v1"
+}

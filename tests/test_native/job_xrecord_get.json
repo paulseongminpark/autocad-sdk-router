@@ -1,0 +1,8 @@
+﻿{
+    "args":  {
+                 "key":  "build_marker",
+                 "dictionary":  "ARIADNE_NATIVE"
+             },
+    "operation":  "inspect.xrecord.get",
+    "schema":  "ariadne.autocad_sdk_job.v1"
+}

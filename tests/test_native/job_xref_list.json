@@ -1,0 +1,4 @@
+﻿{
+    "operation":  "inspect.xref.list",
+    "schema":  "ariadne.autocad_sdk_job.v1"
+}

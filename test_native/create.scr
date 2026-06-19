@@ -1,0 +1,5 @@
+(setvar "SECURELOAD" 0)
+(setvar "FILEDIA" 0)
+(arxload "D:/dev/99_tools/autocad-sdk-router/src/Ariadne.AcadNative/bin/x64/Release/Ariadne.AcadNative.arx")
+ARIADNE_NATIVE_JOB
+_QSAVE

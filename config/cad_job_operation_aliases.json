@@ -1,0 +1,367 @@
+{
+  "schema": "ariadne.cad_job_operation_aliases.v1",
+  "source_schema": "schemas/cad_job.schema.json",
+  "source_catalog": "config/autocad_native_arx_operation_catalog.json",
+  "generated_at": "2026-06-19",
+  "notes": "Phase 0 schema operation to native catalog alignment. Only mapping_type=exact entries carry catalog_op_id; alias and synthetic entries remain explicit router jobs.",
+  "operations": {
+    "inspect.database.summary": {
+      "operation": "inspect.database.summary",
+      "catalog_op_id": "inspect.database.summary",
+      "phase_batch": "P1 Native job shell baseline",
+      "execution_host_class": "dbx",
+      "mapping_type": "exact",
+      "is_router_alias_or_synthetic": false,
+      "catalog_reference_ids": [],
+      "notes": "Exact catalog operation for database summary in the hostless DBX/Core Console lane."
+    },
+    "write.layer.create": {
+      "operation": "write.layer.create",
+      "catalog_op_id": "write.layer.create",
+      "phase_batch": "P2 Batch 1 Core Database CRUD",
+      "execution_host_class": "dbx",
+      "mapping_type": "exact",
+      "is_router_alias_or_synthetic": false,
+      "catalog_reference_ids": [],
+      "notes": "Exact catalog operation for layer table creation."
+    },
+    "write.entity.line": {
+      "operation": "write.entity.line",
+      "catalog_op_id": "write.entity.line",
+      "phase_batch": "P2 Batch 1 Core Database CRUD",
+      "execution_host_class": "dbx",
+      "mapping_type": "exact",
+      "is_router_alias_or_synthetic": false,
+      "catalog_reference_ids": [],
+      "notes": "Exact catalog operation for appending a line entity."
+    },
+    "write.entity.circle": {
+      "operation": "write.entity.circle",
+      "catalog_op_id": "write.entity.circle",
+      "phase_batch": "Phase 1 ObjectDBX/CoreConsole CRUD",
+      "execution_host_class": "dbx",
+      "mapping_type": "exact",
+      "is_router_alias_or_synthetic": false,
+      "catalog_reference_ids": [],
+      "notes": "Exact catalog operation for appending a circle entity."
+    },
+    "inspect.entity.count": {
+      "operation": "inspect.entity.count",
+      "catalog_op_id": null,
+      "phase_batch": "Phase 1 ObjectDBX/CoreConsole CRUD",
+      "execution_host_class": "dbx",
+      "mapping_type": "synthetic",
+      "is_router_alias_or_synthetic": true,
+      "catalog_reference_ids": [
+        "select.ss.count",
+        "inspect.block.iterate"
+      ],
+      "notes": "Router job counts modelspace entities, optionally by simple entity type; catalog exposes lower-level selection/block iteration primitives."
+    },
+    "write.xrecord.set": {
+      "operation": "write.xrecord.set",
+      "catalog_op_id": "write.xrecord.set",
+      "phase_batch": "P2 Batch 1 Core Database CRUD",
+      "execution_host_class": "dbx",
+      "mapping_type": "exact",
+      "is_router_alias_or_synthetic": false,
+      "catalog_reference_ids": [],
+      "notes": "Exact catalog operation for named dictionary xrecord writes."
+    },
+    "inspect.xrecord.get": {
+      "operation": "inspect.xrecord.get",
+      "catalog_op_id": "inspect.xrecord.get",
+      "phase_batch": "P2 Batch 1 Core Database CRUD",
+      "execution_host_class": "dbx",
+      "mapping_type": "exact",
+      "is_router_alias_or_synthetic": false,
+      "catalog_reference_ids": [],
+      "notes": "Exact catalog operation for named dictionary xrecord reads."
+    },
+    "write.xdata.set": {
+      "operation": "write.xdata.set",
+      "catalog_op_id": null,
+      "phase_batch": "P2 Batch 1 Core Database CRUD",
+      "execution_host_class": "dbx",
+      "mapping_type": "alias",
+      "is_router_alias_or_synthetic": true,
+      "catalog_reference_ids": [
+        "write.entity.set_xdata",
+        "write.regapp.register"
+      ],
+      "notes": "Router job name differs from catalog entity xdata primitives and includes regapp setup."
+    },
+    "inspect.xdata.get": {
+      "operation": "inspect.xdata.get",
+      "catalog_op_id": null,
+      "phase_batch": "P2 Batch 1 Core Database CRUD",
+      "execution_host_class": "dbx",
+      "mapping_type": "alias",
+      "is_router_alias_or_synthetic": true,
+      "catalog_reference_ids": [
+        "inspect.entity.get_xdata"
+      ],
+      "notes": "Router job name differs from the catalog entity xdata read primitive."
+    },
+    "write.block.simple_create": {
+      "operation": "write.block.simple_create",
+      "catalog_op_id": null,
+      "phase_batch": "P2 Batch 2 Blocks, Layouts, Xrefs",
+      "execution_host_class": "dbx",
+      "mapping_type": "synthetic",
+      "is_router_alias_or_synthetic": true,
+      "catalog_reference_ids": [
+        "inspect.symboltable.block",
+        "write.block.append_entity"
+      ],
+      "notes": "Router job creates a simple block definition by combining block table and entity append primitives."
+    },
+    "write.block.insert": {
+      "operation": "write.block.insert",
+      "catalog_op_id": null,
+      "phase_batch": "P2 Batch 2 Blocks, Layouts, Xrefs",
+      "execution_host_class": "dbx",
+      "mapping_type": "alias",
+      "is_router_alias_or_synthetic": true,
+      "catalog_reference_ids": [
+        "write.entity.blockref",
+        "transform.database.insert_block"
+      ],
+      "notes": "Router job inserts a block reference; catalog uses lower-level blockref and database insert operation IDs."
+    },
+    "inspect.block.count": {
+      "operation": "inspect.block.count",
+      "catalog_op_id": null,
+      "phase_batch": "P2 Batch 2 Blocks, Layouts, Xrefs",
+      "execution_host_class": "dbx",
+      "mapping_type": "alias",
+      "is_router_alias_or_synthetic": true,
+      "catalog_reference_ids": [
+        "inspect.symboltable.block",
+        "inspect.block.iterate"
+      ],
+      "notes": "Router job counts block definitions; catalog exposes block symbol table and iterator primitives."
+    },
+    "write.layout.create": {
+      "operation": "write.layout.create",
+      "catalog_op_id": null,
+      "phase_batch": "P2 Batch 2 Blocks, Layouts, Xrefs",
+      "execution_host_class": "dbx",
+      "mapping_type": "synthetic",
+      "is_router_alias_or_synthetic": true,
+      "catalog_reference_ids": [
+        "inspect.dictionary.named_objects"
+      ],
+      "notes": "Router job uses layout manager behavior not represented by an exact catalog op ID."
+    },
+    "inspect.layout.list": {
+      "operation": "inspect.layout.list",
+      "catalog_op_id": null,
+      "phase_batch": "P2 Batch 2 Blocks, Layouts, Xrefs",
+      "execution_host_class": "dbx",
+      "mapping_type": "synthetic",
+      "is_router_alias_or_synthetic": true,
+      "catalog_reference_ids": [
+        "inspect.dictionary.named_objects"
+      ],
+      "notes": "Router job lists layouts through layout dictionary/manager state; catalog has no exact layout-list op."
+    },
+    "inspect.xref.list": {
+      "operation": "inspect.xref.list",
+      "catalog_op_id": null,
+      "phase_batch": "P2 Batch 2 Blocks, Layouts, Xrefs",
+      "execution_host_class": "dbx",
+      "mapping_type": "synthetic",
+      "is_router_alias_or_synthetic": true,
+      "catalog_reference_ids": [
+        "inspect.symboltable.block",
+        "inspect.block.iterate"
+      ],
+      "notes": "Router job filters xref block table records; catalog does not expose a dedicated xref-list op."
+    },
+    "inspect.runtime.capabilities": {
+      "operation": "inspect.runtime.capabilities",
+      "catalog_op_id": null,
+      "phase_batch": "P2 Batch 3 Host-Bound Capability Contracts",
+      "execution_host_class": "coreconsole",
+      "mapping_type": "synthetic",
+      "is_router_alias_or_synthetic": true,
+      "catalog_reference_ids": [
+        "module.app.accessor",
+        "module.load"
+      ],
+      "notes": "Router capability contract reports current host support instead of invoking one catalog primitive."
+    },
+    "live.reactor.enable": {
+      "operation": "live.reactor.enable",
+      "catalog_op_id": null,
+      "phase_batch": "P2 Batch 3 Host-Bound Capability Contracts",
+      "execution_host_class": "arx_adapter",
+      "mapping_type": "alias",
+      "is_router_alias_or_synthetic": true,
+      "catalog_reference_ids": [
+        "react.editor.command_monitor",
+        "react.object.attach_transient"
+      ],
+      "notes": "Router job installs the current Ariadne editor reactor; catalog separates reactor attach and monitor primitives."
+    },
+    "inspect.reactor.registry": {
+      "operation": "inspect.reactor.registry",
+      "catalog_op_id": null,
+      "phase_batch": "P2 Batch 3 Host-Bound Capability Contracts",
+      "execution_host_class": "coreconsole",
+      "mapping_type": "synthetic",
+      "is_router_alias_or_synthetic": true,
+      "catalog_reference_ids": [
+        "react.editor.command_monitor",
+        "react.object.monitor"
+      ],
+      "notes": "Router job reports Ariadne reactor registration state; catalog exposes monitor categories, not this registry contract."
+    },
+    "live.reactor.disable": {
+      "operation": "live.reactor.disable",
+      "catalog_op_id": null,
+      "phase_batch": "P2 Batch 3 Host-Bound Capability Contracts",
+      "execution_host_class": "arx_adapter",
+      "mapping_type": "alias",
+      "is_router_alias_or_synthetic": true,
+      "catalog_reference_ids": [
+        "react.object.detach_transient"
+      ],
+      "notes": "Router job removes the current Ariadne editor reactor; catalog uses lower-level detach primitives."
+    },
+    "inspect.overrule.registry": {
+      "operation": "inspect.overrule.registry",
+      "catalog_op_id": null,
+      "phase_batch": "P2 Batch 3 Host-Bound Capability Contracts",
+      "execution_host_class": "coreconsole",
+      "mapping_type": "synthetic",
+      "is_router_alias_or_synthetic": true,
+      "catalog_reference_ids": [
+        "overrule.query.has",
+        "overrule.object.install"
+      ],
+      "notes": "Router job reports Ariadne overrule registration state; catalog has query/install primitives but no registry contract."
+    },
+    "live.overrule.enable": {
+      "operation": "live.overrule.enable",
+      "catalog_op_id": null,
+      "phase_batch": "P2 Batch 5 Overrule Registry and Jig Probe",
+      "execution_host_class": "arx_adapter",
+      "mapping_type": "alias",
+      "is_router_alias_or_synthetic": true,
+      "catalog_reference_ids": [
+        "overrule.object.install",
+        "overrule.global.enable"
+      ],
+      "notes": "Router job installs the Ariadne object overrule and enables the runtime overrule path."
+    },
+    "live.overrule.disable": {
+      "operation": "live.overrule.disable",
+      "catalog_op_id": null,
+      "phase_batch": "P2 Batch 5 Overrule Registry and Jig Probe",
+      "execution_host_class": "arx_adapter",
+      "mapping_type": "alias",
+      "is_router_alias_or_synthetic": true,
+      "catalog_reference_ids": [
+        "overrule.remove"
+      ],
+      "notes": "Router job removes the Ariadne object overrule through the lower-level removal primitive."
+    },
+    "inspect.jig.host_support": {
+      "operation": "inspect.jig.host_support",
+      "catalog_op_id": null,
+      "phase_batch": "P2 Batch 3 Host-Bound Capability Contracts",
+      "execution_host_class": "coreconsole",
+      "mapping_type": "synthetic",
+      "is_router_alias_or_synthetic": true,
+      "catalog_reference_ids": [
+        "interact.jig.acquire",
+        "interact.jig.run"
+      ],
+      "notes": "Router job reports whether the current host can run interactive jig work."
+    },
+    "live.jig.point_probe": {
+      "operation": "live.jig.point_probe",
+      "catalog_op_id": null,
+      "phase_batch": "P2 Batch 5 Overrule Registry and Jig Probe",
+      "execution_host_class": "full_autocad",
+      "mapping_type": "alias",
+      "is_router_alias_or_synthetic": true,
+      "catalog_reference_ids": [
+        "interact.jig.acquire",
+        "interact.jig.run"
+      ],
+      "notes": "Router job drives a point probe through the live jig path; Core Console can only report support status."
+    },
+    "extend.customclass.create": {
+      "operation": "extend.customclass.create",
+      "catalog_op_id": null,
+      "phase_batch": "P1 Custom objects/protocols",
+      "execution_host_class": "arx_adapter",
+      "mapping_type": "synthetic",
+      "is_router_alias_or_synthetic": true,
+      "catalog_reference_ids": [
+        "extend.customclass.declare",
+        "extend.customclass.define",
+        "extend.customclass.rxinit",
+        "extend.customentity.define",
+        "module.class.register_object"
+      ],
+      "notes": "Router job creates an Ariadne custom entity instance; catalog entries describe class definition and registration primitives."
+    },
+    "inspect.customclass.count": {
+      "operation": "inspect.customclass.count",
+      "catalog_op_id": null,
+      "phase_batch": "P1 Custom objects/protocols",
+      "execution_host_class": "arx_adapter",
+      "mapping_type": "synthetic",
+      "is_router_alias_or_synthetic": true,
+      "catalog_reference_ids": [
+        "inspect.runtime.iskindof",
+        "inspect.block.iterate"
+      ],
+      "notes": "Router job counts Ariadne custom entity instances in model space; catalog exposes runtime and iteration primitives."
+    },
+    "extend.customobject.create": {
+      "operation": "extend.customobject.create",
+      "catalog_op_id": null,
+      "phase_batch": "P1 Custom objects/protocols",
+      "execution_host_class": "arx_adapter",
+      "mapping_type": "synthetic",
+      "is_router_alias_or_synthetic": true,
+      "catalog_reference_ids": [
+        "extend.customobject.define",
+        "extend.customobject.filer_dwgout",
+        "write.xrecord.set"
+      ],
+      "notes": "Router job creates an Ariadne custom DBObject record; catalog separates custom object definition, filing, and storage primitives."
+    },
+    "inspect.customobject.count": {
+      "operation": "inspect.customobject.count",
+      "catalog_op_id": null,
+      "phase_batch": "P1 Custom objects/protocols",
+      "execution_host_class": "arx_adapter",
+      "mapping_type": "synthetic",
+      "is_router_alias_or_synthetic": true,
+      "catalog_reference_ids": [
+        "extend.customobject.filer_dwgin",
+        "inspect.xrecord.get"
+      ],
+      "notes": "Router job counts Ariadne custom DBObject records; catalog exposes filing/read primitives but no count operation."
+    },
+    "inspect.protocol.queryx": {
+      "operation": "inspect.protocol.queryx",
+      "catalog_op_id": null,
+      "phase_batch": "P1 Custom objects/protocols",
+      "execution_host_class": "arx_adapter",
+      "mapping_type": "alias",
+      "is_router_alias_or_synthetic": true,
+      "catalog_reference_ids": [
+        "extend.protocol.query",
+        "overrule.queryx.install"
+      ],
+      "notes": "Router job probes Ariadne protocol availability; catalog has the lower-level protocol query primitive."
+    }
+  }
+}

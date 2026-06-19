@@ -1,0 +1,12 @@
+﻿{
+    "args":  {
+                 "name":  "P2_TEST_BLOCK",
+                 "position":  {
+                                  "y":  2,
+                                  "z":  0,
+                                  "x":  1
+                              }
+             },
+    "operation":  "write.block.insert",
+    "schema":  "ariadne.autocad_sdk_job.v1"
+}

@@ -1,0 +1,1 @@
+{"schema":"ariadne.autocad_sdk_job.v1","operation":"live.jig.point_probe","args":{"base":{"x":0.0,"y":0.0,"z":0.0},"point":{"x":7.0,"y":8.0,"z":0.0}}}

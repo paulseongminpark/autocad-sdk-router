@@ -1,0 +1,7 @@
+﻿{
+    "args":  {
+                 "name":  "P2_LAYOUT"
+             },
+    "operation":  "write.layout.create",
+    "schema":  "ariadne.autocad_sdk_job.v1"
+}

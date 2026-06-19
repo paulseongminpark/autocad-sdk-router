@@ -1,0 +1,137 @@
+{
+  "schema": "ariadne.autocad_official_sdk_catalog.v1",
+  "generated_at": "2026-06-17",
+  "source": {
+    "autodesk_docs": [
+      "https://help.autodesk.com/view/OARX/2027/ENU/?guid=GUID-9B4F6629-8B7D-460B-802B-6D2C25966994",
+      "https://aps.autodesk.com/developer/overview/objectarx-autocad-sdk",
+      "https://help.autodesk.com/view/OARX/2027/ENU/?guid=GUID-C3F3C736-40CF-44A0-9210-55F6A939B6F2"
+    ],
+    "local_sdk_root": "C:\\ObjectARX 2027",
+    "autocad_host": "C:\\Program Files\\Autodesk\\AutoCAD 2027"
+  },
+  "real_dwg_policy": "excluded",
+  "priority_order": [
+    "native_objectarx_objectdbx",
+    "managed_dotnet",
+    "autolisp_visual_lisp",
+    "core_console",
+    "full_autocad_com"
+  ],
+  "local_sdk_evidence": {
+    "managed_xml_member_total": 14684,
+    "native_header_count": 638,
+    "native_ac_class_or_struct_hits": 1561,
+    "sample_categories": ["com", "database", "dotNet", "editor", "entity", "graphics", "misc", "reactors"]
+  },
+  "families": [
+    {
+      "id": "runtime_commands",
+      "name": "Runtime, commands, services, and loading",
+      "native_first": true,
+      "surfaces": ["ObjectARX command registration", "ARX load/unload", "AutoLISP-callable functions", "demand load", "secure/trusted loading"]
+    },
+    {
+      "id": "objectdbx_database",
+      "name": "ObjectDBX database operations",
+      "native_first": true,
+      "surfaces": ["AcDbDatabase", "transactions", "read/write/save/saveas", "audit/recover", "ObjectId", "Handle", "side database access"]
+    },
+    {
+      "id": "symbol_tables_dictionaries",
+      "name": "Symbol tables, dictionaries, XData, and XRecords",
+      "native_first": true,
+      "surfaces": ["layers", "linetypes", "dimstyles", "textstyles", "UCSs", "views", "viewports", "RegApp", "NOD", "extension dictionaries", "XRecord", "XData"]
+    },
+    {
+      "id": "entities",
+      "name": "AutoCAD entity creation and editing",
+      "native_first": true,
+      "surfaces": ["2D curves", "3D curves", "text", "MText", "dimensions", "leaders", "hatches", "tables", "blocks", "attributes", "solids", "surfaces", "regions", "meshes", "images", "underlays", "point clouds", "sections", "fields"]
+    },
+    {
+      "id": "blocks_xrefs_clone",
+      "name": "Blocks, xrefs, cloning, and references",
+      "native_first": true,
+      "surfaces": ["dynamic blocks", "attributes", "insert", "explode", "deepClone", "wblockClone", "xref attach", "xref bind", "xref overlay", "DGN", "DWF", "PDF", "raster references"]
+    },
+    {
+      "id": "geometry_kernel",
+      "name": "AcGe geometry kernel",
+      "native_first": true,
+      "surfaces": ["curves", "surfaces", "transforms", "intersections", "coordinate systems", "tolerances"]
+    },
+    {
+      "id": "brep_solids",
+      "name": "BRep, solids, and subentities",
+      "native_first": true,
+      "surfaces": ["AcBr", "subentities", "faces", "edges", "vertices", "mass properties", "solid/surface topology"]
+    },
+    {
+      "id": "graphics_system",
+      "name": "Graphics system and draw pipeline",
+      "native_first": true,
+      "surfaces": ["AcGi", "AcGs", "worldDraw", "viewportDraw", "traits", "transient graphics", "highlighting", "grips"]
+    },
+    {
+      "id": "editor_input",
+      "name": "Editor, input, selection, and jigs",
+      "native_first": true,
+      "surfaces": ["selection sets", "prompts", "jigs", "grips", "osnap", "input filters", "input monitors", "command stack", "undo", "document locks"]
+    },
+    {
+      "id": "reactors_events",
+      "name": "Reactors and events",
+      "native_first": true,
+      "surfaces": ["database reactors", "object reactors", "entity reactors", "editor reactors", "document reactors", "command reactors", "input reactors", "xref reactors", "wblock/deepclone reactors", "sysvar reactors", "LISP reactors", "persistent reactors"]
+    },
+    {
+      "id": "custom_objects_protocols",
+      "name": "Custom entities, object enablers, protocols, and overrules",
+      "native_first": true,
+      "surfaces": ["custom entity", "custom DBObject", "object enabler", "protocol extension", "queryX", "properties overrule", "geometry overrule", "drawable overrule", "osnap overrule", "transform overrule", "subentity overrule", "visibility overrule"]
+    },
+    {
+      "id": "constraints_associativity",
+      "name": "Associativity and constraints",
+      "native_first": true,
+      "surfaces": ["AcDbAssoc", "geometric constraints", "dimensional constraints", "associative arrays", "associative surfaces", "action bodies", "dependencies", "evaluation callbacks"]
+    },
+    {
+      "id": "layouts_plot_publish",
+      "name": "Layouts, plotting, and publishing",
+      "native_first": false,
+      "surfaces": ["layouts", "paper space", "viewports", "page setups", "plot settings", "plot engine", "publish"]
+    },
+    {
+      "id": "ui_customization",
+      "name": "UI and customization",
+      "native_first": false,
+      "surfaces": ["CUI", "palettes", "ribbon", "tool palettes", "menus", "MFC UI", "managed UI wrappers"]
+    },
+    {
+      "id": "com_activex",
+      "name": "COM and ActiveX bridges",
+      "native_first": false,
+      "surfaces": ["Application", "Document", "IAcadDatabase", "Sheet Set", "CAD Standards", "Transmittal", "session-bound automation"]
+    },
+    {
+      "id": "autolisp_visual_lisp",
+      "name": "AutoLISP and Visual LISP",
+      "native_first": false,
+      "surfaces": ["command", "command-s", "vla", "vlax", "vlr", "legacy command automation"]
+    },
+    {
+      "id": "core_console",
+      "name": "AutoCAD Core Console",
+      "native_first": false,
+      "surfaces": ["headless batch", "ARX loading", ".NET loading", "AutoLISP script execution", "DB mutation with explicit save"]
+    },
+    {
+      "id": "active_document_write_original",
+      "name": "Full AutoCAD active-document write_original lane",
+      "native_first": false,
+      "surfaces": ["currently open drawing", "live edit", "UI/session-bound commands", "COM SendCommand", "active document save"]
+    }
+  ]
+}

@@ -1,0 +1,4 @@
+﻿{
+    "operation":  "inspect.block.count",
+    "schema":  "ariadne.autocad_sdk_job.v1"
+}

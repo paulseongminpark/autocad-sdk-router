@@ -1,0 +1,137 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "DWG Native Geometry Extract",
+  "type": "object",
+  "required": [
+    "schema",
+    "route",
+    "extractor",
+    "status",
+    "source",
+    "summary",
+    "entities"
+  ],
+  "properties": {
+    "schema": {
+      "const": "ariadne.dwg_geometry_extract.v1"
+    },
+    "route": {
+      "const": "dwg_truth_autocad"
+    },
+    "extractor": {
+      "type": "string"
+    },
+    "extractor_version": {
+      "type": "string"
+    },
+    "status": {
+      "enum": [
+        "ok",
+        "error"
+      ]
+    },
+    "source": {
+      "type": "object"
+    },
+    "summary": {
+      "type": "object",
+      "required": [
+        "modelspace_count",
+        "entities_by_type"
+      ],
+      "properties": {
+        "modelspace_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "entities_by_type": {
+          "type": "object"
+        },
+        "supported_geometry_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "unsupported_geometry_count": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "entities": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "handle",
+          "object_id",
+          "type",
+          "layer",
+          "geometry"
+        ],
+        "properties": {
+          "handle": {
+            "type": "string"
+          },
+          "object_id": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          },
+          "runtime_type": {
+            "type": "string"
+          },
+          "layer": {
+            "type": "string"
+          },
+          "layout": {
+            "type": "string"
+          },
+          "bbox": {
+            "type": "object"
+          },
+          "xdata": {
+            "type": "array"
+          },
+          "geometry": {
+            "type": "object",
+            "required": [
+              "kind"
+            ],
+            "properties": {
+              "kind": {
+                "enum": [
+                  "line",
+                  "polyline",
+                  "arc",
+                  "circle",
+                  "block_reference",
+                  "text",
+                  "mtext",
+                  "dimension",
+                  "hatch",
+                  "unsupported"
+                ]
+              },
+              "start": {
+                "type": "object"
+              },
+              "end": {
+                "type": "object"
+              },
+              "center": {
+                "type": "object"
+              },
+              "vertices": {
+                "type": "array"
+              },
+              "position": {
+                "type": "object"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

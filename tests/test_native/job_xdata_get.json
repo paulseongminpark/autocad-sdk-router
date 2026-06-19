@@ -1,0 +1,7 @@
+﻿{
+    "args":  {
+                 "app":  "P2_APP"
+             },
+    "operation":  "inspect.xdata.get",
+    "schema":  "ariadne.autocad_sdk_job.v1"
+}

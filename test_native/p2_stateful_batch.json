@@ -1,0 +1,56 @@
+{
+  "schema": "ariadne.autocad_sdk_job_batch.v1",
+  "execution": {
+    "mode": "sequential",
+    "parallel": false,
+    "host_bound": true,
+    "write_mode": "write_original"
+  },
+  "variables": {
+    "dwg": "test_native/native_job_batch2_working.dwg",
+    "block_name": "ARIADNE_P2_STATEFUL_BLOCK"
+  },
+  "steps": [
+    {
+      "id": "01-create-block",
+      "input_path": "${dwg}",
+      "operation": "write.block.simple_create",
+      "job": {
+        "schema": "ariadne.autocad_sdk_job.v1",
+        "operation": "write.block.simple_create",
+        "args": {
+          "name": "${block_name}"
+        }
+      }
+    },
+    {
+      "id": "02-insert-block",
+      "input_path": "${dwg}",
+      "operation": "write.block.insert",
+      "job": {
+        "schema": "ariadne.autocad_sdk_job.v1",
+        "operation": "write.block.insert",
+        "args": {
+          "name": "${block_name}",
+          "position": {
+            "x": 25.0,
+            "y": 35.0,
+            "z": 0.0
+          }
+        }
+      }
+    },
+    {
+      "id": "03-count-block",
+      "input_path": "${dwg}",
+      "operation": "inspect.block.count",
+      "job": {
+        "schema": "ariadne.autocad_sdk_job.v1",
+        "operation": "inspect.block.count",
+        "args": {
+          "name": "${block_name}"
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,51 @@
+# ── Build outputs (regenerable: tools/build_native_acad.ps1 + dotnet build) ──
+bin/
+obj/
+obj-crx/
+*.pdb
+*.ilk
+*.exp
+*.lib
+*.idb
+*.obj
+*.pch
+*.ipdb
+*.iobj
+*.tlog
+*.lastbuildstate
+*.user
+
+# ── Large, regenerable run + staging evidence ──
+runs/
+staging/
+ErrorReports/
+
+# ── Caches / generated indexes ──
+.pytest_cache/
+__pycache__/
+*.pyc
+graphify-out/
+
+# ── CAD binaries: originals must never be committed; staged copies regenerate ──
+*.dwg
+*.dxf
+*.dwt
+*.dwl
+*.dwl2
+*.bak
+*.sv$
+
+# ── Secrets (defense-in-depth; none currently present) ──
+.env
+.env.*
+*.env
+*.pem
+*.p12
+*.key
+*credential*
+*secret*
+
+# ── OS noise ──
+Thumbs.db
+desktop.ini
+.DS_Store
