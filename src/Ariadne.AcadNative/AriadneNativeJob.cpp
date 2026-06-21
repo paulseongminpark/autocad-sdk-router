@@ -600,6 +600,46 @@ static bool collectModelSpaceGraph(AcDbDatabase* pDb, int& total,
             }
             arr << "]";
         }
+        // M02: old-style 2D/3D polylines store vertices as owned sub-entities
+        // (AcDb2dVertex / AcDb3dPolylineVertex) walked via vertexIterator(), not
+        // getPointAt(). Without this branch these (1874 POLYLINE in the golden)
+        // carried no coordinate geometry. position() is OCS for 2D; emitted as-is.
+        else if (AcDb2dPolyline* p2d = AcDb2dPolyline::cast(pEnt)) {
+            arr << ",\"closed\":" << (p2d->isClosed() ? "true" : "false")
+                << ",\"vertices\":[";
+            AcDbObjectIterator* pVi = p2d->vertexIterator();
+            bool vfirst = true;
+            for (; pVi != nullptr && !pVi->done(); pVi->step()) {
+                AcDb2dVertex* pV = nullptr;
+                if (acdbOpenObject(pV, pVi->objectId(), AcDb::kForRead) == Acad::eOk) {
+                    const AcGePoint3d vp = pV->position();
+                    if (!vfirst) arr << ",";
+                    vfirst = false;
+                    arr << "[" << vp.x << "," << vp.y << "," << vp.z << "]";
+                    pV->close();
+                }
+            }
+            delete pVi;
+            arr << "]";
+        }
+        else if (AcDb3dPolyline* p3d = AcDb3dPolyline::cast(pEnt)) {
+            arr << ",\"closed\":" << (p3d->isClosed() ? "true" : "false")
+                << ",\"vertices\":[";
+            AcDbObjectIterator* pVi = p3d->vertexIterator();
+            bool vfirst = true;
+            for (; pVi != nullptr && !pVi->done(); pVi->step()) {
+                AcDb3dPolylineVertex* pV = nullptr;
+                if (acdbOpenObject(pV, pVi->objectId(), AcDb::kForRead) == Acad::eOk) {
+                    const AcGePoint3d vp = pV->position();
+                    if (!vfirst) arr << ",";
+                    vfirst = false;
+                    arr << "[" << vp.x << "," << vp.y << "," << vp.z << "]";
+                    pV->close();
+                }
+            }
+            delete pVi;
+            arr << "]";
+        }
 
         arr << "}";
         pEnt->close();
@@ -2552,6 +2592,180 @@ static void ariadneNativeJobMailbox()
 }
 
 //============================================================================
+// Live ARX named-pipe pump (CADAGENT_PUMP) — M02
+//
+// A single-threaded, MAIN-THREAD, blocking named-pipe server invoked AS an
+// AutoCAD command. Running on the document/command thread keeps AcDb access
+// safe (no worker-thread marshaling). Wire protocol: length-prefixed frames
+// (4-byte little-endian uint32 + UTF-8 JSON body) in BOTH directions. Ops:
+// live.echo / live.status / live.list_documents / live.stop. The connect and
+// every read use OVERLAPPED I/O with a timeout, so the pump is self-terminating
+// and can NEVER hang a headless accoreconsole session. The identical command
+// works attended (when the .arx is loaded into a running AutoCAD) and headless
+// (accoreconsole), which is how it is protocol-tested without touching a live
+// user session. Pipe name + timeout come from ARIADNE_PUMP_PIPE /
+// ARIADNE_PUMP_TIMEOUT (defaults: \\.\pipe\ariadne_cad_pump, 30s).
+//============================================================================
+static std::wstring pumpPipeName()
+{
+    wchar_t buf[256] = {};
+    const DWORD n = GetEnvironmentVariableW(L"ARIADNE_PUMP_PIPE", buf, 256);
+    if (n > 0 && n < 256)
+        return std::wstring(buf, n);
+    return std::wstring(L"\\\\.\\pipe\\ariadne_cad_pump");
+}
+
+static DWORD pumpTimeoutMs()
+{
+    wchar_t buf[32] = {};
+    const DWORD n = GetEnvironmentVariableW(L"ARIADNE_PUMP_TIMEOUT", buf, 32);
+    if (n > 0 && n < 32) {
+        const int v = _wtoi(buf);
+        if (v > 0)
+            return static_cast<DWORD>(v) * 1000u;
+    }
+    return 30000u;
+}
+
+static bool pumpReadExact(HANDLE pipe, char* out, DWORD len, HANDLE evt, DWORD timeoutMs)
+{
+    DWORD got = 0;
+    while (got < len) {
+        OVERLAPPED ov = {}; ov.hEvent = evt; ResetEvent(evt);
+        DWORD chunk = 0;
+        const BOOL ok = ReadFile(pipe, out + got, len - got, &chunk, &ov);
+        if (!ok) {
+            if (GetLastError() != ERROR_IO_PENDING) return false;
+            if (WaitForSingleObject(evt, timeoutMs) != WAIT_OBJECT_0) { CancelIo(pipe); return false; }
+            if (!GetOverlappedResult(pipe, &ov, &chunk, FALSE)) return false;
+        }
+        if (chunk == 0) return false;
+        got += chunk;
+    }
+    return true;
+}
+
+static bool pumpWriteAll(HANDLE pipe, const char* data, DWORD len, HANDLE evt, DWORD timeoutMs)
+{
+    DWORD sent = 0;
+    while (sent < len) {
+        OVERLAPPED ov = {}; ov.hEvent = evt; ResetEvent(evt);
+        DWORD chunk = 0;
+        const BOOL ok = WriteFile(pipe, data + sent, len - sent, &chunk, &ov);
+        if (!ok) {
+            if (GetLastError() != ERROR_IO_PENDING) return false;
+            if (WaitForSingleObject(evt, timeoutMs) != WAIT_OBJECT_0) { CancelIo(pipe); return false; }
+            if (!GetOverlappedResult(pipe, &ov, &chunk, FALSE)) return false;
+        }
+        sent += chunk;
+    }
+    return true;
+}
+
+static bool pumpWriteFrame(HANDLE pipe, const std::string& body, HANDLE evt, DWORD timeoutMs)
+{
+    const unsigned int n = static_cast<unsigned int>(body.size());
+    char hdr[4] = {
+        static_cast<char>(n & 0xFF), static_cast<char>((n >> 8) & 0xFF),
+        static_cast<char>((n >> 16) & 0xFF), static_cast<char>((n >> 24) & 0xFF)
+    };
+    if (!pumpWriteAll(pipe, hdr, 4, evt, timeoutMs)) return false;
+    return pumpWriteAll(pipe, body.data(), n, evt, timeoutMs);
+}
+
+static std::string pumpDispatch(const std::string& req, bool& stop)
+{
+    stop = false;
+    std::string op;
+    jsonFindString(req, "op", op);
+    AcDbDatabase* pDb = acdbHostApplicationServices()->workingDatabase();
+    std::ostringstream r;
+    r << "{\"schema\":\"ariadne.cad_pump_frame.v1\",\"op\":\"" << jsonEscape(op) << "\",";
+    if (op == "live.echo") {
+        std::string msg;
+        jsonFindString(req, "message", msg);
+        r << "\"status\":\"ok\",\"echo\":\"" << jsonEscape(msg) << "\"}";
+    }
+    else if (op == "live.status") {
+        int total = 0, probes = 0;
+        if (pDb) countModelSpace(pDb, total, probes);
+        r << "\"status\":\"ok\",\"pump\":\"running\",\"has_database\":"
+          << (pDb ? "true" : "false")
+          << ",\"modelspace_entities\":" << total << "}";
+    }
+    else if (op == "live.list_documents") {
+        int total = 0, probes = 0;
+        if (pDb) countModelSpace(pDb, total, probes);
+        r << "\"status\":\"ok\",\"documents\":[{\"working_database\":"
+          << (pDb ? "true" : "false")
+          << ",\"modelspace_entities\":" << total << "}]}";
+    }
+    else if (op == "live.stop") {
+        stop = true;
+        r << "\"status\":\"ok\",\"stopped\":true}";
+    }
+    else {
+        r << "\"status\":\"not_implemented\",\"reason\":\"unknown op (supported: "
+          << "live.echo/live.status/live.list_documents/live.stop)\"}";
+    }
+    return r.str();
+}
+
+static void ariadneCadAgentPump()
+{
+    const std::wstring pipeName = pumpPipeName();
+    const DWORD timeoutMs = pumpTimeoutMs();
+    HANDLE pipe = CreateNamedPipeW(
+        pipeName.c_str(),
+        PIPE_ACCESS_DUPLEX | FILE_FLAG_OVERLAPPED,
+        PIPE_TYPE_BYTE | PIPE_READMODE_BYTE | PIPE_WAIT,
+        1, 65536, 65536, 0, nullptr);
+    if (pipe == INVALID_HANDLE_VALUE) {
+        acutPrintf(_T("\nCADAGENT_PUMP: CreateNamedPipe failed (%lu)\n"), GetLastError());
+        return;
+    }
+    HANDLE evt = CreateEventW(nullptr, TRUE, FALSE, nullptr);
+    OVERLAPPED ov = {}; ov.hEvent = evt; ResetEvent(evt);
+    bool ok = false;
+    if (ConnectNamedPipe(pipe, &ov)) {
+        ok = true;
+    }
+    else {
+        const DWORD err = GetLastError();
+        if (err == ERROR_PIPE_CONNECTED) ok = true;
+        else if (err == ERROR_IO_PENDING) {
+            if (WaitForSingleObject(evt, timeoutMs) == WAIT_OBJECT_0) ok = true;
+            else CancelIo(pipe);
+        }
+    }
+    if (!ok) {
+        acutPrintf(_T("\nCADAGENT_PUMP: no client connected within timeout; exiting\n"));
+        CloseHandle(evt); CloseHandle(pipe); return;
+    }
+    acutPrintf(_T("\nCADAGENT_PUMP: client connected; serving frames\n"));
+    bool stop = false;
+    while (!stop) {
+        char hdr[4];
+        if (!pumpReadExact(pipe, hdr, 4, evt, timeoutMs)) break;
+        const unsigned int n =
+            static_cast<unsigned char>(hdr[0]) |
+            (static_cast<unsigned char>(hdr[1]) << 8) |
+            (static_cast<unsigned char>(hdr[2]) << 16) |
+            (static_cast<unsigned char>(hdr[3]) << 24);
+        if (n == 0 || n > (1u << 20)) break;
+        std::string body(n, '\0');
+        if (!pumpReadExact(pipe, &body[0], n, evt, timeoutMs)) break;
+        const std::string resp = pumpDispatch(body, stop);
+        if (!pumpWriteFrame(pipe, resp, evt, timeoutMs)) break;
+    }
+    FlushFileBuffers(pipe);
+    DisconnectNamedPipe(pipe);
+    CloseHandle(evt);
+    CloseHandle(pipe);
+    acutPrintf(_T("\nCADAGENT_PUMP: stopped\n"));
+}
+
+//============================================================================
 // Module entry point
 //============================================================================
 extern "C" AcRx::AppRetCode __declspec(dllexport)
@@ -2580,7 +2794,12 @@ acrxEntryPoint(AcRx::AppMsgCode msg, void* pkt)
                                 _T("ARIADNE_NATIVE_JOB_MAILBOX"),
                                 ACRX_CMD_MODAL,
                                 &ariadneNativeJobMailbox);
-        acutPrintf(_T("\nAriadne.AcadNative loaded. Commands: ARIADNE_NATIVE_JOB, ARIADNE_NATIVE_JOB_ARGS, ARIADNE_NATIVE_JOB_MAILBOX\n"));
+        acedRegCmds->addCommand(_T("ARIADNE_NATIVE"),
+                                _T("CADAGENT_PUMP"),
+                                _T("CADAGENT_PUMP"),
+                                ACRX_CMD_MODAL,
+                                &ariadneCadAgentPump);
+        acutPrintf(_T("\nAriadne.AcadNative loaded. Commands: ARIADNE_NATIVE_JOB, ARIADNE_NATIVE_JOB_ARGS, ARIADNE_NATIVE_JOB_MAILBOX, CADAGENT_PUMP\n"));
         break;
 
     case AcRx::kUnloadAppMsg:

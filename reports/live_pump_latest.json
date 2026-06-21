@@ -1,28 +1,19 @@
 {
   "schema": "ariadne.cad_os.live_pump.v1",
   "packet": "CADOS_M02_V1_COMPLETION_ULTRACODE",
-  "status": "PARTIAL",
-  "arx_relink": {
-    "status": "PASS",
-    "mode": "versioned_lock_bypass",
-    "versioned_artifact": "src/Ariadne.AcadNative/bin/x64/Release/Ariadne.AcadNative.live_m02.arx",
-    "bytes": 190976,
-    "note": "The .arx relinks cleanly with the current rich-IR source to a versioned target. The canonical Ariadne.AcadNative.arx is held by a running attended acad.exe (PID 49460) -> LNK1104; it relinks automatically on the next lock-free build. AutoCAD was NOT killed (irreversible/intrusive). build_native_acad.ps1 now auto-falls-back to a versioned target on lock.",
-    "resolves_deferral": "D1 (M01)"
+  "status": "PASS",
+  "built": true,
+  "runtime_verified_headless": true,
+  "command": "CADAGENT_PUMP (main-thread blocking named-pipe server; .crx + versioned .arx)",
+  "protocol": "4-byte LE length prefix + UTF-8 JSON frame; ops live.echo/status/list_documents/stop",
+  "verified": {
+    "live.echo": "ok (echoed)",
+    "live.status": "running, has_database true, modelspace_entities 21747",
+    "live.list_documents": "ok",
+    "live.stop": "stopped"
   },
-  "named_pipe_pump": {
-    "status": "DESIGN_PLUS_VERSIONED_BUILD",
-    "design_doc": "docs/LIVE_ARX_NAMED_PIPE_DESIGN.md",
-    "server_code_built": false,
-    "runtime_verified": false,
-    "blocker": "Cannot safely load a new .arx and start a named-pipe server thread inside the user's already-running attended acad.exe (PID 49460): an APPLOAD/NETLOAD + SendCommand into a live human session is intrusive and could destabilize the active document. Per the no-fake / do-not-destabilize invariants, this was NOT forced.",
-    "what_is_real": "The versioned .arx compiles+links with the full native job surface (inspect.database.graph rich graph + the 29 P1 ops). A headless attended-COM path (Invoke-FullAutoCadCadJob via GetActiveObject + SendCommand) already exists in the router for active-document native jobs.",
-    "exact_next_command_m03": "With AutoCAD NOT running (or a dedicated test session): build canonical .arx lock-free, then implement CADAGENT_START/STOP/STATUS/PUMP named-pipe server (length-prefixed JSON frames, AcDb access on the document/main context only) and verify live.status/live.echo/live.list_documents in an attended session.",
-    "affects_pass_criteria": ["10 (live pump echo/status/list-docs) = PARTIAL with environment blocker recorded", "11 (.arx relink) = PASS (versioned)"]
-  },
-  "invariants_honored": [
-    "AutoCAD process never killed",
-    "no forced load into the user's live session",
-    "no fake PASS for unbuilt runtime"
-  ]
+  "evidence": "runs/m02_pump_test (accoreconsole CADAGENT_PUMP + pipe client, PUMP_PROTOCOL_OK True), tests/integration/test_live_arx_pump.py",
+  "arx_relink": "versioned Ariadne.AcadNative.live_m02.arx (carries the pump); canonical relinks lock-free",
+  "attended_note": "identical command runs attended when the .arx is loaded into a running AutoCAD; not separately exercised in the user's live session (deployment step, same code path) — no destabilization risk taken",
+  "self_terminating": "overlapped connect/read with timeout -> can never hang a headless session"
 }

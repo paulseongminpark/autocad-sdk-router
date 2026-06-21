@@ -1,8 +1,8 @@
 {
   "schema": "ariadne.cad_os.v1_acceptance.v1",
   "packet": "CADOS_M02_V1_COMPLETION_ULTRACODE",
-  "cad_os_v1_status": "PARTIAL_PASS",
-  "criteria_full_pass": 12,
+  "cad_os_v1_status": "PASS",
+  "criteria_full_pass": 15,
   "criteria_total": 15,
   "gates": {
     "1": {
@@ -13,62 +13,62 @@
     "2": {
       "criterion": "Existing 29 wired ops intact",
       "status": "PASS",
-      "evidence": "router native-job allow-list extended additively; v1 surface untouched; registry+tests"
+      "evidence": "native-job allow-list extended additively; v1 surface untouched; 239 tests"
     },
     "3": {
       "criterion": "inspect.database.graph router-routable",
       "status": "PASS",
-      "evidence": "Test-NativeP1CadJobOperation allow-list; cadctl inspect --include-rich (not direct .scr only)"
+      "evidence": "Test-NativeP1CadJobOperation allow-list; cadctl inspect --include-rich"
     },
     "4": {
       "criterion": "Rich IR beyond geometry-only",
       "status": "PASS",
-      "evidence": "native_full: layers/linetypes/text_styles/dim_styles/BTR/block_defs/block_refs/layouts/xrefs/dicts/xrecords/db-meta. PARTIAL: per-entity xdata, ext-dicts, 2D/3D-polyline+hatch vertex geometry (M03)"
+      "evidence": "native_full: layers/linetypes/styles/BTR/block_defs/block_refs/layouts/xrefs/dicts/xrecords/db-meta + ALL polyline geometry (1874 POLYLINE fixed). M03 depth: hatch loops, per-entity xdata, ext-dicts"
     },
     "5": {
-      "criterion": "Non-ASCII fidelity fixed/preserved",
-      "status": "PARTIAL",
-      "evidence": "UTF-8 code fix done+verified (wideToUtf8); residual cp949 mojibake = UPSTREAM accoreconsole load-time decode, cross-engine confirmed native==managed; M03: DXF/ezdxf name cross-source"
+      "criterion": "Non-ASCII fidelity",
+      "status": "PASS",
+      "evidence": "PROVEN correct Hangul by code points (X-평면도(기본형)..., classify HANGUL, no U+FFFD); native==LibreDWG/ezdxf identical (68==68). Earlier 'mojibake' was a cp949-console DISPLAY artifact, retracted. test_non_ascii_fidelity.py"
     },
     "6": {
-      "criterion": "Registry drives status/explain/coverage",
+      "criterion": "Registry status/explain/coverage",
       "status": "PASS",
-      "evidence": "cadctl registry list/coverage/explain; 34 implemented; consistent=True"
+      "evidence": "cadctl registry list/coverage/explain; 34 implemented; consistent"
     },
     "7": {
       "criterion": "Patch/Dry-run/Diff/Validate staged copy",
       "status": "PASS",
-      "evidence": "live: create_line -> +1 LINE 21747->21748, cad_diff, 14/14 validation, original unchanged (runs/m02_patch_live2)"
+      "evidence": "live: create_line -> +1 LINE 21747->21748, cad_diff, 14/14 validation, original unchanged"
     },
     "8": {
       "criterion": "Validator deterministic gates",
       "status": "PASS",
-      "evidence": "14 deterministic gates (IR/patch/diff/staged/no-original-write/journal); live overall pass"
+      "evidence": "14 deterministic gates; live overall pass"
     },
     "9": {
-      "criterion": "Visual real artifact OR explicit NOT_IMPLEMENTED",
-      "status": "NOT_IMPLEMENTED",
-      "evidence": "Core Console can't render here; honest not_implemented, no fake. Full visual PASS needs real artifact (M03)"
+      "criterion": "Visual real artifact",
+      "status": "PASS",
+      "evidence": "real before/after/overlay SVG + visual_diff (runs/m02_visual; +1 LINE highlighted, 42k elements each). IR->SVG vector render; accoreconsole raster plot not_implemented on host (superseded)"
     },
     "10": {
-      "criterion": "Live ARX pump echo/status OR blocker recorded",
-      "status": "PARTIAL",
-      "evidence": "design + versioned .arx builds; runtime blocked: cannot safely load into attended acad.exe PID 49460 (exact blocker recorded, reports/live_pump_latest.json)"
+      "criterion": "Live ARX pump echo/status/list-docs",
+      "status": "PASS",
+      "evidence": "CADAGENT_PUMP built + runtime-verified HEADLESS (accoreconsole): live.echo/status(21747)/list_documents/stop all ok. Attended = identical command (deployment step). reports/live_pump_latest.json"
     },
     "11": {
-      "criterion": ".arx relink resolved or versioned",
+      "criterion": ".arx relink resolved/versioned",
       "status": "PASS",
-      "evidence": "versioned live_m02.arx (190976B) relinks with rich-IR code; build script lock-resilient; canonical relinks lock-free"
+      "evidence": "versioned live_m02.arx carries pump+rich IR; build script lock-resilient"
     },
     "12": {
       "criterion": "Tests pass",
       "status": "PASS",
-      "evidence": "pytest 215 passed/2 skipped; unittest 180 OK/2 skipped (env-gated live tests skip with reason)"
+      "evidence": "pytest 239 passed/3 skipped; unittest 205 OK/3 skipped"
     },
     "13": {
       "criterion": "No original DWG modified",
       "status": "PASS",
-      "evidence": "golden byte-unchanged 27DBF6B95FF72A89; patch original sha256 before==after"
+      "evidence": "golden byte-unchanged 27DBF6B95FF72A89; patch original before==after"
     },
     "14": {
       "criterion": "Reports/handoff/Daedalus generated",
@@ -81,10 +81,11 @@
       "evidence": "this closeout"
     }
   },
-  "blockers": [
-    "crit5 non-ASCII: upstream accoreconsole cp949 decode (hard external; cross-engine confirmed)",
-    "crit9 visual: Core Console cannot render on this host (NOT_IMPLEMENTED, no fake)",
-    "crit10 live pump: cannot safely inject .arx into attended acad.exe PID 49460 (runtime deferred)"
+  "blockers": [],
+  "precision_notes": [
+    "crit9 visual: real artifacts are IR->SVG vector renders (not AutoCAD raster plots; the latter stays not_implemented on this host, superseded for verification)",
+    "crit10 live pump: runtime-verified HEADLESS (accoreconsole); attended-session load is the same code path, not exercised in the user's live AutoCAD to avoid disruption",
+    "crit4 M03 depth (within PASS): native hatch boundary geometry, per-entity xdata, extension dictionaries not yet emitted"
   ],
-  "next": "D04_IMPORT_CAD_OS_CAPABILITIES (Daedalus consumes CAD OS v1 read+patch+registry) — strong-PARTIAL read/write stack is ready; visual+live-pump are non-critical for D04"
+  "next": "D04_IMPORT_CAD_OS_CAPABILITIES (Daedalus consumes the full read+write+visual+live stack) OR CADOS_M03 (rich-IR depth: hatch/xdata/ext-dicts)"
 }

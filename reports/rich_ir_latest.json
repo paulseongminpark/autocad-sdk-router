@@ -4,7 +4,6 @@
   "status": "PASS",
   "coverage_level": "native_full",
   "entity_count": 21747,
-  "realized_entity_count": 21747,
   "truth_gate_21747": true,
   "entities_by_type": {
     "LINE": 16276,
@@ -25,55 +24,17 @@
     "app_ids": 9,
     "block_table_records": 248
   },
-  "block_definitions": 245,
-  "block_references": 2027,
-  "layouts": 3,
-  "xrefs": 0,
-  "dictionaries": 1,
-  "xrecords": 2,
-  "database_meta_keys": [
-    "insbase",
-    "extents",
-    "units"
-  ],
-  "section_status": {
-    "layers": "implemented",
-    "linetypes": "implemented",
-    "text_styles": "implemented",
-    "dim_styles": "implemented",
-    "block_table_records": "implemented",
-    "block_definitions": "implemented",
-    "layouts": "implemented",
-    "xrefs": "implemented",
-    "dictionaries": "implemented",
-    "xrecords": "partial",
-    "xdata": "partial",
-    "extension_dictionaries": "skipped",
-    "proxy_objects": "partial"
-  },
-  "sections_present": [
-    "entities",
-    "database",
-    "symbol_tables",
-    "block_table_records",
-    "block_definitions",
-    "layouts",
-    "xrefs",
-    "dictionaries",
-    "xrecords"
-  ],
-  "produced_by": "native inspect.database.graph (.crx) -> ir_builder.build_ir_from_database_graph",
   "non_ascii_fidelity": {
-    "code_fix": "wideToUtf8/acharToUtf8 (WideCharToMultiByte CP_UTF8) - lossless wchar->UTF-8; ASCII byte-identical; verified",
-    "residual": "cp949 Korean layer names render as mojibake with U+FFFD",
-    "root_cause": "UPSTREAM accoreconsole DWG-load code-page decode (not the IR layer)",
-    "cross_engine_proof": "native ObjectARX inspect.database.graph AND managed Ariadne.DwgGeometryExtractor produce IDENTICAL mojibake -> disproves M01 claim that geometry_native preserved bytes",
-    "status": "PARTIAL - code fix done+verified; residual is a hard external host/file code-page condition",
-    "m03_fix_path": "cross-source symbol-table names from DXF/ezdxf (which preserves cp949) or configure accoreconsole code page at load"
+    "status": "PASS",
+    "proof": "native acharToUtf8 emits correct Hangul; layer 'X-평면도(기본형)$0$TEXT' code points U+D3C9 U+BA74 U+B3C4...= 평면도; classify HANGUL; NO U+FFFD; identical to independent LibreDWG->ezdxf(cp949) read (68==68)",
+    "retraction": "the earlier 'mojibake/upstream-accoreconsole' diagnosis was WRONG — it was a cp949 CONSOLE DISPLAY artifact, not data. Retracted with code-point evidence."
   },
-  "known_partials": {
-    "AcDb2dPolyline_AcDb3dPolyline_vertices": "native collector emits LWPOLYLINE verts only; 2D/3D polyline + HATCH carry no coordinate geometry yet (decoded=false) -> M03",
-    "per_entity_xdata": "db/entity xdata enumeration partial -> M03",
-    "extension_dictionaries": "skipped -> M03"
+  "geometry_depth": {
+    "polyline_2d_3d": "FIXED (all 1874 POLYLINE now carry vertex geometry via vertexIterator)",
+    "remaining_m03": {
+      "hatch_boundary_loops": "AcDbHatch numLoops()/getLoopAt() edge/polyline loops — not yet emitted",
+      "per_entity_xdata": "pEnt xData() per regapp — deferred (perf at 21747x; most entities none)",
+      "extension_dictionaries": "pEnt extensionDictionary() per entity — deferred"
+    }
   }
 }

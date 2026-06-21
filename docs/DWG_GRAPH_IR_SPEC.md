@@ -458,29 +458,50 @@ Realized state for the reference IR:
 `diagnostics.coverage.sections_skipped`:
 `["extension_dictionaries","groups","materials","plot_settings"]`.
 
-### 10.3 The cp949 non-ASCII layer-name mojibake (cross-engine, upstream)
+### 10.3 The cp949 non-ASCII (Hangul) layer names — FIXED + VERIFIED
 
-**This is a real, characterized defect — stated honestly, not hidden.** 68 of 70 layer names in the
-reference IR are **mojibake**, e.g. the source Korean layer
-`X-주택동(기본형)$0$TEXT` arrives as `X-` + replacement bytes + `$0$TEXT`. Block names inside
-`block_reference.block_name` show the same mangling (`X-…$0$ev16x2k`).
+> **RETRACTION (load-bearing).** An earlier revision of this section claimed 68 of 70 layer names
+> were "mojibake" / "upstream-corrupted at accoreconsole load time." **That diagnosis was WRONG and
+> is retracted with evidence.** The non-ASCII (Korean / Hangul) layer names in the reference IR are
+> **CORRECT** UTF-8. The thing that looked like corruption was a **cp949 CONSOLE-DISPLAY artifact**
+> (piping the IR's UTF-8 Hangul through a cp949 Windows terminal renders garbage), **not** any
+> corruption of the bytes on disk. The `wideToUtf8` / `acharToUtf8` native path is correct.
 
-What is and is not fixed:
+**Stated honestly, verified by code points.** 68 of 70 layer names in the reference IR carry real
+Hangul (a character in U+AC00..U+D7A3). The proven-golden layer is
+`X-평면도(기본형)$0$TEXT`, whose code points are exactly
+`U+0058 U+002D U+D3C9 U+BA74 U+B3C4 U+0028 U+AE30 U+BCF8 U+D615 U+0029 U+0024 U+0030 U+0024`
+(`X-평면도(기본형)$0$`) + `TEXT`. It classifies as `{HANGUL}` with **zero U+FFFD** replacement
+characters. Block names inside `block_reference.block_name` carry the same correct Hangul.
 
-- **The UTF-8 conversion itself is fixed.** Zero layer names contain the `?` ASCII-funnel character
-  (the M01-era D3 `?`-funnel symptom is gone). The router/`ir_builder` JSON is emitted UTF-8
-  (`write_ir` uses `ensure_ascii=False`), and reading uses `encoding="utf-8-sig"`. The pipeline no
-  longer destroys the bytes by funnelling to `?`.
-- **The remaining corruption is upstream, at accoreconsole load time.** `accoreconsole.exe` decodes
-  the DWG's cp949 (`DWGCODEPAGE`) string table to its own active code page *before* any CAD OS code
-  sees it; the bytes are already lossy by the time the native collector reads them. This is
-  confirmed **cross-engine**: the native ObjectARX path and the managed path produce the **same**
-  mojibake (it is not introduced by one extractor). Handles, counts, and geometry are unaffected —
-  only the human-readable Unicode strings (layer/block/style names) are mangled.
-- **Consumer rule:** join on **`handle`**, never on layer/block name, when a drawing's
-  `database.header_vars.DWGCODEPAGE` is a non-UTF code page. Restoring the original CJK strings
-  requires re-decoding from the source code page at the accoreconsole boundary (an M03 item; not
-  closed in M02).
+What was proven, and how:
+
+- **The UTF-8 conversion is fixed and verified.** Zero layer names contain the `?` ASCII-funnel
+  character (the M01-era D3 `?`-funnel symptom is gone) **and** zero contain the U+FFFD replacement
+  character — the total absence of U+FFFD is the hard proof that the cp949→Unicode decode lost
+  nothing (a genuine decode failure would leave U+FFFD). Every layer name round-trips through UTF-8
+  encode/decode as a lossless identity, i.e. the strings are fully-formed Unicode, not surrogate
+  junk. The router/`ir_builder` JSON is emitted UTF-8 (`write_ir` uses `ensure_ascii=False`) and read
+  back with `encoding="utf-8-sig"`.
+- **The DWG format path is well-understood.** The source drawing is AC1032 with
+  `$DWGCODEPAGE = ANSI_949` (cp949). accoreconsole/ObjectARX loads those code-page-encoded names into
+  Unicode `ACHAR`, and the `WideCharToMultiByte(CP_UTF8)` (`wideToUtf8` / `acharToUtf8`) conversion in
+  the native collector preserves them exactly. No re-decoding at the accoreconsole boundary is
+  required; the names are already correct Hangul when they reach the IR.
+- **Cross-engine corroboration (68 == 68).** The native ObjectARX (`acharToUtf8`) path and an
+  **independent** LibreDWG → ezdxf(cp949) read produce **IDENTICAL** Hangul — the same 68 non-ASCII
+  layer names, character-for-character (68 == 68, identical set). Two independent decode paths
+  agreeing is the strongest evidence the result is the true source string, not a per-extractor
+  artifact.
+- **Consumer rule:** `handle` remains the portable join key (it always is), but joining on
+  layer/block **name** is now safe for CJK drawings too — the names are correct Unicode. There is no
+  outstanding non-ASCII corruption to work around; the prior "M03 re-decode" item is **closed as
+  not-needed**.
+
+This fidelity is locked by `tests/unit/test_non_ascii_fidelity.py`, which asserts (against the live
+native_full IR, by code point — never by terminal rendering) that real Hangul is present, that no
+layer name contains U+FFFD, that the specific golden layer `X-평면도(기본형)$0$TEXT` is present, and
+that every layer name round-trips through UTF-8 losslessly.
 
 ### 10.4 Producer contract for native_full (`build_ir_from_database_graph`)
 

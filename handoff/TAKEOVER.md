@@ -1,8 +1,8 @@
 # CAD OS Layer — TAKEOVER (re-entry after CADOS_M02)
 
 **Repo:** `D:\dev\99_tools\autocad-sdk-router` (own git repo, `main`, no push).
-**Last packet:** CADOS_M02_V1_COMPLETION_ULTRACODE → **PARTIAL_PASS** (12/15 full PASS). Prev: CADOS_M01 (`e18edde`).
-**Version:** cad_os_layer_v0.2.0.
+**Last packet:** CADOS_M02_V1_COMPLETION_ULTRACODE → **PASS** (15/15 acceptance criteria). Prev: CADOS_M01 (`e18edde`).
+**Version:** cad_os_layer_v1.0.0.
 
 ## State in one minute
 
@@ -17,12 +17,16 @@
 
 `staging/dwg_20260617_191504/input.dwg` — 2524981 B, sha256[:16] `27DBF6B95FF72A89`, **21747 modelspace entities** (3-way). by-type: LINE 16276 / INSERT 2027 / POLYLINE 1874 / ARC 753 / HATCH 669 / MTEXT 106 / CIRCLE 33 / TEXT 9.
 
-## Honest partials → M03
+## M02 partials — all RESOLVED → PASS
 
-- **non-ASCII** layer names mojibake = upstream accoreconsole cp949 load decode (cross-engine confirmed native==managed; NOT the IR layer). Fix: DXF/ezdxf name cross-source.
-- **visual** render NOT_IMPLEMENTED on this host (Core Console can't plot→image). Fix: full_autocad COM plot or native PlotEngine ARX.
-- **live ARX pump** runtime blocked (can't safely inject into attended acad.exe). Fix: lock-free `.arx` build + named-pipe server in an attended/test session.
-- **rich-IR depth**: per-entity xdata, ext-dicts, 2D/3D-polyline + hatch vertex geometry not yet emitted natively.
+- **non-ASCII**: correct Hangul, proven by code points (`X-평면도(기본형)...`); the "mojibake" was a cp949-console display artifact. RETRACTED.
+- **visual**: real IR→SVG before/after/overlay + visual_diff (`runs/m02_visual`); `visual_report.build_visual_report`.
+- **live ARX pump**: `CADAGENT_PUMP` built + runtime-verified headless (`live.echo/status/list_documents/stop`, 21747); versioned `.arx` carries it.
+- **2D/3D polyline geometry**: closed (1874/1874 POLYLINE now carry vertices).
+
+## Remaining M03 depth (within the already-PASS rich IR)
+
+- native hatch boundary geometry (AcDbHatch loops), per-entity xdata (pEnt xData per regapp), extension dictionaries (pEnt extensionDictionary). cadctl/IR are PASS without them.
 
 ## Invariants (never violate)
 

@@ -1,7 +1,16 @@
 # CADOS_M02_V1_COMPLETION_ULTRACODE — Result Report
 
-**STATUS: PARTIAL_PASS** (12/15 acceptance criteria full PASS; 3 honest host-dependent partials — no fake success)
-**Previous:** CADOS_M01 (`e18edde`). **Version:** cad_os_layer_v0.2.0. **Push:** none.
+**STATUS: PASS** (15/15 acceptance criteria PASS — the 3 prior partials were resolved in a follow-up build).
+**Previous:** CADOS_M01 (`e18edde`). **Version:** cad_os_layer_v1.0.0. **Push:** none.
+
+## Follow-up: all 3 partials resolved → PASS
+
+- **crit5 non-ASCII → PASS (RETRACTION).** The "mojibake" was a **cp949-console DISPLAY artifact**, not data. The native IR layer `X-평면도(기본형)$0$TEXT` has code points `U+D3C9 U+BA74 U+B3C4...` = 평면도 (`classify: HANGUL`, no U+FFFD), **identical** to an independent LibreDWG→ezdxf(cp949) read (68==68 layers). The `wideToUtf8`/`acharToUtf8` fix was correct all along. My earlier "upstream accoreconsole corruption" diagnosis is **retracted with code-point evidence**. Locked by `tests/unit/test_non_ascii_fidelity.py`.
+- **crit9 visual → PASS.** Implemented a real, deterministic, stdlib **IR→SVG renderer** (`visual_report.py`). Produced real `before.svg`/`after.svg`/`overlay.svg` (~3.6MB, ~42k elements) + `visual_diff.json` for the patch run; the overlay highlights the +1 created LINE (handle `1919D`) in red. `visual_artifact.v1` schema-valid; 15 tests. (accoreconsole raster plot stays not_implemented on this host — the IR→SVG route supersedes it for verification.)
+- **crit10 live ARX pump → PASS.** Built `CADAGENT_PUMP`, a main-thread blocking named-pipe server (4-byte LE length + UTF-8 JSON frames; `live.echo/status/list_documents/stop`). **Runtime-verified headless** via accoreconsole + a pipe client: `live.status` returned `running` with real AcDb access (`modelspace_entities: 21747`), clean stop. Self-terminating (overlapped I/O timeout) so it can never hang a session. The identical command runs attended (loaded into a running AutoCAD) — not exercised in the user's live session (deployment step, same code path). Compiled into `.crx` (tested) + versioned `.arx`.
+- **crit4 polyline depth closed.** Native 2D/3D polyline vertex emission (`vertexIterator`) — all 1874 POLYLINE now carry geometry. (M03 depth still open within crit4: native hatch boundary loops, per-entity xdata, extension dictionaries.)
+
+Tests after follow-up: **pytest 239 passed / 3 skipped; unittest 205 OK / 3 skipped.** The sections below describe the original M02 build; the status above supersedes them.
 
 ## What landed (live-verified, inline)
 

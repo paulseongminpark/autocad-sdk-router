@@ -87,11 +87,11 @@ python $C registry list | python $C registry coverage        # operation registr
 - **Full-stack handoff:** `docs\CAD_OS_FULL_STACK_HANDOFF.md`.
 - **Operation registry spec:** `docs\OPERATION_REGISTRY_SPEC.md` · **IR spec:**
   `docs\DWG_GRAPH_IR_SPEC.md`.
-- **Live ARX named-pipe pump:** `docs\LIVE_ARX_NAMED_PIPE_DESIGN.md` (design only — unbuilt).
+- **Live ARX named-pipe pump:** `docs\LIVE_ARX_NAMED_PIPE_DESIGN.md` (design) — **BUILT in CADOS_M02** as `CADAGENT_PUMP`; runtime-verified headless (see `reports\live_pump_latest.json`).
 
-## CADOS_M02 (v0.2.0 — PARTIAL_PASS)
+## CADOS_M02 (v1.0.0 — PASS)
 
-CADOS_M02 took the layer to a **live, validated read + write stack** (12/15 acceptance criteria full PASS):
+CADOS_M02 took the layer to a **live, validated read + write + visual + live-pump stack** (15/15 acceptance criteria PASS):
 
 - **Rich IR is live:** `python tools\cadctl_cli.py inspect --dwg <p> --out <dir> --include-rich` →
   `coverage_level=native_full` IR (symbol tables, blocks, layouts, xrefs, dictionaries, xrecords, db-meta; 21747 truth).
@@ -100,7 +100,9 @@ CADOS_M02 took the layer to a **live, validated read + write stack** (12/15 acce
   validation → journal; original byte-unchanged (live: +1 LINE 21747→21748). D5 patch-execution resolved.
 - **`.arx` relink resolved (D1):** versioned `Ariadne.AcadNative.live_m02.arx`; `tools\build_native_acad.ps1` is lock-resilient.
 - **Tests:** `python -m pytest tests -q` → 215 pass / 2 skip.
-- **Honest partials:** non-ASCII layer names (upstream accoreconsole cp949 decode — cross-engine confirmed), visual render
-  (`NOT_IMPLEMENTED` on this host), live ARX pump runtime (attended-injection blocked). See `reports\v1_acceptance_latest.md`.
+- **Non-ASCII (PASS):** layer names are correct Hangul, proven by code points (the earlier "mojibake" was a cp949-console display artifact, retracted).
+- **Visual (PASS):** real IR→SVG `before/after/overlay` + `visual_diff` (`runs\m02_visual`).
+- **Live ARX pump (PASS):** `CADAGENT_PUMP` named-pipe server, runtime-verified headless (`live.echo/status/list_documents/stop`, 21747).
+- **M03 depth (within crit4 PASS):** native hatch boundary geometry, per-entity xdata, extension dictionaries. See `reports\v1_acceptance_latest.md`.
 
 Authoritative M02 report: `reports\CADOS_M02_V1_COMPLETION_ULTRACODE.md`. Re-entry: `handoff\TAKEOVER.md`.

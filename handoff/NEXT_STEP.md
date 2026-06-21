@@ -1,13 +1,16 @@
-# NEXT_STEP — after CADOS_M02 (PARTIAL_PASS)
+# NEXT_STEP — after CADOS_M02 (PASS)
 
-CADOS_M02 closed **PARTIAL_PASS** (12/15 full PASS). The CAD OS Layer now has a
-**live, validated read + write stack**: native rich `inspect.database.graph` →
-`native_full` IR (21747 truth) routable via `cadctl inspect --include-rich`; a
-real staged-copy patch lifecycle (create_line → +1 LINE → cad_diff → 14/14
-validator gates → journal, original byte-unchanged); Operation Registry v2 (43
-ops, 34 implemented, consistent); 215 tests green. Honest partials: non-ASCII
-(upstream accoreconsole), visual render (NOT_IMPLEMENTED on this host), live ARX
-pump runtime (attended-injection blocked).
+CADOS_M02 closed **PASS** (15/15 acceptance criteria, cad_os_layer_v1.0.0). The
+CAD OS Layer now has a **live, validated read + write + visual + live-pump
+stack**: native rich `inspect.database.graph` → `native_full` IR (21747 truth,
+incl. all polyline geometry) via `cadctl inspect --include-rich`; a real
+staged-copy patch lifecycle (create_line → +1 LINE → cad_diff → 14/14 validator
+gates → journal, original byte-unchanged); Operation Registry v2 (43 ops, 34
+implemented); real IR→SVG visual artifacts; the `CADAGENT_PUMP` live ARX
+named-pipe server (runtime-verified headless); 239 tests green. The 3 prior
+partials are resolved (non-ASCII was a console-display artifact — data is correct
+Hangul; visual + live pump are real). Remaining M03 depth (within the already-PASS
+rich IR): native hatch boundary geometry, per-entity xdata, extension dictionaries.
 
 ## Decision
 
