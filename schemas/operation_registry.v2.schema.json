@@ -89,8 +89,8 @@
         },
         "status": {
           "type": "string",
-          "description": "Reality of this op. implemented = has a live, test-asserted handler (the 6 exact ops + any wired op whose C++/C# handler name is pinned by an existing test). wired = present in the v1 schema enum with a live router/dispatcher path. stub = handler declared but empty (none today). catalogued = known from the catalog but no router path yet (default for catalog-only). deprecated = retired (reserved; none today). blocked = cannot run because a required host/tier is not available. not_implemented = addressable but no handler exists. Per no-fake-success, anything not actually runnable MUST be one of catalogued|stub|blocked|not_implemented|deprecated, never implemented/wired.",
-          "enum": ["implemented", "wired", "stub", "catalogued", "deprecated", "blocked", "not_implemented"]
+          "description": "Reality of this op. implemented = has a live, test-asserted handler. wired = route exists but coverage is incomplete. stub = intentionally returns NOT_IMPLEMENTED. catalogued = known from the catalog but no router path yet. deprecated = explicitly not used. blocked = cannot run because a required host/tier/license/environment is unavailable. Per no-fake-success, anything not actually runnable MUST be catalogued|stub|blocked|deprecated, never implemented/wired.",
+          "enum": ["implemented", "wired", "stub", "catalogued", "deprecated", "blocked"]
         },
         "blocked_reason": {
           "type": "string",

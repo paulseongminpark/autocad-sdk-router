@@ -1,38 +1,24 @@
 {
   "schema": "ariadne.cad_os.operation_coverage.v1",
-  "packet": "CADOS_M02_V1_COMPLETION_ULTRACODE",
-  "operation_count": 43,
+  "packet": "CADOS_M04_OPERATION_REGISTRY_AND_TOOL_SURFACE",
+  "operation_count": 517,
   "by_status": {
+    "blocked": 2,
+    "catalogued": 474,
     "implemented": 34,
-    "stub": 7,
-    "blocked": 2
+    "stub": 7
   },
-  "by_family": {
-    "objectdbx_database": 1,
-    "symbol_tables_dictionaries": 3,
-    "geometry_kernel": 2,
-    "inspect": 16,
-    "write": 4,
-    "live": 7,
-    "extend": 2,
-    "query": 1,
-    "render": 1,
-    "apply": 1,
-    "validate": 2,
-    "patch": 2,
-    "diff": 1
-  },
+  "implemented": 34,
+  "wired": 0,
+  "stub": 7,
+  "catalogued": 474,
+  "blocked": 2,
+  "deprecated": 0,
+  "unknown": 0,
   "catalog_total_ops": 480,
-  "consistent": true,
-  "marquee_implemented": [
-    "inspect.database.graph",
-    "inspect.database.summary",
-    "query.entities",
-    "validate.ir",
-    "patch.dry_run",
-    "patch.apply_staged",
-    "write.entity.line",
-    "write.entity.circle",
-    "write.layer.create"
-  ]
+  "catalog_classified_ops": 480,
+  "catalog_unclassified_ops": 0,
+  "existing_29_ops_mapped": true,
+  "inspect_database_graph_status": "implemented",
+  "consistent": true
 }

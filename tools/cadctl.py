@@ -139,6 +139,28 @@ class Cad:
             ],
             "note": "read-only snapshot of the router-published status; not a live probe.",
         }
+        reg = self.registry_coverage()
+        if reg.get("status") == "ok":
+            by_status = reg.get("computed_by_status") or {}
+            out["registry"] = {
+                "schema": reg.get("registry_schema"),
+                "version": reg.get("registry_version"),
+                "operation_count": reg.get("operation_count"),
+                "implemented": by_status.get("implemented", 0),
+                "wired": by_status.get("wired", 0),
+                "stub": by_status.get("stub", 0),
+                "catalogued": by_status.get("catalogued", 0),
+                "blocked": by_status.get("blocked", 0),
+                "deprecated": by_status.get("deprecated", 0),
+                "unknown": reg.get("unknown_count", 0),
+                "consistent": reg.get("consistent"),
+            }
+        else:
+            out["registry"] = {
+                "status": reg.get("status"),
+                "reason": reg.get("reason"),
+                "unknown": None,
+            }
         return out
 
     # ----------------------------------------------------------------- inspect
@@ -490,6 +512,29 @@ class Cad:
             "row_count": len(result.get("rows", [])),
         }
 
+    def get_entity(self, ir_path: str, handle: str) -> dict:
+        """Fetch one entity by handle using the same read-only SQL shell."""
+        safe_handle = str(handle).replace("'", "''")
+        q = self.query(ir_path, "SELECT * FROM entities WHERE handle = '%s'" % safe_handle)
+        if q.get("status") != "ok":
+            return {
+                "schema": "ariadne.cadctl.get_entity.v1",
+                "status": q.get("status", "error"),
+                "handle": handle,
+                "reason": q.get("reason") or q.get("error"),
+                "delegate": "cadctl.query",
+            }
+        return {
+            "schema": "ariadne.cadctl.get_entity.v1",
+            "status": "ok",
+            "handle": handle,
+            "db_path": q.get("db_path"),
+            "columns": q.get("columns", []),
+            "rows": q.get("rows", []),
+            "row_count": q.get("row_count", 0),
+            "delegate": "cadctl.query",
+        }
+
     # ---------------------------------------------------------------- validate
     def validate(self, ir_path: str) -> dict:
         """Validate an IR/run via the deterministic gates in validator (Lane E).
@@ -574,6 +619,7 @@ class Cad:
             by_family[o.get("family")] = by_family.get(o.get("family"), 0) + 1
             by_tier[o.get("engine_tier")] = by_tier.get(o.get("engine_tier"), 0) + 1
         wired = by_status.get("implemented", 0)
+        unknown_count = sum(v for k, v in by_status.items() if k in (None, "", "unknown"))
         return {
             "schema": "ariadne.cadctl.registry_coverage.v1",
             "status": "ok",
@@ -586,6 +632,7 @@ class Cad:
             "computed_by_status": by_status,
             "computed_by_family": by_family,
             "computed_by_engine_tier": by_tier,
+            "unknown_count": unknown_count,
             "consistent": (
                 reg.get("totals", {}).get("by_status", {}).get("implemented") == wired
             ),
@@ -614,7 +661,101 @@ class Cad:
             "schema": "ariadne.cadctl.registry_explain.v1",
             "status": "ok",
             "operation": op_id,
+            "registry_operation_status": rec.get("status"),
             "record": rec,
+        }
+
+    def _registry_operation_status(self, op_id: str | None) -> str | None:
+        if not op_id:
+            return None
+        try:
+            reg = _load_json_bom(OPERATIONS_V2)
+        except Exception:
+            return None
+        for rec in reg.get("operations", []) or []:
+            if rec.get("id") == op_id or rec.get("operation") == op_id:
+                return rec.get("status")
+        return None
+
+    # ------------------------------------------------------------- shell tools
+    def patch_dry_run(self, patch: dict) -> dict:
+        patch_engine, imp_err = _import_optional("patch_engine")
+        if patch_engine is None or not hasattr(patch_engine, "dry_run_plan"):
+            return {
+                "schema": "ariadne.cadctl.patch_dry_run.v1",
+                "status": "not_implemented",
+                "reason": f"patch_engine.dry_run_plan unavailable: {imp_err}",
+            }
+        try:
+            return patch_engine.dry_run_plan(patch)
+        except Exception as exc:
+            return {
+                "schema": "ariadne.cadctl.patch_dry_run.v1",
+                "status": "error",
+                "reason": f"patch_engine.dry_run_plan failed: {type(exc).__name__}: {exc}",
+            }
+
+    def diff_before_after(self, pre_ir_path: str, post_ir_path: str) -> dict:
+        pre = Path(pre_ir_path)
+        post = Path(post_ir_path)
+        if not pre.exists() or not post.exists():
+            return {
+                "schema": "ariadne.cad_diff.v1",
+                "status": "blocked",
+                "reason": "pre_ir or post_ir file not found",
+                "pre_ir": str(pre_ir_path),
+                "post_ir": str(post_ir_path),
+            }
+        cad_diff, imp_err = _import_optional("cad_diff")
+        if cad_diff is None or not hasattr(cad_diff, "compute_diff"):
+            return {
+                "schema": "ariadne.cad_diff.v1",
+                "status": "not_implemented",
+                "reason": f"cad_diff.compute_diff unavailable: {imp_err}",
+            }
+        try:
+            pre_doc = _load_json_bom(pre)
+            post_doc = _load_json_bom(post)
+            return cad_diff.compute_diff(pre_doc, post_doc)
+        except Exception as exc:
+            return {
+                "schema": "ariadne.cad_diff.v1",
+                "status": "error",
+                "reason": f"cad_diff.compute_diff failed: {type(exc).__name__}: {exc}",
+            }
+
+    def visual_report(self, source_ref: str, kind: str = "png",
+                      artifact_id: str | None = None, out_dir: str | None = None,
+                      route: str | None = None) -> dict:
+        visual_report, imp_err = _import_optional("visual_report")
+        if visual_report is None or not hasattr(visual_report, "build_visual_report"):
+            return {
+                "schema": "ariadne.visual_artifact.v1",
+                "status": "not_implemented",
+                "reason": f"visual_report.build_visual_report unavailable: {imp_err}",
+            }
+        try:
+            result = visual_report.build_visual_report(
+                source_ref, kind=kind, artifact_id=artifact_id,
+                out_dir=out_dir, route=route)
+            if result.get("status") == "error" and not Path(source_ref).exists():
+                result = dict(result)
+                result["status"] = "blocked"
+                result["reason"] = "source_ref not found"
+            return result
+        except Exception as exc:
+            return {
+                "schema": "ariadne.visual_artifact.v1",
+                "status": "error",
+                "reason": f"visual_report.build_visual_report failed: {type(exc).__name__}: {exc}",
+            }
+
+    def live_status(self) -> dict:
+        return {
+            "schema": "ariadne.cadctl.live_status.v1",
+            "status": "not_implemented",
+            "live": False,
+            "reason": "No persistent attended ObjectARX live pump is attached to cadctl. Use staged router operations; M07 owns deep live surface completion.",
         }
 
     # ----------------------------------------------------------------- helpers
@@ -651,6 +792,10 @@ class Cad:
             "schema": "ariadne.cadctl.inspect.v1",
             "status": status_word,
             "operation": result.get("operation"),
+            "registry_operation_status": (
+                result.get("registry_operation_status")
+                or self._registry_operation_status(result.get("operation"))
+            ),
             "cad_job": str(cad_job_path),
             "cad_result": str(cad_result_path),
             "stdout": stdout_path,
@@ -681,6 +826,10 @@ def query(ir_path: str, sql: str) -> dict:
     return Cad().query(ir_path, sql)
 
 
+def get_entity(ir_path: str, handle: str) -> dict:
+    return Cad().get_entity(ir_path, handle)
+
+
 def validate(ir_path: str) -> dict:
     return Cad().validate(ir_path)
 
@@ -695,3 +844,21 @@ def registry_coverage() -> dict:
 
 def registry_explain(op_id: str) -> dict:
     return Cad().registry_explain(op_id)
+
+
+def patch_dry_run(patch: dict) -> dict:
+    return Cad().patch_dry_run(patch)
+
+
+def diff_before_after(pre_ir_path: str, post_ir_path: str) -> dict:
+    return Cad().diff_before_after(pre_ir_path, post_ir_path)
+
+
+def visual_report(source_ref: str, kind: str = "png",
+                  artifact_id: str | None = None, out_dir: str | None = None,
+                  route: str | None = None) -> dict:
+    return Cad().visual_report(source_ref, kind, artifact_id, out_dir, route)
+
+
+def live_status() -> dict:
+    return Cad().live_status()

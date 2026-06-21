@@ -1307,6 +1307,34 @@ switch ($Action) {
     })
   }
   'explain' {
+    if (-not [string]::IsNullOrWhiteSpace($Operation)) {
+      $registryPath = Join-Path $RouterHome 'config\operations.v2.json'
+      $registry = Read-JsonFile -Path $registryPath
+      $record = @($registry.operations | Where-Object {
+        "$($_.id)" -eq $Operation -or "$($_.operation)" -eq $Operation
+      }) | Select-Object -First 1
+      if ($null -eq $record) {
+        Write-Json -Payload ([ordered]@{
+          timestamp = (Get-Date).ToString('o')
+          schema = 'ariadne.autocad_router_operation_explain.v1'
+          status = 'NOT_FOUND'
+          operation = $Operation
+          registry_path = $registryPath
+          reason = "Operation '$Operation' is not present in config\operations.v2.json."
+        })
+        break
+      }
+      Write-Json -Payload ([ordered]@{
+        timestamp = (Get-Date).ToString('o')
+        schema = 'ariadne.autocad_router_operation_explain.v1'
+        status = 'PASS'
+        operation = $Operation
+        registry_operation_status = "$($record.status)"
+        registry_path = $registryPath
+        record = $record
+      })
+      break
+    }
     $status = Get-Status -Capabilities $capabilities
     $selection = Select-Route -Capabilities $capabilities -Status $status -Intent $Intent -Route $Route
     Write-Json -Payload ([ordered]@{

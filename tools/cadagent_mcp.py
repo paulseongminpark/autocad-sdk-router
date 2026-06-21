@@ -225,16 +225,16 @@ def _tool_registry_explain(args: Dict[str, Any]) -> Dict[str, Any]:
 
 
 def _tool_patch_dry_run(args: Dict[str, Any]) -> Dict[str, Any]:
-    if _patch_engine is None:
-        return _err("patch_engine shell unavailable: %s" % _patch_err,
-                    delegate="patch_engine.dry_run_plan")
     patch = args.get("patch")
     if patch is None:
         return _err("missing required arg: patch (a cad_patch.v1 object)")
+    cad, e = _cad()
+    if cad is None:
+        return _err(e, delegate="cadctl.Cad.patch_dry_run")
     try:
-        return {"ok": True, "result": _patch_engine.dry_run_plan(patch)}
+        return {"ok": True, "result": cad.patch_dry_run(patch)}
     except Exception as exc:  # noqa: BLE001
-        return _err("patch_engine.dry_run_plan failed: %r" % exc)
+        return _err("cadctl.patch_dry_run failed: %r" % exc)
 
 
 def _tool_patch_apply_staged(args: Dict[str, Any]) -> Dict[str, Any]:
@@ -281,46 +281,17 @@ def _tool_diff_before_after(args: Dict[str, Any]) -> Dict[str, Any]:
     peer lane and may not be on disk yet -> truthful not_implemented; otherwise
     each IR path is read (utf-8-sig, BOM-tolerant) and passed as a dict.
     """
-    if _cad_diff is None:
-        return {
-            "ok": True,
-            "result": {
-                "schema": "ariadne.cad_diff.v1",
-                "status": "not_implemented",
-                "reason": "cad_diff shell unavailable: %s" % _cad_diff_err,
-                "delegate": "cad_diff.compute_diff",
-            },
-        }
-    compute = getattr(_cad_diff, "compute_diff", None)
-    if compute is None:
-        return {
-            "ok": True,
-            "result": {
-                "schema": "ariadne.cad_diff.v1",
-                "status": "not_implemented",
-                "reason": "cad_diff.compute_diff not present on the loaded shell",
-                "delegate": "cad_diff.compute_diff",
-            },
-        }
     pre = args.get("pre_ir") or args.get("pre_ir_path") or args.get("pre")
     post = args.get("post_ir") or args.get("post_ir_path") or args.get("post")
     if not pre or not post:
         return _err("missing required args: pre_ir, post_ir (paths to dwg_graph_ir.json)")
-    if not os.path.isfile(pre):
-        return _err("pre_ir not found: %s" % pre)
-    if not os.path.isfile(post):
-        return _err("post_ir not found: %s" % post)
+    cad, e = _cad()
+    if cad is None:
+        return _err(e, delegate="cadctl.Cad.diff_before_after")
     try:
-        with open(pre, "r", encoding="utf-8-sig") as fh:
-            pre_doc = json.load(fh)
-        with open(post, "r", encoding="utf-8-sig") as fh:
-            post_doc = json.load(fh)
-    except (OSError, ValueError) as exc:
-        return _err("failed to read an IR document: %r" % exc)
-    try:
-        return {"ok": True, "result": compute(pre_doc, post_doc)}
+        return {"ok": True, "result": cad.diff_before_after(pre, post)}
     except Exception as exc:  # noqa: BLE001
-        return _err("cad_diff.compute_diff failed: %r" % exc)
+        return _err("cadctl.diff_before_after failed: %r" % exc)
 
 
 def _tool_visual_report(args: Dict[str, Any]) -> Dict[str, Any]:
@@ -330,15 +301,15 @@ def _tool_visual_report(args: Dict[str, Any]) -> Dict[str, Any]:
     emit the requested kind, build_visual_report itself returns
     not_implemented/blocked with empty refs -- this handler just relays it.
     """
-    if _visual_report is None:
-        return _err("visual_report shell unavailable: %s" % _visual_err,
-                    delegate="visual_report.build_visual_report")
     source_ref = args.get("source_ref") or args.get("source") or args.get("ir") or args.get("dwg")
     if not source_ref:
         return _err("missing required arg: source_ref (a DWG/IR path)")
+    cad, e = _cad()
+    if cad is None:
+        return _err(e, delegate="cadctl.Cad.visual_report")
     kind = args.get("kind", "png")
     try:
-        return {"ok": True, "result": _visual_report.build_visual_report(
+        return {"ok": True, "result": cad.visual_report(
             source_ref,
             kind=kind,
             artifact_id=args.get("artifact_id"),
@@ -346,7 +317,7 @@ def _tool_visual_report(args: Dict[str, Any]) -> Dict[str, Any]:
             route=args.get("route"),
         )}
     except Exception as exc:  # noqa: BLE001
-        return _err("visual_report.build_visual_report failed: %r" % exc)
+        return _err("cadctl.visual_report failed: %r" % exc)
 
 
 def _tool_live_status(args: Dict[str, Any]) -> Dict[str, Any]:
@@ -356,20 +327,13 @@ def _tool_live_status(args: Dict[str, Any]) -> Dict[str, Any]:
     the router's staged accoreconsole job, not a persistent live document). This
     is reported honestly as not_implemented -- NEVER a fake "live" success.
     """
-    return {
-        "ok": True,
-        "result": {
-            "schema": "ariadne.cadagent.live_status.v1",
-            "status": "not_implemented",
-            "live": False,
-            "transport": TRANSPORT,
-            "reason": "no live in-process ObjectARX pump is attached to this MCP "
-                      "shell; CAD writes route through the router's staged "
-                      "accoreconsole job, not a persistent live document.",
-            "available_path": "use cad.inspect_drawing / cad.patch_apply_staged "
-                              "(staged-copy router jobs) instead of a live pump.",
-        },
-    }
+    cad, e = _cad()
+    if cad is None:
+        return _err(e, delegate="cadctl.Cad.live_status")
+    try:
+        return {"ok": True, "result": cad.live_status()}
+    except Exception as exc:  # noqa: BLE001
+        return _err("cadctl.live_status failed: %r" % exc)
 
 
 # --------------------------------------------------------------------------- #
@@ -476,7 +440,7 @@ _TOOLS: List[Dict[str, Any]] = [
         "name": "cad.patch_dry_run",
         "description": "Validate, risk-classify, and PLAN a cad_patch.v1 without "
                        "executing it (execution is not_implemented). Delegates to patch_engine.dry_run_plan.",
-        "delegates_to": "patch_engine.dry_run_plan",
+        "delegates_to": "cadctl.Cad.patch_dry_run",
         "inputSchema": {
             "type": "object",
             "properties": {
@@ -508,7 +472,7 @@ _TOOLS: List[Dict[str, Any]] = [
         "description": "Compute a structural IR diff (cad_diff.v1) between two "
                        "dwg_graph_ir.json documents. Delegates to cad_diff.compute_diff; "
                        "degrades to not_implemented if the peer lane's cad_diff is absent.",
-        "delegates_to": "cad_diff.compute_diff",
+        "delegates_to": "cadctl.Cad.diff_before_after",
         "inputSchema": {
             "type": "object",
             "properties": {
@@ -524,8 +488,8 @@ _TOOLS: List[Dict[str, Any]] = [
         "description": "Build a visual_artifact.v1 envelope for a derived artifact "
                        "(png/svg/pdf/diff_overlay). No-fake-success: returns "
                        "not_implemented/blocked with empty refs when no producer is wired. "
-                       "Delegates to visual_report.build_visual_report.",
-        "delegates_to": "visual_report.build_visual_report",
+                       "Delegates through cadctl.Cad.visual_report.",
+        "delegates_to": "cadctl.Cad.visual_report",
         "inputSchema": {
             "type": "object",
             "properties": {
@@ -544,7 +508,7 @@ _TOOLS: List[Dict[str, Any]] = [
         "name": "cad.live_status",
         "description": "Truthful liveness probe. No live in-process ObjectARX pump is "
                        "attached to this shell -> returns not_implemented (never a fake live).",
-        "delegates_to": "(none -- truthful local probe)",
+        "delegates_to": "cadctl.Cad.live_status",
         "inputSchema": {"type": "object", "properties": {}, "additionalProperties": False},
     },
 ]

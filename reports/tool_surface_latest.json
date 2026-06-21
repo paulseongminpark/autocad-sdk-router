@@ -1,0 +1,32 @@
+{
+  "schema": "ariadne.cad_os.tool_surface.v1",
+  "packet": "CADOS_M04_OPERATION_REGISTRY_AND_TOOL_SURFACE",
+  "status": "PASS",
+  "cadctl_commands": [
+    "status --json",
+    "inspect --include-rich",
+    "query",
+    "get-entity",
+    "validate",
+    "registry list",
+    "registry coverage",
+    "registry explain",
+    "patch dry-run",
+    "diff",
+    "visual",
+    "live status"
+  ],
+  "cadctl_evidence": {
+    "status_json": "PASS operation_count=517 unknown=0",
+    "registry_coverage": "PASS",
+    "registry_explain": "PASS registry_operation_status=implemented",
+    "get_entity": "PASS handle=11935 row_count=1",
+    "validate": "PASS validation_report.status=pass"
+  },
+  "router_explain": {
+    "status": "PASS",
+    "schema": "ariadne.autocad_router_operation_explain.v1",
+    "operation": "inspect.database.graph"
+  },
+  "shell_degradation": "patch/diff/visual/live return structured planned/rejected/blocked/not_implemented envelopes; no raw SDK bypass"
+}

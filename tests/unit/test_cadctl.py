@@ -23,6 +23,7 @@ from __future__ import annotations
 
 import json
 import os
+import subprocess
 import sys
 import tempfile
 import unittest
@@ -97,6 +98,21 @@ class TestCadctlStatusReadOnly(unittest.TestCase):
         # in the payload itself -- this is how we encode the read-only intent.
         self.assertIn("not a live probe", (out.get("note") or "").lower())
 
+    def test_status_json_cli_includes_registry_summary(self):
+        proc = subprocess.run(
+            [sys.executable, os.path.join(_REPO, "tools", "cadctl_cli.py"),
+             "status", "--json"],
+            cwd=_REPO,
+            text=True,
+            capture_output=True,
+        )
+        self.assertEqual(proc.returncode, 0, proc.stderr)
+        out = json.loads(proc.stdout)
+        self.assertEqual(out.get("schema"), "ariadne.cadctl.status.v1")
+        self.assertEqual(out.get("status"), "ok")
+        self.assertIn("registry", out)
+        self.assertEqual(out["registry"].get("unknown"), 0)
+
 
 class TestCadctlRegistry(unittest.TestCase):
     """registry_list / registry_coverage are truthful pure reads."""
@@ -136,6 +152,66 @@ class TestCadctlRegistry(unittest.TestCase):
         cov = self.cad.registry_coverage()
         self.assertEqual(lst.get("wired_count"), cov.get("wired_count"))
         self.assertEqual(lst.get("operation_count"), cov.get("operation_count"))
+
+    def test_cli_registry_explain_returns_registry_operation_status(self):
+        proc = subprocess.run(
+            [sys.executable, os.path.join(_REPO, "tools", "cadctl_cli.py"),
+             "registry", "explain", "inspect.database.graph"],
+            cwd=_REPO,
+            text=True,
+            capture_output=True,
+        )
+        self.assertEqual(proc.returncode, 0, proc.stderr)
+        out = json.loads(proc.stdout)
+        self.assertEqual(out.get("status"), "ok")
+        self.assertEqual(out.get("operation"), "inspect.database.graph")
+        self.assertEqual(out.get("registry_operation_status"), "implemented")
+
+
+class TestCadctlToolSurfaceCli(unittest.TestCase):
+    """M04 CLI parity for high-value read/query shell commands."""
+
+    def test_get_entity_cli_fetches_one_handle(self):
+        import sqlite_ir_store
+
+        with tempfile.TemporaryDirectory() as tmp:
+            ir_path = os.path.join(tmp, "dwg_graph_ir.json")
+            with open(ir_path, "w", encoding="utf-8") as fh:
+                json.dump(sqlite_ir_store._fixture_ir(), fh, ensure_ascii=False, indent=2)
+            proc = subprocess.run(
+                [sys.executable, os.path.join(_REPO, "tools", "cadctl_cli.py"),
+                 "get-entity", "--ir", ir_path, "--handle", "2A7"],
+                cwd=_REPO,
+                text=True,
+                capture_output=True,
+            )
+            self.assertEqual(proc.returncode, 0, proc.stderr)
+            out = json.loads(proc.stdout)
+            self.assertEqual(out.get("schema"), "ariadne.cadctl.get_entity.v1")
+            self.assertEqual(out.get("status"), "ok")
+            self.assertEqual(out.get("handle"), "2A7")
+            self.assertEqual(out.get("row_count"), 1)
+
+    def test_cli_shell_surfaces_degrade_without_crash(self):
+        commands = [
+            ["patch", "dry-run", "--patch-json", '{"schema":"ariadne.cad_patch.v1"}'],
+            ["diff", "--pre-ir", "missing-before.json", "--post-ir", "missing-after.json"],
+            ["visual", "--source-ref", "missing-source.dwg", "--kind", "png"],
+            ["live", "status"],
+        ]
+        for cmd in commands:
+            with self.subTest(cmd=cmd):
+                proc = subprocess.run(
+                    [sys.executable, os.path.join(_REPO, "tools", "cadctl_cli.py"), *cmd],
+                    cwd=_REPO,
+                    text=True,
+                    capture_output=True,
+                )
+                self.assertEqual(proc.returncode, 0, proc.stderr)
+                out = json.loads(proc.stdout)
+                self.assertIn(out.get("status"), {
+                    "ok", "planned", "rejected", "blocked", "not_implemented", "error",
+                })
 
 
 class TestCadctlInspectErrorPaths(unittest.TestCase):

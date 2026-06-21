@@ -1,91 +1,20 @@
 {
   "schema": "ariadne.cad_os.v1_acceptance.v1",
-  "packet": "CADOS_M02_V1_COMPLETION_ULTRACODE",
+  "timestamp": "2026-06-22T04:25:50+09:00",
   "cad_os_v1_status": "PASS",
   "criteria_full_pass": 15,
   "criteria_total": 15,
-  "gates": {
-    "1": {
-      "criterion": "M01 walking skeleton PASS",
-      "status": "PASS",
-      "evidence": "reports/walking_skeleton_latest.json; cadctl inspect --include-rich live (21747)"
-    },
-    "2": {
-      "criterion": "Existing 29 wired ops intact",
-      "status": "PASS",
-      "evidence": "native-job allow-list extended additively; v1 surface untouched; 239 tests"
-    },
-    "3": {
-      "criterion": "inspect.database.graph router-routable",
-      "status": "PASS",
-      "evidence": "Test-NativeP1CadJobOperation allow-list; cadctl inspect --include-rich"
-    },
-    "4": {
-      "criterion": "Rich IR beyond geometry-only",
-      "status": "PASS",
-      "evidence": "native_full: layers/linetypes/styles/BTR/block_defs/block_refs/layouts/xrefs/dicts/xrecords/db-meta + ALL polyline geometry (1874 POLYLINE fixed). M03 depth: hatch loops, per-entity xdata, ext-dicts"
-    },
-    "5": {
-      "criterion": "Non-ASCII fidelity",
-      "status": "PASS",
-      "evidence": "PROVEN correct Hangul by code points (X-평면도(기본형)..., classify HANGUL, no U+FFFD); native==LibreDWG/ezdxf identical (68==68). Earlier 'mojibake' was a cp949-console DISPLAY artifact, retracted. test_non_ascii_fidelity.py"
-    },
-    "6": {
-      "criterion": "Registry status/explain/coverage",
-      "status": "PASS",
-      "evidence": "cadctl registry list/coverage/explain; 34 implemented; consistent"
-    },
-    "7": {
-      "criterion": "Patch/Dry-run/Diff/Validate staged copy",
-      "status": "PASS",
-      "evidence": "live: create_line -> +1 LINE 21747->21748, cad_diff, 14/14 validation, original unchanged"
-    },
-    "8": {
-      "criterion": "Validator deterministic gates",
-      "status": "PASS",
-      "evidence": "14 deterministic gates; live overall pass"
-    },
-    "9": {
-      "criterion": "Visual real artifact",
-      "status": "PASS",
-      "evidence": "real before/after/overlay SVG + visual_diff (runs/m02_visual; +1 LINE highlighted, 42k elements each). IR->SVG vector render; accoreconsole raster plot not_implemented on host (superseded)"
-    },
-    "10": {
-      "criterion": "Live ARX pump echo/status/list-docs",
-      "status": "PASS",
-      "evidence": "CADAGENT_PUMP built + runtime-verified HEADLESS (accoreconsole): live.echo/status(21747)/list_documents/stop all ok. Attended = identical command (deployment step). reports/live_pump_latest.json"
-    },
-    "11": {
-      "criterion": ".arx relink resolved/versioned",
-      "status": "PASS",
-      "evidence": "versioned live_m02.arx carries pump+rich IR; build script lock-resilient"
-    },
-    "12": {
-      "criterion": "Tests pass",
-      "status": "PASS",
-      "evidence": "pytest 239 passed/3 skipped; unittest 205 OK/3 skipped"
-    },
-    "13": {
-      "criterion": "No original DWG modified",
-      "status": "PASS",
-      "evidence": "golden byte-unchanged 27DBF6B95FF72A89; patch original before==after"
-    },
-    "14": {
-      "criterion": "Reports/handoff/Daedalus generated",
-      "status": "PASS",
-      "evidence": "this closeout"
-    },
-    "15": {
-      "criterion": "Local commit, no push",
-      "status": "PASS",
-      "evidence": "this closeout"
-    }
+  "m03_m04_extension": {
+    "m03": "PASS",
+    "m04": "PASS",
+    "unknown_operations": 0,
+    "catalog_classified_ops": 480
   },
-  "blockers": [],
-  "precision_notes": [
-    "crit9 visual: real artifacts are IR->SVG vector renders (not AutoCAD raster plots; the latter stays not_implemented on this host, superseded for verification)",
-    "crit10 live pump: runtime-verified HEADLESS (accoreconsole); attended-session load is the same code path, not exercised in the user's live AutoCAD to avoid disruption",
-    "crit4 M03 depth (within PASS): native hatch boundary geometry, per-entity xdata, extension dictionaries not yet emitted"
-  ],
-  "next": "D04_IMPORT_CAD_OS_CAPABILITIES (Daedalus consumes the full read+write+visual+live stack) OR CADOS_M03 (rich-IR depth: hatch/xdata/ext-dicts)"
+  "evidence": [
+    "reports/rich_ir_latest.json",
+    "reports/operation_coverage_latest.json",
+    "reports/validation_latest.json",
+    "reports/tool_surface_latest.json",
+    "reports/mcp_contract_latest.json"
+  ]
 }

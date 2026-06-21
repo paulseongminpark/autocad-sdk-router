@@ -1,52 +1,5 @@
-# Packet Index — AutoCAD SDK Router / CAD OS Layer
+# Packet Index
 
-Chronological record of packets executed against
-`D:\dev\99_tools\autocad-sdk-router`, plus what is planned next. One row per
-packet. "Executed" packets have an on-disk record in this folder.
-
-| Packet | Type | Status | Record |
-|---|---|---|---|
-| CADOS_M01_FULL_STACK_ULTRACODE_BUILD | executed | **PASS** | `packets\CADOS_M01_FULL_STACK_ULTRACODE_BUILD.md` |
-| D04_IMPORT_CAD_OS_CAPABILITIES | planned | not started | see `handoff\NEXT_STEP.md` (Option A — recommended) |
-| CADOS_M02_NATIVE_IR_COMPLETION | planned | not started | see `handoff\NEXT_STEP.md` (Option B) |
-
----
-
-## CADOS_M01 — PASS (executed)
-
-CAD OS Layer Milestone 01. Built the contract layer (8 v2 schemas + Operation
-Registry v2 + 6 specs), the stdlib-Python control surface (`cadctl` + the
-extract → IR → SQLite → query → validate walking skeleton, 83 new tests), and the
-native `inspect.database.graph` op. Walking skeleton PASS on the 21,747-entity
-golden (6/6 gates, 3-way cross-engine); native op smoked directly at 3 and 291,706
-entities; 120 tests pass; router intact (11/11 available). Deferrals D1–D5
-documented (honest — `.arx` relink env-lock, native op not yet router-wired,
-non-ASCII funnel, 30/480 ops, patch/visual safety shells).
-
-Full record: `packets\CADOS_M01_FULL_STACK_ULTRACODE_BUILD.md`.
-Resume: `handoff\TAKEOVER.md`.
-
-## Next (planned — pick one)
-
-- **D04_IMPORT_CAD_OS_CAPABILITIES** (recommended) — Daedalus consumes the CAD OS
-  Layer via `cadctl`. Recommended because the walking skeleton is PASS, so the
-  contract is ready to be consumed.
-- **CADOS_M02_NATIVE_IR_COMPLETION** — router-wire the native graph op, relink the
-  `.arx` (clears D1), fix non-ASCII fidelity (D3), and add more native ops.
-
-Goals + first steps for each: `handoff\NEXT_STEP.md`.
-
----
-
-## CADOS_M02_V1_COMPLETION_ULTRACODE — 2026-06-22 — **PARTIAL_PASS** (v0.2.0)
-
-Executed the M02 completion push (workflow + ultracode, 9 Opus agents + inline keystone).
-Landed a **live, validated read + write stack**: router-wired native rich IR
-(`inspect.database.graph` → `native_full`, 21747 truth), `ir_builder.build_ir_from_database_graph`,
-cadctl rich read surface (`--include-rich` / query / validate / registry explain), **real staged
-patch** (`patch_engine.apply_staged` → +1 LINE, cad_diff, 14/14 validation, original unchanged),
-`cad_diff.py`, validator gates, sqlite rich, registry v2 (43 ops / 34 implemented), versioned `.arx`
-(D1 resolved), 215 tests. Honest partials: non-ASCII (upstream accoreconsole), visual (NOT_IMPLEMENTED),
-live ARX pump runtime (blocked). Report: `reports\CADOS_M02_V1_COMPLETION_ULTRACODE.md`.
-
-**Next:** `D04_IMPORT_CAD_OS_CAPABILITIES` (recommended) or `CADOS_M03_NATIVE_IR_COMPLETION`.
+- CADOS_M03_NATIVE_ROUTER_RICH_IR_COMPLETION: PASS, see `reports/CADOS_M03_NATIVE_ROUTER_RICH_IR_COMPLETION.md`
+- CADOS_M04_OPERATION_REGISTRY_AND_TOOL_SURFACE: PASS, see `reports/CADOS_M04_OPERATION_REGISTRY_AND_TOOL_SURFACE.md`
+- Next: CADOS_M05_PATCH_DIFF_VALIDATION_TRANSACTION

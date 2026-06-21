@@ -1,47 +1,46 @@
 {
-  "packet_id": "CADOS_M02_V1_COMPLETION_ULTRACODE",
-  "previous_packet": "CADOS_M01_FULL_STACK_ULTRACODE_BUILD",
-  "previous_commit": "e18edde",
-  "project": "autocad-sdk-router",
+  "schema": "ariadne.cad_os.latest_status.v1",
+  "timestamp": "2026-06-22T04:25:50+09:00",
   "root": "D:\\dev\\99_tools\\autocad-sdk-router",
+  "current_packet": "CADOS_M04_OPERATION_REGISTRY_AND_TOOL_SURFACE",
   "status": "PASS",
-  "version": "cad_os_layer_v1.0.0",
-  "status_note": "All 15 acceptance criteria PASS. The 3 prior partials are resolved: crit5 non-ASCII was a cp949-console DISPLAY artifact (data is correct Hangul, proven by code points); crit9 visual now produces real IR->SVG artifacts; crit10 live ARX pump is built + runtime-verified headless. Remaining items (hatch/xdata/ext-dict native extraction) are rich-IR DEPTH within the already-PASS crit4, documented as M03 with exact approach.",
-  "timestamp_local": "2026-06-22T03:10:00+09:00",
-  "git": { "repo": true, "branch": "main", "head": "CADOS_M02 PASS closeout commit (see git log)", "pushed": false },
-  "verified_live": {
-    "native_rich_ir": "inspect.database.graph .crx; truth gate 21747; symbol_tables/blocks/layouts/xrefs/dicts/xrecords/db-meta; ALL 1874 POLYLINE now carry vertex geometry",
-    "non_ascii": "PASS - correct Hangul proven by code points (X-평면도(기본형)..., classify HANGUL, no U+FFFD); native==LibreDWG/ezdxf identical (68==68)",
-    "router_wired": "cadctl inspect --include-rich -> native_full IR",
-    "read_surface": "inspect --include-rich / query (21747) / validate (pass) / registry list|coverage|explain",
-    "patch_vertical_slice": "live: create_line -> +1 LINE (21747->21748), cad_diff, 14/14 validation gates, original byte-unchanged",
-    "visual": "PASS - real before/after/overlay SVG + visual_diff (runs/m02_visual; +1 LINE highlighted; 42k elements each)",
-    "live_pump": "PASS - CADAGENT_PUMP runtime-verified headless (accoreconsole): live.echo/status(21747)/list_documents/stop all ok",
-    "arx_versioned_relink": "Ariadne.AcadNative.live_m02.arx (carries pump+rich IR)",
-    "tests": "pytest 239 passed / 3 skipped; unittest 205 OK / 3 skipped",
-    "original_dwg_unchanged": true,
-    "golden_sha256_16": "27DBF6B95FF72A89"
+  "m03": {
+    "status": "PASS",
+    "ir_ref": "runs/m03_rich_ir/dwg_graph_ir.json",
+    "entity_count": 21747,
+    "hatch_loops": 702,
+    "xdata_blocks": 751,
+    "non_ascii": "PASS",
+    "native_smoke": "reports/native_smoke_latest.json"
   },
-  "registry": { "operations": 43, "implemented": 34, "stub": 7, "blocked": 2, "catalog_total": 480, "consistent": true },
-  "acceptance": { "criteria_full_pass": 15, "criteria_total": 15, "status": "PASS" },
-  "resolved_partials": {
-    "crit5_non_ascii": "RESOLVED -> PASS (was a console DISPLAY artifact; data is correct Hangul; prior 'upstream accoreconsole' diagnosis RETRACTED with code-point evidence)",
-    "crit9_visual": "RESOLVED -> PASS (real IR->SVG before/after/overlay artifacts)",
-    "crit10_live_pump": "RESOLVED -> PASS (named-pipe pump built + runtime-verified headless)",
-    "crit4_polyline_geometry": "CLOSED (2D/3D polyline vertices now emitted; 1874/1874 POLYLINE carry geometry)"
+  "m04": {
+    "status": "PASS",
+    "operation_count": 517,
+    "implemented": 34,
+    "catalogued": 474,
+    "unknown": 0,
+    "tool_surface": "reports/tool_surface_latest.json",
+    "mcp_contract": "reports/mcp_contract_latest.json"
   },
-  "m03_depth_within_pass": [
-    "native hatch boundary loop geometry (AcDbHatch numLoops/getLoopAt)",
-    "native per-entity xdata extraction (pEnt xData per regapp)",
-    "native per-entity extension dictionaries"
-  ],
-  "precision_notes": [
-    "visual artifacts are IR->SVG vector renders (not AutoCAD raster plots; raster plot stays not_implemented on this host, superseded for verification)",
-    "live pump runtime-verified HEADLESS (accoreconsole); attended-session load is the identical code path, not exercised in the user's live AutoCAD to avoid disruption"
-  ],
-  "next_packet_options": [
-    "D04_IMPORT_CAD_OS_CAPABILITIES (Daedalus consumes read+write+visual+live stack; recommended)",
-    "CADOS_M03_RICH_IR_DEPTH (native hatch/xdata/ext-dict extraction)"
-  ],
-  "handoff_zip": "handoff/zip/CADOS_M02_V1_COMPLETION_ULTRACODE.zip"
+  "router": {
+    "status": "ALL_AVAILABLE",
+    "route_count": 11,
+    "available_count": 11
+  },
+  "validation": {
+    "status": "pass",
+    "gates_total": 14,
+    "gates_failed": 0
+  },
+  "tests": {
+    "pytest": "250 passed in 74.56s",
+    "unittest": "Ran 213 tests in 72.214s OK"
+  },
+  "git": {
+    "before": "dc6bc03",
+    "after": "dc6bc03",
+    "commit": null,
+    "remote_push": false
+  },
+  "next": "CADOS_M05_PATCH_DIFF_VALIDATION_TRANSACTION"
 }

@@ -47,8 +47,12 @@ _JSON_ENCODING = "utf-8-sig"
 _OPERATIONS_V2 = os.path.join(_CONFIG, "operations.v2.json")
 _REGISTRY_SCHEMA = os.path.join(_SCHEMAS, "operation_registry.v2.schema.json")
 _V1_CAD_JOB = os.path.join(_SCHEMAS, "cad_job.schema.json")
+_CATALOG = os.path.join(_CONFIG, "autocad_native_arx_operation_catalog.json")
 
 _RUNNABLE = {"implemented", "wired"}
+_M04_ALLOWED_STATUSES = {
+    "implemented", "wired", "stub", "catalogued", "deprecated", "blocked",
+}
 
 
 def _load_json(path):
@@ -104,11 +108,36 @@ class TestTotalsMatchRecords(unittest.TestCase):
         )
 
     def test_no_record_carries_unknown_status(self):
-        allowed = {"implemented", "wired", "stub", "catalogued",
-                   "deprecated", "blocked", "not_implemented"}
         bad = [(o.get("id"), o.get("status")) for o in self.ops
-               if o.get("status") not in allowed]
+               if o.get("status") not in _M04_ALLOWED_STATUSES]
         self.assertEqual(bad, [], "operation records with unknown status: %r" % bad)
+
+    def test_catalog_union_is_classified(self):
+        catalog = _load_json(_CATALOG)
+        catalog_ids = {o.get("op_id") for o in catalog.get("operations", [])
+                       if isinstance(o, dict) and o.get("op_id")}
+        registry_ids = {o.get("id") for o in self.ops if o.get("id")}
+        # M04 makes operations.v2 authoritative for the 480 native catalog plus
+        # the router synthetic/wired surface. Every catalog op_id must now have
+        # one classified registry record (exact-mapped wired ids count once).
+        missing = sorted(catalog_ids - registry_ids)
+        self.assertEqual(missing, [], "catalog op_ids missing from operations.v2: %r" % missing[:20])
+        self.assertGreaterEqual(
+            len(self.ops), len(catalog_ids),
+            "registry must classify at least the full native catalog",
+        )
+
+    def test_every_operation_has_m04_metadata(self):
+        required = {
+            "operation", "family", "status", "hosts", "engines", "write_level",
+            "handler", "schema_refs", "policy", "tests", "evidence_refs", "notes",
+        }
+        missing = []
+        for op in self.ops:
+            absent = sorted(k for k in required if k not in op)
+            if absent:
+                missing.append((op.get("id"), absent))
+        self.assertEqual(missing, [], "operations missing M04 metadata: %r" % missing[:20])
 
 
 class TestInspectDatabaseGraphImplemented(unittest.TestCase):

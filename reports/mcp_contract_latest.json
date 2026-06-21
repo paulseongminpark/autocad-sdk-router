@@ -1,0 +1,25 @@
+{
+  "schema": "ariadne.cad_os.mcp_contract.v1",
+  "packet": "CADOS_M04_OPERATION_REGISTRY_AND_TOOL_SURFACE",
+  "status": "PASS",
+  "server": "cadagent-mcp",
+  "version": "0.1.0",
+  "transport": "mock",
+  "tool_count": 12,
+  "tools": [
+    "cad.status",
+    "cad.inspect_drawing",
+    "cad.query_entities",
+    "cad.get_entity",
+    "cad.validate_ir",
+    "cad.registry_status",
+    "cad.registry_explain",
+    "cad.patch_dry_run",
+    "cad.patch_apply_staged",
+    "cad.diff_before_after",
+    "cad.visual_report",
+    "cad.live_status"
+  ],
+  "selftest": "SELFTEST_OK",
+  "raw_ref": "reports/mcp_contract_latest.raw.txt"
+}

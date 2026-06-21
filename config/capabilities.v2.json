@@ -1,7 +1,7 @@
 {
   "schema": "ariadne.autocad_capabilities_registry.v2",
   "version": "2.0.0",
-  "generated_at": "2026-06-21",
+  "generated_at": "2026-06-22",
   "generated_by": "CADOS_M01 Lane D (Operation Registry v2)",
   "additive_to_v1": true,
   "purpose": "Route x capability map for the CAD OS Layer. References (does NOT modify) config/autocad_router_capabilities.json (schema ariadne.autocad_router_capabilities.v2, 11 routes). v1 capabilities file remains the live-probe source of truth for route availability; this file adds the operation-family -> route capability projection that operations.v2.json consumes.",
@@ -50,27 +50,81 @@
       "priority": 10,
       "engine": "native_objectarx_objectdbx_first",
       "available_truth_source": "config/autocad_router_capabilities.json#routes[dwg_truth_autocad].available",
-      "native_lanes": ["ARIADNE_NATIVE_JOB", "ARIADNE_CAD_JOB", "geometry_native"],
-      "hosts": ["objectdbx", "core_console", "native_arx", "managed", "full_autocad"],
+      "native_lanes": [
+        "ARIADNE_NATIVE_JOB",
+        "ARIADNE_CAD_JOB",
+        "geometry_native"
+      ],
+      "hosts": [
+        "objectdbx",
+        "core_console",
+        "native_arx",
+        "managed",
+        "full_autocad"
+      ],
       "capabilities": [
-        "db_read", "db_write_staged", "db_write_original", "entity_crud", "symbol_table_crud",
-        "dictionary_xrecord_xdata", "block_xref", "layout_plot", "geometry_kernel", "brep_solid",
-        "runtime_capabilities", "reactor_overrule", "custom_object_protocol", "jig_interactive",
-        "graph_ir_export", "patch_apply", "patch_validate", "diff_snapshot", "live_active_document",
+        "db_read",
+        "db_write_staged",
+        "db_write_original",
+        "entity_crud",
+        "symbol_table_crud",
+        "dictionary_xrecord_xdata",
+        "block_xref",
+        "layout_plot",
+        "geometry_kernel",
+        "brep_solid",
+        "runtime_capabilities",
+        "reactor_overrule",
+        "custom_object_protocol",
+        "jig_interactive",
+        "graph_ir_export",
+        "patch_apply",
+        "patch_validate",
+        "diff_snapshot",
+        "live_active_document",
         "geometry_extract_truth"
       ],
       "operation_families": [
-        "inspect.database.summary", "inspect.database.graph", "inspect.layers", "inspect.blocks",
-        "inspect.entities", "inspect.entity.count", "query.entities", "inspect.xrecord.get",
-        "inspect.xdata.get", "inspect.block.count", "inspect.layout.list", "inspect.xref.list",
-        "inspect.runtime.capabilities", "inspect.reactor.registry", "inspect.overrule.registry",
-        "inspect.jig.host_support", "inspect.customclass.count", "inspect.customobject.count",
-        "inspect.protocol.queryx", "write.layer.create", "write.entity.line", "write.entity.circle",
-        "write.xrecord.set", "write.xdata.set", "write.block.simple_create", "write.block.insert",
-        "write.layout.create", "live.reactor.enable", "live.reactor.disable", "live.overrule.enable",
-        "live.overrule.disable", "live.jig.point_probe", "extend.customclass.create",
-        "extend.customobject.create", "apply.patch", "validate.patch", "diff.before_after",
-        "render.layout", "live.status", "live.apply_patch"
+        "inspect.database.summary",
+        "inspect.database.graph",
+        "inspect.layers",
+        "inspect.blocks",
+        "inspect.entities",
+        "inspect.entity.count",
+        "query.entities",
+        "inspect.xrecord.get",
+        "inspect.xdata.get",
+        "inspect.block.count",
+        "inspect.layout.list",
+        "inspect.xref.list",
+        "inspect.runtime.capabilities",
+        "inspect.reactor.registry",
+        "inspect.overrule.registry",
+        "inspect.jig.host_support",
+        "inspect.customclass.count",
+        "inspect.customobject.count",
+        "inspect.protocol.queryx",
+        "write.layer.create",
+        "write.entity.line",
+        "write.entity.circle",
+        "write.xrecord.set",
+        "write.xdata.set",
+        "write.block.simple_create",
+        "write.block.insert",
+        "write.layout.create",
+        "live.reactor.enable",
+        "live.reactor.disable",
+        "live.overrule.enable",
+        "live.overrule.disable",
+        "live.jig.point_probe",
+        "extend.customclass.create",
+        "extend.customobject.create",
+        "apply.patch",
+        "validate.patch",
+        "diff.before_after",
+        "render.layout",
+        "live.status",
+        "live.apply_patch"
       ],
       "notes": "Authoritative DWG control plane. Hosts the 29 wired ops + the v2 target families. The 1 managed op (inspect.database.summary) runs via ARIADNE_CAD_JOB; the other 28 via ARIADNE_NATIVE_JOB. geometry_extract_truth is the read/truth lane (separate dwg_geometry_extract.v1 schema)."
     },
@@ -80,8 +134,17 @@
       "available_truth_source": "config/autocad_router_capabilities.json#routes[dxf_fast_secondary].available",
       "native_lanes": [],
       "hosts": [],
-      "capabilities": ["dxf_secondary", "db_read", "geometry_extract_truth"],
-      "operation_families": ["inspect.database.graph", "inspect.entities", "query.entities", "diff.before_after"],
+      "capabilities": [
+        "dxf_secondary",
+        "db_read",
+        "geometry_extract_truth"
+      ],
+      "operation_families": [
+        "inspect.database.graph",
+        "inspect.entities",
+        "query.entities",
+        "diff.before_after"
+      ],
       "cross_engine_role": "Secondary read/cross-check lane for DXF without AutoCAD (375=375 cross-engine parity vs dwg_truth_autocad). Read-only; never an authoritative write lane.",
       "notes": "python:dxf_fast_secondary handler for graph/entity reads when no AutoCAD host is available. Lossy vs native truth (no dynamic-block/xdata fidelity guarantees)."
     },
@@ -91,8 +154,14 @@
       "available_truth_source": "config/autocad_router_capabilities.json#routes[dwg_libredwg_sidecar].available",
       "native_lanes": [],
       "hosts": [],
-      "capabilities": ["db_read", "dxf_secondary"],
-      "operation_families": ["inspect.database.graph", "diff.before_after"],
+      "capabilities": [
+        "db_read",
+        "dxf_secondary"
+      ],
+      "operation_families": [
+        "inspect.database.graph",
+        "diff.before_after"
+      ],
       "cross_engine_role": "GPL sidecar cross-check ONLY. Separate process; never link/import into the production router.",
       "notes": "DWG read without AutoCAD for crosscheck/diff. Sidecar-only per GPL boundary."
     },
@@ -102,7 +171,11 @@
       "available_truth_source": "config/autocad_router_capabilities.json#routes[solid_brep_occ].available",
       "native_lanes": [],
       "hosts": [],
-      "capabilities": ["step_brep", "brep_solid", "geometry_kernel"],
+      "capabilities": [
+        "step_brep",
+        "brep_solid",
+        "geometry_kernel"
+      ],
       "operation_families": [],
       "notes": "STEP/BREP/IGES topology lane. Not an AutoCAD DWG operation host; complements the catalog brep_solids family for non-DWG solids."
     },
@@ -112,7 +185,10 @@
       "available_truth_source": "config/autocad_router_capabilities.json#routes[parametric_rebuild].available",
       "native_lanes": [],
       "hosts": [],
-      "capabilities": ["step_brep", "geometry_kernel"],
+      "capabilities": [
+        "step_brep",
+        "geometry_kernel"
+      ],
       "operation_families": [],
       "notes": "Generation-only (output STEP/STL/SVG). Not a DWG read/write op host."
     },
@@ -122,7 +198,10 @@
       "available_truth_source": "config/autocad_router_capabilities.json#routes[ifc_bim_semantic].available",
       "native_lanes": [],
       "hosts": [],
-      "capabilities": ["ifc_bim", "db_read"],
+      "capabilities": [
+        "ifc_bim",
+        "db_read"
+      ],
       "operation_families": [],
       "notes": "IFC/BIM semantic read. Out of the AutoCAD op surface; referenced for cross-domain BIM alignment only."
     },
@@ -132,7 +211,9 @@
       "available_truth_source": "config/autocad_router_capabilities.json#routes[mesh_analysis].available",
       "native_lanes": [],
       "hosts": [],
-      "capabilities": ["mesh"],
+      "capabilities": [
+        "mesh"
+      ],
       "operation_families": [],
       "notes": "STL/OBJ/PLY mesh analysis. Non-DWG."
     },
@@ -142,7 +223,9 @@
       "available_truth_source": "config/autocad_router_capabilities.json#routes[pointcloud_route].available",
       "native_lanes": [],
       "hosts": [],
-      "capabilities": ["pointcloud"],
+      "capabilities": [
+        "pointcloud"
+      ],
       "operation_families": [],
       "notes": "LAS/LAZ/PCD point cloud. Non-DWG."
     },
@@ -152,7 +235,10 @@
       "available_truth_source": "config/autocad_router_capabilities.json#routes[geo_vector_route].available",
       "native_lanes": [],
       "hosts": [],
-      "capabilities": ["geo_vector", "dxf_secondary"],
+      "capabilities": [
+        "geo_vector",
+        "dxf_secondary"
+      ],
       "operation_families": [],
       "notes": "SHP/GeoJSON/DGN vector IO + CRS. Non-DWG (DXF/DGN secondary read only)."
     },
@@ -162,8 +248,12 @@
       "available_truth_source": "config/autocad_router_capabilities.json#routes[pdf_svg_vector_route].available",
       "native_lanes": [],
       "hosts": [],
-      "capabilities": ["vector_pdf_svg"],
-      "operation_families": ["render.layout"],
+      "capabilities": [
+        "vector_pdf_svg"
+      ],
+      "operation_families": [
+        "render.layout"
+      ],
       "notes": "PDF/SVG vector path extraction. Candidate downstream for a future headless render.layout overlay (render itself remains blocked on the plot host)."
     },
     "raster_compare_route": {
@@ -172,45 +262,150 @@
       "available_truth_source": "config/autocad_router_capabilities.json#routes[raster_compare_route].available",
       "native_lanes": [],
       "hosts": [],
-      "capabilities": ["raster_compare"],
-      "operation_families": ["diff.before_after"],
+      "capabilities": [
+        "raster_compare"
+      ],
+      "operation_families": [
+        "diff.before_after"
+      ],
       "notes": "PNG/JPG render SSIM compare. Candidate visual-QA backend for diff.before_after when a rendered image pair exists."
     }
   },
   "capability_to_routes": {
     "_comment": "Reverse index: capability -> routes that satisfy it (priority order). Router picks the cheapest available host/route via the v1 fallback_to chain.",
-    "db_read": ["dwg_truth_autocad", "dxf_fast_secondary", "dwg_libredwg_sidecar", "ifc_bim_semantic"],
-    "db_write_staged": ["dwg_truth_autocad"],
-    "db_write_original": ["dwg_truth_autocad"],
-    "entity_crud": ["dwg_truth_autocad"],
-    "symbol_table_crud": ["dwg_truth_autocad"],
-    "dictionary_xrecord_xdata": ["dwg_truth_autocad"],
-    "block_xref": ["dwg_truth_autocad"],
-    "layout_plot": ["dwg_truth_autocad"],
-    "geometry_kernel": ["dwg_truth_autocad", "solid_brep_occ", "parametric_rebuild"],
-    "brep_solid": ["dwg_truth_autocad", "solid_brep_occ"],
-    "runtime_capabilities": ["dwg_truth_autocad"],
-    "reactor_overrule": ["dwg_truth_autocad"],
-    "custom_object_protocol": ["dwg_truth_autocad"],
-    "jig_interactive": ["dwg_truth_autocad"],
-    "graph_ir_export": ["dwg_truth_autocad", "dxf_fast_secondary", "dwg_libredwg_sidecar"],
-    "patch_apply": ["dwg_truth_autocad"],
-    "patch_validate": ["dwg_truth_autocad"],
-    "diff_snapshot": ["dwg_truth_autocad", "dxf_fast_secondary", "raster_compare_route"],
-    "live_active_document": ["dwg_truth_autocad"],
-    "geometry_extract_truth": ["dwg_truth_autocad", "dxf_fast_secondary"],
-    "dxf_secondary": ["dxf_fast_secondary", "geo_vector_route", "dwg_libredwg_sidecar"],
-    "ifc_bim": ["ifc_bim_semantic"],
-    "step_brep": ["solid_brep_occ", "parametric_rebuild"],
-    "mesh": ["mesh_analysis"],
-    "pointcloud": ["pointcloud_route"],
-    "geo_vector": ["geo_vector_route"],
-    "vector_pdf_svg": ["pdf_svg_vector_route"],
-    "raster_compare": ["raster_compare_route"]
+    "db_read": [
+      "dwg_truth_autocad",
+      "dxf_fast_secondary",
+      "dwg_libredwg_sidecar",
+      "ifc_bim_semantic"
+    ],
+    "db_write_staged": [
+      "dwg_truth_autocad"
+    ],
+    "db_write_original": [
+      "dwg_truth_autocad"
+    ],
+    "entity_crud": [
+      "dwg_truth_autocad"
+    ],
+    "symbol_table_crud": [
+      "dwg_truth_autocad"
+    ],
+    "dictionary_xrecord_xdata": [
+      "dwg_truth_autocad"
+    ],
+    "block_xref": [
+      "dwg_truth_autocad"
+    ],
+    "layout_plot": [
+      "dwg_truth_autocad"
+    ],
+    "geometry_kernel": [
+      "dwg_truth_autocad",
+      "solid_brep_occ",
+      "parametric_rebuild"
+    ],
+    "brep_solid": [
+      "dwg_truth_autocad",
+      "solid_brep_occ"
+    ],
+    "runtime_capabilities": [
+      "dwg_truth_autocad"
+    ],
+    "reactor_overrule": [
+      "dwg_truth_autocad"
+    ],
+    "custom_object_protocol": [
+      "dwg_truth_autocad"
+    ],
+    "jig_interactive": [
+      "dwg_truth_autocad"
+    ],
+    "graph_ir_export": [
+      "dwg_truth_autocad",
+      "dxf_fast_secondary",
+      "dwg_libredwg_sidecar"
+    ],
+    "patch_apply": [
+      "dwg_truth_autocad"
+    ],
+    "patch_validate": [
+      "dwg_truth_autocad"
+    ],
+    "diff_snapshot": [
+      "dwg_truth_autocad",
+      "dxf_fast_secondary",
+      "raster_compare_route"
+    ],
+    "live_active_document": [
+      "dwg_truth_autocad"
+    ],
+    "geometry_extract_truth": [
+      "dwg_truth_autocad",
+      "dxf_fast_secondary"
+    ],
+    "dxf_secondary": [
+      "dxf_fast_secondary",
+      "geo_vector_route",
+      "dwg_libredwg_sidecar"
+    ],
+    "ifc_bim": [
+      "ifc_bim_semantic"
+    ],
+    "step_brep": [
+      "solid_brep_occ",
+      "parametric_rebuild"
+    ],
+    "mesh": [
+      "mesh_analysis"
+    ],
+    "pointcloud": [
+      "pointcloud_route"
+    ],
+    "geo_vector": [
+      "geo_vector_route"
+    ],
+    "vector_pdf_svg": [
+      "pdf_svg_vector_route"
+    ],
+    "raster_compare": [
+      "raster_compare_route"
+    ]
   },
   "invariants": {
     "availability_truth": "A route is available ONLY if every REQUIRED tool imports/resolves (live probe). This file never asserts availability; it only maps capabilities. Consult reports/autocad_router_status_latest.json.",
     "no_modify_v1": "config/autocad_router_capabilities.json is READ-ONLY to this lane and is not modified.",
     "no_fake_success": "Unavailable/unimplemented capability => explicit not_implemented/unavailable/blocked, never a faked pass."
+  },
+  "m04_tool_surface_binding": {
+    "packet": "CADOS_M04_OPERATION_REGISTRY_AND_TOOL_SURFACE",
+    "operations_v2_records": 517,
+    "catalog_total_ops": 480,
+    "catalog_classified_ops": 480,
+    "catalog_unclassified_ops": 0,
+    "unknown_status_count": 0,
+    "registry_status_vocabulary": [
+      "implemented",
+      "wired",
+      "stub",
+      "catalogued",
+      "blocked",
+      "deprecated"
+    ],
+    "cadctl_commands": [
+      "status",
+      "inspect",
+      "query",
+      "get-entity",
+      "validate",
+      "registry list",
+      "registry coverage",
+      "registry explain",
+      "patch dry-run",
+      "diff",
+      "visual",
+      "live status"
+    ],
+    "router_explain": "autocad-router.ps1 -Action explain -Operation <op> returns operations.v2-derived records."
   }
 }
