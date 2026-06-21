@@ -1,6 +1,6 @@
 {
   "schema": "ariadne.validation_report.v1",
-  "validation_id": "val-0aee9426da99",
+  "validation_id": "val-d34eb41f01bf",
   "status": "pass",
   "gates": [
     {
@@ -14,7 +14,7 @@
       "operator": "eq",
       "message": "",
       "detail": "",
-      "evidence_ref": "runs/m03_rich_ir/dwg_graph_ir.json"
+      "evidence_ref": "runs\\m05_patch_create_line\\post\\dwg_graph_ir.json"
     },
     {
       "id": "entity_count_consistency",
@@ -22,33 +22,35 @@
       "status": "pass",
       "required": true,
       "description": "diagnostics.entity_count == len(entities) == independent summary count (when present)",
-      "expected": 21747,
-      "actual": 21747,
+      "expected": 21748,
+      "actual": 21748,
       "operator": "eq",
-      "message": "entity_count==len(entities)==21747 (cross-checked vs diagnostics.realized_entity_count=21747)",
-      "detail": "entity_count==len(entities)==21747 (cross-checked vs diagnostics.realized_entity_count=21747)",
-      "evidence_ref": "runs/m03_rich_ir/dwg_graph_ir.json"
+      "message": "entity_count==len(entities)==21748 (cross-checked vs diagnostics.realized_entity_count=21748)",
+      "detail": "entity_count==len(entities)==21748 (cross-checked vs diagnostics.realized_entity_count=21748)",
+      "evidence_ref": "runs\\m05_patch_create_line\\post\\dwg_graph_ir.json"
     },
     {
       "id": "required_artifacts_exist",
       "gate": "required_artifacts_exist",
       "status": "pass",
       "required": true,
-      "description": "run folder contains the expected artifacts (cadctl inspect OR patch run)",
+      "description": "patch run folder contains patch.json, cad_diff.json, journal.json, staged_output.dwg",
       "expected": [
-        "cad_job.json",
-        "cad_result.json",
-        "dwg_graph_ir.json"
+        "patch.json",
+        "cad_diff.json",
+        "journal.json",
+        "staged_output.dwg"
       ],
       "actual": [
-        "cad_job.json",
-        "cad_result.json",
-        "dwg_graph_ir.json"
+        "cad_diff.json",
+        "journal.json",
+        "patch.json",
+        "staged_output.dwg"
       ],
       "operator": "exists",
       "message": "",
       "detail": "",
-      "evidence_ref": "runs/m03_rich_ir"
+      "evidence_ref": "runs\\m05_patch_create_line"
     },
     {
       "id": "no_original_write_evidence",
@@ -58,12 +60,12 @@
       "description": "extraction operated on a staged copy, never the read-only original",
       "expected": "dwg_path != original_path",
       "actual": {
-        "dwg_path": "D:\\dev\\99_tools\\autocad-sdk-router\\staging\\golden\\20260622_034424_873\\input.dwg",
+        "dwg_path": "runs\\m05_patch_create_line\\staged_output.dwg",
         "original_path": "D:\\dev\\99_tools\\autocad-sdk-router\\staging\\dwg_20260617_191504\\input.dwg"
       },
       "operator": "ne",
-      "message": "operated on staged copy under staging/",
-      "detail": "operated on staged copy under staging/"
+      "message": "operated on staged copy",
+      "detail": "operated on staged copy"
     },
     {
       "id": "registry_status_consistency",
@@ -97,96 +99,129 @@
         "stdout",
         "stderr"
       ],
-      "actual": [
-        "stderr.txt",
-        "stdout.txt"
-      ],
+      "actual": [],
       "operator": "exists",
       "message": "",
       "detail": "",
-      "evidence_ref": "runs/m03_rich_ir"
+      "evidence_ref": "runs\\m05_patch_create_line"
     },
     {
       "id": "cad_diff_schema",
       "gate": "cad_diff_schema",
-      "status": "skipped",
-      "required": false,
+      "status": "pass",
+      "required": true,
       "description": "diff parses and conforms to cad_diff.v1 (structural if jsonschema absent)",
       "expected": "ariadne.cad_diff.v1",
-      "operator": "exists",
-      "message": "no diff supplied; cad_diff schema gate skipped",
-      "detail": "no diff supplied; cad_diff schema gate skipped",
-      "skip_benign": true
+      "actual": "ariadne.cad_diff.v1",
+      "operator": "eq",
+      "message": "validated against cad_diff.v1.schema.json (jsonschema)",
+      "detail": "validated against cad_diff.v1.schema.json (jsonschema)",
+      "evidence_ref": "runs\\m05_patch_create_line\\cad_diff.json"
     },
     {
       "id": "diff_expected_changes",
       "gate": "diff_expected_changes",
-      "status": "skipped",
-      "required": false,
+      "status": "pass",
+      "required": true,
       "description": "diff records >=1 created/modified/deleted (a patch that produced NO diff is NOT a success)",
       "expected": ">=1 change",
+      "actual": {
+        "created": 1,
+        "modified": 0,
+        "deleted": 0,
+        "total": 1
+      },
       "operator": "ge",
-      "message": "no diff supplied; expected-changes gate skipped",
-      "detail": "no diff supplied; expected-changes gate skipped",
-      "skip_benign": true
+      "message": "1 change(s): +1 ~0 -0",
+      "detail": "1 change(s): +1 ~0 -0",
+      "evidence_ref": "runs\\m05_patch_create_line\\cad_diff.json"
     },
     {
       "id": "no_unrelated_changes",
       "gate": "no_unrelated_changes",
-      "status": "skipped",
+      "status": "pass",
       "required": false,
       "description": "modified/deleted handles fall within the patch's declared expectation when a patch is given (else informational)",
+      "expected": "informational (no per-handle expectation declared)",
+      "actual": {
+        "modified_or_removed": []
+      },
       "operator": "eq",
-      "message": "no diff supplied; unrelated-changes gate skipped",
-      "detail": "no diff supplied; unrelated-changes gate skipped",
-      "skip_benign": true
+      "message": "informational: 0 modified/removed handle(s); no declared per-handle expectation to enforce",
+      "detail": "informational: 0 modified/removed handle(s); no declared per-handle expectation to enforce",
+      "evidence_ref": "runs\\m05_patch_create_line\\cad_diff.json"
     },
     {
       "id": "patch_policy",
       "gate": "patch_policy",
-      "status": "skipped",
-      "required": false,
+      "status": "pass",
+      "required": true,
       "description": "patch (cad_patch.v1) declares allow_original_write false (policy.staged_copy true + safe write_mode)",
+      "expected": {
+        "staged_copy": true,
+        "allow_original_write": false
+      },
+      "actual": {
+        "staged_copy": true,
+        "write_mode": "write_copy",
+        "allow_original_write": false,
+        "staged_path": "runs\\m05_patch_create_line\\staged_input.dwg",
+        "original_path": "staging\\dwg_20260617_191504\\input.dwg"
+      },
       "operator": "eq",
-      "message": "no patch supplied; patch-policy gate skipped",
-      "detail": "no patch supplied; patch-policy gate skipped",
-      "skip_benign": true
+      "message": "staged write, original protected",
+      "detail": "staged write, original protected",
+      "evidence_ref": "runs\\m05_patch_create_line\\patch.json"
     },
     {
       "id": "staged_copy_used",
       "gate": "staged_copy_used",
-      "status": "skipped",
-      "required": false,
+      "status": "pass",
+      "required": true,
       "description": "patch run folder contains staged_input.dwg / staged_output.dwg",
+      "expected": [
+        "staged_input.dwg",
+        "staged_output.dwg"
+      ],
+      "actual": [
+        "staged_input.dwg",
+        "staged_output.dwg"
+      ],
       "operator": "exists",
-      "message": "run_dir is not a patch run; staged-copy gate skipped",
-      "detail": "run_dir is not a patch run; staged-copy gate skipped",
-      "evidence_ref": "runs/m03_rich_ir",
-      "skip_benign": true
+      "message": "staged copies present",
+      "detail": "staged copies present",
+      "evidence_ref": "runs\\m05_patch_create_line"
     },
     {
       "id": "journal_present",
       "gate": "journal_present",
-      "status": "skipped",
-      "required": false,
+      "status": "pass",
+      "required": true,
       "description": "patch run folder records a journal.json",
+      "expected": "journal.json",
+      "actual": "present",
       "operator": "exists",
-      "message": "not a patch run; journal gate skipped",
-      "detail": "not a patch run; journal gate skipped",
-      "evidence_ref": "runs/m03_rich_ir",
-      "skip_benign": true
+      "message": "journal.json present",
+      "detail": "journal.json present",
+      "evidence_ref": "runs\\m05_patch_create_line"
     },
     {
       "id": "original_dwg_unchanged",
       "gate": "original_dwg_unchanged",
-      "status": "skipped",
-      "required": false,
+      "status": "pass",
+      "required": true,
       "description": "journal records original DWG sha256 before == after (read-only honored)",
+      "expected": {
+        "sha256_before == sha256_after": true
+      },
+      "actual": {
+        "before": "27dbf6b95ff72a89fd53b153891187365b9e8ebc4c05a97cfed307057bf49bc8",
+        "after": "27dbf6b95ff72a89fd53b153891187365b9e8ebc4c05a97cfed307057bf49bc8"
+      },
       "operator": "eq",
-      "message": "not a patch run; original-unchanged gate skipped",
-      "detail": "not a patch run; original-unchanged gate skipped",
-      "evidence_ref": "runs/m03_rich_ir",
-      "skip_benign": true
+      "message": "original DWG sha256 unchanged across the patch",
+      "detail": "original DWG sha256 unchanged across the patch",
+      "evidence_ref": "runs\\m05_patch_create_line"
     },
     {
       "id": "no_fake_success",
@@ -201,7 +236,7 @@
       "operator": "eq",
       "message": "coverage flags are honest (no fake-success contradiction)",
       "detail": "coverage flags are honest (no fake-success contradiction)",
-      "evidence_ref": "runs/m03_rich_ir/dwg_graph_ir.json"
+      "evidence_ref": "runs\\m05_patch_create_line\\post\\dwg_graph_ir.json"
     }
   ],
   "errors": [],
@@ -209,25 +244,33 @@
   "artifacts": [
     {
       "kind": "ir_json",
-      "ref": "runs/m03_rich_ir/dwg_graph_ir.json"
+      "ref": "runs\\m05_patch_create_line\\post\\dwg_graph_ir.json"
     },
     {
       "kind": "run_dir",
-      "ref": "runs/m03_rich_ir"
+      "ref": "runs\\m05_patch_create_line"
+    },
+    {
+      "kind": "diff",
+      "ref": "runs\\m05_patch_create_line\\cad_diff.json"
+    },
+    {
+      "kind": "patch",
+      "ref": "runs\\m05_patch_create_line\\patch.json"
     }
   ],
   "summary": {
     "gates_total": 14,
-    "gates_passed": 7,
+    "gates_passed": 14,
     "gates_failed": 0,
-    "gates_skipped": 7,
-    "gates_skipped_benign": 7,
+    "gates_skipped": 0,
+    "gates_skipped_benign": 0,
     "gates_blocked": 0,
     "schema_check_basis": "jsonschema",
-    "is_patch_run": false
+    "is_patch_run": true
   },
   "subject_ref": {
     "kind": "ir",
-    "ref": "runs/m03_rich_ir/dwg_graph_ir.json"
+    "ref": "runs\\m05_patch_create_line\\post\\dwg_graph_ir.json"
   }
 }

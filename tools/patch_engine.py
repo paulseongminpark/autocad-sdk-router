@@ -91,13 +91,12 @@ PATCH_SCHEMA_ID = "ariadne.cad_patch.v1"
 RESULT_SCHEMA_ID = "ariadne.cad_patch.result.v1"
 
 # The declared high-level mutation operations this shell understands, mapped to
-# the operation-registry id (config/operations.v2.json) that would carry them.
-# The patch-apply pipeline itself routes through 'apply.patch' (a stub op today),
-# so EXECUTION of any of these is not_implemented in this packet.
+# the operation-registry id (config/operations.v2.json) that carries the native
+# operation evidence.
 OP_REGISTRY_MAP: Dict[str, str] = {
-    "create_line": "write.entity.create",
-    "create_polyline": "write.entity.create",
-    "create_text": "write.entity.create",
+    "create_line": "write.entity.line",
+    "create_polyline": "write.entity.polyline",
+    "create_text": "write.entity.text",
     "set_layer": "write.entity.modify",
     "move_entity": "write.entity.modify",
     "delete_entity": "write.entity.delete",

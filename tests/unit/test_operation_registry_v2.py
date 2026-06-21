@@ -202,6 +202,12 @@ class TestFrozenV1OpsStillPresent(unittest.TestCase):
             self.assertEqual(self.by_id[op].get("status"), "implemented",
                              "native write op %s not implemented" % op)
 
+    def test_m05_patch_diff_validator_ops_are_implemented(self):
+        for op in ("apply.patch", "validate.patch", "diff.before_after"):
+            self.assertIn(op, self.by_id, "M05 op %s missing" % op)
+            self.assertEqual(self.by_id[op].get("status"), "implemented",
+                             "M05 op %s not implemented" % op)
+
 
 class TestRegistryConformsToSchema(unittest.TestCase):
     def test_validates_against_registry_schema(self):

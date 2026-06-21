@@ -1,0 +1,157 @@
+{
+  "schema": "ariadne.cad_patch.journal.v1",
+  "patch_id": "m05-create-line-20260622",
+  "started_at": "2026-06-21T20:02:26.233058+00:00",
+  "out_dir": "runs\\m05_patch_create_line",
+  "steps": [
+    {
+      "step": "validate_patch_schema",
+      "status": "pass",
+      "at": "2026-06-21T20:02:26.233058+00:00",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "step": "classify_patch_risk",
+      "status": "pass",
+      "at": "2026-06-21T20:02:26.233058+00:00",
+      "risk": "low",
+      "reasons": []
+    },
+    {
+      "step": "guards",
+      "status": "pass",
+      "at": "2026-06-21T20:02:26.233058+00:00",
+      "guards": [
+        {
+          "ok": true,
+          "guard": "require_staged_copy",
+          "message": "staged copy is distinct from original"
+        },
+        {
+          "ok": true,
+          "guard": "reject_write_original_by_default",
+          "message": "write_mode=write_copy is safe"
+        },
+        {
+          "ok": true,
+          "guard": "require_validation",
+          "message": "validation conditions present (or no-op)"
+        }
+      ]
+    },
+    {
+      "step": "resolve_native_write_op",
+      "status": "pass",
+      "at": "2026-06-21T20:02:26.233058+00:00",
+      "patch_op": "create_line",
+      "native_op": "write.entity.line",
+      "deferred": 0
+    },
+    {
+      "step": "create_staged_copy",
+      "status": "pass",
+      "at": "2026-06-21T20:02:26.238670+00:00",
+      "staged_path": "runs\\m05_patch_create_line\\staged_input.dwg",
+      "original_path": "D:\\dev\\99_tools\\autocad-sdk-router\\staging\\dwg_20260617_191504\\input.dwg",
+      "original_sha256_before": "27dbf6b95ff72a89fd53b153891187365b9e8ebc4c05a97cfed307057bf49bc8",
+      "original_byte_size": 2524981
+    },
+    {
+      "step": "pre_inspect",
+      "status": "pass",
+      "at": "2026-06-21T20:02:38.546895+00:00",
+      "ir_path": "runs\\m05_patch_create_line\\pre\\dwg_graph_ir.json",
+      "entity_count": 21747,
+      "exit_code": 0,
+      "stdout": "runs\\m05_patch_create_line\\pre\\stdout.txt",
+      "stderr": "runs\\m05_patch_create_line\\pre\\stderr.txt",
+      "reason": null
+    },
+    {
+      "step": "apply",
+      "status": "pass",
+      "at": "2026-06-21T20:02:48.497991+00:00",
+      "native_op": "write.entity.line",
+      "staged_output": "runs\\m05_patch_create_line\\staged_output.dwg",
+      "staged_used": "D:\\dev\\99_tools\\autocad-sdk-router\\staging\\dwg_job_20260622_050245\\input.dwg",
+      "exit_code": 0,
+      "stdout": "runs\\m05_patch_create_line\\apply\\stdout.txt",
+      "stderr": "runs\\m05_patch_create_line\\apply\\stderr.txt"
+    },
+    {
+      "step": "post_inspect",
+      "status": "pass",
+      "at": "2026-06-21T20:03:00.588216+00:00",
+      "ir_path": "runs\\m05_patch_create_line\\post\\dwg_graph_ir.json",
+      "entity_count": 21748,
+      "exit_code": 0,
+      "stdout": "runs\\m05_patch_create_line\\post\\stdout.txt",
+      "stderr": "runs\\m05_patch_create_line\\post\\stderr.txt",
+      "reason": null
+    },
+    {
+      "step": "compute_diff",
+      "status": "pass",
+      "at": "2026-06-21T20:03:01.717334+00:00",
+      "diff_path": "runs\\m05_patch_create_line\\cad_diff.json",
+      "summary": {
+        "added": 1,
+        "removed": 0,
+        "modified": 0,
+        "unchanged": 21747,
+        "entity_count_before": 21747,
+        "entity_count_after": 21748,
+        "by_type": {
+          "LINE": {
+            "added": 1,
+            "removed": 0,
+            "modified": 0
+          }
+        },
+        "created_count": 1,
+        "deleted_count": 0,
+        "modified_count": 0,
+        "unchanged_count": 21747
+      }
+    },
+    {
+      "step": "validate",
+      "status": "pass",
+      "at": "2026-06-21T20:03:01.909995+00:00",
+      "report": "runs\\m05_patch_create_line\\validation_report.json",
+      "validation_status": "pass",
+      "passed_kwargs": [
+        "diff_path",
+        "ir_path",
+        "patch_path",
+        "run_dir"
+      ],
+      "diff_aware": true
+    },
+    {
+      "step": "original_unchanged_proof",
+      "status": "pass",
+      "at": "2026-06-21T20:03:01.912235+00:00",
+      "proof": {
+        "original_path": "D:\\dev\\99_tools\\autocad-sdk-router\\staging\\dwg_20260617_191504\\input.dwg",
+        "sha256_before": "27dbf6b95ff72a89fd53b153891187365b9e8ebc4c05a97cfed307057bf49bc8",
+        "sha256_after": "27dbf6b95ff72a89fd53b153891187365b9e8ebc4c05a97cfed307057bf49bc8",
+        "unchanged": true
+      }
+    }
+  ],
+  "original_unchanged": {
+    "original_path": "D:\\dev\\99_tools\\autocad-sdk-router\\staging\\dwg_20260617_191504\\input.dwg",
+    "sha256_before": "27dbf6b95ff72a89fd53b153891187365b9e8ebc4c05a97cfed307057bf49bc8",
+    "sha256_after": "27dbf6b95ff72a89fd53b153891187365b9e8ebc4c05a97cfed307057bf49bc8",
+    "unchanged": true
+  },
+  "original": {
+    "original_path": "D:\\dev\\99_tools\\autocad-sdk-router\\staging\\dwg_20260617_191504\\input.dwg",
+    "sha256_before": "27dbf6b95ff72a89fd53b153891187365b9e8ebc4c05a97cfed307057bf49bc8",
+    "sha256_after": "27dbf6b95ff72a89fd53b153891187365b9e8ebc4c05a97cfed307057bf49bc8"
+  },
+  "finished_at": "2026-06-21T20:03:01.912235+00:00",
+  "result_status": "ok"
+}

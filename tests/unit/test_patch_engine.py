@@ -168,11 +168,12 @@ class TestDryRunPlan(unittest.TestCase):
         self.assertFalse(plan["guards_ok"])
 
     def test_plan_records_registry_status_for_create(self):
-        # create_* maps to write.entity.create; the plan surfaces that op's
-        # registry status so a reader sees whether the real handler exists.
+        # create_line maps to the concrete native line writer; the plan surfaces
+        # that op's registry status so a reader sees whether the real handler
+        # exists.
         plan = self.pe.dry_run_plan(_good_patch())
         po = plan["planned_ops"][0]
-        self.assertEqual(po["registry_op"], "write.entity.create")
+        self.assertEqual(po["registry_op"], "write.entity.line")
         # registry_status may be a real status string or None if registry absent;
         # both are truthful. It must be present as a key.
         self.assertIn("registry_status", po)

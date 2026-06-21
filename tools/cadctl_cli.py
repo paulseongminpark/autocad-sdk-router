@@ -84,12 +84,22 @@ def build_parser() -> argparse.ArgumentParser:
     patch = sub.add_parser("patch", help="patch shell commands")
     patch_sub = patch.add_subparsers(dest="patch_command", required=True)
     patch_dry = patch_sub.add_parser("dry-run", help="plan a cad_patch.v1 without applying it")
+    patch_dry.add_argument("--dwg", help="source DWG path; recorded for M05 command parity")
+    patch_dry.add_argument("--out", help="optional output run directory for patch.json + dry_run_plan.json")
+    patch_dry.add_argument("--patch", help="path to a cad_patch.v1 JSON file")
     patch_dry.add_argument("--patch-json", help="inline cad_patch.v1 JSON")
     patch_dry.add_argument("--patch-file", help="path to a cad_patch.v1 JSON file")
+    patch_apply = patch_sub.add_parser("apply-staged", help="apply a cad_patch.v1 to a staged copy")
+    patch_apply.add_argument("--dwg", required=True, help="source DWG path; original stays read-only")
+    patch_apply.add_argument("--patch", required=True, help="path to a cad_patch.v1 JSON file")
+    patch_apply.add_argument("--out", required=True, help="output run directory")
 
     diff = sub.add_parser("diff", help="structural IR diff shell")
-    diff.add_argument("--pre-ir", required=True, help="before dwg_graph_ir.json")
-    diff.add_argument("--post-ir", required=True, help="after dwg_graph_ir.json")
+    diff.add_argument("--pre-ir", dest="pre_ir", help="before dwg_graph_ir.json")
+    diff.add_argument("--post-ir", dest="post_ir", help="after dwg_graph_ir.json")
+    diff.add_argument("--before", dest="before", help="before dwg_graph_ir.json (M05 packet alias)")
+    diff.add_argument("--after", dest="after", help="after dwg_graph_ir.json (M05 packet alias)")
+    diff.add_argument("--out", help="optional output run directory for cad_diff.json")
 
     visual = sub.add_parser("visual", help="visual report shell")
     visual.add_argument("--source-ref", required=True, help="DWG/IR/source artifact path")
@@ -106,11 +116,20 @@ def build_parser() -> argparse.ArgumentParser:
 
 
 def _load_patch_arg(args) -> dict:
-    if args.patch_json:
-        return json.loads(args.patch_json)
-    if args.patch_file:
-        return json.loads(Path(args.patch_file).read_text(encoding="utf-8-sig"))
+    patch_json = getattr(args, "patch_json", None)
+    if patch_json:
+        return json.loads(patch_json)
+    if getattr(args, "patch", None):
+        return json.loads(Path(args.patch).read_text(encoding="utf-8-sig"))
+    patch_file = getattr(args, "patch_file", None)
+    if patch_file:
+        return json.loads(Path(patch_file).read_text(encoding="utf-8-sig"))
     return {}
+
+
+def _write_json(path: Path, payload: dict) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -139,9 +158,39 @@ def main(argv: list[str] | None = None) -> int:
                 return _emit(cad.registry_explain(args.op_id))
         if args.command == "patch":
             if args.patch_command == "dry-run":
-                return _emit(cad.patch_dry_run(_load_patch_arg(args)))
+                patch_doc = _load_patch_arg(args)
+                result = cad.patch_dry_run(patch_doc)
+                if args.out:
+                    out_dir = Path(args.out)
+                    _write_json(out_dir / "patch.json", patch_doc)
+                    _write_json(out_dir / "dry_run_plan.json", result)
+                    result = dict(result)
+                    result["out_dir"] = str(out_dir)
+                    result["patch_ref"] = str(out_dir / "patch.json")
+                    result["plan_ref"] = str(out_dir / "dry_run_plan.json")
+                    if args.dwg:
+                        result["dwg"] = args.dwg
+                return _emit(result)
+            if args.patch_command == "apply-staged":
+                return _emit(cad.patch_apply_staged(
+                    _load_patch_arg(args), args.dwg, args.out))
         if args.command == "diff":
-            return _emit(cad.diff_before_after(args.pre_ir, args.post_ir))
+            before = args.pre_ir or args.before
+            after = args.post_ir or args.after
+            if not before or not after:
+                return _emit({
+                    "schema": "ariadne.cad_diff.v1",
+                    "status": "blocked",
+                    "reason": "diff requires --before/--after or --pre-ir/--post-ir",
+                })
+            result = cad.diff_before_after(before, after)
+            if args.out and result.get("schema") == "ariadne.cad_diff.v1" and result.get("status") != "blocked":
+                out_dir = Path(args.out)
+                diff_ref = out_dir / "cad_diff.json"
+                _write_json(diff_ref, result)
+                result = dict(result)
+                result["diff_ref"] = str(diff_ref)
+            return _emit(result)
         if args.command == "visual":
             return _emit(cad.visual_report(
                 args.source_ref, kind=args.kind, artifact_id=args.artifact_id,

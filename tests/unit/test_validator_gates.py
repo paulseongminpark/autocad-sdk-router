@@ -224,9 +224,13 @@ class TestPatchRunFolderGates(unittest.TestCase):
                 fh.write(b"STAGED-OUT")
         with open(os.path.join(run, "cad_diff.json"), "w", encoding="utf-8") as fh:
             json.dump(_diff_with_one_added(), fh)
-        with open(os.path.join(run, "cad_patch.json"), "w", encoding="utf-8") as fh:
+        with open(os.path.join(run, "patch.json"), "w", encoding="utf-8") as fh:
             json.dump(_good_patch(os.path.join(run, "staged_input.dwg"),
                                   os.path.join(tmp, "orig.dwg")), fh)
+        with open(os.path.join(run, "stdout.txt"), "w", encoding="utf-8") as fh:
+            fh.write("ok\n")
+        with open(os.path.join(run, "stderr.txt"), "w", encoding="utf-8") as fh:
+            fh.write("")
         sha_a = "a" * 64
         sha_b = sha_a if journal_unchanged else ("b" * 64)
         journal = {
@@ -251,6 +255,24 @@ class TestPatchRunFolderGates(unittest.TestCase):
             self.assertIsNotNone(g, "gate %s missing" % gid)
             self.assertEqual(g["status"], "pass",
                              "patch-run gate %s did not pass: %r" % (gid, g))
+
+    def test_patch_run_discovers_post_ir_for_core_gates(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            run = self._make_patch_run(tmp)
+            post = os.path.join(run, "post")
+            os.makedirs(post, exist_ok=True)
+            _write_ir(_good_ir(), post)
+
+            report = self.validator.validate_target(run_dir=run)
+
+        self.assertEqual(report["status"], "pass", report)
+        for gid in ("ir_schema_present", "entity_count_consistency",
+                    "no_original_write_evidence"):
+            g = _gate(report, gid)
+            self.assertIsNotNone(g, "core IR gate %s vanished" % gid)
+            self.assertEqual(g["status"], "pass",
+                             "core IR gate %s did not pass from post IR: %r"
+                             % (gid, g))
 
     def test_original_changed_in_journal_fails_gate(self):
         with tempfile.TemporaryDirectory() as tmp:

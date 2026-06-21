@@ -695,6 +695,29 @@ class Cad:
                 "reason": f"patch_engine.dry_run_plan failed: {type(exc).__name__}: {exc}",
             }
 
+    def patch_apply_staged(self, patch: dict, dwg_path: str, out_dir: str) -> dict:
+        """Apply a cad_patch.v1 to a staged copy through patch_engine.
+
+        This is the explicit M05 mutation surface. It delegates to
+        patch_engine.apply_staged, which copies dwg_path to out_dir first and
+        never writes the original DWG.
+        """
+        patch_engine, imp_err = _import_optional("patch_engine")
+        if patch_engine is None or not hasattr(patch_engine, "apply_staged"):
+            return {
+                "schema": "ariadne.cad_patch.result.v1",
+                "status": "not_implemented",
+                "reason": f"patch_engine.apply_staged unavailable: {imp_err}",
+            }
+        try:
+            return patch_engine.apply_staged(patch, dwg_path, out_dir)
+        except Exception as exc:
+            return {
+                "schema": "ariadne.cad_patch.result.v1",
+                "status": "error",
+                "reason": f"patch_engine.apply_staged failed: {type(exc).__name__}: {exc}",
+            }
+
     def diff_before_after(self, pre_ir_path: str, post_ir_path: str) -> dict:
         pre = Path(pre_ir_path)
         post = Path(post_ir_path)
@@ -848,6 +871,10 @@ def registry_explain(op_id: str) -> dict:
 
 def patch_dry_run(patch: dict) -> dict:
     return Cad().patch_dry_run(patch)
+
+
+def patch_apply_staged(patch: dict, dwg_path: str, out_dir: str) -> dict:
+    return Cad().patch_apply_staged(patch, dwg_path, out_dir)
 
 
 def diff_before_after(pre_ir_path: str, post_ir_path: str) -> dict:

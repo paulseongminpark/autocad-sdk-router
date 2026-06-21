@@ -1,4 +1,4 @@
-{
+﻿{
   "schema": "ariadne.operations_registry.v2",
   "version": "2.0.0",
   "generated_at": "2026-06-22",
@@ -58,8 +58,8 @@
     "by_status": {
       "blocked": 2,
       "catalogued": 474,
-      "implemented": 34,
-      "stub": 7
+      "implemented": 37,
+      "stub": 4
     },
     "by_family": {
       "active_document_write_original": 8,
@@ -130,9 +130,9 @@
       "ui_customization": 39
     },
     "operation_records": 517,
-    "implemented": 34,
+    "implemented": 37,
     "wired": 0,
-    "stub": 7,
+    "stub": 4,
     "catalogued": 474,
     "blocked": 2,
     "deprecated": 0,
@@ -2421,7 +2421,7 @@
     {
       "id": "apply.patch",
       "family": "apply",
-      "status": "stub",
+      "status": "implemented",
       "engine_tier": "objectdbx_capable",
       "host_eligibility": [
         "dbx",
@@ -2441,22 +2441,32 @@
       },
       "handler": {
         "router_lane": "ARIADNE_NATIVE_JOB",
-        "dispatcher_symbol": null,
+        "dispatcher_symbol": "patch_engine.apply_staged",
         "execution_host_class": "dbx",
-        "composed_of": []
+        "composed_of": [
+          "write.entity.line",
+          "inspect.database.graph",
+          "diff.before_after",
+          "validate.patch"
+        ]
       },
       "mapping_type": "synthetic",
       "catalog_op_id": null,
       "input_schema": "schemas/cad_job.v2.schema.json#/allOf",
       "output_schema": "schemas/cad_result.v2.schema.json",
-      "summary": "Apply a structured edit patch to a staged DWG copy. Composes write.* primitives under copy+backup+journal+validation. Not yet built.",
+      "summary": "Apply a structured edit patch to a staged DWG copy. M05 verified create_line through patch_engine.apply_staged on a staged copy with original SHA256 unchanged.",
       "evidence_refs": [
         "docs/OPERATION_REGISTRY_SPEC.md",
-        "CADOS_M01 Lane D native triage (inspect.database.graph insertion point)"
+        "CADOS_M01 Lane D native triage (inspect.database.graph insertion point)",
+        "runs/m05_patch_create_line/result.json",
+        "runs/m05_patch_create_line/cad_diff.json",
+        "runs/m05_patch_create_line/journal.json",
+        "reports/validation_latest.json",
+        "reports/CADOS_M05_PATCH_DIFF_VALIDATION_TRANSACTION.md"
       ],
       "target_family_first_class": true,
       "wired_v1": false,
-      "implementation_notes": "STUB (no-fake-success). The mutating staged-write engine (patch_engine.apply_staged) is NOT yet present on disk as of M02; the read-only pre-flight patch.dry_run (patch_engine.dry_run_plan) IS live. This record stays stub until apply_staged lands and is smoked on a staged DWG copy.",
+      "implementation_notes": "M05 IMPLEMENTED. Uses staged_input.dwg/staged_output.dwg, native write.entity.line, pre/post inspect.database.graph, cad_diff.compute_diff, validator.validate_target, journal.json, and no-original-write hash gate.",
       "operation": "apply.patch",
       "hosts": [
         "dbx",
@@ -2473,19 +2483,22 @@
       },
       "policy": {
         "source": "config/policy.v2.json",
-        "status_policy": "stub",
+        "status_policy": "implemented",
         "default_write_mode": "write_copy",
         "no_original_write_default": true
       },
       "tests": [
-        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified"
+        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
+        "tests/unit/test_m05_cli_contract.py::TestM05PacketCliContract::test_patch_apply_staged_accepts_packet_flags_and_blocks_missing_dwg",
+        "tests/unit/test_patch_engine_policy.py::TestPatchEnginePolicy::test_create_line_runs_lifecycle_and_protects_original",
+        "CADOS_M05 live smoke: runs/m05_patch_create_line/result.json"
       ],
-      "notes": "STUB (no-fake-success). The mutating staged-write engine (patch_engine.apply_staged) is NOT yet present on disk as of M02; the read-only pre-flight patch.dry_run (patch_engine.dry_run_plan) IS live. This record stays stub until apply_staged lands and is smoked on a staged DWG copy."
+      "notes": "IMPLEMENTED by tools.patch_engine.apply_staged + tools.cadctl.patch_apply_staged + cadctl_cli patch apply-staged. M05 smoke run: runs/m05_patch_create_line, status ok, diff +1 LINE, validation pass, original DWG unchanged."
     },
     {
       "id": "validate.patch",
       "family": "validate",
-      "status": "stub",
+      "status": "implemented",
       "engine_tier": "objectdbx_capable",
       "host_eligibility": [
         "dbx",
@@ -2504,18 +2517,26 @@
       },
       "handler": {
         "router_lane": "ARIADNE_NATIVE_JOB",
-        "dispatcher_symbol": null,
+        "dispatcher_symbol": "validator.validate_target",
         "execution_host_class": "dbx",
-        "composed_of": []
+        "composed_of": [
+          "diff.before_after",
+          "inspect.database.graph"
+        ]
       },
       "mapping_type": "synthetic",
       "catalog_op_id": null,
       "input_schema": "schemas/cad_job.v2.schema.json#/allOf",
       "output_schema": "schemas/validation_report.v1.schema.json",
-      "summary": "Validate a patch payload against schema + DB preconditions WITHOUT writing. Read-only dry-run for apply.patch.",
+      "summary": "Validate a staged patch run deterministically against post IR, diff, patch policy, journal, staged-copy artifacts, and original-DWG hash evidence.",
       "evidence_refs": [
         "docs/OPERATION_REGISTRY_SPEC.md",
-        "CADOS_M01 Lane D native triage (inspect.database.graph insertion point)"
+        "CADOS_M01 Lane D native triage (inspect.database.graph insertion point)",
+        "runs/m05_patch_create_line/result.json",
+        "runs/m05_patch_create_line/cad_diff.json",
+        "runs/m05_patch_create_line/journal.json",
+        "reports/validation_latest.json",
+        "reports/CADOS_M05_PATCH_DIFF_VALIDATION_TRANSACTION.md"
       ],
       "target_family_first_class": true,
       "wired_v1": false,
@@ -2535,14 +2556,18 @@
       },
       "policy": {
         "source": "config/policy.v2.json",
-        "status_policy": "stub",
+        "status_policy": "implemented",
         "default_write_mode": "read",
         "no_original_write_default": true
       },
       "tests": [
-        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified"
+        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
+        "tests/unit/test_validator_gates.py::TestPatchRunFolderGates::test_patch_run_discovers_post_ir_for_core_gates",
+        "tests/unit/test_validator_gates.py::TestPatchRunFolderGates::test_patch_run_gates_fire_pass",
+        "CADOS_M05 live smoke: reports/validation_latest.json"
       ],
-      "notes": "Validate a patch payload against schema + DB preconditions WITHOUT writing. Read-only dry-run for apply.patch."
+      "notes": "IMPLEMENTED by tools.validator.validate_target and validator.py --run. M05 validator run reports 14/14 gates pass in reports/validation_latest.json.",
+      "implementation_notes": "M05 IMPLEMENTED. --run auto-discovers post/dwg_graph_ir.json for core IR gates and validates cad_diff.json, patch.json, journal.json, staged_input/output DWGs, and original hash invariance."
     },
     {
       "id": "validate.ir",
@@ -2762,7 +2787,7 @@
     {
       "id": "diff.before_after",
       "family": "diff",
-      "status": "stub",
+      "status": "implemented",
       "engine_tier": "objectdbx_capable",
       "host_eligibility": [
         "dbx",
@@ -2781,7 +2806,7 @@
       },
       "handler": {
         "router_lane": "ARIADNE_NATIVE_JOB",
-        "dispatcher_symbol": null,
+        "dispatcher_symbol": "cad_diff.compute_diff",
         "execution_host_class": "dbx",
         "composed_of": [
           "inspect.database.graph"
@@ -2791,14 +2816,19 @@
       "catalog_op_id": null,
       "input_schema": "schemas/cad_job.v2.schema.json#/allOf",
       "output_schema": "schemas/cad_diff.v1.schema.json",
-      "summary": "Compare two DWG/graph snapshots (entity-level add/remove/change). Composes two inspect.database.graph reads; diff math in python.",
+      "summary": "Compare two native_full DWG graph IR snapshots and report deterministic entity-level added/removed/modified changes.",
       "evidence_refs": [
         "docs/OPERATION_REGISTRY_SPEC.md",
-        "CADOS_M01 Lane D native triage (inspect.database.graph insertion point)"
+        "CADOS_M01 Lane D native triage (inspect.database.graph insertion point)",
+        "runs/m05_patch_create_line/result.json",
+        "runs/m05_patch_create_line/cad_diff.json",
+        "runs/m05_patch_create_line/journal.json",
+        "reports/validation_latest.json",
+        "reports/CADOS_M05_PATCH_DIFF_VALIDATION_TRANSACTION.md"
       ],
       "target_family_first_class": true,
       "wired_v1": false,
-      "implementation_notes": "STUB (no-fake-success). The diff engine (tools/cad_diff.py compute_diff) is defined by a peer lane in this workflow and is NOT yet on disk; cadagent_mcp imports it optionally and degrades to not_implemented. composed_of references inspect.database.graph (the two snapshot reads). Stays stub until cad_diff.py lands and is verified on two real IR snapshots.",
+      "implementation_notes": "M05 IMPLEMENTED. Computes ariadne.cad_diff.v1 from pre/post dwg_graph_ir.json and writes cad_diff.json for validator consumption.",
       "operation": "diff.before_after",
       "hosts": [
         "dbx",
@@ -2815,14 +2845,17 @@
       },
       "policy": {
         "source": "config/policy.v2.json",
-        "status_policy": "stub",
+        "status_policy": "implemented",
         "default_write_mode": "read",
         "no_original_write_default": true
       },
       "tests": [
-        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified"
+        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
+        "tests/unit/test_m05_cli_contract.py::TestM05PacketCliContract::test_diff_accepts_packet_flags_and_writes_cad_diff",
+        "tests/unit/test_cad_diff.py",
+        "CADOS_M05 live smoke: runs/m05_diff_check/cad_diff.json"
       ],
-      "notes": "STUB (no-fake-success). The diff engine (tools/cad_diff.py compute_diff) is defined by a peer lane in this workflow and is NOT yet on disk; cadagent_mcp imports it optionally and degrades to not_implemented. composed_of references inspect.database.graph (the two snapshot reads). Stays stub until cad_diff.py lands and is verified on two real IR snapshots."
+      "notes": "IMPLEMENTED by tools.cad_diff.compute_diff, Cad.diff_before_after, and cadctl_cli diff --before --after --out. M05 smoke diff reported +1 LINE and no unrelated modified/deleted handles."
     },
     {
       "id": "live.status",
@@ -34196,5 +34229,19 @@
       "blocked",
       "deprecated"
     ]
+  },
+  "m05_patch_diff_validation_transaction": {
+    "packet": "CADOS_M05_PATCH_DIFF_VALIDATION_TRANSACTION",
+    "status": "PASS",
+    "implemented_ops": [
+      "apply.patch",
+      "validate.patch",
+      "diff.before_after"
+    ],
+    "evidence_run": "runs/m05_patch_create_line",
+    "diff_ref": "reports/patch_diff_latest.json",
+    "validation_ref": "reports/validation_latest.json",
+    "journal_ref": "reports/journal_latest.json",
+    "original_dwg_unchanged": true
   }
 }

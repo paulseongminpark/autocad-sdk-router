@@ -1,10 +1,27 @@
 {
-  "schema": "ariadne.cad_os.patch_diff.v1",
-  "packet": "CADOS_M02_V1_COMPLETION_ULTRACODE",
-  "status": "PASS",
-  "live_run": "runs/m02_patch_live2",
-  "patch_op": "create_line -> write.entity.line (staged write_copy)",
-  "diff_summary": {
+  "schema": "ariadne.cad_diff.v1",
+  "diff_id": "diff-22abdbcf02129cb1",
+  "before_ref": {
+    "kind": "ir",
+    "ref": "runs\\m05_patch_create_line\\staged_input.dwg",
+    "entity_count": 21747,
+    "sha256": "27dbf6b95ff72a89fd53b153891187365b9e8ebc4c05a97cfed307057bf49bc8"
+  },
+  "after_ref": {
+    "kind": "ir",
+    "ref": "runs\\m05_patch_create_line\\staged_output.dwg",
+    "entity_count": 21748,
+    "sha256": "eb7d78d7032418be6c75129753f5367dd5ce717faf41c85e2234aa2cdde9b2cb"
+  },
+  "changed_handles": [
+    {
+      "handle": "1919C",
+      "change": "added",
+      "dxf_name": "LINE",
+      "layer": "0"
+    }
+  ],
+  "summary": {
     "added": 1,
     "removed": 0,
     "modified": 0,
@@ -23,10 +40,16 @@
     "modified_count": 0,
     "unchanged_count": 21747
   },
-  "entity_count_before": 21747,
-  "entity_count_after": 21748,
-  "original_dwg_unchanged": true,
-  "validation_overall": "partial",
-  "validation_gates_pass": 13,
-  "validation_gates_total": 14
+  "diagnostics": {
+    "comparison_basis": "handle",
+    "warnings": [],
+    "errors": [],
+    "unjoinable_before": 0,
+    "unjoinable_after": 0,
+    "pre_coverage_level": "native_full",
+    "post_coverage_level": "native_full"
+  },
+  "layer_changes": [],
+  "geometry_changes": [],
+  "bbox_changes": []
 }

@@ -2,7 +2,11 @@
 
 - status: pass
 - gates_total: 14
-- gates_passed: 7
+- gates_passed: 14
 - gates_failed: 0
-- gates_skipped: 7
-- subject: `runs/m03_rich_ir/dwg_graph_ir.json`
+- gates_skipped: 0
+- subject: `runs/m05_patch_create_line/post/dwg_graph_ir.json`
+- run: `runs/m05_patch_create_line`
+- patch: PASS
+- diff: PASS
+- journal/original-hash gate: PASS

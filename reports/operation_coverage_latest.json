@@ -1,16 +1,16 @@
 {
   "schema": "ariadne.cad_os.operation_coverage.v1",
-  "packet": "CADOS_M04_OPERATION_REGISTRY_AND_TOOL_SURFACE",
+  "packet": "CADOS_M05_PATCH_DIFF_VALIDATION_TRANSACTION",
   "operation_count": 517,
   "by_status": {
     "blocked": 2,
     "catalogued": 474,
-    "implemented": 34,
-    "stub": 7
+    "implemented": 37,
+    "stub": 4
   },
-  "implemented": 34,
+  "implemented": 37,
   "wired": 0,
-  "stub": 7,
+  "stub": 4,
   "catalogued": 474,
   "blocked": 2,
   "deprecated": 0,
@@ -20,5 +20,11 @@
   "catalog_unclassified_ops": 0,
   "existing_29_ops_mapped": true,
   "inspect_database_graph_status": "implemented",
-  "consistent": true
+  "m05_ops": {
+    "apply.patch": "implemented",
+    "validate.patch": "implemented",
+    "diff.before_after": "implemented"
+  },
+  "consistent": true,
+  "registry_coverage_ref": "reports/registry_coverage_latest.json"
 }

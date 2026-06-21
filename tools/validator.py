@@ -1054,6 +1054,9 @@ def validate_target(ir_path: Optional[str] = None,
     warnings: List[str] = []
     artifacts: List[Dict[str, Any]] = []
 
+    if ir_path is None and run_dir is not None:
+        ir_path = _ir_in_run(run_dir)
+
     ir: Optional[Dict[str, Any]] = None
     if ir_path is not None:
         if os.path.isfile(ir_path):
@@ -1330,25 +1333,39 @@ def _ir_in_run(run_dir: str) -> Optional[str]:
     """Locate the IR document inside a run folder, if present.
 
     Prefers the canonical ``dwg_graph_ir.json``, then a coverage-tagged variant
-    (``dwg_graph_ir.native_full.json`` / ``...geometry_only.json``), then any
-    file whose name contains ``dwg_graph_ir`` and ends in ``.json``.
+    (``dwg_graph_ir.native_full.json`` / ``...geometry_only.json``). Patch runs
+    write their subject IR below ``post/``; fall back to ``pre/`` only when no
+    post-apply IR exists. Finally, accept any one-level nested file whose name
+    contains ``dwg_graph_ir`` and ends in ``.json``.
     """
     if not os.path.isdir(run_dir):
         return None
-    preferred = [
+    preferred_names = [
         "dwg_graph_ir.json",
         "dwg_graph_ir.native_full.json",
         "dwg_graph_ir.geometry_only.json",
     ]
-    for name in preferred:
+    for name in preferred_names:
         p = os.path.join(run_dir, name)
         if os.path.isfile(p):
             return p
+    preferred_dirs = ["post", "pre"]
+    for dirname in preferred_dirs:
+        for name in preferred_names:
+            p = os.path.join(run_dir, dirname, name)
+            if os.path.isfile(p):
+                return p
     try:
         for name in sorted(os.listdir(run_dir)):
             low = name.lower()
             if "dwg_graph_ir" in low and low.endswith(".json"):
                 return os.path.join(run_dir, name)
+            sub = os.path.join(run_dir, name)
+            if os.path.isdir(sub):
+                for child in sorted(os.listdir(sub)):
+                    child_low = child.lower()
+                    if "dwg_graph_ir" in child_low and child_low.endswith(".json"):
+                        return os.path.join(sub, child)
     except OSError:
         return None
     return None
