@@ -1,6 +1,6 @@
 # CAD OS Full Stack Handoff
 
-Status: M03 PASS, M04 PASS, M05 PASS, M06 PASS. Do not proceed to Daedalus app logic before M07-M09 gates.
+Status: M03 PASS, M04 PASS, M05 PASS, M06 PASS, M07 PARTIAL_PASS. Do not proceed to Daedalus app logic before the M08 coverage closure → M09 v1 freeze gates (M10 burn-down if M09 not PASS).
 
 ## Stable Surfaces
 
@@ -21,6 +21,11 @@ Status: M03 PASS, M04 PASS, M05 PASS, M06 PASS. Do not proceed to Daedalus app l
 - Latest batch: `reports/batch_latest.json`
 - Latest golden: `reports/golden_regression_latest.json`
 - Latest performance: `reports/performance_latest.json`
+- M07 live ARX pump (12 ops + CADAGENT_STATUS): `reports/live_pump_latest.json`, headless proof `runs/m07_pump_test/m07_pump_result.json` (17/17)
+- M07 deep native status (7 implemented / 3 attended_blocked / 0 design_only): `reports/deep_native_latest.json`, `docs/NATIVE_DEEP_SURFACE_STATUS.md`
+- M07 pump spike report: `docs/LIVE_ARX_PUMP_SPIKE_REPORT.md`
+- M07 report: `reports/CADOS_M07_LIVE_ARX_AND_DEEP_NATIVE_SURFACE.md`
+- M07 unit tests: `tests/unit/test_pump_frame_codec.py`, `tests/unit/test_pump_shutdown_and_deep_native_source.py`
 
 ## Safety
 
@@ -30,7 +35,9 @@ Status: M03 PASS, M04 PASS, M05 PASS, M06 PASS. Do not proceed to Daedalus app l
 - M06 batch inspected only the staging fixture `staging/dwg_20260617_191504/input.dwg` and wrote outputs under `runs/m06_visual_batch_golden/batch/`.
 - Remote push was not performed.
 - AutoCAD was not killed; locked canonical ARX was handled through versioned relink.
+- M07 live pump is read-only (`live.apply_patch` always disabled, no live save); headless test used a staged copy and the original golden hash `27dbf6b95ff72a89fd53b153891187365b9e8ebc4c05a97cfed307057bf49bc8` stayed unchanged.
+- M07 attended-only surfaces (live-pump attended proof, OPM panel, selection monitor, palette UI) were hard-blocked with evidence, not faked; the user's running acad.exe (PID 49460) was not driven.
 
 ## Next Packet
 
-CADOS_M07_LIVE_ARX_AND_DEEP_NATIVE_SURFACE.
+CADOS_M08_FULL_OPERATION_COVERAGE_CLOSURE.
