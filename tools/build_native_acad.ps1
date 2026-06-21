@@ -35,14 +35,15 @@ function Build-Project {
   if (-not (Test-Path -LiteralPath $Project)) { throw "Native project missing: $Project" }
   $argList = @($Project, "/p:Configuration=$Configuration", "/p:Platform=$Platform") + $ExtraProps + @('/m', '/v:minimal')
   & $msbuild @argList
-  return $LASTEXITCODE
+  $script:LastNativeBuildExitCode = $LASTEXITCODE
 }
 
 # .dbx + .crx are the headless truth modules (inspect.database.graph runs on the
 # .crx via accoreconsole). They are never held by an attended acad.exe, so they
 # must build cleanly.
 foreach ($p in @($dbxProj, $crxProj)) {
-  if ((Build-Project -Project $p) -ne 0) { throw "MSBuild failed for $p with exit $LASTEXITCODE" }
+  Build-Project -Project $p
+  if ($script:LastNativeBuildExitCode -ne 0) { throw "MSBuild failed for $p with exit $script:LastNativeBuildExitCode" }
 }
 
 # .arx is the attended/live module. A running acad.exe holds the canonical
@@ -50,12 +51,14 @@ foreach ($p in @($dbxProj, $crxProj)) {
 # versioned target so the build still proves the .arx compiles + links with the
 # current source, and the live-pump loader can load the versioned module. The
 # canonical .arx relinks automatically on the next lock-free build.
-$arxCanonicalCode = Build-Project -Project $arxProj
+Build-Project -Project $arxProj
+$arxCanonicalCode = $script:LastNativeBuildExitCode
 $arxMode = 'canonical'
 $arxVersionedName = ''
 if ($arxCanonicalCode -ne 0) {
   $arxVersionedName = "Ariadne.AcadNative.live_$((Get-Date -Format 'yyyyMMdd_HHmmss'))"
-  $arxVersionedCode = Build-Project -Project $arxProj -ExtraProps @("/p:TargetName=$arxVersionedName")
+  Build-Project -Project $arxProj -ExtraProps @("/p:TargetName=$arxVersionedName")
+  $arxVersionedCode = $script:LastNativeBuildExitCode
   if ($arxVersionedCode -ne 0) {
     throw "MSBuild failed for .arx (canonical exit $arxCanonicalCode, versioned exit $arxVersionedCode); not a lock issue."
   }

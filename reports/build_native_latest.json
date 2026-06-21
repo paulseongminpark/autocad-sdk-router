@@ -1,0 +1,7 @@
+﻿{
+    "status":  "ok",
+    "arx_relink_mode":  "versioned_lock_bypass",
+    "arx_versioned_name":  "Ariadne.AcadNative.live_20260622_034352",
+    "exit_code":  0,
+    "artifact":  "src\\Ariadne.AcadNative\\bin\\x64\\Release\\Ariadne.AcadNative.live_20260622_034352.arx"
+}

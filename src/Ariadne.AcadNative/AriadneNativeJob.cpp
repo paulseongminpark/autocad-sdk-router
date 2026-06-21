@@ -25,6 +25,7 @@
 #include "dbents.h"
 #include "dbmtext.h"
 #include "dbpl.h"
+#include "dbhatch.h"
 #include "dbxrecrd.h"
 #include "dbsymtb.h"
 #include "dbcolor.h"
@@ -459,6 +460,310 @@ static bool countModelSpaceEntitiesByType(AcDbDatabase* pDb, const std::string& 
     return true;
 }
 
+struct RichGraphCounters
+{
+    int xdataBlocks = 0;
+    int xdataItems = 0;
+    int extensionDictionaries = 0;
+    int extensionDictionaryEntries = 0;
+    int extensionXrecords = 0;
+    int extensionXrecordItems = 0;
+    int hatchLoops = 0;
+    int hatchLoopVertices = 0;
+};
+
+static bool resbufCodeIsString(short code)
+{
+    return code == 1 || code == 2 || code == 3 || code == 4 || code == 5 ||
+           code == 6 || code == 7 || code == 8 || code == 9 ||
+           code == 100 || code == 102 ||
+           (code >= 300 && code <= 309) ||
+           (code >= 1000 && code <= 1005);
+}
+
+static bool resbufCodeIsPoint(short code)
+{
+    return (code >= 10 && code <= 18) ||
+           code == 1010 || code == 1011 || code == 1012 || code == 1013;
+}
+
+static bool resbufCodeIsReal(short code)
+{
+    return (code >= 40 && code <= 59) ||
+           code == 1040 || code == 1041 || code == 1042;
+}
+
+static bool resbufCodeIsInt16(short code)
+{
+    return (code >= 60 && code <= 79) || code == 1070;
+}
+
+static bool resbufCodeIsInt32(short code)
+{
+    return (code >= 90 && code <= 99) || code == 1071;
+}
+
+static std::string resbufItemJson(const resbuf* rb)
+{
+    std::ostringstream o;
+    o << "{\"code\":" << rb->restype;
+    const short code = rb->restype;
+    if (resbufCodeIsString(code)) {
+        const ACHAR* raw = rb->resval.rstring;
+        o << ",\"value\":\"" << jsonEscape(raw != nullptr ? acharToAscii(raw) : std::string()) << "\"";
+    }
+    else if (resbufCodeIsPoint(code)) {
+        o << ",\"value\":[" << rb->resval.rpoint[0] << ","
+          << rb->resval.rpoint[1] << "," << rb->resval.rpoint[2] << "]";
+    }
+    else if (resbufCodeIsReal(code)) {
+        o << ",\"value\":" << rb->resval.rreal;
+    }
+    else if (resbufCodeIsInt16(code)) {
+        o << ",\"value\":" << rb->resval.rint;
+    }
+    else if (resbufCodeIsInt32(code)) {
+        o << ",\"value\":" << rb->resval.rlong;
+    }
+    else if (code >= 290 && code <= 299) {
+        o << ",\"value\":" << (rb->resval.rint != 0 ? "true" : "false");
+    }
+    else if (code == 310 || code == 1004) {
+        o << ",\"value_kind\":\"binary\",\"byte_count\":" << rb->resval.rbinary.clen;
+    }
+    else {
+        o << ",\"value_kind\":\"unhandled\"";
+    }
+    o << "}";
+    return o.str();
+}
+
+static std::string resbufItemsJson(resbuf* rb, int& itemCount)
+{
+    itemCount = 0;
+    std::ostringstream arr;
+    arr << "[";
+    bool first = true;
+    for (resbuf* cur = rb; cur != nullptr; cur = cur->rbnext) {
+        if (!first)
+            arr << ",";
+        first = false;
+        arr << resbufItemJson(cur);
+        ++itemCount;
+    }
+    arr << "]";
+    return arr.str();
+}
+
+static std::string xdataBlocksJson(resbuf* rb, int& blockCount, int& itemCount)
+{
+    blockCount = 0;
+    itemCount = 0;
+    std::ostringstream arr;
+    arr << "[";
+    bool firstBlock = true;
+    bool blockOpen = false;
+    bool firstItem = true;
+    for (resbuf* cur = rb; cur != nullptr; cur = cur->rbnext) {
+        if (cur->restype == 1001) {
+            if (blockOpen)
+                arr << "]}";
+            if (!firstBlock)
+                arr << ",";
+            firstBlock = false;
+            blockOpen = true;
+            firstItem = true;
+            const ACHAR* raw = cur->resval.rstring;
+            arr << "{\"app\":\"" << jsonEscape(raw != nullptr ? acharToAscii(raw) : std::string())
+                << "\",\"items\":[";
+            ++blockCount;
+            continue;
+        }
+        if (!blockOpen) {
+            if (!firstBlock)
+                arr << ",";
+            firstBlock = false;
+            blockOpen = true;
+            firstItem = true;
+            arr << "{\"app\":\"\",\"items\":[";
+            ++blockCount;
+        }
+        if (!firstItem)
+            arr << ",";
+        firstItem = false;
+        arr << resbufItemJson(cur);
+        ++itemCount;
+    }
+    if (blockOpen)
+        arr << "]}";
+    arr << "]";
+    return arr.str();
+}
+
+static std::string xrecordJson(AcDbXrecord* pXrec,
+                               const std::string& handle,
+                               const std::string& ownerHandle,
+                               const std::string& key,
+                               int& itemCount)
+{
+    itemCount = 0;
+    std::string items = "[]";
+    resbuf* rb = nullptr;
+    const Acad::ErrorStatus es = pXrec->rbChain(&rb);
+    if (es == Acad::eOk && rb != nullptr) {
+        items = resbufItemsJson(rb, itemCount);
+        acutRelRb(rb);
+    }
+    std::ostringstream o;
+    o << "{\"handle\":\"" << jsonEscape(handle) << "\""
+      << ",\"owner_handle\":\"" << jsonEscape(ownerHandle) << "\""
+      << ",\"key\":\"" << jsonEscape(key) << "\""
+      << ",\"item_count\":" << itemCount
+      << ",\"items\":" << items << "}";
+    return o.str();
+}
+
+static std::string dictionaryEntriesJson(AcDbDictionary* pDict,
+                                         const std::string& dictHandle,
+                                         std::ostringstream& xrecords,
+                                         bool& xrecordFirst,
+                                         RichGraphCounters& counters)
+{
+    std::ostringstream entries;
+    entries << "[";
+    bool first = true;
+    AcDbDictionaryIterator* pIt = pDict->newIterator();
+    for (; pIt != nullptr && !pIt->done(); pIt->next()) {
+        const ACHAR* keyRaw = pIt->name();
+        const std::string key = (keyRaw != nullptr) ? acharToAscii(keyRaw) : std::string();
+        const AcDbObjectId valueId = pIt->objectId();
+        const std::string valueHandle = handleOfId(valueId);
+        std::string className;
+        bool isXrecord = false;
+
+        AcDbObject* pObj = nullptr;
+        if (acdbOpenObject(pObj, valueId, AcDb::kForRead) == Acad::eOk) {
+            if (pObj->isA() != nullptr)
+                className = acharToAscii(pObj->isA()->name());
+            AcDbXrecord* pXrec = AcDbXrecord::cast(pObj);
+            if (pXrec != nullptr) {
+                isXrecord = true;
+                int itemCount = 0;
+                if (!xrecordFirst)
+                    xrecords << ",";
+                xrecordFirst = false;
+                xrecords << xrecordJson(pXrec, valueHandle, dictHandle, key, itemCount);
+                ++counters.extensionXrecords;
+                counters.extensionXrecordItems += itemCount;
+            }
+            pObj->close();
+        }
+
+        if (!first)
+            entries << ",";
+        first = false;
+        entries << "{\"key\":\"" << jsonEscape(key) << "\""
+                << ",\"value_handle\":\"" << jsonEscape(valueHandle) << "\""
+                << ",\"class_name\":\"" << jsonEscape(className) << "\""
+                << ",\"is_xrecord\":" << (isXrecord ? "true" : "false") << "}";
+        ++counters.extensionDictionaryEntries;
+    }
+    delete pIt;
+    entries << "]";
+    return entries.str();
+}
+
+static std::string extensionDictionaryJson(const std::string& ownerHandle,
+                                           const AcDbObjectId& dictId,
+                                           std::ostringstream& xrecords,
+                                           bool& xrecordFirst,
+                                           RichGraphCounters& counters)
+{
+    if (dictId.isNull())
+        return std::string();
+
+    AcDbDictionary* pDict = nullptr;
+    if (acdbOpenObject(pDict, dictId, AcDb::kForRead) != Acad::eOk)
+        return std::string();
+
+    const std::string dictHandle = handleOf(pDict);
+    const std::string entries = dictionaryEntriesJson(
+        pDict, dictHandle, xrecords, xrecordFirst, counters);
+    pDict->close();
+    ++counters.extensionDictionaries;
+
+    std::ostringstream o;
+    o << "{\"owner_handle\":\"" << jsonEscape(ownerHandle) << "\""
+      << ",\"handle\":\"" << jsonEscape(dictHandle) << "\""
+      << ",\"entries\":" << entries << "}";
+    return o.str();
+}
+
+static std::string hatchLoopsJson(AcDbHatch* pHatch, int& loopCount, int& vertexCount)
+{
+    loopCount = 0;
+    vertexCount = 0;
+    std::ostringstream arr;
+    arr << "[";
+    bool firstLoop = true;
+    const int loops = pHatch->numLoops();
+    const double elevation = pHatch->elevation();
+    for (int li = 0; li < loops; ++li) {
+        Adesk::Int32 loopType = 0;
+        AcGePoint2dArray vertices;
+        AcGeDoubleArray bulges;
+        const Acad::ErrorStatus es = pHatch->getLoopAt(li, loopType, vertices, bulges);
+        if (!firstLoop)
+            arr << ",";
+        firstLoop = false;
+        arr << "{\"index\":" << li
+            << ",\"loop_type\":" << loopType
+            << ",\"status\":\"" << (es == Acad::eOk ? "ok" : "unavailable") << "\""
+            << ",\"vertices\":[";
+        if (es == Acad::eOk) {
+            ++loopCount;
+            const int n = vertices.length();
+            for (int vi = 0; vi < n; ++vi) {
+                if (vi != 0)
+                    arr << ",";
+                const AcGePoint2d p = vertices[vi];
+                const double bulge = (vi < bulges.length()) ? bulges[vi] : 0.0;
+                arr << "{\"point\":[" << p.x << "," << p.y << "," << elevation << "]"
+                    << ",\"bulge\":" << bulge << "}";
+                ++vertexCount;
+            }
+        }
+        arr << "]}";
+    }
+    arr << "]";
+    return arr.str();
+}
+
+static bool jsonArrayHasItems(const std::string& arr)
+{
+    return arr.size() > 2 && arr.find_first_not_of(" \t\r\n", 1) != arr.size() - 1;
+}
+
+static std::string jsonArrayInner(const std::string& arr)
+{
+    if (arr.size() < 2)
+        return std::string();
+    return arr.substr(1, arr.size() - 2);
+}
+
+static std::string mergeJsonArrays(const std::string& left, const std::string& right)
+{
+    const bool hasLeft = jsonArrayHasItems(left);
+    const bool hasRight = jsonArrayHasItems(right);
+    if (!hasLeft && !hasRight)
+        return "[]";
+    if (!hasLeft)
+        return right;
+    if (!hasRight)
+        return left;
+    return "[" + jsonArrayInner(left) + "," + jsonArrayInner(right) + "]";
+}
+
 //----------------------------------------------------------------------------
 // collectModelSpaceGraph
 //
@@ -479,12 +784,21 @@ static bool countModelSpaceEntitiesByType(AcDbDatabase* pDb, const std::string& 
 // explicit M02 follow-up; it is deliberately out of this additive lane.
 //----------------------------------------------------------------------------
 static bool collectModelSpaceGraph(AcDbDatabase* pDb, int& total,
-                                   std::string& entitiesJson)
+                                   std::string& entitiesJson,
+                                   std::string& extensionDictionariesJson,
+                                   std::string& extensionXrecordsJson,
+                                   RichGraphCounters& richCounters)
 {
     total = 0;
     std::ostringstream arr;
     arr << "[";
     bool first = true;
+    std::ostringstream extensionDictionaries;
+    extensionDictionaries << "[";
+    bool extensionDictionaryFirst = true;
+    std::ostringstream extensionXrecords;
+    extensionXrecords << "[";
+    bool extensionXrecordFirst = true;
 
     AcDbBlockTable* pBT = nullptr;
     if (pDb->getBlockTable(pBT, AcDb::kForRead) != Acad::eOk)
@@ -538,6 +852,32 @@ static bool collectModelSpaceGraph(AcDbDatabase* pDb, int& total,
             << ",\"layer\":\"" << jsonEscape(layer) << "\""
             << ",\"owner_handle\":\"" << jsonEscape(ownerStr) << "\""
             << ",\"space\":\"model\"";
+
+        resbuf* xdata = pEnt->xData(nullptr);
+        if (xdata != nullptr) {
+            int blockCount = 0, itemCount = 0;
+            const std::string blocksJson = xdataBlocksJson(xdata, blockCount, itemCount);
+            acutRelRb(xdata);
+            if (blockCount > 0) {
+                arr << ",\"xdata\":" << blocksJson;
+                richCounters.xdataBlocks += blockCount;
+                richCounters.xdataItems += itemCount;
+            }
+        }
+
+        const AcDbObjectId extDictId = pEnt->extensionDictionary();
+        if (!extDictId.isNull()) {
+            arr << ",\"extension_dictionary_handle\":\""
+                << jsonEscape(handleOfId(extDictId)) << "\"";
+            const std::string extJson = extensionDictionaryJson(
+                handleStr, extDictId, extensionXrecords, extensionXrecordFirst, richCounters);
+            if (!extJson.empty()) {
+                if (!extensionDictionaryFirst)
+                    extensionDictionaries << ",";
+                extensionDictionaryFirst = false;
+                extensionDictionaries << extJson;
+            }
+        }
 
         // type-specific geometry by cast (cheap accessors only)
         if (AcDbLine* pLine = AcDbLine::cast(pEnt)) {
@@ -640,6 +980,15 @@ static bool collectModelSpaceGraph(AcDbDatabase* pDb, int& total,
             delete pVi;
             arr << "]";
         }
+        else if (AcDbHatch* pHatch = AcDbHatch::cast(pEnt)) {
+            int loopCount = 0, vertexCount = 0;
+            const std::string loopsJson = hatchLoopsJson(pHatch, loopCount, vertexCount);
+            arr << ",\"pattern_name\":\"" << jsonEscape(acharToAscii(pHatch->patternName())) << "\""
+                << ",\"loop_count\":" << loopCount
+                << ",\"loops\":" << loopsJson;
+            richCounters.hatchLoops += loopCount;
+            richCounters.hatchLoopVertices += vertexCount;
+        }
 
         arr << "}";
         pEnt->close();
@@ -648,7 +997,11 @@ static bool collectModelSpaceGraph(AcDbDatabase* pDb, int& total,
     delete pIt;
     pMS->close();
     arr << "]";
+    extensionDictionaries << "]";
+    extensionXrecords << "]";
     entitiesJson = arr.str();
+    extensionDictionariesJson = extensionDictionaries.str();
+    extensionXrecordsJson = extensionXrecords.str();
     return true;
 }
 
@@ -936,10 +1289,12 @@ static std::string xrefsRichJson(AcDbDatabase* pDb, int& count)
 // dictionary_record, and surface any XRECORD living directly under it. Deeper
 // (nested-dictionary) xrecords + full resbuf decode are a documented partial.
 static std::string namedObjectDictJson(AcDbDatabase* pDb, int& entryCount,
-                                       int& xrecordCount, std::string& xrecordsJson)
+                                       int& xrecordCount, int& xrecordItemCount,
+                                       std::string& xrecordsJson)
 {
     entryCount = 0;
     xrecordCount = 0;
+    xrecordItemCount = 0;
     std::ostringstream entries;
     entries << "[";
     bool efirst = true;
@@ -971,9 +1326,9 @@ static std::string namedObjectDictJson(AcDbDatabase* pDb, int& entryCount,
                 if (!xfirst)
                     xrecs << ",";
                 xfirst = false;
-                xrecs << "{\"handle\":\"" << jsonEscape(vh) << "\""
-                      << ",\"owner_handle\":\"" << jsonEscape(nodHandle) << "\""
-                      << ",\"key\":\"" << jsonEscape(key) << "\"}";
+                int itemCount = 0;
+                xrecs << xrecordJson(AcDbXrecord::cast(pObj), vh, nodHandle, key, itemCount);
+                xrecordItemCount += itemCount;
                 ++xrecordCount;
             }
             pObj->close();
@@ -1007,7 +1362,11 @@ static std::string databaseMetaJson(AcDbDatabase* pDb)
 // Compose the rich sections into a JSON fragment (no outer braces; the op branch
 // splices it after entities[]). coverageJson reports per-section status so a
 // consumer can tell implemented from partial/skipped without guessing.
-static std::string collectDatabaseGraph(AcDbDatabase* pDb, std::string& coverageJson)
+static std::string collectDatabaseGraph(AcDbDatabase* pDb,
+                                        const std::string& extensionDictionariesJson,
+                                        const std::string& extensionXrecordsJson,
+                                        const RichGraphCounters& richCounters,
+                                        std::string& coverageJson)
 {
     std::ostringstream sec;
     std::ostringstream present;
@@ -1052,13 +1411,19 @@ static std::string collectDatabaseGraph(AcDbDatabase* pDb, std::string& coverage
     sec << ",\"xrefs\":" << xrefsRichJson(pDb, xrefCount);
     addPresent("xrefs");
 
-    int dictEntryCount = 0, xrecordCount = 0;
+    int dictEntryCount = 0, xrecordCount = 0, xrecordItemCount = 0;
     std::string xrecordsJson;
-    const std::string nodEntries = namedObjectDictJson(pDb, dictEntryCount, xrecordCount, xrecordsJson);
+    const std::string nodEntries = namedObjectDictJson(
+        pDb, dictEntryCount, xrecordCount, xrecordItemCount, xrecordsJson);
+    const std::string mergedXrecords = mergeJsonArrays(xrecordsJson, extensionXrecordsJson);
     sec << ",\"dictionaries\":[{\"name\":\"ACAD_NAMED_OBJECTS\",\"entries\":" << nodEntries << "}]"
-        << ",\"xrecords\":" << xrecordsJson;
+        << ",\"extension_dictionaries\":" << extensionDictionariesJson
+        << ",\"xrecords\":" << mergedXrecords;
     addPresent("dictionaries");
+    addPresent("extension_dictionaries");
     addPresent("xrecords");
+    addPresent("xdata");
+    addPresent("hatch_loops");
 
     std::ostringstream cov;
     cov << "{\"layers\":\"implemented\""
@@ -1070,9 +1435,10 @@ static std::string collectDatabaseGraph(AcDbDatabase* pDb, std::string& coverage
         << ",\"layouts\":\"implemented\""
         << ",\"xrefs\":\"implemented\""
         << ",\"dictionaries\":\"implemented\""
-        << ",\"xrecords\":\"partial\""        // top-level NOD only; nested + resbuf decode = M03
-        << ",\"xdata\":\"partial\""           // db/entity xdata enumeration = M03
-        << ",\"extension_dictionaries\":\"skipped\""
+        << ",\"xrecords\":\"implemented\""
+        << ",\"xdata\":\"implemented\""
+        << ",\"extension_dictionaries\":\"implemented\""
+        << ",\"hatch_loops\":\"implemented\""
         << ",\"proxy_objects\":\"partial\""   // surfaced via entities[] dxf_name; deep decode = M03
         << ",\"counts\":{\"layers\":" << layerCount
         << ",\"linetypes\":" << ltCount
@@ -1085,9 +1451,18 @@ static std::string collectDatabaseGraph(AcDbDatabase* pDb, std::string& coverage
         << ",\"layouts\":" << layoutCount
         << ",\"xrefs\":" << xrefCount
         << ",\"dictionary_entries\":" << dictEntryCount
-        << ",\"xrecords\":" << xrecordCount << "}"
+        << ",\"xrecords\":" << (xrecordCount + richCounters.extensionXrecords)
+        << ",\"xrecord_items\":" << (xrecordItemCount + richCounters.extensionXrecordItems)
+        << ",\"xdata_blocks\":" << richCounters.xdataBlocks
+        << ",\"xdata_items\":" << richCounters.xdataItems
+        << ",\"extension_dictionaries\":" << richCounters.extensionDictionaries
+        << ",\"extension_dictionary_entries\":" << richCounters.extensionDictionaryEntries
+        << ",\"extension_xrecords\":" << richCounters.extensionXrecords
+        << ",\"extension_xrecord_items\":" << richCounters.extensionXrecordItems
+        << ",\"hatch_loops\":" << richCounters.hatchLoops
+        << ",\"hatch_loop_vertices\":" << richCounters.hatchLoopVertices << "}"
         << ",\"sections_present\":[" << present.str() << "]"
-        << ",\"sections_skipped\":[\"extension_dictionaries\",\"groups\",\"materials\",\"plot_settings\"]}";
+        << ",\"sections_skipped\":[\"groups\",\"materials\",\"plot_settings\"]}";
     coverageJson = cov.str();
     return sec.str();
 }
@@ -2192,15 +2567,23 @@ static void ariadneNativeJob()
         // same model-space walk) equal to inspect.database.summary's count.
         int total = 0;
         std::string entitiesJson;
-        const bool ok = collectModelSpaceGraph(pDb, total, entitiesJson);
-        if (!ok)
+        std::string extensionDictionariesJson;
+        std::string extensionXrecordsJson;
+        RichGraphCounters richCounters;
+        const bool ok = collectModelSpaceGraph(
+            pDb, total, entitiesJson, extensionDictionariesJson, extensionXrecordsJson, richCounters);
+        if (!ok) {
             entitiesJson = "[]";
+            extensionDictionariesJson = "[]";
+            extensionXrecordsJson = "[]";
+        }
         // M02: rich database graph (symbol tables, blocks, layouts, xrefs,
         // dictionaries, xrecords) spliced alongside the model-space entities[].
         // collectDatabaseGraph is a guarded pure read; coverage reports which
         // sections are real vs partial/skipped (no-fake-success).
         std::string coverageJson;
-        const std::string richSections = collectDatabaseGraph(pDb, coverageJson);
+        const std::string richSections = collectDatabaseGraph(
+            pDb, extensionDictionariesJson, extensionXrecordsJson, richCounters, coverageJson);
         r << "\"result\":{\"modelspace_entities\":" << total
           << ",\"entities\":" << entitiesJson
           << "," << richSections

@@ -213,6 +213,75 @@ class TestSyntheticNativeMapping(unittest.TestCase):
         self.assertEqual(len(self.ir["block_references"]), 1)
         self.assertEqual(self.ir["block_references"][0]["block_name"], "DOOR")
 
+    def test_m03_depth_sections_are_carried_through(self):
+        # M03 rich-IR depth: native graph records may carry entity XDATA,
+        # extension-dictionary handles, hatch loops, decoded xrecords, and a
+        # top-level extension_dictionaries section. The builder must preserve
+        # those without requiring downstream consumers to re-read raw native JSON.
+        result = _synthetic_native_result()
+        result["modelspace_entities"] = 5
+        result["extension_dictionaries"] = [
+            {
+                "owner_handle": "2A7",
+                "dictionary_handle": "ED1",
+                "entries": [{"key": "ARIADNE_META", "value_handle": "XR1"}],
+            }
+        ]
+        result["xrecords"] = [
+            {
+                "handle": "XR1",
+                "owner_handle": "ED1",
+                "dictionary": "extension:2A7",
+                "key": "ARIADNE_META",
+                "resbuf": [{"code": 1, "value": "kept"}],
+            }
+        ]
+        result["entities"][0]["extension_dictionary_handle"] = "ED1"
+        result["entities"][0]["xdata"] = [
+            {
+                "app": "ARIADNE_TEST",
+                "items": [{"code": 1000, "value": "평면도"}],
+            }
+        ]
+        result["entities"].append({
+            "handle": "2AC",
+            "dxf_name": "AcDbHatch",
+            "owner_handle": "1F",
+            "space": "model",
+            "layer": "WALLS",
+            "pattern_name": "ANSI31",
+            "loops": [
+                {
+                    "loop_type": 2,
+                    "vertices": [
+                        {"point": [0.0, 0.0, 0.0], "bulge": 0.0},
+                        {"point": [10.0, 0.0, 0.0], "bulge": 0.0},
+                    ],
+                }
+            ],
+        })
+
+        ir = self.ir_builder.build_ir_from_database_graph(result, _source_meta())
+        by_handle = {e["handle"]: e for e in ir["entities"]}
+
+        line = by_handle["2A7"]
+        self.assertEqual(line["extension_dictionary_handle"], "ED1")
+        self.assertEqual(line["xdata"][0]["app"], "ARIADNE_TEST")
+        self.assertEqual(line["xdata"][0]["items"][0]["value"], "평면도")
+
+        hatch = by_handle["2AC"]
+        self.assertEqual(hatch["dxf_name"], "HATCH")
+        self.assertEqual(hatch["geometry"]["kind"], "hatch")
+        self.assertEqual(hatch["geometry"]["pattern_name"], "ANSI31")
+        self.assertEqual(hatch["geometry"]["loops"][0]["vertices"][1]["point"],
+                         [10.0, 0.0, 0.0])
+
+        self.assertEqual(ir["extension_dictionaries"][0]["owner_handle"], "2A7")
+        self.assertEqual(ir["xrecords"][0]["resbuf"][0]["value"], "kept")
+        coverage = ir["diagnostics"]["coverage"]
+        self.assertIn("extension_dictionaries", coverage["sections_present"])
+        self.assertEqual(coverage["section_status"]["xdata"], "implemented")
+
     def test_unknown_native_class_degrades_truthfully(self):
         # No-fake-success: an unrecognized class must NOT claim a decoded kind.
         result = _synthetic_native_result()

@@ -526,6 +526,10 @@ def _geometry_from_native_entity(raw: dict, kind: str) -> dict:
         geom["text"] = str(raw.get("text"))
     if raw.get("block_name") is not None:
         geom["block_name"] = str(raw.get("block_name"))
+    if raw.get("pattern_name") is not None:
+        geom["pattern_name"] = str(raw.get("pattern_name"))
+    if isinstance(raw.get("closed"), bool):
+        geom["closed"] = raw["closed"]
     verts = raw.get("vertices")
     if isinstance(verts, list) and verts:
         norm = []
@@ -533,8 +537,19 @@ def _geometry_from_native_entity(raw: dict, kind: str) -> dict:
             pt = _as_point3(v)
             if pt is not None:
                 norm.append({"point": pt})
+            elif isinstance(v, dict) and isinstance(v.get("point"), list):
+                pt = _as_point3(v.get("point"))
+                if pt is not None:
+                    item = {"point": pt}
+                    bulge = _to_number(v.get("bulge"))
+                    if bulge is not None:
+                        item["bulge"] = bulge
+                    norm.append(item)
         if norm:
             geom["vertices"] = norm
+    loops = raw.get("loops")
+    if isinstance(loops, list) and loops:
+        geom["loops"] = loops
     return geom
 
 
@@ -567,6 +582,10 @@ def _entity_from_native(raw: dict, source_block: dict) -> dict:
     }
     if raw.get("block_record_handle"):
         entity["block_record_handle"] = str(raw["block_record_handle"])
+    if isinstance(raw.get("xdata"), list) and raw["xdata"]:
+        entity["xdata"] = raw["xdata"]
+    if raw.get("extension_dictionary_handle"):
+        entity["extension_dictionary_handle"] = str(raw["extension_dictionary_handle"])
     return entity
 
 
@@ -615,6 +634,12 @@ def build_ir_from_database_graph(graph_result: dict, source_meta: dict) -> dict:
     sections_present = list(native_cov.get("sections_present") or [])
     if "entities" not in sections_present:
         sections_present = ["entities"] + sections_present
+    section_status = {k: v for k, v in native_cov.items() if isinstance(v, str)}
+
+    def _mark_present(name: str, status: str = "implemented") -> None:
+        if name not in sections_present:
+            sections_present.append(name)
+        section_status.setdefault(name, status)
 
     # carry the native rich sections straight through (schema is additive).
     symbol_tables = graph_result.get("symbol_tables") or {}
@@ -636,6 +661,19 @@ def build_ir_from_database_graph(graph_result: dict, source_meta: dict) -> dict:
                 "scale": g.get("scale", [1.0, 1.0, 1.0]),
                 "rotation": g.get("rotation", 0.0),
             })
+        if ent.get("xdata"):
+            _mark_present("xdata")
+        if ent.get("extension_dictionary_handle"):
+            _mark_present("extension_dictionaries")
+        if ent.get("dxf_name") == "HATCH" and ent.get("geometry", {}).get("loops"):
+            _mark_present("hatch_loops")
+
+    if graph_result.get("extension_dictionaries") is not None:
+        _mark_present("extension_dictionaries")
+    if graph_result.get("xrecords") is not None:
+        # Existing M02 native collectors emitted top-level xrecord shells. M03
+        # collectors can add decoded resbufs; either way the section is present.
+        _mark_present("xrecords", section_status.get("xrecords", "implemented"))
 
     diagnostics = {
         "entity_count": entity_count,
@@ -650,8 +688,7 @@ def build_ir_from_database_graph(graph_result: dict, source_meta: dict) -> dict:
             "match": (asserted is None) or (asserted == entity_count),
             "sections_present": sections_present,
             "sections_skipped": list(native_cov.get("sections_skipped") or []),
-            "section_status": {k: v for k, v in native_cov.items()
-                               if isinstance(v, str)},
+            "section_status": section_status,
             "counts": native_cov.get("counts", {}),
             "proxy_or_undecoded_count": proxy_undecoded,
         },
@@ -674,6 +711,7 @@ def build_ir_from_database_graph(graph_result: dict, source_meta: dict) -> dict:
         "block_references": block_references,
         "xrefs": graph_result.get("xrefs") or [],
         "dictionaries": graph_result.get("dictionaries") or [],
+        "extension_dictionaries": graph_result.get("extension_dictionaries") or [],
         "xrecords": graph_result.get("xrecords") or [],
         "layouts": graph_result.get("layouts") or [],
         "entities": entities,
