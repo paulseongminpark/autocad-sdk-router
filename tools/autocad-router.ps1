@@ -148,6 +148,8 @@ function Get-CadJobJigPointLine {
 function Test-NativeP1CadJobOperation {
   param([string]$OperationName)
   return @(
+    'inspect.database.summary',
+    'inspect.database.graph',
     'write.layer.create',
     'write.entity.line',
     'write.entity.circle',

@@ -1,0 +1,32 @@
+{
+  "schema": "ariadne.cad_os.patch_diff.v1",
+  "packet": "CADOS_M02_V1_COMPLETION_ULTRACODE",
+  "status": "PASS",
+  "live_run": "runs/m02_patch_live2",
+  "patch_op": "create_line -> write.entity.line (staged write_copy)",
+  "diff_summary": {
+    "added": 1,
+    "removed": 0,
+    "modified": 0,
+    "unchanged": 21747,
+    "entity_count_before": 21747,
+    "entity_count_after": 21748,
+    "by_type": {
+      "LINE": {
+        "added": 1,
+        "removed": 0,
+        "modified": 0
+      }
+    },
+    "created_count": 1,
+    "deleted_count": 0,
+    "modified_count": 0,
+    "unchanged_count": 21747
+  },
+  "entity_count_before": 21747,
+  "entity_count_after": 21748,
+  "original_dwg_unchanged": true,
+  "validation_overall": "partial",
+  "validation_gates_pass": 13,
+  "validation_gates_total": 14
+}

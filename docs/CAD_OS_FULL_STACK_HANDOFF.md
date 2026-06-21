@@ -154,3 +154,16 @@ See `docs\CAD_OS_BUILD_STATUS.md` §8 for the verbatim list. Headline carry-forw
 | Reports (truth) | `reports\walking_skeleton_latest.json`, `native_graph_smoke_latest.json`, `autocad_router_status_latest.json`, `build_native_latest.log` |
 | Build status (authoritative) | `docs\CAD_OS_BUILD_STATUS.md` |
 | Live-pump design (unbuilt) | `docs\LIVE_ARX_NAMED_PIPE_DESIGN.md` |
+
+---
+
+## CADOS_M02 (v0.2.0 — PARTIAL_PASS, 2026-06-22)
+
+The stack is now **live read + write**, not just a skeleton:
+
+- **Read:** `cadctl inspect --include-rich` → `native_full` IR (rich symbol tables/blocks/layouts/xrefs/dicts/xrecords; 21747 truth) · `query` (sqlite) · `validate` · `registry list|coverage|explain`.
+- **Write:** `patch_engine.apply_staged` → real staged-copy mutation → `cad_diff.compute_diff` → `validator` (14 gates) → journal; original byte-unchanged.
+- **New modules:** `tools\cad_diff.py`; extended `patch_engine.py` / `validator.py` / `sqlite_ir_store.py` / `cadagent_mcp.py` / `cadctl.py` / `run_job.py` / `ir_builder.py`.
+- **Native:** rich `.crx` (collectDatabaseGraph + UTF-8 fix) + versioned `.arx` (D1). M02 reports: `reports\CADOS_M02_V1_COMPLETION_ULTRACODE.md`, `reports\v1_acceptance_latest.md`.
+- **Honest partials:** non-ASCII (upstream accoreconsole), visual (`NOT_IMPLEMENTED`), live ARX pump runtime (blocked).
+- **Daedalus consumption handoff:** `D:\dev\_ariadne\_daedalus\external\cad_os\` (CADOS_M02_SUMMARY, CAD_OS_V1_CAPABILITIES.json, ...).

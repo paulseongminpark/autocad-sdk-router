@@ -467,6 +467,230 @@ def _build_source(source_meta, extract_source, extractor, engine_tier):
     return source
 
 
+# --- rich native database-graph builder (M02) ----------------------------------
+
+# Native collectModelSpaceGraph emits dxf_name = the runtime class name
+# (AcDbLine, AcDb2dPolyline, ...). Map it back to the (class, dxf_name, kind)
+# triple the IR schema wants. Unknown classes pass through as class==dxf_name
+# with geometry kind "unsupported" (no-fake-success).
+_NATIVE_CLASS_TO_DXF_KIND = {
+    "AcDbLine": ("LINE", "line"),
+    "AcDbArc": ("ARC", "arc"),
+    "AcDbCircle": ("CIRCLE", "circle"),
+    "AcDbEllipse": ("ELLIPSE", "ellipse"),
+    "AcDbPolyline": ("LWPOLYLINE", "lwpolyline"),
+    "AcDb2dPolyline": ("POLYLINE", "polyline"),
+    "AcDb3dPolyline": ("POLYLINE", "polyline"),
+    "AcDbBlockReference": ("INSERT", "block_reference"),
+    "AcDbMText": ("MTEXT", "mtext"),
+    "AcDbText": ("TEXT", "text"),
+    "AcDbAttributeDefinition": ("ATTDEF", "attribute"),
+    "AcDbAttribute": ("ATTRIB", "attribute"),
+    "AcDbHatch": ("HATCH", "hatch"),
+    "AcDbSpline": ("SPLINE", "spline"),
+    "AcDbPoint": ("POINT", "point"),
+    "AcDbSolid": ("SOLID", "solid"),
+    "AcDb3dSolid": ("3DSOLID", "solid"),
+    "AcDbRegion": ("REGION", "region"),
+    "AcDbViewport": ("VIEWPORT", "viewport"),
+    "AcDbRotatedDimension": ("DIMENSION", "dimension"),
+    "AcDbAlignedDimension": ("DIMENSION", "dimension"),
+    "AcDbDimension": ("DIMENSION", "dimension"),
+    "AcDbLeader": ("LEADER", "leader"),
+    "AcDbMLeader": ("MULTILEADER", "leader"),
+}
+
+
+def _geometry_from_native_entity(raw: dict, kind: str) -> dict:
+    """Lift a native graph entity's inline geometry fields into an IR geometry dict.
+
+    The native collector writes geometry inline on the entity record (start/end,
+    center/radius/angles, position/scale/rotation/block_name, text, vertices).
+    Returns an IR geometry dict with a valid ``kind``; unrepresented kinds get a
+    geometry that carries only ``kind`` (decoded=False is decided by the caller).
+    """
+    geom: dict = {"kind": kind}
+    for key in ("start", "end", "center", "position", "scale", "normal"):
+        pt = _as_point3(raw.get(key))
+        if pt is not None:
+            geom[key] = pt
+    radius = _to_number(raw.get("radius"))
+    if radius is not None:
+        geom["radius"] = radius
+    for nk, ik in (("start_angle", "start_angle"), ("end_angle", "end_angle"),
+                   ("rotation", "rotation")):
+        num = _to_number(raw.get(nk))
+        if num is not None:
+            geom[ik] = num
+    if raw.get("text") is not None:
+        geom["text"] = str(raw.get("text"))
+    if raw.get("block_name") is not None:
+        geom["block_name"] = str(raw.get("block_name"))
+    verts = raw.get("vertices")
+    if isinstance(verts, list) and verts:
+        norm = []
+        for v in verts:
+            pt = _as_point3(v)
+            if pt is not None:
+                norm.append({"point": pt})
+        if norm:
+            geom["vertices"] = norm
+    return geom
+
+
+def _entity_from_native(raw: dict, source_block: dict) -> dict:
+    """Map one native graph entity record to one IR entity (all required fields)."""
+    handle = str(raw.get("handle", "") or "")
+    native_class = str(raw.get("dxf_name", "") or "")  # native dxf_name == class name
+    dxf_name, kind = _NATIVE_CLASS_TO_DXF_KIND.get(
+        native_class, (native_class or "UNKNOWN", "unsupported"))
+    layer = str(raw.get("layer", "") or "")
+    geom = _geometry_from_native_entity(raw, kind)
+    bbox = _normalize_bbox(None, geom)
+    decoded = kind != "unsupported"
+
+    entity: dict = {
+        "handle": handle,
+        "class": native_class or "AcDbEntity",
+        "dxf_name": dxf_name,
+        "owner_handle": str(raw.get("owner_handle", "") or ""),
+        "space": str(raw.get("space", "model") or "model"),
+        "layer": layer,
+        "bbox": bbox,
+        "geometry": geom,
+        "source": {
+            "extractor": source_block.get("extractor", ""),
+            "engine_tier": source_block.get("engine_tier", ""),
+            "route": source_block.get("route", ""),
+            "decoded": decoded,
+        },
+    }
+    if raw.get("block_record_handle"):
+        entity["block_record_handle"] = str(raw["block_record_handle"])
+    return entity
+
+
+def build_ir_from_database_graph(graph_result: dict, source_meta: dict) -> dict:
+    """Normalize a native ``inspect.database.graph`` result into dwg_graph_ir.v1.
+
+    Args:
+        graph_result: the ``result`` object of the native job result JSON
+            (keys: modelspace_entities, entities[], database, symbol_tables,
+            block_table_records, block_definitions, layouts, xrefs,
+            dictionaries, xrecords, coverage).
+        source_meta: provenance (dwg_path, original_path, byte_size, sha256, ...).
+
+    Returns:
+        dict conforming to ariadne.dwg_graph_ir.v1 at coverage_level
+        "native_full". Truth gate (entity_count == len(entities)) holds by
+        construction; native coverage flags are carried into diagnostics.coverage.
+    """
+    graph_result = graph_result or {}
+    source_meta = source_meta or {}
+    extractor = source_meta.get("extractor") or "native_objectarx"
+    engine_tier = source_meta.get("engine_tier") or "native_arx"
+    route = source_meta.get("route") or "dwg_truth_autocad"
+    source_block = {"extractor": extractor, "engine_tier": engine_tier, "route": route}
+
+    raw_entities = graph_result.get("entities") or []
+    entities = [_entity_from_native(e, source_block) for e in raw_entities]
+
+    entity_count = len(entities)
+    asserted = graph_result.get("modelspace_entities")
+    entities_by_type: dict[str, int] = {}
+    proxy_undecoded = 0
+    for ent in entities:
+        dxf = ent.get("dxf_name", "") or ""
+        entities_by_type[dxf] = entities_by_type.get(dxf, 0) + 1
+        if not ent["source"].get("decoded", True):
+            proxy_undecoded += 1
+
+    warnings: list[str] = []
+    errors: list[str] = []
+    if asserted is not None and asserted != entity_count:
+        warnings.append(
+            f"native modelspace_entities {asserted} != realized {entity_count}")
+
+    native_cov = graph_result.get("coverage") or {}
+    sections_present = list(native_cov.get("sections_present") or [])
+    if "entities" not in sections_present:
+        sections_present = ["entities"] + sections_present
+
+    # carry the native rich sections straight through (schema is additive).
+    symbol_tables = graph_result.get("symbol_tables") or {}
+    if "layers" not in symbol_tables:
+        symbol_tables = {**symbol_tables, "layers": []}
+
+    # block_references projection from INSERT entities (convenience index).
+    block_references = []
+    for ent in entities:
+        if ent.get("dxf_name") == "INSERT":
+            g = ent.get("geometry", {})
+            block_references.append({
+                "handle": ent["handle"],
+                "block_name": g.get("block_name", ""),
+                "block_record_handle": ent.get("block_record_handle", ""),
+                "space": ent.get("space", "model"),
+                "layer": ent.get("layer", ""),
+                "insertion_point": g.get("position", [0.0, 0.0, 0.0]),
+                "scale": g.get("scale", [1.0, 1.0, 1.0]),
+                "rotation": g.get("rotation", 0.0),
+            })
+
+    diagnostics = {
+        "entity_count": entity_count,
+        "count_scope": "modelspace",
+        "realized_entity_count": entity_count,
+        "entities_by_type": entities_by_type,
+        "warnings": warnings,
+        "errors": errors,
+        "coverage": {
+            "modelspace_count_from_native": asserted,
+            "realized_entity_count": entity_count,
+            "match": (asserted is None) or (asserted == entity_count),
+            "sections_present": sections_present,
+            "sections_skipped": list(native_cov.get("sections_skipped") or []),
+            "section_status": {k: v for k, v in native_cov.items()
+                               if isinstance(v, str)},
+            "counts": native_cov.get("counts", {}),
+            "proxy_or_undecoded_count": proxy_undecoded,
+        },
+        "engines": [
+            {"extractor": extractor, "engine_tier": engine_tier,
+             "entity_count": entity_count},
+        ],
+    }
+
+    source = _build_source(source_meta, {}, extractor, engine_tier)
+
+    ir = {
+        "schema": IR_SCHEMA_ID,
+        "ir_version": IR_PRODUCER_VERSION,
+        "coverage_level": "native_full",
+        "source": source,
+        "database": graph_result.get("database") or {"header_vars": {}},
+        "symbol_tables": symbol_tables,
+        "block_definitions": graph_result.get("block_definitions") or [],
+        "block_references": block_references,
+        "xrefs": graph_result.get("xrefs") or [],
+        "dictionaries": graph_result.get("dictionaries") or [],
+        "xrecords": graph_result.get("xrecords") or [],
+        "layouts": graph_result.get("layouts") or [],
+        "entities": entities,
+        "diagnostics": diagnostics,
+    }
+    btr = graph_result.get("block_table_records")
+    if btr is not None:
+        ir["symbol_tables"]["block_table_records"] = btr
+    return ir
+
+
+def load_native_graph_result(path) -> dict:
+    """Load a native job result JSON and return its ``result`` object (BOM-tolerant)."""
+    doc = json.loads(Path(path).read_text(encoding="utf-8-sig"))
+    return doc.get("result", doc)
+
+
 # --- IO ------------------------------------------------------------------------
 
 def load_ir(path) -> dict:

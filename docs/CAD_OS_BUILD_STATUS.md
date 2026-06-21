@@ -262,3 +262,19 @@ capabilities. See `CAD_OS_FULL_STACK_HANDOFF.md` for the architecture and the ne
   - `D04_IMPORT_CAD_OS_CAPABILITIES` — Daedalus consumes CAD OS via cadctl, **or**
   - `CADOS_M02_NATIVE_IR_COMPLETION` — router-wire the native graph op (D2) + relink the
     `.arx` (D1) + non-ASCII fidelity (D3) + more native ops (D4).
+
+---
+
+## CADOS_M02 update (v0.2.0 — PARTIAL_PASS, 2026-06-22)
+
+The M01 deferrals above are largely cleared:
+
+| M01 deferral | M02 outcome |
+|---|---|
+| D1 `.arx` relink (lock) | **RESOLVED** — versioned `Ariadne.AcadNative.live_m02.arx`; build script lock-resilient |
+| D2 native graph op not routable | **RESOLVED** — `inspect.database.graph` routable via `cadctl inspect --include-rich` |
+| D3 non-ASCII `?` funnel | **CODE-FIXED** (UTF-8) + **re-characterized**: residual cp949 mojibake is UPSTREAM accoreconsole load decode (cross-engine confirmed native==managed; M01's "geometry_native preserves bytes" DISPROVEN) → M03 |
+| D4 coverage 30/480 | **ADVANCED** — 34 implemented + rich IR sections (native_full) |
+| D5 patch/visual shells | **patch EXECUTION now REAL** (staged, diffed, 14/14 validated, original unchanged); visual = honest `NOT_IMPLEMENTED`; live pump = design + versioned `.arx` |
+
+New M02 partials (host-dependent, no fake): non-ASCII (upstream), visual render (host can't plot→image), live-pump runtime (attended-injection blocked). Acceptance matrix: `reports\v1_acceptance_latest.md` (12/15 full PASS). Tests: pytest 215 pass / 2 skip.

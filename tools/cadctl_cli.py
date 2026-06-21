@@ -56,7 +56,10 @@ def build_parser() -> argparse.ArgumentParser:
     insp = sub.add_parser("inspect", help="stage a copy, extract via router, build IR")
     insp.add_argument("--dwg", required=True, help="path to the input DWG (read-only original)")
     insp.add_argument("--out", required=True, help="output run directory")
-    insp.add_argument("--mode", default="graph", choices=["graph"], help="inspection mode")
+    insp.add_argument("--mode", default="graph", choices=["graph", "rich"],
+                      help="graph = geometry_only extract; rich = native_full database graph")
+    insp.add_argument("--include-rich", dest="include_rich", action="store_true",
+                      help="route native inspect.database.graph -> coverage_level=native_full IR")
 
     q = sub.add_parser("query", help="read-only SQL over the IR sqlite store")
     q.add_argument("--ir", required=True, help="path to a dwg_graph_ir.v1 JSON")
@@ -69,6 +72,8 @@ def build_parser() -> argparse.ArgumentParser:
     reg_sub = reg.add_subparsers(dest="registry_command", required=True)
     reg_sub.add_parser("list", help="list the v2 operation registry")
     reg_sub.add_parser("coverage", help="operation coverage summary")
+    reg_explain = reg_sub.add_parser("explain", help="full registry record for one operation")
+    reg_explain.add_argument("op_id", help="operation id, e.g. inspect.database.graph")
 
     return p
 
@@ -82,7 +87,8 @@ def main(argv: list[str] | None = None) -> int:
         if args.command == "status":
             return _emit(cad.status())
         if args.command == "inspect":
-            return _emit(cad.inspect(args.dwg, args.out, args.mode))
+            include_rich = bool(getattr(args, "include_rich", False)) or args.mode == "rich"
+            return _emit(cad.inspect(args.dwg, args.out, args.mode, include_rich=include_rich))
         if args.command == "query":
             return _emit(cad.query(args.ir, args.sql))
         if args.command == "validate":
@@ -92,6 +98,8 @@ def main(argv: list[str] | None = None) -> int:
                 return _emit(cad.registry_list())
             if args.registry_command == "coverage":
                 return _emit(cad.registry_coverage())
+            if args.registry_command == "explain":
+                return _emit(cad.registry_explain(args.op_id))
     except Exception as exc:  # genuine cadctl-side failure
         err = {
             "schema": "ariadne.cadctl.error.v1",

@@ -1,111 +1,63 @@
 {
-  "schema": "ariadne.cad_os.validation_report_capture.v1",
-  "captured_at": "2026-06-22T00:00:14+09:00",
-  "packet_id": "CADOS_M01_FULL_STACK_ULTRACODE_BUILD",
-  "subject": {
-    "kind": "walking_skeleton_golden_run_ir",
-    "run_dir": "runs/cados_m01_skeleton_20260621_231144_golden",
-    "ir": "runs/cados_m01_skeleton_20260621_231144_golden/dwg_graph_ir.json",
-    "golden_dwg": "staging/dwg_20260617_191504/input.dwg",
-    "golden_sha16": "27DBF6B95FF72A89",
-    "golden_size_bytes": 2524981,
-    "truth_entity_count": 21747
-  },
-  "command": "python tools/cadctl_cli.py validate --ir runs/cados_m01_skeleton_20260621_231144_golden/dwg_graph_ir.json",
-  "cadctl_exit_code": 0,
-  "cadctl_status": "ok",
-  "report_status": "pass",
-  "validation_id": "val-529a732aecd9",
-  "gates_summary": {
-    "gates_total": 6,
-    "gates_passed": 6,
-    "gates_failed": 0,
-    "gates_skipped": 0
-  },
+  "schema": "ariadne.cad_os.validation.v1",
+  "packet": "CADOS_M02_V1_COMPLETION_ULTRACODE",
+  "overall": "partial",
   "gates": [
     {
-      "id": "ir_schema_present",
-      "status": "pass",
-      "required": true,
-      "description": "IR document carries the expected schema tag",
-      "expected": "ariadne.dwg_graph_ir.v1",
-      "actual": "ariadne.dwg_graph_ir.v1",
-      "message": null
+      "gate": "ir_schema_present",
+      "status": "pass"
     },
     {
-      "id": "entity_count_consistency",
-      "status": "pass",
-      "required": true,
-      "description": "diagnostics.entity_count == len(entities) == independent summary count (when present)",
-      "expected": 21747,
-      "actual": 21747,
-      "message": "entity_count==len(entities)==21747 (cross-checked vs diagnostics.realized_entity_count=21747)"
+      "gate": "entity_count_consistency",
+      "status": "pass"
     },
     {
-      "id": "required_artifacts_exist",
-      "status": "pass",
-      "required": true,
-      "description": "run folder contains the expected cadctl artifacts",
-      "expected": [
-        "cad_job.json",
-        "cad_result.json",
-        "dwg_graph_ir.json"
-      ],
-      "actual": [
-        "cad_job.json",
-        "cad_result.json",
-        "dwg_graph_ir.json"
-      ],
-      "message": null
+      "gate": "required_artifacts_exist",
+      "status": "pass"
     },
     {
-      "id": "no_original_write_evidence",
-      "status": "pass",
-      "required": true,
-      "description": "extraction operated on a staged copy, never the read-only original",
-      "expected": "dwg_path != original_path",
-      "actual": {
-        "dwg_path": "D:\\dev\\99_tools\\autocad-sdk-router\\staging\\golden\\20260621_231411_843\\input.dwg",
-        "original_path": "D:\\dev\\99_tools\\autocad-sdk-router\\staging\\dwg_20260617_191504\\input.dwg"
-      },
-      "message": "operated on staged copy under staging/"
+      "gate": "no_original_write_evidence",
+      "status": "pass"
     },
     {
-      "id": "registry_status_consistency",
-      "status": "pass",
-      "required": true,
-      "description": "wired baseline ops present and implemented in operations.v2.json",
-      "expected": {
-        "inspect.database.summary": "implemented",
-        "inspect.entity.count": "implemented"
-      },
-      "actual": {
-        "wired_total": 30,
-        "required_ops_status": {
-          "inspect.database.summary": "implemented",
-          "inspect.entity.count": "implemented"
-        }
-      },
-      "message": null
+      "gate": "registry_status_consistency",
+      "status": "pass"
     },
     {
-      "id": "run_folder_completeness",
-      "status": "pass",
-      "required": false,
-      "description": "run folder captured stdout/stderr evidence for the external command",
-      "expected": [
-        "stdout",
-        "stderr"
-      ],
-      "actual": [
-        "stderr.txt",
-        "stdout.txt"
-      ],
-      "message": null
+      "gate": "run_folder_completeness",
+      "status": "fail"
+    },
+    {
+      "gate": "cad_diff_schema",
+      "status": "pass"
+    },
+    {
+      "gate": "diff_expected_changes",
+      "status": "pass"
+    },
+    {
+      "gate": "no_unrelated_changes",
+      "status": "pass"
+    },
+    {
+      "gate": "patch_policy",
+      "status": "pass"
+    },
+    {
+      "gate": "staged_copy_used",
+      "status": "pass"
+    },
+    {
+      "gate": "journal_present",
+      "status": "pass"
+    },
+    {
+      "gate": "original_dwg_unchanged",
+      "status": "pass"
+    },
+    {
+      "gate": "no_fake_success",
+      "status": "pass"
     }
-  ],
-  "errors": [],
-  "warnings": [],
-  "verdict": "PASS",
-  "note": "Validator executed LIVE against the golden walking-skeleton run IR (21747 entities). Captured stdout of cadctl_cli validate; exit code recorded. Not fabricated."
+  ]
 }

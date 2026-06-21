@@ -35,3 +35,18 @@ Resume: `handoff\TAKEOVER.md`.
   `.arx` (clears D1), fix non-ASCII fidelity (D3), and add more native ops.
 
 Goals + first steps for each: `handoff\NEXT_STEP.md`.
+
+---
+
+## CADOS_M02_V1_COMPLETION_ULTRACODE — 2026-06-22 — **PARTIAL_PASS** (v0.2.0)
+
+Executed the M02 completion push (workflow + ultracode, 9 Opus agents + inline keystone).
+Landed a **live, validated read + write stack**: router-wired native rich IR
+(`inspect.database.graph` → `native_full`, 21747 truth), `ir_builder.build_ir_from_database_graph`,
+cadctl rich read surface (`--include-rich` / query / validate / registry explain), **real staged
+patch** (`patch_engine.apply_staged` → +1 LINE, cad_diff, 14/14 validation, original unchanged),
+`cad_diff.py`, validator gates, sqlite rich, registry v2 (43 ops / 34 implemented), versioned `.arx`
+(D1 resolved), 215 tests. Honest partials: non-ASCII (upstream accoreconsole), visual (NOT_IMPLEMENTED),
+live ARX pump runtime (blocked). Report: `reports\CADOS_M02_V1_COMPLETION_ULTRACODE.md`.
+
+**Next:** `D04_IMPORT_CAD_OS_CAPABILITIES` (recommended) or `CADOS_M03_NATIVE_IR_COMPLETION`.

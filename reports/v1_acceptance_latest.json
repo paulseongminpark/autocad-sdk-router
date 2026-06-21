@@ -1,0 +1,90 @@
+{
+  "schema": "ariadne.cad_os.v1_acceptance.v1",
+  "packet": "CADOS_M02_V1_COMPLETION_ULTRACODE",
+  "cad_os_v1_status": "PARTIAL_PASS",
+  "criteria_full_pass": 12,
+  "criteria_total": 15,
+  "gates": {
+    "1": {
+      "criterion": "M01 walking skeleton PASS",
+      "status": "PASS",
+      "evidence": "reports/walking_skeleton_latest.json; cadctl inspect --include-rich live (21747)"
+    },
+    "2": {
+      "criterion": "Existing 29 wired ops intact",
+      "status": "PASS",
+      "evidence": "router native-job allow-list extended additively; v1 surface untouched; registry+tests"
+    },
+    "3": {
+      "criterion": "inspect.database.graph router-routable",
+      "status": "PASS",
+      "evidence": "Test-NativeP1CadJobOperation allow-list; cadctl inspect --include-rich (not direct .scr only)"
+    },
+    "4": {
+      "criterion": "Rich IR beyond geometry-only",
+      "status": "PASS",
+      "evidence": "native_full: layers/linetypes/text_styles/dim_styles/BTR/block_defs/block_refs/layouts/xrefs/dicts/xrecords/db-meta. PARTIAL: per-entity xdata, ext-dicts, 2D/3D-polyline+hatch vertex geometry (M03)"
+    },
+    "5": {
+      "criterion": "Non-ASCII fidelity fixed/preserved",
+      "status": "PARTIAL",
+      "evidence": "UTF-8 code fix done+verified (wideToUtf8); residual cp949 mojibake = UPSTREAM accoreconsole load-time decode, cross-engine confirmed native==managed; M03: DXF/ezdxf name cross-source"
+    },
+    "6": {
+      "criterion": "Registry drives status/explain/coverage",
+      "status": "PASS",
+      "evidence": "cadctl registry list/coverage/explain; 34 implemented; consistent=True"
+    },
+    "7": {
+      "criterion": "Patch/Dry-run/Diff/Validate staged copy",
+      "status": "PASS",
+      "evidence": "live: create_line -> +1 LINE 21747->21748, cad_diff, 14/14 validation, original unchanged (runs/m02_patch_live2)"
+    },
+    "8": {
+      "criterion": "Validator deterministic gates",
+      "status": "PASS",
+      "evidence": "14 deterministic gates (IR/patch/diff/staged/no-original-write/journal); live overall pass"
+    },
+    "9": {
+      "criterion": "Visual real artifact OR explicit NOT_IMPLEMENTED",
+      "status": "NOT_IMPLEMENTED",
+      "evidence": "Core Console can't render here; honest not_implemented, no fake. Full visual PASS needs real artifact (M03)"
+    },
+    "10": {
+      "criterion": "Live ARX pump echo/status OR blocker recorded",
+      "status": "PARTIAL",
+      "evidence": "design + versioned .arx builds; runtime blocked: cannot safely load into attended acad.exe PID 49460 (exact blocker recorded, reports/live_pump_latest.json)"
+    },
+    "11": {
+      "criterion": ".arx relink resolved or versioned",
+      "status": "PASS",
+      "evidence": "versioned live_m02.arx (190976B) relinks with rich-IR code; build script lock-resilient; canonical relinks lock-free"
+    },
+    "12": {
+      "criterion": "Tests pass",
+      "status": "PASS",
+      "evidence": "pytest 215 passed/2 skipped; unittest 180 OK/2 skipped (env-gated live tests skip with reason)"
+    },
+    "13": {
+      "criterion": "No original DWG modified",
+      "status": "PASS",
+      "evidence": "golden byte-unchanged 27DBF6B95FF72A89; patch original sha256 before==after"
+    },
+    "14": {
+      "criterion": "Reports/handoff/Daedalus generated",
+      "status": "PASS",
+      "evidence": "this closeout"
+    },
+    "15": {
+      "criterion": "Local commit, no push",
+      "status": "PASS",
+      "evidence": "this closeout"
+    }
+  },
+  "blockers": [
+    "crit5 non-ASCII: upstream accoreconsole cp949 decode (hard external; cross-engine confirmed)",
+    "crit9 visual: Core Console cannot render on this host (NOT_IMPLEMENTED, no fake)",
+    "crit10 live pump: cannot safely inject .arx into attended acad.exe PID 49460 (runtime deferred)"
+  ],
+  "next": "D04_IMPORT_CAD_OS_CAPABILITIES (Daedalus consumes CAD OS v1 read+patch+registry) — strong-PARTIAL read/write stack is ready; visual+live-pump are non-critical for D04"
+}

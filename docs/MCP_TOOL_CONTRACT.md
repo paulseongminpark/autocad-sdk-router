@@ -31,19 +31,35 @@ production MCP endpoint.
 
 ## Tools
 
-| tool | delegates to | required args |
-|------|--------------|---------------|
-| `cad.status` | `cadctl.Cad.status` | — |
-| `cad.inspect_drawing` | `cadctl.Cad.inspect` | `dwg`, `out` |
-| `cad.query_entities` | `cadctl.Cad.query` | `ir`, `sql` |
-| `cad.get_entity` | `cadctl.Cad.query` (handle filter) | `ir`, `handle` |
-| `cad.validate_ir` | `validator.validate_target` | `ir` and/or `run_dir` |
-| `cad.registry_status` | `cadctl.Cad.registry_coverage` | — |
-| `cad.patch_dry_run` | `patch_engine.dry_run_plan` | `patch` |
+**Every handler delegates to a CAD OS Layer shell** (`cadctl` / `validator` / `patch_engine` /
+`cad_diff` / `visual_report`) — **never to a raw SDK and never to ad-hoc DWG parsing**. Drawing
+extraction always flows `cadctl → autocad-router.ps1` against a staged copy. The dispatch table
+binds **12 tools** today; `set(_DISPATCH) == {t["name"] for t in manifest.tools}` (self-test
+invariant).
 
-`cad.get_entity` builds a read-only `SELECT * FROM entities WHERE handle = '…'`
-(handle single-quote-escaped) and delegates to `cadctl.Cad.query`; read-only
-enforcement lives in the cadctl/sqlite shell, not here.
+### Wired tools (all in `_DISPATCH`, callable now)
+
+| tool | delegates to | required args | return (inside `{"ok":true,"result":…}`) |
+|------|--------------|---------------|------------------------------------------|
+| `cad.status` | `cadctl.Cad().status()` | — | `ariadne.cadctl.status.v1` (route_count, available_count, native_available) — read-only snapshot of the published status JSON; never runs `-Action status` |
+| `cad.inspect_drawing` | `cadctl.Cad().inspect(dwg, out, mode)` | `dwg`, `out` | `ariadne.cadctl.inspect.v1` envelope (cad_job, cad_result, dwg_graph_ir refs, entity_count) |
+| `cad.query_entities` | `cadctl.Cad().query(ir, sql)` | `ir`, `sql` | `ariadne.cadctl.query.v1` (`columns`, `rows`, `row_count`) over the IR-backed SQLite store |
+| `cad.get_entity` | `cadctl.Cad().query(ir, handle-SQL)` | `ir`, `handle` | same as `query_entities`, filtered to one handle |
+| `cad.validate_ir` | `validator.validate_target(ir, run_dir)` | `ir` **and/or** `run_dir` | `ariadne.validation_report.v1` (14 gates) |
+| `cad.registry_status` | `cadctl.Cad().registry_coverage()` | — | `ariadne.cadctl.registry_coverage.v1` (operation_count, wired_count, by_status) |
+| `cad.registry_explain` | `cadctl.Cad().registry_explain(op_id)` | `op_id` | `ariadne.cadctl.registry_explain.v1` (the full v2 registry record for one op) |
+| `cad.patch_dry_run` | `patch_engine.dry_run_plan(patch)` | `patch` | `ariadne.cad_patch.dry_run.v1` (plan only; `execution: "not_implemented"`) |
+| `cad.patch_apply_staged` | `patch_engine.apply_staged(patch, dwg_path, out_dir)` | `patch`, `dwg_path`, `out_dir` | the staged-write result envelope (status `ok`/`blocked`/`not_implemented`/`partial`; refs to pre/post IR, `cad_diff.json`, `journal.json`, original-unchanged proof). See PATCH_ENGINE_SPEC §A. |
+| `cad.diff_before_after` | `cad_diff.compute_diff(pre_ir, post_ir)` | `pre_ir`, `post_ir` | `ariadne.cad_diff.v1` (handle-keyed; `summary.added/removed/modified`; `comparison_basis: "handle"`). The handler loads the two IR paths (BOM-tolerant) and calls `compute_diff`. |
+| `cad.visual_report` | `visual_report.build_visual_report(source_ref, kind)` | `source_ref` | `ariadne.visual_artifact.v1` — a render it cannot produce returns **`NOT_IMPLEMENTED`**, never a fake PASS |
+| `cad.live_status` | truthful local liveness probe (no shell) | — | a truthful liveness report; the live ARX named-pipe pump is **not attached** (design-only) and is reported as such, not faked |
+
+Each result envelope is `{"ok": true, "result": …}` on success, or
+`{"ok": false, "status": "error", "error": "…", "delegate": "…"}` when the underlying shell is
+unavailable (no-fake-success). `cad.get_entity` builds a read-only
+`SELECT * FROM entities WHERE handle = '…'` (handle single-quote-escaped); read-only enforcement
+lives in the cadctl/sqlite shell, not here. `cad.patch_apply_staged` mutates only a **staged copy**
+(the shell stages the copy; the router `_QSAVE`s its own copy) and **never** the original.
 
 ## JSON-RPC methods
 
@@ -74,7 +90,7 @@ python tools/cadagent_mcp.py --serve
 ```
 
 Verdict line example:
-`SELFTEST_OK | tools=7 transport=mock | validator_loaded=True cadctl_loaded=True`
+`SELFTEST_OK | tools=12 transport=mock | validator_loaded=True cadctl_loaded=True`
 
 ## Manifest shape
 
@@ -88,16 +104,23 @@ Verdict line example:
 }
 ```
 
-## Not implemented yet
+## Not implemented yet (truthful degradation, not faked)
 
-- **Real MCP transport.** This is a stdlib JSON-RPC mock, not an
+- **Real MCP transport.** This is a stdlib JSON-RPC mock (`transport == "mock"`), not an
   `mcp`-library-hosted server. Promoting it means binding the same `_DISPATCH`
   table to a real MCP server (`stdio`/SSE) once that dependency is permitted.
-- **`cad.inspect_drawing` / `cad.query_entities` / `cad.get_entity` /
-  `cad.registry_status` / `cad.status`** are only as live as the `cadctl` shell
-  they delegate to (built by Lane B1). When `cadctl` is absent the tools return
-  an explicit `delegate`/`error` envelope (verified by the self-test, which
-  exercises `cad.validate_ir` against a nonexistent IR and gets a truthful
-  result, not a fake pass).
-- **`cad.patch_dry_run`** plans only — patch execution is `not_implemented`
-  (see `PATCH_ENGINE_SPEC.md`).
+- **Shell availability.** Every tool is only as live as the shell it delegates to. All five shells
+  (`cadctl`, `validator`, `patch_engine`, `cad_diff`, `visual_report`) are present today; if one
+  were absent the tool returns an explicit `delegate`/`error` envelope (verified by the self-test,
+  which exercises `cad.validate_ir` against a nonexistent IR and gets a truthful result, not a fake
+  pass).
+- **`cad.patch_dry_run`** plans only — declared-op execution there is `not_implemented`. Use
+  **`cad.patch_apply_staged`** for the real staged write (see `PATCH_ENGINE_SPEC.md` §A).
+- **`cad.patch_apply_staged`** returns a truthful `not_implemented` for any patch op that has no
+  native write handler (only `create_line`/`create_circle`/`set_layer`/`create_layer` map to a live
+  native op) and for any unavailable sibling/host — never a fake `ok`.
+- **`cad.visual_report`** returns `NOT_IMPLEMENTED` for any render it cannot actually produce
+  (no fake PASS). **`cad.live_status`** reports the live ARX pump as not-attached (design-only).
+
+> Self-test invariant: `tools=12`, `transport=mock`, and `set(_DISPATCH) == {t["name"] for t in
+> manifest.tools}`. The wired tool count is **12**; keep this in sync with `_DISPATCH`/`_TOOLS`.

@@ -52,10 +52,15 @@ _V1_CAD_JOB = os.path.join(_SCHEMAS, "cad_job.schema.json")
 
 _RUNNABLE_STATUSES = {"implemented", "wired"}
 
-# The single KNOWN, ALLOWED unresolved composed_of reference: a synthetic *stub*
-# op forward-declares a catalog op that is not catalogued yet. Pinned exactly so
-# it cannot silently grow. (op_id, status, unresolved_ref)
-_KNOWN_UNRESOLVED = {("diff.before_after", "stub", "inspect.database.graph")}
+# Known, ALLOWED unresolved references: a composed_of/catalog ref that resolves
+# to neither the native ARX catalog NOR another registry op id. As of M02 this
+# set is EMPTY: the formerly-forward-declared target `inspect.database.graph`
+# (referenced by the diff.before_after stub and the new query.entities op) is now
+# itself an `implemented` synthetic registry op, so those refs resolve INTRA-
+# REGISTRY (see `_unresolved`, which counts a ref as resolved when it names a
+# real registry op). Pinned exactly so a genuinely-nonexistent ref cannot appear
+# silently. (op_id, status, unresolved_ref)
+_KNOWN_UNRESOLVED = set()
 
 
 def _load_json(path: str):
@@ -165,10 +170,24 @@ class TestCatalogReferencesResolve(unittest.TestCase):
         self.reg = _load_json(_OPERATIONS_V2)
         self.catalog_ids = _catalog_op_ids()
         self.assertGreater(len(self.catalog_ids), 0, "catalog has no op_ids")
+        # Registry op ids are themselves valid composition targets: a synthetic
+        # router op may be composed_of another registry op (e.g. query.entities
+        # and the diff.before_after stub compose over the implemented synthetic
+        # op inspect.database.graph, which has no catalog_op_id). Such an intra-
+        # registry reference RESOLVES; only a ref that names neither a catalog op
+        # nor a registry op is genuinely unresolved.
+        self.registry_ids = {o.get("id") for o in self.reg["operations"]
+                             if isinstance(o, dict) and o.get("id")}
 
     def _unresolved(self):
         """Yield (op_id, status, ref) for every catalog/composed_of ref that does
-        not resolve in the catalog."""
+        not resolve in the catalog OR as another registry op id.
+
+        A ref resolves when it is a native ARX catalog op_id (a real catalog op)
+        OR a registry op id (a real intra-registry composition target). A ref that
+        is neither is genuinely unresolved -- a promise to compose from something
+        that exists nowhere, which on a runnable op is a fake-success hole.
+        """
         out = []
         for o in self.reg["operations"]:
             if not isinstance(o, dict):
@@ -180,7 +199,7 @@ class TestCatalogReferencesResolve(unittest.TestCase):
             for c in (o.get("handler") or {}).get("composed_of") or []:
                 refs.add(c)
             for r in refs:
-                if r not in self.catalog_ids:
+                if r not in self.catalog_ids and r not in self.registry_ids:
                     out.append((o.get("id"), o.get("status"), r))
         return out
 

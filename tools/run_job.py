@@ -135,6 +135,109 @@ def run_router_extract(staged_dwg: str, run_dir: str, *, intent: str = "dwg",
     }
 
 
+def build_cad_job_command(staged_dwg: str, operation: str, *,
+                          intent: str = "dwg", write_mode: str = "read",
+                          job_path: str | None = None) -> list[str]:
+    """Router invocation for a NATIVE cad job (ObjectARX ARIADNE_NATIVE_JOB).
+
+    Runs:  powershell -File <router> -Action run -Intent dwg
+           -InputPath <staged_dwg> -Operation <op> -WriteMode <mode>
+
+    The router routes ``inspect.database.graph`` (and the P1 write ops) to the
+    native .dbx/.crx job path, which writes a native result JSON whose path comes
+    back in execution.engine_output.result_json. write_mode 'write_copy' makes the
+    router stage a copy and _QSAVE it -> a real staged mutation (never the original).
+    """
+    ps = _powershell_exe()
+    cmd = [
+        ps, "-NoProfile", "-NonInteractive", "-ExecutionPolicy", "Bypass",
+        "-File", str(ROUTER_PS1),
+        "-Action", "run", "-Intent", intent,
+        "-InputPath", str(staged_dwg),
+        "-Operation", operation,
+    ]
+    if write_mode:
+        cmd += ["-WriteMode", write_mode]
+    if job_path:
+        cmd += ["-JobPath", str(job_path)]
+    return cmd
+
+
+def run_router_cad_job(staged_dwg: str, run_dir: str, operation: str, *,
+                       intent: str = "dwg", write_mode: str = "read",
+                       job_path: str | None = None, timeout: int = 600) -> dict:
+    """Invoke the router NATIVE cad-job lane; capture stdout/stderr/exit + result.
+
+    Returns:
+      {command, exit_code, stdout_path, stderr_path, envelope, result_json (path|None),
+       result (dict|None), staged_used (path|None), timed_out, error}.
+    Never raises on router failure. The native result JSON path is read from
+    execution.engine_output.result_json; ``result`` is its parsed ``result`` object.
+    """
+    run_dir_p = Path(run_dir)
+    run_dir_p.mkdir(parents=True, exist_ok=True)
+    stdout_path = run_dir_p / "stdout.txt"
+    stderr_path = run_dir_p / "stderr.txt"
+
+    if not ROUTER_PS1.exists():
+        msg = f"router entrypoint missing: {ROUTER_PS1}"
+        stderr_path.write_text(msg + "\n", encoding="utf-8")
+        stdout_path.write_text("", encoding="utf-8")
+        return {"command": None, "exit_code": None, "stdout_path": str(stdout_path),
+                "stderr_path": str(stderr_path), "envelope": None, "result_json": None,
+                "result": None, "staged_used": None, "timed_out": False, "error": msg}
+
+    cmd = build_cad_job_command(staged_dwg, operation, intent=intent,
+                                write_mode=write_mode, job_path=job_path)
+    timed_out = False
+    error = None
+    stdout_text = ""
+    stderr_text = ""
+    code = None
+    try:
+        proc = subprocess.run(
+            cmd, cwd=str(ROUTER_HOME), capture_output=True, text=True,
+            encoding="utf-8", errors="replace", timeout=timeout,
+        )
+        stdout_text = proc.stdout or ""
+        stderr_text = proc.stderr or ""
+        code = proc.returncode
+    except subprocess.TimeoutExpired as exc:
+        timed_out = True
+        error = f"router cad job timed out after {timeout}s"
+        stdout_text = (exc.stdout or "") if isinstance(exc.stdout, str) else ""
+        stderr_text = (exc.stderr or "") if isinstance(exc.stderr, str) else ""
+    except OSError as exc:
+        error = f"failed to launch router: {exc}"
+
+    stdout_path.write_text(stdout_text, encoding="utf-8")
+    stderr_path.write_text(stderr_text, encoding="utf-8")
+
+    envelope = _parse_first_json_object(stdout_text) if stdout_text.strip() else None
+    result_json = None
+    result_obj = None
+    staged_used = None
+    if envelope:
+        eng = (envelope.get("execution") or {}).get("engine_output") or {}
+        result_json = eng.get("result_json")
+        staged_used = eng.get("input")
+        inline = eng.get("result")
+        if isinstance(inline, dict):
+            result_obj = inline.get("result", inline)
+    # Prefer reading the on-disk result file (authoritative, full).
+    if result_json and Path(result_json).exists():
+        try:
+            doc = json.loads(Path(result_json).read_text(encoding="utf-8-sig"))
+            result_obj = doc.get("result", doc)
+        except (ValueError, OSError):
+            pass
+
+    return {"command": cmd, "exit_code": code, "stdout_path": str(stdout_path),
+            "stderr_path": str(stderr_path), "envelope": envelope,
+            "result_json": result_json, "result": result_obj,
+            "staged_used": staged_used, "timed_out": timed_out, "error": error}
+
+
 def _parse_first_json_object(text: str) -> dict | None:
     """Best-effort: parse the router's JSON envelope from stdout.
 

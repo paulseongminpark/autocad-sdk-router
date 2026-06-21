@@ -69,6 +69,29 @@ static std::string wideToAscii(const std::wstring& wide)
     return out;
 }
 
+// M02 D3 fix: lossless UTF-16 -> UTF-8. Used by acharToAscii() so every entity
+// /layer/block/text string emitted into the DWG Graph IR preserves non-ASCII
+// code points (e.g. the Korean layer "설비OPEN") instead of mapping them to '?'.
+// The IR result file is read back as UTF-8 (PowerShell -Encoding UTF8 / Python
+// utf-8-sig), so UTF-8 bytes are the correct on-disk encoding. ASCII input is a
+// strict subset of UTF-8, so existing ASCII output is byte-identical (no
+// regression to the 29 wired ops).
+static std::string wideToUtf8(const std::wstring& wide)
+{
+    if (wide.empty())
+        return std::string();
+    const int needed = WideCharToMultiByte(
+        CP_UTF8, 0, wide.c_str(), static_cast<int>(wide.size()),
+        nullptr, 0, nullptr, nullptr);
+    if (needed <= 0)
+        return std::string();
+    std::string out(static_cast<size_t>(needed), '\0');
+    WideCharToMultiByte(
+        CP_UTF8, 0, wide.c_str(), static_cast<int>(wide.size()),
+        &out[0], needed, nullptr, nullptr);
+    return out;
+}
+
 static std::wstring asciiToWide(const std::string& value)
 {
     std::wstring out;
@@ -82,6 +105,10 @@ static bool moduleDirectory(std::wstring& outDir);
 // Forward decl: collectModelSpaceGraph (defined below) calls acharToAscii,
 // whose definition sits further down next to the reactor helpers.
 static std::string acharToAscii(const ACHAR* text);
+// Handle helpers are defined with the M02 rich-graph collectors (below
+// collectModelSpaceGraph) but used inside it; forward-declare them.
+static std::string handleOf(AcDbObject* pObj);
+static std::string handleOfId(const AcDbObjectId& id);
 
 static std::wstring gJobInOverride;
 static std::wstring gJobOutOverride;
@@ -534,7 +561,10 @@ static bool collectModelSpaceGraph(AcDbDatabase* pDb, int& total,
         }
         else if (AcDbBlockReference* pRef = AcDbBlockReference::cast(pEnt)) {
             const AcGePoint3d p = pRef->position();
-            arr << ",\"position\":[" << p.x << "," << p.y << "," << p.z << "]";
+            const AcGeScale3d sc = pRef->scaleFactors();
+            arr << ",\"position\":[" << p.x << "," << p.y << "," << p.z << "]"
+                << ",\"scale\":[" << sc.sx << "," << sc.sy << "," << sc.sz << "]"
+                << ",\"rotation\":" << pRef->rotation();
             std::string blockName;
             AcDbBlockTableRecord* pDef = nullptr;
             if (acdbOpenObject(pDef, pRef->blockTableRecord(),
@@ -544,7 +574,8 @@ static bool collectModelSpaceGraph(AcDbDatabase* pDb, int& total,
                     blockName = acharToAscii(nameRaw);
                 pDef->close();
             }
-            arr << ",\"block_name\":\"" << jsonEscape(blockName) << "\"";
+            arr << ",\"block_name\":\"" << jsonEscape(blockName) << "\""
+                << ",\"block_record_handle\":\"" << jsonEscape(handleOfId(pRef->blockTableRecord())) << "\"";
         }
         else if (AcDbMText* pM = AcDbMText::cast(pEnt)) {
             const AcGePoint3d p = pM->location();
@@ -579,6 +610,446 @@ static bool collectModelSpaceGraph(AcDbDatabase* pDb, int& total,
     arr << "]";
     entitiesJson = arr.str();
     return true;
+}
+
+//----------------------------------------------------------------------------
+// Rich database graph (M02): symbol tables, block table records, block
+// definitions, layouts, xrefs, and the named-object dictionary, emitted as
+// JSON fragments that the inspect.database.graph op splices alongside the
+// model-space entities[]. All strings go through acharToAscii() (now UTF-8),
+// so non-ASCII names survive. Every collector is a guarded pure read; a section
+// that cannot open its table returns "[]" / "{}" and is marked accordingly in
+// the coverage report (no-fake-success: present sections are real, skipped
+// sections are named).
+//----------------------------------------------------------------------------
+static std::string handleOf(AcDbObject* pObj)
+{
+    if (pObj == nullptr)
+        return std::string();
+    AcDbHandle h;
+    pObj->getAcDbHandle(h);
+    ACHAR buf[40] = {};
+    if (h.getIntoAsciiBuffer(buf, 40))
+        return acharToAscii(buf);
+    return std::string();
+}
+
+static std::string handleOfId(const AcDbObjectId& id)
+{
+    const AcDbHandle h = id.handle();
+    ACHAR buf[40] = {};
+    if (h.getIntoAsciiBuffer(buf, 40))
+        return acharToAscii(buf);
+    return std::string();
+}
+
+// Generic {handle,name} list for any symbol table (linetypes, text styles,
+// dim styles, viewports, regapps). Uses the base AcDbSymbolTable iterator so
+// it never needs a per-table typed API.
+static std::string symbolTableRecordsJson(AcDbObjectId tableId, int& count)
+{
+    count = 0;
+    std::ostringstream arr;
+    arr << "[";
+    bool first = true;
+    AcDbSymbolTable* pTable = nullptr;
+    if (acdbOpenObject(pTable, tableId, AcDb::kForRead) != Acad::eOk)
+        return "[]";
+    AcDbSymbolTableIterator* pIt = nullptr;
+    if (pTable->newIterator(pIt) != Acad::eOk) {
+        pTable->close();
+        return "[]";
+    }
+    for (pIt->start(); !pIt->done(); pIt->step()) {
+        AcDbSymbolTableRecord* pRec = nullptr;
+        if (pIt->getRecord(pRec, AcDb::kForRead) == Acad::eOk) {
+            const ACHAR* nameRaw = nullptr;
+            std::string name;
+            if (pRec->getName(nameRaw) == Acad::eOk)
+                name = acharToAscii(nameRaw);
+            const std::string handle = handleOf(pRec);
+            if (!first)
+                arr << ",";
+            first = false;
+            arr << "{\"handle\":\"" << jsonEscape(handle) << "\""
+                << ",\"name\":\"" << jsonEscape(name) << "\"}";
+            ++count;
+            pRec->close();
+        }
+    }
+    delete pIt;
+    pTable->close();
+    arr << "]";
+    return arr.str();
+}
+
+// Layer table with color + state flags (the highest-value symbol table; carries
+// the non-ASCII names the D3 fix targets).
+static std::string layersRichJson(AcDbDatabase* pDb, int& count)
+{
+    count = 0;
+    std::ostringstream arr;
+    arr << "[";
+    bool first = true;
+    AcDbLayerTable* pLT = nullptr;
+    if (pDb->getLayerTable(pLT, AcDb::kForRead) != Acad::eOk)
+        return "[]";
+    AcDbLayerTableIterator* pIt = nullptr;
+    if (pLT->newIterator(pIt) != Acad::eOk) {
+        pLT->close();
+        return "[]";
+    }
+    for (pIt->start(); !pIt->done(); pIt->step()) {
+        AcDbLayerTableRecord* pRec = nullptr;
+        if (pIt->getRecord(pRec, AcDb::kForRead) == Acad::eOk) {
+            const ACHAR* nameRaw = nullptr;
+            std::string name;
+            if (pRec->getName(nameRaw) == Acad::eOk)
+                name = acharToAscii(nameRaw);
+            const int colorIndex = pRec->color().colorIndex();
+            const std::string handle = handleOf(pRec);
+            if (!first)
+                arr << ",";
+            first = false;
+            arr << "{\"handle\":\"" << jsonEscape(handle) << "\""
+                << ",\"name\":\"" << jsonEscape(name) << "\""
+                << ",\"color_index\":" << colorIndex
+                << ",\"frozen\":" << (pRec->isFrozen() ? "true" : "false")
+                << ",\"off\":" << (pRec->isOff() ? "true" : "false")
+                << ",\"locked\":" << (pRec->isLocked() ? "true" : "false")
+                << ",\"plottable\":" << (pRec->isPlottable() ? "true" : "false")
+                << ",\"is_xref_dependent\":" << (pRec->isDependent() ? "true" : "false")
+                << "}";
+            ++count;
+            pRec->close();
+        }
+    }
+    delete pIt;
+    pLT->close();
+    arr << "]";
+    return arr.str();
+}
+
+// Block table records + the user-block-definition projection (def geometry is
+// referenced from entities[] by owner_handle, not inlined).
+static std::string blockTableRecordsJson(AcDbDatabase* pDb, int& btrCount,
+                                         int& userBlockDefs,
+                                         std::string& blockDefsJson)
+{
+    btrCount = 0;
+    userBlockDefs = 0;
+    std::ostringstream arr;
+    arr << "[";
+    bool first = true;
+    std::ostringstream defs;
+    defs << "[";
+    bool dfirst = true;
+
+    AcDbBlockTable* pBT = nullptr;
+    if (pDb->getBlockTable(pBT, AcDb::kForRead) != Acad::eOk) {
+        blockDefsJson = "[]";
+        return "[]";
+    }
+    AcDbBlockTableIterator* pIt = nullptr;
+    if (pBT->newIterator(pIt) != Acad::eOk) {
+        pBT->close();
+        blockDefsJson = "[]";
+        return "[]";
+    }
+    for (pIt->start(); !pIt->done(); pIt->step()) {
+        AcDbBlockTableRecord* pBTR = nullptr;
+        if (pIt->getRecord(pBTR, AcDb::kForRead) == Acad::eOk) {
+            const ACHAR* nameRaw = nullptr;
+            std::string name;
+            if (pBTR->getName(nameRaw) == Acad::eOk)
+                name = acharToAscii(nameRaw);
+            const bool isLayout = pBTR->isLayout();
+            const bool isAnon = pBTR->isAnonymous();
+            const bool isXref = pBTR->isFromExternalReference();
+            int entityCount = 0;
+            AcDbBlockTableRecordIterator* pEIt = nullptr;
+            if (pBTR->newIterator(pEIt) == Acad::eOk) {
+                for (pEIt->start(); !pEIt->done(); pEIt->step())
+                    ++entityCount;
+                delete pEIt;
+            }
+            const std::string handle = handleOf(pBTR);
+            if (!first)
+                arr << ",";
+            first = false;
+            arr << "{\"handle\":\"" << jsonEscape(handle) << "\""
+                << ",\"name\":\"" << jsonEscape(name) << "\""
+                << ",\"is_layout\":" << (isLayout ? "true" : "false")
+                << ",\"is_anonymous\":" << (isAnon ? "true" : "false")
+                << ",\"is_xref\":" << (isXref ? "true" : "false")
+                << ",\"entity_count\":" << entityCount << "}";
+            ++btrCount;
+            if (!isLayout && !isAnon && !isXref) {
+                ++userBlockDefs;
+                if (!dfirst)
+                    defs << ",";
+                dfirst = false;
+                defs << "{\"handle\":\"" << jsonEscape(handle) << "\""
+                     << ",\"name\":\"" << jsonEscape(name) << "\""
+                     << ",\"entity_count\":" << entityCount << "}";
+            }
+            pBTR->close();
+        }
+    }
+    delete pIt;
+    pBT->close();
+    arr << "]";
+    defs << "]";
+    blockDefsJson = defs.str();
+    return arr.str();
+}
+
+static std::string layoutsRichJson(AcDbDatabase* pDb, int& count)
+{
+    count = 0;
+    std::ostringstream arr;
+    arr << "[";
+    bool first = true;
+    AcDbDictionary* pLayouts = nullptr;
+    if (pDb->getLayoutDictionary(pLayouts, AcDb::kForRead) != Acad::eOk)
+        return "[]";
+    AcDbDictionaryIterator* pIt = pLayouts->newIterator();
+    for (; pIt != nullptr && !pIt->done(); pIt->next()) {
+        AcDbObject* pObj = nullptr;
+        if (acdbOpenObject(pObj, pIt->objectId(), AcDb::kForRead) == Acad::eOk) {
+            AcDbLayout* pLayout = AcDbLayout::cast(pObj);
+            if (pLayout != nullptr) {
+                const ACHAR* nameRaw = nullptr;
+                std::string name;
+                if (pLayout->getLayoutName(nameRaw) == Acad::eOk)
+                    name = acharToAscii(nameRaw);
+                const int tab = pLayout->getTabOrder();
+                const std::string btrHandle = handleOfId(pLayout->getBlockTableRecordId());
+                const std::string handle = handleOf(pObj);
+                if (!first)
+                    arr << ",";
+                first = false;
+                arr << "{\"handle\":\"" << jsonEscape(handle) << "\""
+                    << ",\"name\":\"" << jsonEscape(name) << "\""
+                    << ",\"tab_order\":" << tab
+                    << ",\"block_table_record_handle\":\"" << jsonEscape(btrHandle) << "\"}";
+                ++count;
+            }
+            pObj->close();
+        }
+    }
+    delete pIt;
+    pLayouts->close();
+    arr << "]";
+    return arr.str();
+}
+
+static std::string xrefsRichJson(AcDbDatabase* pDb, int& count)
+{
+    count = 0;
+    std::ostringstream arr;
+    arr << "[";
+    bool first = true;
+    AcDbBlockTable* pBT = nullptr;
+    if (pDb->getBlockTable(pBT, AcDb::kForRead) != Acad::eOk)
+        return "[]";
+    AcDbBlockTableIterator* pIt = nullptr;
+    if (pBT->newIterator(pIt) != Acad::eOk) {
+        pBT->close();
+        return "[]";
+    }
+    for (pIt->start(); !pIt->done(); pIt->step()) {
+        AcDbBlockTableRecord* pBTR = nullptr;
+        if (pIt->getRecord(pBTR, AcDb::kForRead) == Acad::eOk) {
+            if (pBTR->isFromExternalReference()) {
+                const ACHAR* nameRaw = nullptr;
+                std::string name;
+                if (pBTR->getName(nameRaw) == Acad::eOk)
+                    name = acharToAscii(nameRaw);
+                const ACHAR* pathRaw = nullptr;
+                std::string path;
+                if (pBTR->pathName(pathRaw) == Acad::eOk && pathRaw != nullptr)
+                    path = acharToAscii(pathRaw);
+                const bool overlay = pBTR->isFromOverlayReference();
+                const bool unloaded = pBTR->isUnloaded();
+                const std::string handle = handleOf(pBTR);
+                if (!first)
+                    arr << ",";
+                first = false;
+                arr << "{\"handle\":\"" << jsonEscape(handle) << "\""
+                    << ",\"name\":\"" << jsonEscape(name) << "\""
+                    << ",\"path\":\"" << jsonEscape(path) << "\""
+                    << ",\"is_overlay\":" << (overlay ? "true" : "false")
+                    << ",\"status\":\"" << (unloaded ? "unloaded" : "resolved") << "\"}";
+                ++count;
+            }
+            pBTR->close();
+        }
+    }
+    delete pIt;
+    pBT->close();
+    arr << "]";
+    return arr.str();
+}
+
+// Named object dictionary: emit its entries (key -> value handle) as ONE
+// dictionary_record, and surface any XRECORD living directly under it. Deeper
+// (nested-dictionary) xrecords + full resbuf decode are a documented partial.
+static std::string namedObjectDictJson(AcDbDatabase* pDb, int& entryCount,
+                                       int& xrecordCount, std::string& xrecordsJson)
+{
+    entryCount = 0;
+    xrecordCount = 0;
+    std::ostringstream entries;
+    entries << "[";
+    bool efirst = true;
+    std::ostringstream xrecs;
+    xrecs << "[";
+    bool xfirst = true;
+
+    AcDbDictionary* pNOD = nullptr;
+    if (pDb->getNamedObjectsDictionary(pNOD, AcDb::kForRead) != Acad::eOk) {
+        xrecordsJson = "[]";
+        return "[]";
+    }
+    const std::string nodHandle = handleOf(pNOD);
+    AcDbDictionaryIterator* pIt = pNOD->newIterator();
+    for (; pIt != nullptr && !pIt->done(); pIt->next()) {
+        const ACHAR* keyRaw = pIt->name();
+        const std::string key = (keyRaw != nullptr) ? acharToAscii(keyRaw) : std::string();
+        const AcDbObjectId vid = pIt->objectId();
+        const std::string vh = handleOfId(vid);
+        if (!efirst)
+            entries << ",";
+        efirst = false;
+        entries << "{\"key\":\"" << jsonEscape(key) << "\""
+                << ",\"value_handle\":\"" << jsonEscape(vh) << "\"}";
+        ++entryCount;
+        AcDbObject* pObj = nullptr;
+        if (acdbOpenObject(pObj, vid, AcDb::kForRead) == Acad::eOk) {
+            if (AcDbXrecord::cast(pObj) != nullptr) {
+                if (!xfirst)
+                    xrecs << ",";
+                xfirst = false;
+                xrecs << "{\"handle\":\"" << jsonEscape(vh) << "\""
+                      << ",\"owner_handle\":\"" << jsonEscape(nodHandle) << "\""
+                      << ",\"key\":\"" << jsonEscape(key) << "\"}";
+                ++xrecordCount;
+            }
+            pObj->close();
+        }
+    }
+    delete pIt;
+    pNOD->close();
+    entries << "]";
+    xrecs << "]";
+    xrecordsJson = xrecs.str();
+    return entries.str();
+}
+
+static std::string databaseMetaJson(AcDbDatabase* pDb)
+{
+    const AcGePoint3d ins = pDb->insbase();
+    const AcGePoint3d emin = pDb->extmin();
+    const AcGePoint3d emax = pDb->extmax();
+    std::ostringstream o;
+    o << "{\"insbase\":[" << ins.x << "," << ins.y << "," << ins.z << "]"
+      << ",\"extents\":{\"extmin\":[" << emin.x << "," << emin.y << "," << emin.z << "]"
+      << ",\"extmax\":[" << emax.x << "," << emax.y << "," << emax.z << "]}"
+      << ",\"units\":{\"insunits\":" << static_cast<int>(pDb->insunits())
+      << ",\"linear_units\":" << static_cast<int>(pDb->lunits())
+      << ",\"angular_units\":" << static_cast<int>(pDb->aunits())
+      << ",\"linear_precision\":" << static_cast<int>(pDb->luprec())
+      << ",\"angular_precision\":" << static_cast<int>(pDb->auprec()) << "}}";
+    return o.str();
+}
+
+// Compose the rich sections into a JSON fragment (no outer braces; the op branch
+// splices it after entities[]). coverageJson reports per-section status so a
+// consumer can tell implemented from partial/skipped without guessing.
+static std::string collectDatabaseGraph(AcDbDatabase* pDb, std::string& coverageJson)
+{
+    std::ostringstream sec;
+    std::ostringstream present;
+    bool pfirst = true;
+    auto addPresent = [&](const char* name) {
+        if (!pfirst) present << ",";
+        pfirst = false;
+        present << "\"" << name << "\"";
+    };
+
+    sec << "\"database\":" << databaseMetaJson(pDb);
+    addPresent("database");
+
+    int layerCount = 0, ltCount = 0, tsCount = 0, dsCount = 0, vpCount = 0, raCount = 0;
+    const std::string layersJson = layersRichJson(pDb, layerCount);
+    const std::string linetypesJson = symbolTableRecordsJson(pDb->linetypeTableId(), ltCount);
+    const std::string textStylesJson = symbolTableRecordsJson(pDb->textStyleTableId(), tsCount);
+    const std::string dimStylesJson = symbolTableRecordsJson(pDb->dimStyleTableId(), dsCount);
+    const std::string viewportsJson = symbolTableRecordsJson(pDb->viewportTableId(), vpCount);
+    const std::string appIdsJson = symbolTableRecordsJson(pDb->regAppTableId(), raCount);
+    sec << ",\"symbol_tables\":{\"layers\":" << layersJson
+        << ",\"linetypes\":" << linetypesJson
+        << ",\"text_styles\":" << textStylesJson
+        << ",\"dim_styles\":" << dimStylesJson
+        << ",\"viewports\":" << viewportsJson
+        << ",\"app_ids\":" << appIdsJson << "}";
+    addPresent("symbol_tables");
+
+    int btrCount = 0, userBlockDefs = 0;
+    std::string blockDefsJson;
+    const std::string btrJson = blockTableRecordsJson(pDb, btrCount, userBlockDefs, blockDefsJson);
+    sec << ",\"block_table_records\":" << btrJson
+        << ",\"block_definitions\":" << blockDefsJson;
+    addPresent("block_table_records");
+    addPresent("block_definitions");
+
+    int layoutCount = 0;
+    sec << ",\"layouts\":" << layoutsRichJson(pDb, layoutCount);
+    addPresent("layouts");
+
+    int xrefCount = 0;
+    sec << ",\"xrefs\":" << xrefsRichJson(pDb, xrefCount);
+    addPresent("xrefs");
+
+    int dictEntryCount = 0, xrecordCount = 0;
+    std::string xrecordsJson;
+    const std::string nodEntries = namedObjectDictJson(pDb, dictEntryCount, xrecordCount, xrecordsJson);
+    sec << ",\"dictionaries\":[{\"name\":\"ACAD_NAMED_OBJECTS\",\"entries\":" << nodEntries << "}]"
+        << ",\"xrecords\":" << xrecordsJson;
+    addPresent("dictionaries");
+    addPresent("xrecords");
+
+    std::ostringstream cov;
+    cov << "{\"layers\":\"implemented\""
+        << ",\"linetypes\":\"implemented\""
+        << ",\"text_styles\":\"implemented\""
+        << ",\"dim_styles\":\"implemented\""
+        << ",\"block_table_records\":\"implemented\""
+        << ",\"block_definitions\":\"implemented\""
+        << ",\"layouts\":\"implemented\""
+        << ",\"xrefs\":\"implemented\""
+        << ",\"dictionaries\":\"implemented\""
+        << ",\"xrecords\":\"partial\""        // top-level NOD only; nested + resbuf decode = M03
+        << ",\"xdata\":\"partial\""           // db/entity xdata enumeration = M03
+        << ",\"extension_dictionaries\":\"skipped\""
+        << ",\"proxy_objects\":\"partial\""   // surfaced via entities[] dxf_name; deep decode = M03
+        << ",\"counts\":{\"layers\":" << layerCount
+        << ",\"linetypes\":" << ltCount
+        << ",\"text_styles\":" << tsCount
+        << ",\"dim_styles\":" << dsCount
+        << ",\"viewports\":" << vpCount
+        << ",\"app_ids\":" << raCount
+        << ",\"block_table_records\":" << btrCount
+        << ",\"block_definitions\":" << userBlockDefs
+        << ",\"layouts\":" << layoutCount
+        << ",\"xrefs\":" << xrefCount
+        << ",\"dictionary_entries\":" << dictEntryCount
+        << ",\"xrecords\":" << xrecordCount << "}"
+        << ",\"sections_present\":[" << present.str() << "]"
+        << ",\"sections_skipped\":[\"extension_dictionaries\",\"groups\",\"materials\",\"plot_settings\"]}";
+    coverageJson = cov.str();
+    return sec.str();
 }
 
 static Acad::ErrorStatus appendProbe(AcDbDatabase* pDb,
@@ -650,11 +1121,15 @@ static Acad::ErrorStatus openAriadneDict(AcDbDatabase* pDb, AcDb::OpenMode mode,
 
 static std::string acharToAscii(const ACHAR* text)
 {
+    // NOTE (M02): despite the historical name, this now emits UTF-8, not ASCII.
+    // The rename to acharToUtf8 is a deferred cosmetic cleanup (call sites are
+    // unchanged to keep this diff additive); behavior for pure-ASCII input is
+    // byte-identical. See wideToUtf8 for the D3 fidelity rationale.
     if (text == nullptr)
         return std::string();
 #ifdef _UNICODE
     const std::wstring wide(text);
-    return wideToAscii(wide);
+    return wideToUtf8(wide);
 #else
     return std::string(text);
 #endif
@@ -1680,8 +2155,16 @@ static void ariadneNativeJob()
         const bool ok = collectModelSpaceGraph(pDb, total, entitiesJson);
         if (!ok)
             entitiesJson = "[]";
+        // M02: rich database graph (symbol tables, blocks, layouts, xrefs,
+        // dictionaries, xrecords) spliced alongside the model-space entities[].
+        // collectDatabaseGraph is a guarded pure read; coverage reports which
+        // sections are real vs partial/skipped (no-fake-success).
+        std::string coverageJson;
+        const std::string richSections = collectDatabaseGraph(pDb, coverageJson);
         r << "\"result\":{\"modelspace_entities\":" << total
-          << ",\"entities\":" << entitiesJson << "},"
+          << ",\"entities\":" << entitiesJson
+          << "," << richSections
+          << ",\"coverage\":" << coverageJson << "},"
           << "\"status\":\"" << (ok ? "ok" : "error") << "\"}";
     }
     else if (op == "write.layer.create") {

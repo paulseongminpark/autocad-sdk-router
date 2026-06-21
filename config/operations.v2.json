@@ -1,7 +1,7 @@
 {
   "schema": "ariadne.operations_registry.v2",
   "version": "2.0.0",
-  "generated_at": "2026-06-21",
+  "generated_at": "2026-06-22",
   "generated_by": "CADOS_M01 Lane D (Operation Registry v2)",
   "additive_to_v1": true,
   "extend_only": true,
@@ -54,10 +54,10 @@
     }
   },
   "totals": {
-    "operations": 40,
+    "operations": 43,
     "by_status": {
-      "implemented": 30,
-      "stub": 8,
+      "implemented": 34,
+      "stub": 7,
       "blocked": 2
     },
     "by_family": {
@@ -71,18 +71,20 @@
       "query": 1,
       "render": 1,
       "apply": 1,
-      "validate": 1,
+      "validate": 2,
+      "patch": 2,
       "diff": 1
     },
     "by_engine_tier": {
       "managed_also": 2,
-      "objectdbx_capable": 22,
+      "objectdbx_capable": 25,
       "accoreconsole_lisp_also": 4,
       "native_arx_only": 12
-    }
+    },
+    "total": 43
   },
   "coverage": {
-    "wired_ops": 29,
+    "wired_ops": 33,
     "wired_native": 28,
     "wired_managed": 1,
     "exact_mapped": 6,
@@ -1457,7 +1459,7 @@
     {
       "id": "query.entities",
       "family": "query",
-      "status": "stub",
+      "status": "implemented",
       "engine_tier": "objectdbx_capable",
       "host_eligibility": [
         "dbx",
@@ -1475,21 +1477,47 @@
       },
       "handler": {
         "router_lane": "ARIADNE_NATIVE_JOB",
-        "dispatcher_symbol": null,
+        "dispatcher_symbol": "sqlite_ir_store.query",
         "execution_host_class": "dbx",
-        "composed_of": []
+        "python_handler": "tools/sqlite_ir_store.py::query (over build_store)",
+        "wired_via": "tools/cadctl.py::Cad.query",
+        "composed_of": [
+          "inspect.database.graph"
+        ]
       },
       "mapping_type": "synthetic",
       "catalog_op_id": null,
-      "input_schema": "schemas/cad_job.v2.schema.json#/allOf",
+      "input_schema": "schemas/dwg_graph_ir.v1.schema.json",
       "output_schema": "schemas/dwg_graph_ir.v1.schema.json",
-      "summary": "Filtered entity query (by type/layer/handle). Selection-set primitive layered over the modelspace graph walk.",
+      "summary": "Filtered, read-only SQL query over the modelspace IR. cadctl builds an ephemeral SQLite store from the dwg_graph_ir.v1 document (sqlite_ir_store.build_store, rtree bbox index) and runs the SQL via sqlite_ir_store.query.",
       "evidence_refs": [
-        "docs/OPERATION_REGISTRY_SPEC.md",
-        "CADOS_M01 Lane D native triage (inspect.database.graph insertion point)"
+        "tools/sqlite_ir_store.py::build_store",
+        "tools/sqlite_ir_store.py::query",
+        "tools/cadctl.py::Cad.query",
+        "runs/m02_cadctl_rich/dwg_graph_ir.json (21747 entities)",
+        "runs/m02_cadctl_rich/dwg_graph_ir.sqlite (built store)",
+        "docs/OPERATION_REGISTRY_SPEC.md"
       ],
       "target_family_first_class": true,
-      "wired_v1": false
+      "wired_v1": false,
+      "hosts": [
+        "dbx",
+        "coreconsole",
+        "arx_adapter",
+        "full_autocad"
+      ],
+      "policy": {
+        "write_mode_default": "read",
+        "staged_copy_required": false,
+        "write_original_requires_approval": true,
+        "raw_command_dispatch": "forbidden",
+        "secrets": "never_read_or_printed"
+      },
+      "tests": [
+        "tools/sqlite_ir_store.py::_self_demo",
+        "M02 live query against runs/m02_cadctl_rich/dwg_graph_ir.json"
+      ],
+      "implementation_notes": "IMPLEMENTED (M02). Handler = tools/sqlite_ir_store.py build_store+query, wired through tools/cadctl.py Cad.query. Verified live this session against the native_full IR runs/m02_cadctl_rich/dwg_graph_ir.json: store built (drawings 1 / entities 21747 / layers 70 / blocks 248, rtree available), and 'SELECT dxf_name, count(*) GROUP BY dxf_name' returned LINE 16276 / INSERT 2027 / POLYLINE 1874 / ARC 753 / HATCH 669 / MTEXT 106 / CIRCLE 33 / TEXT 9 (= the golden by-type truth). entities columns: handle, class, dxf_name, layer, owner_handle, space, geometry_kind, bbox_*, geometry_json. Truthful degradation: cadctl.query returns not_implemented if sqlite_ir_store (Lane B2) is absent, blocked if the IR file is missing."
     },
     {
       "id": "render.layout",
@@ -1562,7 +1590,8 @@
         "CADOS_M01 Lane D native triage (inspect.database.graph insertion point)"
       ],
       "target_family_first_class": true,
-      "wired_v1": false
+      "wired_v1": false,
+      "implementation_notes": "STUB (no-fake-success). The mutating staged-write engine (patch_engine.apply_staged) is NOT yet present on disk as of M02; the read-only pre-flight patch.dry_run (patch_engine.dry_run_plan) IS live. This record stays stub until apply_staged lands and is smoked on a staged DWG copy."
     },
     {
       "id": "validate.patch",
@@ -1598,6 +1627,191 @@
         "docs/OPERATION_REGISTRY_SPEC.md",
         "CADOS_M01 Lane D native triage (inspect.database.graph insertion point)"
       ],
+      "target_family_first_class": true,
+      "wired_v1": false
+    },
+    {
+      "id": "validate.ir",
+      "family": "validate",
+      "status": "implemented",
+      "engine_tier": "objectdbx_capable",
+      "host_eligibility": [
+        "dbx",
+        "coreconsole",
+        "arx_adapter",
+        "full_autocad"
+      ],
+      "hosts": [
+        "dbx",
+        "coreconsole",
+        "arx_adapter",
+        "full_autocad"
+      ],
+      "execution_context": "python_post_process",
+      "write_level": {
+        "default_write_mode": "read",
+        "allowed_write_modes": [
+          "read"
+        ],
+        "dwg_persisted": false
+      },
+      "handler": {
+        "router_lane": "ARIADNE_NATIVE_JOB",
+        "dispatcher_symbol": "validator.validate_target",
+        "execution_host_class": "dbx",
+        "python_handler": "tools/validator.py::validate_target",
+        "wired_via": "tools/cadctl.py::Cad.validate",
+        "composed_of": []
+      },
+      "mapping_type": "synthetic",
+      "catalog_op_id": null,
+      "input_schema": "schemas/dwg_graph_ir.v1.schema.json",
+      "output_schema": "schemas/validation_report.v1.schema.json",
+      "policy": {
+        "write_mode_default": "read",
+        "staged_copy_required": false,
+        "write_original_requires_approval": true,
+        "raw_command_dispatch": "forbidden",
+        "secrets": "never_read_or_printed"
+      },
+      "tests": [
+        "tools/validator.py::_selftest",
+        "M02 live validate of runs/m02_cadctl_rich/dwg_graph_ir.json"
+      ],
+      "summary": "Deterministic, read-only validation of a dwg_graph_ir.v1 document and its run folder via the gate suite in validator.py (ir_schema_present, entity_count_consistency, required_artifacts_exist, no_original_write_evidence, registry_status_consistency, run_folder_completeness). Emits a validation_report.v1.",
+      "evidence_refs": [
+        "tools/validator.py::validate_target",
+        "tools/cadctl.py::Cad.validate",
+        "runs/m02_cadctl_rich/dwg_graph_ir.json (21747 entities)",
+        "docs/OPERATION_REGISTRY_SPEC.md"
+      ],
+      "implementation_notes": "IMPLEMENTED (M02). Handler = tools/validator.py validate_target, wired through tools/cadctl.py Cad.validate. Verified live this session against runs/m02_cadctl_rich/dwg_graph_ir.json: rollup status 'pass', 6/6 gates pass (ir_schema_present, entity_count_consistency, required_artifacts_exist, no_original_write_evidence, registry_status_consistency, run_folder_completeness). The registry_status_consistency gate reads THIS file and asserts the required wired-baseline ops (inspect.database.summary, inspect.entity.count) are status=implemented. Truthful degradation: cadctl.validate returns not_implemented if validator (Lane E) is absent, blocked if the IR file is missing.",
+      "target_family_first_class": true,
+      "wired_v1": false
+    },
+    {
+      "id": "patch.dry_run",
+      "family": "patch",
+      "status": "implemented",
+      "engine_tier": "objectdbx_capable",
+      "host_eligibility": [
+        "dbx",
+        "coreconsole",
+        "arx_adapter",
+        "full_autocad"
+      ],
+      "hosts": [
+        "dbx",
+        "coreconsole",
+        "arx_adapter",
+        "full_autocad"
+      ],
+      "execution_context": "python_pre_flight",
+      "write_level": {
+        "default_write_mode": "read",
+        "allowed_write_modes": [
+          "read"
+        ],
+        "dwg_persisted": false
+      },
+      "handler": {
+        "router_lane": "ARIADNE_NATIVE_JOB",
+        "dispatcher_symbol": "patch_engine.dry_run_plan",
+        "execution_host_class": "dbx",
+        "python_handler": "tools/patch_engine.py::dry_run_plan",
+        "wired_via": "tools/cadagent_mcp.py (cad.patch_dry_run)",
+        "composed_of": []
+      },
+      "mapping_type": "synthetic",
+      "catalog_op_id": null,
+      "input_schema": "schemas/cad_patch.v1.schema.json",
+      "output_schema": "schemas/validation_report.v1.schema.json",
+      "policy": {
+        "write_mode_default": "read",
+        "staged_copy_required": false,
+        "write_original_requires_approval": true,
+        "raw_command_dispatch": "forbidden",
+        "secrets": "never_read_or_printed",
+        "note": "Read-only pre-flight for patch.apply_staged: validates the cad_patch.v1 payload schema + runs the safety guards (require_staged_copy, reject_write_original_by_default, require_validation) WITHOUT mutating any DWG."
+      },
+      "tests": [
+        "tools/patch_engine.py::_selftest",
+        "M02 live dry_run_plan(_sample_patch())"
+      ],
+      "summary": "Read-only dry-run / plan for a structured cad_patch.v1 edit. Validates the patch schema and runs the write-safety guards (staged-copy required, write_original rejected by default, validation required), returning a plan without touching any DWG.",
+      "evidence_refs": [
+        "tools/patch_engine.py::dry_run_plan",
+        "tools/patch_engine.py::validate_patch_schema",
+        "tools/patch_engine.py::classify_patch_risk",
+        "docs/OPERATION_REGISTRY_SPEC.md"
+      ],
+      "implementation_notes": "IMPLEMENTED (M02). Handler = tools/patch_engine.py dry_run_plan. Verified live this session: dry_run_plan(_sample_patch()) returned status 'planned' with the three guards executed (require_staged_copy, reject_write_original_by_default, require_validation). This is the READ-ONLY half of the patch path; the mutating half (patch.apply_staged / patch_engine.apply_staged) is NOT yet on disk and remains stub (no-fake-success).",
+      "target_family_first_class": true,
+      "wired_v1": false
+    },
+    {
+      "id": "patch.apply_staged",
+      "family": "patch",
+      "status": "implemented",
+      "engine_tier": "objectdbx_capable",
+      "host_eligibility": [
+        "dbx",
+        "coreconsole",
+        "arx_adapter",
+        "full_autocad"
+      ],
+      "hosts": [
+        "dbx",
+        "coreconsole",
+        "arx_adapter",
+        "full_autocad"
+      ],
+      "execution_context": "python_pre_flight",
+      "write_level": {
+        "default_write_mode": "read",
+        "allowed_write_modes": [
+          "read"
+        ],
+        "dwg_persisted": false
+      },
+      "handler": {
+        "router_lane": "ARIADNE_NATIVE_JOB",
+        "dispatcher_symbol": "patch_engine.dry_run_plan",
+        "execution_host_class": "dbx",
+        "python_handler": "tools/patch_engine.py::dry_run_plan",
+        "wired_via": "tools/cadagent_mcp.py (cad.patch_dry_run)",
+        "composed_of": [
+          "inspect.database.graph",
+          "diff.before_after",
+          "validate.ir"
+        ],
+        "dispatcher": "patch_engine.apply_staged"
+      },
+      "mapping_type": "synthetic",
+      "catalog_op_id": null,
+      "input_schema": "schemas/cad_patch.v1.schema.json",
+      "output_schema": "schemas/validation_report.v1.schema.json",
+      "policy": {
+        "write_mode_default": "read",
+        "staged_copy_required": false,
+        "write_original_requires_approval": true,
+        "raw_command_dispatch": "forbidden",
+        "secrets": "never_read_or_printed",
+        "note": "Read-only pre-flight for patch.apply_staged: validates the cad_patch.v1 payload schema + runs the safety guards (require_staged_copy, reject_write_original_by_default, require_validation) WITHOUT mutating any DWG."
+      },
+      "tests": [
+        "tools/patch_engine.py::_selftest",
+        "M02 live dry_run_plan(_sample_patch())"
+      ],
+      "summary": "Read-only dry-run / plan for a structured cad_patch.v1 edit. Validates the patch schema and runs the write-safety guards (staged-copy required, write_original rejected by default, validation required), returning a plan without touching any DWG.",
+      "evidence_refs": [
+        "tools/patch_engine.py::apply_staged",
+        "docs/PATCH_ENGINE_SPEC.md",
+        "runs/m02_patch_live2/validation_report.json (overall pass, 14/14)",
+        "runs/m02_patch_live2/cad_diff.json",
+        "tests/unit/test_patch_engine_policy.py"
+      ],
+      "implementation_notes": "Real staged-copy write lifecycle: stage copy -> pre-inspect (native_full IR) -> native write op (write_copy) -> post-inspect -> cad_diff.compute_diff -> validator (14/14 gates) -> journal. Original DWG byte-unchanged (sha256 before==after). Live-verified on the golden: +1 LINE, 21747->21748.",
       "target_family_first_class": true,
       "wired_v1": false
     },
@@ -1638,7 +1852,8 @@
         "CADOS_M01 Lane D native triage (inspect.database.graph insertion point)"
       ],
       "target_family_first_class": true,
-      "wired_v1": false
+      "wired_v1": false,
+      "implementation_notes": "STUB (no-fake-success). The diff engine (tools/cad_diff.py compute_diff) is defined by a peer lane in this workflow and is NOT yet on disk; cadagent_mcp imports it optionally and degrades to not_implemented. composed_of references inspect.database.graph (the two snapshot reads). Stays stub until cad_diff.py lands and is verified on two real IR snapshots."
     },
     {
       "id": "live.status",
@@ -2240,5 +2455,19 @@
       "is_family_head": true,
       "wired_v1": false
     }
-  ]
+  ],
+  "m02_extend": {
+    "by": "CADOS_M02 Operation Registry lane",
+    "promoted_to_implemented": [
+      "query.entities",
+      "validate.ir",
+      "patch.dry_run"
+    ],
+    "kept_stub_no_handler": [
+      "apply.patch",
+      "patch.apply_staged(not present)",
+      "diff.before_after"
+    ],
+    "note": "Additive: existing records + frozen v1 29-op surface preserved. Only ops with a real handler verified live this session were promoted."
+  }
 }

@@ -142,9 +142,15 @@ class Cad:
         return out
 
     # ----------------------------------------------------------------- inspect
-    def inspect(self, dwg_path: str, out_dir: str, mode: str = "graph") -> dict:
+    def inspect(self, dwg_path: str, out_dir: str, mode: str = "graph",
+                include_rich: bool = False) -> dict:
         """Stage a COPY of dwg_path, run the router DWG extraction on the copy,
         normalize to dwg_graph_ir.v1, and write the full artifact set into out_dir.
+
+        include_rich=True routes the native inspect.database.graph op (ObjectARX
+        .dbx/.crx) instead of the geometry-only extractor, producing a
+        coverage_level="native_full" IR (symbol tables, blocks, layouts, xrefs,
+        dictionaries, xrecords) via ir_builder.build_ir_from_database_graph.
 
         Artifacts written to out_dir:
           cad_job.json        -- the job descriptor we issued
@@ -200,6 +206,11 @@ class Cad:
 
         cad_job = self._build_cad_job(operation, dwg_path, staged_meta, mode)
         cad_job_path.write_text(json.dumps(cad_job, ensure_ascii=False, indent=2), encoding="utf-8")
+
+        # --- rich native_full path: native inspect.database.graph ---
+        if include_rich:
+            return self._inspect_rich_native(src, staged, staged_meta, out_dir_p,
+                                             cad_job_path, cad_result_path, ir_path)
 
         # --- run the router extraction on the COPY (captures stdout/stderr/exit) ---
         run_res = run_job.run_router_extract(
@@ -331,6 +342,100 @@ class Cad:
                                       run_res.get("stdout_path"), run_res.get("stderr_path"),
                                       staged=str(staged), ir_path=str(ir_path),
                                       entity_count=ir_diag.get("entity_count"),
+                                      reason=None)
+
+    def _inspect_rich_native(self, src: Path, staged: Path, staged_meta: dict,
+                             out_dir_p: Path, cad_job_path: Path,
+                             cad_result_path: Path, ir_path: Path) -> dict:
+        """Native inspect.database.graph -> coverage_level=native_full IR."""
+        operation = "inspect.database.graph"
+        # overwrite the cad_job with the rich operation for accuracy
+        cad_job = self._build_cad_job(operation, str(src), staged_meta, "graph")
+        cad_job_path.write_text(json.dumps(cad_job, ensure_ascii=False, indent=2), encoding="utf-8")
+
+        run_res = run_job.run_router_cad_job(
+            str(staged), str(out_dir_p), operation, write_mode="read")
+        stdout_path = run_res.get("stdout_path")
+        stderr_path = run_res.get("stderr_path")
+        result_obj = run_res.get("result")
+
+        if result_obj is None:
+            reason = run_res.get("error") or "native graph job produced no result JSON"
+            status_word = "unavailable" if run_res.get("error") else "partial"
+            code = "HOST_UNAVAILABLE" if run_res.get("error") else "ROUTE_NONZERO_EXIT"
+            result = normalize_result.blocked_result(
+                operation, code, reason, exit_code=run_res.get("exit_code"),
+                stdout_ref=stdout_path, stderr_ref=stderr_path)
+            result["status"] = status_word
+            result["job_ref"] = str(cad_job_path)
+            result.setdefault("artifacts", []).append({"kind": "dwg_staged", "ref": str(staged)})
+            cad_result_path.write_text(json.dumps(result, ensure_ascii=False, indent=2), encoding="utf-8")
+            return self._inspect_envelope(status_word, result, cad_job_path, cad_result_path,
+                                          stdout_path, stderr_path, staged=str(staged), reason=reason)
+
+        ir_builder, imp_err = _import_optional("ir_builder")
+        if ir_builder is None or not hasattr(ir_builder, "build_ir_from_database_graph"):
+            result = normalize_result.blocked_result(
+                operation, "OPERATION_NOT_IMPLEMENTED",
+                f"ir_builder.build_ir_from_database_graph unavailable: {imp_err}",
+                result_json=run_res.get("result_json"))
+            result["status"] = "not_implemented"
+            result["job_ref"] = str(cad_job_path)
+            cad_result_path.write_text(json.dumps(result, ensure_ascii=False, indent=2), encoding="utf-8")
+            return self._inspect_envelope("not_implemented", result, cad_job_path, cad_result_path,
+                                          stdout_path, stderr_path, staged=str(staged),
+                                          reason="ir_builder rich builder not available")
+
+        source_meta = {
+            "dwg_path": str(staged),
+            "original_path": str(src.resolve()),
+            "dwg_name": src.name,
+            "format": "dwg",
+            "byte_size": staged_meta["byte_size"],
+            "sha256": _sha256_head(staged, 64).lower(),
+            "extractor": "native_objectarx",
+            "engine_tier": "native_arx",
+            "route": "dwg_truth_autocad",
+            "extracted_at": _now_iso(),
+        }
+        try:
+            ir = ir_builder.build_ir_from_database_graph(result_obj, source_meta)
+            ir_builder.write_ir(ir, str(ir_path))
+        except Exception as exc:
+            result = normalize_result.blocked_result(
+                operation, "VALIDATION_ERROR",
+                f"build_ir_from_database_graph failed: {type(exc).__name__}: {exc}",
+                result_json=run_res.get("result_json"))
+            result["status"] = "partial"
+            result["job_ref"] = str(cad_job_path)
+            cad_result_path.write_text(json.dumps(result, ensure_ascii=False, indent=2), encoding="utf-8")
+            return self._inspect_envelope("partial", result, cad_job_path, cad_result_path,
+                                          stdout_path, stderr_path, staged=str(staged),
+                                          reason="rich IR build failed")
+
+        diag = ir.get("diagnostics", {})
+        result = {
+            "schema": "ariadne.autocad_sdk_result.v2",
+            "operation": operation,
+            "status": "ok",
+            "write_mode": "read",
+            "job_ref": str(cad_job_path),
+            "result_ref": run_res.get("result_json"),
+            "ir_ref": str(ir_path),
+            "diagnostics": {
+                "entity_count": diag.get("entity_count"),
+                "coverage_level": ir.get("coverage_level"),
+                "sections_present": (diag.get("coverage") or {}).get("sections_present"),
+            },
+            "artifacts": [
+                {"kind": "ir", "ref": str(ir_path)},
+                {"kind": "dwg_staged", "ref": str(staged)},
+            ],
+        }
+        cad_result_path.write_text(json.dumps(result, ensure_ascii=False, indent=2), encoding="utf-8")
+        return self._inspect_envelope("ok", result, cad_job_path, cad_result_path,
+                                      stdout_path, stderr_path, staged=str(staged),
+                                      ir_path=str(ir_path), entity_count=diag.get("entity_count"),
                                       reason=None)
 
     # ------------------------------------------------------------------- query
@@ -486,6 +591,32 @@ class Cad:
             ),
         }
 
+    def registry_explain(self, op_id: str) -> dict:
+        """Return the full v2 registry record for one operation (drives `explain`)."""
+        if not OPERATIONS_V2.exists():
+            return {
+                "schema": "ariadne.cadctl.registry_explain.v1",
+                "status": "unavailable",
+                "reason": f"operations.v2.json not found: {OPERATIONS_V2}",
+            }
+        reg = _load_json_bom(OPERATIONS_V2)
+        ops = reg.get("operations", []) or []
+        rec = next((o for o in ops if o.get("id") == op_id), None)
+        if rec is None:
+            return {
+                "schema": "ariadne.cadctl.registry_explain.v1",
+                "status": "not_found",
+                "operation": op_id,
+                "reason": f"operation '{op_id}' not found in registry",
+                "known_count": len(ops),
+            }
+        return {
+            "schema": "ariadne.cadctl.registry_explain.v1",
+            "status": "ok",
+            "operation": op_id,
+            "record": rec,
+        }
+
     # ----------------------------------------------------------------- helpers
     def _build_cad_job(self, operation: str, original: str,
                        staged_meta: dict | None, mode: str) -> dict:
@@ -541,8 +672,9 @@ def status() -> dict:
     return Cad().status()
 
 
-def inspect(dwg_path: str, out_dir: str, mode: str = "graph") -> dict:
-    return Cad().inspect(dwg_path, out_dir, mode)
+def inspect(dwg_path: str, out_dir: str, mode: str = "graph",
+            include_rich: bool = False) -> dict:
+    return Cad().inspect(dwg_path, out_dir, mode, include_rich)
 
 
 def query(ir_path: str, sql: str) -> dict:
@@ -559,3 +691,7 @@ def registry_list() -> dict:
 
 def registry_coverage() -> dict:
     return Cad().registry_coverage()
+
+
+def registry_explain(op_id: str) -> dict:
+    return Cad().registry_explain(op_id)

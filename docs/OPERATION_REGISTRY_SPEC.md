@@ -1,9 +1,12 @@
 # Operation Registry v2 — Specification
 
-**Lane:** CAD OS Layer build packet `CADOS_M01`, Lane D (Operation Registry v2)
+**Lane:** CAD OS Layer build packet `CADOS_M01` Lane D (Operation Registry v2); extended by `CADOS_M02`.
 **Status:** additive to v1 — the v1 working surface (11 routes, 29 wired ops, `schemas/cad_job.schema.json`,
-`config/cad_job_operation_aliases.json`, `config/autocad_router_capabilities.json`) is preserved unchanged.
-**Generated:** 2026-06-21
+`config/cad_job_operation_aliases.json`, `config/autocad_router_capabilities.json`) is preserved unchanged. The
+frozen v1 29-op surface and every prior v2 record are preserved; M02 only adds records / promotes statuses that
+have a real, live-verified handler.
+**Generated:** 2026-06-21 (M01) · **Extended:** 2026-06-22 (M02 — `inspect.database.graph`, `query.entities`,
+`validate.ir`, `patch.dry_run` implemented; `operations[]` now 42 = 33 implemented / 7 stub / 2 blocked).
 
 ---
 
@@ -92,7 +95,7 @@ native envelope onto the declared result schema.
 |---|---|---|
 | `implemented` | Wired AND has an asserted dispatcher handler. | The 29 v1-enum ops — all 29 have a live router path and a C++/C# handler name asserted by `tests/test_native_arx_dbx_contract.py`. 28 native + 1 managed (`inspect.database.summary`). |
 | `wired` | Reachable through the router with a live path, handler not separately asserted. | Reserved; currently the 29 all qualify as `implemented`. The status exists so a future op can be `wired` before its handler test lands. |
-| `stub` | A named target family with a designed-but-unbuilt handler. | The new CAD OS Layer target families whose dispatcher branch is designed but not yet compiled/verified (e.g. `inspect.database.graph`, `apply.patch`). |
+| `stub` | A named target family with a designed-but-unbuilt handler. | CAD OS Layer target families whose handler is designed but not yet on disk/verified (e.g. `apply.patch` — `patch_engine.apply_staged` absent; `diff.before_after` — `cad_diff.py` absent; `inspect.layers`/`inspect.blocks`/`inspect.entities`). |
 | `catalogued` | Known in the 480-catalogue, no router path yet. | The 16 catalog family heads (and, by extension, the ~451 unwired catalog ops they represent). |
 | `deprecated` | Retired. | None today; reserved. |
 | `blocked` | Cannot run on currently-available hosts; explicit non-PASS. | `render.layout` (plot host), `live.apply_patch` (attended full-AutoCAD live edit + approval). Carries `blocked_reason`. |
@@ -112,24 +115,28 @@ The CAD OS Layer pins these 12 families as first-class registry entries:
 | Op id | Status | Host | Note |
 |---|---|---|---|
 | `inspect.database.summary` | implemented | managed (dbx-eligible) | The 1 managed wired op; 4 scalar counts. |
-| `inspect.database.graph` | stub | objectdbx (headless) | Per-entity graph IR (handle/type/layer/geometry). Native branch designed (`collectModelSpaceGraph`, adjacent to summary). |
+| `inspect.database.graph` | **implemented** (M02) | objectdbx (headless) | Per-entity graph IR (handle/type/layer/geometry). Native `collectModelSpaceGraph` branch compiled into `Ariadne.AcadNative.crx` and accoreconsole-smoked on a staged golden DWG (entities[] == summary count: 3==3 small, 291706==291706 at scale; 21747 truth on the M02 golden). |
 | `inspect.layers` | stub | objectdbx (headless) | Enumerate layer-table records; extends `countSymbolTable`. |
 | `inspect.blocks` | stub | objectdbx (headless) | Enumerate block definitions; extends `countBlockDefinitions`. |
 | `inspect.entities` | stub | objectdbx (headless) | Per-entity inspection; sibling of the graph op. |
-| `query.entities` | stub | objectdbx (headless) | Filtered entity query (type/layer/handle). |
+| `query.entities` | **implemented** (M02) | objectdbx (headless) | Filtered read-only SQL over the IR. Handler `sqlite_ir_store.build_store`+`query`, wired via `cadctl.query`; verified live (21747-entity store, by-type LINE 16276 / INSERT 2027 / … matches golden truth). |
+| `validate.ir` | **implemented** (M02) | objectdbx (headless) | Deterministic read-only IR/run gate suite. Handler `validator.validate_target`, wired via `cadctl.validate`; verified live (`registry_status_consistency` + IR/run gates). Emits `validation_report.v1`. |
+| `patch.dry_run` | **implemented** (M02) | objectdbx (headless) | Read-only plan/dry-run for a `cad_patch.v1` edit. Handler `patch_engine.dry_run_plan` (schema-validate + safety guards, no DWG mutation); verified live (status `planned`). |
 | `render.layout` | **blocked** | full_autocad (attended) | Plot/publish render; no headless path. |
-| `apply.patch` | stub | objectdbx (headless) | Structured edit → staged copy under journal+backup+validate. |
-| `validate.patch` | stub | objectdbx (headless) | Read-only dry-run of `apply.patch`. |
-| `diff.before_after` | stub | objectdbx (headless) | Entity-level diff of two graph snapshots; diff math in python. |
+| `apply.patch` | stub | objectdbx (headless) | Mutating structured edit → staged copy under journal+backup+validate. STAYS stub: `patch_engine.apply_staged` not yet on disk (no-fake-success); only the read-only `patch.dry_run` half is live. |
+| `validate.patch` | stub | objectdbx (headless) | Patch payload + DB-precondition dry-run. The validator-backed IR validation is split out as the implemented `validate.ir`; this patch+precondition record stays stub until its DB-precondition half is wired. |
+| `diff.before_after` | stub | objectdbx (headless) | Entity-level diff of two graph snapshots; diff math in python. STAYS stub: peer-lane `tools/cad_diff.py compute_diff` not yet on disk (cadagent_mcp imports it optionally, degrades to not_implemented). |
 | `live.status` | stub | full_autocad (attended) | Active-document session status. |
 | `live.apply_patch` | **blocked** | full_autocad (attended) | Live active-doc edit; requires approval. |
 
-The 10 stub/blocked families are not claimed as working; they are registered so the router/`cadctl` can address
-them, report their true status, and route them once their lanes are built. (For `inspect.database.graph`, the
-native triage identified the exact insertion point: a new `else if (op == "inspect.database.graph")` branch + a
-`collectModelSpaceGraph` helper modelled on `countModelSpace`/`countModelSpaceEntitiesByType`, emitting the
-existing nested-array JSON. Building and verifying it requires a native rebuild + accoreconsole smoke against a
-staged golden DWG — not done in this lane.)
+The remaining stub/blocked families are not claimed as working; they are registered so the router/`cadctl` can
+address them, report their true status, and route them once their lanes are built. `inspect.database.graph` shipped
+in M02: the `else if (op == "inspect.database.graph")` branch + `collectModelSpaceGraph` helper (modelled on
+`countModelSpace`/`countModelSpaceEntitiesByType`) were compiled into `Ariadne.AcadNative.crx` and smoked via
+accoreconsole against a staged golden DWG. Known M02 limitation: non-ASCII names funnel through `acharToAscii` → `?`;
+and the `.arx` relink for the attended `full_autocad` host was blocked by a live session lock (the coreconsole host
+is fully updated). Router/registry allow-list wiring in `autocad-router.ps1` remains a follow-up (the op was smoked
+directly, not yet through the PowerShell router).
 
 ---
 
@@ -193,10 +200,22 @@ or renamed).
   (`inspect.database.summary`, `write.layer.create`, `write.entity.line`, `write.entity.circle`,
   `write.xrecord.set`, `inspect.xrecord.get`); the other 23 are alias/synthetic router aggregates over catalog
   primitives (carried in `composed_of`).
-- **Target families:** 12 first-class entries — `inspect.database.summary` (already wired, status `implemented`)
-  + 9 `stub` + 2 `blocked` (`render.layout`, `live.apply_patch`).
-- **`operations.v2.json` `operations[]` records:** 40 — `implemented` 29, `stub` 9, `blocked` 2. Rolled up in the
-  file's `totals.by_status` / `by_family` / `by_engine_tier`.
+- **Target families:** 12 first-class entries originally (1 implemented + 9 stub + 2 blocked). After M02, the
+  first-class implemented set grew to **`inspect.database.summary`, `inspect.database.graph`, `query.entities`,
+  `validate.ir`, `patch.dry_run`** (5 implemented), with `inspect.layers` / `inspect.blocks` / `inspect.entities` /
+  `apply.patch` / `validate.patch` / `diff.before_after` / `live.status` still `stub` and `render.layout` /
+  `live.apply_patch` still `blocked`. (`validate.ir` and `patch.dry_run` were added as new records alongside the
+  original `validate.patch` / `apply.patch`.)
+- **`operations.v2.json` `operations[]` records:** **42 — `implemented` 33, `stub` 7, `blocked` 2** (post-M02; was
+  40/29/9/2 at M01, then 40/30/8/2 once `inspect.database.graph` landed, now 42/33/7/2 with `query.entities`
+  promoted and `validate.ir` + `patch.dry_run` added). Rolled up in the file's `totals.by_status` / `by_family` /
+  `by_engine_tier`; `cadctl registry coverage` asserts `totals.by_status.implemented` == the live implemented count
+  (currently 33, `consistent: true`).
+- **M02 promotion rule (no-fake-success):** only ops with a real handler verified live this session were promoted.
+  `query.entities` (sqlite_ir_store), `validate.ir` (validator), `patch.dry_run` (patch_engine) each have a live
+  Python handler. `apply.patch`/`patch.apply_staged` (`patch_engine.apply_staged`) and `diff.before_after`
+  (`tools/cad_diff.py`) were **kept `stub`** because those peer-lane handlers are not yet on disk — the registry
+  records reality, never an unbuilt PASS.
 - **Catalogued:** 480 native operations across **16 families** and **4 engine tiers**, represented by 16 family
   head records (status `catalogued`) in the parallel `catalog_families[]` array.
   - By tier: `native_arx_only` 221, `objectdbx_capable` 198, `managed_also` 45, `accoreconsole_lisp_also` 16

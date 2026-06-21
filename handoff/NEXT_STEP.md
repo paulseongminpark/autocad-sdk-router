@@ -1,83 +1,40 @@
-# NEXT_STEP — after CADOS_M01 (PASS)
+# NEXT_STEP — after CADOS_M02 (PARTIAL_PASS)
 
-CADOS_M01 closed **PASS**: the CAD OS Layer has a working
-extract → IR → SQLite → query → validate walking skeleton (21,747-entity golden,
-6/6 gates), a native `inspect.database.graph` op smoked directly, and Operation
-Registry v2 (30 implemented / 8 stub / 2 blocked over a 480-op catalog). Deferrals
-D1–D5 are documented in `handoff\TAKEOVER.md`.
+CADOS_M02 closed **PARTIAL_PASS** (12/15 full PASS). The CAD OS Layer now has a
+**live, validated read + write stack**: native rich `inspect.database.graph` →
+`native_full` IR (21747 truth) routable via `cadctl inspect --include-rich`; a
+real staged-copy patch lifecycle (create_line → +1 LINE → cad_diff → 14/14
+validator gates → journal, original byte-unchanged); Operation Registry v2 (43
+ops, 34 implemented, consistent); 215 tests green. Honest partials: non-ASCII
+(upstream accoreconsole), visual render (NOT_IMPLEMENTED on this host), live ARX
+pump runtime (attended-injection blocked).
 
-Two candidate next packets. **A is recommended** because the walking skeleton
-already passes, so the highest-leverage move is to let a consumer use the CAD OS
-through `cadctl` and surface real requirements, rather than deepening native
-coverage before there is a consumer pulling on it.
+## Decision
 
----
+**Recommended: `D04_IMPORT_CAD_OS_CAPABILITIES`** — return to Daedalus and consume
+the CAD OS v1 read+patch+registry surface via `cadctl`. The read/write stack is
+ready; visual + live-pump are non-critical for D04 (read + staged-patch + validate
+is the capability Daedalus needs). Handoff for D04 is in
+`D:\dev\_ariadne\_daedalus\external\cad_os\` (CADOS_M02_SUMMARY.md,
+cad_os_latest_status.json, CAD_OS_V1_CAPABILITIES.json, CAD_OS_ADAPTER_IMPORT_NOTES.md,
+CADOS_NEXT_RECOMMENDATION.md).
 
-## Option A — `D04_IMPORT_CAD_OS_CAPABILITIES` (RECOMMENDED)
+**Alternative: `CADOS_M03_NATIVE_IR_COMPLETION`** — stay in CAD OS and close the
+3 partials + deepen rich IR:
+- non-ASCII symbol-table names: cross-source from the DXF/ezdxf route (which
+  preserves cp949) or configure the accoreconsole code page at DWG load.
+- rich-IR depth: native per-entity xdata, extension dictionaries, 2D/3D-polyline
+  + hatch vertex geometry.
+- visual: full_autocad COM plot (acad.exe running, allow_full_autocad) OR a native
+  PlotEngine ARX export module → real before/after/overlay artifacts.
+- live ARX pump: build canonical `.arx` lock-free, implement CADAGENT_START/STOP/
+  STATUS/PUMP named-pipe server (length-prefixed JSON, AcDb on document context),
+  verify live.status/echo/list_documents in an attended session.
 
-**Goal:** Daedalus consumes the CAD OS Layer through `cadctl` as a capability
-provider — i.e. the control plane above this router calls the cadctl CLI / IR
-contract instead of touching AutoCAD or DWGs directly. Prove the integration on
-the existing golden (21,747 entities) end to end.
+## First commands for either
 
-**Why now:** the walking skeleton is PASS, so the contract surface
-(`cadctl_cli.py` + `dwg_graph_ir.v1` + `validation_report.v1`) is ready to be
-imported. A real consumer will tell us which ops actually matter next (informs
-how to prioritize M02's native work), instead of guessing.
-
-**First steps:**
-1. Read the Daedalus capability-registry contract (`project_daedalus_os` /
-   `project_cad_os_layer` memories + the Daedalus packet sequence — currently at
-   P02 PARTIAL, P03 next) and decide how CAD OS registers as a capability.
-2. Map cadctl's agent-facing CLI (`status | inspect | query | validate |
-   registry list | registry coverage`) onto Daedalus capability descriptors.
-3. Wire a thin Daedalus → `cadctl_cli.py` adapter (no AutoCAD/DWG direct access;
-   IR + validation report are the interface).
-4. Run the golden through Daedalus → cadctl → IR → validate and assert the same
-   21,747 / 6-of-6 result the walking skeleton produced.
-5. Honest closeout: handoff zip + index, deferrals preserved.
-
-**Non-goals:** do **not** relink the `.arx`, router-wire the native graph op, or
-fix non-ASCII fidelity here — those belong to Option B / M02.
-
----
-
-## Option B — `CADOS_M02_NATIVE_IR_COMPLETION`
-
-**Goal:** Finish the native IR path that M01 deliberately left at the edge:
-router-wire the native `inspect.database.graph` op, relink the `.arx`, fix
-non-ASCII fidelity, and implement more native ops.
-
-**Scope (closes M01 deferrals):**
-- **D2:** add `inspect.database.graph` to the `autocad-router.ps1` native
-  allow-list so it is routable via cadctl/router (not just direct accoreconsole).
-- **D1:** relink `Ariadne.AcadNative.arx` once AutoCAD is **not** holding the file
-  (no live `acad.exe` lock); confirm against `reports\build_native_latest.log`.
-- **D3:** widen the ASCII funnel — preserve UTF-8 `dxf_name` / `layer` /
-  `block_name` (e.g. Korean "설비OPEN") instead of `acharToAscii` → `?`; vendor a
-  JSON lib if needed.
-- **D4:** implement the next tranche of native ops beyond the current 30, driven
-  by the Operation Registry v2 stub/blocked list.
-
-**First steps:**
-1. Confirm no `acad.exe` lock, then `dotnet build` the native module and verify
-   the on-disk `.arx` relinks clean (resolves D1).
-2. Add the native op to the router allow-list; route it through cadctl and smoke
-   on the 3-entity and golden drawings (resolves D2).
-3. Replace `acharToAscii` with a UTF-8-preserving path; re-smoke on a drawing
-   containing non-ASCII layer/block names; assert bytes preserved (resolves D3).
-4. Pick the next native ops from `config\operations.v2.json` (stub → implemented)
-   with tests; keep zero regression on the 120-test suite.
-
-**Non-goals:** Daedalus integration (that is Option A); live ARX named-pipe write
-pump (still design-only per D5).
-
----
-
-## Recommendation
-
-Take **Option A** next. The walking skeleton PASS means the CAD OS contract is
-ready to be *consumed*; importing it into Daedalus exercises the real interface
-and tells us which native ops M02 should prioritize. Hold Option B (M02) until a
-consumer has pulled on the contract — or pick B first only if non-ASCII fidelity
-(D3) or a routable native graph op (D2) becomes an immediate blocker.
+```
+python -m pytest tests -q                              # 215 pass / 2 skip
+python tools/cadctl_cli.py inspect --dwg staging/dwg_20260617_191504/input.dwg --out runs/check --include-rich
+python tools/cadctl_cli.py registry coverage           # 34 implemented, consistent
+```

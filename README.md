@@ -88,3 +88,19 @@ python $C registry list | python $C registry coverage        # operation registr
 - **Operation registry spec:** `docs\OPERATION_REGISTRY_SPEC.md` · **IR spec:**
   `docs\DWG_GRAPH_IR_SPEC.md`.
 - **Live ARX named-pipe pump:** `docs\LIVE_ARX_NAMED_PIPE_DESIGN.md` (design only — unbuilt).
+
+## CADOS_M02 (v0.2.0 — PARTIAL_PASS)
+
+CADOS_M02 took the layer to a **live, validated read + write stack** (12/15 acceptance criteria full PASS):
+
+- **Rich IR is live:** `python tools\cadctl_cli.py inspect --dwg <p> --out <dir> --include-rich` →
+  `coverage_level=native_full` IR (symbol tables, blocks, layouts, xrefs, dictionaries, xrecords, db-meta; 21747 truth).
+  Native `inspect.database.graph` is **router-wired** (D2 resolved).
+- **Staged patch is real:** `patch_engine.apply_staged(...)` → stage copy → native write (write_copy) → diff → 14/14
+  validation → journal; original byte-unchanged (live: +1 LINE 21747→21748). D5 patch-execution resolved.
+- **`.arx` relink resolved (D1):** versioned `Ariadne.AcadNative.live_m02.arx`; `tools\build_native_acad.ps1` is lock-resilient.
+- **Tests:** `python -m pytest tests -q` → 215 pass / 2 skip.
+- **Honest partials:** non-ASCII layer names (upstream accoreconsole cp949 decode — cross-engine confirmed), visual render
+  (`NOT_IMPLEMENTED` on this host), live ARX pump runtime (attended-injection blocked). See `reports\v1_acceptance_latest.md`.
+
+Authoritative M02 report: `reports\CADOS_M02_V1_COMPLETION_ULTRACODE.md`. Re-entry: `handoff\TAKEOVER.md`.

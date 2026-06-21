@@ -72,3 +72,20 @@ Intended bundle members (per the CADOS_M01 closeout):
 Status: `CADOS_M01_FULL_STACK_ULTRACODE_BUILD.zip` is **not yet present** in this
 folder at the time this index was written; the orchestrator emits it as the final
 closeout step. Once present, it sits beside this file and is git-ignored.
+
+---
+
+### CADOS_M02_V1_COMPLETION_ULTRACODE.zip  *(present — 109 KB, 34 members)*
+
+Unlike M01, every logical member now exists as a **standalone on-disk file** (the M01
+reconciliation gap is closed). Members (all present, verified at build):
+
+- `README.md`
+- `docs\CAD_OS_BUILD_STATUS.md`, `docs\CAD_OS_FULL_STACK_HANDOFF.md`, `docs\CAD_OS_V1_ACCEPTANCE.md`
+- Specs: `docs\{DWG_GRAPH_IR_SPEC,PATCH_ENGINE_SPEC,CAD_DIFF_SPEC,VALIDATION_SPEC,VISUAL_VERIFICATION_SPEC,MCP_TOOL_CONTRACT,OPERATION_REGISTRY_SPEC}.md`
+- Reports: `reports\{latest_status,CADOS_M02_V1_COMPLETION_ULTRACODE,v1_acceptance_latest(.json/.md),walking_skeleton_latest,rich_ir_latest,operation_coverage_latest,patch_diff_latest,validation_latest,visual_verification_latest,live_pump_latest,native_graph_smoke_latest}`
+- `config\operations.v2.json`
+- Schemas: `dwg_graph_ir.v1`, `cad_job.v2`, `cad_result.v2`, `cad_patch.v1`, `cad_diff.v1`, `validation_report.v1`, `operation_registry.v2`
+- `handoff\TAKEOVER.md`, `handoff\NEXT_STEP.md`, `packets\CADOS_M02_V1_COMPLETION_ULTRACODE.md`
+
+Packet result: **PARTIAL_PASS** (12/15 full PASS). The zip is git-ignored; this index is the tracked record.

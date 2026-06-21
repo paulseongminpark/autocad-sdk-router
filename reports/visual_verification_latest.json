@@ -1,0 +1,9 @@
+{
+  "schema": "ariadne.cad_os.visual_verification.v1",
+  "packet": "CADOS_M02_V1_COMPLETION_ULTRACODE",
+  "status": "NOT_IMPLEMENTED",
+  "reason": "Core Console alone cannot render DWG->PDF/PNG on this host (EXPORTPDF unknown / -PLOT locale prompt desync / no ActiveX COM in coreconsole). build_visual_report truthfully returns not_implemented with evidence; NO fake artifact produced.",
+  "no_fake_artifact": true,
+  "full_v1_requires": "a real before/after/overlay render artifact on disk",
+  "fix_path_m03": "full_autocad COM plot (acad.exe running, allow_full_autocad) OR a native PlotEngine ARX export module"
+}

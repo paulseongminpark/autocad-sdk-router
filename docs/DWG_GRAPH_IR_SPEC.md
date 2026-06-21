@@ -3,6 +3,15 @@
 `schema`: `ariadne.dwg_graph_ir.v1`
 JSON Schema: `schemas/dwg_graph_ir.v1.schema.json` (draft-07)
 Status: v1 (CAD OS Layer, Lane A / SCHEMAS). Authored alongside the frozen v1 working surface; does not modify it.
+Producer: `tools/ir_builder.py` — `build_ir_from_extract(...)` (geometry_only) and `build_ir_from_database_graph(...)` (native_full).
+
+> **M02 state (this doc is implementation-true, not aspirational).** The IR is produced at **two**
+> coverage levels today. A live **`native_full`** IR exists at
+> `runs/m02_cadctl_rich/dwg_graph_ir.json` (15.7 MB, **21747** entities) — Section 10 documents
+> exactly which sections are IMPLEMENTED vs PARTIAL/deferred against that artifact. The
+> `geometry_only` builder is unchanged from M01. Sections 1–9 describe the *full v1 schema surface*;
+> Section 10 states *what an M02 native_full IR actually carries*. Where they differ, Section 10 is
+> the live truth.
 
 ---
 
@@ -378,3 +387,112 @@ A producer SHOULD verify before emitting:
 - New optional sections / fields / `kind` values are additive and allowed within v1
   (`additionalProperties: true`), provided they do not alter the required set or the truth
   gate.
+
+---
+
+## 10. M02 `native_full` IR — what is actually populated (implementation-true)
+
+This section pins the *realized* native_full IR shape against the live artifact, so a consumer
+knows exactly which sections to trust and which are still partial/deferred. It is not a wish list.
+
+**Reference artifact** (read-only): `runs/m02_cadctl_rich/dwg_graph_ir.json`
+(`schema = ariadne.dwg_graph_ir.v1`, `ir_version = 1.0.0`, `coverage_level = native_full`).
+Produced by `cadctl.Cad().inspect(dwg, out_dir, mode="graph", include_rich=True)` →
+`run_job.run_router_cad_job(staged, run_dir, "inspect.database.graph", write_mode="read")` →
+`ir_builder.build_ir_from_database_graph(result, source_meta)`. The native job result it consumes
+is `runs/dwg_truth_autocad_cad_job_20260622_012807/native_cad_job_result.json` (its `.result`
+object). The native graph op **is router-wired** in M02 (`autocad-router.ps1`
+`Test-NativeP1CadJobOperation` allow-list, line 152 — closes M01 carry-forward D2).
+
+### 10.1 The truth gate, measured
+
+```
+diagnostics.entity_count == len(entities) == 21747          (PASS — holds by construction)
+native result.modelspace_entities == 21747                  (cross-checked; coverage.match == true)
+*Model_Space block_table_record.entity_count == 21747
+entities_by_type (sum == 21747):
+  LINE 16276 · INSERT 2027 · POLYLINE 1874 · ARC 753 · HATCH 669 · MTEXT 106 · CIRCLE 33 · TEXT 9
+```
+
+The producer never fakes this: `build_ir_from_database_graph` sets
+`diagnostics.entity_count = len(entities)` (realized length is the numerator) and records a
+warning + `coverage.match = false` if the native asserted `modelspace_entities` disagrees. For
+this artifact they agree exactly.
+
+> **Golden-identity caveat (load-bearing).** `21747` is the truth count for the **large production
+> drawing** pinned by `source.original_path = staging/dwg_20260617_191504/input.dwg`,
+> `byte_size = 2524981`, `sha256 = 27dbf6b95ff…`. The name `input.dwg` has been reused for other,
+> smaller drawings (a 48416-byte sample; a separate 389-entity drawing; the native op was also
+> smoked directly at 3 and 291706 entities). A truth-count gate MUST pin drawing identity
+> (`source.sha256`/`byte_size`) alongside the number — that is what `source` exists for.
+
+### 10.2 Section-by-section coverage (against the live artifact)
+
+`diagnostics.coverage.section_status` carries the native collector's own honest per-section flags.
+Realized state for the reference IR:
+
+| IR section | native_full status | realized in the artifact |
+|---|---|---|
+| `entities[]` | **IMPLEMENTED** | 21747 entities, each with `handle/class/dxf_name/owner_handle/space/layer/bbox/geometry/source` |
+| `symbol_tables.layers` | **IMPLEMENTED** | 70 layer records (`handle, name, color_index, frozen, off, locked, plottable, is_xref_dependent`) |
+| `symbol_tables.linetypes` | **IMPLEMENTED** | 15 |
+| `symbol_tables.text_styles` | **IMPLEMENTED** | 4 |
+| `symbol_tables.dim_styles` | **IMPLEMENTED** | 4 |
+| `symbol_tables.viewports` | **IMPLEMENTED** | 1 |
+| `symbol_tables.app_ids` | **IMPLEMENTED** | 9 registered APPIDs |
+| `symbol_tables.block_table_records` | **IMPLEMENTED** | 248 BTRs (`*Model_Space` carries `entity_count: 21747`) |
+| `block_definitions[]` | **IMPLEMENTED** | 245 |
+| `block_references[]` | **IMPLEMENTED** (projection) | 2027 — `ir_builder` projects every `INSERT` (`block_name, block_record_handle, insertion_point, scale, rotation`) |
+| `layouts[]` | **IMPLEMENTED** | 3 (Model + 2 paper) |
+| `xrefs[]` | **IMPLEMENTED** | 0 (this drawing binds no xrefs — a true zero, not skipped) |
+| `dictionaries[]` | **IMPLEMENTED** | NOD + named dicts; `coverage.counts.dictionary_entries = 16` |
+| `xrecords[]` | **PARTIAL** | 2 decoded; `section_status.xrecords = "partial"` (resbuf decode is best-effort) |
+| `database.header_vars` | **IMPLEMENTED** (carried through) | native `database` object passed through verbatim |
+| per-entity `xdata[]` | **PARTIAL → M03** | **0** entities carry `xdata` today; `section_status.xdata = "partial"`. The XDATA *write/read ops* (`write.xdata.set`/`inspect.xdata.get`) are wired, but per-entity XDATA is **not yet folded into the graph IR**. |
+| per-entity `extension_dictionary_handle` | **PARTIAL → M03** | **0** entities carry it; `section_status.extension_dictionaries = "skipped"`. |
+| 2D/3D polyline **vertex geometry** | **PARTIAL → M03** | **0** of 1874 `POLYLINE` entities carry `geometry.vertices`. The native `AcDbPolyline` (`LWPOLYLINE`) family emits vertices via `_geometry_from_native_entity`, but the legacy `AcDb2dPolyline`/`AcDb3dPolyline` vertex walk (separate `VERTEX` sub-entities) is **not yet collected** — `POLYLINE` entities currently carry `kind: "polyline"` with `decoded: true` but no vertex array. |
+| `groups` / `materials` / `plot_settings` / `proxy_objects` | **SKIPPED / PARTIAL** | listed in `coverage.sections_skipped` (`extension_dictionaries, groups, materials, plot_settings`) and/or `section_status.proxy_objects = "partial"` — honest absence, never faked. |
+
+`diagnostics.coverage.sections_present` for the artifact:
+`["entities","database","symbol_tables","block_table_records","block_definitions","layouts","xrefs","dictionaries","xrecords"]`.
+`diagnostics.coverage.sections_skipped`:
+`["extension_dictionaries","groups","materials","plot_settings"]`.
+
+### 10.3 The cp949 non-ASCII layer-name mojibake (cross-engine, upstream)
+
+**This is a real, characterized defect — stated honestly, not hidden.** 68 of 70 layer names in the
+reference IR are **mojibake**, e.g. the source Korean layer
+`X-주택동(기본형)$0$TEXT` arrives as `X-` + replacement bytes + `$0$TEXT`. Block names inside
+`block_reference.block_name` show the same mangling (`X-…$0$ev16x2k`).
+
+What is and is not fixed:
+
+- **The UTF-8 conversion itself is fixed.** Zero layer names contain the `?` ASCII-funnel character
+  (the M01-era D3 `?`-funnel symptom is gone). The router/`ir_builder` JSON is emitted UTF-8
+  (`write_ir` uses `ensure_ascii=False`), and reading uses `encoding="utf-8-sig"`. The pipeline no
+  longer destroys the bytes by funnelling to `?`.
+- **The remaining corruption is upstream, at accoreconsole load time.** `accoreconsole.exe` decodes
+  the DWG's cp949 (`DWGCODEPAGE`) string table to its own active code page *before* any CAD OS code
+  sees it; the bytes are already lossy by the time the native collector reads them. This is
+  confirmed **cross-engine**: the native ObjectARX path and the managed path produce the **same**
+  mojibake (it is not introduced by one extractor). Handles, counts, and geometry are unaffected —
+  only the human-readable Unicode strings (layer/block/style names) are mangled.
+- **Consumer rule:** join on **`handle`**, never on layer/block name, when a drawing's
+  `database.header_vars.DWGCODEPAGE` is a non-UTF code page. Restoring the original CJK strings
+  requires re-decoding from the source code page at the accoreconsole boundary (an M03 item; not
+  closed in M02).
+
+### 10.4 Producer contract for native_full (`build_ir_from_database_graph`)
+
+- Native `dxf_name` is the **runtime class name** (`AcDbLine`, `AcDb2dPolyline`, …);
+  `_NATIVE_CLASS_TO_DXF_KIND` maps it back to the `(dxf_name, geometry.kind)` pair the schema wants.
+  An unmapped class passes through as `class == native name`, `dxf_name == native name`,
+  `geometry.kind == "unsupported"`, `source.decoded == false` — counted in
+  `coverage.proxy_or_undecoded_count` (no-fake-success).
+- `block_references[]` is a **convenience projection** of the INSERT entities, not an independent
+  source of truth; every INSERT also appears in `entities[]` under the same `handle`.
+- `database`, `symbol_tables`, `block_definitions`, `layouts`, `xrefs`, `dictionaries`, `xrecords`
+  are carried through from the native result largely verbatim (the schema is additive), with
+  `symbol_tables.layers` guaranteed present (possibly empty).
+- The builder is **stdlib-only** and reads BOM-tolerant (`load_native_graph_result` uses
+  `utf-8-sig`).
