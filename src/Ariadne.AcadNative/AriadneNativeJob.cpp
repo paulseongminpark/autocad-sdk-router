@@ -2988,7 +2988,34 @@ static void ariadneNativeJobMailbox()
 // (accoreconsole), which is how it is protocol-tested without touching a live
 // user session. Pipe name + timeout come from ARIADNE_PUMP_PIPE /
 // ARIADNE_PUMP_TIMEOUT (defaults: \\.\pipe\ariadne_cad_pump, 30s).
+//
+// §3 THREAD-SAFETY (worker thread never touches AcDb) — satisfied BY CONSTRUCTION:
+//   * CADAGENT_PUMP is registered ACRX_CMD_MODAL and therefore runs on the
+//     AutoCAD document/command thread. The named-pipe serve loop, pumpDispatch,
+//     and every AcDb call it makes (workingDatabase, getBlockTable,
+//     getAcDbObjectId, acdbOpenObject kForRead, countModelSpace) execute on
+//     THAT thread.
+//   * There is NO worker thread. The overlapped I/O (ReadFile/WriteFile/
+//     ConnectNamedPipe + event + WaitForSingleObject timeout) gives async I/O
+//     without a second thread, so the rule "worker thread never touches AcDb"
+//     holds vacuously: nothing off the main thread ever touches AcDb.
+//   * DllMain / acrxEntryPoint start no threads. A future background reader
+//     would have to marshal requests to the document thread; the current design
+//     avoids this entirely.
+//
+// §5 WRITE GUARD: the pump is read-only. live.apply_patch hard-returns
+//   "disabled" and points at the M05 staged-patch governor (router apply_staged
+//   on a staged copy); the pump never opens the db for write and never saves.
+//
+// CLEAN SHUTDOWN:
+//   * In-band: a {"op":"live.stop"} frame sets stop=true; the while-loop exits;
+//     FlushFileBuffers -> DisconnectNamedPipe -> CloseHandle(evt) -> CloseHandle(pipe).
+//   * Timeout: any read/connect that exceeds ARIADNE_PUMP_TIMEOUT CancelIo's and
+//     breaks into the same teardown -> the pump can never hang headless.
+//   * gPumpServing is cleared on loop exit so CADAGENT_STATUS reports serving:false.
 //============================================================================
+static volatile LONG gPumpServing = 0;  // 1 while ariadneCadAgentPump serves a client
+
 static std::wstring pumpPipeName()
 {
     wchar_t buf[256] = {};
@@ -3061,6 +3088,11 @@ static std::string pumpDispatch(const std::string& req, bool& stop)
     stop = false;
     std::string op;
     jsonFindString(req, "op", op);
+    // Host mode (same env-backed setting the job dispatcher uses) lets the pump
+    // report honestly whether a full editor is present for attended_only ops.
+    std::string hostMode = wideToAscii(readJobPathSetting(L"ARIADNE_CAD_JOB_HOST_MODE"));
+    if (hostMode.empty())
+        hostMode = "coreconsole";
     AcDbDatabase* pDb = acdbHostApplicationServices()->workingDatabase();
     std::ostringstream r;
     r << "{\"schema\":\"ariadne.cad_pump_frame.v1\",\"op\":\"" << jsonEscape(op) << "\",";
@@ -3072,8 +3104,8 @@ static std::string pumpDispatch(const std::string& req, bool& stop)
     else if (op == "live.status") {
         int total = 0, probes = 0;
         if (pDb) countModelSpace(pDb, total, probes);
-        r << "\"status\":\"ok\",\"pump\":\"running\",\"has_database\":"
-          << (pDb ? "true" : "false")
+        r << "\"status\":\"ok\",\"pump\":\"running\",\"host_mode\":\"" << jsonEscape(hostMode) << "\""
+          << ",\"has_database\":" << (pDb ? "true" : "false")
           << ",\"modelspace_entities\":" << total << "}";
     }
     else if (op == "live.list_documents") {
@@ -3083,13 +3115,147 @@ static std::string pumpDispatch(const std::string& req, bool& stop)
           << (pDb ? "true" : "false")
           << ",\"modelspace_entities\":" << total << "}]}";
     }
+    else if (op == "live.active_document") {
+        // Working-db dwg path + model-space handle + entity counts. All pure
+        // reads on the document thread; no editor/graphics. originalFileName()
+        // is empty for an unsaved headless db -> reported as null, never faked.
+        if (pDb == nullptr) {
+            r << "\"status\":\"error\",\"reason\":\"no working database\"}";
+        } else {
+            const ACHAR* fnRaw = pDb->originalFileName();
+            const std::string dwgPath = (fnRaw != nullptr) ? acharToAscii(fnRaw) : std::string();
+            // Model-space handle via the block table (same idiom as countModelSpace).
+            std::string msHandle;
+            AcDbBlockTable* pBT = nullptr;
+            if (pDb->getBlockTable(pBT, AcDb::kForRead) == Acad::eOk) {
+                AcDbBlockTableRecord* pMS = nullptr;
+                if (pBT->getAt(ACDB_MODEL_SPACE, pMS, AcDb::kForRead) == Acad::eOk) {
+                    msHandle = handleOfId(pMS->objectId());
+                    pMS->close();
+                }
+                pBT->close();
+            }
+            int total = 0, probes = 0;
+            countModelSpace(pDb, total, probes);
+            r << "\"status\":\"ok\""
+              << ",\"dwg_path\":" << (dwgPath.empty() ? std::string("null")
+                                       : std::string("\"") + jsonEscape(dwgPath) + "\"")
+              << ",\"modelspace_handle\":" << (msHandle.empty() ? std::string("null")
+                                       : std::string("\"") + jsonEscape(msHandle) + "\"")
+              << ",\"modelspace_entities\":" << total
+              << ",\"ariadne_probes\":" << probes << "}";
+        }
+    }
+    else if (op == "live.inspect_entity") {
+        // Read one entity by hex handle. Resolve handle -> objectId on the
+        // working db, open kForRead, emit the SAME geometry shape as
+        // collectModelSpaceGraph. Pure read; not_found is honest (no fake).
+        std::string handleHex;
+        jsonFindString(req, "handle", handleHex);
+        if (pDb == nullptr) {
+            r << "\"status\":\"error\",\"reason\":\"no working database\"}";
+        } else if (handleHex.empty()) {
+            r << "\"status\":\"error\",\"reason\":\"missing handle\"}";
+        } else {
+#ifdef _UNICODE
+            const std::wstring wh(handleHex.begin(), handleHex.end());
+            const AcDbHandle h(wh.c_str());
+#else
+            const AcDbHandle h(handleHex.c_str());
+#endif
+            AcDbObjectId id;
+            if (pDb->getAcDbObjectId(id, false, h) != Acad::eOk || id.isNull()) {
+                r << "\"status\":\"not_found\",\"handle\":\"" << jsonEscape(handleHex) << "\"}";
+            } else {
+                AcDbEntity* pEnt = nullptr;
+                if (acdbOpenObject(pEnt, id, AcDb::kForRead) != Acad::eOk || pEnt == nullptr) {
+                    r << "\"status\":\"not_found\",\"handle\":\"" << jsonEscape(handleHex)
+                      << "\",\"reason\":\"handle resolves but entity open failed (non-entity or erased)\"}";
+                } else {
+                    const std::string dxfName = (pEnt->isA() != nullptr)
+                        ? acharToAscii(pEnt->isA()->name()) : std::string();
+                    const std::string layer = acharToAscii(pEnt->layer());
+                    const std::string ownerStr = handleOfId(pEnt->ownerId());
+                    std::ostringstream e;
+                    e << "{\"handle\":\"" << jsonEscape(handleHex) << "\""
+                      << ",\"dxf_name\":\"" << jsonEscape(dxfName) << "\""
+                      << ",\"layer\":\"" << jsonEscape(layer) << "\""
+                      << ",\"owner_handle\":\"" << jsonEscape(ownerStr) << "\"";
+                    if (AcDbLine* pLine = AcDbLine::cast(pEnt)) {
+                        const AcGePoint3d s = pLine->startPoint();
+                        const AcGePoint3d en = pLine->endPoint();
+                        e << ",\"start\":[" << s.x << "," << s.y << "," << s.z << "]"
+                          << ",\"end\":[" << en.x << "," << en.y << "," << en.z << "]";
+                    } else if (AcDbArc* pArc = AcDbArc::cast(pEnt)) {
+                        const AcGePoint3d c = pArc->center();
+                        e << ",\"center\":[" << c.x << "," << c.y << "," << c.z << "]"
+                          << ",\"radius\":" << pArc->radius()
+                          << ",\"start_angle\":" << pArc->startAngle()
+                          << ",\"end_angle\":" << pArc->endAngle();
+                    } else if (AcDbCircle* pCir = AcDbCircle::cast(pEnt)) {
+                        const AcGePoint3d c = pCir->center();
+                        e << ",\"center\":[" << c.x << "," << c.y << "," << c.z << "]"
+                          << ",\"radius\":" << pCir->radius();
+                    } else if (AcDbBlockReference* pRef = AcDbBlockReference::cast(pEnt)) {
+                        const AcGePoint3d p = pRef->position();
+                        e << ",\"position\":[" << p.x << "," << p.y << "," << p.z << "]"
+                          << ",\"block_record_handle\":\"" << jsonEscape(handleOfId(pRef->blockTableRecord())) << "\"";
+                    } else if (AcDbText* pT = AcDbText::cast(pEnt)) {
+                        const AcGePoint3d p = pT->position();
+                        e << ",\"position\":[" << p.x << "," << p.y << "," << p.z << "]"
+                          << ",\"text\":\"" << jsonEscape(acharToAscii(pT->textStringConst())) << "\"";
+                    }
+                    e << "}";
+                    pEnt->close();
+                    r << "\"status\":\"ok\",\"entity\":" << e.str() << "}";
+                }
+            }
+        }
+    }
+    else if (op == "live.apply_patch") {
+        // §5: ALWAYS disabled on the live pump. Mutation goes ONLY through the
+        // M05 staged-patch governor (router apply_staged on a staged copy); the
+        // original DWG is READ-ONLY and the pump never saves.
+        r << "\"status\":\"disabled\""
+          << ",\"reason\":\"live mutation is disabled; use the M05 staged-patch governor\""
+          << ",\"governor\":\"autocad-router.ps1 apply_staged (staged_input.dwg -> staged_output.dwg)\""
+          << ",\"original_dwg\":\"read_only\"}";
+    }
+    else if (op == "live.inspect_selection") {
+        r << "\"status\":\"attended_only\",\"host_mode\":\"" << jsonEscape(hostMode) << "\""
+          << ",\"interactive_editor_required\":true"
+          << ",\"reason\":\"editor selection set (acedSSGet) requires a full AutoCAD editor; accoreconsole has no interactive editor\"}";
+    }
+    else if (op == "live.highlight_handles") {
+        r << "\"status\":\"attended_only\",\"host_mode\":\"" << jsonEscape(hostMode) << "\""
+          << ",\"interactive_editor_required\":true"
+          << ",\"reason\":\"entity highlight drives the graphics subsystem; accoreconsole has no graphics device\"}";
+    }
+    else if (op == "live.clear_highlight") {
+        r << "\"status\":\"attended_only\",\"host_mode\":\"" << jsonEscape(hostMode) << "\""
+          << ",\"interactive_editor_required\":true"
+          << ",\"reason\":\"unhighlight/redraw requires the graphics subsystem absent in accoreconsole\"}";
+    }
+    else if (op == "live.zoom_to_handles") {
+        r << "\"status\":\"attended_only\",\"host_mode\":\"" << jsonEscape(hostMode) << "\""
+          << ",\"interactive_editor_required\":true"
+          << ",\"reason\":\"viewport zoom needs a live editor view; accoreconsole has no viewport/editor\"}";
+    }
+    else if (op == "live.render_view") {
+        r << "\"status\":\"attended_only\",\"host_mode\":\"" << jsonEscape(hostMode) << "\""
+          << ",\"interactive_editor_required\":true"
+          << ",\"reason\":\"rendering needs a graphics/render pipeline and viewport; accoreconsole has neither\"}";
+    }
     else if (op == "live.stop") {
         stop = true;
         r << "\"status\":\"ok\",\"stopped\":true}";
     }
     else {
-        r << "\"status\":\"not_implemented\",\"reason\":\"unknown op (supported: "
-          << "live.echo/live.status/live.list_documents/live.stop)\"}";
+        r << "\"status\":\"not_implemented\",\"reason\":\"unknown op ("
+          << "read: live.echo/live.status/live.list_documents/live.active_document/live.inspect_entity; "
+          << "write-disabled: live.apply_patch; "
+          << "attended_only: live.inspect_selection/live.highlight_handles/live.clear_highlight/live.zoom_to_handles/live.render_view; "
+          << "control: live.stop)\"}";
     }
     return r.str();
 }
@@ -3126,6 +3292,7 @@ static void ariadneCadAgentPump()
         CloseHandle(evt); CloseHandle(pipe); return;
     }
     acutPrintf(_T("\nCADAGENT_PUMP: client connected; serving frames\n"));
+    InterlockedExchange(&gPumpServing, 1);
     bool stop = false;
     while (!stop) {
         char hdr[4];
@@ -3141,11 +3308,50 @@ static void ariadneCadAgentPump()
         const std::string resp = pumpDispatch(body, stop);
         if (!pumpWriteFrame(pipe, resp, evt, timeoutMs)) break;
     }
+    InterlockedExchange(&gPumpServing, 0);
     FlushFileBuffers(pipe);
     DisconnectNamedPipe(pipe);
     CloseHandle(evt);
     CloseHandle(pipe);
     acutPrintf(_T("\nCADAGENT_PUMP: stopped\n"));
+}
+
+// Build identifier: compile-time stamp of THIS translation unit. Honest and
+// dependency-free; changes on every rebuild.
+static std::string pumpBuildId()
+{
+    return std::string(__DATE__) + " " + std::string(__TIME__);
+}
+
+//============================================================================
+// CADAGENT_STATUS: non-blocking config/health report. Unlike CADAGENT_PUMP it
+// does NOT open a pipe or block; it prints the pump configuration so an operator
+// (attended or headless) can verify wiring without starting a serve loop. For
+// the single-threaded main-thread model: START == CADAGENT_PUMP (start+serve),
+// STOP == sending a {"op":"live.stop"} frame to a serving pump.
+//============================================================================
+static void ariadneCadAgentStatus()
+{
+    const std::string pipe = wideToAscii(pumpPipeName());
+    const DWORD timeoutMs = pumpTimeoutMs();
+    std::string hostMode = wideToAscii(readJobPathSetting(L"ARIADNE_CAD_JOB_HOST_MODE"));
+    if (hostMode.empty())
+        hostMode = "coreconsole";
+    const bool serving = (InterlockedCompareExchange(&gPumpServing, 0, 0) != 0);
+
+    std::ostringstream r;
+    r << "{\"schema\":\"ariadne.cad_pump_status.v1\""
+      << ",\"command\":\"CADAGENT_STATUS\""
+      << ",\"build_id\":\"" << jsonEscape(pumpBuildId()) << "\""
+      << ",\"pipe_name\":\"" << jsonEscape(pipe) << "\""
+      << ",\"timeout_ms\":" << static_cast<unsigned long>(timeoutMs)
+      << ",\"host_mode\":\"" << jsonEscape(hostMode) << "\""
+      << ",\"serving\":" << (serving ? "true" : "false")
+      << ",\"start_command\":\"CADAGENT_PUMP\""
+      << ",\"stop_via\":\"frame:{op:live.stop}\""
+      << ",\"supported_ops\":[\"live.echo\",\"live.status\",\"live.list_documents\",\"live.active_document\",\"live.inspect_entity\",\"live.apply_patch\",\"live.inspect_selection\",\"live.highlight_handles\",\"live.clear_highlight\",\"live.zoom_to_handles\",\"live.render_view\",\"live.stop\"]"
+      << ",\"write_policy\":\"disabled_use_m05_staged_governor\"}";
+    acutPrintf(_T("\nCADAGENT_STATUS: %hs\n"), r.str().c_str());
 }
 
 //============================================================================
@@ -3182,7 +3388,12 @@ acrxEntryPoint(AcRx::AppMsgCode msg, void* pkt)
                                 _T("CADAGENT_PUMP"),
                                 ACRX_CMD_MODAL,
                                 &ariadneCadAgentPump);
-        acutPrintf(_T("\nAriadne.AcadNative loaded. Commands: ARIADNE_NATIVE_JOB, ARIADNE_NATIVE_JOB_ARGS, ARIADNE_NATIVE_JOB_MAILBOX, CADAGENT_PUMP\n"));
+        acedRegCmds->addCommand(_T("ARIADNE_NATIVE"),
+                                _T("CADAGENT_STATUS"),
+                                _T("CADAGENT_STATUS"),
+                                ACRX_CMD_MODAL,
+                                &ariadneCadAgentStatus);
+        acutPrintf(_T("\nAriadne.AcadNative loaded. Commands: ARIADNE_NATIVE_JOB, ARIADNE_NATIVE_JOB_ARGS, ARIADNE_NATIVE_JOB_MAILBOX, CADAGENT_PUMP, CADAGENT_STATUS\n"));
         break;
 
     case AcRx::kUnloadAppMsg:

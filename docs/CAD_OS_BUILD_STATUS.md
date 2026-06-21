@@ -1,6 +1,6 @@
 # CAD OS Build Status
 
-Updated: 2026-06-22T05:22:29+09:00
+Updated: 2026-06-22T06:20:00+09:00
 
 ## Current Packet
 
@@ -8,7 +8,17 @@ Updated: 2026-06-22T05:22:29+09:00
 - M04 Operation Registry/Tool Surface: PASS
 - M05 Patch Diff Validation Transaction: PASS
 - M06 Visual Batch Golden Regression: PASS
-- Next: CADOS_M07_LIVE_ARX_AND_DEEP_NATIVE_SURFACE
+- M07 Live ARX Pump / Deep Native Surface: PARTIAL_PASS
+- Next: CADOS_M08_FULL_OPERATION_COVERAGE_CLOSURE
+
+## Live ARX Pump / Deep Native (M07)
+
+- Native build: PASS via `tools/build_native_acad.ps1` — `.dbx` 44544, `.crx` 229888 (canonical/fresh, +14336 over baseline), `.arx` versioned `Ariadne.AcadNative.live_20260622_061225` (lock bypass; AutoCAD not killed). build_id `Jun 22 2026 06:12:22`.
+- Live pump: 12 ops + `CADAGENT_STATUS`. Headless-verified `runs/m07_pump_test/run_m07_pump_test.ps1` (`M07_PUMP_OPS_OK: True`, 17/17). modelspace 21747. `inspect_entity` on real handles 11935/12B4C/19166 + `FFFFFFFF`→not_found. `apply_patch`→disabled (§5). 5 GUI ops→attended_only. `stop`→clean. CADAGENT_STATUS v1 JSON printed headless.
+- §3 thread-safety: no worker thread (main-thread pump); clean shutdown documented + tested.
+- Deep native: 7 implemented (custom entity, worldDraw, overrules, reactors, jigs[host-gated], filer versioning, protocol extensions) / 3 attended_blocked (AcRxProperty/OPM, selection monitor, palette/status UI) / 0 design_only. See `reports/deep_native_latest.json`, `docs/NATIVE_DEEP_SURFACE_STATUS.md`.
+- Original golden DWG modified: no (`27dbf6b9…` before/after; staged copies only).
+- Attended live-pump proof: attended_blocked (acad.exe PID 49460, no automation channel, must not disrupt) — identical `.crx` code path headless-verified.
 
 ## Native Build
 
@@ -57,6 +67,6 @@ Updated: 2026-06-22T05:22:29+09:00
 
 - M06 focused: `28 passed in 1.35s`
 - M05/M06 combined focused: `127 passed in 2.78s`
-- Full pytest: `260 passed in 74.84s`
-- unittest discover: `Ran 223 tests in 18.823s, OK (skipped=3)`
+- M07 unit: `tests/unit/test_pump_frame_codec.py` 11 + `tests/unit/test_pump_shutdown_and_deep_native_source.py` 16 = 27 passed
+- Full pytest: `284 passed, 3 skipped in 21.67s` (3 skipped = env-gated CADOS_LIVE)
 - staging DWG SHA256: `27dbf6b95ff72a89fd53b153891187365b9e8ebc4c05a97cfed307057bf49bc8`

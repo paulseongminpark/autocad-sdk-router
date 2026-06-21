@@ -1,9 +1,9 @@
 {
   "schema": "ariadne.cad_os.latest_status.v1",
-  "timestamp": "2026-06-22T05:25:21+09:00",
+  "timestamp": "2026-06-22T06:20:00+09:00",
   "root": "D:\\dev\\99_tools\\autocad-sdk-router",
-  "current_packet": "CADOS_M06_VISUAL_BATCH_GOLDEN_REGRESSION",
-  "status": "PASS",
+  "current_packet": "CADOS_M07_LIVE_ARX_AND_DEEP_NATIVE_SURFACE",
+  "status": "PARTIAL_PASS",
   "m03": {
     "status": "PASS",
     "ir_ref": "runs/m03_rich_ir/dwg_graph_ir.json",
@@ -52,15 +52,34 @@
     "original_hash_after": "27dbf6b95ff72a89fd53b153891187365b9e8ebc4c05a97cfed307057bf49bc8",
     "original_modified": false
   },
+  "m07": {
+    "status": "PARTIAL_PASS",
+    "build_id": "Jun 22 2026 06:12:22",
+    "crx_bytes": 229888,
+    "arx_versioned": "Ariadne.AcadNative.live_20260622_061225",
+    "pump_ops": 12,
+    "status_command": "CADAGENT_STATUS",
+    "headless_proof": "runs/m07_pump_test/m07_pump_result.json",
+    "headless_checks": "17/17",
+    "live_pump": "reports/live_pump_latest.json",
+    "deep_native": "reports/deep_native_latest.json",
+    "deep_native_implemented": 7,
+    "deep_native_attended_blocked": 3,
+    "deep_native_design_only": 0,
+    "thread_safety_worker_acdb": "none",
+    "clean_shutdown": true,
+    "attended_live_proof": "attended_blocked (acad.exe PID 49460, no channel, not disrupted)",
+    "original_modified": false
+  },
   "tests": {
     "m06_focused": "28 passed in 1.35s",
     "m05_m06_combined_focused": "127 passed in 2.78s",
-    "pytest_full": "260 passed in 74.84s",
-    "unittest_discover": "Ran 223 tests in 18.823s OK (skipped=3)"
+    "m07_unit": "27 passed (codec 11 + shutdown/deep-native 16)",
+    "pytest_full": "284 passed, 3 skipped in 21.67s"
   },
   "git": {
     "commit": null,
     "remote_push": false
   },
-  "next": "CADOS_M07_LIVE_ARX_AND_DEEP_NATIVE_SURFACE"
+  "next": "CADOS_M08_FULL_OPERATION_COVERAGE_CLOSURE"
 }

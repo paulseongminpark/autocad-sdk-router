@@ -1,11 +1,11 @@
 # CAD OS V1 Acceptance Latest
 
-- status: PASS
-- criteria: 18 / 18
+- status: IN_PROGRESS (v1 freeze is M09; M03–M07 closed)
 - M03: PASS
 - M04: PASS
 - M05: PASS
 - M06: PASS
+- M07: PARTIAL_PASS (live ARX pump complete + headless-verified 17/17; deep native 7 implemented / 3 attended_blocked / 0 design_only)
 - operation unknown: 0
 - catalog classified: 480/480
 - staged patch apply: PASS
@@ -15,4 +15,10 @@
 - batch runner: PASS
 - golden regression: PASS
 - performance report: PASS
+- live ARX pump (12 ops + CADAGENT_STATUS): PASS (headless)
+- thread safety (no worker AcDb): PASS (main-thread pump)
+- deep native surface implemented-or-hard-blocked: PASS (7 implemented, 3 attended_blocked w/ exact evidence)
+- attended live-pump + 3 GUI surfaces: attended_blocked (dedicated attended packet; PID 49460 not driven)
 - original DWG modified: no
+- full pytest: 284 passed, 3 skipped, 0 failed
+- next: CADOS_M08_FULL_OPERATION_COVERAGE_CLOSURE
