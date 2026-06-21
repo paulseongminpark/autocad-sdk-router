@@ -1,0 +1,37 @@
+{
+  "schema": "ariadne.cad_os.m06.performance_report.v1",
+  "status": "PASS",
+  "artifacts": [
+    {
+      "id": "small",
+      "kind": "ir",
+      "path": "runs\\m05_patch_create_line\\pre\\dwg_graph_ir.json",
+      "status": "PASS",
+      "reason": "",
+      "duration_ms": 126.128,
+      "byte_size": 19912378,
+      "entity_count": 21747
+    },
+    {
+      "id": "golden21747",
+      "kind": "ir",
+      "path": "runs\\m03_rich_ir\\dwg_graph_ir.json",
+      "status": "PASS",
+      "reason": "",
+      "duration_ms": 146.516,
+      "byte_size": 19912398,
+      "entity_count": 21747
+    },
+    {
+      "id": "large291706",
+      "kind": "json",
+      "path": "runs\\native_graph_20260621_234158\\result_scale_graph.json",
+      "status": "PASS",
+      "reason": "",
+      "duration_ms": 0.159,
+      "byte_size": 49113314,
+      "entity_count": null
+    }
+  ],
+  "thresholds": {}
+}

@@ -1,6 +1,6 @@
 {
   "schema": "ariadne.cad_os.tool_surface.v1",
-  "packet": "CADOS_M04_OPERATION_REGISTRY_AND_TOOL_SURFACE",
+  "packet": "CADOS_M05_PATCH_DIFF_VALIDATION_TRANSACTION",
   "status": "PASS",
   "cadctl_commands": [
     "status --json",
@@ -14,19 +14,39 @@
     "patch dry-run",
     "diff",
     "visual",
-    "live status"
+    "live status",
+    "patch apply-staged --dwg --patch --out",
+    "diff --before --after --out",
+    "validator.py --run"
   ],
   "cadctl_evidence": {
     "status_json": "PASS operation_count=517 unknown=0",
     "registry_coverage": "PASS",
     "registry_explain": "PASS registry_operation_status=implemented",
     "get_entity": "PASS handle=11935 row_count=1",
-    "validate": "PASS validation_report.status=pass"
+    "validate": "PASS validation_report.status=pass",
+    "patch_dry_run": "PASS runs/m05_patch_create_line/dry_run/dry_run_plan.json",
+    "patch_apply_staged": "PASS runs/m05_patch_create_line/result.json status=ok original_unchanged=true",
+    "diff_before_after": "PASS runs/m05_diff_check/cad_diff.json added=1 removed=0 modified=0",
+    "validator_run": "PASS reports/validation_latest.json gates=14/14"
   },
   "router_explain": {
     "status": "PASS",
     "schema": "ariadne.autocad_router_operation_explain.v1",
     "operation": "inspect.database.graph"
   },
-  "shell_degradation": "patch/diff/visual/live return structured planned/rejected/blocked/not_implemented envelopes; no raw SDK bypass"
+  "shell_degradation": "patch/diff/visual/live return structured envelopes; M05 patch apply-staged is implemented for supported native write ops and blocks unsupported/original-write cases truthfully.",
+  "m05_patch_surface": {
+    "supported_ops": [
+      "create_line",
+      "create_circle",
+      "create_layer",
+      "set_layer"
+    ],
+    "real_smoke_op": "create_line",
+    "staged_apply": "PASS",
+    "dry_run": "PASS",
+    "original_write_default": false,
+    "remote_push": false
+  }
 }

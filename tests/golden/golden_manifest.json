@@ -1,6 +1,6 @@
 {
   "schema": "ariadne.cad_os.golden_manifest.v1",
-  "description": "CAD OS Layer M02 golden-fixture manifest. Pins the live, real artifacts the smoke/integration tests assert against. Counts are the cross-engine ground truth for the golden DWG (21747 modelspace entities). Paths are relative to the repo root (D:\\dev\\99_tools\\autocad-sdk-router). A test treats any missing path as a SKIP (with reason), never a failure.",
+  "description": "CAD OS golden-fixture manifest through CADOS M06. Pins the live, real artifacts the smoke/integration tests assert against. Counts are the cross-engine ground truth for the golden DWG (21747 modelspace entities). Paths are relative to the repo root (D:\\dev\\99_tools\\autocad-sdk-router). Legacy M02 paths are preserved for existing smoke tests; M06 adds visual, batch, golden, and scale references without replacing earlier evidence.",
   "golden_dwg": {
     "path": "staging/dwg_20260617_191504/input.dwg",
     "role": "READ-ONLY original; truth = 21747 modelspace entities. Tests stage their own copy and NEVER write this path.",
@@ -17,6 +17,32 @@
     "result_object_key": "result",
     "modelspace_entities": 21747,
     "consumed_by": "ir_builder.build_ir_from_database_graph"
+  },
+  "m06_fixtures": {
+    "native_full_ir": {
+      "path": "runs/m03_rich_ir/dwg_graph_ir.json",
+      "schema": "ariadne.dwg_graph_ir.v1",
+      "coverage_level": "native_full",
+      "entity_count": 21747
+    },
+    "patch_diff": {
+      "path": "runs/m05_patch_create_line/cad_diff.json",
+      "kind": "staged-copy cad diff",
+      "expected_status": "ok"
+    },
+    "visual_verification": {
+      "path": "runs/m06_visual_batch_golden/visual/visual_verification.json",
+      "kind": "IR SVG before/after/overlay"
+    },
+    "batch_manifest": {
+      "path": "runs/m06_visual_batch_golden/batch_manifest.json",
+      "kind": "M06 isolated batch manifest"
+    },
+    "scale_fixture": {
+      "path": "runs/native_graph_20260621_234158/result_scale_graph.json",
+      "modelspace_entities": 291706,
+      "source": "native inspect.database.graph scale artifact"
+    }
   },
   "engine": {
     "accoreconsole": "C:\\Program Files\\Autodesk\\AutoCAD 2027\\accoreconsole.exe"

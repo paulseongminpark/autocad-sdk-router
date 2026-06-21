@@ -1,0 +1,6 @@
+{
+  "schema": "ariadne.cad_os.m06.review_report.v1",
+  "status": "PASS",
+  "markdown_ref": "runs\\m06_visual_batch_golden\\review\\review_report.md",
+  "html_ref": "runs\\m06_visual_batch_golden\\review\\review_report.html"
+}

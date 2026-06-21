@@ -1,8 +1,8 @@
 {
   "schema": "ariadne.cad_os.latest_status.v1",
-  "timestamp": "2026-06-22T04:25:50+09:00",
+  "timestamp": "2026-06-22T05:25:21+09:00",
   "root": "D:\\dev\\99_tools\\autocad-sdk-router",
-  "current_packet": "CADOS_M04_OPERATION_REGISTRY_AND_TOOL_SURFACE",
+  "current_packet": "CADOS_M06_VISUAL_BATCH_GOLDEN_REGRESSION",
   "status": "PASS",
   "m03": {
     "status": "PASS",
@@ -16,31 +16,51 @@
   "m04": {
     "status": "PASS",
     "operation_count": 517,
-    "implemented": 34,
+    "implemented": 37,
     "catalogued": 474,
     "unknown": 0,
     "tool_surface": "reports/tool_surface_latest.json",
     "mcp_contract": "reports/mcp_contract_latest.json"
   },
-  "router": {
-    "status": "ALL_AVAILABLE",
-    "route_count": 11,
-    "available_count": 11
+  "m05": {
+    "status": "PASS",
+    "run_dir": "runs/m05_patch_create_line",
+    "diff": "reports/patch_diff_latest.json",
+    "validation": "reports/validation_latest.json",
+    "journal": "reports/journal_latest.json",
+    "original_modified": false
   },
-  "validation": {
-    "status": "pass",
-    "gates_total": 14,
-    "gates_failed": 0
+  "m06": {
+    "status": "PASS",
+    "run_dir": "runs/m06_visual_batch_golden",
+    "visual": "reports/visual_verification_latest.json",
+    "batch": "reports/batch_latest.json",
+    "golden": "reports/golden_regression_latest.json",
+    "performance": "reports/performance_latest.json",
+    "review": "reports/review_latest.json",
+    "visual_route": "ir_svg",
+    "visual_artifacts": [
+      "runs\\m06_visual_batch_golden\\visual\\before.svg",
+      "runs\\m06_visual_batch_golden\\visual\\after.svg",
+      "runs\\m06_visual_batch_golden\\visual\\overlay.svg",
+      "runs\\m06_visual_batch_golden\\visual\\visual_diff.json"
+    ],
+    "batch_successes": 4,
+    "batch_failures": 0,
+    "golden_fixtures": 1,
+    "large_fixture": "runs/native_graph_20260621_234158/result_scale_graph.json",
+    "original_hash_after": "27dbf6b95ff72a89fd53b153891187365b9e8ebc4c05a97cfed307057bf49bc8",
+    "original_modified": false
   },
   "tests": {
-    "pytest": "250 passed in 74.56s",
-    "unittest": "Ran 213 tests in 72.214s OK"
+    "m06_focused": "28 passed in 1.35s",
+    "m05_m06_combined_focused": "127 passed in 2.78s",
+    "pytest_full": "260 passed in 74.84s",
+    "unittest_discover": "Ran 223 tests in 18.823s OK (skipped=3)"
   },
   "git": {
-    "before": "dc6bc03",
-    "after": "dc6bc03",
     "commit": null,
     "remote_push": false
   },
-  "next": "CADOS_M05_PATCH_DIFF_VALIDATION_TRANSACTION"
+  "next": "CADOS_M07_LIVE_ARX_AND_DEEP_NATIVE_SURFACE"
 }

@@ -1,26 +1,175 @@
 {
-  "schema": "ariadne.cad_os.visual_verification.v1",
-  "packet": "CADOS_M02_V1_COMPLETION_ULTRACODE",
+  "schema": "ariadne.cad_os.m06.visual_verification.v1",
   "status": "PASS",
-  "route": "ir_svg (deterministic stdlib IR->SVG vector render; no AutoCAD needed)",
-  "artifacts": {
-    "after": "runs/m02_visual\\after.svg",
-    "before": "runs/m02_visual\\before.svg",
-    "overlay": "runs/m02_visual\\overlay.svg"
-  },
-  "element_counts": {
-    "after": 23259,
-    "before": 23258,
-    "overlay": 23259
-  },
-  "diff_counts": {
-    "created": 1,
-    "deleted": 0,
-    "modified": 0
-  },
-  "highlighted_handles": [
-    "1919D"
+  "render_status": "ok",
+  "route": "ir_svg",
+  "source_before_ir": "runs\\m05_patch_create_line\\pre\\dwg_graph_ir.json",
+  "source_after_ir": "runs\\m05_patch_create_line\\post\\dwg_graph_ir.json",
+  "diff_ref": "runs\\m05_patch_create_line\\cad_diff.json",
+  "run_dir": "runs\\m06_visual_batch_golden\\visual",
+  "artifacts": [
+    {
+      "role": "before",
+      "ref": "runs\\m06_visual_batch_golden\\visual\\before.svg",
+      "media_type": "image/svg+xml",
+      "byte_size": 3965035,
+      "sha256": "177ae1c7f61d81744b0f8ca5bd75930f84ba58313fdbca91f72aa943f8faabfb"
+    },
+    {
+      "role": "after",
+      "ref": "runs\\m06_visual_batch_golden\\visual\\after.svg",
+      "media_type": "image/svg+xml",
+      "byte_size": 3965171,
+      "sha256": "ee652a303fd1ccc7685450ff938036ac9eff3a1d5031e795e5c443f646166db6"
+    },
+    {
+      "role": "overlay",
+      "ref": "runs\\m06_visual_batch_golden\\visual\\overlay.svg",
+      "media_type": "image/svg+xml",
+      "byte_size": 3965170,
+      "sha256": "fa12c1b20816c465e60d68c134ddd0d5b9108dd5f20da785ebea816e6739b252"
+    },
+    {
+      "role": "visual_diff",
+      "ref": "runs\\m06_visual_batch_golden\\visual\\visual_diff.json",
+      "media_type": "application/json",
+      "byte_size": 1071,
+      "sha256": "7a57dbdbf4992b77f6966ea8f397a12dfefd5cbcae4c96b2f0b547f9b0e3f468"
+    }
   ],
-  "run": "runs/m02_visual",
-  "note": "Real before/after/overlay SVG render the EXTRACTED IR geometry (so it verifies extraction+patch directly); the +1 patched LINE is highlighted in the overlay. accoreconsole raster plot remains not_implemented on this host (EXPORTPDF unknown / -PLOT locale) — the ir_svg route supersedes it for verification."
+  "visual_artifact": {
+    "schema": "ariadne.visual_artifact.v1",
+    "artifact_id": "m06-visual",
+    "kind": "diff_overlay",
+    "status": "ok",
+    "source_ref": "runs\\m05_patch_create_line\\pre\\dwg_graph_ir.json",
+    "route": "ir_svg",
+    "media_type": "image/svg+xml",
+    "refs": [
+      {
+        "ref": "runs\\m06_visual_batch_golden\\visual\\before.svg",
+        "role": "before",
+        "media_type": "image/svg+xml",
+        "byte_size": 3965035,
+        "sha256": "177ae1c7f61d81744b0f8ca5bd75930f84ba58313fdbca91f72aa943f8faabfb"
+      },
+      {
+        "ref": "runs\\m06_visual_batch_golden\\visual\\after.svg",
+        "role": "after",
+        "media_type": "image/svg+xml",
+        "byte_size": 3965171,
+        "sha256": "ee652a303fd1ccc7685450ff938036ac9eff3a1d5031e795e5c443f646166db6"
+      },
+      {
+        "ref": "runs\\m06_visual_batch_golden\\visual\\overlay.svg",
+        "role": "overlay",
+        "media_type": "image/svg+xml",
+        "byte_size": 3965170,
+        "sha256": "fa12c1b20816c465e60d68c134ddd0d5b9108dd5f20da785ebea816e6739b252"
+      },
+      {
+        "ref": "runs\\m06_visual_batch_golden\\visual\\visual_diff.json",
+        "role": "visual_diff",
+        "media_type": "application/json",
+        "byte_size": 1071,
+        "sha256": "7a57dbdbf4992b77f6966ea8f397a12dfefd5cbcae4c96b2f0b547f9b0e3f468"
+      }
+    ],
+    "run_dir": "runs\\m06_visual_batch_golden\\visual",
+    "visual_diff": "runs\\m06_visual_batch_golden\\visual\\visual_diff.json",
+    "diagnostics": {
+      "warnings": [],
+      "before": {
+        "element_count": 25132,
+        "viewbox": [
+          -761486.9,
+          -741361.9,
+          1766070.8,
+          1665232.8
+        ],
+        "entity_count": 21747
+      },
+      "after": {
+        "element_count": 25133,
+        "viewbox": [
+          -761486.9,
+          -741361.9,
+          1766070.8,
+          1665232.8
+        ],
+        "entity_count": 21748
+      },
+      "overlay": {
+        "element_count": 25133,
+        "highlighted_handles": [
+          "1919C"
+        ],
+        "highlighted_present_in_after": [
+          "1919C"
+        ]
+      },
+      "diff_counts": {
+        "created": 1,
+        "modified": 0,
+        "deleted": 0
+      }
+    },
+    "notes": "real IR->SVG render via ir_svg route (before/after/overlay + visual_diff); artifacts exist on disk."
+  },
+  "visual_diff": "runs\\m06_visual_batch_golden\\visual\\visual_diff.json",
+  "viewport_metadata": {
+    "before": [
+      -761486.9,
+      -741361.9,
+      1766070.8,
+      1665232.8
+    ],
+    "after": [
+      -761486.9,
+      -741361.9,
+      1766070.8,
+      1665232.8
+    ],
+    "overlay": null
+  },
+  "handles_highlighted": [
+    "1919C"
+  ],
+  "diagnostics": {
+    "warnings": [],
+    "before": {
+      "element_count": 25132,
+      "viewbox": [
+        -761486.9,
+        -741361.9,
+        1766070.8,
+        1665232.8
+      ],
+      "entity_count": 21747
+    },
+    "after": {
+      "element_count": 25133,
+      "viewbox": [
+        -761486.9,
+        -741361.9,
+        1766070.8,
+        1665232.8
+      ],
+      "entity_count": 21748
+    },
+    "overlay": {
+      "element_count": 25133,
+      "highlighted_handles": [
+        "1919C"
+      ],
+      "highlighted_present_in_after": [
+        "1919C"
+      ]
+    },
+    "diff_counts": {
+      "created": 1,
+      "modified": 0,
+      "deleted": 0
+    }
+  }
 }

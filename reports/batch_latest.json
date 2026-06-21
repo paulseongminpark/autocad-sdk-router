@@ -1,0 +1,52 @@
+{
+  "schema": "ariadne.cad_os.m06.batch_result.v1",
+  "status": "PASS",
+  "manifest": "runs\\m06_visual_batch_golden\\batch_manifest.json",
+  "out_dir": "runs\\m06_visual_batch_golden\\batch",
+  "successes": 4,
+  "failures": 0,
+  "results": [
+    {
+      "id": "m03_native_full_ir",
+      "kind": "ir_validate",
+      "status": "PASS",
+      "ir_path": "runs/m03_rich_ir/dwg_graph_ir.json",
+      "validation_ref": "runs\\m06_visual_batch_golden\\batch\\m03_native_full_ir_validation.json",
+      "duration_ms": 150.562,
+      "gates_total": 14,
+      "gates_failed": 0
+    },
+    {
+      "id": "m05_patch_pre_ir",
+      "kind": "ir_validate",
+      "status": "PASS",
+      "ir_path": "runs/m05_patch_create_line/pre/dwg_graph_ir.json",
+      "validation_ref": "runs\\m06_visual_batch_golden\\batch\\m05_patch_pre_ir_validation.json",
+      "duration_ms": 156.258,
+      "gates_total": 14,
+      "gates_failed": 0
+    },
+    {
+      "id": "m05_patch_post_ir",
+      "kind": "ir_validate",
+      "status": "PASS",
+      "ir_path": "runs/m05_patch_create_line/post/dwg_graph_ir.json",
+      "validation_ref": "runs\\m06_visual_batch_golden\\batch\\m05_patch_post_ir_validation.json",
+      "duration_ms": 177.223,
+      "gates_total": 14,
+      "gates_failed": 0
+    },
+    {
+      "id": "golden_staging_dwg_readonly_inspect",
+      "kind": "dwg_inspect_validate",
+      "status": "PASS",
+      "dwg_path": "staging/dwg_20260617_191504/input.dwg",
+      "inspect_ref": "runs\\m06_visual_batch_golden\\batch\\golden_staging_dwg_readonly_inspect\\inspect_result.json",
+      "ir_ref": "runs\\m06_visual_batch_golden\\batch\\golden_staging_dwg_readonly_inspect\\dwg_graph_ir.json",
+      "validation_ref": "runs\\m06_visual_batch_golden\\batch\\golden_staging_dwg_readonly_inspect\\validation.json",
+      "duration_ms": 12965.086,
+      "entity_count": 21747
+    }
+  ],
+  "quarantine": []
+}

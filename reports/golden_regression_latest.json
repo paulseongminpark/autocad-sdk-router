@@ -1,0 +1,25 @@
+{
+  "schema": "ariadne.cad_os.m06.golden_regression.v1",
+  "status": "PASS",
+  "manifest": "tests\\golden\\golden_manifest.json",
+  "expected_counts": "tests\\golden\\expected_counts.json",
+  "fixtures": [
+    {
+      "id": "golden",
+      "status": "PASS",
+      "ir_path": "D:\\dev\\99_tools\\autocad-sdk-router\\runs\\m02_cadctl_rich\\dwg_graph_ir.json",
+      "entity_count": 21747,
+      "by_type": {
+        "LINE": 16276,
+        "INSERT": 2027,
+        "MTEXT": 106,
+        "HATCH": 669,
+        "POLYLINE": 1874,
+        "ARC": 753,
+        "CIRCLE": 33,
+        "TEXT": 9
+      },
+      "mismatches": []
+    }
+  ]
+}
