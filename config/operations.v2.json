@@ -1,0 +1,2244 @@
+{
+  "schema": "ariadne.operations_registry.v2",
+  "version": "2.0.0",
+  "generated_at": "2026-06-21",
+  "generated_by": "CADOS_M01 Lane D (Operation Registry v2)",
+  "additive_to_v1": true,
+  "extend_only": true,
+  "derived_from": [
+    "config/cad_job_operation_aliases.json",
+    "config/autocad_native_arx_operation_catalog.json",
+    "schemas/cad_job.schema.json"
+  ],
+  "v1_sources_readonly": [
+    "schemas/cad_job.schema.json",
+    "config/cad_job_operation_aliases.json",
+    "config/autocad_native_arx_operation_catalog.json",
+    "config/autocad_router_capabilities.json"
+  ],
+  "host_class_crosswalk": {
+    "_comment": "WHERE (execution_host_class) vs WHAT (engine_tier) are different axes. Per engine_tier: ordered cheapest-host-first host_eligibility + whether a managed handler exists.",
+    "by_engine_tier": {
+      "objectdbx_capable": {
+        "host_eligibility": [
+          "dbx",
+          "coreconsole",
+          "arx_adapter",
+          "full_autocad"
+        ],
+        "managed_handler_available": false
+      },
+      "accoreconsole_lisp_also": {
+        "host_eligibility": [
+          "coreconsole",
+          "dbx",
+          "arx_adapter",
+          "full_autocad"
+        ],
+        "managed_handler_available": false
+      },
+      "native_arx_only": {
+        "host_eligibility": [
+          "arx_adapter",
+          "full_autocad"
+        ],
+        "managed_handler_available": false
+      },
+      "managed_also": {
+        "host_eligibility": [
+          "arx_adapter",
+          "full_autocad"
+        ],
+        "managed_handler_available": true
+      }
+    }
+  },
+  "totals": {
+    "operations": 40,
+    "by_status": {
+      "implemented": 30,
+      "stub": 8,
+      "blocked": 2
+    },
+    "by_family": {
+      "objectdbx_database": 1,
+      "symbol_tables_dictionaries": 3,
+      "geometry_kernel": 2,
+      "inspect": 16,
+      "write": 4,
+      "live": 7,
+      "extend": 2,
+      "query": 1,
+      "render": 1,
+      "apply": 1,
+      "validate": 1,
+      "diff": 1
+    },
+    "by_engine_tier": {
+      "managed_also": 2,
+      "objectdbx_capable": 22,
+      "accoreconsole_lisp_also": 4,
+      "native_arx_only": 12
+    }
+  },
+  "coverage": {
+    "wired_ops": 29,
+    "wired_native": 28,
+    "wired_managed": 1,
+    "exact_mapped": 6,
+    "target_families_first_class": 12,
+    "catalog_total_ops": 480,
+    "catalog_family_heads": 16,
+    "catalog_by_tier": {
+      "native_arx_only": 221,
+      "accoreconsole_lisp_also": 16,
+      "managed_also": 45,
+      "objectdbx_capable": 198
+    },
+    "catalog_by_family": {
+      "active_document_write_original": 8,
+      "blocks_xrefs_clone": 5,
+      "brep_solids": 54,
+      "com_activex": 49,
+      "constraints_associativity": 58,
+      "custom_objects_protocols": 63,
+      "editor_input": 27,
+      "entities": 56,
+      "geometry_kernel": 25,
+      "graphics_system": 9,
+      "layouts_plot_publish": 2,
+      "objectdbx_database": 21,
+      "reactors_events": 22,
+      "runtime_commands": 26,
+      "symbol_tables_dictionaries": 16,
+      "ui_customization": 39
+    }
+  },
+  "operations": [
+    {
+      "id": "inspect.database.summary",
+      "family": "objectdbx_database",
+      "status": "implemented",
+      "engine_tier": "managed_also",
+      "host_eligibility": [
+        "dbx",
+        "coreconsole",
+        "arx_adapter",
+        "full_autocad"
+      ],
+      "execution_context": "hostless_dbx_in_accoreconsole",
+      "write_level": {
+        "default_write_mode": "read",
+        "allowed_write_modes": [
+          "read"
+        ],
+        "dwg_persisted": false
+      },
+      "handler": {
+        "router_lane": "ARIADNE_CAD_JOB",
+        "dispatcher_symbol": "InspectDatabaseSummary",
+        "execution_host_class": "dbx",
+        "composed_of": [],
+        "native_api": "CadJobRunner.InspectDatabaseSummary (managed .NET; counts symbol tables + dicts)"
+      },
+      "mapping_type": "exact",
+      "catalog_op_id": "inspect.database.summary",
+      "input_schema": "schemas/cad_job.v2.schema.json#/allOf",
+      "output_schema": "schemas/cad_result.v2.schema.json",
+      "summary": "Summarize database: symbol-table + dictionary counts, units, modelspace entity count",
+      "evidence_refs": [
+        "config/cad_job_operation_aliases.json#inspect.database.summary",
+        "tests/test_native_arx_dbx_contract.py::InspectDatabaseSummary",
+        "config/autocad_native_arx_operation_catalog.json#inspect.database.summary"
+      ],
+      "phase_batch": "P1 Native job shell baseline",
+      "target_family_first_class": true,
+      "wired_v1": true,
+      "source_slice": "existing_managed_plane",
+      "citation": "src/Ariadne.DwgGeometryExtractor/CadJobRunner.cs:47"
+    },
+    {
+      "id": "write.layer.create",
+      "family": "symbol_tables_dictionaries",
+      "status": "implemented",
+      "engine_tier": "objectdbx_capable",
+      "host_eligibility": [
+        "dbx",
+        "coreconsole",
+        "arx_adapter",
+        "full_autocad"
+      ],
+      "execution_context": "hostless_dbx_in_accoreconsole",
+      "write_level": {
+        "default_write_mode": "write_copy",
+        "allowed_write_modes": [
+          "write_copy",
+          "write_original"
+        ],
+        "dwg_persisted": true
+      },
+      "handler": {
+        "router_lane": "ARIADNE_NATIVE_JOB",
+        "dispatcher_symbol": "createLayer",
+        "execution_host_class": "dbx",
+        "composed_of": [],
+        "native_api": "AcDbLayerTable::add(AcDbObjectId&, AcDbLayerTableRecord*)"
+      },
+      "mapping_type": "exact",
+      "catalog_op_id": "write.layer.create",
+      "input_schema": "schemas/cad_job.v2.schema.json#/allOf",
+      "output_schema": "schemas/cad_result.v2.schema.json",
+      "summary": "Add a new layer record to both the db and the table; returns its",
+      "evidence_refs": [
+        "config/cad_job_operation_aliases.json#write.layer.create",
+        "tests/test_native_arx_dbx_contract.py::createLayer",
+        "config/autocad_native_arx_operation_catalog.json#write.layer.create"
+      ],
+      "phase_batch": "P2 Batch 1 Core Database CRUD",
+      "target_family_first_class": false,
+      "wired_v1": true,
+      "source_slice": "acdb-core.md",
+      "citation": "ref AcDbLayerTable__add@AcDbObjectId_@AcDbLayerTableRecord_.html"
+    },
+    {
+      "id": "write.entity.line",
+      "family": "geometry_kernel",
+      "status": "implemented",
+      "engine_tier": "objectdbx_capable",
+      "host_eligibility": [
+        "dbx",
+        "coreconsole",
+        "arx_adapter",
+        "full_autocad"
+      ],
+      "execution_context": "host",
+      "write_level": {
+        "default_write_mode": "write_copy",
+        "allowed_write_modes": [
+          "write_copy",
+          "write_original"
+        ],
+        "dwg_persisted": true
+      },
+      "handler": {
+        "router_lane": "ARIADNE_NATIVE_JOB",
+        "dispatcher_symbol": "appendLine",
+        "execution_host_class": "dbx",
+        "composed_of": [],
+        "native_api": "AcDbLine(const AcGePoint3d& start, const AcGePoint3d& end) + setStartPoint/setEndPoint/setNormal/setThickness"
+      },
+      "mapping_type": "exact",
+      "catalog_op_id": "write.entity.line",
+      "input_schema": "schemas/cad_job.v2.schema.json#/allOf",
+      "output_schema": "schemas/cad_result.v2.schema.json",
+      "summary": "Create a straight line segment entity",
+      "evidence_refs": [
+        "config/cad_job_operation_aliases.json#write.entity.line",
+        "tests/test_native_arx_dbx_contract.py::appendLine",
+        "config/autocad_native_arx_operation_catalog.json#write.entity.line"
+      ],
+      "phase_batch": "P2 Batch 1 Core Database CRUD",
+      "target_family_first_class": false,
+      "wired_v1": true,
+      "source_slice": "entities-geometry-graphics.md",
+      "citation": "hdr dbents.h AcDbLine; ActiveX cross-ref AcadLine GUID-18ADF171 (Circle pg lists AddLine family)"
+    },
+    {
+      "id": "write.entity.circle",
+      "family": "geometry_kernel",
+      "status": "implemented",
+      "engine_tier": "objectdbx_capable",
+      "host_eligibility": [
+        "dbx",
+        "coreconsole",
+        "arx_adapter",
+        "full_autocad"
+      ],
+      "execution_context": "host",
+      "write_level": {
+        "default_write_mode": "write_copy",
+        "allowed_write_modes": [
+          "write_copy",
+          "write_original"
+        ],
+        "dwg_persisted": true
+      },
+      "handler": {
+        "router_lane": "ARIADNE_NATIVE_JOB",
+        "dispatcher_symbol": "appendCircle",
+        "execution_host_class": "dbx",
+        "composed_of": [],
+        "native_api": "AcDbCircle(const AcGePoint3d& cntr, const AcGeVector3d& nrm, double radius) + setCenter/setRadius/setNormal"
+      },
+      "mapping_type": "exact",
+      "catalog_op_id": "write.entity.circle",
+      "input_schema": "schemas/cad_job.v2.schema.json#/allOf",
+      "output_schema": "schemas/cad_result.v2.schema.json",
+      "summary": "Create a full circle",
+      "evidence_refs": [
+        "config/cad_job_operation_aliases.json#write.entity.circle",
+        "tests/test_native_arx_dbx_contract.py::appendCircle",
+        "config/autocad_native_arx_operation_catalog.json#write.entity.circle"
+      ],
+      "phase_batch": "Phase 1 ObjectDBX/CoreConsole CRUD",
+      "target_family_first_class": false,
+      "wired_v1": true,
+      "source_slice": "entities-geometry-graphics.md",
+      "citation": "hdr dbents.h AcDbCircle; ActiveX AcadCircle GUID-18ADF171-166F-4FF0-8ED6-5F83153A5649"
+    },
+    {
+      "id": "inspect.entity.count",
+      "family": "inspect",
+      "status": "implemented",
+      "engine_tier": "objectdbx_capable",
+      "host_eligibility": [
+        "dbx",
+        "coreconsole",
+        "arx_adapter",
+        "full_autocad"
+      ],
+      "execution_context": "in_process_host",
+      "write_level": {
+        "default_write_mode": "read",
+        "allowed_write_modes": [
+          "read"
+        ],
+        "dwg_persisted": false
+      },
+      "handler": {
+        "router_lane": "ARIADNE_NATIVE_JOB",
+        "dispatcher_symbol": "countModelSpaceEntitiesByType",
+        "execution_host_class": "dbx",
+        "composed_of": [
+          "select.ss.count",
+          "inspect.block.iterate"
+        ]
+      },
+      "mapping_type": "synthetic",
+      "catalog_op_id": null,
+      "input_schema": "schemas/cad_job.v2.schema.json#/allOf",
+      "output_schema": "schemas/cad_result.v2.schema.json",
+      "summary": "Router job counts modelspace entities, optionally by simple entity type; catalog exposes lower-level selection/block iteration primitives.",
+      "evidence_refs": [
+        "config/cad_job_operation_aliases.json#inspect.entity.count",
+        "tests/test_native_arx_dbx_contract.py::countModelSpaceEntitiesByType"
+      ],
+      "phase_batch": "Phase 1 ObjectDBX/CoreConsole CRUD",
+      "target_family_first_class": false,
+      "wired_v1": true
+    },
+    {
+      "id": "write.xrecord.set",
+      "family": "symbol_tables_dictionaries",
+      "status": "implemented",
+      "engine_tier": "objectdbx_capable",
+      "host_eligibility": [
+        "dbx",
+        "coreconsole",
+        "arx_adapter",
+        "full_autocad"
+      ],
+      "execution_context": "hostless_dbx_in_accoreconsole",
+      "write_level": {
+        "default_write_mode": "write_copy",
+        "allowed_write_modes": [
+          "write_copy",
+          "write_original"
+        ],
+        "dwg_persisted": true
+      },
+      "handler": {
+        "router_lane": "ARIADNE_NATIVE_JOB",
+        "dispatcher_symbol": "setXrecord",
+        "execution_host_class": "dbx",
+        "composed_of": [],
+        "native_api": "AcDbXrecord::setFromRbChain(const resbuf& pRb, AcDbDatabase* auxDb=NULL)"
+      },
+      "mapping_type": "exact",
+      "catalog_op_id": "write.xrecord.set",
+      "input_schema": "schemas/cad_job.v2.schema.json#/allOf",
+      "output_schema": "schemas/cad_result.v2.schema.json",
+      "summary": "Set an xrecord's payload from a resbuf chain (DXF group codes <1000; ids in",
+      "evidence_refs": [
+        "config/cad_job_operation_aliases.json#write.xrecord.set",
+        "tests/test_native_arx_dbx_contract.py::setXrecord",
+        "config/autocad_native_arx_operation_catalog.json#write.xrecord.set"
+      ],
+      "phase_batch": "P2 Batch 1 Core Database CRUD",
+      "target_family_first_class": false,
+      "wired_v1": true,
+      "source_slice": "acdb-core.md",
+      "citation": "ref AcDbXrecord__setFromRbChain@resbuf_@AcDbDatabase_.html"
+    },
+    {
+      "id": "inspect.xrecord.get",
+      "family": "symbol_tables_dictionaries",
+      "status": "implemented",
+      "engine_tier": "objectdbx_capable",
+      "host_eligibility": [
+        "dbx",
+        "coreconsole",
+        "arx_adapter",
+        "full_autocad"
+      ],
+      "execution_context": "hostless_dbx_in_accoreconsole",
+      "write_level": {
+        "default_write_mode": "read",
+        "allowed_write_modes": [
+          "read"
+        ],
+        "dwg_persisted": false
+      },
+      "handler": {
+        "router_lane": "ARIADNE_NATIVE_JOB",
+        "dispatcher_symbol": "getXrecord",
+        "execution_host_class": "dbx",
+        "composed_of": [],
+        "native_api": "AcDbXrecord::rbChain(resbuf** ppRb, AcDbDatabase* auxDb=NULL) const"
+      },
+      "mapping_type": "exact",
+      "catalog_op_id": "inspect.xrecord.get",
+      "input_schema": "schemas/cad_job.v2.schema.json#/allOf",
+      "output_schema": "schemas/cad_result.v2.schema.json",
+      "summary": "Read an xrecord back as a resbuf chain (handles→ids via auxDb if non-resident). Caller",
+      "evidence_refs": [
+        "config/cad_job_operation_aliases.json#inspect.xrecord.get",
+        "tests/test_native_arx_dbx_contract.py::getXrecord",
+        "config/autocad_native_arx_operation_catalog.json#inspect.xrecord.get"
+      ],
+      "phase_batch": "P2 Batch 1 Core Database CRUD",
+      "target_family_first_class": false,
+      "wired_v1": true,
+      "source_slice": "acdb-core.md",
+      "citation": "ref AcDbXrecord__rbChain@resbuf__@AcDbDatabase_@const.html"
+    },
+    {
+      "id": "write.xdata.set",
+      "family": "write",
+      "status": "implemented",
+      "engine_tier": "objectdbx_capable",
+      "host_eligibility": [
+        "dbx",
+        "coreconsole",
+        "arx_adapter",
+        "full_autocad"
+      ],
+      "execution_context": "in_process_host",
+      "write_level": {
+        "default_write_mode": "write_copy",
+        "allowed_write_modes": [
+          "write_copy",
+          "write_original"
+        ],
+        "dwg_persisted": true
+      },
+      "handler": {
+        "router_lane": "ARIADNE_NATIVE_JOB",
+        "dispatcher_symbol": "setDatabaseXdata",
+        "execution_host_class": "dbx",
+        "composed_of": [
+          "write.entity.set_xdata",
+          "write.regapp.register"
+        ]
+      },
+      "mapping_type": "alias",
+      "catalog_op_id": null,
+      "input_schema": "schemas/cad_job.v2.schema.json#/allOf",
+      "output_schema": "schemas/cad_result.v2.schema.json",
+      "summary": "Router job name differs from catalog entity xdata primitives and includes regapp setup.",
+      "evidence_refs": [
+        "config/cad_job_operation_aliases.json#write.xdata.set",
+        "tests/test_native_arx_dbx_contract.py::setDatabaseXdata"
+      ],
+      "phase_batch": "P2 Batch 1 Core Database CRUD",
+      "target_family_first_class": false,
+      "wired_v1": true
+    },
+    {
+      "id": "inspect.xdata.get",
+      "family": "inspect",
+      "status": "implemented",
+      "engine_tier": "objectdbx_capable",
+      "host_eligibility": [
+        "dbx",
+        "coreconsole",
+        "arx_adapter",
+        "full_autocad"
+      ],
+      "execution_context": "in_process_host",
+      "write_level": {
+        "default_write_mode": "read",
+        "allowed_write_modes": [
+          "read"
+        ],
+        "dwg_persisted": false
+      },
+      "handler": {
+        "router_lane": "ARIADNE_NATIVE_JOB",
+        "dispatcher_symbol": "getDatabaseXdata",
+        "execution_host_class": "dbx",
+        "composed_of": [
+          "inspect.entity.get_xdata"
+        ]
+      },
+      "mapping_type": "alias",
+      "catalog_op_id": null,
+      "input_schema": "schemas/cad_job.v2.schema.json#/allOf",
+      "output_schema": "schemas/cad_result.v2.schema.json",
+      "summary": "Router job name differs from the catalog entity xdata read primitive.",
+      "evidence_refs": [
+        "config/cad_job_operation_aliases.json#inspect.xdata.get",
+        "tests/test_native_arx_dbx_contract.py::getDatabaseXdata"
+      ],
+      "phase_batch": "P2 Batch 1 Core Database CRUD",
+      "target_family_first_class": false,
+      "wired_v1": true
+    },
+    {
+      "id": "write.block.simple_create",
+      "family": "write",
+      "status": "implemented",
+      "engine_tier": "objectdbx_capable",
+      "host_eligibility": [
+        "dbx",
+        "coreconsole",
+        "arx_adapter",
+        "full_autocad"
+      ],
+      "execution_context": "in_process_host",
+      "write_level": {
+        "default_write_mode": "write_copy",
+        "allowed_write_modes": [
+          "write_copy",
+          "write_original"
+        ],
+        "dwg_persisted": true
+      },
+      "handler": {
+        "router_lane": "ARIADNE_NATIVE_JOB",
+        "dispatcher_symbol": "createSimpleBlock",
+        "execution_host_class": "dbx",
+        "composed_of": [
+          "inspect.symboltable.block",
+          "write.block.append_entity"
+        ]
+      },
+      "mapping_type": "synthetic",
+      "catalog_op_id": null,
+      "input_schema": "schemas/cad_job.v2.schema.json#/allOf",
+      "output_schema": "schemas/cad_result.v2.schema.json",
+      "summary": "Router job creates a simple block definition by combining block table and entity append primitives.",
+      "evidence_refs": [
+        "config/cad_job_operation_aliases.json#write.block.simple_create",
+        "tests/test_native_arx_dbx_contract.py::createSimpleBlock"
+      ],
+      "phase_batch": "P2 Batch 2 Blocks, Layouts, Xrefs",
+      "target_family_first_class": false,
+      "wired_v1": true
+    },
+    {
+      "id": "write.block.insert",
+      "family": "write",
+      "status": "implemented",
+      "engine_tier": "objectdbx_capable",
+      "host_eligibility": [
+        "dbx",
+        "coreconsole",
+        "arx_adapter",
+        "full_autocad"
+      ],
+      "execution_context": "in_process_host",
+      "write_level": {
+        "default_write_mode": "write_copy",
+        "allowed_write_modes": [
+          "write_copy",
+          "write_original"
+        ],
+        "dwg_persisted": true
+      },
+      "handler": {
+        "router_lane": "ARIADNE_NATIVE_JOB",
+        "dispatcher_symbol": "insertBlockReference",
+        "execution_host_class": "dbx",
+        "composed_of": [
+          "write.entity.blockref",
+          "transform.database.insert_block"
+        ]
+      },
+      "mapping_type": "alias",
+      "catalog_op_id": null,
+      "input_schema": "schemas/cad_job.v2.schema.json#/allOf",
+      "output_schema": "schemas/cad_result.v2.schema.json",
+      "summary": "Router job inserts a block reference; catalog uses lower-level blockref and database insert operation IDs.",
+      "evidence_refs": [
+        "config/cad_job_operation_aliases.json#write.block.insert",
+        "tests/test_native_arx_dbx_contract.py::insertBlockReference"
+      ],
+      "phase_batch": "P2 Batch 2 Blocks, Layouts, Xrefs",
+      "target_family_first_class": false,
+      "wired_v1": true
+    },
+    {
+      "id": "inspect.block.count",
+      "family": "inspect",
+      "status": "implemented",
+      "engine_tier": "objectdbx_capable",
+      "host_eligibility": [
+        "dbx",
+        "coreconsole",
+        "arx_adapter",
+        "full_autocad"
+      ],
+      "execution_context": "in_process_host",
+      "write_level": {
+        "default_write_mode": "read",
+        "allowed_write_modes": [
+          "read"
+        ],
+        "dwg_persisted": false
+      },
+      "handler": {
+        "router_lane": "ARIADNE_NATIVE_JOB",
+        "dispatcher_symbol": "countBlockDefinitions",
+        "execution_host_class": "dbx",
+        "composed_of": [
+          "inspect.symboltable.block",
+          "inspect.block.iterate"
+        ]
+      },
+      "mapping_type": "alias",
+      "catalog_op_id": null,
+      "input_schema": "schemas/cad_job.v2.schema.json#/allOf",
+      "output_schema": "schemas/cad_result.v2.schema.json",
+      "summary": "Router job counts block definitions; catalog exposes block symbol table and iterator primitives.",
+      "evidence_refs": [
+        "config/cad_job_operation_aliases.json#inspect.block.count",
+        "tests/test_native_arx_dbx_contract.py::countBlockDefinitions"
+      ],
+      "phase_batch": "P2 Batch 2 Blocks, Layouts, Xrefs",
+      "target_family_first_class": false,
+      "wired_v1": true
+    },
+    {
+      "id": "write.layout.create",
+      "family": "write",
+      "status": "implemented",
+      "engine_tier": "objectdbx_capable",
+      "host_eligibility": [
+        "dbx",
+        "coreconsole",
+        "arx_adapter",
+        "full_autocad"
+      ],
+      "execution_context": "in_process_host",
+      "write_level": {
+        "default_write_mode": "write_copy",
+        "allowed_write_modes": [
+          "write_copy",
+          "write_original"
+        ],
+        "dwg_persisted": true
+      },
+      "handler": {
+        "router_lane": "ARIADNE_NATIVE_JOB",
+        "dispatcher_symbol": "createLayout",
+        "execution_host_class": "dbx",
+        "composed_of": [
+          "inspect.dictionary.named_objects"
+        ]
+      },
+      "mapping_type": "synthetic",
+      "catalog_op_id": null,
+      "input_schema": "schemas/cad_job.v2.schema.json#/allOf",
+      "output_schema": "schemas/cad_result.v2.schema.json",
+      "summary": "Router job uses layout manager behavior not represented by an exact catalog op ID.",
+      "evidence_refs": [
+        "config/cad_job_operation_aliases.json#write.layout.create",
+        "tests/test_native_arx_dbx_contract.py::createLayout"
+      ],
+      "phase_batch": "P2 Batch 2 Blocks, Layouts, Xrefs",
+      "target_family_first_class": false,
+      "wired_v1": true
+    },
+    {
+      "id": "inspect.layout.list",
+      "family": "inspect",
+      "status": "implemented",
+      "engine_tier": "objectdbx_capable",
+      "host_eligibility": [
+        "dbx",
+        "coreconsole",
+        "arx_adapter",
+        "full_autocad"
+      ],
+      "execution_context": "in_process_host",
+      "write_level": {
+        "default_write_mode": "read",
+        "allowed_write_modes": [
+          "read"
+        ],
+        "dwg_persisted": false
+      },
+      "handler": {
+        "router_lane": "ARIADNE_NATIVE_JOB",
+        "dispatcher_symbol": "listLayouts",
+        "execution_host_class": "dbx",
+        "composed_of": [
+          "inspect.dictionary.named_objects"
+        ]
+      },
+      "mapping_type": "synthetic",
+      "catalog_op_id": null,
+      "input_schema": "schemas/cad_job.v2.schema.json#/allOf",
+      "output_schema": "schemas/cad_result.v2.schema.json",
+      "summary": "Router job lists layouts through layout dictionary/manager state; catalog has no exact layout-list op.",
+      "evidence_refs": [
+        "config/cad_job_operation_aliases.json#inspect.layout.list",
+        "tests/test_native_arx_dbx_contract.py::listLayouts"
+      ],
+      "phase_batch": "P2 Batch 2 Blocks, Layouts, Xrefs",
+      "target_family_first_class": false,
+      "wired_v1": true
+    },
+    {
+      "id": "inspect.xref.list",
+      "family": "inspect",
+      "status": "implemented",
+      "engine_tier": "objectdbx_capable",
+      "host_eligibility": [
+        "dbx",
+        "coreconsole",
+        "arx_adapter",
+        "full_autocad"
+      ],
+      "execution_context": "in_process_host",
+      "write_level": {
+        "default_write_mode": "read",
+        "allowed_write_modes": [
+          "read"
+        ],
+        "dwg_persisted": false
+      },
+      "handler": {
+        "router_lane": "ARIADNE_NATIVE_JOB",
+        "dispatcher_symbol": "listXrefs",
+        "execution_host_class": "dbx",
+        "composed_of": [
+          "inspect.symboltable.block",
+          "inspect.block.iterate"
+        ]
+      },
+      "mapping_type": "synthetic",
+      "catalog_op_id": null,
+      "input_schema": "schemas/cad_job.v2.schema.json#/allOf",
+      "output_schema": "schemas/cad_result.v2.schema.json",
+      "summary": "Router job filters xref block table records; catalog does not expose a dedicated xref-list op.",
+      "evidence_refs": [
+        "config/cad_job_operation_aliases.json#inspect.xref.list",
+        "tests/test_native_arx_dbx_contract.py::listXrefs"
+      ],
+      "phase_batch": "P2 Batch 2 Blocks, Layouts, Xrefs",
+      "target_family_first_class": false,
+      "wired_v1": true
+    },
+    {
+      "id": "inspect.runtime.capabilities",
+      "family": "inspect",
+      "status": "implemented",
+      "engine_tier": "accoreconsole_lisp_also",
+      "host_eligibility": [
+        "coreconsole",
+        "dbx",
+        "arx_adapter",
+        "full_autocad"
+      ],
+      "execution_context": "in_process_host",
+      "write_level": {
+        "default_write_mode": "read",
+        "allowed_write_modes": [
+          "read"
+        ],
+        "dwg_persisted": false
+      },
+      "handler": {
+        "router_lane": "ARIADNE_NATIVE_JOB",
+        "dispatcher_symbol": "runtimeCapabilitiesJson",
+        "execution_host_class": "coreconsole",
+        "composed_of": [
+          "module.app.accessor",
+          "module.load"
+        ]
+      },
+      "mapping_type": "synthetic",
+      "catalog_op_id": null,
+      "input_schema": "schemas/cad_job.v2.schema.json#/allOf",
+      "output_schema": "schemas/cad_result.v2.schema.json",
+      "summary": "Router capability contract reports current host support instead of invoking one catalog primitive.",
+      "evidence_refs": [
+        "config/cad_job_operation_aliases.json#inspect.runtime.capabilities",
+        "tests/test_native_arx_dbx_contract.py::runtimeCapabilitiesJson"
+      ],
+      "phase_batch": "P2 Batch 3 Host-Bound Capability Contracts",
+      "target_family_first_class": false,
+      "wired_v1": true
+    },
+    {
+      "id": "live.reactor.enable",
+      "family": "live",
+      "status": "implemented",
+      "engine_tier": "native_arx_only",
+      "host_eligibility": [
+        "arx_adapter",
+        "full_autocad"
+      ],
+      "execution_context": "in_process_host",
+      "write_level": {
+        "default_write_mode": "live_edit",
+        "allowed_write_modes": [
+          "live_edit",
+          "write_original"
+        ],
+        "dwg_persisted": false
+      },
+      "handler": {
+        "router_lane": "ARIADNE_NATIVE_JOB",
+        "dispatcher_symbol": "enableEditorReactor",
+        "execution_host_class": "arx_adapter",
+        "composed_of": [
+          "react.editor.command_monitor",
+          "react.object.attach_transient"
+        ]
+      },
+      "mapping_type": "alias",
+      "catalog_op_id": null,
+      "input_schema": "schemas/cad_job.v2.schema.json#/allOf",
+      "output_schema": "schemas/cad_result.v2.schema.json",
+      "summary": "Router job installs the current Ariadne editor reactor; catalog separates reactor attach and monitor primitives.",
+      "evidence_refs": [
+        "config/cad_job_operation_aliases.json#live.reactor.enable",
+        "tests/test_native_arx_dbx_contract.py::enableEditorReactor"
+      ],
+      "phase_batch": "P2 Batch 3 Host-Bound Capability Contracts",
+      "target_family_first_class": false,
+      "wired_v1": true
+    },
+    {
+      "id": "inspect.reactor.registry",
+      "family": "inspect",
+      "status": "implemented",
+      "engine_tier": "accoreconsole_lisp_also",
+      "host_eligibility": [
+        "coreconsole",
+        "dbx",
+        "arx_adapter",
+        "full_autocad"
+      ],
+      "execution_context": "in_process_host",
+      "write_level": {
+        "default_write_mode": "read",
+        "allowed_write_modes": [
+          "read"
+        ],
+        "dwg_persisted": false
+      },
+      "handler": {
+        "router_lane": "ARIADNE_NATIVE_JOB",
+        "dispatcher_symbol": "reactorRegistryJson",
+        "execution_host_class": "coreconsole",
+        "composed_of": [
+          "react.editor.command_monitor",
+          "react.object.monitor"
+        ]
+      },
+      "mapping_type": "synthetic",
+      "catalog_op_id": null,
+      "input_schema": "schemas/cad_job.v2.schema.json#/allOf",
+      "output_schema": "schemas/cad_result.v2.schema.json",
+      "summary": "Router job reports Ariadne reactor registration state; catalog exposes monitor categories, not this registry contract.",
+      "evidence_refs": [
+        "config/cad_job_operation_aliases.json#inspect.reactor.registry",
+        "tests/test_native_arx_dbx_contract.py::reactorRegistryJson"
+      ],
+      "phase_batch": "P2 Batch 3 Host-Bound Capability Contracts",
+      "target_family_first_class": false,
+      "wired_v1": true
+    },
+    {
+      "id": "live.reactor.disable",
+      "family": "live",
+      "status": "implemented",
+      "engine_tier": "native_arx_only",
+      "host_eligibility": [
+        "arx_adapter",
+        "full_autocad"
+      ],
+      "execution_context": "in_process_host",
+      "write_level": {
+        "default_write_mode": "live_edit",
+        "allowed_write_modes": [
+          "live_edit",
+          "write_original"
+        ],
+        "dwg_persisted": false
+      },
+      "handler": {
+        "router_lane": "ARIADNE_NATIVE_JOB",
+        "dispatcher_symbol": "disableEditorReactor",
+        "execution_host_class": "arx_adapter",
+        "composed_of": [
+          "react.object.detach_transient"
+        ]
+      },
+      "mapping_type": "alias",
+      "catalog_op_id": null,
+      "input_schema": "schemas/cad_job.v2.schema.json#/allOf",
+      "output_schema": "schemas/cad_result.v2.schema.json",
+      "summary": "Router job removes the current Ariadne editor reactor; catalog uses lower-level detach primitives.",
+      "evidence_refs": [
+        "config/cad_job_operation_aliases.json#live.reactor.disable",
+        "tests/test_native_arx_dbx_contract.py::disableEditorReactor"
+      ],
+      "phase_batch": "P2 Batch 3 Host-Bound Capability Contracts",
+      "target_family_first_class": false,
+      "wired_v1": true
+    },
+    {
+      "id": "inspect.overrule.registry",
+      "family": "inspect",
+      "status": "implemented",
+      "engine_tier": "accoreconsole_lisp_also",
+      "host_eligibility": [
+        "coreconsole",
+        "dbx",
+        "arx_adapter",
+        "full_autocad"
+      ],
+      "execution_context": "in_process_host",
+      "write_level": {
+        "default_write_mode": "read",
+        "allowed_write_modes": [
+          "read"
+        ],
+        "dwg_persisted": false
+      },
+      "handler": {
+        "router_lane": "ARIADNE_NATIVE_JOB",
+        "dispatcher_symbol": "overruleRegistryJson",
+        "execution_host_class": "coreconsole",
+        "composed_of": [
+          "overrule.query.has",
+          "overrule.object.install"
+        ]
+      },
+      "mapping_type": "synthetic",
+      "catalog_op_id": null,
+      "input_schema": "schemas/cad_job.v2.schema.json#/allOf",
+      "output_schema": "schemas/cad_result.v2.schema.json",
+      "summary": "Router job reports Ariadne overrule registration state; catalog has query/install primitives but no registry contract.",
+      "evidence_refs": [
+        "config/cad_job_operation_aliases.json#inspect.overrule.registry",
+        "tests/test_native_arx_dbx_contract.py::overruleRegistryJson"
+      ],
+      "phase_batch": "P2 Batch 3 Host-Bound Capability Contracts",
+      "target_family_first_class": false,
+      "wired_v1": true
+    },
+    {
+      "id": "live.overrule.enable",
+      "family": "live",
+      "status": "implemented",
+      "engine_tier": "native_arx_only",
+      "host_eligibility": [
+        "arx_adapter",
+        "full_autocad"
+      ],
+      "execution_context": "in_process_host",
+      "write_level": {
+        "default_write_mode": "live_edit",
+        "allowed_write_modes": [
+          "live_edit",
+          "write_original"
+        ],
+        "dwg_persisted": false
+      },
+      "handler": {
+        "router_lane": "ARIADNE_NATIVE_JOB",
+        "dispatcher_symbol": "enableObjectOverrule",
+        "execution_host_class": "arx_adapter",
+        "composed_of": [
+          "overrule.object.install",
+          "overrule.global.enable"
+        ]
+      },
+      "mapping_type": "alias",
+      "catalog_op_id": null,
+      "input_schema": "schemas/cad_job.v2.schema.json#/allOf",
+      "output_schema": "schemas/cad_result.v2.schema.json",
+      "summary": "Router job installs the Ariadne object overrule and enables the runtime overrule path.",
+      "evidence_refs": [
+        "config/cad_job_operation_aliases.json#live.overrule.enable",
+        "tests/test_native_arx_dbx_contract.py::enableObjectOverrule"
+      ],
+      "phase_batch": "P2 Batch 5 Overrule Registry and Jig Probe",
+      "target_family_first_class": false,
+      "wired_v1": true
+    },
+    {
+      "id": "live.overrule.disable",
+      "family": "live",
+      "status": "implemented",
+      "engine_tier": "native_arx_only",
+      "host_eligibility": [
+        "arx_adapter",
+        "full_autocad"
+      ],
+      "execution_context": "in_process_host",
+      "write_level": {
+        "default_write_mode": "live_edit",
+        "allowed_write_modes": [
+          "live_edit",
+          "write_original"
+        ],
+        "dwg_persisted": false
+      },
+      "handler": {
+        "router_lane": "ARIADNE_NATIVE_JOB",
+        "dispatcher_symbol": "disableObjectOverrule",
+        "execution_host_class": "arx_adapter",
+        "composed_of": [
+          "overrule.remove"
+        ]
+      },
+      "mapping_type": "alias",
+      "catalog_op_id": null,
+      "input_schema": "schemas/cad_job.v2.schema.json#/allOf",
+      "output_schema": "schemas/cad_result.v2.schema.json",
+      "summary": "Router job removes the Ariadne object overrule through the lower-level removal primitive.",
+      "evidence_refs": [
+        "config/cad_job_operation_aliases.json#live.overrule.disable",
+        "tests/test_native_arx_dbx_contract.py::disableObjectOverrule"
+      ],
+      "phase_batch": "P2 Batch 5 Overrule Registry and Jig Probe",
+      "target_family_first_class": false,
+      "wired_v1": true
+    },
+    {
+      "id": "inspect.jig.host_support",
+      "family": "inspect",
+      "status": "implemented",
+      "engine_tier": "accoreconsole_lisp_also",
+      "host_eligibility": [
+        "coreconsole",
+        "dbx",
+        "arx_adapter",
+        "full_autocad"
+      ],
+      "execution_context": "in_process_host",
+      "write_level": {
+        "default_write_mode": "read",
+        "allowed_write_modes": [
+          "read"
+        ],
+        "dwg_persisted": false
+      },
+      "handler": {
+        "router_lane": "ARIADNE_NATIVE_JOB",
+        "dispatcher_symbol": "jigHostSupportJson",
+        "execution_host_class": "coreconsole",
+        "composed_of": [
+          "interact.jig.acquire",
+          "interact.jig.run"
+        ]
+      },
+      "mapping_type": "synthetic",
+      "catalog_op_id": null,
+      "input_schema": "schemas/cad_job.v2.schema.json#/allOf",
+      "output_schema": "schemas/cad_result.v2.schema.json",
+      "summary": "Router job reports whether the current host can run interactive jig work.",
+      "evidence_refs": [
+        "config/cad_job_operation_aliases.json#inspect.jig.host_support",
+        "tests/test_native_arx_dbx_contract.py::jigHostSupportJson"
+      ],
+      "phase_batch": "P2 Batch 3 Host-Bound Capability Contracts",
+      "target_family_first_class": false,
+      "wired_v1": true
+    },
+    {
+      "id": "live.jig.point_probe",
+      "family": "live",
+      "status": "implemented",
+      "engine_tier": "native_arx_only",
+      "host_eligibility": [
+        "full_autocad"
+      ],
+      "execution_context": "in_process_host",
+      "write_level": {
+        "default_write_mode": "live_edit",
+        "allowed_write_modes": [
+          "live_edit",
+          "write_original"
+        ],
+        "dwg_persisted": false
+      },
+      "handler": {
+        "router_lane": "ARIADNE_NATIVE_JOB",
+        "dispatcher_symbol": "runLineJigProbe",
+        "execution_host_class": "full_autocad",
+        "composed_of": [
+          "interact.jig.acquire",
+          "interact.jig.run"
+        ]
+      },
+      "mapping_type": "alias",
+      "catalog_op_id": null,
+      "input_schema": "schemas/cad_job.v2.schema.json#/allOf",
+      "output_schema": "schemas/cad_result.v2.schema.json",
+      "summary": "Router job drives a point probe through the live jig path; Core Console can only report support status.",
+      "evidence_refs": [
+        "config/cad_job_operation_aliases.json#live.jig.point_probe",
+        "tests/test_native_arx_dbx_contract.py::runLineJigProbe"
+      ],
+      "phase_batch": "P2 Batch 5 Overrule Registry and Jig Probe",
+      "target_family_first_class": false,
+      "wired_v1": true
+    },
+    {
+      "id": "extend.customclass.create",
+      "family": "extend",
+      "status": "implemented",
+      "engine_tier": "native_arx_only",
+      "host_eligibility": [
+        "arx_adapter",
+        "full_autocad"
+      ],
+      "execution_context": "in_process_host",
+      "write_level": {
+        "default_write_mode": "live_edit",
+        "allowed_write_modes": [
+          "live_edit",
+          "write_original"
+        ],
+        "dwg_persisted": true
+      },
+      "handler": {
+        "router_lane": "ARIADNE_NATIVE_JOB",
+        "dispatcher_symbol": "createCustomEntity",
+        "execution_host_class": "arx_adapter",
+        "composed_of": [
+          "extend.customclass.declare",
+          "extend.customclass.define",
+          "extend.customclass.rxinit",
+          "extend.customentity.define",
+          "module.class.register_object"
+        ]
+      },
+      "mapping_type": "synthetic",
+      "catalog_op_id": null,
+      "input_schema": "schemas/cad_job.v2.schema.json#/allOf",
+      "output_schema": "schemas/cad_result.v2.schema.json",
+      "summary": "Router job creates an Ariadne custom entity instance; catalog entries describe class definition and registration primitives.",
+      "evidence_refs": [
+        "config/cad_job_operation_aliases.json#extend.customclass.create",
+        "tests/test_native_arx_dbx_contract.py::createCustomEntity"
+      ],
+      "phase_batch": "P1 Custom objects/protocols",
+      "target_family_first_class": false,
+      "wired_v1": true
+    },
+    {
+      "id": "inspect.customclass.count",
+      "family": "inspect",
+      "status": "implemented",
+      "engine_tier": "native_arx_only",
+      "host_eligibility": [
+        "arx_adapter",
+        "full_autocad"
+      ],
+      "execution_context": "in_process_host",
+      "write_level": {
+        "default_write_mode": "read",
+        "allowed_write_modes": [
+          "read"
+        ],
+        "dwg_persisted": false
+      },
+      "handler": {
+        "router_lane": "ARIADNE_NATIVE_JOB",
+        "dispatcher_symbol": "countCustomEntities",
+        "execution_host_class": "arx_adapter",
+        "composed_of": [
+          "inspect.runtime.iskindof",
+          "inspect.block.iterate"
+        ]
+      },
+      "mapping_type": "synthetic",
+      "catalog_op_id": null,
+      "input_schema": "schemas/cad_job.v2.schema.json#/allOf",
+      "output_schema": "schemas/cad_result.v2.schema.json",
+      "summary": "Router job counts Ariadne custom entity instances in model space; catalog exposes runtime and iteration primitives.",
+      "evidence_refs": [
+        "config/cad_job_operation_aliases.json#inspect.customclass.count",
+        "tests/test_native_arx_dbx_contract.py::countCustomEntities"
+      ],
+      "phase_batch": "P1 Custom objects/protocols",
+      "target_family_first_class": false,
+      "wired_v1": true
+    },
+    {
+      "id": "extend.customobject.create",
+      "family": "extend",
+      "status": "implemented",
+      "engine_tier": "native_arx_only",
+      "host_eligibility": [
+        "arx_adapter",
+        "full_autocad"
+      ],
+      "execution_context": "in_process_host",
+      "write_level": {
+        "default_write_mode": "live_edit",
+        "allowed_write_modes": [
+          "live_edit",
+          "write_original"
+        ],
+        "dwg_persisted": true
+      },
+      "handler": {
+        "router_lane": "ARIADNE_NATIVE_JOB",
+        "dispatcher_symbol": "createCustomObject",
+        "execution_host_class": "arx_adapter",
+        "composed_of": [
+          "extend.customobject.define",
+          "extend.customobject.filer_dwgout",
+          "write.xrecord.set"
+        ]
+      },
+      "mapping_type": "synthetic",
+      "catalog_op_id": null,
+      "input_schema": "schemas/cad_job.v2.schema.json#/allOf",
+      "output_schema": "schemas/cad_result.v2.schema.json",
+      "summary": "Router job creates an Ariadne custom DBObject record; catalog separates custom object definition, filing, and storage primitives.",
+      "evidence_refs": [
+        "config/cad_job_operation_aliases.json#extend.customobject.create",
+        "tests/test_native_arx_dbx_contract.py::createCustomObject"
+      ],
+      "phase_batch": "P1 Custom objects/protocols",
+      "target_family_first_class": false,
+      "wired_v1": true
+    },
+    {
+      "id": "inspect.customobject.count",
+      "family": "inspect",
+      "status": "implemented",
+      "engine_tier": "native_arx_only",
+      "host_eligibility": [
+        "arx_adapter",
+        "full_autocad"
+      ],
+      "execution_context": "in_process_host",
+      "write_level": {
+        "default_write_mode": "read",
+        "allowed_write_modes": [
+          "read"
+        ],
+        "dwg_persisted": false
+      },
+      "handler": {
+        "router_lane": "ARIADNE_NATIVE_JOB",
+        "dispatcher_symbol": "countCustomObjects",
+        "execution_host_class": "arx_adapter",
+        "composed_of": [
+          "extend.customobject.filer_dwgin",
+          "inspect.xrecord.get"
+        ]
+      },
+      "mapping_type": "synthetic",
+      "catalog_op_id": null,
+      "input_schema": "schemas/cad_job.v2.schema.json#/allOf",
+      "output_schema": "schemas/cad_result.v2.schema.json",
+      "summary": "Router job counts Ariadne custom DBObject records; catalog exposes filing/read primitives but no count operation.",
+      "evidence_refs": [
+        "config/cad_job_operation_aliases.json#inspect.customobject.count",
+        "tests/test_native_arx_dbx_contract.py::countCustomObjects"
+      ],
+      "phase_batch": "P1 Custom objects/protocols",
+      "target_family_first_class": false,
+      "wired_v1": true
+    },
+    {
+      "id": "inspect.protocol.queryx",
+      "family": "inspect",
+      "status": "implemented",
+      "engine_tier": "native_arx_only",
+      "host_eligibility": [
+        "arx_adapter",
+        "full_autocad"
+      ],
+      "execution_context": "in_process_host",
+      "write_level": {
+        "default_write_mode": "read",
+        "allowed_write_modes": [
+          "read"
+        ],
+        "dwg_persisted": false
+      },
+      "handler": {
+        "router_lane": "ARIADNE_NATIVE_JOB",
+        "dispatcher_symbol": "protocolQueryX",
+        "execution_host_class": "arx_adapter",
+        "composed_of": [
+          "extend.protocol.query",
+          "overrule.queryx.install"
+        ]
+      },
+      "mapping_type": "alias",
+      "catalog_op_id": null,
+      "input_schema": "schemas/cad_job.v2.schema.json#/allOf",
+      "output_schema": "schemas/cad_result.v2.schema.json",
+      "summary": "Router job probes Ariadne protocol availability; catalog has the lower-level protocol query primitive.",
+      "evidence_refs": [
+        "config/cad_job_operation_aliases.json#inspect.protocol.queryx",
+        "tests/test_native_arx_dbx_contract.py::protocolQueryX"
+      ],
+      "phase_batch": "P1 Custom objects/protocols",
+      "target_family_first_class": false,
+      "wired_v1": true
+    },
+    {
+      "id": "inspect.database.graph",
+      "family": "inspect",
+      "status": "implemented",
+      "engine_tier": "objectdbx_capable",
+      "host_eligibility": [
+        "dbx",
+        "coreconsole",
+        "arx_adapter",
+        "full_autocad"
+      ],
+      "execution_context": "hostless_dbx_in_accoreconsole",
+      "write_level": {
+        "default_write_mode": "read",
+        "allowed_write_modes": [
+          "read"
+        ],
+        "dwg_persisted": false
+      },
+      "handler": {
+        "router_lane": "ARIADNE_NATIVE_JOB",
+        "dispatcher_symbol": "collectModelSpaceGraph",
+        "execution_host_class": "dbx",
+        "composed_of": []
+      },
+      "mapping_type": "synthetic",
+      "catalog_op_id": null,
+      "input_schema": "schemas/cad_job.v2.schema.json#/allOf",
+      "output_schema": "schemas/dwg_graph_ir.v1.schema.json",
+      "summary": "Headless modelspace graph IR: one record per entity (handle, DXF type, layer, owner_handle, type-specific geometry). IMPLEMENTED: additive else-if branch in AriadneNativeJob.cpp (op==\"inspect.database.graph\") backed by the collectModelSpaceGraph helper (adjacent to inspect.database.summary). Compiled into Ariadne.AcadNative.crx and smoked via accoreconsole on a staged DWG copy: entities[] length equals modelspace_entities and equals inspect.database.summary's count (3==3 on the small drawing; 291706==291706 at scale). Known limitation: non-ASCII names funnel through acharToAscii -> '?' (M02). Router/registry allow-list wiring (autocad-router.ps1) is a separate follow-up; smoked directly, not via the router. NOTE: .arx relink was blocked by a live full_autocad session lock, so the full_autocad host carries the prior .arx until its next rebuild; the coreconsole host is fully updated.",
+      "evidence_refs": [
+        "docs/OPERATION_REGISTRY_SPEC.md",
+        "CADOS_M01 Lane D native triage (inspect.database.graph insertion point)",
+        "reports/native_graph_smoke_latest.json",
+        "reports/build_native_latest.log",
+        "runs/native_graph_20260621_234158/result_graph.json"
+      ],
+      "target_family_first_class": true,
+      "wired_v1": false
+    },
+    {
+      "id": "inspect.layers",
+      "family": "inspect",
+      "status": "stub",
+      "engine_tier": "objectdbx_capable",
+      "host_eligibility": [
+        "dbx",
+        "coreconsole",
+        "arx_adapter",
+        "full_autocad"
+      ],
+      "execution_context": "hostless_dbx_in_accoreconsole",
+      "write_level": {
+        "default_write_mode": "read",
+        "allowed_write_modes": [
+          "read"
+        ],
+        "dwg_persisted": false
+      },
+      "handler": {
+        "router_lane": "ARIADNE_NATIVE_JOB",
+        "dispatcher_symbol": null,
+        "execution_host_class": "dbx",
+        "composed_of": []
+      },
+      "mapping_type": "synthetic",
+      "catalog_op_id": null,
+      "input_schema": "schemas/cad_job.v2.schema.json#/allOf",
+      "output_schema": "schemas/dwg_graph_ir.v1.schema.json",
+      "summary": "Enumerate layer-table records with properties. Extends the existing countSymbolTable(layerTableId) walk to emit records.",
+      "evidence_refs": [
+        "docs/OPERATION_REGISTRY_SPEC.md",
+        "CADOS_M01 Lane D native triage (inspect.database.graph insertion point)"
+      ],
+      "target_family_first_class": true,
+      "wired_v1": false
+    },
+    {
+      "id": "inspect.blocks",
+      "family": "inspect",
+      "status": "stub",
+      "engine_tier": "objectdbx_capable",
+      "host_eligibility": [
+        "dbx",
+        "coreconsole",
+        "arx_adapter",
+        "full_autocad"
+      ],
+      "execution_context": "hostless_dbx_in_accoreconsole",
+      "write_level": {
+        "default_write_mode": "read",
+        "allowed_write_modes": [
+          "read"
+        ],
+        "dwg_persisted": false
+      },
+      "handler": {
+        "router_lane": "ARIADNE_NATIVE_JOB",
+        "dispatcher_symbol": null,
+        "execution_host_class": "dbx",
+        "composed_of": []
+      },
+      "mapping_type": "synthetic",
+      "catalog_op_id": null,
+      "input_schema": "schemas/cad_job.v2.schema.json#/allOf",
+      "output_schema": "schemas/dwg_graph_ir.v1.schema.json",
+      "summary": "Enumerate block-table definitions. Extends countBlockDefinitions to emit records instead of a count.",
+      "evidence_refs": [
+        "docs/OPERATION_REGISTRY_SPEC.md",
+        "CADOS_M01 Lane D native triage (inspect.database.graph insertion point)"
+      ],
+      "target_family_first_class": true,
+      "wired_v1": false
+    },
+    {
+      "id": "inspect.entities",
+      "family": "inspect",
+      "status": "stub",
+      "engine_tier": "objectdbx_capable",
+      "host_eligibility": [
+        "dbx",
+        "coreconsole",
+        "arx_adapter",
+        "full_autocad"
+      ],
+      "execution_context": "hostless_dbx_in_accoreconsole",
+      "write_level": {
+        "default_write_mode": "read",
+        "allowed_write_modes": [
+          "read"
+        ],
+        "dwg_persisted": false
+      },
+      "handler": {
+        "router_lane": "ARIADNE_NATIVE_JOB",
+        "dispatcher_symbol": null,
+        "execution_host_class": "dbx",
+        "composed_of": []
+      },
+      "mapping_type": "synthetic",
+      "catalog_op_id": null,
+      "input_schema": "schemas/cad_job.v2.schema.json#/allOf",
+      "output_schema": "schemas/dwg_graph_ir.v1.schema.json",
+      "summary": "Per-entity inspection beyond counts. Sibling/subset of inspect.database.graph.",
+      "evidence_refs": [
+        "docs/OPERATION_REGISTRY_SPEC.md",
+        "CADOS_M01 Lane D native triage (inspect.database.graph insertion point)"
+      ],
+      "target_family_first_class": true,
+      "wired_v1": false
+    },
+    {
+      "id": "query.entities",
+      "family": "query",
+      "status": "stub",
+      "engine_tier": "objectdbx_capable",
+      "host_eligibility": [
+        "dbx",
+        "coreconsole",
+        "arx_adapter",
+        "full_autocad"
+      ],
+      "execution_context": "hostless_dbx_in_accoreconsole",
+      "write_level": {
+        "default_write_mode": "read",
+        "allowed_write_modes": [
+          "read"
+        ],
+        "dwg_persisted": false
+      },
+      "handler": {
+        "router_lane": "ARIADNE_NATIVE_JOB",
+        "dispatcher_symbol": null,
+        "execution_host_class": "dbx",
+        "composed_of": []
+      },
+      "mapping_type": "synthetic",
+      "catalog_op_id": null,
+      "input_schema": "schemas/cad_job.v2.schema.json#/allOf",
+      "output_schema": "schemas/dwg_graph_ir.v1.schema.json",
+      "summary": "Filtered entity query (by type/layer/handle). Selection-set primitive layered over the modelspace graph walk.",
+      "evidence_refs": [
+        "docs/OPERATION_REGISTRY_SPEC.md",
+        "CADOS_M01 Lane D native triage (inspect.database.graph insertion point)"
+      ],
+      "target_family_first_class": true,
+      "wired_v1": false
+    },
+    {
+      "id": "render.layout",
+      "family": "render",
+      "status": "blocked",
+      "engine_tier": "native_arx_only",
+      "host_eligibility": [
+        "full_autocad"
+      ],
+      "execution_context": "in_process_host",
+      "write_level": {
+        "default_write_mode": "read",
+        "allowed_write_modes": [
+          "read"
+        ],
+        "dwg_persisted": false
+      },
+      "handler": {
+        "router_lane": "full_autocad",
+        "dispatcher_symbol": null,
+        "execution_host_class": "full_autocad",
+        "composed_of": []
+      },
+      "mapping_type": "synthetic",
+      "catalog_op_id": null,
+      "input_schema": "schemas/cad_job.v2.schema.json#/allOf",
+      "output_schema": "schemas/visual_artifact.v1.schema.json",
+      "summary": "Layout/plot render to image. Plot/publish is host-bound (full AutoCAD) and not headless-safe.",
+      "evidence_refs": [
+        "docs/OPERATION_REGISTRY_SPEC.md",
+        "CADOS_M01 Lane D native triage (inspect.database.graph insertion point)"
+      ],
+      "target_family_first_class": true,
+      "wired_v1": false,
+      "blocked_reason": "Requires full_autocad plot/publish host; no headless render path implemented (no-fake-success)."
+    },
+    {
+      "id": "apply.patch",
+      "family": "apply",
+      "status": "stub",
+      "engine_tier": "objectdbx_capable",
+      "host_eligibility": [
+        "dbx",
+        "coreconsole",
+        "arx_adapter",
+        "full_autocad"
+      ],
+      "execution_context": "hostless_dbx_in_accoreconsole",
+      "write_level": {
+        "default_write_mode": "write_copy",
+        "allowed_write_modes": [
+          "write_copy",
+          "write_original"
+        ],
+        "dwg_persisted": true
+      },
+      "handler": {
+        "router_lane": "ARIADNE_NATIVE_JOB",
+        "dispatcher_symbol": null,
+        "execution_host_class": "dbx",
+        "composed_of": []
+      },
+      "mapping_type": "synthetic",
+      "catalog_op_id": null,
+      "input_schema": "schemas/cad_job.v2.schema.json#/allOf",
+      "output_schema": "schemas/cad_result.v2.schema.json",
+      "summary": "Apply a structured edit patch to a staged DWG copy. Composes write.* primitives under copy+backup+journal+validation. Not yet built.",
+      "evidence_refs": [
+        "docs/OPERATION_REGISTRY_SPEC.md",
+        "CADOS_M01 Lane D native triage (inspect.database.graph insertion point)"
+      ],
+      "target_family_first_class": true,
+      "wired_v1": false
+    },
+    {
+      "id": "validate.patch",
+      "family": "validate",
+      "status": "stub",
+      "engine_tier": "objectdbx_capable",
+      "host_eligibility": [
+        "dbx",
+        "coreconsole",
+        "arx_adapter",
+        "full_autocad"
+      ],
+      "execution_context": "hostless_dbx_in_accoreconsole",
+      "write_level": {
+        "default_write_mode": "read",
+        "allowed_write_modes": [
+          "read"
+        ],
+        "dwg_persisted": false
+      },
+      "handler": {
+        "router_lane": "ARIADNE_NATIVE_JOB",
+        "dispatcher_symbol": null,
+        "execution_host_class": "dbx",
+        "composed_of": []
+      },
+      "mapping_type": "synthetic",
+      "catalog_op_id": null,
+      "input_schema": "schemas/cad_job.v2.schema.json#/allOf",
+      "output_schema": "schemas/validation_report.v1.schema.json",
+      "summary": "Validate a patch payload against schema + DB preconditions WITHOUT writing. Read-only dry-run for apply.patch.",
+      "evidence_refs": [
+        "docs/OPERATION_REGISTRY_SPEC.md",
+        "CADOS_M01 Lane D native triage (inspect.database.graph insertion point)"
+      ],
+      "target_family_first_class": true,
+      "wired_v1": false
+    },
+    {
+      "id": "diff.before_after",
+      "family": "diff",
+      "status": "stub",
+      "engine_tier": "objectdbx_capable",
+      "host_eligibility": [
+        "dbx",
+        "coreconsole",
+        "arx_adapter",
+        "full_autocad"
+      ],
+      "execution_context": "hostless_dbx_in_accoreconsole",
+      "write_level": {
+        "default_write_mode": "read",
+        "allowed_write_modes": [
+          "read"
+        ],
+        "dwg_persisted": false
+      },
+      "handler": {
+        "router_lane": "ARIADNE_NATIVE_JOB",
+        "dispatcher_symbol": null,
+        "execution_host_class": "dbx",
+        "composed_of": [
+          "inspect.database.graph"
+        ]
+      },
+      "mapping_type": "synthetic",
+      "catalog_op_id": null,
+      "input_schema": "schemas/cad_job.v2.schema.json#/allOf",
+      "output_schema": "schemas/cad_diff.v1.schema.json",
+      "summary": "Compare two DWG/graph snapshots (entity-level add/remove/change). Composes two inspect.database.graph reads; diff math in python.",
+      "evidence_refs": [
+        "docs/OPERATION_REGISTRY_SPEC.md",
+        "CADOS_M01 Lane D native triage (inspect.database.graph insertion point)"
+      ],
+      "target_family_first_class": true,
+      "wired_v1": false
+    },
+    {
+      "id": "live.status",
+      "family": "live",
+      "status": "stub",
+      "engine_tier": "managed_also",
+      "host_eligibility": [
+        "full_autocad"
+      ],
+      "execution_context": "in_process_host",
+      "write_level": {
+        "default_write_mode": "read",
+        "allowed_write_modes": [
+          "read"
+        ],
+        "dwg_persisted": false
+      },
+      "handler": {
+        "router_lane": "full_autocad",
+        "dispatcher_symbol": null,
+        "execution_host_class": "full_autocad",
+        "composed_of": []
+      },
+      "mapping_type": "synthetic",
+      "catalog_op_id": null,
+      "input_schema": "schemas/cad_job.v2.schema.json#/allOf",
+      "output_schema": "schemas/cad_result.v2.schema.json",
+      "summary": "Report live active-document session status (open document, modified flag). Host-bound to the full AutoCAD active document.",
+      "evidence_refs": [
+        "docs/OPERATION_REGISTRY_SPEC.md",
+        "CADOS_M01 Lane D native triage (inspect.database.graph insertion point)"
+      ],
+      "target_family_first_class": true,
+      "wired_v1": false
+    },
+    {
+      "id": "live.apply_patch",
+      "family": "live",
+      "status": "blocked",
+      "engine_tier": "native_arx_only",
+      "host_eligibility": [
+        "full_autocad"
+      ],
+      "execution_context": "in_process_host",
+      "write_level": {
+        "default_write_mode": "live_edit",
+        "allowed_write_modes": [
+          "live_edit",
+          "write_original"
+        ],
+        "dwg_persisted": true
+      },
+      "handler": {
+        "router_lane": "full_autocad",
+        "dispatcher_symbol": null,
+        "execution_host_class": "full_autocad",
+        "composed_of": []
+      },
+      "mapping_type": "synthetic",
+      "catalog_op_id": null,
+      "input_schema": "schemas/cad_job.v2.schema.json#/allOf",
+      "output_schema": "schemas/cad_result.v2.schema.json",
+      "summary": "Apply a patch to the live active document. Requires full_autocad + explicit write_original approval.",
+      "evidence_refs": [
+        "docs/OPERATION_REGISTRY_SPEC.md",
+        "CADOS_M01 Lane D native triage (inspect.database.graph insertion point)"
+      ],
+      "target_family_first_class": true,
+      "wired_v1": false,
+      "blocked_reason": "Requires full_autocad live_edit host + explicit write_original approval; not implemented (no-fake-success)."
+    }
+  ],
+  "catalog_families": [
+    {
+      "id": "catalog.family.active_document_write_original",
+      "family": "active_document_write_original",
+      "status": "catalogued",
+      "engine_tier": "managed_also",
+      "host_eligibility": [
+        "arx_adapter",
+        "full_autocad"
+      ],
+      "write_level": {
+        "default_write_mode": "read",
+        "allowed_write_modes": [
+          "read"
+        ]
+      },
+      "handler": {
+        "router_lane": null,
+        "dispatcher_symbol": null,
+        "composed_of": []
+      },
+      "catalog_op_count": 8,
+      "by_tier": {
+        "native_arx_only": 1,
+        "accoreconsole_lisp_also": 3,
+        "managed_also": 4
+      },
+      "already_implemented_managed_count": 0,
+      "evidence_refs": [
+        "config/autocad_native_arx_operation_catalog.json (family=active_document_write_original, count=8)"
+      ],
+      "is_family_head": true,
+      "wired_v1": false
+    },
+    {
+      "id": "catalog.family.blocks_xrefs_clone",
+      "family": "blocks_xrefs_clone",
+      "status": "catalogued",
+      "engine_tier": "objectdbx_capable",
+      "host_eligibility": [
+        "dbx",
+        "coreconsole",
+        "arx_adapter",
+        "full_autocad"
+      ],
+      "write_level": {
+        "default_write_mode": "read",
+        "allowed_write_modes": [
+          "read"
+        ]
+      },
+      "handler": {
+        "router_lane": null,
+        "dispatcher_symbol": null,
+        "composed_of": []
+      },
+      "catalog_op_count": 5,
+      "by_tier": {
+        "objectdbx_capable": 4,
+        "native_arx_only": 1
+      },
+      "already_implemented_managed_count": 0,
+      "evidence_refs": [
+        "config/autocad_native_arx_operation_catalog.json (family=blocks_xrefs_clone, count=5)"
+      ],
+      "is_family_head": true,
+      "wired_v1": false
+    },
+    {
+      "id": "catalog.family.brep_solids",
+      "family": "brep_solids",
+      "status": "catalogued",
+      "engine_tier": "objectdbx_capable",
+      "host_eligibility": [
+        "dbx",
+        "coreconsole",
+        "arx_adapter",
+        "full_autocad"
+      ],
+      "write_level": {
+        "default_write_mode": "read",
+        "allowed_write_modes": [
+          "read"
+        ]
+      },
+      "handler": {
+        "router_lane": null,
+        "dispatcher_symbol": null,
+        "composed_of": []
+      },
+      "catalog_op_count": 54,
+      "by_tier": {
+        "objectdbx_capable": 44,
+        "native_arx_only": 10
+      },
+      "already_implemented_managed_count": 0,
+      "evidence_refs": [
+        "config/autocad_native_arx_operation_catalog.json (family=brep_solids, count=54)"
+      ],
+      "is_family_head": true,
+      "wired_v1": false
+    },
+    {
+      "id": "catalog.family.com_activex",
+      "family": "com_activex",
+      "status": "catalogued",
+      "engine_tier": "native_arx_only",
+      "host_eligibility": [
+        "arx_adapter",
+        "full_autocad"
+      ],
+      "write_level": {
+        "default_write_mode": "read",
+        "allowed_write_modes": [
+          "read"
+        ]
+      },
+      "handler": {
+        "router_lane": null,
+        "dispatcher_symbol": null,
+        "composed_of": []
+      },
+      "catalog_op_count": 49,
+      "by_tier": {
+        "objectdbx_capable": 8,
+        "native_arx_only": 38,
+        "managed_also": 3
+      },
+      "already_implemented_managed_count": 0,
+      "evidence_refs": [
+        "config/autocad_native_arx_operation_catalog.json (family=com_activex, count=49)"
+      ],
+      "is_family_head": true,
+      "wired_v1": false
+    },
+    {
+      "id": "catalog.family.constraints_associativity",
+      "family": "constraints_associativity",
+      "status": "catalogued",
+      "engine_tier": "objectdbx_capable",
+      "host_eligibility": [
+        "dbx",
+        "coreconsole",
+        "arx_adapter",
+        "full_autocad"
+      ],
+      "write_level": {
+        "default_write_mode": "read",
+        "allowed_write_modes": [
+          "read"
+        ]
+      },
+      "handler": {
+        "router_lane": null,
+        "dispatcher_symbol": null,
+        "composed_of": []
+      },
+      "catalog_op_count": 58,
+      "by_tier": {
+        "native_arx_only": 19,
+        "objectdbx_capable": 39
+      },
+      "already_implemented_managed_count": 0,
+      "evidence_refs": [
+        "config/autocad_native_arx_operation_catalog.json (family=constraints_associativity, count=58)"
+      ],
+      "is_family_head": true,
+      "wired_v1": false
+    },
+    {
+      "id": "catalog.family.custom_objects_protocols",
+      "family": "custom_objects_protocols",
+      "status": "catalogued",
+      "engine_tier": "native_arx_only",
+      "host_eligibility": [
+        "arx_adapter",
+        "full_autocad"
+      ],
+      "write_level": {
+        "default_write_mode": "read",
+        "allowed_write_modes": [
+          "read"
+        ]
+      },
+      "handler": {
+        "router_lane": null,
+        "dispatcher_symbol": null,
+        "composed_of": []
+      },
+      "catalog_op_count": 63,
+      "by_tier": {
+        "native_arx_only": 41,
+        "objectdbx_capable": 5,
+        "accoreconsole_lisp_also": 1,
+        "managed_also": 16
+      },
+      "already_implemented_managed_count": 0,
+      "evidence_refs": [
+        "config/autocad_native_arx_operation_catalog.json (family=custom_objects_protocols, count=63)"
+      ],
+      "is_family_head": true,
+      "wired_v1": false
+    },
+    {
+      "id": "catalog.family.editor_input",
+      "family": "editor_input",
+      "status": "catalogued",
+      "engine_tier": "native_arx_only",
+      "host_eligibility": [
+        "arx_adapter",
+        "full_autocad"
+      ],
+      "write_level": {
+        "default_write_mode": "read",
+        "allowed_write_modes": [
+          "read"
+        ]
+      },
+      "handler": {
+        "router_lane": null,
+        "dispatcher_symbol": null,
+        "composed_of": []
+      },
+      "catalog_op_count": 27,
+      "by_tier": {
+        "native_arx_only": 13,
+        "accoreconsole_lisp_also": 10,
+        "managed_also": 4
+      },
+      "already_implemented_managed_count": 0,
+      "evidence_refs": [
+        "config/autocad_native_arx_operation_catalog.json (family=editor_input, count=27)"
+      ],
+      "is_family_head": true,
+      "wired_v1": false
+    },
+    {
+      "id": "catalog.family.entities",
+      "family": "entities",
+      "status": "catalogued",
+      "engine_tier": "objectdbx_capable",
+      "host_eligibility": [
+        "dbx",
+        "coreconsole",
+        "arx_adapter",
+        "full_autocad"
+      ],
+      "write_level": {
+        "default_write_mode": "read",
+        "allowed_write_modes": [
+          "read"
+        ]
+      },
+      "handler": {
+        "router_lane": null,
+        "dispatcher_symbol": null,
+        "composed_of": []
+      },
+      "catalog_op_count": 56,
+      "by_tier": {
+        "objectdbx_capable": 56
+      },
+      "already_implemented_managed_count": 0,
+      "evidence_refs": [
+        "config/autocad_native_arx_operation_catalog.json (family=entities, count=56)"
+      ],
+      "is_family_head": true,
+      "wired_v1": false
+    },
+    {
+      "id": "catalog.family.geometry_kernel",
+      "family": "geometry_kernel",
+      "status": "catalogued",
+      "engine_tier": "native_arx_only",
+      "host_eligibility": [
+        "arx_adapter",
+        "full_autocad"
+      ],
+      "write_level": {
+        "default_write_mode": "read",
+        "allowed_write_modes": [
+          "read"
+        ]
+      },
+      "handler": {
+        "router_lane": null,
+        "dispatcher_symbol": null,
+        "composed_of": []
+      },
+      "catalog_op_count": 25,
+      "by_tier": {
+        "objectdbx_capable": 9,
+        "native_arx_only": 16
+      },
+      "already_implemented_managed_count": 1,
+      "evidence_refs": [
+        "config/autocad_native_arx_operation_catalog.json (family=geometry_kernel, count=25)"
+      ],
+      "is_family_head": true,
+      "wired_v1": false
+    },
+    {
+      "id": "catalog.family.graphics_system",
+      "family": "graphics_system",
+      "status": "catalogued",
+      "engine_tier": "native_arx_only",
+      "host_eligibility": [
+        "arx_adapter",
+        "full_autocad"
+      ],
+      "write_level": {
+        "default_write_mode": "read",
+        "allowed_write_modes": [
+          "read"
+        ]
+      },
+      "handler": {
+        "router_lane": null,
+        "dispatcher_symbol": null,
+        "composed_of": []
+      },
+      "catalog_op_count": 9,
+      "by_tier": {
+        "native_arx_only": 9
+      },
+      "already_implemented_managed_count": 0,
+      "evidence_refs": [
+        "config/autocad_native_arx_operation_catalog.json (family=graphics_system, count=9)"
+      ],
+      "is_family_head": true,
+      "wired_v1": false
+    },
+    {
+      "id": "catalog.family.layouts_plot_publish",
+      "family": "layouts_plot_publish",
+      "status": "catalogued",
+      "engine_tier": "managed_also",
+      "host_eligibility": [
+        "arx_adapter",
+        "full_autocad"
+      ],
+      "write_level": {
+        "default_write_mode": "read",
+        "allowed_write_modes": [
+          "read"
+        ]
+      },
+      "handler": {
+        "router_lane": null,
+        "dispatcher_symbol": null,
+        "composed_of": []
+      },
+      "catalog_op_count": 2,
+      "by_tier": {
+        "managed_also": 2
+      },
+      "already_implemented_managed_count": 0,
+      "evidence_refs": [
+        "config/autocad_native_arx_operation_catalog.json (family=layouts_plot_publish, count=2)"
+      ],
+      "is_family_head": true,
+      "wired_v1": false
+    },
+    {
+      "id": "catalog.family.objectdbx_database",
+      "family": "objectdbx_database",
+      "status": "catalogued",
+      "engine_tier": "objectdbx_capable",
+      "host_eligibility": [
+        "dbx",
+        "coreconsole",
+        "arx_adapter",
+        "full_autocad"
+      ],
+      "write_level": {
+        "default_write_mode": "read",
+        "allowed_write_modes": [
+          "read"
+        ]
+      },
+      "handler": {
+        "router_lane": null,
+        "dispatcher_symbol": null,
+        "composed_of": []
+      },
+      "catalog_op_count": 21,
+      "by_tier": {
+        "objectdbx_capable": 17,
+        "native_arx_only": 3,
+        "managed_also": 1
+      },
+      "already_implemented_managed_count": 1,
+      "evidence_refs": [
+        "config/autocad_native_arx_operation_catalog.json (family=objectdbx_database, count=21)"
+      ],
+      "is_family_head": true,
+      "wired_v1": false
+    },
+    {
+      "id": "catalog.family.reactors_events",
+      "family": "reactors_events",
+      "status": "catalogued",
+      "engine_tier": "managed_also",
+      "host_eligibility": [
+        "arx_adapter",
+        "full_autocad"
+      ],
+      "write_level": {
+        "default_write_mode": "read",
+        "allowed_write_modes": [
+          "read"
+        ]
+      },
+      "handler": {
+        "router_lane": null,
+        "dispatcher_symbol": null,
+        "composed_of": []
+      },
+      "catalog_op_count": 22,
+      "by_tier": {
+        "native_arx_only": 9,
+        "managed_also": 13
+      },
+      "already_implemented_managed_count": 0,
+      "evidence_refs": [
+        "config/autocad_native_arx_operation_catalog.json (family=reactors_events, count=22)"
+      ],
+      "is_family_head": true,
+      "wired_v1": false
+    },
+    {
+      "id": "catalog.family.runtime_commands",
+      "family": "runtime_commands",
+      "status": "catalogued",
+      "engine_tier": "native_arx_only",
+      "host_eligibility": [
+        "arx_adapter",
+        "full_autocad"
+      ],
+      "write_level": {
+        "default_write_mode": "read",
+        "allowed_write_modes": [
+          "read"
+        ]
+      },
+      "handler": {
+        "router_lane": null,
+        "dispatcher_symbol": null,
+        "composed_of": []
+      },
+      "catalog_op_count": 26,
+      "by_tier": {
+        "native_arx_only": 23,
+        "objectdbx_capable": 1,
+        "accoreconsole_lisp_also": 2
+      },
+      "already_implemented_managed_count": 0,
+      "evidence_refs": [
+        "config/autocad_native_arx_operation_catalog.json (family=runtime_commands, count=26)"
+      ],
+      "is_family_head": true,
+      "wired_v1": false
+    },
+    {
+      "id": "catalog.family.symbol_tables_dictionaries",
+      "family": "symbol_tables_dictionaries",
+      "status": "catalogued",
+      "engine_tier": "objectdbx_capable",
+      "host_eligibility": [
+        "dbx",
+        "coreconsole",
+        "arx_adapter",
+        "full_autocad"
+      ],
+      "write_level": {
+        "default_write_mode": "read",
+        "allowed_write_modes": [
+          "read"
+        ]
+      },
+      "handler": {
+        "router_lane": null,
+        "dispatcher_symbol": null,
+        "composed_of": []
+      },
+      "catalog_op_count": 16,
+      "by_tier": {
+        "objectdbx_capable": 15,
+        "native_arx_only": 1
+      },
+      "already_implemented_managed_count": 2,
+      "evidence_refs": [
+        "config/autocad_native_arx_operation_catalog.json (family=symbol_tables_dictionaries, count=16)"
+      ],
+      "is_family_head": true,
+      "wired_v1": false
+    },
+    {
+      "id": "catalog.family.ui_customization",
+      "family": "ui_customization",
+      "status": "catalogued",
+      "engine_tier": "native_arx_only",
+      "host_eligibility": [
+        "arx_adapter",
+        "full_autocad"
+      ],
+      "write_level": {
+        "default_write_mode": "read",
+        "allowed_write_modes": [
+          "read"
+        ]
+      },
+      "handler": {
+        "router_lane": null,
+        "dispatcher_symbol": null,
+        "composed_of": []
+      },
+      "catalog_op_count": 39,
+      "by_tier": {
+        "native_arx_only": 37,
+        "managed_also": 2
+      },
+      "already_implemented_managed_count": 0,
+      "evidence_refs": [
+        "config/autocad_native_arx_operation_catalog.json (family=ui_customization, count=39)"
+      ],
+      "is_family_head": true,
+      "wired_v1": false
+    }
+  ]
+}

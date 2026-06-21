@@ -1,0 +1,89 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "ariadne.validation_report.v1",
+  "title": "Ariadne Validation Report v1",
+  "description": "Result of validating a drawing/extraction/patch against a set of gates. The canonical home of the entity-count truth gate (e.g. extracted entities[] length == asserted modelspace_count == cross-engine count). status is the overall verdict; gates[] is the per-gate breakdown where each gate carries its own pass/fail plus expected/actual evidence so a failure is never silent. errors[]/warnings[] aggregate issues; artifacts[] references supporting files. additionalProperties true for extension.",
+  "type": "object",
+  "additionalProperties": true,
+  "required": ["schema", "validation_id", "status", "gates", "errors", "warnings", "artifacts"],
+  "properties": {
+    "schema": { "type": "string", "const": "ariadne.validation_report.v1" },
+    "validation_id": { "type": "string", "minLength": 1 },
+    "subject_ref": {
+      "type": "object",
+      "description": "What was validated (a DWG, an IR document, an extract, a patch result, or a diff).",
+      "additionalProperties": true,
+      "properties": {
+        "kind": {
+          "type": "string",
+          "enum": ["dwg", "ir", "extract", "patch_result", "diff", "cad_result"]
+        },
+        "ref": { "type": "string" }
+      }
+    },
+    "status": {
+      "type": "string",
+      "description": "Overall verdict. pass = all required gates passed. fail = at least one required gate failed. partial = some non-required gates failed / partial coverage. blocked = validation could not run (missing input/host); never report pass when a required gate did not actually execute (no-fake-success).",
+      "enum": ["pass", "fail", "partial", "blocked"]
+    },
+    "gates": {
+      "type": "array",
+      "description": "Per-gate results. Each gate has an id, a status, and expected vs actual evidence. The entity-count truth gate lives here (gate id e.g. 'entity_count_truth').",
+      "items": { "$ref": "#/$defs/gate" }
+    },
+    "errors": { "type": "array", "items": { "type": "string" } },
+    "warnings": { "type": "array", "items": { "type": "string" } },
+    "artifacts": {
+      "type": "array",
+      "description": "Supporting artifacts (extract JSON, IR doc, logs).",
+      "items": {
+        "type": "object",
+        "additionalProperties": true,
+        "required": ["kind", "ref"],
+        "properties": {
+          "kind": { "type": "string" },
+          "ref": { "type": "string" }
+        }
+      }
+    },
+    "summary": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "gates_total": { "type": "integer", "minimum": 0 },
+        "gates_passed": { "type": "integer", "minimum": 0 },
+        "gates_failed": { "type": "integer", "minimum": 0 },
+        "gates_skipped": { "type": "integer", "minimum": 0 }
+      }
+    }
+  },
+  "$defs": {
+    "gate": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": ["id", "status"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1, "description": "Gate identifier (e.g. entity_count_truth, coordinate_payloads_present, cross_engine_agreement, postconditions_met)." },
+        "description": { "type": "string" },
+        "required": {
+          "type": "boolean",
+          "default": true,
+          "description": "When true, a failed gate forces overall status fail. When false, a failure only downgrades to partial."
+        },
+        "status": {
+          "type": "string",
+          "enum": ["pass", "fail", "skipped", "blocked"]
+        },
+        "expected": { "description": "Expected value/assertion (e.g. 21747)." },
+        "actual": { "description": "Observed value (e.g. 21747)." },
+        "operator": {
+          "type": "string",
+          "enum": ["eq", "ne", "gt", "ge", "lt", "le", "exists", "not_exists"],
+          "description": "Comparison used to decide pass/fail."
+        },
+        "message": { "type": "string", "description": "Human explanation, especially on failure." },
+        "evidence_ref": { "type": "string", "description": "Path/id of evidence backing this gate (e.g. the extract JSON that yielded actual)." }
+      }
+    }
+  }
+}

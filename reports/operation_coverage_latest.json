@@ -1,0 +1,327 @@
+{
+  "schema": "ariadne.cad_os.operation_coverage.v1",
+  "generated_at": "2026-06-22T00:02:38+09:00",
+  "packet_id": "CADOS_M01_FULL_STACK_ULTRACODE_BUILD",
+  "source": "config/operations.v2.json (ariadne.operations_registry.v2 v2.0.0)",
+  "catalog": {
+    "total_ops": 480,
+    "family_heads": 16,
+    "by_family": {
+      "active_document_write_original": 8,
+      "blocks_xrefs_clone": 5,
+      "brep_solids": 54,
+      "com_activex": 49,
+      "constraints_associativity": 58,
+      "custom_objects_protocols": 63,
+      "editor_input": 27,
+      "entities": 56,
+      "geometry_kernel": 25,
+      "graphics_system": 9,
+      "layouts_plot_publish": 2,
+      "objectdbx_database": 21,
+      "reactors_events": 22,
+      "runtime_commands": 26,
+      "symbol_tables_dictionaries": 16,
+      "ui_customization": 39
+    },
+    "by_family_sum_check_from_map": 480,
+    "by_family_sum_check_from_family_heads": 480,
+    "by_tier": {
+      "native_arx_only": 221,
+      "accoreconsole_lisp_also": 16,
+      "managed_also": 45,
+      "objectdbx_capable": 198
+    }
+  },
+  "registry_first_class": {
+    "operations_modeled": 40,
+    "by_status": {
+      "implemented": 30,
+      "stub": 8,
+      "blocked": 2
+    },
+    "by_status_sum_check": 40,
+    "by_engine_tier": {
+      "managed_also": 2,
+      "objectdbx_capable": 22,
+      "accoreconsole_lisp_also": 4,
+      "native_arx_only": 12
+    },
+    "by_family": {
+      "objectdbx_database": 1,
+      "symbol_tables_dictionaries": 3,
+      "geometry_kernel": 2,
+      "inspect": 16,
+      "write": 4,
+      "live": 7,
+      "extend": 2,
+      "query": 1,
+      "render": 1,
+      "apply": 1,
+      "validate": 1,
+      "diff": 1
+    }
+  },
+  "implemented_breakdown": {
+    "total_implemented": 30,
+    "v1_wired": 29,
+    "synthetic_native_new_this_packet": [
+      "inspect.database.graph"
+    ],
+    "by_route_class": {
+      "native_or_objectdbx_or_coreconsole": 29,
+      "managed_dotnet": 1
+    },
+    "note": "30 implemented = 29 v1-wired ops + 1 synthetic native op (inspect.database.graph, wired_v1=false, built into Ariadne.AcadNative.crx). coverage.wired_ops=29 is the v1 baseline; coverage.wired_native=28 + wired_managed=1 = 29."
+  },
+  "v1_wired_ops": [
+    {
+      "id": "inspect.database.summary",
+      "status": "implemented",
+      "engine_tier": "managed_also",
+      "router_lane": "ARIADNE_CAD_JOB",
+      "execution_host_class": "dbx"
+    },
+    {
+      "id": "write.layer.create",
+      "status": "implemented",
+      "engine_tier": "objectdbx_capable",
+      "router_lane": "ARIADNE_NATIVE_JOB",
+      "execution_host_class": "dbx"
+    },
+    {
+      "id": "write.entity.line",
+      "status": "implemented",
+      "engine_tier": "objectdbx_capable",
+      "router_lane": "ARIADNE_NATIVE_JOB",
+      "execution_host_class": "dbx"
+    },
+    {
+      "id": "write.entity.circle",
+      "status": "implemented",
+      "engine_tier": "objectdbx_capable",
+      "router_lane": "ARIADNE_NATIVE_JOB",
+      "execution_host_class": "dbx"
+    },
+    {
+      "id": "inspect.entity.count",
+      "status": "implemented",
+      "engine_tier": "objectdbx_capable",
+      "router_lane": "ARIADNE_NATIVE_JOB",
+      "execution_host_class": "dbx"
+    },
+    {
+      "id": "write.xrecord.set",
+      "status": "implemented",
+      "engine_tier": "objectdbx_capable",
+      "router_lane": "ARIADNE_NATIVE_JOB",
+      "execution_host_class": "dbx"
+    },
+    {
+      "id": "inspect.xrecord.get",
+      "status": "implemented",
+      "engine_tier": "objectdbx_capable",
+      "router_lane": "ARIADNE_NATIVE_JOB",
+      "execution_host_class": "dbx"
+    },
+    {
+      "id": "write.xdata.set",
+      "status": "implemented",
+      "engine_tier": "objectdbx_capable",
+      "router_lane": "ARIADNE_NATIVE_JOB",
+      "execution_host_class": "dbx"
+    },
+    {
+      "id": "inspect.xdata.get",
+      "status": "implemented",
+      "engine_tier": "objectdbx_capable",
+      "router_lane": "ARIADNE_NATIVE_JOB",
+      "execution_host_class": "dbx"
+    },
+    {
+      "id": "write.block.simple_create",
+      "status": "implemented",
+      "engine_tier": "objectdbx_capable",
+      "router_lane": "ARIADNE_NATIVE_JOB",
+      "execution_host_class": "dbx"
+    },
+    {
+      "id": "write.block.insert",
+      "status": "implemented",
+      "engine_tier": "objectdbx_capable",
+      "router_lane": "ARIADNE_NATIVE_JOB",
+      "execution_host_class": "dbx"
+    },
+    {
+      "id": "inspect.block.count",
+      "status": "implemented",
+      "engine_tier": "objectdbx_capable",
+      "router_lane": "ARIADNE_NATIVE_JOB",
+      "execution_host_class": "dbx"
+    },
+    {
+      "id": "write.layout.create",
+      "status": "implemented",
+      "engine_tier": "objectdbx_capable",
+      "router_lane": "ARIADNE_NATIVE_JOB",
+      "execution_host_class": "dbx"
+    },
+    {
+      "id": "inspect.layout.list",
+      "status": "implemented",
+      "engine_tier": "objectdbx_capable",
+      "router_lane": "ARIADNE_NATIVE_JOB",
+      "execution_host_class": "dbx"
+    },
+    {
+      "id": "inspect.xref.list",
+      "status": "implemented",
+      "engine_tier": "objectdbx_capable",
+      "router_lane": "ARIADNE_NATIVE_JOB",
+      "execution_host_class": "dbx"
+    },
+    {
+      "id": "inspect.runtime.capabilities",
+      "status": "implemented",
+      "engine_tier": "accoreconsole_lisp_also",
+      "router_lane": "ARIADNE_NATIVE_JOB",
+      "execution_host_class": "coreconsole"
+    },
+    {
+      "id": "live.reactor.enable",
+      "status": "implemented",
+      "engine_tier": "native_arx_only",
+      "router_lane": "ARIADNE_NATIVE_JOB",
+      "execution_host_class": "arx_adapter"
+    },
+    {
+      "id": "inspect.reactor.registry",
+      "status": "implemented",
+      "engine_tier": "accoreconsole_lisp_also",
+      "router_lane": "ARIADNE_NATIVE_JOB",
+      "execution_host_class": "coreconsole"
+    },
+    {
+      "id": "live.reactor.disable",
+      "status": "implemented",
+      "engine_tier": "native_arx_only",
+      "router_lane": "ARIADNE_NATIVE_JOB",
+      "execution_host_class": "arx_adapter"
+    },
+    {
+      "id": "inspect.overrule.registry",
+      "status": "implemented",
+      "engine_tier": "accoreconsole_lisp_also",
+      "router_lane": "ARIADNE_NATIVE_JOB",
+      "execution_host_class": "coreconsole"
+    },
+    {
+      "id": "live.overrule.enable",
+      "status": "implemented",
+      "engine_tier": "native_arx_only",
+      "router_lane": "ARIADNE_NATIVE_JOB",
+      "execution_host_class": "arx_adapter"
+    },
+    {
+      "id": "live.overrule.disable",
+      "status": "implemented",
+      "engine_tier": "native_arx_only",
+      "router_lane": "ARIADNE_NATIVE_JOB",
+      "execution_host_class": "arx_adapter"
+    },
+    {
+      "id": "inspect.jig.host_support",
+      "status": "implemented",
+      "engine_tier": "accoreconsole_lisp_also",
+      "router_lane": "ARIADNE_NATIVE_JOB",
+      "execution_host_class": "coreconsole"
+    },
+    {
+      "id": "live.jig.point_probe",
+      "status": "implemented",
+      "engine_tier": "native_arx_only",
+      "router_lane": "ARIADNE_NATIVE_JOB",
+      "execution_host_class": "full_autocad"
+    },
+    {
+      "id": "extend.customclass.create",
+      "status": "implemented",
+      "engine_tier": "native_arx_only",
+      "router_lane": "ARIADNE_NATIVE_JOB",
+      "execution_host_class": "arx_adapter"
+    },
+    {
+      "id": "inspect.customclass.count",
+      "status": "implemented",
+      "engine_tier": "native_arx_only",
+      "router_lane": "ARIADNE_NATIVE_JOB",
+      "execution_host_class": "arx_adapter"
+    },
+    {
+      "id": "extend.customobject.create",
+      "status": "implemented",
+      "engine_tier": "native_arx_only",
+      "router_lane": "ARIADNE_NATIVE_JOB",
+      "execution_host_class": "arx_adapter"
+    },
+    {
+      "id": "inspect.customobject.count",
+      "status": "implemented",
+      "engine_tier": "native_arx_only",
+      "router_lane": "ARIADNE_NATIVE_JOB",
+      "execution_host_class": "arx_adapter"
+    },
+    {
+      "id": "inspect.protocol.queryx",
+      "status": "implemented",
+      "engine_tier": "native_arx_only",
+      "router_lane": "ARIADNE_NATIVE_JOB",
+      "execution_host_class": "arx_adapter"
+    }
+  ],
+  "stub_ops": [
+    "inspect.layers",
+    "inspect.blocks",
+    "inspect.entities",
+    "query.entities",
+    "apply.patch",
+    "validate.patch",
+    "diff.before_after",
+    "live.status"
+  ],
+  "blocked_ops": [
+    {
+      "id": "render.layout",
+      "summary": "Layout/plot render to image. Plot/publish is host-bound (full AutoCAD) and not headless-safe."
+    },
+    {
+      "id": "live.apply_patch",
+      "summary": "Apply a patch to the live active document. Requires full_autocad + explicit write_original approval."
+    }
+  ],
+  "route_availability": {
+    "router_status": "ALL_AVAILABLE",
+    "route_count": 11,
+    "available_count": 11,
+    "native_modules_status": "PASS",
+    "coreconsole_load": "PASS",
+    "managed_handler_present": true,
+    "python_engines_available": 10,
+    "native_objectarx_extract": "geometry_native (ObjectARX) live; inspect.database.graph implemented in .crx, smoked directly (not yet router-wired -> M02)"
+  },
+  "evidence_refs": [
+    "config/operations.v2.json",
+    "reports/autocad_router_status_latest.json",
+    "reports/walking_skeleton_latest.json",
+    "reports/native_graph_smoke_latest.json",
+    "reports/build_native_latest.log",
+    "docs/OPERATION_REGISTRY_SPEC.md"
+  ],
+  "consistency": {
+    "catalog_family_map_sum_equals_total": true,
+    "catalog_family_heads_sum_equals_total": true,
+    "status_sum_equals_operations_modeled": true,
+    "v1_wired_count_is_29": true,
+    "implemented_30_stub_8_blocked_2": true
+  }
+}

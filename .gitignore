@@ -45,6 +45,9 @@ graphify-out/
 *credential*
 *secret*
 
+# ── Handoff bundles (regenerable zips; index.md stays tracked) ──
+handoff/zip/*.zip
+
 # ── OS noise ──
 Thumbs.db
 desktop.ini

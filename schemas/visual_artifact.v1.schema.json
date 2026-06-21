@@ -1,0 +1,73 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "ariadne.visual_artifact.v1",
+  "title": "Ariadne Visual Artifact v1",
+  "description": "Descriptor for a derived visual/output artifact produced by a CAD operation, extraction, patch, diff, or validation — e.g. a rendered PNG, an exported PDF/SVG, a DXF, a staged DWG copy, an IR JSON, or a diff overlay. Referenced from cad_result.v2.artifacts[] and validation_report.v1.artifacts[]. status follows the no-fake-success rule: an artifact that was requested but not produced records status not_implemented/blocked/error with no usable ref, never ok. additionalProperties true for kind-specific metadata.",
+  "type": "object",
+  "additionalProperties": true,
+  "required": ["schema", "artifact_id", "kind", "status"],
+  "properties": {
+    "schema": { "type": "string", "const": "ariadne.visual_artifact.v1" },
+    "artifact_id": { "type": "string", "minLength": 1 },
+    "kind": {
+      "type": "string",
+      "description": "Artifact category.",
+      "enum": [
+        "png",
+        "jpg",
+        "svg",
+        "pdf",
+        "dxf",
+        "dwg_staged",
+        "ir_json",
+        "extract_json",
+        "diff_json",
+        "diff_overlay",
+        "thumbnail",
+        "log",
+        "json",
+        "other"
+      ]
+    },
+    "status": {
+      "type": "string",
+      "description": "Production status. ok = artifact exists at source_ref/refs. error = production failed. blocked = could not produce (precondition/host). not_implemented = the requested artifact kind has no producer. partial = produced but incomplete.",
+      "enum": ["ok", "error", "blocked", "not_implemented", "partial"]
+    },
+    "source_ref": {
+      "type": "string",
+      "description": "Path/id of what this artifact derives from (e.g. the DWG or IR it was rendered from). Provenance; for original DWGs this is a READ-ONLY reference."
+    },
+    "refs": {
+      "type": "array",
+      "description": "Path(s)/id(s) of the produced artifact file(s). Empty/absent when status != ok.",
+      "items": {
+        "type": "object",
+        "additionalProperties": true,
+        "required": ["ref"],
+        "properties": {
+          "ref": { "type": "string", "description": "Path/id of the artifact file." },
+          "role": { "type": "string", "description": "Optional role when an artifact has multiple files (e.g. page, layer, before/after)." },
+          "media_type": { "type": "string" },
+          "byte_size": { "type": "integer", "minimum": 0 },
+          "sha256": { "type": "string" }
+        }
+      }
+    },
+    "media_type": { "type": "string", "description": "Primary MIME type (e.g. image/png, application/pdf, image/svg+xml)." },
+    "width": { "type": "integer", "minimum": 0, "description": "Pixel width for raster artifacts." },
+    "height": { "type": "integer", "minimum": 0, "description": "Pixel height for raster artifacts." },
+    "route": {
+      "type": "string",
+      "description": "Which router route/lane produced the artifact (e.g. pdf_svg_vector_route, raster_compare_route, geometry_native)."
+    },
+    "diagnostics": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "exit_code": { "type": "integer" },
+        "warnings": { "type": "array", "items": { "type": "string" } }
+      }
+    }
+  }
+}

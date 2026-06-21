@@ -1,0 +1,119 @@
+{
+  "schema": "ariadne.autocad_write_policy.v2",
+  "version": "2.0.0",
+  "generated_at": "2026-06-21",
+  "generated_by": "CADOS_M01 Lane D (Operation Registry v2)",
+  "additive_to_v1": true,
+  "purpose": "Write-safety policy for the CAD OS Layer. Defines what each write_level is permitted to do, the preconditions a staged write must satisfy, and the hard prohibitions (raw command, original-DWG overwrite without approval). operations.v2.json write_level.default for every op MUST resolve to 'read' unless the op is explicitly a write/live family.",
+  "registry_binding": {
+    "_comment": "config/operations.v2.json is bound to schemas/operation_registry.v2.schema.json and expresses write semantics in the v1 write_mode enum {read, write_copy, write_original, live_edit}. This policy uses the descriptive vocabulary {read, staged_write, write_original, live}. Each write_level below carries v1_write_mode_equivalent. Mapping: read=read, staged_write=write_copy, write_original=write_original, live=live_edit. Consumers should resolve an op's registry default_write_mode, translate via this mapping, then apply the matching write_level preconditions here.",
+    "write_mode_to_write_level": {"read": "read", "write_copy": "staged_write", "write_original": "write_original", "live_edit": "live"}
+  },
+  "default_write_mode": "read",
+  "write_levels": {
+    "read": {
+      "description": "Read-only DB/graph inspection. No mutation of any kind.",
+      "allowed": true,
+      "requires_approval": false,
+      "mutates_dwg": false,
+      "preconditions": [],
+      "v1_write_mode_equivalent": "read",
+      "applies_to_default": [
+        "inspect.database.summary", "inspect.database.graph", "inspect.layers", "inspect.blocks",
+        "inspect.entities", "inspect.entity.count", "query.entities", "inspect.xrecord.get",
+        "inspect.xdata.get", "inspect.block.count", "inspect.layout.list", "inspect.xref.list",
+        "inspect.runtime.capabilities", "inspect.reactor.registry", "inspect.overrule.registry",
+        "inspect.jig.host_support", "inspect.customclass.count", "inspect.customobject.count",
+        "inspect.protocol.queryx", "validate.patch", "diff.before_after", "live.status", "render.layout"
+      ]
+    },
+    "staged_write": {
+      "description": "Write to a STAGED COPY of the DWG only (never the original). Default for all write.* and apply.patch ops.",
+      "allowed": true,
+      "requires_approval": false,
+      "mutates_dwg": "staged_copy_only",
+      "v1_write_mode_equivalent": "write_copy",
+      "preconditions": [
+        "copy: original DWG is copied into staging\\golden\\<stamp>\\ before any write; original byte/mtime must remain unchanged.",
+        "backup: a pre-edit backup of the staged copy is retained alongside the working copy.",
+        "journal: every mutating operation is appended to an edit journal (op id, args, timestamp, target handle) before commit.",
+        "validation: post-write validation runs (e.g. entity-count / 3-way gate) and must pass before the staged result is accepted; on failure the staged copy is discarded and status=blocked/error is returned.",
+        "persist_via_qsave: if the staged copy is saved, persistence uses QSAVE, never Database.SaveAs."
+      ],
+      "applies_to_default": [
+        "write.layer.create", "write.entity.line", "write.entity.circle", "write.xrecord.set",
+        "write.xdata.set", "write.block.simple_create", "write.block.insert", "write.layout.create",
+        "apply.patch"
+      ]
+    },
+    "write_original": {
+      "description": "Mutate the ORIGINAL DWG or the currently-open active document in place.",
+      "allowed": true,
+      "requires_approval": true,
+      "approval_token": "explicit operator approval (CADOS write_original approval); packet-level approve P-NN where the original DWG path is a PROTECTED_PATH.",
+      "mutates_dwg": "original",
+      "v1_write_mode_equivalent": "write_original",
+      "preconditions": [
+        "explicit_approval: operator must explicitly authorize write_original for the specific drawing; default behavior NEVER escalates a staged_write to write_original automatically.",
+        "all staged_write preconditions (copy-as-backup, journal, validation) still apply; the pre-edit copy is the rollback artifact.",
+        "persist_via_qsave: persistence uses QSAVE, never Database.SaveAs (preserves the original-DWG safety contract).",
+        "report_changes: the operation must report exactly what was changed."
+      ],
+      "applies_to_default": [],
+      "notes": "No operation defaults to write_original. It is an opt-in escalation per the v1 capabilities write_original_policy."
+    },
+    "live": {
+      "description": "Live runtime effects in an attended active-document session (reactors, overrules, jigs, live patch).",
+      "allowed": true,
+      "requires_approval": "for live.apply_patch and any active-document mutation: yes; for ephemeral live.* runtime toggles (reactor/overrule enable/disable, jig probe): operator-initiated, no DWG mutation.",
+      "mutates_dwg": "only when the live op writes the active document (then write_original rules apply)",
+      "v1_write_mode_equivalent": "live_edit",
+      "preconditions": [
+        "host: requires native_arx or full_autocad host (see host_matrix.v2.json); not headless-safe for observable live effects.",
+        "if the live op mutates the active document: all write_original preconditions apply (explicit approval + journal + QSAVE + report_changes)."
+      ],
+      "applies_to_default": [
+        "live.reactor.enable", "live.reactor.disable", "live.overrule.enable", "live.overrule.disable",
+        "live.jig.point_probe", "extend.customclass.create", "extend.customobject.create",
+        "live.apply_patch"
+      ]
+    }
+  },
+  "prohibitions": {
+    "raw_command_forbidden": {
+      "rule": "Arbitrary raw AutoCAD command / AutoLISP injection from job payloads is FORBIDDEN. Only the registered, enumerated operation ids in operations.v2.json may be dispatched.",
+      "rationale": "Prevents route drift, fake extraction, and uncontrolled original-DWG mutation."
+    },
+    "original_dwg_overwrite_without_approval": {
+      "rule": "Overwriting an original DWG without an explicit write_original approval is FORBIDDEN. Default write_mode=read; writes are staged_copy_only unless escalated.",
+      "rationale": "Original CAD sources are READ-ONLY by default (CAD router invariant)."
+    },
+    "database_saveas_forbidden": {
+      "rule": "Database.SaveAs is FORBIDDEN for persistence; use QSAVE.",
+      "rationale": "Matches test_write_original_persistence_is_done_by_router_qsave_not_database_saveas."
+    },
+    "no_fake_success": {
+      "rule": "Unavailable/unimplemented operations MUST return explicit not_implemented/unavailable/blocked status. Claiming PASS for unrun or unsupported work is FORBIDDEN.",
+      "rationale": "no-fake-success invariant; mirrors the router guard that 'SDK_OPERATION_NOT_IMPLEMENTED' must not ship as a silent success stub."
+    },
+    "secrets": {
+      "rule": "Never read or print .env/token/key/credential/.pem/.p12 in job payloads, journals, logs, or results.",
+      "rationale": "Secrets rule."
+    }
+  },
+  "write_lock": {
+    "rule": "The native ARIADNE_NATIVE_JOB and managed ARIADNE_CAD_JOB dispatchers take a document write lock before any write operation (LockDocument before runner.Run).",
+    "read_ops_lock": "Read-only ops also acquire the lock unconditionally at dispatcher entry; this is harmless (no-op in Core Console where there is no document manager) and is left as-is to match the existing dispatcher contract.",
+    "evidence": "tests/test_cad_job_control_plane.py::test_cad_job_command_locks_document_before_write_operations"
+  },
+  "escalation_rules": {
+    "read_to_staged": "An inspect.*/validate.*/diff.* op NEVER escalates to a write. read is terminal for those ops.",
+    "staged_to_original": "staged_write -> write_original requires explicit operator approval per request; never automatic.",
+    "default_resolution": "If a job omits write_mode, the effective write_mode is the op's write_level.default from operations.v2.json, which is 'read' for all inspect/validate/diff/render/status ops, 'staged_write' for write.*/apply.patch, and 'live' for live.*/extend.* runtime ops. The global default_write_mode (read) governs any op whose write_level cannot be resolved."
+  },
+  "blocked_operations": {
+    "_comment": "Ops that are blocked by policy/host until their lane is wired (no-fake-success).",
+    "render.layout": "blocked: plot/publish render is host-bound (full_autocad); no headless render path implemented.",
+    "live.apply_patch": "blocked: live active-document edit requires full_autocad + explicit write_original approval; not implemented."
+  }
+}

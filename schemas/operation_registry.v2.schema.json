@@ -1,0 +1,188 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "ariadne.operations_registry.v2",
+  "title": "Ariadne Operation Registry v2",
+  "description": "Schema for config/operations.v2.json: the additive, superset operation registry that unifies the two existing v1 surfaces (the 29 wired ops in schemas/cad_job.schema.json + config/cad_job_operation_aliases.json, and the 480 catalog ops in config/autocad_native_arx_operation_catalog.json) into one record-per-canonical-op_id table. v2 is EXTEND-ONLY: it never removes/renames a v1 enum op (those must appear here with status implemented|wired), and it references — does not regenerate — the frozen v1 alias map (derived_from). The registry is the runtime source of truth for which operations exist and whether they are runnable; the no-fake-success invariant is encoded as data via status (blocked|not_implemented|deprecated) and the explicit host_eligibility/engine_tier crosswalk. additionalProperties true on operation records for forward extension.",
+  "type": "object",
+  "additionalProperties": true,
+  "required": ["schema", "operations"],
+  "properties": {
+    "schema": { "type": "string", "const": "ariadne.operations_registry.v2" },
+    "generated_at": { "type": "string", "description": "ISO date the registry was generated." },
+    "derived_from": {
+      "type": "array",
+      "description": "Source artifacts this registry joins/derives from (referenced, not regenerated). Expected to include config/cad_job_operation_aliases.json, config/autocad_native_arx_operation_catalog.json, schemas/cad_job.schema.json.",
+      "items": { "type": "string" },
+      "default": [
+        "config/cad_job_operation_aliases.json",
+        "config/autocad_native_arx_operation_catalog.json",
+        "schemas/cad_job.schema.json"
+      ]
+    },
+    "host_class_crosswalk": {
+      "type": "object",
+      "description": "The main new intelligence v2 adds: an explicit crosswalk between the two distinct 4-value vocabularies that already coexist — execution_host_class (WHERE an op runs: dbx|coreconsole|arx_adapter|full_autocad, from the alias map) and engine_tier (WHAT API surface an op needs: native_arx_only|objectdbx_capable|managed_also|accoreconsole_lisp_also, from the catalog). They are NOT the same axis. This object documents, per engine_tier, the ordered (cheapest-host-first) host_eligibility list and whether a managed handler exists, so the router can pick the lowest-capability host and fall back.",
+      "additionalProperties": true,
+      "properties": {
+        "by_engine_tier": {
+          "type": "object",
+          "description": "Map engine_tier -> { host_eligibility[], managed_handler_available }. Recommended defaults: objectdbx_capable -> [dbx, coreconsole, arx_adapter, full_autocad]; accoreconsole_lisp_also -> [coreconsole, dbx, arx_adapter, full_autocad]; native_arx_only -> [arx_adapter, full_autocad]; managed_also -> managed_handler_available true.",
+          "additionalProperties": {
+            "type": "object",
+            "additionalProperties": true,
+            "properties": {
+              "host_eligibility": {
+                "type": "array",
+                "items": { "$ref": "#/$defs/host_class" }
+              },
+              "managed_handler_available": { "type": "boolean" }
+            }
+          }
+        }
+      }
+    },
+    "totals": {
+      "type": "object",
+      "description": "Optional roll-up counts (by status, by family, by engine_tier) for quick auditing.",
+      "additionalProperties": true,
+      "properties": {
+        "operations": { "type": "integer", "minimum": 0 },
+        "by_status": { "type": "object", "additionalProperties": { "type": "integer" } },
+        "by_family": { "type": "object", "additionalProperties": { "type": "integer" } },
+        "by_engine_tier": { "type": "object", "additionalProperties": { "type": "integer" } }
+      }
+    },
+    "operations": {
+      "type": "array",
+      "description": "One record per canonical operation id (the union of the 29 wired ids and the 480 catalog op_ids; the 6 exact-mapped ids are counted once). Wired ops MUST carry status implemented|wired; catalog-only ops default to catalogued.",
+      "items": { "$ref": "#/$defs/operation" }
+    }
+  },
+  "$defs": {
+    "host_class": {
+      "type": "string",
+      "enum": ["dbx", "coreconsole", "arx_adapter", "full_autocad"],
+      "description": "execution_host_class vocabulary (WHERE an op runs)."
+    },
+    "engine_tier": {
+      "type": "string",
+      "enum": ["native_arx_only", "objectdbx_capable", "managed_also", "accoreconsole_lisp_also"],
+      "description": "catalog engine_tier vocabulary (WHAT API surface an op needs)."
+    },
+    "write_mode": {
+      "type": "string",
+      "enum": ["read", "write_copy", "write_original", "live_edit"]
+    },
+    "operation": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": ["id", "family", "status", "host_eligibility", "write_level", "handler"],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Canonical operation id. For wired ops this is the v1 enum operation (e.g. write.entity.line); for catalog-only ops this is the catalog op_id (e.g. command.invoke.coroutine)."
+        },
+        "family": {
+          "type": "string",
+          "description": "Operation family. For catalog ops, the catalog family (one of the 16, e.g. entities, custom_objects_protocols, reactors_events). For router-synthetic ops, a router family label."
+        },
+        "status": {
+          "type": "string",
+          "description": "Reality of this op. implemented = has a live, test-asserted handler (the 6 exact ops + any wired op whose C++/C# handler name is pinned by an existing test). wired = present in the v1 schema enum with a live router/dispatcher path. stub = handler declared but empty (none today). catalogued = known from the catalog but no router path yet (default for catalog-only). deprecated = retired (reserved; none today). blocked = cannot run because a required host/tier is not available. not_implemented = addressable but no handler exists. Per no-fake-success, anything not actually runnable MUST be one of catalogued|stub|blocked|not_implemented|deprecated, never implemented/wired.",
+          "enum": ["implemented", "wired", "stub", "catalogued", "deprecated", "blocked", "not_implemented"]
+        },
+        "blocked_reason": {
+          "type": "string",
+          "description": "Required when status == blocked (e.g. 'requires full_autocad host not currently available')."
+        },
+        "engine_tier": {
+          "$ref": "#/$defs/engine_tier",
+          "description": "The catalog engine_tier for this op (WHAT API surface). Drives host_eligibility via host_class_crosswalk."
+        },
+        "host_eligibility": {
+          "type": "array",
+          "description": "Ordered (cheapest-host-first) list of execution_host_class values this op can run on. Derived from engine_tier + execution_context. The router picks the first available host and falls back down the list.",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/host_class" }
+        },
+        "execution_context": {
+          "type": "string",
+          "description": "Free-text catalog execution_context (e.g. hostless_dbx_in_accoreconsole, in_process_host) carried through for reference."
+        },
+        "write_level": {
+          "type": "object",
+          "description": "Write semantics mapped to the v1 write_mode vocabulary. default_write_mode is what the op uses unless overridden; allowed_write_modes bounds what a job may request. Derived from verb prefix + catalog dwg_persisted.",
+          "additionalProperties": true,
+          "required": ["default_write_mode", "allowed_write_modes"],
+          "properties": {
+            "default_write_mode": { "$ref": "#/$defs/write_mode" },
+            "allowed_write_modes": {
+              "type": "array",
+              "minItems": 1,
+              "items": { "$ref": "#/$defs/write_mode" }
+            },
+            "dwg_persisted": {
+              "type": "boolean",
+              "description": "Catalog dwg_persisted flag: whether the op's effect is persisted to the DWG."
+            }
+          }
+        },
+        "handler": {
+          "type": "object",
+          "description": "How the op is dispatched. router_lane names the router entrypoint; dispatcher_symbol is the C++/C# handler name where one exists (populated for the 29 wired ops from the names existing native_arx_dbx tests already assert, so a future test can cross-check registry<->source; null for catalogued ops). native_api carries the catalog's native API signature. composed_of lists the catalog op_ids a synthetic/alias router op is built from (mirrors the v1 alias map catalog_reference_ids).",
+          "additionalProperties": true,
+          "properties": {
+            "router_lane": {
+              "type": ["string", "null"],
+              "enum": ["ARIADNE_CAD_JOB", "ARIADNE_NATIVE_JOB", "geometry_native", "full_autocad", "libredwg_sidecar", null],
+              "description": "Router entrypoint/lane that handles this op. null for catalogued ops with no lane yet."
+            },
+            "dispatcher_symbol": {
+              "type": ["string", "null"],
+              "description": "C++/C# handler symbol (e.g. appendLine, createLayout, runLineJigProbe). Non-null only for ops with a real handler; null for catalogued ops."
+            },
+            "native_api": {
+              "type": "string",
+              "description": "Native API signature from the catalog (e.g. acedCommandC(...))."
+            },
+            "execution_host_class": {
+              "$ref": "#/$defs/host_class",
+              "description": "Preferred/primary host class for this op (the alias map's execution_host_class for wired ops). host_eligibility carries the full fallback list."
+            },
+            "composed_of": {
+              "type": "array",
+              "description": "For alias/synthetic router ops: the catalog op_ids this aggregate is composed of. Each MUST resolve in config/autocad_native_arx_operation_catalog.json. Mirrors the v1 alias map's catalog_reference_ids.",
+              "items": { "type": "string" }
+            }
+          }
+        },
+        "mapping_type": {
+          "type": "string",
+          "enum": ["exact", "alias", "synthetic"],
+          "description": "Relationship to the catalog (carried from the v1 alias map). exact = id is itself a catalog op_id (the 6 exact ops). alias = router id aliases one catalog op. synthetic = router aggregate over multiple catalog ops."
+        },
+        "catalog_op_id": {
+          "type": ["string", "null"],
+          "description": "The catalog op_id when mapping_type == exact (equals id); null for alias/synthetic (their constituents are in handler.composed_of)."
+        },
+        "input_schema": {
+          "type": "string",
+          "description": "Reference to the request-args validator for this op (e.g. schemas/cad_job.v2.schema.json#/allOf for wired ops, or an op-specific args schema)."
+        },
+        "output_schema": {
+          "type": "string",
+          "description": "Reference to the result validator for this op (e.g. schemas/cad_result.v2.schema.json, or schemas/dwg_geometry_extract.schema.json for the extract lane)."
+        },
+        "summary": { "type": "string", "description": "Human description (from the catalog summary where applicable)." },
+        "source_slice": { "type": "string", "description": "Catalog source_slice provenance (e.g. acdb-core.md)." },
+        "citation": { "type": "string", "description": "Catalog citation (header/line refs)." },
+        "evidence_refs": {
+          "type": "array",
+          "description": "Paths/ids of evidence that this op behaves as declared (run artifacts, test names, extract JSONs). Required to justify an implemented/wired status beyond the catalog.",
+          "items": { "type": "string" }
+        }
+      }
+    }
+  }
+}

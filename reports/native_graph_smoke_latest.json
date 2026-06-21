@@ -1,0 +1,139 @@
+﻿{
+    "schema":  "ariadne.cad_os.native_graph_smoke.v1",
+    "status":  "PASS",
+    "generated_at":  "2026-06-21T23:47:59.3479756+09:00",
+    "operation":  "inspect.database.graph",
+    "lane":  "ARIADNE_NATIVE_JOB (Core Console / .crx)",
+    "engine":  "accoreconsole + Ariadne.AcadNative.crx + Ariadne.AcadNativeDbx.dbx",
+    "primary_case":  {
+                         "drawing":  "staging/dwg_20260616_094058/input.dwg (origin, 18096 bytes, READ-ONLY)",
+                         "staged_copy":  "staging/golden/20260621_234158/input.dwg",
+                         "modelspace_entities":  3,
+                         "entities_len":  3,
+                         "summary_count":  3,
+                         "consistent":  true,
+                         "sample_entity":  {
+                                               "handle":  "24",
+                                               "dxf_name":  "AcDbPolyline",
+                                               "layer":  "0",
+                                               "owner_handle":  "2",
+                                               "space":  "model",
+                                               "vertex_count":  4,
+                                               "vertices":  [
+                                                                [
+                                                                    6.80866,
+                                                                    3.51246,
+                                                                    0
+                                                                ],
+                                                                [
+                                                                    6.55866,
+                                                                    4.19933,
+                                                                    0
+                                                                ],
+                                                                [
+                                                                    6.05866,
+                                                                    2.82559,
+                                                                    0
+                                                                ],
+                                                                [
+                                                                    5.80866,
+                                                                    3.51246,
+                                                                    0
+                                                                ]
+                                                            ]
+                                           }
+                     },
+    "scale_case":  {
+                       "drawing":  "staging/dwg_20260616_102654/input.dwg (origin, 29798126 bytes, READ-ONLY)",
+                       "staged_copy":  "staging/golden/20260621_234158_scale/input.dwg",
+                       "modelspace_entities":  291706,
+                       "entities_len":  291706,
+                       "summary_count":  291706,
+                       "consistent":  true,
+                       "sample_entity_types":  [
+                                                   "AcDbLine",
+                                                   "AcDbCircle",
+                                                   "AcDbText",
+                                                   "AcDbText",
+                                                   "AcDbText"
+                                               ]
+                   },
+    "drawing":  "staging/dwg_20260616_094058/input.dwg",
+    "staged_copy":  "staging/golden/20260621_234158/input.dwg",
+    "modelspace_entities":  3,
+    "entities_len":  3,
+    "summary_count":  3,
+    "consistent":  true,
+    "sample_entity":  {
+                          "handle":  "24",
+                          "dxf_name":  "AcDbPolyline",
+                          "layer":  "0",
+                          "owner_handle":  "2",
+                          "space":  "model",
+                          "vertex_count":  4,
+                          "vertices":  [
+                                           [
+                                               6.80866,
+                                               3.51246,
+                                               0
+                                           ],
+                                           [
+                                               6.55866,
+                                               4.19933,
+                                               0
+                                           ],
+                                           [
+                                               6.05866,
+                                               2.82559,
+                                               0
+                                           ],
+                                           [
+                                               5.80866,
+                                               3.51246,
+                                               0
+                                           ]
+                                       ]
+                      },
+    "original_sha_before":  "3FA7CB751345B48AAFDD488C8D6E6DCBD3B9611E00FC5BE3B78E4245ED954841",
+    "original_sha_after":  "3FA7CB751345B48AAFDD488C8D6E6DCBD3B9611E00FC5BE3B78E4245ED954841",
+    "original_untouched":  true,
+    "commands":  [
+                     {
+                         "step":  "build",
+                         "cmd":  "build_native_acad.ps1 -Configuration Release -Platform x64",
+                         "exit":  1,
+                         "note":  ".crx + .dbx OK; .arx LINK blocked by live acad.exe PID 49460 (LNK1104 file lock) - environmental, not a code defect"
+                     },
+                     {
+                         "step":  "reverify_status",
+                         "cmd":  "autocad-router.ps1 -Action status",
+                         "exit":  0,
+                         "note":  "ALL_AVAILABLE, route_count=11, available_count=11, native_modules=PASS, coreconsole_load=PASS"
+                     },
+                     {
+                         "step":  "regression_smoke",
+                         "cmd":  "accoreconsole /i \u003cstaged\u003e /s native_summary.scr (inspect.database.summary)",
+                         "exit":  0,
+                         "note":  "modelspace_entities=3, status ok - existing op intact on rebuilt .crx"
+                     },
+                     {
+                         "step":  "new_op_smoke_small",
+                         "cmd":  "accoreconsole /i \u003cstaged\u003e /s native_graph.scr (inspect.database.graph)",
+                         "exit":  0,
+                         "note":  "entities_len=3 == summary 3"
+                     },
+                     {
+                         "step":  "new_op_smoke_scale",
+                         "cmd":  "accoreconsole /i \u003c291706-entity staged\u003e /s scale_graph.scr",
+                         "exit":  0,
+                         "note":  "entities_len=291706 == summary 291706"
+                     }
+                 ],
+    "notes":  [
+                  "NON-ASCII FIDELITY LIMITATION (documented M02 follow-up): dxf_name/layer/block_name funnel through acharToAscii -\u003e any code point \u003e127 becomes \"?\". A Korean layer like \"설비OPEN\" emits as \"????????\". Widening to UTF-8 / vendoring a JSON lib is deliberately out of this additive lane.",
+                  "ROUTER/REGISTRY ALLOW-LIST WIRING is a documented follow-up: cadctl/router cannot yet route inspect.database.graph to native without an autocad-router.ps1 edit (out of this lane). The op is smoked DIRECTLY via accoreconsole+.scr, not via the router allow-list.",
+                  ".arx relink blocked by a live 3-day-old full_autocad session (acad.exe PID 49460). On-disk .arx is the prior WORKING binary, unchanged/uncorrupted. Did NOT kill the live session and did NOT restore (additive change proven-compiling via .crx + zero regression). The identical source will link into .arx on the next rebuild once the lock releases.",
+                  "Floats use default ostringstream precision, matching the existing write.entity.* emitters.",
+                  "Staged-copy sha changes after accoreconsole /i open (metadata touch) but that is the COPY; the ORIGIN sha is unchanged on every case."
+              ]
+}

@@ -23,6 +23,8 @@
 #include "dbmain.h"
 #include "dbdict.h"
 #include "dbents.h"
+#include "dbmtext.h"
+#include "dbpl.h"
 #include "dbxrecrd.h"
 #include "dbsymtb.h"
 #include "dbcolor.h"
@@ -77,6 +79,9 @@ static std::wstring asciiToWide(const std::string& value)
 }
 
 static bool moduleDirectory(std::wstring& outDir);
+// Forward decl: collectModelSpaceGraph (defined below) calls acharToAscii,
+// whose definition sits further down next to the reactor helpers.
+static std::string acharToAscii(const ACHAR* text);
 
 static std::wstring gJobInOverride;
 static std::wstring gJobOutOverride;
@@ -424,6 +429,155 @@ static bool countModelSpaceEntitiesByType(AcDbDatabase* pDb, const std::string& 
     }
     delete pIt;
     pMS->close();
+    return true;
+}
+
+//----------------------------------------------------------------------------
+// collectModelSpaceGraph
+//
+// Pure read: walk ACDB_MODEL_SPACE and emit ONE IR record per entity into a
+// nested JSON array (entitiesJson), and the total entity count (total). Modeled
+// directly on countModelSpace / countModelSpaceEntitiesByType (BlockTable ->
+// ACDB_MODEL_SPACE BTR opened kForRead -> AcDbBlockTableRecordIterator), and it
+// uses the same comma-first appendJsonString / jsonEscape idiom as the other
+// emitters in this file. Floats use the default ostringstream precision, exactly
+// like the existing write.entity.* emitters.
+//
+// KNOWN FIDELITY LIMITATION (documented M02 follow-up, NOT fixed this session):
+// every string field (dxf_name from isA()->name(), layer from pEnt->layer(),
+// block reference target name) is funneled through acharToAscii(), which maps any
+// code point > 127 to '?'. So a non-ASCII layer/type name -- e.g. the Korean
+// layer "설비OPEN" present in the workitem drawings -- is emitted as "????????".
+// Widening the ASCII funnel (UTF-8) / vendoring a real JSON library is the
+// explicit M02 follow-up; it is deliberately out of this additive lane.
+//----------------------------------------------------------------------------
+static bool collectModelSpaceGraph(AcDbDatabase* pDb, int& total,
+                                   std::string& entitiesJson)
+{
+    total = 0;
+    std::ostringstream arr;
+    arr << "[";
+    bool first = true;
+
+    AcDbBlockTable* pBT = nullptr;
+    if (pDb->getBlockTable(pBT, AcDb::kForRead) != Acad::eOk)
+        return false;
+    AcDbBlockTableRecord* pMS = nullptr;
+    if (pBT->getAt(ACDB_MODEL_SPACE, pMS, AcDb::kForRead) != Acad::eOk) {
+        pBT->close();
+        return false;
+    }
+    pBT->close();
+
+    AcDbBlockTableRecordIterator* pIt = nullptr;
+    if (pMS->newIterator(pIt) != Acad::eOk) {
+        pMS->close();
+        return false;
+    }
+
+    for (pIt->start(); !pIt->done(); pIt->step()) {
+        AcDbEntity* pEnt = nullptr;
+        if (pIt->getEntity(pEnt, AcDb::kForRead) != Acad::eOk)
+            continue;
+        ++total;
+
+        // handle (this entity's persistent objectId handle, ascii hex)
+        std::string handleStr;
+        {
+            AcDbHandle h;
+            pEnt->getAcDbHandle(h);
+            ACHAR hbuf[40] = {};
+            if (h.getIntoAsciiBuffer(hbuf, 40))
+                handleStr = acharToAscii(hbuf);
+        }
+        // owner handle (model-space BTR) via the objectId, no extra open needed
+        std::string ownerStr;
+        {
+            const AcDbHandle oh = pEnt->ownerId().handle();
+            ACHAR obuf[40] = {};
+            if (oh.getIntoAsciiBuffer(obuf, 40))
+                ownerStr = acharToAscii(obuf);
+        }
+        // dxf_name from the runtime class, layer from the entity
+        const std::string dxfName = (pEnt->isA() != nullptr)
+            ? acharToAscii(pEnt->isA()->name()) : std::string();
+        const std::string layer = acharToAscii(pEnt->layer());
+
+        if (!first)
+            arr << ",";
+        first = false;
+        arr << "{\"handle\":\"" << jsonEscape(handleStr) << "\""
+            << ",\"dxf_name\":\"" << jsonEscape(dxfName) << "\""
+            << ",\"layer\":\"" << jsonEscape(layer) << "\""
+            << ",\"owner_handle\":\"" << jsonEscape(ownerStr) << "\""
+            << ",\"space\":\"model\"";
+
+        // type-specific geometry by cast (cheap accessors only)
+        if (AcDbLine* pLine = AcDbLine::cast(pEnt)) {
+            const AcGePoint3d s = pLine->startPoint();
+            const AcGePoint3d e = pLine->endPoint();
+            arr << ",\"start\":[" << s.x << "," << s.y << "," << s.z << "]"
+                << ",\"end\":[" << e.x << "," << e.y << "," << e.z << "]";
+        }
+        else if (AcDbArc* pArc = AcDbArc::cast(pEnt)) {
+            // AcDbArc derives from AcDbCircle; test arc BEFORE circle.
+            const AcGePoint3d c = pArc->center();
+            arr << ",\"center\":[" << c.x << "," << c.y << "," << c.z << "]"
+                << ",\"radius\":" << pArc->radius()
+                << ",\"start_angle\":" << pArc->startAngle()
+                << ",\"end_angle\":" << pArc->endAngle();
+        }
+        else if (AcDbCircle* pCir = AcDbCircle::cast(pEnt)) {
+            const AcGePoint3d c = pCir->center();
+            arr << ",\"center\":[" << c.x << "," << c.y << "," << c.z << "]"
+                << ",\"radius\":" << pCir->radius();
+        }
+        else if (AcDbBlockReference* pRef = AcDbBlockReference::cast(pEnt)) {
+            const AcGePoint3d p = pRef->position();
+            arr << ",\"position\":[" << p.x << "," << p.y << "," << p.z << "]";
+            std::string blockName;
+            AcDbBlockTableRecord* pDef = nullptr;
+            if (acdbOpenObject(pDef, pRef->blockTableRecord(),
+                               AcDb::kForRead) == Acad::eOk) {
+                const ACHAR* nameRaw = nullptr;
+                if (pDef->getName(nameRaw) == Acad::eOk)
+                    blockName = acharToAscii(nameRaw);
+                pDef->close();
+            }
+            arr << ",\"block_name\":\"" << jsonEscape(blockName) << "\"";
+        }
+        else if (AcDbMText* pM = AcDbMText::cast(pEnt)) {
+            const AcGePoint3d p = pM->location();
+            arr << ",\"position\":[" << p.x << "," << p.y << "," << p.z << "]"
+                << ",\"text\":\"" << jsonEscape(acharToAscii(pM->contents())) << "\"";
+        }
+        else if (AcDbText* pT = AcDbText::cast(pEnt)) {
+            const AcGePoint3d p = pT->position();
+            arr << ",\"position\":[" << p.x << "," << p.y << "," << p.z << "]"
+                << ",\"text\":\"" << jsonEscape(acharToAscii(pT->textStringConst())) << "\"";
+        }
+        else if (AcDbPolyline* pPl = AcDbPolyline::cast(pEnt)) {
+            const unsigned int n = pPl->numVerts();
+            arr << ",\"vertex_count\":" << n << ",\"vertices\":[";
+            for (unsigned int vi = 0; vi < n; ++vi) {
+                AcGePoint3d vp;
+                if (pPl->getPointAt(vi, vp) != Acad::eOk)
+                    break;
+                if (vi != 0)
+                    arr << ",";
+                arr << "[" << vp.x << "," << vp.y << "," << vp.z << "]";
+            }
+            arr << "]";
+        }
+
+        arr << "}";
+        pEnt->close();
+    }
+
+    delete pIt;
+    pMS->close();
+    arr << "]";
+    entitiesJson = arr.str();
     return true;
 }
 
@@ -1514,6 +1668,21 @@ static void ariadneNativeJob()
           << ",\"modelspace_entities\":" << total
           << ",\"ariadne_probes\":" << probes << "},"
           << "\"status\":\"ok\"}";
+    }
+    else if (op == "inspect.database.graph") {
+        // Pure DB read -> NO host gating (runs in coreconsole + full_autocad).
+        // The enclosing AriadneDocumentWriteLock is kept as-is (harmless for a
+        // read). modelspace_entities is the array length by construction, so the
+        // emitted count and entities[] are internally consistent and (modulo the
+        // same model-space walk) equal to inspect.database.summary's count.
+        int total = 0;
+        std::string entitiesJson;
+        const bool ok = collectModelSpaceGraph(pDb, total, entitiesJson);
+        if (!ok)
+            entitiesJson = "[]";
+        r << "\"result\":{\"modelspace_entities\":" << total
+          << ",\"entities\":" << entitiesJson << "},"
+          << "\"status\":\"" << (ok ? "ok" : "error") << "\"}";
     }
     else if (op == "write.layer.create") {
         std::string name;

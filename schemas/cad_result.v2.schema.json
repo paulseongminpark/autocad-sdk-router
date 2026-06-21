@@ -1,0 +1,154 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "ariadne.autocad_sdk_result.v2",
+  "title": "Ariadne AutoCAD SDK Result v2",
+  "description": "v2 result contract returned by a CAD job. Enforces the no-fake-success invariant at the type level: status is a closed enum that includes blocked / not_implemented / unavailable, so an operation that did not actually run reports one of those (never ok). When status != ok the error envelope MUST be populated. result_ref points to the operation's primary payload; ir_ref points to an ariadne.dwg_graph_ir.v1 document when output_mode == ir; artifacts[] lists side files (logs, exports, renders). diagnostics carries counts/warnings. additionalProperties true so handlers may attach op-specific result fields.",
+  "type": "object",
+  "additionalProperties": true,
+  "required": ["schema", "operation", "status"],
+  "properties": {
+    "schema": {
+      "type": "string",
+      "const": "ariadne.autocad_sdk_result.v2"
+    },
+    "operation": {
+      "type": "string",
+      "minLength": 1,
+      "description": "The operation id that produced this result (echoes the job's operation)."
+    },
+    "status": {
+      "type": "string",
+      "description": "Outcome. ok = ran and succeeded. error = ran and failed (see error). blocked = could not run due to a policy/precondition/host gate (see error.code + blocked_reason). partial = ran but only partially succeeded (some sub-steps failed; details in diagnostics/error). not_implemented = operation is catalogued but has no live handler. unavailable = required host/engine/route not present (e.g. full_autocad lane absent). Only `ok` (and `partial` where explicitly allowed) may accompany a successful payload; the other values forbid claiming success.",
+      "enum": ["ok", "error", "blocked", "partial", "not_implemented", "unavailable"]
+    },
+    "job_ref": {
+      "type": "string",
+      "description": "Path/id of the originating ariadne.autocad_sdk_job.v2 request (provenance)."
+    },
+    "idempotency_key": {
+      "type": "string",
+      "description": "Echoes the job idempotency_key when supplied."
+    },
+    "write_mode": {
+      "type": "string",
+      "enum": ["read", "write_copy", "write_original", "live_edit"],
+      "description": "Effective write mode that was applied."
+    },
+    "dry_run": {
+      "type": "boolean",
+      "description": "True when the job ran in dry_run mode (planned only, nothing persisted)."
+    },
+    "host": {
+      "type": "object",
+      "description": "Which host/engine/route actually executed the operation.",
+      "additionalProperties": true,
+      "properties": {
+        "execution_host_class": {
+          "type": "string",
+          "enum": ["dbx", "coreconsole", "arx_adapter", "full_autocad"]
+        },
+        "router_lane": {
+          "type": "string",
+          "enum": ["ARIADNE_CAD_JOB", "ARIADNE_NATIVE_JOB", "geometry_native", "full_autocad", "libredwg_sidecar"]
+        },
+        "engine_tier": { "type": "string" }
+      }
+    },
+    "result_ref": {
+      "type": "string",
+      "description": "Path/id of the primary result payload for this operation (e.g. the JSON the handler wrote). Present when status == ok/partial and the payload is externalized rather than inlined."
+    },
+    "result": {
+      "description": "Inlined primary result payload (alternative to result_ref for small results). Shape is operation-specific; validated against the operation's output_schema in the registry.",
+      "type": ["object", "array", "string", "number", "boolean", "null"]
+    },
+    "ir_ref": {
+      "type": "string",
+      "description": "Path/id of an ariadne.dwg_graph_ir.v1 document for the (post-operation) drawing/scope. Present when the job requested output_mode == ir."
+    },
+    "graph_ref": {
+      "type": "string",
+      "description": "Path/id of a graph/lineage projection (changed handles, affected subtree). Present when output_mode == graph."
+    },
+    "artifacts": {
+      "type": "array",
+      "description": "Side artifacts produced by the operation (logs, exported DXF/PDF/PNG, staged copies). Each entry is an ariadne.visual_artifact.v1-compatible descriptor or a minimal {kind, ref} pair.",
+      "items": { "$ref": "#/$defs/artifact_ref" }
+    },
+    "diagnostics": {
+      "type": "object",
+      "description": "Operation self-report: stdout/stderr/exit_code of any external command, counts, and warnings. Capturing stdout+stderr+exit_code is mandatory for any external command invocation.",
+      "additionalProperties": true,
+      "properties": {
+        "exit_code": { "type": "integer", "description": "Process exit code of the underlying command/host (0 = clean)." },
+        "stdout_ref": { "type": "string", "description": "Path to captured stdout (or inline via stdout)." },
+        "stderr_ref": { "type": "string", "description": "Path to captured stderr (or inline via stderr)." },
+        "stdout": { "type": "string" },
+        "stderr": { "type": "string" },
+        "duration_ms": { "type": "number", "minimum": 0 },
+        "entity_count": { "type": "integer", "minimum": 0, "description": "Entity count when the op reports one (e.g. inspect.entity.count)." },
+        "affected_handles": {
+          "type": "array",
+          "description": "Handles created/modified/deleted by a write/live op.",
+          "items": { "type": "string" }
+        },
+        "warnings": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "error": {
+      "$ref": "#/$defs/error_envelope",
+      "description": "REQUIRED whenever status != ok. For blocked/not_implemented/unavailable, code and message explain why, and retryable indicates whether a later attempt could succeed."
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": { "status": { "enum": ["error", "blocked", "not_implemented", "unavailable"] } }
+      },
+      "then": {
+        "required": ["error"]
+      }
+    }
+  ],
+  "$defs": {
+    "artifact_ref": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": ["kind", "ref"],
+      "properties": {
+        "artifact_id": { "type": "string" },
+        "kind": {
+          "type": "string",
+          "description": "Artifact category (e.g. log, json, dxf, dwg_staged, pdf, png, ir, diff).",
+          "examples": ["log", "json", "dxf", "dwg_staged", "pdf", "png", "ir", "diff"]
+        },
+        "ref": { "type": "string", "description": "Path/id of the artifact." },
+        "media_type": { "type": "string" }
+      }
+    },
+    "error_envelope": {
+      "type": "object",
+      "description": "Structured error. code is a machine-stable token; message is human text; retryable says whether a retry might succeed; details carries op/host specifics (never secrets).",
+      "additionalProperties": true,
+      "required": ["code", "message", "retryable"],
+      "properties": {
+        "code": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Machine-stable error code (e.g. OPERATION_NOT_IMPLEMENTED, HOST_UNAVAILABLE, PRECONDITION_FAILED, STAGED_COPY_REQUIRED, VALIDATION_ERROR, DOCUMENT_LOCK_FAILED, ROUTE_NONZERO_EXIT)."
+        },
+        "message": { "type": "string", "minLength": 1 },
+        "retryable": { "type": "boolean" },
+        "blocked_reason": {
+          "type": "string",
+          "description": "Free-text reason when status == blocked (e.g. 'requires full_autocad host which is not running')."
+        },
+        "details": {
+          "type": "object",
+          "description": "Additional structured context (exit codes, missing host class, failing precondition). Must not contain secrets.",
+          "additionalProperties": true
+        }
+      }
+    }
+  }
+}

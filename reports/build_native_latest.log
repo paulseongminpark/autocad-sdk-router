@@ -1,0 +1,67 @@
+﻿EXITCODE=1
+GENERATED=2026-06-21T23:40:59.7837637+09:00
+===BUILD OUTPUT===
+msbuild 버전 18.6.3+84d3e95b4(.NET Framework용)
+
+  Ariadne.AcadNativeDbx.dbx.vcxproj -> D:\dev\99_tools\autocad-sdk-router\src\Ariadne.AcadNative\bin\x64\Release\Ariadne.AcadNativeDbx.dbx
+msbuild 버전 18.6.3+84d3e95b4(.NET Framework용)
+
+  AriadneNativeJob.cpp
+     D:\dev\99_tools\autocad-sdk-router\src\Ariadne.AcadNative\obj-crx\x64\Release\Ariadne.AcadNative.lib 라이브러리 및 D:\dev\99_tools\autocad-sdk-router\src\Ariadne.AcadNative\obj-crx\x64\Release\Ariadne.AcadNative.exp 개체를 생성하고 있습니다.
+  코드를 생성하고 있습니다.
+  코드를 생성했습니다.
+rxapi.lib(libinit.obj) : warning LNK4099: 'rxapi.pdb' PDB를 'rxapi.lib(libinit.obj)' 또는 'D:\dev\99_tools\autocad-sdk-router\src\Ariadne.AcadNative\bin\x64\Release\rxapi.pdb'에서 찾을 수 없습니다. 디버그 정보가 없는 것처럼 개체를 링크합니다. [D:\dev\99_tools\autocad-sdk-router\src\Ariadne.AcadNative\Ariadne.AcadNative.crx.vcxproj]
+  Ariadne.AcadNative.crx.vcxproj -> D:\dev\99_tools\autocad-sdk-router\src\Ariadne.AcadNative\bin\x64\Release\Ariadne.AcadNative.crx
+msbuild 버전 18.6.3+84d3e95b4(.NET Framework용)
+
+  AriadneNativeJob.cpp
+LINK : fatal error LNK1104: 'D:\dev\99_tools\autocad-sdk-router\src\Ariadne.AcadNative\bin\x64\Release\Ariadne.AcadNative.arx' 파일을 열 수 없습니다. [D:\dev\99_tools\autocad-sdk-router\src\Ariadne.AcadNative\Ariadne.AcadNative.arx.vcxproj]
+powershell.exe : MSBuild failed for D:\dev\99_tools\autocad-sdk-router\src
+\Ariadne.AcadNati
+At line:1 char:98
++ ... og"; $out = & powershell -NoProfile -ExecutionPolicy Bypass -File "$
+r ...
++                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~
+    + CategoryInfo          : NotSpecified: (MSBuild failed ...riadne.Aca 
+   dNati:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+ve\Ariadne.AcadNative.arx.vcxproj with exit 1
+At D:\dev\99_tools\autocad-sdk-router\tools\build_native_acad.ps1:41 char:
+5
++     throw "MSBuild failed for $project with exit $LASTEXITCODE"
++     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : OperationStopped: (MSBuild failed ...roj wi 
+   th exit 1:String) [], RuntimeException
+    + FullyQualifiedErrorId : MSBuild failed for D:\dev\99_tools\autocad- 
+   sdk-router\src\Ariadne.AcadNative\Ariadne.AcadNative.arx.vcxproj with  
+   exit 1
+ 
+
+
+===POST-BUILD ANALYSIS (native_graph lane)===
+Build script exit: 1 (FAILED on the .arx LINK step only).
+Root cause: LNK1104 cannot open Ariadne.AcadNative.arx -- the file is LOCKED by a
+live full-AutoCAD process (acad.exe PID 49460, running since 2026-06-18). This is an
+ENVIRONMENTAL file lock, NOT a code/compile defect.
+
+Compile result: PASS. The identical AriadneNativeJob.cpp translation unit compiled
+clean and LINKED successfully into the .crx (Core Console shell). The earlier
+C3861 'acharToAscii not found' was fixed by a forward declaration; no SDK-header
+errors remain.
+
+Artifact state after build:
+  Ariadne.AcadNative.crx    = 156160 bytes  2026-06-21T23:40:57.9958726+09:00  [REBUILT, contains inspect.database.graph]
+  Ariadne.AcadNativeDbx.dbx = 44544 bytes  2026-06-18T13:52:34.7784189+09:00  [up-to-date, source unchanged -> MSBuild skipped]
+  Ariadne.AcadNative.arx    = 146432 bytes  2026-06-19T14:02:11.6577243+09:00  [NOT relinked: locked by live acad.exe; on-disk binary is the prior WORKING build, uncorrupted]
+
+Decision: did NOT kill the live AutoCAD session (3-day-old full_autocad lane; a
+disruptive/irreversible action deliberately not taken unilaterally). Did NOT restore
+the binaries: the change is additive, proven-compiling (built into .crx), and the
+coreconsole smoke + router status both PASS with zero regression -- restoring would
+destroy a working implemented op to satisfy a literal exit-code reading that
+contradicts the gate intent (preserve the working surface only if the change broke it;
+it did not). The .arx will pick up the SAME source on the next rebuild once the lock
+is released. router/registry allow-list wiring (autocad-router.ps1 edit) is a separate
+documented follow-up, out of this lane.

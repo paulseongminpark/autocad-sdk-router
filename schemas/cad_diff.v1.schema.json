@@ -1,0 +1,106 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "ariadne.cad_diff.v1",
+  "title": "Ariadne CAD Diff v1",
+  "description": "A structured difference between two drawing states (typically before/after a cad_patch). before_ref and after_ref point at the two states (DWG paths or ariadne.dwg_graph_ir.v1 documents); changed_handles enumerates per-handle changes (added/removed/modified) keyed by the DWG handle (the IR's cross-engine join key); summary gives roll-up counts. The diff is computed by comparing IR/entity sets, so it is engine-neutral. additionalProperties true for extension.",
+  "type": "object",
+  "additionalProperties": true,
+  "required": ["schema", "diff_id", "before_ref", "after_ref", "changed_handles", "summary", "diagnostics"],
+  "properties": {
+    "schema": { "type": "string", "const": "ariadne.cad_diff.v1" },
+    "diff_id": { "type": "string", "minLength": 1 },
+    "patch_id": { "type": "string", "description": "The cad_patch.v1 patch_id this diff measures, when the diff is patch-induced." },
+    "before_ref": {
+      "$ref": "#/$defs/state_ref",
+      "description": "The 'before' drawing state."
+    },
+    "after_ref": {
+      "$ref": "#/$defs/state_ref",
+      "description": "The 'after' drawing state."
+    },
+    "changed_handles": {
+      "type": "array",
+      "description": "Per-handle change records. Each entry names the handle and the change kind; modified entries may carry a field-level delta.",
+      "items": { "$ref": "#/$defs/handle_change" }
+    },
+    "summary": {
+      "type": "object",
+      "description": "Roll-up of the diff.",
+      "additionalProperties": true,
+      "required": ["added", "removed", "modified"],
+      "properties": {
+        "added": { "type": "integer", "minimum": 0, "description": "Count of handles present only in after." },
+        "removed": { "type": "integer", "minimum": 0, "description": "Count of handles present only in before." },
+        "modified": { "type": "integer", "minimum": 0, "description": "Count of handles present in both but changed." },
+        "unchanged": { "type": "integer", "minimum": 0 },
+        "entity_count_before": { "type": "integer", "minimum": 0 },
+        "entity_count_after": { "type": "integer", "minimum": 0 },
+        "by_type": {
+          "type": "object",
+          "description": "Per-DXF-type net change, e.g. {\"LINE\": {\"added\":3,\"removed\":0,\"modified\":1}}.",
+          "additionalProperties": true
+        }
+      }
+    },
+    "diagnostics": {
+      "type": "object",
+      "description": "Diff self-report: which engine/IR produced before/after, warnings, and whether the comparison was exact (handle-keyed) or heuristic.",
+      "additionalProperties": true,
+      "required": ["warnings"],
+      "properties": {
+        "comparison_basis": {
+          "type": "string",
+          "enum": ["handle", "geometry", "mixed"],
+          "description": "handle = exact join on DWG handles (preferred); geometry = positional matching when handles are unstable; mixed = both."
+        },
+        "warnings": { "type": "array", "items": { "type": "string" } },
+        "errors": { "type": "array", "items": { "type": "string" } }
+      }
+    }
+  },
+  "$defs": {
+    "state_ref": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": ["kind", "ref"],
+      "properties": {
+        "kind": {
+          "type": "string",
+          "enum": ["dwg", "ir", "extract"],
+          "description": "dwg = a DWG path; ir = an ariadne.dwg_graph_ir.v1 document; extract = a dwg_geometry_extract document."
+        },
+        "ref": { "type": "string", "description": "Path/id of the referenced state." },
+        "sha256": { "type": "string" },
+        "entity_count": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "handle_change": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": ["handle", "change"],
+      "properties": {
+        "handle": { "type": "string", "description": "DWG handle (uppercase hex)." },
+        "change": {
+          "type": "string",
+          "enum": ["added", "removed", "modified"]
+        },
+        "dxf_name": { "type": "string" },
+        "layer": { "type": "string" },
+        "fields": {
+          "type": "array",
+          "description": "Field-level deltas for a modified entity.",
+          "items": {
+            "type": "object",
+            "additionalProperties": true,
+            "required": ["field"],
+            "properties": {
+              "field": { "type": "string", "description": "Name of the changed field (e.g. layer, geometry.start, color_index)." },
+              "before": {},
+              "after": {}
+            }
+          }
+        }
+      }
+    }
+  }
+}

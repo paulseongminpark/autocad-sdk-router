@@ -1,0 +1,194 @@
+{
+  "schema": "ariadne.autocad_host_matrix.v2",
+  "version": "2.0.0",
+  "generated_at": "2026-06-21",
+  "generated_by": "CADOS_M01 Lane D (Operation Registry v2)",
+  "additive_to_v1": true,
+  "purpose": "Declares, per operation family, which AutoCAD execution host each family runs in and whether that host is headless (unattended) or attended (interactive session). Bridges the two pre-existing 4-value host vocabularies: the alias map's execution_host_class {dbx, coreconsole, arx_adapter, full_autocad} and the catalog's engine_tier {objectdbx_capable, native_arx_only, managed_also, accoreconsole_lisp_also}. These are NOT the same axis: host_class = WHERE it runs; engine_tier = WHAT API surface it needs. The crosswalk below is the new intelligence v2 adds.",
+  "hosts": {
+    "objectdbx": {
+      "binary": "in-process ObjectDBX (.dbx) loaded under accoreconsole.exe",
+      "headless": true,
+      "attended": false,
+      "doc_manager": false,
+      "can_write_original": false,
+      "can_write_staged": true,
+      "notes": "Hostless DBX database read/write inside Core Console. No editor, no active document. Cheapest host for pure DB work."
+    },
+    "core_console": {
+      "binary": "accoreconsole.exe (AutoCAD 2027)",
+      "binary_path": "C:\\Program Files\\Autodesk\\AutoCAD 2027\\accoreconsole.exe",
+      "headless": true,
+      "attended": false,
+      "doc_manager": false,
+      "can_write_original": true,
+      "can_write_staged": true,
+      "notes": "Headless command/script automation + .crx native shell + AutoLISP/.scr. No UI. Document write via QSAVE (never Database.SaveAs) per original-DWG safety contract."
+    },
+    "native_arx": {
+      "binary": "in-process ObjectARX (.arx/.crx) ARIADNE_NATIVE_JOB dispatcher",
+      "headless": true,
+      "attended": false,
+      "doc_manager": true,
+      "can_write_original": true,
+      "can_write_staged": true,
+      "notes": "Native ARX shell loads the DBX core then registers the ARIADNE_NATIVE_JOB session-modal command. Takes an AriadneDocumentWriteLock at entry. Runs under Core Console (headless) or full AutoCAD."
+    },
+    "managed": {
+      "binary": "managed .NET host (acmgd/acdbmgd/accoremgd) ARIADNE_CAD_JOB CommandMethod",
+      "headless": true,
+      "attended": false,
+      "doc_manager": true,
+      "can_write_original": true,
+      "can_write_staged": true,
+      "notes": "Managed .NET CadJobRunner. Hosts the 1 managed wired op (inspect.database.summary). Locks the current document before write ops; persists via router QSAVE not Database.SaveAs."
+    },
+    "full_autocad": {
+      "binary": "full AutoCAD active-document host (acad.exe)",
+      "headless": false,
+      "attended": true,
+      "doc_manager": true,
+      "can_write_original": true,
+      "can_write_staged": true,
+      "notes": "Interactive/attended session. Required for live active-document edits, jigs, plot/publish render, COM/ActiveX, and any UI-bound surface. Not headless-safe; gated behind full_autocad host mode."
+    }
+  },
+  "host_class_crosswalk": {
+    "_comment": "alias-map execution_host_class -> ordered host_eligibility (cheapest-first) + default headless host.",
+    "dbx": {
+      "host_eligibility": ["objectdbx", "core_console", "managed", "native_arx", "full_autocad"],
+      "default_host": "objectdbx",
+      "headless": true
+    },
+    "coreconsole": {
+      "host_eligibility": ["core_console", "objectdbx", "managed", "native_arx", "full_autocad"],
+      "default_host": "core_console",
+      "headless": true
+    },
+    "arx_adapter": {
+      "host_eligibility": ["native_arx", "managed", "full_autocad"],
+      "default_host": "native_arx",
+      "headless": true,
+      "notes": "Reactor/overrule/custom-class/protocol ops. Headless-capable under Core Console .crx, but live.* runtime effects observable only in an attended full_autocad session."
+    },
+    "full_autocad": {
+      "host_eligibility": ["full_autocad"],
+      "default_host": "full_autocad",
+      "headless": false,
+      "notes": "Live jig probe and any active-document write. Attended only."
+    }
+  },
+  "engine_tier_crosswalk": {
+    "_comment": "catalog engine_tier -> host_eligibility (cheapest-first). engine_tier = API surface required; host = where it runs.",
+    "objectdbx_capable": {
+      "host_eligibility": ["objectdbx", "core_console", "native_arx", "full_autocad"],
+      "default_host": "objectdbx",
+      "headless": true,
+      "catalog_count": 198
+    },
+    "native_arx_only": {
+      "host_eligibility": ["native_arx", "full_autocad"],
+      "default_host": "native_arx",
+      "headless": true,
+      "catalog_count": 221,
+      "notes": "Requires the full ARX API surface; cannot run as plain hostless DBX. Headless under Core Console .crx where the surface is host-neutral, else full AutoCAD."
+    },
+    "managed_also": {
+      "host_eligibility": ["managed", "objectdbx", "native_arx", "full_autocad"],
+      "default_host": "managed",
+      "headless": true,
+      "catalog_count": 45,
+      "notes": "Surface also reachable via managed .NET; choose managed when it is the better wrapper."
+    },
+    "accoreconsole_lisp_also": {
+      "host_eligibility": ["core_console", "objectdbx", "native_arx", "full_autocad"],
+      "default_host": "core_console",
+      "headless": true,
+      "catalog_count": 16,
+      "notes": "Reachable via AutoLISP/.scr under Core Console in addition to native."
+    }
+  },
+  "registry_vocabulary_crosswalk": {
+    "_comment": "config/operations.v2.json is bound to schemas/operation_registry.v2.schema.json, whose host_eligibility uses the 4-value execution_host_class enum {dbx, coreconsole, arx_adapter, full_autocad}. This block maps each of those registry host classes to the physical host(s) in this file's 'hosts' section, so a consumer reading operations.v2.json can resolve a concrete host. The registry vocabulary is the WHERE axis; the physical 'hosts' here add headless/attended + binary detail.",
+    "execution_host_class_to_physical_host": {
+      "dbx": {"primary_physical_host": "objectdbx", "also": ["core_console"], "headless": true},
+      "coreconsole": {"primary_physical_host": "core_console", "also": ["objectdbx"], "headless": true},
+      "arx_adapter": {"primary_physical_host": "native_arx", "also": ["managed"], "headless": true},
+      "full_autocad": {"primary_physical_host": "full_autocad", "also": [], "headless": false}
+    },
+    "registry_write_mode_to_write_level": {
+      "_comment": "operations.v2.json write_level uses the v1 write_mode enum {read, write_copy, write_original, live_edit}. policy.v2.json uses the descriptive {read, staged_write, write_original, live}. Mapping: read=read, write_copy=staged_write, write_original=write_original, live_edit=live.",
+      "read": "read",
+      "write_copy": "staged_write",
+      "write_original": "write_original",
+      "live_edit": "live"
+    }
+  },
+  "family_host_matrix": {
+    "_comment": "Per operations.v2 family head -> resolved host. headless=true means runnable without an attended AutoCAD UI.",
+    "inspect.database.summary": {"host": "managed", "host_eligibility": ["objectdbx", "core_console", "managed", "native_arx", "full_autocad"], "headless": true, "attended_required": false, "engine_tier": "managed_also"},
+    "inspect.database.graph": {"host": "objectdbx", "host_eligibility": ["objectdbx", "core_console", "native_arx", "full_autocad"], "headless": true, "attended_required": false, "engine_tier": "objectdbx_capable"},
+    "inspect.layers": {"host": "objectdbx", "host_eligibility": ["objectdbx", "core_console", "native_arx", "full_autocad"], "headless": true, "attended_required": false, "engine_tier": "objectdbx_capable"},
+    "inspect.blocks": {"host": "objectdbx", "host_eligibility": ["objectdbx", "core_console", "native_arx", "full_autocad"], "headless": true, "attended_required": false, "engine_tier": "objectdbx_capable"},
+    "inspect.entities": {"host": "objectdbx", "host_eligibility": ["objectdbx", "core_console", "native_arx", "full_autocad"], "headless": true, "attended_required": false, "engine_tier": "objectdbx_capable"},
+    "inspect.entity.count": {"host": "objectdbx", "host_eligibility": ["objectdbx", "core_console", "managed", "native_arx", "full_autocad"], "headless": true, "attended_required": false, "engine_tier": "objectdbx_capable"},
+    "query.entities": {"host": "objectdbx", "host_eligibility": ["objectdbx", "core_console", "native_arx", "full_autocad"], "headless": true, "attended_required": false, "engine_tier": "objectdbx_capable"},
+    "inspect.xrecord.get": {"host": "objectdbx", "host_eligibility": ["objectdbx", "core_console", "managed", "native_arx", "full_autocad"], "headless": true, "attended_required": false, "engine_tier": "objectdbx_capable"},
+    "inspect.xdata.get": {"host": "objectdbx", "host_eligibility": ["objectdbx", "core_console", "managed", "native_arx", "full_autocad"], "headless": true, "attended_required": false, "engine_tier": "objectdbx_capable"},
+    "inspect.block.count": {"host": "objectdbx", "host_eligibility": ["objectdbx", "core_console", "managed", "native_arx", "full_autocad"], "headless": true, "attended_required": false, "engine_tier": "objectdbx_capable"},
+    "inspect.layout.list": {"host": "objectdbx", "host_eligibility": ["objectdbx", "core_console", "managed", "native_arx", "full_autocad"], "headless": true, "attended_required": false, "engine_tier": "objectdbx_capable"},
+    "inspect.xref.list": {"host": "objectdbx", "host_eligibility": ["objectdbx", "core_console", "managed", "native_arx", "full_autocad"], "headless": true, "attended_required": false, "engine_tier": "objectdbx_capable"},
+    "write.layer.create": {"host": "objectdbx", "host_eligibility": ["objectdbx", "core_console", "managed", "native_arx", "full_autocad"], "headless": true, "attended_required": false, "engine_tier": "objectdbx_capable"},
+    "write.entity.line": {"host": "objectdbx", "host_eligibility": ["objectdbx", "core_console", "managed", "native_arx", "full_autocad"], "headless": true, "attended_required": false, "engine_tier": "objectdbx_capable"},
+    "write.entity.circle": {"host": "objectdbx", "host_eligibility": ["objectdbx", "core_console", "managed", "native_arx", "full_autocad"], "headless": true, "attended_required": false, "engine_tier": "objectdbx_capable"},
+    "write.xrecord.set": {"host": "objectdbx", "host_eligibility": ["objectdbx", "core_console", "managed", "native_arx", "full_autocad"], "headless": true, "attended_required": false, "engine_tier": "objectdbx_capable"},
+    "write.xdata.set": {"host": "objectdbx", "host_eligibility": ["objectdbx", "core_console", "managed", "native_arx", "full_autocad"], "headless": true, "attended_required": false, "engine_tier": "objectdbx_capable"},
+    "write.block.simple_create": {"host": "objectdbx", "host_eligibility": ["objectdbx", "core_console", "managed", "native_arx", "full_autocad"], "headless": true, "attended_required": false, "engine_tier": "objectdbx_capable"},
+    "write.block.insert": {"host": "objectdbx", "host_eligibility": ["objectdbx", "core_console", "managed", "native_arx", "full_autocad"], "headless": true, "attended_required": false, "engine_tier": "objectdbx_capable"},
+    "write.layout.create": {"host": "objectdbx", "host_eligibility": ["objectdbx", "core_console", "managed", "native_arx", "full_autocad"], "headless": true, "attended_required": false, "engine_tier": "objectdbx_capable"},
+    "apply.patch": {"host": "objectdbx", "host_eligibility": ["objectdbx", "native_arx", "full_autocad"], "headless": true, "attended_required": false, "engine_tier": "objectdbx_capable", "notes": "Staged-copy write under journal+backup+validate."},
+    "validate.patch": {"host": "objectdbx", "host_eligibility": ["objectdbx", "core_console", "native_arx", "full_autocad"], "headless": true, "attended_required": false, "engine_tier": "objectdbx_capable", "notes": "Read-only dry-run."},
+    "diff.before_after": {"host": "objectdbx", "host_eligibility": ["objectdbx", "core_console", "native_arx", "full_autocad"], "headless": true, "attended_required": false, "engine_tier": "objectdbx_capable", "notes": "Two graph reads + python diff."},
+    "inspect.runtime.capabilities": {"host": "core_console", "host_eligibility": ["core_console", "objectdbx", "managed", "native_arx", "full_autocad"], "headless": true, "attended_required": false, "engine_tier": "objectdbx_capable"},
+    "inspect.reactor.registry": {"host": "core_console", "host_eligibility": ["core_console", "objectdbx", "managed", "native_arx", "full_autocad"], "headless": true, "attended_required": false, "engine_tier": "accoreconsole_lisp_also"},
+    "inspect.overrule.registry": {"host": "core_console", "host_eligibility": ["core_console", "objectdbx", "managed", "native_arx", "full_autocad"], "headless": true, "attended_required": false, "engine_tier": "accoreconsole_lisp_also"},
+    "inspect.jig.host_support": {"host": "core_console", "host_eligibility": ["core_console", "objectdbx", "managed", "native_arx", "full_autocad"], "headless": true, "attended_required": false, "engine_tier": "accoreconsole_lisp_also", "notes": "Reports whether the host can run interactive jig work; the report is headless, the work it describes is not."},
+    "live.reactor.enable": {"host": "native_arx", "host_eligibility": ["native_arx", "managed", "full_autocad"], "headless": true, "attended_required": false, "engine_tier": "native_arx_only", "notes": "Installs reactor under Core Console .crx; live editor events observable only in attended session."},
+    "live.reactor.disable": {"host": "native_arx", "host_eligibility": ["native_arx", "managed", "full_autocad"], "headless": true, "attended_required": false, "engine_tier": "native_arx_only"},
+    "live.overrule.enable": {"host": "native_arx", "host_eligibility": ["native_arx", "managed", "full_autocad"], "headless": true, "attended_required": false, "engine_tier": "native_arx_only"},
+    "live.overrule.disable": {"host": "native_arx", "host_eligibility": ["native_arx", "managed", "full_autocad"], "headless": true, "attended_required": false, "engine_tier": "native_arx_only"},
+    "extend.customclass.create": {"host": "native_arx", "host_eligibility": ["native_arx", "managed", "full_autocad"], "headless": true, "attended_required": false, "engine_tier": "native_arx_only"},
+    "inspect.customclass.count": {"host": "native_arx", "host_eligibility": ["native_arx", "managed", "full_autocad"], "headless": true, "attended_required": false, "engine_tier": "native_arx_only"},
+    "extend.customobject.create": {"host": "native_arx", "host_eligibility": ["native_arx", "managed", "full_autocad"], "headless": true, "attended_required": false, "engine_tier": "native_arx_only"},
+    "inspect.customobject.count": {"host": "native_arx", "host_eligibility": ["native_arx", "managed", "full_autocad"], "headless": true, "attended_required": false, "engine_tier": "native_arx_only"},
+    "inspect.protocol.queryx": {"host": "native_arx", "host_eligibility": ["native_arx", "managed", "full_autocad"], "headless": true, "attended_required": false, "engine_tier": "native_arx_only"},
+    "live.jig.point_probe": {"host": "full_autocad", "host_eligibility": ["full_autocad"], "headless": false, "attended_required": true, "engine_tier": "native_arx_only", "notes": "Live jig drag requires an attended full AutoCAD editor; Core Console can only report support (inspect.jig.host_support)."},
+    "render.layout": {"host": "full_autocad", "host_eligibility": ["full_autocad"], "headless": false, "attended_required": true, "engine_tier": "native_arx_only", "status": "blocked", "blocked_reason": "Plot/publish render is host-bound; no headless render path implemented."},
+    "live.status": {"host": "full_autocad", "host_eligibility": ["full_autocad"], "headless": false, "attended_required": true, "engine_tier": "managed_also"},
+    "live.apply_patch": {"host": "full_autocad", "host_eligibility": ["full_autocad"], "headless": false, "attended_required": true, "engine_tier": "native_arx_only", "status": "blocked", "blocked_reason": "Live active-document edit requires attended full AutoCAD + explicit write_original approval."}
+  },
+  "catalog_family_default_host": {
+    "_comment": "16 catalog families -> default headless host derived from each family's dominant engine_tier (see operations.v2.json catalog_families[].by_tier).",
+    "objectdbx_database": {"default_host": "objectdbx", "headless": true, "catalog_op_count": 21},
+    "symbol_tables_dictionaries": {"default_host": "objectdbx", "headless": true, "catalog_op_count": 16},
+    "entities": {"default_host": "objectdbx", "headless": true, "catalog_op_count": 56},
+    "geometry_kernel": {"default_host": "objectdbx", "headless": true, "catalog_op_count": 25},
+    "blocks_xrefs_clone": {"default_host": "objectdbx", "headless": true, "catalog_op_count": 5},
+    "layouts_plot_publish": {"default_host": "full_autocad", "headless": false, "catalog_op_count": 2, "notes": "Plot/publish is attended/host-bound."},
+    "brep_solids": {"default_host": "native_arx", "headless": true, "catalog_op_count": 54},
+    "graphics_system": {"default_host": "native_arx", "headless": false, "catalog_op_count": 9, "notes": "AcGi/AcGs graphics surface; attended for live draw/highlight/grips."},
+    "editor_input": {"default_host": "full_autocad", "headless": false, "catalog_op_count": 27, "notes": "Selection/prompts/jigs/osnap are editor-bound."},
+    "reactors_events": {"default_host": "native_arx", "headless": true, "catalog_op_count": 22},
+    "custom_objects_protocols": {"default_host": "native_arx", "headless": true, "catalog_op_count": 63},
+    "constraints_associativity": {"default_host": "native_arx", "headless": true, "catalog_op_count": 58},
+    "runtime_commands": {"default_host": "core_console", "headless": true, "catalog_op_count": 26},
+    "ui_customization": {"default_host": "full_autocad", "headless": false, "catalog_op_count": 39, "notes": "CUI/palettes/ribbon/menus are UI-bound."},
+    "com_activex": {"default_host": "full_autocad", "headless": false, "catalog_op_count": 49, "notes": "COM/ActiveX is session-bound."},
+    "active_document_write_original": {"default_host": "full_autocad", "headless": false, "catalog_op_count": 8, "notes": "Active-document write_original; attended unless routed through Core Console QSAVE."}
+  },
+  "invariants": {
+    "original_dwg_read_only": "Original DWG files are never overwritten; staged copies under staging\\golden\\ only.",
+    "persist_via_qsave": "Document persistence uses QSAVE, never Database.SaveAs (preserves original-DWG safety contract).",
+    "no_fake_success": "A host is only usable if it is actually present and healthy; unavailable host => status blocked/unavailable, never a faked pass."
+  }
+}

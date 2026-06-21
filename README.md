@@ -57,3 +57,34 @@ autocad-sdk-router/
 | geo_vector_route | pyogrio (bundled GDAL) + pyproj | yes |
 | pdf_svg_vector_route | svgpathtools + svgelements | yes |
 | raster_compare_route | opencv-headless + skimage | yes |
+
+## CAD OS Layer control plane (CADOS_M01)
+
+A stdlib-only Python control plane (`tools\cadctl_cli.py`) layered **on top of** the router:
+typed **DWG Graph IR**, a queryable **SQLite IR store**, a deterministic **validator**, and an
+**Operation Registry v2**. The router and the 29 v1-wired native ops are unchanged.
+
+- **Walking skeleton: PASS** — `inspect -> dwg_graph_ir.v1 -> SQLite -> query -> validate`
+  proven end-to-end on the golden drawing at **21747** modelspace entities (6/6 validation
+  gates; original byte-identical). Report: `reports\walking_skeleton_latest.json`.
+- **Operation Registry v2** (`config\operations.v2.json`): **30 implemented** / 8 stub /
+  2 blocked, 16 catalog families over the 480-op native catalog.
+- **Native `inspect.database.graph`** is built into `Ariadne.AcadNative.crx` and smoked
+  directly at 3 + 291706 entities (`reports\native_graph_smoke_latest.json`); router-wiring is
+  deferred to M02.
+
+```powershell
+$C = 'D:\dev\99_tools\autocad-sdk-router\tools\cadctl_cli.py'
+python $C status                                              # published router status (read-only)
+python $C inspect --dwg <orig.dwg> --out <run_dir>           # stage copy, extract, build IR
+python $C query   --ir <run_dir>\dwg_graph_ir.json --sql "select count(*) as n from entities"
+python $C validate --ir <run_dir>\dwg_graph_ir.json          # deterministic gates
+python $C registry list | python $C registry coverage        # operation registry views
+```
+
+- **Build status (authoritative):** `docs\CAD_OS_BUILD_STATUS.md` (built / deferred / how to
+  run / acceptance = PASS, deferrals D1–D5).
+- **Full-stack handoff:** `docs\CAD_OS_FULL_STACK_HANDOFF.md`.
+- **Operation registry spec:** `docs\OPERATION_REGISTRY_SPEC.md` · **IR spec:**
+  `docs\DWG_GRAPH_IR_SPEC.md`.
+- **Live ARX named-pipe pump:** `docs\LIVE_ARX_NAMED_PIPE_DESIGN.md` (design only — unbuilt).

@@ -1,0 +1,116 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "ariadne.cad_patch.v1",
+  "title": "Ariadne CAD Patch v1",
+  "description": "A declarative, idempotent batch of CAD mutations applied to a STAGED copy of a drawing. A patch is the unit the router applies transactionally-ish: an ordered list of operations (each an ariadne.autocad_sdk_job.v2-shaped action) with pre/postconditions that gate and verify the change. policy.staged_copy is REQUIRED true: the original-DWG safety invariant forbids patching an original/active drawing in place; patches always target staging/. additionalProperties true so callers may attach metadata.",
+  "type": "object",
+  "additionalProperties": true,
+  "required": ["schema", "patch_id", "target_dwg", "operations", "policy"],
+  "properties": {
+    "schema": { "type": "string", "const": "ariadne.cad_patch.v1" },
+    "patch_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Stable id for this patch (used for idempotency and for naming derived diff/result artifacts)."
+    },
+    "title": { "type": "string" },
+    "description": { "type": "string" },
+    "source_agent": { "type": "string", "description": "Agent/runtime that authored the patch (provenance, no secrets)." },
+    "target_dwg": {
+      "type": "object",
+      "description": "The STAGED drawing the patch mutates. staged_path must be a copy under staging/; original_path records the read-only source for provenance and is never written.",
+      "additionalProperties": true,
+      "required": ["staged_path"],
+      "properties": {
+        "staged_path": {
+          "type": "string",
+          "description": "Path to the staged copy that the patch operates on (writable). MUST be distinct from original_path."
+        },
+        "original_path": {
+          "type": "string",
+          "description": "Path to the read-only original the staged copy was made from. READ-ONLY; never written by a patch."
+        },
+        "sha256_before": { "type": "string", "description": "SHA-256 of the staged drawing before the patch (links to cad_diff.before_ref)." }
+      }
+    },
+    "operations": {
+      "type": "array",
+      "description": "Ordered list of mutations. Each item is a job-shaped action (operation + args) plus an optional per-op idempotency_key. Applied in array order; BUNDLE order is significant.",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/patch_operation" }
+    },
+    "preconditions": {
+      "type": "array",
+      "description": "Conditions that MUST hold before the patch is applied (e.g. entity_count == N, layer 'FOO' exists). If any fails the patch is not applied and the result is blocked.",
+      "items": { "$ref": "#/$defs/condition" }
+    },
+    "postconditions": {
+      "type": "array",
+      "description": "Conditions that MUST hold after the patch is applied to consider it successful (e.g. entity_count increased by K, handle H exists). Drives validation_report gates.",
+      "items": { "$ref": "#/$defs/condition" }
+    },
+    "policy": {
+      "type": "object",
+      "description": "Application policy. staged_copy MUST be true (original-DWG safety). dry_run plans without mutating.",
+      "additionalProperties": true,
+      "required": ["staged_copy"],
+      "properties": {
+        "staged_copy": {
+          "type": "boolean",
+          "const": true,
+          "description": "Always true: patches apply only to staged copies, never to an original/active drawing in place."
+        },
+        "write_mode": {
+          "type": "string",
+          "enum": ["write_copy", "write_original", "live_edit"],
+          "default": "write_copy",
+          "description": "Effective write level for the staged target. write_copy is the safe default; write_original/live_edit require explicit authorization upstream."
+        },
+        "dry_run": { "type": "boolean", "default": false },
+        "atomic": {
+          "type": "boolean",
+          "default": false,
+          "description": "When true and a sub-operation fails, the runner discards the staged result (no partial drawing kept)."
+        },
+        "stop_on_error": { "type": "boolean", "default": true }
+      }
+    },
+    "idempotency_key": { "type": "string", "description": "Top-level key making re-application of the whole patch safe." }
+  },
+  "$defs": {
+    "patch_operation": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": ["operation"],
+      "properties": {
+        "step_id": { "type": "string", "description": "Optional id for this step (for diff/validation traceability)." },
+        "operation": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Operation id resolvable in the operation registry (config/operations.v2.json). Same id space as cad_job.v2.operation."
+        },
+        "args": { "type": "object", "default": {} },
+        "idempotency_key": { "type": "string" }
+      }
+    },
+    "condition": {
+      "type": "object",
+      "description": "A checkable assertion over drawing state. subject names what is checked, op the comparison, value the expected value.",
+      "additionalProperties": true,
+      "required": ["subject", "op"],
+      "properties": {
+        "subject": {
+          "type": "string",
+          "description": "What is asserted (e.g. entity_count, entity_count_by_type.LINE, layer_exists, handle_exists, block_count)."
+        },
+        "op": {
+          "type": "string",
+          "enum": ["eq", "ne", "gt", "ge", "lt", "le", "exists", "not_exists", "delta_eq", "delta_ge"],
+          "description": "Comparison/operator. delta_* compares post-vs-pre (e.g. entity_count delta_eq +K)."
+        },
+        "value": { "description": "Expected value/operand (number, string, bool) per subject/op." },
+        "description": { "type": "string" }
+      }
+    }
+  }
+}

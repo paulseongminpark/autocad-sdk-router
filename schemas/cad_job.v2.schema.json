@@ -1,0 +1,339 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "ariadne.autocad_sdk_job.v2",
+  "title": "Ariadne AutoCAD SDK Job v2",
+  "description": "v2 job-request contract. AUTHORED ALONGSIDE v1 (schemas/cad_job.schema.json, ariadne.autocad_sdk_job.v1) which remains frozen at exactly 29 operations and unchanged. v2 is additive: it keeps the v1 semantics (operation + write_mode + args), and adds a structured target, an explicit policy block (write_mode/dry_run), idempotency, the originating agent, and an output_mode (summary|graph|ir). The v2 operation field is OPEN (no inline 29-enum) and is validated against the operation registry (config/operations.v2.json, schema schemas/operation_registry.v2.schema.json) at runtime rather than by a frozen enum, so adding catalogued ops does not require a schema edit. The 18 v1 per-operation arg if/then rules for the wired ops are carried over verbatim below for the operations that remain wired. additionalProperties true so richer callers may attach context.",
+  "type": "object",
+  "additionalProperties": true,
+  "required": ["operation"],
+  "properties": {
+    "schema": {
+      "type": "string",
+      "const": "ariadne.autocad_sdk_job.v2"
+    },
+    "operation": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Canonical operation id. MUST resolve to an entry in the operation registry (config/operations.v2.json). The registry is the source of truth for which operations exist and their status; this field is intentionally NOT a closed enum in v2 (unlike v1) so newly catalogued ops are addressable without a schema change. A runtime validator rejects operations whose registry status is not runnable (catalogued/blocked/not_implemented => explicit error, never a fake PASS)."
+    },
+    "registry_ref": {
+      "type": "string",
+      "default": "config/operations.v2.json",
+      "description": "Path to the operation registry that defines/validates `operation`."
+    },
+    "target": {
+      "type": "object",
+      "description": "What the job acts on. dwg_path is the drawing; for write jobs it should be a staged copy unless policy.write_mode == write_original/live_edit explicitly authorizes acting on the active/original drawing.",
+      "additionalProperties": true,
+      "properties": {
+        "dwg_path": {
+          "type": "string",
+          "description": "Path to the target DWG. Read jobs may point at any readable drawing; write jobs SHOULD point at a staged copy under staging/ unless write_mode authorizes the original."
+        },
+        "original_path": {
+          "type": "string",
+          "description": "Path to the read-only original when dwg_path is a staged copy (provenance)."
+        },
+        "space": {
+          "type": "string",
+          "enum": ["model", "paper"],
+          "default": "model"
+        },
+        "layout": {
+          "type": "string",
+          "description": "Paper-space layout/tab name when space == paper."
+        }
+      }
+    },
+    "write_mode": {
+      "type": "string",
+      "default": "read",
+      "enum": ["read", "write_copy", "write_original", "live_edit"],
+      "description": "Carried over from v1 for backward compatibility. policy.write_mode (if present) takes precedence; when only this top-level field is supplied it is treated as the effective write mode."
+    },
+    "save": {
+      "type": "boolean",
+      "description": "v1-compatible flag: when true the active/original DWG is saved after a write job (router uses QSAVE, never Database.SaveAs)."
+    },
+    "policy": {
+      "type": "object",
+      "description": "Execution policy. Supersedes the top-level write_mode/save when present.",
+      "additionalProperties": true,
+      "properties": {
+        "write_mode": {
+          "type": "string",
+          "enum": ["read", "write_copy", "write_original", "live_edit"],
+          "default": "read",
+          "description": "Effective write level. read = no persistence; write_copy = persist to a staged copy; write_original = persist to the original active drawing (QSAVE); live_edit = act on the live in-session document."
+        },
+        "dry_run": {
+          "type": "boolean",
+          "default": false,
+          "description": "When true, the job is validated and planned but no entity is created/modified and nothing is persisted. The result reports what WOULD happen (status ok with a dry_run marker)."
+        },
+        "require_staged_copy": {
+          "type": "boolean",
+          "default": true,
+          "description": "When true (default for write_copy), the runner refuses to write unless target.dwg_path is a staged copy distinct from original_path (original-DWG safety)."
+        },
+        "save": {
+          "type": "boolean",
+          "description": "Whether to persist after a write (QSAVE for write_original). Defaults true for write_original."
+        },
+        "lock_document": {
+          "type": "boolean",
+          "default": true,
+          "description": "Lock the document before write/live operations (matches the LockDocument-before-Run contract)."
+        }
+      }
+    },
+    "output_mode": {
+      "type": "string",
+      "default": "summary",
+      "enum": ["summary", "graph", "ir"],
+      "description": "Shape of the returned result payload. summary = compact operation result + diagnostics (default). graph = result plus a graph/lineage projection of affected handles. ir = result plus a full ariadne.dwg_graph_ir.v1 document of the (post-operation) drawing/scope. The chosen mode determines which result refs the v2 result carries (result_ref / ir_ref)."
+    },
+    "args": {
+      "type": "object",
+      "default": {},
+      "description": "Operation-specific arguments. For the wired operations the same per-op required-arg rules as v1 apply (see allOf below). For catalogued/extended operations, args are validated against the operation's input_schema declared in the registry."
+    },
+    "idempotency_key": {
+      "type": "string",
+      "description": "Caller-supplied key that makes re-submission of the same logical job safe. The runner may dedupe/short-circuit on a repeated key. Recommended for write/live jobs."
+    },
+    "source_agent": {
+      "type": "string",
+      "description": "Identifier of the agent/runtime that issued this job (e.g. claude_code, codex, hermes, router). For provenance and audit; never carries secrets."
+    },
+    "correlation_id": {
+      "type": "string",
+      "description": "Optional id linking this job to a larger packet/convoy/run."
+    }
+  },
+  "allOf": [
+    {
+      "if": { "properties": { "operation": { "const": "extend.customclass.create" } } },
+      "then": {
+        "properties": {
+          "args": {
+            "type": "object",
+            "required": ["center", "size"],
+            "properties": {
+              "center": { "$ref": "#/$defs/point" },
+              "size": { "type": "number", "exclusiveMinimum": 0 }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": { "properties": { "operation": { "const": "extend.customobject.create" } } },
+      "then": {
+        "properties": {
+          "args": {
+            "type": "object",
+            "required": ["key", "value"],
+            "properties": {
+              "key": { "type": "string", "minLength": 1 },
+              "value": { "type": "integer" }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": { "properties": { "operation": { "const": "write.layer.create" } } },
+      "then": {
+        "properties": {
+          "args": {
+            "type": "object",
+            "required": ["name"],
+            "properties": {
+              "name": { "type": "string", "minLength": 1 },
+              "color_index": { "type": "integer", "minimum": 1, "maximum": 255 }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": { "properties": { "operation": { "const": "write.entity.line" } } },
+      "then": {
+        "properties": {
+          "args": {
+            "type": "object",
+            "required": ["start", "end"],
+            "properties": {
+              "layer": { "type": "string" },
+              "start": { "$ref": "#/$defs/point" },
+              "end": { "$ref": "#/$defs/point" }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": { "properties": { "operation": { "const": "write.entity.circle" } } },
+      "then": {
+        "properties": {
+          "args": {
+            "type": "object",
+            "required": ["center", "radius"],
+            "properties": {
+              "layer": { "type": "string" },
+              "center": { "$ref": "#/$defs/point" },
+              "radius": { "type": "number", "exclusiveMinimum": 0 }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": { "properties": { "operation": { "const": "inspect.entity.count" } } },
+      "then": {
+        "properties": {
+          "args": {
+            "type": "object",
+            "properties": { "type": { "type": "string" } }
+          }
+        }
+      }
+    },
+    {
+      "if": { "properties": { "operation": { "const": "write.xrecord.set" } } },
+      "then": {
+        "properties": {
+          "args": {
+            "type": "object",
+            "required": ["key", "value"],
+            "properties": {
+              "dictionary": { "type": "string", "default": "ARIADNE" },
+              "key": { "type": "string", "minLength": 1 },
+              "value": {}
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": { "properties": { "operation": { "const": "inspect.xrecord.get" } } },
+      "then": {
+        "properties": {
+          "args": {
+            "type": "object",
+            "required": ["key"],
+            "properties": {
+              "dictionary": { "type": "string", "default": "ARIADNE_NATIVE" },
+              "key": { "type": "string", "minLength": 1 }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": { "properties": { "operation": { "const": "write.xdata.set" } } },
+      "then": {
+        "properties": {
+          "args": {
+            "type": "object",
+            "required": ["app", "value"],
+            "properties": {
+              "app": { "type": "string", "minLength": 1 },
+              "value": { "type": "string" }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": { "properties": { "operation": { "const": "inspect.xdata.get" } } },
+      "then": {
+        "properties": {
+          "args": {
+            "type": "object",
+            "required": ["app"],
+            "properties": { "app": { "type": "string", "minLength": 1 } }
+          }
+        }
+      }
+    },
+    {
+      "if": { "properties": { "operation": { "const": "live.jig.point_probe" } } },
+      "then": {
+        "properties": {
+          "args": {
+            "type": "object",
+            "required": ["point"],
+            "properties": {
+              "point": { "$ref": "#/$defs/point" },
+              "base": { "$ref": "#/$defs/point" }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": { "properties": { "operation": { "const": "write.block.simple_create" } } },
+      "then": {
+        "properties": {
+          "args": {
+            "type": "object",
+            "required": ["name"],
+            "properties": { "name": { "type": "string", "minLength": 1 } }
+          }
+        }
+      }
+    },
+    {
+      "if": { "properties": { "operation": { "const": "write.block.insert" } } },
+      "then": {
+        "properties": {
+          "args": {
+            "type": "object",
+            "required": ["name", "position"],
+            "properties": {
+              "name": { "type": "string", "minLength": 1 },
+              "position": { "$ref": "#/$defs/point" }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": { "properties": { "operation": { "const": "inspect.block.count" } } },
+      "then": {
+        "properties": {
+          "args": {
+            "type": "object",
+            "properties": { "name": { "type": "string", "minLength": 1 } }
+          }
+        }
+      }
+    },
+    {
+      "if": { "properties": { "operation": { "const": "write.layout.create" } } },
+      "then": {
+        "properties": {
+          "args": {
+            "type": "object",
+            "required": ["name"],
+            "properties": { "name": { "type": "string", "minLength": 1 } }
+          }
+        }
+      }
+    }
+  ],
+  "$defs": {
+    "point": {
+      "type": "object",
+      "description": "2D/3D point. Matches the v1 cad_job $defs.point semantics (requires x,y; z defaults 0).",
+      "required": ["x", "y"],
+      "properties": {
+        "x": { "type": "number" },
+        "y": { "type": "number" },
+        "z": { "type": "number", "default": 0 }
+      }
+    }
+  }
+}

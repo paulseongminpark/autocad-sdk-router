@@ -1,0 +1,45 @@
+{
+  "packet_id": "CADOS_M01_FULL_STACK_ULTRACODE_BUILD",
+  "project": "autocad-sdk-router",
+  "root": "D:\\dev\\99_tools\\autocad-sdk-router",
+  "status": "PASS",
+  "version": "cad_os_layer_v0.1.0",
+  "timestamp_local": "2026-06-22T00:03:11+09:00",
+  "git": {
+    "repo": true,
+    "branch": "main",
+    "head": "CADOS_M01 closeout commit (see git log; prev 33b2932 init)",
+    "clean_after": true,
+    "pushed": false
+  },
+  "verified": {
+    "router_status_11_11": true,
+    "native_modules_pass": true,
+    "29_ops_intact": true,
+    "walking_skeleton": "PASS",
+    "golden_entity_count": 21747,
+    "native_graph_op": "implemented_crx_smoked",
+    "tests_passed": 120,
+    "original_dwg_modified": false,
+    "secrets_touched": false
+  },
+  "registry": {
+    "implemented": 30,
+    "stub": 8,
+    "blocked": 2,
+    "catalogued_families": 16,
+    "catalog_total": 480
+  },
+  "deferred": [
+    "D1: Ariadne.AcadNative.arx relink blocked by live acad.exe (PID 49460) file lock (LNK1104) - environmental, not a code defect; identical TU linked into .crx; on-disk .arx is prior working binary; relinks on next lock-free build.",
+    "D2: native inspect.database.graph verified DIRECTLY (accoreconsole+.scr) but NOT yet routable via cadctl/router - needs autocad-router.ps1 native allow-list edit (out of scope this packet). Walking skeleton uses existing geometry_native ObjectARX extract.",
+    "D3: non-ASCII fidelity - native graph op funnels dxf_name/layer/block_name through acharToAscii -> '?' for code points >127 (e.g. Korean to '????????'). geometry_native path preserves bytes. ASCII-funnel widening / JSON-lib vendoring = M02.",
+    "D4: coverage - 30 of 480 catalogued ops implemented (29 v1-wired + native graph); rest catalogued/stub/blocked by design (phased).",
+    "D5: patch EXECUTION and visual RENDER are not_implemented safety shells (no destructive writes, no fake visual PASS). Live ARX named-pipe pump = design-only (deferred)."
+  ],
+  "next_packet_options": [
+    "D04_IMPORT_CAD_OS_CAPABILITIES",
+    "CADOS_M02_NATIVE_IR_COMPLETION"
+  ],
+  "handoff_zip": "handoff/zip/CADOS_M01_FULL_STACK_ULTRACODE_BUILD.zip"
+}

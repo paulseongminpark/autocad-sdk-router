@@ -1,0 +1,815 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "ariadne.dwg_graph_ir.v1",
+  "title": "Ariadne DWG Graph IR v1",
+  "description": "Engine-neutral intermediate representation of a DWG/DXF drawing as a graph of symbol-table records, block definitions, block references (with transforms), and per-entity geometry. Produced by any extraction lane (native ObjectARX, ObjectDBX, managed accoremgd, or DXF/ezdxf) and normalized to a single shape so downstream consumers (diff, validation, lineage) never depend on the producing engine. additionalProperties is true at object boundaries where richer engines may attach extra fields; the truth gate is diagnostics.entity_count vs the realized entities[] length.",
+  "type": "object",
+  "additionalProperties": true,
+  "required": [
+    "schema",
+    "source",
+    "database",
+    "symbol_tables",
+    "entities",
+    "diagnostics"
+  ],
+  "properties": {
+    "schema": {
+      "type": "string",
+      "const": "ariadne.dwg_graph_ir.v1"
+    },
+    "ir_version": {
+      "type": "string",
+      "description": "Optional semantic version of the IR producer, e.g. 1.0.0."
+    },
+    "coverage_level": {
+      "type": "string",
+      "description": "Declared completeness tier of this IR document. native_full = native/managed full traversal (header+symbol tables+blocks+entities+xdata+dictionaries). dbx_full = ObjectDBX side-database traversal. dxf_geometry = DXF-derived geometry-only (no live runtime objects/proxies). geometry_only = entities + bbox without symbol-table depth. partial = explicitly incomplete (see diagnostics.errors).",
+      "enum": [
+        "native_full",
+        "dbx_full",
+        "managed_full",
+        "dxf_geometry",
+        "geometry_only",
+        "partial"
+      ]
+    },
+    "source": {
+      "$ref": "#/$defs/source_descriptor"
+    },
+    "database": {
+      "type": "object",
+      "description": "Drawing-level database state: header system variables, units, base point, extents, and global settings that scope the whole drawing.",
+      "additionalProperties": true,
+      "properties": {
+        "header_vars": {
+          "type": "object",
+          "description": "Raw DWG/DXF header system variables (e.g. ACADVER, DWGCODEPAGE, LUNITS, AUNITS, PDMODE). Keys are variable names; values are scalar/array as stored.",
+          "additionalProperties": true
+        },
+        "units": {
+          "type": "object",
+          "description": "Resolved drawing units.",
+          "additionalProperties": true,
+          "properties": {
+            "insunits": {
+              "type": "integer",
+              "description": "INSUNITS header value (0=unitless, 1=inches, 4=mm, 6=meters, ...)."
+            },
+            "insunits_text": { "type": "string" },
+            "linear_units": { "type": "integer", "description": "LUNITS." },
+            "angular_units": { "type": "integer", "description": "AUNITS." },
+            "linear_precision": { "type": "integer" },
+            "angular_precision": { "type": "integer" }
+          }
+        },
+        "insbase": {
+          "$ref": "#/$defs/point3",
+          "description": "INSBASE header system variable: the drawing insertion base point used when this drawing is inserted as a block/xref into another."
+        },
+        "extents": {
+          "type": "object",
+          "description": "Drawing extents (EXTMIN/EXTMAX) and limits (LIMMIN/LIMMAX).",
+          "additionalProperties": true,
+          "properties": {
+            "extmin": { "$ref": "#/$defs/point3" },
+            "extmax": { "$ref": "#/$defs/point3" },
+            "limmin": { "$ref": "#/$defs/point2" },
+            "limmax": { "$ref": "#/$defs/point2" }
+          }
+        },
+        "ucs": {
+          "type": "object",
+          "description": "Current UCS origin and axes at extraction time.",
+          "additionalProperties": true
+        },
+        "codepage": {
+          "type": "string",
+          "description": "DWGCODEPAGE / drawing code page (relevant for non-ASCII layer names such as Korean text)."
+        }
+      }
+    },
+    "symbol_tables": {
+      "type": "object",
+      "description": "The DWG symbol tables and named-object dictionaries. layers is the only required member (it may be empty for geometry_only coverage); all other tables are present at richer coverage levels.",
+      "additionalProperties": true,
+      "required": ["layers"],
+      "properties": {
+        "layers": {
+          "type": "array",
+          "description": "Layer table records.",
+          "items": { "$ref": "#/$defs/layer_record" }
+        },
+        "linetypes": {
+          "type": "array",
+          "description": "Linetype (LTYPE) table records.",
+          "items": { "$ref": "#/$defs/linetype_record" }
+        },
+        "text_styles": {
+          "type": "array",
+          "description": "Text style (STYLE) table records, including SHX/TTF font binding.",
+          "items": { "$ref": "#/$defs/text_style_record" }
+        },
+        "dim_styles": {
+          "type": "array",
+          "description": "Dimension style (DIMSTYLE) table records.",
+          "items": { "$ref": "#/$defs/dim_style_record" }
+        },
+        "block_table_records": {
+          "type": "array",
+          "description": "Block table records (BTR): the named-block registry including *Model_Space, *Paper_Space, and anonymous blocks. Geometry of each block lives under block_definitions keyed by the same handle.",
+          "items": { "$ref": "#/$defs/block_table_record" }
+        },
+        "viewports": {
+          "type": "array",
+          "description": "VPORT table records (named model-space viewport configurations). Paper-space VIEWPORT entities are carried in entities[] with class VIEWPORT.",
+          "items": { "$ref": "#/$defs/viewport_record" }
+        },
+        "views": {
+          "type": "array",
+          "description": "VIEW table records (named views).",
+          "items": { "type": "object", "additionalProperties": true }
+        },
+        "ucs_table": {
+          "type": "array",
+          "description": "UCS table records (named user coordinate systems).",
+          "items": { "type": "object", "additionalProperties": true }
+        },
+        "app_ids": {
+          "type": "array",
+          "description": "Registered application IDs (APPID / RegApp) used by XDATA.",
+          "items": { "type": "object", "additionalProperties": true }
+        }
+      }
+    },
+    "block_definitions": {
+      "type": "array",
+      "description": "Full geometric/content definition of each block table record. One entry per BTR that owns geometry; the entities owned by the block may be inlined here (def_entities) or referenced by owner_handle from the top-level entities[] array (an extractor picks one strategy and declares it in diagnostics.coverage).",
+      "items": { "$ref": "#/$defs/block_definition" }
+    },
+    "block_references": {
+      "type": "array",
+      "description": "Optional dedicated index of INSERT entities (block references) with resolved transforms and attribute values. INSERTs also appear in entities[]; this array is a convenience projection for consumers that traverse instance trees. May be omitted when entities[] is the single source.",
+      "items": { "$ref": "#/$defs/block_reference" }
+    },
+    "xrefs": {
+      "type": "array",
+      "description": "External reference (xref) block records: attached/overlaid drawings, their resolution status and saved path.",
+      "items": { "$ref": "#/$defs/xref_record" }
+    },
+    "dictionaries": {
+      "type": "array",
+      "description": "Named object dictionaries (ACAD_GROUP, ACAD_LAYOUT, ACAD_MLINESTYLE, ACAD_PLOTSETTINGS, custom app dictionaries, ...). Entries reference owned objects by handle.",
+      "items": { "$ref": "#/$defs/dictionary_record" }
+    },
+    "extension_dictionaries": {
+      "type": "array",
+      "description": "Per-object extension dictionaries (the dictionary an entity/object owns to attach app-specific persistent data). Keyed by owner_handle.",
+      "items": {
+        "type": "object",
+        "additionalProperties": true,
+        "required": ["owner_handle"],
+        "properties": {
+          "owner_handle": { "$ref": "#/$defs/handle" },
+          "dictionary_handle": { "$ref": "#/$defs/handle" },
+          "entries": {
+            "type": "array",
+            "items": { "$ref": "#/$defs/dictionary_entry" }
+          }
+        }
+      }
+    },
+    "xrecords": {
+      "type": "array",
+      "description": "XRECORD objects (resbuf/DXF-coded persistent records) wherever they live (in named dictionaries, extension dictionaries, or NOD). Each carries its owner and decoded result-buffer list.",
+      "items": { "$ref": "#/$defs/xrecord_record" }
+    },
+    "groups": {
+      "type": "array",
+      "description": "ACAD_GROUP entries: named/anonymous groups and their member entity handles.",
+      "items": {
+        "type": "object",
+        "additionalProperties": true,
+        "required": ["name", "members"],
+        "properties": {
+          "handle": { "$ref": "#/$defs/handle" },
+          "name": { "type": "string" },
+          "selectable": { "type": "boolean" },
+          "anonymous": { "type": "boolean" },
+          "members": {
+            "type": "array",
+            "description": "Handles of entities that belong to the group.",
+            "items": { "$ref": "#/$defs/handle" }
+          }
+        }
+      }
+    },
+    "materials": {
+      "type": "array",
+      "description": "ACAD_MATERIAL dictionary entries (render materials).",
+      "items": { "type": "object", "additionalProperties": true }
+    },
+    "plot_settings": {
+      "type": "array",
+      "description": "Named plot settings (ACAD_PLOTSETTINGS) and per-layout plot configuration (paper size, plot area, scale).",
+      "items": { "type": "object", "additionalProperties": true }
+    },
+    "layouts": {
+      "type": "array",
+      "description": "Layout objects (ACAD_LAYOUT): Model + each paper-space layout, with their owning block table record handle and tab order.",
+      "items": {
+        "type": "object",
+        "additionalProperties": true,
+        "required": ["name"],
+        "properties": {
+          "handle": { "$ref": "#/$defs/handle" },
+          "name": { "type": "string" },
+          "tab_order": { "type": "integer" },
+          "block_table_record_handle": {
+            "$ref": "#/$defs/handle",
+            "description": "Handle of the paper-space BTR that holds this layout's geometry."
+          },
+          "plot_settings_ref": { "$ref": "#/$defs/handle" }
+        }
+      }
+    },
+    "custom_objects": {
+      "type": "array",
+      "description": "Custom/proxy objects and entities: ACAD_PROXY_ENTITY / ACAD_PROXY_OBJECT and live custom classes whose owning ARX app may or may not be loaded. Captures class name, proxy flags, and graphics-only fallback so a no-fake-success extraction can record 'present but not natively decoded'.",
+      "items": { "$ref": "#/$defs/custom_object_record" }
+    },
+    "classes": {
+      "type": "array",
+      "description": "DWG CLASSES section: registered custom class records (dxf_name, cpp_class_name, app_name, proxy flags). Lets a consumer know which entity classes require which ARX app.",
+      "items": { "type": "object", "additionalProperties": true }
+    },
+    "entities": {
+      "type": "array",
+      "description": "Flat list of all entities across model space and paper-space layouts (and optionally block-definition geometry, when not inlined under block_definitions). The realized length of this array is the truth-gate numerator; it MUST equal diagnostics.entity_count.",
+      "items": { "$ref": "#/$defs/entity" }
+    },
+    "spatial_index": {
+      "type": "object",
+      "description": "Optional spatial acceleration structure over entities[] (e.g. an R-tree / grid). Advisory only; consumers may ignore it. When absent, consumers compute their own index from per-entity bbox.",
+      "additionalProperties": true,
+      "properties": {
+        "kind": {
+          "type": "string",
+          "enum": ["rtree", "grid", "quadtree", "bvh", "none"]
+        },
+        "world_bbox": { "$ref": "#/$defs/bbox" },
+        "nodes": {
+          "type": "array",
+          "description": "Index nodes; each typically references a bbox and a list of entity handles.",
+          "items": { "type": "object", "additionalProperties": true }
+        }
+      }
+    },
+    "diagnostics": {
+      "$ref": "#/$defs/diagnostics"
+    }
+  },
+  "$defs": {
+    "handle": {
+      "type": "string",
+      "description": "DWG entity/object handle as an uppercase hex string (e.g. \"2A7\"). Stable across a single drawing's lifetime; the primary cross-engine join key in the IR."
+    },
+    "point2": {
+      "type": "array",
+      "description": "2D point [x, y].",
+      "minItems": 2,
+      "maxItems": 2,
+      "items": { "type": "number" }
+    },
+    "point3": {
+      "type": "array",
+      "description": "3D point [x, y, z].",
+      "minItems": 3,
+      "maxItems": 3,
+      "items": { "type": "number" }
+    },
+    "bbox": {
+      "type": "array",
+      "description": "Axis-aligned bounding box as [minX, minY, minZ, maxX, maxY, maxZ]. For 2D geometry minZ=maxZ=0. Empty array [] means 'no bbox computed' (e.g. for zero-extent or non-graphical objects).",
+      "minItems": 0,
+      "items": { "type": "number" }
+    },
+    "source_descriptor": {
+      "type": "object",
+      "description": "Provenance of this IR: which drawing file it came from, which engine/extractor produced it, and integrity fingerprints. Required so every IR is traceable to an exact input.",
+      "additionalProperties": true,
+      "properties": {
+        "dwg_path": {
+          "type": "string",
+          "description": "Path to the source DWG/DXF. For staged extraction this is the staged copy, not the read-only original."
+        },
+        "original_path": {
+          "type": "string",
+          "description": "Path to the read-only original, if the extraction worked from a staged copy."
+        },
+        "dwg_name": { "type": "string" },
+        "format": {
+          "type": "string",
+          "enum": ["dwg", "dxf", "dxb", "unknown"]
+        },
+        "dwg_version": {
+          "type": "string",
+          "description": "DWG format version string, e.g. AC1032 (2018) / AC1027 (2013)."
+        },
+        "byte_size": { "type": "integer", "minimum": 0 },
+        "sha256": {
+          "type": "string",
+          "description": "SHA-256 of the source file bytes for integrity/traceability."
+        },
+        "mtime": {
+          "type": "string",
+          "description": "Source file modification time (ISO-8601)."
+        },
+        "extractor": {
+          "type": "string",
+          "description": "Name of the producing extractor (e.g. objectarx_active_document, objectdbx_sidedb, autolisp_ssget, accoremgd_managed, ezdxf)."
+        },
+        "extractor_version": { "type": "string" },
+        "engine_tier": {
+          "type": "string",
+          "description": "Which API surface produced this IR.",
+          "enum": [
+            "native_arx",
+            "objectdbx",
+            "managed",
+            "accoreconsole_lisp",
+            "dxf"
+          ]
+        },
+        "extracted_at": {
+          "type": "string",
+          "description": "Extraction timestamp (ISO-8601)."
+        }
+      }
+    },
+    "layer_record": {
+      "type": "object",
+      "description": "One LAYER symbol-table record.",
+      "additionalProperties": true,
+      "required": ["name"],
+      "properties": {
+        "handle": { "$ref": "#/$defs/handle" },
+        "name": { "type": "string", "description": "Layer name (may be non-ASCII)." },
+        "color_index": { "type": "integer", "description": "ACI color 1-255 (negative = off)." },
+        "true_color": { "type": "string", "description": "RGB true color, if set (e.g. #RRGGBB)." },
+        "linetype": { "type": "string" },
+        "lineweight": { "type": "integer" },
+        "plottable": { "type": "boolean" },
+        "frozen": { "type": "boolean" },
+        "locked": { "type": "boolean" },
+        "off": { "type": "boolean" },
+        "is_xref_dependent": { "type": "boolean" }
+      }
+    },
+    "linetype_record": {
+      "type": "object",
+      "description": "One LTYPE symbol-table record.",
+      "additionalProperties": true,
+      "required": ["name"],
+      "properties": {
+        "handle": { "$ref": "#/$defs/handle" },
+        "name": { "type": "string" },
+        "description": { "type": "string" },
+        "pattern_length": { "type": "number" },
+        "dash_lengths": {
+          "type": "array",
+          "items": { "type": "number" }
+        }
+      }
+    },
+    "text_style_record": {
+      "type": "object",
+      "description": "One STYLE (text style) symbol-table record, including font binding.",
+      "additionalProperties": true,
+      "required": ["name"],
+      "properties": {
+        "handle": { "$ref": "#/$defs/handle" },
+        "name": { "type": "string" },
+        "font_file": { "type": "string", "description": "SHX/TTF primary font file." },
+        "big_font_file": { "type": "string", "description": "SHX bigfont (CJK) file." },
+        "height": { "type": "number" },
+        "width_factor": { "type": "number" },
+        "oblique_angle": { "type": "number" }
+      }
+    },
+    "dim_style_record": {
+      "type": "object",
+      "description": "One DIMSTYLE symbol-table record. Dimension variables (DIMSCALE, DIMTXT, ...) are carried in dim_vars.",
+      "additionalProperties": true,
+      "required": ["name"],
+      "properties": {
+        "handle": { "$ref": "#/$defs/handle" },
+        "name": { "type": "string" },
+        "dim_vars": {
+          "type": "object",
+          "description": "Resolved dimension system variables for this style.",
+          "additionalProperties": true
+        }
+      }
+    },
+    "block_table_record": {
+      "type": "object",
+      "description": "One BLOCK_RECORD (BTR) entry: the registry-level record for a block, model space, paper space, or anonymous block.",
+      "additionalProperties": true,
+      "required": ["name"],
+      "properties": {
+        "handle": { "$ref": "#/$defs/handle" },
+        "name": { "type": "string", "description": "Block name. *Model_Space and *Paper_Space are the layout BTRs; *U### / *D### are anonymous." },
+        "is_layout": { "type": "boolean" },
+        "is_anonymous": { "type": "boolean" },
+        "is_xref": { "type": "boolean" },
+        "is_xref_overlay": { "type": "boolean" },
+        "has_attribute_definitions": { "type": "boolean" },
+        "origin": { "$ref": "#/$defs/point3" },
+        "entity_count": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Number of entities owned by this BTR (definition geometry)."
+        }
+      }
+    },
+    "block_definition": {
+      "type": "object",
+      "description": "Geometric definition of a block: its BTR handle/name plus either inlined definition entities or a pointer (via owner_handle on entities[]) to its geometry.",
+      "additionalProperties": true,
+      "required": ["name"],
+      "properties": {
+        "handle": { "$ref": "#/$defs/handle", "description": "Handle of the owning BTR." },
+        "name": { "type": "string" },
+        "origin": { "$ref": "#/$defs/point3" },
+        "bbox": { "$ref": "#/$defs/bbox" },
+        "attribute_definitions": {
+          "type": "array",
+          "description": "ATTDEF templates defined in the block.",
+          "items": { "type": "object", "additionalProperties": true }
+        },
+        "def_entities": {
+          "type": "array",
+          "description": "Inlined definition geometry (optional). When present these are the same entity shape as top-level entities[]; when absent, definition geometry is found in entities[] by owner_handle == this BTR handle.",
+          "items": { "$ref": "#/$defs/entity" }
+        }
+      }
+    },
+    "block_reference": {
+      "type": "object",
+      "description": "An INSERT (block reference) with resolved placement transform and any attribute values. Mirrors the corresponding entities[] item (same handle).",
+      "additionalProperties": true,
+      "required": ["handle", "block_name"],
+      "properties": {
+        "handle": { "$ref": "#/$defs/handle" },
+        "block_name": { "type": "string" },
+        "block_record_handle": { "$ref": "#/$defs/handle" },
+        "space": { "$ref": "#/$defs/space" },
+        "layer": { "type": "string" },
+        "insertion_point": { "$ref": "#/$defs/point3" },
+        "scale": { "$ref": "#/$defs/point3", "description": "X/Y/Z scale factors." },
+        "rotation": { "type": "number", "description": "Rotation in radians (or degrees if declared by extractor; document in DWG_GRAPH_IR_SPEC)." },
+        "normal": { "$ref": "#/$defs/point3", "description": "Extrusion/normal vector (OCS)." },
+        "transform": { "$ref": "#/$defs/transform4x4" },
+        "is_dynamic": { "type": "boolean" },
+        "attributes": {
+          "type": "array",
+          "description": "ATTRIB values attached to this reference.",
+          "items": {
+            "type": "object",
+            "additionalProperties": true,
+            "properties": {
+              "tag": { "type": "string" },
+              "value": { "type": "string" },
+              "handle": { "$ref": "#/$defs/handle" }
+            }
+          }
+        }
+      }
+    },
+    "transform4x4": {
+      "type": "array",
+      "description": "Block reference placement as a 4x4 row-major transform matrix (16 numbers). Provided alongside insertion_point/scale/rotation for consumers that prefer a single matrix.",
+      "minItems": 16,
+      "maxItems": 16,
+      "items": { "type": "number" }
+    },
+    "xref_record": {
+      "type": "object",
+      "description": "An external reference block.",
+      "additionalProperties": true,
+      "required": ["name"],
+      "properties": {
+        "handle": { "$ref": "#/$defs/handle" },
+        "name": { "type": "string" },
+        "path": { "type": "string", "description": "Saved xref path." },
+        "resolved_path": { "type": "string" },
+        "status": {
+          "type": "string",
+          "enum": ["resolved", "unresolved", "unloaded", "unreferenced", "not_found", "orphaned"]
+        },
+        "is_overlay": { "type": "boolean" },
+        "nesting_depth": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "dictionary_record": {
+      "type": "object",
+      "description": "A DICTIONARY object and its entries.",
+      "additionalProperties": true,
+      "required": ["entries"],
+      "properties": {
+        "handle": { "$ref": "#/$defs/handle" },
+        "name": { "type": "string", "description": "Dictionary name as keyed in its parent (e.g. ACAD_LAYOUT)." },
+        "owner_handle": { "$ref": "#/$defs/handle" },
+        "is_hard_owner": { "type": "boolean" },
+        "entries": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/dictionary_entry" }
+        }
+      }
+    },
+    "dictionary_entry": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": ["key", "value_handle"],
+      "properties": {
+        "key": { "type": "string" },
+        "value_handle": { "$ref": "#/$defs/handle", "description": "Handle of the object this key points to." }
+      }
+    },
+    "xrecord_record": {
+      "type": "object",
+      "description": "An XRECORD object with its decoded result-buffer (resbuf) list.",
+      "additionalProperties": true,
+      "required": ["handle", "owner_handle"],
+      "properties": {
+        "handle": { "$ref": "#/$defs/handle" },
+        "owner_handle": { "$ref": "#/$defs/handle" },
+        "dictionary": { "type": "string", "description": "Owning dictionary name/path if applicable (e.g. ARIADNE, ARIADNE_NATIVE)." },
+        "key": { "type": "string" },
+        "resbuf": {
+          "type": "array",
+          "description": "Decoded result buffer: ordered DXF-coded values.",
+          "items": { "$ref": "#/$defs/resbuf_item" }
+        }
+      }
+    },
+    "resbuf_item": {
+      "type": "object",
+      "description": "One DXF group-code/value pair from a result buffer or XDATA.",
+      "additionalProperties": true,
+      "required": ["code"],
+      "properties": {
+        "code": { "type": "integer", "description": "DXF group code." },
+        "value": { "description": "Scalar value (number, string, handle, or point array) per the group code." }
+      }
+    },
+    "xdata_block": {
+      "type": "object",
+      "description": "Extended entity data for one registered application.",
+      "additionalProperties": true,
+      "required": ["app"],
+      "properties": {
+        "app": { "type": "string", "description": "Registered application name (RegAppId)." },
+        "items": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/resbuf_item" }
+        }
+      }
+    },
+    "viewport_record": {
+      "type": "object",
+      "description": "A VPORT table record (named viewport config) or a paper-space VIEWPORT entity summary.",
+      "additionalProperties": true,
+      "required": ["name"],
+      "properties": {
+        "handle": { "$ref": "#/$defs/handle" },
+        "name": { "type": "string" },
+        "center": { "$ref": "#/$defs/point2" },
+        "height": { "type": "number" },
+        "width": { "type": "number" },
+        "view_target": { "$ref": "#/$defs/point3" },
+        "view_direction": { "$ref": "#/$defs/point3" }
+      }
+    },
+    "custom_object_record": {
+      "type": "object",
+      "description": "A custom/proxy object or entity. Records enough to surface 'present but possibly not natively decodable' so extraction never fakes a decode it could not perform.",
+      "additionalProperties": true,
+      "required": ["handle", "class_name"],
+      "properties": {
+        "handle": { "$ref": "#/$defs/handle" },
+        "class_name": { "type": "string", "description": "Runtime/DXF class name (e.g. ACAD_PROXY_ENTITY or a third-party class)." },
+        "dxf_name": { "type": "string" },
+        "is_proxy": { "type": "boolean", "description": "True when the owning ARX app is not loaded and only proxy graphics are available." },
+        "app_name": { "type": "string", "description": "ARX application that owns this class, if known." },
+        "decoded": {
+          "type": "boolean",
+          "description": "True only when the object was natively decoded. False = graphics/proxy fallback only (no-fake-success marker)."
+        },
+        "graphics_only": { "type": "boolean" },
+        "owner_handle": { "$ref": "#/$defs/handle" }
+      }
+    },
+    "space": {
+      "type": "string",
+      "description": "Which space the entity lives in.",
+      "enum": ["model", "paper", "block"]
+    },
+    "geometry": {
+      "type": "object",
+      "description": "Geometric payload of an entity, discriminated by kind. Only the fields relevant to a given kind are populated; additionalProperties true allows engine-specific extras (e.g. bulge arrays, OCS normals, spline control points). kind == unsupported means the extractor recognized the entity but did not emit coordinate geometry (no-fake-success).",
+      "additionalProperties": true,
+      "required": ["kind"],
+      "properties": {
+        "kind": {
+          "type": "string",
+          "description": "Geometry discriminator. Aligned with the v1 dwg_geometry_extract contract plus IR extensions.",
+          "enum": [
+            "line",
+            "polyline",
+            "lwpolyline",
+            "arc",
+            "circle",
+            "ellipse",
+            "spline",
+            "point",
+            "text",
+            "mtext",
+            "block_reference",
+            "attribute",
+            "dimension",
+            "leader",
+            "hatch",
+            "solid",
+            "region",
+            "viewport",
+            "ray",
+            "xline",
+            "proxy",
+            "unsupported"
+          ]
+        },
+        "start": { "$ref": "#/$defs/point3" },
+        "end": { "$ref": "#/$defs/point3" },
+        "center": { "$ref": "#/$defs/point3" },
+        "position": { "$ref": "#/$defs/point3" },
+        "radius": { "type": "number" },
+        "major_axis": { "$ref": "#/$defs/point3" },
+        "minor_ratio": { "type": "number" },
+        "start_angle": { "type": "number" },
+        "end_angle": { "type": "number" },
+        "normal": { "$ref": "#/$defs/point3", "description": "OCS extrusion/normal vector." },
+        "closed": { "type": "boolean" },
+        "vertices": {
+          "type": "array",
+          "description": "Ordered vertices for polyline-family geometry. Each vertex is at minimum a point; LWPOLYLINE vertices may carry a bulge.",
+          "items": {
+            "type": "object",
+            "additionalProperties": true,
+            "properties": {
+              "point": { "$ref": "#/$defs/point3" },
+              "bulge": { "type": "number" },
+              "start_width": { "type": "number" },
+              "end_width": { "type": "number" }
+            }
+          }
+        },
+        "text": { "type": "string", "description": "Resolved text/mtext content." },
+        "height": { "type": "number" },
+        "rotation": { "type": "number" },
+        "block_name": { "type": "string", "description": "For block_reference geometry: referenced block name." },
+        "scale": { "$ref": "#/$defs/point3" },
+        "dimension_type": { "type": "string" },
+        "measurement": { "type": "number", "description": "Dimension measured value." },
+        "control_points": {
+          "type": "array",
+          "description": "Spline control points.",
+          "items": { "$ref": "#/$defs/point3" }
+        },
+        "degree": { "type": "integer" },
+        "loops": {
+          "type": "array",
+          "description": "Hatch boundary loops.",
+          "items": { "type": "object", "additionalProperties": true }
+        },
+        "pattern_name": { "type": "string" }
+      }
+    },
+    "entity": {
+      "type": "object",
+      "description": "A single drawing entity, normalized across engines. handle is the join key; class/dxf_name give the runtime and DXF type; owner_handle ties block-definition entities to their BTR; space says model/paper/block; geometry carries coordinates. This is a superset of the v1 dwg_geometry_extract entity shape.",
+      "additionalProperties": true,
+      "required": ["handle", "class", "dxf_name", "owner_handle", "space", "layer", "bbox", "geometry", "source"],
+      "properties": {
+        "handle": { "$ref": "#/$defs/handle" },
+        "object_id": { "type": "string", "description": "Optional engine-local object id/pointer (non-portable; handle is the portable key)." },
+        "class": { "type": "string", "description": "Runtime class name (e.g. AcDbLine, AcDbBlockReference)." },
+        "dxf_name": { "type": "string", "description": "DXF entity name (e.g. LINE, LWPOLYLINE, INSERT, DIMENSION)." },
+        "owner_handle": { "$ref": "#/$defs/handle", "description": "Handle of the owning BTR (model space, paper space, or a block definition). Empty string allowed when owner is not resolved." },
+        "space": { "$ref": "#/$defs/space" },
+        "layout": { "type": "string", "description": "Layout/tab name when space == paper." },
+        "layer": { "type": "string" },
+        "linetype": { "type": "string" },
+        "color_index": { "type": "integer" },
+        "lineweight": { "type": "integer" },
+        "visible": { "type": "boolean" },
+        "bbox": { "$ref": "#/$defs/bbox" },
+        "geometry": { "$ref": "#/$defs/geometry" },
+        "xdata": {
+          "type": "array",
+          "description": "XDATA blocks attached to this entity (per registered app).",
+          "items": { "$ref": "#/$defs/xdata_block" }
+        },
+        "extension_dictionary_handle": { "$ref": "#/$defs/handle" },
+        "reactors": {
+          "type": "array",
+          "description": "Handles of persistent reactors attached to this entity.",
+          "items": { "$ref": "#/$defs/handle" }
+        },
+        "source": {
+          "type": "object",
+          "description": "Per-entity provenance: which engine/pass emitted this record and any decode notes. Required so a partial/merged IR can attribute each entity.",
+          "additionalProperties": true,
+          "properties": {
+            "extractor": { "type": "string" },
+            "engine_tier": { "type": "string" },
+            "decoded": { "type": "boolean", "description": "False = geometry kind 'unsupported'/proxy fallback (no-fake-success)." },
+            "notes": { "type": "string" }
+          }
+        }
+      }
+    },
+    "diagnostics": {
+      "type": "object",
+      "description": "Extraction self-report and the truth gate. entity_count is the asserted modelspace/total entity count; it MUST equal the realized entities[] length for the declared scope (this is the cross-engine truth gate, e.g. 21747 == 21747 == 21747). warnings/errors capture degradation; coverage enumerates which IR sections were actually populated by which engine.",
+      "additionalProperties": true,
+      "required": ["entity_count", "warnings", "errors", "coverage"],
+      "properties": {
+        "entity_count": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Asserted entity count for the declared scope (see count_scope). Truth-gate numerator."
+        },
+        "count_scope": {
+          "type": "string",
+          "description": "What entity_count counts.",
+          "enum": ["modelspace", "modelspace_and_paperspace", "all_including_block_definitions", "total"]
+        },
+        "realized_entity_count": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Length of entities[] as actually emitted. A consumer/validator asserts entity_count == realized_entity_count for the matching scope; a mismatch is a hard failure."
+        },
+        "entities_by_type": {
+          "type": "object",
+          "description": "Count per DXF type (e.g. LINE, INSERT, LWPOLYLINE). Sums to entity_count for the matching scope.",
+          "additionalProperties": { "type": "integer" }
+        },
+        "warnings": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "errors": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "coverage": {
+          "type": "object",
+          "description": "Which IR sections were populated, and at what fidelity. Keys are IR section names (header_vars, layers, block_definitions, xdata, dictionaries, custom_objects, ...); values describe extraction status for that section.",
+          "additionalProperties": true,
+          "properties": {
+            "sections_present": {
+              "type": "array",
+              "description": "Names of IR sections this extractor populated.",
+              "items": { "type": "string" }
+            },
+            "sections_skipped": {
+              "type": "array",
+              "description": "Names of IR sections deliberately not populated at this coverage level.",
+              "items": { "type": "string" }
+            },
+            "proxy_or_undecoded_count": {
+              "type": "integer",
+              "minimum": 0,
+              "description": "Entities/objects recorded as present but not natively decoded (no-fake-success accounting)."
+            }
+          }
+        },
+        "engines": {
+          "type": "array",
+          "description": "When this IR merges multiple extraction passes, the list of engines that contributed and the count each asserted (supports the 3-way agreement record).",
+          "items": {
+            "type": "object",
+            "additionalProperties": true,
+            "properties": {
+              "extractor": { "type": "string" },
+              "engine_tier": { "type": "string" },
+              "entity_count": { "type": "integer", "minimum": 0 }
+            }
+          }
+        }
+      }
+    }
+  }
+}

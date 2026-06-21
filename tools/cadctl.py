@@ -1,0 +1,561 @@
+#!/usr/bin/env python
+"""cadctl.py -- the CAD OS Layer control surface (Lane B1).
+
+`Cad` is a thin, truthful orchestrator over the existing AutoCAD SDK router. It
+never parses a DWG itself: it stages a COPY of an input drawing under
+staging/golden/<ts>/ and drives tools/autocad-router.ps1 (ObjectARX ->
+ObjectDBX -> AutoLISP) to produce a dwg_geometry_extract.v1 JSON, then normalizes
+that to the engine-neutral ariadne.dwg_graph_ir.v1 via tools/ir_builder.py.
+
+Invariants honored here:
+  * Original DWG files are READ-ONLY. inspect() always operates on a staged copy.
+  * No-fake-success. If the router extraction is unavailable/fails, or a required
+    sibling module (ir_builder / sqlite_ir_store / validator) is absent, the
+    method returns a truthful status (not_implemented / unavailable / partial /
+    blocked) -- never a faked ok.
+  * status() READS the published router status JSON read-only; it never runs
+    `-Action status`.
+  * Every external command's stdout + stderr + exit code is captured into out_dir.
+
+Standard library only (json, sqlite3 are stdlib). Config/status JSON on this box
+is BOM-prefixed -> read with encoding="utf-8-sig".
+"""
+from __future__ import annotations
+
+import hashlib
+import json
+import os
+import shutil
+import sys
+from datetime import datetime, timezone
+from pathlib import Path
+
+_THIS_DIR = Path(__file__).resolve().parent
+ROUTER_HOME = _THIS_DIR.parent
+CONFIG_DIR = ROUTER_HOME / "config"
+REPORTS_DIR = ROUTER_HOME / "reports"
+STAGING_GOLDEN_DIR = ROUTER_HOME / "staging" / "golden"
+
+STATUS_JSON = REPORTS_DIR / "autocad_router_status_latest.json"
+OPERATIONS_V2 = CONFIG_DIR / "operations.v2.json"
+
+# Ensure sibling tools/*.py are importable when cadctl is imported by path.
+if str(_THIS_DIR) not in sys.path:
+    sys.path.insert(0, str(_THIS_DIR))
+
+import run_job  # noqa: E402  (sibling helper, Lane B1)
+import normalize_result  # noqa: E402  (sibling helper, Lane B1)
+import route_select  # noqa: E402  (sibling helper, Lane B1)
+
+
+def _now_iso() -> str:
+    return datetime.now(timezone.utc).isoformat()
+
+
+def _ts() -> str:
+    return datetime.now().strftime("%Y%m%d_%H%M%S_%f")[:-3]
+
+
+def _load_json_bom(path: Path) -> dict:
+    return json.loads(Path(path).read_text(encoding="utf-8-sig"))
+
+
+def _sha256_head(path: Path, n: int = 16) -> str:
+    h = hashlib.sha256()
+    with open(path, "rb") as fh:
+        for chunk in iter(lambda: fh.read(1 << 20), b""):
+            h.update(chunk)
+    return h.hexdigest()[:n].upper()
+
+
+def _import_optional(module_name: str):
+    """Import a sibling module that another lane owns; return (mod, error_str|None)."""
+    try:
+        mod = __import__(module_name)
+        return mod, None
+    except Exception as exc:  # ImportError or downstream error in that module
+        return None, f"{type(exc).__name__}: {exc}"
+
+
+class Cad:
+    """The cadctl control surface. All methods return plain dicts (stateless)."""
+
+    def __init__(self, router_home: Path | str = ROUTER_HOME):
+        self.router_home = Path(router_home)
+        self.config_dir = self.router_home / "config"
+        self.reports_dir = self.router_home / "reports"
+        self.status_json = self.reports_dir / "autocad_router_status_latest.json"
+        self.staging_golden = self.router_home / "staging" / "golden"
+
+    # ------------------------------------------------------------------ status
+    def status(self) -> dict:
+        """Read the published router status JSON read-only and normalize it.
+
+        DOES NOT run `-Action status`. If the published file is missing, report
+        that truthfully (status='unavailable') rather than spawning a probe.
+        """
+        if not self.status_json.exists():
+            return {
+                "schema": "ariadne.cadctl.status.v1",
+                "status": "unavailable",
+                "reason": f"published router status JSON not found: {self.status_json}",
+                "status_json_path": str(self.status_json),
+                "route_count": 0,
+                "available_count": 0,
+                "native_available": False,
+            }
+        try:
+            raw = _load_json_bom(self.status_json)
+        except Exception as exc:
+            return {
+                "schema": "ariadne.cadctl.status.v1",
+                "status": "error",
+                "reason": f"failed to parse status JSON: {type(exc).__name__}: {exc}",
+                "status_json_path": str(self.status_json),
+            }
+        native_modules = raw.get("native_modules") or {}
+        native_status = str(native_modules.get("status", "")).upper()
+        routes = raw.get("routes") or []
+        out = {
+            "schema": "ariadne.cadctl.status.v1",
+            "status": "ok",
+            "router_status": raw.get("status"),
+            "router_status_schema": raw.get("schema"),
+            "status_json_path": str(self.status_json),
+            "router_home": raw.get("router_home"),
+            "timestamp": raw.get("timestamp"),
+            "route_count": raw.get("route_count", len(routes)),
+            "available_count": raw.get(
+                "available_count",
+                sum(1 for r in routes if r.get("available")),
+            ),
+            "unavailable": list(raw.get("unavailable", []) or []),
+            "native_available": native_status == "PASS",
+            "native_modules_status": native_modules.get("status"),
+            "routes": [
+                {"route": r.get("route"), "available": bool(r.get("available")),
+                 "engine": r.get("engine")}
+                for r in routes
+            ],
+            "note": "read-only snapshot of the router-published status; not a live probe.",
+        }
+        return out
+
+    # ----------------------------------------------------------------- inspect
+    def inspect(self, dwg_path: str, out_dir: str, mode: str = "graph") -> dict:
+        """Stage a COPY of dwg_path, run the router DWG extraction on the copy,
+        normalize to dwg_graph_ir.v1, and write the full artifact set into out_dir.
+
+        Artifacts written to out_dir:
+          cad_job.json        -- the job descriptor we issued
+          stdout.txt          -- router stdout (captured)
+          stderr.txt          -- router stderr (captured)
+          cad_result.json     -- ariadne.autocad_sdk_result.v2
+          dwg_graph_ir.json   -- ariadne.dwg_graph_ir.v1 (when extraction succeeded)
+
+        Truthful failure modes:
+          - input missing                -> status 'blocked'
+          - ir_builder (Lane B3) absent  -> status 'not_implemented'
+          - router extraction failed     -> status 'partial' / 'unavailable'
+        """
+        out_dir_p = Path(out_dir)
+        out_dir_p.mkdir(parents=True, exist_ok=True)
+        cad_job_path = out_dir_p / "cad_job.json"
+        cad_result_path = out_dir_p / "cad_result.json"
+        ir_path = out_dir_p / "dwg_graph_ir.json"
+
+        src = Path(dwg_path)
+        operation = "inspect.geometry.extract"
+
+        # --- precondition: input exists ---
+        if not src.exists():
+            cad_job = self._build_cad_job(operation, dwg_path, None, mode)
+            cad_job_path.write_text(json.dumps(cad_job, ensure_ascii=False, indent=2), encoding="utf-8")
+            result = normalize_result.blocked_result(
+                operation, "PRECONDITION_FAILED",
+                f"input DWG not found: {dwg_path}", input_path=str(dwg_path),
+            )
+            result["job_ref"] = str(cad_job_path)
+            cad_result_path.write_text(json.dumps(result, ensure_ascii=False, indent=2), encoding="utf-8")
+            return self._inspect_envelope("blocked", result, cad_job_path, cad_result_path,
+                                          None, None, staged=None,
+                                          reason="input DWG not found")
+
+        # --- stage a COPY under staging/golden/<ts>/ (NEVER touch the original) ---
+        stage_root = self.staging_golden / _ts()
+        stage_root.mkdir(parents=True, exist_ok=True)
+        staged = stage_root / "input.dwg"
+        shutil.copy2(src, staged)
+        try:
+            os.chmod(staged, 0o666)  # ensure the staged copy is writable for the lane
+        except OSError:
+            pass
+        staged_meta = {
+            "staged_copy": str(staged),
+            "original": str(src.resolve()),
+            "byte_size": staged.stat().st_size,
+            "sha256_16": _sha256_head(staged),
+            "staged_at": _now_iso(),
+        }
+
+        cad_job = self._build_cad_job(operation, dwg_path, staged_meta, mode)
+        cad_job_path.write_text(json.dumps(cad_job, ensure_ascii=False, indent=2), encoding="utf-8")
+
+        # --- run the router extraction on the COPY (captures stdout/stderr/exit) ---
+        run_res = run_job.run_router_extract(
+            str(staged), str(out_dir_p), intent="dwg", extract_mode="geometry_native"
+        )
+        envelope = run_res.get("envelope")
+
+        # Build the cad_result.v2 from whatever the router returned.
+        if envelope is None:
+            # Router produced no parseable JSON (missing entrypoint, spawn failure,
+            # or timeout). That is unavailable/partial, never ok.
+            reason = run_res.get("error") or "router produced no parseable JSON envelope"
+            status_word = "unavailable" if run_res.get("error") else "partial"
+            code = "HOST_UNAVAILABLE" if run_res.get("error") else "ROUTE_NONZERO_EXIT"
+            result = normalize_result.blocked_result(
+                operation, code, reason,
+                exit_code=run_res.get("exit_code"),
+                stdout_ref=run_res.get("stdout_path"),
+                stderr_ref=run_res.get("stderr_path"),
+            )
+            # blocked_result chose status by code; force the intended word.
+            result["status"] = status_word
+            result["error"]["retryable"] = True
+            result["job_ref"] = str(cad_job_path)
+            result.setdefault("artifacts", []).append(
+                {"kind": "dwg_staged", "ref": str(staged)}
+            )
+            cad_result_path.write_text(json.dumps(result, ensure_ascii=False, indent=2), encoding="utf-8")
+            return self._inspect_envelope(status_word, result, cad_job_path, cad_result_path,
+                                          run_res.get("stdout_path"), run_res.get("stderr_path"),
+                                          staged=str(staged), reason=reason)
+
+        result = normalize_result.normalize_router_run(
+            envelope,
+            operation=operation,
+            job_ref=str(cad_job_path),
+            write_mode="read",
+            stdout_ref=run_res.get("stdout_path"),
+            stderr_ref=run_res.get("stderr_path"),
+        )
+
+        # If the router did not succeed, write the result and stop (no IR).
+        if result.get("status") != "ok":
+            cad_result_path.write_text(json.dumps(result, ensure_ascii=False, indent=2), encoding="utf-8")
+            return self._inspect_envelope(result.get("status", "error"), result,
+                                          cad_job_path, cad_result_path,
+                                          run_res.get("stdout_path"), run_res.get("stderr_path"),
+                                          staged=str(staged),
+                                          reason="router extraction did not return ok")
+
+        # --- load the extract JSON the router wrote ---
+        extract_ref = result.get("result_ref")
+        extract = None
+        extract_err = None
+        if extract_ref and Path(extract_ref).exists():
+            try:
+                extract = _load_json_bom(Path(extract_ref))
+            except Exception as exc:
+                extract_err = f"failed to read extract JSON: {type(exc).__name__}: {exc}"
+        else:
+            extract_err = f"router reported ok but extract JSON missing: {extract_ref}"
+
+        if extract is None:
+            result["status"] = "partial"
+            result["error"] = {
+                "code": "VALIDATION_ERROR",
+                "message": extract_err or "extract unavailable",
+                "retryable": False,
+            }
+            cad_result_path.write_text(json.dumps(result, ensure_ascii=False, indent=2), encoding="utf-8")
+            return self._inspect_envelope("partial", result, cad_job_path, cad_result_path,
+                                          run_res.get("stdout_path"), run_res.get("stderr_path"),
+                                          staged=str(staged), reason=extract_err)
+
+        # --- normalize extract -> dwg_graph_ir.v1 via Lane B3's ir_builder ---
+        ir_builder, imp_err = _import_optional("ir_builder")
+        if ir_builder is None:
+            # ir_builder is owned by Lane B3 and not present yet: report truthfully.
+            result["status"] = "not_implemented"
+            result["error"] = {
+                "code": "OPERATION_NOT_IMPLEMENTED",
+                "message": f"ir_builder (Lane B3) unavailable; cannot normalize extract to dwg_graph_ir.v1: {imp_err}",
+                "retryable": True,
+                "details": {"missing_module": "ir_builder", "extract_ref": extract_ref},
+            }
+            cad_result_path.write_text(json.dumps(result, ensure_ascii=False, indent=2), encoding="utf-8")
+            return self._inspect_envelope("not_implemented", result, cad_job_path, cad_result_path,
+                                          run_res.get("stdout_path"), run_res.get("stderr_path"),
+                                          staged=str(staged),
+                                          reason="ir_builder not available")
+
+        source_meta = {
+            "dwg_path": str(staged),
+            "original_path": str(src.resolve()),
+            "dwg_name": src.name,
+            "format": "dwg",
+            "byte_size": staged_meta["byte_size"],
+            "sha256": _sha256_head(staged, 64).lower(),
+            "extractor": (envelope.get("execution") or {}).get("engine_output", {}).get("winning_engine")
+            or "objectarx",
+            "engine_tier": "native_arx",
+            "extracted_at": _now_iso(),
+        }
+        summary = extract.get("summary")
+        try:
+            ir = ir_builder.build_ir_from_extract(extract, summary, source_meta)
+            ir_written = ir_builder.write_ir(ir, str(ir_path))
+        except Exception as exc:
+            result["status"] = "partial"
+            result["error"] = {
+                "code": "VALIDATION_ERROR",
+                "message": f"ir_builder.build_ir_from_extract failed: {type(exc).__name__}: {exc}",
+                "retryable": False,
+                "details": {"extract_ref": extract_ref},
+            }
+            cad_result_path.write_text(json.dumps(result, ensure_ascii=False, indent=2), encoding="utf-8")
+            return self._inspect_envelope("partial", result, cad_job_path, cad_result_path,
+                                          run_res.get("stdout_path"), run_res.get("stderr_path"),
+                                          staged=str(staged), reason="ir_builder failed")
+
+        # --- success: attach IR ref + diagnostics, finalize cad_result.v2 ---
+        ir_diag = (ir or {}).get("diagnostics", {})
+        result["ir_ref"] = str(ir_path)
+        result.setdefault("diagnostics", {})["entity_count"] = ir_diag.get("entity_count")
+        result.setdefault("artifacts", []).append({"kind": "ir", "ref": str(ir_path)})
+        cad_result_path.write_text(json.dumps(result, ensure_ascii=False, indent=2), encoding="utf-8")
+
+        return self._inspect_envelope("ok", result, cad_job_path, cad_result_path,
+                                      run_res.get("stdout_path"), run_res.get("stderr_path"),
+                                      staged=str(staged), ir_path=str(ir_path),
+                                      entity_count=ir_diag.get("entity_count"),
+                                      reason=None)
+
+    # ------------------------------------------------------------------- query
+    def query(self, ir_path: str, sql: str) -> dict:
+        """Run a read-only SQL query against an IR's sqlite store (Lane B2).
+
+        Builds an ephemeral sqlite DB from the IR via sqlite_ir_store.build_store,
+        then runs sqlite_ir_store.query(db, sql). Truthful failures: ir missing ->
+        blocked; sqlite_ir_store (Lane B2) absent -> not_implemented.
+        """
+        irp = Path(ir_path)
+        if not irp.exists():
+            return {
+                "schema": "ariadne.cadctl.query.v1",
+                "status": "blocked",
+                "reason": f"IR file not found: {ir_path}",
+            }
+        store, imp_err = _import_optional("sqlite_ir_store")
+        if store is None:
+            return {
+                "schema": "ariadne.cadctl.query.v1",
+                "status": "not_implemented",
+                "reason": f"sqlite_ir_store (Lane B2) unavailable: {imp_err}",
+            }
+        try:
+            ir = _load_json_bom(irp)
+        except Exception as exc:
+            return {
+                "schema": "ariadne.cadctl.query.v1",
+                "status": "error",
+                "reason": f"failed to read IR: {type(exc).__name__}: {exc}",
+            }
+        # Build the store next to the IR (deterministic, overwritable).
+        db_path = str(irp.with_suffix(".sqlite"))
+        try:
+            build_info = store.build_store(ir, db_path)
+            result = store.query(db_path, sql)
+        except Exception as exc:
+            return {
+                "schema": "ariadne.cadctl.query.v1",
+                "status": "error",
+                "reason": f"sqlite_ir_store failed: {type(exc).__name__}: {exc}",
+                "db_path": db_path,
+            }
+        return {
+            "schema": "ariadne.cadctl.query.v1",
+            "status": "ok",
+            "db_path": db_path,
+            "store": build_info,
+            "columns": result.get("columns", []),
+            "rows": result.get("rows", []),
+            "row_count": len(result.get("rows", [])),
+        }
+
+    # ---------------------------------------------------------------- validate
+    def validate(self, ir_path: str) -> dict:
+        """Validate an IR/run via the deterministic gates in validator (Lane E).
+
+        Truthful failure: validator absent -> not_implemented (NOT a faked pass).
+        """
+        irp = Path(ir_path)
+        if not irp.exists():
+            return {
+                "schema": "ariadne.cadctl.validate.v1",
+                "status": "blocked",
+                "reason": f"IR file not found: {ir_path}",
+            }
+        validator, imp_err = _import_optional("validator")
+        if validator is None:
+            return {
+                "schema": "ariadne.cadctl.validate.v1",
+                "status": "not_implemented",
+                "reason": f"validator (Lane E) unavailable: {imp_err}",
+            }
+        try:
+            report = validator.validate_target(ir_path=str(irp), run_dir=str(irp.parent))
+        except Exception as exc:
+            return {
+                "schema": "ariadne.cadctl.validate.v1",
+                "status": "error",
+                "reason": f"validator.validate_target failed: {type(exc).__name__}: {exc}",
+            }
+        return {
+            "schema": "ariadne.cadctl.validate.v1",
+            "status": "ok",
+            "report": report,
+        }
+
+    # --------------------------------------------------------------- registry
+    def registry_list(self) -> dict:
+        """List the v2 operation registry (config/operations.v2.json, utf-8-sig)."""
+        if not OPERATIONS_V2.exists():
+            return {
+                "schema": "ariadne.cadctl.registry_list.v1",
+                "status": "unavailable",
+                "reason": f"operations.v2.json not found: {OPERATIONS_V2}",
+            }
+        reg = _load_json_bom(OPERATIONS_V2)
+        ops = reg.get("operations", []) or []
+        listed = [
+            {
+                "id": o.get("id"),
+                "family": o.get("family"),
+                "status": o.get("status"),
+                "engine_tier": o.get("engine_tier"),
+                "router_lane": (o.get("handler") or {}).get("router_lane"),
+                "execution_host_class": (o.get("handler") or {}).get("execution_host_class"),
+            }
+            for o in ops
+        ]
+        return {
+            "schema": "ariadne.cadctl.registry_list.v1",
+            "status": "ok",
+            "registry_schema": reg.get("schema"),
+            "registry_version": reg.get("version"),
+            "operation_count": len(listed),
+            "wired_count": sum(1 for o in listed if o["status"] == "implemented"),
+            "operations": listed,
+        }
+
+    def registry_coverage(self) -> dict:
+        """Summarize operation coverage (totals + coverage block of operations.v2)."""
+        if not OPERATIONS_V2.exists():
+            return {
+                "schema": "ariadne.cadctl.registry_coverage.v1",
+                "status": "unavailable",
+                "reason": f"operations.v2.json not found: {OPERATIONS_V2}",
+            }
+        reg = _load_json_bom(OPERATIONS_V2)
+        ops = reg.get("operations", []) or []
+        by_status: dict = {}
+        by_family: dict = {}
+        by_tier: dict = {}
+        for o in ops:
+            by_status[o.get("status")] = by_status.get(o.get("status"), 0) + 1
+            by_family[o.get("family")] = by_family.get(o.get("family"), 0) + 1
+            by_tier[o.get("engine_tier")] = by_tier.get(o.get("engine_tier"), 0) + 1
+        wired = by_status.get("implemented", 0)
+        return {
+            "schema": "ariadne.cadctl.registry_coverage.v1",
+            "status": "ok",
+            "registry_schema": reg.get("schema"),
+            "registry_version": reg.get("version"),
+            "operation_count": len(ops),
+            "wired_count": wired,
+            "totals": reg.get("totals"),
+            "declared_coverage": reg.get("coverage"),
+            "computed_by_status": by_status,
+            "computed_by_family": by_family,
+            "computed_by_engine_tier": by_tier,
+            "consistent": (
+                reg.get("totals", {}).get("by_status", {}).get("implemented") == wired
+            ),
+        }
+
+    # ----------------------------------------------------------------- helpers
+    def _build_cad_job(self, operation: str, original: str,
+                       staged_meta: dict | None, mode: str) -> dict:
+        sel = route_select.operation_route(operation)
+        if not sel.get("found"):
+            sel = route_select.intent_route("dwg")
+        job = {
+            "schema": "ariadne.autocad_sdk_job.v1",
+            "operation": operation,
+            "write_mode": "read",
+            "output_mode": "ir" if mode == "graph" else "extract",
+            "issued_by": "cadctl",
+            "issued_at": _now_iso(),
+            "route": sel.get("route", "dwg_truth_autocad"),
+            "extract_mode": "geometry_native",
+            "input": {
+                "original_path": str(Path(original).resolve()) if Path(original).exists() else str(original),
+            },
+        }
+        if staged_meta:
+            job["input"]["staged_copy"] = staged_meta.get("staged_copy")
+            job["input"]["byte_size"] = staged_meta.get("byte_size")
+            job["input"]["sha256_16"] = staged_meta.get("sha256_16")
+        return job
+
+    def _inspect_envelope(self, status_word: str, result: dict,
+                          cad_job_path: Path, cad_result_path: Path,
+                          stdout_path: str | None, stderr_path: str | None,
+                          staged: str | None, ir_path: str | None = None,
+                          entity_count=None, reason: str | None = None) -> dict:
+        env = {
+            "schema": "ariadne.cadctl.inspect.v1",
+            "status": status_word,
+            "operation": result.get("operation"),
+            "cad_job": str(cad_job_path),
+            "cad_result": str(cad_result_path),
+            "stdout": stdout_path,
+            "stderr": stderr_path,
+            "staged_copy": staged,
+            "result_status": result.get("status"),
+        }
+        if ir_path:
+            env["dwg_graph_ir"] = ir_path
+        if entity_count is not None:
+            env["entity_count"] = entity_count
+        if reason:
+            env["reason"] = reason
+        return env
+
+
+# Module-level convenience wrappers (so callers can `from cadctl import status`).
+def status() -> dict:
+    return Cad().status()
+
+
+def inspect(dwg_path: str, out_dir: str, mode: str = "graph") -> dict:
+    return Cad().inspect(dwg_path, out_dir, mode)
+
+
+def query(ir_path: str, sql: str) -> dict:
+    return Cad().query(ir_path, sql)
+
+
+def validate(ir_path: str) -> dict:
+    return Cad().validate(ir_path)
+
+
+def registry_list() -> dict:
+    return Cad().registry_list()
+
+
+def registry_coverage() -> dict:
+    return Cad().registry_coverage()
