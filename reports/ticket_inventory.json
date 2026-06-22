@@ -1,0 +1,4357 @@
+{
+  "schema": "ariadne.cad_os.ticket_inventory.v1",
+  "ticket": "M08A-T02",
+  "generated_from": "reports/full_sdk_implementation_map.json",
+  "operation_count": 517,
+  "ticket_count": 38,
+  "lane_count": 15,
+  "merge_wave_order": [
+    "foundation",
+    "infra",
+    "MERGE-M08-READ",
+    "MERGE-M08-WRITE",
+    "MERGE-M08-VISLIVE",
+    "MERGE-M08-NATIVE",
+    "MERGE-M08-FALLBACK",
+    "MERGE-M08-FINAL"
+  ],
+  "tickets": {
+    "M08A-T01": {
+      "ticket": "M08A-T01",
+      "lane": "M08A",
+      "merge_wave": "foundation",
+      "depends_on": [
+        "main"
+      ],
+      "op_count": 0,
+      "open": 0,
+      "implemented": 0,
+      "blocked": 0,
+      "families": {},
+      "strategies": {}
+    },
+    "M08A-T02": {
+      "ticket": "M08A-T02",
+      "lane": "M08A",
+      "merge_wave": "foundation",
+      "depends_on": [
+        "M08A-T01"
+      ],
+      "op_count": 0,
+      "open": 0,
+      "implemented": 0,
+      "blocked": 0,
+      "families": {},
+      "strategies": {}
+    },
+    "M08B-T01": {
+      "ticket": "M08B-T01",
+      "lane": "M08B",
+      "merge_wave": "infra",
+      "depends_on": [
+        "M08A-T02"
+      ],
+      "op_count": 0,
+      "open": 0,
+      "implemented": 0,
+      "blocked": 0,
+      "families": {},
+      "strategies": {}
+    },
+    "M08B-T02": {
+      "ticket": "M08B-T02",
+      "lane": "M08B",
+      "merge_wave": "infra",
+      "depends_on": [
+        "M08A-T02"
+      ],
+      "op_count": 0,
+      "open": 0,
+      "implemented": 0,
+      "blocked": 0,
+      "families": {},
+      "strategies": {}
+    },
+    "M08B-T03": {
+      "ticket": "M08B-T03",
+      "lane": "M08B",
+      "merge_wave": "infra",
+      "depends_on": [
+        "M08A-T02"
+      ],
+      "op_count": 2,
+      "open": 2,
+      "implemented": 0,
+      "blocked": 0,
+      "families": {
+        "objectdbx_database": 2
+      },
+      "strategies": {
+        "native_arx_cpp": 2
+      }
+    },
+    "M08C-T01": {
+      "ticket": "M08C-T01",
+      "lane": "M08C",
+      "merge_wave": "MERGE-M08-READ",
+      "depends_on": [
+        "M08B-T01"
+      ],
+      "op_count": 35,
+      "open": 18,
+      "implemented": 17,
+      "blocked": 0,
+      "families": {
+        "objectdbx_database": 19,
+        "inspect": 16
+      },
+      "strategies": {
+        "implemented_v1": 17,
+        "objectdbx_hostless": 17,
+        "native_arx_cpp": 1
+      }
+    },
+    "M08C-T02": {
+      "ticket": "M08C-T02",
+      "lane": "M08C",
+      "merge_wave": "MERGE-M08-READ",
+      "depends_on": [
+        "M08B-T01"
+      ],
+      "op_count": 7,
+      "open": 6,
+      "implemented": 1,
+      "blocked": 0,
+      "families": {
+        "symbol_tables_dictionaries": 7
+      },
+      "strategies": {
+        "implemented_v1": 1,
+        "objectdbx_hostless": 5,
+        "native_arx_cpp": 1
+      }
+    },
+    "M08C-T03": {
+      "ticket": "M08C-T03",
+      "lane": "M08C",
+      "merge_wave": "MERGE-M08-READ",
+      "depends_on": [
+        "M08B-T01"
+      ],
+      "op_count": 1,
+      "open": 1,
+      "implemented": 0,
+      "blocked": 0,
+      "families": {
+        "symbol_tables_dictionaries": 1
+      },
+      "strategies": {
+        "objectdbx_hostless": 1
+      }
+    },
+    "M08D-T01": {
+      "ticket": "M08D-T01",
+      "lane": "M08D",
+      "merge_wave": "MERGE-M08-READ",
+      "depends_on": [
+        "M08B-T01"
+      ],
+      "op_count": 3,
+      "open": 3,
+      "implemented": 0,
+      "blocked": 0,
+      "families": {
+        "entities": 3
+      },
+      "strategies": {
+        "objectdbx_hostless": 3
+      }
+    },
+    "M08D-T02": {
+      "ticket": "M08D-T02",
+      "lane": "M08D",
+      "merge_wave": "MERGE-M08-READ",
+      "depends_on": [
+        "M08D-T01"
+      ],
+      "op_count": 19,
+      "open": 19,
+      "implemented": 0,
+      "blocked": 0,
+      "families": {
+        "entities": 1,
+        "geometry_kernel": 18
+      },
+      "strategies": {
+        "objectdbx_hostless": 3,
+        "native_arx_cpp": 16
+      }
+    },
+    "M08D-T03": {
+      "ticket": "M08D-T03",
+      "lane": "M08D",
+      "merge_wave": "MERGE-M08-READ",
+      "depends_on": [
+        "M08D-T01"
+      ],
+      "op_count": 51,
+      "open": 51,
+      "implemented": 0,
+      "blocked": 0,
+      "families": {
+        "brep_solids": 51
+      },
+      "strategies": {
+        "objectdbx_hostless": 44,
+        "native_arx_cpp": 7
+      }
+    },
+    "M08D-T04": {
+      "ticket": "M08D-T04",
+      "lane": "M08D",
+      "merge_wave": "MERGE-M08-READ",
+      "depends_on": [
+        "M08D-T01"
+      ],
+      "op_count": 0,
+      "open": 0,
+      "implemented": 0,
+      "blocked": 0,
+      "families": {},
+      "strategies": {}
+    },
+    "M08E-T01": {
+      "ticket": "M08E-T01",
+      "lane": "M08E",
+      "merge_wave": "MERGE-M08-READ",
+      "depends_on": [
+        "M08B-T01",
+        "M08D-T01"
+      ],
+      "op_count": 5,
+      "open": 5,
+      "implemented": 0,
+      "blocked": 0,
+      "families": {
+        "blocks_xrefs_clone": 5
+      },
+      "strategies": {
+        "objectdbx_hostless": 4,
+        "native_arx_cpp": 1
+      }
+    },
+    "M08E-T02": {
+      "ticket": "M08E-T02",
+      "lane": "M08E",
+      "merge_wave": "MERGE-M08-READ",
+      "depends_on": [
+        "M08B-T01",
+        "M08D-T01"
+      ],
+      "op_count": 0,
+      "open": 0,
+      "implemented": 0,
+      "blocked": 0,
+      "families": {},
+      "strategies": {}
+    },
+    "M08E-T03": {
+      "ticket": "M08E-T03",
+      "lane": "M08E",
+      "merge_wave": "MERGE-M08-READ",
+      "depends_on": [
+        "M08B-T01",
+        "M08D-T01"
+      ],
+      "op_count": 8,
+      "open": 6,
+      "implemented": 2,
+      "blocked": 0,
+      "families": {
+        "symbol_tables_dictionaries": 8
+      },
+      "strategies": {
+        "implemented_v1": 2,
+        "objectdbx_hostless": 6
+      }
+    },
+    "M08F-T01": {
+      "ticket": "M08F-T01",
+      "lane": "M08F",
+      "merge_wave": "MERGE-M08-READ",
+      "depends_on": [
+        "M08C-T01",
+        "M08D-T01",
+        "M08E-T01"
+      ],
+      "op_count": 0,
+      "open": 0,
+      "implemented": 0,
+      "blocked": 0,
+      "families": {},
+      "strategies": {}
+    },
+    "M08F-T02": {
+      "ticket": "M08F-T02",
+      "lane": "M08F",
+      "merge_wave": "MERGE-M08-READ",
+      "depends_on": [
+        "M08F-T01"
+      ],
+      "op_count": 1,
+      "open": 0,
+      "implemented": 1,
+      "blocked": 0,
+      "families": {
+        "query": 1
+      },
+      "strategies": {
+        "implemented_v1": 1
+      }
+    },
+    "M08G-T01": {
+      "ticket": "M08G-T01",
+      "lane": "M08G",
+      "merge_wave": "MERGE-M08-WRITE",
+      "depends_on": [
+        "M08B-T01",
+        "M08D-T01",
+        "M08E-T01"
+      ],
+      "op_count": 5,
+      "open": 0,
+      "implemented": 5,
+      "blocked": 0,
+      "families": {
+        "apply": 1,
+        "validate": 2,
+        "patch": 2
+      },
+      "strategies": {
+        "implemented_v1": 5
+      }
+    },
+    "M08G-T02": {
+      "ticket": "M08G-T02",
+      "lane": "M08G",
+      "merge_wave": "MERGE-M08-WRITE",
+      "depends_on": [
+        "M08G-T01"
+      ],
+      "op_count": 40,
+      "open": 34,
+      "implemented": 6,
+      "blocked": 0,
+      "families": {
+        "geometry_kernel": 5,
+        "write": 4,
+        "entities": 31
+      },
+      "strategies": {
+        "implemented_v1": 6,
+        "objectdbx_hostless": 34
+      }
+    },
+    "M08G-T03": {
+      "ticket": "M08G-T03",
+      "lane": "M08G",
+      "merge_wave": "MERGE-M08-WRITE",
+      "depends_on": [
+        "M08G-T01"
+      ],
+      "op_count": 11,
+      "open": 11,
+      "implemented": 0,
+      "blocked": 0,
+      "families": {
+        "brep_solids": 3,
+        "entities": 6,
+        "geometry_kernel": 2
+      },
+      "strategies": {
+        "native_arx_cpp": 3,
+        "objectdbx_hostless": 8
+      }
+    },
+    "M08H-T01": {
+      "ticket": "M08H-T01",
+      "lane": "M08H",
+      "merge_wave": "MERGE-M08-WRITE",
+      "depends_on": [
+        "M08G-T01"
+      ],
+      "op_count": 14,
+      "open": 14,
+      "implemented": 0,
+      "blocked": 0,
+      "families": {
+        "entities": 14
+      },
+      "strategies": {
+        "objectdbx_hostless": 14
+      }
+    },
+    "M08H-T02": {
+      "ticket": "M08H-T02",
+      "lane": "M08H",
+      "merge_wave": "MERGE-M08-WRITE",
+      "depends_on": [
+        "M08G-T01"
+      ],
+      "op_count": 1,
+      "open": 1,
+      "implemented": 0,
+      "blocked": 0,
+      "families": {
+        "entities": 1
+      },
+      "strategies": {
+        "objectdbx_hostless": 1
+      }
+    },
+    "M08I-T01": {
+      "ticket": "M08I-T01",
+      "lane": "M08I",
+      "merge_wave": "MERGE-M08-VISLIVE",
+      "depends_on": [
+        "M08D-T01",
+        "M08G-T01"
+      ],
+      "op_count": 3,
+      "open": 2,
+      "implemented": 0,
+      "blocked": 1,
+      "families": {
+        "render": 1,
+        "layouts_plot_publish": 2
+      },
+      "strategies": {
+        "hard_blocked": 1,
+        "managed_dotnet": 2
+      }
+    },
+    "M08I-T02": {
+      "ticket": "M08I-T02",
+      "lane": "M08I",
+      "merge_wave": "MERGE-M08-VISLIVE",
+      "depends_on": [
+        "M08I-T01"
+      ],
+      "op_count": 1,
+      "open": 0,
+      "implemented": 1,
+      "blocked": 0,
+      "families": {
+        "diff": 1
+      },
+      "strategies": {
+        "implemented_v1": 1
+      }
+    },
+    "M08J-T01": {
+      "ticket": "M08J-T01",
+      "lane": "M08J",
+      "merge_wave": "MERGE-M08-VISLIVE",
+      "depends_on": [
+        "M08B-T01"
+      ],
+      "op_count": 7,
+      "open": 0,
+      "implemented": 6,
+      "blocked": 1,
+      "families": {
+        "live": 7
+      },
+      "strategies": {
+        "implemented_v1": 6,
+        "hard_blocked": 1
+      }
+    },
+    "M08J-T02": {
+      "ticket": "M08J-T02",
+      "lane": "M08J",
+      "merge_wave": "MERGE-M08-VISLIVE",
+      "depends_on": [
+        "M08J-T01"
+      ],
+      "op_count": 0,
+      "open": 0,
+      "implemented": 0,
+      "blocked": 0,
+      "families": {},
+      "strategies": {}
+    },
+    "M08J-T03": {
+      "ticket": "M08J-T03",
+      "lane": "M08J",
+      "merge_wave": "MERGE-M08-VISLIVE",
+      "depends_on": [
+        "M08J-T01",
+        "M08G-T01"
+      ],
+      "op_count": 5,
+      "open": 5,
+      "implemented": 0,
+      "blocked": 0,
+      "families": {
+        "active_document_write_original": 5
+      },
+      "strategies": {
+        "managed_dotnet": 4,
+        "accoreconsole_lisp": 1
+      }
+    },
+    "M08K-T01": {
+      "ticket": "M08K-T01",
+      "lane": "M08K",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "depends_on": [
+        "M08B-T01"
+      ],
+      "op_count": 47,
+      "open": 45,
+      "implemented": 2,
+      "blocked": 0,
+      "families": {
+        "extend": 2,
+        "custom_objects_protocols": 45
+      },
+      "strategies": {
+        "implemented_v1": 2,
+        "native_arx_cpp": 38,
+        "objectdbx_hostless": 5,
+        "accoreconsole_lisp": 1,
+        "managed_dotnet": 1
+      }
+    },
+    "M08K-T02": {
+      "ticket": "M08K-T02",
+      "lane": "M08K",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "depends_on": [
+        "M08K-T01"
+      ],
+      "op_count": 0,
+      "open": 0,
+      "implemented": 0,
+      "blocked": 0,
+      "families": {},
+      "strategies": {}
+    },
+    "M08K-T03": {
+      "ticket": "M08K-T03",
+      "lane": "M08K",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "depends_on": [
+        "M08B-T01"
+      ],
+      "op_count": 58,
+      "open": 58,
+      "implemented": 0,
+      "blocked": 0,
+      "families": {
+        "constraints_associativity": 58
+      },
+      "strategies": {
+        "native_arx_cpp": 19,
+        "objectdbx_hostless": 39
+      }
+    },
+    "M08L-T01": {
+      "ticket": "M08L-T01",
+      "lane": "M08L",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "depends_on": [
+        "M08K-T01"
+      ],
+      "op_count": 8,
+      "open": 8,
+      "implemented": 0,
+      "blocked": 0,
+      "families": {
+        "graphics_system": 8
+      },
+      "strategies": {
+        "native_arx_cpp": 8
+      }
+    },
+    "M08L-T02": {
+      "ticket": "M08L-T02",
+      "lane": "M08L",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "depends_on": [
+        "M08K-T01",
+        "M08L-T01"
+      ],
+      "op_count": 19,
+      "open": 19,
+      "implemented": 0,
+      "blocked": 0,
+      "families": {
+        "custom_objects_protocols": 18,
+        "graphics_system": 1
+      },
+      "strategies": {
+        "managed_dotnet": 15,
+        "native_arx_cpp": 4
+      }
+    },
+    "M08M-T01": {
+      "ticket": "M08M-T01",
+      "lane": "M08M",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "depends_on": [
+        "M08K-T01"
+      ],
+      "op_count": 33,
+      "open": 33,
+      "implemented": 0,
+      "blocked": 0,
+      "families": {
+        "com_activex": 33
+      },
+      "strategies": {
+        "objectdbx_hostless": 4,
+        "native_arx_cpp": 29
+      }
+    },
+    "M08M-T02": {
+      "ticket": "M08M-T02",
+      "lane": "M08M",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "depends_on": [
+        "M08K-T01"
+      ],
+      "op_count": 22,
+      "open": 22,
+      "implemented": 0,
+      "blocked": 0,
+      "families": {
+        "reactors_events": 22
+      },
+      "strategies": {
+        "native_arx_cpp": 9,
+        "managed_dotnet": 13
+      }
+    },
+    "M08N-T01": {
+      "ticket": "M08N-T01",
+      "lane": "M08N",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "depends_on": [
+        "M08J-T01"
+      ],
+      "op_count": 17,
+      "open": 17,
+      "implemented": 0,
+      "blocked": 0,
+      "families": {
+        "editor_input": 17
+      },
+      "strategies": {
+        "native_arx_cpp": 10,
+        "accoreconsole_lisp": 6,
+        "managed_dotnet": 1
+      }
+    },
+    "M08N-T02": {
+      "ticket": "M08N-T02",
+      "lane": "M08N",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "depends_on": [
+        "M08J-T01"
+      ],
+      "op_count": 56,
+      "open": 56,
+      "implemented": 0,
+      "blocked": 0,
+      "families": {
+        "editor_input": 9,
+        "runtime_commands": 8,
+        "ui_customization": 39
+      },
+      "strategies": {
+        "accoreconsole_lisp": 4,
+        "native_arx_cpp": 46,
+        "managed_dotnet": 5,
+        "objectdbx_hostless": 1
+      }
+    },
+    "M08O-T01": {
+      "ticket": "M08O-T01",
+      "lane": "M08O",
+      "merge_wave": "MERGE-M08-FALLBACK",
+      "depends_on": [
+        "M08B-T01"
+      ],
+      "op_count": 16,
+      "open": 16,
+      "implemented": 0,
+      "blocked": 0,
+      "families": {
+        "com_activex": 16
+      },
+      "strategies": {
+        "objectdbx_hostless": 4,
+        "native_arx_cpp": 9,
+        "managed_dotnet": 3
+      }
+    },
+    "M08O-T02": {
+      "ticket": "M08O-T02",
+      "lane": "M08O",
+      "merge_wave": "MERGE-M08-FALLBACK",
+      "depends_on": [
+        "M08B-T01"
+      ],
+      "op_count": 22,
+      "open": 22,
+      "implemented": 0,
+      "blocked": 0,
+      "families": {
+        "active_document_write_original": 3,
+        "editor_input": 1,
+        "runtime_commands": 18
+      },
+      "strategies": {
+        "deprecated_raw_command": 5,
+        "native_arx_cpp": 15,
+        "accoreconsole_lisp": 2
+      }
+    }
+  },
+  "operations": [
+    {
+      "operation": "inspect.database.summary",
+      "owner_ticket": "M08C-T01",
+      "lane": "M08C",
+      "merge_wave": "MERGE-M08-READ",
+      "status": "implemented"
+    },
+    {
+      "operation": "write.layer.create",
+      "owner_ticket": "M08C-T02",
+      "lane": "M08C",
+      "merge_wave": "MERGE-M08-READ",
+      "status": "implemented"
+    },
+    {
+      "operation": "write.entity.line",
+      "owner_ticket": "M08G-T02",
+      "lane": "M08G",
+      "merge_wave": "MERGE-M08-WRITE",
+      "status": "implemented"
+    },
+    {
+      "operation": "write.entity.circle",
+      "owner_ticket": "M08G-T02",
+      "lane": "M08G",
+      "merge_wave": "MERGE-M08-WRITE",
+      "status": "implemented"
+    },
+    {
+      "operation": "inspect.entity.count",
+      "owner_ticket": "M08C-T01",
+      "lane": "M08C",
+      "merge_wave": "MERGE-M08-READ",
+      "status": "implemented"
+    },
+    {
+      "operation": "write.xrecord.set",
+      "owner_ticket": "M08E-T03",
+      "lane": "M08E",
+      "merge_wave": "MERGE-M08-READ",
+      "status": "implemented"
+    },
+    {
+      "operation": "inspect.xrecord.get",
+      "owner_ticket": "M08E-T03",
+      "lane": "M08E",
+      "merge_wave": "MERGE-M08-READ",
+      "status": "implemented"
+    },
+    {
+      "operation": "write.xdata.set",
+      "owner_ticket": "M08G-T02",
+      "lane": "M08G",
+      "merge_wave": "MERGE-M08-WRITE",
+      "status": "implemented"
+    },
+    {
+      "operation": "inspect.xdata.get",
+      "owner_ticket": "M08C-T01",
+      "lane": "M08C",
+      "merge_wave": "MERGE-M08-READ",
+      "status": "implemented"
+    },
+    {
+      "operation": "write.block.simple_create",
+      "owner_ticket": "M08G-T02",
+      "lane": "M08G",
+      "merge_wave": "MERGE-M08-WRITE",
+      "status": "implemented"
+    },
+    {
+      "operation": "write.block.insert",
+      "owner_ticket": "M08G-T02",
+      "lane": "M08G",
+      "merge_wave": "MERGE-M08-WRITE",
+      "status": "implemented"
+    },
+    {
+      "operation": "inspect.block.count",
+      "owner_ticket": "M08C-T01",
+      "lane": "M08C",
+      "merge_wave": "MERGE-M08-READ",
+      "status": "implemented"
+    },
+    {
+      "operation": "write.layout.create",
+      "owner_ticket": "M08G-T02",
+      "lane": "M08G",
+      "merge_wave": "MERGE-M08-WRITE",
+      "status": "implemented"
+    },
+    {
+      "operation": "inspect.layout.list",
+      "owner_ticket": "M08C-T01",
+      "lane": "M08C",
+      "merge_wave": "MERGE-M08-READ",
+      "status": "implemented"
+    },
+    {
+      "operation": "inspect.xref.list",
+      "owner_ticket": "M08C-T01",
+      "lane": "M08C",
+      "merge_wave": "MERGE-M08-READ",
+      "status": "implemented"
+    },
+    {
+      "operation": "inspect.runtime.capabilities",
+      "owner_ticket": "M08C-T01",
+      "lane": "M08C",
+      "merge_wave": "MERGE-M08-READ",
+      "status": "implemented"
+    },
+    {
+      "operation": "live.reactor.enable",
+      "owner_ticket": "M08J-T01",
+      "lane": "M08J",
+      "merge_wave": "MERGE-M08-VISLIVE",
+      "status": "implemented"
+    },
+    {
+      "operation": "inspect.reactor.registry",
+      "owner_ticket": "M08C-T01",
+      "lane": "M08C",
+      "merge_wave": "MERGE-M08-READ",
+      "status": "implemented"
+    },
+    {
+      "operation": "live.reactor.disable",
+      "owner_ticket": "M08J-T01",
+      "lane": "M08J",
+      "merge_wave": "MERGE-M08-VISLIVE",
+      "status": "implemented"
+    },
+    {
+      "operation": "inspect.overrule.registry",
+      "owner_ticket": "M08C-T01",
+      "lane": "M08C",
+      "merge_wave": "MERGE-M08-READ",
+      "status": "implemented"
+    },
+    {
+      "operation": "live.overrule.enable",
+      "owner_ticket": "M08J-T01",
+      "lane": "M08J",
+      "merge_wave": "MERGE-M08-VISLIVE",
+      "status": "implemented"
+    },
+    {
+      "operation": "live.overrule.disable",
+      "owner_ticket": "M08J-T01",
+      "lane": "M08J",
+      "merge_wave": "MERGE-M08-VISLIVE",
+      "status": "implemented"
+    },
+    {
+      "operation": "inspect.jig.host_support",
+      "owner_ticket": "M08C-T01",
+      "lane": "M08C",
+      "merge_wave": "MERGE-M08-READ",
+      "status": "implemented"
+    },
+    {
+      "operation": "live.jig.point_probe",
+      "owner_ticket": "M08J-T01",
+      "lane": "M08J",
+      "merge_wave": "MERGE-M08-VISLIVE",
+      "status": "implemented"
+    },
+    {
+      "operation": "extend.customclass.create",
+      "owner_ticket": "M08K-T01",
+      "lane": "M08K",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "implemented"
+    },
+    {
+      "operation": "inspect.customclass.count",
+      "owner_ticket": "M08C-T01",
+      "lane": "M08C",
+      "merge_wave": "MERGE-M08-READ",
+      "status": "implemented"
+    },
+    {
+      "operation": "extend.customobject.create",
+      "owner_ticket": "M08K-T01",
+      "lane": "M08K",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "implemented"
+    },
+    {
+      "operation": "inspect.customobject.count",
+      "owner_ticket": "M08C-T01",
+      "lane": "M08C",
+      "merge_wave": "MERGE-M08-READ",
+      "status": "implemented"
+    },
+    {
+      "operation": "inspect.protocol.queryx",
+      "owner_ticket": "M08C-T01",
+      "lane": "M08C",
+      "merge_wave": "MERGE-M08-READ",
+      "status": "implemented"
+    },
+    {
+      "operation": "inspect.database.graph",
+      "owner_ticket": "M08C-T01",
+      "lane": "M08C",
+      "merge_wave": "MERGE-M08-READ",
+      "status": "implemented"
+    },
+    {
+      "operation": "inspect.layers",
+      "owner_ticket": "M08C-T01",
+      "lane": "M08C",
+      "merge_wave": "MERGE-M08-READ",
+      "status": "implemented"
+    },
+    {
+      "operation": "inspect.blocks",
+      "owner_ticket": "M08C-T01",
+      "lane": "M08C",
+      "merge_wave": "MERGE-M08-READ",
+      "status": "implemented"
+    },
+    {
+      "operation": "inspect.entities",
+      "owner_ticket": "M08C-T01",
+      "lane": "M08C",
+      "merge_wave": "MERGE-M08-READ",
+      "status": "implemented"
+    },
+    {
+      "operation": "query.entities",
+      "owner_ticket": "M08F-T02",
+      "lane": "M08F",
+      "merge_wave": "MERGE-M08-READ",
+      "status": "implemented"
+    },
+    {
+      "operation": "render.layout",
+      "owner_ticket": "M08I-T01",
+      "lane": "M08I",
+      "merge_wave": "MERGE-M08-VISLIVE",
+      "status": "blocked"
+    },
+    {
+      "operation": "apply.patch",
+      "owner_ticket": "M08G-T01",
+      "lane": "M08G",
+      "merge_wave": "MERGE-M08-WRITE",
+      "status": "implemented"
+    },
+    {
+      "operation": "validate.patch",
+      "owner_ticket": "M08G-T01",
+      "lane": "M08G",
+      "merge_wave": "MERGE-M08-WRITE",
+      "status": "implemented"
+    },
+    {
+      "operation": "validate.ir",
+      "owner_ticket": "M08G-T01",
+      "lane": "M08G",
+      "merge_wave": "MERGE-M08-WRITE",
+      "status": "implemented"
+    },
+    {
+      "operation": "patch.dry_run",
+      "owner_ticket": "M08G-T01",
+      "lane": "M08G",
+      "merge_wave": "MERGE-M08-WRITE",
+      "status": "implemented"
+    },
+    {
+      "operation": "patch.apply_staged",
+      "owner_ticket": "M08G-T01",
+      "lane": "M08G",
+      "merge_wave": "MERGE-M08-WRITE",
+      "status": "implemented"
+    },
+    {
+      "operation": "diff.before_after",
+      "owner_ticket": "M08I-T02",
+      "lane": "M08I",
+      "merge_wave": "MERGE-M08-VISLIVE",
+      "status": "implemented"
+    },
+    {
+      "operation": "live.status",
+      "owner_ticket": "M08J-T01",
+      "lane": "M08J",
+      "merge_wave": "MERGE-M08-VISLIVE",
+      "status": "implemented"
+    },
+    {
+      "operation": "live.apply_patch",
+      "owner_ticket": "M08J-T01",
+      "lane": "M08J",
+      "merge_wave": "MERGE-M08-VISLIVE",
+      "status": "blocked"
+    },
+    {
+      "operation": "command.invoke.coroutine",
+      "owner_ticket": "M08O-T02",
+      "lane": "M08O",
+      "merge_wave": "MERGE-M08-FALLBACK",
+      "status": "catalogued"
+    },
+    {
+      "operation": "command.invoke.sync",
+      "owner_ticket": "M08O-T02",
+      "lane": "M08O",
+      "merge_wave": "MERGE-M08-FALLBACK",
+      "status": "catalogued"
+    },
+    {
+      "operation": "command.invoke.sync.resbuf",
+      "owner_ticket": "M08O-T02",
+      "lane": "M08O",
+      "merge_wave": "MERGE-M08-FALLBACK",
+      "status": "catalogued"
+    },
+    {
+      "operation": "doc.current",
+      "owner_ticket": "M08J-T03",
+      "lane": "M08J",
+      "merge_wave": "MERGE-M08-VISLIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "doc.lock",
+      "owner_ticket": "M08J-T03",
+      "lane": "M08J",
+      "merge_wave": "MERGE-M08-VISLIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "doc.new",
+      "owner_ticket": "M08J-T03",
+      "lane": "M08J",
+      "merge_wave": "MERGE-M08-VISLIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "doc.sendstring",
+      "owner_ticket": "M08J-T03",
+      "lane": "M08J",
+      "merge_wave": "MERGE-M08-VISLIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "doc.syncopen",
+      "owner_ticket": "M08J-T03",
+      "lane": "M08J",
+      "merge_wave": "MERGE-M08-VISLIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "infra.hostapp.provide_services",
+      "owner_ticket": "M08E-T01",
+      "lane": "M08E",
+      "merge_wave": "MERGE-M08-READ",
+      "status": "catalogued"
+    },
+    {
+      "operation": "inspect.block.iterate",
+      "owner_ticket": "M08E-T01",
+      "lane": "M08E",
+      "merge_wave": "MERGE-M08-READ",
+      "status": "catalogued"
+    },
+    {
+      "operation": "transform.database.deep_clone",
+      "owner_ticket": "M08E-T01",
+      "lane": "M08E",
+      "merge_wave": "MERGE-M08-READ",
+      "status": "catalogued"
+    },
+    {
+      "operation": "transform.database.insert_block",
+      "owner_ticket": "M08E-T01",
+      "lane": "M08E",
+      "merge_wave": "MERGE-M08-READ",
+      "status": "catalogued"
+    },
+    {
+      "operation": "write.block.append_entity",
+      "owner_ticket": "M08E-T01",
+      "lane": "M08E",
+      "merge_wave": "MERGE-M08-READ",
+      "status": "catalogued"
+    },
+    {
+      "operation": "compute.brep.line_containment",
+      "owner_ticket": "M08D-T03",
+      "lane": "M08D",
+      "merge_wave": "MERGE-M08-READ",
+      "status": "catalogued"
+    },
+    {
+      "operation": "compute.brep.massprops",
+      "owner_ticket": "M08D-T03",
+      "lane": "M08D",
+      "merge_wave": "MERGE-M08-READ",
+      "status": "catalogued"
+    },
+    {
+      "operation": "compute.brep.perimeter",
+      "owner_ticket": "M08D-T03",
+      "lane": "M08D",
+      "merge_wave": "MERGE-M08-READ",
+      "status": "catalogued"
+    },
+    {
+      "operation": "compute.brep.point_containment",
+      "owner_ticket": "M08D-T03",
+      "lane": "M08D",
+      "merge_wave": "MERGE-M08-READ",
+      "status": "catalogued"
+    },
+    {
+      "operation": "compute.brep.surface_area",
+      "owner_ticket": "M08D-T03",
+      "lane": "M08D",
+      "merge_wave": "MERGE-M08-READ",
+      "status": "catalogued"
+    },
+    {
+      "operation": "compute.brep.volume",
+      "owner_ticket": "M08D-T03",
+      "lane": "M08D",
+      "merge_wave": "MERGE-M08-READ",
+      "status": "catalogued"
+    },
+    {
+      "operation": "edit.subentity.add_paths",
+      "owner_ticket": "M08G-T03",
+      "lane": "M08G",
+      "merge_wave": "MERGE-M08-WRITE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "edit.subentity.delete_paths",
+      "owner_ticket": "M08G-T03",
+      "lane": "M08G",
+      "merge_wave": "MERGE-M08-WRITE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "edit.subentity.transform",
+      "owner_ticket": "M08G-T03",
+      "lane": "M08G",
+      "merge_wave": "MERGE-M08-WRITE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "inspect.brep.bounds",
+      "owner_ticket": "M08D-T03",
+      "lane": "M08D",
+      "merge_wave": "MERGE-M08-READ",
+      "status": "catalogued"
+    },
+    {
+      "operation": "inspect.brep.changed",
+      "owner_ticket": "M08D-T03",
+      "lane": "M08D",
+      "merge_wave": "MERGE-M08-READ",
+      "status": "catalogued"
+    },
+    {
+      "operation": "inspect.brep.from_entity",
+      "owner_ticket": "M08D-T03",
+      "lane": "M08D",
+      "merge_wave": "MERGE-M08-READ",
+      "status": "catalogued"
+    },
+    {
+      "operation": "inspect.brep.from_subentpath",
+      "owner_ticket": "M08D-T03",
+      "lane": "M08D",
+      "merge_wave": "MERGE-M08-READ",
+      "status": "catalogued"
+    },
+    {
+      "operation": "inspect.brep.owner",
+      "owner_ticket": "M08D-T03",
+      "lane": "M08D",
+      "merge_wave": "MERGE-M08-READ",
+      "status": "catalogued"
+    },
+    {
+      "operation": "inspect.brep.solid_roundtrip",
+      "owner_ticket": "M08D-T03",
+      "lane": "M08D",
+      "merge_wave": "MERGE-M08-READ",
+      "status": "catalogued"
+    },
+    {
+      "operation": "inspect.brep.validate",
+      "owner_ticket": "M08D-T03",
+      "lane": "M08D",
+      "merge_wave": "MERGE-M08-READ",
+      "status": "catalogued"
+    },
+    {
+      "operation": "inspect.brep.validation_level",
+      "owner_ticket": "M08D-T03",
+      "lane": "M08D",
+      "merge_wave": "MERGE-M08-READ",
+      "status": "catalogued"
+    },
+    {
+      "operation": "inspect.edge.curve",
+      "owner_ticket": "M08D-T03",
+      "lane": "M08D",
+      "merge_wave": "MERGE-M08-READ",
+      "status": "catalogued"
+    },
+    {
+      "operation": "inspect.edge.curve_as_nurb",
+      "owner_ticket": "M08D-T03",
+      "lane": "M08D",
+      "merge_wave": "MERGE-M08-READ",
+      "status": "catalogued"
+    },
+    {
+      "operation": "inspect.edge.curve_type",
+      "owner_ticket": "M08D-T03",
+      "lane": "M08D",
+      "merge_wave": "MERGE-M08-READ",
+      "status": "catalogued"
+    },
+    {
+      "operation": "inspect.edge.orientation",
+      "owner_ticket": "M08D-T03",
+      "lane": "M08D",
+      "merge_wave": "MERGE-M08-READ",
+      "status": "catalogued"
+    },
+    {
+      "operation": "inspect.edge.vertices",
+      "owner_ticket": "M08D-T03",
+      "lane": "M08D",
+      "merge_wave": "MERGE-M08-READ",
+      "status": "catalogued"
+    },
+    {
+      "operation": "inspect.face.area",
+      "owner_ticket": "M08D-T03",
+      "lane": "M08D",
+      "merge_wave": "MERGE-M08-READ",
+      "status": "catalogued"
+    },
+    {
+      "operation": "inspect.face.orientation",
+      "owner_ticket": "M08D-T03",
+      "lane": "M08D",
+      "merge_wave": "MERGE-M08-READ",
+      "status": "catalogued"
+    },
+    {
+      "operation": "inspect.face.shell",
+      "owner_ticket": "M08D-T03",
+      "lane": "M08D",
+      "merge_wave": "MERGE-M08-READ",
+      "status": "catalogued"
+    },
+    {
+      "operation": "inspect.face.surface",
+      "owner_ticket": "M08D-T03",
+      "lane": "M08D",
+      "merge_wave": "MERGE-M08-READ",
+      "status": "catalogued"
+    },
+    {
+      "operation": "inspect.face.surface_as_nurb",
+      "owner_ticket": "M08D-T03",
+      "lane": "M08D",
+      "merge_wave": "MERGE-M08-READ",
+      "status": "catalogued"
+    },
+    {
+      "operation": "inspect.face.surface_as_trimmed_nurbs",
+      "owner_ticket": "M08D-T03",
+      "lane": "M08D",
+      "merge_wave": "MERGE-M08-READ",
+      "status": "catalogued"
+    },
+    {
+      "operation": "inspect.face.surface_type",
+      "owner_ticket": "M08D-T03",
+      "lane": "M08D",
+      "merge_wave": "MERGE-M08-READ",
+      "status": "catalogued"
+    },
+    {
+      "operation": "inspect.loop.face",
+      "owner_ticket": "M08D-T03",
+      "lane": "M08D",
+      "merge_wave": "MERGE-M08-READ",
+      "status": "catalogued"
+    },
+    {
+      "operation": "inspect.loop.type",
+      "owner_ticket": "M08D-T03",
+      "lane": "M08D",
+      "merge_wave": "MERGE-M08-READ",
+      "status": "catalogued"
+    },
+    {
+      "operation": "inspect.shell.complex",
+      "owner_ticket": "M08D-T03",
+      "lane": "M08D",
+      "merge_wave": "MERGE-M08-READ",
+      "status": "catalogued"
+    },
+    {
+      "operation": "inspect.shell.type",
+      "owner_ticket": "M08D-T03",
+      "lane": "M08D",
+      "merge_wave": "MERGE-M08-READ",
+      "status": "catalogued"
+    },
+    {
+      "operation": "inspect.subentity.class_id",
+      "owner_ticket": "M08D-T03",
+      "lane": "M08D",
+      "merge_wave": "MERGE-M08-READ",
+      "status": "catalogued"
+    },
+    {
+      "operation": "inspect.subentity.color",
+      "owner_ticket": "M08D-T03",
+      "lane": "M08D",
+      "merge_wave": "MERGE-M08-READ",
+      "status": "catalogued"
+    },
+    {
+      "operation": "inspect.subentity.geom_extents",
+      "owner_ticket": "M08D-T03",
+      "lane": "M08D",
+      "merge_wave": "MERGE-M08-READ",
+      "status": "catalogued"
+    },
+    {
+      "operation": "inspect.subentity.markers_at_path",
+      "owner_ticket": "M08D-T03",
+      "lane": "M08D",
+      "merge_wave": "MERGE-M08-READ",
+      "status": "catalogued"
+    },
+    {
+      "operation": "inspect.subentity.path_at_marker",
+      "owner_ticket": "M08D-T03",
+      "lane": "M08D",
+      "merge_wave": "MERGE-M08-READ",
+      "status": "catalogued"
+    },
+    {
+      "operation": "inspect.subentity.ptr",
+      "owner_ticket": "M08D-T03",
+      "lane": "M08D",
+      "merge_wave": "MERGE-M08-READ",
+      "status": "catalogued"
+    },
+    {
+      "operation": "inspect.vertex.point",
+      "owner_ticket": "M08D-T03",
+      "lane": "M08D",
+      "merge_wave": "MERGE-M08-READ",
+      "status": "catalogued"
+    },
+    {
+      "operation": "traverse.brep.complexes",
+      "owner_ticket": "M08D-T03",
+      "lane": "M08D",
+      "merge_wave": "MERGE-M08-READ",
+      "status": "catalogued"
+    },
+    {
+      "operation": "traverse.brep.edges",
+      "owner_ticket": "M08D-T03",
+      "lane": "M08D",
+      "merge_wave": "MERGE-M08-READ",
+      "status": "catalogued"
+    },
+    {
+      "operation": "traverse.brep.faces",
+      "owner_ticket": "M08D-T03",
+      "lane": "M08D",
+      "merge_wave": "MERGE-M08-READ",
+      "status": "catalogued"
+    },
+    {
+      "operation": "traverse.brep.shells",
+      "owner_ticket": "M08D-T03",
+      "lane": "M08D",
+      "merge_wave": "MERGE-M08-READ",
+      "status": "catalogued"
+    },
+    {
+      "operation": "traverse.brep.vertices",
+      "owner_ticket": "M08D-T03",
+      "lane": "M08D",
+      "merge_wave": "MERGE-M08-READ",
+      "status": "catalogued"
+    },
+    {
+      "operation": "traverse.complex.shells",
+      "owner_ticket": "M08D-T03",
+      "lane": "M08D",
+      "merge_wave": "MERGE-M08-READ",
+      "status": "catalogued"
+    },
+    {
+      "operation": "traverse.edge.loops",
+      "owner_ticket": "M08D-T03",
+      "lane": "M08D",
+      "merge_wave": "MERGE-M08-READ",
+      "status": "catalogued"
+    },
+    {
+      "operation": "traverse.face.loops",
+      "owner_ticket": "M08D-T03",
+      "lane": "M08D",
+      "merge_wave": "MERGE-M08-READ",
+      "status": "catalogued"
+    },
+    {
+      "operation": "traverse.loop.edges",
+      "owner_ticket": "M08D-T03",
+      "lane": "M08D",
+      "merge_wave": "MERGE-M08-READ",
+      "status": "catalogued"
+    },
+    {
+      "operation": "traverse.loop.vertices",
+      "owner_ticket": "M08D-T03",
+      "lane": "M08D",
+      "merge_wave": "MERGE-M08-READ",
+      "status": "catalogued"
+    },
+    {
+      "operation": "traverse.shell.faces",
+      "owner_ticket": "M08D-T03",
+      "lane": "M08D",
+      "merge_wave": "MERGE-M08-READ",
+      "status": "catalogued"
+    },
+    {
+      "operation": "traverse.vertex.edges",
+      "owner_ticket": "M08D-T03",
+      "lane": "M08D",
+      "merge_wave": "MERGE-M08-READ",
+      "status": "catalogued"
+    },
+    {
+      "operation": "traverse.vertex.loops",
+      "owner_ticket": "M08D-T03",
+      "lane": "M08D",
+      "merge_wave": "MERGE-M08-READ",
+      "status": "catalogued"
+    },
+    {
+      "operation": "ui.subentity.highlight",
+      "owner_ticket": "M08D-T03",
+      "lane": "M08D",
+      "merge_wave": "MERGE-M08-READ",
+      "status": "catalogued"
+    },
+    {
+      "operation": "automate.com.bridge_objectid",
+      "owner_ticket": "M08O-T01",
+      "lane": "M08O",
+      "merge_wave": "MERGE-M08-FALLBACK",
+      "status": "catalogued"
+    },
+    {
+      "operation": "automate.com.entity_helpers",
+      "owner_ticket": "M08O-T01",
+      "lane": "M08O",
+      "merge_wave": "MERGE-M08-FALLBACK",
+      "status": "catalogued"
+    },
+    {
+      "operation": "automate.com.get_app",
+      "owner_ticket": "M08O-T01",
+      "lane": "M08O",
+      "merge_wave": "MERGE-M08-FALLBACK",
+      "status": "catalogued"
+    },
+    {
+      "operation": "automate.com.get_document",
+      "owner_ticket": "M08O-T01",
+      "lane": "M08O",
+      "merge_wave": "MERGE-M08-FALLBACK",
+      "status": "catalogued"
+    },
+    {
+      "operation": "automate.com.get_for_command",
+      "owner_ticket": "M08O-T01",
+      "lane": "M08O",
+      "merge_wave": "MERGE-M08-FALLBACK",
+      "status": "catalogued"
+    },
+    {
+      "operation": "automate.com.get_winapp",
+      "owner_ticket": "M08O-T01",
+      "lane": "M08O",
+      "merge_wave": "MERGE-M08-FALLBACK",
+      "status": "catalogued"
+    },
+    {
+      "operation": "automate.com.hold_objectref",
+      "owner_ticket": "M08O-T01",
+      "lane": "M08O",
+      "merge_wave": "MERGE-M08-FALLBACK",
+      "status": "catalogued"
+    },
+    {
+      "operation": "automate.com.lock_document",
+      "owner_ticket": "M08O-T01",
+      "lane": "M08O",
+      "merge_wave": "MERGE-M08-FALLBACK",
+      "status": "catalogued"
+    },
+    {
+      "operation": "automate.com.objectid_from_iunknown",
+      "owner_ticket": "M08O-T01",
+      "lane": "M08O",
+      "merge_wave": "MERGE-M08-FALLBACK",
+      "status": "catalogued"
+    },
+    {
+      "operation": "automate.com.send_command",
+      "owner_ticket": "M08O-T01",
+      "lane": "M08O",
+      "merge_wave": "MERGE-M08-FALLBACK",
+      "status": "catalogued"
+    },
+    {
+      "operation": "automate.com.wrapper_for_object",
+      "owner_ticket": "M08O-T01",
+      "lane": "M08O",
+      "merge_wave": "MERGE-M08-FALLBACK",
+      "status": "catalogued"
+    },
+    {
+      "operation": "automate.property.set",
+      "owner_ticket": "M08M-T01",
+      "lane": "M08M",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "embed.ole.frame",
+      "owner_ticket": "M08O-T01",
+      "lane": "M08O",
+      "merge_wave": "MERGE-M08-FALLBACK",
+      "status": "catalogued"
+    },
+    {
+      "operation": "extend.members.facet_provider",
+      "owner_ticket": "M08O-T01",
+      "lane": "M08O",
+      "merge_wave": "MERGE-M08-FALLBACK",
+      "status": "catalogued"
+    },
+    {
+      "operation": "extend.opm.define_property",
+      "owner_ticket": "M08M-T01",
+      "lane": "M08M",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "extend.opm.define_property2",
+      "owner_ticket": "M08M-T01",
+      "lane": "M08M",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "extend.opm.dialog_property",
+      "owner_ticket": "M08M-T01",
+      "lane": "M08M",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "extend.opm.enum_property",
+      "owner_ticket": "M08M-T01",
+      "lane": "M08M",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "extend.opm.get_dispid",
+      "owner_ticket": "M08M-T01",
+      "lane": "M08M",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "extend.opm.get_manager",
+      "owner_ticket": "M08M-T01",
+      "lane": "M08M",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "extend.opm.map_category",
+      "owner_ticket": "M08M-T01",
+      "lane": "M08M",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "extend.opm.per_instance_source",
+      "owner_ticket": "M08M-T01",
+      "lane": "M08M",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "extend.opm.property_expander",
+      "owner_ticket": "M08M-T01",
+      "lane": "M08M",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "extend.opm.property_expression",
+      "owner_ticket": "M08M-T01",
+      "lane": "M08M",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "extend.opm.property_extension",
+      "owner_ticket": "M08M-T01",
+      "lane": "M08M",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "extend.opm.register_provider",
+      "owner_ticket": "M08M-T01",
+      "lane": "M08M",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "extend.property.category",
+      "owner_ticket": "M08M-T01",
+      "lane": "M08M",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "extend.property.com_name",
+      "owner_ticket": "M08M-T01",
+      "lane": "M08M",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "extend.property.default_value",
+      "owner_ticket": "M08M-T01",
+      "lane": "M08M",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "extend.property.define",
+      "owner_ticket": "M08M-T01",
+      "lane": "M08M",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "extend.property.define_collection",
+      "owner_ticket": "M08M-T01",
+      "lane": "M08M",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "extend.property.define_dictionary",
+      "owner_ticket": "M08M-T01",
+      "lane": "M08M",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "extend.property.define_indexed",
+      "owner_ticket": "M08M-T01",
+      "lane": "M08M",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "extend.property.describe",
+      "owner_ticket": "M08M-T01",
+      "lane": "M08M",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "extend.property.display_as",
+      "owner_ticket": "M08M-T01",
+      "lane": "M08M",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "extend.property.enum_tag",
+      "owner_ticket": "M08M-T01",
+      "lane": "M08M",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "extend.property.expose_to_com",
+      "owner_ticket": "M08M-T01",
+      "lane": "M08M",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "extend.property.filepath",
+      "owner_ticket": "M08M-T01",
+      "lane": "M08M",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "extend.property.flags",
+      "owner_ticket": "M08M-T01",
+      "lane": "M08M",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "extend.property.localize_name",
+      "owner_ticket": "M08M-T01",
+      "lane": "M08M",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "extend.property.overrule",
+      "owner_ticket": "M08M-T01",
+      "lane": "M08M",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "extend.property.refers_to",
+      "owner_ticket": "M08M-T01",
+      "lane": "M08M",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "extend.property.units",
+      "owner_ticket": "M08M-T01",
+      "lane": "M08M",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "inspect.entity.properties",
+      "owner_ticket": "M08O-T01",
+      "lane": "M08O",
+      "merge_wave": "MERGE-M08-FALLBACK",
+      "status": "catalogued"
+    },
+    {
+      "operation": "inspect.members.promoted",
+      "owner_ticket": "M08O-T01",
+      "lane": "M08O",
+      "merge_wave": "MERGE-M08-FALLBACK",
+      "status": "catalogued"
+    },
+    {
+      "operation": "inspect.property.by_name",
+      "owner_ticket": "M08M-T01",
+      "lane": "M08M",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "inspect.property.is_readonly",
+      "owner_ticket": "M08M-T01",
+      "lane": "M08M",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "inspect.property.metadata",
+      "owner_ticket": "M08M-T01",
+      "lane": "M08M",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "inspect.value.to_string",
+      "owner_ticket": "M08O-T01",
+      "lane": "M08O",
+      "merge_wave": "MERGE-M08-FALLBACK",
+      "status": "catalogued"
+    },
+    {
+      "operation": "config.assoceval.callback",
+      "owner_ticket": "M08K-T03",
+      "lane": "M08K",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "config.assocmanager.evalDisabler",
+      "owner_ticket": "M08K-T03",
+      "lane": "M08K",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "config.constraint.globalCallback",
+      "owner_ticket": "M08K-T03",
+      "lane": "M08K",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "define.assocaction.addDependency",
+      "owner_ticket": "M08K-T03",
+      "lane": "M08K",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "define.assocaction.create",
+      "owner_ticket": "M08K-T03",
+      "lane": "M08K",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "define.assocaction.valueParam",
+      "owner_ticket": "M08K-T03",
+      "lane": "M08K",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "define.assocarray.create",
+      "owner_ticket": "M08K-T03",
+      "lane": "M08K",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "define.assocarray.path",
+      "owner_ticket": "M08K-T03",
+      "lane": "M08K",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "define.assocarray.polar",
+      "owner_ticket": "M08K-T03",
+      "lane": "M08K",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "define.assocarray.rectangular",
+      "owner_ticket": "M08K-T03",
+      "lane": "M08K",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "define.assocdependency.attach",
+      "owner_ticket": "M08K-T03",
+      "lane": "M08K",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "define.assocgeomdependency.subent",
+      "owner_ticket": "M08K-T03",
+      "lane": "M08K",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "define.assocnetwork.addAction",
+      "owner_ticket": "M08K-T03",
+      "lane": "M08K",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "define.assocsurface.blend",
+      "owner_ticket": "M08K-T03",
+      "lane": "M08K",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "define.assocsurface.extrude",
+      "owner_ticket": "M08K-T03",
+      "lane": "M08K",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "define.assocsurface.fillet",
+      "owner_ticket": "M08K-T03",
+      "lane": "M08K",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "define.assocsurface.loft",
+      "owner_ticket": "M08K-T03",
+      "lane": "M08K",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "define.assocsurface.offset",
+      "owner_ticket": "M08K-T03",
+      "lane": "M08K",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "define.assocsurface.patch",
+      "owner_ticket": "M08K-T03",
+      "lane": "M08K",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "define.assocsurface.result",
+      "owner_ticket": "M08K-T03",
+      "lane": "M08K",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "define.assocsurface.trim",
+      "owner_ticket": "M08K-T03",
+      "lane": "M08K",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "define.assocvaluedependency.value",
+      "owner_ticket": "M08K-T03",
+      "lane": "M08K",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "define.constraint.addGeometry",
+      "owner_ticket": "M08K-T03",
+      "lane": "M08K",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "define.constraint.autoConstrain",
+      "owner_ticket": "M08K-T03",
+      "lane": "M08K",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "define.constraint.dimensional.angle",
+      "owner_ticket": "M08K-T03",
+      "lane": "M08K",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "define.constraint.dimensional.distance",
+      "owner_ticket": "M08K-T03",
+      "lane": "M08K",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "define.constraint.dimensional.radiusDiameter",
+      "owner_ticket": "M08K-T03",
+      "lane": "M08K",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "define.constraint.geometric",
+      "owner_ticket": "M08K-T03",
+      "lane": "M08K",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "define.constraint.group",
+      "owner_ticket": "M08K-T03",
+      "lane": "M08K",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "define.dimassoc.geometryDriven",
+      "owner_ticket": "M08K-T03",
+      "lane": "M08K",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "define.georef.subent",
+      "owner_ticket": "M08K-T03",
+      "lane": "M08K",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "define.parameter.merge",
+      "owner_ticket": "M08K-T03",
+      "lane": "M08K",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "define.parameter.variable",
+      "owner_ticket": "M08K-T03",
+      "lane": "M08K",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "define.perssubentid.resolve",
+      "owner_ticket": "M08K-T03",
+      "lane": "M08K",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "edit.assocarray.explode",
+      "owner_ticket": "M08K-T03",
+      "lane": "M08K",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "edit.assocarray.item",
+      "owner_ticket": "M08K-T03",
+      "lane": "M08K",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "edit.assocarray.itemReplace",
+      "owner_ticket": "M08K-T03",
+      "lane": "M08K",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "edit.assocarray.reset",
+      "owner_ticket": "M08K-T03",
+      "lane": "M08K",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "edit.assocarray.source",
+      "owner_ticket": "M08K-T03",
+      "lane": "M08K",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "edit.assocarray.transform",
+      "owner_ticket": "M08K-T03",
+      "lane": "M08K",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "edit.assocdata.xref",
+      "owner_ticket": "M08K-T03",
+      "lane": "M08K",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "edit.assocnetwork.removeAction",
+      "owner_ticket": "M08K-T03",
+      "lane": "M08K",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "edit.constraint.delete",
+      "owner_ticket": "M08K-T03",
+      "lane": "M08K",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "inspect.assocaction.dependencies",
+      "owner_ticket": "M08K-T03",
+      "lane": "M08K",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "inspect.assocaction.evaluate",
+      "owner_ticket": "M08K-T03",
+      "lane": "M08K",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "inspect.assocaction.requestToEvaluate",
+      "owner_ticket": "M08K-T03",
+      "lane": "M08K",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "inspect.assocarray.identify",
+      "owner_ticket": "M08K-T03",
+      "lane": "M08K",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "inspect.assocmanager.state",
+      "owner_ticket": "M08K-T03",
+      "lane": "M08K",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "inspect.assocnetwork.evaluate",
+      "owner_ticket": "M08K-T03",
+      "lane": "M08K",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "inspect.assocnetwork.get",
+      "owner_ticket": "M08K-T03",
+      "lane": "M08K",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "inspect.assocnetwork.iterate",
+      "owner_ticket": "M08K-T03",
+      "lane": "M08K",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "inspect.assocsurface.topology",
+      "owner_ticket": "M08K-T03",
+      "lane": "M08K",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "inspect.constraint.dimensional.value",
+      "owner_ticket": "M08K-T03",
+      "lane": "M08K",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "inspect.constraint.enumerate",
+      "owner_ticket": "M08K-T03",
+      "lane": "M08K",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "inspect.constraint.node",
+      "owner_ticket": "M08K-T03",
+      "lane": "M08K",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "inspect.constraint.status",
+      "owner_ticket": "M08K-T03",
+      "lane": "M08K",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "inspect.parameter.evaluate",
+      "owner_ticket": "M08K-T03",
+      "lane": "M08K",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "repair.assocdata.audit",
+      "owner_ticket": "M08K-T03",
+      "lane": "M08K",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "extend.customclass.declare",
+      "owner_ticket": "M08K-T01",
+      "lane": "M08K",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "extend.customclass.define",
+      "owner_ticket": "M08K-T01",
+      "lane": "M08K",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "extend.customclass.define_cons",
+      "owner_ticket": "M08K-T01",
+      "lane": "M08K",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "extend.customclass.define_dxf",
+      "owner_ticket": "M08K-T01",
+      "lane": "M08K",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "extend.customclass.define_nocons",
+      "owner_ticket": "M08K-T01",
+      "lane": "M08K",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "extend.customclass.rxinit",
+      "owner_ticket": "M08K-T01",
+      "lane": "M08K",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "extend.customclass.unregister",
+      "owner_ticket": "M08K-T01",
+      "lane": "M08K",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "extend.customentity.db_defaults",
+      "owner_ticket": "M08K-T01",
+      "lane": "M08K",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "extend.customentity.define",
+      "owner_ticket": "M08K-T01",
+      "lane": "M08K",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "extend.customentity.draw_viewport",
+      "owner_ticket": "M08K-T01",
+      "lane": "M08K",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "extend.customentity.draw_world",
+      "owner_ticket": "M08K-T01",
+      "lane": "M08K",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "extend.customentity.explode",
+      "owner_ticket": "M08K-T01",
+      "lane": "M08K",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "extend.customentity.geom_extents",
+      "owner_ticket": "M08K-T01",
+      "lane": "M08K",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "extend.customentity.grips",
+      "owner_ticket": "M08K-T01",
+      "lane": "M08K",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "extend.customentity.intersect",
+      "owner_ticket": "M08K-T01",
+      "lane": "M08K",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "extend.customentity.list",
+      "owner_ticket": "M08K-T01",
+      "lane": "M08K",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "extend.customentity.osnap",
+      "owner_ticket": "M08K-T01",
+      "lane": "M08K",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "extend.customentity.stretch",
+      "owner_ticket": "M08K-T01",
+      "lane": "M08K",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "extend.customentity.subentpaths",
+      "owner_ticket": "M08K-T01",
+      "lane": "M08K",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "extend.customentity.transform",
+      "owner_ticket": "M08K-T01",
+      "lane": "M08K",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "extend.customobject.deepclone",
+      "owner_ticket": "M08K-T01",
+      "lane": "M08K",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "extend.customobject.define",
+      "owner_ticket": "M08K-T01",
+      "lane": "M08K",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "extend.customobject.embedded",
+      "owner_ticket": "M08K-T01",
+      "lane": "M08K",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "extend.customobject.filer_dwgin",
+      "owner_ticket": "M08K-T01",
+      "lane": "M08K",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "extend.customobject.filer_dwgout",
+      "owner_ticket": "M08K-T01",
+      "lane": "M08K",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "extend.customobject.filer_dxfin",
+      "owner_ticket": "M08K-T01",
+      "lane": "M08K",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "extend.customobject.filer_dxfout",
+      "owner_ticket": "M08K-T01",
+      "lane": "M08K",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "extend.customobject.partial_undo",
+      "owner_ticket": "M08K-T01",
+      "lane": "M08K",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "extend.customobject.version",
+      "owner_ticket": "M08K-T01",
+      "lane": "M08K",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "extend.customobject.wblockclone",
+      "owner_ticket": "M08K-T01",
+      "lane": "M08K",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "extend.module.entrypoint",
+      "owner_ticket": "M08K-T01",
+      "lane": "M08K",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "extend.object_enabler.build",
+      "owner_ticket": "M08K-T01",
+      "lane": "M08K",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "extend.object_enabler.demand_register",
+      "owner_ticket": "M08K-T01",
+      "lane": "M08K",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "extend.object_enabler.register_classes",
+      "owner_ticket": "M08K-T01",
+      "lane": "M08K",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "extend.osnap.custom_mode",
+      "owner_ticket": "M08K-T01",
+      "lane": "M08K",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "extend.protocol.attach",
+      "owner_ticket": "M08K-T01",
+      "lane": "M08K",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "extend.protocol.declare",
+      "owner_ticket": "M08K-T01",
+      "lane": "M08K",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "extend.protocol.detach",
+      "owner_ticket": "M08K-T01",
+      "lane": "M08K",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "extend.protocol.query",
+      "owner_ticket": "M08K-T01",
+      "lane": "M08K",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "extend.service.register",
+      "owner_ticket": "M08K-T01",
+      "lane": "M08K",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "inspect.proxy.detect",
+      "owner_ticket": "M08K-T01",
+      "lane": "M08K",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "inspect.runtime.cast",
+      "owner_ticket": "M08K-T01",
+      "lane": "M08K",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "inspect.runtime.desc",
+      "owner_ticket": "M08K-T01",
+      "lane": "M08K",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "inspect.runtime.isa",
+      "owner_ticket": "M08K-T01",
+      "lane": "M08K",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "inspect.runtime.iskindof",
+      "owner_ticket": "M08K-T01",
+      "lane": "M08K",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "overrule.applicable",
+      "owner_ticket": "M08L-T02",
+      "lane": "M08L",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "overrule.dimstyle.install",
+      "owner_ticket": "M08L-T02",
+      "lane": "M08L",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "overrule.drawable.install",
+      "owner_ticket": "M08L-T02",
+      "lane": "M08L",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "overrule.geometry.install",
+      "owner_ticket": "M08L-T02",
+      "lane": "M08L",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "overrule.global.enable",
+      "owner_ticket": "M08L-T02",
+      "lane": "M08L",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "overrule.grip.install",
+      "owner_ticket": "M08L-T02",
+      "lane": "M08L",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "overrule.highlight.install",
+      "owner_ticket": "M08L-T02",
+      "lane": "M08L",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "overrule.highlightstate.install",
+      "owner_ticket": "M08L-T02",
+      "lane": "M08L",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "overrule.install",
+      "owner_ticket": "M08L-T02",
+      "lane": "M08L",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "overrule.object.install",
+      "owner_ticket": "M08L-T02",
+      "lane": "M08L",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "overrule.osnap.install",
+      "owner_ticket": "M08L-T02",
+      "lane": "M08L",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "overrule.properties.install",
+      "owner_ticket": "M08L-T02",
+      "lane": "M08L",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "overrule.query.has",
+      "owner_ticket": "M08L-T02",
+      "lane": "M08L",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "overrule.queryx.install",
+      "owner_ticket": "M08L-T02",
+      "lane": "M08L",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "overrule.remove",
+      "owner_ticket": "M08L-T02",
+      "lane": "M08L",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "overrule.subentity.install",
+      "owner_ticket": "M08L-T02",
+      "lane": "M08L",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "overrule.transform.install",
+      "owner_ticket": "M08L-T02",
+      "lane": "M08L",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "overrule.visibility.install",
+      "owner_ticket": "M08L-T02",
+      "lane": "M08L",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "command.queue.post",
+      "owner_ticket": "M08O-T02",
+      "lane": "M08O",
+      "merge_wave": "MERGE-M08-FALLBACK",
+      "status": "catalogued"
+    },
+    {
+      "operation": "editor.react.events",
+      "owner_ticket": "M08N-T01",
+      "lane": "M08N",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "input.get.angle",
+      "owner_ticket": "M08N-T01",
+      "lane": "M08N",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "input.get.corner",
+      "owner_ticket": "M08N-T01",
+      "lane": "M08N",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "input.get.dist",
+      "owner_ticket": "M08N-T01",
+      "lane": "M08N",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "input.get.int",
+      "owner_ticket": "M08N-T01",
+      "lane": "M08N",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "input.get.keyword",
+      "owner_ticket": "M08N-T01",
+      "lane": "M08N",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "input.get.point",
+      "owner_ticket": "M08N-T01",
+      "lane": "M08N",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "input.get.real",
+      "owner_ticket": "M08N-T01",
+      "lane": "M08N",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "input.get.string",
+      "owner_ticket": "M08N-T01",
+      "lane": "M08N",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "input.initget.constrain",
+      "owner_ticket": "M08N-T01",
+      "lane": "M08N",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "interact.inputcontext.react",
+      "owner_ticket": "M08N-T01",
+      "lane": "M08N",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "interact.inputpoint.filter",
+      "owner_ticket": "M08N-T01",
+      "lane": "M08N",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "interact.inputpoint.monitor",
+      "owner_ticket": "M08N-T01",
+      "lane": "M08N",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "interact.jig.acquire",
+      "owner_ticket": "M08N-T01",
+      "lane": "M08N",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "interact.jig.run",
+      "owner_ticket": "M08N-T01",
+      "lane": "M08N",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "prompt.alert",
+      "owner_ticket": "M08N-T01",
+      "lane": "M08N",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "prompt.print",
+      "owner_ticket": "M08N-T01",
+      "lane": "M08N",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "select.entity.pick",
+      "owner_ticket": "M08N-T02",
+      "lane": "M08N",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "select.nentity.pick",
+      "owner_ticket": "M08N-T02",
+      "lane": "M08N",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "select.pickfirst.get",
+      "owner_ticket": "M08N-T02",
+      "lane": "M08N",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "select.pickfirst.set",
+      "owner_ticket": "M08N-T02",
+      "lane": "M08N",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "select.ss.addremove",
+      "owner_ticket": "M08N-T02",
+      "lane": "M08N",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "select.ss.count",
+      "owner_ticket": "M08N-T02",
+      "lane": "M08N",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "select.ss.free",
+      "owner_ticket": "M08N-T02",
+      "lane": "M08N",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "select.ssget.interactive",
+      "owner_ticket": "M08N-T02",
+      "lane": "M08N",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "select.ssget.preview",
+      "owner_ticket": "M08N-T02",
+      "lane": "M08N",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "inspect.curve.protocol",
+      "owner_ticket": "M08D-T02",
+      "lane": "M08D",
+      "merge_wave": "MERGE-M08-READ",
+      "status": "catalogued"
+    },
+    {
+      "operation": "inspect.entity.common",
+      "owner_ticket": "M08D-T01",
+      "lane": "M08D",
+      "merge_wave": "MERGE-M08-READ",
+      "status": "catalogued"
+    },
+    {
+      "operation": "inspect.entity.geomextents",
+      "owner_ticket": "M08D-T01",
+      "lane": "M08D",
+      "merge_wave": "MERGE-M08-READ",
+      "status": "catalogued"
+    },
+    {
+      "operation": "inspect.entity.osnap",
+      "owner_ticket": "M08D-T01",
+      "lane": "M08D",
+      "merge_wave": "MERGE-M08-READ",
+      "status": "catalogued"
+    },
+    {
+      "operation": "modify.curve.offset",
+      "owner_ticket": "M08G-T03",
+      "lane": "M08G",
+      "merge_wave": "MERGE-M08-WRITE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "modify.curve.split",
+      "owner_ticket": "M08G-T03",
+      "lane": "M08G",
+      "merge_wave": "MERGE-M08-WRITE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "modify.curve.to_spline",
+      "owner_ticket": "M08G-T03",
+      "lane": "M08G",
+      "merge_wave": "MERGE-M08-WRITE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "modify.entity.common",
+      "owner_ticket": "M08G-T03",
+      "lane": "M08G",
+      "merge_wave": "MERGE-M08-WRITE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "modify.entity.copy_transformed",
+      "owner_ticket": "M08G-T03",
+      "lane": "M08G",
+      "merge_wave": "MERGE-M08-WRITE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "modify.entity.explode",
+      "owner_ticket": "M08G-T03",
+      "lane": "M08G",
+      "merge_wave": "MERGE-M08-WRITE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "write.entity.arc",
+      "owner_ticket": "M08G-T02",
+      "lane": "M08G",
+      "merge_wave": "MERGE-M08-WRITE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "write.entity.attribdef",
+      "owner_ticket": "M08G-T02",
+      "lane": "M08G",
+      "merge_wave": "MERGE-M08-WRITE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "write.entity.attribute",
+      "owner_ticket": "M08G-T02",
+      "lane": "M08G",
+      "merge_wave": "MERGE-M08-WRITE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "write.entity.blockref",
+      "owner_ticket": "M08G-T02",
+      "lane": "M08G",
+      "merge_wave": "MERGE-M08-WRITE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "write.entity.body",
+      "owner_ticket": "M08G-T02",
+      "lane": "M08G",
+      "merge_wave": "MERGE-M08-WRITE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "write.entity.dim.aligned",
+      "owner_ticket": "M08H-T01",
+      "lane": "M08H",
+      "merge_wave": "MERGE-M08-WRITE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "write.entity.dim.angular2line",
+      "owner_ticket": "M08H-T01",
+      "lane": "M08H",
+      "merge_wave": "MERGE-M08-WRITE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "write.entity.dim.angular3pt",
+      "owner_ticket": "M08H-T01",
+      "lane": "M08H",
+      "merge_wave": "MERGE-M08-WRITE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "write.entity.dim.arc",
+      "owner_ticket": "M08H-T01",
+      "lane": "M08H",
+      "merge_wave": "MERGE-M08-WRITE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "write.entity.dim.diametric",
+      "owner_ticket": "M08H-T01",
+      "lane": "M08H",
+      "merge_wave": "MERGE-M08-WRITE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "write.entity.dim.ordinate",
+      "owner_ticket": "M08H-T01",
+      "lane": "M08H",
+      "merge_wave": "MERGE-M08-WRITE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "write.entity.dim.radial",
+      "owner_ticket": "M08H-T01",
+      "lane": "M08H",
+      "merge_wave": "MERGE-M08-WRITE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "write.entity.dim.radiallarge",
+      "owner_ticket": "M08H-T01",
+      "lane": "M08H",
+      "merge_wave": "MERGE-M08-WRITE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "write.entity.dim.rotated",
+      "owner_ticket": "M08H-T01",
+      "lane": "M08H",
+      "merge_wave": "MERGE-M08-WRITE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "write.entity.ellipse",
+      "owner_ticket": "M08G-T02",
+      "lane": "M08G",
+      "merge_wave": "MERGE-M08-WRITE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "write.entity.face",
+      "owner_ticket": "M08G-T02",
+      "lane": "M08G",
+      "merge_wave": "MERGE-M08-WRITE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "write.entity.hatch",
+      "owner_ticket": "M08H-T02",
+      "lane": "M08H",
+      "merge_wave": "MERGE-M08-WRITE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "write.entity.leader",
+      "owner_ticket": "M08H-T01",
+      "lane": "M08H",
+      "merge_wave": "MERGE-M08-WRITE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "write.entity.minsert",
+      "owner_ticket": "M08G-T02",
+      "lane": "M08G",
+      "merge_wave": "MERGE-M08-WRITE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "write.entity.mleader",
+      "owner_ticket": "M08H-T01",
+      "lane": "M08H",
+      "merge_wave": "MERGE-M08-WRITE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "write.entity.mline",
+      "owner_ticket": "M08G-T02",
+      "lane": "M08G",
+      "merge_wave": "MERGE-M08-WRITE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "write.entity.mpolygon",
+      "owner_ticket": "M08G-T02",
+      "lane": "M08G",
+      "merge_wave": "MERGE-M08-WRITE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "write.entity.mtext",
+      "owner_ticket": "M08H-T01",
+      "lane": "M08H",
+      "merge_wave": "MERGE-M08-WRITE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "write.entity.nurbsurface",
+      "owner_ticket": "M08G-T02",
+      "lane": "M08G",
+      "merge_wave": "MERGE-M08-WRITE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "write.entity.polyfacemesh",
+      "owner_ticket": "M08G-T02",
+      "lane": "M08G",
+      "merge_wave": "MERGE-M08-WRITE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "write.entity.polygonmesh",
+      "owner_ticket": "M08G-T02",
+      "lane": "M08G",
+      "merge_wave": "MERGE-M08-WRITE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "write.entity.polyline2d",
+      "owner_ticket": "M08G-T02",
+      "lane": "M08G",
+      "merge_wave": "MERGE-M08-WRITE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "write.entity.polyline3d",
+      "owner_ticket": "M08G-T02",
+      "lane": "M08G",
+      "merge_wave": "MERGE-M08-WRITE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "write.entity.rasterimage",
+      "owner_ticket": "M08G-T02",
+      "lane": "M08G",
+      "merge_wave": "MERGE-M08-WRITE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "write.entity.ray",
+      "owner_ticket": "M08G-T02",
+      "lane": "M08G",
+      "merge_wave": "MERGE-M08-WRITE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "write.entity.region",
+      "owner_ticket": "M08G-T02",
+      "lane": "M08G",
+      "merge_wave": "MERGE-M08-WRITE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "write.entity.shape",
+      "owner_ticket": "M08G-T02",
+      "lane": "M08G",
+      "merge_wave": "MERGE-M08-WRITE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "write.entity.solid2d",
+      "owner_ticket": "M08G-T02",
+      "lane": "M08G",
+      "merge_wave": "MERGE-M08-WRITE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "write.entity.solid3d.extrude",
+      "owner_ticket": "M08G-T02",
+      "lane": "M08G",
+      "merge_wave": "MERGE-M08-WRITE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "write.entity.solid3d.loft",
+      "owner_ticket": "M08G-T02",
+      "lane": "M08G",
+      "merge_wave": "MERGE-M08-WRITE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "write.entity.solid3d.primitive",
+      "owner_ticket": "M08G-T02",
+      "lane": "M08G",
+      "merge_wave": "MERGE-M08-WRITE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "write.entity.solid3d.revolve",
+      "owner_ticket": "M08G-T02",
+      "lane": "M08G",
+      "merge_wave": "MERGE-M08-WRITE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "write.entity.solid3d.sweep",
+      "owner_ticket": "M08G-T02",
+      "lane": "M08G",
+      "merge_wave": "MERGE-M08-WRITE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "write.entity.spline",
+      "owner_ticket": "M08G-T02",
+      "lane": "M08G",
+      "merge_wave": "MERGE-M08-WRITE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "write.entity.subdmesh",
+      "owner_ticket": "M08G-T02",
+      "lane": "M08G",
+      "merge_wave": "MERGE-M08-WRITE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "write.entity.surface",
+      "owner_ticket": "M08G-T02",
+      "lane": "M08G",
+      "merge_wave": "MERGE-M08-WRITE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "write.entity.table",
+      "owner_ticket": "M08H-T01",
+      "lane": "M08H",
+      "merge_wave": "MERGE-M08-WRITE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "write.entity.text",
+      "owner_ticket": "M08H-T01",
+      "lane": "M08H",
+      "merge_wave": "MERGE-M08-WRITE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "write.entity.trace",
+      "owner_ticket": "M08G-T02",
+      "lane": "M08G",
+      "merge_wave": "MERGE-M08-WRITE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "write.entity.wipeout",
+      "owner_ticket": "M08G-T02",
+      "lane": "M08G",
+      "merge_wave": "MERGE-M08-WRITE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "write.entity.xline",
+      "owner_ticket": "M08G-T02",
+      "lane": "M08G",
+      "merge_wave": "MERGE-M08-WRITE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "compute.entity.intersect",
+      "owner_ticket": "M08D-T02",
+      "lane": "M08D",
+      "merge_wave": "MERGE-M08-READ",
+      "status": "catalogued"
+    },
+    {
+      "operation": "compute.geometry.circarc",
+      "owner_ticket": "M08D-T02",
+      "lane": "M08D",
+      "merge_wave": "MERGE-M08-READ",
+      "status": "catalogued"
+    },
+    {
+      "operation": "compute.geometry.compositecurve",
+      "owner_ticket": "M08D-T02",
+      "lane": "M08D",
+      "merge_wave": "MERGE-M08-READ",
+      "status": "catalogued"
+    },
+    {
+      "operation": "compute.geometry.curve.closest",
+      "owner_ticket": "M08D-T02",
+      "lane": "M08D",
+      "merge_wave": "MERGE-M08-READ",
+      "status": "catalogued"
+    },
+    {
+      "operation": "compute.geometry.curve.eval",
+      "owner_ticket": "M08D-T02",
+      "lane": "M08D",
+      "merge_wave": "MERGE-M08-READ",
+      "status": "catalogued"
+    },
+    {
+      "operation": "compute.geometry.curve.intersect",
+      "owner_ticket": "M08D-T02",
+      "lane": "M08D",
+      "merge_wave": "MERGE-M08-READ",
+      "status": "catalogued"
+    },
+    {
+      "operation": "compute.geometry.curve.sample",
+      "owner_ticket": "M08D-T02",
+      "lane": "M08D",
+      "merge_wave": "MERGE-M08-READ",
+      "status": "catalogued"
+    },
+    {
+      "operation": "compute.geometry.elliparc",
+      "owner_ticket": "M08D-T02",
+      "lane": "M08D",
+      "merge_wave": "MERGE-M08-READ",
+      "status": "catalogued"
+    },
+    {
+      "operation": "compute.geometry.lineseg",
+      "owner_ticket": "M08D-T02",
+      "lane": "M08D",
+      "merge_wave": "MERGE-M08-READ",
+      "status": "catalogued"
+    },
+    {
+      "operation": "compute.geometry.matrix.build",
+      "owner_ticket": "M08D-T02",
+      "lane": "M08D",
+      "merge_wave": "MERGE-M08-READ",
+      "status": "catalogued"
+    },
+    {
+      "operation": "compute.geometry.matrix.compose",
+      "owner_ticket": "M08D-T02",
+      "lane": "M08D",
+      "merge_wave": "MERGE-M08-READ",
+      "status": "catalogued"
+    },
+    {
+      "operation": "compute.geometry.nurbcurve",
+      "owner_ticket": "M08D-T02",
+      "lane": "M08D",
+      "merge_wave": "MERGE-M08-READ",
+      "status": "catalogued"
+    },
+    {
+      "operation": "compute.geometry.point.distance",
+      "owner_ticket": "M08D-T02",
+      "lane": "M08D",
+      "merge_wave": "MERGE-M08-READ",
+      "status": "catalogued"
+    },
+    {
+      "operation": "compute.geometry.point.transform",
+      "owner_ticket": "M08D-T02",
+      "lane": "M08D",
+      "merge_wave": "MERGE-M08-READ",
+      "status": "catalogued"
+    },
+    {
+      "operation": "compute.geometry.scale.build",
+      "owner_ticket": "M08D-T02",
+      "lane": "M08D",
+      "merge_wave": "MERGE-M08-READ",
+      "status": "catalogued"
+    },
+    {
+      "operation": "compute.geometry.surface.nurb",
+      "owner_ticket": "M08D-T02",
+      "lane": "M08D",
+      "merge_wave": "MERGE-M08-READ",
+      "status": "catalogued"
+    },
+    {
+      "operation": "compute.geometry.tolerance",
+      "owner_ticket": "M08D-T02",
+      "lane": "M08D",
+      "merge_wave": "MERGE-M08-READ",
+      "status": "catalogued"
+    },
+    {
+      "operation": "compute.solid3d.interference",
+      "owner_ticket": "M08D-T02",
+      "lane": "M08D",
+      "merge_wave": "MERGE-M08-READ",
+      "status": "catalogued"
+    },
+    {
+      "operation": "modify.entity.solid3d.boolean",
+      "owner_ticket": "M08G-T03",
+      "lane": "M08G",
+      "merge_wave": "MERGE-M08-WRITE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "modify.entity.transform",
+      "owner_ticket": "M08G-T03",
+      "lane": "M08G",
+      "merge_wave": "MERGE-M08-WRITE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "write.entity.point",
+      "owner_ticket": "M08G-T02",
+      "lane": "M08G",
+      "merge_wave": "MERGE-M08-WRITE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "write.entity.polyline",
+      "owner_ticket": "M08G-T02",
+      "lane": "M08G",
+      "merge_wave": "MERGE-M08-WRITE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "write.entity.tolerance",
+      "owner_ticket": "M08G-T02",
+      "lane": "M08G",
+      "merge_wave": "MERGE-M08-WRITE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "inspect.entity.grips",
+      "owner_ticket": "M08L-T02",
+      "lane": "M08L",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "render.context.query",
+      "owner_ticket": "M08L-T01",
+      "lane": "M08L",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "render.draw.viewportgeom",
+      "owner_ticket": "M08L-T01",
+      "lane": "M08L",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "render.draw.worldgeom",
+      "owner_ticket": "M08L-T01",
+      "lane": "M08L",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "render.drawable.def",
+      "owner_ticket": "M08L-T01",
+      "lane": "M08L",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "render.entity.worlddraw_override",
+      "owner_ticket": "M08L-T01",
+      "lane": "M08L",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "render.facedata.attach",
+      "owner_ticket": "M08L-T01",
+      "lane": "M08L",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "render.polyline.helper",
+      "owner_ticket": "M08L-T01",
+      "lane": "M08L",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "render.traits.set",
+      "owner_ticket": "M08L-T01",
+      "lane": "M08L",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "plot.config.settings",
+      "owner_ticket": "M08I-T01",
+      "lane": "M08I",
+      "merge_wave": "MERGE-M08-VISLIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "plot.engine.run",
+      "owner_ticket": "M08I-T01",
+      "lane": "M08I",
+      "merge_wave": "MERGE-M08-VISLIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "infra.hostapp.get_services",
+      "owner_ticket": "M08C-T01",
+      "lane": "M08C",
+      "merge_wave": "MERGE-M08-READ",
+      "status": "catalogued"
+    },
+    {
+      "operation": "infra.hostapp.set_working_db",
+      "owner_ticket": "M08C-T01",
+      "lane": "M08C",
+      "merge_wave": "MERGE-M08-READ",
+      "status": "catalogued"
+    },
+    {
+      "operation": "inspect.database.dxf_in",
+      "owner_ticket": "M08C-T01",
+      "lane": "M08C",
+      "merge_wave": "MERGE-M08-READ",
+      "status": "catalogued"
+    },
+    {
+      "operation": "inspect.database.flush_input",
+      "owner_ticket": "M08C-T01",
+      "lane": "M08C",
+      "merge_wave": "MERGE-M08-READ",
+      "status": "catalogued"
+    },
+    {
+      "operation": "inspect.database.read_dwg",
+      "owner_ticket": "M08C-T01",
+      "lane": "M08C",
+      "merge_wave": "MERGE-M08-READ",
+      "status": "catalogued"
+    },
+    {
+      "operation": "inspect.database.read_dwg_handle",
+      "owner_ticket": "M08C-T01",
+      "lane": "M08C",
+      "merge_wave": "MERGE-M08-READ",
+      "status": "catalogued"
+    },
+    {
+      "operation": "inspect.database.summaryinfo",
+      "owner_ticket": "M08C-T01",
+      "lane": "M08C",
+      "merge_wave": "MERGE-M08-READ",
+      "status": "catalogued"
+    },
+    {
+      "operation": "inspect.database.sysvar",
+      "owner_ticket": "M08C-T01",
+      "lane": "M08C",
+      "merge_wave": "MERGE-M08-READ",
+      "status": "catalogued"
+    },
+    {
+      "operation": "inspect.object.handle",
+      "owner_ticket": "M08C-T01",
+      "lane": "M08C",
+      "merge_wave": "MERGE-M08-READ",
+      "status": "catalogued"
+    },
+    {
+      "operation": "inspect.object.id",
+      "owner_ticket": "M08C-T01",
+      "lane": "M08C",
+      "merge_wave": "MERGE-M08-READ",
+      "status": "catalogued"
+    },
+    {
+      "operation": "inspect.object.open",
+      "owner_ticket": "M08C-T01",
+      "lane": "M08C",
+      "merge_wave": "MERGE-M08-READ",
+      "status": "catalogued"
+    },
+    {
+      "operation": "transaction.manager.get_object",
+      "owner_ticket": "M08B-T03",
+      "lane": "M08B",
+      "merge_wave": "infra",
+      "status": "catalogued"
+    },
+    {
+      "operation": "transaction.manager.start",
+      "owner_ticket": "M08B-T03",
+      "lane": "M08B",
+      "merge_wave": "infra",
+      "status": "catalogued"
+    },
+    {
+      "operation": "transform.database.dxf_out",
+      "owner_ticket": "M08C-T01",
+      "lane": "M08C",
+      "merge_wave": "MERGE-M08-READ",
+      "status": "catalogued"
+    },
+    {
+      "operation": "transform.database.save_as",
+      "owner_ticket": "M08C-T01",
+      "lane": "M08C",
+      "merge_wave": "MERGE-M08-READ",
+      "status": "catalogued"
+    },
+    {
+      "operation": "transform.database.save_as_simple",
+      "owner_ticket": "M08C-T01",
+      "lane": "M08C",
+      "merge_wave": "MERGE-M08-READ",
+      "status": "catalogued"
+    },
+    {
+      "operation": "write.object.cancel",
+      "owner_ticket": "M08C-T01",
+      "lane": "M08C",
+      "merge_wave": "MERGE-M08-READ",
+      "status": "catalogued"
+    },
+    {
+      "operation": "write.object.close",
+      "owner_ticket": "M08C-T01",
+      "lane": "M08C",
+      "merge_wave": "MERGE-M08-READ",
+      "status": "catalogued"
+    },
+    {
+      "operation": "write.object.downgrade_open",
+      "owner_ticket": "M08C-T01",
+      "lane": "M08C",
+      "merge_wave": "MERGE-M08-READ",
+      "status": "catalogued"
+    },
+    {
+      "operation": "write.object.upgrade_open",
+      "owner_ticket": "M08C-T01",
+      "lane": "M08C",
+      "merge_wave": "MERGE-M08-READ",
+      "status": "catalogued"
+    },
+    {
+      "operation": "react.config.disable_namespace",
+      "owner_ticket": "M08M-T02",
+      "lane": "M08M",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "react.database.attach",
+      "owner_ticket": "M08M-T02",
+      "lane": "M08M",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "react.database.monitor",
+      "owner_ticket": "M08M-T02",
+      "lane": "M08M",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "react.docmanager.attach",
+      "owner_ticket": "M08M-T02",
+      "lane": "M08M",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "react.docmanager.monitor",
+      "owner_ticket": "M08M-T02",
+      "lane": "M08M",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "react.editor.command_monitor",
+      "owner_ticket": "M08M-T02",
+      "lane": "M08M",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "react.editor.dwg_lifecycle",
+      "owner_ticket": "M08M-T02",
+      "lane": "M08M",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "react.editor.input_monitor",
+      "owner_ticket": "M08M-T02",
+      "lane": "M08M",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "react.editor.lisp_monitor",
+      "owner_ticket": "M08M-T02",
+      "lane": "M08M",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "react.editor.sysvar_monitor",
+      "owner_ticket": "M08M-T02",
+      "lane": "M08M",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "react.entity.monitor",
+      "owner_ticket": "M08M-T02",
+      "lane": "M08M",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "react.linker.attach",
+      "owner_ticket": "M08M-T02",
+      "lane": "M08M",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "react.linker.monitor",
+      "owner_ticket": "M08M-T02",
+      "lane": "M08M",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "react.longtx.attach",
+      "owner_ticket": "M08M-T02",
+      "lane": "M08M",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "react.longtx.monitor",
+      "owner_ticket": "M08M-T02",
+      "lane": "M08M",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "react.object.attach_transient",
+      "owner_ticket": "M08M-T02",
+      "lane": "M08M",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "react.object.detach_transient",
+      "owner_ticket": "M08M-T02",
+      "lane": "M08M",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "react.object.monitor",
+      "owner_ticket": "M08M-T02",
+      "lane": "M08M",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "react.persistent.attach",
+      "owner_ticket": "M08M-T02",
+      "lane": "M08M",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "react.persistent.detach",
+      "owner_ticket": "M08M-T02",
+      "lane": "M08M",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "react.rxevent.attach",
+      "owner_ticket": "M08M-T02",
+      "lane": "M08M",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "react.rxevent.monitor",
+      "owner_ticket": "M08M-T02",
+      "lane": "M08M",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "command.register.define",
+      "owner_ticket": "M08N-T02",
+      "lane": "M08N",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "module.ads.register_symbol",
+      "owner_ticket": "M08N-T02",
+      "lane": "M08N",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "module.app.accessor",
+      "owner_ticket": "M08O-T02",
+      "lane": "M08O",
+      "merge_wave": "MERGE-M08-FALLBACK",
+      "status": "catalogued"
+    },
+    {
+      "operation": "module.class.register_object",
+      "owner_ticket": "M08N-T02",
+      "lane": "M08N",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "module.command.flags",
+      "owner_ticket": "M08O-T02",
+      "lane": "M08O",
+      "merge_wave": "MERGE-M08-FALLBACK",
+      "status": "catalogued"
+    },
+    {
+      "operation": "module.command.lookup",
+      "owner_ticket": "M08O-T02",
+      "lane": "M08O",
+      "merge_wave": "MERGE-M08-FALLBACK",
+      "status": "catalogued"
+    },
+    {
+      "operation": "module.command.register_auto",
+      "owner_ticket": "M08N-T02",
+      "lane": "M08N",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "module.command.register_manual",
+      "owner_ticket": "M08N-T02",
+      "lane": "M08N",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "module.command.remove_group",
+      "owner_ticket": "M08O-T02",
+      "lane": "M08O",
+      "merge_wave": "MERGE-M08-FALLBACK",
+      "status": "catalogued"
+    },
+    {
+      "operation": "module.command.stack_handle",
+      "owner_ticket": "M08O-T02",
+      "lane": "M08O",
+      "merge_wave": "MERGE-M08-FALLBACK",
+      "status": "catalogued"
+    },
+    {
+      "operation": "module.entrypoint.define",
+      "owner_ticket": "M08O-T02",
+      "lane": "M08O",
+      "merge_wave": "MERGE-M08-FALLBACK",
+      "status": "catalogued"
+    },
+    {
+      "operation": "module.entrypoint.dispatch",
+      "owner_ticket": "M08O-T02",
+      "lane": "M08O",
+      "merge_wave": "MERGE-M08-FALLBACK",
+      "status": "catalogued"
+    },
+    {
+      "operation": "module.lifecycle.init",
+      "owner_ticket": "M08O-T02",
+      "lane": "M08O",
+      "merge_wave": "MERGE-M08-FALLBACK",
+      "status": "catalogued"
+    },
+    {
+      "operation": "module.lifecycle.on_load_dwg",
+      "owner_ticket": "M08O-T02",
+      "lane": "M08O",
+      "merge_wave": "MERGE-M08-FALLBACK",
+      "status": "catalogued"
+    },
+    {
+      "operation": "module.lifecycle.on_ole_unload",
+      "owner_ticket": "M08O-T02",
+      "lane": "M08O",
+      "merge_wave": "MERGE-M08-FALLBACK",
+      "status": "catalogued"
+    },
+    {
+      "operation": "module.lifecycle.on_unload_dwg",
+      "owner_ticket": "M08O-T02",
+      "lane": "M08O",
+      "merge_wave": "MERGE-M08-FALLBACK",
+      "status": "catalogued"
+    },
+    {
+      "operation": "module.lifecycle.other",
+      "owner_ticket": "M08O-T02",
+      "lane": "M08O",
+      "merge_wave": "MERGE-M08-FALLBACK",
+      "status": "catalogued"
+    },
+    {
+      "operation": "module.lifecycle.unload",
+      "owner_ticket": "M08O-T02",
+      "lane": "M08O",
+      "merge_wave": "MERGE-M08-FALLBACK",
+      "status": "catalogued"
+    },
+    {
+      "operation": "module.load",
+      "owner_ticket": "M08O-T02",
+      "lane": "M08O",
+      "merge_wave": "MERGE-M08-FALLBACK",
+      "status": "catalogued"
+    },
+    {
+      "operation": "module.load.acad_rx",
+      "owner_ticket": "M08O-T02",
+      "lane": "M08O",
+      "merge_wave": "MERGE-M08-FALLBACK",
+      "status": "catalogued"
+    },
+    {
+      "operation": "module.load.by_app",
+      "owner_ticket": "M08O-T02",
+      "lane": "M08O",
+      "merge_wave": "MERGE-M08-FALLBACK",
+      "status": "catalogued"
+    },
+    {
+      "operation": "module.load.demand_register",
+      "owner_ticket": "M08N-T02",
+      "lane": "M08N",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "module.load.lisp",
+      "owner_ticket": "M08O-T02",
+      "lane": "M08O",
+      "merge_wave": "MERGE-M08-FALLBACK",
+      "status": "catalogued"
+    },
+    {
+      "operation": "module.register_mdi",
+      "owner_ticket": "M08N-T02",
+      "lane": "M08N",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "module.register_service",
+      "owner_ticket": "M08N-T02",
+      "lane": "M08N",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "module.unload",
+      "owner_ticket": "M08O-T02",
+      "lane": "M08O",
+      "merge_wave": "MERGE-M08-FALLBACK",
+      "status": "catalogued"
+    },
+    {
+      "operation": "acdb.database.create",
+      "owner_ticket": "M08E-T03",
+      "lane": "M08E",
+      "merge_wave": "MERGE-M08-READ",
+      "status": "catalogued"
+    },
+    {
+      "operation": "inspect.dictionary.get",
+      "owner_ticket": "M08E-T03",
+      "lane": "M08E",
+      "merge_wave": "MERGE-M08-READ",
+      "status": "catalogued"
+    },
+    {
+      "operation": "inspect.dictionary.named_objects",
+      "owner_ticket": "M08E-T03",
+      "lane": "M08E",
+      "merge_wave": "MERGE-M08-READ",
+      "status": "catalogued"
+    },
+    {
+      "operation": "inspect.entity.get_xdata",
+      "owner_ticket": "M08E-T03",
+      "lane": "M08E",
+      "merge_wave": "MERGE-M08-READ",
+      "status": "catalogued"
+    },
+    {
+      "operation": "inspect.object.ext_dict",
+      "owner_ticket": "M08C-T02",
+      "lane": "M08C",
+      "merge_wave": "MERGE-M08-READ",
+      "status": "catalogued"
+    },
+    {
+      "operation": "inspect.symboltable.block",
+      "owner_ticket": "M08C-T02",
+      "lane": "M08C",
+      "merge_wave": "MERGE-M08-READ",
+      "status": "catalogued"
+    },
+    {
+      "operation": "inspect.symboltable.layers",
+      "owner_ticket": "M08C-T02",
+      "lane": "M08C",
+      "merge_wave": "MERGE-M08-READ",
+      "status": "catalogued"
+    },
+    {
+      "operation": "transform.database.wblock",
+      "owner_ticket": "M08C-T02",
+      "lane": "M08C",
+      "merge_wave": "MERGE-M08-READ",
+      "status": "catalogued"
+    },
+    {
+      "operation": "transform.database.wblock_clone",
+      "owner_ticket": "M08C-T02",
+      "lane": "M08C",
+      "merge_wave": "MERGE-M08-READ",
+      "status": "catalogued"
+    },
+    {
+      "operation": "write.dictionary.set",
+      "owner_ticket": "M08E-T03",
+      "lane": "M08E",
+      "merge_wave": "MERGE-M08-READ",
+      "status": "catalogued"
+    },
+    {
+      "operation": "write.entity.set_xdata",
+      "owner_ticket": "M08E-T03",
+      "lane": "M08E",
+      "merge_wave": "MERGE-M08-READ",
+      "status": "catalogued"
+    },
+    {
+      "operation": "write.object.create_ext_dict",
+      "owner_ticket": "M08C-T02",
+      "lane": "M08C",
+      "merge_wave": "MERGE-M08-READ",
+      "status": "catalogued"
+    },
+    {
+      "operation": "write.regapp.register",
+      "owner_ticket": "M08C-T03",
+      "lane": "M08C",
+      "merge_wave": "MERGE-M08-READ",
+      "status": "catalogued"
+    },
+    {
+      "operation": "command.menu.invoke",
+      "owner_ticket": "M08N-T02",
+      "lane": "M08N",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "editor.command.register",
+      "owner_ticket": "M08N-T02",
+      "lane": "M08N",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "editor.command.unregister",
+      "owner_ticket": "M08N-T02",
+      "lane": "M08N",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "editor.menu.add_item",
+      "owner_ticket": "M08N-T02",
+      "lane": "M08N",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "editor.menu.context",
+      "owner_ticket": "M08N-T02",
+      "lane": "M08N",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "editor.menu.menubar_get",
+      "owner_ticket": "M08N-T02",
+      "lane": "M08N",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "editor.palette.add_palette",
+      "owner_ticket": "M08N-T02",
+      "lane": "M08N",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "editor.palette.create",
+      "owner_ticket": "M08N-T02",
+      "lane": "M08N",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "editor.palette.create_dockable",
+      "owner_ticket": "M08N-T02",
+      "lane": "M08N",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "editor.palette.dock",
+      "owner_ticket": "M08N-T02",
+      "lane": "M08N",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "editor.palette.persist",
+      "owner_ticket": "M08N-T02",
+      "lane": "M08N",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "editor.palette.style",
+      "owner_ticket": "M08N-T02",
+      "lane": "M08N",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "editor.statusbar.add_pane",
+      "owner_ticket": "M08N-T02",
+      "lane": "M08N",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "editor.statusbar.context_menu",
+      "owner_ticket": "M08N-T02",
+      "lane": "M08N",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "editor.statusbar.get",
+      "owner_ticket": "M08N-T02",
+      "lane": "M08N",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "editor.statusbar.pane",
+      "owner_ticket": "M08N-T02",
+      "lane": "M08N",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "editor.statusbar.pane_config",
+      "owner_ticket": "M08N-T02",
+      "lane": "M08N",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "editor.statusbar.remove_pane",
+      "owner_ticket": "M08N-T02",
+      "lane": "M08N",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "editor.toolpalette.add_tool",
+      "owner_ticket": "M08N-T02",
+      "lane": "M08N",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "editor.toolpalette.catalog_item_props",
+      "owner_ticket": "M08N-T02",
+      "lane": "M08N",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "editor.toolpalette.catalog_manager",
+      "owner_ticket": "M08N-T02",
+      "lane": "M08N",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "editor.toolpalette.create",
+      "owner_ticket": "M08N-T02",
+      "lane": "M08N",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "editor.toolpalette.export",
+      "owner_ticket": "M08N-T02",
+      "lane": "M08N",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "editor.toolpalette.global_init",
+      "owner_ticket": "M08N-T02",
+      "lane": "M08N",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "editor.toolpalette.group_activate",
+      "owner_ticket": "M08N-T02",
+      "lane": "M08N",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "editor.toolpalette.group_create",
+      "owner_ticket": "M08N-T02",
+      "lane": "M08N",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "editor.toolpalette.refresh",
+      "owner_ticket": "M08N-T02",
+      "lane": "M08N",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "editor.toolpalette.scheme_create",
+      "owner_ticket": "M08N-T02",
+      "lane": "M08N",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "editor.toolpalette.scheme_register",
+      "owner_ticket": "M08N-T02",
+      "lane": "M08N",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "editor.toolpalette.stocktool_find",
+      "owner_ticket": "M08N-T02",
+      "lane": "M08N",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "editor.toolpalette.tool_execute",
+      "owner_ticket": "M08N-T02",
+      "lane": "M08N",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "editor.toolpalette.tool_set_command",
+      "owner_ticket": "M08N-T02",
+      "lane": "M08N",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "editor.toolpalette.window_get",
+      "owner_ticket": "M08N-T02",
+      "lane": "M08N",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "editor.toolpalette.window_show",
+      "owner_ticket": "M08N-T02",
+      "lane": "M08N",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "editor.toolpaletteset.add_palette",
+      "owner_ticket": "M08N-T02",
+      "lane": "M08N",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "editor.toolpaletteset.show",
+      "owner_ticket": "M08N-T02",
+      "lane": "M08N",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "editor.tray.add_item",
+      "owner_ticket": "M08N-T02",
+      "lane": "M08N",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "editor.tray.item_config",
+      "owner_ticket": "M08N-T02",
+      "lane": "M08N",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    },
+    {
+      "operation": "editor.tray.remove",
+      "owner_ticket": "M08N-T02",
+      "lane": "M08N",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "status": "catalogued"
+    }
+  ],
+  "validation": {
+    "every_op_has_lane": true,
+    "every_op_has_merge_wave": true,
+    "every_lane_has_merge_dependency": true,
+    "dag_acyclic": true,
+    "every_nonroot_ticket_has_dependency": true,
+    "op_total": 517,
+    "ticket_total": 38,
+    "lane_total": 15,
+    "ops_without_lane": [],
+    "lanes_without_wave": [],
+    "valid": true
+  }
+}
