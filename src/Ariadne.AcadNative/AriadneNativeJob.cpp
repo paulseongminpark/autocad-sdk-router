@@ -2864,6 +2864,91 @@ private:
     bool mLocked;
 };
 
+//============================================================================
+// M08B-T01: Native OperationSpec dispatch table + standard result/error envelope.
+//
+// kAriadneNativeOperationTable is the AUTHORITATIVE registry of the operations
+// ARIADNE_NATIVE_JOB implements today. The dispatcher gates on it: an op_id absent
+// from the table is not implemented in the native module and returns a structured
+// OPERATION_NOT_IMPLEMENTED (the honest contract for the catalogued ops the M08
+// family tickets will build). The implemented handler bodies are bridged unchanged
+// in the dispatch chain below; the table drives the membership/dispatch decision.
+// INVARIANT: the table op_ids and the `op == "..."` handler branches below are the
+// same set (asserted source-side by tests/unit/test_m08b_dispatcher_table.py).
+//============================================================================
+struct AriadneOperationSpec
+{
+    const char* op_id;
+    const char* family;   // mirrors operations.v2.json; native-only diagnostics carry a native family
+};
+
+static const AriadneOperationSpec kAriadneNativeOperationTable[] = {
+    { "inspect.database.summary", "objectdbx_database" },
+    { "inspect.database.graph", "inspect" },
+    { "write.layer.create", "symbol_tables_dictionaries" },
+    { "write.entity.line", "geometry_kernel" },
+    { "write.entity.circle", "geometry_kernel" },
+    { "inspect.entity.count", "inspect" },
+    { "write.xrecord.set", "symbol_tables_dictionaries" },
+    { "inspect.xrecord.get", "symbol_tables_dictionaries" },
+    { "write.xdata.set", "write" },
+    { "inspect.xdata.get", "inspect" },
+    { "write.block.simple_create", "write" },
+    { "write.block.insert", "write" },
+    { "inspect.block.count", "inspect" },
+    { "write.layout.create", "write" },
+    { "inspect.layout.list", "inspect" },
+    { "inspect.xref.list", "inspect" },
+    { "inspect.layers", "inspect" },
+    { "inspect.blocks", "inspect" },
+    { "inspect.entities", "inspect" },
+    { "inspect.runtime.capabilities", "inspect" },
+    { "live.reactor.enable", "live" },
+    { "inspect.reactor.registry", "inspect" },
+    { "live.reactor.disable", "live" },
+    { "live.selection.monitor.enable", "live" },
+    { "live.selection.monitor.disable", "live" },
+    { "inspect.selection.monitor.registry", "live" },
+    { "inspect.probe.property_count", "inspect" },
+    { "inspect.overrule.registry", "inspect" },
+    { "live.overrule.enable", "live" },
+    { "live.overrule.disable", "live" },
+    { "inspect.jig.host_support", "inspect" },
+    { "live.jig.point_probe", "live" },
+    { "extend.deep_native.firing_selftest", "extend" },
+    { "inspect.deep_native.firing_report", "inspect" },
+    { "extend.customclass.create", "extend" },
+    { "inspect.customclass.count", "inspect" },
+    { "extend.customobject.create", "extend" },
+    { "inspect.customobject.count", "inspect" },
+    { "inspect.protocol.queryx", "inspect" },
+};
+
+static const size_t kAriadneNativeOperationCount =
+    sizeof(kAriadneNativeOperationTable) / sizeof(kAriadneNativeOperationTable[0]);
+
+static const AriadneOperationSpec* findAriadneNativeOp(const std::string& op)
+{
+    for (size_t i = 0; i < kAriadneNativeOperationCount; ++i) {
+        if (op == kAriadneNativeOperationTable[i].op_id)
+            return &kAriadneNativeOperationTable[i];
+    }
+    return nullptr;
+}
+
+// Standard structured error: the result `r` already carries the
+// {schema, engine, operation,} prefix; this appends a machine-stable error_code
+// plus the human error message and closes the JSON object. The additive error_code
+// keeps the legacy `error` string for back-compat.
+static void emitNativeError(std::ostringstream& r,
+                            const char* errorCode,
+                            const std::string& message)
+{
+    r << "\"status\":\"error\","
+      << "\"error_code\":\"" << errorCode << "\","
+      << "\"error\":\"" << jsonEscape(message) << "\"}";
+}
+
 static void ariadneNativeJob()
 {
     const std::wstring inPath = readJobPathSetting(L"ARIADNE_CAD_JOB_IN");
@@ -2884,8 +2969,20 @@ static void ariadneNativeJob()
       << "\"engine\":\"native_objectarx\","
       << "\"operation\":\"" << op << "\",";
 
+    // M08B-T01: table-gated dispatch. An op_id absent from the native operation
+    // table is not implemented in this module -> structured OPERATION_NOT_IMPLEMENTED
+    // (reported even without a working database, since it is a contract fact, not a
+    // DB error). This replaces the former generic unsupported-operation else and is
+    // the honest contract the M08 family tickets convert into real handlers.
+    if (findAriadneNativeOp(op) == nullptr) {
+        emitNativeError(r, "OPERATION_NOT_IMPLEMENTED",
+                        "operation '" + op + "' is not implemented in the native module");
+        writeResult(outPath.empty() ? nullptr : outPath.c_str(), r.str());
+        return;
+    }
+
     if (pDb == nullptr) {
-        r << "\"status\":\"error\",\"error\":\"no working database\"}";
+        emitNativeError(r, "NO_WORKING_DATABASE", "no working database");
         writeResult(outPath.empty() ? nullptr : outPath.c_str(), r.str());
         return;
     }
@@ -3394,7 +3491,12 @@ static void ariadneNativeJob()
           << "\"status\":\"" << (available ? "ok" : "error") << "\"}";
     }
     else {
-        r << "\"status\":\"error\",\"error\":\"unsupported operation\"}";
+        // Unreachable in normal flow: the table gate above already returned
+        // OPERATION_NOT_IMPLEMENTED for any op absent from kAriadneNativeOperationTable.
+        // Reaching here means an op IS in the table but has no handler branch -> a
+        // table/handler drift bug. Surfaced explicitly, never silent.
+        emitNativeError(r, "OPERATION_DISPATCH_MISMATCH",
+                        "operation '" + op + "' is registered in the native table but has no handler branch");
     }
 
     writeResult(outPath.empty() ? nullptr : outPath.c_str(), r.str());
