@@ -1,0 +1,1099 @@
+{
+  "schema": "ariadne.cad_os.operation_execution_dag.v1",
+  "ticket": "M08A-T02",
+  "generated_from": "reports/full_sdk_implementation_map.json",
+  "merge_wave_order": [
+    "foundation",
+    "infra",
+    "MERGE-M08-READ",
+    "MERGE-M08-WRITE",
+    "MERGE-M08-VISLIVE",
+    "MERGE-M08-NATIVE",
+    "MERGE-M08-FALLBACK",
+    "MERGE-M08-FINAL"
+  ],
+  "merge_wave_deps": {
+    "foundation": [],
+    "infra": [
+      "foundation"
+    ],
+    "MERGE-M08-READ": [
+      "infra"
+    ],
+    "MERGE-M08-WRITE": [
+      "MERGE-M08-READ"
+    ],
+    "MERGE-M08-VISLIVE": [
+      "MERGE-M08-READ"
+    ],
+    "MERGE-M08-NATIVE": [
+      "infra"
+    ],
+    "MERGE-M08-FALLBACK": [
+      "infra"
+    ],
+    "MERGE-M08-FINAL": [
+      "MERGE-M08-WRITE",
+      "MERGE-M08-VISLIVE",
+      "MERGE-M08-NATIVE",
+      "MERGE-M08-FALLBACK"
+    ]
+  },
+  "lanes": {
+    "M08A": {
+      "merge_wave": "foundation",
+      "tickets": [
+        "M08A-T01",
+        "M08A-T02"
+      ],
+      "op_count": 0,
+      "open": 0
+    },
+    "M08B": {
+      "merge_wave": "infra",
+      "tickets": [
+        "M08B-T01",
+        "M08B-T02",
+        "M08B-T03"
+      ],
+      "op_count": 2,
+      "open": 2
+    },
+    "M08C": {
+      "merge_wave": "MERGE-M08-READ",
+      "tickets": [
+        "M08C-T01",
+        "M08C-T02",
+        "M08C-T03"
+      ],
+      "op_count": 43,
+      "open": 25
+    },
+    "M08D": {
+      "merge_wave": "MERGE-M08-READ",
+      "tickets": [
+        "M08D-T01",
+        "M08D-T02",
+        "M08D-T03",
+        "M08D-T04"
+      ],
+      "op_count": 73,
+      "open": 73
+    },
+    "M08E": {
+      "merge_wave": "MERGE-M08-READ",
+      "tickets": [
+        "M08E-T01",
+        "M08E-T02",
+        "M08E-T03"
+      ],
+      "op_count": 13,
+      "open": 11
+    },
+    "M08F": {
+      "merge_wave": "MERGE-M08-READ",
+      "tickets": [
+        "M08F-T01",
+        "M08F-T02"
+      ],
+      "op_count": 1,
+      "open": 0
+    },
+    "M08G": {
+      "merge_wave": "MERGE-M08-WRITE",
+      "tickets": [
+        "M08G-T01",
+        "M08G-T02",
+        "M08G-T03"
+      ],
+      "op_count": 56,
+      "open": 45
+    },
+    "M08H": {
+      "merge_wave": "MERGE-M08-WRITE",
+      "tickets": [
+        "M08H-T01",
+        "M08H-T02"
+      ],
+      "op_count": 15,
+      "open": 15
+    },
+    "M08I": {
+      "merge_wave": "MERGE-M08-VISLIVE",
+      "tickets": [
+        "M08I-T01",
+        "M08I-T02"
+      ],
+      "op_count": 4,
+      "open": 2
+    },
+    "M08J": {
+      "merge_wave": "MERGE-M08-VISLIVE",
+      "tickets": [
+        "M08J-T01",
+        "M08J-T02",
+        "M08J-T03"
+      ],
+      "op_count": 12,
+      "open": 5
+    },
+    "M08K": {
+      "merge_wave": "MERGE-M08-NATIVE",
+      "tickets": [
+        "M08K-T01",
+        "M08K-T02",
+        "M08K-T03"
+      ],
+      "op_count": 105,
+      "open": 103
+    },
+    "M08L": {
+      "merge_wave": "MERGE-M08-NATIVE",
+      "tickets": [
+        "M08L-T01",
+        "M08L-T02"
+      ],
+      "op_count": 27,
+      "open": 27
+    },
+    "M08M": {
+      "merge_wave": "MERGE-M08-NATIVE",
+      "tickets": [
+        "M08M-T01",
+        "M08M-T02"
+      ],
+      "op_count": 55,
+      "open": 55
+    },
+    "M08N": {
+      "merge_wave": "MERGE-M08-NATIVE",
+      "tickets": [
+        "M08N-T01",
+        "M08N-T02"
+      ],
+      "op_count": 73,
+      "open": 73
+    },
+    "M08O": {
+      "merge_wave": "MERGE-M08-FALLBACK",
+      "tickets": [
+        "M08O-T01",
+        "M08O-T02"
+      ],
+      "op_count": 38,
+      "open": 38
+    }
+  },
+  "tickets": {
+    "M08A-T01": {
+      "ticket": "M08A-T01",
+      "lane": "M08A",
+      "merge_wave": "foundation",
+      "depends_on": [
+        "main"
+      ],
+      "op_count": 0,
+      "open": 0,
+      "implemented": 0,
+      "blocked": 0,
+      "families": {},
+      "strategies": {}
+    },
+    "M08A-T02": {
+      "ticket": "M08A-T02",
+      "lane": "M08A",
+      "merge_wave": "foundation",
+      "depends_on": [
+        "M08A-T01"
+      ],
+      "op_count": 0,
+      "open": 0,
+      "implemented": 0,
+      "blocked": 0,
+      "families": {},
+      "strategies": {}
+    },
+    "M08B-T01": {
+      "ticket": "M08B-T01",
+      "lane": "M08B",
+      "merge_wave": "infra",
+      "depends_on": [
+        "M08A-T02"
+      ],
+      "op_count": 0,
+      "open": 0,
+      "implemented": 0,
+      "blocked": 0,
+      "families": {},
+      "strategies": {}
+    },
+    "M08B-T02": {
+      "ticket": "M08B-T02",
+      "lane": "M08B",
+      "merge_wave": "infra",
+      "depends_on": [
+        "M08A-T02"
+      ],
+      "op_count": 0,
+      "open": 0,
+      "implemented": 0,
+      "blocked": 0,
+      "families": {},
+      "strategies": {}
+    },
+    "M08B-T03": {
+      "ticket": "M08B-T03",
+      "lane": "M08B",
+      "merge_wave": "infra",
+      "depends_on": [
+        "M08A-T02"
+      ],
+      "op_count": 2,
+      "open": 2,
+      "implemented": 0,
+      "blocked": 0,
+      "families": {
+        "objectdbx_database": 2
+      },
+      "strategies": {
+        "native_arx_cpp": 2
+      }
+    },
+    "M08C-T01": {
+      "ticket": "M08C-T01",
+      "lane": "M08C",
+      "merge_wave": "MERGE-M08-READ",
+      "depends_on": [
+        "M08B-T01"
+      ],
+      "op_count": 35,
+      "open": 18,
+      "implemented": 17,
+      "blocked": 0,
+      "families": {
+        "objectdbx_database": 19,
+        "inspect": 16
+      },
+      "strategies": {
+        "implemented_v1": 17,
+        "objectdbx_hostless": 17,
+        "native_arx_cpp": 1
+      }
+    },
+    "M08C-T02": {
+      "ticket": "M08C-T02",
+      "lane": "M08C",
+      "merge_wave": "MERGE-M08-READ",
+      "depends_on": [
+        "M08B-T01"
+      ],
+      "op_count": 7,
+      "open": 6,
+      "implemented": 1,
+      "blocked": 0,
+      "families": {
+        "symbol_tables_dictionaries": 7
+      },
+      "strategies": {
+        "implemented_v1": 1,
+        "objectdbx_hostless": 5,
+        "native_arx_cpp": 1
+      }
+    },
+    "M08C-T03": {
+      "ticket": "M08C-T03",
+      "lane": "M08C",
+      "merge_wave": "MERGE-M08-READ",
+      "depends_on": [
+        "M08B-T01"
+      ],
+      "op_count": 1,
+      "open": 1,
+      "implemented": 0,
+      "blocked": 0,
+      "families": {
+        "symbol_tables_dictionaries": 1
+      },
+      "strategies": {
+        "objectdbx_hostless": 1
+      }
+    },
+    "M08D-T01": {
+      "ticket": "M08D-T01",
+      "lane": "M08D",
+      "merge_wave": "MERGE-M08-READ",
+      "depends_on": [
+        "M08B-T01"
+      ],
+      "op_count": 3,
+      "open": 3,
+      "implemented": 0,
+      "blocked": 0,
+      "families": {
+        "entities": 3
+      },
+      "strategies": {
+        "objectdbx_hostless": 3
+      }
+    },
+    "M08D-T02": {
+      "ticket": "M08D-T02",
+      "lane": "M08D",
+      "merge_wave": "MERGE-M08-READ",
+      "depends_on": [
+        "M08D-T01"
+      ],
+      "op_count": 19,
+      "open": 19,
+      "implemented": 0,
+      "blocked": 0,
+      "families": {
+        "entities": 1,
+        "geometry_kernel": 18
+      },
+      "strategies": {
+        "objectdbx_hostless": 3,
+        "native_arx_cpp": 16
+      }
+    },
+    "M08D-T03": {
+      "ticket": "M08D-T03",
+      "lane": "M08D",
+      "merge_wave": "MERGE-M08-READ",
+      "depends_on": [
+        "M08D-T01"
+      ],
+      "op_count": 51,
+      "open": 51,
+      "implemented": 0,
+      "blocked": 0,
+      "families": {
+        "brep_solids": 51
+      },
+      "strategies": {
+        "objectdbx_hostless": 44,
+        "native_arx_cpp": 7
+      }
+    },
+    "M08D-T04": {
+      "ticket": "M08D-T04",
+      "lane": "M08D",
+      "merge_wave": "MERGE-M08-READ",
+      "depends_on": [
+        "M08D-T01"
+      ],
+      "op_count": 0,
+      "open": 0,
+      "implemented": 0,
+      "blocked": 0,
+      "families": {},
+      "strategies": {}
+    },
+    "M08E-T01": {
+      "ticket": "M08E-T01",
+      "lane": "M08E",
+      "merge_wave": "MERGE-M08-READ",
+      "depends_on": [
+        "M08B-T01",
+        "M08D-T01"
+      ],
+      "op_count": 5,
+      "open": 5,
+      "implemented": 0,
+      "blocked": 0,
+      "families": {
+        "blocks_xrefs_clone": 5
+      },
+      "strategies": {
+        "objectdbx_hostless": 4,
+        "native_arx_cpp": 1
+      }
+    },
+    "M08E-T02": {
+      "ticket": "M08E-T02",
+      "lane": "M08E",
+      "merge_wave": "MERGE-M08-READ",
+      "depends_on": [
+        "M08B-T01",
+        "M08D-T01"
+      ],
+      "op_count": 0,
+      "open": 0,
+      "implemented": 0,
+      "blocked": 0,
+      "families": {},
+      "strategies": {}
+    },
+    "M08E-T03": {
+      "ticket": "M08E-T03",
+      "lane": "M08E",
+      "merge_wave": "MERGE-M08-READ",
+      "depends_on": [
+        "M08B-T01",
+        "M08D-T01"
+      ],
+      "op_count": 8,
+      "open": 6,
+      "implemented": 2,
+      "blocked": 0,
+      "families": {
+        "symbol_tables_dictionaries": 8
+      },
+      "strategies": {
+        "implemented_v1": 2,
+        "objectdbx_hostless": 6
+      }
+    },
+    "M08F-T01": {
+      "ticket": "M08F-T01",
+      "lane": "M08F",
+      "merge_wave": "MERGE-M08-READ",
+      "depends_on": [
+        "M08C-T01",
+        "M08D-T01",
+        "M08E-T01"
+      ],
+      "op_count": 0,
+      "open": 0,
+      "implemented": 0,
+      "blocked": 0,
+      "families": {},
+      "strategies": {}
+    },
+    "M08F-T02": {
+      "ticket": "M08F-T02",
+      "lane": "M08F",
+      "merge_wave": "MERGE-M08-READ",
+      "depends_on": [
+        "M08F-T01"
+      ],
+      "op_count": 1,
+      "open": 0,
+      "implemented": 1,
+      "blocked": 0,
+      "families": {
+        "query": 1
+      },
+      "strategies": {
+        "implemented_v1": 1
+      }
+    },
+    "M08G-T01": {
+      "ticket": "M08G-T01",
+      "lane": "M08G",
+      "merge_wave": "MERGE-M08-WRITE",
+      "depends_on": [
+        "M08B-T01",
+        "M08D-T01",
+        "M08E-T01"
+      ],
+      "op_count": 5,
+      "open": 0,
+      "implemented": 5,
+      "blocked": 0,
+      "families": {
+        "apply": 1,
+        "validate": 2,
+        "patch": 2
+      },
+      "strategies": {
+        "implemented_v1": 5
+      }
+    },
+    "M08G-T02": {
+      "ticket": "M08G-T02",
+      "lane": "M08G",
+      "merge_wave": "MERGE-M08-WRITE",
+      "depends_on": [
+        "M08G-T01"
+      ],
+      "op_count": 40,
+      "open": 34,
+      "implemented": 6,
+      "blocked": 0,
+      "families": {
+        "geometry_kernel": 5,
+        "write": 4,
+        "entities": 31
+      },
+      "strategies": {
+        "implemented_v1": 6,
+        "objectdbx_hostless": 34
+      }
+    },
+    "M08G-T03": {
+      "ticket": "M08G-T03",
+      "lane": "M08G",
+      "merge_wave": "MERGE-M08-WRITE",
+      "depends_on": [
+        "M08G-T01"
+      ],
+      "op_count": 11,
+      "open": 11,
+      "implemented": 0,
+      "blocked": 0,
+      "families": {
+        "brep_solids": 3,
+        "entities": 6,
+        "geometry_kernel": 2
+      },
+      "strategies": {
+        "native_arx_cpp": 3,
+        "objectdbx_hostless": 8
+      }
+    },
+    "M08H-T01": {
+      "ticket": "M08H-T01",
+      "lane": "M08H",
+      "merge_wave": "MERGE-M08-WRITE",
+      "depends_on": [
+        "M08G-T01"
+      ],
+      "op_count": 14,
+      "open": 14,
+      "implemented": 0,
+      "blocked": 0,
+      "families": {
+        "entities": 14
+      },
+      "strategies": {
+        "objectdbx_hostless": 14
+      }
+    },
+    "M08H-T02": {
+      "ticket": "M08H-T02",
+      "lane": "M08H",
+      "merge_wave": "MERGE-M08-WRITE",
+      "depends_on": [
+        "M08G-T01"
+      ],
+      "op_count": 1,
+      "open": 1,
+      "implemented": 0,
+      "blocked": 0,
+      "families": {
+        "entities": 1
+      },
+      "strategies": {
+        "objectdbx_hostless": 1
+      }
+    },
+    "M08I-T01": {
+      "ticket": "M08I-T01",
+      "lane": "M08I",
+      "merge_wave": "MERGE-M08-VISLIVE",
+      "depends_on": [
+        "M08D-T01",
+        "M08G-T01"
+      ],
+      "op_count": 3,
+      "open": 2,
+      "implemented": 0,
+      "blocked": 1,
+      "families": {
+        "render": 1,
+        "layouts_plot_publish": 2
+      },
+      "strategies": {
+        "hard_blocked": 1,
+        "managed_dotnet": 2
+      }
+    },
+    "M08I-T02": {
+      "ticket": "M08I-T02",
+      "lane": "M08I",
+      "merge_wave": "MERGE-M08-VISLIVE",
+      "depends_on": [
+        "M08I-T01"
+      ],
+      "op_count": 1,
+      "open": 0,
+      "implemented": 1,
+      "blocked": 0,
+      "families": {
+        "diff": 1
+      },
+      "strategies": {
+        "implemented_v1": 1
+      }
+    },
+    "M08J-T01": {
+      "ticket": "M08J-T01",
+      "lane": "M08J",
+      "merge_wave": "MERGE-M08-VISLIVE",
+      "depends_on": [
+        "M08B-T01"
+      ],
+      "op_count": 7,
+      "open": 0,
+      "implemented": 6,
+      "blocked": 1,
+      "families": {
+        "live": 7
+      },
+      "strategies": {
+        "implemented_v1": 6,
+        "hard_blocked": 1
+      }
+    },
+    "M08J-T02": {
+      "ticket": "M08J-T02",
+      "lane": "M08J",
+      "merge_wave": "MERGE-M08-VISLIVE",
+      "depends_on": [
+        "M08J-T01"
+      ],
+      "op_count": 0,
+      "open": 0,
+      "implemented": 0,
+      "blocked": 0,
+      "families": {},
+      "strategies": {}
+    },
+    "M08J-T03": {
+      "ticket": "M08J-T03",
+      "lane": "M08J",
+      "merge_wave": "MERGE-M08-VISLIVE",
+      "depends_on": [
+        "M08J-T01",
+        "M08G-T01"
+      ],
+      "op_count": 5,
+      "open": 5,
+      "implemented": 0,
+      "blocked": 0,
+      "families": {
+        "active_document_write_original": 5
+      },
+      "strategies": {
+        "managed_dotnet": 4,
+        "accoreconsole_lisp": 1
+      }
+    },
+    "M08K-T01": {
+      "ticket": "M08K-T01",
+      "lane": "M08K",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "depends_on": [
+        "M08B-T01"
+      ],
+      "op_count": 47,
+      "open": 45,
+      "implemented": 2,
+      "blocked": 0,
+      "families": {
+        "extend": 2,
+        "custom_objects_protocols": 45
+      },
+      "strategies": {
+        "implemented_v1": 2,
+        "native_arx_cpp": 38,
+        "objectdbx_hostless": 5,
+        "accoreconsole_lisp": 1,
+        "managed_dotnet": 1
+      }
+    },
+    "M08K-T02": {
+      "ticket": "M08K-T02",
+      "lane": "M08K",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "depends_on": [
+        "M08K-T01"
+      ],
+      "op_count": 0,
+      "open": 0,
+      "implemented": 0,
+      "blocked": 0,
+      "families": {},
+      "strategies": {}
+    },
+    "M08K-T03": {
+      "ticket": "M08K-T03",
+      "lane": "M08K",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "depends_on": [
+        "M08B-T01"
+      ],
+      "op_count": 58,
+      "open": 58,
+      "implemented": 0,
+      "blocked": 0,
+      "families": {
+        "constraints_associativity": 58
+      },
+      "strategies": {
+        "native_arx_cpp": 19,
+        "objectdbx_hostless": 39
+      }
+    },
+    "M08L-T01": {
+      "ticket": "M08L-T01",
+      "lane": "M08L",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "depends_on": [
+        "M08K-T01"
+      ],
+      "op_count": 8,
+      "open": 8,
+      "implemented": 0,
+      "blocked": 0,
+      "families": {
+        "graphics_system": 8
+      },
+      "strategies": {
+        "native_arx_cpp": 8
+      }
+    },
+    "M08L-T02": {
+      "ticket": "M08L-T02",
+      "lane": "M08L",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "depends_on": [
+        "M08K-T01",
+        "M08L-T01"
+      ],
+      "op_count": 19,
+      "open": 19,
+      "implemented": 0,
+      "blocked": 0,
+      "families": {
+        "custom_objects_protocols": 18,
+        "graphics_system": 1
+      },
+      "strategies": {
+        "managed_dotnet": 15,
+        "native_arx_cpp": 4
+      }
+    },
+    "M08M-T01": {
+      "ticket": "M08M-T01",
+      "lane": "M08M",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "depends_on": [
+        "M08K-T01"
+      ],
+      "op_count": 33,
+      "open": 33,
+      "implemented": 0,
+      "blocked": 0,
+      "families": {
+        "com_activex": 33
+      },
+      "strategies": {
+        "objectdbx_hostless": 4,
+        "native_arx_cpp": 29
+      }
+    },
+    "M08M-T02": {
+      "ticket": "M08M-T02",
+      "lane": "M08M",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "depends_on": [
+        "M08K-T01"
+      ],
+      "op_count": 22,
+      "open": 22,
+      "implemented": 0,
+      "blocked": 0,
+      "families": {
+        "reactors_events": 22
+      },
+      "strategies": {
+        "native_arx_cpp": 9,
+        "managed_dotnet": 13
+      }
+    },
+    "M08N-T01": {
+      "ticket": "M08N-T01",
+      "lane": "M08N",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "depends_on": [
+        "M08J-T01"
+      ],
+      "op_count": 17,
+      "open": 17,
+      "implemented": 0,
+      "blocked": 0,
+      "families": {
+        "editor_input": 17
+      },
+      "strategies": {
+        "native_arx_cpp": 10,
+        "accoreconsole_lisp": 6,
+        "managed_dotnet": 1
+      }
+    },
+    "M08N-T02": {
+      "ticket": "M08N-T02",
+      "lane": "M08N",
+      "merge_wave": "MERGE-M08-NATIVE",
+      "depends_on": [
+        "M08J-T01"
+      ],
+      "op_count": 56,
+      "open": 56,
+      "implemented": 0,
+      "blocked": 0,
+      "families": {
+        "editor_input": 9,
+        "runtime_commands": 8,
+        "ui_customization": 39
+      },
+      "strategies": {
+        "accoreconsole_lisp": 4,
+        "native_arx_cpp": 46,
+        "managed_dotnet": 5,
+        "objectdbx_hostless": 1
+      }
+    },
+    "M08O-T01": {
+      "ticket": "M08O-T01",
+      "lane": "M08O",
+      "merge_wave": "MERGE-M08-FALLBACK",
+      "depends_on": [
+        "M08B-T01"
+      ],
+      "op_count": 16,
+      "open": 16,
+      "implemented": 0,
+      "blocked": 0,
+      "families": {
+        "com_activex": 16
+      },
+      "strategies": {
+        "objectdbx_hostless": 4,
+        "native_arx_cpp": 9,
+        "managed_dotnet": 3
+      }
+    },
+    "M08O-T02": {
+      "ticket": "M08O-T02",
+      "lane": "M08O",
+      "merge_wave": "MERGE-M08-FALLBACK",
+      "depends_on": [
+        "M08B-T01"
+      ],
+      "op_count": 22,
+      "open": 22,
+      "implemented": 0,
+      "blocked": 0,
+      "families": {
+        "active_document_write_original": 3,
+        "editor_input": 1,
+        "runtime_commands": 18
+      },
+      "strategies": {
+        "deprecated_raw_command": 5,
+        "native_arx_cpp": 15,
+        "accoreconsole_lisp": 2
+      }
+    }
+  },
+  "validation": {
+    "every_op_has_lane": true,
+    "every_op_has_merge_wave": true,
+    "every_lane_has_merge_dependency": true,
+    "dag_acyclic": true,
+    "every_nonroot_ticket_has_dependency": true,
+    "op_total": 517,
+    "ticket_total": 38,
+    "lane_total": 15,
+    "ops_without_lane": [],
+    "lanes_without_wave": [],
+    "valid": true
+  },
+  "edges": [
+    {
+      "from": "main",
+      "to": "M08A-T01"
+    },
+    {
+      "from": "M08A-T01",
+      "to": "M08A-T02"
+    },
+    {
+      "from": "M08A-T02",
+      "to": "M08B-T01"
+    },
+    {
+      "from": "M08A-T02",
+      "to": "M08B-T02"
+    },
+    {
+      "from": "M08A-T02",
+      "to": "M08B-T03"
+    },
+    {
+      "from": "M08B-T01",
+      "to": "M08C-T01"
+    },
+    {
+      "from": "M08B-T01",
+      "to": "M08C-T02"
+    },
+    {
+      "from": "M08B-T01",
+      "to": "M08C-T03"
+    },
+    {
+      "from": "M08B-T01",
+      "to": "M08D-T01"
+    },
+    {
+      "from": "M08D-T01",
+      "to": "M08D-T02"
+    },
+    {
+      "from": "M08D-T01",
+      "to": "M08D-T03"
+    },
+    {
+      "from": "M08D-T01",
+      "to": "M08D-T04"
+    },
+    {
+      "from": "M08B-T01",
+      "to": "M08E-T01"
+    },
+    {
+      "from": "M08D-T01",
+      "to": "M08E-T01"
+    },
+    {
+      "from": "M08B-T01",
+      "to": "M08E-T02"
+    },
+    {
+      "from": "M08D-T01",
+      "to": "M08E-T02"
+    },
+    {
+      "from": "M08B-T01",
+      "to": "M08E-T03"
+    },
+    {
+      "from": "M08D-T01",
+      "to": "M08E-T03"
+    },
+    {
+      "from": "M08C-T01",
+      "to": "M08F-T01"
+    },
+    {
+      "from": "M08D-T01",
+      "to": "M08F-T01"
+    },
+    {
+      "from": "M08E-T01",
+      "to": "M08F-T01"
+    },
+    {
+      "from": "M08F-T01",
+      "to": "M08F-T02"
+    },
+    {
+      "from": "M08B-T01",
+      "to": "M08G-T01"
+    },
+    {
+      "from": "M08D-T01",
+      "to": "M08G-T01"
+    },
+    {
+      "from": "M08E-T01",
+      "to": "M08G-T01"
+    },
+    {
+      "from": "M08G-T01",
+      "to": "M08G-T02"
+    },
+    {
+      "from": "M08G-T01",
+      "to": "M08G-T03"
+    },
+    {
+      "from": "M08G-T01",
+      "to": "M08H-T01"
+    },
+    {
+      "from": "M08G-T01",
+      "to": "M08H-T02"
+    },
+    {
+      "from": "M08D-T01",
+      "to": "M08I-T01"
+    },
+    {
+      "from": "M08G-T01",
+      "to": "M08I-T01"
+    },
+    {
+      "from": "M08I-T01",
+      "to": "M08I-T02"
+    },
+    {
+      "from": "M08B-T01",
+      "to": "M08J-T01"
+    },
+    {
+      "from": "M08J-T01",
+      "to": "M08J-T02"
+    },
+    {
+      "from": "M08J-T01",
+      "to": "M08J-T03"
+    },
+    {
+      "from": "M08G-T01",
+      "to": "M08J-T03"
+    },
+    {
+      "from": "M08B-T01",
+      "to": "M08K-T01"
+    },
+    {
+      "from": "M08K-T01",
+      "to": "M08K-T02"
+    },
+    {
+      "from": "M08B-T01",
+      "to": "M08K-T03"
+    },
+    {
+      "from": "M08K-T01",
+      "to": "M08L-T01"
+    },
+    {
+      "from": "M08K-T01",
+      "to": "M08L-T02"
+    },
+    {
+      "from": "M08L-T01",
+      "to": "M08L-T02"
+    },
+    {
+      "from": "M08K-T01",
+      "to": "M08M-T01"
+    },
+    {
+      "from": "M08K-T01",
+      "to": "M08M-T02"
+    },
+    {
+      "from": "M08J-T01",
+      "to": "M08N-T01"
+    },
+    {
+      "from": "M08J-T01",
+      "to": "M08N-T02"
+    },
+    {
+      "from": "M08B-T01",
+      "to": "M08O-T01"
+    },
+    {
+      "from": "M08B-T01",
+      "to": "M08O-T02"
+    }
+  ]
+}

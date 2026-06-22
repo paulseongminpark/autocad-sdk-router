@@ -1,0 +1,50 @@
+{
+  "ticket_id": "M08A-T02",
+  "phase": "M08A",
+  "title": "Generate execution DAG and ticket inventory",
+  "status": "PASS",
+  "branch": "cados/M08A-T02",
+  "base_branch": "cados/M08A-T01",
+  "commit": "pending-fill-at-commit",
+  "pr": "pending-fill-at-push",
+  "depends_on": "M08A-T01",
+  "change_only_honored": true,
+  "operation_count": 517,
+  "ticket_count": 38,
+  "lane_count": 15,
+  "validation": {
+    "valid": true,
+    "every_op_has_lane": true,
+    "every_op_has_merge_wave": true,
+    "every_lane_has_merge_dependency": true,
+    "dag_acyclic": true,
+    "every_nonroot_ticket_has_dependency": true
+  },
+  "merge_wave_op_load": {
+    "foundation": 0,
+    "infra": 2,
+    "MERGE-M08-READ": 130,
+    "MERGE-M08-WRITE": 71,
+    "MERGE-M08-VISLIVE": 16,
+    "MERGE-M08-NATIVE": 260,
+    "MERGE-M08-FALLBACK": 38,
+    "MERGE-M08-FINAL": 0
+  },
+  "implemented_ops": 0,
+  "hard_blocked_ops": 0,
+  "deprecated_ops": 0,
+  "catalogued_remaining": 474,
+  "tests": [
+    "generator validation block valid=true (5 structural checks)",
+    "reports/operation_execution_dag.json parses",
+    "reports/ticket_inventory.json parses"
+  ],
+  "artifacts": [
+    "reports/operation_execution_dag.json",
+    "reports/ticket_inventory.json",
+    "docs/M08A_EXECUTION_DAG.md",
+    "reports/tickets/M08A-T02.md",
+    "reports/tickets/M08A-T02_PLAN.md"
+  ],
+  "next": "M08B - native dispatcher core + generic serializers + transaction/document lock wrappers (infra; prerequisite for all family lanes)"
+}
