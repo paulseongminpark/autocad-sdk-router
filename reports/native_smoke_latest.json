@@ -1,54 +1,35 @@
 {
-  "schema": "ariadne.cad_os.native_smoke.v1",
-  "packet": "CADOS_M03_NATIVE_ROUTER_RICH_IR_COMPLETION",
+  "schema": "ariadne.cad_os.m07b.native_smoke.v1",
+  "packet": "CADOS_M07B_ATTENDED_GUI_VERIFICATION_AND_NATIVE_DEPLOY",
   "status": "PASS",
-  "router_status": "PASS",
-  "operation": "inspect.database.graph",
-  "write_mode": "read",
-  "input": "D:\\dev\\99_tools\\autocad-sdk-router\\staging\\dwg_job_20260622_035227\\input.dwg",
-  "original_input": "staging\\dwg_20260617_191504\\input.dwg",
-  "job": "D:\\dev\\99_tools\\autocad-sdk-router\\runs\\dwg_truth_autocad_cad_job_20260622_035227\\cad_job_request.json",
-  "result_ref": "D:\\dev\\99_tools\\autocad-sdk-router\\runs\\dwg_truth_autocad_cad_job_20260622_035227\\native_cad_job_result.json",
-  "modelspace_entities": 21747,
-  "coverage_counts": {
-    "layers": 70,
-    "linetypes": 15,
-    "text_styles": 4,
-    "dim_styles": 4,
-    "viewports": 1,
-    "app_ids": 9,
-    "block_table_records": 248,
-    "block_definitions": 245,
-    "layouts": 3,
-    "xrefs": 0,
-    "dictionary_entries": 16,
-    "xrecords": 2,
-    "xrecord_items": 7,
-    "xdata_blocks": 751,
-    "xdata_items": 1069,
-    "extension_dictionaries": 0,
-    "extension_dictionary_entries": 0,
-    "extension_xrecords": 0,
-    "extension_xrecord_items": 0,
-    "hatch_loops": 702,
-    "hatch_loop_vertices": 9572
+  "build": {
+    "command": "tools/build_native_acad.ps1",
+    "arx_relink_mode": "canonical",
+    "dbx_bytes": 48128, "dbx_sha256_16": "EAA1EB3B0DB8B2A8",
+    "crx_bytes": 247808, "crx_sha256_16": "C6DCFC81E9E82E3D",
+    "arx_bytes": 255488, "arx_sha256_16": "E161694731B580F5",
+    "log": "reports/build_native_m07b.log"
   },
-  "sections_present": [
-    "database",
-    "symbol_tables",
-    "block_table_records",
-    "block_definitions",
-    "layouts",
-    "xrefs",
-    "dictionaries",
-    "extension_dictionaries",
-    "xrecords",
-    "xdata",
-    "hatch_loops"
-  ],
-  "sections_skipped": [
-    "groups",
-    "materials",
-    "plot_settings"
-  ]
+  "headless_channel_smoke": {
+    "harness": "runs/m07b_native_smoke/run_native_smoke.ps1 (ARIADNE_NATIVE_JOB_ARGS env-file channel, accoreconsole, host_mode coreconsole)",
+    "inspect.probe.property_count": { "property_count": 1, "property": "Size", "opm_registration": true, "status": "ok" },
+    "inspect.runtime.capabilities": { "status": "ok", "all_surfaces_implemented": true, "selection_monitor": "implemented:true,registered:false", "reactors": "implemented:true,registered:false", "overrules": "implemented:true,registered:false" },
+    "inspect.selection.monitor.registry": { "implemented": true, "registered": false, "status": "ok" },
+    "original_golden_unchanged": true
+  },
+  "headless_pump": {
+    "harness": "runs/m07_pump_test/run_m07_pump_test.ps1 (accoreconsole + pipe client)",
+    "checks_passed": "17/17",
+    "gated_ops_headless": "attended_only (hostIsFullAutoCad() false under accoreconsole -> honest stub; pump-gating preserved headless honesty)",
+    "original_golden_unchanged": true
+  },
+  "router_status": "ALL routes probed (autocad-router.ps1 -Action status)",
+  "registry": { "operation_count": 517, "unknown": 0, "consistent": true },
+  "pytest": "294 passed, 3 skipped (incl. 9 new M07B source guards)",
+  "original_dwg_modified": false,
+  "m03_ir_smoke_preserved": {
+    "note": "prior CADOS_M03 native rich-IR smoke (inspect.database.graph), still valid",
+    "modelspace_entities": 21747,
+    "coverage_counts": { "layers": 70, "block_table_records": 248, "block_definitions": 245, "layouts": 3, "hatch_loops": 702, "hatch_loop_vertices": 9572, "xdata_blocks": 751, "xdata_items": 1069 }
+  }
 }

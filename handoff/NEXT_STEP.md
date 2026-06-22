@@ -1,21 +1,27 @@
 # Next Step
 
-Proceed to CADOS_M08_FULL_OPERATION_COVERAGE_CLOSURE only.
+Proceed to **CADOS_M08_FULL_OPERATION_COVERAGE_CLOSURE_WITH_LIVE_PARTIAL_REVIEW**.
 
-M03, M04, M05, M06 are closed with PASS evidence; **M07 is closed with PARTIAL_PASS**
-(every acceptance criterion satisfied — attended-only items via the packet's explicit
-"OR exact blocker recorded" / "OR hard-block with evidence" allowances):
+M03–M06 closed PASS; **M07 PARTIAL_PASS**; **M07A** implemented + build-verified; **M07B
+PARTIAL_PASS** (attended GUI verification + native deploy closure).
 
-- M03 rich native IR: `runs/m03_rich_ir/dwg_graph_ir.json`
-- M04 registry/tool surface: `reports/operation_coverage_latest.json`, `reports/tool_surface_latest.json`, `reports/mcp_contract_latest.json`
-- M05 patch/diff/validation: `runs/m05_patch_create_line/`, `reports/patch_diff_latest.json`, `reports/validation_latest.json`, `reports/journal_latest.json`
-- M06 visual/batch/golden/performance: `runs/m06_visual_batch_golden/`, `reports/visual_verification_latest.json`, `reports/batch_latest.json`, `reports/golden_regression_latest.json`, `reports/performance_latest.json`
-- M07 live pump + deep native: `runs/m07_pump_test/`, `reports/live_pump_latest.json`, `reports/deep_native_latest.json`, `docs/LIVE_ARX_PUMP_SPIKE_REPORT.md`, `docs/NATIVE_DEEP_SURFACE_STATUS.md`
+## M07B closed (PARTIAL_PASS)
 
-M07 residue carried into the attended-followup backlog (NOT M08): attended live-pump proof on
-a running AutoCAD + the 3 attended_blocked deep surfaces (AcRxProperty/OPM panel, selection
-monitor, palette/status UI) — a dedicated attended packet that loads the `.arx` into an
-agent-drivable AutoCAD.
+- Native build canonical (`.dbx` 48128 / `.crx` 247808 / `.arx` 255488); `reports/build_native_m07b.log`.
+- Pump-gating integrated (host-EXE gate): attended `highlight 2/2` + `clear 2/2` + `inspect_selection`
+  real; `zoom`/`render` honestly deferred; headless 17/17 preserved.
+- Live job channel `ARIADNE_NATIVE_JOB_ARGS` finalized (M07A blocker resolved); `docs/LIVE_JOB_ARGUMENT_CONTRACT.md`.
+- Palette: MFC-free `ARIADNE_PALETTE` (arx-only); docked CAdUiPaletteSet deferred.
+- Attended run `cados_m07b_attended_20260622_123505` (dedicated acad.exe PID 51708, zero COM):
+  `ATTENDED_PUMP_OK: True`; worldDraw circle + OPM palette screenshot; 3 safety gates pass.
+- Reports: `reports/{attended_gui,live_pump,deep_native,opm_property,worlddraw,native_smoke,live_job_args_contract,attended_shutdown}_latest.json`,
+  `reports/CADOS_M07B_ATTENDED_GUI_VERIFICATION_AND_NATIVE_DEPLOY.md`.
+
+## M07B residual → M08 live-partial review
+
+Reactor / overrule / selection-monitor **LIVE FIRING COUNTS** were not captured (need synthesized
+interactive editor events). Implemented + registered + headless-proven. Carry as an M08 live-partial
+review item, or close via a human-in-the-loop / scripted-command attended pass.
 
 Do not jump to Daedalus integration before the CAD OS v1 gate (M08 → M09 freeze) is closed.
 If M09 does not PASS, repeat M10 blocker burn-down. No fake PASS. No original DWG write. No remote push.

@@ -1,7 +1,17 @@
 # CAD OS Takeover
 
-Current status: M03 PASS, M04 PASS, M05 PASS, M06 PASS, and **M07 PARTIAL_PASS**
-(live ARX pump complete + headless-verified; deep native 7/10 implemented, 3 attended_blocked).
+Current status: M03–M06 PASS, **M07 PARTIAL_PASS**, **M07A** implemented + build-verified,
+**M07B PARTIAL_PASS** (attended GUI verification + native deploy closure). Deep native now
+10/10 implemented-or-verified (0 attended_blocked); the residual is reactor/overrule/
+selection-monitor LIVE FIRING counts.
+
+**M07B re-entry — read first:** `reports/CADOS_M07B_ATTENDED_GUI_VERIFICATION_AND_NATIVE_DEPLOY.md`,
+`reports/attended_gui_latest.json`, `reports/{live_pump,deep_native}_latest.json`,
+`docs/LIVE_JOB_ARGUMENT_CONTRACT.md`. Attended evidence:
+`runs/cados_m07b_attended_20260622_123505/` (screenshots + pump result). Native build:
+`tools/build_native_acad.ps1` (canonical: .dbx 48128 / .crx 247808 / .arx 255488). Re-run attended:
+`tools/attended/run_attended_m07b.ps1` (dedicated acad.exe, zero COM, unique pipe, 3 safety gates).
+Next packet: **CADOS_M08_FULL_OPERATION_COVERAGE_CLOSURE_WITH_LIVE_PARTIAL_REVIEW**.
 
 Start from `reports/latest_status.json`, then read:
 

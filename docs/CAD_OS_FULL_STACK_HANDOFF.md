@@ -1,6 +1,8 @@
 # CAD OS Full Stack Handoff
 
-Status: M03 PASS, M04 PASS, M05 PASS, M06 PASS, M07 PARTIAL_PASS. Do not proceed to Daedalus app logic before the M08 coverage closure → M09 v1 freeze gates (M10 burn-down if M09 not PASS).
+Status: M03 PASS, M04 PASS, M05 PASS, M06 PASS, M07 PARTIAL_PASS, **M07A done**, **M07B PARTIAL_PASS**. Do not proceed to Daedalus app logic before the M08 coverage closure → M09 v1 freeze gates (M10 burn-down if M09 not PASS).
+
+**M07B (attended GUI verification + native deploy):** live ARX pump verified in a dedicated attended acad.exe (host_mode full_autocad); pump-gating real execution (highlight 2/2, clear 2/2, selection real path; zoom/render honestly deferred); `ARIADNE_NATIVE_JOB_ARGS` env-file job channel finalized (`docs/LIVE_JOB_ARGUMENT_CONTRACT.md`); MFC-free `ARIADNE_PALETTE`; worldDraw circle + OPM palette screenshot (`runs/cados_m07b_attended_20260622_123505/`). Native build canonical (.dbx 48128 / .crx 247808 / .arx 255488). Re-run attended: `tools/attended/run_attended_m07b.ps1`. Residual: reactor/overrule/selection-monitor LIVE FIRING counts. pytest 294 passed/3 skipped. Original DWG read-only; no remote push.
 
 ## Stable Surfaces
 

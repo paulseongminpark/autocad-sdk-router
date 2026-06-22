@@ -5,4 +5,6 @@
 - CADOS_M05_PATCH_DIFF_VALIDATION_TRANSACTION: PASS, see `reports/CADOS_M05_PATCH_DIFF_VALIDATION_TRANSACTION.md`
 - CADOS_M06_VISUAL_BATCH_GOLDEN_REGRESSION: PASS, see `reports/CADOS_M06_VISUAL_BATCH_GOLDEN_REGRESSION.md`
 - CADOS_M07_LIVE_ARX_AND_DEEP_NATIVE_SURFACE: PARTIAL_PASS (live pump complete + headless-verified; deep native 7 implemented / 3 attended_blocked), see `reports/CADOS_M07_LIVE_ARX_AND_DEEP_NATIVE_SURFACE.md`
-- Next: CADOS_M08_FULL_OPERATION_COVERAGE_CLOSURE
+- CADOS_M07A_ATTENDED_SURFACE_VERIFICATION: implemented + build-verified (selection monitor + AcRxProperty/OPM), see `reports/CADOS_M07A_ATTENDED_SURFACE_VERIFICATION.md`
+- CADOS_M07B_ATTENDED_GUI_VERIFICATION_AND_NATIVE_DEPLOY: PARTIAL_PASS (pump-gating real execution attended + env-file job channel + palette + dedicated-instance attended GUI; deep native 10 impl/verified, 0 attended_blocked; live-firing residual), see `reports/CADOS_M07B_ATTENDED_GUI_VERIFICATION_AND_NATIVE_DEPLOY.md`
+- Next: CADOS_M08_FULL_OPERATION_COVERAGE_CLOSURE_WITH_LIVE_PARTIAL_REVIEW

@@ -1,0 +1,69 @@
+{
+  "schema": "ariadne.cad_os.m07b.attended_gui.v1",
+  "packet": "CADOS_M07B_ATTENDED_GUI_VERIFICATION_AND_NATIVE_DEPLOY",
+  "status": "PARTIAL_PASS",
+  "run_id": "cados_m07b_attended_20260622_123505",
+  "harness": "tools/attended/run_attended_m07b.ps1 (zero-COM; dedicated acad.exe /b startup.scr; unique pipe; PrintWindow capture)",
+  "host": "attended AutoCAD 2027 (acad.exe), dedicated launched instance",
+  "dedicated_instance_pid": 51708,
+  "pipe_name": "\\\\.\\pipe\\ariadne-cadagent-m07b-cados_m07b_attended_20260622_123505",
+  "safety_gates": {
+    "dedicated_instance": "pass (no pre-existing acad.exe; launched PID 51708 distinct)",
+    "staged_document": "pass (staging/attended/<run_id>/attended.dwg; original golden only copied from)",
+    "unique_live_channel": "pass (pipe name carries run_id; clean shutdown)",
+    "user_session_touched": false,
+    "zero_com": true
+  },
+  "attended_pump_all_ok": true,
+  "live_pump": {
+    "echo": "ok",
+    "status": "ok (pump running, host_mode FULL_AUTOCAD, modelspace_entities 21748 = 21747 golden + 1 probe)",
+    "list_documents": "ok",
+    "active_document": "ok (dwg=staged attended.dwg, modelspace_handle 1F, ariadne_probes 1)",
+    "stop": "ok (clean)"
+  },
+  "pump_gating_real_execution": {
+    "inspect_selection": "ok (REAL acedSSGet pickfirst path executed; honest empty: count 0, no pickfirst set)",
+    "highlight_handles": "ok (REAL AcDbEntity::highlight executed: requested 2, highlighted 2, missed 0)",
+    "clear_highlight": "ok (REAL unhighlight executed: cleared 2, missed 0)",
+    "zoom_to_handles": "deferred (editor_present true; honest: acedCommand cannot run reentrantly inside the modal pump command)",
+    "render_view": "deferred (editor_present true; honest, same reentrancy reason)",
+    "note": "These same ops return attended_only headless. Real execution here is only possible with a live editor, proving the pump-gating real path."
+  },
+  "custom_entity_attended": {
+    "op": "extend.customclass.create (via ARIADNE_NATIVE_JOB_ARGS env-file channel, host_mode full_autocad)",
+    "created": true, "center": [150000, 350000, 0], "size": 3000, "ariadne_probes_after": 1,
+    "worlddraw_circle_rendered": true,
+    "evidence": "screenshots/acad_window.png shows the magenta worldDraw circle marker in the viewport"
+  },
+  "opm_acrxproperty": {
+    "registration_proven_headless": true,
+    "property_count": 1, "property": "Size",
+    "panel_open_attended": true,
+    "evidence": "property_count headless smoke (runs/m07b_native_smoke) + screenshots/acad_window.png shows the Properties (OPM) palette open with the probe context",
+    "caveat": "the OPM palette is open and rendered; the specific 'Size' property row is not isolated/zoomed in the capture (registration is independently proven by property_count=1)"
+  },
+  "screenshots": {
+    "acad_window": "runs/cados_m07b_attended_20260622_123505/screenshots/acad_window.png",
+    "primary_screen": "runs/cados_m07b_attended_20260622_123505/screenshots/primary_screen.png",
+    "shows": "real Autodesk AutoCAD 2027 window (attended.dwg), OPM Properties palette open, worldDraw circle marker in viewport"
+  },
+  "verified_attended": [
+    "live pump in real acad.exe (host_mode full_autocad)",
+    "pump-gating real execution (highlight 2/2, clear 2/2, selection real path)",
+    "honest deferral of zoom/render (editor_present, reentrancy reason)",
+    "custom entity (AriadneProbe worldDraw) creation in the live drawing",
+    "worldDraw circle rendered (screenshot)",
+    "OPM Properties palette open (screenshot) + AcRxProperty 'Size' registration (property_count 1)",
+    "all three safety gates; golden read-only; dedicated PID closed; no user session touched"
+  ],
+  "residual_not_verified_attended": {
+    "surfaces": ["persistent_reactor_firing", "object_overrule_firing", "selection_monitor_pickfirst_firing"],
+    "status": "implemented + registered + headless-proven (registry ops report implemented:true); LIVE FIRING COUNTS not captured",
+    "exact_blocker": "live firing of these surfaces requires genuine interactive editor events (a command running while the reactor is enabled, an AriadneProbe opened while the overrule is enabled, an interactive pickfirst selection). The automated zero-COM pump harness drives the named-pipe pump but does not synthesize interactive editor events; doing so reliably needs a human operator or a fragile UI-automation layer. Deferred to M07C / M08-with-live-partial-review.",
+    "no_fake_pass": true
+  },
+  "original_dwg_modified": false,
+  "original_golden_sha256": "27dbf6b95ff72a89fd53b153891187365b9e8ebc4c05a97cfed307057bf49bc8",
+  "git": { "commit": null, "remote_push": false }
+}

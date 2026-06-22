@@ -1,0 +1,27 @@
+{
+  "schema": "ariadne.cad_os.m07b.live_job_args_contract.v1",
+  "packet": "CADOS_M07B_ATTENDED_GUI_VERIFICATION_AND_NATIVE_DEPLOY",
+  "status": "finalized",
+  "resolves": "M07A TBD: loose ARIADNE_CAD_JOB_IN/_OUT env vars did not reliably drive a custom op from a startup .scr",
+  "env_var": "ARIADNE_NATIVE_JOB_ARGS",
+  "command": "ARIADNE_NATIVE_JOB_ARGS",
+  "args_file": "runs/<run_id>/live_job_args.json",
+  "args_file_keys": ["job_in", "job_out", "host_mode"],
+  "job_in_key": "operation",
+  "pump_frame_key": "op",
+  "path_convention": "forward-slash, UTF-8 (utf8ToWide); no JSON unescaping by the hand-rolled reader",
+  "non_interactive": true,
+  "fallback": "interactive ARIADNE_CAD_JOB_IN/OUT/HOST_MODE prompts only when the env channel is absent",
+  "doc": "docs/LIVE_JOB_ARGUMENT_CONTRACT.md",
+  "headless_proof": {
+    "harness": "runs/m07b_native_smoke/run_native_smoke.ps1",
+    "host_mode": "coreconsole",
+    "ops": {
+      "inspect.probe.property_count": { "property_count": 1, "property": "Size", "opm_registration": true, "status": "ok" },
+      "inspect.runtime.capabilities": { "status": "ok", "all_surfaces_implemented": true },
+      "inspect.selection.monitor.registry": { "implemented": true, "registered": false, "status": "ok" }
+    },
+    "original_golden_unchanged": true
+  },
+  "attended_use": "tools/attended/run_attended_m07b.ps1 drives the same channel with host_mode=full_autocad to create an AriadneProbe (extend.customclass.create) in a dedicated acad.exe before serving CADAGENT_PUMP"
+}

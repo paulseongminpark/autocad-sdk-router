@@ -51,6 +51,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="AriadneNativeJob.cpp" />
+    <ClCompile Include="AriadnePalette.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Ariadne.AcadNativeDbx\AriadneDbxApi.h" />

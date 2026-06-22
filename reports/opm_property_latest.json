@@ -1,0 +1,20 @@
+{
+  "schema": "ariadne.cad_os.m07b.opm_property.v1",
+  "packet": "CADOS_M07B_ATTENDED_GUI_VERIFICATION_AND_NATIVE_DEPLOY",
+  "surface": "acrxproperty_opm",
+  "status": "verified",
+  "property": "Size",
+  "type": "double (read/write, backed by AriadneProbe::size()/setSize())",
+  "registration": "ACRX_DXF_DEFINE_MEMBERS_WITH_PROPERTIES + AriadneSizeProperty + makeMembers callback (AriadneProbe.cpp / AriadneDbxEntry.cpp)",
+  "headless_proof": {
+    "op": "inspect.probe.property_count",
+    "result": { "property_count": 1, "property": "Size", "opm_registration": true, "panel_display": "attended_only" },
+    "harness": "runs/m07b_native_smoke (ARIADNE_NATIVE_JOB_ARGS env-file channel, accoreconsole)"
+  },
+  "attended_panel": {
+    "opm_palette_open": true,
+    "evidence": "runs/cados_m07b_attended_20260622_123505/screenshots/acad_window.png (Properties palette open in dedicated acad.exe)",
+    "caveat": "the OPM palette is open + rendered; the specific 'Size' row is not isolated in the capture. Registration is independently proven (property_count=1)."
+  },
+  "original_dwg_modified": false
+}

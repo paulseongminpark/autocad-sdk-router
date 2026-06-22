@@ -15,6 +15,7 @@
 #include <sstream>
 #include <fstream>
 #include <cstdlib>
+#include <vector>
 #include <tchar.h>
 #include <windows.h>
 
@@ -37,6 +38,8 @@
 #include "acdocman.h"
 #include "acutads.h"
 #include "adscodes.h"
+#include "acedads.h"   // M07B: acedSSGet/acedSSName/acedSSLength/acedSSFree (pickfirst selection)
+#include "acdbads.h"   // M07B: acdbGetObjectId (ads_name -> AcDbObjectId)
 
 #include "..\Ariadne.AcadNativeDbx\AriadneDbxApi.h"
 
@@ -102,7 +105,29 @@ static std::wstring asciiToWide(const std::string& value)
     return out;
 }
 
+// M07B: UTF-8 -> UTF-16. Used by the ARIADNE_NATIVE_JOB_ARGS env-file channel to
+// turn JSON path strings (written by the harness as UTF-8) back into wide paths
+// without the lossy ASCII funnel. ASCII input is a strict subset, so ASCII paths
+// are unchanged.
+static std::wstring utf8ToWide(const std::string& s)
+{
+    if (s.empty())
+        return std::wstring();
+    const int n = MultiByteToWideChar(CP_UTF8, 0, s.c_str(),
+                                      static_cast<int>(s.size()), nullptr, 0);
+    if (n <= 0)
+        return std::wstring();
+    std::wstring w(static_cast<size_t>(n), L'\0');
+    MultiByteToWideChar(CP_UTF8, 0, s.c_str(), static_cast<int>(s.size()), &w[0], n);
+    return w;
+}
+
 static bool moduleDirectory(std::wstring& outDir);
+// M07B: attended-only ARIADNE_PALETTE registration lives in AriadnePalette.cpp,
+// compiled ONLY into the .arx module. Declared (not defined) here at file scope;
+// the call site in acrxEntryPoint is wrapped in #ifndef ARIADNE_NATIVE_CRX so the
+// headless .crx never references the symbol.
+extern "C" void ariadneRegisterPaletteCommand();
 // Forward decl: collectModelSpaceGraph (defined below) calls acharToAscii,
 // whose definition sits further down next to the reactor helpers.
 static std::string acharToAscii(const ACHAR* text);
@@ -262,6 +287,32 @@ static bool jsonFindObject(const std::string& j, const char* key, std::string& o
     return false;
 }
 
+// M07B: minimal "key":["a","b",...] string-array extractor for the live pump
+// `handles` payload. Mirrors the hand-rolled jsonFind* idiom (no vendored JSON);
+// returns raw inter-quote substrings (callers pass forward-slash/ASCII hex, so no
+// unescape is needed). Stops at the first ']'.
+static std::vector<std::string> jsonFindStringArray(const std::string& j, const char* key)
+{
+    std::vector<std::string> out;
+    const std::string k = std::string("\"") + key + "\"";
+    size_t p = j.find(k);
+    if (p == std::string::npos) return out;
+    p = j.find('[', p);
+    if (p == std::string::npos) return out;
+    const size_t end = j.find(']', p);
+    if (end == std::string::npos) return out;
+    size_t i = p + 1;
+    while (i < end) {
+        const size_t q1 = j.find('"', i);
+        if (q1 == std::string::npos || q1 >= end) break;
+        const size_t q2 = j.find('"', q1 + 1);
+        if (q2 == std::string::npos || q2 > end) break;
+        out.push_back(j.substr(q1 + 1, q2 - q1 - 1));
+        i = q2 + 1;
+    }
+    return out;
+}
+
 static bool parsePointFromObject(const std::string& objectJson, double& x, double& y, double& z)
 {
     if (!jsonFindNumber(objectJson, "x", x))
@@ -346,6 +397,23 @@ static bool moduleDirectory(std::wstring& outDir)
         return false;
     outDir.resize(slash);
     return true;
+}
+
+// M07B: reliable attended-vs-headless discriminator. acedEditor is NON-null in
+// BOTH accoreconsole and full AutoCAD (accoreconsole has an AcEditor singleton; it
+// just lacks an interactive/graphics editor), so it cannot gate the attended ops.
+// The host EXECUTABLE name is bulletproof: accoreconsole.exe (headless) vs acad.exe
+// (attended). GetModuleFileNameW(NULL) returns the running host exe path.
+static bool hostIsFullAutoCad()
+{
+    wchar_t path[MAX_PATH] = {};
+    const DWORD len = GetModuleFileNameW(NULL, path, MAX_PATH);
+    if (len == 0 || len >= MAX_PATH)
+        return false;
+    const std::wstring p(path, len);
+    const size_t slash = p.find_last_of(L"\\/");
+    const std::wstring base = (slash == std::wstring::npos) ? p : p.substr(slash + 1);
+    return _wcsicmp(base.c_str(), L"acad.exe") == 0;
 }
 
 static bool loadDbxCore()
@@ -3040,11 +3108,58 @@ static void clearJobPathOverrides()
     gJobHostModeOverride.clear();
 }
 
+// M07B live-job-argument contract: the ARIADNE_NATIVE_JOB_ARGS env var points at a
+// run-scoped JSON args file {"job_in":..,"job_out":..,"host_mode":..} whose paths
+// are forward-slash + UTF-8. Both acedGetEnv (AutoCAD-scoped) and the process env
+// are consulted. Returns the file path or empty.
+static std::wstring readArgsFileSetting()
+{
+    wchar_t acadEnv[4096] = {};
+    if (acedGetEnv(_T("ARIADNE_NATIVE_JOB_ARGS"), acadEnv, _countof(acadEnv)) == RTNORM &&
+        acadEnv[0] != L'\0') {
+        return std::wstring(acadEnv);
+    }
+    const wchar_t* p = _wgetenv(L"ARIADNE_NATIVE_JOB_ARGS");
+    if (p != nullptr && p[0] != L'\0')
+        return std::wstring(p);
+    return std::wstring();
+}
+
 static void ariadneNativeJobArgs()
 {
     std::wstring inPath;
     std::wstring outPath;
     std::wstring hostMode;
+
+    // Preferred (non-interactive, reproducible): a run-scoped JSON args file named
+    // by the ARIADNE_NATIVE_JOB_ARGS env var. Read once, NEVER prompts for keyboard
+    // text -> drivable from a startup .scr in a dedicated attended acad.exe. This
+    // is what the M07B attended harness uses to run custom ops (e.g.
+    // inspect.probe.property_count / extend.customclass.create) without manual
+    // input. host_mode defaults to full_autocad (this command path is attended).
+    const std::wstring argsPath = readArgsFileSetting();
+    if (!argsPath.empty()) {
+        const std::string spec = readAllBytes(argsPath.c_str());
+        std::string in, out, host;
+        if (!jsonFindString(spec, "job_in", in)) jsonFindString(spec, "in", in);
+        if (!jsonFindString(spec, "job_out", out)) jsonFindString(spec, "out", out);
+        if (!jsonFindString(spec, "host_mode", host))
+            host = "full_autocad";
+        if (!in.empty()) {
+            gJobInOverride = utf8ToWide(in);
+            gJobOutOverride = utf8ToWide(out);
+            gJobHostModeOverride = utf8ToWide(host);
+            acutPrintf(_T("\nARIADNE_NATIVE_JOB_ARGS: args file %ls\n"), argsPath.c_str());
+            ariadneNativeJob();
+            clearJobPathOverrides();
+            return;
+        }
+        acutPrintf(_T("\nARIADNE_NATIVE_JOB_ARGS: args file %ls missing job_in; falling back to prompts\n"),
+                   argsPath.c_str());
+    }
+
+    // Documented fallback: interactive prompts (only when the env-file channel is
+    // absent). Kept so an operator can still drive the job by hand.
     if (!readCommandArg(_T("\nARIADNE_CAD_JOB_IN: "), inPath) ||
         !readCommandArg(_T("\nARIADNE_CAD_JOB_OUT: "), outPath) ||
         !readCommandArg(_T("\nARIADNE_CAD_JOB_HOST_MODE: "), hostMode)) {
@@ -3182,9 +3297,20 @@ static std::string pumpDispatch(const std::string& req, bool& stop)
     jsonFindString(req, "op", op);
     // Host mode (same env-backed setting the job dispatcher uses) lets the pump
     // report honestly whether a full editor is present for attended_only ops.
-    std::string hostMode = wideToAscii(readJobPathSetting(L"ARIADNE_CAD_JOB_HOST_MODE"));
-    if (hostMode.empty())
-        hostMode = "coreconsole";
+    // M07B pump-gating: the formerly-stubbed "attended_only" ops execute FOR REAL
+    // only in attended AutoCAD. Both the gate AND the reported host_mode derive
+    // from the reliable host EXE discriminator (acad.exe vs accoreconsole.exe).
+    // acedEditor is non-null in BOTH hosts so it cannot gate; the
+    // ARIADNE_CAD_JOB_HOST_MODE env hint is not reliably propagated into the
+    // attended process, so the pump does NOT consult it (that would make the
+    // reported host_mode inconsistent with the gate). Headless accoreconsole keeps
+    // the honest attended_only stub, so the 17/17 headless pump proof is preserved.
+    // Command-free AcDb/ADS ops (selection set, highlight) are safe inside the
+    // modal CADAGENT_PUMP command; ops that need an acedCommand context
+    // (zoom/render) are honestly deferred (acedCommand cannot run reentrantly from
+    // inside the pump command).
+    const bool attendedHost = hostIsFullAutoCad();
+    const std::string hostMode = attendedHost ? "full_autocad" : "coreconsole";
     AcDbDatabase* pDb = acdbHostApplicationServices()->workingDatabase();
     std::ostringstream r;
     r << "{\"schema\":\"ariadne.cad_pump_frame.v1\",\"op\":\"" << jsonEscape(op) << "\",";
@@ -3314,29 +3440,126 @@ static std::string pumpDispatch(const std::string& req, bool& stop)
           << ",\"original_dwg\":\"read_only\"}";
     }
     else if (op == "live.inspect_selection") {
-        r << "\"status\":\"attended_only\",\"host_mode\":\"" << jsonEscape(hostMode) << "\""
-          << ",\"interactive_editor_required\":true"
-          << ",\"reason\":\"editor selection set (acedSSGet) requires a full AutoCAD editor; accoreconsole has no interactive editor\"}";
+        if (!attendedHost) {
+            r << "\"status\":\"attended_only\",\"host_mode\":\"" << jsonEscape(hostMode) << "\""
+              << ",\"interactive_editor_required\":true"
+              << ",\"reason\":\"editor selection set (acedSSGet) requires a full AutoCAD editor; accoreconsole has no interactive editor\"}";
+        } else {
+            // Pickfirst (implied) selection set. acedSSGet does NOT start a command,
+            // so it is safe to call inside the modal CADAGENT_PUMP command. Honest:
+            // an empty pickfirst set returns count 0, never a fabricated selection.
+            ads_name ss;
+            const int rc = acedSSGet(_T("_I"), nullptr, nullptr, nullptr, ss);
+            if (rc != RTNORM) {
+                r << "\"status\":\"ok\",\"host_mode\":\"" << jsonEscape(hostMode) << "\""
+                  << ",\"selection\":[],\"count\":0,\"note\":\"no pickfirst selection set\"}";
+            } else {
+                Adesk::Int32 len = 0;
+                acedSSLength(ss, &len);
+                std::ostringstream sel;
+                sel << "[";
+                bool firstSel = true;
+                int emitted = 0;
+                for (Adesk::Int32 i = 0; i < len; ++i) {
+                    ads_name en;
+                    if (acedSSName(ss, i, en) != RTNORM) continue;
+                    AcDbObjectId id;
+                    if (acdbGetObjectId(id, en) != Acad::eOk || id.isNull()) continue;
+                    if (!firstSel) sel << ",";
+                    firstSel = false;
+                    sel << "\"" << jsonEscape(handleOfId(id)) << "\"";
+                    ++emitted;
+                }
+                sel << "]";
+                acedSSFree(ss);
+                r << "\"status\":\"ok\",\"host_mode\":\"" << jsonEscape(hostMode) << "\""
+                  << ",\"selection\":" << sel.str() << ",\"count\":" << emitted << "}";
+            }
+        }
     }
     else if (op == "live.highlight_handles") {
-        r << "\"status\":\"attended_only\",\"host_mode\":\"" << jsonEscape(hostMode) << "\""
-          << ",\"interactive_editor_required\":true"
-          << ",\"reason\":\"entity highlight drives the graphics subsystem; accoreconsole has no graphics device\"}";
+        if (!attendedHost) {
+            r << "\"status\":\"attended_only\",\"host_mode\":\"" << jsonEscape(hostMode) << "\""
+              << ",\"interactive_editor_required\":true"
+              << ",\"reason\":\"entity highlight drives the graphics subsystem; accoreconsole has no graphics device\"}";
+        } else {
+            // AcDbEntity::highlight() is a const display call (no db write, no
+            // command) -> safe inside the pump command. Handles that do not resolve
+            // are counted as missed, not faked.
+            const std::vector<std::string> handles = jsonFindStringArray(req, "handles");
+            int hl = 0, miss = 0;
+            for (const std::string& hx : handles) {
+#ifdef _UNICODE
+                const std::wstring wh(hx.begin(), hx.end());
+                const AcDbHandle h(wh.c_str());
+#else
+                const AcDbHandle h(hx.c_str());
+#endif
+                AcDbObjectId id;
+                if (pDb == nullptr || pDb->getAcDbObjectId(id, false, h) != Acad::eOk || id.isNull()) { ++miss; continue; }
+                AcDbEntity* pEnt = nullptr;
+                if (acdbOpenObject(pEnt, id, AcDb::kForRead) != Acad::eOk || pEnt == nullptr) { ++miss; continue; }
+                if (pEnt->highlight() == Acad::eOk) ++hl; else ++miss;
+                pEnt->close();
+            }
+            r << "\"status\":\"ok\",\"host_mode\":\"" << jsonEscape(hostMode) << "\""
+              << ",\"requested\":" << static_cast<int>(handles.size())
+              << ",\"highlighted\":" << hl << ",\"missed\":" << miss << "}";
+        }
     }
     else if (op == "live.clear_highlight") {
-        r << "\"status\":\"attended_only\",\"host_mode\":\"" << jsonEscape(hostMode) << "\""
-          << ",\"interactive_editor_required\":true"
-          << ",\"reason\":\"unhighlight/redraw requires the graphics subsystem absent in accoreconsole\"}";
+        if (!attendedHost) {
+            r << "\"status\":\"attended_only\",\"host_mode\":\"" << jsonEscape(hostMode) << "\""
+              << ",\"interactive_editor_required\":true"
+              << ",\"reason\":\"unhighlight/redraw requires the graphics subsystem absent in accoreconsole\"}";
+        } else {
+            const std::vector<std::string> handles = jsonFindStringArray(req, "handles");
+            int cleared = 0, miss = 0;
+            for (const std::string& hx : handles) {
+#ifdef _UNICODE
+                const std::wstring wh(hx.begin(), hx.end());
+                const AcDbHandle h(wh.c_str());
+#else
+                const AcDbHandle h(hx.c_str());
+#endif
+                AcDbObjectId id;
+                if (pDb == nullptr || pDb->getAcDbObjectId(id, false, h) != Acad::eOk || id.isNull()) { ++miss; continue; }
+                AcDbEntity* pEnt = nullptr;
+                if (acdbOpenObject(pEnt, id, AcDb::kForRead) != Acad::eOk || pEnt == nullptr) { ++miss; continue; }
+                if (pEnt->unhighlight() == Acad::eOk) ++cleared; else ++miss;
+                pEnt->close();
+            }
+            r << "\"status\":\"ok\",\"host_mode\":\"" << jsonEscape(hostMode) << "\""
+              << ",\"requested\":" << static_cast<int>(handles.size())
+              << ",\"cleared\":" << cleared << ",\"missed\":" << miss << "}";
+        }
     }
     else if (op == "live.zoom_to_handles") {
-        r << "\"status\":\"attended_only\",\"host_mode\":\"" << jsonEscape(hostMode) << "\""
-          << ",\"interactive_editor_required\":true"
-          << ",\"reason\":\"viewport zoom needs a live editor view; accoreconsole has no viewport/editor\"}";
+        if (!attendedHost) {
+            r << "\"status\":\"attended_only\",\"host_mode\":\"" << jsonEscape(hostMode) << "\""
+              << ",\"interactive_editor_required\":true"
+              << ",\"reason\":\"viewport zoom needs a live editor view; accoreconsole has no viewport/editor\"}";
+        } else {
+            // Honest deferral (NOT a fake ok): a viewport ZOOM needs an acedCommand
+            // context, but CADAGENT_PUMP is itself a modal command and acedCommand
+            // cannot be invoked reentrantly from inside a running command.
+            r << "\"status\":\"deferred\",\"host_mode\":\"" << jsonEscape(hostMode) << "\""
+              << ",\"editor_present\":true"
+              << ",\"reason\":\"viewport zoom requires an acedCommand context; CADAGENT_PUMP is a modal command and acedCommand cannot be invoked reentrantly from the pump loop\""
+              << ",\"alternative\":\"live.highlight_handles (in-pump visual feedback) or a non-pump ZOOM command\"}";
+        }
     }
     else if (op == "live.render_view") {
-        r << "\"status\":\"attended_only\",\"host_mode\":\"" << jsonEscape(hostMode) << "\""
-          << ",\"interactive_editor_required\":true"
-          << ",\"reason\":\"rendering needs a graphics/render pipeline and viewport; accoreconsole has neither\"}";
+        if (!attendedHost) {
+            r << "\"status\":\"attended_only\",\"host_mode\":\"" << jsonEscape(hostMode) << "\""
+              << ",\"interactive_editor_required\":true"
+              << ",\"reason\":\"rendering needs a graphics/render pipeline and viewport; accoreconsole has neither\"}";
+        } else {
+            r << "\"status\":\"deferred\",\"host_mode\":\"" << jsonEscape(hostMode) << "\""
+              << ",\"editor_present\":true"
+              << ",\"reason\":\"regen/render requires an acedCommand context; CADAGENT_PUMP is a modal command and acedCommand cannot be invoked reentrantly from the pump loop\""
+              << ",\"alternative\":\"trigger REGEN/RENDER from a non-pump command context\"}";
+        }
     }
     else if (op == "live.stop") {
         stop = true;
@@ -3485,7 +3708,15 @@ acrxEntryPoint(AcRx::AppMsgCode msg, void* pkt)
                                 _T("CADAGENT_STATUS"),
                                 ACRX_CMD_MODAL,
                                 &ariadneCadAgentStatus);
+#ifndef ARIADNE_NATIVE_CRX
+        // Attended-only status UI command (ARIADNE_PALETTE), provided by
+        // AriadnePalette.cpp which is in the .arx project ONLY. The headless .crx
+        // (ARIADNE_NATIVE_CRX defined) neither links nor registers it.
+        ariadneRegisterPaletteCommand();  // arx-only; declared extern "C" at file scope
+        acutPrintf(_T("\nAriadne.AcadNative loaded. Commands: ARIADNE_NATIVE_JOB, ARIADNE_NATIVE_JOB_ARGS, ARIADNE_NATIVE_JOB_MAILBOX, CADAGENT_PUMP, CADAGENT_STATUS, ARIADNE_PALETTE\n"));
+#else
         acutPrintf(_T("\nAriadne.AcadNative loaded. Commands: ARIADNE_NATIVE_JOB, ARIADNE_NATIVE_JOB_ARGS, ARIADNE_NATIVE_JOB_MAILBOX, CADAGENT_PUMP, CADAGENT_STATUS\n"));
+#endif
         break;
 
     case AcRx::kUnloadAppMsg:

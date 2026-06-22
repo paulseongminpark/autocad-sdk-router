@@ -1,11 +1,13 @@
 # CAD OS V1 Acceptance Latest
 
-- status: IN_PROGRESS (v1 freeze is M09; M03–M07 closed)
+- status: IN_PROGRESS (v1 freeze is M09; M03–M07B closed)
 - M03: PASS
 - M04: PASS
 - M05: PASS
 - M06: PASS
 - M07: PARTIAL_PASS (live ARX pump complete + headless-verified 17/17; deep native 7 implemented / 3 attended_blocked / 0 design_only)
+- M07A: implemented + build-verified (selection monitor + AcRxProperty/OPM)
+- M07B: PARTIAL_PASS (pump-gating real execution attended + ARIADNE_NATIVE_JOB_ARGS env-file channel + MFC-free palette + dedicated-instance attended GUI: live pump host_mode full_autocad, highlight 2/2, worldDraw circle rendered, OPM palette open, custom entity created; deep native 10 impl/verified, 0 attended_blocked; residual = reactor/overrule/selection-monitor LIVE FIRING counts). Next: M08-with-live-partial-review.
 - operation unknown: 0
 - catalog classified: 480/480
 - staged patch apply: PASS

@@ -23,11 +23,35 @@ Source of truth: `src/Ariadne.AcadNative/AriadneNativeJob.cpp` (.arx/.crx single
 | 9 | Custom object serialization / filer versioning | **implemented** | yes | headless | `AriadneRecord : AcDbObject`; `dwgOut` writes `kAriadneRecordVersion`(=1) int16 + value; `dwgIn` returns `Acad::eMakeMeProxy` on newer; dxf mirrors. Headless save+reload roundtrip. |
 | 10 | Protocol extensions (`AcRxObject` protocol) | **implemented** | yes | headless | `AriadneProbeProtocol : AcRxObject` (`AriadneProtocol.h:6`); `AriadneProbe::desc()->addX(AriadneProbeProtocol::desc(),…)` (`AriadneProtocol.cpp:26`) registered in `AriadneDbxEntry.cpp`; op `inspect.protocol.queryx` (`AriadneNativeJob.cpp:2920`) reports `probe_protocol_available`. |
 
-## Summary counts
+## Summary counts (M07 baseline)
 
 - **implemented:** 7 (custom entity, worldDraw, overrules, reactors, jigs[host-gated], filer versioning, protocol extensions)
 - **attended_blocked:** 3 (AcRxProperty/OPM, selection monitor, palette/status UI)
 - **design_only:** 0
+
+## CADOS_M07B update (the 3 attended_blocked are now implemented + verified)
+
+Rows 3, 7, 8 above are superseded — `reports/deep_native_latest.json` is the current matrix.
+
+- **Row 3 — AcRxProperty/OPM → `verified`.** `AriadneSizeProperty` (Desc<double>) registered via
+  `ACRX_DXF_DEFINE_MEMBERS_WITH_PROPERTIES`; `inspect.probe.property_count → property_count 1`
+  headless; OPM Properties palette open in the attended screenshot.
+- **Row 7 — selection monitor → `implemented`.** `AriadneSelectionMonitor : AcEditorReactor`
+  (`pickfirstModified`); registry op reports `implemented:true`. Live pickfirst FIRING is the residual.
+- **Row 8 — palette/status UI → `implemented`.** `AriadnePalette.cpp` (arx-only TU; MFC-free
+  `ARIADNE_PALETTE` → `acedAlert`). A docked `CAdUiPaletteSet` is the deliberate MFC enhancement,
+  deferred to keep the non-MFC ObjectARX build stable.
+
+**M07B counts:** 10 implemented/verified · 0 attended_blocked · 0 design_only.
+
+**Live-firing residual (PARTIAL_PASS):** reactor (row 5) / overrule (row 4) / selection-monitor (row 7)
+LIVE FIRING COUNTS were not captured — they need synthesized interactive editor events (command start,
+entity open, pickfirst pick) the automated zero-COM harness does not generate. All three are registered +
+headless-proven. Deferred to M07C / M08-with-live-partial-review. No fake PASS.
+
+**Attended verified** (run `cados_m07b_attended_20260622_123505`, dedicated acad.exe, zero COM): live pump
+(host_mode full_autocad), pump-gating real execution (highlight 2/2, clear 2/2, selection real path),
+worldDraw circle rendered, OPM palette open, custom entity created. Golden read-only throughout.
 
 ## Correction of the M07 design-stream miscount
 

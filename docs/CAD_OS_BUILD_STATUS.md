@@ -1,6 +1,6 @@
 # CAD OS Build Status
 
-Updated: 2026-06-22T06:20:00+09:00
+Updated: 2026-06-22T12:45:00+09:00
 
 ## Current Packet
 
@@ -9,7 +9,31 @@ Updated: 2026-06-22T06:20:00+09:00
 - M05 Patch Diff Validation Transaction: PASS
 - M06 Visual Batch Golden Regression: PASS
 - M07 Live ARX Pump / Deep Native Surface: PARTIAL_PASS
-- Next: CADOS_M08_FULL_OPERATION_COVERAGE_CLOSURE
+- M07A Deep-native remainder (selection monitor + AcRxProperty/OPM): implemented + build-verified
+- M07B Attended GUI Verification + Native Deploy Closure: **PARTIAL_PASS**
+- Next: CADOS_M08_FULL_OPERATION_COVERAGE_CLOSURE_WITH_LIVE_PARTIAL_REVIEW
+
+## M07B — Attended GUI Verification + Native Deploy (PARTIAL_PASS)
+
+- **Native build: canonical** via `tools/build_native_acad.ps1` — `.dbx` 48128, `.crx` 247808,
+  `.arx` 255488 (canonical relink, no lock; AutoCAD not killed). Log `reports/build_native_m07b.log`.
+- **Pump-gating:** the 5 formerly-`attended_only` ops gate on `hostIsFullAutoCad()` (host EXE name —
+  reliable; `acedEditor` is non-null in both hosts and the host_mode env hint does not propagate).
+  Attended: `highlight`/`clear`/`inspect_selection` execute for real; `zoom`/`render` honestly deferred
+  (acedCommand reentrancy). Headless 17/17 preserved.
+- **Live job channel:** `ARIADNE_NATIVE_JOB_ARGS` env-file channel finalized (M07A blocker resolved);
+  `inspect.probe.property_count → property_count 1` headless. Contract `docs/LIVE_JOB_ARGUMENT_CONTRACT.md`.
+- **Palette:** `ARIADNE_PALETTE` (MFC-free, arx-only); docked CAdUiPaletteSet (MFC) deferred to keep build stable.
+- **Attended (dedicated acad.exe, zero COM, run `cados_m07b_attended_20260622_123505`, PID 51708):**
+  `ATTENDED_PUMP_OK: True` — live pump host_mode full_autocad, highlight 2/2, clear 2/2, worldDraw circle
+  rendered + OPM palette open (screenshot), probe created (`ariadne_probes 1`). 3 safety gates pass.
+- **Residual:** reactor/overrule/selection-monitor LIVE FIRING counts (need interactive editor events).
+- **Original golden DWG modified: no** (`27dbf6b9…` before/after). No remote push. pytest 294 passed / 3 skipped.
+
+### Versioned vs canonical ARX
+The build relinks the canonical `.arx` when no acad.exe holds it (M07B: canonical). If a running acad.exe
+locks it (LNK1104), the script falls back to a versioned `Ariadne.AcadNative.live_<ts>.arx` and the `.crx`
+(what accoreconsole loads) stays canonical/fresh. AutoCAD is never killed.
 
 ## Live ARX Pump / Deep Native (M07)
 

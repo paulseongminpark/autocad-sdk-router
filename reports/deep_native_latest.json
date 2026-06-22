@@ -1,85 +1,39 @@
 {
-  "schema": "ariadne.cad_os.m07.deep_native.v1",
-  "packet": "CADOS_M07_LIVE_ARX_AND_DEEP_NATIVE_SURFACE",
+  "schema": "ariadne.cad_os.m07b.deep_native.v1",
+  "packet": "CADOS_M07B_ATTENDED_GUI_VERIFICATION_AND_NATIVE_DEPLOY",
   "status": "PARTIAL_PASS",
-  "source_commit_base": "ef603b8",
-  "translation_units": "src/Ariadne.AcadNative/AriadneNativeJob.cpp + src/Ariadne.AcadNative/AriadneProbe.{h,cpp} + src/Ariadne.AcadNativeDbx/{AriadneRecord,AriadneProtocol}.{h,cpp}",
-  "note": "Corrects an M07 design-stream miscount: worldDraw_rendering and protocol_extensions ARE implemented (the stream grepped only AriadneNativeJob.cpp and missed AriadneProbe.cpp / AriadneProtocol.cpp). Verified against ground truth + codified by tests/unit/test_pump_shutdown_and_deep_native_source.py::{test_custom_entity_worlddraw_present,test_protocol_extension_registered}.",
+  "supersedes": "ariadne.cad_os.m07.deep_native.v1 (M07: 7 implemented / 3 attended_blocked)",
+  "note": "M07B implements + attended-verifies the 3 former attended_blocked surfaces (acrxproperty_opm, selection_monitor, palette_status_ui). The remaining residual is LIVE FIRING COUNTS of the persistent reactor / object overrule / selection-monitor, which require synthesized interactive editor events.",
   "surfaces": [
-    {
-      "name": "custom_entity_lifecycle",
-      "status": "implemented",
-      "registered": true,
-      "host": "headless+attended",
-      "evidence_ref": "AriadneProbe : AcDbEntity (AriadneProbe.h:22, ACRX_DECLARE_MEMBERS) registered AriadneProbe::rxInit (AriadneDbxEntry.cpp:68); ops extend.customclass.create / inspect.customclass.count"
-    },
-    {
-      "name": "worlddraw_rendering",
-      "status": "implemented",
-      "registered": true,
-      "host": "headless(class+callback)/attended(pixels)",
-      "evidence_ref": "AriadneProbe::subWorldDraw (AriadneProbe.cpp:148, mode->geometry().circle marker) + subGetGeomExtents:156 + subTransformBy:165; render callback compiles into the .dbx and round-trips headless; PIXEL verification (viewport regen) is attended-only"
-    },
-    {
-      "name": "object_overrules",
-      "status": "implemented",
-      "registered": true,
-      "host": "headless+attended",
-      "evidence_ref": "AriadneObjectOverrule : AcDbObjectOverrule (AriadneNativeJob.cpp:1606); AcRxOverrule::addOverrule(AcDbEntity::desc())+setIsOverruling; ops live.overrule.enable/disable; inspect.overrule.registry; fixtures job_overrule_enable/disable.json"
-    },
-    {
-      "name": "persistent_reactors",
-      "status": "implemented",
-      "registered": true,
-      "host": "headless_register/attended_fire",
-      "evidence_ref": "AriadneEditorReactor : AcEditorReactor (AriadneNativeJob.cpp:1557, commandWillStart/commandEnded counters); acedEditor->addReactor; ops live.reactor.enable/disable; disabled on kUnloadAppMsg; callbacks fire only under full_autocad"
-    },
-    {
-      "name": "editor_jigs",
-      "status": "implemented",
-      "registered": true,
-      "host": "attended_for_drag",
-      "evidence_ref": "AriadneLineJig : AcEdJig (AriadneNativeJob.cpp:1695); runLineJigProbe host-gates to full_autocad with reason 'AcEdJig drag requires the full AutoCAD editor interaction loop'; op live.jig.point_probe; class compiles+registered, interactive drag attended-only"
-    },
-    {
-      "name": "custom_object_filer_versioning",
-      "status": "implemented",
-      "registered": true,
-      "host": "headless",
-      "evidence_ref": "AriadneRecord : AcDbObject (AriadneRecord.cpp) ACRX_DXF_DEFINE_MEMBERS; dwgOut writes kAriadneRecordVersion=1 int16+value; dwgIn returns Acad::eMakeMeProxy on newer; dxf mirrors; accoreconsole save+reload roundtrip"
-    },
-    {
-      "name": "protocol_extensions",
-      "status": "implemented",
-      "registered": true,
-      "host": "headless",
-      "evidence_ref": "AriadneProbeProtocol : AcRxObject (AriadneProtocol.h:6); AriadneProbe::desc()->addX(AriadneProbeProtocol::desc(),...) (AriadneProtocol.cpp:26) registered in AriadneDbxEntry.cpp; op inspect.protocol.queryx (AriadneNativeJob.cpp:2920) reports probe_protocol_available"
-    },
-    {
-      "name": "acrxproperty_opm",
-      "status": "attended_blocked",
-      "registered": false,
-      "host": "attended_only",
-      "evidence_ref": "no AcRxProperty code (grep clean). AcRxProperty REGISTRATION is headless-feasible but its purpose is the OPM Properties palette, an MFC GUI absent in accoreconsole; deferred to a dedicated attended packet. Exact blocker: Properties panel render + per-property edit only exercisable in attended acad.exe (PID 49460 must not be driven)"
-    },
-    {
-      "name": "selection_monitor",
-      "status": "attended_blocked",
-      "registered": false,
-      "host": "attended_only",
-      "evidence_ref": "no selection-monitor code (grep clean). A real monitor reacts to the interactive pick stream; acedEditor is null headless so callbacks never fire. Registration would mirror AriadneEditorReactor but live events are attended-only; deferred. Exact blocker: selection-change callbacks require attended acad.exe"
-    },
-    {
-      "name": "palette_status_ui",
-      "status": "attended_blocked",
-      "registered": false,
-      "host": "attended_only",
-      "evidence_ref": "no palette/status code (grep clean). CAcUiDockControlBar / AcApStatusBar are MFC GUI on acad.exe's UI thread; accoreconsole has no MFC main window or message pump. Cannot instantiate/render headless; must not inject into the user's session"
-    }
+    { "name": "custom_entity_lifecycle", "status": "implemented", "host": "headless+attended",
+      "evidence_ref": "AriadneProbe : AcDbEntity; extend.customclass.create created a probe in attended acad.exe (ariadne_probes_after 1, run cados_m07b_attended_20260622_123505)" },
+    { "name": "worlddraw_rendering", "status": "verified", "host": "headless(class+callback)/attended(pixels)",
+      "evidence_ref": "AriadneProbe::subWorldDraw circle marker; PIXEL render verified attended (screenshots/acad_window.png magenta circle)" },
+    { "name": "object_overrules", "status": "implemented", "host": "headless_register/attended_fire",
+      "evidence_ref": "AriadneObjectOverrule : AcDbObjectOverrule; registered + registry op; LIVE FIRING counts attended-residual (needs a probe opened while enabled)" },
+    { "name": "persistent_reactors", "status": "implemented", "host": "headless_register/attended_fire",
+      "evidence_ref": "AriadneEditorReactor : AcEditorReactor; registered + registry op; LIVE FIRING counts attended-residual (needs a command running while enabled)" },
+    { "name": "editor_jigs", "status": "implemented", "host": "attended_for_drag",
+      "evidence_ref": "AriadneLineJig : AcEdJig; host-gated to full_autocad; interactive drag attended-only" },
+    { "name": "custom_object_filer_versioning", "status": "implemented", "host": "headless",
+      "evidence_ref": "AriadneRecord : AcDbObject versioned filer (kAriadneRecordVersion); accoreconsole save+reload roundtrip" },
+    { "name": "protocol_extensions", "status": "implemented", "host": "headless",
+      "evidence_ref": "AriadneProbeProtocol addX on AriadneProbe::desc(); inspect.protocol.queryx" },
+    { "name": "acrxproperty_opm", "status": "verified", "registered": true, "host": "headless_register/attended_panel",
+      "evidence_ref": "AcRxProperty 'Size' (Desc<double>) registered; inspect.probe.property_count -> property_count 1 (headless); OPM Properties palette open attended (screenshot). Specific 'Size' row not isolated in capture; registration independently proven." },
+    { "name": "selection_monitor", "status": "implemented", "registered": "headless:false/attended_register:gated", "host": "headless_register/attended_fire",
+      "evidence_ref": "AriadneSelectionMonitor : AcEditorReactor pickfirstModified; registry op implemented:true; LIVE pickfirstModified FIRING attended-residual (needs interactive pick)" },
+    { "name": "palette_status_ui", "status": "implemented", "host": "attended_only",
+      "evidence_ref": "AriadnePalette.cpp (arx-only TU; #ifndef ARIADNE_NATIVE_CRX); ARIADNE_PALETTE command -> MFC-FREE acedAlert status surface. A docked CAdUiPaletteSet is the deliberate MFC-dependent enhancement (would change the module runtime/linkage; deferred to avoid destabilizing the build)." }
   ],
-  "implemented_count": 7,
-  "attended_blocked_count": 3,
+  "implemented_or_verified_count": 10,
+  "attended_blocked_count": 0,
   "design_only_count": 0,
-  "decision_no_new_native_stubs": "Did NOT add headless AcRxProperty / selection-monitor registration stubs: their ObjectARX 2027 signatures are unverified (aceditor.h/rxproperty.h not at canonical inc path), their function is attended-GUI-only regardless, and Rule 2/3 + no-fake-success favor honest hard-block over a risky build-breaking stub. The substantial M07 native advance is the live pump expansion (5 new ops + CADAGENT_STATUS), fully headless-verified.",
-  "attended_followup_packet": "the 3 attended_blocked surfaces + attended live-pump proof belong to a dedicated attended packet that loads the .arx into an agent-drivable AutoCAD"
+  "live_firing_residual": {
+    "surfaces": ["persistent_reactors", "object_overrules", "selection_monitor"],
+    "reason": "live firing counts require synthesized interactive editor events (command start, entity open, pickfirst pick) that the automated zero-COM pump harness does not generate; deferred to M07C / M08-with-live-partial-review. No fake PASS.",
+    "registration_and_headless_proof": "all three are registered + their registry ops report implemented:true headless"
+  },
+  "palette_toolchain_note": "MFC-free status skeleton shipped; docked CAdUiPaletteSet (MFC) deliberately deferred to keep the non-MFC ObjectARX build stable (packet: do not destabilize existing build)",
+  "original_dwg_modified": false
 }

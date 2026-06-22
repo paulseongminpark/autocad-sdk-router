@@ -1,0 +1,19 @@
+{
+  "schema": "ariadne.cad_os.m07b.worlddraw.v1",
+  "packet": "CADOS_M07B_ATTENDED_GUI_VERIFICATION_AND_NATIVE_DEPLOY",
+  "surface": "worlddraw_rendering",
+  "status": "verified",
+  "custom_entity": "AriadneProbe : AcDbEntity (subWorldDraw -> geometry().circle marker, AriadneProbe.cpp)",
+  "attended_creation": {
+    "op": "extend.customclass.create (ARIADNE_NATIVE_JOB_ARGS env-file channel, host_mode full_autocad)",
+    "created": true, "center": [150000, 350000, 0], "size": 3000, "ariadne_probes_after": 1,
+    "host": "dedicated attended AutoCAD 2027 (PID 51708)"
+  },
+  "pixel_evidence": {
+    "rendered": true,
+    "screenshot": "runs/cados_m07b_attended_20260622_123505/screenshots/acad_window.png",
+    "shows": "magenta worldDraw circle marker in the live viewport, zoomed to the probe"
+  },
+  "headless": "the subWorldDraw callback compiles into the .dbx and round-trips headless; PIXEL render is attended-only (verified here)",
+  "original_dwg_modified": false
+}
