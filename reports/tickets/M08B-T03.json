@@ -1,0 +1,48 @@
+{
+  "ticket_id": "M08B-T03",
+  "phase": "M08B",
+  "title": "Transaction/document lock wrappers",
+  "status": "PASS",
+  "branch": "cados/M08B-T03",
+  "base_branch": "cados/M08B-T02",
+  "commit": "pending-fill-at-commit",
+  "pr": "pending-fill-at-push",
+  "depends_on": "M08A (stacked on M08B-T01/T02)",
+  "change_only_honored": true,
+  "primitives_added": [
+    "AriadneReadTransaction (RAII read txn)",
+    "AriadneStagedWriteTransaction (RAII staged-write txn; commit() or auto-abort=rollback)",
+    "resolveHandle(AcDbDatabase*, hex, AcDbObjectId&) (hex->id)",
+    "AriadneDocumentWriteLock (pre-existing doc-lock wrapper, kept)"
+  ],
+  "include_added": "dbtrans.h",
+  "build": {
+    "tool": "tools/build_native_acad.ps1",
+    "exit_code": 0,
+    "arx_relink_mode": "canonical",
+    "artifacts": {"Ariadne.AcadNativeDbx.dbx": 48640, "Ariadne.AcadNative.crx": 262144, "Ariadne.AcadNative.arx": 270336},
+    "note": "build caught 2 real API errors first (AcTransactionManager->AcDbTransactionManager; AcDbHandle needs const ACHAR*); fixed -> clean. sizes unchanged vs T02 because wrappers are additive infra not yet called (type-checked+linked, dead-code-eliminated until C-F/G use them)."
+  },
+  "implemented_ops": 0,
+  "hard_blocked_ops": 0,
+  "deprecated_ops": 0,
+  "catalogued_remaining": 474,
+  "validate_bar": {
+    "no_original_write": "source-asserted: wrappers never save/saveAs; staged copy only",
+    "failure_rolls_back": "RAII-by-construction: staged-write dtor abortTransaction() guarded by !mCommitted; source-asserted",
+    "tests_pass": "pytest tests/unit = 272 passed"
+  },
+  "tests": [
+    "tools/build_native_acad.ps1 = exit 0 (compile+link against AcDbTransactionManager/AcTransaction)",
+    "pytest tests/unit/test_m08b_transactions.py = 6 passed (rollback + no-original-write contracts)",
+    "pytest tests/unit = 272 passed, 0 failed (no regression)"
+  ],
+  "artifacts": [
+    "src/Ariadne.AcadNative/AriadneNativeJob.cpp (+dbtrans.h, AriadneReadTransaction, AriadneStagedWriteTransaction, resolveHandle)",
+    "tests/unit/test_m08b_transactions.py",
+    "docs/M08B_TRANSACTIONS.md",
+    "reports/tickets/M08B-T03.md",
+    "reports/tickets/M08B-T03_PLAN.md"
+  ],
+  "next": "MERGE-M08-INFRA (merge M08B-T01..T03 chain to main); then M08C-F READ family extends the dispatch table + uses these serializer/transaction primitives"
+}
