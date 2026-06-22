@@ -11546,5 +11546,31 @@
       "engine_tier": "native_arx_only",
       "mapping_type": "exact"
     }
-  ]
+  ],
+  "closure_gate": {
+    "schema": "ariadne.cad_os.closure_gate.v1",
+    "ticket_basis": "M08A-T01",
+    "totals_by_status": {
+      "implemented": 41,
+      "blocked": 2,
+      "catalogued": 474
+    },
+    "catalogued": 474,
+    "stub": 0,
+    "unknown": 0,
+    "deprecated": 0,
+    "checks": {
+      "every_op_has_owner_ticket": true,
+      "every_open_op_has_strategy_and_evidence": true,
+      "zero_catalogued": false,
+      "zero_stub": true,
+      "zero_unknown": true,
+      "v1_target_escape_banned": true
+    },
+    "closure_gate_pass": false,
+    "m09_blocked_until_m08r": true,
+    "m09_allowed": false,
+    "ops_without_owner_ticket": [],
+    "open_ops_missing_plan": []
+  }
 }

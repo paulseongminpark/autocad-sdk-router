@@ -1,0 +1,57 @@
+{
+  "ticket_id": "M08A-T01",
+  "phase": "M08A",
+  "title": "Reopen catalog and remove v1_target escape",
+  "status": "PASS",
+  "branch": "cados/M08A-T01",
+  "commit": "pending-fill-at-commit",
+  "pr": "pending-fill-at-push",
+  "depends_on": "current main (b2b8fa2)",
+  "change_only_honored": true,
+  "operation_count": 517,
+  "owner_ticket_lane_count": 29,
+  "by_status": {
+    "implemented": 41,
+    "blocked": 2,
+    "catalogued": 474,
+    "stub": 0,
+    "unknown": 0
+  },
+  "closure_gate": {
+    "closure_gate_pass": false,
+    "m09_allowed": false,
+    "m09_blocked_until_m08r": true,
+    "v1_target_escape_banned": true,
+    "every_op_has_owner_ticket": true,
+    "every_open_op_has_strategy_and_evidence": true,
+    "zero_catalogued": false,
+    "zero_stub": true,
+    "zero_unknown": true
+  },
+  "legacy_v1_gate_pass": true,
+  "implemented_ops": 41,
+  "hard_blocked_ops": 2,
+  "deprecated_ops": 0,
+  "catalogued_remaining": 474,
+  "tests": [
+    "pytest tests/unit -q = 253 passed",
+    "tests/unit/test_m08a_catalog_reopen.py = 11 passed",
+    "tests/unit/test_m08_operation_coverage.py = 18 passed (frozen, back-compat)"
+  ],
+  "artifacts": [
+    "config/operations.v2.json (additive: owner_ticket/implementation_strategy/evidence_required on 517 ops + m08a_catalog_reopen marker)",
+    "reports/full_sdk_implementation_map.json",
+    "reports/closure_gate_latest.json",
+    "reports/operation_coverage_full_matrix.json (regenerated, +closure_gate)",
+    "tools/operation_coverage_matrix.py (additive: reopen + closure gate + --reopen CLI)",
+    "tests/unit/test_m08a_catalog_reopen.py",
+    "docs/M08A_CATALOG_REOPEN.md",
+    "reports/tickets/M08A-T01.md",
+    "reports/tickets/M08A-T01_PLAN.md"
+  ],
+  "findings": [
+    "M08 index gap: constraints_associativity (58 ops) has no dedicated ticket -> proposed new deep-native lane M08K-T03.",
+    "M08E-T02 received 0 ops (xref/layout ids folded to M08E-T01/M08I-T01) -> M08A-T02 to reconcile lane definitions."
+  ],
+  "next": "M08A-T02 - generate operation_execution_dag.json + ticket_inventory.json (lanes + merge waves over this map)"
+}
