@@ -269,6 +269,9 @@ def build_matrix():
         "gate": gate,
         "operations": rows,
     }
+    # M08A-T01 (additive): the honest full-coverage closure gate alongside the
+    # legacy v1 gate. Does NOT feed `gate` (the frozen 18 tests assert `gate`).
+    matrix["closure_gate"] = compute_closure_gate(doc)
     return matrix, doc
 
 
@@ -422,17 +425,305 @@ def write_reports():
     return matrix
 
 
+# ===========================================================================
+# M08A-T01 — catalog reopen + honest full-coverage closure gate (ADDITIVE).
+#
+# Removes the v1_target=false escape: the legacy `gate` above only ever scored
+# the {implemented, blocked} subset, so the 474 `catalogued` ops never counted.
+# Here every op is brought into scope — assigned an owner_ticket, an
+# implementation_strategy, and an evidence_required — and a SEPARATE closure_gate
+# scores ALL 517 ops (honestly False while any op is catalogued/stub). The legacy
+# `gate` is left byte-for-byte unchanged so the frozen coverage tests still hold.
+# ===========================================================================
+
+SDK_MAP = os.path.join(REPORTS, "full_sdk_implementation_map.json")
+CLOSURE_GATE = os.path.join(REPORTS, "closure_gate_latest.json")
+
+# Closure states a reopened op may legitimately end in, and the states the
+# COMMON_TICKET_CONTRACT forbids as a closure (the banned escapes).
+CLOSURE_STATES = ["implemented", "hard_blocked", "deprecated"]
+FORBIDDEN_CLOSURE_STATES = ["catalogued", "stub", "unknown", "deferred", "v1_target_false"]
+
+# The M08 ticket index (03_TICKET_INDEX.md) has no dedicated ticket for the
+# constraints_associativity family (58 native AcDbAssoc* ops). Rather than cram
+# them into an unrelated ticket, M08A proposes a new deep-native lane and surfaces
+# the gap; M08A-T02 formalizes lanes + merge waves.
+PROPOSED_NEW_TICKETS = {
+    "M08K-T03": "constraints_associativity — AcDbAssoc* constraints/associativity (deep native; M08 index gap)",
+}
+
+
+def _prefix(op):
+    return (op.get("id") or "").split(".")[0]
+
+
+def assign_owner_ticket(op):
+    """Deterministic (family, id-prefix/keyword) -> owner_ticket. Every op gets one.
+    Raw-command dispatch ops are owned by the fallback command lane (M08O-T02) and
+    close as `deprecated` (never agent-exposed)."""
+    fam = op.get("family")
+    oid = op.get("id") or ""
+    p = _prefix(op)
+    if is_raw_command(op):
+        return "M08O-T02"
+    if fam == "objectdbx_database":
+        return "M08B-T03" if p == "transaction" else "M08C-T01"
+    if fam == "inspect":
+        return "M08C-T01"
+    if fam == "symbol_tables_dictionaries":
+        if any(k in oid for k in ("xrecord", "xdata", ".dict", "dictionary", "acdb")):
+            return "M08E-T03"
+        if any(k in oid for k in ("dimstyle", ".ucs", ".view", "vport", "regapp")):
+            return "M08C-T03"
+        return "M08C-T02"
+    if fam == "entities":
+        if p == "inspect":
+            return "M08D-T02" if "curve" in oid else "M08D-T01"
+        if p == "write":
+            if any(k in oid for k in ("dim", "leader", "mtext", ".text", "mleader", ".table")):
+                return "M08H-T01"
+            if "hatch" in oid:
+                return "M08H-T02"
+            return "M08G-T02"
+        if p == "modify":
+            return "M08G-T03"
+        return "M08D-T01"
+    if fam == "geometry_kernel":
+        if p == "compute":
+            return "M08D-T02"
+        if p == "modify":
+            return "M08G-T03"
+        return "M08G-T02"
+    if fam == "brep_solids":
+        return "M08G-T03" if p == "edit" else "M08D-T03"
+    if fam == "blocks_xrefs_clone":
+        return "M08E-T02" if ("xref" in oid or "layout" in oid) else "M08E-T01"
+    if fam in ("layouts_plot_publish", "render"):
+        return "M08I-T01"
+    if fam == "diff":
+        return "M08I-T02"
+    if fam == "graphics_system":
+        return "M08L-T02" if "grip" in oid else "M08L-T01"
+    if fam == "live":
+        return "M08J-T02" if any(k in oid for k in ("read", "visual", "inspect")) else "M08J-T01"
+    if fam == "custom_objects_protocols":
+        return "M08L-T02" if p == "overrule" else "M08K-T01"
+    if fam == "constraints_associativity":
+        return "M08K-T03"
+    if fam == "com_activex":
+        return "M08M-T01" if ("opm" in oid or "property" in oid) else "M08O-T01"
+    if fam == "ui_customization":
+        return "M08M-T01" if ("opm" in oid or "property" in oid) else "M08N-T02"
+    if fam == "editor_input":
+        return "M08N-T02" if p == "select" else "M08N-T01"
+    if fam == "runtime_commands":
+        return "M08N-T02" if "register" in oid else "M08O-T02"
+    if fam == "reactors_events":
+        return "M08M-T02"
+    if fam == "active_document_write_original":
+        return "M08J-T03"
+    if fam == "write":
+        return "M08G-T02"
+    if fam == "extend":
+        return "M08K-T01"
+    if fam in ("validate", "patch", "apply"):
+        return "M08G-T01"
+    if fam == "query":
+        return "M08F-T02"
+    return "M08B-T01"  # never leave an op unowned
+
+
+def impl_strategy(op):
+    """How this op gets closed (the path), from status + raw/write-level + tier."""
+    st = op.get("status")
+    if st == "implemented":
+        return "implemented_v1"
+    if st == "blocked":
+        return "hard_blocked"
+    if is_raw_command(op):
+        return "deprecated_raw_command"
+    wl = op.get("write_level") or {}
+    if wl.get("default_write_mode") == "write_original" or wl.get("original_write_default") is True:
+        return "hard_blocked_original_write_forbidden"
+    return {
+        "native_arx_only": "native_arx_cpp",
+        "objectdbx_capable": "objectdbx_hostless",
+        "managed_also": "managed_dotnet",
+        "accoreconsole_lisp_also": "accoreconsole_lisp",
+    }.get(op.get("engine_tier"), "native_arx_cpp")
+
+
+def evidence_required(op):
+    """What evidence closes the op."""
+    st = op.get("status")
+    if st == "implemented":
+        return "existing_tests_and_evidence_refs"
+    if st == "blocked":
+        return "blocker_ref_and_evidence"
+    if is_raw_command(op):
+        return "contract_test_not_agent_exposed"
+    wl = op.get("write_level") or {}
+    dwm = wl.get("default_write_mode")
+    if dwm == "write_original" or wl.get("original_write_default") is True:
+        return "safety_blocker_original_write_forbidden"
+    if dwm == "write_copy":
+        return "unit_test+staged_diff_fixture_original_unchanged"
+    if dwm == "live_edit":
+        return "attended_live_pump_session_log"
+    return "unit_test+native_extraction_fixture"
+
+
+def reopen_registry(doc):
+    """Additively assign owner_ticket / implementation_strategy / evidence_required
+    to EVERY op (idempotent; never changes op status). Stamps a registry-level
+    reopen marker that records the banned escape + the M09 block."""
+    changed = 0
+    for op in doc["operations"]:
+        ot, ist, ev = assign_owner_ticket(op), impl_strategy(op), evidence_required(op)
+        if (op.get("owner_ticket"), op.get("implementation_strategy"),
+                op.get("evidence_required")) != (ot, ist, ev):
+            changed += 1
+        op["owner_ticket"], op["implementation_strategy"], op["evidence_required"] = ot, ist, ev
+    doc["m08a_catalog_reopen"] = {
+        "schema": "ariadne.cad_os.m08a_catalog_reopen.v1",
+        "ticket": "M08A-T01",
+        "v1_target_escape_banned": True,
+        "closure_states": CLOSURE_STATES,
+        "forbidden_closure_states": FORBIDDEN_CLOSURE_STATES,
+        "m09_blocked_until_m08r": True,
+        "proposed_new_tickets": PROPOSED_NEW_TICKETS,
+    }
+    return changed
+
+
+def build_sdk_implementation_map(doc):
+    """Every op -> {owner_ticket, implementation_strategy, evidence_required, ...}
+    plus a per-ticket rollup. The forward implementation map for M08B-O."""
+    ops = doc["operations"]
+    rows, by_ticket = [], collections.defaultdict(list)
+    for op in ops:
+        ot = op.get("owner_ticket") or assign_owner_ticket(op)
+        rows.append({
+            "operation": op.get("id"),
+            "family": op.get("family"),
+            "status": op.get("status"),
+            "engine_tier": op.get("engine_tier"),
+            "owner_ticket": ot,
+            "implementation_strategy": op.get("implementation_strategy") or impl_strategy(op),
+            "evidence_required": op.get("evidence_required") or evidence_required(op),
+            "risk_class": derive_risk_class(op),
+        })
+        by_ticket[ot].append(op)
+    open_states = ("catalogued", "stub")
+    ticket_summary = {}
+    for t, recs in sorted(by_ticket.items()):
+        ticket_summary[t] = {
+            "op_count": len(recs),
+            "open": sum(1 for o in recs if o.get("status") in open_states),
+            "implemented": sum(1 for o in recs if o.get("status") == "implemented"),
+            "blocked": sum(1 for o in recs if o.get("status") == "blocked"),
+            "by_family": dict(collections.Counter(o.get("family") for o in recs)),
+            "by_strategy": dict(collections.Counter(o.get("implementation_strategy")
+                                                    or impl_strategy(o) for o in recs)),
+        }
+    return {
+        "schema": "ariadne.cad_os.full_sdk_implementation_map.v1",
+        "ticket": "M08A-T01",
+        "generated_from": "config/operations.v2.json",
+        "operation_count": len(ops),
+        "ticket_count": len(by_ticket),
+        "proposed_new_tickets": PROPOSED_NEW_TICKETS,
+        "by_ticket": ticket_summary,
+        "operations": rows,
+    }
+
+
+def compute_closure_gate(doc):
+    """The HONEST full-coverage gate over ALL ops (bans the v1_target escape).
+    closure_gate_pass is True only when nothing is catalogued/stub/unknown and
+    every op carries an owner_ticket + (for open ops) a strategy + evidence."""
+    ops = doc["operations"]
+    by_status = collections.Counter(o.get("status") for o in ops)
+    catalogued = by_status.get("catalogued", 0)
+    stub = by_status.get("stub", 0)
+    unknown = by_status.get(None, 0) + by_status.get("", 0) + by_status.get("unknown", 0)
+    no_owner = [o.get("id") for o in ops if not o.get("owner_ticket")]
+    open_states = ("catalogued", "stub")
+    open_missing_plan = [o.get("id") for o in ops if o.get("status") in open_states
+                         and (not o.get("implementation_strategy") or not o.get("evidence_required"))]
+    checks = {
+        "every_op_has_owner_ticket": len(no_owner) == 0,
+        "every_open_op_has_strategy_and_evidence": len(open_missing_plan) == 0,
+        "zero_catalogued": catalogued == 0,
+        "zero_stub": stub == 0,
+        "zero_unknown": unknown == 0,
+        "v1_target_escape_banned": bool((doc.get("m08a_catalog_reopen") or {}).get("v1_target_escape_banned")),
+    }
+    cg = {
+        "schema": "ariadne.cad_os.closure_gate.v1",
+        "ticket_basis": "M08A-T01",
+        "totals_by_status": dict(by_status),
+        "catalogued": catalogued,
+        "stub": stub,
+        "unknown": unknown,
+        "deprecated": by_status.get("deprecated", 0),
+        "checks": checks,
+        "closure_gate_pass": all(checks.values()),
+        "m09_blocked_until_m08r": True,
+        "m09_allowed": all(checks.values()),
+        "ops_without_owner_ticket": no_owner[:20],
+        "open_ops_missing_plan": open_missing_plan[:20],
+    }
+    return cg
+
+
+def _dump_registry(path, obj):
+    """Write the registry preserving its on-disk format: BOM (utf-8-sig),
+    indent=2, no trailing newline."""
+    with open(path, "w", encoding="utf-8-sig", newline="\n") as f:
+        json.dump(obj, f, indent=2, ensure_ascii=False)
+
+
+def write_m08a_reports():
+    doc = _load(REG)
+    changed = reopen_registry(doc)
+    _dump_registry(REG, doc)
+    smap = build_sdk_implementation_map(doc)
+    _dump(SDK_MAP, smap)
+    cg = compute_closure_gate(doc)
+    _dump(CLOSURE_GATE, cg)
+    write_reports()  # refresh the v1 coverage with the now-additive registry
+    return doc, smap, cg, changed
+
+
 if __name__ == "__main__":
-    m = write_reports()
-    g = m["gate"]
-    t = m["totals"]
-    print("schema:", m["schema"])
-    print("total:", t["total"], "implemented:", t["implemented"], "blocked:", t["blocked"],
-          "catalogued:", t["catalogued"], "stub:", t["stub"], "unknown:", t["unknown"])
-    print("v1_target:", t["v1_target_total"], "impl:", t["v1_target_implemented"],
-          "blocked:", t["v1_target_blocked"], "deferred:", t["v1_target_deferred"])
-    print("risk:", json.dumps(t["by_risk_class"]))
-    print("agent_exposed_count:", t["agent_exposed_count"])
-    for k, v in g.items():
-        print(f"  gate.{k} = {v}")
-    print("GATE PASS:", g["gate_pass"])
+    import sys
+    if "--reopen" in sys.argv:
+        doc, smap, cg, changed = write_m08a_reports()
+        st = collections.Counter(o.get("status") for o in doc["operations"])
+        owners = collections.Counter(o.get("owner_ticket") for o in doc["operations"])
+        print("M08A-T01 catalog reopen")
+        print("  ops:", len(doc["operations"]), "| fields_changed:", changed,
+              "| owner_tickets:", len(owners))
+        print("  status:", dict(st))
+        print("  sdk_map:", os.path.relpath(SDK_MAP, ROOT))
+        print("  closure_gate_pass:", cg["closure_gate_pass"], "| m09_allowed:", cg["m09_allowed"])
+        for k, v in cg["checks"].items():
+            print(f"    closure.{k} = {v}")
+        print("  open ops remaining (catalogued+stub):", cg["catalogued"] + cg["stub"])
+    else:
+        m = write_reports()
+        g = m["gate"]
+        t = m["totals"]
+        print("schema:", m["schema"])
+        print("total:", t["total"], "implemented:", t["implemented"], "blocked:", t["blocked"],
+              "catalogued:", t["catalogued"], "stub:", t["stub"], "unknown:", t["unknown"])
+        print("v1_target:", t["v1_target_total"], "impl:", t["v1_target_implemented"],
+              "blocked:", t["v1_target_blocked"], "deferred:", t["v1_target_deferred"])
+        print("risk:", json.dumps(t["by_risk_class"]))
+        print("agent_exposed_count:", t["agent_exposed_count"])
+        for k, v in g.items():
+            print(f"  gate.{k} = {v}")
+        print("GATE PASS:", g["gate_pass"])
+        print("closure_gate_pass:", m["closure_gate"]["closure_gate_pass"],
+              "(catalogued", m["closure_gate"]["catalogued"], "→ honest fail until M08R)")

@@ -1,0 +1,5577 @@
+{
+  "schema": "ariadne.cad_os.full_sdk_implementation_map.v1",
+  "ticket": "M08A-T01",
+  "generated_from": "config/operations.v2.json",
+  "operation_count": 517,
+  "ticket_count": 29,
+  "proposed_new_tickets": {
+    "M08K-T03": "constraints_associativity — AcDbAssoc* constraints/associativity (deep native; M08 index gap)"
+  },
+  "by_ticket": {
+    "M08B-T03": {
+      "op_count": 2,
+      "open": 2,
+      "implemented": 0,
+      "blocked": 0,
+      "by_family": {
+        "objectdbx_database": 2
+      },
+      "by_strategy": {
+        "native_arx_cpp": 2
+      }
+    },
+    "M08C-T01": {
+      "op_count": 35,
+      "open": 18,
+      "implemented": 17,
+      "blocked": 0,
+      "by_family": {
+        "objectdbx_database": 19,
+        "inspect": 16
+      },
+      "by_strategy": {
+        "implemented_v1": 17,
+        "objectdbx_hostless": 17,
+        "native_arx_cpp": 1
+      }
+    },
+    "M08C-T02": {
+      "op_count": 7,
+      "open": 6,
+      "implemented": 1,
+      "blocked": 0,
+      "by_family": {
+        "symbol_tables_dictionaries": 7
+      },
+      "by_strategy": {
+        "implemented_v1": 1,
+        "objectdbx_hostless": 5,
+        "native_arx_cpp": 1
+      }
+    },
+    "M08C-T03": {
+      "op_count": 1,
+      "open": 1,
+      "implemented": 0,
+      "blocked": 0,
+      "by_family": {
+        "symbol_tables_dictionaries": 1
+      },
+      "by_strategy": {
+        "objectdbx_hostless": 1
+      }
+    },
+    "M08D-T01": {
+      "op_count": 3,
+      "open": 3,
+      "implemented": 0,
+      "blocked": 0,
+      "by_family": {
+        "entities": 3
+      },
+      "by_strategy": {
+        "objectdbx_hostless": 3
+      }
+    },
+    "M08D-T02": {
+      "op_count": 19,
+      "open": 19,
+      "implemented": 0,
+      "blocked": 0,
+      "by_family": {
+        "entities": 1,
+        "geometry_kernel": 18
+      },
+      "by_strategy": {
+        "objectdbx_hostless": 3,
+        "native_arx_cpp": 16
+      }
+    },
+    "M08D-T03": {
+      "op_count": 51,
+      "open": 51,
+      "implemented": 0,
+      "blocked": 0,
+      "by_family": {
+        "brep_solids": 51
+      },
+      "by_strategy": {
+        "objectdbx_hostless": 44,
+        "native_arx_cpp": 7
+      }
+    },
+    "M08E-T01": {
+      "op_count": 5,
+      "open": 5,
+      "implemented": 0,
+      "blocked": 0,
+      "by_family": {
+        "blocks_xrefs_clone": 5
+      },
+      "by_strategy": {
+        "objectdbx_hostless": 4,
+        "native_arx_cpp": 1
+      }
+    },
+    "M08E-T03": {
+      "op_count": 8,
+      "open": 6,
+      "implemented": 2,
+      "blocked": 0,
+      "by_family": {
+        "symbol_tables_dictionaries": 8
+      },
+      "by_strategy": {
+        "implemented_v1": 2,
+        "objectdbx_hostless": 6
+      }
+    },
+    "M08F-T02": {
+      "op_count": 1,
+      "open": 0,
+      "implemented": 1,
+      "blocked": 0,
+      "by_family": {
+        "query": 1
+      },
+      "by_strategy": {
+        "implemented_v1": 1
+      }
+    },
+    "M08G-T01": {
+      "op_count": 5,
+      "open": 0,
+      "implemented": 5,
+      "blocked": 0,
+      "by_family": {
+        "apply": 1,
+        "validate": 2,
+        "patch": 2
+      },
+      "by_strategy": {
+        "implemented_v1": 5
+      }
+    },
+    "M08G-T02": {
+      "op_count": 40,
+      "open": 34,
+      "implemented": 6,
+      "blocked": 0,
+      "by_family": {
+        "geometry_kernel": 5,
+        "write": 4,
+        "entities": 31
+      },
+      "by_strategy": {
+        "implemented_v1": 6,
+        "objectdbx_hostless": 34
+      }
+    },
+    "M08G-T03": {
+      "op_count": 11,
+      "open": 11,
+      "implemented": 0,
+      "blocked": 0,
+      "by_family": {
+        "brep_solids": 3,
+        "entities": 6,
+        "geometry_kernel": 2
+      },
+      "by_strategy": {
+        "native_arx_cpp": 3,
+        "objectdbx_hostless": 8
+      }
+    },
+    "M08H-T01": {
+      "op_count": 14,
+      "open": 14,
+      "implemented": 0,
+      "blocked": 0,
+      "by_family": {
+        "entities": 14
+      },
+      "by_strategy": {
+        "objectdbx_hostless": 14
+      }
+    },
+    "M08H-T02": {
+      "op_count": 1,
+      "open": 1,
+      "implemented": 0,
+      "blocked": 0,
+      "by_family": {
+        "entities": 1
+      },
+      "by_strategy": {
+        "objectdbx_hostless": 1
+      }
+    },
+    "M08I-T01": {
+      "op_count": 3,
+      "open": 2,
+      "implemented": 0,
+      "blocked": 1,
+      "by_family": {
+        "render": 1,
+        "layouts_plot_publish": 2
+      },
+      "by_strategy": {
+        "hard_blocked": 1,
+        "managed_dotnet": 2
+      }
+    },
+    "M08I-T02": {
+      "op_count": 1,
+      "open": 0,
+      "implemented": 1,
+      "blocked": 0,
+      "by_family": {
+        "diff": 1
+      },
+      "by_strategy": {
+        "implemented_v1": 1
+      }
+    },
+    "M08J-T01": {
+      "op_count": 7,
+      "open": 0,
+      "implemented": 6,
+      "blocked": 1,
+      "by_family": {
+        "live": 7
+      },
+      "by_strategy": {
+        "implemented_v1": 6,
+        "hard_blocked": 1
+      }
+    },
+    "M08J-T03": {
+      "op_count": 5,
+      "open": 5,
+      "implemented": 0,
+      "blocked": 0,
+      "by_family": {
+        "active_document_write_original": 5
+      },
+      "by_strategy": {
+        "managed_dotnet": 4,
+        "accoreconsole_lisp": 1
+      }
+    },
+    "M08K-T01": {
+      "op_count": 47,
+      "open": 45,
+      "implemented": 2,
+      "blocked": 0,
+      "by_family": {
+        "extend": 2,
+        "custom_objects_protocols": 45
+      },
+      "by_strategy": {
+        "implemented_v1": 2,
+        "native_arx_cpp": 38,
+        "objectdbx_hostless": 5,
+        "accoreconsole_lisp": 1,
+        "managed_dotnet": 1
+      }
+    },
+    "M08K-T03": {
+      "op_count": 58,
+      "open": 58,
+      "implemented": 0,
+      "blocked": 0,
+      "by_family": {
+        "constraints_associativity": 58
+      },
+      "by_strategy": {
+        "native_arx_cpp": 19,
+        "objectdbx_hostless": 39
+      }
+    },
+    "M08L-T01": {
+      "op_count": 8,
+      "open": 8,
+      "implemented": 0,
+      "blocked": 0,
+      "by_family": {
+        "graphics_system": 8
+      },
+      "by_strategy": {
+        "native_arx_cpp": 8
+      }
+    },
+    "M08L-T02": {
+      "op_count": 19,
+      "open": 19,
+      "implemented": 0,
+      "blocked": 0,
+      "by_family": {
+        "custom_objects_protocols": 18,
+        "graphics_system": 1
+      },
+      "by_strategy": {
+        "managed_dotnet": 15,
+        "native_arx_cpp": 4
+      }
+    },
+    "M08M-T01": {
+      "op_count": 33,
+      "open": 33,
+      "implemented": 0,
+      "blocked": 0,
+      "by_family": {
+        "com_activex": 33
+      },
+      "by_strategy": {
+        "objectdbx_hostless": 4,
+        "native_arx_cpp": 29
+      }
+    },
+    "M08M-T02": {
+      "op_count": 22,
+      "open": 22,
+      "implemented": 0,
+      "blocked": 0,
+      "by_family": {
+        "reactors_events": 22
+      },
+      "by_strategy": {
+        "native_arx_cpp": 9,
+        "managed_dotnet": 13
+      }
+    },
+    "M08N-T01": {
+      "op_count": 17,
+      "open": 17,
+      "implemented": 0,
+      "blocked": 0,
+      "by_family": {
+        "editor_input": 17
+      },
+      "by_strategy": {
+        "native_arx_cpp": 10,
+        "accoreconsole_lisp": 6,
+        "managed_dotnet": 1
+      }
+    },
+    "M08N-T02": {
+      "op_count": 56,
+      "open": 56,
+      "implemented": 0,
+      "blocked": 0,
+      "by_family": {
+        "editor_input": 9,
+        "runtime_commands": 8,
+        "ui_customization": 39
+      },
+      "by_strategy": {
+        "accoreconsole_lisp": 4,
+        "native_arx_cpp": 46,
+        "managed_dotnet": 5,
+        "objectdbx_hostless": 1
+      }
+    },
+    "M08O-T01": {
+      "op_count": 16,
+      "open": 16,
+      "implemented": 0,
+      "blocked": 0,
+      "by_family": {
+        "com_activex": 16
+      },
+      "by_strategy": {
+        "objectdbx_hostless": 4,
+        "native_arx_cpp": 9,
+        "managed_dotnet": 3
+      }
+    },
+    "M08O-T02": {
+      "op_count": 22,
+      "open": 22,
+      "implemented": 0,
+      "blocked": 0,
+      "by_family": {
+        "active_document_write_original": 3,
+        "editor_input": 1,
+        "runtime_commands": 18
+      },
+      "by_strategy": {
+        "deprecated_raw_command": 5,
+        "native_arx_cpp": 15,
+        "accoreconsole_lisp": 2
+      }
+    }
+  },
+  "operations": [
+    {
+      "operation": "inspect.database.summary",
+      "family": "objectdbx_database",
+      "status": "implemented",
+      "engine_tier": "managed_also",
+      "owner_ticket": "M08C-T01",
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "write.layer.create",
+      "family": "symbol_tables_dictionaries",
+      "status": "implemented",
+      "engine_tier": "objectdbx_capable",
+      "owner_ticket": "M08C-T02",
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs",
+      "risk_class": "staged_write"
+    },
+    {
+      "operation": "write.entity.line",
+      "family": "geometry_kernel",
+      "status": "implemented",
+      "engine_tier": "objectdbx_capable",
+      "owner_ticket": "M08G-T02",
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs",
+      "risk_class": "staged_write"
+    },
+    {
+      "operation": "write.entity.circle",
+      "family": "geometry_kernel",
+      "status": "implemented",
+      "engine_tier": "objectdbx_capable",
+      "owner_ticket": "M08G-T02",
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs",
+      "risk_class": "staged_write"
+    },
+    {
+      "operation": "inspect.entity.count",
+      "family": "inspect",
+      "status": "implemented",
+      "engine_tier": "objectdbx_capable",
+      "owner_ticket": "M08C-T01",
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "write.xrecord.set",
+      "family": "symbol_tables_dictionaries",
+      "status": "implemented",
+      "engine_tier": "objectdbx_capable",
+      "owner_ticket": "M08E-T03",
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs",
+      "risk_class": "staged_write"
+    },
+    {
+      "operation": "inspect.xrecord.get",
+      "family": "symbol_tables_dictionaries",
+      "status": "implemented",
+      "engine_tier": "objectdbx_capable",
+      "owner_ticket": "M08E-T03",
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "write.xdata.set",
+      "family": "write",
+      "status": "implemented",
+      "engine_tier": "objectdbx_capable",
+      "owner_ticket": "M08G-T02",
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs",
+      "risk_class": "staged_write"
+    },
+    {
+      "operation": "inspect.xdata.get",
+      "family": "inspect",
+      "status": "implemented",
+      "engine_tier": "objectdbx_capable",
+      "owner_ticket": "M08C-T01",
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "write.block.simple_create",
+      "family": "write",
+      "status": "implemented",
+      "engine_tier": "objectdbx_capable",
+      "owner_ticket": "M08G-T02",
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs",
+      "risk_class": "staged_write"
+    },
+    {
+      "operation": "write.block.insert",
+      "family": "write",
+      "status": "implemented",
+      "engine_tier": "objectdbx_capable",
+      "owner_ticket": "M08G-T02",
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs",
+      "risk_class": "staged_write"
+    },
+    {
+      "operation": "inspect.block.count",
+      "family": "inspect",
+      "status": "implemented",
+      "engine_tier": "objectdbx_capable",
+      "owner_ticket": "M08C-T01",
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "write.layout.create",
+      "family": "write",
+      "status": "implemented",
+      "engine_tier": "objectdbx_capable",
+      "owner_ticket": "M08G-T02",
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs",
+      "risk_class": "staged_write"
+    },
+    {
+      "operation": "inspect.layout.list",
+      "family": "inspect",
+      "status": "implemented",
+      "engine_tier": "objectdbx_capable",
+      "owner_ticket": "M08C-T01",
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "inspect.xref.list",
+      "family": "inspect",
+      "status": "implemented",
+      "engine_tier": "objectdbx_capable",
+      "owner_ticket": "M08C-T01",
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "inspect.runtime.capabilities",
+      "family": "inspect",
+      "status": "implemented",
+      "engine_tier": "accoreconsole_lisp_also",
+      "owner_ticket": "M08C-T01",
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "live.reactor.enable",
+      "family": "live",
+      "status": "implemented",
+      "engine_tier": "native_arx_only",
+      "owner_ticket": "M08J-T01",
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs",
+      "risk_class": "live_edit"
+    },
+    {
+      "operation": "inspect.reactor.registry",
+      "family": "inspect",
+      "status": "implemented",
+      "engine_tier": "accoreconsole_lisp_also",
+      "owner_ticket": "M08C-T01",
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "live.reactor.disable",
+      "family": "live",
+      "status": "implemented",
+      "engine_tier": "native_arx_only",
+      "owner_ticket": "M08J-T01",
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs",
+      "risk_class": "live_edit"
+    },
+    {
+      "operation": "inspect.overrule.registry",
+      "family": "inspect",
+      "status": "implemented",
+      "engine_tier": "accoreconsole_lisp_also",
+      "owner_ticket": "M08C-T01",
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "live.overrule.enable",
+      "family": "live",
+      "status": "implemented",
+      "engine_tier": "native_arx_only",
+      "owner_ticket": "M08J-T01",
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs",
+      "risk_class": "live_edit"
+    },
+    {
+      "operation": "live.overrule.disable",
+      "family": "live",
+      "status": "implemented",
+      "engine_tier": "native_arx_only",
+      "owner_ticket": "M08J-T01",
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs",
+      "risk_class": "live_edit"
+    },
+    {
+      "operation": "inspect.jig.host_support",
+      "family": "inspect",
+      "status": "implemented",
+      "engine_tier": "accoreconsole_lisp_also",
+      "owner_ticket": "M08C-T01",
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "live.jig.point_probe",
+      "family": "live",
+      "status": "implemented",
+      "engine_tier": "native_arx_only",
+      "owner_ticket": "M08J-T01",
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs",
+      "risk_class": "live_edit"
+    },
+    {
+      "operation": "extend.customclass.create",
+      "family": "extend",
+      "status": "implemented",
+      "engine_tier": "native_arx_only",
+      "owner_ticket": "M08K-T01",
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs",
+      "risk_class": "live_edit"
+    },
+    {
+      "operation": "inspect.customclass.count",
+      "family": "inspect",
+      "status": "implemented",
+      "engine_tier": "native_arx_only",
+      "owner_ticket": "M08C-T01",
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "extend.customobject.create",
+      "family": "extend",
+      "status": "implemented",
+      "engine_tier": "native_arx_only",
+      "owner_ticket": "M08K-T01",
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs",
+      "risk_class": "live_edit"
+    },
+    {
+      "operation": "inspect.customobject.count",
+      "family": "inspect",
+      "status": "implemented",
+      "engine_tier": "native_arx_only",
+      "owner_ticket": "M08C-T01",
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "inspect.protocol.queryx",
+      "family": "inspect",
+      "status": "implemented",
+      "engine_tier": "native_arx_only",
+      "owner_ticket": "M08C-T01",
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "inspect.database.graph",
+      "family": "inspect",
+      "status": "implemented",
+      "engine_tier": "objectdbx_capable",
+      "owner_ticket": "M08C-T01",
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "inspect.layers",
+      "family": "inspect",
+      "status": "implemented",
+      "engine_tier": "objectdbx_capable",
+      "owner_ticket": "M08C-T01",
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "inspect.blocks",
+      "family": "inspect",
+      "status": "implemented",
+      "engine_tier": "objectdbx_capable",
+      "owner_ticket": "M08C-T01",
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "inspect.entities",
+      "family": "inspect",
+      "status": "implemented",
+      "engine_tier": "objectdbx_capable",
+      "owner_ticket": "M08C-T01",
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "query.entities",
+      "family": "query",
+      "status": "implemented",
+      "engine_tier": "objectdbx_capable",
+      "owner_ticket": "M08F-T02",
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "render.layout",
+      "family": "render",
+      "status": "blocked",
+      "engine_tier": "native_arx_only",
+      "owner_ticket": "M08I-T01",
+      "implementation_strategy": "hard_blocked",
+      "evidence_required": "blocker_ref_and_evidence",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "apply.patch",
+      "family": "apply",
+      "status": "implemented",
+      "engine_tier": "objectdbx_capable",
+      "owner_ticket": "M08G-T01",
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs",
+      "risk_class": "staged_write"
+    },
+    {
+      "operation": "validate.patch",
+      "family": "validate",
+      "status": "implemented",
+      "engine_tier": "objectdbx_capable",
+      "owner_ticket": "M08G-T01",
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "validate.ir",
+      "family": "validate",
+      "status": "implemented",
+      "engine_tier": "objectdbx_capable",
+      "owner_ticket": "M08G-T01",
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "patch.dry_run",
+      "family": "patch",
+      "status": "implemented",
+      "engine_tier": "objectdbx_capable",
+      "owner_ticket": "M08G-T01",
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "patch.apply_staged",
+      "family": "patch",
+      "status": "implemented",
+      "engine_tier": "objectdbx_capable",
+      "owner_ticket": "M08G-T01",
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "diff.before_after",
+      "family": "diff",
+      "status": "implemented",
+      "engine_tier": "objectdbx_capable",
+      "owner_ticket": "M08I-T02",
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "live.status",
+      "family": "live",
+      "status": "implemented",
+      "engine_tier": "managed_also",
+      "owner_ticket": "M08J-T01",
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "live.apply_patch",
+      "family": "live",
+      "status": "blocked",
+      "engine_tier": "native_arx_only",
+      "owner_ticket": "M08J-T01",
+      "implementation_strategy": "hard_blocked",
+      "evidence_required": "blocker_ref_and_evidence",
+      "risk_class": "live_edit"
+    },
+    {
+      "operation": "command.invoke.coroutine",
+      "family": "active_document_write_original",
+      "status": "catalogued",
+      "engine_tier": "native_arx_only",
+      "owner_ticket": "M08O-T02",
+      "implementation_strategy": "deprecated_raw_command",
+      "evidence_required": "contract_test_not_agent_exposed",
+      "risk_class": "raw_command"
+    },
+    {
+      "operation": "command.invoke.sync",
+      "family": "active_document_write_original",
+      "status": "catalogued",
+      "engine_tier": "accoreconsole_lisp_also",
+      "owner_ticket": "M08O-T02",
+      "implementation_strategy": "deprecated_raw_command",
+      "evidence_required": "contract_test_not_agent_exposed",
+      "risk_class": "raw_command"
+    },
+    {
+      "operation": "command.invoke.sync.resbuf",
+      "family": "active_document_write_original",
+      "status": "catalogued",
+      "engine_tier": "accoreconsole_lisp_also",
+      "owner_ticket": "M08O-T02",
+      "implementation_strategy": "deprecated_raw_command",
+      "evidence_required": "contract_test_not_agent_exposed",
+      "risk_class": "raw_command"
+    },
+    {
+      "operation": "doc.current",
+      "family": "active_document_write_original",
+      "status": "catalogued",
+      "engine_tier": "managed_also",
+      "owner_ticket": "M08J-T03",
+      "implementation_strategy": "managed_dotnet",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "doc.lock",
+      "family": "active_document_write_original",
+      "status": "catalogued",
+      "engine_tier": "managed_also",
+      "owner_ticket": "M08J-T03",
+      "implementation_strategy": "managed_dotnet",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "doc.new",
+      "family": "active_document_write_original",
+      "status": "catalogued",
+      "engine_tier": "managed_also",
+      "owner_ticket": "M08J-T03",
+      "implementation_strategy": "managed_dotnet",
+      "evidence_required": "unit_test+staged_diff_fixture_original_unchanged",
+      "risk_class": "staged_write"
+    },
+    {
+      "operation": "doc.sendstring",
+      "family": "active_document_write_original",
+      "status": "catalogued",
+      "engine_tier": "accoreconsole_lisp_also",
+      "owner_ticket": "M08J-T03",
+      "implementation_strategy": "accoreconsole_lisp",
+      "evidence_required": "unit_test+staged_diff_fixture_original_unchanged",
+      "risk_class": "staged_write"
+    },
+    {
+      "operation": "doc.syncopen",
+      "family": "active_document_write_original",
+      "status": "catalogued",
+      "engine_tier": "managed_also",
+      "owner_ticket": "M08J-T03",
+      "implementation_strategy": "managed_dotnet",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "infra.hostapp.provide_services",
+      "family": "blocks_xrefs_clone",
+      "status": "catalogued",
+      "engine_tier": "objectdbx_capable",
+      "owner_ticket": "M08E-T01",
+      "implementation_strategy": "objectdbx_hostless",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "inspect.block.iterate",
+      "family": "blocks_xrefs_clone",
+      "status": "catalogued",
+      "engine_tier": "objectdbx_capable",
+      "owner_ticket": "M08E-T01",
+      "implementation_strategy": "objectdbx_hostless",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "transform.database.deep_clone",
+      "family": "blocks_xrefs_clone",
+      "status": "catalogued",
+      "engine_tier": "native_arx_only",
+      "owner_ticket": "M08E-T01",
+      "implementation_strategy": "native_arx_cpp",
+      "evidence_required": "attended_live_pump_session_log",
+      "risk_class": "live_edit"
+    },
+    {
+      "operation": "transform.database.insert_block",
+      "family": "blocks_xrefs_clone",
+      "status": "catalogued",
+      "engine_tier": "objectdbx_capable",
+      "owner_ticket": "M08E-T01",
+      "implementation_strategy": "objectdbx_hostless",
+      "evidence_required": "unit_test+staged_diff_fixture_original_unchanged",
+      "risk_class": "staged_write"
+    },
+    {
+      "operation": "write.block.append_entity",
+      "family": "blocks_xrefs_clone",
+      "status": "catalogued",
+      "engine_tier": "objectdbx_capable",
+      "owner_ticket": "M08E-T01",
+      "implementation_strategy": "objectdbx_hostless",
+      "evidence_required": "unit_test+staged_diff_fixture_original_unchanged",
+      "risk_class": "staged_write"
+    },
+    {
+      "operation": "compute.brep.line_containment",
+      "family": "brep_solids",
+      "status": "catalogued",
+      "engine_tier": "objectdbx_capable",
+      "owner_ticket": "M08D-T03",
+      "implementation_strategy": "objectdbx_hostless",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "compute.brep.massprops",
+      "family": "brep_solids",
+      "status": "catalogued",
+      "engine_tier": "objectdbx_capable",
+      "owner_ticket": "M08D-T03",
+      "implementation_strategy": "objectdbx_hostless",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "compute.brep.perimeter",
+      "family": "brep_solids",
+      "status": "catalogued",
+      "engine_tier": "objectdbx_capable",
+      "owner_ticket": "M08D-T03",
+      "implementation_strategy": "objectdbx_hostless",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "compute.brep.point_containment",
+      "family": "brep_solids",
+      "status": "catalogued",
+      "engine_tier": "objectdbx_capable",
+      "owner_ticket": "M08D-T03",
+      "implementation_strategy": "objectdbx_hostless",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "compute.brep.surface_area",
+      "family": "brep_solids",
+      "status": "catalogued",
+      "engine_tier": "objectdbx_capable",
+      "owner_ticket": "M08D-T03",
+      "implementation_strategy": "objectdbx_hostless",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "compute.brep.volume",
+      "family": "brep_solids",
+      "status": "catalogued",
+      "engine_tier": "objectdbx_capable",
+      "owner_ticket": "M08D-T03",
+      "implementation_strategy": "objectdbx_hostless",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "edit.subentity.add_paths",
+      "family": "brep_solids",
+      "status": "catalogued",
+      "engine_tier": "native_arx_only",
+      "owner_ticket": "M08G-T03",
+      "implementation_strategy": "native_arx_cpp",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "edit.subentity.delete_paths",
+      "family": "brep_solids",
+      "status": "catalogued",
+      "engine_tier": "native_arx_only",
+      "owner_ticket": "M08G-T03",
+      "implementation_strategy": "native_arx_cpp",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "edit.subentity.transform",
+      "family": "brep_solids",
+      "status": "catalogued",
+      "engine_tier": "native_arx_only",
+      "owner_ticket": "M08G-T03",
+      "implementation_strategy": "native_arx_cpp",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "inspect.brep.bounds",
+      "family": "brep_solids",
+      "status": "catalogued",
+      "engine_tier": "objectdbx_capable",
+      "owner_ticket": "M08D-T03",
+      "implementation_strategy": "objectdbx_hostless",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "inspect.brep.changed",
+      "family": "brep_solids",
+      "status": "catalogued",
+      "engine_tier": "objectdbx_capable",
+      "owner_ticket": "M08D-T03",
+      "implementation_strategy": "objectdbx_hostless",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "inspect.brep.from_entity",
+      "family": "brep_solids",
+      "status": "catalogued",
+      "engine_tier": "objectdbx_capable",
+      "owner_ticket": "M08D-T03",
+      "implementation_strategy": "objectdbx_hostless",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "inspect.brep.from_subentpath",
+      "family": "brep_solids",
+      "status": "catalogued",
+      "engine_tier": "objectdbx_capable",
+      "owner_ticket": "M08D-T03",
+      "implementation_strategy": "objectdbx_hostless",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "inspect.brep.owner",
+      "family": "brep_solids",
+      "status": "catalogued",
+      "engine_tier": "objectdbx_capable",
+      "owner_ticket": "M08D-T03",
+      "implementation_strategy": "objectdbx_hostless",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "inspect.brep.solid_roundtrip",
+      "family": "brep_solids",
+      "status": "catalogued",
+      "engine_tier": "objectdbx_capable",
+      "owner_ticket": "M08D-T03",
+      "implementation_strategy": "objectdbx_hostless",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "inspect.brep.validate",
+      "family": "brep_solids",
+      "status": "catalogued",
+      "engine_tier": "objectdbx_capable",
+      "owner_ticket": "M08D-T03",
+      "implementation_strategy": "objectdbx_hostless",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "inspect.brep.validation_level",
+      "family": "brep_solids",
+      "status": "catalogued",
+      "engine_tier": "objectdbx_capable",
+      "owner_ticket": "M08D-T03",
+      "implementation_strategy": "objectdbx_hostless",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "inspect.edge.curve",
+      "family": "brep_solids",
+      "status": "catalogued",
+      "engine_tier": "objectdbx_capable",
+      "owner_ticket": "M08D-T03",
+      "implementation_strategy": "objectdbx_hostless",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "inspect.edge.curve_as_nurb",
+      "family": "brep_solids",
+      "status": "catalogued",
+      "engine_tier": "objectdbx_capable",
+      "owner_ticket": "M08D-T03",
+      "implementation_strategy": "objectdbx_hostless",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "inspect.edge.curve_type",
+      "family": "brep_solids",
+      "status": "catalogued",
+      "engine_tier": "objectdbx_capable",
+      "owner_ticket": "M08D-T03",
+      "implementation_strategy": "objectdbx_hostless",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "inspect.edge.orientation",
+      "family": "brep_solids",
+      "status": "catalogued",
+      "engine_tier": "objectdbx_capable",
+      "owner_ticket": "M08D-T03",
+      "implementation_strategy": "objectdbx_hostless",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "inspect.edge.vertices",
+      "family": "brep_solids",
+      "status": "catalogued",
+      "engine_tier": "objectdbx_capable",
+      "owner_ticket": "M08D-T03",
+      "implementation_strategy": "objectdbx_hostless",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "inspect.face.area",
+      "family": "brep_solids",
+      "status": "catalogued",
+      "engine_tier": "objectdbx_capable",
+      "owner_ticket": "M08D-T03",
+      "implementation_strategy": "objectdbx_hostless",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "inspect.face.orientation",
+      "family": "brep_solids",
+      "status": "catalogued",
+      "engine_tier": "objectdbx_capable",
+      "owner_ticket": "M08D-T03",
+      "implementation_strategy": "objectdbx_hostless",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "inspect.face.shell",
+      "family": "brep_solids",
+      "status": "catalogued",
+      "engine_tier": "objectdbx_capable",
+      "owner_ticket": "M08D-T03",
+      "implementation_strategy": "objectdbx_hostless",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "inspect.face.surface",
+      "family": "brep_solids",
+      "status": "catalogued",
+      "engine_tier": "objectdbx_capable",
+      "owner_ticket": "M08D-T03",
+      "implementation_strategy": "objectdbx_hostless",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "inspect.face.surface_as_nurb",
+      "family": "brep_solids",
+      "status": "catalogued",
+      "engine_tier": "objectdbx_capable",
+      "owner_ticket": "M08D-T03",
+      "implementation_strategy": "objectdbx_hostless",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "inspect.face.surface_as_trimmed_nurbs",
+      "family": "brep_solids",
+      "status": "catalogued",
+      "engine_tier": "objectdbx_capable",
+      "owner_ticket": "M08D-T03",
+      "implementation_strategy": "objectdbx_hostless",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "inspect.face.surface_type",
+      "family": "brep_solids",
+      "status": "catalogued",
+      "engine_tier": "objectdbx_capable",
+      "owner_ticket": "M08D-T03",
+      "implementation_strategy": "objectdbx_hostless",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "inspect.loop.face",
+      "family": "brep_solids",
+      "status": "catalogued",
+      "engine_tier": "objectdbx_capable",
+      "owner_ticket": "M08D-T03",
+      "implementation_strategy": "objectdbx_hostless",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "inspect.loop.type",
+      "family": "brep_solids",
+      "status": "catalogued",
+      "engine_tier": "objectdbx_capable",
+      "owner_ticket": "M08D-T03",
+      "implementation_strategy": "objectdbx_hostless",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "inspect.shell.complex",
+      "family": "brep_solids",
+      "status": "catalogued",
+      "engine_tier": "objectdbx_capable",
+      "owner_ticket": "M08D-T03",
+      "implementation_strategy": "objectdbx_hostless",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "inspect.shell.type",
+      "family": "brep_solids",
+      "status": "catalogued",
+      "engine_tier": "objectdbx_capable",
+      "owner_ticket": "M08D-T03",
+      "implementation_strategy": "objectdbx_hostless",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "inspect.subentity.class_id",
+      "family": "brep_solids",
+      "status": "catalogued",
+      "engine_tier": "native_arx_only",
+      "owner_ticket": "M08D-T03",
+      "implementation_strategy": "native_arx_cpp",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "inspect.subentity.color",
+      "family": "brep_solids",
+      "status": "catalogued",
+      "engine_tier": "native_arx_only",
+      "owner_ticket": "M08D-T03",
+      "implementation_strategy": "native_arx_cpp",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "inspect.subentity.geom_extents",
+      "family": "brep_solids",
+      "status": "catalogued",
+      "engine_tier": "native_arx_only",
+      "owner_ticket": "M08D-T03",
+      "implementation_strategy": "native_arx_cpp",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "inspect.subentity.markers_at_path",
+      "family": "brep_solids",
+      "status": "catalogued",
+      "engine_tier": "native_arx_only",
+      "owner_ticket": "M08D-T03",
+      "implementation_strategy": "native_arx_cpp",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "inspect.subentity.path_at_marker",
+      "family": "brep_solids",
+      "status": "catalogued",
+      "engine_tier": "native_arx_only",
+      "owner_ticket": "M08D-T03",
+      "implementation_strategy": "native_arx_cpp",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "inspect.subentity.ptr",
+      "family": "brep_solids",
+      "status": "catalogued",
+      "engine_tier": "native_arx_only",
+      "owner_ticket": "M08D-T03",
+      "implementation_strategy": "native_arx_cpp",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "inspect.vertex.point",
+      "family": "brep_solids",
+      "status": "catalogued",
+      "engine_tier": "objectdbx_capable",
+      "owner_ticket": "M08D-T03",
+      "implementation_strategy": "objectdbx_hostless",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "traverse.brep.complexes",
+      "family": "brep_solids",
+      "status": "catalogued",
+      "engine_tier": "objectdbx_capable",
+      "owner_ticket": "M08D-T03",
+      "implementation_strategy": "objectdbx_hostless",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "traverse.brep.edges",
+      "family": "brep_solids",
+      "status": "catalogued",
+      "engine_tier": "objectdbx_capable",
+      "owner_ticket": "M08D-T03",
+      "implementation_strategy": "objectdbx_hostless",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "traverse.brep.faces",
+      "family": "brep_solids",
+      "status": "catalogued",
+      "engine_tier": "objectdbx_capable",
+      "owner_ticket": "M08D-T03",
+      "implementation_strategy": "objectdbx_hostless",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "traverse.brep.shells",
+      "family": "brep_solids",
+      "status": "catalogued",
+      "engine_tier": "objectdbx_capable",
+      "owner_ticket": "M08D-T03",
+      "implementation_strategy": "objectdbx_hostless",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "traverse.brep.vertices",
+      "family": "brep_solids",
+      "status": "catalogued",
+      "engine_tier": "objectdbx_capable",
+      "owner_ticket": "M08D-T03",
+      "implementation_strategy": "objectdbx_hostless",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "traverse.complex.shells",
+      "family": "brep_solids",
+      "status": "catalogued",
+      "engine_tier": "objectdbx_capable",
+      "owner_ticket": "M08D-T03",
+      "implementation_strategy": "objectdbx_hostless",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "traverse.edge.loops",
+      "family": "brep_solids",
+      "status": "catalogued",
+      "engine_tier": "objectdbx_capable",
+      "owner_ticket": "M08D-T03",
+      "implementation_strategy": "objectdbx_hostless",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "traverse.face.loops",
+      "family": "brep_solids",
+      "status": "catalogued",
+      "engine_tier": "objectdbx_capable",
+      "owner_ticket": "M08D-T03",
+      "implementation_strategy": "objectdbx_hostless",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "traverse.loop.edges",
+      "family": "brep_solids",
+      "status": "catalogued",
+      "engine_tier": "objectdbx_capable",
+      "owner_ticket": "M08D-T03",
+      "implementation_strategy": "objectdbx_hostless",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "traverse.loop.vertices",
+      "family": "brep_solids",
+      "status": "catalogued",
+      "engine_tier": "objectdbx_capable",
+      "owner_ticket": "M08D-T03",
+      "implementation_strategy": "objectdbx_hostless",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "traverse.shell.faces",
+      "family": "brep_solids",
+      "status": "catalogued",
+      "engine_tier": "objectdbx_capable",
+      "owner_ticket": "M08D-T03",
+      "implementation_strategy": "objectdbx_hostless",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "traverse.vertex.edges",
+      "family": "brep_solids",
+      "status": "catalogued",
+      "engine_tier": "objectdbx_capable",
+      "owner_ticket": "M08D-T03",
+      "implementation_strategy": "objectdbx_hostless",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "traverse.vertex.loops",
+      "family": "brep_solids",
+      "status": "catalogued",
+      "engine_tier": "objectdbx_capable",
+      "owner_ticket": "M08D-T03",
+      "implementation_strategy": "objectdbx_hostless",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "ui.subentity.highlight",
+      "family": "brep_solids",
+      "status": "catalogued",
+      "engine_tier": "native_arx_only",
+      "owner_ticket": "M08D-T03",
+      "implementation_strategy": "native_arx_cpp",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "automate.com.bridge_objectid",
+      "family": "com_activex",
+      "status": "catalogued",
+      "engine_tier": "objectdbx_capable",
+      "owner_ticket": "M08O-T01",
+      "implementation_strategy": "objectdbx_hostless",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "automate.com.entity_helpers",
+      "family": "com_activex",
+      "status": "catalogued",
+      "engine_tier": "native_arx_only",
+      "owner_ticket": "M08O-T01",
+      "implementation_strategy": "native_arx_cpp",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "automate.com.get_app",
+      "family": "com_activex",
+      "status": "catalogued",
+      "engine_tier": "managed_also",
+      "owner_ticket": "M08O-T01",
+      "implementation_strategy": "managed_dotnet",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "automate.com.get_document",
+      "family": "com_activex",
+      "status": "catalogued",
+      "engine_tier": "managed_also",
+      "owner_ticket": "M08O-T01",
+      "implementation_strategy": "managed_dotnet",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "automate.com.get_for_command",
+      "family": "com_activex",
+      "status": "catalogued",
+      "engine_tier": "native_arx_only",
+      "owner_ticket": "M08O-T01",
+      "implementation_strategy": "native_arx_cpp",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "automate.com.get_winapp",
+      "family": "com_activex",
+      "status": "catalogued",
+      "engine_tier": "native_arx_only",
+      "owner_ticket": "M08O-T01",
+      "implementation_strategy": "native_arx_cpp",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "automate.com.hold_objectref",
+      "family": "com_activex",
+      "status": "catalogued",
+      "engine_tier": "native_arx_only",
+      "owner_ticket": "M08O-T01",
+      "implementation_strategy": "native_arx_cpp",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "automate.com.lock_document",
+      "family": "com_activex",
+      "status": "catalogued",
+      "engine_tier": "native_arx_only",
+      "owner_ticket": "M08O-T01",
+      "implementation_strategy": "native_arx_cpp",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "automate.com.objectid_from_iunknown",
+      "family": "com_activex",
+      "status": "catalogued",
+      "engine_tier": "native_arx_only",
+      "owner_ticket": "M08O-T01",
+      "implementation_strategy": "native_arx_cpp",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "automate.com.send_command",
+      "family": "com_activex",
+      "status": "catalogued",
+      "engine_tier": "managed_also",
+      "owner_ticket": "M08O-T01",
+      "implementation_strategy": "managed_dotnet",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "automate.com.wrapper_for_object",
+      "family": "com_activex",
+      "status": "catalogued",
+      "engine_tier": "native_arx_only",
+      "owner_ticket": "M08O-T01",
+      "implementation_strategy": "native_arx_cpp",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "automate.property.set",
+      "family": "com_activex",
+      "status": "catalogued",
+      "engine_tier": "objectdbx_capable",
+      "owner_ticket": "M08M-T01",
+      "implementation_strategy": "objectdbx_hostless",
+      "evidence_required": "unit_test+staged_diff_fixture_original_unchanged",
+      "risk_class": "staged_write"
+    },
+    {
+      "operation": "embed.ole.frame",
+      "family": "com_activex",
+      "status": "catalogued",
+      "engine_tier": "native_arx_only",
+      "owner_ticket": "M08O-T01",
+      "implementation_strategy": "native_arx_cpp",
+      "evidence_required": "attended_live_pump_session_log",
+      "risk_class": "live_edit"
+    },
+    {
+      "operation": "extend.members.facet_provider",
+      "family": "com_activex",
+      "status": "catalogued",
+      "engine_tier": "native_arx_only",
+      "owner_ticket": "M08O-T01",
+      "implementation_strategy": "native_arx_cpp",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "extend.opm.define_property",
+      "family": "com_activex",
+      "status": "catalogued",
+      "engine_tier": "native_arx_only",
+      "owner_ticket": "M08M-T01",
+      "implementation_strategy": "native_arx_cpp",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "extend.opm.define_property2",
+      "family": "com_activex",
+      "status": "catalogued",
+      "engine_tier": "native_arx_only",
+      "owner_ticket": "M08M-T01",
+      "implementation_strategy": "native_arx_cpp",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "extend.opm.dialog_property",
+      "family": "com_activex",
+      "status": "catalogued",
+      "engine_tier": "native_arx_only",
+      "owner_ticket": "M08M-T01",
+      "implementation_strategy": "native_arx_cpp",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "extend.opm.enum_property",
+      "family": "com_activex",
+      "status": "catalogued",
+      "engine_tier": "native_arx_only",
+      "owner_ticket": "M08M-T01",
+      "implementation_strategy": "native_arx_cpp",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "extend.opm.get_dispid",
+      "family": "com_activex",
+      "status": "catalogued",
+      "engine_tier": "native_arx_only",
+      "owner_ticket": "M08M-T01",
+      "implementation_strategy": "native_arx_cpp",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "extend.opm.get_manager",
+      "family": "com_activex",
+      "status": "catalogued",
+      "engine_tier": "native_arx_only",
+      "owner_ticket": "M08M-T01",
+      "implementation_strategy": "native_arx_cpp",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "extend.opm.map_category",
+      "family": "com_activex",
+      "status": "catalogued",
+      "engine_tier": "native_arx_only",
+      "owner_ticket": "M08M-T01",
+      "implementation_strategy": "native_arx_cpp",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "extend.opm.per_instance_source",
+      "family": "com_activex",
+      "status": "catalogued",
+      "engine_tier": "native_arx_only",
+      "owner_ticket": "M08M-T01",
+      "implementation_strategy": "native_arx_cpp",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "extend.opm.property_expander",
+      "family": "com_activex",
+      "status": "catalogued",
+      "engine_tier": "native_arx_only",
+      "owner_ticket": "M08M-T01",
+      "implementation_strategy": "native_arx_cpp",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "extend.opm.property_expression",
+      "family": "com_activex",
+      "status": "catalogued",
+      "engine_tier": "native_arx_only",
+      "owner_ticket": "M08M-T01",
+      "implementation_strategy": "native_arx_cpp",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "extend.opm.property_extension",
+      "family": "com_activex",
+      "status": "catalogued",
+      "engine_tier": "native_arx_only",
+      "owner_ticket": "M08M-T01",
+      "implementation_strategy": "native_arx_cpp",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "extend.opm.register_provider",
+      "family": "com_activex",
+      "status": "catalogued",
+      "engine_tier": "native_arx_only",
+      "owner_ticket": "M08M-T01",
+      "implementation_strategy": "native_arx_cpp",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "extend.property.category",
+      "family": "com_activex",
+      "status": "catalogued",
+      "engine_tier": "native_arx_only",
+      "owner_ticket": "M08M-T01",
+      "implementation_strategy": "native_arx_cpp",
+      "evidence_required": "attended_live_pump_session_log",
+      "risk_class": "live_edit"
+    },
+    {
+      "operation": "extend.property.com_name",
+      "family": "com_activex",
+      "status": "catalogued",
+      "engine_tier": "native_arx_only",
+      "owner_ticket": "M08M-T01",
+      "implementation_strategy": "native_arx_cpp",
+      "evidence_required": "attended_live_pump_session_log",
+      "risk_class": "live_edit"
+    },
+    {
+      "operation": "extend.property.default_value",
+      "family": "com_activex",
+      "status": "catalogued",
+      "engine_tier": "native_arx_only",
+      "owner_ticket": "M08M-T01",
+      "implementation_strategy": "native_arx_cpp",
+      "evidence_required": "attended_live_pump_session_log",
+      "risk_class": "live_edit"
+    },
+    {
+      "operation": "extend.property.define",
+      "family": "com_activex",
+      "status": "catalogued",
+      "engine_tier": "native_arx_only",
+      "owner_ticket": "M08M-T01",
+      "implementation_strategy": "native_arx_cpp",
+      "evidence_required": "attended_live_pump_session_log",
+      "risk_class": "live_edit"
+    },
+    {
+      "operation": "extend.property.define_collection",
+      "family": "com_activex",
+      "status": "catalogued",
+      "engine_tier": "native_arx_only",
+      "owner_ticket": "M08M-T01",
+      "implementation_strategy": "native_arx_cpp",
+      "evidence_required": "attended_live_pump_session_log",
+      "risk_class": "live_edit"
+    },
+    {
+      "operation": "extend.property.define_dictionary",
+      "family": "com_activex",
+      "status": "catalogued",
+      "engine_tier": "native_arx_only",
+      "owner_ticket": "M08M-T01",
+      "implementation_strategy": "native_arx_cpp",
+      "evidence_required": "attended_live_pump_session_log",
+      "risk_class": "live_edit"
+    },
+    {
+      "operation": "extend.property.define_indexed",
+      "family": "com_activex",
+      "status": "catalogued",
+      "engine_tier": "native_arx_only",
+      "owner_ticket": "M08M-T01",
+      "implementation_strategy": "native_arx_cpp",
+      "evidence_required": "attended_live_pump_session_log",
+      "risk_class": "live_edit"
+    },
+    {
+      "operation": "extend.property.describe",
+      "family": "com_activex",
+      "status": "catalogued",
+      "engine_tier": "native_arx_only",
+      "owner_ticket": "M08M-T01",
+      "implementation_strategy": "native_arx_cpp",
+      "evidence_required": "attended_live_pump_session_log",
+      "risk_class": "live_edit"
+    },
+    {
+      "operation": "extend.property.display_as",
+      "family": "com_activex",
+      "status": "catalogued",
+      "engine_tier": "native_arx_only",
+      "owner_ticket": "M08M-T01",
+      "implementation_strategy": "native_arx_cpp",
+      "evidence_required": "attended_live_pump_session_log",
+      "risk_class": "live_edit"
+    },
+    {
+      "operation": "extend.property.enum_tag",
+      "family": "com_activex",
+      "status": "catalogued",
+      "engine_tier": "native_arx_only",
+      "owner_ticket": "M08M-T01",
+      "implementation_strategy": "native_arx_cpp",
+      "evidence_required": "attended_live_pump_session_log",
+      "risk_class": "live_edit"
+    },
+    {
+      "operation": "extend.property.expose_to_com",
+      "family": "com_activex",
+      "status": "catalogued",
+      "engine_tier": "native_arx_only",
+      "owner_ticket": "M08M-T01",
+      "implementation_strategy": "native_arx_cpp",
+      "evidence_required": "attended_live_pump_session_log",
+      "risk_class": "live_edit"
+    },
+    {
+      "operation": "extend.property.filepath",
+      "family": "com_activex",
+      "status": "catalogued",
+      "engine_tier": "native_arx_only",
+      "owner_ticket": "M08M-T01",
+      "implementation_strategy": "native_arx_cpp",
+      "evidence_required": "attended_live_pump_session_log",
+      "risk_class": "live_edit"
+    },
+    {
+      "operation": "extend.property.flags",
+      "family": "com_activex",
+      "status": "catalogued",
+      "engine_tier": "native_arx_only",
+      "owner_ticket": "M08M-T01",
+      "implementation_strategy": "native_arx_cpp",
+      "evidence_required": "attended_live_pump_session_log",
+      "risk_class": "live_edit"
+    },
+    {
+      "operation": "extend.property.localize_name",
+      "family": "com_activex",
+      "status": "catalogued",
+      "engine_tier": "native_arx_only",
+      "owner_ticket": "M08M-T01",
+      "implementation_strategy": "native_arx_cpp",
+      "evidence_required": "attended_live_pump_session_log",
+      "risk_class": "live_edit"
+    },
+    {
+      "operation": "extend.property.overrule",
+      "family": "com_activex",
+      "status": "catalogued",
+      "engine_tier": "native_arx_only",
+      "owner_ticket": "M08M-T01",
+      "implementation_strategy": "native_arx_cpp",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "extend.property.refers_to",
+      "family": "com_activex",
+      "status": "catalogued",
+      "engine_tier": "native_arx_only",
+      "owner_ticket": "M08M-T01",
+      "implementation_strategy": "native_arx_cpp",
+      "evidence_required": "attended_live_pump_session_log",
+      "risk_class": "live_edit"
+    },
+    {
+      "operation": "extend.property.units",
+      "family": "com_activex",
+      "status": "catalogued",
+      "engine_tier": "native_arx_only",
+      "owner_ticket": "M08M-T01",
+      "implementation_strategy": "native_arx_cpp",
+      "evidence_required": "attended_live_pump_session_log",
+      "risk_class": "live_edit"
+    },
+    {
+      "operation": "inspect.entity.properties",
+      "family": "com_activex",
+      "status": "catalogued",
+      "engine_tier": "objectdbx_capable",
+      "owner_ticket": "M08O-T01",
+      "implementation_strategy": "objectdbx_hostless",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "inspect.members.promoted",
+      "family": "com_activex",
+      "status": "catalogued",
+      "engine_tier": "objectdbx_capable",
+      "owner_ticket": "M08O-T01",
+      "implementation_strategy": "objectdbx_hostless",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "inspect.property.by_name",
+      "family": "com_activex",
+      "status": "catalogued",
+      "engine_tier": "objectdbx_capable",
+      "owner_ticket": "M08M-T01",
+      "implementation_strategy": "objectdbx_hostless",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "inspect.property.is_readonly",
+      "family": "com_activex",
+      "status": "catalogued",
+      "engine_tier": "objectdbx_capable",
+      "owner_ticket": "M08M-T01",
+      "implementation_strategy": "objectdbx_hostless",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "inspect.property.metadata",
+      "family": "com_activex",
+      "status": "catalogued",
+      "engine_tier": "objectdbx_capable",
+      "owner_ticket": "M08M-T01",
+      "implementation_strategy": "objectdbx_hostless",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "inspect.value.to_string",
+      "family": "com_activex",
+      "status": "catalogued",
+      "engine_tier": "objectdbx_capable",
+      "owner_ticket": "M08O-T01",
+      "implementation_strategy": "objectdbx_hostless",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "config.assoceval.callback",
+      "family": "constraints_associativity",
+      "status": "catalogued",
+      "engine_tier": "native_arx_only",
+      "owner_ticket": "M08K-T03",
+      "implementation_strategy": "native_arx_cpp",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "config.assocmanager.evalDisabler",
+      "family": "constraints_associativity",
+      "status": "catalogued",
+      "engine_tier": "objectdbx_capable",
+      "owner_ticket": "M08K-T03",
+      "implementation_strategy": "objectdbx_hostless",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "config.constraint.globalCallback",
+      "family": "constraints_associativity",
+      "status": "catalogued",
+      "engine_tier": "native_arx_only",
+      "owner_ticket": "M08K-T03",
+      "implementation_strategy": "native_arx_cpp",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "define.assocaction.addDependency",
+      "family": "constraints_associativity",
+      "status": "catalogued",
+      "engine_tier": "objectdbx_capable",
+      "owner_ticket": "M08K-T03",
+      "implementation_strategy": "objectdbx_hostless",
+      "evidence_required": "unit_test+staged_diff_fixture_original_unchanged",
+      "risk_class": "staged_write"
+    },
+    {
+      "operation": "define.assocaction.create",
+      "family": "constraints_associativity",
+      "status": "catalogued",
+      "engine_tier": "objectdbx_capable",
+      "owner_ticket": "M08K-T03",
+      "implementation_strategy": "objectdbx_hostless",
+      "evidence_required": "unit_test+staged_diff_fixture_original_unchanged",
+      "risk_class": "staged_write"
+    },
+    {
+      "operation": "define.assocaction.valueParam",
+      "family": "constraints_associativity",
+      "status": "catalogued",
+      "engine_tier": "objectdbx_capable",
+      "owner_ticket": "M08K-T03",
+      "implementation_strategy": "objectdbx_hostless",
+      "evidence_required": "unit_test+staged_diff_fixture_original_unchanged",
+      "risk_class": "staged_write"
+    },
+    {
+      "operation": "define.assocarray.create",
+      "family": "constraints_associativity",
+      "status": "catalogued",
+      "engine_tier": "objectdbx_capable",
+      "owner_ticket": "M08K-T03",
+      "implementation_strategy": "objectdbx_hostless",
+      "evidence_required": "unit_test+staged_diff_fixture_original_unchanged",
+      "risk_class": "staged_write"
+    },
+    {
+      "operation": "define.assocarray.path",
+      "family": "constraints_associativity",
+      "status": "catalogued",
+      "engine_tier": "objectdbx_capable",
+      "owner_ticket": "M08K-T03",
+      "implementation_strategy": "objectdbx_hostless",
+      "evidence_required": "unit_test+staged_diff_fixture_original_unchanged",
+      "risk_class": "staged_write"
+    },
+    {
+      "operation": "define.assocarray.polar",
+      "family": "constraints_associativity",
+      "status": "catalogued",
+      "engine_tier": "objectdbx_capable",
+      "owner_ticket": "M08K-T03",
+      "implementation_strategy": "objectdbx_hostless",
+      "evidence_required": "unit_test+staged_diff_fixture_original_unchanged",
+      "risk_class": "staged_write"
+    },
+    {
+      "operation": "define.assocarray.rectangular",
+      "family": "constraints_associativity",
+      "status": "catalogued",
+      "engine_tier": "objectdbx_capable",
+      "owner_ticket": "M08K-T03",
+      "implementation_strategy": "objectdbx_hostless",
+      "evidence_required": "unit_test+staged_diff_fixture_original_unchanged",
+      "risk_class": "staged_write"
+    },
+    {
+      "operation": "define.assocdependency.attach",
+      "family": "constraints_associativity",
+      "status": "catalogued",
+      "engine_tier": "objectdbx_capable",
+      "owner_ticket": "M08K-T03",
+      "implementation_strategy": "objectdbx_hostless",
+      "evidence_required": "unit_test+staged_diff_fixture_original_unchanged",
+      "risk_class": "staged_write"
+    },
+    {
+      "operation": "define.assocgeomdependency.subent",
+      "family": "constraints_associativity",
+      "status": "catalogued",
+      "engine_tier": "objectdbx_capable",
+      "owner_ticket": "M08K-T03",
+      "implementation_strategy": "objectdbx_hostless",
+      "evidence_required": "unit_test+staged_diff_fixture_original_unchanged",
+      "risk_class": "staged_write"
+    },
+    {
+      "operation": "define.assocnetwork.addAction",
+      "family": "constraints_associativity",
+      "status": "catalogued",
+      "engine_tier": "objectdbx_capable",
+      "owner_ticket": "M08K-T03",
+      "implementation_strategy": "objectdbx_hostless",
+      "evidence_required": "unit_test+staged_diff_fixture_original_unchanged",
+      "risk_class": "staged_write"
+    },
+    {
+      "operation": "define.assocsurface.blend",
+      "family": "constraints_associativity",
+      "status": "catalogued",
+      "engine_tier": "native_arx_only",
+      "owner_ticket": "M08K-T03",
+      "implementation_strategy": "native_arx_cpp",
+      "evidence_required": "attended_live_pump_session_log",
+      "risk_class": "live_edit"
+    },
+    {
+      "operation": "define.assocsurface.extrude",
+      "family": "constraints_associativity",
+      "status": "catalogued",
+      "engine_tier": "native_arx_only",
+      "owner_ticket": "M08K-T03",
+      "implementation_strategy": "native_arx_cpp",
+      "evidence_required": "attended_live_pump_session_log",
+      "risk_class": "live_edit"
+    },
+    {
+      "operation": "define.assocsurface.fillet",
+      "family": "constraints_associativity",
+      "status": "catalogued",
+      "engine_tier": "native_arx_only",
+      "owner_ticket": "M08K-T03",
+      "implementation_strategy": "native_arx_cpp",
+      "evidence_required": "attended_live_pump_session_log",
+      "risk_class": "live_edit"
+    },
+    {
+      "operation": "define.assocsurface.loft",
+      "family": "constraints_associativity",
+      "status": "catalogued",
+      "engine_tier": "native_arx_only",
+      "owner_ticket": "M08K-T03",
+      "implementation_strategy": "native_arx_cpp",
+      "evidence_required": "attended_live_pump_session_log",
+      "risk_class": "live_edit"
+    },
+    {
+      "operation": "define.assocsurface.offset",
+      "family": "constraints_associativity",
+      "status": "catalogued",
+      "engine_tier": "native_arx_only",
+      "owner_ticket": "M08K-T03",
+      "implementation_strategy": "native_arx_cpp",
+      "evidence_required": "attended_live_pump_session_log",
+      "risk_class": "live_edit"
+    },
+    {
+      "operation": "define.assocsurface.patch",
+      "family": "constraints_associativity",
+      "status": "catalogued",
+      "engine_tier": "native_arx_only",
+      "owner_ticket": "M08K-T03",
+      "implementation_strategy": "native_arx_cpp",
+      "evidence_required": "attended_live_pump_session_log",
+      "risk_class": "live_edit"
+    },
+    {
+      "operation": "define.assocsurface.result",
+      "family": "constraints_associativity",
+      "status": "catalogued",
+      "engine_tier": "native_arx_only",
+      "owner_ticket": "M08K-T03",
+      "implementation_strategy": "native_arx_cpp",
+      "evidence_required": "attended_live_pump_session_log",
+      "risk_class": "live_edit"
+    },
+    {
+      "operation": "define.assocsurface.trim",
+      "family": "constraints_associativity",
+      "status": "catalogued",
+      "engine_tier": "native_arx_only",
+      "owner_ticket": "M08K-T03",
+      "implementation_strategy": "native_arx_cpp",
+      "evidence_required": "attended_live_pump_session_log",
+      "risk_class": "live_edit"
+    },
+    {
+      "operation": "define.assocvaluedependency.value",
+      "family": "constraints_associativity",
+      "status": "catalogued",
+      "engine_tier": "objectdbx_capable",
+      "owner_ticket": "M08K-T03",
+      "implementation_strategy": "objectdbx_hostless",
+      "evidence_required": "unit_test+staged_diff_fixture_original_unchanged",
+      "risk_class": "staged_write"
+    },
+    {
+      "operation": "define.constraint.addGeometry",
+      "family": "constraints_associativity",
+      "status": "catalogued",
+      "engine_tier": "objectdbx_capable",
+      "owner_ticket": "M08K-T03",
+      "implementation_strategy": "objectdbx_hostless",
+      "evidence_required": "unit_test+staged_diff_fixture_original_unchanged",
+      "risk_class": "staged_write"
+    },
+    {
+      "operation": "define.constraint.autoConstrain",
+      "family": "constraints_associativity",
+      "status": "catalogued",
+      "engine_tier": "native_arx_only",
+      "owner_ticket": "M08K-T03",
+      "implementation_strategy": "native_arx_cpp",
+      "evidence_required": "attended_live_pump_session_log",
+      "risk_class": "live_edit"
+    },
+    {
+      "operation": "define.constraint.dimensional.angle",
+      "family": "constraints_associativity",
+      "status": "catalogued",
+      "engine_tier": "objectdbx_capable",
+      "owner_ticket": "M08K-T03",
+      "implementation_strategy": "objectdbx_hostless",
+      "evidence_required": "unit_test+staged_diff_fixture_original_unchanged",
+      "risk_class": "staged_write"
+    },
+    {
+      "operation": "define.constraint.dimensional.distance",
+      "family": "constraints_associativity",
+      "status": "catalogued",
+      "engine_tier": "objectdbx_capable",
+      "owner_ticket": "M08K-T03",
+      "implementation_strategy": "objectdbx_hostless",
+      "evidence_required": "unit_test+staged_diff_fixture_original_unchanged",
+      "risk_class": "staged_write"
+    },
+    {
+      "operation": "define.constraint.dimensional.radiusDiameter",
+      "family": "constraints_associativity",
+      "status": "catalogued",
+      "engine_tier": "objectdbx_capable",
+      "owner_ticket": "M08K-T03",
+      "implementation_strategy": "objectdbx_hostless",
+      "evidence_required": "unit_test+staged_diff_fixture_original_unchanged",
+      "risk_class": "staged_write"
+    },
+    {
+      "operation": "define.constraint.geometric",
+      "family": "constraints_associativity",
+      "status": "catalogued",
+      "engine_tier": "objectdbx_capable",
+      "owner_ticket": "M08K-T03",
+      "implementation_strategy": "objectdbx_hostless",
+      "evidence_required": "unit_test+staged_diff_fixture_original_unchanged",
+      "risk_class": "staged_write"
+    },
+    {
+      "operation": "define.constraint.group",
+      "family": "constraints_associativity",
+      "status": "catalogued",
+      "engine_tier": "objectdbx_capable",
+      "owner_ticket": "M08K-T03",
+      "implementation_strategy": "objectdbx_hostless",
+      "evidence_required": "unit_test+staged_diff_fixture_original_unchanged",
+      "risk_class": "staged_write"
+    },
+    {
+      "operation": "define.dimassoc.geometryDriven",
+      "family": "constraints_associativity",
+      "status": "catalogued",
+      "engine_tier": "native_arx_only",
+      "owner_ticket": "M08K-T03",
+      "implementation_strategy": "native_arx_cpp",
+      "evidence_required": "attended_live_pump_session_log",
+      "risk_class": "live_edit"
+    },
+    {
+      "operation": "define.georef.subent",
+      "family": "constraints_associativity",
+      "status": "catalogued",
+      "engine_tier": "objectdbx_capable",
+      "owner_ticket": "M08K-T03",
+      "implementation_strategy": "objectdbx_hostless",
+      "evidence_required": "unit_test+staged_diff_fixture_original_unchanged",
+      "risk_class": "staged_write"
+    },
+    {
+      "operation": "define.parameter.merge",
+      "family": "constraints_associativity",
+      "status": "catalogued",
+      "engine_tier": "objectdbx_capable",
+      "owner_ticket": "M08K-T03",
+      "implementation_strategy": "objectdbx_hostless",
+      "evidence_required": "unit_test+staged_diff_fixture_original_unchanged",
+      "risk_class": "staged_write"
+    },
+    {
+      "operation": "define.parameter.variable",
+      "family": "constraints_associativity",
+      "status": "catalogued",
+      "engine_tier": "objectdbx_capable",
+      "owner_ticket": "M08K-T03",
+      "implementation_strategy": "objectdbx_hostless",
+      "evidence_required": "unit_test+staged_diff_fixture_original_unchanged",
+      "risk_class": "staged_write"
+    },
+    {
+      "operation": "define.perssubentid.resolve",
+      "family": "constraints_associativity",
+      "status": "catalogued",
+      "engine_tier": "objectdbx_capable",
+      "owner_ticket": "M08K-T03",
+      "implementation_strategy": "objectdbx_hostless",
+      "evidence_required": "unit_test+staged_diff_fixture_original_unchanged",
+      "risk_class": "staged_write"
+    },
+    {
+      "operation": "edit.assocarray.explode",
+      "family": "constraints_associativity",
+      "status": "catalogued",
+      "engine_tier": "native_arx_only",
+      "owner_ticket": "M08K-T03",
+      "implementation_strategy": "native_arx_cpp",
+      "evidence_required": "attended_live_pump_session_log",
+      "risk_class": "live_edit"
+    },
+    {
+      "operation": "edit.assocarray.item",
+      "family": "constraints_associativity",
+      "status": "catalogued",
+      "engine_tier": "objectdbx_capable",
+      "owner_ticket": "M08K-T03",
+      "implementation_strategy": "objectdbx_hostless",
+      "evidence_required": "unit_test+staged_diff_fixture_original_unchanged",
+      "risk_class": "staged_write"
+    },
+    {
+      "operation": "edit.assocarray.itemReplace",
+      "family": "constraints_associativity",
+      "status": "catalogued",
+      "engine_tier": "objectdbx_capable",
+      "owner_ticket": "M08K-T03",
+      "implementation_strategy": "objectdbx_hostless",
+      "evidence_required": "unit_test+staged_diff_fixture_original_unchanged",
+      "risk_class": "staged_write"
+    },
+    {
+      "operation": "edit.assocarray.reset",
+      "family": "constraints_associativity",
+      "status": "catalogued",
+      "engine_tier": "objectdbx_capable",
+      "owner_ticket": "M08K-T03",
+      "implementation_strategy": "objectdbx_hostless",
+      "evidence_required": "unit_test+staged_diff_fixture_original_unchanged",
+      "risk_class": "staged_write"
+    },
+    {
+      "operation": "edit.assocarray.source",
+      "family": "constraints_associativity",
+      "status": "catalogued",
+      "engine_tier": "objectdbx_capable",
+      "owner_ticket": "M08K-T03",
+      "implementation_strategy": "objectdbx_hostless",
+      "evidence_required": "unit_test+staged_diff_fixture_original_unchanged",
+      "risk_class": "staged_write"
+    },
+    {
+      "operation": "edit.assocarray.transform",
+      "family": "constraints_associativity",
+      "status": "catalogued",
+      "engine_tier": "objectdbx_capable",
+      "owner_ticket": "M08K-T03",
+      "implementation_strategy": "objectdbx_hostless",
+      "evidence_required": "unit_test+staged_diff_fixture_original_unchanged",
+      "risk_class": "staged_write"
+    },
+    {
+      "operation": "edit.assocdata.xref",
+      "family": "constraints_associativity",
+      "status": "catalogued",
+      "engine_tier": "native_arx_only",
+      "owner_ticket": "M08K-T03",
+      "implementation_strategy": "native_arx_cpp",
+      "evidence_required": "attended_live_pump_session_log",
+      "risk_class": "live_edit"
+    },
+    {
+      "operation": "edit.assocnetwork.removeAction",
+      "family": "constraints_associativity",
+      "status": "catalogued",
+      "engine_tier": "objectdbx_capable",
+      "owner_ticket": "M08K-T03",
+      "implementation_strategy": "objectdbx_hostless",
+      "evidence_required": "unit_test+staged_diff_fixture_original_unchanged",
+      "risk_class": "staged_write"
+    },
+    {
+      "operation": "edit.constraint.delete",
+      "family": "constraints_associativity",
+      "status": "catalogued",
+      "engine_tier": "objectdbx_capable",
+      "owner_ticket": "M08K-T03",
+      "implementation_strategy": "objectdbx_hostless",
+      "evidence_required": "unit_test+staged_diff_fixture_original_unchanged",
+      "risk_class": "staged_write"
+    },
+    {
+      "operation": "inspect.assocaction.dependencies",
+      "family": "constraints_associativity",
+      "status": "catalogued",
+      "engine_tier": "objectdbx_capable",
+      "owner_ticket": "M08K-T03",
+      "implementation_strategy": "objectdbx_hostless",
+      "evidence_required": "unit_test+staged_diff_fixture_original_unchanged",
+      "risk_class": "staged_write"
+    },
+    {
+      "operation": "inspect.assocaction.evaluate",
+      "family": "constraints_associativity",
+      "status": "catalogued",
+      "engine_tier": "native_arx_only",
+      "owner_ticket": "M08K-T03",
+      "implementation_strategy": "native_arx_cpp",
+      "evidence_required": "attended_live_pump_session_log",
+      "risk_class": "live_edit"
+    },
+    {
+      "operation": "inspect.assocaction.requestToEvaluate",
+      "family": "constraints_associativity",
+      "status": "catalogued",
+      "engine_tier": "objectdbx_capable",
+      "owner_ticket": "M08K-T03",
+      "implementation_strategy": "objectdbx_hostless",
+      "evidence_required": "unit_test+staged_diff_fixture_original_unchanged",
+      "risk_class": "staged_write"
+    },
+    {
+      "operation": "inspect.assocarray.identify",
+      "family": "constraints_associativity",
+      "status": "catalogued",
+      "engine_tier": "objectdbx_capable",
+      "owner_ticket": "M08K-T03",
+      "implementation_strategy": "objectdbx_hostless",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "inspect.assocmanager.state",
+      "family": "constraints_associativity",
+      "status": "catalogued",
+      "engine_tier": "objectdbx_capable",
+      "owner_ticket": "M08K-T03",
+      "implementation_strategy": "objectdbx_hostless",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "inspect.assocnetwork.evaluate",
+      "family": "constraints_associativity",
+      "status": "catalogued",
+      "engine_tier": "native_arx_only",
+      "owner_ticket": "M08K-T03",
+      "implementation_strategy": "native_arx_cpp",
+      "evidence_required": "attended_live_pump_session_log",
+      "risk_class": "live_edit"
+    },
+    {
+      "operation": "inspect.assocnetwork.get",
+      "family": "constraints_associativity",
+      "status": "catalogued",
+      "engine_tier": "objectdbx_capable",
+      "owner_ticket": "M08K-T03",
+      "implementation_strategy": "objectdbx_hostless",
+      "evidence_required": "unit_test+staged_diff_fixture_original_unchanged",
+      "risk_class": "staged_write"
+    },
+    {
+      "operation": "inspect.assocnetwork.iterate",
+      "family": "constraints_associativity",
+      "status": "catalogued",
+      "engine_tier": "objectdbx_capable",
+      "owner_ticket": "M08K-T03",
+      "implementation_strategy": "objectdbx_hostless",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "inspect.assocsurface.topology",
+      "family": "constraints_associativity",
+      "status": "catalogued",
+      "engine_tier": "native_arx_only",
+      "owner_ticket": "M08K-T03",
+      "implementation_strategy": "native_arx_cpp",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "inspect.constraint.dimensional.value",
+      "family": "constraints_associativity",
+      "status": "catalogued",
+      "engine_tier": "objectdbx_capable",
+      "owner_ticket": "M08K-T03",
+      "implementation_strategy": "objectdbx_hostless",
+      "evidence_required": "unit_test+staged_diff_fixture_original_unchanged",
+      "risk_class": "staged_write"
+    },
+    {
+      "operation": "inspect.constraint.enumerate",
+      "family": "constraints_associativity",
+      "status": "catalogued",
+      "engine_tier": "objectdbx_capable",
+      "owner_ticket": "M08K-T03",
+      "implementation_strategy": "objectdbx_hostless",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "inspect.constraint.node",
+      "family": "constraints_associativity",
+      "status": "catalogued",
+      "engine_tier": "objectdbx_capable",
+      "owner_ticket": "M08K-T03",
+      "implementation_strategy": "objectdbx_hostless",
+      "evidence_required": "unit_test+staged_diff_fixture_original_unchanged",
+      "risk_class": "staged_write"
+    },
+    {
+      "operation": "inspect.constraint.status",
+      "family": "constraints_associativity",
+      "status": "catalogued",
+      "engine_tier": "native_arx_only",
+      "owner_ticket": "M08K-T03",
+      "implementation_strategy": "native_arx_cpp",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "inspect.parameter.evaluate",
+      "family": "constraints_associativity",
+      "status": "catalogued",
+      "engine_tier": "objectdbx_capable",
+      "owner_ticket": "M08K-T03",
+      "implementation_strategy": "objectdbx_hostless",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "repair.assocdata.audit",
+      "family": "constraints_associativity",
+      "status": "catalogued",
+      "engine_tier": "native_arx_only",
+      "owner_ticket": "M08K-T03",
+      "implementation_strategy": "native_arx_cpp",
+      "evidence_required": "attended_live_pump_session_log",
+      "risk_class": "live_edit"
+    },
+    {
+      "operation": "extend.customclass.declare",
+      "family": "custom_objects_protocols",
+      "status": "catalogued",
+      "engine_tier": "native_arx_only",
+      "owner_ticket": "M08K-T01",
+      "implementation_strategy": "native_arx_cpp",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "extend.customclass.define",
+      "family": "custom_objects_protocols",
+      "status": "catalogued",
+      "engine_tier": "native_arx_only",
+      "owner_ticket": "M08K-T01",
+      "implementation_strategy": "native_arx_cpp",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "extend.customclass.define_cons",
+      "family": "custom_objects_protocols",
+      "status": "catalogued",
+      "engine_tier": "native_arx_only",
+      "owner_ticket": "M08K-T01",
+      "implementation_strategy": "native_arx_cpp",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "extend.customclass.define_dxf",
+      "family": "custom_objects_protocols",
+      "status": "catalogued",
+      "engine_tier": "native_arx_only",
+      "owner_ticket": "M08K-T01",
+      "implementation_strategy": "native_arx_cpp",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "extend.customclass.define_nocons",
+      "family": "custom_objects_protocols",
+      "status": "catalogued",
+      "engine_tier": "native_arx_only",
+      "owner_ticket": "M08K-T01",
+      "implementation_strategy": "native_arx_cpp",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "extend.customclass.rxinit",
+      "family": "custom_objects_protocols",
+      "status": "catalogued",
+      "engine_tier": "native_arx_only",
+      "owner_ticket": "M08K-T01",
+      "implementation_strategy": "native_arx_cpp",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "extend.customclass.unregister",
+      "family": "custom_objects_protocols",
+      "status": "catalogued",
+      "engine_tier": "native_arx_only",
+      "owner_ticket": "M08K-T01",
+      "implementation_strategy": "native_arx_cpp",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "extend.customentity.db_defaults",
+      "family": "custom_objects_protocols",
+      "status": "catalogued",
+      "engine_tier": "native_arx_only",
+      "owner_ticket": "M08K-T01",
+      "implementation_strategy": "native_arx_cpp",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "extend.customentity.define",
+      "family": "custom_objects_protocols",
+      "status": "catalogued",
+      "engine_tier": "native_arx_only",
+      "owner_ticket": "M08K-T01",
+      "implementation_strategy": "native_arx_cpp",
+      "evidence_required": "attended_live_pump_session_log",
+      "risk_class": "live_edit"
+    },
+    {
+      "operation": "extend.customentity.draw_viewport",
+      "family": "custom_objects_protocols",
+      "status": "catalogued",
+      "engine_tier": "native_arx_only",
+      "owner_ticket": "M08K-T01",
+      "implementation_strategy": "native_arx_cpp",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "extend.customentity.draw_world",
+      "family": "custom_objects_protocols",
+      "status": "catalogued",
+      "engine_tier": "native_arx_only",
+      "owner_ticket": "M08K-T01",
+      "implementation_strategy": "native_arx_cpp",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "extend.customentity.explode",
+      "family": "custom_objects_protocols",
+      "status": "catalogued",
+      "engine_tier": "native_arx_only",
+      "owner_ticket": "M08K-T01",
+      "implementation_strategy": "native_arx_cpp",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "extend.customentity.geom_extents",
+      "family": "custom_objects_protocols",
+      "status": "catalogued",
+      "engine_tier": "native_arx_only",
+      "owner_ticket": "M08K-T01",
+      "implementation_strategy": "native_arx_cpp",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "extend.customentity.grips",
+      "family": "custom_objects_protocols",
+      "status": "catalogued",
+      "engine_tier": "native_arx_only",
+      "owner_ticket": "M08K-T01",
+      "implementation_strategy": "native_arx_cpp",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "extend.customentity.intersect",
+      "family": "custom_objects_protocols",
+      "status": "catalogued",
+      "engine_tier": "native_arx_only",
+      "owner_ticket": "M08K-T01",
+      "implementation_strategy": "native_arx_cpp",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "extend.customentity.list",
+      "family": "custom_objects_protocols",
+      "status": "catalogued",
+      "engine_tier": "native_arx_only",
+      "owner_ticket": "M08K-T01",
+      "implementation_strategy": "native_arx_cpp",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "extend.customentity.osnap",
+      "family": "custom_objects_protocols",
+      "status": "catalogued",
+      "engine_tier": "native_arx_only",
+      "owner_ticket": "M08K-T01",
+      "implementation_strategy": "native_arx_cpp",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "extend.customentity.stretch",
+      "family": "custom_objects_protocols",
+      "status": "catalogued",
+      "engine_tier": "native_arx_only",
+      "owner_ticket": "M08K-T01",
+      "implementation_strategy": "native_arx_cpp",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "extend.customentity.subentpaths",
+      "family": "custom_objects_protocols",
+      "status": "catalogued",
+      "engine_tier": "native_arx_only",
+      "owner_ticket": "M08K-T01",
+      "implementation_strategy": "native_arx_cpp",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "extend.customentity.transform",
+      "family": "custom_objects_protocols",
+      "status": "catalogued",
+      "engine_tier": "native_arx_only",
+      "owner_ticket": "M08K-T01",
+      "implementation_strategy": "native_arx_cpp",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "extend.customobject.deepclone",
+      "family": "custom_objects_protocols",
+      "status": "catalogued",
+      "engine_tier": "native_arx_only",
+      "owner_ticket": "M08K-T01",
+      "implementation_strategy": "native_arx_cpp",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "extend.customobject.define",
+      "family": "custom_objects_protocols",
+      "status": "catalogued",
+      "engine_tier": "native_arx_only",
+      "owner_ticket": "M08K-T01",
+      "implementation_strategy": "native_arx_cpp",
+      "evidence_required": "attended_live_pump_session_log",
+      "risk_class": "live_edit"
+    },
+    {
+      "operation": "extend.customobject.embedded",
+      "family": "custom_objects_protocols",
+      "status": "catalogued",
+      "engine_tier": "native_arx_only",
+      "owner_ticket": "M08K-T01",
+      "implementation_strategy": "native_arx_cpp",
+      "evidence_required": "attended_live_pump_session_log",
+      "risk_class": "live_edit"
+    },
+    {
+      "operation": "extend.customobject.filer_dwgin",
+      "family": "custom_objects_protocols",
+      "status": "catalogued",
+      "engine_tier": "objectdbx_capable",
+      "owner_ticket": "M08K-T01",
+      "implementation_strategy": "objectdbx_hostless",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "extend.customobject.filer_dwgout",
+      "family": "custom_objects_protocols",
+      "status": "catalogued",
+      "engine_tier": "objectdbx_capable",
+      "owner_ticket": "M08K-T01",
+      "implementation_strategy": "objectdbx_hostless",
+      "evidence_required": "unit_test+staged_diff_fixture_original_unchanged",
+      "risk_class": "staged_write"
+    },
+    {
+      "operation": "extend.customobject.filer_dxfin",
+      "family": "custom_objects_protocols",
+      "status": "catalogued",
+      "engine_tier": "objectdbx_capable",
+      "owner_ticket": "M08K-T01",
+      "implementation_strategy": "objectdbx_hostless",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "extend.customobject.filer_dxfout",
+      "family": "custom_objects_protocols",
+      "status": "catalogued",
+      "engine_tier": "objectdbx_capable",
+      "owner_ticket": "M08K-T01",
+      "implementation_strategy": "objectdbx_hostless",
+      "evidence_required": "unit_test+staged_diff_fixture_original_unchanged",
+      "risk_class": "staged_write"
+    },
+    {
+      "operation": "extend.customobject.partial_undo",
+      "family": "custom_objects_protocols",
+      "status": "catalogued",
+      "engine_tier": "native_arx_only",
+      "owner_ticket": "M08K-T01",
+      "implementation_strategy": "native_arx_cpp",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "extend.customobject.version",
+      "family": "custom_objects_protocols",
+      "status": "catalogued",
+      "engine_tier": "native_arx_only",
+      "owner_ticket": "M08K-T01",
+      "implementation_strategy": "native_arx_cpp",
+      "evidence_required": "attended_live_pump_session_log",
+      "risk_class": "live_edit"
+    },
+    {
+      "operation": "extend.customobject.wblockclone",
+      "family": "custom_objects_protocols",
+      "status": "catalogued",
+      "engine_tier": "native_arx_only",
+      "owner_ticket": "M08K-T01",
+      "implementation_strategy": "native_arx_cpp",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "extend.module.entrypoint",
+      "family": "custom_objects_protocols",
+      "status": "catalogued",
+      "engine_tier": "native_arx_only",
+      "owner_ticket": "M08K-T01",
+      "implementation_strategy": "native_arx_cpp",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "extend.object_enabler.build",
+      "family": "custom_objects_protocols",
+      "status": "catalogued",
+      "engine_tier": "objectdbx_capable",
+      "owner_ticket": "M08K-T01",
+      "implementation_strategy": "objectdbx_hostless",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "extend.object_enabler.demand_register",
+      "family": "custom_objects_protocols",
+      "status": "catalogued",
+      "engine_tier": "accoreconsole_lisp_also",
+      "owner_ticket": "M08K-T01",
+      "implementation_strategy": "accoreconsole_lisp",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "extend.object_enabler.register_classes",
+      "family": "custom_objects_protocols",
+      "status": "catalogued",
+      "engine_tier": "native_arx_only",
+      "owner_ticket": "M08K-T01",
+      "implementation_strategy": "native_arx_cpp",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "extend.osnap.custom_mode",
+      "family": "custom_objects_protocols",
+      "status": "catalogued",
+      "engine_tier": "native_arx_only",
+      "owner_ticket": "M08K-T01",
+      "implementation_strategy": "native_arx_cpp",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "extend.protocol.attach",
+      "family": "custom_objects_protocols",
+      "status": "catalogued",
+      "engine_tier": "native_arx_only",
+      "owner_ticket": "M08K-T01",
+      "implementation_strategy": "native_arx_cpp",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "extend.protocol.declare",
+      "family": "custom_objects_protocols",
+      "status": "catalogued",
+      "engine_tier": "native_arx_only",
+      "owner_ticket": "M08K-T01",
+      "implementation_strategy": "native_arx_cpp",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "extend.protocol.detach",
+      "family": "custom_objects_protocols",
+      "status": "catalogued",
+      "engine_tier": "native_arx_only",
+      "owner_ticket": "M08K-T01",
+      "implementation_strategy": "native_arx_cpp",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "extend.protocol.query",
+      "family": "custom_objects_protocols",
+      "status": "catalogued",
+      "engine_tier": "native_arx_only",
+      "owner_ticket": "M08K-T01",
+      "implementation_strategy": "native_arx_cpp",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "extend.service.register",
+      "family": "custom_objects_protocols",
+      "status": "catalogued",
+      "engine_tier": "native_arx_only",
+      "owner_ticket": "M08K-T01",
+      "implementation_strategy": "native_arx_cpp",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "inspect.proxy.detect",
+      "family": "custom_objects_protocols",
+      "status": "catalogued",
+      "engine_tier": "managed_also",
+      "owner_ticket": "M08K-T01",
+      "implementation_strategy": "managed_dotnet",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "inspect.runtime.cast",
+      "family": "custom_objects_protocols",
+      "status": "catalogued",
+      "engine_tier": "native_arx_only",
+      "owner_ticket": "M08K-T01",
+      "implementation_strategy": "native_arx_cpp",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "inspect.runtime.desc",
+      "family": "custom_objects_protocols",
+      "status": "catalogued",
+      "engine_tier": "native_arx_only",
+      "owner_ticket": "M08K-T01",
+      "implementation_strategy": "native_arx_cpp",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "inspect.runtime.isa",
+      "family": "custom_objects_protocols",
+      "status": "catalogued",
+      "engine_tier": "native_arx_only",
+      "owner_ticket": "M08K-T01",
+      "implementation_strategy": "native_arx_cpp",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "inspect.runtime.iskindof",
+      "family": "custom_objects_protocols",
+      "status": "catalogued",
+      "engine_tier": "native_arx_only",
+      "owner_ticket": "M08K-T01",
+      "implementation_strategy": "native_arx_cpp",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "overrule.applicable",
+      "family": "custom_objects_protocols",
+      "status": "catalogued",
+      "engine_tier": "managed_also",
+      "owner_ticket": "M08L-T02",
+      "implementation_strategy": "managed_dotnet",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "overrule.dimstyle.install",
+      "family": "custom_objects_protocols",
+      "status": "catalogued",
+      "engine_tier": "native_arx_only",
+      "owner_ticket": "M08L-T02",
+      "implementation_strategy": "native_arx_cpp",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "overrule.drawable.install",
+      "family": "custom_objects_protocols",
+      "status": "catalogued",
+      "engine_tier": "managed_also",
+      "owner_ticket": "M08L-T02",
+      "implementation_strategy": "managed_dotnet",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "overrule.geometry.install",
+      "family": "custom_objects_protocols",
+      "status": "catalogued",
+      "engine_tier": "managed_also",
+      "owner_ticket": "M08L-T02",
+      "implementation_strategy": "managed_dotnet",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "overrule.global.enable",
+      "family": "custom_objects_protocols",
+      "status": "catalogued",
+      "engine_tier": "managed_also",
+      "owner_ticket": "M08L-T02",
+      "implementation_strategy": "managed_dotnet",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "overrule.grip.install",
+      "family": "custom_objects_protocols",
+      "status": "catalogued",
+      "engine_tier": "managed_also",
+      "owner_ticket": "M08L-T02",
+      "implementation_strategy": "managed_dotnet",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "overrule.highlight.install",
+      "family": "custom_objects_protocols",
+      "status": "catalogued",
+      "engine_tier": "managed_also",
+      "owner_ticket": "M08L-T02",
+      "implementation_strategy": "managed_dotnet",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "overrule.highlightstate.install",
+      "family": "custom_objects_protocols",
+      "status": "catalogued",
+      "engine_tier": "managed_also",
+      "owner_ticket": "M08L-T02",
+      "implementation_strategy": "managed_dotnet",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "overrule.install",
+      "family": "custom_objects_protocols",
+      "status": "catalogued",
+      "engine_tier": "managed_also",
+      "owner_ticket": "M08L-T02",
+      "implementation_strategy": "managed_dotnet",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "overrule.object.install",
+      "family": "custom_objects_protocols",
+      "status": "catalogued",
+      "engine_tier": "native_arx_only",
+      "owner_ticket": "M08L-T02",
+      "implementation_strategy": "native_arx_cpp",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "overrule.osnap.install",
+      "family": "custom_objects_protocols",
+      "status": "catalogued",
+      "engine_tier": "managed_also",
+      "owner_ticket": "M08L-T02",
+      "implementation_strategy": "managed_dotnet",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "overrule.properties.install",
+      "family": "custom_objects_protocols",
+      "status": "catalogued",
+      "engine_tier": "managed_also",
+      "owner_ticket": "M08L-T02",
+      "implementation_strategy": "managed_dotnet",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "overrule.query.has",
+      "family": "custom_objects_protocols",
+      "status": "catalogued",
+      "engine_tier": "managed_also",
+      "owner_ticket": "M08L-T02",
+      "implementation_strategy": "managed_dotnet",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "overrule.queryx.install",
+      "family": "custom_objects_protocols",
+      "status": "catalogued",
+      "engine_tier": "native_arx_only",
+      "owner_ticket": "M08L-T02",
+      "implementation_strategy": "native_arx_cpp",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "overrule.remove",
+      "family": "custom_objects_protocols",
+      "status": "catalogued",
+      "engine_tier": "managed_also",
+      "owner_ticket": "M08L-T02",
+      "implementation_strategy": "managed_dotnet",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "overrule.subentity.install",
+      "family": "custom_objects_protocols",
+      "status": "catalogued",
+      "engine_tier": "managed_also",
+      "owner_ticket": "M08L-T02",
+      "implementation_strategy": "managed_dotnet",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "overrule.transform.install",
+      "family": "custom_objects_protocols",
+      "status": "catalogued",
+      "engine_tier": "managed_also",
+      "owner_ticket": "M08L-T02",
+      "implementation_strategy": "managed_dotnet",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "overrule.visibility.install",
+      "family": "custom_objects_protocols",
+      "status": "catalogued",
+      "engine_tier": "managed_also",
+      "owner_ticket": "M08L-T02",
+      "implementation_strategy": "managed_dotnet",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "command.queue.post",
+      "family": "editor_input",
+      "status": "catalogued",
+      "engine_tier": "native_arx_only",
+      "owner_ticket": "M08O-T02",
+      "implementation_strategy": "deprecated_raw_command",
+      "evidence_required": "contract_test_not_agent_exposed",
+      "risk_class": "raw_command"
+    },
+    {
+      "operation": "editor.react.events",
+      "family": "editor_input",
+      "status": "catalogued",
+      "engine_tier": "native_arx_only",
+      "owner_ticket": "M08N-T01",
+      "implementation_strategy": "native_arx_cpp",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "input.get.angle",
+      "family": "editor_input",
+      "status": "catalogued",
+      "engine_tier": "native_arx_only",
+      "owner_ticket": "M08N-T01",
+      "implementation_strategy": "native_arx_cpp",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "input.get.corner",
+      "family": "editor_input",
+      "status": "catalogued",
+      "engine_tier": "native_arx_only",
+      "owner_ticket": "M08N-T01",
+      "implementation_strategy": "native_arx_cpp",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "input.get.dist",
+      "family": "editor_input",
+      "status": "catalogued",
+      "engine_tier": "native_arx_only",
+      "owner_ticket": "M08N-T01",
+      "implementation_strategy": "native_arx_cpp",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "input.get.int",
+      "family": "editor_input",
+      "status": "catalogued",
+      "engine_tier": "accoreconsole_lisp_also",
+      "owner_ticket": "M08N-T01",
+      "implementation_strategy": "accoreconsole_lisp",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "input.get.keyword",
+      "family": "editor_input",
+      "status": "catalogued",
+      "engine_tier": "accoreconsole_lisp_also",
+      "owner_ticket": "M08N-T01",
+      "implementation_strategy": "accoreconsole_lisp",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "input.get.point",
+      "family": "editor_input",
+      "status": "catalogued",
+      "engine_tier": "native_arx_only",
+      "owner_ticket": "M08N-T01",
+      "implementation_strategy": "native_arx_cpp",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "input.get.real",
+      "family": "editor_input",
+      "status": "catalogued",
+      "engine_tier": "accoreconsole_lisp_also",
+      "owner_ticket": "M08N-T01",
+      "implementation_strategy": "accoreconsole_lisp",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "input.get.string",
+      "family": "editor_input",
+      "status": "catalogued",
+      "engine_tier": "accoreconsole_lisp_also",
+      "owner_ticket": "M08N-T01",
+      "implementation_strategy": "accoreconsole_lisp",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "input.initget.constrain",
+      "family": "editor_input",
+      "status": "catalogued",
+      "engine_tier": "accoreconsole_lisp_also",
+      "owner_ticket": "M08N-T01",
+      "implementation_strategy": "accoreconsole_lisp",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "interact.inputcontext.react",
+      "family": "editor_input",
+      "status": "catalogued",
+      "engine_tier": "native_arx_only",
+      "owner_ticket": "M08N-T01",
+      "implementation_strategy": "native_arx_cpp",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "interact.inputpoint.filter",
+      "family": "editor_input",
+      "status": "catalogued",
+      "engine_tier": "native_arx_only",
+      "owner_ticket": "M08N-T01",
+      "implementation_strategy": "native_arx_cpp",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "interact.inputpoint.monitor",
+      "family": "editor_input",
+      "status": "catalogued",
+      "engine_tier": "native_arx_only",
+      "owner_ticket": "M08N-T01",
+      "implementation_strategy": "native_arx_cpp",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "interact.jig.acquire",
+      "family": "editor_input",
+      "status": "catalogued",
+      "engine_tier": "native_arx_only",
+      "owner_ticket": "M08N-T01",
+      "implementation_strategy": "native_arx_cpp",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "interact.jig.run",
+      "family": "editor_input",
+      "status": "catalogued",
+      "engine_tier": "native_arx_only",
+      "owner_ticket": "M08N-T01",
+      "implementation_strategy": "native_arx_cpp",
+      "evidence_required": "attended_live_pump_session_log",
+      "risk_class": "live_edit"
+    },
+    {
+      "operation": "prompt.alert",
+      "family": "editor_input",
+      "status": "catalogued",
+      "engine_tier": "managed_also",
+      "owner_ticket": "M08N-T01",
+      "implementation_strategy": "managed_dotnet",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "prompt.print",
+      "family": "editor_input",
+      "status": "catalogued",
+      "engine_tier": "accoreconsole_lisp_also",
+      "owner_ticket": "M08N-T01",
+      "implementation_strategy": "accoreconsole_lisp",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "select.entity.pick",
+      "family": "editor_input",
+      "status": "catalogued",
+      "engine_tier": "accoreconsole_lisp_also",
+      "owner_ticket": "M08N-T02",
+      "implementation_strategy": "accoreconsole_lisp",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "select.nentity.pick",
+      "family": "editor_input",
+      "status": "catalogued",
+      "engine_tier": "native_arx_only",
+      "owner_ticket": "M08N-T02",
+      "implementation_strategy": "native_arx_cpp",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "select.pickfirst.get",
+      "family": "editor_input",
+      "status": "catalogued",
+      "engine_tier": "accoreconsole_lisp_also",
+      "owner_ticket": "M08N-T02",
+      "implementation_strategy": "accoreconsole_lisp",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "select.pickfirst.set",
+      "family": "editor_input",
+      "status": "catalogued",
+      "engine_tier": "accoreconsole_lisp_also",
+      "owner_ticket": "M08N-T02",
+      "implementation_strategy": "accoreconsole_lisp",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "select.ss.addremove",
+      "family": "editor_input",
+      "status": "catalogued",
+      "engine_tier": "managed_also",
+      "owner_ticket": "M08N-T02",
+      "implementation_strategy": "managed_dotnet",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "select.ss.count",
+      "family": "editor_input",
+      "status": "catalogued",
+      "engine_tier": "managed_also",
+      "owner_ticket": "M08N-T02",
+      "implementation_strategy": "managed_dotnet",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "select.ss.free",
+      "family": "editor_input",
+      "status": "catalogued",
+      "engine_tier": "managed_also",
+      "owner_ticket": "M08N-T02",
+      "implementation_strategy": "managed_dotnet",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "select.ssget.interactive",
+      "family": "editor_input",
+      "status": "catalogued",
+      "engine_tier": "accoreconsole_lisp_also",
+      "owner_ticket": "M08N-T02",
+      "implementation_strategy": "accoreconsole_lisp",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "select.ssget.preview",
+      "family": "editor_input",
+      "status": "catalogued",
+      "engine_tier": "native_arx_only",
+      "owner_ticket": "M08N-T02",
+      "implementation_strategy": "native_arx_cpp",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "inspect.curve.protocol",
+      "family": "entities",
+      "status": "catalogued",
+      "engine_tier": "objectdbx_capable",
+      "owner_ticket": "M08D-T02",
+      "implementation_strategy": "objectdbx_hostless",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "inspect.entity.common",
+      "family": "entities",
+      "status": "catalogued",
+      "engine_tier": "objectdbx_capable",
+      "owner_ticket": "M08D-T01",
+      "implementation_strategy": "objectdbx_hostless",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "inspect.entity.geomextents",
+      "family": "entities",
+      "status": "catalogued",
+      "engine_tier": "objectdbx_capable",
+      "owner_ticket": "M08D-T01",
+      "implementation_strategy": "objectdbx_hostless",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "inspect.entity.osnap",
+      "family": "entities",
+      "status": "catalogued",
+      "engine_tier": "objectdbx_capable",
+      "owner_ticket": "M08D-T01",
+      "implementation_strategy": "objectdbx_hostless",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "modify.curve.offset",
+      "family": "entities",
+      "status": "catalogued",
+      "engine_tier": "objectdbx_capable",
+      "owner_ticket": "M08G-T03",
+      "implementation_strategy": "objectdbx_hostless",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "modify.curve.split",
+      "family": "entities",
+      "status": "catalogued",
+      "engine_tier": "objectdbx_capable",
+      "owner_ticket": "M08G-T03",
+      "implementation_strategy": "objectdbx_hostless",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "modify.curve.to_spline",
+      "family": "entities",
+      "status": "catalogued",
+      "engine_tier": "objectdbx_capable",
+      "owner_ticket": "M08G-T03",
+      "implementation_strategy": "objectdbx_hostless",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "modify.entity.common",
+      "family": "entities",
+      "status": "catalogued",
+      "engine_tier": "objectdbx_capable",
+      "owner_ticket": "M08G-T03",
+      "implementation_strategy": "objectdbx_hostless",
+      "evidence_required": "unit_test+staged_diff_fixture_original_unchanged",
+      "risk_class": "staged_write"
+    },
+    {
+      "operation": "modify.entity.copy_transformed",
+      "family": "entities",
+      "status": "catalogued",
+      "engine_tier": "objectdbx_capable",
+      "owner_ticket": "M08G-T03",
+      "implementation_strategy": "objectdbx_hostless",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "modify.entity.explode",
+      "family": "entities",
+      "status": "catalogued",
+      "engine_tier": "objectdbx_capable",
+      "owner_ticket": "M08G-T03",
+      "implementation_strategy": "objectdbx_hostless",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "write.entity.arc",
+      "family": "entities",
+      "status": "catalogued",
+      "engine_tier": "objectdbx_capable",
+      "owner_ticket": "M08G-T02",
+      "implementation_strategy": "objectdbx_hostless",
+      "evidence_required": "unit_test+staged_diff_fixture_original_unchanged",
+      "risk_class": "staged_write"
+    },
+    {
+      "operation": "write.entity.attribdef",
+      "family": "entities",
+      "status": "catalogued",
+      "engine_tier": "objectdbx_capable",
+      "owner_ticket": "M08G-T02",
+      "implementation_strategy": "objectdbx_hostless",
+      "evidence_required": "unit_test+staged_diff_fixture_original_unchanged",
+      "risk_class": "staged_write"
+    },
+    {
+      "operation": "write.entity.attribute",
+      "family": "entities",
+      "status": "catalogued",
+      "engine_tier": "objectdbx_capable",
+      "owner_ticket": "M08G-T02",
+      "implementation_strategy": "objectdbx_hostless",
+      "evidence_required": "unit_test+staged_diff_fixture_original_unchanged",
+      "risk_class": "staged_write"
+    },
+    {
+      "operation": "write.entity.blockref",
+      "family": "entities",
+      "status": "catalogued",
+      "engine_tier": "objectdbx_capable",
+      "owner_ticket": "M08G-T02",
+      "implementation_strategy": "objectdbx_hostless",
+      "evidence_required": "unit_test+staged_diff_fixture_original_unchanged",
+      "risk_class": "staged_write"
+    },
+    {
+      "operation": "write.entity.body",
+      "family": "entities",
+      "status": "catalogued",
+      "engine_tier": "objectdbx_capable",
+      "owner_ticket": "M08G-T02",
+      "implementation_strategy": "objectdbx_hostless",
+      "evidence_required": "unit_test+staged_diff_fixture_original_unchanged",
+      "risk_class": "staged_write"
+    },
+    {
+      "operation": "write.entity.dim.aligned",
+      "family": "entities",
+      "status": "catalogued",
+      "engine_tier": "objectdbx_capable",
+      "owner_ticket": "M08H-T01",
+      "implementation_strategy": "objectdbx_hostless",
+      "evidence_required": "unit_test+staged_diff_fixture_original_unchanged",
+      "risk_class": "staged_write"
+    },
+    {
+      "operation": "write.entity.dim.angular2line",
+      "family": "entities",
+      "status": "catalogued",
+      "engine_tier": "objectdbx_capable",
+      "owner_ticket": "M08H-T01",
+      "implementation_strategy": "objectdbx_hostless",
+      "evidence_required": "unit_test+staged_diff_fixture_original_unchanged",
+      "risk_class": "staged_write"
+    },
+    {
+      "operation": "write.entity.dim.angular3pt",
+      "family": "entities",
+      "status": "catalogued",
+      "engine_tier": "objectdbx_capable",
+      "owner_ticket": "M08H-T01",
+      "implementation_strategy": "objectdbx_hostless",
+      "evidence_required": "unit_test+staged_diff_fixture_original_unchanged",
+      "risk_class": "staged_write"
+    },
+    {
+      "operation": "write.entity.dim.arc",
+      "family": "entities",
+      "status": "catalogued",
+      "engine_tier": "objectdbx_capable",
+      "owner_ticket": "M08H-T01",
+      "implementation_strategy": "objectdbx_hostless",
+      "evidence_required": "unit_test+staged_diff_fixture_original_unchanged",
+      "risk_class": "staged_write"
+    },
+    {
+      "operation": "write.entity.dim.diametric",
+      "family": "entities",
+      "status": "catalogued",
+      "engine_tier": "objectdbx_capable",
+      "owner_ticket": "M08H-T01",
+      "implementation_strategy": "objectdbx_hostless",
+      "evidence_required": "unit_test+staged_diff_fixture_original_unchanged",
+      "risk_class": "staged_write"
+    },
+    {
+      "operation": "write.entity.dim.ordinate",
+      "family": "entities",
+      "status": "catalogued",
+      "engine_tier": "objectdbx_capable",
+      "owner_ticket": "M08H-T01",
+      "implementation_strategy": "objectdbx_hostless",
+      "evidence_required": "unit_test+staged_diff_fixture_original_unchanged",
+      "risk_class": "staged_write"
+    },
+    {
+      "operation": "write.entity.dim.radial",
+      "family": "entities",
+      "status": "catalogued",
+      "engine_tier": "objectdbx_capable",
+      "owner_ticket": "M08H-T01",
+      "implementation_strategy": "objectdbx_hostless",
+      "evidence_required": "unit_test+staged_diff_fixture_original_unchanged",
+      "risk_class": "staged_write"
+    },
+    {
+      "operation": "write.entity.dim.radiallarge",
+      "family": "entities",
+      "status": "catalogued",
+      "engine_tier": "objectdbx_capable",
+      "owner_ticket": "M08H-T01",
+      "implementation_strategy": "objectdbx_hostless",
+      "evidence_required": "unit_test+staged_diff_fixture_original_unchanged",
+      "risk_class": "staged_write"
+    },
+    {
+      "operation": "write.entity.dim.rotated",
+      "family": "entities",
+      "status": "catalogued",
+      "engine_tier": "objectdbx_capable",
+      "owner_ticket": "M08H-T01",
+      "implementation_strategy": "objectdbx_hostless",
+      "evidence_required": "unit_test+staged_diff_fixture_original_unchanged",
+      "risk_class": "staged_write"
+    },
+    {
+      "operation": "write.entity.ellipse",
+      "family": "entities",
+      "status": "catalogued",
+      "engine_tier": "objectdbx_capable",
+      "owner_ticket": "M08G-T02",
+      "implementation_strategy": "objectdbx_hostless",
+      "evidence_required": "unit_test+staged_diff_fixture_original_unchanged",
+      "risk_class": "staged_write"
+    },
+    {
+      "operation": "write.entity.face",
+      "family": "entities",
+      "status": "catalogued",
+      "engine_tier": "objectdbx_capable",
+      "owner_ticket": "M08G-T02",
+      "implementation_strategy": "objectdbx_hostless",
+      "evidence_required": "unit_test+staged_diff_fixture_original_unchanged",
+      "risk_class": "staged_write"
+    },
+    {
+      "operation": "write.entity.hatch",
+      "family": "entities",
+      "status": "catalogued",
+      "engine_tier": "objectdbx_capable",
+      "owner_ticket": "M08H-T02",
+      "implementation_strategy": "objectdbx_hostless",
+      "evidence_required": "unit_test+staged_diff_fixture_original_unchanged",
+      "risk_class": "staged_write"
+    },
+    {
+      "operation": "write.entity.leader",
+      "family": "entities",
+      "status": "catalogued",
+      "engine_tier": "objectdbx_capable",
+      "owner_ticket": "M08H-T01",
+      "implementation_strategy": "objectdbx_hostless",
+      "evidence_required": "unit_test+staged_diff_fixture_original_unchanged",
+      "risk_class": "staged_write"
+    },
+    {
+      "operation": "write.entity.minsert",
+      "family": "entities",
+      "status": "catalogued",
+      "engine_tier": "objectdbx_capable",
+      "owner_ticket": "M08G-T02",
+      "implementation_strategy": "objectdbx_hostless",
+      "evidence_required": "unit_test+staged_diff_fixture_original_unchanged",
+      "risk_class": "staged_write"
+    },
+    {
+      "operation": "write.entity.mleader",
+      "family": "entities",
+      "status": "catalogued",
+      "engine_tier": "objectdbx_capable",
+      "owner_ticket": "M08H-T01",
+      "implementation_strategy": "objectdbx_hostless",
+      "evidence_required": "unit_test+staged_diff_fixture_original_unchanged",
+      "risk_class": "staged_write"
+    },
+    {
+      "operation": "write.entity.mline",
+      "family": "entities",
+      "status": "catalogued",
+      "engine_tier": "objectdbx_capable",
+      "owner_ticket": "M08G-T02",
+      "implementation_strategy": "objectdbx_hostless",
+      "evidence_required": "unit_test+staged_diff_fixture_original_unchanged",
+      "risk_class": "staged_write"
+    },
+    {
+      "operation": "write.entity.mpolygon",
+      "family": "entities",
+      "status": "catalogued",
+      "engine_tier": "objectdbx_capable",
+      "owner_ticket": "M08G-T02",
+      "implementation_strategy": "objectdbx_hostless",
+      "evidence_required": "unit_test+staged_diff_fixture_original_unchanged",
+      "risk_class": "staged_write"
+    },
+    {
+      "operation": "write.entity.mtext",
+      "family": "entities",
+      "status": "catalogued",
+      "engine_tier": "objectdbx_capable",
+      "owner_ticket": "M08H-T01",
+      "implementation_strategy": "objectdbx_hostless",
+      "evidence_required": "unit_test+staged_diff_fixture_original_unchanged",
+      "risk_class": "staged_write"
+    },
+    {
+      "operation": "write.entity.nurbsurface",
+      "family": "entities",
+      "status": "catalogued",
+      "engine_tier": "objectdbx_capable",
+      "owner_ticket": "M08G-T02",
+      "implementation_strategy": "objectdbx_hostless",
+      "evidence_required": "unit_test+staged_diff_fixture_original_unchanged",
+      "risk_class": "staged_write"
+    },
+    {
+      "operation": "write.entity.polyfacemesh",
+      "family": "entities",
+      "status": "catalogued",
+      "engine_tier": "objectdbx_capable",
+      "owner_ticket": "M08G-T02",
+      "implementation_strategy": "objectdbx_hostless",
+      "evidence_required": "unit_test+staged_diff_fixture_original_unchanged",
+      "risk_class": "staged_write"
+    },
+    {
+      "operation": "write.entity.polygonmesh",
+      "family": "entities",
+      "status": "catalogued",
+      "engine_tier": "objectdbx_capable",
+      "owner_ticket": "M08G-T02",
+      "implementation_strategy": "objectdbx_hostless",
+      "evidence_required": "unit_test+staged_diff_fixture_original_unchanged",
+      "risk_class": "staged_write"
+    },
+    {
+      "operation": "write.entity.polyline2d",
+      "family": "entities",
+      "status": "catalogued",
+      "engine_tier": "objectdbx_capable",
+      "owner_ticket": "M08G-T02",
+      "implementation_strategy": "objectdbx_hostless",
+      "evidence_required": "unit_test+staged_diff_fixture_original_unchanged",
+      "risk_class": "staged_write"
+    },
+    {
+      "operation": "write.entity.polyline3d",
+      "family": "entities",
+      "status": "catalogued",
+      "engine_tier": "objectdbx_capable",
+      "owner_ticket": "M08G-T02",
+      "implementation_strategy": "objectdbx_hostless",
+      "evidence_required": "unit_test+staged_diff_fixture_original_unchanged",
+      "risk_class": "staged_write"
+    },
+    {
+      "operation": "write.entity.rasterimage",
+      "family": "entities",
+      "status": "catalogued",
+      "engine_tier": "objectdbx_capable",
+      "owner_ticket": "M08G-T02",
+      "implementation_strategy": "objectdbx_hostless",
+      "evidence_required": "unit_test+staged_diff_fixture_original_unchanged",
+      "risk_class": "staged_write"
+    },
+    {
+      "operation": "write.entity.ray",
+      "family": "entities",
+      "status": "catalogued",
+      "engine_tier": "objectdbx_capable",
+      "owner_ticket": "M08G-T02",
+      "implementation_strategy": "objectdbx_hostless",
+      "evidence_required": "unit_test+staged_diff_fixture_original_unchanged",
+      "risk_class": "staged_write"
+    },
+    {
+      "operation": "write.entity.region",
+      "family": "entities",
+      "status": "catalogued",
+      "engine_tier": "objectdbx_capable",
+      "owner_ticket": "M08G-T02",
+      "implementation_strategy": "objectdbx_hostless",
+      "evidence_required": "unit_test+staged_diff_fixture_original_unchanged",
+      "risk_class": "staged_write"
+    },
+    {
+      "operation": "write.entity.shape",
+      "family": "entities",
+      "status": "catalogued",
+      "engine_tier": "objectdbx_capable",
+      "owner_ticket": "M08G-T02",
+      "implementation_strategy": "objectdbx_hostless",
+      "evidence_required": "unit_test+staged_diff_fixture_original_unchanged",
+      "risk_class": "staged_write"
+    },
+    {
+      "operation": "write.entity.solid2d",
+      "family": "entities",
+      "status": "catalogued",
+      "engine_tier": "objectdbx_capable",
+      "owner_ticket": "M08G-T02",
+      "implementation_strategy": "objectdbx_hostless",
+      "evidence_required": "unit_test+staged_diff_fixture_original_unchanged",
+      "risk_class": "staged_write"
+    },
+    {
+      "operation": "write.entity.solid3d.extrude",
+      "family": "entities",
+      "status": "catalogued",
+      "engine_tier": "objectdbx_capable",
+      "owner_ticket": "M08G-T02",
+      "implementation_strategy": "objectdbx_hostless",
+      "evidence_required": "unit_test+staged_diff_fixture_original_unchanged",
+      "risk_class": "staged_write"
+    },
+    {
+      "operation": "write.entity.solid3d.loft",
+      "family": "entities",
+      "status": "catalogued",
+      "engine_tier": "objectdbx_capable",
+      "owner_ticket": "M08G-T02",
+      "implementation_strategy": "objectdbx_hostless",
+      "evidence_required": "unit_test+staged_diff_fixture_original_unchanged",
+      "risk_class": "staged_write"
+    },
+    {
+      "operation": "write.entity.solid3d.primitive",
+      "family": "entities",
+      "status": "catalogued",
+      "engine_tier": "objectdbx_capable",
+      "owner_ticket": "M08G-T02",
+      "implementation_strategy": "objectdbx_hostless",
+      "evidence_required": "unit_test+staged_diff_fixture_original_unchanged",
+      "risk_class": "staged_write"
+    },
+    {
+      "operation": "write.entity.solid3d.revolve",
+      "family": "entities",
+      "status": "catalogued",
+      "engine_tier": "objectdbx_capable",
+      "owner_ticket": "M08G-T02",
+      "implementation_strategy": "objectdbx_hostless",
+      "evidence_required": "unit_test+staged_diff_fixture_original_unchanged",
+      "risk_class": "staged_write"
+    },
+    {
+      "operation": "write.entity.solid3d.sweep",
+      "family": "entities",
+      "status": "catalogued",
+      "engine_tier": "objectdbx_capable",
+      "owner_ticket": "M08G-T02",
+      "implementation_strategy": "objectdbx_hostless",
+      "evidence_required": "unit_test+staged_diff_fixture_original_unchanged",
+      "risk_class": "staged_write"
+    },
+    {
+      "operation": "write.entity.spline",
+      "family": "entities",
+      "status": "catalogued",
+      "engine_tier": "objectdbx_capable",
+      "owner_ticket": "M08G-T02",
+      "implementation_strategy": "objectdbx_hostless",
+      "evidence_required": "unit_test+staged_diff_fixture_original_unchanged",
+      "risk_class": "staged_write"
+    },
+    {
+      "operation": "write.entity.subdmesh",
+      "family": "entities",
+      "status": "catalogued",
+      "engine_tier": "objectdbx_capable",
+      "owner_ticket": "M08G-T02",
+      "implementation_strategy": "objectdbx_hostless",
+      "evidence_required": "unit_test+staged_diff_fixture_original_unchanged",
+      "risk_class": "staged_write"
+    },
+    {
+      "operation": "write.entity.surface",
+      "family": "entities",
+      "status": "catalogued",
+      "engine_tier": "objectdbx_capable",
+      "owner_ticket": "M08G-T02",
+      "implementation_strategy": "objectdbx_hostless",
+      "evidence_required": "unit_test+staged_diff_fixture_original_unchanged",
+      "risk_class": "staged_write"
+    },
+    {
+      "operation": "write.entity.table",
+      "family": "entities",
+      "status": "catalogued",
+      "engine_tier": "objectdbx_capable",
+      "owner_ticket": "M08H-T01",
+      "implementation_strategy": "objectdbx_hostless",
+      "evidence_required": "unit_test+staged_diff_fixture_original_unchanged",
+      "risk_class": "staged_write"
+    },
+    {
+      "operation": "write.entity.text",
+      "family": "entities",
+      "status": "catalogued",
+      "engine_tier": "objectdbx_capable",
+      "owner_ticket": "M08H-T01",
+      "implementation_strategy": "objectdbx_hostless",
+      "evidence_required": "unit_test+staged_diff_fixture_original_unchanged",
+      "risk_class": "staged_write"
+    },
+    {
+      "operation": "write.entity.trace",
+      "family": "entities",
+      "status": "catalogued",
+      "engine_tier": "objectdbx_capable",
+      "owner_ticket": "M08G-T02",
+      "implementation_strategy": "objectdbx_hostless",
+      "evidence_required": "unit_test+staged_diff_fixture_original_unchanged",
+      "risk_class": "staged_write"
+    },
+    {
+      "operation": "write.entity.wipeout",
+      "family": "entities",
+      "status": "catalogued",
+      "engine_tier": "objectdbx_capable",
+      "owner_ticket": "M08G-T02",
+      "implementation_strategy": "objectdbx_hostless",
+      "evidence_required": "unit_test+staged_diff_fixture_original_unchanged",
+      "risk_class": "staged_write"
+    },
+    {
+      "operation": "write.entity.xline",
+      "family": "entities",
+      "status": "catalogued",
+      "engine_tier": "objectdbx_capable",
+      "owner_ticket": "M08G-T02",
+      "implementation_strategy": "objectdbx_hostless",
+      "evidence_required": "unit_test+staged_diff_fixture_original_unchanged",
+      "risk_class": "staged_write"
+    },
+    {
+      "operation": "compute.entity.intersect",
+      "family": "geometry_kernel",
+      "status": "catalogued",
+      "engine_tier": "objectdbx_capable",
+      "owner_ticket": "M08D-T02",
+      "implementation_strategy": "objectdbx_hostless",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "compute.geometry.circarc",
+      "family": "geometry_kernel",
+      "status": "catalogued",
+      "engine_tier": "native_arx_only",
+      "owner_ticket": "M08D-T02",
+      "implementation_strategy": "native_arx_cpp",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "compute.geometry.compositecurve",
+      "family": "geometry_kernel",
+      "status": "catalogued",
+      "engine_tier": "native_arx_only",
+      "owner_ticket": "M08D-T02",
+      "implementation_strategy": "native_arx_cpp",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "compute.geometry.curve.closest",
+      "family": "geometry_kernel",
+      "status": "catalogued",
+      "engine_tier": "native_arx_only",
+      "owner_ticket": "M08D-T02",
+      "implementation_strategy": "native_arx_cpp",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "compute.geometry.curve.eval",
+      "family": "geometry_kernel",
+      "status": "catalogued",
+      "engine_tier": "native_arx_only",
+      "owner_ticket": "M08D-T02",
+      "implementation_strategy": "native_arx_cpp",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "compute.geometry.curve.intersect",
+      "family": "geometry_kernel",
+      "status": "catalogued",
+      "engine_tier": "native_arx_only",
+      "owner_ticket": "M08D-T02",
+      "implementation_strategy": "native_arx_cpp",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "compute.geometry.curve.sample",
+      "family": "geometry_kernel",
+      "status": "catalogued",
+      "engine_tier": "native_arx_only",
+      "owner_ticket": "M08D-T02",
+      "implementation_strategy": "native_arx_cpp",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "compute.geometry.elliparc",
+      "family": "geometry_kernel",
+      "status": "catalogued",
+      "engine_tier": "native_arx_only",
+      "owner_ticket": "M08D-T02",
+      "implementation_strategy": "native_arx_cpp",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "compute.geometry.lineseg",
+      "family": "geometry_kernel",
+      "status": "catalogued",
+      "engine_tier": "native_arx_only",
+      "owner_ticket": "M08D-T02",
+      "implementation_strategy": "native_arx_cpp",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "compute.geometry.matrix.build",
+      "family": "geometry_kernel",
+      "status": "catalogued",
+      "engine_tier": "native_arx_only",
+      "owner_ticket": "M08D-T02",
+      "implementation_strategy": "native_arx_cpp",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "compute.geometry.matrix.compose",
+      "family": "geometry_kernel",
+      "status": "catalogued",
+      "engine_tier": "native_arx_only",
+      "owner_ticket": "M08D-T02",
+      "implementation_strategy": "native_arx_cpp",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "compute.geometry.nurbcurve",
+      "family": "geometry_kernel",
+      "status": "catalogued",
+      "engine_tier": "native_arx_only",
+      "owner_ticket": "M08D-T02",
+      "implementation_strategy": "native_arx_cpp",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "compute.geometry.point.distance",
+      "family": "geometry_kernel",
+      "status": "catalogued",
+      "engine_tier": "native_arx_only",
+      "owner_ticket": "M08D-T02",
+      "implementation_strategy": "native_arx_cpp",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "compute.geometry.point.transform",
+      "family": "geometry_kernel",
+      "status": "catalogued",
+      "engine_tier": "native_arx_only",
+      "owner_ticket": "M08D-T02",
+      "implementation_strategy": "native_arx_cpp",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "compute.geometry.scale.build",
+      "family": "geometry_kernel",
+      "status": "catalogued",
+      "engine_tier": "native_arx_only",
+      "owner_ticket": "M08D-T02",
+      "implementation_strategy": "native_arx_cpp",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "compute.geometry.surface.nurb",
+      "family": "geometry_kernel",
+      "status": "catalogued",
+      "engine_tier": "native_arx_only",
+      "owner_ticket": "M08D-T02",
+      "implementation_strategy": "native_arx_cpp",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "compute.geometry.tolerance",
+      "family": "geometry_kernel",
+      "status": "catalogued",
+      "engine_tier": "native_arx_only",
+      "owner_ticket": "M08D-T02",
+      "implementation_strategy": "native_arx_cpp",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "compute.solid3d.interference",
+      "family": "geometry_kernel",
+      "status": "catalogued",
+      "engine_tier": "objectdbx_capable",
+      "owner_ticket": "M08D-T02",
+      "implementation_strategy": "objectdbx_hostless",
+      "evidence_required": "unit_test+staged_diff_fixture_original_unchanged",
+      "risk_class": "staged_write"
+    },
+    {
+      "operation": "modify.entity.solid3d.boolean",
+      "family": "geometry_kernel",
+      "status": "catalogued",
+      "engine_tier": "objectdbx_capable",
+      "owner_ticket": "M08G-T03",
+      "implementation_strategy": "objectdbx_hostless",
+      "evidence_required": "unit_test+staged_diff_fixture_original_unchanged",
+      "risk_class": "staged_write"
+    },
+    {
+      "operation": "modify.entity.transform",
+      "family": "geometry_kernel",
+      "status": "catalogued",
+      "engine_tier": "objectdbx_capable",
+      "owner_ticket": "M08G-T03",
+      "implementation_strategy": "objectdbx_hostless",
+      "evidence_required": "unit_test+staged_diff_fixture_original_unchanged",
+      "risk_class": "staged_write"
+    },
+    {
+      "operation": "write.entity.point",
+      "family": "geometry_kernel",
+      "status": "catalogued",
+      "engine_tier": "objectdbx_capable",
+      "owner_ticket": "M08G-T02",
+      "implementation_strategy": "objectdbx_hostless",
+      "evidence_required": "unit_test+staged_diff_fixture_original_unchanged",
+      "risk_class": "staged_write"
+    },
+    {
+      "operation": "write.entity.polyline",
+      "family": "geometry_kernel",
+      "status": "catalogued",
+      "engine_tier": "objectdbx_capable",
+      "owner_ticket": "M08G-T02",
+      "implementation_strategy": "objectdbx_hostless",
+      "evidence_required": "unit_test+staged_diff_fixture_original_unchanged",
+      "risk_class": "staged_write"
+    },
+    {
+      "operation": "write.entity.tolerance",
+      "family": "geometry_kernel",
+      "status": "catalogued",
+      "engine_tier": "objectdbx_capable",
+      "owner_ticket": "M08G-T02",
+      "implementation_strategy": "objectdbx_hostless",
+      "evidence_required": "unit_test+staged_diff_fixture_original_unchanged",
+      "risk_class": "staged_write"
+    },
+    {
+      "operation": "inspect.entity.grips",
+      "family": "graphics_system",
+      "status": "catalogued",
+      "engine_tier": "native_arx_only",
+      "owner_ticket": "M08L-T02",
+      "implementation_strategy": "native_arx_cpp",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "render.context.query",
+      "family": "graphics_system",
+      "status": "catalogued",
+      "engine_tier": "native_arx_only",
+      "owner_ticket": "M08L-T01",
+      "implementation_strategy": "native_arx_cpp",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "render.draw.viewportgeom",
+      "family": "graphics_system",
+      "status": "catalogued",
+      "engine_tier": "native_arx_only",
+      "owner_ticket": "M08L-T01",
+      "implementation_strategy": "native_arx_cpp",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "render.draw.worldgeom",
+      "family": "graphics_system",
+      "status": "catalogued",
+      "engine_tier": "native_arx_only",
+      "owner_ticket": "M08L-T01",
+      "implementation_strategy": "native_arx_cpp",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "render.drawable.def",
+      "family": "graphics_system",
+      "status": "catalogued",
+      "engine_tier": "native_arx_only",
+      "owner_ticket": "M08L-T01",
+      "implementation_strategy": "native_arx_cpp",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "render.entity.worlddraw_override",
+      "family": "graphics_system",
+      "status": "catalogued",
+      "engine_tier": "native_arx_only",
+      "owner_ticket": "M08L-T01",
+      "implementation_strategy": "native_arx_cpp",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "render.facedata.attach",
+      "family": "graphics_system",
+      "status": "catalogued",
+      "engine_tier": "native_arx_only",
+      "owner_ticket": "M08L-T01",
+      "implementation_strategy": "native_arx_cpp",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "render.polyline.helper",
+      "family": "graphics_system",
+      "status": "catalogued",
+      "engine_tier": "native_arx_only",
+      "owner_ticket": "M08L-T01",
+      "implementation_strategy": "native_arx_cpp",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "render.traits.set",
+      "family": "graphics_system",
+      "status": "catalogued",
+      "engine_tier": "native_arx_only",
+      "owner_ticket": "M08L-T01",
+      "implementation_strategy": "native_arx_cpp",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "plot.config.settings",
+      "family": "layouts_plot_publish",
+      "status": "catalogued",
+      "engine_tier": "managed_also",
+      "owner_ticket": "M08I-T01",
+      "implementation_strategy": "managed_dotnet",
+      "evidence_required": "attended_live_pump_session_log",
+      "risk_class": "live_edit"
+    },
+    {
+      "operation": "plot.engine.run",
+      "family": "layouts_plot_publish",
+      "status": "catalogued",
+      "engine_tier": "managed_also",
+      "owner_ticket": "M08I-T01",
+      "implementation_strategy": "managed_dotnet",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "infra.hostapp.get_services",
+      "family": "objectdbx_database",
+      "status": "catalogued",
+      "engine_tier": "objectdbx_capable",
+      "owner_ticket": "M08C-T01",
+      "implementation_strategy": "objectdbx_hostless",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "infra.hostapp.set_working_db",
+      "family": "objectdbx_database",
+      "status": "catalogued",
+      "engine_tier": "objectdbx_capable",
+      "owner_ticket": "M08C-T01",
+      "implementation_strategy": "objectdbx_hostless",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "inspect.database.dxf_in",
+      "family": "objectdbx_database",
+      "status": "catalogued",
+      "engine_tier": "objectdbx_capable",
+      "owner_ticket": "M08C-T01",
+      "implementation_strategy": "objectdbx_hostless",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "inspect.database.flush_input",
+      "family": "objectdbx_database",
+      "status": "catalogued",
+      "engine_tier": "native_arx_only",
+      "owner_ticket": "M08C-T01",
+      "implementation_strategy": "native_arx_cpp",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "inspect.database.read_dwg",
+      "family": "objectdbx_database",
+      "status": "catalogued",
+      "engine_tier": "objectdbx_capable",
+      "owner_ticket": "M08C-T01",
+      "implementation_strategy": "objectdbx_hostless",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "inspect.database.read_dwg_handle",
+      "family": "objectdbx_database",
+      "status": "catalogued",
+      "engine_tier": "objectdbx_capable",
+      "owner_ticket": "M08C-T01",
+      "implementation_strategy": "objectdbx_hostless",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "inspect.database.summaryinfo",
+      "family": "objectdbx_database",
+      "status": "catalogued",
+      "engine_tier": "objectdbx_capable",
+      "owner_ticket": "M08C-T01",
+      "implementation_strategy": "objectdbx_hostless",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "inspect.database.sysvar",
+      "family": "objectdbx_database",
+      "status": "catalogued",
+      "engine_tier": "objectdbx_capable",
+      "owner_ticket": "M08C-T01",
+      "implementation_strategy": "objectdbx_hostless",
+      "evidence_required": "unit_test+staged_diff_fixture_original_unchanged",
+      "risk_class": "staged_write"
+    },
+    {
+      "operation": "inspect.object.handle",
+      "family": "objectdbx_database",
+      "status": "catalogued",
+      "engine_tier": "objectdbx_capable",
+      "owner_ticket": "M08C-T01",
+      "implementation_strategy": "objectdbx_hostless",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "inspect.object.id",
+      "family": "objectdbx_database",
+      "status": "catalogued",
+      "engine_tier": "objectdbx_capable",
+      "owner_ticket": "M08C-T01",
+      "implementation_strategy": "objectdbx_hostless",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "inspect.object.open",
+      "family": "objectdbx_database",
+      "status": "catalogued",
+      "engine_tier": "objectdbx_capable",
+      "owner_ticket": "M08C-T01",
+      "implementation_strategy": "objectdbx_hostless",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "transaction.manager.get_object",
+      "family": "objectdbx_database",
+      "status": "catalogued",
+      "engine_tier": "native_arx_only",
+      "owner_ticket": "M08B-T03",
+      "implementation_strategy": "native_arx_cpp",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "transaction.manager.start",
+      "family": "objectdbx_database",
+      "status": "catalogued",
+      "engine_tier": "native_arx_only",
+      "owner_ticket": "M08B-T03",
+      "implementation_strategy": "native_arx_cpp",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "transform.database.dxf_out",
+      "family": "objectdbx_database",
+      "status": "catalogued",
+      "engine_tier": "objectdbx_capable",
+      "owner_ticket": "M08C-T01",
+      "implementation_strategy": "objectdbx_hostless",
+      "evidence_required": "unit_test+staged_diff_fixture_original_unchanged",
+      "risk_class": "staged_write"
+    },
+    {
+      "operation": "transform.database.save_as",
+      "family": "objectdbx_database",
+      "status": "catalogued",
+      "engine_tier": "objectdbx_capable",
+      "owner_ticket": "M08C-T01",
+      "implementation_strategy": "objectdbx_hostless",
+      "evidence_required": "unit_test+staged_diff_fixture_original_unchanged",
+      "risk_class": "staged_write"
+    },
+    {
+      "operation": "transform.database.save_as_simple",
+      "family": "objectdbx_database",
+      "status": "catalogued",
+      "engine_tier": "objectdbx_capable",
+      "owner_ticket": "M08C-T01",
+      "implementation_strategy": "objectdbx_hostless",
+      "evidence_required": "unit_test+staged_diff_fixture_original_unchanged",
+      "risk_class": "staged_write"
+    },
+    {
+      "operation": "write.object.cancel",
+      "family": "objectdbx_database",
+      "status": "catalogued",
+      "engine_tier": "objectdbx_capable",
+      "owner_ticket": "M08C-T01",
+      "implementation_strategy": "objectdbx_hostless",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "write.object.close",
+      "family": "objectdbx_database",
+      "status": "catalogued",
+      "engine_tier": "objectdbx_capable",
+      "owner_ticket": "M08C-T01",
+      "implementation_strategy": "objectdbx_hostless",
+      "evidence_required": "unit_test+staged_diff_fixture_original_unchanged",
+      "risk_class": "staged_write"
+    },
+    {
+      "operation": "write.object.downgrade_open",
+      "family": "objectdbx_database",
+      "status": "catalogued",
+      "engine_tier": "objectdbx_capable",
+      "owner_ticket": "M08C-T01",
+      "implementation_strategy": "objectdbx_hostless",
+      "evidence_required": "unit_test+staged_diff_fixture_original_unchanged",
+      "risk_class": "staged_write"
+    },
+    {
+      "operation": "write.object.upgrade_open",
+      "family": "objectdbx_database",
+      "status": "catalogued",
+      "engine_tier": "objectdbx_capable",
+      "owner_ticket": "M08C-T01",
+      "implementation_strategy": "objectdbx_hostless",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "react.config.disable_namespace",
+      "family": "reactors_events",
+      "status": "catalogued",
+      "engine_tier": "native_arx_only",
+      "owner_ticket": "M08M-T02",
+      "implementation_strategy": "native_arx_cpp",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "react.database.attach",
+      "family": "reactors_events",
+      "status": "catalogued",
+      "engine_tier": "managed_also",
+      "owner_ticket": "M08M-T02",
+      "implementation_strategy": "managed_dotnet",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "react.database.monitor",
+      "family": "reactors_events",
+      "status": "catalogued",
+      "engine_tier": "managed_also",
+      "owner_ticket": "M08M-T02",
+      "implementation_strategy": "managed_dotnet",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "react.docmanager.attach",
+      "family": "reactors_events",
+      "status": "catalogued",
+      "engine_tier": "managed_also",
+      "owner_ticket": "M08M-T02",
+      "implementation_strategy": "managed_dotnet",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "react.docmanager.monitor",
+      "family": "reactors_events",
+      "status": "catalogued",
+      "engine_tier": "managed_also",
+      "owner_ticket": "M08M-T02",
+      "implementation_strategy": "managed_dotnet",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "react.editor.command_monitor",
+      "family": "reactors_events",
+      "status": "catalogued",
+      "engine_tier": "managed_also",
+      "owner_ticket": "M08M-T02",
+      "implementation_strategy": "managed_dotnet",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "react.editor.dwg_lifecycle",
+      "family": "reactors_events",
+      "status": "catalogued",
+      "engine_tier": "managed_also",
+      "owner_ticket": "M08M-T02",
+      "implementation_strategy": "managed_dotnet",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "react.editor.input_monitor",
+      "family": "reactors_events",
+      "status": "catalogued",
+      "engine_tier": "managed_also",
+      "owner_ticket": "M08M-T02",
+      "implementation_strategy": "managed_dotnet",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "react.editor.lisp_monitor",
+      "family": "reactors_events",
+      "status": "catalogued",
+      "engine_tier": "managed_also",
+      "owner_ticket": "M08M-T02",
+      "implementation_strategy": "managed_dotnet",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "react.editor.sysvar_monitor",
+      "family": "reactors_events",
+      "status": "catalogued",
+      "engine_tier": "managed_also",
+      "owner_ticket": "M08M-T02",
+      "implementation_strategy": "managed_dotnet",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "react.entity.monitor",
+      "family": "reactors_events",
+      "status": "catalogued",
+      "engine_tier": "managed_also",
+      "owner_ticket": "M08M-T02",
+      "implementation_strategy": "managed_dotnet",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "react.linker.attach",
+      "family": "reactors_events",
+      "status": "catalogued",
+      "engine_tier": "native_arx_only",
+      "owner_ticket": "M08M-T02",
+      "implementation_strategy": "native_arx_cpp",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "react.linker.monitor",
+      "family": "reactors_events",
+      "status": "catalogued",
+      "engine_tier": "native_arx_only",
+      "owner_ticket": "M08M-T02",
+      "implementation_strategy": "native_arx_cpp",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "react.longtx.attach",
+      "family": "reactors_events",
+      "status": "catalogued",
+      "engine_tier": "native_arx_only",
+      "owner_ticket": "M08M-T02",
+      "implementation_strategy": "native_arx_cpp",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "react.longtx.monitor",
+      "family": "reactors_events",
+      "status": "catalogued",
+      "engine_tier": "native_arx_only",
+      "owner_ticket": "M08M-T02",
+      "implementation_strategy": "native_arx_cpp",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "react.object.attach_transient",
+      "family": "reactors_events",
+      "status": "catalogued",
+      "engine_tier": "managed_also",
+      "owner_ticket": "M08M-T02",
+      "implementation_strategy": "managed_dotnet",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "react.object.detach_transient",
+      "family": "reactors_events",
+      "status": "catalogued",
+      "engine_tier": "managed_also",
+      "owner_ticket": "M08M-T02",
+      "implementation_strategy": "managed_dotnet",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "react.object.monitor",
+      "family": "reactors_events",
+      "status": "catalogued",
+      "engine_tier": "managed_also",
+      "owner_ticket": "M08M-T02",
+      "implementation_strategy": "managed_dotnet",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "react.persistent.attach",
+      "family": "reactors_events",
+      "status": "catalogued",
+      "engine_tier": "native_arx_only",
+      "owner_ticket": "M08M-T02",
+      "implementation_strategy": "native_arx_cpp",
+      "evidence_required": "attended_live_pump_session_log",
+      "risk_class": "live_edit"
+    },
+    {
+      "operation": "react.persistent.detach",
+      "family": "reactors_events",
+      "status": "catalogued",
+      "engine_tier": "native_arx_only",
+      "owner_ticket": "M08M-T02",
+      "implementation_strategy": "native_arx_cpp",
+      "evidence_required": "attended_live_pump_session_log",
+      "risk_class": "live_edit"
+    },
+    {
+      "operation": "react.rxevent.attach",
+      "family": "reactors_events",
+      "status": "catalogued",
+      "engine_tier": "native_arx_only",
+      "owner_ticket": "M08M-T02",
+      "implementation_strategy": "native_arx_cpp",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "react.rxevent.monitor",
+      "family": "reactors_events",
+      "status": "catalogued",
+      "engine_tier": "native_arx_only",
+      "owner_ticket": "M08M-T02",
+      "implementation_strategy": "native_arx_cpp",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "command.register.define",
+      "family": "runtime_commands",
+      "status": "catalogued",
+      "engine_tier": "native_arx_only",
+      "owner_ticket": "M08N-T02",
+      "implementation_strategy": "native_arx_cpp",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "module.ads.register_symbol",
+      "family": "runtime_commands",
+      "status": "catalogued",
+      "engine_tier": "native_arx_only",
+      "owner_ticket": "M08N-T02",
+      "implementation_strategy": "native_arx_cpp",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "module.app.accessor",
+      "family": "runtime_commands",
+      "status": "catalogued",
+      "engine_tier": "native_arx_only",
+      "owner_ticket": "M08O-T02",
+      "implementation_strategy": "native_arx_cpp",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "module.class.register_object",
+      "family": "runtime_commands",
+      "status": "catalogued",
+      "engine_tier": "objectdbx_capable",
+      "owner_ticket": "M08N-T02",
+      "implementation_strategy": "objectdbx_hostless",
+      "evidence_required": "unit_test+staged_diff_fixture_original_unchanged",
+      "risk_class": "staged_write"
+    },
+    {
+      "operation": "module.command.flags",
+      "family": "runtime_commands",
+      "status": "catalogued",
+      "engine_tier": "native_arx_only",
+      "owner_ticket": "M08O-T02",
+      "implementation_strategy": "native_arx_cpp",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "module.command.lookup",
+      "family": "runtime_commands",
+      "status": "catalogued",
+      "engine_tier": "native_arx_only",
+      "owner_ticket": "M08O-T02",
+      "implementation_strategy": "deprecated_raw_command",
+      "evidence_required": "contract_test_not_agent_exposed",
+      "risk_class": "raw_command"
+    },
+    {
+      "operation": "module.command.register_auto",
+      "family": "runtime_commands",
+      "status": "catalogued",
+      "engine_tier": "native_arx_only",
+      "owner_ticket": "M08N-T02",
+      "implementation_strategy": "native_arx_cpp",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "module.command.register_manual",
+      "family": "runtime_commands",
+      "status": "catalogued",
+      "engine_tier": "native_arx_only",
+      "owner_ticket": "M08N-T02",
+      "implementation_strategy": "native_arx_cpp",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "module.command.remove_group",
+      "family": "runtime_commands",
+      "status": "catalogued",
+      "engine_tier": "native_arx_only",
+      "owner_ticket": "M08O-T02",
+      "implementation_strategy": "native_arx_cpp",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "module.command.stack_handle",
+      "family": "runtime_commands",
+      "status": "catalogued",
+      "engine_tier": "native_arx_only",
+      "owner_ticket": "M08O-T02",
+      "implementation_strategy": "native_arx_cpp",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "module.entrypoint.define",
+      "family": "runtime_commands",
+      "status": "catalogued",
+      "engine_tier": "native_arx_only",
+      "owner_ticket": "M08O-T02",
+      "implementation_strategy": "native_arx_cpp",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "module.entrypoint.dispatch",
+      "family": "runtime_commands",
+      "status": "catalogued",
+      "engine_tier": "native_arx_only",
+      "owner_ticket": "M08O-T02",
+      "implementation_strategy": "native_arx_cpp",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "module.lifecycle.init",
+      "family": "runtime_commands",
+      "status": "catalogued",
+      "engine_tier": "native_arx_only",
+      "owner_ticket": "M08O-T02",
+      "implementation_strategy": "native_arx_cpp",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "module.lifecycle.on_load_dwg",
+      "family": "runtime_commands",
+      "status": "catalogued",
+      "engine_tier": "native_arx_only",
+      "owner_ticket": "M08O-T02",
+      "implementation_strategy": "native_arx_cpp",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "module.lifecycle.on_ole_unload",
+      "family": "runtime_commands",
+      "status": "catalogued",
+      "engine_tier": "native_arx_only",
+      "owner_ticket": "M08O-T02",
+      "implementation_strategy": "native_arx_cpp",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "module.lifecycle.on_unload_dwg",
+      "family": "runtime_commands",
+      "status": "catalogued",
+      "engine_tier": "native_arx_only",
+      "owner_ticket": "M08O-T02",
+      "implementation_strategy": "native_arx_cpp",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "module.lifecycle.other",
+      "family": "runtime_commands",
+      "status": "catalogued",
+      "engine_tier": "native_arx_only",
+      "owner_ticket": "M08O-T02",
+      "implementation_strategy": "native_arx_cpp",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "module.lifecycle.unload",
+      "family": "runtime_commands",
+      "status": "catalogued",
+      "engine_tier": "native_arx_only",
+      "owner_ticket": "M08O-T02",
+      "implementation_strategy": "native_arx_cpp",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "module.load",
+      "family": "runtime_commands",
+      "status": "catalogued",
+      "engine_tier": "native_arx_only",
+      "owner_ticket": "M08O-T02",
+      "implementation_strategy": "native_arx_cpp",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "module.load.acad_rx",
+      "family": "runtime_commands",
+      "status": "catalogued",
+      "engine_tier": "accoreconsole_lisp_also",
+      "owner_ticket": "M08O-T02",
+      "implementation_strategy": "accoreconsole_lisp",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "module.load.by_app",
+      "family": "runtime_commands",
+      "status": "catalogued",
+      "engine_tier": "native_arx_only",
+      "owner_ticket": "M08O-T02",
+      "implementation_strategy": "native_arx_cpp",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "module.load.demand_register",
+      "family": "runtime_commands",
+      "status": "catalogued",
+      "engine_tier": "native_arx_only",
+      "owner_ticket": "M08N-T02",
+      "implementation_strategy": "native_arx_cpp",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "module.load.lisp",
+      "family": "runtime_commands",
+      "status": "catalogued",
+      "engine_tier": "accoreconsole_lisp_also",
+      "owner_ticket": "M08O-T02",
+      "implementation_strategy": "accoreconsole_lisp",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "module.register_mdi",
+      "family": "runtime_commands",
+      "status": "catalogued",
+      "engine_tier": "native_arx_only",
+      "owner_ticket": "M08N-T02",
+      "implementation_strategy": "native_arx_cpp",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "module.register_service",
+      "family": "runtime_commands",
+      "status": "catalogued",
+      "engine_tier": "native_arx_only",
+      "owner_ticket": "M08N-T02",
+      "implementation_strategy": "native_arx_cpp",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "module.unload",
+      "family": "runtime_commands",
+      "status": "catalogued",
+      "engine_tier": "native_arx_only",
+      "owner_ticket": "M08O-T02",
+      "implementation_strategy": "native_arx_cpp",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "acdb.database.create",
+      "family": "symbol_tables_dictionaries",
+      "status": "catalogued",
+      "engine_tier": "objectdbx_capable",
+      "owner_ticket": "M08E-T03",
+      "implementation_strategy": "objectdbx_hostless",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "inspect.dictionary.get",
+      "family": "symbol_tables_dictionaries",
+      "status": "catalogued",
+      "engine_tier": "objectdbx_capable",
+      "owner_ticket": "M08E-T03",
+      "implementation_strategy": "objectdbx_hostless",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "inspect.dictionary.named_objects",
+      "family": "symbol_tables_dictionaries",
+      "status": "catalogued",
+      "engine_tier": "objectdbx_capable",
+      "owner_ticket": "M08E-T03",
+      "implementation_strategy": "objectdbx_hostless",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "inspect.entity.get_xdata",
+      "family": "symbol_tables_dictionaries",
+      "status": "catalogued",
+      "engine_tier": "objectdbx_capable",
+      "owner_ticket": "M08E-T03",
+      "implementation_strategy": "objectdbx_hostless",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "inspect.object.ext_dict",
+      "family": "symbol_tables_dictionaries",
+      "status": "catalogued",
+      "engine_tier": "objectdbx_capable",
+      "owner_ticket": "M08C-T02",
+      "implementation_strategy": "objectdbx_hostless",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "inspect.symboltable.block",
+      "family": "symbol_tables_dictionaries",
+      "status": "catalogued",
+      "engine_tier": "objectdbx_capable",
+      "owner_ticket": "M08C-T02",
+      "implementation_strategy": "objectdbx_hostless",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "inspect.symboltable.layers",
+      "family": "symbol_tables_dictionaries",
+      "status": "catalogued",
+      "engine_tier": "objectdbx_capable",
+      "owner_ticket": "M08C-T02",
+      "implementation_strategy": "objectdbx_hostless",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "transform.database.wblock",
+      "family": "symbol_tables_dictionaries",
+      "status": "catalogued",
+      "engine_tier": "objectdbx_capable",
+      "owner_ticket": "M08C-T02",
+      "implementation_strategy": "objectdbx_hostless",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "transform.database.wblock_clone",
+      "family": "symbol_tables_dictionaries",
+      "status": "catalogued",
+      "engine_tier": "native_arx_only",
+      "owner_ticket": "M08C-T02",
+      "implementation_strategy": "native_arx_cpp",
+      "evidence_required": "attended_live_pump_session_log",
+      "risk_class": "live_edit"
+    },
+    {
+      "operation": "write.dictionary.set",
+      "family": "symbol_tables_dictionaries",
+      "status": "catalogued",
+      "engine_tier": "objectdbx_capable",
+      "owner_ticket": "M08E-T03",
+      "implementation_strategy": "objectdbx_hostless",
+      "evidence_required": "unit_test+staged_diff_fixture_original_unchanged",
+      "risk_class": "staged_write"
+    },
+    {
+      "operation": "write.entity.set_xdata",
+      "family": "symbol_tables_dictionaries",
+      "status": "catalogued",
+      "engine_tier": "objectdbx_capable",
+      "owner_ticket": "M08E-T03",
+      "implementation_strategy": "objectdbx_hostless",
+      "evidence_required": "unit_test+staged_diff_fixture_original_unchanged",
+      "risk_class": "staged_write"
+    },
+    {
+      "operation": "write.object.create_ext_dict",
+      "family": "symbol_tables_dictionaries",
+      "status": "catalogued",
+      "engine_tier": "objectdbx_capable",
+      "owner_ticket": "M08C-T02",
+      "implementation_strategy": "objectdbx_hostless",
+      "evidence_required": "unit_test+staged_diff_fixture_original_unchanged",
+      "risk_class": "staged_write"
+    },
+    {
+      "operation": "write.regapp.register",
+      "family": "symbol_tables_dictionaries",
+      "status": "catalogued",
+      "engine_tier": "objectdbx_capable",
+      "owner_ticket": "M08C-T03",
+      "implementation_strategy": "objectdbx_hostless",
+      "evidence_required": "unit_test+staged_diff_fixture_original_unchanged",
+      "risk_class": "staged_write"
+    },
+    {
+      "operation": "command.menu.invoke",
+      "family": "ui_customization",
+      "status": "catalogued",
+      "engine_tier": "native_arx_only",
+      "owner_ticket": "M08N-T02",
+      "implementation_strategy": "native_arx_cpp",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "editor.command.register",
+      "family": "ui_customization",
+      "status": "catalogued",
+      "engine_tier": "native_arx_only",
+      "owner_ticket": "M08N-T02",
+      "implementation_strategy": "native_arx_cpp",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "editor.command.unregister",
+      "family": "ui_customization",
+      "status": "catalogued",
+      "engine_tier": "native_arx_only",
+      "owner_ticket": "M08N-T02",
+      "implementation_strategy": "native_arx_cpp",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "editor.menu.add_item",
+      "family": "ui_customization",
+      "status": "catalogued",
+      "engine_tier": "native_arx_only",
+      "owner_ticket": "M08N-T02",
+      "implementation_strategy": "native_arx_cpp",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "editor.menu.context",
+      "family": "ui_customization",
+      "status": "catalogued",
+      "engine_tier": "native_arx_only",
+      "owner_ticket": "M08N-T02",
+      "implementation_strategy": "native_arx_cpp",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "editor.menu.menubar_get",
+      "family": "ui_customization",
+      "status": "catalogued",
+      "engine_tier": "native_arx_only",
+      "owner_ticket": "M08N-T02",
+      "implementation_strategy": "native_arx_cpp",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "editor.palette.add_palette",
+      "family": "ui_customization",
+      "status": "catalogued",
+      "engine_tier": "native_arx_only",
+      "owner_ticket": "M08N-T02",
+      "implementation_strategy": "native_arx_cpp",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "editor.palette.create",
+      "family": "ui_customization",
+      "status": "catalogued",
+      "engine_tier": "managed_also",
+      "owner_ticket": "M08N-T02",
+      "implementation_strategy": "managed_dotnet",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "editor.palette.create_dockable",
+      "family": "ui_customization",
+      "status": "catalogued",
+      "engine_tier": "native_arx_only",
+      "owner_ticket": "M08N-T02",
+      "implementation_strategy": "native_arx_cpp",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "editor.palette.dock",
+      "family": "ui_customization",
+      "status": "catalogued",
+      "engine_tier": "native_arx_only",
+      "owner_ticket": "M08N-T02",
+      "implementation_strategy": "native_arx_cpp",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "editor.palette.persist",
+      "family": "ui_customization",
+      "status": "catalogued",
+      "engine_tier": "native_arx_only",
+      "owner_ticket": "M08N-T02",
+      "implementation_strategy": "native_arx_cpp",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "editor.palette.style",
+      "family": "ui_customization",
+      "status": "catalogued",
+      "engine_tier": "native_arx_only",
+      "owner_ticket": "M08N-T02",
+      "implementation_strategy": "native_arx_cpp",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "editor.statusbar.add_pane",
+      "family": "ui_customization",
+      "status": "catalogued",
+      "engine_tier": "native_arx_only",
+      "owner_ticket": "M08N-T02",
+      "implementation_strategy": "native_arx_cpp",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "editor.statusbar.context_menu",
+      "family": "ui_customization",
+      "status": "catalogued",
+      "engine_tier": "native_arx_only",
+      "owner_ticket": "M08N-T02",
+      "implementation_strategy": "native_arx_cpp",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "editor.statusbar.get",
+      "family": "ui_customization",
+      "status": "catalogued",
+      "engine_tier": "native_arx_only",
+      "owner_ticket": "M08N-T02",
+      "implementation_strategy": "native_arx_cpp",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "editor.statusbar.pane",
+      "family": "ui_customization",
+      "status": "catalogued",
+      "engine_tier": "managed_also",
+      "owner_ticket": "M08N-T02",
+      "implementation_strategy": "managed_dotnet",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "editor.statusbar.pane_config",
+      "family": "ui_customization",
+      "status": "catalogued",
+      "engine_tier": "native_arx_only",
+      "owner_ticket": "M08N-T02",
+      "implementation_strategy": "native_arx_cpp",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "editor.statusbar.remove_pane",
+      "family": "ui_customization",
+      "status": "catalogued",
+      "engine_tier": "native_arx_only",
+      "owner_ticket": "M08N-T02",
+      "implementation_strategy": "native_arx_cpp",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "editor.toolpalette.add_tool",
+      "family": "ui_customization",
+      "status": "catalogued",
+      "engine_tier": "native_arx_only",
+      "owner_ticket": "M08N-T02",
+      "implementation_strategy": "native_arx_cpp",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "editor.toolpalette.catalog_item_props",
+      "family": "ui_customization",
+      "status": "catalogued",
+      "engine_tier": "native_arx_only",
+      "owner_ticket": "M08N-T02",
+      "implementation_strategy": "native_arx_cpp",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "editor.toolpalette.catalog_manager",
+      "family": "ui_customization",
+      "status": "catalogued",
+      "engine_tier": "native_arx_only",
+      "owner_ticket": "M08N-T02",
+      "implementation_strategy": "native_arx_cpp",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "editor.toolpalette.create",
+      "family": "ui_customization",
+      "status": "catalogued",
+      "engine_tier": "native_arx_only",
+      "owner_ticket": "M08N-T02",
+      "implementation_strategy": "native_arx_cpp",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "editor.toolpalette.export",
+      "family": "ui_customization",
+      "status": "catalogued",
+      "engine_tier": "native_arx_only",
+      "owner_ticket": "M08N-T02",
+      "implementation_strategy": "native_arx_cpp",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "editor.toolpalette.global_init",
+      "family": "ui_customization",
+      "status": "catalogued",
+      "engine_tier": "native_arx_only",
+      "owner_ticket": "M08N-T02",
+      "implementation_strategy": "native_arx_cpp",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "editor.toolpalette.group_activate",
+      "family": "ui_customization",
+      "status": "catalogued",
+      "engine_tier": "native_arx_only",
+      "owner_ticket": "M08N-T02",
+      "implementation_strategy": "native_arx_cpp",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "editor.toolpalette.group_create",
+      "family": "ui_customization",
+      "status": "catalogued",
+      "engine_tier": "native_arx_only",
+      "owner_ticket": "M08N-T02",
+      "implementation_strategy": "native_arx_cpp",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "editor.toolpalette.refresh",
+      "family": "ui_customization",
+      "status": "catalogued",
+      "engine_tier": "native_arx_only",
+      "owner_ticket": "M08N-T02",
+      "implementation_strategy": "native_arx_cpp",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "editor.toolpalette.scheme_create",
+      "family": "ui_customization",
+      "status": "catalogued",
+      "engine_tier": "native_arx_only",
+      "owner_ticket": "M08N-T02",
+      "implementation_strategy": "native_arx_cpp",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "editor.toolpalette.scheme_register",
+      "family": "ui_customization",
+      "status": "catalogued",
+      "engine_tier": "native_arx_only",
+      "owner_ticket": "M08N-T02",
+      "implementation_strategy": "native_arx_cpp",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "editor.toolpalette.stocktool_find",
+      "family": "ui_customization",
+      "status": "catalogued",
+      "engine_tier": "native_arx_only",
+      "owner_ticket": "M08N-T02",
+      "implementation_strategy": "native_arx_cpp",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "editor.toolpalette.tool_execute",
+      "family": "ui_customization",
+      "status": "catalogued",
+      "engine_tier": "native_arx_only",
+      "owner_ticket": "M08N-T02",
+      "implementation_strategy": "native_arx_cpp",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "editor.toolpalette.tool_set_command",
+      "family": "ui_customization",
+      "status": "catalogued",
+      "engine_tier": "native_arx_only",
+      "owner_ticket": "M08N-T02",
+      "implementation_strategy": "native_arx_cpp",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "editor.toolpalette.window_get",
+      "family": "ui_customization",
+      "status": "catalogued",
+      "engine_tier": "native_arx_only",
+      "owner_ticket": "M08N-T02",
+      "implementation_strategy": "native_arx_cpp",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "editor.toolpalette.window_show",
+      "family": "ui_customization",
+      "status": "catalogued",
+      "engine_tier": "native_arx_only",
+      "owner_ticket": "M08N-T02",
+      "implementation_strategy": "native_arx_cpp",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "editor.toolpaletteset.add_palette",
+      "family": "ui_customization",
+      "status": "catalogued",
+      "engine_tier": "native_arx_only",
+      "owner_ticket": "M08N-T02",
+      "implementation_strategy": "native_arx_cpp",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "editor.toolpaletteset.show",
+      "family": "ui_customization",
+      "status": "catalogued",
+      "engine_tier": "native_arx_only",
+      "owner_ticket": "M08N-T02",
+      "implementation_strategy": "native_arx_cpp",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "editor.tray.add_item",
+      "family": "ui_customization",
+      "status": "catalogued",
+      "engine_tier": "native_arx_only",
+      "owner_ticket": "M08N-T02",
+      "implementation_strategy": "native_arx_cpp",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "editor.tray.item_config",
+      "family": "ui_customization",
+      "status": "catalogued",
+      "engine_tier": "native_arx_only",
+      "owner_ticket": "M08N-T02",
+      "implementation_strategy": "native_arx_cpp",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    },
+    {
+      "operation": "editor.tray.remove",
+      "family": "ui_customization",
+      "status": "catalogued",
+      "engine_tier": "native_arx_only",
+      "owner_ticket": "M08N-T02",
+      "implementation_strategy": "native_arx_cpp",
+      "evidence_required": "unit_test+native_extraction_fixture",
+      "risk_class": "read_safe"
+    }
+  ]
+}
