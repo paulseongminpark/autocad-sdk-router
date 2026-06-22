@@ -1,0 +1,65 @@
+{
+  "ticket_id": "M08E",
+  "phase": "M08 READ family",
+  "title": "Native READ family E — blocks / dictionaries / xdata-xrecords reads",
+  "status": "PASS",
+  "branch": "cados/M08E",
+  "base_branch": "main",
+  "commits": ["4e5ddf5 (handlers + plan)", "9f69197 (tests)"],
+  "pr": "https://github.com/paulseongminpark/autocad-sdk-router/pull/8",
+  "depends_on": "M08A + M08B infra (merged to main) + M08C0 family seam",
+  "design_spec": "docs/NATIVE_ARX_DBX_DESIGN.md sec 2.2, sec 4; research/native_arx/acdb-core.md",
+  "owned_file": "src/Ariadne.AcadNative/families/m08e_handlers.inc",
+  "shared_files_changed": 0,
+  "change_only_honored": true,
+  "implemented_ops": 4,
+  "implemented_op_ids": [
+    "inspect.entity.get_xdata",
+    "inspect.dictionary.named_objects",
+    "inspect.dictionary.get",
+    "inspect.block.iterate"
+  ],
+  "op_apis": {
+    "inspect.entity.get_xdata": "AcDbObject::xData(const ACHAR* regapp=nullptr) (dbObject.h:265) -> xdataBlocksJson; acutRelRb frees",
+    "inspect.dictionary.named_objects": "AcDbDatabase::getNamedObjectsDictionary(kForRead) -> dictionaryEntriesJson (+ xrecordJson for NOD-owned xrecords)",
+    "inspect.dictionary.get": "AcDbDictionary::getAt(const ACHAR*, AcDbObjectId&) (dbdict.h:106); eKeyNotFound = found:false (normal miss, not error); sub-dict listing via dictionaryEntriesJson",
+    "inspect.block.iterate": "getBlockTable -> AcDbBlockTable::getAt(ACDB_MODEL_SPACE|name)/resolveHandle -> AcDbBlockTableRecord::newIterator -> AcDbBlockTableRecordIterator::getEntity (dbsymtb.h:1654); serializeEntityCommon per entity"
+  },
+  "gate_mechanism": "familyHasOp(op) (the family seam). NOT added to kAriadneNativeOperationTable -> dispatcher-table parity invariant (test_m08b_dispatcher_table) untouched; m08e op== comparisons are #included before ariadneNativeJob() so they are outside the scanned dispatcher region.",
+  "hard_blocked_ops": 0,
+  "deprecated_ops": 0,
+  "catalogued_remaining": 7,
+  "catalogued_remaining_detail": [
+    {"op": "write.block.append_entity", "tier": "objectdbx_capable", "persist": true, "reason": "appends entity to a BTR (original-DWG mutation) -> M08G write lane, not a read-only family"},
+    {"op": "write.dictionary.set", "tier": "objectdbx_capable", "persist": true, "reason": "adds/replaces a NOD/dict entry (mutation) -> write lane"},
+    {"op": "write.entity.set_xdata", "tier": "objectdbx_capable", "persist": true, "reason": "attaches xdata, needs regapp in APPID (mutation) -> write lane"},
+    {"op": "transform.database.deep_clone", "tier": "native_arx_only", "persist": true, "reason": "deepCloneObjects is a host-only mutation mechanism; not read-only, not headless"},
+    {"op": "transform.database.insert_block", "tier": "objectdbx_capable", "persist": true, "reason": "AcDbDatabase::insert creates a BTR + copies entities (mutation) -> write lane"},
+    {"op": "acdb.database.create", "tier": "objectdbx_capable", "persist": false, "reason": "constructs a NEW AcDbDatabase; the headless job already owns/serves the working DB; side-DB creation is runtime/infra, not a read on ctx.pDb"},
+    {"op": "infra.hostapp.provide_services", "tier": "objectdbx_capable", "persist": false, "reason": "the host-application-services subclass IS the accoreconsole host bootstrap (already provided by the running .crx host); not a per-job READ handler action"}
+  ],
+  "build": {
+    "tool": "tools/build_native_acad.ps1",
+    "exit_code": 0,
+    "isolation": "built in a dedicated git worktree (D:/dev/99_tools/_m08e_wt) pinned to the branch commit, to avoid the shared-checkout race with concurrent M08C/M08D agents in the main directory",
+    "msbuild": "VS2026 Community, x64, Release",
+    "arx_relink_mode": "canonical",
+    "artifacts": {
+      "Ariadne.AcadNativeDbx.dbx": 48128,
+      "Ariadne.AcadNative.crx": 284672,
+      "Ariadne.AcadNative.arx": 292352
+    }
+  },
+  "structured_error_codes": [
+    "MISSING_HANDLE", "HANDLE_NOT_FOUND", "OBJECT_OPEN_FAILED",
+    "NOD_OPEN_FAILED", "MISSING_KEY", "DICT_OPEN_FAILED",
+    "BLOCK_TABLE_OPEN_FAILED", "BLOCK_NOT_FOUND", "BTR_OPEN_FAILED", "BTR_ITER_FAILED"
+  ],
+  "tests": [
+    "tools/build_native_acad.ps1 = exit 0 (.dbx + .crx + .arx compile + link, ObjectARX 2027)",
+    "pytest tests/unit/test_m08e_handlers.py = 11 passed (HasOp<->Dispatch parity for the 4 reads; 7 write ops not claimed; read-only token scan on comment-stripped code; kForRead-only opens; UTF-8 via njsonStr; in-TU serializer reuse)",
+    "pytest tests/unit = 289 passed, 13 skipped, 0 failed (no regression; test_m08c0_family_seam + test_m08b_dispatcher_table still green)"
+  ],
+  "hard_constraints": "read-only (no save/saveAs/_QSAVE, no acedCommand/acedCmd, no append/set/clone, no acdbSetHostApplicationServices); every acdbOpenObject is kForRead; UTF-8 fidelity via njsonStr (Korean layer/block names); no fake PASS; reuses in-TU primitives (no re-rolled encoders); no secrets",
+  "next": "Merge PR #8 to main (with sibling C/D/F via the merge orchestrator). Direct-ARIADNE_NATIVE_JOB runtime smoke for these 4 reads belongs to MERGE-M08-READ (router routes catalogued ops to the managed plane; the native gate fires only on a direct ARIADNE_NATIVE_JOB harness). Write ops (append/set/clone/insert/create) -> M08G write lane."
+}
