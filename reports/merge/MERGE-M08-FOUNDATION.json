@@ -1,0 +1,33 @@
+{
+  "merge_id": "MERGE-M08-FOUNDATION",
+  "role": "merge_executor",
+  "date": "2026-06-22",
+  "scope": "M08A foundation (M08A-T01, M08A-T02) pre-merge to main",
+  "status": "PASS",
+  "merged": [
+    {"pr": 1, "branch": "cados/M08A-T01", "title": "reopen catalog + ban v1_target escape", "merged_at": "2026-06-22T07:51:08Z"},
+    {"pr": 2, "branch": "cados/M08A-T02", "title": "execution DAG + ticket inventory", "base_retargeted_to": "main", "merged_at": "2026-06-22T07:51:13Z"}
+  ],
+  "rejected": [],
+  "main_commit": "c554f23",
+  "main_commit_parents": ["85bfbb0", "88a6b95"],
+  "post_merge_gate": {
+    "pytest_tests_unit": "266 passed",
+    "registry_coverage_consistent": true,
+    "registry_unknown": 0,
+    "registry_stub": 0,
+    "v1_gate_pass": true,
+    "closure_gate_pass": false,
+    "by_status": {"implemented": 41, "blocked": 2, "catalogued": 474, "stub": 0, "unknown": 0}
+  },
+  "reject_if_audit": {
+    "original_dwg_changed": false,
+    "secrets_staged": false,
+    "raw_command_agent_exposed": false,
+    "existing_29_frozen_regress": false,
+    "catalogued_stub_unknown_increased_unexplained": false,
+    "ticket_report_missing": false,
+    "tests_fail": false
+  },
+  "next": "M08B (native dispatcher/serializer/lock infra) in a build-capable checkout; then family waves READ -> WRITE/VISLIVE/NATIVE/FALLBACK -> FINAL"
+}
