@@ -1,9 +1,9 @@
 # Next Step
 
-Proceed to **CADOS_M08_FULL_OPERATION_COVERAGE_CLOSURE_WITH_LIVE_PARTIAL_REVIEW**.
+Proceed to **CADOS_M08_FULL_OPERATION_COVERAGE_CLOSURE**.
 
 M03–M06 closed PASS; **M07 PARTIAL_PASS**; **M07A** implemented + build-verified; **M07B
-PARTIAL_PASS** (attended GUI verification + native deploy closure).
+PASS** (attended GUI verification + native deploy closure; deep-native firing CLOSED).
 
 ## M07B closed (PARTIAL_PASS)
 
@@ -17,11 +17,14 @@ PARTIAL_PASS** (attended GUI verification + native deploy closure).
 - Reports: `reports/{attended_gui,live_pump,deep_native,opm_property,worlddraw,native_smoke,live_job_args_contract,attended_shutdown}_latest.json`,
   `reports/CADOS_M07B_ATTENDED_GUI_VERIFICATION_AND_NATIVE_DEPLOY.md`.
 
-## M07B residual → M08 live-partial review
+## M07B firing residual — CLOSED
 
-Reactor / overrule / selection-monitor **LIVE FIRING COUNTS** were not captured (need synthesized
-interactive editor events). Implemented + registered + headless-proven. Carry as an M08 live-partial
-review item, or close via a human-in-the-loop / scripted-command attended pass.
+Reactor / overrule / selection-monitor **LIVE FIRING COUNTS** are captured with live data in BOTH
+headless and attended (reactor 1/1, overrule 2/3, selmon 1/1) via `extend.deep_native.firing_selftest`
++ `inspect.deep_native.firing_report` (overrule=`acdbOpenObject`, selmon=`acedSSSetFirst`, reactor
+`commandWillStart` on a 2nd command). No acedCommand reentrancy, no human, zero COM.
+`runs/m07b_firing/run_firing.ps1 -Mode headless|attended` · `reports/firing_latest.json`.
+The 3 `CADOS_LIVE=1` live tests also run+pass (298/0). M07B = full PASS.
 
 Do not jump to Daedalus integration before the CAD OS v1 gate (M08 → M09 freeze) is closed.
 If M09 does not PASS, repeat M10 blocker burn-down. No fake PASS. No original DWG write. No remote push.

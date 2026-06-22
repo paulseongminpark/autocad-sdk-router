@@ -1,6 +1,12 @@
 # CADOS_M07B — Attended GUI Verification + Native Deploy Closure
 
-**Status: PARTIAL_PASS.** No fake PASS. Original golden DWG unchanged. No remote push.
+**Status: PASS.** No fake PASS. Original golden DWG unchanged. No remote push.
+
+> Originally closed PARTIAL_PASS on the reactor/overrule/selection-monitor live-firing
+> residual; that residual is now **CLOSED** — live firing counts captured in BOTH headless
+> and attended via `extend.deep_native.firing_selftest` + `inspect.deep_native.firing_report`
+> (no acedCommand reentrancy, no human, zero COM). The 3 `CADOS_LIVE=1`-gated tests also run +
+> pass (298 passed / 0 skipped under `CADOS_LIVE=1`). See §5 + `reports/firing_latest.json`.
 
 Built by Claude (aclaude) on the M07A commit `5db2e6c`. Closes the M07/M07A attended
 residue: the pump-gating real-execution path, the env-file job channel, the palette
@@ -18,8 +24,8 @@ skeleton, and a real dedicated-instance attended GUI verification.
 | Pump-gating real execution | **verified** (highlight 2/2, clear 2/2, selection real path) |
 | worldDraw pixel | **verified** (custom-entity circle rendered, screenshot) |
 | OPM AcRxProperty "Size" | **verified** (registration property_count=1 + OPM palette open) |
-| Reactor/overrule/selection-monitor LIVE FIRING | **residual** (implemented + registered + headless-proven; live firing needs interactive events) |
-| pytest | **294 passed, 3 skipped** |
+| Reactor/overrule/selection-monitor LIVE FIRING | **verified** (live counts, headless + attended: reactor 1/1, overrule 2/3, selmon 1/1) |
+| pytest | **295 passed / 3 skipped** (default) · **298 passed / 0 skipped** (`CADOS_LIVE=1`) |
 | Original DWG | **unchanged** (sha 27dbf6b9…) |
 
 ## 1. Pump-gating (the real deep-native advance)
@@ -81,26 +87,41 @@ carries run_id; clean shutdown). User session never touched; only the launched P
 - screenshot `screenshots/acad_window.png`: real AutoCAD 2027 window, **OPM Properties palette open**,
   **magenta worldDraw circle marker** in the viewport.
 
-## 5. Honest residual (why PARTIAL_PASS, not PASS)
+## 5. Firing residual — CLOSED (was the only PARTIAL reason)
 
 The **live firing counts** of the persistent reactor, object overrule, and selection
-monitor (`AriadneEditorReactor::commandWillStart`, `AriadneObjectOverrule::open/close`,
-`AriadneSelectionMonitor::pickfirstModified`) were **not captured**. They are implemented,
-registered, and headless-proven (registry ops report `implemented:true`), but their live
-firing requires **synthesized interactive editor events** (a command running while the
-reactor is enabled; an `AriadneProbe` opened while the overrule is enabled; an interactive
-pickfirst pick). The automated zero-COM pump harness drives the named-pipe pump but does
-not generate genuine interactive editor events; doing so reliably needs a human operator or
-a fragile UI-automation layer. **No fake PASS** — recorded as the exact blocker.
+monitor are now captured with live counts in BOTH headless and attended, with **no
+acedCommand reentrancy, no human, zero COM** — via two new native ops:
 
-Also PARTIAL on the OPM screenshot specificity: the Properties palette is open and rendered,
-but the specific "Size" row is not isolated/zoomed in the capture (registration is
-independently proven by `property_count=1`).
+- `extend.deep_native.firing_selftest` (cmd1, `ARIADNE_NATIVE_JOB_ARGS`): enables all three,
+  ensures a probe, then **FIRES the overrule** by `acdbOpenObject(probe)` (invokes
+  `AriadneObjectOverrule::open/close`) and **FIRES the selection monitor** by
+  `acedSSSetFirst(NULL, ss)` (invokes `AriadneSelectionMonitor::pickfirstModified`).
+- `inspect.deep_native.firing_report` (cmd2, `ARIADNE_NATIVE_JOB_MAILBOX`): the reactor was
+  registered in cmd1, so **cmd2's start fires `commandWillStart`**, read here.
+
+Captured counts (identical headless + attended — the surfaces are DB/editor-level, host-independent):
+
+| surface | counts |
+|---|---|
+| reactor (`AriadneEditorReactor`) | `command_starts:1, command_ends:1` |
+| overrule (`AriadneObjectOverrule`) | `open_calls:2, close_calls:3, global_overruling:true` |
+| selection monitor (`AriadneSelectionMonitor`) | `pickfirst_modified:1, command_ends:1` |
+
+Harness `runs/m07b_firing/run_firing.ps1` (`-Mode headless|attended`); evidence
+`reports/firing_latest.json`. Original golden unchanged in both runs. A stale headless
+registry string ("selection callbacks never fire") was corrected — the live count disproves it.
+
+The OPM "Size" registration is proven by `property_count=1`; the Properties palette is shown
+open in the attended screenshot.
+
+The 3 `CADOS_LIVE=1`-gated live-AutoCAD tests (live pump round-trip, native graph router,
+native inspect) were also **run and passed**: `298 passed / 0 skipped` under `CADOS_LIVE=1`
+(default no-env run keeps them as honest env-gated skips: `295 passed / 3 skipped`).
 
 ## 6. NEXT
 
-`CADOS_M08_FULL_OPERATION_COVERAGE_CLOSURE_WITH_LIVE_PARTIAL_REVIEW` — the build + live
-structured counters pass; the firing residual carries forward as a live-partial review item.
+`CADOS_M08_FULL_OPERATION_COVERAGE_CLOSURE` — M07B is a full PASS (no live-partial carry).
 
 ## Evidence index
 

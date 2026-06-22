@@ -5,10 +5,18 @@
   "build": {
     "command": "tools/build_native_acad.ps1",
     "arx_relink_mode": "canonical",
-    "dbx_bytes": 48128, "dbx_sha256_16": "EAA1EB3B0DB8B2A8",
-    "crx_bytes": 247808, "crx_sha256_16": "C6DCFC81E9E82E3D",
-    "arx_bytes": 255488, "arx_sha256_16": "E161694731B580F5",
+    "dbx_bytes": 48128, "dbx_sha256_12": "EAA1EB3B0DB8",
+    "crx_bytes": 250368, "crx_sha256_12": "59293E551267",
+    "arx_bytes": 258048, "arx_sha256_12": "87A2579DF808",
     "log": "reports/build_native_m07b.log"
+  },
+  "deep_native_firing": {
+    "harness": "runs/m07b_firing/run_firing.ps1 (-Mode headless|attended)",
+    "reactor": "command_starts 1, command_ends 1",
+    "overrule": "open_calls 2, close_calls 3, global_overruling true",
+    "selection_monitor": "pickfirst_modified 1, command_ends 1",
+    "hosts": "captured in BOTH headless and attended; original golden unchanged",
+    "report": "reports/firing_latest.json"
   },
   "headless_channel_smoke": {
     "harness": "runs/m07b_native_smoke/run_native_smoke.ps1 (ARIADNE_NATIVE_JOB_ARGS env-file channel, accoreconsole, host_mode coreconsole)",
@@ -25,7 +33,7 @@
   },
   "router_status": "ALL routes probed (autocad-router.ps1 -Action status)",
   "registry": { "operation_count": 517, "unknown": 0, "consistent": true },
-  "pytest": "294 passed, 3 skipped (incl. 9 new M07B source guards)",
+  "pytest": "295 passed / 3 skipped (default); 298 passed / 0 skipped (CADOS_LIVE=1 -> 3 live AutoCAD tests run+pass)",
   "original_dwg_modified": false,
   "m03_ir_smoke_preserved": {
     "note": "prior CADOS_M03 native rich-IR smoke (inspect.database.graph), still valid",

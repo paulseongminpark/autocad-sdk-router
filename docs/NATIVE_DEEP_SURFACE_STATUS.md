@@ -44,10 +44,14 @@ Rows 3, 7, 8 above are superseded — `reports/deep_native_latest.json` is the c
 
 **M07B counts:** 10 implemented/verified · 0 attended_blocked · 0 design_only.
 
-**Live-firing residual (PARTIAL_PASS):** reactor (row 5) / overrule (row 4) / selection-monitor (row 7)
-LIVE FIRING COUNTS were not captured — they need synthesized interactive editor events (command start,
-entity open, pickfirst pick) the automated zero-COM harness does not generate. All three are registered +
-headless-proven. Deferred to M07C / M08-with-live-partial-review. No fake PASS.
+**Live-firing CLOSED (M07B = PASS):** reactor (row 5) / overrule (row 4) / selection-monitor (row 7)
+LIVE FIRING COUNTS captured with live data in BOTH headless and attended, with **no acedCommand
+reentrancy, no human, zero COM** — via `extend.deep_native.firing_selftest` (overrule = `acdbOpenObject`,
+selmon = `acedSSSetFirst`) + `inspect.deep_native.firing_report` (reactor `commandWillStart` fires on a
+2nd command). Counts: reactor command_starts 1 / command_ends 1; overrule open 2 / close 3; selmon
+pickfirst_modified 1 / command_ends 1. Evidence `reports/firing_latest.json` · `runs/m07b_firing/`.
+(A stale headless registry string — "selection callbacks never fire" — was corrected; the live count
+disproves it: programmatic pickfirst fires in both hosts, interactive mouse-pick needs the attended editor.)
 
 **Attended verified** (run `cados_m07b_attended_20260622_123505`, dedicated acad.exe, zero COM): live pump
 (host_mode full_autocad), pump-gating real execution (highlight 2/2, clear 2/2, selection real path),

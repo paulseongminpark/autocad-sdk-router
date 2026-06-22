@@ -122,6 +122,22 @@ def test_palette_registration_is_arx_only(arx_src: str):
     assert 'extern "C" void ariadneRegisterPaletteCommand();' in arx_src
 
 
+def test_deep_native_firing_ops_present(arx_src: str):
+    """M07B firing self-test: enable + FIRE reactor/overrule/selection-monitor with
+    no acedCommand reentrancy (overrule via acdbOpenObject, selmon via acedSSSetFirst),
+    + a firing_report op that reads all three registries."""
+    assert 'op == "extend.deep_native.firing_selftest"' in arx_src
+    assert 'op == "inspect.deep_native.firing_report"' in arx_src
+    assert "enableEditorReactor" in arx_src
+    assert "enableObjectOverrule" in arx_src
+    assert "enableSelectionMonitor" in arx_src
+    assert "acedSSSetFirst(NULL, ss)" in arx_src
+    assert "findFirstProbe" in arx_src
+    assert "reactorRegistryJson" in arx_src
+    assert "overruleRegistryJson" in arx_src
+    assert "selectionMonitorRegistryJson" in arx_src
+
+
 def test_palette_in_arx_project_not_crx_project():
     arx = _read(ARX_VCXPROJ)
     crx = _read(CRX_VCXPROJ)

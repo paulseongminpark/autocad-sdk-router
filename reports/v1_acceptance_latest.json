@@ -1,32 +1,33 @@
 {
   "schema": "ariadne.cad_os.v1_acceptance.v1",
   "timestamp": "2026-06-22T12:40:00+09:00",
-  "cad_os_v1_status": "ON_TRACK (M02-M06 PASS; M07 PARTIAL_PASS; M07A/M07B done; M08-M09 remain)",
+  "cad_os_v1_status": "ON_TRACK (M02-M06 PASS; M07 PARTIAL_PASS; M07A done; M07B PASS; M08-M09 remain)",
   "milestones": {
     "m02": "PASS (15/15)",
     "m03": "PASS", "m04": "PASS", "m05": "PASS", "m06": "PASS",
     "m07": "PARTIAL_PASS (live ARX pump 12 ops + CADAGENT_STATUS, headless 17/17; deep native 7 impl)",
     "m07a": "implemented + build-verified (selection monitor + AcRxProperty/OPM)",
-    "m07b": "PARTIAL_PASS (attended GUI verification + native deploy closure)"
+    "m07b": "PASS (attended GUI verification + native deploy closure; deep-native firing closed headless+attended)"
   },
   "registry": { "unknown_operations": 0, "implemented_operations": 37, "operation_count": 517 },
   "m07b": {
-    "status": "PARTIAL_PASS",
-    "native_build": "canonical (.dbx 48128 / .crx 247808 / .arx 255488)",
+    "status": "PASS",
+    "native_build": "canonical (.dbx 48128 / .crx 250368 / .arx 258048)",
     "pump_gating": "integrated + tested (real highlight/selection attended; honest zoom/render deferral; headless 17/17 preserved)",
     "palette": "implemented (MFC-free ARIADNE_PALETTE arx-only; docked CAdUiPaletteSet MFC enhancement deferred)",
     "live_job_argument_contract": "finalized (ARIADNE_NATIVE_JOB_ARGS env-file channel; M07A blocker resolved)",
     "attended_verified": ["live pump in real acad.exe", "pump-gating real execution (highlight 2/2)", "worldDraw circle rendered", "OPM Properties palette open + AcRxProperty Size registration", "custom entity creation attended", "all 3 safety gates"],
-    "attended_residual": "reactor/overrule/selection-monitor LIVE FIRING counts (implemented + registered + headless-proven; live firing needs interactive editor events)",
-    "pytest": "294 passed, 3 skipped",
+    "deep_native_firing_verified": "reactor 1/1 + overrule 2/3 + selmon 1/1 (live counts, headless AND attended; firing_selftest + firing_report, no acedCommand reentrancy). reports/firing_latest.json",
+    "pytest": "295 passed / 3 skipped (default); 298 passed / 0 skipped (CADOS_LIVE=1 -> 3 live tests run+pass)",
     "original_dwg_modified": false,
     "remote_push": false
   },
-  "next": "CADOS_M08_FULL_OPERATION_COVERAGE_CLOSURE_WITH_LIVE_PARTIAL_REVIEW",
+  "next": "CADOS_M08_FULL_OPERATION_COVERAGE_CLOSURE",
   "evidence": [
     "reports/live_pump_latest.json",
     "reports/deep_native_latest.json",
     "reports/attended_gui_latest.json",
+    "reports/firing_latest.json",
     "reports/opm_property_latest.json",
     "reports/worlddraw_latest.json",
     "reports/native_smoke_latest.json",

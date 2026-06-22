@@ -1,0 +1,30 @@
+{
+  "schema": "ariadne.cad_os.m07b.deep_native_firing.v1",
+  "packet": "CADOS_M07B_ATTENDED_GUI_VERIFICATION_AND_NATIVE_DEPLOY",
+  "status": "PASS",
+  "closes": "the M07B PARTIAL residual: live FIRING counts of reactor / overrule / selection-monitor",
+  "mechanism": {
+    "ops": ["extend.deep_native.firing_selftest", "inspect.deep_native.firing_report"],
+    "no_acedcommand_reentrancy": true,
+    "overrule_fire": "acdbOpenObject(probe, kForRead) invokes AriadneObjectOverrule::open/close",
+    "selection_monitor_fire": "acedSSSetFirst(NULL, ss-with-probe) invokes AriadneSelectionMonitor::pickfirstModified",
+    "reactor_fire": "commandWillStart fires on the SECOND command boundary; cmd1=ARIADNE_NATIVE_JOB_ARGS (firing_selftest), cmd2=ARIADNE_NATIVE_JOB_MAILBOX (firing_report) -> reactor was registered in cmd1, so cmd2's start fires commandWillStart, read in cmd2",
+    "harness": "runs/m07b_firing/run_firing.ps1 (-Mode headless | attended)"
+  },
+  "headless": {
+    "host": "accoreconsole (coreconsole)",
+    "reactor": { "registered": true, "command_starts": 1, "command_ends": 1, "last_command": "ARIADNE_NATIVE_JOB_MAILBOX" },
+    "overrule": { "registered": true, "global_overruling": true, "open_calls": 2, "close_calls": 3 },
+    "selection_monitor": { "registered": true, "pickfirst_modified": 1, "command_ends": 1 },
+    "original_golden_unchanged": true
+  },
+  "attended": {
+    "host": "full AutoCAD 2027 (acad.exe), dedicated PID 36096, zero COM",
+    "reactor": { "registered": true, "command_starts": 1, "command_ends": 1, "last_command": "ARIADNE_NATIVE_JOB_MAILBOX" },
+    "overrule": { "registered": true, "global_overruling": true, "open_calls": 2, "close_calls": 3 },
+    "selection_monitor": { "registered": true, "pickfirst_modified": 1, "command_ends": 1, "live_events_supported": true },
+    "original_golden_unchanged": true
+  },
+  "note": "Firing is host-independent (overrule/reactor are DB/editor-level; acedEditor is non-null in both hosts), so the same live counts are captured headless AND attended. The selection-monitor registry's prior 'never fire' headless text was corrected: programmatic pickfirst (acedSSSetFirst) fires pickfirstModified in both hosts; interactive mouse-pick events need the attended editor.",
+  "original_dwg_modified": false
+}

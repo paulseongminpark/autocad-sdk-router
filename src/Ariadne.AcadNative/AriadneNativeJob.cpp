@@ -1568,6 +1568,46 @@ static Acad::ErrorStatus appendProbe(AcDbDatabase* pDb,
     return es;
 }
 
+// M07B firing self-test helper: find the first AriadneProbe in model space (its
+// objectId), used to FIRE the object overrule (acdbOpenObject) and the selection
+// monitor (acedSSSetFirst) deterministically without any acedCommand reentrancy.
+static bool findFirstProbe(AcDbDatabase* pDb, AcDbObjectId& outId)
+{
+    outId = AcDbObjectId::kNull;
+    if (pDb == nullptr)
+        return false;
+    AcDbBlockTable* pBT = nullptr;
+    if (pDb->getBlockTable(pBT, AcDb::kForRead) != Acad::eOk)
+        return false;
+    AcDbBlockTableRecord* pMS = nullptr;
+    if (pBT->getAt(ACDB_MODEL_SPACE, pMS, AcDb::kForRead) != Acad::eOk) {
+        pBT->close();
+        return false;
+    }
+    pBT->close();
+    AcDbBlockTableRecordIterator* pIt = nullptr;
+    if (pMS->newIterator(pIt) != Acad::eOk) {
+        pMS->close();
+        return false;
+    }
+    bool found = false;
+    for (pIt->start(); !pIt->done(); pIt->step()) {
+        AcDbEntity* pE = nullptr;
+        if (pIt->getEntity(pE, AcDb::kForRead) == Acad::eOk) {
+            if (ariadneIsProbeEntity(pE)) {
+                outId = pE->objectId();
+                found = true;
+                pE->close();
+                break;
+            }
+            pE->close();
+        }
+    }
+    delete pIt;
+    pMS->close();
+    return found;
+}
+
 static Acad::ErrorStatus openAriadneDict(AcDbDatabase* pDb, AcDb::OpenMode mode,
                                          bool createIfMissing,
                                          AcDbDictionary*& pDict)
@@ -2592,7 +2632,7 @@ static std::string selectionMonitorRegistryJson(const std::string& jobHostMode)
         + "\"items\":" + (gAriadneSelectionMonitor != nullptr ? "[\"AriadneSelectionMonitor\"]" : "[]") + ","
         + "\"reason\":\"" + (fullAutoCad
             ? "Full AutoCAD editor delivers interactive selection notifications"
-            : "Core Console has no interactive editor; selection callbacks never fire") + "\"}";
+            : "Core Console has no interactive pick UI, but programmatic pickfirst (acedSSSetFirst) still fires pickfirstModified -- see firing_report counts") + "\"}";
 }
 
 static std::string overruleRegistryJson(const std::string& jobHostMode)
@@ -3027,6 +3067,67 @@ static void ariadneNativeJob()
     else if (op == "live.jig.point_probe") {
         r << "\"result\":" << runLineJigProbe(job, jobHostMode) << ","
           << "\"status\":\"ok\"}";
+    }
+    else if (op == "extend.deep_native.firing_selftest") {
+        // M07B: deterministically FIRE the interactive deep-native surfaces with NO
+        // acedCommand reentrancy. Enable reactor + overrule + selection monitor,
+        // ensure a probe, then OPEN the probe (invokes AriadneObjectOverrule
+        // open/close) and SSSetFirst it (invokes AriadneSelectionMonitor
+        // pickfirstModified). The reactor's commandWillStart fires on the NEXT
+        // command boundary; read it via inspect.deep_native.firing_report from a
+        // SECOND command (e.g. the mailbox channel). overrule/selmon captured here.
+        bool rc = false, oc = false, sc = false;
+        enableEditorReactor(rc);
+        enableObjectOverrule(oc);
+        enableSelectionMonitor(sc);
+        AcDbObjectId probeId;
+        bool created = false;
+        if (!findFirstProbe(pDb, probeId)) {
+            if (appendProbe(pDb, AcGePoint3d(150000.0, 350000.0, 0.0), 3000.0) == Acad::eOk) {
+                created = true;
+                findFirstProbe(pDb, probeId);
+            }
+        }
+        if (!probeId.isNull()) {                         // FIRE overrule open/close
+            AcDbEntity* pE = nullptr;
+            if (acdbOpenObject(pE, probeId, AcDb::kForRead) == Acad::eOk && pE != nullptr)
+                pE->close();
+        }
+        bool selFired = false;                           // FIRE selection monitor
+        if (!probeId.isNull()) {
+            ads_name en;
+            if (acdbGetAdsName(en, probeId) == Acad::eOk) {
+                ads_name ss;
+                if (acedSSAdd(en, NULL, ss) == RTNORM) {
+                    if (acedSSSetFirst(NULL, ss) == RTNORM)
+                        selFired = true;
+                    acedSSFree(ss);
+                }
+            }
+        }
+        r << "\"result\":{"
+          << "\"host_mode\":\"" << jsonEscape(jobHostMode) << "\""
+          << ",\"reactor_registered\":" << (gAriadneEditorReactor != nullptr ? "true" : "false")
+          << ",\"overrule_registered\":" << (gAriadneObjectOverrule != nullptr ? "true" : "false")
+          << ",\"selection_monitor_registered\":" << (gAriadneSelectionMonitor != nullptr ? "true" : "false")
+          << ",\"probe_found_or_created\":" << (!probeId.isNull() ? "true" : "false")
+          << ",\"probe_created\":" << (created ? "true" : "false")
+          << ",\"overrule_open_calls\":" << gOverruleOpenCalls
+          << ",\"overrule_close_calls\":" << gOverruleCloseCalls
+          << ",\"selmon_pickfirst_mods\":" << gSelMonPickfirstMods
+          << ",\"selmon_command_ends\":" << gSelMonCommandEnds
+          << ",\"sssetfirst_ok\":" << (selFired ? "true" : "false")
+          << "},\"status\":\"ok\"}";
+    }
+    else if (op == "inspect.deep_native.firing_report") {
+        // M07B: read all three firing registries together. When invoked as a SECOND
+        // command after firing_selftest, the reactor's commandWillStart has fired on
+        // THIS command's start, so reactor.command_starts >= 1 here.
+        r << "\"result\":{"
+          << "\"reactor\":" << reactorRegistryJson(jobHostMode) << ","
+          << "\"overrule\":" << overruleRegistryJson(jobHostMode) << ","
+          << "\"selection_monitor\":" << selectionMonitorRegistryJson(jobHostMode)
+          << "},\"status\":\"ok\"}";
     }
     else if (op == "extend.customclass.create") {
         double cx = jsonFindNumberOr(job, "cx", "x", 0.0);

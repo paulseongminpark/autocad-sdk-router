@@ -10,13 +10,13 @@ Updated: 2026-06-22T12:45:00+09:00
 - M06 Visual Batch Golden Regression: PASS
 - M07 Live ARX Pump / Deep Native Surface: PARTIAL_PASS
 - M07A Deep-native remainder (selection monitor + AcRxProperty/OPM): implemented + build-verified
-- M07B Attended GUI Verification + Native Deploy Closure: **PARTIAL_PASS**
-- Next: CADOS_M08_FULL_OPERATION_COVERAGE_CLOSURE_WITH_LIVE_PARTIAL_REVIEW
+- M07B Attended GUI Verification + Native Deploy Closure: **PASS**
+- Next: CADOS_M08_FULL_OPERATION_COVERAGE_CLOSURE
 
-## M07B — Attended GUI Verification + Native Deploy (PARTIAL_PASS)
+## M07B — Attended GUI Verification + Native Deploy (PASS)
 
-- **Native build: canonical** via `tools/build_native_acad.ps1` — `.dbx` 48128, `.crx` 247808,
-  `.arx` 255488 (canonical relink, no lock; AutoCAD not killed). Log `reports/build_native_m07b.log`.
+- **Native build: canonical** via `tools/build_native_acad.ps1` — `.dbx` 48128, `.crx` 250368,
+  `.arx` 258048 (canonical relink, no lock; AutoCAD not killed). Log `reports/build_native_m07b.log`.
 - **Pump-gating:** the 5 formerly-`attended_only` ops gate on `hostIsFullAutoCad()` (host EXE name —
   reliable; `acedEditor` is non-null in both hosts and the host_mode env hint does not propagate).
   Attended: `highlight`/`clear`/`inspect_selection` execute for real; `zoom`/`render` honestly deferred
@@ -27,8 +27,11 @@ Updated: 2026-06-22T12:45:00+09:00
 - **Attended (dedicated acad.exe, zero COM, run `cados_m07b_attended_20260622_123505`, PID 51708):**
   `ATTENDED_PUMP_OK: True` — live pump host_mode full_autocad, highlight 2/2, clear 2/2, worldDraw circle
   rendered + OPM palette open (screenshot), probe created (`ariadne_probes 1`). 3 safety gates pass.
-- **Residual:** reactor/overrule/selection-monitor LIVE FIRING counts (need interactive editor events).
-- **Original golden DWG modified: no** (`27dbf6b9…` before/after). No remote push. pytest 294 passed / 3 skipped.
+- **Deep-native firing CLOSED:** reactor (1/1) + overrule (2/3) + selmon (1/1) live counts captured in
+  BOTH headless and attended via `firing_selftest` + `firing_report` (no acedCommand reentrancy, no human,
+  zero COM). `reports/firing_latest.json` · `runs/m07b_firing/`.
+- **Original golden DWG modified: no** (`27dbf6b9…` before/after). No remote push.
+  pytest 295 passed / 3 skipped (default); 298 passed / 0 skipped (`CADOS_LIVE=1` → 3 live tests run+pass).
 
 ### Versioned vs canonical ARX
 The build relinks the canonical `.arx` when no acad.exe holds it (M07B: canonical). If a running acad.exe

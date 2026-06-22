@@ -9,11 +9,13 @@ fallback), and executes a real operation. No fake availability, no fake success.
 - **Capabilities**: `config\autocad_router_capabilities.json`
 - **Live status**: `reports\autocad_router_status_latest.json`
 - **Env binding**: Ariadne tracked wrappers export `ARIADNE_AUTOCAD_ROUTER_*` directly.
-- **CAD OS Layer status**: M03–M06 PASS · M07/M07B PARTIAL_PASS — native ObjectARX rich IR +
-  staged patch/diff/validate + live ARX pump (`CADAGENT_PUMP`, headless + attended). See
-  `docs/CAD_OS_BUILD_STATUS.md`; build native with `tools/build_native_acad.ps1`; attended
-  verify with `tools/attended/run_attended_m07b.ps1` (dedicated acad.exe, zero COM). Next:
-  `CADOS_M08_..._WITH_LIVE_PARTIAL_REVIEW`. No fake PASS · original DWG read-only · no remote push.
+- **CAD OS Layer status**: M03–M06 PASS · M07 PARTIAL_PASS · **M07B PASS** — native ObjectARX rich IR +
+  staged patch/diff/validate + live ARX pump (`CADAGENT_PUMP`, headless + attended) + deep-native
+  firing verified (reactor/overrule/selection-monitor, headless + attended). See
+  `docs/CAD_OS_BUILD_STATUS.md`; build native with `tools/build_native_acad.ps1`; attended verify with
+  `tools/attended/run_attended_m07b.ps1`; firing with `runs/m07b_firing/run_firing.ps1` (dedicated
+  acad.exe, zero COM). Next: `CADOS_M08_FULL_OPERATION_COVERAGE_CLOSURE`. No fake PASS · original DWG
+  read-only · no remote push.
 
 ## Quick start
 
