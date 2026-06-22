@@ -35,11 +35,12 @@
     "pytest tests/unit/test_m08b_dispatcher_table.py = 6 passed (table<->handler parity drift guard)",
     "pytest tests/unit = 259 passed, 0 failed (253 pre-existing + 6 new; no regression)"
   ],
+  "runtime_smoke_finding": "Attempted via worktree router + tracked tests/fixtures/native_sample.dwg. The router selects engine BY OP and routes catalogued ops (incl. native-family: compute.brep.massprops, extend.customobject.define) to the MANAGED CadJobRunner (engine=managed_objectarx_active_document, returns 'Unsupported CAD job operation') -- NOT to the native .crx. So this ticket's native OPERATION_NOT_IMPLEMENTED is a native-module-internal contract that fires only on a DIRECT ARIADNE_NATIVE_JOB invocation (router does that only for inspect.database.graph + P1 writes).",
   "deferred": [
     {
-      "item": "live accoreconsole round-trip smoke (catalogued op returns error_code=OPERATION_NOT_IMPLEMENTED end-to-end)",
-      "reason": "git worktree has only tracked files; DWG fixtures + native bin are gitignored (main-checkout only) so there is no DWG to stage in the worktree. tools/run_job.py also has a pre-existing engine_output envelope-shape bug and is outside CHANGE_ONLY.",
-      "mitigation": "runtime NOT_IMPLEMENTED is a deterministic source-verified consequence of the table gate; module compiles+links. Run the live smoke in MERGE-M08-READ (main checkout has fixtures + accoreconsole), as M07 did attended verification separately."
+      "item": "direct-ARIADNE_NATIVE_JOB negative-path smoke (load worktree .crx in accoreconsole, feed a catalogued op, assert error_code=OPERATION_NOT_IMPLEMENTED + engine=native_objectarx)",
+      "reason": "router per-op routing sends catalogued ops to the managed plane, so it cannot reach the native gate; the negative path requires a direct ARIADNE_NATIVE_JOB harness (attended/MERGE-gate). Former blocker 'worktree has no DWG' is now REMOVED: tests/fixtures/native_sample.dwg (AC1032) is tracked so any worktree can stage it.",
+      "mitigation": "native gate is compile-verified (build exit 0; .crx grew) + source-contract-verified (parity + gate present in ariadneNativeJob); deterministic 3-line gate proven in the built binary; 39 handler bodies byte-identical (259 tests pass). Run the direct-native smoke in MERGE-M08-READ."
     }
   ],
   "artifacts": [
