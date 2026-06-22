@@ -33,6 +33,16 @@ graphify-out/
 *.dwl
 *.dwl2
 *.bak
+
+# ── EXCEPTION: tracked native test fixtures ───────────────────────────────────
+# A git worktree checks out only TRACKED files, so the staging/ DWG churn (above)
+# never reaches a worktree — which blocks native ObjectARX/DBX runtime smokes in
+# isolated ticket worktrees. We therefore track a small, CLEAN, canonical DWG (and
+# any future fixtures) under tests/fixtures/ ONLY. Everything else under staging/,
+# runs/, and every other *.dwg stays ignored. Originals are never mutated; this is
+# a read-only fixture copy.
+!tests/fixtures/*.dwg
+!tests/fixtures/*.dxf
 *.sv$
 
 # ── Secrets (defense-in-depth; none currently present) ──
