@@ -3096,6 +3096,44 @@ static void emitNativeError(std::ostringstream& r,
       << "\"error\":\"" << jsonEscape(message) << "\"}";
 }
 
+//============================================================================
+// M08C0: family handler seam. Each READ/family ticket lives in its own
+// families/m08X_handlers.inc (#included below; compiled into .crx/.arx as part of
+// this TU, so it sees every static helper: njsonStr / serializeObjectCommon /
+// serializeEntityCommon, the transaction wrappers, resolveHandle, jsonFind*,
+// handleOf / handleOfId, the resbuf serializers, AriadneOperationSpec). A family
+// owns ONLY its .inc -> parallel teammates never touch a shared file -> conflict-
+// free merges. Each .inc defines, for family X:
+//     static bool m08xHasOp(const std::string& op);     // op in this family?
+//     static bool m08xDispatch(op, const AriadneJobCtx&, std::ostringstream&);
+// The dispatcher gate admits an op if any family claims it; the final else routes
+// it to the owning family. Stubs return false until the family teammate fills them.
+//============================================================================
+struct AriadneJobCtx
+{
+    const std::string& job;       // raw job JSON (parse args with jsonFind*)
+    AcDbDatabase* pDb;            // working database (a staged copy in the headless host)
+    const std::string& hostMode;  // "coreconsole" | "full_autocad"
+};
+
+#include "families/m08c_handlers.inc"   // M08C — symbol tables / database metadata
+#include "families/m08d_handlers.inc"   // M08D — entities / geometry / brep / annotation read
+#include "families/m08e_handlers.inc"   // M08E — blocks / xrefs-layouts / dictionaries-xdata
+#include "families/m08f_handlers.inc"   // M08F — SQLite rich IR / query DSL
+
+// op admitted by any family module? (gate admission for not-yet-legacy family ops)
+static bool familyHasOp(const std::string& op)
+{
+    return m08cHasOp(op) || m08dHasOp(op) || m08eHasOp(op) || m08fHasOp(op);
+}
+
+// route op to its owning family module; true if handled (result appended to r)
+static bool tryFamilyDispatch(const std::string& op, const AriadneJobCtx& ctx, std::ostringstream& r)
+{
+    return m08cDispatch(op, ctx, r) || m08dDispatch(op, ctx, r)
+        || m08eDispatch(op, ctx, r) || m08fDispatch(op, ctx, r);
+}
+
 static void ariadneNativeJob()
 {
     const std::wstring inPath = readJobPathSetting(L"ARIADNE_CAD_JOB_IN");
@@ -3121,7 +3159,7 @@ static void ariadneNativeJob()
     // (reported even without a working database, since it is a contract fact, not a
     // DB error). This replaces the former generic unsupported-operation else and is
     // the honest contract the M08 family tickets convert into real handlers.
-    if (findAriadneNativeOp(op) == nullptr) {
+    if (findAriadneNativeOp(op) == nullptr && !familyHasOp(op)) {
         emitNativeError(r, "OPERATION_NOT_IMPLEMENTED",
                         "operation '" + op + "' is not implemented in the native module");
         writeResult(outPath.empty() ? nullptr : outPath.c_str(), r.str());
@@ -3638,12 +3676,14 @@ static void ariadneNativeJob()
           << "\"status\":\"" << (available ? "ok" : "error") << "\"}";
     }
     else {
-        // Unreachable in normal flow: the table gate above already returned
-        // OPERATION_NOT_IMPLEMENTED for any op absent from kAriadneNativeOperationTable.
-        // Reaching here means an op IS in the table but has no handler branch -> a
-        // table/handler drift bug. Surfaced explicitly, never silent.
-        emitNativeError(r, "OPERATION_DISPATCH_MISMATCH",
-                        "operation '" + op + "' is registered in the native table but has no handler branch");
+        // Not a legacy table op -> it was admitted by a family module (familyHasOp).
+        // Route to the owning family handler. If none claims it (HasOp/Dispatch drift),
+        // surface OPERATION_DISPATCH_MISMATCH -- never silent.
+        const AriadneJobCtx ctx{ job, pDb, jobHostMode };
+        if (!tryFamilyDispatch(op, ctx, r)) {
+            emitNativeError(r, "OPERATION_DISPATCH_MISMATCH",
+                            "operation '" + op + "' was admitted by a family module but no handler claimed it");
+        }
     }
 
     writeResult(outPath.empty() ? nullptr : outPath.c_str(), r.str());
