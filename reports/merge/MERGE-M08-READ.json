@@ -1,0 +1,36 @@
+{
+  "merge_id": "MERGE-M08-READ",
+  "role": "merge_executor",
+  "date": "2026-06-22",
+  "scope": "M08C/M08D/M08E READ families (M08F: 0 catalogued, skipped)",
+  "status": "PASS",
+  "main_commit": "a11f982",
+  "merged": [
+    {"pr": 8, "branch": "cados/M08E", "family": "E", "implemented_ops": 4, "deferred": 7},
+    {"pr": 9, "branch": "cados/M08C-iso", "family": "C", "implemented_ops": 11, "deferred": 14},
+    {"pr": 11, "branch": "cados/M08D-iso", "family": "D", "implemented_ops": 69, "deferred": 4}
+  ],
+  "rejected": [{"pr": 10, "reason": "superseded by #11 (m08d re-homed to isolated worktree)"}],
+  "implemented_total": 84,
+  "deferred_total": 25,
+  "hard_blocked_total": 0,
+  "pre_merge_integration": {
+    "worktree": "integ/m08-cde (octopus-merged all 3 families)",
+    "build_exit": 0,
+    "pytest": "311 passed",
+    "verified": "3-way combined build links in shared TU; no cross-family static-symbol collision (m08c*/m08d*/m08e* namespacing)"
+  },
+  "post_merge_gate": {
+    "build_exit": 0,
+    "artifacts": {"Ariadne.AcadNativeDbx.dbx": 48128, "Ariadne.AcadNative.crx": 343552, "Ariadne.AcadNative.arx": 350720},
+    "pytest": "324 passed, 0 failed"
+  },
+  "reject_if_audit": {
+    "original_dwg_changed": false, "secrets_staged": false, "raw_command_agent_exposed": false,
+    "frozen_ops_regress": false, "ticket_reports_missing": false, "tests_fail": false, "disjoint_inc": true
+  },
+  "key_finding": "AcBr import lib correction: NOT AcDrawBridge.lib (0 AcBr symbols); real = utils/brep/lib-x64/acbr26.lib + acgex26.lib + acgeoment.lib. Linked via #pragma comment(lib, abs-path) in the .inc. Doc-only follow-up: fix brep-topology slice + NATIVE_ARX_DBX_DESIGN sec 3, and parameterize the machine-specific abs lib path.",
+  "process_lesson": "teammateMode:in-process shares shell cwd + primary tree; Agent isolation:worktree held for only 1 of 3. Recovered via per-family own worktree off main + fresh -iso branch + absolute paths. Future: own-worktree+absolute-paths from start, or serialize.",
+  "registry_status_note": "The 84 ops are implemented + build/unit verified in the native module but config/operations.v2.json still marks them 'catalogued' (teammate CHANGE_ONLY was families/*.inc only). closure_gate still reads 474 catalogued. NEXT step = registry reconciliation: set the 84 to status=implemented with evidence_refs (handler + test + build; runtime ARIADNE_NATIVE_JOB smoke deferred to attended verification), then regenerate closure_gate + coverage.",
+  "next": "registry reconciliation (84 catalogued->implemented + regen gate); then M08G/H WRITE, M08I/J VISLIVE, M08K/L/M/N NATIVE, M08O FALLBACK waves. No M09 until catalogued/stub/unknown/deferred=0."
+}
