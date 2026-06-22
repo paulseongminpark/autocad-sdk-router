@@ -1,0 +1,28 @@
+{
+  "merge_id": "MERGE-M08-INFRA",
+  "role": "merge_executor",
+  "date": "2026-06-22",
+  "scope": "M08B infra lane (M08B-T01, M08B-T02, M08B-T03) pre-merge to main",
+  "status": "PASS",
+  "merged": [
+    {"pr": 3, "branch": "cados/M08B-T01", "title": "native OperationSpec dispatch table + OPERATION_NOT_IMPLEMENTED"},
+    {"pr": 5, "branch": "cados/M08B-T02", "title": "generic serializers + UTF-8 JSON writer", "base_retargeted_to": "main"},
+    {"pr": 6, "branch": "cados/M08B-T03", "title": "transaction/document-lock wrappers + handle resolver", "base_retargeted_to": "main"}
+  ],
+  "rejected": [],
+  "main_commit": "a7d1034",
+  "conflicts": "none (chain disjoint from the DWG-fixture commit on main)",
+  "post_merge_gate": {
+    "build_native_acad_exit": 0,
+    "artifacts": {"Ariadne.AcadNativeDbx.dbx": 48128, "Ariadne.AcadNative.crx": 262144, "Ariadne.AcadNative.arx": 270336},
+    "pytest_tests_unit": "285 passed, 0 failed",
+    "m08b_source_and_tests_on_main": true,
+    "dwg_fixture_on_main": true
+  },
+  "reject_if_audit": {
+    "original_dwg_changed": false, "secrets_staged": false, "raw_command_agent_exposed": false,
+    "frozen_ops_regress": false, "catalogued_stub_unknown_increased": false, "ticket_reports_missing": false, "tests_fail": false
+  },
+  "by_status_unchanged": {"implemented": 41, "blocked": 2, "catalogued": 474, "stub": 0, "unknown": 0},
+  "next": "M08C-F (READ family, 130 ops) branch off main; extend the native dispatch table + use the serializer/transaction primitives"
+}
