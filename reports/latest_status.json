@@ -1,85 +1,89 @@
 {
   "schema": "ariadne.cad_os.latest_status.v1",
-  "timestamp": "2026-06-22T06:20:00+09:00",
+  "timestamp": "2026-06-22T14:10:00+09:00",
   "root": "D:\\dev\\99_tools\\autocad-sdk-router",
-  "current_packet": "CADOS_M07_LIVE_ARX_AND_DEEP_NATIVE_SURFACE",
-  "status": "PARTIAL_PASS",
+  "current_packet": "CADOS_M08_FULL_OPERATION_COVERAGE_CLOSURE",
+  "status": "PASS",
   "m03": {
     "status": "PASS",
     "ir_ref": "runs/m03_rich_ir/dwg_graph_ir.json",
     "entity_count": 21747,
-    "hatch_loops": 702,
-    "xdata_blocks": 751,
-    "non_ascii": "PASS",
-    "native_smoke": "reports/native_smoke_latest.json"
+    "non_ascii": "PASS"
   },
   "m04": {
     "status": "PASS",
     "operation_count": 517,
-    "implemented": 37,
-    "catalogued": 474,
-    "unknown": 0,
-    "tool_surface": "reports/tool_surface_latest.json",
-    "mcp_contract": "reports/mcp_contract_latest.json"
+    "unknown": 0
   },
   "m05": {
     "status": "PASS",
     "run_dir": "runs/m05_patch_create_line",
-    "diff": "reports/patch_diff_latest.json",
     "validation": "reports/validation_latest.json",
-    "journal": "reports/journal_latest.json",
     "original_modified": false
   },
   "m06": {
     "status": "PASS",
     "run_dir": "runs/m06_visual_batch_golden",
-    "visual": "reports/visual_verification_latest.json",
-    "batch": "reports/batch_latest.json",
-    "golden": "reports/golden_regression_latest.json",
-    "performance": "reports/performance_latest.json",
-    "review": "reports/review_latest.json",
-    "visual_route": "ir_svg",
-    "visual_artifacts": [
-      "runs\\m06_visual_batch_golden\\visual\\before.svg",
-      "runs\\m06_visual_batch_golden\\visual\\after.svg",
-      "runs\\m06_visual_batch_golden\\visual\\overlay.svg",
-      "runs\\m06_visual_batch_golden\\visual\\visual_diff.json"
-    ],
-    "batch_successes": 4,
-    "batch_failures": 0,
-    "golden_fixtures": 1,
-    "large_fixture": "runs/native_graph_20260621_234158/result_scale_graph.json",
-    "original_hash_after": "27dbf6b95ff72a89fd53b153891187365b9e8ebc4c05a97cfed307057bf49bc8",
     "original_modified": false
   },
   "m07": {
     "status": "PARTIAL_PASS",
-    "build_id": "Jun 22 2026 06:12:22",
-    "crx_bytes": 229888,
-    "arx_versioned": "Ariadne.AcadNative.live_20260622_061225",
     "pump_ops": 12,
-    "status_command": "CADAGENT_STATUS",
-    "headless_proof": "runs/m07_pump_test/m07_pump_result.json",
     "headless_checks": "17/17",
-    "live_pump": "reports/live_pump_latest.json",
-    "deep_native": "reports/deep_native_latest.json",
-    "deep_native_implemented": 7,
-    "deep_native_attended_blocked": 3,
-    "deep_native_design_only": 0,
-    "thread_safety_worker_acdb": "none",
-    "clean_shutdown": true,
-    "attended_live_proof": "attended_blocked (acad.exe PID 49460, no channel, not disrupted)",
+    "superseded_by": "M07B (firing closed) + M08"
+  },
+  "m07b": {
+    "status": "PASS",
+    "attended_run": "runs/cados_m07b_attended_20260622_123505",
+    "deep_native_firing": "reactor 1/1 + overrule 2/3 + selmon 1/1 (headless + attended)",
+    "deep_native_implemented": 10,
+    "deep_native_attended_blocked": 0,
+    "original_modified": false
+  },
+  "m08": {
+    "status": "PASS",
+    "operation_count": 517,
+    "by_status": { "implemented": 41, "stub": 0, "blocked": 2, "catalogued": 474 },
+    "unknown": 0,
+    "taxonomy_fields": 13,
+    "missing_field_count": 0,
+    "v1_target_total": 43,
+    "v1_target_implemented": 41,
+    "v1_target_blocked": 2,
+    "v1_target_deferred": 0,
+    "v1_gate": "11/11 PASS",
+    "v1_gate_ref": "reports/v1_operation_gate_latest.json",
+    "matrix_ref": "reports/operation_coverage_full_matrix.json",
+    "matrix_md_ref": "reports/operation_coverage_full_matrix.md",
+    "generator": "tools/operation_coverage_matrix.py",
+    "promoted_ops": {
+      "inspect.layers": "implemented (native listLayerRecords; smoke layers=70)",
+      "inspect.blocks": "implemented (native listBlockDefinitionsDetailed; smoke block_definitions=245)",
+      "inspect.entities": "implemented (native listModelSpaceEntities; smoke modelspace_entities=21747, bounded page)",
+      "live.status": "implemented (pumpDispatch; M07 pump headless 17/17 + M07B attended)"
+    },
+    "native_inspect_smoke": "runs/m08_inspect_ops/inspect_smoke_result.json",
+    "native_inspect_cross_validation": "layers 70 / blocks 245 / entities 21747 == M03 rich-IR truth",
+    "non_ascii": "UTF-8 preserved (code-point verified U+D3C9 평; 0 U+FFFD, 0 literal '?')",
+    "risk_classes": { "read_safe": 349, "staged_write": 113, "live_edit": 50, "raw_command": 5 },
+    "agent_exposed": 41,
+    "no_agent_exposed_raw_command": true,
+    "no_original_write_default": true,
+    "existing_29_frozen": true,
+    "crx_bytes": 260096,
+    "arx_bytes": 268288,
+    "dbx_bytes": 48128,
+    "build_log": "reports/build_native_m08.log",
     "original_modified": false
   },
   "tests": {
-    "m06_focused": "28 passed in 1.35s",
-    "m05_m06_combined_focused": "127 passed in 2.78s",
-    "m07_unit": "27 passed (codec 11 + shutdown/deep-native 16)",
-    "pytest_full": "284 passed, 3 skipped in 21.67s"
+    "m08_coverage": "tests/unit/test_m08_operation_coverage.py (17 tests)",
+    "pytest_full_default": "313 passed, 3 skipped",
+    "pytest_full_cados_live": "316 passed, 0 skipped"
   },
   "git": {
     "commit": null,
     "remote_push": false
   },
-  "next": "CADOS_M08_FULL_OPERATION_COVERAGE_CLOSURE"
+  "next": "CADOS_M09_V1_RELEASE_FREEZE_AND_DAEDALUS_HANDOFF"
 }

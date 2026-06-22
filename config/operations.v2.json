@@ -56,10 +56,9 @@
   "totals": {
     "operations": 517,
     "by_status": {
+      "implemented": 41,
       "blocked": 2,
-      "catalogued": 474,
-      "implemented": 37,
-      "stub": 4
+      "catalogued": 474
     },
     "by_family": {
       "active_document_write_original": 8,
@@ -130,9 +129,9 @@
       "ui_customization": 39
     },
     "operation_records": 517,
-    "implemented": 37,
+    "implemented": 41,
     "wired": 0,
-    "stub": 4,
+    "stub": 0,
     "catalogued": 474,
     "blocked": 2,
     "deprecated": 0,
@@ -2105,7 +2104,7 @@
     {
       "id": "inspect.layers",
       "family": "inspect",
-      "status": "stub",
+      "status": "implemented",
       "engine_tier": "objectdbx_capable",
       "host_eligibility": [
         "dbx",
@@ -2124,7 +2123,7 @@
       },
       "handler": {
         "router_lane": "ARIADNE_NATIVE_JOB",
-        "dispatcher_symbol": null,
+        "dispatcher_symbol": "listLayerRecords",
         "execution_host_class": "dbx",
         "composed_of": []
       },
@@ -2135,7 +2134,10 @@
       "summary": "Enumerate layer-table records with properties. Extends the existing countSymbolTable(layerTableId) walk to emit records.",
       "evidence_refs": [
         "docs/OPERATION_REGISTRY_SPEC.md",
-        "CADOS_M01 Lane D native triage (inspect.database.graph insertion point)"
+        "CADOS_M01 Lane D native triage (inspect.database.graph insertion point)",
+        "runs/m08_inspect_ops/job_out_inspect_layers.json",
+        "runs/m08_inspect_ops/inspect_smoke_result.json",
+        "reports/operation_coverage_full_matrix.json"
       ],
       "target_family_first_class": true,
       "wired_v1": false,
@@ -2155,19 +2157,21 @@
       },
       "policy": {
         "source": "config/policy.v2.json",
-        "status_policy": "stub",
+        "status_policy": "implemented",
         "default_write_mode": "read",
         "no_original_write_default": true
       },
       "tests": [
-        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified"
+        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
+        "tests/unit/test_m08_operation_coverage.py::test_inspect_enumeration_ops_implemented",
+        "runs/m08_inspect_ops/run_inspect_smoke.ps1"
       ],
       "notes": "Enumerate layer-table records with properties. Extends the existing countSymbolTable(layerTableId) walk to emit records."
     },
     {
       "id": "inspect.blocks",
       "family": "inspect",
-      "status": "stub",
+      "status": "implemented",
       "engine_tier": "objectdbx_capable",
       "host_eligibility": [
         "dbx",
@@ -2186,7 +2190,7 @@
       },
       "handler": {
         "router_lane": "ARIADNE_NATIVE_JOB",
-        "dispatcher_symbol": null,
+        "dispatcher_symbol": "listBlockDefinitionsDetailed",
         "execution_host_class": "dbx",
         "composed_of": []
       },
@@ -2197,7 +2201,10 @@
       "summary": "Enumerate block-table definitions. Extends countBlockDefinitions to emit records instead of a count.",
       "evidence_refs": [
         "docs/OPERATION_REGISTRY_SPEC.md",
-        "CADOS_M01 Lane D native triage (inspect.database.graph insertion point)"
+        "CADOS_M01 Lane D native triage (inspect.database.graph insertion point)",
+        "runs/m08_inspect_ops/job_out_inspect_blocks.json",
+        "runs/m08_inspect_ops/inspect_smoke_result.json",
+        "reports/operation_coverage_full_matrix.json"
       ],
       "target_family_first_class": true,
       "wired_v1": false,
@@ -2217,19 +2224,21 @@
       },
       "policy": {
         "source": "config/policy.v2.json",
-        "status_policy": "stub",
+        "status_policy": "implemented",
         "default_write_mode": "read",
         "no_original_write_default": true
       },
       "tests": [
-        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified"
+        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
+        "tests/unit/test_m08_operation_coverage.py::test_inspect_enumeration_ops_implemented",
+        "runs/m08_inspect_ops/run_inspect_smoke.ps1"
       ],
       "notes": "Enumerate block-table definitions. Extends countBlockDefinitions to emit records instead of a count."
     },
     {
       "id": "inspect.entities",
       "family": "inspect",
-      "status": "stub",
+      "status": "implemented",
       "engine_tier": "objectdbx_capable",
       "host_eligibility": [
         "dbx",
@@ -2248,7 +2257,7 @@
       },
       "handler": {
         "router_lane": "ARIADNE_NATIVE_JOB",
-        "dispatcher_symbol": null,
+        "dispatcher_symbol": "listModelSpaceEntities",
         "execution_host_class": "dbx",
         "composed_of": []
       },
@@ -2259,7 +2268,10 @@
       "summary": "Per-entity inspection beyond counts. Sibling/subset of inspect.database.graph.",
       "evidence_refs": [
         "docs/OPERATION_REGISTRY_SPEC.md",
-        "CADOS_M01 Lane D native triage (inspect.database.graph insertion point)"
+        "CADOS_M01 Lane D native triage (inspect.database.graph insertion point)",
+        "runs/m08_inspect_ops/job_out_inspect_entities.json",
+        "runs/m08_inspect_ops/inspect_smoke_result.json",
+        "reports/operation_coverage_full_matrix.json"
       ],
       "target_family_first_class": true,
       "wired_v1": false,
@@ -2279,12 +2291,14 @@
       },
       "policy": {
         "source": "config/policy.v2.json",
-        "status_policy": "stub",
+        "status_policy": "implemented",
         "default_write_mode": "read",
         "no_original_write_default": true
       },
       "tests": [
-        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified"
+        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
+        "tests/unit/test_m08_operation_coverage.py::test_inspect_enumeration_ops_implemented",
+        "runs/m08_inspect_ops/run_inspect_smoke.ps1"
       ],
       "notes": "Per-entity inspection beyond counts. Sibling/subset of inspect.database.graph."
     },
@@ -2860,7 +2874,7 @@
     {
       "id": "live.status",
       "family": "live",
-      "status": "stub",
+      "status": "implemented",
       "engine_tier": "managed_also",
       "host_eligibility": [
         "full_autocad"
@@ -2876,7 +2890,7 @@
       },
       "handler": {
         "router_lane": "full_autocad",
-        "dispatcher_symbol": null,
+        "dispatcher_symbol": "pumpDispatch",
         "execution_host_class": "full_autocad",
         "composed_of": []
       },
@@ -2887,7 +2901,11 @@
       "summary": "Report live active-document session status (open document, modified flag). Host-bound to the full AutoCAD active document.",
       "evidence_refs": [
         "docs/OPERATION_REGISTRY_SPEC.md",
-        "CADOS_M01 Lane D native triage (inspect.database.graph insertion point)"
+        "CADOS_M01 Lane D native triage (inspect.database.graph insertion point)",
+        "reports/live_pump_latest.json",
+        "runs/m07_pump_test",
+        "runs/m08_inspect_ops/inspect_smoke_result.json",
+        "reports/operation_coverage_full_matrix.json"
       ],
       "target_family_first_class": true,
       "wired_v1": false,
@@ -2904,12 +2922,14 @@
       },
       "policy": {
         "source": "config/policy.v2.json",
-        "status_policy": "stub",
+        "status_policy": "implemented",
         "default_write_mode": "read",
         "no_original_write_default": true
       },
       "tests": [
-        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified"
+        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
+        "tests/integration/test_live_arx_pump.py",
+        "tests/unit/test_pump_frame_codec.py"
       ],
       "notes": "Report live active-document session status (open document, modified flag). Host-bound to the full AutoCAD active document."
     },

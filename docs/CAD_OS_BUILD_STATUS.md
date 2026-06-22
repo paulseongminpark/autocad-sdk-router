@@ -1,6 +1,6 @@
 # CAD OS Build Status
 
-Updated: 2026-06-22T12:45:00+09:00
+Updated: 2026-06-22T14:10:00+09:00
 
 ## Current Packet
 
@@ -11,7 +11,34 @@ Updated: 2026-06-22T12:45:00+09:00
 - M07 Live ARX Pump / Deep Native Surface: PARTIAL_PASS
 - M07A Deep-native remainder (selection monitor + AcRxProperty/OPM): implemented + build-verified
 - M07B Attended GUI Verification + Native Deploy Closure: **PASS**
-- Next: CADOS_M08_FULL_OPERATION_COVERAGE_CLOSURE
+- M08 Full Operation Coverage Closure: **PASS**
+- Next: CADOS_M09_V1_RELEASE_FREEZE_AND_DAEDALUS_HANDOFF
+
+## M08 — Full Operation Coverage Closure (PASS)
+
+- **Coverage matrix:** all **517** ops projected into the 13-field M08 taxonomy
+  (`tools/operation_coverage_matrix.py`, deterministic) → `reports/operation_coverage_full_matrix.json`
+  + `.md`. **0 unknown, 0 missing field, 0 v1-target deferred.** v1 gate **11/11 PASS**
+  (`reports/v1_operation_gate_latest.json`).
+- **Status rollup:** implemented **41** · stub **0** · blocked **2** · catalogued **474**
+  (was 37/4/2/474). cadctl `registry coverage` consistent=true.
+- **v1-target = 43** (status ∈ {implemented, blocked}): 41 implemented + 2 hard-blocked with evidence
+  (`render.layout` plot host, `live.apply_patch` attended live-edit+approval). The 474 `catalogued` ops
+  are classified future-version native capability (v1_target=false), not omitted.
+- **Implementation sweep (4 stubs → implemented):**
+  - `inspect.layers` / `inspect.blocks` / `inspect.entities` — **built natively** (`listLayerRecords`,
+    `listBlockDefinitionsDetailed`, `listModelSpaceEntities` in `AriadneNativeJob.cpp`), accoreconsole-smoked
+    on a staged golden copy: **layers 70 · blocks 245 · modelspace entities 21747** — cross-validates the
+    M03 rich-IR truth (70/245/21747). Non-ASCII **UTF-8 preserved** (code-point verified: `U+D3C9 U+BA74
+    U+B3C4` = 평면도; 0 U+FFFD, 0 literal `?`). `inspect.entities` is bounded (limit, `returned`/`truncated`,
+    honest total — no silent cap). Evidence `runs/m08_inspect_ops/`.
+  - `live.status` — promoted (real handler `pumpDispatch`, M07 pump headless 17/17 + M07B attended).
+- **Native build canonical:** `.dbx` 48128 · `.crx` 260096 · `.arx` 268288 (`reports/build_native_m08.log`).
+- **Risk classes:** read_safe 349 · staged_write 113 · live_edit 50 · raw_command 5. The 5 raw-command ops
+  (`acedCommand*`/`command.invoke`) are all `catalogued` and **0 are agent-exposed** (packet hard rule).
+  agent_exposed = 41 (every implemented op is agent-permitted; raw-command and original-write are excluded).
+- **Original golden DWG modified: no** (`27dbf6b9…` before/after, staged copies only). No remote push.
+  pytest **313 passed / 3 skipped** (default); **316 passed / 0 skipped** (`CADOS_LIVE=1`).
 
 ## M07B — Attended GUI Verification + Native Deploy (PASS)
 
@@ -65,11 +92,14 @@ locks it (LNK1104), the script falls back to a versioned `Ariadne.AcadNative.liv
 ## Registry
 
 - total: 517
-- implemented: 37
-- stub: 4
+- implemented: 41
+- stub: 0
+- blocked: 2
 - catalogued: 474
 - unknown: 0
 - M05 implemented ops: `apply.patch`, `diff.before_after`, `validate.patch`
+- M08 promoted ops: `inspect.layers`, `inspect.blocks`, `inspect.entities` (native), `live.status` (pump)
+- 13-field coverage matrix: `reports/operation_coverage_full_matrix.json` (+ `.md`); v1 gate `reports/v1_operation_gate_latest.json`
 
 ## Patch / Diff / Validation
 
@@ -95,5 +125,6 @@ locks it (LNK1104), the script falls back to a versioned `Ariadne.AcadNative.liv
 - M06 focused: `28 passed in 1.35s`
 - M05/M06 combined focused: `127 passed in 2.78s`
 - M07 unit: `tests/unit/test_pump_frame_codec.py` 11 + `tests/unit/test_pump_shutdown_and_deep_native_source.py` 16 = 27 passed
-- Full pytest: `284 passed, 3 skipped in 21.67s` (3 skipped = env-gated CADOS_LIVE)
+- Full pytest (M08): `313 passed, 3 skipped` (default; 3 skipped = env-gated CADOS_LIVE) · `316 passed, 0 skipped` (`CADOS_LIVE=1`)
+- M08 coverage tests: `tests/unit/test_m08_operation_coverage.py` (17 — taxonomy/gate/promotions/native-source)
 - staging DWG SHA256: `27dbf6b95ff72a89fd53b153891187365b9e8ebc4c05a97cfed307057bf49bc8`

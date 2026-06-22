@@ -1,6 +1,8 @@
 # CAD OS Full Stack Handoff
 
-Status: M03 PASS, M04 PASS, M05 PASS, M06 PASS, M07 PARTIAL_PASS, **M07A done**, **M07B PASS**. Do not proceed to Daedalus app logic before the M08 coverage closure → M09 v1 freeze gates (M10 burn-down if M09 not PASS).
+Status: M03 PASS, M04 PASS, M05 PASS, M06 PASS, M07 PARTIAL_PASS, **M07A done**, **M07B PASS**, **M08 PASS**. Do not proceed to Daedalus app logic before the **M09 v1 freeze** gate (M10 burn-down if M09 not PASS).
+
+**M08 (full operation coverage closure) = PASS:** all 517 registry ops carry the 13-field M08 taxonomy (0 unknown, 0 missing field); v1 gate 11/11 (`reports/v1_operation_gate_latest.json`). Status rollup implemented **41** / stub **0** / blocked **2** / catalogued **474** (cadctl consistent). v1-target **43** (41 implemented + 2 hard-blocked: `render.layout`, `live.apply_patch`; **0 deferred**). Implementation sweep built 3 native inspect-enumeration ops (`inspect.layers`/`blocks`/`entities` — accoreconsole-smoked: 70 layers / 245 blocks / 21747 entities, matching M03 truth; UTF-8 Korean preserved, code-point verified) + promoted `live.status` (M07 pump). Matrix `reports/operation_coverage_full_matrix.json` (+ `.md`); generator `tools/operation_coverage_matrix.py` (deterministic). Native build canonical (.dbx 48128 / .crx 260096 / .arx 268288). Re-run: `python tools/operation_coverage_matrix.py`; smoke `runs/m08_inspect_ops/run_inspect_smoke.ps1`. pytest 313/3 (default), 316/0 (`CADOS_LIVE=1`). Original DWG read-only; no remote push.
 
 **M07B (attended GUI verification + native deploy) = PASS:** live ARX pump verified in a dedicated attended acad.exe (host_mode full_autocad); pump-gating real execution (highlight 2/2, clear 2/2, selection real path; zoom/render honestly deferred); `ARIADNE_NATIVE_JOB_ARGS` env-file job channel finalized (`docs/LIVE_JOB_ARGUMENT_CONTRACT.md`); MFC-free `ARIADNE_PALETTE`; worldDraw circle + OPM palette screenshot (`runs/cados_m07b_attended_20260622_123505/`). **Deep-native firing CLOSED** — reactor (1/1) + overrule (2/3) + selmon (1/1) live counts in BOTH headless and attended (`firing_selftest` + `firing_report`, no acedCommand reentrancy; `runs/m07b_firing/`, `reports/firing_latest.json`). Native build canonical (.dbx 48128 / .crx 250368 / .arx 258048). Re-run: attended `tools/attended/run_attended_m07b.ps1`; firing `runs/m07b_firing/run_firing.ps1 -Mode headless|attended`. pytest 295/3 (default), 298/0 (`CADOS_LIVE=1`). Original DWG read-only; no remote push.
 
@@ -9,7 +11,11 @@ Status: M03 PASS, M04 PASS, M05 PASS, M06 PASS, M07 PARTIAL_PASS, **M07A done**,
 - Router status: `reports/autocad_router_status_latest.json` (ALL_AVAILABLE, 11/11)
 - Rich IR run: `runs/m03_rich_ir/`
 - Native smoke: `reports/native_smoke_latest.json`
-- Registry: `config/operations.v2.json` (517 records, 480 catalog ops classified, unknown 0)
+- Registry: `config/operations.v2.json` (517 records, implemented 41 / stub 0 / blocked 2 / catalogued 474, unknown 0)
+- M08 coverage matrix (13-field, all 517): `reports/operation_coverage_full_matrix.json` (+ `.md`); v1 gate `reports/v1_operation_gate_latest.json`; generator `tools/operation_coverage_matrix.py`
+- M08 native inspect ops smoke: `runs/m08_inspect_ops/inspect_smoke_result.json` (layers 70 / blocks 245 / entities 21747)
+- M08 report: `reports/CADOS_M08_FULL_OPERATION_COVERAGE_CLOSURE.md`
+- M08 tests: `tests/unit/test_m08_operation_coverage.py`
 - Tool surface: `reports/tool_surface_latest.json`
 - MCP contract: `reports/mcp_contract_latest.json`
 - Patch/diff transaction: `runs/m05_patch_create_line/`
@@ -42,4 +48,4 @@ Status: M03 PASS, M04 PASS, M05 PASS, M06 PASS, M07 PARTIAL_PASS, **M07A done**,
 
 ## Next Packet
 
-CADOS_M08_FULL_OPERATION_COVERAGE_CLOSURE.
+CADOS_M09_V1_RELEASE_FREEZE_AND_DAEDALUS_HANDOFF.

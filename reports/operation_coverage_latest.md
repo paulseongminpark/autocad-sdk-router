@@ -1,16 +1,12 @@
-# CAD OS Operation Coverage (M05)
+# CAD OS Operation Coverage (M08)
 
 - operations registered: 517
-- implemented: 37
-- wired: 0
-- stub: 4
-- catalogued: 474
+- implemented: 41
+- stub: 0
 - blocked: 2
+- catalogued: 474
 - deprecated: 0
 - unknown: 0
-- catalog classified: 480 / 480
-- inspect.database.graph: implemented
-- apply.patch: implemented
-- diff.before_after: implemented
-- validate.patch: implemented
-- consistent: True
+- v1-target total / implemented / blocked / deferred: 43 / 41 / 2 / 0
+- 13-field taxonomy complete (0 missing): True
+- gate pass: True

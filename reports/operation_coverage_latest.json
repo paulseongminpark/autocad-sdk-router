@@ -1,30 +1,30 @@
 {
   "schema": "ariadne.cad_os.operation_coverage.v1",
-  "packet": "CADOS_M05_PATCH_DIFF_VALIDATION_TRANSACTION",
+  "packet": "CADOS_M08_FULL_OPERATION_COVERAGE_CLOSURE",
   "operation_count": 517,
   "by_status": {
+    "implemented": 41,
     "blocked": 2,
-    "catalogued": 474,
-    "implemented": 37,
-    "stub": 4
+    "catalogued": 474
   },
-  "implemented": 37,
+  "implemented": 41,
   "wired": 0,
-  "stub": 4,
+  "stub": 0,
   "catalogued": 474,
   "blocked": 2,
   "deprecated": 0,
   "unknown": 0,
+  "v1_target_total": 43,
+  "v1_target_implemented": 41,
+  "v1_target_blocked": 2,
+  "v1_target_deferred": 0,
   "catalog_total_ops": 480,
   "catalog_classified_ops": 480,
   "catalog_unclassified_ops": 0,
   "existing_29_ops_mapped": true,
   "inspect_database_graph_status": "implemented",
-  "m05_ops": {
-    "apply.patch": "implemented",
-    "validate.patch": "implemented",
-    "diff.before_after": "implemented"
-  },
   "consistent": true,
+  "full_matrix_ref": "reports/operation_coverage_full_matrix.json",
+  "v1_gate_ref": "reports/v1_operation_gate_latest.json",
   "registry_coverage_ref": "reports/registry_coverage_latest.json"
 }

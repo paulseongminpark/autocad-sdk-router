@@ -1,0 +1,30 @@
+{
+  "schema": "ariadne.cad_os.v1_operation_gate.v1",
+  "packet": "CADOS_M08_FULL_OPERATION_COVERAGE_CLOSURE",
+  "gate": {
+    "all_classified": true,
+    "zero_unknown": true,
+    "zero_missing_field": true,
+    "zero_untested_implemented": true,
+    "zero_v1_target_deferred": true,
+    "every_blocked_has_blocker_ref": true,
+    "no_agent_exposed_raw_command": true,
+    "no_original_write_default": true,
+    "existing_29_frozen": true,
+    "v1_target_implemented_or_blocked": true,
+    "gate_pass": true
+  },
+  "gate_pass": true,
+  "counts": {
+    "total": 517,
+    "implemented": 41,
+    "stub": 0,
+    "blocked": 2,
+    "catalogued": 474,
+    "unknown": 0,
+    "v1_target_total": 43,
+    "v1_target_implemented": 41,
+    "v1_target_blocked": 2,
+    "v1_target_deferred": 0
+  }
+}

@@ -2376,6 +2376,177 @@ static bool countBlockDefinitions(AcDbDatabase* pDb, const std::string& targetNa
     return true;
 }
 
+// --- M08 inspect-enumeration helpers (pure read; mirror countBlockDefinitions
+// /collectModelSpaceGraph idioms: SymbolTable/BTR iterators opened kForRead, the
+// comma-first jsonEscape emitter, acharToAscii name funnel). Same documented
+// non-ASCII fidelity limitation as the rest of this file (code points > 127 ->
+// '?'); the underlying DWG bytes are unchanged. ---
+
+// inspect.layers: enumerate every layer-table record with its display flags.
+static bool listLayerRecords(AcDbDatabase* pDb, int& count, std::string& layersJson)
+{
+    count = 0;
+    std::ostringstream arr;
+    arr << "[";
+    bool first = true;
+    AcDbLayerTable* pTable = nullptr;
+    if (pDb->getLayerTable(pTable, AcDb::kForRead) != Acad::eOk)
+        return false;
+    AcDbLayerTableIterator* pIt = nullptr;
+    if (pTable->newIterator(pIt) != Acad::eOk) {
+        pTable->close();
+        return false;
+    }
+    for (pIt->start(); !pIt->done(); pIt->step()) {
+        AcDbLayerTableRecord* pRec = nullptr;
+        if (pIt->getRecord(pRec, AcDb::kForRead) == Acad::eOk) {
+            const ACHAR* nameRaw = nullptr;
+            std::string name;
+            if (pRec->getName(nameRaw) == Acad::eOk)
+                name = acharToAscii(nameRaw);
+            const bool isOff = pRec->isOff() ? true : false;
+            const bool isFrozen = pRec->isFrozen() ? true : false;
+            const bool isLocked = pRec->isLocked() ? true : false;
+            const int colorIndex = static_cast<int>(pRec->color().colorIndex());
+            if (!first)
+                arr << ",";
+            first = false;
+            arr << "{\"name\":\"" << jsonEscape(name) << "\""
+                << ",\"off\":" << (isOff ? "true" : "false")
+                << ",\"frozen\":" << (isFrozen ? "true" : "false")
+                << ",\"locked\":" << (isLocked ? "true" : "false")
+                << ",\"color\":" << colorIndex << "}";
+            ++count;
+            pRec->close();
+        }
+    }
+    delete pIt;
+    pTable->close();
+    arr << "]";
+    layersJson = arr.str();
+    return true;
+}
+
+// inspect.blocks: enumerate user block definitions with each block's entity count.
+static bool listBlockDefinitionsDetailed(AcDbDatabase* pDb, int& count,
+                                         std::string& blocksJson)
+{
+    count = 0;
+    std::ostringstream arr;
+    arr << "[";
+    bool first = true;
+    AcDbBlockTable* pBT = nullptr;
+    if (pDb->getBlockTable(pBT, AcDb::kForRead) != Acad::eOk)
+        return false;
+    AcDbBlockTableIterator* pIt = nullptr;
+    if (pBT->newIterator(pIt) != Acad::eOk) {
+        pBT->close();
+        return false;
+    }
+    for (pIt->start(); !pIt->done(); pIt->step()) {
+        AcDbBlockTableRecord* pBTR = nullptr;
+        if (pIt->getRecord(pBTR, AcDb::kForRead) == Acad::eOk) {
+            const bool isUserBlock =
+                !pBTR->isLayout() &&
+                !pBTR->isAnonymous() &&
+                !pBTR->isFromExternalReference();
+            if (isUserBlock) {
+                const ACHAR* nameRaw = nullptr;
+                std::string name;
+                if (pBTR->getName(nameRaw) == Acad::eOk)
+                    name = acharToAscii(nameRaw);
+                int entCount = 0;
+                AcDbBlockTableRecordIterator* pEIt = nullptr;
+                if (pBTR->newIterator(pEIt) == Acad::eOk) {
+                    for (pEIt->start(); !pEIt->done(); pEIt->step())
+                        ++entCount;
+                    delete pEIt;
+                }
+                if (!first)
+                    arr << ",";
+                first = false;
+                arr << "{\"name\":\"" << jsonEscape(name) << "\""
+                    << ",\"entity_count\":" << entCount << "}";
+                ++count;
+            }
+            pBTR->close();
+        }
+    }
+    delete pIt;
+    pBT->close();
+    arr << "]";
+    blocksJson = arr.str();
+    return true;
+}
+
+// inspect.entities: per-entity handle/dxf_name/layer over model space, optional
+// type filter (reuses entityMatchesType). Bounded page: emits up to `limit`
+// records but reports the true total/matching counts and a truncated flag (no
+// silent cap).
+static bool listModelSpaceEntities(AcDbDatabase* pDb, const std::string& type,
+                                   int limit, int& total, int& matching,
+                                   int& returned, bool& truncated,
+                                   std::string& entitiesJson)
+{
+    total = 0;
+    matching = 0;
+    returned = 0;
+    truncated = false;
+    std::ostringstream arr;
+    arr << "[";
+    bool first = true;
+    AcDbBlockTable* pBT = nullptr;
+    if (pDb->getBlockTable(pBT, AcDb::kForRead) != Acad::eOk)
+        return false;
+    AcDbBlockTableRecord* pMS = nullptr;
+    if (pBT->getAt(ACDB_MODEL_SPACE, pMS, AcDb::kForRead) != Acad::eOk) {
+        pBT->close();
+        return false;
+    }
+    pBT->close();
+    AcDbBlockTableRecordIterator* pIt = nullptr;
+    if (pMS->newIterator(pIt) != Acad::eOk) {
+        pMS->close();
+        return false;
+    }
+    for (pIt->start(); !pIt->done(); pIt->step()) {
+        AcDbEntity* pEnt = nullptr;
+        if (pIt->getEntity(pEnt, AcDb::kForRead) != Acad::eOk)
+            continue;
+        ++total;
+        if (entityMatchesType(pEnt, type)) {
+            ++matching;
+            if (returned < limit) {
+                std::string handleStr;
+                {
+                    AcDbHandle h;
+                    pEnt->getAcDbHandle(h);
+                    ACHAR hbuf[40] = {};
+                    if (h.getIntoAsciiBuffer(hbuf, 40))
+                        handleStr = acharToAscii(hbuf);
+                }
+                const std::string dxfName = (pEnt->isA() != nullptr)
+                    ? acharToAscii(pEnt->isA()->name()) : std::string();
+                const std::string layer = acharToAscii(pEnt->layer());
+                if (!first)
+                    arr << ",";
+                first = false;
+                arr << "{\"handle\":\"" << jsonEscape(handleStr) << "\""
+                    << ",\"dxf_name\":\"" << jsonEscape(dxfName) << "\""
+                    << ",\"layer\":\"" << jsonEscape(layer) << "\"}";
+                ++returned;
+            }
+        }
+        pEnt->close();
+    }
+    delete pIt;
+    pMS->close();
+    arr << "]";
+    entitiesJson = arr.str();
+    truncated = (matching > returned);
+    return true;
+}
+
 static Acad::ErrorStatus createSimpleBlock(AcDbDatabase* pDb,
                                            const std::string& name,
                                            bool& created,
@@ -2983,6 +3154,43 @@ static void ariadneNativeJob()
         const bool ok = listXrefs(pDb, xrefCount, namesJson);
         r << "\"result\":{\"xrefs\":" << xrefCount
           << ",\"names\":" << namesJson << "},"
+          << "\"status\":\"" << (ok ? "ok" : "error") << "\"}";
+    }
+    else if (op == "inspect.layers") {
+        int layerCount = 0;
+        std::string layersJson;
+        const bool ok = listLayerRecords(pDb, layerCount, layersJson);
+        r << "\"result\":{\"layers\":" << layerCount
+          << ",\"records\":" << layersJson << "},"
+          << "\"status\":\"" << (ok ? "ok" : "error") << "\"}";
+    }
+    else if (op == "inspect.blocks") {
+        int blockCount = 0;
+        std::string blocksJson;
+        const bool ok = listBlockDefinitionsDetailed(pDb, blockCount, blocksJson);
+        r << "\"result\":{\"block_definitions\":" << blockCount
+          << ",\"records\":" << blocksJson << "},"
+          << "\"status\":\"" << (ok ? "ok" : "error") << "\"}";
+    }
+    else if (op == "inspect.entities") {
+        std::string type;
+        jsonFindString(job, "type", type);
+        double limitN = 1000.0;
+        jsonFindNumber(job, "limit", limitN);
+        int limit = static_cast<int>(limitN);
+        if (limit <= 0)
+            limit = 1000;
+        int total = 0, matching = 0, returned = 0;
+        bool truncated = false;
+        std::string entitiesJson;
+        const bool ok = listModelSpaceEntities(
+            pDb, type, limit, total, matching, returned, truncated, entitiesJson);
+        r << "\"result\":{\"modelspace_entities\":" << total
+          << ",\"type\":\"" << jsonEscape(type) << "\""
+          << ",\"matching_entities\":" << matching
+          << ",\"returned\":" << returned
+          << ",\"truncated\":" << (truncated ? "true" : "false")
+          << ",\"entities\":" << entitiesJson << "},"
           << "\"status\":\"" << (ok ? "ok" : "error") << "\"}";
     }
     else if (op == "inspect.runtime.capabilities") {
