@@ -22,6 +22,7 @@
 #include "aced.h"
 #include "rxregsvc.h"
 #include "dbmain.h"
+#include "dbtrans.h"   // M08B-T03: AcTransactionManager / AcTransaction (txn wrappers)
 #include "dbdict.h"
 #include "dbents.h"
 #include "dbmtext.h"
@@ -2892,6 +2893,97 @@ static std::string jigHostSupportJson(const std::string& jobHostMode)
 //============================================================================
 // Command: ARIADNE_NATIVE_JOB
 //============================================================================
+//============================================================================
+// M08B-T03: transaction / handle-resolver wrappers (with AriadneDocumentWriteLock
+// below, the safe scoped-DB-access infra the M08 family/write tickets build on).
+//
+// RAII guarantees a transaction always closes. The staged-write wrapper commits
+// ONLY via commit(); any uncommitted scope exit (early return / failure / thrown)
+// auto-ABORTS -> rollback. No original DWG is ever written: these operate on the
+// router-staged copy in memory; nothing here calls save()/saveAs().
+//============================================================================
+
+// Scoped READ transaction. endTransaction() on exit (reads roll back nothing).
+class AriadneReadTransaction
+{
+public:
+    explicit AriadneReadTransaction(AcDbDatabase* pDb)
+        : mMgr(nullptr), mTxn(nullptr)
+    {
+        if (pDb != nullptr) {
+            mMgr = pDb->transactionManager();
+            if (mMgr != nullptr)
+                mTxn = mMgr->startTransaction();
+        }
+    }
+    ~AriadneReadTransaction()
+    {
+        if (mMgr != nullptr && mTxn != nullptr)
+            mMgr->endTransaction();
+    }
+    bool active() const { return mTxn != nullptr; }
+    AcTransaction* txn() const { return mTxn; }
+private:
+    AcDbTransactionManager* mMgr;
+    AcTransaction* mTxn;
+    AriadneReadTransaction(const AriadneReadTransaction&);
+    AriadneReadTransaction& operator=(const AriadneReadTransaction&);
+};
+
+// Scoped STAGED-WRITE transaction. commit() keeps the staged mutation; an
+// uncommitted dtor abortTransaction()s -> rollback (the "failure rolls back"
+// contract). Never touches the original file.
+class AriadneStagedWriteTransaction
+{
+public:
+    explicit AriadneStagedWriteTransaction(AcDbDatabase* pDb)
+        : mMgr(nullptr), mTxn(nullptr), mCommitted(false)
+    {
+        if (pDb != nullptr) {
+            mMgr = pDb->transactionManager();
+            if (mMgr != nullptr)
+                mTxn = mMgr->startTransaction();
+        }
+    }
+    ~AriadneStagedWriteTransaction()
+    {
+        if (mMgr != nullptr && mTxn != nullptr && !mCommitted)
+            mMgr->abortTransaction();   // rollback on any uncommitted exit
+    }
+    bool active() const { return mTxn != nullptr; }
+    AcTransaction* txn() const { return mTxn; }
+    // Keep the staged mutation. Returns the end status; on success the txn is done.
+    Acad::ErrorStatus commit()
+    {
+        if (mMgr == nullptr || mTxn == nullptr || mCommitted)
+            return Acad::eOk;
+        const Acad::ErrorStatus es = mMgr->endTransaction();
+        if (es == Acad::eOk) {
+            mCommitted = true;
+            mTxn = nullptr;
+        }
+        return es;
+    }
+private:
+    AcDbTransactionManager* mMgr;
+    AcTransaction* mTxn;
+    bool mCommitted;
+    AriadneStagedWriteTransaction(const AriadneStagedWriteTransaction&);
+    AriadneStagedWriteTransaction& operator=(const AriadneStagedWriteTransaction&);
+};
+
+// Handle resolver: hex-handle string -> AcDbObjectId (the inverse of handleOf()).
+// Reusable factoring of the inline AcDbHandle/getAcDbObjectId pattern. Returns true
+// + sets out on success; false (out = null) otherwise.
+static bool resolveHandle(AcDbDatabase* pDb, const std::string& hexHandle, AcDbObjectId& out)
+{
+    out = AcDbObjectId::kNull;
+    if (pDb == nullptr || hexHandle.empty())
+        return false;
+    const AcDbHandle h(asciiToWide(hexHandle).c_str());  // AcDbHandle ctor takes const ACHAR* (wide)
+    return (pDb->getAcDbObjectId(out, false, h) == Acad::eOk) && !out.isNull();
+}
+
 class AriadneDocumentWriteLock
 {
 public:
