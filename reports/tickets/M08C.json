@@ -1,0 +1,48 @@
+{
+  "ticket_id": "M08C",
+  "status": "PASS",
+  "branch": "cados/M08C-iso",
+  "commit": "a054ea1c136ce02e324177c53081f65ed3000629",
+  "pr": "https://github.com/paulseongminpark/autocad-sdk-router/pull/9",
+  "implemented_ops": [
+    "infra.hostapp.get_services",
+    "inspect.database.summaryinfo",
+    "inspect.database.sysvar",
+    "inspect.object.open",
+    "inspect.object.id",
+    "inspect.object.handle",
+    "inspect.object.ext_dict",
+    "inspect.symboltable.block",
+    "inspect.symboltable.layers",
+    "transform.database.wblock",
+    "write.object.cancel"
+  ],
+  "hard_blocked_ops": [],
+  "deprecated_ops": [],
+  "catalogued_remaining": [
+    {"op": "infra.hostapp.set_working_db", "wmode": "read", "reason": "setWorkingDatabase mutates global host working-db pointer; host-setup lane, not a read"},
+    {"op": "inspect.database.read_dwg", "wmode": "read", "reason": "side-db constructor (fresh AcDbDatabase(false,true)+readDwgFile); would clobber the live working db; DBX side-db lane"},
+    {"op": "inspect.database.read_dwg_handle", "wmode": "read", "reason": "same as read_dwg from an AcDwgFileHandle (ref 'internal use'); DBX side-db lane"},
+    {"op": "inspect.database.dxf_in", "wmode": "read", "reason": "ref mandates a fresh never-reused db; cannot run on the working db; DBX side-db lane"},
+    {"op": "inspect.database.flush_input", "wmode": "read", "reason": "closeInput is 'AutoCAD internal use; undesirable in ObjectARX'; host-only; unsafe on working db"},
+    {"op": "write.object.upgrade_open", "wmode": "read", "reason": "upgradeOpen() is a write-intent primitive (kForRead->kForWrite); staged-write lane"},
+    {"op": "transform.database.dxf_out", "wmode": "write_copy", "reason": "writes a .dxf file; export/write lane"},
+    {"op": "transform.database.save_as", "wmode": "write_copy", "reason": "DWG-write primitive; write lane (barred for original)"},
+    {"op": "transform.database.save_as_simple", "wmode": "write_copy", "reason": "saveAs convenience overload; write lane"},
+    {"op": "write.object.close", "wmode": "write_copy", "reason": "commit point for open/close edits; write lane"},
+    {"op": "write.object.downgrade_open", "wmode": "write_copy", "reason": "downgradeOpen() commits changes + fires modified; write lane"},
+    {"op": "transform.database.wblock_clone", "wmode": "live_edit", "reason": "wblockCloneObjects clones INTO an owner (db mutation); write/clone lane"},
+    {"op": "write.object.create_ext_dict", "wmode": "write_copy", "reason": "createExtensionDictionary() mutates the object; write lane"},
+    {"op": "write.regapp.register", "wmode": "write_copy", "reason": "AcDbRegAppTable::add / acdbRegApp registers an APPID; write lane"}
+  ],
+  "tests": {
+    "build": "tools/build_native_acad.ps1 EXIT=0 (.dbx 48128B, .crx 280576B, .arx 288256B; ObjectARX 2027 SDK; arx_relink_mode=canonical)",
+    "pytest": "python -m pytest tests/unit -q => 288 passed, 13 skipped, 0 failed (13 skips pre-existing AutoCAD-host tests)",
+    "new_test": "tests/unit/test_m08c_handlers.py (10 source-contract tests, all pass)"
+  },
+  "corrections": [
+    "research/native_arx/acdb-core.md inspect.database.sysvar cites AcDbDatabase::getSysVar/getLUNITS (marked unverified); ObjectARX 2027 dbmain.h has neither (0 occurrences). Implemented read-only via typed lunits/insunits/measurement/getFingerprintGuid + acedGetVar; catalog write_copy (setSysVar) path not implemented."
+  ],
+  "isolation_note": "Recovered from a shared-primary-worktree branch-collision (sibling M08E switched branches under it -> concurrent-write TOCTOU). Created isolated worktree off clean seam commit ad32bc4 (D:/dev/99_tools/_m08c_wt, branch cados/M08C-iso) non-destructively; siblings' uncommitted work untouched. Two over-strict self-tests fixed to match code (not prose). Implementation unchanged.",
+  "next": "Merge PR (single file m08c_handlers.inc + test + plan; zero sibling overlap). Then: M08-write lane ticket(s) for the 14 deferred write_copy/live_edit ops, and a DBX hostless-side-db ticket for read_dwg/read_dwg_handle/dxf_in/set_working_db/flush_input."
+}
