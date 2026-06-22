@@ -5,6 +5,8 @@
 #include "..\Ariadne.AcadNative\AriadneProbe.h"
 #include "AriadneRecord.h"
 #include "AriadneProtocol.h"
+#include "rxmember.h"
+#include <tchar.h>
 
 #ifdef _WIN64
 #pragma comment(linker, "/export:acrxGetApiVersion,PRIVATE")
@@ -56,6 +58,28 @@ extern "C" ARIADNE_DBX_API Acad::ErrorStatus ariadneCreateRecordObject(
 extern "C" ARIADNE_DBX_API bool ariadneIsRecordObject(const AcDbObject* object)
 {
     return object != nullptr && object->isKindOf(AriadneRecord::desc());
+}
+
+// M07A headless proof: is the OPM "Size" AcRxProperty registered on AriadneProbe?
+// Uses the runtime member-query engine (the real OPM lookup path). Returns 1 if
+// "Size" is found, 0 if not, -1 if the class/engine is unavailable (e.g. engine
+// not present in this host). The attended OPM panel is verified separately.
+extern "C" ARIADNE_DBX_API int ariadneProbePropertyCount()
+{
+    AcRxClass* cls = AriadneProbe::desc();
+    if (cls == nullptr)
+        return -1;
+    AcRxMemberQueryEngine* eng = AcRxMemberQueryEngine::theEngine();
+    if (eng == nullptr)
+        return -1;
+    AriadneProbe probe; // transient instance to query members on
+    AcRxMemberIterator* it = eng->newMemberIterator(&probe);
+    if (it == nullptr)
+        return 0;
+    AcRxMember* m = it->find(ACRX_T("Size")); // member owned by collection; do not free
+    const int found = (m != nullptr) ? 1 : 0;
+    delete it; // public virtual dtor (rxmember.h:373)
+    return found;
 }
 
 extern "C" AcRx::AppRetCode __declspec(dllexport)

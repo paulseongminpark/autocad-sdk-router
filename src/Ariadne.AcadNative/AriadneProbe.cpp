@@ -3,6 +3,13 @@
 //////////////////////////////////////////////////////////////////////////////
 #include <tchar.h>
 #include "AriadneProbe.h"
+// OPM/AcRxProperty surface (M07A): expose AriadneProbe::size() as a runtime
+// property so the Properties palette (attended) and the headless member-query
+// path both see it. Registered via the WITH_PROPERTIES class macro below.
+#include "rxprop.h"
+#include "rxvalue.h"
+#include "rxvaluetype.h"
+#include "rxmember.h"
 
 // Persisted data-member version. First item written/read; on a newer-than-known
 // version we return eMakeMeProxy so the object round-trips safely (research:
@@ -10,17 +17,58 @@
 static const Adesk::Int16 kAriadneProbeVersion = 1;
 
 //----------------------------------------------------------------------------
+// AcRxProperty (OPM) — "Size" runtime property backed by size()/setSize().
+// The member-collection builder has a private ctor (rxmember.h); the canonical
+// way to attach members is the MAKEPROPS callback passed through newAcRxClass at
+// class registration (ACRX_DXF_DEFINE_MEMBERS_WITH_PROPERTIES, rxboiler.h:289).
+// Write idiom: AcRxValue::operator=(double); read: rxvalue_cast<double> (rxvalue.h).
+//----------------------------------------------------------------------------
+class AriadneSizeProperty : public AcRxProperty
+{
+public:
+    AriadneSizeProperty()
+        : AcRxProperty(ACRX_T("Size"), AcRxValueType::Desc<double>::value(), NULL) {}
+    // AcRxMember::operator delete is protected (the SDK owns member lifetime). Expose a
+    // forwarding delete so the compiler can pair it with `new` (ctor-cleanup path); the
+    // member collection still frees it through the SDK's own friended path.
+    void operator delete(void* p) { AcRxMember::operator delete(p); }
+protected:
+    Acad::ErrorStatus subGetValue(const AcRxObject* pO, AcRxValue& value) const override
+    {
+        const AriadneProbe* probe = AriadneProbe::cast(pO);
+        if (probe == NULL) return Acad::eNotApplicable;
+        value = probe->size();
+        return Acad::eOk;
+    }
+    Acad::ErrorStatus subSetValue(AcRxObject* pO, const AcRxValue& value) const override
+    {
+        AriadneProbe* probe = AriadneProbe::cast(pO);
+        if (probe == NULL) return Acad::eNotApplicable;
+        const double* pd = rxvalue_cast<double>(&value);
+        if (pd == NULL) return Acad::eInvalidInput;
+        return probe->setSize(*pd); // setSize enforces > 0
+    }
+};
+
+static void ariadneMakeProbeMembers(AcRxMemberCollectionBuilder& builder, void*)
+{
+    builder.add(new AriadneSizeProperty());
+}
+
+//----------------------------------------------------------------------------
 // Runtime-class registration. DWG/DXF-persistent custom class: birth version
 // kDHL_CURRENT/kMReleaseCurrent, all proxy operations allowed, DXF record name
-// ARIADNEPROBE, owning app string. (Mirrors poly.cpp:173.)
+// ARIADNEPROBE, owning app string. (Mirrors poly.cpp:173.) WITH_PROPERTIES binds
+// the OPM "Size" member at rxInit() via the makeMembers callback.
 //----------------------------------------------------------------------------
-ACRX_DXF_DEFINE_MEMBERS(
+ACRX_DXF_DEFINE_MEMBERS_WITH_PROPERTIES(
     AriadneProbe, AcDbEntity,
     AcDb::kDHL_CURRENT, AcDb::kMReleaseCurrent,
     AcDbProxyEntity::kAllAllowedBits, ARIADNEPROBE,
     "AriadneAcadNative1.0\
 |Product Desc:     Ariadne Native ObjectARX Controller\
-|Company:          Ariadne");
+|Company:          Ariadne",
+    ariadneMakeProbeMembers);
 
 //----------------------------------------------------------------------------
 AriadneProbe::AriadneProbe()

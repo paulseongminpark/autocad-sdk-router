@@ -26,4 +26,9 @@ ARIADNE_DBX_API Acad::ErrorStatus ariadneCreateRecordObject(
 ARIADNE_DBX_API bool ariadneIsRecordObject(const AcDbObject* object);
 
 ARIADNE_DBX_API bool ariadneProbeProtocolAvailable();
+
+// M07A: count registered AcRxProperty members named "Size" on AriadneProbe::desc()
+// (headless proof of OPM property registration). Returns >=1 if registered, 0 if
+// none, -1 if the class/engine is unavailable.
+ARIADNE_DBX_API int ariadneProbePropertyCount();
 }

@@ -1600,6 +1600,51 @@ static bool disableEditorReactor(bool& removed)
     return true;
 }
 
+// --- Selection monitor (registration headless-safe; live pickfirst events attended-only) ---
+// Mirrors AriadneEditorReactor: an AcEditorReactor subclass counting interactive
+// selection changes via pickfirstModified() (aced.h:541). Under coreconsole acedEditor
+// is null so enable returns false (honest gating); the callbacks only fire in a full
+// editor. Registration is provable headless; live events require attended AutoCAD.
+static int gSelMonPickfirstMods = 0;
+static int gSelMonCommandEnds = 0;
+
+class AriadneSelectionMonitor : public AcEditorReactor
+{
+public:
+    void pickfirstModified() override { ++gSelMonPickfirstMods; }
+    void commandEnded(const ACHAR* /*cmdStr*/) override { ++gSelMonCommandEnds; }
+};
+
+static AriadneSelectionMonitor* gAriadneSelectionMonitor = nullptr;
+
+static bool enableSelectionMonitor(bool& created)
+{
+    created = false;
+    if (gAriadneSelectionMonitor != nullptr)
+        return true;
+    AcEditor* pEditor = acedEditor;
+    if (pEditor == nullptr)
+        return false; // coreconsole: no interactive editor -> live events attended-only
+    gAriadneSelectionMonitor = new AriadneSelectionMonitor();
+    pEditor->addReactor(gAriadneSelectionMonitor);
+    created = true;
+    return true;
+}
+
+static bool disableSelectionMonitor(bool& removed)
+{
+    removed = false;
+    if (gAriadneSelectionMonitor == nullptr)
+        return true;
+    AcEditor* pEditor = acedEditor;
+    if (pEditor != nullptr)
+        pEditor->removeReactor(gAriadneSelectionMonitor);
+    delete gAriadneSelectionMonitor;
+    gAriadneSelectionMonitor = nullptr;
+    removed = true;
+    return true;
+}
+
 static int gOverruleOpenCalls = 0;
 static int gOverruleCloseCalls = 0;
 
@@ -2444,6 +2489,7 @@ static std::string runtimeCapabilitiesJson(const std::string& jobHostMode)
         + "\"layouts\":true,"
         + "\"xrefs_inspect\":true,"
         + "\"reactors\":{\"implemented\":true,\"registered\":" + (gAriadneEditorReactor != nullptr ? "true" : "false") + "},"
+        + "\"selection_monitor\":{\"implemented\":true,\"registered\":" + (gAriadneSelectionMonitor != nullptr ? "true" : "false") + ",\"live_events\":\"attended_only\"},"
         + "\"overrules\":{\"implemented\":true,\"registered\":" + (gAriadneObjectOverrule != nullptr ? "true" : "false") + "},"
         + "\"jigs\":{\"interactive\":" + (fullAutoCad ? "true" : "false") + ","
         + "\"implemented\":true,"
@@ -2462,6 +2508,23 @@ static std::string reactorRegistryJson(const std::string& jobHostMode)
         + "\"command_ends\":" + std::to_string(gReactorCommandEnds) + ","
         + "\"last_command\":\"" + jsonEscape(gReactorLastCommand) + "\","
         + "\"items\":" + (gAriadneEditorReactor != nullptr ? "[\"AriadneEditorReactor\"]" : "[]") + "}";
+}
+
+static std::string selectionMonitorRegistryJson(const std::string& jobHostMode)
+{
+    const bool fullAutoCad = (jobHostMode == "full_autocad");
+    return std::string()
+        + "{\"host\":\"" + jsonEscape(jobHostMode) + "\","
+        + "\"implemented\":true,"
+        + "\"registered\":" + (gAriadneSelectionMonitor != nullptr ? "true" : "false") + ","
+        + "\"interactive_editor_required\":true,"
+        + "\"live_events_supported\":" + (fullAutoCad ? "true" : "false") + ","
+        + "\"pickfirst_modified\":" + std::to_string(gSelMonPickfirstMods) + ","
+        + "\"command_ends\":" + std::to_string(gSelMonCommandEnds) + ","
+        + "\"items\":" + (gAriadneSelectionMonitor != nullptr ? "[\"AriadneSelectionMonitor\"]" : "[]") + ","
+        + "\"reason\":\"" + (fullAutoCad
+            ? "Full AutoCAD editor delivers interactive selection notifications"
+            : "Core Console has no interactive editor; selection callbacks never fire") + "\"}";
 }
 
 static std::string overruleRegistryJson(const std::string& jobHostMode)
@@ -2837,6 +2900,35 @@ static void ariadneNativeJob()
           << ",\"removed\":" << (gAriadneEditorReactor == nullptr ? "true" : "false")
           << ",\"name\":\"AriadneEditorReactor\"},"
           << "\"status\":\"" << (ok ? "ok" : "error") << "\"}";
+    }
+    else if (op == "live.selection.monitor.enable") {
+        bool created = false;
+        const bool ok = enableSelectionMonitor(created);
+        r << "\"result\":{\"registered\":" << (gAriadneSelectionMonitor != nullptr ? "true" : "false")
+          << ",\"created\":" << (created ? "true" : "false")
+          << ",\"name\":\"AriadneSelectionMonitor\"},"
+          << "\"status\":\"" << (ok ? "ok" : "error") << "\"}";
+    }
+    else if (op == "live.selection.monitor.disable") {
+        bool removed = false;
+        const bool ok = disableSelectionMonitor(removed);
+        r << "\"result\":{\"registered\":" << (gAriadneSelectionMonitor != nullptr ? "true" : "false")
+          << ",\"removed\":" << (gAriadneSelectionMonitor == nullptr ? "true" : "false")
+          << ",\"name\":\"AriadneSelectionMonitor\"},"
+          << "\"status\":\"" << (ok ? "ok" : "error") << "\"}";
+    }
+    else if (op == "inspect.selection.monitor.registry") {
+        r << "\"result\":" << selectionMonitorRegistryJson(jobHostMode) << ","
+          << "\"status\":\"ok\"}";
+    }
+    else if (op == "inspect.probe.property_count") {
+        // Headless proof of OPM AcRxProperty registration: counts the "Size"
+        // member on AriadneProbe::desc() (registered via WITH_PROPERTIES macro).
+        const int pc = ariadneProbePropertyCount();
+        r << "\"result\":{\"property_count\":" << pc
+          << ",\"property\":\"Size\",\"opm_registration\":" << (pc >= 1 ? "true" : "false")
+          << ",\"panel_display\":\"attended_only\"},"
+          << "\"status\":\"" << (pc >= 0 ? "ok" : "error") << "\"}";
     }
     else if (op == "inspect.overrule.registry") {
         r << "\"result\":" << overruleRegistryJson(jobHostMode) << ","
@@ -3400,6 +3492,7 @@ acrxEntryPoint(AcRx::AppMsgCode msg, void* pkt)
         {
             bool removed = false;
             disableEditorReactor(removed);
+            disableSelectionMonitor(removed);
             disableObjectOverrule(removed);
         }
         acedRegCmds->removeGroup(_T("ARIADNE_NATIVE"));

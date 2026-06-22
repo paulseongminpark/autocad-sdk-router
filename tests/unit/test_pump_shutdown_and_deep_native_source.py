@@ -115,6 +115,24 @@ def test_editor_reactor_surface_present(arx_src: str):
     assert 'op == "live.reactor.disable"' in arx_src
 
 
+def test_selection_monitor_surface_present(arx_src: str):
+    """M07-remainder: AriadneSelectionMonitor : AcEditorReactor with pickfirstModified
+    (aced.h:541), enable/disable, dispatch ops, registry json, and clean-unload wiring.
+    Registration is acedEditor-gated (headless registered=false); live events attended."""
+    assert "class AriadneSelectionMonitor : public AcEditorReactor" in arx_src
+    assert "pickfirstModified() override" in arx_src
+    assert "enableSelectionMonitor" in arx_src
+    assert "disableSelectionMonitor" in arx_src
+    assert 'op == "live.selection.monitor.enable"' in arx_src
+    assert 'op == "live.selection.monitor.disable"' in arx_src
+    assert 'op == "inspect.selection.monitor.registry"' in arx_src
+    assert "selectionMonitorRegistryJson" in arx_src
+    # capability advertised + disabled on unload alongside the editor reactor
+    assert "selection_monitor" in arx_src
+    idx = arx_src.index("kUnloadAppMsg")
+    assert "disableSelectionMonitor" in arx_src[idx:]
+
+
 def test_editor_jig_surface_present_and_host_gated(arx_src: str):
     """AcEdJig is implemented but its drag loop is correctly attended-only."""
     assert "class AriadneLineJig : public AcEdJig" in arx_src
