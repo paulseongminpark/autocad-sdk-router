@@ -540,6 +540,60 @@ struct RichGraphCounters
     int hatchLoopVertices = 0;
 };
 
+//============================================================================
+// M08B-T02: generic serializers + UTF-8 JSON writer.
+//
+// The reusable serialization primitives the M08 family tickets (C-F) build on, so
+// per-op handlers never re-implement string encoding or the common AcDbObject/
+// AcDbEntity field shapes. ALL string output is UTF-8 (acharToAscii()/wideToUtf8(),
+// lossless) -- never the lossy wideToAscii() '?' funnel. njsonStr() is the
+// canonical UTF-8 JSON-string writer.
+//============================================================================
+
+// UTF-8 JSON string writer: returns a fully-quoted, escaped JSON string token
+// (e.g.  "설비OPEN" ) preserving non-ASCII code points as UTF-8 bytes; only JSON
+// metacharacters are escaped. nullptr -> "". Three overloads cover the ACHAR*
+// (entity/layer/class names), wide, and already-decoded std::string (handles) cases.
+static std::string njsonStr(const ACHAR* s)
+{
+    return std::string("\"") + jsonEscape(s != nullptr ? acharToAscii(s) : std::string()) + "\"";
+}
+static std::string njsonStr(const std::wstring& s)
+{
+    return std::string("\"") + jsonEscape(wideToUtf8(s)) + "\"";
+}
+static std::string njsonStr(const std::string& utf8)
+{
+    return std::string("\"") + jsonEscape(utf8) + "\"";
+}
+
+// Generic AcDbObject common fields (NO enclosing braces; caller wraps). The shared
+// shape every persisted object carries: handle, RX class name, owner handle.
+static std::string serializeObjectCommon(AcDbObject* pObj)
+{
+    std::ostringstream o;
+    o << "\"handle\":" << njsonStr(handleOf(pObj));
+    const ACHAR* cls = (pObj != nullptr && pObj->isA() != nullptr) ? pObj->isA()->name() : nullptr;
+    o << ",\"class\":" << njsonStr(cls);
+    o << ",\"owner\":" << njsonStr(pObj != nullptr ? handleOfId(pObj->ownerId()) : std::string());
+    return o.str();
+}
+
+// Generic AcDbEntity common fields (NO enclosing braces): object-common + the
+// entity-common graphics properties. The base every entity handler reuses.
+static std::string serializeEntityCommon(AcDbEntity* pEnt)
+{
+    std::ostringstream o;
+    o << serializeObjectCommon(pEnt);
+    if (pEnt != nullptr) {
+        o << ",\"layer\":" << njsonStr(pEnt->layer());
+        o << ",\"color_index\":" << static_cast<int>(pEnt->colorIndex());
+        o << ",\"linetype\":" << njsonStr(pEnt->linetype());
+        o << ",\"visible\":" << (pEnt->visibility() == AcDb::kVisible ? "true" : "false");
+    }
+    return o.str();
+}
+
 static bool resbufCodeIsString(short code)
 {
     return code == 1 || code == 2 || code == 3 || code == 4 || code == 5 ||
@@ -577,8 +631,9 @@ static std::string resbufItemJson(const resbuf* rb)
     o << "{\"code\":" << rb->restype;
     const short code = rb->restype;
     if (resbufCodeIsString(code)) {
-        const ACHAR* raw = rb->resval.rstring;
-        o << ",\"value\":\"" << jsonEscape(raw != nullptr ? acharToAscii(raw) : std::string()) << "\"";
+        // M08B-T02: route through the canonical UTF-8 JSON writer (byte-identical
+        // output; now covers njsonStr() under the existing resbuf/xdata tests).
+        o << ",\"value\":" << njsonStr(rb->resval.rstring);
     }
     else if (resbufCodeIsPoint(code)) {
         o << ",\"value\":[" << rb->resval.rpoint[0] << ","

@@ -1,0 +1,40 @@
+{
+  "ticket_id": "M08B-T02",
+  "phase": "M08B",
+  "title": "Generic serializers and UTF-8 writer",
+  "status": "PASS",
+  "branch": "cados/M08B-T02",
+  "base_branch": "cados/M08B-T01",
+  "commit": "621e3cb",
+  "pr": "https://github.com/paulseongminpark/autocad-sdk-router/pull/5",
+  "depends_on": "M08A (stacked on M08B-T01)",
+  "change_only_honored": true,
+  "primitives_added": ["njsonStr (UTF-8 JSON writer, 3 overloads)", "serializeObjectCommon(AcDbObject*)", "serializeEntityCommon(AcDbEntity*)"],
+  "resbuf_xdata_serializer": "pre-existing (resbufItemJson/resbufItemsJson/xdataBlocksJson); string value routed through njsonStr (byte-identical)",
+  "build": {
+    "tool": "tools/build_native_acad.ps1",
+    "exit_code": 0,
+    "arx_relink_mode": "canonical",
+    "artifacts": {"Ariadne.AcadNativeDbx.dbx": 48640, "Ariadne.AcadNative.crx": 262144, "Ariadne.AcadNative.arx": 270336}
+  },
+  "implemented_ops": 0,
+  "hard_blocked_ops": 0,
+  "deprecated_ops": 0,
+  "catalogued_remaining": 474,
+  "tests": [
+    "tools/build_native_acad.ps1 = exit 0 (compile+link)",
+    "pytest tests/unit/test_m08b_serializers.py = 7 passed (UTF-8 routing + generic serializer contract)",
+    "pytest tests/unit/test_non_ascii_fidelity.py passes (UTF-8 fidelity / no lossy '?')",
+    "pytest tests/unit = 266 passed, 0 failed (no regression)"
+  ],
+  "validate_bar": "non-ASCII test passes; no lossy '?' output (generic path is UTF-8; wideToAscii only for ASCII-only diagnostics)",
+  "scope_note": "generic object/entity serializers compile-verified + source-contract-tested, runtime-exercised by C-F; inline collectModelSpaceGraph emission left intact.",
+  "artifacts": [
+    "src/Ariadne.AcadNative/AriadneNativeJob.cpp (njsonStr + serializeObjectCommon + serializeEntityCommon + resbuf routed through njsonStr)",
+    "tests/unit/test_m08b_serializers.py",
+    "docs/M08B_SERIALIZERS.md",
+    "reports/tickets/M08B-T02.md",
+    "reports/tickets/M08B-T02_PLAN.md"
+  ],
+  "next": "M08B-T03 (transaction/document lock wrappers); then MERGE-M08-INFRA -> main; then C-F"
+}
