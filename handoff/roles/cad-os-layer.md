@@ -2,8 +2,8 @@
 role: cad-os-layer
 state: working
 started: 2026-06-21
-last-updated: 2026-06-22T14:15:00+09:00
-last-session: sessions/SESSION_2026-06-22_1333.md
+last-updated: 2026-06-22T14:51:00+09:00
+last-session: sessions/SESSION_2026-06-22_1451.md
 canonical-cross-system-bead: D:\dev\_ariadne\_daedalus\HANDOFF\roles\cad-os-layer.md
 ---
 
@@ -17,12 +17,12 @@ canonical-cross-system-bead: D:\dev\_ariadne\_daedalus\HANDOFF\roles\cad-os-laye
 
 **Key lesson (M08)**: caught + fixed a risk_class misclassification — `policy.raw_command_dispatch=forbidden` is a SAFETY GUARANTEE carried by safe python ops, NOT a "this op IS a raw command" marker; conflating it wrongly walled off the 4 cadctl/MCP tools (query.entities/validate.ir/patch.dry_run/patch.apply_staged). Fixed: raw_command detected by actual native_api (`acedCommand*`/`command.invoke`) → 5 raw ops, all `catalogued`, **0 agent-exposed** (guard is non-vacuous). Also: the cp949 console mojibake on Korean names is a DISPLAY artifact — on-disk bytes are valid UTF-8 (verify by code-point, never console).
 
-**Next action**: **CADOS_M09_V1_RELEASE_FREEZE_AND_DAEDALUS_HANDOFF** — confirm completion-definition items 1–16, freeze v1 surface, produce final docs/reports + Daedalus external handoff. M10 burn-down only if M09 not PASS. Do NOT start Daedalus app logic before the v1 gate closes. Bundle SoT: `D:\dev\_ariadne\alm\docs\CADOS_COMPLETION_PACKET_BUNDLE_M03_TO_FINAL\` (M09–M10 remain).
+**Next action (SCOPE DECISION OPEN — do NOT auto-proceed to M09)**: Paul questioned whether M08 actually built the ~474 ops / matches the "태초의 계획". Honest truth: this session built only **3 new native ops** (+live.status promo); **474 remain `catalogued` = NOT built**. M08 PASS holds ONLY under the packet *body* acceptance (classify-all + v1-target-only); the bundle `index.md` ("implement OR hard-block, no unclassified") is stricter and NOT met. **The two spec sources contradict.** Paul rejected the structured scope question and wants to **clarify first** — I offered 4 angles (① index-vs-body wording, ② per-family feasible-cheap vs bespoke-heavy breakdown, ③ his baseline intent, ④ was my narrow v1_target a fair cut). **Resolve scope with Paul → then either (A) build feasible reads ~30 more, (B) implement-or-block all 474 [reopens M08, huge], or (C) keep v1-surface + proceed M09.** Honesty first, no fake PASS.
 
 **Blockers**:
 | since | blocker | mitigation |
 |---|---|---|
-| — | none | M08 is a clean full PASS |
+| 2026-06-22 | M08 scope ratification OPEN — "build 474 vs classify+v1-surface" undecided; packet index.md (implement-or-block-all) vs body (classify+v1-only) contradict | Paul clarifying; do NOT proceed to M09 until scope set; M08 PASS = packet-body-acceptance only |
 
 **Decisions log** (append-only):
 | date | decision | rationale |
@@ -32,6 +32,8 @@ canonical-cross-system-bead: D:\dev\_ariadne\_daedalus\HANDOFF\roles\cad-os-laye
 | 2026-06-22 | v1_target = status∈{implemented,blocked} | v1 surface = implemented + first-class hard-blocked; 474 catalogued = future native capability; no feasible v1 read left catalogued after the inspect sweep |
 | 2026-06-22 | raw_command by native_api not policy flag | policy.raw_command_dispatch=forbidden is a safety guarantee on SAFE ops; fixed to detect acedCommand*/command.invoke → 5 raw ops catalogued, 0 exposed |
 | 2026-06-22 | built inspect.layers/blocks/entities natively | feasible headless reads → honesty requires building (not deferring to non-v1); smoked 70/245/21747 == M03 truth |
+| 2026-06-22 | M08 scope SURFACED as open (post-commit) | Paul asked "are all 474 actually built?"; honest NO (3 built); packet index vs body contradict; M08 PASS is body-acceptance only — scope to be ratified before M09 |
 
 **Linked sessions**:
 - sessions/SESSION_2026-06-22_1333.md (M07B PARTIAL→full PASS firing close; then M08 full coverage closure)
+- sessions/SESSION_2026-06-22_1451.md (M08 committed PASS; scope question OPEN — 474 catalogued not built; Paul clarifying)
