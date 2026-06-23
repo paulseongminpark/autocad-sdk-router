@@ -4,7 +4,7 @@
   "status": "PASS",
   "title": "AutoLISP and .NET fallback adapters",
   "branch": "cados/m08o-fallback-raw-policy",
-  "commit": "PENDING",
+  "commit": "4e53130",
   "pr": "",
   "implemented_ops": [],
   "hard_blocked_ops": [
