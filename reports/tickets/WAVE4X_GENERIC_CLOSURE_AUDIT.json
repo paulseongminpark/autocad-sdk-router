@@ -1,0 +1,41 @@
+{
+  "schema": "wave4x.generic_closure.audit.v1",
+  "audited_branch": "cados/w4x-generic-closure",
+  "audited_commit": "98605fb",
+  "status": "ok",
+  "synthetic_op": "wave4x.generic_closure.validation_attended_debt",
+  "decision": "SYNTHETIC_REPORT_ONLY",
+  "registry_membership": {
+    "present_in_operations_v2": false,
+    "implemented_count": 457,
+    "blocked_count": 60,
+    "total_count": 517,
+    "count_impact_if_removed_from_registry": 0
+  },
+  "patch_inspection": {
+    "synthetic_symbol_found_in_patch": true,
+    "synthetic_symbol_files": [
+      "reports/tickets/WAVE4X_GENERIC_CLOSURE.json",
+      "reports/tickets/WAVE4X_GENERIC_CLOSURE.md",
+      "reports/tickets/WAVE4X_GENERIC_CLOSURE_OPS.json",
+      "reports/tickets/WAVE4X_PANE6_GENERIC_CLOSURE_CLAIMS.json",
+      "tests/unit/test_wave4x_generic_closure.py",
+      "tools/wave4x_generic_closure_audit.py"
+    ],
+    "synthetic_symbol_in_config_diff": false,
+    "config_diff_summary": "Audited config diff only normalizes live.apply_patch blocker/evidence; no synthetic CAD op was added to the registry."
+  },
+  "resolution": {
+    "registry_change_required": false,
+    "report_location": "reports/tickets/WAVE4X_GENERIC_CLOSURE_AUDIT.json",
+    "guard_test_added": "tests/unit/test_wave4x_registry_synthetic_ops.py",
+    "guard_rule": "wave/ticket bookkeeping markers must not enter config/operations.v2.json"
+  },
+  "evidence_refs": [
+    "config/operations.v2.json",
+    "tests/unit/test_wave4x_registry_synthetic_ops.py",
+    "reports/tickets/WAVE4X_GENERIC_CLOSURE_AUDIT.md",
+    "git diff main..98605fb -- config/operations.v2.json",
+    "git grep -n wave4x.generic_closure.validation_attended_debt 98605fb -- ."
+  ]
+}
