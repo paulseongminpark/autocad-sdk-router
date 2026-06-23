@@ -2,9 +2,9 @@
 
 - packet: `CADOS_M08_FULL_OPERATION_COVERAGE_CLOSURE`
 - generated_from: `config/operations.v2.json`
-- total operations: **517** · implemented 285 · stub 0 · blocked 2 · catalogued 230 · deprecated 0 · **unknown 0**
-- v1-target: **287** (implemented 285 · blocked 2 · **deferred 0**)
-- agent-exposed ops: 285
+- total operations: **517** · implemented 355 · stub 0 · blocked 5 · catalogued 157 · deprecated 0 · **unknown 0**
+- v1-target: **360** (implemented 355 · blocked 5 · **deferred 0**)
+- agent-exposed ops: 355
 
 ## Gate
 
@@ -32,7 +32,7 @@
 | validate_diff | 3 | 0 | 0 | 0 | 3 |
 | render_visual | 8 | 0 | 1 | 3 | 9 |
 | live | 6 | 0 | 1 | 0 | 7 |
-| native_only | 225 | 0 | 0 | 196 | 225 |
+| native_only | 295 | 0 | 3 | 123 | 298 |
 
 ## Risk class distribution
 
@@ -49,6 +49,9 @@
 |---|---|---|---|---|---|---|---|
 | live.apply_patch | live | blocked | live_edit | live_edit | False |  | Requires full_autocad live_edit host + explicit write_origin |
 | render.layout | render | blocked | read_safe | read | False |  | Requires full_autocad plot/publish host; no headless render  |
+| module.load.demand_register | runtime_commands | blocked | read_safe | read | False | Registry: HKLM\…\R<ver>\<prodkey>\Applications\< | SAFETY_FORBIDDEN: ObjectARX demand-load registration require |
+| command.menu.invoke | ui_customization | blocked | read_safe | read | False | acedMenuCmd(const ACHAR*) | SAFETY_FORBIDDEN: acedMenuCmd executes arbitrary menu/comman |
+| editor.toolpalette.tool_execute | ui_customization | blocked | read_safe | read | False | AcTcTool::Execute(int nFlag, HWND, POINT, DWORD  | SAFETY_FORBIDDEN: AcTcTool::Execute programmatically fires a |
 | apply.patch | apply | implemented | staged_write | write_copy | True | patch_engine.apply_staged |  |
 | inspect.block.iterate | blocks_xrefs_clone | implemented | read_safe | read | True | m08eDispatch |  |
 | compute.brep.line_containment | brep_solids | implemented | read_safe | read | True | m08dDispatch |  |
@@ -202,6 +205,32 @@
 | overrule.transform.install | custom_objects_protocols | implemented | read_safe | read | True | m08lDispatch |  |
 | overrule.visibility.install | custom_objects_protocols | implemented | read_safe | read | True | m08lDispatch |  |
 | diff.before_after | diff | implemented | read_safe | read | True | cad_diff.compute_diff |  |
+| editor.react.events | editor_input | implemented | read_safe | read | True | m08nDispatch |  |
+| input.get.angle | editor_input | implemented | read_safe | read | True | m08nDispatch |  |
+| input.get.corner | editor_input | implemented | read_safe | read | True | m08nDispatch |  |
+| input.get.dist | editor_input | implemented | read_safe | read | True | m08nDispatch |  |
+| input.get.int | editor_input | implemented | read_safe | read | True | m08nDispatch |  |
+| input.get.keyword | editor_input | implemented | read_safe | read | True | m08nDispatch |  |
+| input.get.point | editor_input | implemented | read_safe | read | True | m08nDispatch |  |
+| input.get.real | editor_input | implemented | read_safe | read | True | m08nDispatch |  |
+| input.get.string | editor_input | implemented | read_safe | read | True | m08nDispatch |  |
+| input.initget.constrain | editor_input | implemented | read_safe | read | True | m08nDispatch |  |
+| interact.inputcontext.react | editor_input | implemented | read_safe | read | True | m08nDispatch |  |
+| interact.inputpoint.filter | editor_input | implemented | read_safe | read | True | m08nDispatch |  |
+| interact.inputpoint.monitor | editor_input | implemented | read_safe | read | True | m08nDispatch |  |
+| interact.jig.acquire | editor_input | implemented | read_safe | read | True | m08nDispatch |  |
+| interact.jig.run | editor_input | implemented | live_edit | live_edit | True | m08nDispatch |  |
+| prompt.alert | editor_input | implemented | read_safe | read | True | m08nDispatch |  |
+| prompt.print | editor_input | implemented | read_safe | read | True | m08nDispatch |  |
+| select.entity.pick | editor_input | implemented | read_safe | read | True | m08nDispatch |  |
+| select.nentity.pick | editor_input | implemented | read_safe | read | True | m08nDispatch |  |
+| select.pickfirst.get | editor_input | implemented | read_safe | read | True | m08nDispatch |  |
+| select.pickfirst.set | editor_input | implemented | read_safe | read | True | m08nDispatch |  |
+| select.ss.addremove | editor_input | implemented | read_safe | read | True | m08nDispatch |  |
+| select.ss.count | editor_input | implemented | read_safe | read | True | m08nDispatch |  |
+| select.ss.free | editor_input | implemented | read_safe | read | True | m08nDispatch |  |
+| select.ssget.interactive | editor_input | implemented | read_safe | read | True | m08nDispatch |  |
+| select.ssget.preview | editor_input | implemented | read_safe | read | True | m08nDispatch |  |
 | inspect.curve.protocol | entities | implemented | read_safe | read | True | m08dDispatch |  |
 | inspect.entity.common | entities | implemented | read_safe | read | True | m08dDispatch |  |
 | inspect.entity.geomextents | entities | implemented | read_safe | read | True | m08dDispatch |  |
@@ -318,6 +347,13 @@
 | react.persistent.detach | reactors_events | implemented | live_edit | live_edit | True | m08mDispatch |  |
 | react.rxevent.attach | reactors_events | implemented | read_safe | read | True | m08mDispatch |  |
 | react.rxevent.monitor | reactors_events | implemented | read_safe | read | True | m08mDispatch |  |
+| command.register.define | runtime_commands | implemented | read_safe | read | True | m08nDispatch |  |
+| module.ads.register_symbol | runtime_commands | implemented | read_safe | read | True | m08nDispatch |  |
+| module.class.register_object | runtime_commands | implemented | staged_write | write_copy | True | m08nDispatch |  |
+| module.command.register_auto | runtime_commands | implemented | read_safe | read | True | m08nDispatch |  |
+| module.command.register_manual | runtime_commands | implemented | read_safe | read | True | m08nDispatch |  |
+| module.register_mdi | runtime_commands | implemented | read_safe | read | True | m08nDispatch |  |
+| module.register_service | runtime_commands | implemented | read_safe | read | True | m08nDispatch |  |
 | inspect.dictionary.get | symbol_tables_dictionaries | implemented | read_safe | read | True | m08eDispatch |  |
 | inspect.dictionary.named_objects | symbol_tables_dictionaries | implemented | read_safe | read | True | m08eDispatch |  |
 | inspect.entity.get_xdata | symbol_tables_dictionaries | implemented | read_safe | read | True | m08eDispatch |  |
@@ -328,6 +364,43 @@
 | transform.database.wblock | symbol_tables_dictionaries | implemented | read_safe | read | True | m08cDispatch |  |
 | write.layer.create | symbol_tables_dictionaries | implemented | staged_write | write_copy | True | createLayer |  |
 | write.xrecord.set | symbol_tables_dictionaries | implemented | staged_write | write_copy | True | setXrecord |  |
+| editor.command.register | ui_customization | implemented | read_safe | read | True | m08nDispatch |  |
+| editor.command.unregister | ui_customization | implemented | read_safe | read | True | m08nDispatch |  |
+| editor.menu.add_item | ui_customization | implemented | read_safe | read | True | m08nDispatch |  |
+| editor.menu.context | ui_customization | implemented | read_safe | read | True | m08nDispatch |  |
+| editor.menu.menubar_get | ui_customization | implemented | read_safe | read | True | m08nDispatch |  |
+| editor.palette.add_palette | ui_customization | implemented | read_safe | read | True | m08nDispatch |  |
+| editor.palette.create | ui_customization | implemented | read_safe | read | True | m08nDispatch |  |
+| editor.palette.create_dockable | ui_customization | implemented | read_safe | read | True | m08nDispatch |  |
+| editor.palette.dock | ui_customization | implemented | read_safe | read | True | m08nDispatch |  |
+| editor.palette.persist | ui_customization | implemented | read_safe | read | True | m08nDispatch |  |
+| editor.palette.style | ui_customization | implemented | read_safe | read | True | m08nDispatch |  |
+| editor.statusbar.add_pane | ui_customization | implemented | read_safe | read | True | m08nDispatch |  |
+| editor.statusbar.context_menu | ui_customization | implemented | read_safe | read | True | m08nDispatch |  |
+| editor.statusbar.get | ui_customization | implemented | read_safe | read | True | m08nDispatch |  |
+| editor.statusbar.pane | ui_customization | implemented | read_safe | read | True | m08nDispatch |  |
+| editor.statusbar.pane_config | ui_customization | implemented | read_safe | read | True | m08nDispatch |  |
+| editor.statusbar.remove_pane | ui_customization | implemented | read_safe | read | True | m08nDispatch |  |
+| editor.toolpalette.add_tool | ui_customization | implemented | read_safe | read | True | m08nDispatch |  |
+| editor.toolpalette.catalog_item_props | ui_customization | implemented | read_safe | read | True | m08nDispatch |  |
+| editor.toolpalette.catalog_manager | ui_customization | implemented | read_safe | read | True | m08nDispatch |  |
+| editor.toolpalette.create | ui_customization | implemented | read_safe | read | True | m08nDispatch |  |
+| editor.toolpalette.export | ui_customization | implemented | read_safe | read | True | m08nDispatch |  |
+| editor.toolpalette.global_init | ui_customization | implemented | read_safe | read | True | m08nDispatch |  |
+| editor.toolpalette.group_activate | ui_customization | implemented | read_safe | read | True | m08nDispatch |  |
+| editor.toolpalette.group_create | ui_customization | implemented | read_safe | read | True | m08nDispatch |  |
+| editor.toolpalette.refresh | ui_customization | implemented | read_safe | read | True | m08nDispatch |  |
+| editor.toolpalette.scheme_create | ui_customization | implemented | read_safe | read | True | m08nDispatch |  |
+| editor.toolpalette.scheme_register | ui_customization | implemented | read_safe | read | True | m08nDispatch |  |
+| editor.toolpalette.stocktool_find | ui_customization | implemented | read_safe | read | True | m08nDispatch |  |
+| editor.toolpalette.tool_set_command | ui_customization | implemented | read_safe | read | True | m08nDispatch |  |
+| editor.toolpalette.window_get | ui_customization | implemented | read_safe | read | True | m08nDispatch |  |
+| editor.toolpalette.window_show | ui_customization | implemented | read_safe | read | True | m08nDispatch |  |
+| editor.toolpaletteset.add_palette | ui_customization | implemented | read_safe | read | True | m08nDispatch |  |
+| editor.toolpaletteset.show | ui_customization | implemented | read_safe | read | True | m08nDispatch |  |
+| editor.tray.add_item | ui_customization | implemented | read_safe | read | True | m08nDispatch |  |
+| editor.tray.item_config | ui_customization | implemented | read_safe | read | True | m08nDispatch |  |
+| editor.tray.remove | ui_customization | implemented | read_safe | read | True | m08nDispatch |  |
 | validate.ir | validate | implemented | read_safe | read | True | validator.validate_target |  |
 | validate.patch | validate | implemented | read_safe | read | True | validator.validate_target |  |
 | write.block.insert | write | implemented | staged_write | write_copy | True | insertBlockReference |  |
@@ -335,4 +408,4 @@
 | write.layout.create | write | implemented | staged_write | write_copy | True | createLayout |  |
 | write.xdata.set | write | implemented | staged_write | write_copy | True | setDatabaseXdata |  |
 
-> Full 517-operation detail (all 13 fields per op) is in `reports/operation_coverage_full_matrix.json` — this table lists only the 287 v1-target ops. The 230 catalogued ops are classified future-version native capability (v1_target=false), not omitted.
+> Full 517-operation detail (all 13 fields per op) is in `reports/operation_coverage_full_matrix.json` — this table lists only the 360 v1-target ops. The 157 catalogued ops are classified future-version native capability (v1_target=false), not omitted.

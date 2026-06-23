@@ -3126,13 +3126,15 @@ struct AriadneJobCtx
 #include "families/m08kc_handlers.inc"  // M08K-T03 — constraints / associativity (native)
 #include "families/m08l_handlers.inc"   // M08L — graphics system: worldDraw / overrules / grips (native)
 #include "families/m08m_handlers.inc"   // M08M — OPM properties + reactors (native)
+#include "families/m08n_handlers.inc"   // M08N — editor/jig/selection/UI/command lifecycle (native)
 
 // op admitted by any family module? (gate admission for not-yet-legacy family ops)
 static bool familyHasOp(const std::string& op)
 {
     return m08cHasOp(op) || m08dHasOp(op) || m08eHasOp(op) || m08fHasOp(op)
         || m08gHasOp(op) || m08hHasOp(op)
-        || m08kHasOp(op) || m08kcHasOp(op) || m08lHasOp(op) || m08mHasOp(op);
+        || m08kHasOp(op) || m08kcHasOp(op) || m08lHasOp(op) || m08mHasOp(op)
+        || m08nHasOp(op);
 }
 
 // route op to its owning family module; true if handled (result appended to r)
@@ -3142,7 +3144,8 @@ static bool tryFamilyDispatch(const std::string& op, const AriadneJobCtx& ctx, s
         || m08eDispatch(op, ctx, r) || m08fDispatch(op, ctx, r)
         || m08gDispatch(op, ctx, r) || m08hDispatch(op, ctx, r)
         || m08kDispatch(op, ctx, r) || m08kcDispatch(op, ctx, r)
-        || m08lDispatch(op, ctx, r) || m08mDispatch(op, ctx, r);
+        || m08lDispatch(op, ctx, r) || m08mDispatch(op, ctx, r)
+        || m08nDispatch(op, ctx, r);
 }
 
 static void ariadneNativeJob()
@@ -4149,13 +4152,67 @@ static std::string pumpDispatch(const std::string& req, bool& stop)
               << ",\"interactive_editor_required\":true"
               << ",\"reason\":\"viewport zoom needs a live editor view; accoreconsole has no viewport/editor\"}";
         } else {
-            // Honest deferral (NOT a fake ok): a viewport ZOOM needs an acedCommand
-            // context, but CADAGENT_PUMP is itself a modal command and acedCommand
-            // cannot be invoked reentrantly from inside a running command.
-            r << "\"status\":\"deferred\",\"host_mode\":\"" << jsonEscape(hostMode) << "\""
-              << ",\"editor_present\":true"
-              << ",\"reason\":\"viewport zoom requires an acedCommand context; CADAGENT_PUMP is a modal command and acedCommand cannot be invoked reentrantly from the pump loop\""
-              << ",\"alternative\":\"live.highlight_handles (in-pump visual feedback) or a non-pump ZOOM command\"}";
+            // M08N-A3: implement zoom without raw command dispatch. Compute WCS extents
+            // for the requested handles and call acedSetCurrentView() with a transient
+            // AcDbViewTableRecord. This is safe inside CADAGENT_PUMP (no acedCommand
+            // reentrancy, no DB write, no original DWG save).
+            const std::vector<std::string> handles = jsonFindStringArray(req, "handles");
+            AcDbExtents ext;
+            bool haveExt = false;
+            int used = 0, miss = 0;
+            for (const std::string& hx : handles) {
+#ifdef _UNICODE
+                const std::wstring wh(hx.begin(), hx.end());
+                const AcDbHandle h(wh.c_str());
+#else
+                const AcDbHandle h(hx.c_str());
+#endif
+                AcDbObjectId id;
+                if (pDb == nullptr || pDb->getAcDbObjectId(id, false, h) != Acad::eOk || id.isNull()) { ++miss; continue; }
+                AcDbEntity* pEnt = nullptr;
+                if (acdbOpenObject(pEnt, id, AcDb::kForRead) != Acad::eOk || pEnt == nullptr) { ++miss; continue; }
+                AcDbExtents one;
+                if (pEnt->getGeomExtents(one) == Acad::eOk && one.isValid()) {
+                    if (!haveExt) { ext = one; haveExt = true; }
+                    else { ext.addExt(one); }
+                    ++used;
+                } else {
+                    ++miss;
+                }
+                pEnt->close();
+            }
+            if (!haveExt) {
+                r << "\"status\":\"not_found\",\"host_mode\":\"" << jsonEscape(hostMode) << "\""
+                  << ",\"requested\":" << static_cast<int>(handles.size())
+                  << ",\"reason\":\"no requested handle resolved to valid geometric extents\"}";
+            } else {
+                const AcGePoint3d mn = ext.minPoint();
+                const AcGePoint3d mx = ext.maxPoint();
+                const double cx = (mn.x + mx.x) * 0.5;
+                const double cy = (mn.y + mx.y) * 0.5;
+                const double cz = (mn.z + mx.z) * 0.5;
+                double width = mx.x - mn.x;
+                double height = mx.y - mn.y;
+                if (width <= 1.0e-9) width = 1.0;
+                if (height <= 1.0e-9) height = 1.0;
+                const double pad = 1.15;
+                AcDbViewTableRecord view;
+                view.setViewDirection(AcGeVector3d(0.0, 0.0, 1.0));
+                view.setTarget(AcGePoint3d(cx, cy, cz));
+                view.setCenterPoint(AcGePoint2d(cx, cy));
+                view.setWidth(width * pad);
+                view.setHeight(height * pad);
+                const Acad::ErrorStatus es = acedSetCurrentView(&view, nullptr);
+                r << "\"status\":\"" << (es == Acad::eOk ? "ok" : "error") << "\""
+                  << ",\"host_mode\":\"" << jsonEscape(hostMode) << "\""
+                  << ",\"requested\":" << static_cast<int>(handles.size())
+                  << ",\"used\":" << used << ",\"missed\":" << miss
+                  << ",\"set_current_view_status\":" << static_cast<int>(es)
+                  << ",\"center\":[" << cx << "," << cy << "," << cz << "]"
+                  << ",\"width\":" << (width * pad)
+                  << ",\"height\":" << (height * pad)
+                  << ",\"raw_command_dispatch\":false}";
+            }
         }
     }
     else if (op == "live.render_view") {
