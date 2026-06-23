@@ -86,7 +86,7 @@ FINAL:
 [M08CDEF READ/GRAPH/QUERY RESULT]
 STATUS: PASS
 BRANCH: cados/m08cdef-read-graph-query-30
-COMMIT: PENDING_FINAL_COMMIT
+COMMIT: 1a1e345 (implementation commit; final branch HEAD in final response)
 PATCH: handoff/pr/M08CDEF_READ_GRAPH_QUERY_30.patch
 IMPLEMENTED_OPS_COUNT: 30
 HARD_BLOCKED_OPS:

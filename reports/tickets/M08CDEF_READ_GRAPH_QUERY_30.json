@@ -2,7 +2,8 @@
   "ticket_id": "M08CDEF_READ_GRAPH_QUERY_30",
   "status": "PASS",
   "branch": "cados/m08cdef-read-graph-query-30",
-  "commit": "PENDING_FINAL_COMMIT",
+  "commit": "1a1e345",
+  "commit_note": "implementation commit; final branch HEAD is reported in final response after metadata artifact commit",
   "pr": "",
   "implemented_ops": [
     "infra.hostapp.set_working_db",
