@@ -46,7 +46,7 @@ FAMILIES_DIR = os.path.join(ROOT, "src", "Ariadne.AcadNative", "families")
 RE_CONST = re.compile(r'\b([A-Za-z_]\w*)\s*=\s*"([^"]+)"\s*;')
 # op == "literal"  |  op == IDENT
 RE_OPEQ = re.compile(r'op\s*==\s*(?:"([^"]+)"|([A-Za-z_]\w*))')
-RE_FAMFILE = re.compile(r'^m08([a-z])_handlers\.inc$')
+RE_FAMFILE = re.compile(r'^m08([a-z]+)_handlers\.inc$')   # unit token may be multi-char (e.g. m08kc)
 
 
 def _load_reg():
