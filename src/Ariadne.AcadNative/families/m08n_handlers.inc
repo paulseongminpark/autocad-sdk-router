@@ -336,6 +336,12 @@ static bool m08nHasOp(const std::string& op)
         op == "module.command.register_manual" ||
         op == "module.register_mdi" ||
         op == "module.register_service" ||
+        op == "module.app.accessor" ||
+        op == "module.command.stack_handle" ||
+        op == "doc.current" ||
+        op == "doc.lock" ||
+        op == "doc.new" ||
+        op == "doc.syncopen" ||
         // T02 UI/palette/status builder source (37 implemented; menu.invoke/tool_execute hard-blocked)
         op == "editor.command.register" ||
         op == "editor.command.unregister" ||
@@ -800,6 +806,122 @@ static bool m08nDispatch(const std::string& op, const AriadneJobCtx& ctx, std::o
           << ",\"registered_after\":" << (after ? "true" : "false")
           << ",\"service_ptr_present\":" << (svc != nullptr ? "true" : "false")
           << ",\"process_lifetime_service\":true"
+          << "},\"status\":\"ok\"}";
+        return true;
+    }
+
+    // --- module.app.accessor -------------------------------------------------------------
+    if (op == "module.app.accessor") {
+        HMODULE hMod = GetModuleHandleW(L"Ariadne.AcadNative.arx");
+        if (hMod == NULL) {
+            hMod = GetModuleHandleW(L"Ariadne.AcadNative.crx");
+        }
+        r << "\"result\":{\"hinstance\":" << reinterpret_cast<uintptr_t>(hMod)
+          << ",\"module_name\":\"Ariadne.AcadNative\""
+          << ",\"app_ptr\":0"
+          << "},\"status\":\"ok\"}";
+        return true;
+    }
+
+    // --- module.command.stack_handle ----------------------------------------------------
+    if (op == "module.command.stack_handle") {
+        AcEdCommandStack* stack = acedRegCmds;
+        r << "\"result\":{\"stack_ptr\":" << reinterpret_cast<uintptr_t>(stack)
+          << ",\"stack_present\":" << (stack != nullptr ? "true" : "false")
+          << ",\"group_count\":0"
+          << "},\"status\":\"" << (stack != nullptr ? "ok" : "error") << "\"}";
+        return true;
+    }
+
+    // --- doc.current ---------------------------------------------------------------------
+    if (op == "doc.current") {
+        AcApDocument* pDoc = nullptr;
+        if (acDocManager != nullptr) {
+            pDoc = acDocManager->curDocument();
+            if (pDoc == nullptr) {
+                pDoc = acDocManager->mdiActiveDocument();
+            }
+        }
+        std::string docTitle;
+        if (pDoc != nullptr) {
+            const ACHAR* title = pDoc->fileName();
+            if (title != nullptr) {
+                docTitle = acharToAscii(title);
+            }
+        }
+        r << "\"result\":{\"document_ptr\":" << reinterpret_cast<uintptr_t>(pDoc)
+          << ",\"doc_present\":" << (pDoc != nullptr ? "true" : "false")
+          << ",\"file_name\":" << njsonStr(docTitle)
+          << ",\"host_mode\":" << njsonStr(ctx.hostMode)
+          << "},\"status\":\"ok\"}";
+        return true;
+    }
+
+    // --- doc.lock ------------------------------------------------------------------------
+    if (op == "doc.lock") {
+        const bool execute = m08nBoolArg(job, "execute", false);
+        AcApDocument* pDoc = nullptr;
+        Acad::ErrorStatus lockEs = Acad::eNotApplicable;
+        Acad::ErrorStatus unlockEs = Acad::eNotApplicable;
+        if (acDocManager != nullptr) {
+            pDoc = acDocManager->curDocument();
+            if (pDoc == nullptr) {
+                pDoc = acDocManager->mdiActiveDocument();
+            }
+        }
+        if (execute && pDoc != nullptr && acDocManager != nullptr) {
+            lockEs = acDocManager->lockDocument(pDoc, AcAp::kWrite);
+            if (lockEs == Acad::eOk) {
+                unlockEs = acDocManager->unlockDocument(pDoc);
+            }
+        }
+        r << "\"result\":{\"document_ptr\":" << reinterpret_cast<uintptr_t>(pDoc)
+          << ",\"execute_requested\":" << (execute ? "true" : "false")
+          << ",\"lock_status\":" << static_cast<int>(lockEs)
+          << ",\"unlock_status\":" << static_cast<int>(unlockEs)
+          << ",\"locked_and_unlocked\":" << ((lockEs == Acad::eOk && unlockEs == Acad::eOk) ? "true" : "false")
+          << "},\"status\":\"ok\"}";
+        return true;
+    }
+
+    // --- doc.new -------------------------------------------------------------------------
+    if (op == "doc.new") {
+        const bool execute = m08nBoolArg(job, "execute", false);
+        std::string templPath = m08nStringArg(job, "template_path", "");
+        if (execute && !m08nFullEditor(ctx)) {
+            m08nAttendedOnly(r, op, ctx, "creating a new document requires a live MDI host");
+            return true;
+        }
+        Acad::ErrorStatus es = Acad::eNotApplicable;
+        if (execute && acDocManager != nullptr) {
+            std::wstring wtempl = m08nWide(templPath);
+            es = acDocManager->appContextNewDocument(wtempl.empty() ? nullptr : wtempl.c_str());
+        }
+        r << "\"result\":{\"execute_requested\":" << (execute ? "true" : "false")
+          << ",\"template_path\":" << njsonStr(templPath)
+          << ",\"create_status\":" << static_cast<int>(es)
+          << ",\"host_mode\":" << njsonStr(ctx.hostMode)
+          << "},\"status\":\"ok\"}";
+        return true;
+    }
+
+    // --- doc.syncopen --------------------------------------------------------------------
+    if (op == "doc.syncopen") {
+        const bool execute = m08nBoolArg(job, "execute", false);
+        std::string dwgPath = m08nStringArg(job, "dwg_path", "");
+        if (execute && !m08nFullEditor(ctx)) {
+            m08nAttendedOnly(r, op, ctx, "acedSyncFileOpen requires a live document editor host");
+            return true;
+        }
+        int rc = RTNONE;
+        if (execute && !dwgPath.empty()) {
+            std::wstring wpath = m08nWide(dwgPath);
+            rc = static_cast<int>(acedSyncFileOpen(wpath.c_str()));
+        }
+        r << "\"result\":{\"execute_requested\":" << (execute ? "true" : "false")
+          << ",\"dwg_path\":" << njsonStr(dwgPath)
+          << ",\"acedSyncFileOpen_status\":" << rc
+          << ",\"host_mode\":" << njsonStr(ctx.hostMode)
           << "},\"status\":\"ok\"}";
         return true;
     }
