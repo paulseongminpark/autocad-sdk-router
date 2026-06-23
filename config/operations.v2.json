@@ -57,8 +57,8 @@
     "operations": 517,
     "by_status": {
       "implemented": 285,
-      "blocked": 2,
-      "catalogued": 230
+      "blocked": 7,
+      "catalogued": 225
     },
     "by_family": {
       "active_document_write_original": 8,
@@ -94,7 +94,14 @@
       "native_arx_only": 233,
       "objectdbx_capable": 218
     },
-    "total": 517
+    "total": 517,
+    "catalogued": 225,
+    "blocked": 7,
+    "implemented": 285,
+    "wired": 0,
+    "stub": 0,
+    "deprecated": 0,
+    "unknown": 0
   },
   "coverage": {
     "wired_ops": 33,
@@ -132,13 +139,14 @@
     "implemented": 285,
     "wired": 0,
     "stub": 0,
-    "catalogued": 230,
-    "blocked": 2,
+    "catalogued": 225,
+    "blocked": 7,
     "deprecated": 0,
     "unknown": 0,
     "catalog_classified_ops": 480,
     "catalog_unclassified_ops": 0,
-    "catalog_classification_status": "complete"
+    "catalog_classification_status": "complete",
+    "total": 517
   },
   "operations": [
     {
@@ -3124,7 +3132,7 @@
       "id": "command.invoke.coroutine",
       "operation": "command.invoke.coroutine",
       "family": "active_document_write_original",
-      "status": "catalogued",
+      "status": "blocked",
       "engine_tier": "native_arx_only",
       "engines": [
         "native_arx_only"
@@ -3179,18 +3187,21 @@
       "source_slice": "editor-delta.md",
       "citation": "acedCmdNF.h:146-151; acedFiberWorld() acedCmdNF.h:31; acedads.h:71 (acedCmd disabled)",
       "evidence_refs": [
-        "config/autocad_native_arx_operation_catalog.json#command.invoke.coroutine"
+        "config/autocad_native_arx_operation_catalog.json#command.invoke.coroutine",
+        "docs/FALLBACK_POLICY.md",
+        "docs/M08_REMAINING_BATCH_PLAN.md#m08o-fallback-raw-command-hard-block"
       ],
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "M04 catalog-only classification for this raw-command API is closed as hard-blocked: raw AutoCAD command dispatch is forbidden in fallback policy and never exposed to agents.",
       "owner_ticket": "M08O-T02",
-      "implementation_strategy": "deprecated_raw_command",
-      "evidence_required": "contract_test_not_agent_exposed"
+      "implementation_strategy": "hard_blocked",
+      "evidence_required": "blocker_ref_and_evidence",
+      "blocked_reason": "SAFETY_FORBIDDEN: raw command dispatch is blocked in M08O fallback policy. Fallbacks are managed/.NET/LISP-only and do not expose direct command strings."
     },
     {
       "id": "command.invoke.sync",
       "operation": "command.invoke.sync",
       "family": "active_document_write_original",
-      "status": "catalogued",
+      "status": "blocked",
       "engine_tier": "accoreconsole_lisp_also",
       "engines": [
         "accoreconsole_lisp_also"
@@ -3249,18 +3260,21 @@
       "source_slice": "editor-delta.md",
       "citation": "acedCmdNF.h:46; acedads.h:70 (acedCommand #defined to \"MustSwitchTo_acedCommandC_or_acedCommandS\")",
       "evidence_refs": [
-        "config/autocad_native_arx_operation_catalog.json#command.invoke.sync"
+        "config/autocad_native_arx_operation_catalog.json#command.invoke.sync",
+        "docs/FALLBACK_POLICY.md",
+        "docs/M08_REMAINING_BATCH_PLAN.md#m08o-fallback-raw-command-hard-block"
       ],
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "M04 catalog-only classification for this raw-command API is closed as hard-blocked: raw AutoCAD command dispatch is forbidden in fallback policy and never exposed to agents.",
       "owner_ticket": "M08O-T02",
-      "implementation_strategy": "deprecated_raw_command",
-      "evidence_required": "contract_test_not_agent_exposed"
+      "implementation_strategy": "hard_blocked",
+      "evidence_required": "blocker_ref_and_evidence",
+      "blocked_reason": "SAFETY_FORBIDDEN: raw command dispatch is blocked in M08O fallback policy. Fallbacks are managed/.NET/LISP-only and do not expose direct command strings."
     },
     {
       "id": "command.invoke.sync.resbuf",
       "operation": "command.invoke.sync.resbuf",
       "family": "active_document_write_original",
-      "status": "catalogued",
+      "status": "blocked",
       "engine_tier": "accoreconsole_lisp_also",
       "engines": [
         "accoreconsole_lisp_also"
@@ -3319,12 +3333,15 @@
       "source_slice": "editor-delta.md",
       "citation": "acedCmdNF.h:50-53",
       "evidence_refs": [
-        "config/autocad_native_arx_operation_catalog.json#command.invoke.sync.resbuf"
+        "config/autocad_native_arx_operation_catalog.json#command.invoke.sync.resbuf",
+        "docs/FALLBACK_POLICY.md",
+        "docs/M08_REMAINING_BATCH_PLAN.md#m08o-fallback-raw-command-hard-block"
       ],
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "M04 catalog-only classification for this raw-command API is closed as hard-blocked: raw AutoCAD command dispatch is forbidden in fallback policy and never exposed to agents.",
       "owner_ticket": "M08O-T02",
-      "implementation_strategy": "deprecated_raw_command",
-      "evidence_required": "contract_test_not_agent_exposed"
+      "implementation_strategy": "hard_blocked",
+      "evidence_required": "blocker_ref_and_evidence",
+      "blocked_reason": "SAFETY_FORBIDDEN: raw command dispatch is blocked in M08O fallback policy. Fallbacks are managed/.NET/LISP-only and do not expose direct command strings."
     },
     {
       "id": "doc.current",
@@ -19937,7 +19954,7 @@
       "id": "command.queue.post",
       "operation": "command.queue.post",
       "family": "editor_input",
-      "status": "catalogued",
+      "status": "blocked",
       "engine_tier": "native_arx_only",
       "engines": [
         "native_arx_only"
@@ -19992,12 +20009,15 @@
       "source_slice": "editor-delta.md",
       "citation": "aced.h:175 (acedPostCommandPrompt); acedads.h:70-71 context. acedPostCommand token form unverified (exact signature not read)",
       "evidence_refs": [
-        "config/autocad_native_arx_operation_catalog.json#command.queue.post"
+        "config/autocad_native_arx_operation_catalog.json#command.queue.post",
+        "docs/FALLBACK_POLICY.md",
+        "docs/M08_REMAINING_BATCH_PLAN.md#m08o-fallback-raw-command-hard-block"
       ],
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "M04 catalog-only classification for this raw-command API is closed as hard-blocked: raw AutoCAD command dispatch is forbidden in fallback policy and never exposed to agents.",
       "owner_ticket": "M08O-T02",
-      "implementation_strategy": "deprecated_raw_command",
-      "evidence_required": "contract_test_not_agent_exposed"
+      "implementation_strategy": "hard_blocked",
+      "evidence_required": "blocker_ref_and_evidence",
+      "blocked_reason": "SAFETY_FORBIDDEN: raw command dispatch is blocked in M08O fallback policy. Fallbacks are managed/.NET/LISP-only and do not expose direct command strings."
     },
     {
       "id": "editor.react.events",
@@ -31555,7 +31575,7 @@
       "id": "module.command.lookup",
       "operation": "module.command.lookup",
       "family": "runtime_commands",
-      "status": "catalogued",
+      "status": "blocked",
       "engine_tier": "native_arx_only",
       "engines": [
         "native_arx_only"
@@ -31610,12 +31630,15 @@
       "source_slice": "arx-framework.md",
       "citation": "[DOC acedCmdLookup2]",
       "evidence_refs": [
-        "config/autocad_native_arx_operation_catalog.json#module.command.lookup"
+        "config/autocad_native_arx_operation_catalog.json#module.command.lookup",
+        "docs/FALLBACK_POLICY.md",
+        "docs/M08_REMAINING_BATCH_PLAN.md#m08o-fallback-raw-command-hard-block"
       ],
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "M04 catalog-only classification for this raw-command API is closed as hard-blocked: raw AutoCAD command dispatch is forbidden in fallback policy and never exposed to agents.",
       "owner_ticket": "M08O-T02",
-      "implementation_strategy": "deprecated_raw_command",
-      "evidence_required": "contract_test_not_agent_exposed"
+      "implementation_strategy": "hard_blocked",
+      "evidence_required": "blocker_ref_and_evidence",
+      "blocked_reason": "SAFETY_FORBIDDEN: raw command dispatch is blocked in M08O fallback policy. Fallbacks are managed/.NET/LISP-only and do not expose direct command strings."
     },
     {
       "id": "module.command.register_auto",

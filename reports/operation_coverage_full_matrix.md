@@ -2,8 +2,8 @@
 
 - packet: `CADOS_M08_FULL_OPERATION_COVERAGE_CLOSURE`
 - generated_from: `config/operations.v2.json`
-- total operations: **517** · implemented 285 · stub 0 · blocked 2 · catalogued 230 · deprecated 0 · **unknown 0**
-- v1-target: **287** (implemented 285 · blocked 2 · **deferred 0**)
+- total operations: **517** · implemented 285 · stub 0 · blocked 7 · catalogued 225 · deprecated 0 · **unknown 0**
+- v1-target: **292** (implemented 285 · blocked 7 · **deferred 0**)
 - agent-exposed ops: 285
 
 ## Gate
@@ -28,11 +28,11 @@
 |---|---|---|---|---|---|
 | read | 34 | 0 | 0 | 19 | 34 |
 | query | 1 | 0 | 0 | 0 | 1 |
-| write_patch | 8 | 0 | 0 | 12 | 8 |
+| write_patch | 8 | 0 | 3 | 9 | 11 |
 | validate_diff | 3 | 0 | 0 | 0 | 3 |
 | render_visual | 8 | 0 | 1 | 3 | 9 |
 | live | 6 | 0 | 1 | 0 | 7 |
-| native_only | 225 | 0 | 0 | 196 | 225 |
+| native_only | 225 | 0 | 2 | 194 | 227 |
 
 ## Risk class distribution
 
@@ -47,8 +47,13 @@
 
 | operation | family | status | risk_class | write_level | agent_exposed | handler | blocker_ref |
 |---|---|---|---|---|---|---|---|
+| command.invoke.coroutine | active_document_write_original | blocked | raw_command | live_edit | False | acedCommandC(AcEdCoroutineCallback, void*, int r | SAFETY_FORBIDDEN: raw command dispatch is blocked in M08O fa |
+| command.invoke.sync | active_document_write_original | blocked | raw_command | live_edit | False | acedCommandS(int rtype, ...) | SAFETY_FORBIDDEN: raw command dispatch is blocked in M08O fa |
+| command.invoke.sync.resbuf | active_document_write_original | blocked | raw_command | live_edit | False | acedCmdS(const resbuf* rb, bool, AcApDocument*) | SAFETY_FORBIDDEN: raw command dispatch is blocked in M08O fa |
+| command.queue.post | editor_input | blocked | raw_command | live_edit | False | acedPostCommand / acedPostCommandPrompt() | SAFETY_FORBIDDEN: raw command dispatch is blocked in M08O fa |
 | live.apply_patch | live | blocked | live_edit | live_edit | False |  | Requires full_autocad live_edit host + explicit write_origin |
 | render.layout | render | blocked | read_safe | read | False |  | Requires full_autocad plot/publish host; no headless render  |
+| module.command.lookup | runtime_commands | blocked | raw_command | read | False | acedRegCmds->lookupCmd2(...) via acedCmdLookup2( | SAFETY_FORBIDDEN: raw command dispatch is blocked in M08O fa |
 | apply.patch | apply | implemented | staged_write | write_copy | True | patch_engine.apply_staged |  |
 | inspect.block.iterate | blocks_xrefs_clone | implemented | read_safe | read | True | m08eDispatch |  |
 | compute.brep.line_containment | brep_solids | implemented | read_safe | read | True | m08dDispatch |  |
@@ -335,4 +340,4 @@
 | write.layout.create | write | implemented | staged_write | write_copy | True | createLayout |  |
 | write.xdata.set | write | implemented | staged_write | write_copy | True | setDatabaseXdata |  |
 
-> Full 517-operation detail (all 13 fields per op) is in `reports/operation_coverage_full_matrix.json` — this table lists only the 287 v1-target ops. The 230 catalogued ops are classified future-version native capability (v1_target=false), not omitted.
+> Full 517-operation detail (all 13 fields per op) is in `reports/operation_coverage_full_matrix.json` — this table lists only the 292 v1-target ops. The 225 catalogued ops are classified future-version native capability (v1_target=false), not omitted.
