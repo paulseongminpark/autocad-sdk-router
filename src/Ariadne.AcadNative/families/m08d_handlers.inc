@@ -20,6 +20,9 @@
 
 #include "dbcurve.h"      // AcDbCurve protocol (start/end/closed/planar/area)
 #include "dbsol3d.h"      // AcDb3dSolid::checkInterference
+#include "dbsurf.h"       // AcDbSurface::getSubentColor
+#include "dbSubD.h"       // AcDbSubDMesh::getSubentColor
+#include "AcCmColor.h"    // AcCmColor payload for subentity color reads
 #include "dbsubeid.h"     // AcDbSubentId / AcDbFullSubentPath
 #include "gept3dar.h"     // AcGePoint3dArray
 #include "gemat3d.h"      // AcGeMatrix3d
@@ -239,6 +242,9 @@ static bool m08dHasOp(const std::string& op)
         op == "inspect.subentity.geom_extents" ||
         op == "inspect.subentity.class_id" ||
         op == "inspect.subentity.ptr" ||
+        op == "inspect.subentity.color" ||
+        op == "inspect.subentity.markers_at_path" ||
+        op == "inspect.subentity.path_at_marker" ||
 #ifdef ARIADNE_M08D_BREP
         // Group C — AcBr BRep
         op == "inspect.brep.from_entity" ||
@@ -762,7 +768,10 @@ static bool m08dDispatch(const std::string& op, const AriadneJobCtx& ctx, std::o
     //========================================================================
     if (op == "inspect.subentity.geom_extents" ||
         op == "inspect.subentity.class_id" ||
-        op == "inspect.subentity.ptr") {
+        op == "inspect.subentity.ptr" ||
+        op == "inspect.subentity.color" ||
+        op == "inspect.subentity.markers_at_path" ||
+        op == "inspect.subentity.path_at_marker") {
         std::string handle;
         if (!m08dFindHandle(job, handle)) {
             emitNativeError(r, "MISSING_ARG", op + " requires 'handle'");
@@ -815,6 +824,74 @@ static bool m08dDispatch(const std::string& op, const AriadneJobCtx& ctx, std::o
             return true;
         }
         // inspect.subentity.ptr — materialize transient subentity, report class + extents.
+        if (op == "inspect.subentity.markers_at_path") {
+            AcArray<Adesk::GsMarker> markers;
+            const Acad::ErrorStatus es = pEnt->getGsMarkersAtSubentPath(path, markers);
+            std::ostringstream o;
+            o << "\"subent_type\":\"" << subTypeStr << "\",\"marker\":" << static_cast<long>(marker)
+              << ",\"markers_status\":" << static_cast<int>(es)
+              << ",\"marker_count\":" << markers.length()
+              << ",\"markers\":[";
+            for (int i = 0; i < markers.length(); ++i) {
+                if (i) o << ",";
+                o << static_cast<long>(markers[i]);
+            }
+            o << "]";
+            pEnt->close();
+            r << "\"result\":{" << o.str() << "},\"status\":\"ok\"}";
+            return true;
+        }
+        if (op == "inspect.subentity.path_at_marker") {
+            AcGePoint3d pick(0.0, 0.0, 0.0);
+            AcGeMatrix3d viewXform;
+            viewXform.setToIdentity();
+            int numPaths = 0;
+            AcDbFullSubentPath* paths = nullptr;
+            const Acad::ErrorStatus es = pEnt->getSubentPathsAtGsMarker(
+                st, marker, pick, viewXform, numPaths, paths);
+            if (paths != nullptr)
+                delete[] paths;
+            pEnt->close();
+            r << "\"result\":{\"subent_type\":\"" << subTypeStr
+              << "\",\"marker\":" << static_cast<long>(marker)
+              << ",\"path_status\":" << static_cast<int>(es)
+              << ",\"path_count\":" << numPaths
+              << ",\"pick_point\":" << m08dPointJson(pick)
+              << "},\"status\":\"ok\"}";
+            return true;
+        }
+        if (op == "inspect.subentity.color") {
+            AcCmColor color;
+            Acad::ErrorStatus es = Acad::eNotApplicable;
+            const char* supportedClass = "none";
+            if (AcDb3dSolid::cast(pEnt) != nullptr) {
+                supportedClass = "AcDb3dSolid";
+                es = AcDb3dSolid::cast(pEnt)->getSubentColor(path.subentId(), color);
+            } else if (AcDbSurface::cast(pEnt) != nullptr) {
+                supportedClass = "AcDbSurface";
+                es = AcDbSurface::cast(pEnt)->getSubentColor(path.subentId(), color);
+            } else if (AcDbSubDMesh::cast(pEnt) != nullptr) {
+                supportedClass = "AcDbSubDMesh";
+                es = AcDbSubDMesh::cast(pEnt)->getSubentColor(path.subentId(), color);
+            }
+            pEnt->close();
+            if (supportedClass == std::string("none")) {
+                emitNativeError(r, "UNSUPPORTED_ENTITY",
+                                "inspect.subentity.color requires AcDb3dSolid, AcDbSurface, or AcDbSubDMesh");
+                return true;
+            }
+            r << "\"result\":{\"subent_type\":\"" << subTypeStr
+              << "\",\"marker\":" << static_cast<long>(marker)
+              << ",\"supported_class\":\"" << supportedClass << "\""
+              << ",\"color_status\":" << static_cast<int>(es)
+              << ",\"color_method\":" << static_cast<int>(color.colorMethod())
+              << ",\"color_index\":" << static_cast<int>(color.colorIndex())
+              << ",\"rgb\":[" << static_cast<int>(color.red())
+              << "," << static_cast<int>(color.green())
+              << "," << static_cast<int>(color.blue()) << "]"
+              << "},\"status\":\"ok\"}";
+            return true;
+        }
         AcDbEntity* pSub = pEnt->subentPtr(path);
         std::ostringstream o;
         o << "\"subent_type\":\"" << subTypeStr << "\",\"marker\":" << static_cast<long>(marker)

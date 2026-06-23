@@ -538,7 +538,7 @@ def assign_owner_ticket(op):
 
 def impl_strategy(op):
     """How this op gets closed (the path), from status + raw/write-level + tier."""
-    if op.get("id") == "plot.engine.run":
+    if op.get("id") == "plot.engine.run" and op.get("status") == "implemented":
         return "attended_verification"
     st = op.get("status")
     if st == "implemented":
@@ -560,7 +560,7 @@ def impl_strategy(op):
 
 def evidence_required(op):
     """What evidence closes the op."""
-    if op.get("id") == "plot.engine.run":
+    if op.get("id") == "plot.engine.run" and op.get("status") == "implemented":
         return "attended_live_pump_session_log"
     st = op.get("status")
     if st == "implemented":

@@ -195,10 +195,23 @@ static std::string m08kcRxClassName(const AcRxObject* p)
     return njsonStr(n);
 }
 
+static std::string m08kcIntArrayJson(const AcArray<int>& values)
+{
+    std::ostringstream out;
+    out << "[";
+    for (int i = 0; i < values.length(); ++i) {
+        if (i)
+            out << ",";
+        out << values[i];
+    }
+    out << "]";
+    return out.str();
+}
+
 //============================================================================
 // HasOp — every op id this family IMPLEMENTS (gate admission). Kept in lockstep
 // with the dispatch branches below (asserted by tests/unit/test_m08kc_handlers.py).
-// Solver/modeler/callback-bound ops are intentionally ABSENT (honest defer).
+// Solver/modeler/callback-mutation ops are intentionally ABSENT (honest defer).
 //============================================================================
 static bool m08kcHasOp(const std::string& op)
 {
@@ -215,6 +228,8 @@ static bool m08kcHasOp(const std::string& op)
         op == "inspect.assocaction.requestToEvaluate" ||
         op == "inspect.assocmanager.state" ||
         op == "config.assocmanager.evalDisabler" ||
+        op == "config.assoceval.callback" ||
+        op == "config.constraint.globalCallback" ||
         // dependencies (create / attach / subent) (5)
         op == "define.assocdependency.attach" ||
         op == "define.assocgeomdependency.subent" ||
@@ -254,6 +269,32 @@ static bool m08kcDispatch(const std::string& op, const AriadneJobCtx& ctx, std::
 
     AcDbDatabase* pDb = ctx.pDb;
     const std::string& job = ctx.job;
+
+    //========================================================================
+    // callback configuration status/introspection only. These branches do not
+    // register/remove callbacks and do not invoke the associative evaluator.
+    //========================================================================
+    if (op == "config.assoceval.callback") {
+        AcArray<AcDbAssocEvaluationCallback*> callbacks;
+        AcArray<int> orders;
+        AcDbAssocManager::getGlobalEvaluationCallbacks(callbacks, orders);
+        r << "\"result\":{\"mode\":\"introspection_only\""
+          << ",\"registered_callback_count\":" << callbacks.length()
+          << ",\"orders\":" << m08kcIntArrayJson(orders)
+          << ",\"mutation_allowed\":false"
+          << ",\"evaluated\":false},\"status\":\"ok\"}";
+        return true;
+    }
+    if (op == "config.constraint.globalCallback") {
+        AcDbAssoc2dConstraintCallback* pCallback = AcDbAssoc2dConstraintGroup::globalCallback();
+        const bool doNotCheck = AcDbAssoc2dConstraintGroup::doNotCheckNewlyAddedConstraints();
+        r << "\"result\":{\"mode\":\"introspection_only\""
+          << ",\"global_callback_available\":" << (pCallback != nullptr ? "true" : "false")
+          << ",\"do_not_check_newly_added_constraints\":" << (doNotCheck ? "true" : "false")
+          << ",\"mutation_allowed\":false"
+          << ",\"evaluated\":false},\"status\":\"ok\"}";
+        return true;
+    }
 
     //========================================================================
     // Wave3 Pane2 constraint authoring (solver not top-level evaluated here)

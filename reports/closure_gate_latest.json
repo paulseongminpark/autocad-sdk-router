@@ -2,25 +2,24 @@
   "schema": "ariadne.cad_os.closure_gate.v1",
   "ticket_basis": "M08A-T01",
   "totals_by_status": {
-    "implemented": 451,
-    "blocked": 11,
-    "catalogued": 55
+    "implemented": 457,
+    "blocked": 60
   },
-  "catalogued": 55,
+  "catalogued": 0,
   "stub": 0,
   "unknown": 0,
   "deprecated": 0,
   "checks": {
     "every_op_has_owner_ticket": true,
     "every_open_op_has_strategy_and_evidence": true,
-    "zero_catalogued": false,
+    "zero_catalogued": true,
     "zero_stub": true,
     "zero_unknown": true,
     "v1_target_escape_banned": true
   },
-  "closure_gate_pass": false,
+  "closure_gate_pass": true,
   "m09_blocked_until_m08r": true,
-  "m09_allowed": false,
+  "m09_allowed": true,
   "ops_without_owner_ticket": [],
   "open_ops_missing_plan": []
 }

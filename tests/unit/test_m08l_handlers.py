@@ -18,12 +18,11 @@ Intent (WHY):
 
   2. HASOP LISTS EXACTLY THE IMPLEMENTED SET -- guards a silent shrink (a refactor
      dropping ops) or a silent fake-grow (claiming ops with no handler). The
-     feasible-hostless subset is 25 ops; the 2 attended/absent ops are DEFERRED.
+     feasible-hostless subset is 27 ops.
 
-  3. DEFERRED OPS MUST NOT APPEAR IN HASOP (honest contract) --
-     render.draw.viewportgeom needs a live AcGiViewportDraw (viewport-bound, no
-     hostless surface); overrule.dimstyle.install has no AcDbDimStyleOverrule class
-     in ObjectARX 2027 (verified by header scan). Claiming either would be a fake.
+  3. DIMSTYLE OVERRULE RE-AUDIT -- ObjectARX 2027 exposes
+     AcDbDimensionStyleOverrule in dbdim.h, so overrule.dimstyle.install is a real
+     register/query/remove lifecycle handler, not a hard block.
 
   4. READ / REGISTER-LIFECYCLE PROOF (source-level) -- M08L never writes the
      original DWG nor mutates persistent DB state: no save/saveAs/_QSAVE/
@@ -59,7 +58,7 @@ _GROUP_T01 = [
     "render.context.query",
     "render.entity.worlddraw_override",
 ]
-# T02 -- overrule register lifecycle (13; overrule.dimstyle.install DEFERRED)
+# T02 -- overrule register lifecycle (14)
 _GROUP_T02_INSTALL = [
     "overrule.install",
     "overrule.object.install",
@@ -74,6 +73,7 @@ _GROUP_T02_INSTALL = [
     "overrule.visibility.install",
     "overrule.grip.install",
     "overrule.queryx.install",
+    "overrule.dimstyle.install",
 ]
 # T02 -- overrule global/query/remove + grips read (5)
 _GROUP_T02_LIFECYCLE = [
@@ -86,10 +86,7 @@ _GROUP_T02_LIFECYCLE = [
 
 _IMPLEMENTED = _GROUP_T01 + _GROUP_T02_INSTALL + _GROUP_T02_LIFECYCLE
 
-# Deferred ops that must NOT appear in HasOp (honest contract).
-_DEFERRED = [
-    "overrule.dimstyle.install",    # no AcDbDimStyleOverrule class in ObjectARX 2027 (header-verified)
-]
+_DEFERRED = []
 
 
 def _read():
@@ -155,17 +152,15 @@ class TestM08LHandlers(unittest.TestCase):
         )
 
     def test_implemented_count(self):
-        # Group totals: T01=8 (render.draw.viewportgeom implemented), T02 install=13
-        # (overrule.dimstyle.install deferred), T02 lifecycle=5. 8+13+5 = 26 real handlers.
-        # The remaining 1 op of the 27-op brief is the _DEFERRED one -- left OUT of
-        # HasOp on purpose (no fake pass).
+        # Group totals: T01=8 (render.draw.viewportgeom implemented), T02 install=14
+        # (including AcDbDimensionStyleOverrule), T02 lifecycle=5. 8+14+5 = 27 real handlers.
         self.assertEqual(len(_GROUP_T01), 8)
-        self.assertEqual(len(_GROUP_T02_INSTALL), 13)
+        self.assertEqual(len(_GROUP_T02_INSTALL), 14)
         self.assertEqual(len(_GROUP_T02_LIFECYCLE), 5)
-        self.assertEqual(len(_IMPLEMENTED), 26)
-        self.assertEqual(len(set(_IMPLEMENTED)), 26, "duplicate op id in the implemented list")
-        self.assertEqual(len(self.hasop), 26)
-        # 26 implemented + 1 deferred == the 27-op brief.
+        self.assertEqual(len(_IMPLEMENTED), 27)
+        self.assertEqual(len(set(_IMPLEMENTED)), 27, "duplicate op id in the implemented list")
+        self.assertEqual(len(self.hasop), 27)
+        # 27 implemented + 0 deferred == the 27-op brief.
         self.assertEqual(len(_IMPLEMENTED) + len(_DEFERRED), 27)
 
     def test_no_deferred_op_in_hasop(self):
@@ -228,6 +223,7 @@ class TestM08LHandlers(unittest.TestCase):
         self.assertIn("AcRxOverrule::removeOverrule", self.src)
         self.assertIn("AcRxOverrule::setIsOverruling", self.src)
         self.assertIn("AcRxOverrule::hasOverrule", self.src)
+        self.assertIn("AcDbDimensionStyleOverrule", self.src)
         # honest semantics: the overrule's effect fires only in-app, stated not faked.
         self.assertIn('effect_fires', self.src)
         self.assertIn('in_app_only', self.src)

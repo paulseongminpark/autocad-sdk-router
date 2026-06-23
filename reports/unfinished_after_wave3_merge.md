@@ -1,0 +1,179 @@
+# Unfinished After Wave3 Merge
+
+- Generated: `2026-06-23T23:37:33+09:00`
+- Branch: `cados/wave3-integrate-and-build-unfinished`
+- Post-merge baseline commit: `53dde79`
+- Counts after merge before unfinished build: `{'implemented': 451, 'blocked': 11, 'catalogued': 55}`
+- Counts after unfinished build: `{'implemented': 457, 'blocked': 60}`
+
+## A. Catalogued After Merge
+- `automate.com.get_app` -> `blocked`
+- `automate.com.get_document` -> `blocked`
+- `automate.com.get_for_command` -> `blocked`
+- `automate.com.get_winapp` -> `blocked`
+- `automate.com.send_command` -> `blocked`
+- `automate.com.wrapper_for_object` -> `blocked`
+- `config.assoceval.callback` -> `implemented`
+- `config.constraint.globalCallback` -> `implemented`
+- `define.assocarray.create` -> `blocked`
+- `define.assocarray.path` -> `blocked`
+- `define.assocarray.polar` -> `blocked`
+- `define.assocarray.rectangular` -> `blocked`
+- `define.assocsurface.blend` -> `blocked`
+- `define.assocsurface.extrude` -> `blocked`
+- `define.assocsurface.fillet` -> `blocked`
+- `define.assocsurface.loft` -> `blocked`
+- `define.assocsurface.offset` -> `blocked`
+- `define.assocsurface.patch` -> `blocked`
+- `define.assocsurface.result` -> `blocked`
+- `define.assocsurface.trim` -> `blocked`
+- `edit.assocarray.explode` -> `blocked`
+- `edit.assocarray.item` -> `blocked`
+- `edit.assocarray.itemReplace` -> `blocked`
+- `edit.assocarray.reset` -> `blocked`
+- `edit.assocarray.source` -> `blocked`
+- `edit.assocarray.transform` -> `blocked`
+- `edit.assocdata.xref` -> `blocked`
+- `edit.subentity.add_paths` -> `blocked`
+- `edit.subentity.delete_paths` -> `blocked`
+- `edit.subentity.transform` -> `blocked`
+- `embed.ole.frame` -> `blocked`
+- `inspect.assocaction.evaluate` -> `blocked`
+- `inspect.assocnetwork.evaluate` -> `blocked`
+- `inspect.assocsurface.topology` -> `blocked`
+- `inspect.subentity.color` -> `implemented`
+- `inspect.subentity.markers_at_path` -> `implemented`
+- `inspect.subentity.path_at_marker` -> `implemented`
+- `module.command.flags` -> `implemented`
+- `module.command.remove_group` -> `blocked`
+- `module.entrypoint.define` -> `blocked`
+- `module.entrypoint.dispatch` -> `blocked`
+- `module.lifecycle.init` -> `blocked`
+- `module.lifecycle.on_load_dwg` -> `blocked`
+- `module.lifecycle.on_ole_unload` -> `blocked`
+- `module.lifecycle.on_unload_dwg` -> `blocked`
+- `module.lifecycle.other` -> `blocked`
+- `module.lifecycle.unload` -> `blocked`
+- `module.load` -> `blocked`
+- `module.load.acad_rx` -> `blocked`
+- `module.load.by_app` -> `blocked`
+- `module.load.lisp` -> `blocked`
+- `module.unload` -> `blocked`
+- `overrule.dimstyle.install` -> `implemented`
+- `repair.assocdata.audit` -> `blocked`
+- `ui.subentity.highlight` -> `blocked`
+
+## B. Hard-Blocked After Merge
+- `command.invoke.coroutine` -> `blocked`
+- `command.invoke.sync` -> `blocked`
+- `command.invoke.sync.resbuf` -> `blocked`
+- `command.menu.invoke` -> `blocked`
+- `command.queue.post` -> `blocked`
+- `doc.sendstring` -> `blocked`
+- `editor.toolpalette.tool_execute` -> `blocked`
+- `extend.object_enabler.demand_register` -> `implemented`
+- `live.apply_patch` -> `blocked`
+- `module.command.lookup` -> `blocked`
+- `module.load.demand_register` -> `blocked`
+
+## C. Pane-Reported Deferred Targets Re-Audited
+- `extend.customentity.define` -> `implemented`
+- `extend.customobject.define` -> `implemented`
+- `extend.customobject.embedded` -> `implemented`
+- `extend.osnap.custom_mode` -> `implemented`
+- `extend.customobject.partial_undo` -> `implemented`
+- `extend.object_enabler.demand_register` -> `implemented`
+- `overrule.dimstyle.install` -> `implemented`
+
+## D. Missing Handler/Test/Evidence After Merge
+- `automate.com.get_app` -> `blocked`
+- `automate.com.get_document` -> `blocked`
+- `automate.com.get_for_command` -> `blocked`
+- `automate.com.get_winapp` -> `blocked`
+- `automate.com.send_command` -> `blocked`
+- `automate.com.wrapper_for_object` -> `blocked`
+- `config.assoceval.callback` -> `implemented`
+- `config.constraint.globalCallback` -> `implemented`
+- `define.assocarray.create` -> `blocked`
+- `define.assocarray.path` -> `blocked`
+- `define.assocarray.polar` -> `blocked`
+- `define.assocarray.rectangular` -> `blocked`
+- `define.assocsurface.blend` -> `blocked`
+- `define.assocsurface.extrude` -> `blocked`
+- `define.assocsurface.fillet` -> `blocked`
+- `define.assocsurface.loft` -> `blocked`
+- `define.assocsurface.offset` -> `blocked`
+- `define.assocsurface.patch` -> `blocked`
+- `define.assocsurface.result` -> `blocked`
+- `define.assocsurface.trim` -> `blocked`
+- `edit.assocarray.explode` -> `blocked`
+- `edit.assocarray.item` -> `blocked`
+- `edit.assocarray.itemReplace` -> `blocked`
+- `edit.assocarray.reset` -> `blocked`
+- `edit.assocarray.source` -> `blocked`
+- `edit.assocarray.transform` -> `blocked`
+- `edit.assocdata.xref` -> `blocked`
+- `edit.subentity.add_paths` -> `blocked`
+- `edit.subentity.delete_paths` -> `blocked`
+- `edit.subentity.transform` -> `blocked`
+- `embed.ole.frame` -> `blocked`
+- `inspect.assocaction.evaluate` -> `blocked`
+- `inspect.assocnetwork.evaluate` -> `blocked`
+- `inspect.assocsurface.topology` -> `blocked`
+- `inspect.subentity.color` -> `implemented`
+- `inspect.subentity.markers_at_path` -> `implemented`
+- `inspect.subentity.path_at_marker` -> `implemented`
+- `module.command.flags` -> `implemented`
+- `module.command.remove_group` -> `blocked`
+- `module.entrypoint.define` -> `blocked`
+- `module.entrypoint.dispatch` -> `blocked`
+- `module.lifecycle.init` -> `blocked`
+- `module.lifecycle.on_load_dwg` -> `blocked`
+- `module.lifecycle.on_ole_unload` -> `blocked`
+- `module.lifecycle.on_unload_dwg` -> `blocked`
+- `module.lifecycle.other` -> `blocked`
+- `module.lifecycle.unload` -> `blocked`
+- `module.load` -> `blocked`
+- `module.load.acad_rx` -> `blocked`
+- `module.load.by_app` -> `blocked`
+- `module.load.lisp` -> `blocked`
+- `module.unload` -> `blocked`
+- `overrule.dimstyle.install` -> `implemented`
+- `repair.assocdata.audit` -> `blocked`
+- `ui.subentity.highlight` -> `blocked`
+
+## E. Unsafe Or Policy-Sensitive
+- `automate.com.get_app` -> `blocked` (SAFETY_FORBIDDEN)
+- `automate.com.get_document` -> `blocked` (SAFETY_FORBIDDEN)
+- `automate.com.get_for_command` -> `blocked` (SAFETY_FORBIDDEN)
+- `automate.com.get_winapp` -> `blocked` (SAFETY_FORBIDDEN)
+- `automate.com.send_command` -> `blocked` (SAFETY_FORBIDDEN)
+- `automate.com.wrapper_for_object` -> `blocked` (SAFETY_FORBIDDEN)
+- `doc.sendstring` -> `blocked` (SAFETY_FORBIDDEN)
+- `edit.subentity.add_paths` -> `blocked` (SAFETY_FORBIDDEN)
+- `edit.subentity.delete_paths` -> `blocked` (SAFETY_FORBIDDEN)
+- `edit.subentity.transform` -> `blocked` (SAFETY_FORBIDDEN)
+- `module.command.remove_group` -> `blocked` (SAFETY_FORBIDDEN)
+- `module.load` -> `blocked` (SAFETY_FORBIDDEN)
+- `module.load.acad_rx` -> `blocked` (SAFETY_FORBIDDEN)
+- `module.load.by_app` -> `blocked` (SAFETY_FORBIDDEN)
+- `module.load.lisp` -> `blocked` (SAFETY_FORBIDDEN)
+- `module.unload` -> `blocked` (SAFETY_FORBIDDEN)
+- `plot.config.settings` -> `blocked` (SAFETY_FORBIDDEN)
+- `plot.engine.run` -> `blocked` (HOST_UNAVAILABLE)
+
+## F. Registry Flip Only
+- none
+
+## Resolution
+- Implemented from unfinished: `8`
+  - `config.assoceval.callback`
+  - `config.constraint.globalCallback`
+  - `inspect.subentity.color`
+  - `inspect.subentity.markers_at_path`
+  - `inspect.subentity.path_at_marker`
+  - `module.command.flags`
+  - `overrule.dimstyle.install`
+  - `extend.object_enabler.demand_register`
+- Accepted hard blocks after re-audit: `50`
+- Remaining catalogued/stub/unknown/deferred: `0`

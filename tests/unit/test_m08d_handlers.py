@@ -69,11 +69,14 @@ _GROUP_B = [
     "compute.entity.intersect",
     "compute.solid3d.interference",
 ]
-# Group C (main-path subentity reads on AcDbEntity; no AcBr lib) (3)
+# Group C (main-path subentity reads on AcDbEntity; no AcBr lib) (5)
 _GROUP_C_SUBENT = [
     "inspect.subentity.geom_extents",
     "inspect.subentity.class_id",
     "inspect.subentity.ptr",
+    "inspect.subentity.color",
+    "inspect.subentity.markers_at_path",
+    "inspect.subentity.path_at_marker",
 ]
 # Group C -- AcBr BRep topology (48)
 _GROUP_C_BREP = [
@@ -128,9 +131,6 @@ _IMPLEMENTED = _GROUP_A + _GROUP_B + _GROUP_C_SUBENT + _GROUP_C_BREP
 # Deferred/hard-blocked ops that must NOT appear in HasOp (honest contract).
 _DEFERRED = [
     "ui.subentity.highlight",            # attended/graphics (live editor + GS flush)
-    "inspect.subentity.markers_at_path",  # editor-bound (GS marker from interactive pick)
-    "inspect.subentity.path_at_marker",   # editor-bound
-    "inspect.subentity.color",            # AcDbSubentColor header unverified in SDK inc
 ]
 
 
@@ -184,17 +184,17 @@ class TestM08DHandlers(unittest.TestCase):
         )
 
     def test_implemented_count(self):
-        # Group totals: A=4 entities, B=18 geometry-kernel, subent=3 (main-path
-        # AcDbEntity subentity reads), brep=44 (AcBr). 4+18+3+44 = 69 real handlers.
-        # The remaining ops of the 73-op brief are the 4 _DEFERRED (editor/graphics/
-        # unverified-header) ones -- left OUT of HasOp on purpose (no fake pass).
+        # Group totals: A=4 entities, B=18 geometry-kernel, subent=6 (main-path
+        # AcDbEntity subentity reads), brep=44 (AcBr). 4+18+6+44 = 72 real handlers.
+        # The remaining op of the 73-op brief is the editor/graphics _DEFERRED
+        # op -- left OUT of HasOp on purpose (no fake pass).
         self.assertEqual(len(_GROUP_A), 4)
         self.assertEqual(len(_GROUP_B), 18)
-        self.assertEqual(len(_GROUP_C_SUBENT), 3)
+        self.assertEqual(len(_GROUP_C_SUBENT), 6)
         self.assertEqual(len(_GROUP_C_BREP), 44)
-        self.assertEqual(len(_IMPLEMENTED), 69)
-        self.assertEqual(len(set(_IMPLEMENTED)), 69, "duplicate op id in the implemented list")
-        self.assertEqual(len(self.hasop), 69)
+        self.assertEqual(len(_IMPLEMENTED), 72)
+        self.assertEqual(len(set(_IMPLEMENTED)), 72, "duplicate op id in the implemented list")
+        self.assertEqual(len(self.hasop), 72)
 
     def test_no_deferred_op_in_hasop(self):
         leaked = sorted(self.hasop & set(_DEFERRED))
@@ -222,6 +222,7 @@ class TestM08DHandlers(unittest.TestCase):
             r"\btransformSubentPathsBy\b",  # subentity WRITE (mutates the solid)
             r"\baddSubentPaths\b",
             r"\bdeleteSubentPaths\b",
+            r"\bsetSubentColor\b",
         ]
         for pat in banned:
             self.assertIsNone(
@@ -237,6 +238,17 @@ class TestM08DHandlers(unittest.TestCase):
     def test_strings_use_utf8_njsonstr_not_lossy_funnel(self):
         self.assertIn("njsonStr", self.src, "string emission must route through njsonStr")
         self.assertNotIn("wideToAscii(", self.src, "must not use the lossy wideToAscii funnel")
+
+    def test_subentity_marker_path_reads_use_real_apis(self):
+        self.assertIn("getGsMarkersAtSubentPath", self.src)
+        self.assertIn("getSubentPathsAtGsMarker", self.src)
+
+    def test_subentity_color_read_uses_real_apis(self):
+        self.assertIn('op == "inspect.subentity.color"', self.src)
+        self.assertIn("getSubentColor", self.src)
+        self.assertIn("AcDb3dSolid::cast", self.src)
+        self.assertIn("AcDbSurface::cast", self.src)
+        self.assertIn("AcDbSubDMesh::cast", self.src)
 
     def test_acbr_links_real_lib_not_drawbridge(self):
         # AcBr import lib is acbr26.lib (utils\\brep\\lib-x64), NOT AcDrawBridge.lib.

@@ -1,0 +1,697 @@
+{
+  "schema": "ariadne.cad_os.wave3.unfinished_after_merge.v1",
+  "generated_at": "2026-06-23T23:37:33+09:00",
+  "branch": "cados/wave3-integrate-and-build-unfinished",
+  "post_merge_commit": "53dde79",
+  "post_merge_commit_full": "53dde79752be65ac14540943db05f4b1a13d2fa1",
+  "counts_after_merge_before_unfinished_build": {
+    "implemented": 451,
+    "blocked": 11,
+    "catalogued": 55
+  },
+  "counts_after_unfinished_build": {
+    "implemented": 457,
+    "blocked": 60
+  },
+  "A_operations_still_catalogued_after_merge": [
+    {
+      "operation": "automate.com.get_app",
+      "current_status": "blocked"
+    },
+    {
+      "operation": "automate.com.get_document",
+      "current_status": "blocked"
+    },
+    {
+      "operation": "automate.com.get_for_command",
+      "current_status": "blocked"
+    },
+    {
+      "operation": "automate.com.get_winapp",
+      "current_status": "blocked"
+    },
+    {
+      "operation": "automate.com.send_command",
+      "current_status": "blocked"
+    },
+    {
+      "operation": "automate.com.wrapper_for_object",
+      "current_status": "blocked"
+    },
+    {
+      "operation": "config.assoceval.callback",
+      "current_status": "implemented"
+    },
+    {
+      "operation": "config.constraint.globalCallback",
+      "current_status": "implemented"
+    },
+    {
+      "operation": "define.assocarray.create",
+      "current_status": "blocked"
+    },
+    {
+      "operation": "define.assocarray.path",
+      "current_status": "blocked"
+    },
+    {
+      "operation": "define.assocarray.polar",
+      "current_status": "blocked"
+    },
+    {
+      "operation": "define.assocarray.rectangular",
+      "current_status": "blocked"
+    },
+    {
+      "operation": "define.assocsurface.blend",
+      "current_status": "blocked"
+    },
+    {
+      "operation": "define.assocsurface.extrude",
+      "current_status": "blocked"
+    },
+    {
+      "operation": "define.assocsurface.fillet",
+      "current_status": "blocked"
+    },
+    {
+      "operation": "define.assocsurface.loft",
+      "current_status": "blocked"
+    },
+    {
+      "operation": "define.assocsurface.offset",
+      "current_status": "blocked"
+    },
+    {
+      "operation": "define.assocsurface.patch",
+      "current_status": "blocked"
+    },
+    {
+      "operation": "define.assocsurface.result",
+      "current_status": "blocked"
+    },
+    {
+      "operation": "define.assocsurface.trim",
+      "current_status": "blocked"
+    },
+    {
+      "operation": "edit.assocarray.explode",
+      "current_status": "blocked"
+    },
+    {
+      "operation": "edit.assocarray.item",
+      "current_status": "blocked"
+    },
+    {
+      "operation": "edit.assocarray.itemReplace",
+      "current_status": "blocked"
+    },
+    {
+      "operation": "edit.assocarray.reset",
+      "current_status": "blocked"
+    },
+    {
+      "operation": "edit.assocarray.source",
+      "current_status": "blocked"
+    },
+    {
+      "operation": "edit.assocarray.transform",
+      "current_status": "blocked"
+    },
+    {
+      "operation": "edit.assocdata.xref",
+      "current_status": "blocked"
+    },
+    {
+      "operation": "edit.subentity.add_paths",
+      "current_status": "blocked"
+    },
+    {
+      "operation": "edit.subentity.delete_paths",
+      "current_status": "blocked"
+    },
+    {
+      "operation": "edit.subentity.transform",
+      "current_status": "blocked"
+    },
+    {
+      "operation": "embed.ole.frame",
+      "current_status": "blocked"
+    },
+    {
+      "operation": "inspect.assocaction.evaluate",
+      "current_status": "blocked"
+    },
+    {
+      "operation": "inspect.assocnetwork.evaluate",
+      "current_status": "blocked"
+    },
+    {
+      "operation": "inspect.assocsurface.topology",
+      "current_status": "blocked"
+    },
+    {
+      "operation": "inspect.subentity.color",
+      "current_status": "implemented"
+    },
+    {
+      "operation": "inspect.subentity.markers_at_path",
+      "current_status": "implemented"
+    },
+    {
+      "operation": "inspect.subentity.path_at_marker",
+      "current_status": "implemented"
+    },
+    {
+      "operation": "module.command.flags",
+      "current_status": "implemented"
+    },
+    {
+      "operation": "module.command.remove_group",
+      "current_status": "blocked"
+    },
+    {
+      "operation": "module.entrypoint.define",
+      "current_status": "blocked"
+    },
+    {
+      "operation": "module.entrypoint.dispatch",
+      "current_status": "blocked"
+    },
+    {
+      "operation": "module.lifecycle.init",
+      "current_status": "blocked"
+    },
+    {
+      "operation": "module.lifecycle.on_load_dwg",
+      "current_status": "blocked"
+    },
+    {
+      "operation": "module.lifecycle.on_ole_unload",
+      "current_status": "blocked"
+    },
+    {
+      "operation": "module.lifecycle.on_unload_dwg",
+      "current_status": "blocked"
+    },
+    {
+      "operation": "module.lifecycle.other",
+      "current_status": "blocked"
+    },
+    {
+      "operation": "module.lifecycle.unload",
+      "current_status": "blocked"
+    },
+    {
+      "operation": "module.load",
+      "current_status": "blocked"
+    },
+    {
+      "operation": "module.load.acad_rx",
+      "current_status": "blocked"
+    },
+    {
+      "operation": "module.load.by_app",
+      "current_status": "blocked"
+    },
+    {
+      "operation": "module.load.lisp",
+      "current_status": "blocked"
+    },
+    {
+      "operation": "module.unload",
+      "current_status": "blocked"
+    },
+    {
+      "operation": "overrule.dimstyle.install",
+      "current_status": "implemented"
+    },
+    {
+      "operation": "repair.assocdata.audit",
+      "current_status": "blocked"
+    },
+    {
+      "operation": "ui.subentity.highlight",
+      "current_status": "blocked"
+    }
+  ],
+  "B_operations_hard_blocked_after_merge": [
+    {
+      "operation": "command.invoke.coroutine",
+      "current_status": "blocked"
+    },
+    {
+      "operation": "command.invoke.sync",
+      "current_status": "blocked"
+    },
+    {
+      "operation": "command.invoke.sync.resbuf",
+      "current_status": "blocked"
+    },
+    {
+      "operation": "command.menu.invoke",
+      "current_status": "blocked"
+    },
+    {
+      "operation": "command.queue.post",
+      "current_status": "blocked"
+    },
+    {
+      "operation": "doc.sendstring",
+      "current_status": "blocked"
+    },
+    {
+      "operation": "editor.toolpalette.tool_execute",
+      "current_status": "blocked"
+    },
+    {
+      "operation": "extend.object_enabler.demand_register",
+      "current_status": "implemented"
+    },
+    {
+      "operation": "live.apply_patch",
+      "current_status": "blocked"
+    },
+    {
+      "operation": "module.command.lookup",
+      "current_status": "blocked"
+    },
+    {
+      "operation": "module.load.demand_register",
+      "current_status": "blocked"
+    }
+  ],
+  "C_pane_reported_deferred_targets_reaudited": [
+    {
+      "operation": "extend.customentity.define",
+      "current_status": "implemented"
+    },
+    {
+      "operation": "extend.customobject.define",
+      "current_status": "implemented"
+    },
+    {
+      "operation": "extend.customobject.embedded",
+      "current_status": "implemented"
+    },
+    {
+      "operation": "extend.osnap.custom_mode",
+      "current_status": "implemented"
+    },
+    {
+      "operation": "extend.customobject.partial_undo",
+      "current_status": "implemented"
+    },
+    {
+      "operation": "extend.object_enabler.demand_register",
+      "current_status": "implemented"
+    },
+    {
+      "operation": "overrule.dimstyle.install",
+      "current_status": "implemented"
+    }
+  ],
+  "D_missing_handler_test_or_evidence_after_merge": [
+    {
+      "operation": "automate.com.get_app",
+      "current_status": "blocked"
+    },
+    {
+      "operation": "automate.com.get_document",
+      "current_status": "blocked"
+    },
+    {
+      "operation": "automate.com.get_for_command",
+      "current_status": "blocked"
+    },
+    {
+      "operation": "automate.com.get_winapp",
+      "current_status": "blocked"
+    },
+    {
+      "operation": "automate.com.send_command",
+      "current_status": "blocked"
+    },
+    {
+      "operation": "automate.com.wrapper_for_object",
+      "current_status": "blocked"
+    },
+    {
+      "operation": "config.assoceval.callback",
+      "current_status": "implemented"
+    },
+    {
+      "operation": "config.constraint.globalCallback",
+      "current_status": "implemented"
+    },
+    {
+      "operation": "define.assocarray.create",
+      "current_status": "blocked"
+    },
+    {
+      "operation": "define.assocarray.path",
+      "current_status": "blocked"
+    },
+    {
+      "operation": "define.assocarray.polar",
+      "current_status": "blocked"
+    },
+    {
+      "operation": "define.assocarray.rectangular",
+      "current_status": "blocked"
+    },
+    {
+      "operation": "define.assocsurface.blend",
+      "current_status": "blocked"
+    },
+    {
+      "operation": "define.assocsurface.extrude",
+      "current_status": "blocked"
+    },
+    {
+      "operation": "define.assocsurface.fillet",
+      "current_status": "blocked"
+    },
+    {
+      "operation": "define.assocsurface.loft",
+      "current_status": "blocked"
+    },
+    {
+      "operation": "define.assocsurface.offset",
+      "current_status": "blocked"
+    },
+    {
+      "operation": "define.assocsurface.patch",
+      "current_status": "blocked"
+    },
+    {
+      "operation": "define.assocsurface.result",
+      "current_status": "blocked"
+    },
+    {
+      "operation": "define.assocsurface.trim",
+      "current_status": "blocked"
+    },
+    {
+      "operation": "edit.assocarray.explode",
+      "current_status": "blocked"
+    },
+    {
+      "operation": "edit.assocarray.item",
+      "current_status": "blocked"
+    },
+    {
+      "operation": "edit.assocarray.itemReplace",
+      "current_status": "blocked"
+    },
+    {
+      "operation": "edit.assocarray.reset",
+      "current_status": "blocked"
+    },
+    {
+      "operation": "edit.assocarray.source",
+      "current_status": "blocked"
+    },
+    {
+      "operation": "edit.assocarray.transform",
+      "current_status": "blocked"
+    },
+    {
+      "operation": "edit.assocdata.xref",
+      "current_status": "blocked"
+    },
+    {
+      "operation": "edit.subentity.add_paths",
+      "current_status": "blocked"
+    },
+    {
+      "operation": "edit.subentity.delete_paths",
+      "current_status": "blocked"
+    },
+    {
+      "operation": "edit.subentity.transform",
+      "current_status": "blocked"
+    },
+    {
+      "operation": "embed.ole.frame",
+      "current_status": "blocked"
+    },
+    {
+      "operation": "inspect.assocaction.evaluate",
+      "current_status": "blocked"
+    },
+    {
+      "operation": "inspect.assocnetwork.evaluate",
+      "current_status": "blocked"
+    },
+    {
+      "operation": "inspect.assocsurface.topology",
+      "current_status": "blocked"
+    },
+    {
+      "operation": "inspect.subentity.color",
+      "current_status": "implemented"
+    },
+    {
+      "operation": "inspect.subentity.markers_at_path",
+      "current_status": "implemented"
+    },
+    {
+      "operation": "inspect.subentity.path_at_marker",
+      "current_status": "implemented"
+    },
+    {
+      "operation": "module.command.flags",
+      "current_status": "implemented"
+    },
+    {
+      "operation": "module.command.remove_group",
+      "current_status": "blocked"
+    },
+    {
+      "operation": "module.entrypoint.define",
+      "current_status": "blocked"
+    },
+    {
+      "operation": "module.entrypoint.dispatch",
+      "current_status": "blocked"
+    },
+    {
+      "operation": "module.lifecycle.init",
+      "current_status": "blocked"
+    },
+    {
+      "operation": "module.lifecycle.on_load_dwg",
+      "current_status": "blocked"
+    },
+    {
+      "operation": "module.lifecycle.on_ole_unload",
+      "current_status": "blocked"
+    },
+    {
+      "operation": "module.lifecycle.on_unload_dwg",
+      "current_status": "blocked"
+    },
+    {
+      "operation": "module.lifecycle.other",
+      "current_status": "blocked"
+    },
+    {
+      "operation": "module.lifecycle.unload",
+      "current_status": "blocked"
+    },
+    {
+      "operation": "module.load",
+      "current_status": "blocked"
+    },
+    {
+      "operation": "module.load.acad_rx",
+      "current_status": "blocked"
+    },
+    {
+      "operation": "module.load.by_app",
+      "current_status": "blocked"
+    },
+    {
+      "operation": "module.load.lisp",
+      "current_status": "blocked"
+    },
+    {
+      "operation": "module.unload",
+      "current_status": "blocked"
+    },
+    {
+      "operation": "overrule.dimstyle.install",
+      "current_status": "implemented"
+    },
+    {
+      "operation": "repair.assocdata.audit",
+      "current_status": "blocked"
+    },
+    {
+      "operation": "ui.subentity.highlight",
+      "current_status": "blocked"
+    }
+  ],
+  "E_unsafe_or_policy_sensitive_operations": [
+    {
+      "operation": "automate.com.get_app",
+      "current_status": "blocked",
+      "blocker": "SAFETY_FORBIDDEN: exposing AutoCAD application IDispatch to agents would hand out a raw COM automation root instead of a bounded introspection result."
+    },
+    {
+      "operation": "automate.com.get_document",
+      "current_status": "blocked",
+      "blocker": "SAFETY_FORBIDDEN: exposing live AcadDocument automation interfaces/pointers to agents is not a bounded read-only contract."
+    },
+    {
+      "operation": "automate.com.get_for_command",
+      "current_status": "blocked",
+      "blocker": "SAFETY_FORBIDDEN: command-context COM acquisition exposes raw automation handles in a live command surface."
+    },
+    {
+      "operation": "automate.com.get_winapp",
+      "current_status": "blocked",
+      "blocker": "SAFETY_FORBIDDEN: exposing host application pointers/state is outside the bounded CAD OS introspection surface."
+    },
+    {
+      "operation": "automate.com.send_command",
+      "current_status": "blocked",
+      "blocker": "SAFETY_FORBIDDEN: COM SendCommand is raw command-string dispatch and must not be exposed to agents."
+    },
+    {
+      "operation": "automate.com.wrapper_for_object",
+      "current_status": "blocked",
+      "blocker": "SAFETY_FORBIDDEN: wrapping AcDb objects into automation interfaces exposes raw COM object handles to agents."
+    },
+    {
+      "operation": "doc.sendstring",
+      "current_status": "blocked",
+      "blocker": "SAFETY_FORBIDDEN: doc.sendstring uses AcApDocManager::sendStringToExecute to queue arbitrary raw command strings into an AutoCAD document command stream. Exposing command_string as an agent operation would be a raw command surface and may mutate the active user session."
+    },
+    {
+      "operation": "edit.subentity.add_paths",
+      "current_status": "blocked",
+      "blocker": "SAFETY_FORBIDDEN: AcDbEntity::addSubentPaths mutates subentity path association state; the current CAD OS agent contract has no bounded staged-copy authoring schema for arbitrary subentity path mutation."
+    },
+    {
+      "operation": "edit.subentity.delete_paths",
+      "current_status": "blocked",
+      "blocker": "SAFETY_FORBIDDEN: AcDbEntity::deleteSubentPaths mutates subentity path association state; safe read/status variants are implemented separately and this mutation is not agent-exposed."
+    },
+    {
+      "operation": "edit.subentity.transform",
+      "current_status": "blocked",
+      "blocker": "SAFETY_FORBIDDEN: AcDbEntity::transformSubentPathsBy mutates selected subentity paths; the exact operation needs a validated staged authoring contract before exposure."
+    },
+    {
+      "operation": "module.command.remove_group",
+      "current_status": "blocked",
+      "blocker": "SAFETY_FORBIDDEN: arbitrary command group removal mutates the host command stack; implemented probes only clean up their bounded ARIADNE_M08N group."
+    },
+    {
+      "operation": "module.load",
+      "current_status": "blocked",
+      "blocker": "SAFETY_FORBIDDEN: acrxLoadModule loads external code into the AutoCAD host process and is not an agent-exposed operation."
+    },
+    {
+      "operation": "module.load.acad_rx",
+      "current_status": "blocked",
+      "blocker": "SAFETY_FORBIDDEN: ARX demand/load mechanics execute host modules and mutate runtime loader state."
+    },
+    {
+      "operation": "module.load.by_app",
+      "current_status": "blocked",
+      "blocker": "SAFETY_FORBIDDEN: application-driven module loading executes external code and mutates process loader state."
+    },
+    {
+      "operation": "module.load.lisp",
+      "current_status": "blocked",
+      "blocker": "SAFETY_FORBIDDEN: LISP loading executes script code in the AutoCAD host and is not exposed as a raw agent load surface."
+    },
+    {
+      "operation": "module.unload",
+      "current_status": "blocked",
+      "blocker": "SAFETY_FORBIDDEN: acrxUnloadModule can unload host modules and destabilize the running process; it remains non-agent-exposed."
+    },
+    {
+      "operation": "plot.config.settings",
+      "current_status": "blocked",
+      "blocker": "SAFETY_FORBIDDEN: exact plot settings operation is a live_edit read/write page setup mutation; no bounded CAD OS staged handler or validation contract exists in this tree."
+    },
+    {
+      "operation": "plot.engine.run",
+      "current_status": "blocked",
+      "blocker": "HOST_UNAVAILABLE: AcPlPlotEngine execution requires a controlled attended/full AutoCAD plot host; no controlled attended plot route is available in this integration validation."
+    }
+  ],
+  "F_registry_flip_only": [],
+  "resolution": {
+    "implemented_from_unfinished": [
+      "config.assoceval.callback",
+      "config.constraint.globalCallback",
+      "inspect.subentity.color",
+      "inspect.subentity.markers_at_path",
+      "inspect.subentity.path_at_marker",
+      "module.command.flags",
+      "overrule.dimstyle.install",
+      "extend.object_enabler.demand_register"
+    ],
+    "accepted_hard_blocks_after_reaudit": [
+      "automate.com.get_app",
+      "automate.com.get_document",
+      "automate.com.get_for_command",
+      "automate.com.get_winapp",
+      "automate.com.send_command",
+      "automate.com.wrapper_for_object",
+      "define.assocarray.create",
+      "define.assocarray.path",
+      "define.assocarray.polar",
+      "define.assocarray.rectangular",
+      "define.assocsurface.blend",
+      "define.assocsurface.extrude",
+      "define.assocsurface.fillet",
+      "define.assocsurface.loft",
+      "define.assocsurface.offset",
+      "define.assocsurface.patch",
+      "define.assocsurface.result",
+      "define.assocsurface.trim",
+      "edit.assocarray.explode",
+      "edit.assocarray.item",
+      "edit.assocarray.itemReplace",
+      "edit.assocarray.reset",
+      "edit.assocarray.source",
+      "edit.assocarray.transform",
+      "edit.assocdata.xref",
+      "edit.subentity.add_paths",
+      "edit.subentity.delete_paths",
+      "edit.subentity.transform",
+      "embed.ole.frame",
+      "inspect.assocaction.evaluate",
+      "inspect.assocnetwork.evaluate",
+      "inspect.assocsurface.topology",
+      "module.command.remove_group",
+      "module.entrypoint.define",
+      "module.entrypoint.dispatch",
+      "module.lifecycle.init",
+      "module.lifecycle.on_load_dwg",
+      "module.lifecycle.on_ole_unload",
+      "module.lifecycle.on_unload_dwg",
+      "module.lifecycle.other",
+      "module.lifecycle.unload",
+      "module.load",
+      "module.load.acad_rx",
+      "module.load.by_app",
+      "module.load.lisp",
+      "module.unload",
+      "repair.assocdata.audit",
+      "ui.subentity.highlight",
+      "plot.config.settings",
+      "plot.engine.run"
+    ],
+    "remaining_catalogued": [],
+    "remaining_stub": [],
+    "remaining_unknown": [],
+    "remaining_deferred": []
+  }
+}

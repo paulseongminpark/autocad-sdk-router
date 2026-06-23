@@ -2,7 +2,7 @@
   "schema": "ariadne.operations_registry.v2",
   "version": "2.0.0",
   "generated_at": "2026-06-23T20:36:32+09:00",
-  "generated_by": "CADOS_M04 Operation Registry and Tool Surface",
+  "generated_by": "wave3_integrate_and_build_unfinished",
   "additive_to_v1": true,
   "extend_only": true,
   "derived_from": [
@@ -56,9 +56,8 @@
   "totals": {
     "operations": 517,
     "by_status": {
-      "blocked": 11,
-      "catalogued": 55,
-      "implemented": 451
+      "blocked": 60,
+      "implemented": 457
     },
     "by_family": {
       "active_document_write_original": 8,
@@ -129,14 +128,14 @@
       "ui_customization": 39
     },
     "operation_records": 517,
-    "implemented": 451,
+    "implemented": 457,
     "wired": 0,
     "stub": 0,
-    "catalogued": 55,
-    "blocked": 11,
+    "catalogued": 0,
+    "blocked": 60,
     "deprecated": 0,
     "unknown": 0,
-    "catalog_classified_ops": 480,
+    "catalog_classified_ops": 62,
     "catalog_unclassified_ops": 0,
     "catalog_classification_status": "complete"
   },
@@ -2498,9 +2497,12 @@
         "original_write_default": false
       },
       "handler": {
-        "router_lane": "full_autocad",
-        "dispatcher_symbol": null,
-        "execution_host_class": "full_autocad",
+        "router_lane": "ARIADNE_CAD_JOB",
+        "dispatcher_symbol": "visual_report.build_visual_report",
+        "execution_host_class": "dbx",
+        "native_api": "deterministic IR-to-SVG visual report route",
+        "python_handler": "tools/visual_report.py::build_visual_report",
+        "wired_via": "tools/cadctl.py::Cad.visual_report",
         "composed_of": []
       },
       "mapping_type": "synthetic",
@@ -2510,7 +2512,11 @@
       "summary": "Layout/plot render to image. Plot/publish is host-bound (full AutoCAD) and not headless-safe.",
       "evidence_refs": [
         "docs/OPERATION_REGISTRY_SPEC.md",
-        "CADOS_M01 Lane D native triage (inspect.database.graph insertion point)"
+        "CADOS_M01 Lane D native triage (inspect.database.graph insertion point)",
+        "tools/visual_report.py",
+        "reports/WAVE3_RENDER_PLOT_REAUDIT.md#render.layout",
+        "tools/cadctl.py::Cad.visual_report",
+        "tools/visual_report.py::build_visual_report"
       ],
       "target_family_first_class": true,
       "wired_v1": false,
@@ -2532,12 +2538,15 @@
         "source": "config/policy.v2.json",
         "status_policy": "implemented",
         "default_write_mode": "read",
-        "no_original_write_default": true
+        "no_original_write_default": true,
+        "runtime_behavior": "implemented_python_visual_report"
       },
       "tests": [
-        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified"
+        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
+        "tests/unit/test_visual_report.py",
+        "tests/unit/test_wave3_render_plot_registry_safety.py::test_render_layout_has_real_visual_report_handler"
       ],
-      "notes": "Layout/plot render to image. Plot/publish is host-bound (full AutoCAD) and not headless-safe.",
+      "notes": "Implemented via cad.visual_report deterministic IR-to-SVG route; not AutoCAD plot/publish and no original DWG write.",
       "owner_ticket": "M08I-T01",
       "implementation_strategy": "implemented_v1",
       "evidence_required": "existing_tests_and_evidence_refs"
@@ -4524,7 +4533,7 @@
       "id": "edit.subentity.add_paths",
       "operation": "edit.subentity.add_paths",
       "family": "brep_solids",
-      "status": "catalogued",
+      "status": "blocked",
       "engine_tier": "native_arx_only",
       "engines": [
         "native_arx_only"
@@ -4563,34 +4572,39 @@
       },
       "policy": {
         "source": "config/policy.v2.json",
-        "status_policy": "catalogued_not_runnable",
+        "status_policy": "blocked",
         "default_write_mode": "read",
         "allowed_write_modes": [
           "read"
         ],
         "no_original_write_default": true,
-        "runtime_behavior": "not_runnable_until_promoted_to_implemented_or_wired"
+        "runtime_behavior": "hard_blocked_after_wave3_reaudit",
+        "agent_exposed": false
       },
       "tests": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
-        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata"
+        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
+        "tests/unit/test_wave3_remaining_registry_closure.py::test_remaining_wave3_blocks_have_accepted_codes_and_evidence"
       ],
       "summary": "Add subentities (custom-object / associative authoring)",
       "source_slice": "brep-topology.md",
       "citation": "dbmain.h:2001 addSubentPaths",
       "evidence_refs": [
-        "config/autocad_native_arx_operation_catalog.json#edit.subentity.add_paths"
+        "config/autocad_native_arx_operation_catalog.json#edit.subentity.add_paths",
+        "reports/WAVE3_REMAINING_HARDBLOCK_REAUDIT.md#edit.subentity.add_paths"
       ],
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "Wave3 post-merge re-audit accepted hard block. SAFETY_FORBIDDEN: AcDbEntity::addSubentPaths mutates subentity path association state; the current CAD OS agent contract has no bounded staged-copy authoring schema for arbitrary subentity path mutation.",
       "owner_ticket": "M08G-T03",
-      "implementation_strategy": "native_arx_cpp",
-      "evidence_required": "unit_test+native_extraction_fixture"
+      "implementation_strategy": "hard_blocked",
+      "evidence_required": "blocker_ref_and_evidence",
+      "blocked_reason": "SAFETY_FORBIDDEN: AcDbEntity::addSubentPaths mutates subentity path association state; the current CAD OS agent contract has no bounded staged-copy authoring schema for arbitrary subentity path mutation.",
+      "blocker_ref": "reports/WAVE3_REMAINING_HARDBLOCK_REAUDIT.md#edit.subentity.add_paths"
     },
     {
       "id": "edit.subentity.delete_paths",
       "operation": "edit.subentity.delete_paths",
       "family": "brep_solids",
-      "status": "catalogued",
+      "status": "blocked",
       "engine_tier": "native_arx_only",
       "engines": [
         "native_arx_only"
@@ -4629,34 +4643,39 @@
       },
       "policy": {
         "source": "config/policy.v2.json",
-        "status_policy": "catalogued_not_runnable",
+        "status_policy": "blocked",
         "default_write_mode": "read",
         "allowed_write_modes": [
           "read"
         ],
         "no_original_write_default": true,
-        "runtime_behavior": "not_runnable_until_promoted_to_implemented_or_wired"
+        "runtime_behavior": "hard_blocked_after_wave3_reaudit",
+        "agent_exposed": false
       },
       "tests": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
-        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata"
+        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
+        "tests/unit/test_wave3_remaining_registry_closure.py::test_remaining_wave3_blocks_have_accepted_codes_and_evidence"
       ],
       "summary": "Delete addressed subentities",
       "source_slice": "brep-topology.md",
       "citation": "dbmain.h:2004 deleteSubentPaths",
       "evidence_refs": [
-        "config/autocad_native_arx_operation_catalog.json#edit.subentity.delete_paths"
+        "config/autocad_native_arx_operation_catalog.json#edit.subentity.delete_paths",
+        "reports/WAVE3_REMAINING_HARDBLOCK_REAUDIT.md#edit.subentity.delete_paths"
       ],
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "Wave3 post-merge re-audit accepted hard block. SAFETY_FORBIDDEN: AcDbEntity::deleteSubentPaths mutates subentity path association state; safe read/status variants are implemented separately and this mutation is not agent-exposed.",
       "owner_ticket": "M08G-T03",
-      "implementation_strategy": "native_arx_cpp",
-      "evidence_required": "unit_test+native_extraction_fixture"
+      "implementation_strategy": "hard_blocked",
+      "evidence_required": "blocker_ref_and_evidence",
+      "blocked_reason": "SAFETY_FORBIDDEN: AcDbEntity::deleteSubentPaths mutates subentity path association state; safe read/status variants are implemented separately and this mutation is not agent-exposed.",
+      "blocker_ref": "reports/WAVE3_REMAINING_HARDBLOCK_REAUDIT.md#edit.subentity.delete_paths"
     },
     {
       "id": "edit.subentity.transform",
       "operation": "edit.subentity.transform",
       "family": "brep_solids",
-      "status": "catalogued",
+      "status": "blocked",
       "engine_tier": "native_arx_only",
       "engines": [
         "native_arx_only"
@@ -4695,28 +4714,33 @@
       },
       "policy": {
         "source": "config/policy.v2.json",
-        "status_policy": "catalogued_not_runnable",
+        "status_policy": "blocked",
         "default_write_mode": "read",
         "allowed_write_modes": [
           "read"
         ],
         "no_original_write_default": true,
-        "runtime_behavior": "not_runnable_until_promoted_to_implemented_or_wired"
+        "runtime_behavior": "hard_blocked_after_wave3_reaudit",
+        "agent_exposed": false
       },
       "tests": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
-        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata"
+        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
+        "tests/unit/test_wave3_remaining_registry_closure.py::test_remaining_wave3_blocks_have_accepted_codes_and_evidence"
       ],
       "summary": "Direct modeling: move/rotate/scale specific faces/edges/vertices in place (this WRITES to the entity)",
       "source_slice": "brep-topology.md",
       "citation": "dbmain.h:2011 transformSubentPathsBy; MCP AcDbSubentityOverrule (overrule pairing)",
       "evidence_refs": [
-        "config/autocad_native_arx_operation_catalog.json#edit.subentity.transform"
+        "config/autocad_native_arx_operation_catalog.json#edit.subentity.transform",
+        "reports/WAVE3_REMAINING_HARDBLOCK_REAUDIT.md#edit.subentity.transform"
       ],
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "Wave3 post-merge re-audit accepted hard block. SAFETY_FORBIDDEN: AcDbEntity::transformSubentPathsBy mutates selected subentity paths; the exact operation needs a validated staged authoring contract before exposure.",
       "owner_ticket": "M08G-T03",
-      "implementation_strategy": "native_arx_cpp",
-      "evidence_required": "unit_test+native_extraction_fixture"
+      "implementation_strategy": "hard_blocked",
+      "evidence_required": "blocker_ref_and_evidence",
+      "blocked_reason": "SAFETY_FORBIDDEN: AcDbEntity::transformSubentPathsBy mutates selected subentity paths; the exact operation needs a validated staged authoring contract before exposure.",
+      "blocker_ref": "reports/WAVE3_REMAINING_HARDBLOCK_REAUDIT.md#edit.subentity.transform"
     },
     {
       "id": "inspect.brep.bounds",
@@ -6593,7 +6617,7 @@
       "id": "inspect.subentity.color",
       "operation": "inspect.subentity.color",
       "family": "brep_solids",
-      "status": "catalogued",
+      "status": "implemented",
       "engine_tier": "native_arx_only",
       "engines": [
         "native_arx_only"
@@ -6616,10 +6640,10 @@
         "original_write_default": false
       },
       "handler": {
-        "router_lane": null,
-        "dispatcher_symbol": null,
+        "router_lane": "ARIADNE_NATIVE_JOB",
+        "dispatcher_symbol": "m08dDispatch",
         "execution_host_class": "arx_adapter",
-        "native_api": "AcDbSubentColor (per-subentity color override carrier)",
+        "native_api": "AcDb3dSolid::getSubentColor / AcDbSurface::getSubentColor / AcDbSubDMesh::getSubentColor",
         "composed_of": []
       },
       "mapping_type": "exact",
@@ -6632,28 +6656,38 @@
       },
       "policy": {
         "source": "config/policy.v2.json",
-        "status_policy": "catalogued_not_runnable",
+        "status_policy": "implemented_read_only",
         "default_write_mode": "read",
         "allowed_write_modes": [
           "read"
         ],
         "no_original_write_default": true,
-        "runtime_behavior": "not_runnable_until_promoted_to_implemented_or_wired"
+        "runtime_behavior": "implemented_read_only_or_policy_gated",
+        "agent_exposed": true
       },
       "tests": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
-        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata"
+        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
+        "tests/unit/test_m08d_handlers.py",
+        "tests/unit/test_m08d_handlers.py::TestM08DHandlers::test_subentity_color_read_uses_real_apis",
+        "tests/unit/test_wave3_remaining_registry_closure.py::test_inspect_subentity_color_was_reversed_to_implemented"
       ],
       "summary": "Carry a per-subentity color (face coloring)",
       "source_slice": "brep-topology.md",
       "citation": "referenced by packet; class not located in inc/*.h this session — **[unverified]**, confirm header before use",
       "evidence_refs": [
-        "config/autocad_native_arx_operation_catalog.json#inspect.subentity.color"
+        "config/autocad_native_arx_operation_catalog.json#inspect.subentity.color",
+        "src/Ariadne.AcadNative/families/m08d_handlers.inc:m08dDispatch",
+        "reports/merge/MERGE-M08-READ.json",
+        "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
+        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)",
+        "tests/unit/test_m08d_handlers.py::TestM08DHandlers::test_subentity_color_read_uses_real_apis",
+        "reports/WAVE3_REMAINING_HARDBLOCK_REAUDIT.md#inspect.subentity.color"
       ],
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "Wave3 re-audit reversed catalogued state to implemented after SDK header proof found supported read APIs. Handler opens entity kForRead and emits subentity color metadata only.",
       "owner_ticket": "M08D-T03",
-      "implementation_strategy": "native_arx_cpp",
-      "evidence_required": "unit_test+native_extraction_fixture"
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs"
     },
     {
       "id": "inspect.subentity.geom_extents",
@@ -6730,7 +6764,7 @@
       "id": "inspect.subentity.markers_at_path",
       "operation": "inspect.subentity.markers_at_path",
       "family": "brep_solids",
-      "status": "catalogued",
+      "status": "implemented",
       "engine_tier": "native_arx_only",
       "engines": [
         "native_arx_only"
@@ -6754,7 +6788,7 @@
       },
       "handler": {
         "router_lane": null,
-        "dispatcher_symbol": null,
+        "dispatcher_symbol": "m08dDispatch",
         "execution_host_class": "arx_adapter",
         "native_api": "AcDbEntity::getGsMarkersAtSubentPath(const AcDbFullSubentPath&, AcArray<Adesk::GsMarker>&)",
         "composed_of": []
@@ -6779,24 +6813,29 @@
       },
       "tests": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
-        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata"
+        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
+        "tests/unit/test_m08d_handlers.py"
       ],
       "summary": "Inverse: given a subent path, the GS markers that draw it (drives highlight/unhighlight)",
       "source_slice": "brep-topology.md",
       "citation": "dbmain.h:2044; MCP GUID OARX-RefGuide-AcDbEntity__getGsMarkersAtSubentPath",
       "evidence_refs": [
-        "config/autocad_native_arx_operation_catalog.json#inspect.subentity.markers_at_path"
+        "config/autocad_native_arx_operation_catalog.json#inspect.subentity.markers_at_path",
+        "src/Ariadne.AcadNative/families/m08d_handlers.inc:m08dDispatch",
+        "reports/merge/MERGE-M08-READ.json",
+        "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
+        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)"
       ],
       "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
       "owner_ticket": "M08D-T03",
-      "implementation_strategy": "native_arx_cpp",
-      "evidence_required": "unit_test+native_extraction_fixture"
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs"
     },
     {
       "id": "inspect.subentity.path_at_marker",
       "operation": "inspect.subentity.path_at_marker",
       "family": "brep_solids",
-      "status": "catalogued",
+      "status": "implemented",
       "engine_tier": "native_arx_only",
       "engines": [
         "native_arx_only"
@@ -6820,7 +6859,7 @@
       },
       "handler": {
         "router_lane": null,
-        "dispatcher_symbol": null,
+        "dispatcher_symbol": "m08dDispatch",
         "execution_host_class": "arx_adapter",
         "native_api": "AcDbEntity::getSubentPathsAtGsMarker(SubentType, GsMarker, AcGePoint3d&, AcDbMatrix… , int&, AcDbFullSubentPath*&)",
         "composed_of": []
@@ -6845,18 +6884,23 @@
       },
       "tests": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
-        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata"
+        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
+        "tests/unit/test_m08d_handlers.py"
       ],
       "summary": "From a picked GS marker (screen selection) produce the full subentity path(s) — the",
       "source_slice": "brep-topology.md",
       "citation": "dbmain.h:2033 getSubentPathsAtGsMarker; MCP AcDbEntity::getGsMarkersAtSubentPath (describes pairing)",
       "evidence_refs": [
-        "config/autocad_native_arx_operation_catalog.json#inspect.subentity.path_at_marker"
+        "config/autocad_native_arx_operation_catalog.json#inspect.subentity.path_at_marker",
+        "src/Ariadne.AcadNative/families/m08d_handlers.inc:m08dDispatch",
+        "reports/merge/MERGE-M08-READ.json",
+        "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
+        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)"
       ],
       "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
       "owner_ticket": "M08D-T03",
-      "implementation_strategy": "native_arx_cpp",
-      "evidence_required": "unit_test+native_extraction_fixture"
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs"
     },
     {
       "id": "inspect.subentity.ptr",
@@ -7983,7 +8027,7 @@
       "id": "ui.subentity.highlight",
       "operation": "ui.subentity.highlight",
       "family": "brep_solids",
-      "status": "catalogued",
+      "status": "blocked",
       "engine_tier": "native_arx_only",
       "engines": [
         "native_arx_only"
@@ -8022,28 +8066,33 @@
       },
       "policy": {
         "source": "config/policy.v2.json",
-        "status_policy": "catalogued_not_runnable",
+        "status_policy": "blocked",
         "default_write_mode": "read",
         "allowed_write_modes": [
           "read"
         ],
         "no_original_write_default": true,
-        "runtime_behavior": "not_runnable_until_promoted_to_implemented_or_wired"
+        "runtime_behavior": "hard_blocked_after_wave3_reaudit",
+        "agent_exposed": false
       },
       "tests": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
-        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata"
+        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
+        "tests/unit/test_wave3_remaining_registry_closure.py::test_remaining_wave3_blocks_have_accepted_codes_and_evidence"
       ],
       "summary": "Highlight / unhighlight a subentity on screen (requires graphics flush; calls getGsMarkersAtSubentPath internally)",
       "source_slice": "brep-topology.md",
       "citation": "dbmain.h:2048/2051; MCP GUID OARX-RefGuide-AcDbEntity__highlight / __unhighlight",
       "evidence_refs": [
-        "config/autocad_native_arx_operation_catalog.json#ui.subentity.highlight"
+        "config/autocad_native_arx_operation_catalog.json#ui.subentity.highlight",
+        "reports/WAVE3_REMAINING_HARDBLOCK_REAUDIT.md#ui.subentity.highlight"
       ],
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "Wave3 post-merge re-audit accepted hard block. HOST_UNAVAILABLE: subentity highlight requires a live graphics/editor selection context and GS refresh; no controlled attended AutoCAD editor host is available in this integration route.",
       "owner_ticket": "M08D-T03",
-      "implementation_strategy": "native_arx_cpp",
-      "evidence_required": "unit_test+native_extraction_fixture"
+      "implementation_strategy": "hard_blocked",
+      "evidence_required": "blocker_ref_and_evidence",
+      "blocked_reason": "HOST_UNAVAILABLE: subentity highlight requires a live graphics/editor selection context and GS refresh; no controlled attended AutoCAD editor host is available in this integration route.",
+      "blocker_ref": "reports/WAVE3_REMAINING_HARDBLOCK_REAUDIT.md#ui.subentity.highlight"
     },
     {
       "id": "automate.com.bridge_objectid",
@@ -8195,7 +8244,7 @@
       "id": "automate.com.get_app",
       "operation": "automate.com.get_app",
       "family": "com_activex",
-      "status": "catalogued",
+      "status": "blocked",
       "engine_tier": "managed_also",
       "engines": [
         "managed_also"
@@ -8234,34 +8283,39 @@
       },
       "policy": {
         "source": "config/policy.v2.json",
-        "status_policy": "catalogued_not_runnable",
+        "status_policy": "blocked",
         "default_write_mode": "read",
         "allowed_write_modes": [
           "read"
         ],
         "no_original_write_default": true,
-        "runtime_behavior": "not_runnable_until_promoted_to_implemented_or_wired"
+        "runtime_behavior": "hard_blocked_after_wave3_reaudit",
+        "agent_exposed": false
       },
       "tests": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
-        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata"
+        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
+        "tests/unit/test_wave3_remaining_registry_closure.py::test_remaining_wave3_blocks_have_accepted_codes_and_evidence"
       ],
       "summary": "Get AutoCAD's IDispatch (the AcadApplication automation root) from inside ARX — the entry to",
       "source_slice": "com-activex-opm.md",
       "citation": "aced.h:822-824 (\"AutoCAD's IDispatch pointer\")",
       "evidence_refs": [
-        "config/autocad_native_arx_operation_catalog.json#automate.com.get_app"
+        "config/autocad_native_arx_operation_catalog.json#automate.com.get_app",
+        "reports/WAVE3_REMAINING_HARDBLOCK_REAUDIT.md#automate.com.get_app"
       ],
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "Wave3 post-merge re-audit accepted hard block. SAFETY_FORBIDDEN: exposing AutoCAD application IDispatch to agents would hand out a raw COM automation root instead of a bounded introspection result.",
       "owner_ticket": "M08O-T01",
-      "implementation_strategy": "managed_dotnet",
-      "evidence_required": "unit_test+native_extraction_fixture"
+      "implementation_strategy": "hard_blocked",
+      "evidence_required": "blocker_ref_and_evidence",
+      "blocked_reason": "SAFETY_FORBIDDEN: exposing AutoCAD application IDispatch to agents would hand out a raw COM automation root instead of a bounded introspection result.",
+      "blocker_ref": "reports/WAVE3_REMAINING_HARDBLOCK_REAUDIT.md#automate.com.get_app"
     },
     {
       "id": "automate.com.get_document",
       "operation": "automate.com.get_document",
       "family": "com_activex",
-      "status": "catalogued",
+      "status": "blocked",
       "engine_tier": "managed_also",
       "engines": [
         "managed_also"
@@ -8300,34 +8354,39 @@
       },
       "policy": {
         "source": "config/policy.v2.json",
-        "status_policy": "catalogued_not_runnable",
+        "status_policy": "blocked",
         "default_write_mode": "read",
         "allowed_write_modes": [
           "read"
         ],
         "no_original_write_default": true,
-        "runtime_behavior": "not_runnable_until_promoted_to_implemented_or_wired"
+        "runtime_behavior": "hard_blocked_after_wave3_reaudit",
+        "agent_exposed": false
       },
       "tests": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
-        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata"
+        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
+        "tests/unit/test_wave3_remaining_registry_closure.py::test_remaining_wave3_blocks_have_accepted_codes_and_evidence"
       ],
       "summary": "Get the AcadDocument IDispatch for a given ARX document (bridges AcApDocument* → COM document).",
       "source_slice": "com-activex-opm.md",
       "citation": "acdocman.h:145",
       "evidence_refs": [
-        "config/autocad_native_arx_operation_catalog.json#automate.com.get_document"
+        "config/autocad_native_arx_operation_catalog.json#automate.com.get_document",
+        "reports/WAVE3_REMAINING_HARDBLOCK_REAUDIT.md#automate.com.get_document"
       ],
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "Wave3 post-merge re-audit accepted hard block. SAFETY_FORBIDDEN: exposing live AcadDocument automation interfaces/pointers to agents is not a bounded read-only contract.",
       "owner_ticket": "M08O-T01",
-      "implementation_strategy": "managed_dotnet",
-      "evidence_required": "unit_test+native_extraction_fixture"
+      "implementation_strategy": "hard_blocked",
+      "evidence_required": "blocker_ref_and_evidence",
+      "blocked_reason": "SAFETY_FORBIDDEN: exposing live AcadDocument automation interfaces/pointers to agents is not a bounded read-only contract.",
+      "blocker_ref": "reports/WAVE3_REMAINING_HARDBLOCK_REAUDIT.md#automate.com.get_document"
     },
     {
       "id": "automate.com.get_for_command",
       "operation": "automate.com.get_for_command",
       "family": "com_activex",
-      "status": "catalogued",
+      "status": "blocked",
       "engine_tier": "native_arx_only",
       "engines": [
         "native_arx_only"
@@ -8366,34 +8425,39 @@
       },
       "policy": {
         "source": "config/policy.v2.json",
-        "status_policy": "catalogued_not_runnable",
+        "status_policy": "blocked",
         "default_write_mode": "read",
         "allowed_write_modes": [
           "read"
         ],
         "no_original_write_default": true,
-        "runtime_behavior": "not_runnable_until_promoted_to_implemented_or_wired"
+        "runtime_behavior": "hard_blocked_after_wave3_reaudit",
+        "agent_exposed": false
       },
       "tests": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
-        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata"
+        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
+        "tests/unit/test_wave3_remaining_registry_closure.py::test_remaining_wave3_blocks_have_accepted_codes_and_evidence"
       ],
       "summary": "Get the IUnknown associated with the currently executing command (COM context for command-scoped property",
       "source_slice": "com-activex-opm.md",
       "citation": "rxmfcapi.h:177",
       "evidence_refs": [
-        "config/autocad_native_arx_operation_catalog.json#automate.com.get_for_command"
+        "config/autocad_native_arx_operation_catalog.json#automate.com.get_for_command",
+        "reports/WAVE3_REMAINING_HARDBLOCK_REAUDIT.md#automate.com.get_for_command"
       ],
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "Wave3 post-merge re-audit accepted hard block. SAFETY_FORBIDDEN: command-context COM acquisition exposes raw automation handles in a live command surface.",
       "owner_ticket": "M08O-T01",
-      "implementation_strategy": "native_arx_cpp",
-      "evidence_required": "unit_test+native_extraction_fixture"
+      "implementation_strategy": "hard_blocked",
+      "evidence_required": "blocker_ref_and_evidence",
+      "blocked_reason": "SAFETY_FORBIDDEN: command-context COM acquisition exposes raw automation handles in a live command surface.",
+      "blocker_ref": "reports/WAVE3_REMAINING_HARDBLOCK_REAUDIT.md#automate.com.get_for_command"
     },
     {
       "id": "automate.com.get_winapp",
       "operation": "automate.com.get_winapp",
       "family": "com_activex",
-      "status": "catalogued",
+      "status": "blocked",
       "engine_tier": "native_arx_only",
       "engines": [
         "native_arx_only"
@@ -8432,28 +8496,33 @@
       },
       "policy": {
         "source": "config/policy.v2.json",
-        "status_policy": "catalogued_not_runnable",
+        "status_policy": "blocked",
         "default_write_mode": "read",
         "allowed_write_modes": [
           "read"
         ],
         "no_original_write_default": true,
-        "runtime_behavior": "not_runnable_until_promoted_to_implemented_or_wired"
+        "runtime_behavior": "hard_blocked_after_wave3_reaudit",
+        "agent_exposed": false
       },
       "tests": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
-        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata"
+        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
+        "tests/unit/test_wave3_remaining_registry_closure.py::test_remaining_wave3_blocks_have_accepted_codes_and_evidence"
       ],
       "summary": "Get AutoCAD's MFC CWinApp (host window/app object; rarely needed for automation, but the MFC",
       "source_slice": "com-activex-opm.md",
       "citation": "rxmfcapi.h:58-61",
       "evidence_refs": [
-        "config/autocad_native_arx_operation_catalog.json#automate.com.get_winapp"
+        "config/autocad_native_arx_operation_catalog.json#automate.com.get_winapp",
+        "reports/WAVE3_REMAINING_HARDBLOCK_REAUDIT.md#automate.com.get_winapp"
       ],
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "Wave3 post-merge re-audit accepted hard block. SAFETY_FORBIDDEN: exposing host application pointers/state is outside the bounded CAD OS introspection surface.",
       "owner_ticket": "M08O-T01",
-      "implementation_strategy": "native_arx_cpp",
-      "evidence_required": "unit_test+native_extraction_fixture"
+      "implementation_strategy": "hard_blocked",
+      "evidence_required": "blocker_ref_and_evidence",
+      "blocked_reason": "SAFETY_FORBIDDEN: exposing host application pointers/state is outside the bounded CAD OS introspection surface.",
+      "blocker_ref": "reports/WAVE3_REMAINING_HARDBLOCK_REAUDIT.md#automate.com.get_winapp"
     },
     {
       "id": "automate.com.hold_objectref",
@@ -8672,7 +8741,7 @@
       "id": "automate.com.send_command",
       "operation": "automate.com.send_command",
       "family": "com_activex",
-      "status": "catalogued",
+      "status": "blocked",
       "engine_tier": "managed_also",
       "engines": [
         "managed_also"
@@ -8711,34 +8780,39 @@
       },
       "policy": {
         "source": "config/policy.v2.json",
-        "status_policy": "catalogued_not_runnable",
+        "status_policy": "blocked",
         "default_write_mode": "read",
         "allowed_write_modes": [
           "read"
         ],
         "no_original_write_default": true,
-        "runtime_behavior": "not_runnable_until_promoted_to_implemented_or_wired"
+        "runtime_behavior": "hard_blocked_after_wave3_reaudit",
+        "agent_exposed": false
       },
       "tests": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
-        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata"
+        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
+        "tests/unit/test_wave3_remaining_registry_closure.py::test_remaining_wave3_blocks_have_accepted_codes_and_evidence"
       ],
       "summary": "Send a command string to the live document command line. No ARX C++ export",
       "source_slice": "com-activex-opm.md",
       "citation": "unverified — grep of axtempl.h/axtypes.idl found no SendCommand/PostCommand; the method lives in the type library acax26ENU.tlb (inc-x64), not in a readable .h this session",
       "evidence_refs": [
-        "config/autocad_native_arx_operation_catalog.json#automate.com.send_command"
+        "config/autocad_native_arx_operation_catalog.json#automate.com.send_command",
+        "reports/WAVE3_REMAINING_HARDBLOCK_REAUDIT.md#automate.com.send_command"
       ],
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "Wave3 post-merge re-audit accepted hard block. SAFETY_FORBIDDEN: COM SendCommand is raw command-string dispatch and must not be exposed to agents.",
       "owner_ticket": "M08O-T01",
-      "implementation_strategy": "managed_dotnet",
-      "evidence_required": "unit_test+native_extraction_fixture"
+      "implementation_strategy": "hard_blocked",
+      "evidence_required": "blocker_ref_and_evidence",
+      "blocked_reason": "SAFETY_FORBIDDEN: COM SendCommand is raw command-string dispatch and must not be exposed to agents.",
+      "blocker_ref": "reports/WAVE3_REMAINING_HARDBLOCK_REAUDIT.md#automate.com.send_command"
     },
     {
       "id": "automate.com.wrapper_for_object",
       "operation": "automate.com.wrapper_for_object",
       "family": "com_activex",
-      "status": "catalogued",
+      "status": "blocked",
       "engine_tier": "native_arx_only",
       "engines": [
         "native_arx_only"
@@ -8777,28 +8851,33 @@
       },
       "policy": {
         "source": "config/policy.v2.json",
-        "status_policy": "catalogued_not_runnable",
+        "status_policy": "blocked",
         "default_write_mode": "read",
         "allowed_write_modes": [
           "read"
         ],
         "no_original_write_default": true,
-        "runtime_behavior": "not_runnable_until_promoted_to_implemented_or_wired"
+        "runtime_behavior": "hard_blocked_after_wave3_reaudit",
+        "agent_exposed": false
       },
       "tests": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
-        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata"
+        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
+        "tests/unit/test_wave3_remaining_registry_closure.py::test_remaining_wave3_blocks_have_accepted_codes_and_evidence"
       ],
       "summary": "The ARX↔COM wrapper registry: given a DB-resident object/database, get (or set) its COM wrapper",
       "source_slice": "com-activex-opm.md",
       "citation": "oleaprot.h:23-67 (AcAxOleLinkManager, AcAxGetOleLinkManager)",
       "evidence_refs": [
-        "config/autocad_native_arx_operation_catalog.json#automate.com.wrapper_for_object"
+        "config/autocad_native_arx_operation_catalog.json#automate.com.wrapper_for_object",
+        "reports/WAVE3_REMAINING_HARDBLOCK_REAUDIT.md#automate.com.wrapper_for_object"
       ],
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "Wave3 post-merge re-audit accepted hard block. SAFETY_FORBIDDEN: wrapping AcDb objects into automation interfaces exposes raw COM object handles to agents.",
       "owner_ticket": "M08O-T01",
-      "implementation_strategy": "native_arx_cpp",
-      "evidence_required": "unit_test+native_extraction_fixture"
+      "implementation_strategy": "hard_blocked",
+      "evidence_required": "blocker_ref_and_evidence",
+      "blocked_reason": "SAFETY_FORBIDDEN: wrapping AcDb objects into automation interfaces exposes raw COM object handles to agents.",
+      "blocker_ref": "reports/WAVE3_REMAINING_HARDBLOCK_REAUDIT.md#automate.com.wrapper_for_object"
     },
     {
       "id": "automate.property.set",
@@ -8879,7 +8958,7 @@
       "id": "embed.ole.frame",
       "operation": "embed.ole.frame",
       "family": "com_activex",
-      "status": "catalogued",
+      "status": "blocked",
       "engine_tier": "native_arx_only",
       "engines": [
         "native_arx_only"
@@ -8918,28 +8997,33 @@
       },
       "policy": {
         "source": "config/policy.v2.json",
-        "status_policy": "catalogued_not_runnable",
+        "status_policy": "blocked",
         "default_write_mode": "live_edit",
         "allowed_write_modes": [
           "live_edit"
         ],
         "no_original_write_default": true,
-        "runtime_behavior": "not_runnable_until_promoted_to_implemented_or_wired"
+        "runtime_behavior": "hard_blocked_after_wave3_reaudit",
+        "agent_exposed": false
       },
       "tests": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
-        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata"
+        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
+        "tests/unit/test_wave3_remaining_registry_closure.py::test_remaining_wave3_blocks_have_accepted_codes_and_evidence"
       ],
       "summary": "Create/inspect an embedded or linked OLE object as a real DWG entity (the OLEFRAME).",
       "source_slice": "com-activex-opm.md",
       "citation": "dbole.h:49-219 (AcDbOleFrame/AcDbOle2Frame)",
       "evidence_refs": [
-        "config/autocad_native_arx_operation_catalog.json#embed.ole.frame"
+        "config/autocad_native_arx_operation_catalog.json#embed.ole.frame",
+        "reports/WAVE3_REMAINING_HARDBLOCK_REAUDIT.md#embed.ole.frame"
       ],
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "Wave3 post-merge re-audit accepted hard block. HOST_UNAVAILABLE: AcDbOle2Frame embedding/linking requires a live OLE client item and attended host context; no controlled OLE route or staged payload contract is available.",
       "owner_ticket": "M08O-T01",
-      "implementation_strategy": "native_arx_cpp",
-      "evidence_required": "attended_live_pump_session_log"
+      "implementation_strategy": "hard_blocked",
+      "evidence_required": "blocker_ref_and_evidence",
+      "blocked_reason": "HOST_UNAVAILABLE: AcDbOle2Frame embedding/linking requires a live OLE client item and attended host context; no controlled OLE route or staged payload contract is available.",
+      "blocker_ref": "reports/WAVE3_REMAINING_HARDBLOCK_REAUDIT.md#embed.ole.frame"
     },
     {
       "id": "extend.members.facet_provider",
@@ -11525,7 +11609,7 @@
       "id": "config.assoceval.callback",
       "operation": "config.assoceval.callback",
       "family": "constraints_associativity",
-      "status": "catalogued",
+      "status": "implemented",
       "engine_tier": "native_arx_only",
       "engines": [
         "native_arx_only"
@@ -11548,8 +11632,8 @@
         "original_write_default": false
       },
       "handler": {
-        "router_lane": null,
-        "dispatcher_symbol": null,
+        "router_lane": "ARIADNE_NATIVE_JOB",
+        "dispatcher_symbol": "m08kcDispatch",
         "execution_host_class": "arx_adapter",
         "native_api": "AcDbAssocManager::addGlobalEvaluationCallback(cb, order) / removeGlobalEvaluationCallback / getGlobalEvaluationCallbacks; base class AcDbAssocEvaluationCallback",
         "composed_of": []
@@ -11564,28 +11648,38 @@
       },
       "policy": {
         "source": "config/policy.v2.json",
-        "status_policy": "catalogued_not_runnable",
+        "status_policy": "implemented_native_read_safe",
         "default_write_mode": "read",
         "allowed_write_modes": [
           "read"
         ],
         "no_original_write_default": true,
-        "runtime_behavior": "not_runnable_until_promoted_to_implemented_or_wired"
+        "runtime_behavior": "read_only_introspection",
+        "agent_exposed": true,
+        "risk_class": "read_safe"
       },
       "tests": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
-        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata"
+        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
+        "tests/unit/test_m08kc_handlers.py",
+        "tests/unit/test_wave3_pane5_assoc_reaudit.py"
       ],
       "summary": "Register a global hook called during evaluation (progress, veto, custom eval logic).",
       "source_slice": "constraints-associativity.md",
       "citation": "AcDbAssocManager.h:126,140,148; AcDbAssocGlobal.h:286",
       "evidence_refs": [
-        "config/autocad_native_arx_operation_catalog.json#config.assoceval.callback"
+        "config/autocad_native_arx_operation_catalog.json#config.assoceval.callback",
+        "src/Ariadne.AcadNative/families/m08kc_handlers.inc:m08kcDispatch",
+        "reports/merge/MERGE-M08-READ.json",
+        "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
+        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)",
+        "reports/WAVE3_PANE5_ASSOCIATIVITY_REAUDIT.md#config.assoceval.callback",
+        "tests/unit/test_wave3_pane5_assoc_reaudit.py"
       ],
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "Wave3 Pane5 re-audit: implemented as safe callback status/introspection only. Callback registration/removal/evaluation remains unexposed.",
       "owner_ticket": "M08K-T03",
-      "implementation_strategy": "native_arx_cpp",
-      "evidence_required": "unit_test+native_extraction_fixture"
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs"
     },
     {
       "id": "config.assocmanager.evalDisabler",
@@ -11666,7 +11760,7 @@
       "id": "config.constraint.globalCallback",
       "operation": "config.constraint.globalCallback",
       "family": "constraints_associativity",
-      "status": "catalogued",
+      "status": "implemented",
       "engine_tier": "native_arx_only",
       "engines": [
         "native_arx_only"
@@ -11689,8 +11783,8 @@
         "original_write_default": false
       },
       "handler": {
-        "router_lane": null,
-        "dispatcher_symbol": null,
+        "router_lane": "ARIADNE_NATIVE_JOB",
+        "dispatcher_symbol": "m08kcDispatch",
         "execution_host_class": "arx_adapter",
         "native_api": "AcDbAssoc2dConstraintGroup::addGlobalCallback(AcDbAssoc2dConstraintCallback*) / removeGlobalCallback / setDoNotCheckNewlyAddedConstraints(bool)",
         "composed_of": []
@@ -11705,28 +11799,38 @@
       },
       "policy": {
         "source": "config/policy.v2.json",
-        "status_policy": "catalogued_not_runnable",
+        "status_policy": "implemented_native_read_safe",
         "default_write_mode": "read",
         "allowed_write_modes": [
           "read"
         ],
         "no_original_write_default": true,
-        "runtime_behavior": "not_runnable_until_promoted_to_implemented_or_wired"
+        "runtime_behavior": "read_only_introspection",
+        "agent_exposed": true,
+        "risk_class": "read_safe"
       },
       "tests": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
-        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata"
+        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
+        "tests/unit/test_m08kc_handlers.py",
+        "tests/unit/test_wave3_pane5_assoc_reaudit.py"
       ],
       "summary": "Hook constraint deactivation / relax-veto; optimization to skip validation while bulk-adding.",
       "source_slice": "constraints-associativity.md",
       "citation": "AcDbAssoc2dConstraintGroup.h:610,618,649",
       "evidence_refs": [
-        "config/autocad_native_arx_operation_catalog.json#config.constraint.globalCallback"
+        "config/autocad_native_arx_operation_catalog.json#config.constraint.globalCallback",
+        "src/Ariadne.AcadNative/families/m08kc_handlers.inc:m08kcDispatch",
+        "reports/merge/MERGE-M08-READ.json",
+        "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
+        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)",
+        "reports/WAVE3_PANE5_ASSOCIATIVITY_REAUDIT.md#config.constraint.globalCallback",
+        "tests/unit/test_wave3_pane5_assoc_reaudit.py"
       ],
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "Wave3 Pane5 re-audit: implemented as safe callback status/introspection only. Callback registration/removal/evaluation remains unexposed.",
       "owner_ticket": "M08K-T03",
-      "implementation_strategy": "native_arx_cpp",
-      "evidence_required": "unit_test+native_extraction_fixture"
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs"
     },
     {
       "id": "define.assocaction.addDependency",
@@ -11957,7 +12061,7 @@
       "id": "define.assocarray.create",
       "operation": "define.assocarray.create",
       "family": "constraints_associativity",
-      "status": "catalogued",
+      "status": "blocked",
       "engine_tier": "objectdbx_capable",
       "engines": [
         "objectdbx_capable"
@@ -12000,34 +12104,40 @@
       },
       "policy": {
         "source": "config/policy.v2.json",
-        "status_policy": "catalogued_not_runnable",
+        "status_policy": "blocked_not_runnable",
         "default_write_mode": "write_copy",
         "allowed_write_modes": [
           "write_copy"
         ],
         "no_original_write_default": true,
-        "runtime_behavior": "not_runnable_until_promoted_to_implemented_or_wired"
+        "runtime_behavior": "blocked_after_wave3_reaudit",
+        "agent_exposed": false,
+        "risk_class": "unsafe_solver_or_modeler"
       },
       "tests": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
-        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata"
+        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
+        "tests/unit/test_wave3_pane5_assoc_reaudit.py"
       ],
       "summary": "The associative-array factory. Wraps source entities into a single array entity (an anonymous BTR)",
       "source_slice": "constraints-associativity.md",
       "citation": "AcDbAssocArrayActionBody.h:288",
       "evidence_refs": [
-        "config/autocad_native_arx_operation_catalog.json#define.assocarray.create"
+        "config/autocad_native_arx_operation_catalog.json#define.assocarray.create",
+        "reports/WAVE3_PANE5_ASSOCIATIVITY_REAUDIT.md#define.assocarray.create",
+        "tests/unit/test_wave3_pane5_assoc_reaudit.py"
       ],
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "Wave3 Pane5 re-audit: not left catalogued. Closed as blocked because the exact operation requires unsafe solver/modeler/full-database repair or xref synchronization execution. Safe read-only alternatives remain separate implemented operations where available.",
       "owner_ticket": "M08K-T03",
-      "implementation_strategy": "objectdbx_hostless",
-      "evidence_required": "unit_test+staged_diff_fixture_original_unchanged"
+      "implementation_strategy": "hard_blocked",
+      "evidence_required": "blocker_ref_and_evidence",
+      "blocked_reason": "SAFETY_FORBIDDEN: AcDbAssocArrayActionBody::createInstance performs associative array layout/evaluation. CAD OS currently exposes only read-only identify for arrays; creating layout is not a solver-free operation."
     },
     {
       "id": "define.assocarray.path",
       "operation": "define.assocarray.path",
       "family": "constraints_associativity",
-      "status": "catalogued",
+      "status": "blocked",
       "engine_tier": "objectdbx_capable",
       "engines": [
         "objectdbx_capable"
@@ -12070,34 +12180,40 @@
       },
       "policy": {
         "source": "config/policy.v2.json",
-        "status_policy": "catalogued_not_runnable",
+        "status_policy": "blocked_not_runnable",
         "default_write_mode": "write_copy",
         "allowed_write_modes": [
           "write_copy"
         ],
         "no_original_write_default": true,
-        "runtime_behavior": "not_runnable_until_promoted_to_implemented_or_wired"
+        "runtime_behavior": "blocked_after_wave3_reaudit",
+        "agent_exposed": false,
+        "risk_class": "unsafe_solver_or_modeler"
       },
       "tests": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
-        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata"
+        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
+        "tests/unit/test_wave3_pane5_assoc_reaudit.py"
       ],
       "summary": "Parameter object for a path array along a curve.",
       "source_slice": "constraints-associativity.md",
       "citation": "AcDbAssocArrayPathParameters.h",
       "evidence_refs": [
-        "config/autocad_native_arx_operation_catalog.json#define.assocarray.path"
+        "config/autocad_native_arx_operation_catalog.json#define.assocarray.path",
+        "reports/WAVE3_PANE5_ASSOCIATIVITY_REAUDIT.md#define.assocarray.path",
+        "tests/unit/test_wave3_pane5_assoc_reaudit.py"
       ],
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "Wave3 Pane5 re-audit: not left catalogued. Closed as blocked because the exact operation requires unsafe solver/modeler/full-database repair or xref synchronization execution. Safe read-only alternatives remain separate implemented operations where available.",
       "owner_ticket": "M08K-T03",
-      "implementation_strategy": "objectdbx_hostless",
-      "evidence_required": "unit_test+staged_diff_fixture_original_unchanged"
+      "implementation_strategy": "hard_blocked",
+      "evidence_required": "blocker_ref_and_evidence",
+      "blocked_reason": "SAFETY_FORBIDDEN: path associative array creation relies on AcDbAssocArrayActionBody::createInstance and path layout evaluation."
     },
     {
       "id": "define.assocarray.polar",
       "operation": "define.assocarray.polar",
       "family": "constraints_associativity",
-      "status": "catalogued",
+      "status": "blocked",
       "engine_tier": "objectdbx_capable",
       "engines": [
         "objectdbx_capable"
@@ -12140,34 +12256,40 @@
       },
       "policy": {
         "source": "config/policy.v2.json",
-        "status_policy": "catalogued_not_runnable",
+        "status_policy": "blocked_not_runnable",
         "default_write_mode": "write_copy",
         "allowed_write_modes": [
           "write_copy"
         ],
         "no_original_write_default": true,
-        "runtime_behavior": "not_runnable_until_promoted_to_implemented_or_wired"
+        "runtime_behavior": "blocked_after_wave3_reaudit",
+        "agent_exposed": false,
+        "risk_class": "unsafe_solver_or_modeler"
       },
       "tests": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
-        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata"
+        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
+        "tests/unit/test_wave3_pane5_assoc_reaudit.py"
       ],
       "summary": "Parameter object for a polar array.",
       "source_slice": "constraints-associativity.md",
       "citation": "AcDbAssocArrayPolarParameters.h",
       "evidence_refs": [
-        "config/autocad_native_arx_operation_catalog.json#define.assocarray.polar"
+        "config/autocad_native_arx_operation_catalog.json#define.assocarray.polar",
+        "reports/WAVE3_PANE5_ASSOCIATIVITY_REAUDIT.md#define.assocarray.polar",
+        "tests/unit/test_wave3_pane5_assoc_reaudit.py"
       ],
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "Wave3 Pane5 re-audit: not left catalogued. Closed as blocked because the exact operation requires unsafe solver/modeler/full-database repair or xref synchronization execution. Safe read-only alternatives remain separate implemented operations where available.",
       "owner_ticket": "M08K-T03",
-      "implementation_strategy": "objectdbx_hostless",
-      "evidence_required": "unit_test+staged_diff_fixture_original_unchanged"
+      "implementation_strategy": "hard_blocked",
+      "evidence_required": "blocker_ref_and_evidence",
+      "blocked_reason": "SAFETY_FORBIDDEN: polar associative array creation relies on AcDbAssocArrayActionBody::createInstance and parameter layout evaluation."
     },
     {
       "id": "define.assocarray.rectangular",
       "operation": "define.assocarray.rectangular",
       "family": "constraints_associativity",
-      "status": "catalogued",
+      "status": "blocked",
       "engine_tier": "objectdbx_capable",
       "engines": [
         "objectdbx_capable"
@@ -12210,28 +12332,34 @@
       },
       "policy": {
         "source": "config/policy.v2.json",
-        "status_policy": "catalogued_not_runnable",
+        "status_policy": "blocked_not_runnable",
         "default_write_mode": "write_copy",
         "allowed_write_modes": [
           "write_copy"
         ],
         "no_original_write_default": true,
-        "runtime_behavior": "not_runnable_until_promoted_to_implemented_or_wired"
+        "runtime_behavior": "blocked_after_wave3_reaudit",
+        "agent_exposed": false,
+        "risk_class": "unsafe_solver_or_modeler"
       },
       "tests": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
-        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata"
+        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
+        "tests/unit/test_wave3_pane5_assoc_reaudit.py"
       ],
       "summary": "Parameter object for a rectangular array (cols × rows × levels). Pass to createInstance.",
       "source_slice": "constraints-associativity.md",
       "citation": "AcDbAssocArrayRectangularParameters.h; AcDbAssocArrayCommonParameters.h",
       "evidence_refs": [
-        "config/autocad_native_arx_operation_catalog.json#define.assocarray.rectangular"
+        "config/autocad_native_arx_operation_catalog.json#define.assocarray.rectangular",
+        "reports/WAVE3_PANE5_ASSOCIATIVITY_REAUDIT.md#define.assocarray.rectangular",
+        "tests/unit/test_wave3_pane5_assoc_reaudit.py"
       ],
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "Wave3 Pane5 re-audit: not left catalogued. Closed as blocked because the exact operation requires unsafe solver/modeler/full-database repair or xref synchronization execution. Safe read-only alternatives remain separate implemented operations where available.",
       "owner_ticket": "M08K-T03",
-      "implementation_strategy": "objectdbx_hostless",
-      "evidence_required": "unit_test+staged_diff_fixture_original_unchanged"
+      "implementation_strategy": "hard_blocked",
+      "evidence_required": "blocker_ref_and_evidence",
+      "blocked_reason": "SAFETY_FORBIDDEN: rectangular associative array creation relies on AcDbAssocArrayActionBody::createInstance and parameter layout evaluation."
     },
     {
       "id": "define.assocdependency.attach",
@@ -12462,7 +12590,7 @@
       "id": "define.assocsurface.blend",
       "operation": "define.assocsurface.blend",
       "family": "constraints_associativity",
-      "status": "catalogued",
+      "status": "blocked",
       "engine_tier": "native_arx_only",
       "engines": [
         "native_arx_only"
@@ -12501,34 +12629,40 @@
       },
       "policy": {
         "source": "config/policy.v2.json",
-        "status_policy": "catalogued_not_runnable",
+        "status_policy": "blocked_not_runnable",
         "default_write_mode": "live_edit",
         "allowed_write_modes": [
           "live_edit"
         ],
         "no_original_write_default": true,
-        "runtime_behavior": "not_runnable_until_promoted_to_implemented_or_wired"
+        "runtime_behavior": "blocked_after_wave3_reaudit",
+        "agent_exposed": false,
+        "risk_class": "unsafe_solver_or_modeler"
       },
       "tests": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
-        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata"
+        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
+        "tests/unit/test_wave3_pane5_assoc_reaudit.py"
       ],
       "summary": "Associative blend surface between two profiles.",
       "source_slice": "constraints-associativity.md",
       "citation": "AcDbAssocBlendSurfaceActionBody.h",
       "evidence_refs": [
-        "config/autocad_native_arx_operation_catalog.json#define.assocsurface.blend"
+        "config/autocad_native_arx_operation_catalog.json#define.assocsurface.blend",
+        "reports/WAVE3_PANE5_ASSOCIATIVITY_REAUDIT.md#define.assocsurface.blend",
+        "tests/unit/test_wave3_pane5_assoc_reaudit.py"
       ],
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "Wave3 Pane5 re-audit: not left catalogued. Closed as blocked because the exact operation requires unsafe solver/modeler/full-database repair or xref synchronization execution. Safe read-only alternatives remain separate implemented operations where available.",
       "owner_ticket": "M08K-T03",
-      "implementation_strategy": "native_arx_cpp",
-      "evidence_required": "attended_live_pump_session_log"
+      "implementation_strategy": "hard_blocked",
+      "evidence_required": "blocker_ref_and_evidence",
+      "blocked_reason": "SAFETY_FORBIDDEN: AcDbAssocBlendSurfaceActionBody::createInstance enters ASM associative surface creation/modeler evaluation. CAD OS has no bounded, solver-free staged handler for this modeler action."
     },
     {
       "id": "define.assocsurface.extrude",
       "operation": "define.assocsurface.extrude",
       "family": "constraints_associativity",
-      "status": "catalogued",
+      "status": "blocked",
       "engine_tier": "native_arx_only",
       "engines": [
         "native_arx_only"
@@ -12567,34 +12701,40 @@
       },
       "policy": {
         "source": "config/policy.v2.json",
-        "status_policy": "catalogued_not_runnable",
+        "status_policy": "blocked_not_runnable",
         "default_write_mode": "live_edit",
         "allowed_write_modes": [
           "live_edit"
         ],
         "no_original_write_default": true,
-        "runtime_behavior": "not_runnable_until_promoted_to_implemented_or_wired"
+        "runtime_behavior": "blocked_after_wave3_reaudit",
+        "agent_exposed": false,
+        "risk_class": "unsafe_solver_or_modeler"
       },
       "tests": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
-        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata"
+        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
+        "tests/unit/test_wave3_pane5_assoc_reaudit.py"
       ],
       "summary": "Associative extruded surface from a profile + direction.",
       "source_slice": "constraints-associativity.md",
       "citation": "AcDbAssocExtrudedSurfaceActionBody.h",
       "evidence_refs": [
-        "config/autocad_native_arx_operation_catalog.json#define.assocsurface.extrude"
+        "config/autocad_native_arx_operation_catalog.json#define.assocsurface.extrude",
+        "reports/WAVE3_PANE5_ASSOCIATIVITY_REAUDIT.md#define.assocsurface.extrude",
+        "tests/unit/test_wave3_pane5_assoc_reaudit.py"
       ],
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "Wave3 Pane5 re-audit: not left catalogued. Closed as blocked because the exact operation requires unsafe solver/modeler/full-database repair or xref synchronization execution. Safe read-only alternatives remain separate implemented operations where available.",
       "owner_ticket": "M08K-T03",
-      "implementation_strategy": "native_arx_cpp",
-      "evidence_required": "attended_live_pump_session_log"
+      "implementation_strategy": "hard_blocked",
+      "evidence_required": "blocker_ref_and_evidence",
+      "blocked_reason": "SAFETY_FORBIDDEN: AcDbAssocExtrudedSurfaceActionBody::createInstance enters ASM associative surface creation/modeler evaluation. CAD OS has no bounded, solver-free staged handler for this modeler action."
     },
     {
       "id": "define.assocsurface.fillet",
       "operation": "define.assocsurface.fillet",
       "family": "constraints_associativity",
-      "status": "catalogued",
+      "status": "blocked",
       "engine_tier": "native_arx_only",
       "engines": [
         "native_arx_only"
@@ -12633,34 +12773,40 @@
       },
       "policy": {
         "source": "config/policy.v2.json",
-        "status_policy": "catalogued_not_runnable",
+        "status_policy": "blocked_not_runnable",
         "default_write_mode": "live_edit",
         "allowed_write_modes": [
           "live_edit"
         ],
         "no_original_write_default": true,
-        "runtime_behavior": "not_runnable_until_promoted_to_implemented_or_wired"
+        "runtime_behavior": "blocked_after_wave3_reaudit",
+        "agent_exposed": false,
+        "risk_class": "unsafe_solver_or_modeler"
       },
       "tests": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
-        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata"
+        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
+        "tests/unit/test_wave3_pane5_assoc_reaudit.py"
       ],
       "summary": "Associative fillet surface between two surfaces.",
       "source_slice": "constraints-associativity.md",
       "citation": "AcDbAssocFilletSurfaceActionBody.h",
       "evidence_refs": [
-        "config/autocad_native_arx_operation_catalog.json#define.assocsurface.fillet"
+        "config/autocad_native_arx_operation_catalog.json#define.assocsurface.fillet",
+        "reports/WAVE3_PANE5_ASSOCIATIVITY_REAUDIT.md#define.assocsurface.fillet",
+        "tests/unit/test_wave3_pane5_assoc_reaudit.py"
       ],
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "Wave3 Pane5 re-audit: not left catalogued. Closed as blocked because the exact operation requires unsafe solver/modeler/full-database repair or xref synchronization execution. Safe read-only alternatives remain separate implemented operations where available.",
       "owner_ticket": "M08K-T03",
-      "implementation_strategy": "native_arx_cpp",
-      "evidence_required": "attended_live_pump_session_log"
+      "implementation_strategy": "hard_blocked",
+      "evidence_required": "blocker_ref_and_evidence",
+      "blocked_reason": "SAFETY_FORBIDDEN: AcDbAssocFilletSurfaceActionBody::createInstance enters ASM associative surface creation/modeler evaluation. CAD OS has no bounded, solver-free staged handler for this modeler action."
     },
     {
       "id": "define.assocsurface.loft",
       "operation": "define.assocsurface.loft",
       "family": "constraints_associativity",
-      "status": "catalogued",
+      "status": "blocked",
       "engine_tier": "native_arx_only",
       "engines": [
         "native_arx_only"
@@ -12699,34 +12845,40 @@
       },
       "policy": {
         "source": "config/policy.v2.json",
-        "status_policy": "catalogued_not_runnable",
+        "status_policy": "blocked_not_runnable",
         "default_write_mode": "live_edit",
         "allowed_write_modes": [
           "live_edit"
         ],
         "no_original_write_default": true,
-        "runtime_behavior": "not_runnable_until_promoted_to_implemented_or_wired"
+        "runtime_behavior": "blocked_after_wave3_reaudit",
+        "agent_exposed": false,
+        "risk_class": "unsafe_solver_or_modeler"
       },
       "tests": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
-        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata"
+        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
+        "tests/unit/test_wave3_pane5_assoc_reaudit.py"
       ],
       "summary": "Associative lofted surface through cross-sections (+ guides/path). Shows geom-refs feeding a surface op.",
       "source_slice": "constraints-associativity.md",
       "citation": "AcDbAssocLoftedSurfaceActionBody.h",
       "evidence_refs": [
-        "config/autocad_native_arx_operation_catalog.json#define.assocsurface.loft"
+        "config/autocad_native_arx_operation_catalog.json#define.assocsurface.loft",
+        "reports/WAVE3_PANE5_ASSOCIATIVITY_REAUDIT.md#define.assocsurface.loft",
+        "tests/unit/test_wave3_pane5_assoc_reaudit.py"
       ],
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "Wave3 Pane5 re-audit: not left catalogued. Closed as blocked because the exact operation requires unsafe solver/modeler/full-database repair or xref synchronization execution. Safe read-only alternatives remain separate implemented operations where available.",
       "owner_ticket": "M08K-T03",
-      "implementation_strategy": "native_arx_cpp",
-      "evidence_required": "attended_live_pump_session_log"
+      "implementation_strategy": "hard_blocked",
+      "evidence_required": "blocker_ref_and_evidence",
+      "blocked_reason": "SAFETY_FORBIDDEN: AcDbAssocLoftedSurfaceActionBody::createInstance enters ASM associative surface creation/modeler evaluation. CAD OS has no bounded, solver-free staged handler for this modeler action."
     },
     {
       "id": "define.assocsurface.offset",
       "operation": "define.assocsurface.offset",
       "family": "constraints_associativity",
-      "status": "catalogued",
+      "status": "blocked",
       "engine_tier": "native_arx_only",
       "engines": [
         "native_arx_only"
@@ -12765,34 +12917,40 @@
       },
       "policy": {
         "source": "config/policy.v2.json",
-        "status_policy": "catalogued_not_runnable",
+        "status_policy": "blocked_not_runnable",
         "default_write_mode": "live_edit",
         "allowed_write_modes": [
           "live_edit"
         ],
         "no_original_write_default": true,
-        "runtime_behavior": "not_runnable_until_promoted_to_implemented_or_wired"
+        "runtime_behavior": "blocked_after_wave3_reaudit",
+        "agent_exposed": false,
+        "risk_class": "unsafe_solver_or_modeler"
       },
       "tests": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
-        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata"
+        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
+        "tests/unit/test_wave3_pane5_assoc_reaudit.py"
       ],
       "summary": "Create an associative offset surface (result follows input surface + offset distance). Canonical surface-factory",
       "source_slice": "constraints-associativity.md",
       "citation": "AcDbAssocOffsetSurfaceActionBody.h:72",
       "evidence_refs": [
-        "config/autocad_native_arx_operation_catalog.json#define.assocsurface.offset"
+        "config/autocad_native_arx_operation_catalog.json#define.assocsurface.offset",
+        "reports/WAVE3_PANE5_ASSOCIATIVITY_REAUDIT.md#define.assocsurface.offset",
+        "tests/unit/test_wave3_pane5_assoc_reaudit.py"
       ],
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "Wave3 Pane5 re-audit: not left catalogued. Closed as blocked because the exact operation requires unsafe solver/modeler/full-database repair or xref synchronization execution. Safe read-only alternatives remain separate implemented operations where available.",
       "owner_ticket": "M08K-T03",
-      "implementation_strategy": "native_arx_cpp",
-      "evidence_required": "attended_live_pump_session_log"
+      "implementation_strategy": "hard_blocked",
+      "evidence_required": "blocker_ref_and_evidence",
+      "blocked_reason": "SAFETY_FORBIDDEN: AcDbAssocOffsetSurfaceActionBody::createInstance enters ASM associative surface creation/modeler evaluation. CAD OS has no bounded, solver-free staged handler for this modeler action."
     },
     {
       "id": "define.assocsurface.patch",
       "operation": "define.assocsurface.patch",
       "family": "constraints_associativity",
-      "status": "catalogued",
+      "status": "blocked",
       "engine_tier": "native_arx_only",
       "engines": [
         "native_arx_only"
@@ -12831,34 +12989,40 @@
       },
       "policy": {
         "source": "config/policy.v2.json",
-        "status_policy": "catalogued_not_runnable",
+        "status_policy": "blocked_not_runnable",
         "default_write_mode": "live_edit",
         "allowed_write_modes": [
           "live_edit"
         ],
         "no_original_write_default": true,
-        "runtime_behavior": "not_runnable_until_promoted_to_implemented_or_wired"
+        "runtime_behavior": "blocked_after_wave3_reaudit",
+        "agent_exposed": false,
+        "risk_class": "unsafe_solver_or_modeler"
       },
       "tests": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
-        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata"
+        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
+        "tests/unit/test_wave3_pane5_assoc_reaudit.py"
       ],
       "summary": "Associative patch surface bounded by edges, with constraint curves/points.",
       "source_slice": "constraints-associativity.md",
       "citation": "AcDbAssocPatchSurfaceActionBody.h",
       "evidence_refs": [
-        "config/autocad_native_arx_operation_catalog.json#define.assocsurface.patch"
+        "config/autocad_native_arx_operation_catalog.json#define.assocsurface.patch",
+        "reports/WAVE3_PANE5_ASSOCIATIVITY_REAUDIT.md#define.assocsurface.patch",
+        "tests/unit/test_wave3_pane5_assoc_reaudit.py"
       ],
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "Wave3 Pane5 re-audit: not left catalogued. Closed as blocked because the exact operation requires unsafe solver/modeler/full-database repair or xref synchronization execution. Safe read-only alternatives remain separate implemented operations where available.",
       "owner_ticket": "M08K-T03",
-      "implementation_strategy": "native_arx_cpp",
-      "evidence_required": "attended_live_pump_session_log"
+      "implementation_strategy": "hard_blocked",
+      "evidence_required": "blocker_ref_and_evidence",
+      "blocked_reason": "SAFETY_FORBIDDEN: AcDbAssocPatchSurfaceActionBody::createInstance enters ASM associative surface creation/modeler evaluation. CAD OS has no bounded, solver-free staged handler for this modeler action."
     },
     {
       "id": "define.assocsurface.result",
       "operation": "define.assocsurface.result",
       "family": "constraints_associativity",
-      "status": "catalogued",
+      "status": "blocked",
       "engine_tier": "native_arx_only",
       "engines": [
         "native_arx_only"
@@ -12897,34 +13061,40 @@
       },
       "policy": {
         "source": "config/policy.v2.json",
-        "status_policy": "catalogued_not_runnable",
+        "status_policy": "blocked_not_runnable",
         "default_write_mode": "live_edit",
         "allowed_write_modes": [
           "live_edit"
         ],
         "no_original_write_default": true,
-        "runtime_behavior": "not_runnable_until_promoted_to_implemented_or_wired"
+        "runtime_behavior": "blocked_after_wave3_reaudit",
+        "agent_exposed": false,
+        "risk_class": "unsafe_solver_or_modeler"
       },
       "tests": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
-        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata"
+        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
+        "tests/unit/test_wave3_pane5_assoc_reaudit.py"
       ],
       "summary": "Base class for all associative surfaces — wires the action's output AcDbSurface. Subclassed by",
       "source_slice": "constraints-associativity.md",
       "citation": "AcDbAssocSurfaceActionBody.h:44,51,66,86",
       "evidence_refs": [
-        "config/autocad_native_arx_operation_catalog.json#define.assocsurface.result"
+        "config/autocad_native_arx_operation_catalog.json#define.assocsurface.result",
+        "reports/WAVE3_PANE5_ASSOCIATIVITY_REAUDIT.md#define.assocsurface.result",
+        "tests/unit/test_wave3_pane5_assoc_reaudit.py"
       ],
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "Wave3 Pane5 re-audit: not left catalogued. Closed as blocked because the exact operation requires unsafe solver/modeler/full-database repair or xref synchronization execution. Safe read-only alternatives remain separate implemented operations where available.",
       "owner_ticket": "M08K-T03",
-      "implementation_strategy": "native_arx_cpp",
-      "evidence_required": "attended_live_pump_session_log"
+      "implementation_strategy": "hard_blocked",
+      "evidence_required": "blocker_ref_and_evidence",
+      "blocked_reason": "SAFETY_FORBIDDEN: associative surface result extraction depends on a prior ASM/evaluator-created action body result. CAD OS has no solver-free implementation that can honestly produce the result for arbitrary drawings."
     },
     {
       "id": "define.assocsurface.trim",
       "operation": "define.assocsurface.trim",
       "family": "constraints_associativity",
-      "status": "catalogued",
+      "status": "blocked",
       "engine_tier": "native_arx_only",
       "engines": [
         "native_arx_only"
@@ -12963,28 +13133,34 @@
       },
       "policy": {
         "source": "config/policy.v2.json",
-        "status_policy": "catalogued_not_runnable",
+        "status_policy": "blocked_not_runnable",
         "default_write_mode": "live_edit",
         "allowed_write_modes": [
           "live_edit"
         ],
         "no_original_write_default": true,
-        "runtime_behavior": "not_runnable_until_promoted_to_implemented_or_wired"
+        "runtime_behavior": "blocked_after_wave3_reaudit",
+        "agent_exposed": false,
+        "risk_class": "unsafe_solver_or_modeler"
       },
       "tests": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
-        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata"
+        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
+        "tests/unit/test_wave3_pane5_assoc_reaudit.py"
       ],
       "summary": "Associative trimmed surface.",
       "source_slice": "constraints-associativity.md",
       "citation": "AcDbAssocTrimSurfaceActionBody.h",
       "evidence_refs": [
-        "config/autocad_native_arx_operation_catalog.json#define.assocsurface.trim"
+        "config/autocad_native_arx_operation_catalog.json#define.assocsurface.trim",
+        "reports/WAVE3_PANE5_ASSOCIATIVITY_REAUDIT.md#define.assocsurface.trim",
+        "tests/unit/test_wave3_pane5_assoc_reaudit.py"
       ],
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "Wave3 Pane5 re-audit: not left catalogued. Closed as blocked because the exact operation requires unsafe solver/modeler/full-database repair or xref synchronization execution. Safe read-only alternatives remain separate implemented operations where available.",
       "owner_ticket": "M08K-T03",
-      "implementation_strategy": "native_arx_cpp",
-      "evidence_required": "attended_live_pump_session_log"
+      "implementation_strategy": "hard_blocked",
+      "evidence_required": "blocker_ref_and_evidence",
+      "blocked_reason": "SAFETY_FORBIDDEN: AcDbAssocTrimSurfaceActionBody::createInstance enters ASM associative surface creation/modeler evaluation. CAD OS has no bounded, solver-free staged handler for this modeler action."
     },
     {
       "id": "define.assocvaluedependency.value",
@@ -13957,7 +14133,7 @@
       "id": "edit.assocarray.explode",
       "operation": "edit.assocarray.explode",
       "family": "constraints_associativity",
-      "status": "catalogued",
+      "status": "blocked",
       "engine_tier": "native_arx_only",
       "engines": [
         "native_arx_only"
@@ -13996,34 +14172,40 @@
       },
       "policy": {
         "source": "config/policy.v2.json",
-        "status_policy": "catalogued_not_runnable",
+        "status_policy": "blocked_not_runnable",
         "default_write_mode": "live_edit",
         "allowed_write_modes": [
           "live_edit"
         ],
         "no_original_write_default": true,
-        "runtime_behavior": "not_runnable_until_promoted_to_implemented_or_wired"
+        "runtime_behavior": "blocked_after_wave3_reaudit",
+        "agent_exposed": false,
+        "risk_class": "unsafe_solver_or_modeler"
       },
       "tests": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
-        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata"
+        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
+        "tests/unit/test_wave3_pane5_assoc_reaudit.py"
       ],
       "summary": "Burst the array into independent entities (removes associativity).",
       "source_slice": "constraints-associativity.md",
       "citation": "AcDbAssocArrayActionBody.h:239",
       "evidence_refs": [
-        "config/autocad_native_arx_operation_catalog.json#edit.assocarray.explode"
+        "config/autocad_native_arx_operation_catalog.json#edit.assocarray.explode",
+        "reports/WAVE3_PANE5_ASSOCIATIVITY_REAUDIT.md#edit.assocarray.explode",
+        "tests/unit/test_wave3_pane5_assoc_reaudit.py"
       ],
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "Wave3 Pane5 re-audit: not left catalogued. Closed as blocked because the exact operation requires unsafe solver/modeler/full-database repair or xref synchronization execution. Safe read-only alternatives remain separate implemented operations where available.",
       "owner_ticket": "M08K-T03",
-      "implementation_strategy": "native_arx_cpp",
-      "evidence_required": "attended_live_pump_session_log"
+      "implementation_strategy": "hard_blocked",
+      "evidence_required": "blocker_ref_and_evidence",
+      "blocked_reason": "SAFETY_FORBIDDEN: associative array explode mutates the staged database through array action body expansion and is not exposed as a bounded CAD OS operation."
     },
     {
       "id": "edit.assocarray.item",
       "operation": "edit.assocarray.item",
       "family": "constraints_associativity",
-      "status": "catalogued",
+      "status": "blocked",
       "engine_tier": "objectdbx_capable",
       "engines": [
         "objectdbx_capable"
@@ -14066,34 +14248,40 @@
       },
       "policy": {
         "source": "config/policy.v2.json",
-        "status_policy": "catalogued_not_runnable",
+        "status_policy": "blocked_not_runnable",
         "default_write_mode": "write_copy",
         "allowed_write_modes": [
           "write_copy"
         ],
         "no_original_write_default": true,
-        "runtime_behavior": "not_runnable_until_promoted_to_implemented_or_wired"
+        "runtime_behavior": "blocked_after_wave3_reaudit",
+        "agent_exposed": false,
+        "risk_class": "unsafe_solver_or_modeler"
       },
       "tests": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
-        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata"
+        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
+        "tests/unit/test_wave3_pane5_assoc_reaudit.py"
       ],
       "summary": "Override a single array item: move/transform, delete, or read it (items addressed by AcDbItemLocator",
       "source_slice": "constraints-associativity.md",
       "citation": "AcDbAssocArrayActionBody.h:82,71,100,89",
       "evidence_refs": [
-        "config/autocad_native_arx_operation_catalog.json#edit.assocarray.item"
+        "config/autocad_native_arx_operation_catalog.json#edit.assocarray.item",
+        "reports/WAVE3_PANE5_ASSOCIATIVITY_REAUDIT.md#edit.assocarray.item",
+        "tests/unit/test_wave3_pane5_assoc_reaudit.py"
       ],
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "Wave3 Pane5 re-audit: not left catalogued. Closed as blocked because the exact operation requires unsafe solver/modeler/full-database repair or xref synchronization execution. Safe read-only alternatives remain separate implemented operations where available.",
       "owner_ticket": "M08K-T03",
-      "implementation_strategy": "objectdbx_hostless",
-      "evidence_required": "unit_test+staged_diff_fixture_original_unchanged"
+      "implementation_strategy": "hard_blocked",
+      "evidence_required": "blocker_ref_and_evidence",
+      "blocked_reason": "SAFETY_FORBIDDEN: associative array item edits require item locator/layout evaluation and can trigger array body recomputation; no bounded solver-free agent handler exists."
     },
     {
       "id": "edit.assocarray.itemReplace",
       "operation": "edit.assocarray.itemReplace",
       "family": "constraints_associativity",
-      "status": "catalogued",
+      "status": "blocked",
       "engine_tier": "objectdbx_capable",
       "engines": [
         "objectdbx_capable"
@@ -14136,34 +14324,40 @@
       },
       "policy": {
         "source": "config/policy.v2.json",
-        "status_policy": "catalogued_not_runnable",
+        "status_policy": "blocked_not_runnable",
         "default_write_mode": "write_copy",
         "allowed_write_modes": [
           "write_copy"
         ],
         "no_original_write_default": true,
-        "runtime_behavior": "not_runnable_until_promoted_to_implemented_or_wired"
+        "runtime_behavior": "blocked_after_wave3_reaudit",
+        "agent_exposed": false,
+        "risk_class": "unsafe_solver_or_modeler"
       },
       "tests": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
-        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata"
+        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
+        "tests/unit/test_wave3_pane5_assoc_reaudit.py"
       ],
       "summary": "Replace selected array items with substitute entities (the ARRAYEDIT→Replace flow); track which items are",
       "source_slice": "constraints-associativity.md",
       "citation": "AcDbAssocArrayModifyActionBody.h:83,52,59",
       "evidence_refs": [
-        "config/autocad_native_arx_operation_catalog.json#edit.assocarray.itemReplace"
+        "config/autocad_native_arx_operation_catalog.json#edit.assocarray.itemReplace",
+        "reports/WAVE3_PANE5_ASSOCIATIVITY_REAUDIT.md#edit.assocarray.itemReplace",
+        "tests/unit/test_wave3_pane5_assoc_reaudit.py"
       ],
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "Wave3 Pane5 re-audit: not left catalogued. Closed as blocked because the exact operation requires unsafe solver/modeler/full-database repair or xref synchronization execution. Safe read-only alternatives remain separate implemented operations where available.",
       "owner_ticket": "M08K-T03",
-      "implementation_strategy": "objectdbx_hostless",
-      "evidence_required": "unit_test+staged_diff_fixture_original_unchanged"
+      "implementation_strategy": "hard_blocked",
+      "evidence_required": "blocker_ref_and_evidence",
+      "blocked_reason": "SAFETY_FORBIDDEN: associative array item replacement requires source-item substitution and array body recomputation; no bounded solver-free agent handler exists."
     },
     {
       "id": "edit.assocarray.reset",
       "operation": "edit.assocarray.reset",
       "family": "constraints_associativity",
-      "status": "catalogued",
+      "status": "blocked",
       "engine_tier": "objectdbx_capable",
       "engines": [
         "objectdbx_capable"
@@ -14206,34 +14400,40 @@
       },
       "policy": {
         "source": "config/policy.v2.json",
-        "status_policy": "catalogued_not_runnable",
+        "status_policy": "blocked_not_runnable",
         "default_write_mode": "write_copy",
         "allowed_write_modes": [
           "write_copy"
         ],
         "no_original_write_default": true,
-        "runtime_behavior": "not_runnable_until_promoted_to_implemented_or_wired"
+        "runtime_behavior": "blocked_after_wave3_reaudit",
+        "agent_exposed": false,
+        "risk_class": "unsafe_solver_or_modeler"
       },
       "tests": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
-        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata"
+        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
+        "tests/unit/test_wave3_pane5_assoc_reaudit.py"
       ],
       "summary": "Reset item overrides back to the array rule.",
       "source_slice": "constraints-associativity.md",
       "citation": "AcDbAssocArrayActionBody.h:254",
       "evidence_refs": [
-        "config/autocad_native_arx_operation_catalog.json#edit.assocarray.reset"
+        "config/autocad_native_arx_operation_catalog.json#edit.assocarray.reset",
+        "reports/WAVE3_PANE5_ASSOCIATIVITY_REAUDIT.md#edit.assocarray.reset",
+        "tests/unit/test_wave3_pane5_assoc_reaudit.py"
       ],
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "Wave3 Pane5 re-audit: not left catalogued. Closed as blocked because the exact operation requires unsafe solver/modeler/full-database repair or xref synchronization execution. Safe read-only alternatives remain separate implemented operations where available.",
       "owner_ticket": "M08K-T03",
-      "implementation_strategy": "objectdbx_hostless",
-      "evidence_required": "unit_test+staged_diff_fixture_original_unchanged"
+      "implementation_strategy": "hard_blocked",
+      "evidence_required": "blocker_ref_and_evidence",
+      "blocked_reason": "SAFETY_FORBIDDEN: resetArrayItems performs array re-layout/evaluation and is intentionally not exposed to agents."
     },
     {
       "id": "edit.assocarray.source",
       "operation": "edit.assocarray.source",
       "family": "constraints_associativity",
-      "status": "catalogued",
+      "status": "blocked",
       "engine_tier": "objectdbx_capable",
       "engines": [
         "objectdbx_capable"
@@ -14276,34 +14476,40 @@
       },
       "policy": {
         "source": "config/policy.v2.json",
-        "status_policy": "catalogued_not_runnable",
+        "status_policy": "blocked_not_runnable",
         "default_write_mode": "write_copy",
         "allowed_write_modes": [
           "write_copy"
         ],
         "no_original_write_default": true,
-        "runtime_behavior": "not_runnable_until_promoted_to_implemented_or_wired"
+        "runtime_behavior": "blocked_after_wave3_reaudit",
+        "agent_exposed": false,
+        "risk_class": "unsafe_solver_or_modeler"
       },
       "tests": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
-        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata"
+        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
+        "tests/unit/test_wave3_pane5_assoc_reaudit.py"
       ],
       "summary": "Edit the source-entity set / base point that the array replicates.",
       "source_slice": "constraints-associativity.md",
       "citation": "AcDbAssocArrayActionBody.h:173,181,161,196,296",
       "evidence_refs": [
-        "config/autocad_native_arx_operation_catalog.json#edit.assocarray.source"
+        "config/autocad_native_arx_operation_catalog.json#edit.assocarray.source",
+        "reports/WAVE3_PANE5_ASSOCIATIVITY_REAUDIT.md#edit.assocarray.source",
+        "tests/unit/test_wave3_pane5_assoc_reaudit.py"
       ],
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "Wave3 Pane5 re-audit: not left catalogued. Closed as blocked because the exact operation requires unsafe solver/modeler/full-database repair or xref synchronization execution. Safe read-only alternatives remain separate implemented operations where available.",
       "owner_ticket": "M08K-T03",
-      "implementation_strategy": "objectdbx_hostless",
-      "evidence_required": "unit_test+staged_diff_fixture_original_unchanged"
+      "implementation_strategy": "hard_blocked",
+      "evidence_required": "blocker_ref_and_evidence",
+      "blocked_reason": "SAFETY_FORBIDDEN: source entity edits on associative arrays require action body recomputation and can mutate layout through the evaluator."
     },
     {
       "id": "edit.assocarray.transform",
       "operation": "edit.assocarray.transform",
       "family": "constraints_associativity",
-      "status": "catalogued",
+      "status": "blocked",
       "engine_tier": "objectdbx_capable",
       "engines": [
         "objectdbx_capable"
@@ -14346,34 +14552,40 @@
       },
       "policy": {
         "source": "config/policy.v2.json",
-        "status_policy": "catalogued_not_runnable",
+        "status_policy": "blocked_not_runnable",
         "default_write_mode": "write_copy",
         "allowed_write_modes": [
           "write_copy"
         ],
         "no_original_write_default": true,
-        "runtime_behavior": "not_runnable_until_promoted_to_implemented_or_wired"
+        "runtime_behavior": "blocked_after_wave3_reaudit",
+        "agent_exposed": false,
+        "risk_class": "unsafe_solver_or_modeler"
       },
       "tests": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
-        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata"
+        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
+        "tests/unit/test_wave3_pane5_assoc_reaudit.py"
       ],
       "summary": "Transform the whole array as a unit.",
       "source_slice": "constraints-associativity.md",
       "citation": "AcDbAssocArrayActionBody.h:148,154",
       "evidence_refs": [
-        "config/autocad_native_arx_operation_catalog.json#edit.assocarray.transform"
+        "config/autocad_native_arx_operation_catalog.json#edit.assocarray.transform",
+        "reports/WAVE3_PANE5_ASSOCIATIVITY_REAUDIT.md#edit.assocarray.transform",
+        "tests/unit/test_wave3_pane5_assoc_reaudit.py"
       ],
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "Wave3 Pane5 re-audit: not left catalogued. Closed as blocked because the exact operation requires unsafe solver/modeler/full-database repair or xref synchronization execution. Safe read-only alternatives remain separate implemented operations where available.",
       "owner_ticket": "M08K-T03",
-      "implementation_strategy": "objectdbx_hostless",
-      "evidence_required": "unit_test+staged_diff_fixture_original_unchanged"
+      "implementation_strategy": "hard_blocked",
+      "evidence_required": "blocker_ref_and_evidence",
+      "blocked_reason": "SAFETY_FORBIDDEN: transformBy on associative array action bodies can trigger layout/evaluator semantics; no bounded solver-free agent handler exists."
     },
     {
       "id": "edit.assocdata.xref",
       "operation": "edit.assocdata.xref",
       "family": "constraints_associativity",
-      "status": "catalogued",
+      "status": "blocked",
       "engine_tier": "native_arx_only",
       "engines": [
         "native_arx_only"
@@ -14412,28 +14624,34 @@
       },
       "policy": {
         "source": "config/policy.v2.json",
-        "status_policy": "catalogued_not_runnable",
+        "status_policy": "blocked_not_runnable",
         "default_write_mode": "live_edit",
         "allowed_write_modes": [
           "live_edit"
         ],
         "no_original_write_default": true,
-        "runtime_behavior": "not_runnable_until_promoted_to_implemented_or_wired"
+        "runtime_behavior": "blocked_after_wave3_reaudit",
+        "agent_exposed": false,
+        "risk_class": "unsafe_solver_or_modeler"
       },
       "tests": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
-        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata"
+        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
+        "tests/unit/test_wave3_pane5_assoc_reaudit.py"
       ],
       "summary": "Mark / sync associativity that depends on xref geometry.",
       "source_slice": "constraints-associativity.md",
       "citation": "AcDbAssocManager.h:241, 262",
       "evidence_refs": [
-        "config/autocad_native_arx_operation_catalog.json#edit.assocdata.xref"
+        "config/autocad_native_arx_operation_catalog.json#edit.assocdata.xref",
+        "reports/WAVE3_PANE5_ASSOCIATIVITY_REAUDIT.md#edit.assocdata.xref",
+        "tests/unit/test_wave3_pane5_assoc_reaudit.py"
       ],
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "Wave3 Pane5 re-audit: not left catalogued. Closed as blocked because the exact operation requires unsafe solver/modeler/full-database repair or xref synchronization execution. Safe read-only alternatives remain separate implemented operations where available.",
       "owner_ticket": "M08K-T03",
-      "implementation_strategy": "native_arx_cpp",
-      "evidence_required": "attended_live_pump_session_log"
+      "implementation_strategy": "hard_blocked",
+      "evidence_required": "blocker_ref_and_evidence",
+      "blocked_reason": "SAFETY_FORBIDDEN: AcDbAssocManager::syncUpWithXrefs/markSyncUpWithXrefsNeeded crosses drawing references and can schedule/evaluate associative xref synchronization outside a bounded staged-copy contract."
     },
     {
       "id": "edit.assocnetwork.removeAction",
@@ -14664,7 +14882,7 @@
       "id": "inspect.assocaction.evaluate",
       "operation": "inspect.assocaction.evaluate",
       "family": "constraints_associativity",
-      "status": "catalogued",
+      "status": "blocked",
       "engine_tier": "native_arx_only",
       "engines": [
         "native_arx_only"
@@ -14703,28 +14921,34 @@
       },
       "policy": {
         "source": "config/policy.v2.json",
-        "status_policy": "catalogued_not_runnable",
+        "status_policy": "blocked_not_runnable",
         "default_write_mode": "live_edit",
         "allowed_write_modes": [
           "live_edit"
         ],
         "no_original_write_default": true,
-        "runtime_behavior": "not_runnable_until_promoted_to_implemented_or_wired"
+        "runtime_behavior": "blocked_after_wave3_reaudit",
+        "agent_exposed": false,
+        "risk_class": "unsafe_solver_or_modeler"
       },
       "tests": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
-        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata"
+        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
+        "tests/unit/test_wave3_pane5_assoc_reaudit.py"
       ],
       "summary": "Evaluate a single action; read/set its AcDbAssocStatus.",
       "source_slice": "constraints-associativity.md",
       "citation": "AcDbAssocAction.h:809,629,187,222",
       "evidence_refs": [
-        "config/autocad_native_arx_operation_catalog.json#inspect.assocaction.evaluate"
+        "config/autocad_native_arx_operation_catalog.json#inspect.assocaction.evaluate",
+        "reports/WAVE3_PANE5_ASSOCIATIVITY_REAUDIT.md#inspect.assocaction.evaluate",
+        "tests/unit/test_wave3_pane5_assoc_reaudit.py"
       ],
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "Wave3 Pane5 re-audit: not left catalogued. Closed as blocked because the exact operation requires unsafe solver/modeler/full-database repair or xref synchronization execution. Safe read-only alternatives remain separate implemented operations where available.",
       "owner_ticket": "M08K-T03",
-      "implementation_strategy": "native_arx_cpp",
-      "evidence_required": "attended_live_pump_session_log"
+      "implementation_strategy": "hard_blocked",
+      "evidence_required": "blocker_ref_and_evidence",
+      "blocked_reason": "SAFETY_FORBIDDEN: AcDbAssocAction::evaluate is the native associative solver entry. Exposing it as an agent operation would run arbitrary evaluation callbacks and mutate the staged database outside CAD OS bounded semantics."
     },
     {
       "id": "inspect.assocaction.requestToEvaluate",
@@ -14955,7 +15179,7 @@
       "id": "inspect.assocnetwork.evaluate",
       "operation": "inspect.assocnetwork.evaluate",
       "family": "constraints_associativity",
-      "status": "catalogued",
+      "status": "blocked",
       "engine_tier": "native_arx_only",
       "engines": [
         "native_arx_only"
@@ -14994,28 +15218,34 @@
       },
       "policy": {
         "source": "config/policy.v2.json",
-        "status_policy": "catalogued_not_runnable",
+        "status_policy": "blocked_not_runnable",
         "default_write_mode": "live_edit",
         "allowed_write_modes": [
           "live_edit"
         ],
         "no_original_write_default": true,
-        "runtime_behavior": "not_runnable_until_promoted_to_implemented_or_wired"
+        "runtime_behavior": "blocked_after_wave3_reaudit",
+        "agent_exposed": false,
+        "risk_class": "unsafe_solver_or_modeler"
       },
       "tests": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
-        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata"
+        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
+        "tests/unit/test_wave3_pane5_assoc_reaudit.py"
       ],
       "summary": "The core recompute. Evaluate every dirty action in the database's top network in dependency",
       "source_slice": "constraints-associativity.md",
       "citation": "AcDbAssocManager.h:83",
       "evidence_refs": [
-        "config/autocad_native_arx_operation_catalog.json#inspect.assocnetwork.evaluate"
+        "config/autocad_native_arx_operation_catalog.json#inspect.assocnetwork.evaluate",
+        "reports/WAVE3_PANE5_ASSOCIATIVITY_REAUDIT.md#inspect.assocnetwork.evaluate",
+        "tests/unit/test_wave3_pane5_assoc_reaudit.py"
       ],
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "Wave3 Pane5 re-audit: not left catalogued. Closed as blocked because the exact operation requires unsafe solver/modeler/full-database repair or xref synchronization execution. Safe read-only alternatives remain separate implemented operations where available.",
       "owner_ticket": "M08K-T03",
-      "implementation_strategy": "native_arx_cpp",
-      "evidence_required": "attended_live_pump_session_log"
+      "implementation_strategy": "hard_blocked",
+      "evidence_required": "blocker_ref_and_evidence",
+      "blocked_reason": "SAFETY_FORBIDDEN: AcDbAssocManager::evaluateTopLevelNetwork is the top-level associative solver. Exposing it as an agent operation would run arbitrary network evaluation/callback code."
     },
     {
       "id": "inspect.assocnetwork.get",
@@ -15171,7 +15401,7 @@
       "id": "inspect.assocsurface.topology",
       "operation": "inspect.assocsurface.topology",
       "family": "constraints_associativity",
-      "status": "catalogued",
+      "status": "blocked",
       "engine_tier": "native_arx_only",
       "engines": [
         "native_arx_only"
@@ -15210,28 +15440,34 @@
       },
       "policy": {
         "source": "config/policy.v2.json",
-        "status_policy": "catalogued_not_runnable",
+        "status_policy": "blocked_not_runnable",
         "default_write_mode": "read",
         "allowed_write_modes": [
           "read"
         ],
         "no_original_write_default": true,
-        "runtime_behavior": "not_runnable_until_promoted_to_implemented_or_wired"
+        "runtime_behavior": "blocked_after_wave3_reaudit",
+        "agent_exposed": false,
+        "risk_class": "unsafe_solver_or_modeler"
       },
       "tests": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
-        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata"
+        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
+        "tests/unit/test_wave3_pane5_assoc_reaudit.py"
       ],
       "summary": "Trace which actions produced a given face/edge, and which surfaces depend on an object",
       "source_slice": "constraints-associativity.md",
       "citation": "AcDbAssocSurfaceActionBody.h:126,144,159",
       "evidence_refs": [
-        "config/autocad_native_arx_operation_catalog.json#inspect.assocsurface.topology"
+        "config/autocad_native_arx_operation_catalog.json#inspect.assocsurface.topology",
+        "reports/WAVE3_PANE5_ASSOCIATIVITY_REAUDIT.md#inspect.assocsurface.topology",
+        "tests/unit/test_wave3_pane5_assoc_reaudit.py"
       ],
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "Wave3 Pane5 re-audit: not left catalogued. Closed as blocked because the exact operation requires unsafe solver/modeler/full-database repair or xref synchronization execution. Safe read-only alternatives remain separate implemented operations where available.",
       "owner_ticket": "M08K-T03",
-      "implementation_strategy": "native_arx_cpp",
-      "evidence_required": "unit_test+native_extraction_fixture"
+      "implementation_strategy": "hard_blocked",
+      "evidence_required": "blocker_ref_and_evidence",
+      "blocked_reason": "SAFETY_FORBIDDEN: associative surface topology inspection requires ASM/modeler result traversal from evaluated action bodies; no SDK-safe generic reader exists for arbitrary unevaluated actions."
     },
     {
       "id": "inspect.constraint.dimensional.value",
@@ -15608,7 +15844,7 @@
       "id": "repair.assocdata.audit",
       "operation": "repair.assocdata.audit",
       "family": "constraints_associativity",
-      "status": "catalogued",
+      "status": "blocked",
       "engine_tier": "native_arx_only",
       "engines": [
         "native_arx_only"
@@ -15647,28 +15883,34 @@
       },
       "policy": {
         "source": "config/policy.v2.json",
-        "status_policy": "catalogued_not_runnable",
+        "status_policy": "blocked_not_runnable",
         "default_write_mode": "live_edit",
         "allowed_write_modes": [
           "live_edit"
         ],
         "no_original_write_default": true,
-        "runtime_behavior": "not_runnable_until_promoted_to_implemented_or_wired"
+        "runtime_behavior": "blocked_after_wave3_reaudit",
+        "agent_exposed": false,
+        "risk_class": "unsafe_solver_or_modeler"
       },
       "tests": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
-        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata"
+        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
+        "tests/unit/test_wave3_pane5_assoc_reaudit.py"
       ],
       "summary": "Audit + fix associative data (broken dependencies, stale subent ids).",
       "source_slice": "constraints-associativity.md",
       "citation": "AcDbAssocManager.h:225",
       "evidence_refs": [
-        "config/autocad_native_arx_operation_catalog.json#repair.assocdata.audit"
+        "config/autocad_native_arx_operation_catalog.json#repair.assocdata.audit",
+        "reports/WAVE3_PANE5_ASSOCIATIVITY_REAUDIT.md#repair.assocdata.audit",
+        "tests/unit/test_wave3_pane5_assoc_reaudit.py"
       ],
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "Wave3 Pane5 re-audit: not left catalogued. Closed as blocked because the exact operation requires unsafe solver/modeler/full-database repair or xref synchronization execution. Safe read-only alternatives remain separate implemented operations where available.",
       "owner_ticket": "M08K-T03",
-      "implementation_strategy": "native_arx_cpp",
-      "evidence_required": "attended_live_pump_session_log"
+      "implementation_strategy": "hard_blocked",
+      "evidence_required": "blocker_ref_and_evidence",
+      "blocked_reason": "SAFETY_FORBIDDEN: AcDbAssocManager::auditAssociativeData performs full-database associative audit/repair traversal, not read-only inspection, and is not exposed as an agent operation."
     },
     {
       "id": "extend.customclass.declare",
@@ -17999,7 +18241,7 @@
       "id": "extend.object_enabler.demand_register",
       "operation": "extend.object_enabler.demand_register",
       "family": "custom_objects_protocols",
-      "status": "blocked",
+      "status": "implemented",
       "engine_tier": "accoreconsole_lisp_also",
       "engines": [
         "accoreconsole_lisp_also"
@@ -18026,9 +18268,9 @@
         "original_write_default": false
       },
       "handler": {
-        "router_lane": null,
-        "dispatcher_symbol": null,
-        "execution_host_class": "coreconsole",
+        "router_lane": "ARIADNE_NATIVE_JOB",
+        "dispatcher_symbol": "m08kDispatch",
+        "execution_host_class": "arx_adapter",
         "native_api": "Registry keys under HKLM\\SOFTWARE\\Autodesk\\ObjectDBX\\R<ver>\\Applications\\<app> (DESCRIPTION, LOADCTRLS REG_DWORD, LOADER = path to .dbx); no Commands/Groups subkeys for enablers",
         "composed_of": []
       },
@@ -18042,18 +18284,21 @@
       },
       "policy": {
         "source": "config/policy.v2.json",
-        "status_policy": "catalogued_not_runnable",
+        "status_policy": "implemented_native_plan_only",
         "default_write_mode": "read",
         "allowed_write_modes": [
           "read"
         ],
         "no_original_write_default": true,
-        "runtime_behavior": "not_runnable_until_promoted_to_implemented_or_wired"
+        "runtime_behavior": "registration_plan_only_no_registry_write",
+        "agent_exposed": true,
+        "risk_class": "read_safe"
       },
       "tests": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
-        "tests/unit/test_m08k_handlers.py::TestM08KHandlers::test_hard_blocked_install_time_op_not_in_hasop"
+        "tests/unit/test_m08k_handlers.py",
+        "tests/unit/test_m08k_handlers.py::TestM08KHandlers::test_no_original_write_or_editor_command_tokens_in_code"
       ],
       "summary": "Registers the enabler for demand loading on custom-object detection so it auto-loads when a",
       "source_slice": "custom-objects.md",
@@ -18065,13 +18310,15 @@
         "NATIVE_BUILD_RULE: isolated output only; canonical deploy is Pane 1 only",
         "reports/tickets/WAVE3_PANE6_NATIVE_CUSTOM.md",
         "reports/tickets/WAVE3_PANE6_NATIVE_CUSTOM_OPS.json",
-        "reports/tickets/WAVE3_PANE6_native_build.json"
+        "reports/tickets/WAVE3_PANE6_native_build.json",
+        "src/Ariadne.AcadNative/families/m08k_handlers.inc:m08kDispatch",
+        "reports/WAVE3_PANE6_DEMAND_REGISTER_REAUDIT.md#extend.object_enabler.demand_register",
+        "tests/unit/test_m08k_handlers.py"
       ],
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "Wave3 integration re-audit reversed the Pane6 hard block for the safe portion: implemented as registration_plan_only/status. The handler does not write HKLM/ObjectDBX registry keys and does not deploy DBX/CRX/ARX artifacts; actual install mutation remains outside the agent runtime.",
       "owner_ticket": "M08K-T01",
-      "implementation_strategy": "hard_blocked",
-      "evidence_required": "blocker_ref_and_evidence",
-      "blocked_reason": "HARD_BLOCKED_SAFETY_CANONICAL_DEPLOY_PANE1_ONLY: demand-load object-enabler registration writes AutoCAD/ObjectDBX application registry keys and binds a deployed DBX path; Wave3 Pane6 native build rule allows isolated build only and forbids canonical DBX/CRX/ARX deploy. Pane 1 owns canonical deploy/registration."
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs"
     },
     {
       "id": "extend.object_enabler.register_classes",
@@ -19003,7 +19250,7 @@
       "id": "overrule.dimstyle.install",
       "operation": "overrule.dimstyle.install",
       "family": "custom_objects_protocols",
-      "status": "catalogued",
+      "status": "implemented",
       "engine_tier": "native_arx_only",
       "engines": [
         "native_arx_only"
@@ -19027,7 +19274,7 @@
       },
       "handler": {
         "router_lane": null,
-        "dispatcher_symbol": null,
+        "dispatcher_symbol": "m08lDispatch",
         "execution_host_class": "arx_adapter",
         "native_api": "AcDbDimensionStyleOverrule (header present dbdim.h) — **signatures NOT read this session**",
         "composed_of": []
@@ -19052,18 +19299,23 @@
       },
       "tests": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
-        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata"
+        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
+        "tests/unit/test_m08l_handlers.py"
       ],
       "summary": "Likely overrides dimension-style resolution for dimension entities.",
       "source_slice": "reactors-overrules.md",
       "citation": "dbdim.h (class decl present; method bodies UNVERIFIED)",
       "evidence_refs": [
-        "config/autocad_native_arx_operation_catalog.json#overrule.dimstyle.install"
+        "config/autocad_native_arx_operation_catalog.json#overrule.dimstyle.install",
+        "src/Ariadne.AcadNative/families/m08l_handlers.inc:m08lDispatch",
+        "reports/merge/MERGE-M08-READ.json",
+        "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
+        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)"
       ],
       "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
       "owner_ticket": "M08L-T02",
-      "implementation_strategy": "native_arx_cpp",
-      "evidence_required": "unit_test+native_extraction_fixture"
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs"
     },
     {
       "id": "overrule.drawable.install",
@@ -28660,7 +28912,7 @@
       "id": "plot.config.settings",
       "operation": "plot.config.settings",
       "family": "layouts_plot_publish",
-      "status": "implemented",
+      "status": "blocked",
       "engine_tier": "managed_also",
       "engines": [
         "managed_also"
@@ -28699,33 +28951,39 @@
       },
       "policy": {
         "source": "config/policy.v2.json",
-        "status_policy": "implemented",
+        "status_policy": "blocked",
         "default_write_mode": "live_edit",
         "allowed_write_modes": [
           "live_edit"
         ],
-        "no_original_write_default": true
+        "no_original_write_default": true,
+        "agent_exposed": false,
+        "runtime_behavior": "hard_blocked_after_wave3_render_plot_reaudit"
       },
       "tests": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
-        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata"
+        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
+        "tests/unit/test_wave3_render_plot_registry_safety.py::test_plot_ops_are_not_fake_implemented"
       ],
       "summary": "Reads/writes named page setups / plot configs; AcDbPlotSettings is a DB object so it",
       "source_slice": "editor-delta.md",
       "citation": "AcPlPlotConfig.h, AcPlPlotConfigMgr.h present; AcDbPlotSettings is a dbents object (unverified exact line)",
       "evidence_refs": [
-        "config/autocad_native_arx_operation_catalog.json#plot.config.settings"
+        "config/autocad_native_arx_operation_catalog.json#plot.config.settings",
+        "reports/WAVE3_RENDER_PLOT_REAUDIT.md#plot.config.settings"
       ],
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "Wave3 final no-fake-PASS audit accepted hard block. SAFETY_FORBIDDEN: exact plot settings operation is a live_edit read/write page setup mutation; no bounded CAD OS staged handler or validation contract exists in this tree.",
       "owner_ticket": "M08I-T01",
-      "implementation_strategy": "implemented_v1",
-      "evidence_required": "existing_tests_and_evidence_refs"
+      "implementation_strategy": "hard_blocked",
+      "evidence_required": "blocker_ref_and_evidence",
+      "blocked_reason": "SAFETY_FORBIDDEN: exact plot settings operation is a live_edit read/write page setup mutation; no bounded CAD OS staged handler or validation contract exists in this tree.",
+      "blocker_ref": "reports/WAVE3_RENDER_PLOT_REAUDIT.md#plot.config.settings"
     },
     {
       "id": "plot.engine.run",
       "operation": "plot.engine.run",
       "family": "layouts_plot_publish",
-      "status": "implemented",
+      "status": "blocked",
       "engine_tier": "managed_also",
       "engines": [
         "managed_also"
@@ -28764,27 +29022,33 @@
       },
       "policy": {
         "source": "config/policy.v2.json",
-        "status_policy": "implemented",
+        "status_policy": "blocked",
         "default_write_mode": "read",
         "allowed_write_modes": [
           "read"
         ],
-        "no_original_write_default": true
+        "no_original_write_default": true,
+        "agent_exposed": false,
+        "runtime_behavior": "hard_blocked_after_wave3_render_plot_reaudit"
       },
       "tests": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
-        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata"
+        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
+        "tests/unit/test_wave3_render_plot_registry_safety.py::test_plot_ops_are_not_fake_implemented"
       ],
       "summary": "Drives the full plot/publish pipeline (also preview engine). Operates on AcPlPlotInfo/AcPlPlotPageInfo.",
       "source_slice": "editor-delta.md",
       "citation": "AcPlPlotEngine.h:62-79; AcPlPlotInfo.h, AcPlPlotFactory.h present",
       "evidence_refs": [
-        "config/autocad_native_arx_operation_catalog.json#plot.engine.run"
+        "config/autocad_native_arx_operation_catalog.json#plot.engine.run",
+        "reports/WAVE3_RENDER_PLOT_REAUDIT.md#plot.engine.run"
       ],
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "Wave3 final no-fake-PASS audit accepted hard block. HOST_UNAVAILABLE: AcPlPlotEngine execution requires a controlled attended/full AutoCAD plot host; no controlled attended plot route is available in this integration validation.",
       "owner_ticket": "M08I-T01",
-      "implementation_strategy": "attended_verification",
-      "evidence_required": "attended_live_pump_session_log"
+      "implementation_strategy": "hard_blocked",
+      "evidence_required": "blocker_ref_and_evidence",
+      "blocked_reason": "HOST_UNAVAILABLE: AcPlPlotEngine execution requires a controlled attended/full AutoCAD plot host; no controlled attended plot route is available in this integration validation.",
+      "blocker_ref": "reports/WAVE3_RENDER_PLOT_REAUDIT.md#plot.engine.run"
     },
     {
       "id": "infra.hostapp.get_services",
@@ -32173,7 +32437,7 @@
       "id": "module.command.flags",
       "operation": "module.command.flags",
       "family": "runtime_commands",
-      "status": "catalogued",
+      "status": "implemented",
       "engine_tier": "native_arx_only",
       "engines": [
         "native_arx_only"
@@ -32196,10 +32460,10 @@
         "original_write_default": false
       },
       "handler": {
-        "router_lane": null,
-        "dispatcher_symbol": null,
+        "router_lane": "ARIADNE_NATIVE_JOB",
+        "dispatcher_symbol": "m08nDispatch",
         "execution_host_class": "arx_adapter",
-        "native_api": "commandFlags bitmask (ACRX_CMD_MODAL/_TRANSPARENT + _SESSION/_USEPICKSET/_REDRAW/_DOCREADLOCK/_DOCEXCLUSIVELOCK/_INTERRUPTIBLE/_NOHISTORY/_NO_UNDO_MARKER/_NOBEDIT/_UNDEFINED/…)",
+        "native_api": "read-only inventory of accmd-defs.h ACRX_CMD_* command flag constants",
         "composed_of": []
       },
       "mapping_type": "exact",
@@ -32212,28 +32476,38 @@
       },
       "policy": {
         "source": "config/policy.v2.json",
-        "status_policy": "catalogued_not_runnable",
+        "status_policy": "implemented_read_only",
         "default_write_mode": "read",
         "allowed_write_modes": [
           "read"
         ],
         "no_original_write_default": true,
-        "runtime_behavior": "not_runnable_until_promoted_to_implemented_or_wired"
+        "runtime_behavior": "implemented_read_only_or_policy_gated",
+        "agent_exposed": true
       },
       "tests": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
-        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata"
+        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
+        "tests/unit/test_m08n_handlers.py",
+        "tests/unit/test_m08n_handlers.py::TestM08NHandlers::test_module_command_flags_is_read_only_inventory",
+        "tests/unit/test_wave3_remaining_registry_closure.py::test_module_command_flags_was_reversed_to_implemented"
       ],
       "summary": "Defines a command's execution semantics. Primary (exactly one): MODAL vs TRANSPARENT. Key secondary: ACRX_CMD_SESSION",
       "source_slice": "arx-framework.md",
       "citation": "[DOC AcEdCommandStack::addCommand]",
       "evidence_refs": [
-        "config/autocad_native_arx_operation_catalog.json#module.command.flags"
+        "config/autocad_native_arx_operation_catalog.json#module.command.flags",
+        "src/Ariadne.AcadNative/families/m08n_handlers.inc:m08nDispatch",
+        "reports/merge/MERGE-M08-READ.json",
+        "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
+        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)",
+        "tests/unit/test_m08n_handlers.py::TestM08NHandlers::test_module_command_flags_is_read_only_inventory",
+        "reports/WAVE3_REMAINING_HARDBLOCK_REAUDIT.md#module.command.flags"
       ],
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "Wave3 re-audit reversed catalogued state to implemented. Handler returns an ARX command flag constant inventory and does not mutate the command stack or expose raw command dispatch.",
       "owner_ticket": "M08O-T02",
-      "implementation_strategy": "native_arx_cpp",
-      "evidence_required": "unit_test+native_extraction_fixture"
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs"
     },
     {
       "id": "module.command.lookup",
@@ -32450,7 +32724,7 @@
       "id": "module.command.remove_group",
       "operation": "module.command.remove_group",
       "family": "runtime_commands",
-      "status": "catalogued",
+      "status": "blocked",
       "engine_tier": "native_arx_only",
       "engines": [
         "native_arx_only"
@@ -32489,28 +32763,33 @@
       },
       "policy": {
         "source": "config/policy.v2.json",
-        "status_policy": "catalogued_not_runnable",
+        "status_policy": "blocked",
         "default_write_mode": "read",
         "allowed_write_modes": [
           "read"
         ],
         "no_original_write_default": true,
-        "runtime_behavior": "not_runnable_until_promoted_to_implemented_or_wired"
+        "runtime_behavior": "hard_blocked_after_wave3_reaudit",
+        "agent_exposed": false
       },
       "tests": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
-        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata"
+        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
+        "tests/unit/test_wave3_remaining_registry_closure.py::test_remaining_wave3_blocks_have_accepted_codes_and_evidence"
       ],
       "summary": "Cleanup: remove a whole command group (usual kUnloadAppMsg step) or one command. Required before",
       "source_slice": "arx-framework.md",
       "citation": "[DOC Command Stack]",
       "evidence_refs": [
-        "config/autocad_native_arx_operation_catalog.json#module.command.remove_group"
+        "config/autocad_native_arx_operation_catalog.json#module.command.remove_group",
+        "reports/WAVE3_REMAINING_HARDBLOCK_REAUDIT.md#module.command.remove_group"
       ],
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "Wave3 post-merge re-audit accepted hard block. SAFETY_FORBIDDEN: arbitrary command group removal mutates the host command stack; implemented probes only clean up their bounded ARIADNE_M08N group.",
       "owner_ticket": "M08O-T02",
-      "implementation_strategy": "native_arx_cpp",
-      "evidence_required": "unit_test+native_extraction_fixture"
+      "implementation_strategy": "hard_blocked",
+      "evidence_required": "blocker_ref_and_evidence",
+      "blocked_reason": "SAFETY_FORBIDDEN: arbitrary command group removal mutates the host command stack; implemented probes only clean up their bounded ARIADNE_M08N group.",
+      "blocker_ref": "reports/WAVE3_REMAINING_HARDBLOCK_REAUDIT.md#module.command.remove_group"
     },
     {
       "id": "module.command.stack_handle",
@@ -32587,7 +32866,7 @@
       "id": "module.entrypoint.define",
       "operation": "module.entrypoint.define",
       "family": "runtime_commands",
-      "status": "catalogued",
+      "status": "blocked",
       "engine_tier": "native_arx_only",
       "engines": [
         "native_arx_only"
@@ -32626,34 +32905,39 @@
       },
       "policy": {
         "source": "config/policy.v2.json",
-        "status_policy": "catalogued_not_runnable",
+        "status_policy": "blocked",
         "default_write_mode": "read",
         "allowed_write_modes": [
           "read"
         ],
         "no_original_write_default": true,
-        "runtime_behavior": "not_runnable_until_promoted_to_implemented_or_wired"
+        "runtime_behavior": "hard_blocked_after_wave3_reaudit",
+        "agent_exposed": false
       },
       "tests": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
-        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata"
+        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
+        "tests/unit/test_wave3_remaining_registry_closure.py::test_remaining_wave3_blocks_have_accepted_codes_and_evidence"
       ],
       "summary": "Emits the single extern \"C\" __declspec(dllexport) acrxEntryPoint, instantiates the app object entryPointObject, and defines",
       "source_slice": "arx-framework.md",
       "citation": "[HDR dbxEntryPoint.h:172-186]",
       "evidence_refs": [
-        "config/autocad_native_arx_operation_catalog.json#module.entrypoint.define"
+        "config/autocad_native_arx_operation_catalog.json#module.entrypoint.define",
+        "reports/WAVE3_REMAINING_HARDBLOCK_REAUDIT.md#module.entrypoint.define"
       ],
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "Wave3 post-merge re-audit accepted hard block. SDK_NOT_EXPOSED: entrypoint definition is a compile/link-time ARX macro/export contract, not a runtime SDK operation callable by the job dispatcher.",
       "owner_ticket": "M08O-T02",
-      "implementation_strategy": "native_arx_cpp",
-      "evidence_required": "unit_test+native_extraction_fixture"
+      "implementation_strategy": "hard_blocked",
+      "evidence_required": "blocker_ref_and_evidence",
+      "blocked_reason": "SDK_NOT_EXPOSED: entrypoint definition is a compile/link-time ARX macro/export contract, not a runtime SDK operation callable by the job dispatcher.",
+      "blocker_ref": "reports/WAVE3_REMAINING_HARDBLOCK_REAUDIT.md#module.entrypoint.define"
     },
     {
       "id": "module.entrypoint.dispatch",
       "operation": "module.entrypoint.dispatch",
       "family": "runtime_commands",
-      "status": "catalogued",
+      "status": "blocked",
       "engine_tier": "native_arx_only",
       "engines": [
         "native_arx_only"
@@ -32692,34 +32976,39 @@
       },
       "policy": {
         "source": "config/policy.v2.json",
-        "status_policy": "catalogued_not_runnable",
+        "status_policy": "blocked",
         "default_write_mode": "read",
         "allowed_write_modes": [
           "read"
         ],
         "no_original_write_default": true,
-        "runtime_behavior": "not_runnable_until_promoted_to_implemented_or_wired"
+        "runtime_behavior": "hard_blocked_after_wave3_reaudit",
+        "agent_exposed": false
       },
       "tests": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
-        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata"
+        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
+        "tests/unit/test_wave3_remaining_registry_closure.py::test_remaining_wave3_blocks_have_accepted_codes_and_evidence"
       ],
       "summary": "Raw AutoCAD↔module message pump. A switch(msg) that routes each AppMsgCode to its On_k* virtual.",
       "source_slice": "arx-framework.md",
       "citation": "[RG acrxEntryPoint], [HDR dbxEntryPoint.h:129-149]",
       "evidence_refs": [
-        "config/autocad_native_arx_operation_catalog.json#module.entrypoint.dispatch"
+        "config/autocad_native_arx_operation_catalog.json#module.entrypoint.dispatch",
+        "reports/WAVE3_REMAINING_HARDBLOCK_REAUDIT.md#module.entrypoint.dispatch"
       ],
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "Wave3 post-merge re-audit accepted hard block. HOST_UNAVAILABLE: entrypoint dispatch is host-owned by the AutoCAD loader via acrxEntryPoint and cannot be synthesized safely by the integration job dispatcher.",
       "owner_ticket": "M08O-T02",
-      "implementation_strategy": "native_arx_cpp",
-      "evidence_required": "unit_test+native_extraction_fixture"
+      "implementation_strategy": "hard_blocked",
+      "evidence_required": "blocker_ref_and_evidence",
+      "blocked_reason": "HOST_UNAVAILABLE: entrypoint dispatch is host-owned by the AutoCAD loader via acrxEntryPoint and cannot be synthesized safely by the integration job dispatcher.",
+      "blocker_ref": "reports/WAVE3_REMAINING_HARDBLOCK_REAUDIT.md#module.entrypoint.dispatch"
     },
     {
       "id": "module.lifecycle.init",
       "operation": "module.lifecycle.init",
       "family": "runtime_commands",
-      "status": "catalogued",
+      "status": "blocked",
       "engine_tier": "native_arx_only",
       "engines": [
         "native_arx_only"
@@ -32758,34 +33047,39 @@
       },
       "policy": {
         "source": "config/policy.v2.json",
-        "status_policy": "catalogued_not_runnable",
+        "status_policy": "blocked",
         "default_write_mode": "read",
         "allowed_write_modes": [
           "read"
         ],
         "no_original_write_default": true,
-        "runtime_behavior": "not_runnable_until_promoted_to_implemented_or_wired"
+        "runtime_behavior": "hard_blocked_after_wave3_reaudit",
+        "agent_exposed": false
       },
       "tests": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
-        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata"
+        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
+        "tests/unit/test_wave3_remaining_registry_closure.py::test_remaining_wave3_blocks_have_accepted_codes_and_evidence"
       ],
       "summary": "Load-time hook. ARX form registers ARX commands + command groups and may create the",
       "source_slice": "arx-framework.md",
       "citation": "[RG AcRxArxApp::On_kInitAppMsg], [HDR dbxEntryPoint.h:78-104]",
       "evidence_refs": [
-        "config/autocad_native_arx_operation_catalog.json#module.lifecycle.init"
+        "config/autocad_native_arx_operation_catalog.json#module.lifecycle.init",
+        "reports/WAVE3_REMAINING_HARDBLOCK_REAUDIT.md#module.lifecycle.init"
       ],
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "Wave3 post-merge re-audit accepted hard block. HOST_UNAVAILABLE: On_kInitAppMsg is delivered by the AutoCAD loader during module load; it is not a safe runtime job operation.",
       "owner_ticket": "M08O-T02",
-      "implementation_strategy": "native_arx_cpp",
-      "evidence_required": "unit_test+native_extraction_fixture"
+      "implementation_strategy": "hard_blocked",
+      "evidence_required": "blocker_ref_and_evidence",
+      "blocked_reason": "HOST_UNAVAILABLE: On_kInitAppMsg is delivered by the AutoCAD loader during module load; it is not a safe runtime job operation.",
+      "blocker_ref": "reports/WAVE3_REMAINING_HARDBLOCK_REAUDIT.md#module.lifecycle.init"
     },
     {
       "id": "module.lifecycle.on_load_dwg",
       "operation": "module.lifecycle.on_load_dwg",
       "family": "runtime_commands",
-      "status": "catalogued",
+      "status": "blocked",
       "engine_tier": "native_arx_only",
       "engines": [
         "native_arx_only"
@@ -32824,34 +33118,39 @@
       },
       "policy": {
         "source": "config/policy.v2.json",
-        "status_policy": "catalogued_not_runnable",
+        "status_policy": "blocked",
         "default_write_mode": "read",
         "allowed_write_modes": [
           "read"
         ],
         "no_original_write_default": true,
-        "runtime_behavior": "not_runnable_until_promoted_to_implemented_or_wired"
+        "runtime_behavior": "hard_blocked_after_wave3_reaudit",
+        "agent_exposed": false
       },
       "tests": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
-        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata"
+        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
+        "tests/unit/test_wave3_remaining_registry_closure.py::test_remaining_wave3_blocks_have_accepted_codes_and_evidence"
       ],
       "summary": "Fired once the full acedXxx (editor) API is guaranteed available — the correct place",
       "source_slice": "arx-framework.md",
       "citation": "[HDR dbxEntryPoint.h:114], [RG AcRxDbxApp Methods]",
       "evidence_refs": [
-        "config/autocad_native_arx_operation_catalog.json#module.lifecycle.on_load_dwg"
+        "config/autocad_native_arx_operation_catalog.json#module.lifecycle.on_load_dwg",
+        "reports/WAVE3_REMAINING_HARDBLOCK_REAUDIT.md#module.lifecycle.on_load_dwg"
       ],
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "Wave3 post-merge re-audit accepted hard block. HOST_UNAVAILABLE: On_kLoadDwgMsg is delivered by the host during document lifecycle events; no controlled attended lifecycle route is available.",
       "owner_ticket": "M08O-T02",
-      "implementation_strategy": "native_arx_cpp",
-      "evidence_required": "unit_test+native_extraction_fixture"
+      "implementation_strategy": "hard_blocked",
+      "evidence_required": "blocker_ref_and_evidence",
+      "blocked_reason": "HOST_UNAVAILABLE: On_kLoadDwgMsg is delivered by the host during document lifecycle events; no controlled attended lifecycle route is available.",
+      "blocker_ref": "reports/WAVE3_REMAINING_HARDBLOCK_REAUDIT.md#module.lifecycle.on_load_dwg"
     },
     {
       "id": "module.lifecycle.on_ole_unload",
       "operation": "module.lifecycle.on_ole_unload",
       "family": "runtime_commands",
-      "status": "catalogued",
+      "status": "blocked",
       "engine_tier": "native_arx_only",
       "engines": [
         "native_arx_only"
@@ -32890,34 +33189,39 @@
       },
       "policy": {
         "source": "config/policy.v2.json",
-        "status_policy": "catalogued_not_runnable",
+        "status_policy": "blocked",
         "default_write_mode": "read",
         "allowed_write_modes": [
           "read"
         ],
         "no_original_write_default": true,
-        "runtime_behavior": "not_runnable_until_promoted_to_implemented_or_wired"
+        "runtime_behavior": "hard_blocked_after_wave3_reaudit",
+        "agent_exposed": false
       },
       "tests": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
-        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata"
+        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
+        "tests/unit/test_wave3_remaining_registry_closure.py::test_remaining_wave3_blocks_have_accepted_codes_and_evidence"
       ],
       "summary": "Hook to veto/limit unload while OLE/in-use; override to control unloadability.",
       "source_slice": "arx-framework.md",
       "citation": "[HDR dbxEntryPoint.h:123], [RG AcRxDbxApp Methods]",
       "evidence_refs": [
-        "config/autocad_native_arx_operation_catalog.json#module.lifecycle.on_ole_unload"
+        "config/autocad_native_arx_operation_catalog.json#module.lifecycle.on_ole_unload",
+        "reports/WAVE3_REMAINING_HARDBLOCK_REAUDIT.md#module.lifecycle.on_ole_unload"
       ],
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "Wave3 post-merge re-audit accepted hard block. HOST_UNAVAILABLE: On_kOleUnloadAppMsg is a host lifecycle callback and cannot be triggered safely from the CAD OS job surface.",
       "owner_ticket": "M08O-T02",
-      "implementation_strategy": "native_arx_cpp",
-      "evidence_required": "unit_test+native_extraction_fixture"
+      "implementation_strategy": "hard_blocked",
+      "evidence_required": "blocker_ref_and_evidence",
+      "blocked_reason": "HOST_UNAVAILABLE: On_kOleUnloadAppMsg is a host lifecycle callback and cannot be triggered safely from the CAD OS job surface.",
+      "blocker_ref": "reports/WAVE3_REMAINING_HARDBLOCK_REAUDIT.md#module.lifecycle.on_ole_unload"
     },
     {
       "id": "module.lifecycle.on_unload_dwg",
       "operation": "module.lifecycle.on_unload_dwg",
       "family": "runtime_commands",
-      "status": "catalogued",
+      "status": "blocked",
       "engine_tier": "native_arx_only",
       "engines": [
         "native_arx_only"
@@ -32956,34 +33260,39 @@
       },
       "policy": {
         "source": "config/policy.v2.json",
-        "status_policy": "catalogued_not_runnable",
+        "status_policy": "blocked",
         "default_write_mode": "read",
         "allowed_write_modes": [
           "read"
         ],
         "no_original_write_default": true,
-        "runtime_behavior": "not_runnable_until_promoted_to_implemented_or_wired"
+        "runtime_behavior": "hard_blocked_after_wave3_reaudit",
+        "agent_exposed": false
       },
       "tests": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
-        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata"
+        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
+        "tests/unit/test_wave3_remaining_registry_closure.py::test_remaining_wave3_blocks_have_accepted_codes_and_evidence"
       ],
       "summary": "Per-document unload counterpart of kLoadDwgMsg.",
       "source_slice": "arx-framework.md",
       "citation": "[HDR dbxEntryPoint.h:115]",
       "evidence_refs": [
-        "config/autocad_native_arx_operation_catalog.json#module.lifecycle.on_unload_dwg"
+        "config/autocad_native_arx_operation_catalog.json#module.lifecycle.on_unload_dwg",
+        "reports/WAVE3_REMAINING_HARDBLOCK_REAUDIT.md#module.lifecycle.on_unload_dwg"
       ],
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "Wave3 post-merge re-audit accepted hard block. HOST_UNAVAILABLE: On_kUnloadDwgMsg is host-owned document lifecycle dispatch and unavailable to the headless integration job route.",
       "owner_ticket": "M08O-T02",
-      "implementation_strategy": "native_arx_cpp",
-      "evidence_required": "unit_test+native_extraction_fixture"
+      "implementation_strategy": "hard_blocked",
+      "evidence_required": "blocker_ref_and_evidence",
+      "blocked_reason": "HOST_UNAVAILABLE: On_kUnloadDwgMsg is host-owned document lifecycle dispatch and unavailable to the headless integration job route.",
+      "blocker_ref": "reports/WAVE3_REMAINING_HARDBLOCK_REAUDIT.md#module.lifecycle.on_unload_dwg"
     },
     {
       "id": "module.lifecycle.other",
       "operation": "module.lifecycle.other",
       "family": "runtime_commands",
-      "status": "catalogued",
+      "status": "blocked",
       "engine_tier": "native_arx_only",
       "engines": [
         "native_arx_only"
@@ -33022,34 +33331,39 @@
       },
       "policy": {
         "source": "config/policy.v2.json",
-        "status_policy": "catalogued_not_runnable",
+        "status_policy": "blocked",
         "default_write_mode": "read",
         "allowed_write_modes": [
           "read"
         ],
         "no_original_write_default": true,
-        "runtime_behavior": "not_runnable_until_promoted_to_implemented_or_wired"
+        "runtime_behavior": "hard_blocked_after_wave3_reaudit",
+        "agent_exposed": false
       },
       "tests": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
-        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata"
+        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
+        "tests/unit/test_wave3_remaining_registry_closure.py::test_remaining_wave3_blocks_have_accepted_codes_and_evidence"
       ],
       "summary": "The remaining 11 dispatched lifecycle messages; all default to kRetOK. Override only the ones",
       "source_slice": "arx-framework.md",
       "citation": "[HDR dbxEntryPoint.h:114-149], [RG AcRxDbxApp Methods]",
       "evidence_refs": [
-        "config/autocad_native_arx_operation_catalog.json#module.lifecycle.other"
+        "config/autocad_native_arx_operation_catalog.json#module.lifecycle.other",
+        "reports/WAVE3_REMAINING_HARDBLOCK_REAUDIT.md#module.lifecycle.other"
       ],
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "Wave3 post-merge re-audit accepted hard block. HOST_UNAVAILABLE: arbitrary lifecycle message dispatch is host-owned and cannot be simulated safely by the agent job surface.",
       "owner_ticket": "M08O-T02",
-      "implementation_strategy": "native_arx_cpp",
-      "evidence_required": "unit_test+native_extraction_fixture"
+      "implementation_strategy": "hard_blocked",
+      "evidence_required": "blocker_ref_and_evidence",
+      "blocked_reason": "HOST_UNAVAILABLE: arbitrary lifecycle message dispatch is host-owned and cannot be simulated safely by the agent job surface.",
+      "blocker_ref": "reports/WAVE3_REMAINING_HARDBLOCK_REAUDIT.md#module.lifecycle.other"
     },
     {
       "id": "module.lifecycle.unload",
       "operation": "module.lifecycle.unload",
       "family": "runtime_commands",
-      "status": "catalogued",
+      "status": "blocked",
       "engine_tier": "native_arx_only",
       "engines": [
         "native_arx_only"
@@ -33088,34 +33402,39 @@
       },
       "policy": {
         "source": "config/policy.v2.json",
-        "status_policy": "catalogued_not_runnable",
+        "status_policy": "blocked",
         "default_write_mode": "read",
         "allowed_write_modes": [
           "read"
         ],
         "no_original_write_default": true,
-        "runtime_behavior": "not_runnable_until_promoted_to_implemented_or_wired"
+        "runtime_behavior": "hard_blocked_after_wave3_reaudit",
+        "agent_exposed": false
       },
       "tests": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
-        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata"
+        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
+        "tests/unit/test_wave3_remaining_registry_closure.py::test_remaining_wave3_blocks_have_accepted_codes_and_evidence"
       ],
       "summary": "Unload-time hook. ARX form unregisters commands + groups, optionally releases Dynamic Property Manager; DBX",
       "source_slice": "arx-framework.md",
       "citation": "[RG AcRxArxApp::On_kUnloadAppMsg], [RG AcRxDbxApp::On_kUnloadAppMsg], [HDR dbxEntryPoint.h:105-167]",
       "evidence_refs": [
-        "config/autocad_native_arx_operation_catalog.json#module.lifecycle.unload"
+        "config/autocad_native_arx_operation_catalog.json#module.lifecycle.unload",
+        "reports/WAVE3_REMAINING_HARDBLOCK_REAUDIT.md#module.lifecycle.unload"
       ],
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "Wave3 post-merge re-audit accepted hard block. HOST_UNAVAILABLE: On_kUnloadAppMsg is delivered by the loader during module unload; the job dispatcher must not invoke it directly.",
       "owner_ticket": "M08O-T02",
-      "implementation_strategy": "native_arx_cpp",
-      "evidence_required": "unit_test+native_extraction_fixture"
+      "implementation_strategy": "hard_blocked",
+      "evidence_required": "blocker_ref_and_evidence",
+      "blocked_reason": "HOST_UNAVAILABLE: On_kUnloadAppMsg is delivered by the loader during module unload; the job dispatcher must not invoke it directly.",
+      "blocker_ref": "reports/WAVE3_REMAINING_HARDBLOCK_REAUDIT.md#module.lifecycle.unload"
     },
     {
       "id": "module.load",
       "operation": "module.load",
       "family": "runtime_commands",
-      "status": "catalogued",
+      "status": "blocked",
       "engine_tier": "native_arx_only",
       "engines": [
         "native_arx_only"
@@ -33154,34 +33473,39 @@
       },
       "policy": {
         "source": "config/policy.v2.json",
-        "status_policy": "catalogued_not_runnable",
+        "status_policy": "blocked",
         "default_write_mode": "read",
         "allowed_write_modes": [
           "read"
         ],
         "no_original_write_default": true,
-        "runtime_behavior": "not_runnable_until_promoted_to_implemented_or_wired"
+        "runtime_behavior": "hard_blocked_after_wave3_reaudit",
+        "agent_exposed": false
       },
       "tests": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
-        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata"
+        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
+        "tests/unit/test_wave3_remaining_registry_closure.py::test_remaining_wave3_blocks_have_accepted_codes_and_evidence"
       ],
       "summary": "Programmatically load a .arx/module into the running host from C++ (peer to ARX/APPLOAD/arxload). The",
       "source_slice": "arx-framework.md",
       "citation": "[HDR rxregsvc.h:27]",
       "evidence_refs": [
-        "config/autocad_native_arx_operation_catalog.json#module.load"
+        "config/autocad_native_arx_operation_catalog.json#module.load",
+        "reports/WAVE3_REMAINING_HARDBLOCK_REAUDIT.md#module.load"
       ],
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "Wave3 post-merge re-audit accepted hard block. SAFETY_FORBIDDEN: acrxLoadModule loads external code into the AutoCAD host process and is not an agent-exposed operation.",
       "owner_ticket": "M08O-T02",
-      "implementation_strategy": "native_arx_cpp",
-      "evidence_required": "unit_test+native_extraction_fixture"
+      "implementation_strategy": "hard_blocked",
+      "evidence_required": "blocker_ref_and_evidence",
+      "blocked_reason": "SAFETY_FORBIDDEN: acrxLoadModule loads external code into the AutoCAD host process and is not an agent-exposed operation.",
+      "blocker_ref": "reports/WAVE3_REMAINING_HARDBLOCK_REAUDIT.md#module.load"
     },
     {
       "id": "module.load.acad_rx",
       "operation": "module.load.acad_rx",
       "family": "runtime_commands",
-      "status": "catalogued",
+      "status": "blocked",
       "engine_tier": "accoreconsole_lisp_also",
       "engines": [
         "accoreconsole_lisp_also"
@@ -33224,34 +33548,39 @@
       },
       "policy": {
         "source": "config/policy.v2.json",
-        "status_policy": "catalogued_not_runnable",
+        "status_policy": "blocked",
         "default_write_mode": "read",
         "allowed_write_modes": [
           "read"
         ],
         "no_original_write_default": true,
-        "runtime_behavior": "not_runnable_until_promoted_to_implemented_or_wired"
+        "runtime_behavior": "hard_blocked_after_wave3_reaudit",
+        "agent_exposed": false
       },
       "tests": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
-        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata"
+        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
+        "tests/unit/test_wave3_remaining_registry_closure.py::test_remaining_wave3_blocks_have_accepted_codes_and_evidence"
       ],
       "summary": "Per-directory ASCII file of ObjectARX module names auto-loaded at startup; honored by core (incl.",
       "source_slice": "arx-framework.md",
       "citation": "[DOC About Loading ObjectARX Applications]",
       "evidence_refs": [
-        "config/autocad_native_arx_operation_catalog.json#module.load.acad_rx"
+        "config/autocad_native_arx_operation_catalog.json#module.load.acad_rx",
+        "reports/WAVE3_REMAINING_HARDBLOCK_REAUDIT.md#module.load.acad_rx"
       ],
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "Wave3 post-merge re-audit accepted hard block. SAFETY_FORBIDDEN: ARX demand/load mechanics execute host modules and mutate runtime loader state.",
       "owner_ticket": "M08O-T02",
-      "implementation_strategy": "accoreconsole_lisp",
-      "evidence_required": "unit_test+native_extraction_fixture"
+      "implementation_strategy": "hard_blocked",
+      "evidence_required": "blocker_ref_and_evidence",
+      "blocked_reason": "SAFETY_FORBIDDEN: ARX demand/load mechanics execute host modules and mutate runtime loader state.",
+      "blocker_ref": "reports/WAVE3_REMAINING_HARDBLOCK_REAUDIT.md#module.load.acad_rx"
     },
     {
       "id": "module.load.by_app",
       "operation": "module.load.by_app",
       "family": "runtime_commands",
-      "status": "catalogued",
+      "status": "blocked",
       "engine_tier": "native_arx_only",
       "engines": [
         "native_arx_only"
@@ -33290,28 +33619,33 @@
       },
       "policy": {
         "source": "config/policy.v2.json",
-        "status_policy": "catalogued_not_runnable",
+        "status_policy": "blocked",
         "default_write_mode": "read",
         "allowed_write_modes": [
           "read"
         ],
         "no_original_write_default": true,
-        "runtime_behavior": "not_runnable_until_promoted_to_implemented_or_wired"
+        "runtime_behavior": "hard_blocked_after_wave3_reaudit",
+        "agent_exposed": false
       },
       "tests": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
-        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata"
+        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
+        "tests/unit/test_wave3_remaining_registry_closure.py::test_remaining_wave3_blocks_have_accepted_codes_and_evidence"
       ],
       "summary": "Load by registered application name (demand-load registry key resolves the file).",
       "source_slice": "arx-framework.md",
       "citation": "[HDR rxregsvc.h:31]",
       "evidence_refs": [
-        "config/autocad_native_arx_operation_catalog.json#module.load.by_app"
+        "config/autocad_native_arx_operation_catalog.json#module.load.by_app",
+        "reports/WAVE3_REMAINING_HARDBLOCK_REAUDIT.md#module.load.by_app"
       ],
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "Wave3 post-merge re-audit accepted hard block. SAFETY_FORBIDDEN: application-driven module loading executes external code and mutates process loader state.",
       "owner_ticket": "M08O-T02",
-      "implementation_strategy": "native_arx_cpp",
-      "evidence_required": "unit_test+native_extraction_fixture"
+      "implementation_strategy": "hard_blocked",
+      "evidence_required": "blocker_ref_and_evidence",
+      "blocked_reason": "SAFETY_FORBIDDEN: application-driven module loading executes external code and mutates process loader state.",
+      "blocker_ref": "reports/WAVE3_REMAINING_HARDBLOCK_REAUDIT.md#module.load.by_app"
     },
     {
       "id": "module.load.demand_register",
@@ -33389,7 +33723,7 @@
       "id": "module.load.lisp",
       "operation": "module.load.lisp",
       "family": "runtime_commands",
-      "status": "catalogued",
+      "status": "blocked",
       "engine_tier": "accoreconsole_lisp_also",
       "engines": [
         "accoreconsole_lisp_also"
@@ -33432,28 +33766,33 @@
       },
       "policy": {
         "source": "config/policy.v2.json",
-        "status_policy": "catalogued_not_runnable",
+        "status_policy": "blocked",
         "default_write_mode": "read",
         "allowed_write_modes": [
           "read"
         ],
         "no_original_write_default": true,
-        "runtime_behavior": "not_runnable_until_promoted_to_implemented_or_wired"
+        "runtime_behavior": "hard_blocked_after_wave3_reaudit",
+        "agent_exposed": false
       },
       "tests": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
-        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata"
+        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
+        "tests/unit/test_wave3_remaining_registry_closure.py::test_remaining_wave3_blocks_have_accepted_codes_and_evidence"
       ],
       "summary": "LISP-driven load/unload/list of native modules — usable from an accoreconsole .scr script. The hostless-batch",
       "source_slice": "arx-framework.md",
       "citation": "[DOC arxload], [DOC arxunload], [DOC ARX (Command)]",
       "evidence_refs": [
-        "config/autocad_native_arx_operation_catalog.json#module.load.lisp"
+        "config/autocad_native_arx_operation_catalog.json#module.load.lisp",
+        "reports/WAVE3_REMAINING_HARDBLOCK_REAUDIT.md#module.load.lisp"
       ],
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "Wave3 post-merge re-audit accepted hard block. SAFETY_FORBIDDEN: LISP loading executes script code in the AutoCAD host and is not exposed as a raw agent load surface.",
       "owner_ticket": "M08O-T02",
-      "implementation_strategy": "accoreconsole_lisp",
-      "evidence_required": "unit_test+native_extraction_fixture"
+      "implementation_strategy": "hard_blocked",
+      "evidence_required": "blocker_ref_and_evidence",
+      "blocked_reason": "SAFETY_FORBIDDEN: LISP loading executes script code in the AutoCAD host and is not exposed as a raw agent load surface.",
+      "blocker_ref": "reports/WAVE3_REMAINING_HARDBLOCK_REAUDIT.md#module.load.lisp"
     },
     {
       "id": "module.register_mdi",
@@ -33601,7 +33940,7 @@
       "id": "module.unload",
       "operation": "module.unload",
       "family": "runtime_commands",
-      "status": "catalogued",
+      "status": "blocked",
       "engine_tier": "native_arx_only",
       "engines": [
         "native_arx_only"
@@ -33640,28 +33979,33 @@
       },
       "policy": {
         "source": "config/policy.v2.json",
-        "status_policy": "catalogued_not_runnable",
+        "status_policy": "blocked",
         "default_write_mode": "read",
         "allowed_write_modes": [
           "read"
         ],
         "no_original_write_default": true,
-        "runtime_behavior": "not_runnable_until_promoted_to_implemented_or_wired"
+        "runtime_behavior": "hard_blocked_after_wave3_reaudit",
+        "agent_exposed": false
       },
       "tests": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
-        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata"
+        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
+        "tests/unit/test_wave3_remaining_registry_closure.py::test_remaining_wave3_blocks_have_accepted_codes_and_evidence"
       ],
       "summary": "Programmatically unload a module/app. Note: locked apps cannot be unloaded; ObjectARX apps cannot be",
       "source_slice": "arx-framework.md",
       "citation": "[HDR rxregsvc.h:37,41], [DOC arxunload], [DOC Load/Unload Applications]",
       "evidence_refs": [
-        "config/autocad_native_arx_operation_catalog.json#module.unload"
+        "config/autocad_native_arx_operation_catalog.json#module.unload",
+        "reports/WAVE3_REMAINING_HARDBLOCK_REAUDIT.md#module.unload"
       ],
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "Wave3 post-merge re-audit accepted hard block. SAFETY_FORBIDDEN: acrxUnloadModule can unload host modules and destabilize the running process; it remains non-agent-exposed.",
       "owner_ticket": "M08O-T02",
-      "implementation_strategy": "native_arx_cpp",
-      "evidence_required": "unit_test+native_extraction_fixture"
+      "implementation_strategy": "hard_blocked",
+      "evidence_required": "blocker_ref_and_evidence",
+      "blocked_reason": "SAFETY_FORBIDDEN: acrxUnloadModule can unload host modules and destabilize the running process; it remains non-agent-exposed.",
+      "blocker_ref": "reports/WAVE3_REMAINING_HARDBLOCK_REAUDIT.md#module.unload"
     },
     {
       "id": "acdb.database.create",

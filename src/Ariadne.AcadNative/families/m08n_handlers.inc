@@ -328,10 +328,11 @@ static bool m08nHasOp(const std::string& op)
         op == "select.ss.free" ||
         op == "select.ssget.interactive" ||
         op == "select.ssget.preview" ||
-        // T02 runtime command lifecycle (7 implemented; demand_register hard-blocked)
+        // T02 runtime command lifecycle (8 implemented; demand_register hard-blocked)
         op == "command.register.define" ||
         op == "module.ads.register_symbol" ||
         op == "module.class.register_object" ||
+        op == "module.command.flags" ||
         op == "module.command.register_auto" ||
         op == "module.command.register_manual" ||
         op == "module.register_mdi" ||
@@ -758,6 +759,60 @@ static bool m08nDispatch(const std::string& op, const AriadneJobCtx& ctx, std::o
         op == "module.command.register_auto" || op == "editor.command.register") {
         const Adesk::Int32 flags = ACRX_CMD_MODAL | (m08nBoolArg(job, "session", false) ? ACRX_CMD_SESSION : 0);
         m08nCommandLifecycle(op, r, flags);
+        return true;
+    }
+    if (op == "module.command.flags") {
+        // "read_only":true: inventory ARX command flag constants without adding/removing commands.
+        struct FlagInfo {
+            const char* name;
+            unsigned int value;
+        };
+        const FlagInfo flags[] = {
+            {"ACRX_CMD_MODAL", static_cast<unsigned int>(ACRX_CMD_MODAL)},
+            {"ACRX_CMD_TRANSPARENT", static_cast<unsigned int>(ACRX_CMD_TRANSPARENT)},
+            {"ACRX_CMD_USEPICKSET", static_cast<unsigned int>(ACRX_CMD_USEPICKSET)},
+            {"ACRX_CMD_REDRAW", static_cast<unsigned int>(ACRX_CMD_REDRAW)},
+            {"ACRX_CMD_NOPERSPECTIVE", static_cast<unsigned int>(ACRX_CMD_NOPERSPECTIVE)},
+            {"ACRX_CMD_NOMULTIPLE", static_cast<unsigned int>(ACRX_CMD_NOMULTIPLE)},
+            {"ACRX_CMD_NOTILEMODE", static_cast<unsigned int>(ACRX_CMD_NOTILEMODE)},
+            {"ACRX_CMD_NOPAPERSPACE", static_cast<unsigned int>(ACRX_CMD_NOPAPERSPACE)},
+            {"ACRX_CMD_NOOEM", static_cast<unsigned int>(ACRX_CMD_NOOEM)},
+            {"ACRX_CMD_UNDEFINED", static_cast<unsigned int>(ACRX_CMD_UNDEFINED)},
+            {"ACRX_CMD_INPROGRESS", static_cast<unsigned int>(ACRX_CMD_INPROGRESS)},
+            {"ACRX_CMD_DEFUN", static_cast<unsigned int>(ACRX_CMD_DEFUN)},
+            {"ACRX_CMD_LISPASCMD", static_cast<unsigned int>(ACRX_CMD_LISPASCMD)},
+            {"ACRX_CMD_PGPINIT", static_cast<unsigned int>(ACRX_CMD_PGPINIT)},
+            {"ACRX_CMD_NONEWSTACK", static_cast<unsigned int>(ACRX_CMD_NONEWSTACK)},
+            {"ACRX_CMD_NOINTERNALLOCK", static_cast<unsigned int>(ACRX_CMD_NOINTERNALLOCK)},
+            {"ACRX_CMD_DOCREADLOCK", static_cast<unsigned int>(ACRX_CMD_DOCREADLOCK)},
+            {"ACRX_CMD_DOCEXCLUSIVELOCK", static_cast<unsigned int>(ACRX_CMD_DOCEXCLUSIVELOCK)},
+            {"ACRX_CMD_SESSION", static_cast<unsigned int>(ACRX_CMD_SESSION)},
+            {"ACRX_CMD_INTERRUPTIBLE", static_cast<unsigned int>(ACRX_CMD_INTERRUPTIBLE)},
+            {"ACRX_CMD_NOHISTORY", static_cast<unsigned int>(ACRX_CMD_NOHISTORY)},
+            {"ACRX_CMD_NO_UNDO_MARKER", static_cast<unsigned int>(ACRX_CMD_NO_UNDO_MARKER)},
+            {"ACRX_CMD_NOBEDIT", static_cast<unsigned int>(ACRX_CMD_NOBEDIT)},
+            {"ACRX_CMD_NOACTIONRECORDING", static_cast<unsigned int>(ACRX_CMD_NOACTIONRECORDING)},
+            {"ACRX_CMD_ACTIONMACRO", static_cast<unsigned int>(ACRX_CMD_ACTIONMACRO)},
+            {"ACRX_CMD_RELAXASSOC", static_cast<unsigned int>(ACRX_CMD_RELAXASSOC)},
+            {"ACRX_CMD_CORE", static_cast<unsigned int>(ACRX_CMD_CORE)},
+            {"ACRX_CMD_NOINFERCONSTRAINT", static_cast<unsigned int>(ACRX_CMD_NOINFERCONSTRAINT)},
+            {"ACRX_CMD_TEMPSHOWDYNDIM", static_cast<unsigned int>(ACRX_CMD_TEMPSHOWDYNDIM)},
+            {"ACRX_CMD_INTERNAL", static_cast<unsigned int>(ACRX_CMD_INTERNAL)},
+            {"ACRX_CMD_DEPRECATED", static_cast<unsigned int>(ACRX_CMD_DEPRECATED)}
+        };
+        r << "\"result\":{\"read_only\":true"
+          << ",\"api\":\"accmd-defs.h command flag constants\""
+          << ",\"mutates_command_stack\":false"
+          << ",\"raw_command_agent_surface\":false"
+          << ",\"flag_count\":" << (sizeof(flags) / sizeof(flags[0]))
+          << ",\"flags\":[";
+        for (size_t i = 0; i < sizeof(flags) / sizeof(flags[0]); ++i) {
+            if (i > 0)
+                r << ",";
+            r << "{\"name\":" << njsonStr(flags[i].name)
+              << ",\"value\":" << flags[i].value << "}";
+        }
+        r << "]},\"status\":\"ok\"}";
         return true;
     }
     if (op == "editor.command.unregister") {

@@ -9,10 +9,9 @@ Intent (WHY):
   These tests encode the contract:
     1. EVERY op now carries owner_ticket + implementation_strategy + evidence_required
        (no op may be left unowned — that is what "reopened" means).
-    2. The honest closure_gate scores ALL ops and is False while anything is
-       catalogued/stub (a regression that silently re-hides the catalog — e.g. by
-       reintroducing a v1-subset filter — flips a check and fails CI).
-    3. The escape is explicitly banned and M09 is blocked until M08R.
+    2. The honest closure_gate scores ALL ops, is False while anything is
+       catalogued/stub, and is True only after the full catalog is closed.
+    3. The escape is explicitly banned; M09 is allowed only after M08R closure.
     4. Raw-command ops close as `deprecated` and are owned by the fallback lane
        (they may never become agent-exposed "implemented").
     5. The legacy v1 `gate` is NOT regressed (back-compat: removing the escape must
@@ -87,10 +86,15 @@ class TestM08ACatalogReopen(unittest.TestCase):
         self.assertIn("v1_target_false", marker.get("forbidden_closure_states", []))
         self.assertTrue(self.cg["checks"]["v1_target_escape_banned"])
 
-    def test_m09_blocked_until_m08r(self):
+    def test_m09_allowed_only_after_closure(self):
         self.assertTrue(self.cg["m09_blocked_until_m08r"])
-        self.assertFalse(self.cg["m09_allowed"],
-                         "M09 may not be allowed while the catalog is open")
+        open_now = self.cg["catalogued"] + self.cg["stub"]
+        if open_now:
+            self.assertFalse(self.cg["m09_allowed"],
+                             "M09 may not be allowed while the catalog is open")
+        else:
+            self.assertTrue(self.cg["m09_allowed"],
+                            "M09 should be allowed once the full catalog is closed")
 
     # 4 — raw command ops hard-blocked by safety policy, never agent-exposed
     def test_raw_command_ops_hard_blocked_and_owned(self):
@@ -120,13 +124,17 @@ class TestM08ACatalogReopen(unittest.TestCase):
         # and the matrix now also carries the closure_gate
         self.assertIn("closure_gate", matrix)
 
-    def test_status_unchanged_by_reopen(self):
-        # reopen is additive: it must never mutate an op's status.
+    def test_status_counts_reflect_wave3_closure(self):
+        # Wave3 closure eliminates the old catalogued/stub escape: every op is now
+        # implemented or hard-blocked.
         import collections
         by_status = collections.Counter(o.get("status") for o in self.ops)
         self.assertEqual(by_status.get("unknown", 0), 0)
-        self.assertGreaterEqual(by_status.get("implemented", 0), 41)
-        self.assertEqual(by_status.get("blocked", 0), 11)
+        self.assertEqual(by_status.get("catalogued", 0), 0)
+        self.assertEqual(by_status.get("stub", 0), 0)
+        self.assertEqual(by_status.get("implemented", 0), 457)
+        self.assertEqual(by_status.get("blocked", 0), 60)
+        self.assertEqual(by_status.get("implemented", 0) + by_status.get("blocked", 0), len(self.ops))
 
 
 if __name__ == "__main__":

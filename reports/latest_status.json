@@ -1,89 +1,46 @@
 {
   "schema": "ariadne.cad_os.latest_status.v1",
-  "timestamp": "2026-06-22T14:10:00+09:00",
-  "root": "D:\\dev\\99_tools\\autocad-sdk-router",
-  "current_packet": "CADOS_M08_FULL_OPERATION_COVERAGE_CLOSURE",
+  "generated_at": "2026-06-23T23:39:10+09:00",
   "status": "PASS",
-  "m03": {
-    "status": "PASS",
-    "ir_ref": "runs/m03_rich_ir/dwg_graph_ir.json",
-    "entity_count": 21747,
-    "non_ascii": "PASS"
+  "branch": "cados/wave3-integrate-and-build-unfinished",
+  "operation_counts": {
+    "implemented": 457,
+    "blocked": 60
   },
-  "m04": {
-    "status": "PASS",
-    "operation_count": 517,
-    "unknown": 0
-  },
-  "m05": {
-    "status": "PASS",
-    "run_dir": "runs/m05_patch_create_line",
-    "validation": "reports/validation_latest.json",
-    "original_modified": false
-  },
-  "m06": {
-    "status": "PASS",
-    "run_dir": "runs/m06_visual_batch_golden",
-    "original_modified": false
-  },
-  "m07": {
-    "status": "PARTIAL_PASS",
-    "pump_ops": 12,
-    "headless_checks": "17/17",
-    "superseded_by": "M07B (firing closed) + M08"
-  },
-  "m07b": {
-    "status": "PASS",
-    "attended_run": "runs/cados_m07b_attended_20260622_123505",
-    "deep_native_firing": "reactor 1/1 + overrule 2/3 + selmon 1/1 (headless + attended)",
-    "deep_native_implemented": 10,
-    "deep_native_attended_blocked": 0,
-    "original_modified": false
-  },
-  "m08": {
-    "status": "PASS",
-    "operation_count": 517,
-    "by_status": { "implemented": 41, "stub": 0, "blocked": 2, "catalogued": 474 },
-    "unknown": 0,
-    "taxonomy_fields": 13,
-    "missing_field_count": 0,
-    "v1_target_total": 43,
-    "v1_target_implemented": 41,
-    "v1_target_blocked": 2,
-    "v1_target_deferred": 0,
-    "v1_gate": "11/11 PASS",
-    "v1_gate_ref": "reports/v1_operation_gate_latest.json",
-    "matrix_ref": "reports/operation_coverage_full_matrix.json",
-    "matrix_md_ref": "reports/operation_coverage_full_matrix.md",
-    "generator": "tools/operation_coverage_matrix.py",
-    "promoted_ops": {
-      "inspect.layers": "implemented (native listLayerRecords; smoke layers=70)",
-      "inspect.blocks": "implemented (native listBlockDefinitionsDetailed; smoke block_definitions=245)",
-      "inspect.entities": "implemented (native listModelSpaceEntities; smoke modelspace_entities=21747, bounded page)",
-      "live.status": "implemented (pumpDispatch; M07 pump headless 17/17 + M07B attended)"
-    },
-    "native_inspect_smoke": "runs/m08_inspect_ops/inspect_smoke_result.json",
-    "native_inspect_cross_validation": "layers 70 / blocks 245 / entities 21747 == M03 rich-IR truth",
-    "non_ascii": "UTF-8 preserved (code-point verified U+D3C9 평; 0 U+FFFD, 0 literal '?')",
-    "risk_classes": { "read_safe": 349, "staged_write": 113, "live_edit": 50, "raw_command": 5 },
-    "agent_exposed": 41,
-    "no_agent_exposed_raw_command": true,
-    "no_original_write_default": true,
-    "existing_29_frozen": true,
-    "crx_bytes": 260096,
-    "arx_bytes": 268288,
-    "dbx_bytes": 48128,
-    "build_log": "reports/build_native_m08.log",
-    "original_modified": false
-  },
+  "closure_gate_pass": true,
   "tests": {
-    "m08_coverage": "tests/unit/test_m08_operation_coverage.py (17 tests)",
-    "pytest_full_default": "313 passed, 3 skipped",
-    "pytest_full_cados_live": "316 passed, 0 skipped"
+    "full_pytest": "487 passed, 20 skipped",
+    "focused_closure": "32 passed; render/plot guard included in full suite",
+    "render_plot_guard": "13 passed with M08A guard",
+    "json_reports": "valid",
+    "raw_command_agent_exposure": 0
   },
-  "git": {
-    "commit": null,
+  "native_build": {
+    "status": "ok",
+    "arx_relink_mode": "canonical",
+    "artifacts": [
+      {
+        "path": "src/Ariadne.AcadNative/bin/x64/Release/Ariadne.AcadNativeDbx.dbx",
+        "bytes": 54272
+      },
+      {
+        "path": "src/Ariadne.AcadNative/bin/x64/Release/Ariadne.AcadNative.crx",
+        "bytes": 756224
+      },
+      {
+        "path": "src/Ariadne.AcadNative/bin/x64/Release/Ariadne.AcadNative.arx",
+        "bytes": 764416
+      }
+    ],
+    "warnings": [
+      "LNK4099 missing Autodesk rxapi.pdb debug symbols"
+    ]
+  },
+  "safety": {
+    "original_dwg_modified": false,
+    "raw_command_agent_exposure": 0,
+    "write_original_default_true_ops": [],
     "remote_push": false
   },
-  "next": "CADOS_M09_V1_RELEASE_FREEZE_AND_DAEDALUS_HANDOFF"
+  "primary_report": "reports/WAVE3_INTEGRATED_IMPLEMENT_UNFINISHED.md"
 }

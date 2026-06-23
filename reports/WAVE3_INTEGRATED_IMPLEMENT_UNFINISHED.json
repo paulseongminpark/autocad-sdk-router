@@ -1,0 +1,216 @@
+{
+  "schema": "ariadne.cad_os.wave3.integrated_implement_unfinished.v1",
+  "generated_at": "2026-06-23T23:37:33+09:00",
+  "status": "PASS",
+  "branch": "cados/wave3-integrate-and-build-unfinished",
+  "post_merge_baseline_commit": "53dde79",
+  "merged": [
+    {
+      "branch": "cados/wave3-pane2-heavy-native-30",
+      "result": "merged"
+    },
+    {
+      "branch": "cados/wave3-pane6-native-custom",
+      "result": "merged"
+    },
+    {
+      "branch": "cados/wave3-pane8-opm-reactors",
+      "result": "merged"
+    },
+    {
+      "branch": "cados/wave3-pane4-fallback-lowrisk",
+      "result": "already_up_to_date"
+    },
+    {
+      "branch": "cados/wave3-pane3-visual-live",
+      "result": "merged"
+    },
+    {
+      "branch": "cados/wave3-pane9-live-editor-ui",
+      "result": "merged"
+    }
+  ],
+  "reviewed_not_merged": [
+    {
+      "branch": "cados/wave3-pane10-mixed-burndown",
+      "decision": "not_merged_raw_sendstring_surface_reviewed_and_blocked"
+    },
+    {
+      "branch": "cados/wave3-pane5-generic-30",
+      "decision": "not_merged_reaudited_and_reimplemented_or_blocked_in_integration"
+    }
+  ],
+  "reworked": [
+    "doc.sendstring safety block",
+    "Pane5 AcDbAssoc callback read-only introspection",
+    "Pane6 object_enabler demand_register registration-plan-only handler",
+    "Pane3/P6 overrule.dimstyle.install ObjectARX handler",
+    "M08D subentity marker/path reads",
+    "M08D subentity color read",
+    "M08N command flag inventory",
+    "render/plot no-fake-PASS re-audit",
+    "Wave3 remaining hard-block re-audit closure"
+  ],
+  "implemented_from_unfinished": [
+    "config.assoceval.callback",
+    "config.constraint.globalCallback",
+    "inspect.subentity.color",
+    "inspect.subentity.markers_at_path",
+    "inspect.subentity.path_at_marker",
+    "module.command.flags",
+    "overrule.dimstyle.install",
+    "extend.object_enabler.demand_register"
+  ],
+  "hard_blocks_accepted_after_reaudit": [
+    "automate.com.get_app",
+    "automate.com.get_document",
+    "automate.com.get_for_command",
+    "automate.com.get_winapp",
+    "automate.com.send_command",
+    "automate.com.wrapper_for_object",
+    "define.assocarray.create",
+    "define.assocarray.path",
+    "define.assocarray.polar",
+    "define.assocarray.rectangular",
+    "define.assocsurface.blend",
+    "define.assocsurface.extrude",
+    "define.assocsurface.fillet",
+    "define.assocsurface.loft",
+    "define.assocsurface.offset",
+    "define.assocsurface.patch",
+    "define.assocsurface.result",
+    "define.assocsurface.trim",
+    "edit.assocarray.explode",
+    "edit.assocarray.item",
+    "edit.assocarray.itemReplace",
+    "edit.assocarray.reset",
+    "edit.assocarray.source",
+    "edit.assocarray.transform",
+    "edit.assocdata.xref",
+    "edit.subentity.add_paths",
+    "edit.subentity.delete_paths",
+    "edit.subentity.transform",
+    "embed.ole.frame",
+    "inspect.assocaction.evaluate",
+    "inspect.assocnetwork.evaluate",
+    "inspect.assocsurface.topology",
+    "module.command.remove_group",
+    "module.entrypoint.define",
+    "module.entrypoint.dispatch",
+    "module.lifecycle.init",
+    "module.lifecycle.on_load_dwg",
+    "module.lifecycle.on_ole_unload",
+    "module.lifecycle.on_unload_dwg",
+    "module.lifecycle.other",
+    "module.lifecycle.unload",
+    "module.load",
+    "module.load.acad_rx",
+    "module.load.by_app",
+    "module.load.lisp",
+    "module.unload",
+    "repair.assocdata.audit",
+    "ui.subentity.highlight",
+    "plot.config.settings",
+    "plot.engine.run"
+  ],
+  "hard_blocks_reversed_to_implemented": [
+    "extend.object_enabler.demand_register"
+  ],
+  "doc_sendstring_decision": "blocked SAFETY_FORBIDDEN; no agent exposure for raw sendStringToExecute command stream",
+  "pane5_hardblock_reaudit": {
+    "implemented": [
+      "config.assoceval.callback",
+      "config.constraint.globalCallback"
+    ],
+    "accepted_blocks": [
+      "define.assocarray.create",
+      "define.assocarray.path",
+      "define.assocarray.polar",
+      "define.assocarray.rectangular",
+      "define.assocsurface.blend",
+      "define.assocsurface.extrude",
+      "define.assocsurface.fillet",
+      "define.assocsurface.loft",
+      "define.assocsurface.offset",
+      "define.assocsurface.patch",
+      "define.assocsurface.result",
+      "define.assocsurface.trim",
+      "edit.assocarray.explode",
+      "edit.assocarray.item",
+      "edit.assocarray.itemReplace",
+      "edit.assocarray.reset",
+      "edit.assocarray.source",
+      "edit.assocarray.transform",
+      "edit.assocdata.xref",
+      "inspect.assocaction.evaluate",
+      "inspect.assocnetwork.evaluate",
+      "inspect.assocsurface.topology",
+      "repair.assocdata.audit"
+    ]
+  },
+  "pane6_demand_register_decision": "implemented as registration_plan_only; no registry writes or canonical deploy mutation",
+  "pane9_doc_live_implementation": {
+    "module.app.accessor": "implemented",
+    "module.command.stack_handle": "implemented",
+    "doc.current": "implemented",
+    "doc.lock": "implemented",
+    "doc.new": "implemented",
+    "doc.syncopen": "implemented"
+  },
+  "tests": {
+    "full_pytest": "487 passed, 20 skipped",
+    "focused_closure": "32 passed; render/plot guard included in full suite",
+    "render_plot_guard": "13 passed with M08A guard",
+    "json_reports": "valid",
+    "raw_command_agent_exposure": 0
+  },
+  "native_build": {
+    "status": "ok",
+    "arx_relink_mode": "canonical",
+    "artifacts": [
+      {
+        "path": "src/Ariadne.AcadNative/bin/x64/Release/Ariadne.AcadNativeDbx.dbx",
+        "bytes": 54272
+      },
+      {
+        "path": "src/Ariadne.AcadNative/bin/x64/Release/Ariadne.AcadNative.crx",
+        "bytes": 756224
+      },
+      {
+        "path": "src/Ariadne.AcadNative/bin/x64/Release/Ariadne.AcadNative.arx",
+        "bytes": 764416
+      }
+    ],
+    "warnings": [
+      "LNK4099 missing Autodesk rxapi.pdb debug symbols"
+    ]
+  },
+  "op_counts_before": {
+    "implemented": 451,
+    "blocked": 11,
+    "catalogued": 55
+  },
+  "op_counts_after": {
+    "implemented": 457,
+    "blocked": 60
+  },
+  "closure_gate_pass": true,
+  "remaining_unfinished": [],
+  "safety": {
+    "original_dwg_modified": false,
+    "raw_command_agent_exposure": 0,
+    "write_original_default_true_ops": [],
+    "remote_push": false
+  },
+  "reports": [
+    "reports/WAVE3_INTEGRATED_IMPLEMENT_UNFINISHED.md",
+    "reports/WAVE3_INTEGRATED_IMPLEMENT_UNFINISHED.json",
+    "reports/unfinished_after_wave3_merge.md",
+    "reports/unfinished_after_wave3_merge.json",
+    "reports/operation_coverage_latest.json",
+    "reports/operation_coverage_full_matrix.json",
+    "reports/v1_operation_gate_latest.json",
+    "reports/latest_status.json",
+    "handoff/NEXT_STEP.md"
+  ]
+}

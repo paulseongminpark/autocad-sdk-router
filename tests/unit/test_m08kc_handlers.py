@@ -29,9 +29,13 @@ Intent (WHY):
   4. SOLVER/MODELER-BOUND OPS ARE HONESTLY DEFERRED -- the assocsurface.* (ASM modeler),
      *.evaluate, autoConstrain, dimassoc.geometryDriven, assocarray create/edit/explode
      (the createInstance/reset/transform layout pass IS the evaluator), assocdata.xref,
-     assocsurface.topology, repair.assocdata.audit, the global eval callbacks, AND the
+     assocsurface.topology, repair.assocdata.audit, AND the
      geometric/dimensional CONSTRAINT create ops must NOT appear in HasOp. This test pins
      that so a future edit cannot silently claim a solver-bound op.
+
+  5. CALLBACK CONFIG OPS ARE READ-ONLY INTROSPECTION -- the global assoc-evaluation and
+     2d-constraint callback ops may report status/counts, but must never register,
+     remove, or invoke callbacks from the agent surface.
 
   Source-level only (no AutoCAD/build needed). Stdlib only.
 """
@@ -94,10 +98,15 @@ _PARAMETERS = [
 _ARRAYS = [
     "inspect.assocarray.identify",
 ]
+# callback configuration -- read-only status/introspection only (2)
+_CALLBACKS = [
+    "config.assoceval.callback",
+    "config.constraint.globalCallback",
+]
 
-_IMPLEMENTED = _NETWORK_ACTION + _DEPENDENCIES + _CONSTRAINTS + _PARAMETERS + _ARRAYS
+_IMPLEMENTED = _NETWORK_ACTION + _DEPENDENCIES + _CONSTRAINTS + _PARAMETERS + _ARRAYS + _CALLBACKS
 
-# ---- The 33 DEFERRED ops (solver / ASM modeler / eval callbacks) -------------
+# ---- The 23 DEFERRED ops (solver / ASM modeler / mutating callback setup) ----
 # These must NOT appear in HasOp (honest contract; no fakes).
 _DEFERRED = [
     # ASM surface modeler (8)
@@ -127,8 +136,6 @@ _DEFERRED = [
     "edit.assocdata.xref",
     "inspect.assocsurface.topology",
     "repair.assocdata.audit",
-    "config.assoceval.callback",
-    "config.constraint.globalCallback",
 ]
 
 
@@ -194,20 +201,21 @@ class TestM08KCHandlers(unittest.TestCase):
 
     def test_implemented_count(self):
         # Group totals: network/action=11, dependencies=5, constraints=13, parameters=3,
-        # arrays=1. 11+5+13+3+1 = 33 real handlers. The remaining 25 ops of the 58-op brief
-        # are the _DEFERRED solver/modeler/callback set -- left OUT of HasOp (no fake pass).
+        # arrays=1, callbacks=2. 11+5+13+3+1+2 = 35 real handlers. The remaining 23
+        # ops of the 58-op brief are the _DEFERRED solver/modeler/mutating set.
         self.assertEqual(len(_NETWORK_ACTION), 11)
         self.assertEqual(len(_DEPENDENCIES), 5)
         self.assertEqual(len(_CONSTRAINTS), 13)
         self.assertEqual(len(_PARAMETERS), 3)
         self.assertEqual(len(_ARRAYS), 1)
-        self.assertEqual(len(_IMPLEMENTED), 33)
-        self.assertEqual(len(set(_IMPLEMENTED)), 33, "duplicate op id in the implemented list")
-        self.assertEqual(len(self.hasop), 33)
+        self.assertEqual(len(_CALLBACKS), 2)
+        self.assertEqual(len(_IMPLEMENTED), 35)
+        self.assertEqual(len(set(_IMPLEMENTED)), 35, "duplicate op id in the implemented list")
+        self.assertEqual(len(self.hasop), 35)
 
     def test_total_op_budget_is_58(self):
-        # The brief is 58 ops: 33 implemented + 25 deferred, with no overlap.
-        self.assertEqual(len(set(_DEFERRED)), 25, "duplicate op id in the deferred list")
+        # The brief is 58 ops: 35 implemented + 23 deferred, with no overlap.
+        self.assertEqual(len(set(_DEFERRED)), 23, "duplicate op id in the deferred list")
         self.assertEqual(len(set(_IMPLEMENTED)) + len(set(_DEFERRED)), 58)
         self.assertEqual(set(_IMPLEMENTED) & set(_DEFERRED), set(), "an op is both implemented and deferred")
 
@@ -260,6 +268,22 @@ class TestM08KCHandlers(unittest.TestCase):
         # network solver) -- sanity: it is the only "evaluate"-named symbol we use.
         self.assertIn("evaluateExpression", self.code,
                       "inspect.parameter.evaluate must use the static expression evaluator")
+
+    def test_callback_config_is_introspection_only(self):
+        self.assertIn("getGlobalEvaluationCallbacks", self.code)
+        self.assertIn("globalCallback", self.code)
+        banned = [
+            r"addGlobalEvaluationCallback\s*\(",
+            r"removeGlobalEvaluationCallback\s*\(",
+            r"addGlobalCallback\s*\(",
+            r"removeGlobalCallback\s*\(",
+            r"setDoNotCheckNewlyAddedConstraints\s*\(",
+        ]
+        for pat in banned:
+            self.assertIsNone(
+                re.search(pat, self.code),
+                "callback config op must be read-only introspection, not mutation: %s" % pat,
+            )
 
     def test_create_ops_guard_disables_evaluation(self):
         # Every create op posts under an AcDbAssocNetworkEvaluationDisabler so adding an

@@ -18,9 +18,9 @@ Intent (WHY):
      dropping ops) or a silent fake-grow (claiming ops with no handler).
 
   3. WAVE3 CALLBACK OPS ARE REAL HANDLERS -- the former deferred custom entity/object
-     callbacks now have native class overrides plus m08k dispatcher branches. The only
-     claimed op kept out of HasOp is the install-time demand-register registry write,
-     which is hard-blocked in the registry/report for safety and Pane-1 deploy ownership.
+     callbacks now have native class overrides plus m08k dispatcher branches. The
+     object-enabler demand-register surface is implemented only as a safe registration
+     plan/status operation; it must not write HKLM or canonical deployment state.
 
   4. STAGED-WRITE-ONLY / NO ORIGINAL-WRITE / NO EDITOR-COMMAND (source-level) -- the
      family operates on the router-staged copy and rolls every scratch mutation back; it
@@ -75,6 +75,7 @@ _CLASS_REG = [
     "extend.module.entrypoint",
     "extend.object_enabler.build",
     "extend.object_enabler.register_classes",
+    "extend.object_enabler.demand_register",
 ]
 _OBJECT_LIFECYCLE = [
     "extend.customobject.define",
@@ -109,10 +110,7 @@ _CUSTOM_OSNAP = [
 
 _IMPLEMENTED = _RTTI + _PROTOCOL + _CLASS_REG + _OBJECT_LIFECYCLE + _CUSTOM_ENTITY + _CUSTOM_OSNAP
 
-# --- HARD-BLOCKED (must NOT appear in HasOp; registry/report carries blocker) --
-_HARD_BLOCKED = [
-    "extend.object_enabler.demand_register",  # HKLM demand-load/canonical deploy is Pane 1 only
-]
+_HARD_BLOCKED = []
 
 # Invented / dead handler cleanup: this op was a teammate-added duplicate and must stay out
 # of both HasOp and Dispatch; the registry-correct `extend.customentity.db_defaults` remains.
@@ -180,17 +178,17 @@ class TestM08KHandlers(unittest.TestCase):
         )
 
     def test_implemented_count(self):
-        # Group totals: RTTI=5, protocol=4, class-registration=11, object-lifecycle=10,
-        # custom-entity=13, custom-osnap=1. 5+4+11+10+13+1 = 44 real handlers.
+        # Group totals: RTTI=5, protocol=4, class-registration=12, object-lifecycle=10,
+        # custom-entity=13, custom-osnap=1. 5+4+12+10+13+1 = 45 real handlers.
         self.assertEqual(len(_RTTI), 5)
         self.assertEqual(len(_PROTOCOL), 4)
-        self.assertEqual(len(_CLASS_REG), 11)
+        self.assertEqual(len(_CLASS_REG), 12)
         self.assertEqual(len(_OBJECT_LIFECYCLE), 10)
         self.assertEqual(len(_CUSTOM_ENTITY), 13)
         self.assertEqual(len(_CUSTOM_OSNAP), 1)
-        self.assertEqual(len(_IMPLEMENTED), 44)
-        self.assertEqual(len(set(_IMPLEMENTED)), 44, "duplicate op id in the implemented list")
-        self.assertEqual(len(self.hasop), 44)
+        self.assertEqual(len(_IMPLEMENTED), 45)
+        self.assertEqual(len(set(_IMPLEMENTED)), 45, "duplicate op id in the implemented list")
+        self.assertEqual(len(self.hasop), 45)
 
     def test_hard_blocked_install_time_op_not_in_hasop(self):
         leaked = sorted(self.hasop & set(_HARD_BLOCKED))
@@ -222,6 +220,9 @@ class TestM08KHandlers(unittest.TestCase):
             r"\bacedCommand\b",
             r"\bacedCmd\b",
             r"\bacedInvoke\b",
+            r"\bRegSetValue",
+            r"\bSHSetValue",
+            r"\bRegCreateKey",
         ]
         for pat in banned:
             self.assertIsNone(
@@ -284,6 +285,7 @@ class TestM08KHandlers(unittest.TestCase):
             "addCustomOsnapMode",      # custom osnap manager registration
             "applyPartialUndo",        # custom object partial undo override
             "getSubentPathsAtGsMarker",# subentity-path protocol
+            "registration_plan_only",   # object-enabler demand-register safe plan
         ]:
             self.assertIn(token, self.code, "expected real ObjectARX call missing: %s" % token)
 

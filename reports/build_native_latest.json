@@ -1,7 +1,22 @@
-﻿{
-    "status":  "ok",
-    "arx_relink_mode":  "versioned_lock_bypass",
-    "arx_versioned_name":  "Ariadne.AcadNative.live_20260622_034352",
-    "exit_code":  0,
-    "artifact":  "src\\Ariadne.AcadNative\\bin\\x64\\Release\\Ariadne.AcadNative.live_20260622_034352.arx"
+{
+  "status": "ok",
+  "arx_relink_mode": "canonical",
+  "arx_versioned_name": "",
+  "arx_lock_note": "Canonical .arx relinked normally.",
+  "exit_code": 0,
+  "artifacts": [
+    {
+      "path": "src/Ariadne.AcadNative/bin/x64/Release/Ariadne.AcadNativeDbx.dbx",
+      "bytes": 54272
+    },
+    {
+      "path": "src/Ariadne.AcadNative/bin/x64/Release/Ariadne.AcadNative.crx",
+      "bytes": 756224
+    },
+    {
+      "path": "src/Ariadne.AcadNative/bin/x64/Release/Ariadne.AcadNative.arx",
+      "bytes": 764416
+    }
+  ],
+  "generated_at": "2026-06-23T23:37:33+09:00"
 }

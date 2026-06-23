@@ -45,6 +45,7 @@
 #include "dbentityoverrule.h"  // AcDbPropertiesOverrule/Osnap/Transform/Grip/Subentity/Highlight/HighlightState/Visibility/Geometry overrules
 #include "dbgrip.h"         // AcDbGripDataPtrArray
 #include "dbents.h"         // AcDbPoint (transient subject for overrule applicability probes)
+#include "dbdim.h"          // AcDbDimension / AcDbDimensionStyleOverrule
 
 //============================================================================
 // M08L hostless AcGiWorldDraw collector
@@ -468,6 +469,7 @@ M08L_DEFINE_OVERRULE(M08LHighlightStateOverrule, AcDbHighlightStateOverrule);
 M08L_DEFINE_OVERRULE(M08LVisibilityOverrule,     AcDbVisibilityOverrule);
 M08L_DEFINE_OVERRULE(M08LGripOverrule,           AcDbGripOverrule);
 M08L_DEFINE_OVERRULE(M08LQueryXOverrule,         AcRxQueryXOverrule);
+M08L_DEFINE_OVERRULE(M08LDimensionStyleOverrule, AcDbDimensionStyleOverrule);
 
 #undef M08L_DEFINE_OVERRULE
 
@@ -489,6 +491,7 @@ static bool m08lOverruleFor(const std::string& installOp, AcRxOverrule*& pOv,
     static M08LVisibilityOverrule     sVisibility;
     static M08LGripOverrule           sGrip;
     static M08LQueryXOverrule         sQueryX;
+    static M08LDimensionStyleOverrule sDimensionStyle;
 
     // overrule.install (generic) maps to the AcDbObject overrule (the broadest DB base).
     if (installOp == "overrule.install" || installOp == "overrule.object.install") {
@@ -526,6 +529,9 @@ static bool m08lOverruleFor(const std::string& installOp, AcRxOverrule*& pOv,
     }
     if (installOp == "overrule.queryx.install") {
         pOv = &sQueryX; pOvClass = AcRxQueryXOverrule::desc(); className = "AcRxQueryXOverrule"; return true;
+    }
+    if (installOp == "overrule.dimstyle.install") {
+        pOv = &sDimensionStyle; pOvClass = AcDbDimensionStyleOverrule::desc(); className = "AcDbDimensionStyleOverrule"; return true;
     }
     return false;
 }
@@ -623,6 +629,7 @@ static bool m08lHasOp(const std::string& op)
         op == "overrule.visibility.install" ||
         op == "overrule.grip.install" ||
         op == "overrule.queryx.install" ||
+        op == "overrule.dimstyle.install" ||
         // T02 — overrule global/query/remove + grips read (5)
         op == "overrule.global.enable" ||
         op == "overrule.applicable" ||
@@ -868,11 +875,13 @@ static bool m08lDispatch(const std::string& op, const AriadneJobCtx& ctx, std::o
             op != "overrule.global.enable" && op != "overrule.applicable" &&
             op != "overrule.query.has" && op != "overrule.remove" &&
             m08lOverruleFor(op, pOv, pOvClass, className)) {
-            AcRxClass* target = (op == "overrule.queryx.install") ? AcRxObject::desc() : AcDbEntity::desc();
+            AcRxClass* target = (op == "overrule.queryx.install") ? AcRxObject::desc() :
+                (op == "overrule.dimstyle.install" ? AcDbDimension::desc() : AcDbEntity::desc());
             std::string targetName;
             if (m08lFindStr(job, "target_class", targetName)) {
                 if (targetName == "AcDbObject")      target = AcDbObject::desc();
                 else if (targetName == "AcDbEntity") target = AcDbEntity::desc();
+                else if (targetName == "AcDbDimension") target = AcDbDimension::desc();
                 else if (targetName == "AcRxObject") target = AcRxObject::desc();
             }
             const bool overrulingWasOn = AcRxOverrule::isOverruling();

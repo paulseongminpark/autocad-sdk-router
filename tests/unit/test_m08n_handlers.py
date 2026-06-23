@@ -56,6 +56,7 @@ _RUNTIME = [
     "module.ads.register_symbol",
     "module.app.accessor",
     "module.class.register_object",
+    "module.command.flags",
     "module.command.register_auto",
     "module.command.register_manual",
     "module.command.stack_handle",
@@ -170,8 +171,8 @@ class TestM08NHandlers(unittest.TestCase):
         self.assertRegex(self.src, r"bool\s+m08nDispatch\(const std::string& op, const AriadneJobCtx& ctx, std::ostringstream& r\)")
 
     def test_hasop_lists_exactly_feasible_implemented(self):
-        self.assertEqual(len(_IMPLEMENTED), 76)
-        self.assertEqual(len(set(_IMPLEMENTED)), 76)
+        self.assertEqual(len(_IMPLEMENTED), 77)
+        self.assertEqual(len(set(_IMPLEMENTED)), 77)
         self.assertEqual(
             self.hasop,
             set(_IMPLEMENTED),
@@ -239,6 +240,13 @@ class TestM08NHandlers(unittest.TestCase):
             "acrxServiceIsRegistered", "acrxRegisterAppMDIAware",
         ]:
             self.assertIn(token, self.src + self.native_job)
+
+    def test_module_command_flags_is_read_only_inventory(self):
+        self.assertIn('op == "module.command.flags"', self.src)
+        self.assertIn("ACRX_CMD_MODAL", self.src)
+        self.assertIn("ACRX_CMD_TRANSPARENT", self.src)
+        self.assertIn("ACRX_CMD_SESSION", self.src)
+        self.assertIn('"read_only":true', self.src)
 
     def test_selection_filter_structure_present(self):
         self.assertIn("m08nBuildTypeFilter", self.src)

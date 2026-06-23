@@ -84,15 +84,15 @@
     },
     "M08D-T03": {
       "op_count": 51,
-      "open": 4,
-      "implemented": 47,
-      "blocked": 0,
+      "open": 0,
+      "implemented": 50,
+      "blocked": 1,
       "by_family": {
         "brep_solids": 51
       },
       "by_strategy": {
-        "implemented_v1": 47,
-        "native_arx_cpp": 4
+        "implemented_v1": 50,
+        "hard_blocked": 1
       }
     },
     "M08E-T01": {
@@ -161,16 +161,16 @@
     },
     "M08G-T03": {
       "op_count": 11,
-      "open": 3,
+      "open": 0,
       "implemented": 8,
-      "blocked": 0,
+      "blocked": 3,
       "by_family": {
         "brep_solids": 3,
         "entities": 6,
         "geometry_kernel": 2
       },
       "by_strategy": {
-        "native_arx_cpp": 3,
+        "hard_blocked": 3,
         "implemented_v1": 8
       }
     },
@@ -201,15 +201,15 @@
     "M08I-T01": {
       "op_count": 3,
       "open": 0,
-      "implemented": 3,
-      "blocked": 0,
+      "implemented": 1,
+      "blocked": 2,
       "by_family": {
         "render": 1,
         "layouts_plot_publish": 2
       },
       "by_strategy": {
-        "implemented_v1": 2,
-        "attended_verification": 1
+        "implemented_v1": 1,
+        "hard_blocked": 2
       }
     },
     "M08I-T02": {
@@ -252,29 +252,27 @@
     "M08K-T01": {
       "op_count": 47,
       "open": 0,
-      "implemented": 46,
-      "blocked": 1,
+      "implemented": 47,
+      "blocked": 0,
       "by_family": {
         "extend": 2,
         "custom_objects_protocols": 45
       },
       "by_strategy": {
-        "implemented_v1": 46,
-        "hard_blocked": 1
+        "implemented_v1": 47
       }
     },
     "M08K-T03": {
       "op_count": 58,
-      "open": 25,
-      "implemented": 33,
-      "blocked": 0,
+      "open": 0,
+      "implemented": 35,
+      "blocked": 23,
       "by_family": {
         "constraints_associativity": 58
       },
       "by_strategy": {
-        "native_arx_cpp": 16,
-        "implemented_v1": 33,
-        "objectdbx_hostless": 9
+        "implemented_v1": 35,
+        "hard_blocked": 23
       }
     },
     "M08L-T01": {
@@ -291,16 +289,15 @@
     },
     "M08L-T02": {
       "op_count": 19,
-      "open": 1,
-      "implemented": 18,
+      "open": 0,
+      "implemented": 19,
       "blocked": 0,
       "by_family": {
         "custom_objects_protocols": 18,
         "graphics_system": 1
       },
       "by_strategy": {
-        "implemented_v1": 18,
-        "native_arx_cpp": 1
+        "implemented_v1": 19
       }
     },
     "M08M-T01": {
@@ -356,33 +353,30 @@
     },
     "M08O-T01": {
       "op_count": 16,
-      "open": 7,
+      "open": 0,
       "implemented": 9,
-      "blocked": 0,
+      "blocked": 7,
       "by_family": {
         "com_activex": 16
       },
       "by_strategy": {
         "implemented_v1": 9,
-        "managed_dotnet": 3,
-        "native_arx_cpp": 4
+        "hard_blocked": 7
       }
     },
     "M08O-T02": {
       "op_count": 23,
-      "open": 15,
-      "implemented": 2,
-      "blocked": 6,
+      "open": 0,
+      "implemented": 3,
+      "blocked": 20,
       "by_family": {
         "active_document_write_original": 4,
         "editor_input": 1,
         "runtime_commands": 18
       },
       "by_strategy": {
-        "hard_blocked": 6,
-        "implemented_v1": 2,
-        "native_arx_cpp": 13,
-        "accoreconsole_lisp": 2
+        "hard_blocked": 20,
+        "implemented_v1": 3
       }
     }
   },
@@ -1010,31 +1004,31 @@
     {
       "operation": "edit.subentity.add_paths",
       "family": "brep_solids",
-      "status": "catalogued",
+      "status": "blocked",
       "engine_tier": "native_arx_only",
       "owner_ticket": "M08G-T03",
-      "implementation_strategy": "native_arx_cpp",
-      "evidence_required": "unit_test+native_extraction_fixture",
+      "implementation_strategy": "hard_blocked",
+      "evidence_required": "blocker_ref_and_evidence",
       "risk_class": "read_safe"
     },
     {
       "operation": "edit.subentity.delete_paths",
       "family": "brep_solids",
-      "status": "catalogued",
+      "status": "blocked",
       "engine_tier": "native_arx_only",
       "owner_ticket": "M08G-T03",
-      "implementation_strategy": "native_arx_cpp",
-      "evidence_required": "unit_test+native_extraction_fixture",
+      "implementation_strategy": "hard_blocked",
+      "evidence_required": "blocker_ref_and_evidence",
       "risk_class": "read_safe"
     },
     {
       "operation": "edit.subentity.transform",
       "family": "brep_solids",
-      "status": "catalogued",
+      "status": "blocked",
       "engine_tier": "native_arx_only",
       "owner_ticket": "M08G-T03",
-      "implementation_strategy": "native_arx_cpp",
-      "evidence_required": "unit_test+native_extraction_fixture",
+      "implementation_strategy": "hard_blocked",
+      "evidence_required": "blocker_ref_and_evidence",
       "risk_class": "read_safe"
     },
     {
@@ -1290,11 +1284,11 @@
     {
       "operation": "inspect.subentity.color",
       "family": "brep_solids",
-      "status": "catalogued",
+      "status": "implemented",
       "engine_tier": "native_arx_only",
       "owner_ticket": "M08D-T03",
-      "implementation_strategy": "native_arx_cpp",
-      "evidence_required": "unit_test+native_extraction_fixture",
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs",
       "risk_class": "read_safe"
     },
     {
@@ -1310,21 +1304,21 @@
     {
       "operation": "inspect.subentity.markers_at_path",
       "family": "brep_solids",
-      "status": "catalogued",
+      "status": "implemented",
       "engine_tier": "native_arx_only",
       "owner_ticket": "M08D-T03",
-      "implementation_strategy": "native_arx_cpp",
-      "evidence_required": "unit_test+native_extraction_fixture",
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs",
       "risk_class": "read_safe"
     },
     {
       "operation": "inspect.subentity.path_at_marker",
       "family": "brep_solids",
-      "status": "catalogued",
+      "status": "implemented",
       "engine_tier": "native_arx_only",
       "owner_ticket": "M08D-T03",
-      "implementation_strategy": "native_arx_cpp",
-      "evidence_required": "unit_test+native_extraction_fixture",
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs",
       "risk_class": "read_safe"
     },
     {
@@ -1480,11 +1474,11 @@
     {
       "operation": "ui.subentity.highlight",
       "family": "brep_solids",
-      "status": "catalogued",
+      "status": "blocked",
       "engine_tier": "native_arx_only",
       "owner_ticket": "M08D-T03",
-      "implementation_strategy": "native_arx_cpp",
-      "evidence_required": "unit_test+native_extraction_fixture",
+      "implementation_strategy": "hard_blocked",
+      "evidence_required": "blocker_ref_and_evidence",
       "risk_class": "read_safe"
     },
     {
@@ -1510,41 +1504,41 @@
     {
       "operation": "automate.com.get_app",
       "family": "com_activex",
-      "status": "catalogued",
+      "status": "blocked",
       "engine_tier": "managed_also",
       "owner_ticket": "M08O-T01",
-      "implementation_strategy": "managed_dotnet",
-      "evidence_required": "unit_test+native_extraction_fixture",
+      "implementation_strategy": "hard_blocked",
+      "evidence_required": "blocker_ref_and_evidence",
       "risk_class": "read_safe"
     },
     {
       "operation": "automate.com.get_document",
       "family": "com_activex",
-      "status": "catalogued",
+      "status": "blocked",
       "engine_tier": "managed_also",
       "owner_ticket": "M08O-T01",
-      "implementation_strategy": "managed_dotnet",
-      "evidence_required": "unit_test+native_extraction_fixture",
+      "implementation_strategy": "hard_blocked",
+      "evidence_required": "blocker_ref_and_evidence",
       "risk_class": "read_safe"
     },
     {
       "operation": "automate.com.get_for_command",
       "family": "com_activex",
-      "status": "catalogued",
+      "status": "blocked",
       "engine_tier": "native_arx_only",
       "owner_ticket": "M08O-T01",
-      "implementation_strategy": "native_arx_cpp",
-      "evidence_required": "unit_test+native_extraction_fixture",
+      "implementation_strategy": "hard_blocked",
+      "evidence_required": "blocker_ref_and_evidence",
       "risk_class": "read_safe"
     },
     {
       "operation": "automate.com.get_winapp",
       "family": "com_activex",
-      "status": "catalogued",
+      "status": "blocked",
       "engine_tier": "native_arx_only",
       "owner_ticket": "M08O-T01",
-      "implementation_strategy": "native_arx_cpp",
-      "evidence_required": "unit_test+native_extraction_fixture",
+      "implementation_strategy": "hard_blocked",
+      "evidence_required": "blocker_ref_and_evidence",
       "risk_class": "read_safe"
     },
     {
@@ -1580,21 +1574,21 @@
     {
       "operation": "automate.com.send_command",
       "family": "com_activex",
-      "status": "catalogued",
+      "status": "blocked",
       "engine_tier": "managed_also",
       "owner_ticket": "M08O-T01",
-      "implementation_strategy": "managed_dotnet",
-      "evidence_required": "unit_test+native_extraction_fixture",
+      "implementation_strategy": "hard_blocked",
+      "evidence_required": "blocker_ref_and_evidence",
       "risk_class": "read_safe"
     },
     {
       "operation": "automate.com.wrapper_for_object",
       "family": "com_activex",
-      "status": "catalogued",
+      "status": "blocked",
       "engine_tier": "native_arx_only",
       "owner_ticket": "M08O-T01",
-      "implementation_strategy": "native_arx_cpp",
-      "evidence_required": "unit_test+native_extraction_fixture",
+      "implementation_strategy": "hard_blocked",
+      "evidence_required": "blocker_ref_and_evidence",
       "risk_class": "read_safe"
     },
     {
@@ -1610,11 +1604,11 @@
     {
       "operation": "embed.ole.frame",
       "family": "com_activex",
-      "status": "catalogued",
+      "status": "blocked",
       "engine_tier": "native_arx_only",
       "owner_ticket": "M08O-T01",
-      "implementation_strategy": "native_arx_cpp",
-      "evidence_required": "attended_live_pump_session_log",
+      "implementation_strategy": "hard_blocked",
+      "evidence_required": "blocker_ref_and_evidence",
       "risk_class": "live_edit"
     },
     {
@@ -1980,11 +1974,11 @@
     {
       "operation": "config.assoceval.callback",
       "family": "constraints_associativity",
-      "status": "catalogued",
+      "status": "implemented",
       "engine_tier": "native_arx_only",
       "owner_ticket": "M08K-T03",
-      "implementation_strategy": "native_arx_cpp",
-      "evidence_required": "unit_test+native_extraction_fixture",
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs",
       "risk_class": "read_safe"
     },
     {
@@ -2000,11 +1994,11 @@
     {
       "operation": "config.constraint.globalCallback",
       "family": "constraints_associativity",
-      "status": "catalogued",
+      "status": "implemented",
       "engine_tier": "native_arx_only",
       "owner_ticket": "M08K-T03",
-      "implementation_strategy": "native_arx_cpp",
-      "evidence_required": "unit_test+native_extraction_fixture",
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs",
       "risk_class": "read_safe"
     },
     {
@@ -2040,41 +2034,41 @@
     {
       "operation": "define.assocarray.create",
       "family": "constraints_associativity",
-      "status": "catalogued",
+      "status": "blocked",
       "engine_tier": "objectdbx_capable",
       "owner_ticket": "M08K-T03",
-      "implementation_strategy": "objectdbx_hostless",
-      "evidence_required": "unit_test+staged_diff_fixture_original_unchanged",
+      "implementation_strategy": "hard_blocked",
+      "evidence_required": "blocker_ref_and_evidence",
       "risk_class": "staged_write"
     },
     {
       "operation": "define.assocarray.path",
       "family": "constraints_associativity",
-      "status": "catalogued",
+      "status": "blocked",
       "engine_tier": "objectdbx_capable",
       "owner_ticket": "M08K-T03",
-      "implementation_strategy": "objectdbx_hostless",
-      "evidence_required": "unit_test+staged_diff_fixture_original_unchanged",
+      "implementation_strategy": "hard_blocked",
+      "evidence_required": "blocker_ref_and_evidence",
       "risk_class": "staged_write"
     },
     {
       "operation": "define.assocarray.polar",
       "family": "constraints_associativity",
-      "status": "catalogued",
+      "status": "blocked",
       "engine_tier": "objectdbx_capable",
       "owner_ticket": "M08K-T03",
-      "implementation_strategy": "objectdbx_hostless",
-      "evidence_required": "unit_test+staged_diff_fixture_original_unchanged",
+      "implementation_strategy": "hard_blocked",
+      "evidence_required": "blocker_ref_and_evidence",
       "risk_class": "staged_write"
     },
     {
       "operation": "define.assocarray.rectangular",
       "family": "constraints_associativity",
-      "status": "catalogued",
+      "status": "blocked",
       "engine_tier": "objectdbx_capable",
       "owner_ticket": "M08K-T03",
-      "implementation_strategy": "objectdbx_hostless",
-      "evidence_required": "unit_test+staged_diff_fixture_original_unchanged",
+      "implementation_strategy": "hard_blocked",
+      "evidence_required": "blocker_ref_and_evidence",
       "risk_class": "staged_write"
     },
     {
@@ -2110,81 +2104,81 @@
     {
       "operation": "define.assocsurface.blend",
       "family": "constraints_associativity",
-      "status": "catalogued",
+      "status": "blocked",
       "engine_tier": "native_arx_only",
       "owner_ticket": "M08K-T03",
-      "implementation_strategy": "native_arx_cpp",
-      "evidence_required": "attended_live_pump_session_log",
+      "implementation_strategy": "hard_blocked",
+      "evidence_required": "blocker_ref_and_evidence",
       "risk_class": "live_edit"
     },
     {
       "operation": "define.assocsurface.extrude",
       "family": "constraints_associativity",
-      "status": "catalogued",
+      "status": "blocked",
       "engine_tier": "native_arx_only",
       "owner_ticket": "M08K-T03",
-      "implementation_strategy": "native_arx_cpp",
-      "evidence_required": "attended_live_pump_session_log",
+      "implementation_strategy": "hard_blocked",
+      "evidence_required": "blocker_ref_and_evidence",
       "risk_class": "live_edit"
     },
     {
       "operation": "define.assocsurface.fillet",
       "family": "constraints_associativity",
-      "status": "catalogued",
+      "status": "blocked",
       "engine_tier": "native_arx_only",
       "owner_ticket": "M08K-T03",
-      "implementation_strategy": "native_arx_cpp",
-      "evidence_required": "attended_live_pump_session_log",
+      "implementation_strategy": "hard_blocked",
+      "evidence_required": "blocker_ref_and_evidence",
       "risk_class": "live_edit"
     },
     {
       "operation": "define.assocsurface.loft",
       "family": "constraints_associativity",
-      "status": "catalogued",
+      "status": "blocked",
       "engine_tier": "native_arx_only",
       "owner_ticket": "M08K-T03",
-      "implementation_strategy": "native_arx_cpp",
-      "evidence_required": "attended_live_pump_session_log",
+      "implementation_strategy": "hard_blocked",
+      "evidence_required": "blocker_ref_and_evidence",
       "risk_class": "live_edit"
     },
     {
       "operation": "define.assocsurface.offset",
       "family": "constraints_associativity",
-      "status": "catalogued",
+      "status": "blocked",
       "engine_tier": "native_arx_only",
       "owner_ticket": "M08K-T03",
-      "implementation_strategy": "native_arx_cpp",
-      "evidence_required": "attended_live_pump_session_log",
+      "implementation_strategy": "hard_blocked",
+      "evidence_required": "blocker_ref_and_evidence",
       "risk_class": "live_edit"
     },
     {
       "operation": "define.assocsurface.patch",
       "family": "constraints_associativity",
-      "status": "catalogued",
+      "status": "blocked",
       "engine_tier": "native_arx_only",
       "owner_ticket": "M08K-T03",
-      "implementation_strategy": "native_arx_cpp",
-      "evidence_required": "attended_live_pump_session_log",
+      "implementation_strategy": "hard_blocked",
+      "evidence_required": "blocker_ref_and_evidence",
       "risk_class": "live_edit"
     },
     {
       "operation": "define.assocsurface.result",
       "family": "constraints_associativity",
-      "status": "catalogued",
+      "status": "blocked",
       "engine_tier": "native_arx_only",
       "owner_ticket": "M08K-T03",
-      "implementation_strategy": "native_arx_cpp",
-      "evidence_required": "attended_live_pump_session_log",
+      "implementation_strategy": "hard_blocked",
+      "evidence_required": "blocker_ref_and_evidence",
       "risk_class": "live_edit"
     },
     {
       "operation": "define.assocsurface.trim",
       "family": "constraints_associativity",
-      "status": "catalogued",
+      "status": "blocked",
       "engine_tier": "native_arx_only",
       "owner_ticket": "M08K-T03",
-      "implementation_strategy": "native_arx_cpp",
-      "evidence_required": "attended_live_pump_session_log",
+      "implementation_strategy": "hard_blocked",
+      "evidence_required": "blocker_ref_and_evidence",
       "risk_class": "live_edit"
     },
     {
@@ -2320,71 +2314,71 @@
     {
       "operation": "edit.assocarray.explode",
       "family": "constraints_associativity",
-      "status": "catalogued",
+      "status": "blocked",
       "engine_tier": "native_arx_only",
       "owner_ticket": "M08K-T03",
-      "implementation_strategy": "native_arx_cpp",
-      "evidence_required": "attended_live_pump_session_log",
+      "implementation_strategy": "hard_blocked",
+      "evidence_required": "blocker_ref_and_evidence",
       "risk_class": "live_edit"
     },
     {
       "operation": "edit.assocarray.item",
       "family": "constraints_associativity",
-      "status": "catalogued",
+      "status": "blocked",
       "engine_tier": "objectdbx_capable",
       "owner_ticket": "M08K-T03",
-      "implementation_strategy": "objectdbx_hostless",
-      "evidence_required": "unit_test+staged_diff_fixture_original_unchanged",
+      "implementation_strategy": "hard_blocked",
+      "evidence_required": "blocker_ref_and_evidence",
       "risk_class": "staged_write"
     },
     {
       "operation": "edit.assocarray.itemReplace",
       "family": "constraints_associativity",
-      "status": "catalogued",
+      "status": "blocked",
       "engine_tier": "objectdbx_capable",
       "owner_ticket": "M08K-T03",
-      "implementation_strategy": "objectdbx_hostless",
-      "evidence_required": "unit_test+staged_diff_fixture_original_unchanged",
+      "implementation_strategy": "hard_blocked",
+      "evidence_required": "blocker_ref_and_evidence",
       "risk_class": "staged_write"
     },
     {
       "operation": "edit.assocarray.reset",
       "family": "constraints_associativity",
-      "status": "catalogued",
+      "status": "blocked",
       "engine_tier": "objectdbx_capable",
       "owner_ticket": "M08K-T03",
-      "implementation_strategy": "objectdbx_hostless",
-      "evidence_required": "unit_test+staged_diff_fixture_original_unchanged",
+      "implementation_strategy": "hard_blocked",
+      "evidence_required": "blocker_ref_and_evidence",
       "risk_class": "staged_write"
     },
     {
       "operation": "edit.assocarray.source",
       "family": "constraints_associativity",
-      "status": "catalogued",
+      "status": "blocked",
       "engine_tier": "objectdbx_capable",
       "owner_ticket": "M08K-T03",
-      "implementation_strategy": "objectdbx_hostless",
-      "evidence_required": "unit_test+staged_diff_fixture_original_unchanged",
+      "implementation_strategy": "hard_blocked",
+      "evidence_required": "blocker_ref_and_evidence",
       "risk_class": "staged_write"
     },
     {
       "operation": "edit.assocarray.transform",
       "family": "constraints_associativity",
-      "status": "catalogued",
+      "status": "blocked",
       "engine_tier": "objectdbx_capable",
       "owner_ticket": "M08K-T03",
-      "implementation_strategy": "objectdbx_hostless",
-      "evidence_required": "unit_test+staged_diff_fixture_original_unchanged",
+      "implementation_strategy": "hard_blocked",
+      "evidence_required": "blocker_ref_and_evidence",
       "risk_class": "staged_write"
     },
     {
       "operation": "edit.assocdata.xref",
       "family": "constraints_associativity",
-      "status": "catalogued",
+      "status": "blocked",
       "engine_tier": "native_arx_only",
       "owner_ticket": "M08K-T03",
-      "implementation_strategy": "native_arx_cpp",
-      "evidence_required": "attended_live_pump_session_log",
+      "implementation_strategy": "hard_blocked",
+      "evidence_required": "blocker_ref_and_evidence",
       "risk_class": "live_edit"
     },
     {
@@ -2420,11 +2414,11 @@
     {
       "operation": "inspect.assocaction.evaluate",
       "family": "constraints_associativity",
-      "status": "catalogued",
+      "status": "blocked",
       "engine_tier": "native_arx_only",
       "owner_ticket": "M08K-T03",
-      "implementation_strategy": "native_arx_cpp",
-      "evidence_required": "attended_live_pump_session_log",
+      "implementation_strategy": "hard_blocked",
+      "evidence_required": "blocker_ref_and_evidence",
       "risk_class": "live_edit"
     },
     {
@@ -2460,11 +2454,11 @@
     {
       "operation": "inspect.assocnetwork.evaluate",
       "family": "constraints_associativity",
-      "status": "catalogued",
+      "status": "blocked",
       "engine_tier": "native_arx_only",
       "owner_ticket": "M08K-T03",
-      "implementation_strategy": "native_arx_cpp",
-      "evidence_required": "attended_live_pump_session_log",
+      "implementation_strategy": "hard_blocked",
+      "evidence_required": "blocker_ref_and_evidence",
       "risk_class": "live_edit"
     },
     {
@@ -2490,11 +2484,11 @@
     {
       "operation": "inspect.assocsurface.topology",
       "family": "constraints_associativity",
-      "status": "catalogued",
+      "status": "blocked",
       "engine_tier": "native_arx_only",
       "owner_ticket": "M08K-T03",
-      "implementation_strategy": "native_arx_cpp",
-      "evidence_required": "unit_test+native_extraction_fixture",
+      "implementation_strategy": "hard_blocked",
+      "evidence_required": "blocker_ref_and_evidence",
       "risk_class": "read_safe"
     },
     {
@@ -2550,11 +2544,11 @@
     {
       "operation": "repair.assocdata.audit",
       "family": "constraints_associativity",
-      "status": "catalogued",
+      "status": "blocked",
       "engine_tier": "native_arx_only",
       "owner_ticket": "M08K-T03",
-      "implementation_strategy": "native_arx_cpp",
-      "evidence_required": "attended_live_pump_session_log",
+      "implementation_strategy": "hard_blocked",
+      "evidence_required": "blocker_ref_and_evidence",
       "risk_class": "live_edit"
     },
     {
@@ -2880,11 +2874,11 @@
     {
       "operation": "extend.object_enabler.demand_register",
       "family": "custom_objects_protocols",
-      "status": "blocked",
+      "status": "implemented",
       "engine_tier": "accoreconsole_lisp_also",
       "owner_ticket": "M08K-T01",
-      "implementation_strategy": "hard_blocked",
-      "evidence_required": "blocker_ref_and_evidence",
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs",
       "risk_class": "read_safe"
     },
     {
@@ -3020,11 +3014,11 @@
     {
       "operation": "overrule.dimstyle.install",
       "family": "custom_objects_protocols",
-      "status": "catalogued",
+      "status": "implemented",
       "engine_tier": "native_arx_only",
       "owner_ticket": "M08L-T02",
-      "implementation_strategy": "native_arx_cpp",
-      "evidence_required": "unit_test+native_extraction_fixture",
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs",
       "risk_class": "read_safe"
     },
     {
@@ -4340,21 +4334,21 @@
     {
       "operation": "plot.config.settings",
       "family": "layouts_plot_publish",
-      "status": "implemented",
+      "status": "blocked",
       "engine_tier": "managed_also",
       "owner_ticket": "M08I-T01",
-      "implementation_strategy": "implemented_v1",
-      "evidence_required": "existing_tests_and_evidence_refs",
+      "implementation_strategy": "hard_blocked",
+      "evidence_required": "blocker_ref_and_evidence",
       "risk_class": "live_edit"
     },
     {
       "operation": "plot.engine.run",
       "family": "layouts_plot_publish",
-      "status": "implemented",
+      "status": "blocked",
       "engine_tier": "managed_also",
       "owner_ticket": "M08I-T01",
-      "implementation_strategy": "attended_verification",
-      "evidence_required": "attended_live_pump_session_log",
+      "implementation_strategy": "hard_blocked",
+      "evidence_required": "blocker_ref_and_evidence",
       "risk_class": "read_safe"
     },
     {
@@ -4820,11 +4814,11 @@
     {
       "operation": "module.command.flags",
       "family": "runtime_commands",
-      "status": "catalogued",
+      "status": "implemented",
       "engine_tier": "native_arx_only",
       "owner_ticket": "M08O-T02",
-      "implementation_strategy": "native_arx_cpp",
-      "evidence_required": "unit_test+native_extraction_fixture",
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs",
       "risk_class": "read_safe"
     },
     {
@@ -4860,11 +4854,11 @@
     {
       "operation": "module.command.remove_group",
       "family": "runtime_commands",
-      "status": "catalogued",
+      "status": "blocked",
       "engine_tier": "native_arx_only",
       "owner_ticket": "M08O-T02",
-      "implementation_strategy": "native_arx_cpp",
-      "evidence_required": "unit_test+native_extraction_fixture",
+      "implementation_strategy": "hard_blocked",
+      "evidence_required": "blocker_ref_and_evidence",
       "risk_class": "read_safe"
     },
     {
@@ -4880,111 +4874,111 @@
     {
       "operation": "module.entrypoint.define",
       "family": "runtime_commands",
-      "status": "catalogued",
+      "status": "blocked",
       "engine_tier": "native_arx_only",
       "owner_ticket": "M08O-T02",
-      "implementation_strategy": "native_arx_cpp",
-      "evidence_required": "unit_test+native_extraction_fixture",
+      "implementation_strategy": "hard_blocked",
+      "evidence_required": "blocker_ref_and_evidence",
       "risk_class": "read_safe"
     },
     {
       "operation": "module.entrypoint.dispatch",
       "family": "runtime_commands",
-      "status": "catalogued",
+      "status": "blocked",
       "engine_tier": "native_arx_only",
       "owner_ticket": "M08O-T02",
-      "implementation_strategy": "native_arx_cpp",
-      "evidence_required": "unit_test+native_extraction_fixture",
+      "implementation_strategy": "hard_blocked",
+      "evidence_required": "blocker_ref_and_evidence",
       "risk_class": "read_safe"
     },
     {
       "operation": "module.lifecycle.init",
       "family": "runtime_commands",
-      "status": "catalogued",
+      "status": "blocked",
       "engine_tier": "native_arx_only",
       "owner_ticket": "M08O-T02",
-      "implementation_strategy": "native_arx_cpp",
-      "evidence_required": "unit_test+native_extraction_fixture",
+      "implementation_strategy": "hard_blocked",
+      "evidence_required": "blocker_ref_and_evidence",
       "risk_class": "read_safe"
     },
     {
       "operation": "module.lifecycle.on_load_dwg",
       "family": "runtime_commands",
-      "status": "catalogued",
+      "status": "blocked",
       "engine_tier": "native_arx_only",
       "owner_ticket": "M08O-T02",
-      "implementation_strategy": "native_arx_cpp",
-      "evidence_required": "unit_test+native_extraction_fixture",
+      "implementation_strategy": "hard_blocked",
+      "evidence_required": "blocker_ref_and_evidence",
       "risk_class": "read_safe"
     },
     {
       "operation": "module.lifecycle.on_ole_unload",
       "family": "runtime_commands",
-      "status": "catalogued",
+      "status": "blocked",
       "engine_tier": "native_arx_only",
       "owner_ticket": "M08O-T02",
-      "implementation_strategy": "native_arx_cpp",
-      "evidence_required": "unit_test+native_extraction_fixture",
+      "implementation_strategy": "hard_blocked",
+      "evidence_required": "blocker_ref_and_evidence",
       "risk_class": "read_safe"
     },
     {
       "operation": "module.lifecycle.on_unload_dwg",
       "family": "runtime_commands",
-      "status": "catalogued",
+      "status": "blocked",
       "engine_tier": "native_arx_only",
       "owner_ticket": "M08O-T02",
-      "implementation_strategy": "native_arx_cpp",
-      "evidence_required": "unit_test+native_extraction_fixture",
+      "implementation_strategy": "hard_blocked",
+      "evidence_required": "blocker_ref_and_evidence",
       "risk_class": "read_safe"
     },
     {
       "operation": "module.lifecycle.other",
       "family": "runtime_commands",
-      "status": "catalogued",
+      "status": "blocked",
       "engine_tier": "native_arx_only",
       "owner_ticket": "M08O-T02",
-      "implementation_strategy": "native_arx_cpp",
-      "evidence_required": "unit_test+native_extraction_fixture",
+      "implementation_strategy": "hard_blocked",
+      "evidence_required": "blocker_ref_and_evidence",
       "risk_class": "read_safe"
     },
     {
       "operation": "module.lifecycle.unload",
       "family": "runtime_commands",
-      "status": "catalogued",
+      "status": "blocked",
       "engine_tier": "native_arx_only",
       "owner_ticket": "M08O-T02",
-      "implementation_strategy": "native_arx_cpp",
-      "evidence_required": "unit_test+native_extraction_fixture",
+      "implementation_strategy": "hard_blocked",
+      "evidence_required": "blocker_ref_and_evidence",
       "risk_class": "read_safe"
     },
     {
       "operation": "module.load",
       "family": "runtime_commands",
-      "status": "catalogued",
+      "status": "blocked",
       "engine_tier": "native_arx_only",
       "owner_ticket": "M08O-T02",
-      "implementation_strategy": "native_arx_cpp",
-      "evidence_required": "unit_test+native_extraction_fixture",
+      "implementation_strategy": "hard_blocked",
+      "evidence_required": "blocker_ref_and_evidence",
       "risk_class": "read_safe"
     },
     {
       "operation": "module.load.acad_rx",
       "family": "runtime_commands",
-      "status": "catalogued",
+      "status": "blocked",
       "engine_tier": "accoreconsole_lisp_also",
       "owner_ticket": "M08O-T02",
-      "implementation_strategy": "accoreconsole_lisp",
-      "evidence_required": "unit_test+native_extraction_fixture",
+      "implementation_strategy": "hard_blocked",
+      "evidence_required": "blocker_ref_and_evidence",
       "risk_class": "read_safe"
     },
     {
       "operation": "module.load.by_app",
       "family": "runtime_commands",
-      "status": "catalogued",
+      "status": "blocked",
       "engine_tier": "native_arx_only",
       "owner_ticket": "M08O-T02",
-      "implementation_strategy": "native_arx_cpp",
-      "evidence_required": "unit_test+native_extraction_fixture",
+      "implementation_strategy": "hard_blocked",
+      "evidence_required": "blocker_ref_and_evidence",
       "risk_class": "read_safe"
     },
     {
@@ -5000,11 +4994,11 @@
     {
       "operation": "module.load.lisp",
       "family": "runtime_commands",
-      "status": "catalogued",
+      "status": "blocked",
       "engine_tier": "accoreconsole_lisp_also",
       "owner_ticket": "M08O-T02",
-      "implementation_strategy": "accoreconsole_lisp",
-      "evidence_required": "unit_test+native_extraction_fixture",
+      "implementation_strategy": "hard_blocked",
+      "evidence_required": "blocker_ref_and_evidence",
       "risk_class": "read_safe"
     },
     {
@@ -5030,11 +5024,11 @@
     {
       "operation": "module.unload",
       "family": "runtime_commands",
-      "status": "catalogued",
+      "status": "blocked",
       "engine_tier": "native_arx_only",
       "owner_ticket": "M08O-T02",
-      "implementation_strategy": "native_arx_cpp",
-      "evidence_required": "unit_test+native_extraction_fixture",
+      "implementation_strategy": "hard_blocked",
+      "evidence_required": "blocker_ref_and_evidence",
       "risk_class": "read_safe"
     },
     {

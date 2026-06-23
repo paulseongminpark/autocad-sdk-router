@@ -2,9 +2,9 @@
 
 - packet: `CADOS_M08_FULL_OPERATION_COVERAGE_CLOSURE`
 - generated_from: `config/operations.v2.json`
-- total operations: **517** · implemented 451 · stub 0 · blocked 11 · catalogued 55 · deprecated 0 · **unknown 0**
-- v1-target: **462** (implemented 451 · blocked 11 · **deferred 0**)
-- agent-exposed ops: 451
+- total operations: **517** · implemented 457 · stub 0 · blocked 60 · catalogued 0 · deprecated 0 · **unknown 0**
+- v1-target: **517** (implemented 457 · blocked 60 · **deferred 0**)
+- agent-exposed ops: 457
 
 ## Gate
 
@@ -30,9 +30,9 @@
 | query | 1 | 0 | 0 | 0 | 1 |
 | write_patch | 16 | 0 | 4 | 0 | 20 |
 | validate_diff | 3 | 0 | 0 | 0 | 3 |
-| render_visual | 12 | 0 | 0 | 0 | 12 |
+| render_visual | 10 | 0 | 2 | 0 | 12 |
 | live | 6 | 0 | 1 | 0 | 7 |
-| native_only | 360 | 0 | 6 | 55 | 366 |
+| native_only | 368 | 0 | 53 | 0 | 421 |
 
 ## Risk class distribution
 
@@ -51,11 +51,60 @@
 | command.invoke.sync | active_document_write_original | blocked | raw_command | live_edit | False | acedCommandS(int rtype, ...) | SAFETY_FORBIDDEN: raw command dispatch is blocked in M08O fa |
 | command.invoke.sync.resbuf | active_document_write_original | blocked | raw_command | live_edit | False | acedCmdS(const resbuf* rb, bool, AcApDocument*) | SAFETY_FORBIDDEN: raw command dispatch is blocked in M08O fa |
 | doc.sendstring | active_document_write_original | blocked | raw_command | write_copy | False | AcApDocManager::sendStringToExecute(AcApDocument | SAFETY_FORBIDDEN: doc.sendstring uses AcApDocManager::sendSt |
-| extend.object_enabler.demand_register | custom_objects_protocols | blocked | read_safe | read | False | Registry keys under HKLM\SOFTWARE\Autodesk\Objec | HARD_BLOCKED_SAFETY_CANONICAL_DEPLOY_PANE1_ONLY: demand-load |
+| edit.subentity.add_paths | brep_solids | blocked | read_safe | read | False | AcDbEntity::addSubentPaths(const AcDbFullSubentP | SAFETY_FORBIDDEN: AcDbEntity::addSubentPaths mutates subenti |
+| edit.subentity.delete_paths | brep_solids | blocked | read_safe | read | False | AcDbEntity::deleteSubentPaths(const AcDbFullSube | SAFETY_FORBIDDEN: AcDbEntity::deleteSubentPaths mutates sube |
+| edit.subentity.transform | brep_solids | blocked | read_safe | read | False | AcDbEntity::transformSubentPathsBy(const AcDbFul | SAFETY_FORBIDDEN: AcDbEntity::transformSubentPathsBy mutates |
+| ui.subentity.highlight | brep_solids | blocked | read_safe | read | False | AcDbEntity::highlight(const AcDbFullSubentPath&, | HOST_UNAVAILABLE: subentity highlight requires a live graphi |
+| automate.com.get_app | com_activex | blocked | read_safe | read | False | acedGetIDispatch(bool bAddRef) (= AcadGetIDispat | SAFETY_FORBIDDEN: exposing AutoCAD application IDispatch to  |
+| automate.com.get_document | com_activex | blocked | read_safe | read | False | AcApDocument::GetIDispatch(bool bAddRef) | SAFETY_FORBIDDEN: exposing live AcadDocument automation inte |
+| automate.com.get_for_command | com_activex | blocked | read_safe | read | False | acedGetIUnknownForCurrentCommand(LPUNKNOWN& pUnk | SAFETY_FORBIDDEN: command-context COM acquisition exposes ra |
+| automate.com.get_winapp | com_activex | blocked | read_safe | read | False | acedGetAcadWinApp() → CWinApp* | SAFETY_FORBIDDEN: exposing host application pointers/state i |
+| automate.com.send_command | com_activex | blocked | read_safe | read | False | (no native export found this session) — via COM: | SAFETY_FORBIDDEN: COM SendCommand is raw command-string disp |
+| automate.com.wrapper_for_object | com_activex | blocked | read_safe | read | False | AcAxGetOleLinkManager() → AcAxOleLinkManager::Ge | SAFETY_FORBIDDEN: wrapping AcDb objects into automation inte |
+| embed.ole.frame | com_activex | blocked | live_edit | live_edit | False | AcDbOle2Frame (setOleClientItem(COleClientItem*) | HOST_UNAVAILABLE: AcDbOle2Frame embedding/linking requires a |
+| define.assocarray.create | constraints_associativity | blocked | staged_write | write_copy | False | AcDbAssocArrayActionBody::createInstance(AcDbObj | SAFETY_FORBIDDEN: AcDbAssocArrayActionBody::createInstance p |
+| define.assocarray.path | constraints_associativity | blocked | staged_write | write_copy | False | AcDbAssocArrayPathParameters: itemCount, itemSpa | SAFETY_FORBIDDEN: path associative array creation relies on  |
+| define.assocarray.polar | constraints_associativity | blocked | staged_write | write_copy | False | AcDbAssocArrayPolarParameters: itemCount, angleB | SAFETY_FORBIDDEN: polar associative array creation relies on |
+| define.assocarray.rectangular | constraints_associativity | blocked | staged_write | write_copy | False | AcDbAssocArrayRectangularParameters (+ base AcDb | SAFETY_FORBIDDEN: rectangular associative array creation rel |
+| define.assocsurface.blend | constraints_associativity | blocked | live_edit | live_edit | False | AcDbAssocBlendSurfaceActionBody::createInstance( | SAFETY_FORBIDDEN: AcDbAssocBlendSurfaceActionBody::createIns |
+| define.assocsurface.extrude | constraints_associativity | blocked | live_edit | live_edit | False | AcDbAssocExtrudedSurfaceActionBody::createInstan | SAFETY_FORBIDDEN: AcDbAssocExtrudedSurfaceActionBody::create |
+| define.assocsurface.fillet | constraints_associativity | blocked | live_edit | live_edit | False | AcDbAssocFilletSurfaceActionBody::createInstance | SAFETY_FORBIDDEN: AcDbAssocFilletSurfaceActionBody::createIn |
+| define.assocsurface.loft | constraints_associativity | blocked | live_edit | live_edit | False | AcDbAssocLoftedSurfaceActionBody::createInstance | SAFETY_FORBIDDEN: AcDbAssocLoftedSurfaceActionBody::createIn |
+| define.assocsurface.offset | constraints_associativity | blocked | live_edit | live_edit | False | AcDbAssocOffsetSurfaceActionBody::createInstance | SAFETY_FORBIDDEN: AcDbAssocOffsetSurfaceActionBody::createIn |
+| define.assocsurface.patch | constraints_associativity | blocked | live_edit | live_edit | False | AcDbAssocPatchSurfaceActionBody::createInstance( | SAFETY_FORBIDDEN: AcDbAssocPatchSurfaceActionBody::createIns |
+| define.assocsurface.result | constraints_associativity | blocked | live_edit | live_edit | False | AcDbAssocSurfaceActionBody: resultingSurface(),  | SAFETY_FORBIDDEN: associative surface result extraction depe |
+| define.assocsurface.trim | constraints_associativity | blocked | live_edit | live_edit | False | AcDbAssocTrimSurfaceActionBody::createInstance(r | SAFETY_FORBIDDEN: AcDbAssocTrimSurfaceActionBody::createInst |
+| edit.assocarray.explode | constraints_associativity | blocked | live_edit | live_edit | False | AcDbAssocArrayActionBody::explode(AcDbEntity*, A | SAFETY_FORBIDDEN: associative array explode mutates the stag |
+| edit.assocarray.item | constraints_associativity | blocked | staged_write | write_copy | False | AcDbAssocArrayActionBody::transformItemBy(AcDbIt | SAFETY_FORBIDDEN: associative array item edits require item  |
+| edit.assocarray.itemReplace | constraints_associativity | blocked | staged_write | write_copy | False | AcDbAssocArrayModifyActionBody::createInstance(a | SAFETY_FORBIDDEN: associative array item replacement require |
+| edit.assocarray.reset | constraints_associativity | blocked | staged_write | write_copy | False | AcDbAssocArrayActionBody::resetArrayItems(arrayE | SAFETY_FORBIDDEN: resetArrayItems performs array re-layout/e |
+| edit.assocarray.source | constraints_associativity | blocked | staged_write | write_copy | False | addSourceEntity(id, basePoint) / removeSourceEnt | SAFETY_FORBIDDEN: source entity edits on associative arrays  |
+| edit.assocarray.transform | constraints_associativity | blocked | staged_write | write_copy | False | AcDbAssocArrayActionBody::transformBy(AcGeMatrix | SAFETY_FORBIDDEN: transformBy on associative array action bo |
+| edit.assocdata.xref | constraints_associativity | blocked | live_edit | live_edit | False | AcDbAssocManager::markSyncUpWithXrefsNeeded(db)  | SAFETY_FORBIDDEN: AcDbAssocManager::syncUpWithXrefs/markSync |
+| inspect.assocaction.evaluate | constraints_associativity | blocked | live_edit | live_edit | False | AcDbAssocAction::evaluate(callback), evaluateDep | SAFETY_FORBIDDEN: AcDbAssocAction::evaluate is the native as |
+| inspect.assocnetwork.evaluate | constraints_associativity | blocked | live_edit | live_edit | False | AcDbAssocManager::evaluateTopLevelNetwork(AcDbDa | SAFETY_FORBIDDEN: AcDbAssocManager::evaluateTopLevelNetwork  |
+| inspect.assocsurface.topology | constraints_associativity | blocked | read_safe | read | False | AcDbAssocSurfaceActionBody::findActionsThatAffec | SAFETY_FORBIDDEN: associative surface topology inspection re |
+| repair.assocdata.audit | constraints_associativity | blocked | live_edit | live_edit | False | AcDbAssocManager::auditAssociativeData(db, trave | SAFETY_FORBIDDEN: AcDbAssocManager::auditAssociativeData per |
 | command.queue.post | editor_input | blocked | raw_command | live_edit | False | acedPostCommand / acedPostCommandPrompt() | SAFETY_FORBIDDEN: raw command dispatch is blocked in M08O fa |
+| plot.config.settings | layouts_plot_publish | blocked | live_edit | live_edit | False | AcDbPlotSettings / AcPlPlotConfig / AcPlPlotConf | SAFETY_FORBIDDEN: exact plot settings operation is a live_ed |
+| plot.engine.run | layouts_plot_publish | blocked | read_safe | read | False | AcPlPlotEngine: beginPlot/beginDocument/beginPag | HOST_UNAVAILABLE: AcPlPlotEngine execution requires a contro |
 | live.apply_patch | live | blocked | live_edit | live_edit | False |  | Requires full_autocad live_edit host + explicit write_origin |
 | module.command.lookup | runtime_commands | blocked | raw_command | read | False | acedRegCmds->lookupCmd2(...) via acedCmdLookup2( | SAFETY_FORBIDDEN: raw command dispatch is blocked in M08O fa |
+| module.command.remove_group | runtime_commands | blocked | read_safe | read | False | AcEdCommandStack::removeGroup(grpName) (+ remove | SAFETY_FORBIDDEN: arbitrary command group removal mutates th |
+| module.entrypoint.define | runtime_commands | blocked | read_safe | read | False | IMPLEMENT_ARX_ENTRYPOINT(classname) (→ IMPLEMENT | SDK_NOT_EXPOSED: entrypoint definition is a compile/link-tim |
+| module.entrypoint.dispatch | runtime_commands | blocked | read_safe | read | False | AcRxDbxApp::acrxEntryPoint(AcRx::AppMsgCode msg, | HOST_UNAVAILABLE: entrypoint dispatch is host-owned by the A |
+| module.lifecycle.init | runtime_commands | blocked | read_safe | read | False | AcRxArxApp::On_kInitAppMsg(void* pkt) / AcRxDbxA | HOST_UNAVAILABLE: On_kInitAppMsg is delivered by the AutoCAD |
+| module.lifecycle.on_load_dwg | runtime_commands | blocked | read_safe | read | False | AcRxDbxApp::On_kLoadDwgMsg(void* pkt) | HOST_UNAVAILABLE: On_kLoadDwgMsg is delivered by the host du |
+| module.lifecycle.on_ole_unload | runtime_commands | blocked | read_safe | read | False | AcRxDbxApp::On_kOleUnloadAppMsg(void* pkt) | HOST_UNAVAILABLE: On_kOleUnloadAppMsg is a host lifecycle ca |
+| module.lifecycle.on_unload_dwg | runtime_commands | blocked | read_safe | read | False | AcRxDbxApp::On_kUnloadDwgMsg(void* pkt) | HOST_UNAVAILABLE: On_kUnloadDwgMsg is host-owned document li |
+| module.lifecycle.other | runtime_commands | blocked | read_safe | read | False | On_kCfgMsg/On_kEndMsg/On_kQuitMsg/On_kPreQuitMsg | HOST_UNAVAILABLE: arbitrary lifecycle message dispatch is ho |
+| module.lifecycle.unload | runtime_commands | blocked | read_safe | read | False | AcRxArxApp::On_kUnloadAppMsg / AcRxDbxApp::On_kU | HOST_UNAVAILABLE: On_kUnloadAppMsg is delivered by the loade |
+| module.load | runtime_commands | blocked | read_safe | read | False | acrxLoadModule(const ACHAR* moduleName, bool pri | SAFETY_FORBIDDEN: acrxLoadModule loads external code into th |
+| module.load.acad_rx | runtime_commands | blocked | read_safe | read | False | acad.rx file listing module names | SAFETY_FORBIDDEN: ARX demand/load mechanics execute host mod |
+| module.load.by_app | runtime_commands | blocked | read_safe | read | False | acrxLoadApp(const ACHAR* appname, bool asCmd=fal | SAFETY_FORBIDDEN: application-driven module loading executes |
 | module.load.demand_register | runtime_commands | blocked | read_safe | read | False | Registry: HKLM\…\R<ver>\<prodkey>\Applications\< | SAFETY_FORBIDDEN: ObjectARX demand-load registration require |
+| module.load.lisp | runtime_commands | blocked | read_safe | read | False | (arxload "name" [onfailure]) / (arxunload "name" | SAFETY_FORBIDDEN: LISP loading executes script code in the A |
+| module.unload | runtime_commands | blocked | read_safe | read | False | acrxUnloadModule(const ACHAR* moduleName, bool a | SAFETY_FORBIDDEN: acrxUnloadModule can unload host modules a |
 | command.menu.invoke | ui_customization | blocked | read_safe | read | False | acedMenuCmd(const ACHAR*) | SAFETY_FORBIDDEN: acedMenuCmd executes arbitrary menu/comman |
 | editor.toolpalette.tool_execute | ui_customization | blocked | read_safe | read | False | AcTcTool::Execute(int nFlag, HWND, POINT, DWORD  | SAFETY_FORBIDDEN: AcTcTool::Execute programmatically fires a |
 | doc.current | active_document_write_original | implemented | read_safe | read | True | m08nDispatch |  |
@@ -99,7 +148,10 @@
 | inspect.shell.complex | brep_solids | implemented | read_safe | read | True | m08dDispatch |  |
 | inspect.shell.type | brep_solids | implemented | read_safe | read | True | m08dDispatch |  |
 | inspect.subentity.class_id | brep_solids | implemented | read_safe | read | True | m08dDispatch |  |
+| inspect.subentity.color | brep_solids | implemented | read_safe | read | True | m08dDispatch |  |
 | inspect.subentity.geom_extents | brep_solids | implemented | read_safe | read | True | m08dDispatch |  |
+| inspect.subentity.markers_at_path | brep_solids | implemented | read_safe | read | True | m08dDispatch |  |
+| inspect.subentity.path_at_marker | brep_solids | implemented | read_safe | read | True | m08dDispatch |  |
 | inspect.subentity.ptr | brep_solids | implemented | read_safe | read | True | m08dDispatch |  |
 | inspect.vertex.point | brep_solids | implemented | read_safe | read | True | m08dDispatch |  |
 | traverse.brep.complexes | brep_solids | implemented | read_safe | read | True | m08dDispatch |  |
@@ -157,7 +209,9 @@
 | inspect.property.is_readonly | com_activex | implemented | read_safe | read | True | m08mDispatch |  |
 | inspect.property.metadata | com_activex | implemented | read_safe | read | True | m08mDispatch |  |
 | inspect.value.to_string | com_activex | implemented | read_safe | read | True | m08mDispatch |  |
+| config.assoceval.callback | constraints_associativity | implemented | read_safe | read | True | m08kcDispatch |  |
 | config.assocmanager.evalDisabler | constraints_associativity | implemented | read_safe | read | True | m08kcDispatch |  |
+| config.constraint.globalCallback | constraints_associativity | implemented | read_safe | read | True | m08kcDispatch |  |
 | define.assocaction.addDependency | constraints_associativity | implemented | staged_write | write_copy | True | m08kcDispatch |  |
 | define.assocaction.create | constraints_associativity | implemented | staged_write | write_copy | True | m08kcDispatch |  |
 | define.assocaction.valueParam | constraints_associativity | implemented | staged_write | write_copy | True | m08kcDispatch |  |
@@ -222,6 +276,7 @@
 | extend.customobject.wblockclone | custom_objects_protocols | implemented | read_safe | read | True | m08kDispatch |  |
 | extend.module.entrypoint | custom_objects_protocols | implemented | read_safe | read | True | m08kDispatch |  |
 | extend.object_enabler.build | custom_objects_protocols | implemented | read_safe | read | True | m08kDispatch |  |
+| extend.object_enabler.demand_register | custom_objects_protocols | implemented | read_safe | read | True | m08kDispatch |  |
 | extend.object_enabler.register_classes | custom_objects_protocols | implemented | read_safe | read | True | m08kDispatch |  |
 | extend.osnap.custom_mode | custom_objects_protocols | implemented | read_safe | read | True | m08kDispatch |  |
 | extend.protocol.attach | custom_objects_protocols | implemented | read_safe | read | True | m08kDispatch |  |
@@ -235,6 +290,7 @@
 | inspect.runtime.isa | custom_objects_protocols | implemented | read_safe | read | True | m08kDispatch |  |
 | inspect.runtime.iskindof | custom_objects_protocols | implemented | read_safe | read | True | m08kDispatch |  |
 | overrule.applicable | custom_objects_protocols | implemented | read_safe | read | True | m08lDispatch |  |
+| overrule.dimstyle.install | custom_objects_protocols | implemented | read_safe | read | True | m08lDispatch |  |
 | overrule.drawable.install | custom_objects_protocols | implemented | read_safe | read | True | m08lDispatch |  |
 | overrule.geometry.install | custom_objects_protocols | implemented | read_safe | read | True | m08lDispatch |  |
 | overrule.global.enable | custom_objects_protocols | implemented | read_safe | read | True | m08lDispatch |  |
@@ -386,8 +442,6 @@
 | inspect.runtime.capabilities | inspect | implemented | read_safe | read | True | runtimeCapabilitiesJson |  |
 | inspect.xdata.get | inspect | implemented | read_safe | read | True | getDatabaseXdata |  |
 | inspect.xref.list | inspect | implemented | read_safe | read | True | listXrefs |  |
-| plot.config.settings | layouts_plot_publish | implemented | live_edit | live_edit | True | AcDbPlotSettings / AcPlPlotConfig / AcPlPlotConf |  |
-| plot.engine.run | layouts_plot_publish | implemented | read_safe | read | True | AcPlPlotEngine: beginPlot/beginDocument/beginPag |  |
 | live.jig.point_probe | live | implemented | live_edit | live_edit | True | runLineJigProbe |  |
 | live.overrule.disable | live | implemented | live_edit | live_edit | True | disableObjectOverrule |  |
 | live.overrule.enable | live | implemented | live_edit | live_edit | True | enableObjectOverrule |  |
@@ -440,11 +494,12 @@
 | react.persistent.detach | reactors_events | implemented | live_edit | live_edit | True | m08mDispatch |  |
 | react.rxevent.attach | reactors_events | implemented | read_safe | read | True | m08mDispatch |  |
 | react.rxevent.monitor | reactors_events | implemented | read_safe | read | True | m08mDispatch |  |
-| render.layout | render | implemented | read_safe | read | True |  |  |
+| render.layout | render | implemented | read_safe | read | True | visual_report.build_visual_report |  |
 | command.register.define | runtime_commands | implemented | read_safe | read | True | m08nDispatch |  |
 | module.ads.register_symbol | runtime_commands | implemented | read_safe | read | True | m08nDispatch |  |
 | module.app.accessor | runtime_commands | implemented | read_safe | read | True | m08nDispatch |  |
 | module.class.register_object | runtime_commands | implemented | staged_write | write_copy | True | m08nDispatch |  |
+| module.command.flags | runtime_commands | implemented | read_safe | read | True | m08nDispatch |  |
 | module.command.register_auto | runtime_commands | implemented | read_safe | read | True | m08nDispatch |  |
 | module.command.register_manual | runtime_commands | implemented | read_safe | read | True | m08nDispatch |  |
 | module.command.stack_handle | runtime_commands | implemented | read_safe | read | True | m08nDispatch |  |
@@ -510,4 +565,4 @@
 | write.layout.create | write | implemented | staged_write | write_copy | True | createLayout |  |
 | write.xdata.set | write | implemented | staged_write | write_copy | True | setDatabaseXdata |  |
 
-> Full 517-operation detail (all 13 fields per op) is in `reports/operation_coverage_full_matrix.json` — this table lists only the 462 v1-target ops. The 55 catalogued ops are classified future-version native capability (v1_target=false), not omitted.
+> Full 517-operation detail (all 13 fields per op) is in `reports/operation_coverage_full_matrix.json` — this table lists only the 517 v1-target ops. The 0 catalogued ops are classified future-version native capability (v1_target=false), not omitted.

@@ -380,6 +380,7 @@ static bool m08kHasOp(const std::string& op)
         op == "extend.module.entrypoint" ||
         op == "extend.object_enabler.build" ||
         op == "extend.object_enabler.register_classes" ||
+        op == "extend.object_enabler.demand_register" ||
         // Custom-object clone / filer-roundtrip / lifecycle (deepCloneObjects / wblockCloneObjects /
         // class version / db defaults; DWG/DXF filer implementation + partial undo)
         op == "extend.customobject.define" ||
@@ -880,6 +881,38 @@ static bool m08kDispatch(const std::string& op, const AriadneJobCtx& ctx, std::o
           << "{" << m08kRxClassJson(record) << "}"
           << "],\"status_all_registered\":" << ((probe != nullptr && record != nullptr) ? "true" : "false")
           << "},\"status\":\"" << ((probe != nullptr && record != nullptr) ? "ok" : "error") << "\"}";
+        return true;
+    }
+
+    // extend.object_enabler.demand_register -- safe registration plan/status only.
+    // The exact install mutation writes AutoCAD/ObjectDBX demand-load registry keys and is
+    // intentionally not performed from the agent runtime. This handler closes the operation
+    // with actionable, deterministic data while preserving the hard boundary:
+    // registry_write_performed=false and canonical_deploy_performed=false.
+    if (op == "extend.object_enabler.demand_register") {
+        std::string appName, loaderPath, description, rootVersion;
+        m08kFindStr(job, "app_name", appName);
+        m08kFindStr(job, "loader_path", loaderPath);
+        m08kFindStr(job, "description", description);
+        m08kFindStr(job, "root_version", rootVersion);
+        if (appName.empty()) appName = "AriadneObjectEnabler";
+        if (loaderPath.empty()) loaderPath = "Ariadne.AcadNativeDbx.dbx";
+        if (description.empty()) description = "Ariadne CAD OS object enabler";
+        if (rootVersion.empty()) rootVersion = "R25.0";
+        AcRxClass* probe = m08kClassByName(ACRX_T("AriadneProbe"));
+        AcRxClass* record = m08kClassByName(ACRX_T("AriadneRecord"));
+        r << "\"result\":{\"mode\":\"registration_plan_only\""
+          << ",\"mutation_allowed\":false"
+          << ",\"registry_write_performed\":false"
+          << ",\"canonical_deploy_performed\":false"
+          << ",\"classes_registered_in_current_module\":" << ((probe != nullptr && record != nullptr) ? "true" : "false")
+          << ",\"registry_plan\":{\"root\":\"HKLM\\\\SOFTWARE\\\\Autodesk\\\\ObjectDBX\\\\"
+          << rootVersion << "\\\\Applications\\\\" << appName
+          << "\",\"DESCRIPTION\":" << njsonStr(description)
+          << ",\"LOADER\":" << njsonStr(loaderPath)
+          << ",\"LOADCTRLS\":14}"
+          << ",\"safety\":\"install mutation requires explicit deploy packet; this handler only reports the plan\""
+          << "},\"status\":\"ok\"}";
         return true;
     }
 
