@@ -239,14 +239,14 @@
     },
     "M08J-T03": {
       "op_count": 5,
-      "open": 5,
-      "implemented": 0,
+      "open": 1,
+      "implemented": 4,
       "blocked": 0,
       "by_family": {
         "active_document_write_original": 5
       },
       "by_strategy": {
-        "managed_dotnet": 4,
+        "implemented_v1": 4,
         "accoreconsole_lisp": 1
       }
     },
@@ -371,8 +371,8 @@
     },
     "M08O-T02": {
       "op_count": 22,
-      "open": 17,
-      "implemented": 0,
+      "open": 15,
+      "implemented": 2,
       "blocked": 5,
       "by_family": {
         "active_document_write_original": 3,
@@ -381,7 +381,8 @@
       },
       "by_strategy": {
         "hard_blocked": 5,
-        "native_arx_cpp": 15,
+        "implemented_v1": 2,
+        "native_arx_cpp": 13,
         "accoreconsole_lisp": 2
       }
     }
@@ -850,31 +851,31 @@
     {
       "operation": "doc.current",
       "family": "active_document_write_original",
-      "status": "catalogued",
+      "status": "implemented",
       "engine_tier": "managed_also",
       "owner_ticket": "M08J-T03",
-      "implementation_strategy": "managed_dotnet",
-      "evidence_required": "unit_test+native_extraction_fixture",
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs",
       "risk_class": "read_safe"
     },
     {
       "operation": "doc.lock",
       "family": "active_document_write_original",
-      "status": "catalogued",
+      "status": "implemented",
       "engine_tier": "managed_also",
       "owner_ticket": "M08J-T03",
-      "implementation_strategy": "managed_dotnet",
-      "evidence_required": "unit_test+native_extraction_fixture",
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs",
       "risk_class": "read_safe"
     },
     {
       "operation": "doc.new",
       "family": "active_document_write_original",
-      "status": "catalogued",
+      "status": "implemented",
       "engine_tier": "managed_also",
       "owner_ticket": "M08J-T03",
-      "implementation_strategy": "managed_dotnet",
-      "evidence_required": "unit_test+staged_diff_fixture_original_unchanged",
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs",
       "risk_class": "staged_write"
     },
     {
@@ -890,11 +891,11 @@
     {
       "operation": "doc.syncopen",
       "family": "active_document_write_original",
-      "status": "catalogued",
+      "status": "implemented",
       "engine_tier": "managed_also",
       "owner_ticket": "M08J-T03",
-      "implementation_strategy": "managed_dotnet",
-      "evidence_required": "unit_test+native_extraction_fixture",
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs",
       "risk_class": "read_safe"
     },
     {
@@ -4800,11 +4801,11 @@
     {
       "operation": "module.app.accessor",
       "family": "runtime_commands",
-      "status": "catalogued",
+      "status": "implemented",
       "engine_tier": "native_arx_only",
       "owner_ticket": "M08O-T02",
-      "implementation_strategy": "native_arx_cpp",
-      "evidence_required": "unit_test+native_extraction_fixture",
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs",
       "risk_class": "read_safe"
     },
     {
@@ -4870,11 +4871,11 @@
     {
       "operation": "module.command.stack_handle",
       "family": "runtime_commands",
-      "status": "catalogued",
+      "status": "implemented",
       "engine_tier": "native_arx_only",
       "owner_ticket": "M08O-T02",
-      "implementation_strategy": "native_arx_cpp",
-      "evidence_required": "unit_test+native_extraction_fixture",
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs",
       "risk_class": "read_safe"
     },
     {

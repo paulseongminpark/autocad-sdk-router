@@ -1,0 +1,26 @@
+{
+  "ticket_id": "WAVE3_PANE9_LIVE_EDITOR",
+  "status": "PASS",
+  "branch": "cados/wave3-pane9-live-editor-ui",
+  "commit": "d2463c7c7973a85b5a879004947bd34842c3f6a8",
+  "pr": "",
+  "implemented_ops": [
+    "module.app.accessor",
+    "module.command.stack_handle",
+    "doc.current",
+    "doc.lock",
+    "doc.new",
+    "doc.syncopen"
+  ],
+  "hard_blocked_ops": [],
+  "deprecated_ops": [],
+  "catalogued_remaining": [],
+  "tests": {
+    "build": "tools/build_native_acad.ps1 EXIT=0 (VS2026 MSBuild x64, ObjectARX 2027 SDK)",
+    "pytest": "python -m pytest tests -v => 464 passed, 20 skipped, 0 failed",
+    "new_test": "tests/unit/test_m08n_handlers.py (76 ops total, updated to assert new app, stack, and active document write_original handlers)"
+  },
+  "corrections": [],
+  "isolation_note": "Developed and verified in git worktree D:\\dev\\99_tools\\autocad-sdk-router_wave3_pane9_live_editor on branch cados/wave3-pane9-live-editor-ui. Fixed catalog re-opening fields (implementation_strategy and evidence_required) by updating the reconcile script to invoke operation_coverage_matrix.reopen_registry(doc) after flips.",
+  "next": "Merge branch cados/wave3-pane9-live-editor-ui to main."
+}

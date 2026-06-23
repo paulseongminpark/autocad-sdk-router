@@ -2,9 +2,9 @@
 
 - packet: `CADOS_M08_FULL_OPERATION_COVERAGE_CLOSURE`
 - generated_from: `config/operations.v2.json`
-- total operations: **517** · implemented 445 · stub 0 · blocked 10 · catalogued 62 · deprecated 0 · **unknown 0**
-- v1-target: **455** (implemented 445 · blocked 10 · **deferred 0**)
-- agent-exposed ops: 445
+- total operations: **517** · implemented 451 · stub 0 · blocked 10 · catalogued 56 · deprecated 0 · **unknown 0**
+- v1-target: **461** (implemented 451 · blocked 10 · **deferred 0**)
+- agent-exposed ops: 451
 
 ## Gate
 
@@ -28,11 +28,11 @@
 |---|---|---|---|---|---|
 | read | 53 | 0 | 0 | 0 | 53 |
 | query | 1 | 0 | 0 | 0 | 1 |
-| write_patch | 12 | 0 | 3 | 5 | 15 |
+| write_patch | 16 | 0 | 3 | 1 | 19 |
 | validate_diff | 3 | 0 | 0 | 0 | 3 |
 | render_visual | 12 | 0 | 0 | 0 | 12 |
 | live | 6 | 0 | 1 | 0 | 7 |
-| native_only | 358 | 0 | 6 | 57 | 364 |
+| native_only | 360 | 0 | 6 | 55 | 366 |
 
 ## Risk class distribution
 
@@ -57,6 +57,10 @@
 | module.load.demand_register | runtime_commands | blocked | read_safe | read | False | Registry: HKLM\…\R<ver>\<prodkey>\Applications\< | SAFETY_FORBIDDEN: ObjectARX demand-load registration require |
 | command.menu.invoke | ui_customization | blocked | read_safe | read | False | acedMenuCmd(const ACHAR*) | SAFETY_FORBIDDEN: acedMenuCmd executes arbitrary menu/comman |
 | editor.toolpalette.tool_execute | ui_customization | blocked | read_safe | read | False | AcTcTool::Execute(int nFlag, HWND, POINT, DWORD  | SAFETY_FORBIDDEN: AcTcTool::Execute programmatically fires a |
+| doc.current | active_document_write_original | implemented | read_safe | read | True | m08nDispatch |  |
+| doc.lock | active_document_write_original | implemented | read_safe | read | True | m08nDispatch |  |
+| doc.new | active_document_write_original | implemented | staged_write | write_copy | True | m08nDispatch |  |
+| doc.syncopen | active_document_write_original | implemented | read_safe | read | True | m08nDispatch |  |
 | apply.patch | apply | implemented | staged_write | write_copy | True | patch_engine.apply_staged |  |
 | infra.hostapp.provide_services | blocks_xrefs_clone | implemented | read_safe | read | True | m08eDispatch |  |
 | inspect.block.iterate | blocks_xrefs_clone | implemented | read_safe | read | True | m08eDispatch |  |
@@ -438,9 +442,11 @@
 | render.layout | render | implemented | read_safe | read | True |  |  |
 | command.register.define | runtime_commands | implemented | read_safe | read | True | m08nDispatch |  |
 | module.ads.register_symbol | runtime_commands | implemented | read_safe | read | True | m08nDispatch |  |
+| module.app.accessor | runtime_commands | implemented | read_safe | read | True | m08nDispatch |  |
 | module.class.register_object | runtime_commands | implemented | staged_write | write_copy | True | m08nDispatch |  |
 | module.command.register_auto | runtime_commands | implemented | read_safe | read | True | m08nDispatch |  |
 | module.command.register_manual | runtime_commands | implemented | read_safe | read | True | m08nDispatch |  |
+| module.command.stack_handle | runtime_commands | implemented | read_safe | read | True | m08nDispatch |  |
 | module.register_mdi | runtime_commands | implemented | read_safe | read | True | m08nDispatch |  |
 | module.register_service | runtime_commands | implemented | read_safe | read | True | m08nDispatch |  |
 | acdb.database.create | symbol_tables_dictionaries | implemented | read_safe | read | True | m08eDispatch |  |
@@ -503,4 +509,4 @@
 | write.layout.create | write | implemented | staged_write | write_copy | True | createLayout |  |
 | write.xdata.set | write | implemented | staged_write | write_copy | True | setDatabaseXdata |  |
 
-> Full 517-operation detail (all 13 fields per op) is in `reports/operation_coverage_full_matrix.json` — this table lists only the 455 v1-target ops. The 62 catalogued ops are classified future-version native capability (v1_target=false), not omitted.
+> Full 517-operation detail (all 13 fields per op) is in `reports/operation_coverage_full_matrix.json` — this table lists only the 461 v1-target ops. The 56 catalogued ops are classified future-version native capability (v1_target=false), not omitted.

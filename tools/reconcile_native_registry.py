@@ -244,6 +244,12 @@ def main():
             h = {} if h is None else {"native_api": h}
         h["dispatcher_symbol"] = ev["dispatcher_symbol"]
         op["handler"] = h
+
+    # Re-run matrix field assignment to keep strategy/evidence deterministic & synchronized
+    sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+    import operation_coverage_matrix as ocm
+    ocm.reopen_registry(doc)
+
     sync_msgs = _sync_totals(doc)
     for m in sync_msgs:
         print("  SYNC: {0}".format(m))

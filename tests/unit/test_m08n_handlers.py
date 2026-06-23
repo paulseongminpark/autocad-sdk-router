@@ -54,9 +54,11 @@ _SELECTION = [
 _RUNTIME = [
     "command.register.define",
     "module.ads.register_symbol",
+    "module.app.accessor",
     "module.class.register_object",
     "module.command.register_auto",
     "module.command.register_manual",
+    "module.command.stack_handle",
     "module.register_mdi",
     "module.register_service",
 ]
@@ -101,7 +103,14 @@ _UI = [
     "editor.tray.remove",
 ]
 
-_IMPLEMENTED = _T01 + _SELECTION + _RUNTIME + _UI
+_DOC = [
+    "doc.current",
+    "doc.lock",
+    "doc.new",
+    "doc.syncopen",
+]
+
+_IMPLEMENTED = _T01 + _SELECTION + _RUNTIME + _UI + _DOC
 
 _HARD_BLOCKED = [
     "command.menu.invoke",             # arbitrary menu macro execution => raw command surface
@@ -161,8 +170,8 @@ class TestM08NHandlers(unittest.TestCase):
         self.assertRegex(self.src, r"bool\s+m08nDispatch\(const std::string& op, const AriadneJobCtx& ctx, std::ostringstream& r\)")
 
     def test_hasop_lists_exactly_feasible_implemented(self):
-        self.assertEqual(len(_IMPLEMENTED), 70)
-        self.assertEqual(len(set(_IMPLEMENTED)), 70)
+        self.assertEqual(len(_IMPLEMENTED), 76)
+        self.assertEqual(len(set(_IMPLEMENTED)), 76)
         self.assertEqual(
             self.hasop,
             set(_IMPLEMENTED),
