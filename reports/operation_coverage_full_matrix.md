@@ -2,9 +2,9 @@
 
 - packet: `CADOS_M08_FULL_OPERATION_COVERAGE_CLOSURE`
 - generated_from: `config/operations.v2.json`
-- total operations: **517** · implemented 457 · stub 0 · blocked 60 · catalogued 0 · deprecated 0 · **unknown 0**
-- v1-target: **517** (implemented 457 · blocked 60 · **deferred 0**)
-- agent-exposed ops: 457
+- total operations: **517** · implemented 461 · stub 0 · blocked 56 · catalogued 0 · deprecated 0 · **unknown 0**
+- v1-target: **517** (implemented 461 · blocked 56 · **deferred 0**)
+- agent-exposed ops: 461
 
 ## Gate
 
@@ -32,14 +32,14 @@
 | validate_diff | 3 | 0 | 0 | 0 | 3 |
 | render_visual | 10 | 0 | 2 | 0 | 12 |
 | live | 6 | 0 | 1 | 0 | 7 |
-| native_only | 368 | 0 | 53 | 0 | 421 |
+| native_only | 372 | 0 | 49 | 0 | 421 |
 
 ## Risk class distribution
 
 | risk_class | count |
 |---|---|
-| read_safe | 349 |
-| staged_write | 112 |
+| read_safe | 346 |
+| staged_write | 115 |
 | live_edit | 50 |
 | raw_command | 6 |
 
@@ -51,9 +51,6 @@
 | command.invoke.sync | active_document_write_original | blocked | raw_command | live_edit | False | acedCommandS(int rtype, ...) | SAFETY_FORBIDDEN: raw command dispatch is blocked in M08O fa |
 | command.invoke.sync.resbuf | active_document_write_original | blocked | raw_command | live_edit | False | acedCmdS(const resbuf* rb, bool, AcApDocument*) | SAFETY_FORBIDDEN: raw command dispatch is blocked in M08O fa |
 | doc.sendstring | active_document_write_original | blocked | raw_command | write_copy | False | AcApDocManager::sendStringToExecute(AcApDocument | SAFETY_FORBIDDEN: doc.sendstring uses AcApDocManager::sendSt |
-| edit.subentity.add_paths | brep_solids | blocked | read_safe | read | False | AcDbEntity::addSubentPaths(const AcDbFullSubentP | SAFETY_FORBIDDEN: AcDbEntity::addSubentPaths mutates subenti |
-| edit.subentity.delete_paths | brep_solids | blocked | read_safe | read | False | AcDbEntity::deleteSubentPaths(const AcDbFullSube | SAFETY_FORBIDDEN: AcDbEntity::deleteSubentPaths mutates sube |
-| edit.subentity.transform | brep_solids | blocked | read_safe | read | False | AcDbEntity::transformSubentPathsBy(const AcDbFul | SAFETY_FORBIDDEN: AcDbEntity::transformSubentPathsBy mutates |
 | ui.subentity.highlight | brep_solids | blocked | read_safe | read | False | AcDbEntity::highlight(const AcDbFullSubentPath&, | HOST_UNAVAILABLE: subentity highlight requires a live graphi |
 | automate.com.get_app | com_activex | blocked | read_safe | read | False | acedGetIDispatch(bool bAddRef) (= AcadGetIDispat | SAFETY_FORBIDDEN: exposing AutoCAD application IDispatch to  |
 | automate.com.get_document | com_activex | blocked | read_safe | read | False | AcApDocument::GetIDispatch(bool bAddRef) | SAFETY_FORBIDDEN: exposing live AcadDocument automation inte |
@@ -83,7 +80,6 @@
 | edit.assocdata.xref | constraints_associativity | blocked | live_edit | live_edit | False | AcDbAssocManager::markSyncUpWithXrefsNeeded(db)  | SAFETY_FORBIDDEN: AcDbAssocManager::syncUpWithXrefs/markSync |
 | inspect.assocaction.evaluate | constraints_associativity | blocked | live_edit | live_edit | False | AcDbAssocAction::evaluate(callback), evaluateDep | SAFETY_FORBIDDEN: AcDbAssocAction::evaluate is the native as |
 | inspect.assocnetwork.evaluate | constraints_associativity | blocked | live_edit | live_edit | False | AcDbAssocManager::evaluateTopLevelNetwork(AcDbDa | SAFETY_FORBIDDEN: AcDbAssocManager::evaluateTopLevelNetwork  |
-| inspect.assocsurface.topology | constraints_associativity | blocked | read_safe | read | False | AcDbAssocSurfaceActionBody::findActionsThatAffec | SAFETY_FORBIDDEN: associative surface topology inspection re |
 | repair.assocdata.audit | constraints_associativity | blocked | live_edit | live_edit | False | AcDbAssocManager::auditAssociativeData(db, trave | SAFETY_FORBIDDEN: AcDbAssocManager::auditAssociativeData per |
 | command.queue.post | editor_input | blocked | raw_command | live_edit | False | acedPostCommand / acedPostCommandPrompt() | SAFETY_FORBIDDEN: raw command dispatch is blocked in M08O fa |
 | plot.config.settings | layouts_plot_publish | blocked | live_edit | live_edit | False | AcDbPlotSettings / AcPlPlotConfig / AcPlPlotConf | SAFETY_FORBIDDEN: exact plot settings operation is a live_ed |
@@ -123,6 +119,9 @@
 | compute.brep.point_containment | brep_solids | implemented | read_safe | read | True | m08dDispatch |  |
 | compute.brep.surface_area | brep_solids | implemented | read_safe | read | True | m08dDispatch |  |
 | compute.brep.volume | brep_solids | implemented | read_safe | read | True | m08dDispatch |  |
+| edit.subentity.add_paths | brep_solids | implemented | staged_write | write_copy | True | m08gDispatch |  |
+| edit.subentity.delete_paths | brep_solids | implemented | staged_write | write_copy | True | m08gDispatch |  |
+| edit.subentity.transform | brep_solids | implemented | staged_write | write_copy | True | m08gDispatch |  |
 | inspect.brep.bounds | brep_solids | implemented | read_safe | read | True | m08dDispatch |  |
 | inspect.brep.changed | brep_solids | implemented | read_safe | read | True | m08dDispatch |  |
 | inspect.brep.from_entity | brep_solids | implemented | read_safe | read | True | m08dDispatch |  |
@@ -239,6 +238,7 @@
 | inspect.assocmanager.state | constraints_associativity | implemented | read_safe | read | True | m08kcDispatch |  |
 | inspect.assocnetwork.get | constraints_associativity | implemented | staged_write | write_copy | True | m08kcDispatch |  |
 | inspect.assocnetwork.iterate | constraints_associativity | implemented | read_safe | read | True | m08kcDispatch |  |
+| inspect.assocsurface.topology | constraints_associativity | implemented | read_safe | read | True | m08kcDispatch |  |
 | inspect.constraint.dimensional.value | constraints_associativity | implemented | staged_write | write_copy | True | m08kcDispatch |  |
 | inspect.constraint.enumerate | constraints_associativity | implemented | read_safe | read | True | m08kcDispatch |  |
 | inspect.constraint.node | constraints_associativity | implemented | staged_write | write_copy | True | m08kcDispatch |  |

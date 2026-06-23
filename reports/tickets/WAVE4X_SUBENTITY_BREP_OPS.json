@@ -1,0 +1,101 @@
+{
+  "schema": "ariadne.cad_os.wave4x.subentity_brep.ops.v1",
+  "generated_at": "2026-06-23T23:59:00+09:00",
+  "claim_file": "reports/tickets/WAVE4X_PANE3_SUBENTITY_BREP_CLAIMS.json",
+  "claimed_ops_count": 4,
+  "implemented_ops_count": 4,
+  "hard_blocked_ops_count": 0,
+  "deprecated_ops_count": 0,
+  "claimed_catalogued_remaining_count": 0,
+  "implemented_ops": [
+    "edit.subentity.add_paths",
+    "edit.subentity.delete_paths",
+    "edit.subentity.transform",
+    "inspect.assocsurface.topology"
+  ],
+  "hard_blocked_ops": [],
+  "deprecated_ops": [],
+  "claimed_catalogued_remaining": [],
+  "operations": [
+    {
+      "operation": "edit.subentity.add_paths",
+      "family": "brep_solids",
+      "closure": "implemented",
+      "registry_status": "implemented",
+      "dispatcher_symbol": "m08gDispatch",
+      "tests": [
+        "tests/unit/test_m08g_handlers.py",
+        "tests/unit/test_wave3_remaining_registry_closure.py",
+        "tests/unit/test_wave4x_subentity_brep_registry.py"
+      ],
+      "evidence_refs": [
+        "src/Ariadne.AcadNative/families/m08g_handlers.inc:m08gDispatch",
+        "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
+        "runtime_native_job_smoke:deferred_attended(WAVE4X_SUBENTITY_BREP)",
+        "reports/tickets/WAVE4X_SUBENTITY_BREP.md",
+        "reports/tickets/WAVE4X_SUBENTITY_BREP_native_build.json"
+      ],
+      "blocked_reason": ""
+    },
+    {
+      "operation": "edit.subentity.delete_paths",
+      "family": "brep_solids",
+      "closure": "implemented",
+      "registry_status": "implemented",
+      "dispatcher_symbol": "m08gDispatch",
+      "tests": [
+        "tests/unit/test_m08g_handlers.py",
+        "tests/unit/test_wave3_remaining_registry_closure.py",
+        "tests/unit/test_wave4x_subentity_brep_registry.py"
+      ],
+      "evidence_refs": [
+        "src/Ariadne.AcadNative/families/m08g_handlers.inc:m08gDispatch",
+        "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
+        "runtime_native_job_smoke:deferred_attended(WAVE4X_SUBENTITY_BREP)",
+        "reports/tickets/WAVE4X_SUBENTITY_BREP.md",
+        "reports/tickets/WAVE4X_SUBENTITY_BREP_native_build.json"
+      ],
+      "blocked_reason": ""
+    },
+    {
+      "operation": "edit.subentity.transform",
+      "family": "brep_solids",
+      "closure": "implemented",
+      "registry_status": "implemented",
+      "dispatcher_symbol": "m08gDispatch",
+      "tests": [
+        "tests/unit/test_m08g_handlers.py",
+        "tests/unit/test_wave3_remaining_registry_closure.py",
+        "tests/unit/test_wave4x_subentity_brep_registry.py"
+      ],
+      "evidence_refs": [
+        "src/Ariadne.AcadNative/families/m08g_handlers.inc:m08gDispatch",
+        "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
+        "runtime_native_job_smoke:deferred_attended(WAVE4X_SUBENTITY_BREP)",
+        "reports/tickets/WAVE4X_SUBENTITY_BREP.md",
+        "reports/tickets/WAVE4X_SUBENTITY_BREP_native_build.json"
+      ],
+      "blocked_reason": ""
+    },
+    {
+      "operation": "inspect.assocsurface.topology",
+      "family": "constraints_associativity",
+      "closure": "implemented",
+      "registry_status": "implemented",
+      "dispatcher_symbol": "m08kcDispatch",
+      "tests": [
+        "tests/unit/test_m08kc_handlers.py",
+        "tests/unit/test_wave3_pane5_assoc_reaudit.py",
+        "tests/unit/test_wave4x_subentity_brep_registry.py"
+      ],
+      "evidence_refs": [
+        "src/Ariadne.AcadNative/families/m08kc_handlers.inc:m08kcDispatch",
+        "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
+        "runtime_native_job_smoke:deferred_attended(WAVE4X_SUBENTITY_BREP)",
+        "reports/tickets/WAVE4X_SUBENTITY_BREP.md",
+        "reports/tickets/WAVE4X_SUBENTITY_BREP_native_build.json"
+      ],
+      "blocked_reason": ""
+    }
+  ]
+}

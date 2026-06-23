@@ -36,7 +36,6 @@ BLOCKED_ASSOC_SOLVER_OR_MODELER = {
     "edit.assocarray.transform",
     "edit.assocarray.explode",
     "edit.assocdata.xref",
-    "inspect.assocsurface.topology",
     "repair.assocdata.audit",
 }
 
@@ -64,7 +63,7 @@ def test_callback_ops_reaudited_to_safe_introspection_implemented():
 
 def test_remaining_pane5_assoc_ops_have_real_blockers_after_reaudit():
     ops = _ops_by_id()
-    assert len(BLOCKED_ASSOC_SOLVER_OR_MODELER) == 23
+    assert len(BLOCKED_ASSOC_SOLVER_OR_MODELER) == 22
     for oid in BLOCKED_ASSOC_SOLVER_OR_MODELER:
         op = ops[oid]
         assert op["status"] == "blocked", oid
@@ -73,3 +72,15 @@ def test_remaining_pane5_assoc_ops_have_real_blockers_after_reaudit():
         assert "catalogued" not in reason.lower()
         evidence = "\n".join(op.get("evidence_refs", []))
         assert "WAVE3_PANE5_ASSOCIATIVITY_REAUDIT" in evidence, oid
+
+
+def test_inspect_assocsurface_topology_reopened_to_read_only_implemented():
+    ops = _ops_by_id()
+    op = ops["inspect.assocsurface.topology"]
+    assert op["status"] == "implemented"
+    assert op["handler"]["dispatcher_symbol"] == "m08kcDispatch"
+    assert op["handler"]["router_lane"] == "ARIADNE_NATIVE_JOB"
+    assert op["policy"]["agent_exposed"] is True
+    assert op["policy"]["risk_class"] == "read_safe"
+    evidence = "\n".join(op.get("evidence_refs", []))
+    assert "WAVE4X_SUBENTITY_BREP" in evidence

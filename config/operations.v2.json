@@ -56,8 +56,8 @@
   "totals": {
     "operations": 517,
     "by_status": {
-      "blocked": 60,
-      "implemented": 457
+      "implemented": 461,
+      "blocked": 56
     },
     "by_family": {
       "active_document_write_original": 8,
@@ -128,11 +128,11 @@
       "ui_customization": 39
     },
     "operation_records": 517,
-    "implemented": 457,
+    "implemented": 461,
     "wired": 0,
     "stub": 0,
     "catalogued": 0,
-    "blocked": 60,
+    "blocked": 56,
     "deprecated": 0,
     "unknown": 0,
     "catalog_classified_ops": 62,
@@ -4533,7 +4533,7 @@
       "id": "edit.subentity.add_paths",
       "operation": "edit.subentity.add_paths",
       "family": "brep_solids",
-      "status": "blocked",
+      "status": "implemented",
       "engine_tier": "native_arx_only",
       "engines": [
         "native_arx_only"
@@ -4546,18 +4546,18 @@
         "arx_adapter",
         "full_autocad"
       ],
-      "execution_context": "hostless_dbx_in_accoreconsole",
+      "execution_context": "host",
       "write_level": {
-        "default_write_mode": "read",
+        "default_write_mode": "write_copy",
         "allowed_write_modes": [
-          "read"
+          "write_copy"
         ],
-        "dwg_persisted": false,
+        "dwg_persisted": true,
         "original_write_default": false
       },
       "handler": {
-        "router_lane": null,
-        "dispatcher_symbol": null,
+        "router_lane": "ARIADNE_NATIVE_JOB",
+        "dispatcher_symbol": "m08gDispatch",
         "execution_host_class": "arx_adapter",
         "native_api": "AcDbEntity::addSubentPaths(const AcDbFullSubentPath[])",
         "composed_of": []
@@ -4572,39 +4572,47 @@
       },
       "policy": {
         "source": "config/policy.v2.json",
-        "status_policy": "blocked",
-        "default_write_mode": "read",
+        "status_policy": "implemented",
+        "default_write_mode": "write_copy",
         "allowed_write_modes": [
-          "read"
+          "write_copy"
         ],
         "no_original_write_default": true,
-        "runtime_behavior": "hard_blocked_after_wave3_reaudit",
-        "agent_exposed": false
+        "runtime_behavior": "implemented_staged_write_explicit_path",
+        "agent_exposed": true,
+        "risk_class": "staged_write"
       },
       "tests": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
-        "tests/unit/test_wave3_remaining_registry_closure.py::test_remaining_wave3_blocks_have_accepted_codes_and_evidence"
+        "tests/unit/test_wave3_remaining_registry_closure.py::test_remaining_wave3_blocks_have_accepted_codes_and_evidence",
+        "tests/unit/test_wave4x_subentity_brep_registry.py",
+        "tests/unit/test_m08g_handlers.py",
+        "tests/unit/test_wave3_remaining_registry_closure.py"
       ],
       "summary": "Add subentities (custom-object / associative authoring)",
       "source_slice": "brep-topology.md",
       "citation": "dbmain.h:2001 addSubentPaths",
       "evidence_refs": [
         "config/autocad_native_arx_operation_catalog.json#edit.subentity.add_paths",
-        "reports/WAVE3_REMAINING_HARDBLOCK_REAUDIT.md#edit.subentity.add_paths"
+        "reports/WAVE3_REMAINING_HARDBLOCK_REAUDIT.md#edit.subentity.add_paths",
+        "src/Ariadne.AcadNative/families/m08g_handlers.inc:m08gDispatch",
+        "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
+        "runtime_native_job_smoke:deferred_attended(WAVE4X_SUBENTITY_BREP)",
+        "reports/tickets/WAVE4X_SUBENTITY_BREP.md",
+        "reports/tickets/WAVE4X_SUBENTITY_BREP_OPS.json",
+        "reports/tickets/WAVE4X_SUBENTITY_BREP_native_build.json"
       ],
-      "notes": "Wave3 post-merge re-audit accepted hard block. SAFETY_FORBIDDEN: AcDbEntity::addSubentPaths mutates subentity path association state; the current CAD OS agent contract has no bounded staged-copy authoring schema for arbitrary subentity path mutation.",
+      "notes": "Wave4X reopened the prior safety block with a bounded staged-copy contract: the handler accepts explicit AcDbFullSubentPath specs (handle + subentity type/index + optional insert stack), mutates only the staged copy via ARIADNE_NATIVE_JOB, and emits before/after path readback. No editor picks, raw commands, or original-DWG writes.",
       "owner_ticket": "M08G-T03",
-      "implementation_strategy": "hard_blocked",
-      "evidence_required": "blocker_ref_and_evidence",
-      "blocked_reason": "SAFETY_FORBIDDEN: AcDbEntity::addSubentPaths mutates subentity path association state; the current CAD OS agent contract has no bounded staged-copy authoring schema for arbitrary subentity path mutation.",
-      "blocker_ref": "reports/WAVE3_REMAINING_HARDBLOCK_REAUDIT.md#edit.subentity.add_paths"
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs"
     },
     {
       "id": "edit.subentity.delete_paths",
       "operation": "edit.subentity.delete_paths",
       "family": "brep_solids",
-      "status": "blocked",
+      "status": "implemented",
       "engine_tier": "native_arx_only",
       "engines": [
         "native_arx_only"
@@ -4617,18 +4625,18 @@
         "arx_adapter",
         "full_autocad"
       ],
-      "execution_context": "hostless_dbx_in_accoreconsole",
+      "execution_context": "host",
       "write_level": {
-        "default_write_mode": "read",
+        "default_write_mode": "write_copy",
         "allowed_write_modes": [
-          "read"
+          "write_copy"
         ],
-        "dwg_persisted": false,
+        "dwg_persisted": true,
         "original_write_default": false
       },
       "handler": {
-        "router_lane": null,
-        "dispatcher_symbol": null,
+        "router_lane": "ARIADNE_NATIVE_JOB",
+        "dispatcher_symbol": "m08gDispatch",
         "execution_host_class": "arx_adapter",
         "native_api": "AcDbEntity::deleteSubentPaths(const AcDbFullSubentPath[])",
         "composed_of": []
@@ -4643,39 +4651,47 @@
       },
       "policy": {
         "source": "config/policy.v2.json",
-        "status_policy": "blocked",
-        "default_write_mode": "read",
+        "status_policy": "implemented",
+        "default_write_mode": "write_copy",
         "allowed_write_modes": [
-          "read"
+          "write_copy"
         ],
         "no_original_write_default": true,
-        "runtime_behavior": "hard_blocked_after_wave3_reaudit",
-        "agent_exposed": false
+        "runtime_behavior": "implemented_staged_write_explicit_path",
+        "agent_exposed": true,
+        "risk_class": "staged_write"
       },
       "tests": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
-        "tests/unit/test_wave3_remaining_registry_closure.py::test_remaining_wave3_blocks_have_accepted_codes_and_evidence"
+        "tests/unit/test_wave3_remaining_registry_closure.py::test_remaining_wave3_blocks_have_accepted_codes_and_evidence",
+        "tests/unit/test_wave4x_subentity_brep_registry.py",
+        "tests/unit/test_m08g_handlers.py",
+        "tests/unit/test_wave3_remaining_registry_closure.py"
       ],
       "summary": "Delete addressed subentities",
       "source_slice": "brep-topology.md",
       "citation": "dbmain.h:2004 deleteSubentPaths",
       "evidence_refs": [
         "config/autocad_native_arx_operation_catalog.json#edit.subentity.delete_paths",
-        "reports/WAVE3_REMAINING_HARDBLOCK_REAUDIT.md#edit.subentity.delete_paths"
+        "reports/WAVE3_REMAINING_HARDBLOCK_REAUDIT.md#edit.subentity.delete_paths",
+        "src/Ariadne.AcadNative/families/m08g_handlers.inc:m08gDispatch",
+        "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
+        "runtime_native_job_smoke:deferred_attended(WAVE4X_SUBENTITY_BREP)",
+        "reports/tickets/WAVE4X_SUBENTITY_BREP.md",
+        "reports/tickets/WAVE4X_SUBENTITY_BREP_OPS.json",
+        "reports/tickets/WAVE4X_SUBENTITY_BREP_native_build.json"
       ],
-      "notes": "Wave3 post-merge re-audit accepted hard block. SAFETY_FORBIDDEN: AcDbEntity::deleteSubentPaths mutates subentity path association state; safe read/status variants are implemented separately and this mutation is not agent-exposed.",
+      "notes": "Wave4X reopened the prior safety block with a bounded staged-copy contract: the handler accepts explicit AcDbFullSubentPath specs (handle + subentity type/index + optional insert stack), mutates only the staged copy via ARIADNE_NATIVE_JOB, and emits before/after path readback. No editor picks, raw commands, or original-DWG writes.",
       "owner_ticket": "M08G-T03",
-      "implementation_strategy": "hard_blocked",
-      "evidence_required": "blocker_ref_and_evidence",
-      "blocked_reason": "SAFETY_FORBIDDEN: AcDbEntity::deleteSubentPaths mutates subentity path association state; safe read/status variants are implemented separately and this mutation is not agent-exposed.",
-      "blocker_ref": "reports/WAVE3_REMAINING_HARDBLOCK_REAUDIT.md#edit.subentity.delete_paths"
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs"
     },
     {
       "id": "edit.subentity.transform",
       "operation": "edit.subentity.transform",
       "family": "brep_solids",
-      "status": "blocked",
+      "status": "implemented",
       "engine_tier": "native_arx_only",
       "engines": [
         "native_arx_only"
@@ -4688,18 +4704,18 @@
         "arx_adapter",
         "full_autocad"
       ],
-      "execution_context": "hostless_dbx_in_accoreconsole",
+      "execution_context": "host",
       "write_level": {
-        "default_write_mode": "read",
+        "default_write_mode": "write_copy",
         "allowed_write_modes": [
-          "read"
+          "write_copy"
         ],
-        "dwg_persisted": false,
+        "dwg_persisted": true,
         "original_write_default": false
       },
       "handler": {
-        "router_lane": null,
-        "dispatcher_symbol": null,
+        "router_lane": "ARIADNE_NATIVE_JOB",
+        "dispatcher_symbol": "m08gDispatch",
         "execution_host_class": "arx_adapter",
         "native_api": "AcDbEntity::transformSubentPathsBy(const AcDbFullSubentPath[], const AcGeMatrix3d&)",
         "composed_of": []
@@ -4714,33 +4730,41 @@
       },
       "policy": {
         "source": "config/policy.v2.json",
-        "status_policy": "blocked",
-        "default_write_mode": "read",
+        "status_policy": "implemented",
+        "default_write_mode": "write_copy",
         "allowed_write_modes": [
-          "read"
+          "write_copy"
         ],
         "no_original_write_default": true,
-        "runtime_behavior": "hard_blocked_after_wave3_reaudit",
-        "agent_exposed": false
+        "runtime_behavior": "implemented_staged_write_explicit_path",
+        "agent_exposed": true,
+        "risk_class": "staged_write"
       },
       "tests": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
-        "tests/unit/test_wave3_remaining_registry_closure.py::test_remaining_wave3_blocks_have_accepted_codes_and_evidence"
+        "tests/unit/test_wave3_remaining_registry_closure.py::test_remaining_wave3_blocks_have_accepted_codes_and_evidence",
+        "tests/unit/test_wave4x_subentity_brep_registry.py",
+        "tests/unit/test_m08g_handlers.py",
+        "tests/unit/test_wave3_remaining_registry_closure.py"
       ],
       "summary": "Direct modeling: move/rotate/scale specific faces/edges/vertices in place (this WRITES to the entity)",
       "source_slice": "brep-topology.md",
       "citation": "dbmain.h:2011 transformSubentPathsBy; MCP AcDbSubentityOverrule (overrule pairing)",
       "evidence_refs": [
         "config/autocad_native_arx_operation_catalog.json#edit.subentity.transform",
-        "reports/WAVE3_REMAINING_HARDBLOCK_REAUDIT.md#edit.subentity.transform"
+        "reports/WAVE3_REMAINING_HARDBLOCK_REAUDIT.md#edit.subentity.transform",
+        "src/Ariadne.AcadNative/families/m08g_handlers.inc:m08gDispatch",
+        "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
+        "runtime_native_job_smoke:deferred_attended(WAVE4X_SUBENTITY_BREP)",
+        "reports/tickets/WAVE4X_SUBENTITY_BREP.md",
+        "reports/tickets/WAVE4X_SUBENTITY_BREP_OPS.json",
+        "reports/tickets/WAVE4X_SUBENTITY_BREP_native_build.json"
       ],
-      "notes": "Wave3 post-merge re-audit accepted hard block. SAFETY_FORBIDDEN: AcDbEntity::transformSubentPathsBy mutates selected subentity paths; the exact operation needs a validated staged authoring contract before exposure.",
+      "notes": "Wave4X reopened the prior safety block with a bounded staged-copy contract: the handler accepts explicit AcDbFullSubentPath specs (handle + subentity type/index + optional insert stack), mutates only the staged copy via ARIADNE_NATIVE_JOB, and emits before/after path readback. No editor picks, raw commands, or original-DWG writes.",
       "owner_ticket": "M08G-T03",
-      "implementation_strategy": "hard_blocked",
-      "evidence_required": "blocker_ref_and_evidence",
-      "blocked_reason": "SAFETY_FORBIDDEN: AcDbEntity::transformSubentPathsBy mutates selected subentity paths; the exact operation needs a validated staged authoring contract before exposure.",
-      "blocker_ref": "reports/WAVE3_REMAINING_HARDBLOCK_REAUDIT.md#edit.subentity.transform"
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs"
     },
     {
       "id": "inspect.brep.bounds",
@@ -15401,7 +15425,7 @@
       "id": "inspect.assocsurface.topology",
       "operation": "inspect.assocsurface.topology",
       "family": "constraints_associativity",
-      "status": "blocked",
+      "status": "implemented",
       "engine_tier": "native_arx_only",
       "engines": [
         "native_arx_only"
@@ -15424,8 +15448,8 @@
         "original_write_default": false
       },
       "handler": {
-        "router_lane": null,
-        "dispatcher_symbol": null,
+        "router_lane": "ARIADNE_NATIVE_JOB",
+        "dispatcher_symbol": "m08kcDispatch",
         "execution_host_class": "arx_adapter",
         "native_api": "AcDbAssocSurfaceActionBody::findActionsThatAffectedTopologicalSubentity(entity, AcDbSubentId, &actionIds) / getTopologicalSubentitiesForActionsOnEntity(...) / getSurfacesDirectlyDependentOnObject(...) (statics)",
         "composed_of": []
@@ -15440,20 +15464,22 @@
       },
       "policy": {
         "source": "config/policy.v2.json",
-        "status_policy": "blocked_not_runnable",
+        "status_policy": "implemented_read_only",
         "default_write_mode": "read",
         "allowed_write_modes": [
           "read"
         ],
         "no_original_write_default": true,
-        "runtime_behavior": "blocked_after_wave3_reaudit",
-        "agent_exposed": false,
-        "risk_class": "unsafe_solver_or_modeler"
+        "runtime_behavior": "implemented_read_only_or_policy_gated",
+        "agent_exposed": true,
+        "risk_class": "read_safe"
       },
       "tests": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
-        "tests/unit/test_wave3_pane5_assoc_reaudit.py"
+        "tests/unit/test_wave3_pane5_assoc_reaudit.py",
+        "tests/unit/test_wave4x_subentity_brep_registry.py",
+        "tests/unit/test_m08kc_handlers.py"
       ],
       "summary": "Trace which actions produced a given face/edge, and which surfaces depend on an object",
       "source_slice": "constraints-associativity.md",
@@ -15461,13 +15487,18 @@
       "evidence_refs": [
         "config/autocad_native_arx_operation_catalog.json#inspect.assocsurface.topology",
         "reports/WAVE3_PANE5_ASSOCIATIVITY_REAUDIT.md#inspect.assocsurface.topology",
-        "tests/unit/test_wave3_pane5_assoc_reaudit.py"
+        "tests/unit/test_wave3_pane5_assoc_reaudit.py",
+        "src/Ariadne.AcadNative/families/m08kc_handlers.inc:m08kcDispatch",
+        "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
+        "runtime_native_job_smoke:deferred_attended(WAVE4X_SUBENTITY_BREP)",
+        "reports/tickets/WAVE4X_SUBENTITY_BREP.md",
+        "reports/tickets/WAVE4X_SUBENTITY_BREP_OPS.json",
+        "reports/tickets/WAVE4X_SUBENTITY_BREP_native_build.json"
       ],
-      "notes": "Wave3 Pane5 re-audit: not left catalogued. Closed as blocked because the exact operation requires unsafe solver/modeler/full-database repair or xref synchronization execution. Safe read-only alternatives remain separate implemented operations where available.",
+      "notes": "Wave4X reopened the prior modeler block as a read-only implementation using AcDbAssocSurfaceActionBody static topology query helpers only: findActionsThatAffectedTopologicalSubentity, getTopologicalSubentitiesForActionsOnEntity, and getSurfacesDirectlyDependentOnObject. No evaluation, repair, xref sync, or modeler mutation is invoked.",
       "owner_ticket": "M08K-T03",
-      "implementation_strategy": "hard_blocked",
-      "evidence_required": "blocker_ref_and_evidence",
-      "blocked_reason": "SAFETY_FORBIDDEN: associative surface topology inspection requires ASM/modeler result traversal from evaluated action bodies; no SDK-safe generic reader exists for arbitrary unevaluated actions."
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs"
     },
     {
       "id": "inspect.constraint.dimensional.value",

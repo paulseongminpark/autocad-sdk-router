@@ -6,9 +6,6 @@ REPO = Path(__file__).resolve().parents[2]
 REGISTRY = REPO / "config" / "operations.v2.json"
 
 EXPECTED_BLOCKED_AFTER_REAUDIT = {
-    "edit.subentity.add_paths",
-    "edit.subentity.delete_paths",
-    "edit.subentity.transform",
     "ui.subentity.highlight",
     "automate.com.get_app",
     "automate.com.get_document",
@@ -87,3 +84,13 @@ def test_inspect_subentity_color_was_reversed_to_implemented():
     evidence = "\n".join(op.get("evidence_refs") or [])
     assert "tests/unit/test_m08d_handlers.py::TestM08DHandlers::test_subentity_color_read_uses_real_apis" in evidence
     assert "reports/WAVE3_REMAINING_HARDBLOCK_REAUDIT.md#inspect.subentity.color" in evidence
+
+
+def test_subentity_writes_were_reopened_to_implemented():
+    ops = _operations()
+    for oid in ("edit.subentity.add_paths", "edit.subentity.delete_paths", "edit.subentity.transform"):
+        op = ops[oid]
+        assert op["status"] == "implemented", oid
+        assert op["handler"]["dispatcher_symbol"] == "m08gDispatch", oid
+        evidence = "\n".join(op.get("evidence_refs") or [])
+        assert "WAVE4X_SUBENTITY_BREP" in evidence, oid

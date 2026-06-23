@@ -98,15 +98,19 @@ _PARAMETERS = [
 _ARRAYS = [
     "inspect.assocarray.identify",
 ]
+# assoc-surface topology -- read-only static introspection (1)
+_SURFACE_TOPOLOGY = [
+    "inspect.assocsurface.topology",
+]
 # callback configuration -- read-only status/introspection only (2)
 _CALLBACKS = [
     "config.assoceval.callback",
     "config.constraint.globalCallback",
 ]
 
-_IMPLEMENTED = _NETWORK_ACTION + _DEPENDENCIES + _CONSTRAINTS + _PARAMETERS + _ARRAYS + _CALLBACKS
+_IMPLEMENTED = _NETWORK_ACTION + _DEPENDENCIES + _CONSTRAINTS + _PARAMETERS + _ARRAYS + _SURFACE_TOPOLOGY + _CALLBACKS
 
-# ---- The 23 DEFERRED ops (solver / ASM modeler / mutating callback setup) ----
+# ---- The 22 DEFERRED ops (solver / ASM modeler / mutating callback setup) ----
 # These must NOT appear in HasOp (honest contract; no fakes).
 _DEFERRED = [
     # ASM surface modeler (8)
@@ -132,9 +136,8 @@ _DEFERRED = [
     "edit.assocarray.source",
     "edit.assocarray.transform",
     "edit.assocarray.explode",
-    # data/repair/topology + global eval callbacks
+    # data/repair + global eval callbacks
     "edit.assocdata.xref",
-    "inspect.assocsurface.topology",
     "repair.assocdata.audit",
 ]
 
@@ -201,21 +204,23 @@ class TestM08KCHandlers(unittest.TestCase):
 
     def test_implemented_count(self):
         # Group totals: network/action=11, dependencies=5, constraints=13, parameters=3,
-        # arrays=1, callbacks=2. 11+5+13+3+1+2 = 35 real handlers. The remaining 23
-        # ops of the 58-op brief are the _DEFERRED solver/modeler/mutating set.
+        # arrays=1, assoc-surface topology=1, callbacks=2. 11+5+13+3+1+1+2 = 36 real
+        # handlers. The remaining 22 ops of the 58-op brief are the _DEFERRED
+        # solver/modeler/mutating set.
         self.assertEqual(len(_NETWORK_ACTION), 11)
         self.assertEqual(len(_DEPENDENCIES), 5)
         self.assertEqual(len(_CONSTRAINTS), 13)
         self.assertEqual(len(_PARAMETERS), 3)
         self.assertEqual(len(_ARRAYS), 1)
+        self.assertEqual(len(_SURFACE_TOPOLOGY), 1)
         self.assertEqual(len(_CALLBACKS), 2)
-        self.assertEqual(len(_IMPLEMENTED), 35)
-        self.assertEqual(len(set(_IMPLEMENTED)), 35, "duplicate op id in the implemented list")
-        self.assertEqual(len(self.hasop), 35)
+        self.assertEqual(len(_IMPLEMENTED), 36)
+        self.assertEqual(len(set(_IMPLEMENTED)), 36, "duplicate op id in the implemented list")
+        self.assertEqual(len(self.hasop), 36)
 
     def test_total_op_budget_is_58(self):
-        # The brief is 58 ops: 35 implemented + 23 deferred, with no overlap.
-        self.assertEqual(len(set(_DEFERRED)), 23, "duplicate op id in the deferred list")
+        # The brief is 58 ops: 36 implemented + 22 deferred, with no overlap.
+        self.assertEqual(len(set(_DEFERRED)), 22, "duplicate op id in the deferred list")
         self.assertEqual(len(set(_IMPLEMENTED)) + len(set(_DEFERRED)), 58)
         self.assertEqual(set(_IMPLEMENTED) & set(_DEFERRED), set(), "an op is both implemented and deferred")
 
@@ -284,6 +289,13 @@ class TestM08KCHandlers(unittest.TestCase):
                 re.search(pat, self.code),
                 "callback config op must be read-only introspection, not mutation: %s" % pat,
             )
+
+    def test_assocsurface_topology_uses_real_read_only_statics(self):
+        self.assertIn('op == "inspect.assocsurface.topology"', self.src)
+        self.assertIn("AcDbAssocSurfaceActionBody", self.src)
+        self.assertIn("findActionsThatAffectedTopologicalSubentity", self.src)
+        self.assertIn("getTopologicalSubentitiesForActionsOnEntity", self.src)
+        self.assertIn("getSurfacesDirectlyDependentOnObject", self.src)
 
     def test_create_ops_guard_disables_evaluation(self):
         # Every create op posts under an AcDbAssocNetworkEvaluationDisabler so adding an
