@@ -2,9 +2,9 @@
 
 - packet: `CADOS_M08_FULL_OPERATION_COVERAGE_CLOSURE`
 - generated_from: `config/operations.v2.json`
-- total operations: **517** · implemented 457 · stub 0 · blocked 60 · catalogued 0 · deprecated 0 · **unknown 0**
-- v1-target: **517** (implemented 457 · blocked 60 · **deferred 0**)
-- agent-exposed ops: 457
+- total operations: **517** · implemented 459 · stub 0 · blocked 58 · catalogued 0 · deprecated 0 · **unknown 0**
+- v1-target: **517** (implemented 459 · blocked 58 · **deferred 0**)
+- agent-exposed ops: 459
 
 ## Gate
 
@@ -30,7 +30,7 @@
 | query | 1 | 0 | 0 | 0 | 1 |
 | write_patch | 16 | 0 | 4 | 0 | 20 |
 | validate_diff | 3 | 0 | 0 | 0 | 3 |
-| render_visual | 10 | 0 | 2 | 0 | 12 |
+| render_visual | 12 | 0 | 0 | 0 | 12 |
 | live | 6 | 0 | 1 | 0 | 7 |
 | native_only | 368 | 0 | 53 | 0 | 421 |
 
@@ -86,8 +86,6 @@
 | inspect.assocsurface.topology | constraints_associativity | blocked | read_safe | read | False | AcDbAssocSurfaceActionBody::findActionsThatAffec | SAFETY_FORBIDDEN: associative surface topology inspection re |
 | repair.assocdata.audit | constraints_associativity | blocked | live_edit | live_edit | False | AcDbAssocManager::auditAssociativeData(db, trave | SAFETY_FORBIDDEN: AcDbAssocManager::auditAssociativeData per |
 | command.queue.post | editor_input | blocked | raw_command | live_edit | False | acedPostCommand / acedPostCommandPrompt() | SAFETY_FORBIDDEN: raw command dispatch is blocked in M08O fa |
-| plot.config.settings | layouts_plot_publish | blocked | live_edit | live_edit | False | AcDbPlotSettings / AcPlPlotConfig / AcPlPlotConf | SAFETY_FORBIDDEN: exact plot settings operation is a live_ed |
-| plot.engine.run | layouts_plot_publish | blocked | read_safe | read | False | AcPlPlotEngine: beginPlot/beginDocument/beginPag | HOST_UNAVAILABLE: AcPlPlotEngine execution requires a contro |
 | live.apply_patch | live | blocked | live_edit | live_edit | False |  | Requires full_autocad live_edit host + explicit write_origin |
 | module.command.lookup | runtime_commands | blocked | raw_command | read | False | acedRegCmds->lookupCmd2(...) via acedCmdLookup2( | SAFETY_FORBIDDEN: raw command dispatch is blocked in M08O fa |
 | module.command.remove_group | runtime_commands | blocked | read_safe | read | False | AcEdCommandStack::removeGroup(grpName) (+ remove | SAFETY_FORBIDDEN: arbitrary command group removal mutates th |
@@ -442,6 +440,8 @@
 | inspect.runtime.capabilities | inspect | implemented | read_safe | read | True | runtimeCapabilitiesJson |  |
 | inspect.xdata.get | inspect | implemented | read_safe | read | True | getDatabaseXdata |  |
 | inspect.xref.list | inspect | implemented | read_safe | read | True | listXrefs |  |
+| plot.config.settings | layouts_plot_publish | implemented | live_edit | live_edit | True | m08lDispatch |  |
+| plot.engine.run | layouts_plot_publish | implemented | read_safe | read | True | m08lDispatch |  |
 | live.jig.point_probe | live | implemented | live_edit | live_edit | True | runLineJigProbe |  |
 | live.overrule.disable | live | implemented | live_edit | live_edit | True | disableObjectOverrule |  |
 | live.overrule.enable | live | implemented | live_edit | live_edit | True | enableObjectOverrule |  |

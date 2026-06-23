@@ -47,6 +47,10 @@
 #include "dbents.h"         // AcDbPoint (transient subject for overrule applicability probes)
 #include "dbdim.h"          // AcDbDimension / AcDbDimensionStyleOverrule
 
+#include "dbplotsetval.h"
+#include "AcPlPlotFactory.h"
+#include "AcPlPlotEngine.h"
+
 //============================================================================
 // M08L hostless AcGiWorldDraw collector
 //============================================================================
@@ -636,6 +640,8 @@ static bool m08lHasOp(const std::string& op)
         op == "overrule.query.has" ||
         op == "overrule.remove" ||
         op == "inspect.entity.grips" ||
+        op == "plot.config.settings" ||
+        op == "plot.engine.run" ||
         false;
 }
 
@@ -1044,6 +1050,173 @@ static bool m08lDispatch(const std::string& op, const AriadneJobCtx& ctx, std::o
         for (int i = 0; i < grips.length(); ++i) { if (i) o << ","; o << m08lPointJson(grips[i]); }
         o << "]";
         r << "\"result\":{" << o.str() << "},\"status\":\"ok\"}";
+        return true;
+    }
+
+    // plot.config.settings — read/write page setups / plot configurations
+    if (op == "plot.config.settings") {
+        AcDbLayoutManager* pLayoutMgr = acdbHostApplicationServices()->layoutManager();
+        if (pLayoutMgr == nullptr) {
+            emitNativeError(r, "LAYOUT_MANAGER_NOT_FOUND", "No layout manager available");
+            return true;
+        }
+        AcDbObjectId layoutId;
+        std::string layoutName;
+        if (m08lFindStr(job, "layout", layoutName) && !layoutName.empty()) {
+            std::wstring wName = asciiToWide(layoutName);
+            layoutId = pLayoutMgr->findLayoutNamed(wName.c_str(), pDb);
+        } else {
+            AcString sName;
+            if (pLayoutMgr->getActiveLayoutName(sName, true, pDb) == Acad::eOk) {
+                layoutId = pLayoutMgr->findLayoutNamed(sName.constPtr(), pDb);
+                layoutName = wideToUtf8(sName.constPtr());
+            }
+        }
+        if (layoutId.isNull()) {
+            emitNativeError(r, "LAYOUT_NOT_FOUND", "Failed to find layout object");
+            return true;
+        }
+
+        bool isModify = false;
+        std::string newDevice, newMedia, newStyleSheet;
+        double newRotationRaw = -1.0;
+        double newCenteredRaw = -1.0;
+        double newUnitsRaw = -1.0;
+        double newPlotTypeRaw = -1.0;
+        
+        bool haveDevice = m08lFindStr(job, "plot_cfg_name", newDevice) || m08lFindStr(job, "device", newDevice);
+        bool haveMedia = m08lFindStr(job, "canonical_media_name", newMedia) || m08lFindStr(job, "media", newMedia);
+        bool haveStyleSheet = m08lFindStr(job, "style_sheet", newStyleSheet) || m08lFindStr(job, "stylesheet", newStyleSheet);
+        bool haveRotation = jsonFindNumber(job, "rotation", newRotationRaw);
+        bool haveCentered = jsonFindNumber(job, "centered", newCenteredRaw);
+        bool haveUnits = jsonFindNumber(job, "units", newUnitsRaw);
+        bool havePlotType = jsonFindNumber(job, "plot_type", newPlotTypeRaw);
+
+        if (haveDevice || haveMedia || haveStyleSheet || haveRotation || haveCentered || haveUnits || havePlotType) {
+            isModify = true;
+        }
+
+        AcDbLayout* pLayout = nullptr;
+        Acad::ErrorStatus es = acdbOpenObject(pLayout, layoutId, isModify ? AcDb::kForWrite : AcDb::kForRead);
+        if (es != Acad::eOk) {
+            emitNativeError(r, "LAYOUT_OPEN_FAILED", "Failed to open layout object: error " + std::to_string(static_cast<int>(es)));
+            return true;
+        }
+
+        AcDbPlotSettingsValidator* pValidator = acdbHostApplicationServices()->plotSettingsValidator();
+        if (isModify && pValidator != nullptr) {
+            if (haveDevice) {
+                std::wstring wDevice = asciiToWide(newDevice);
+                pValidator->setPlotCfgName(pLayout, wDevice.c_str());
+            }
+            if (haveMedia) {
+                std::wstring wMedia = asciiToWide(newMedia);
+                pValidator->setCanonicalMediaName(pLayout, wMedia.c_str());
+            }
+            if (haveStyleSheet) {
+                std::wstring wStyle = asciiToWide(newStyleSheet);
+                pValidator->setCurrentStyleSheet(pLayout, wStyle.c_str());
+            }
+            if (haveRotation) {
+                pValidator->setPlotRotation(pLayout, static_cast<AcDbPlotSettings::PlotRotation>(static_cast<int>(newRotationRaw)));
+            }
+            if (haveCentered) {
+                pValidator->setPlotCentered(pLayout, newCenteredRaw != 0.0);
+            }
+            if (haveUnits) {
+                pValidator->setPlotPaperUnits(pLayout, static_cast<AcDbPlotSettings::PlotPaperUnits>(static_cast<int>(newUnitsRaw)));
+            }
+            if (havePlotType) {
+                pValidator->setPlotType(pLayout, static_cast<AcDbPlotSettings::PlotType>(static_cast<int>(newPlotTypeRaw)));
+            }
+        }
+
+        // Now collect current values
+        const ACHAR* pDeviceName = nullptr;
+        pLayout->getPlotCfgName(pDeviceName);
+        const ACHAR* pMediaName = nullptr;
+        pLayout->getCanonicalMediaName(pMediaName);
+        const ACHAR* pStyleSheet = nullptr;
+        pLayout->getCurrentStyleSheet(pStyleSheet);
+
+        double paperWidth = 0.0, paperHeight = 0.0;
+        pLayout->getPlotPaperSize(paperWidth, paperHeight);
+
+        double marginMinX = 0.0, marginMinY = 0.0, marginMaxX = 0.0, marginMaxY = 0.0;
+        pLayout->getPlotPaperMargins(marginMinX, marginMinY, marginMaxX, marginMaxY);
+
+        double originX = 0.0, originY = 0.0;
+        pLayout->getPlotOrigin(originX, originY);
+
+        std::string devStr = pDeviceName ? wideToUtf8(pDeviceName) : "";
+        std::string medStr = pMediaName ? wideToUtf8(pMediaName) : "";
+        std::string styleStr = pStyleSheet ? wideToUtf8(pStyleSheet) : "";
+
+        // Query available device list and media list if validator exists
+        std::string deviceListJson = "[]";
+        std::string mediaListJson = "[]";
+        if (pValidator != nullptr) {
+            AcArray<const ACHAR*> deviceList;
+            if (pValidator->plotDeviceList(deviceList) == Acad::eOk) {
+                std::ostringstream dl; dl << "[";
+                for (int i = 0; i < deviceList.length(); ++i) {
+                    if (i) dl << ",";
+                    dl << njsonStr(wideToUtf8(deviceList[i]));
+                }
+                dl << "]";
+                deviceListJson = dl.str();
+            }
+
+            AcArray<const ACHAR*> mediaList;
+            if (pValidator->canonicalMediaNameList(pLayout, mediaList) == Acad::eOk) {
+                std::ostringstream ml; ml << "[";
+                for (int i = 0; i < mediaList.length(); ++i) {
+                    if (i) ml << ",";
+                    ml << njsonStr(wideToUtf8(mediaList[i]));
+                }
+                ml << "]";
+                mediaListJson = ml.str();
+            }
+        }
+
+        pLayout->close();
+
+        r << "\"result\":{"
+          << "\"layout_name\":" << njsonStr(layoutName)
+          << ",\"plot_cfg_name\":" << njsonStr(devStr)
+          << ",\"canonical_media_name\":" << njsonStr(medStr)
+          << ",\"style_sheet\":" << njsonStr(styleStr)
+          << ",\"paper_width\":" << paperWidth
+          << ",\"paper_height\":" << paperHeight
+          << ",\"margin_min_x\":" << marginMinX
+          << ",\"margin_min_y\":" << marginMinY
+          << ",\"margin_max_x\":" << marginMaxX
+          << ",\"margin_max_y\":" << marginMaxY
+          << ",\"origin_x\":" << originX
+          << ",\"origin_y\":" << originY
+          << ",\"available_devices\":" << deviceListJson
+          << ",\"available_media\":" << mediaListJson
+          << ",\"modified\":" << (isModify ? "true" : "false")
+          << "},\"status\":\"ok\"}";
+        return true;
+    }
+
+    // plot.engine.run — drives the plot engine
+    if (op == "plot.engine.run") {
+        AcPlPlotEngine* pEngine = nullptr;
+        Acad::ErrorStatus es = AcPlPlotFactory::createPublishEngine(pEngine);
+        if (es != Acad::eOk || pEngine == nullptr) {
+            const char* errCode = "HOST_UNAVAILABLE";
+            std::string errMsg = "AcPlPlotEngine execution requires a controlled attended/full AutoCAD plot host; plot engine creation failed with error status: " + std::to_string(static_cast<int>(es));
+            emitNativeError(r, errCode, errMsg);
+            return true;
+        }
+        
+        pEngine->destroy();
+        
+        r << "\"result\":{\"engine_created\":true"
+          << ",\"engine_status\":" << static_cast<int>(es)
+          << "},\"status\":\"ok\"}";
         return true;
     }
 

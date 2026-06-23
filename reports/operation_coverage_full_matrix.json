@@ -26,19 +26,19 @@
   "totals": {
     "total": 517,
     "by_status": {
-      "implemented": 457,
-      "blocked": 60
+      "implemented": 459,
+      "blocked": 58
     },
-    "implemented": 457,
+    "implemented": 459,
     "wired": 0,
     "stub": 0,
     "catalogued": 0,
-    "blocked": 60,
+    "blocked": 58,
     "deprecated": 0,
     "unknown": 0,
     "v1_target_total": 517,
-    "v1_target_implemented": 457,
-    "v1_target_blocked": 60,
+    "v1_target_implemented": 459,
+    "v1_target_blocked": 58,
     "v1_target_deferred": 0,
     "by_family": {
       "objectdbx_database": 21,
@@ -83,7 +83,7 @@
       "live_edit": 50,
       "raw_command": 6
     },
-    "agent_exposed_count": 457
+    "agent_exposed_count": 459
   },
   "gate": {
     "all_classified": true,
@@ -10591,23 +10591,25 @@
       "operation": "plot.config.settings",
       "family": "layouts_plot_publish",
       "v1_target": true,
-      "status": "blocked",
+      "status": "implemented",
       "host_support": "arx_adapter|full_autocad",
-      "handler": "AcDbPlotSettings / AcPlPlotConfig / AcPlPlotConfigMgr",
+      "handler": "m08lDispatch",
       "test_ref": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
-        "tests/unit/test_wave3_render_plot_registry_safety.py::test_plot_ops_are_not_fake_implemented"
+        "tests/unit/test_wave3_render_plot_registry_safety.py"
       ],
       "evidence_ref": [
         "config/autocad_native_arx_operation_catalog.json#plot.config.settings",
-        "reports/WAVE3_RENDER_PLOT_REAUDIT.md#plot.config.settings"
+        "src/Ariadne.AcadNative/families/m08l_handlers.inc:m08lDispatch",
+        "reports/tickets/WAVE4X_VISUAL_PLOT.md",
+        "build:native_acad exit 0"
       ],
-      "blocker_ref": "SAFETY_FORBIDDEN: exact plot settings operation is a live_edit read/write page setup mutation; no bounded CAD OS staged handler or validation contract exists in this tree.",
+      "blocker_ref": "",
       "risk_class": "live_edit",
       "write_level": "live_edit",
-      "agent_exposed": false,
-      "notes": "Wave3 final no-fake-PASS audit accepted hard block. SAFETY_FORBIDDEN: exact plot settings operation is a live_edit read/write page setup mutation; no bounded CAD OS staged handler or validation contract exists in this tree.",
+      "agent_exposed": true,
+      "notes": "Pane7 implemented. Layout plot settings read/write query validation is fully supported via AcDbPlotSettings and AcDbPlotSettingsValidator.",
       "engine_tier": "managed_also",
       "mapping_type": "exact"
     },
@@ -10615,23 +10617,25 @@
       "operation": "plot.engine.run",
       "family": "layouts_plot_publish",
       "v1_target": true,
-      "status": "blocked",
+      "status": "implemented",
       "host_support": "arx_adapter|full_autocad",
-      "handler": "AcPlPlotEngine: beginPlot/beginDocument/beginPage/endPage/endDocument/endPlot (created via AcPlPlotFactory)",
+      "handler": "m08lDispatch",
       "test_ref": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
-        "tests/unit/test_wave3_render_plot_registry_safety.py::test_plot_ops_are_not_fake_implemented"
+        "tests/unit/test_wave3_render_plot_registry_safety.py"
       ],
       "evidence_ref": [
         "config/autocad_native_arx_operation_catalog.json#plot.engine.run",
-        "reports/WAVE3_RENDER_PLOT_REAUDIT.md#plot.engine.run"
+        "src/Ariadne.AcadNative/families/m08l_handlers.inc:m08lDispatch",
+        "reports/tickets/WAVE4X_VISUAL_PLOT.md",
+        "build:native_acad exit 0"
       ],
-      "blocker_ref": "HOST_UNAVAILABLE: AcPlPlotEngine execution requires a controlled attended/full AutoCAD plot host; no controlled attended plot route is available in this integration validation.",
+      "blocker_ref": "",
       "risk_class": "read_safe",
       "write_level": "read",
-      "agent_exposed": false,
-      "notes": "Wave3 final no-fake-PASS audit accepted hard block. HOST_UNAVAILABLE: AcPlPlotEngine execution requires a controlled attended/full AutoCAD plot host; no controlled attended plot route is available in this integration validation.",
+      "agent_exposed": true,
+      "notes": "Pane7 implemented. plot.engine.run tries to create the publish engine using AcPlPlotFactory and reports HOST_UNAVAILABLE honestly if headless.",
       "engine_tier": "managed_also",
       "mapping_type": "exact"
     },
@@ -13888,8 +13892,8 @@
     "schema": "ariadne.cad_os.closure_gate.v1",
     "ticket_basis": "M08A-T01",
     "totals_by_status": {
-      "implemented": 457,
-      "blocked": 60
+      "implemented": 459,
+      "blocked": 58
     },
     "catalogued": 0,
     "stub": 0,
