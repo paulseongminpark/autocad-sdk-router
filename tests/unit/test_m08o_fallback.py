@@ -1,13 +1,12 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""M08O fallback lane evidence tests.
+"""M08O / Wave4X fallback lane evidence tests.
 
-These are lane-local guardrails for Pane 4 (COM/bootstrap + raw-command hard-block):
-- raw-command ops are hard-blocked with explicit safety blockers and evidence
-- COM fallback remains constrained to known loader commands (ARXLOAD / NETLOAD), not
-  raw command dispatch
-- `automate.com.send_command` is never agent-exposed while no managed implementation is
-  wired.
+Guardrails:
+- safe COM fallback is metadata-only (no raw COM handles)
+- AutoLISP fallback is router-authored and bounded
+- raw command surfaces stay hard-blocked and never agent-exposed
+- OLE mutation/lifecycle routes stay honestly blocked
 """
 
 from __future__ import annotations
@@ -30,8 +29,42 @@ class TestM08OFallback(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.matrix, cls.doc = ocm.build_matrix()
-        cls.ops = cls.doc["operations"]
+        cls.ops = {o["id"]: o for o in cls.doc["operations"]}
         cls.rows = {r["operation"]: r for r in cls.matrix["operations"]}
+
+    def test_safe_com_metadata_ops_are_implemented(self):
+        safe_ids = {
+            "automate.com.get_app",
+            "automate.com.get_document",
+            "automate.com.get_for_command",
+            "automate.com.get_winapp",
+            "automate.com.wrapper_for_object",
+        }
+        for op_id in sorted(safe_ids):
+            op = self.ops[op_id]
+            row = self.rows[op_id]
+            self.assertEqual(op["status"], "implemented", op_id)
+            self.assertEqual(op["handler"]["router_lane"], "full_autocad", op_id)
+            self.assertEqual(op["handler"]["dispatcher_symbol"], "Invoke-SafeFallbackOperation", op_id)
+            self.assertEqual(op["handler"]["execution_host_class"], "full_autocad", op_id)
+            self.assertIn("docs/FALLBACK_POLICY.md", op.get("evidence_refs", []), op_id)
+            self.assertIn("reports/tickets/WAVE4X_FALLBACK.md", op.get("evidence_refs", []), op_id)
+            self.assertTrue(row["agent_exposed"], op_id)
+            self.assertEqual(row["risk_class"], "read_safe", op_id)
+            self.assertFalse(op.get("blocked_reason"), op_id)
+
+    def test_module_load_lisp_is_implemented_as_safe_adapter_only(self):
+        op = self.ops["module.load.lisp"]
+        row = self.rows["module.load.lisp"]
+        self.assertEqual(op["status"], "implemented")
+        self.assertEqual(op["handler"]["router_lane"], "ARIADNE_CAD_JOB")
+        self.assertEqual(op["handler"]["dispatcher_symbol"], "Invoke-SafeFallbackOperation")
+        self.assertEqual(op["handler"]["execution_host_class"], "coreconsole")
+        self.assertIn("safe_status", (op.get("notes") or ""))
+        self.assertIn("docs/FALLBACK_POLICY.md", op.get("evidence_refs", []))
+        self.assertIn("reports/tickets/WAVE4X_FALLBACK.md", op.get("evidence_refs", []))
+        self.assertTrue(row["agent_exposed"])
+        self.assertEqual(row["risk_class"], "read_safe")
 
     def test_raw_command_ops_hard_blocked_with_fallback_evidence(self):
         raw_ids = {
@@ -39,37 +72,44 @@ class TestM08OFallback(unittest.TestCase):
             "command.invoke.sync",
             "command.invoke.sync.resbuf",
             "command.queue.post",
-            "module.command.lookup",
         }
-        raw_ops = [o for o in self.ops if o["id"] in raw_ids]
-        self.assertEqual(len(raw_ops), len(raw_ids), "expected all raw-command fallback ops to be present")
-        for o in raw_ops:
-            self.assertEqual(o["status"], "blocked", o["id"])
-            self.assertEqual(o["owner_ticket"], "M08O-T02", o["id"])
-            self.assertIn("SAFETY_FORBIDDEN", o["blocked_reason"], o["id"])
-            self.assertIn("docs/FALLBACK_POLICY.md", o.get("evidence_refs", []), o["id"])
-            self.assertFalse(self.rows[o["id"]]["agent_exposed"], o["id"])
+        for op_id in sorted(raw_ids):
+            op = self.ops[op_id]
+            self.assertEqual(op["status"], "blocked", op_id)
+            self.assertIn("SAFETY_FORBIDDEN", op.get("blocked_reason", ""), op_id)
+            self.assertIn("docs/FALLBACK_POLICY.md", op.get("evidence_refs", []), op_id)
+            self.assertFalse(self.rows[op_id]["agent_exposed"], op_id)
 
-    def test_com_send_command_is_not_agent_exposed(self):
-        op = next(o for o in self.ops if o["id"] == "automate.com.send_command")
-        self.assertNotIn(op["status"], ("implemented", "wired"),
-                         "COM send_command must not become surfaced")
-        self.assertIn(op["id"], self.rows)
-        self.assertFalse(self.rows[op["id"]]["agent_exposed"], "automate.com.send_command must remain non-exposed")
+    def test_send_command_and_menu_macro_stay_blocked(self):
+        for op_id in ("automate.com.send_command", "command.menu.invoke"):
+            op = self.ops[op_id]
+            self.assertEqual(op["status"], "blocked", op_id)
+            self.assertIn("SAFETY_FORBIDDEN", op.get("blocked_reason", ""), op_id)
+            self.assertFalse(self.rows[op_id]["agent_exposed"], op_id)
 
-    def test_doc_sendstring_is_safety_blocked_not_agent_exposed(self):
-        op = next(o for o in self.ops if o["id"] == "doc.sendstring")
-        self.assertEqual(op["status"], "blocked", "doc.sendstring must not remain open or runnable")
-        self.assertIn("SAFETY_FORBIDDEN", op.get("blocked_reason", ""))
-        self.assertIn("raw command", op.get("blocked_reason", "").lower())
-        self.assertFalse(self.rows["doc.sendstring"]["agent_exposed"])
-        self.assertEqual(self.rows["doc.sendstring"]["risk_class"], "raw_command")
+    def test_ole_embed_and_unload_remain_honestly_blocked(self):
+        expected = {
+            "embed.ole.frame": "HOST_UNAVAILABLE",
+            "module.lifecycle.on_ole_unload": "HOST_UNAVAILABLE",
+        }
+        for op_id, code in expected.items():
+            op = self.ops[op_id]
+            self.assertEqual(op["status"], "blocked", op_id)
+            self.assertIn(code, op.get("blocked_reason", ""), op_id)
+            self.assertFalse(self.rows[op_id]["agent_exposed"], op_id)
 
-    def test_fallback_loaders_documented(self):
+    def test_fallback_policy_documents_safe_surfaces(self):
         policy = Path(_REPO) / "docs" / "FALLBACK_POLICY.md"
         self.assertTrue(policy.exists())
         text = policy.read_text(encoding="utf-8")
-        for token in ("ARXLOAD", "NETLOAD", "AutoLISP", ".NET"):
+        for token in (
+            "automate.com.get_app",
+            "automate.com.wrapper_for_object",
+            "module.load.lisp",
+            "safe_status",
+            "ARIADNE_CAD_JOB",
+            "NETLOAD",
+        ):
             self.assertIn(token, text, f"fallback policy must document {token}")
 
 

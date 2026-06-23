@@ -58,6 +58,7 @@ $RunsDir = Join-Path $RouterHome 'runs'
 $StagingDir = Join-Path $RouterHome 'staging'
 $NativeExtractorProject = Join-Path $RouterHome 'src\Ariadne.DwgGeometryExtractor\Ariadne.DwgGeometryExtractor.csproj'
 $NativeAcadBinDir = if (-not [string]::IsNullOrWhiteSpace($env:ARIADNE_NATIVE_ACAD_BIN_DIR)) { $env:ARIADNE_NATIVE_ACAD_BIN_DIR } else { Join-Path $RouterHome 'src\Ariadne.AcadNative\bin\x64\Release' }
+. (Join-Path $RouterHome 'tools\fallback_safe_surface.ps1')
 
 function Read-JsonFile {
   param([string]$Path)
@@ -1269,7 +1270,11 @@ switch ($Action) {
     $sel = $selection.selected_route
   if ($sel -eq 'dwg_truth_autocad') {
     $effectiveWriteMode = Get-EffectiveDwgWriteMode
-    if (
+    $safeFallbackExec = Invoke-SafeFallbackOperation -Capabilities $capabilities
+    if ($null -ne $safeFallbackExec) {
+      $exec = $safeFallbackExec
+    }
+    elseif (
       ($HostMode -eq 'full_autocad' -or $effectiveWriteMode -eq 'live_edit') -and
       (-not [string]::IsNullOrWhiteSpace($JobPath) -or -not [string]::IsNullOrWhiteSpace($Operation))
     ) {

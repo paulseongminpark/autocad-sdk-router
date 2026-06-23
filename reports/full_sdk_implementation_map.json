@@ -354,29 +354,29 @@
     "M08O-T01": {
       "op_count": 16,
       "open": 0,
-      "implemented": 9,
-      "blocked": 7,
+      "implemented": 14,
+      "blocked": 2,
       "by_family": {
         "com_activex": 16
       },
       "by_strategy": {
-        "implemented_v1": 9,
-        "hard_blocked": 7
+        "implemented_v1": 14,
+        "hard_blocked": 2
       }
     },
     "M08O-T02": {
       "op_count": 23,
       "open": 0,
-      "implemented": 3,
-      "blocked": 20,
+      "implemented": 4,
+      "blocked": 19,
       "by_family": {
         "active_document_write_original": 4,
         "editor_input": 1,
         "runtime_commands": 18
       },
       "by_strategy": {
-        "hard_blocked": 20,
-        "implemented_v1": 3
+        "hard_blocked": 19,
+        "implemented_v1": 4
       }
     }
   },
@@ -1504,41 +1504,41 @@
     {
       "operation": "automate.com.get_app",
       "family": "com_activex",
-      "status": "blocked",
+      "status": "implemented",
       "engine_tier": "managed_also",
       "owner_ticket": "M08O-T01",
-      "implementation_strategy": "hard_blocked",
-      "evidence_required": "blocker_ref_and_evidence",
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs",
       "risk_class": "read_safe"
     },
     {
       "operation": "automate.com.get_document",
       "family": "com_activex",
-      "status": "blocked",
+      "status": "implemented",
       "engine_tier": "managed_also",
       "owner_ticket": "M08O-T01",
-      "implementation_strategy": "hard_blocked",
-      "evidence_required": "blocker_ref_and_evidence",
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs",
       "risk_class": "read_safe"
     },
     {
       "operation": "automate.com.get_for_command",
       "family": "com_activex",
-      "status": "blocked",
+      "status": "implemented",
       "engine_tier": "native_arx_only",
       "owner_ticket": "M08O-T01",
-      "implementation_strategy": "hard_blocked",
-      "evidence_required": "blocker_ref_and_evidence",
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs",
       "risk_class": "read_safe"
     },
     {
       "operation": "automate.com.get_winapp",
       "family": "com_activex",
-      "status": "blocked",
+      "status": "implemented",
       "engine_tier": "native_arx_only",
       "owner_ticket": "M08O-T01",
-      "implementation_strategy": "hard_blocked",
-      "evidence_required": "blocker_ref_and_evidence",
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs",
       "risk_class": "read_safe"
     },
     {
@@ -1584,11 +1584,11 @@
     {
       "operation": "automate.com.wrapper_for_object",
       "family": "com_activex",
-      "status": "blocked",
+      "status": "implemented",
       "engine_tier": "native_arx_only",
       "owner_ticket": "M08O-T01",
-      "implementation_strategy": "hard_blocked",
-      "evidence_required": "blocker_ref_and_evidence",
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs",
       "risk_class": "read_safe"
     },
     {
@@ -4994,11 +4994,11 @@
     {
       "operation": "module.load.lisp",
       "family": "runtime_commands",
-      "status": "blocked",
+      "status": "implemented",
       "engine_tier": "accoreconsole_lisp_also",
       "owner_ticket": "M08O-T02",
-      "implementation_strategy": "hard_blocked",
-      "evidence_required": "blocker_ref_and_evidence",
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs",
       "risk_class": "read_safe"
     },
     {

@@ -1,87 +1,115 @@
-# AutoCAD Fallback Policy (M08O)
+# AutoCAD Fallback Policy (M08O / Wave4X)
 
-Status: enforced for fallback work (`M08O-T01`, `M08O-T02`) in
-`D:/dev/99_tools/autocad-sdk-router_m08o_fallback`.
+Status: enforced for fallback work in
+`D:/dev/99_tools/autocad-sdk-router`.
 
-## m08o-fallback-raw-command-hard-block
+## 1) Hard rule: no raw AutoCAD command surface
 
-## 1) Hard rule: no direct AutoCAD command injection as agent surface
+These operations remain **hard-blocked** and are never agent-exposed:
 
-The following command-style pathways are **hard-blocked** (closure state =
-`hard_blocked`) and must never be exposed to operators:
-
+- `automate.com.send_command`
 - `command.invoke.coroutine`
 - `command.invoke.sync`
 - `command.invoke.sync.resbuf`
+- `command.menu.invoke`
 - `command.queue.post`
 - `module.command.lookup`
 
 Rationale:
 
-- These are raw command dispatch APIs (`acedCommand*`, `acedCmd*`, `acedPostCommand*` or
-  `module.command` lookup path) and bypass the operation allow-list.
-- They are unsafe for agent exposure because they permit arbitrary command entry,
-  unbounded side-effects, and non-deterministic command-string routing.
-- They are closed as **SAFETY_FORBIDDEN** and documented with explicit evidence refs.
+- they are raw command-string or command-macro dispatch (`SendCommand`,
+  `acedCommand*`, `acedPostCommand*`, `acedMenuCmd`),
+- they bypass the router operation allow-list,
+- they create unbounded editor side effects.
 
-Enforcement in `config/operations.v2.json`:
+Internal note:
 
-- `status: "blocked"`
-- `blocked_reason` begins with `SAFETY_FORBIDDEN`
-- `implementation_strategy: "hard_blocked"`
-- `evidence_required: "blocker_ref_and_evidence"`
+- the router may still use a **router-authored fixed script** as a transport for an
+  attended/full-AutoCAD workflow,
+- but no API accepts arbitrary operator command text and no result ever exposes a
+  reusable command surface.
 
-## 2) COM bootstrap/load fallback policy
+## 2) Implemented safe COM metadata surface
 
-For COM-attached/full-AutoCAD fallback execution, only bootstrap/load operations
-that are explicit and deterministic are permitted:
+The following operations are implemented as **bounded metadata** only:
 
-- **ARX/DBX modules:** `ARXLOAD` (in script as `arxload` where host allows direct load)
-- **Managed DLL/NET adapters:** `NETLOAD`
-- **.lsp support adapters:** AutoLISP `load`/`SDKDWGXTRACT`/`QUIT` scripts
-- `APPLOAD` may be treated as an equivalent ARX bootstrap helper in attended
-  workflows, but raw command-string send paths remain blocked.
+- `automate.com.get_app`
+- `automate.com.get_document`
+- `automate.com.get_for_command`
+- `automate.com.get_winapp`
+- `automate.com.wrapper_for_object`
 
-This means:
+Rules:
 
-- module registration and execution must be explicit by function and argument contract,
-  not by arbitrary command text.
-- no new `SendCommand`-style raw command surface is accepted for routing or policy.
+- return structured metadata only,
+- never return `IDispatch`, `IUnknown`, `AcadDocument`, or raw COM object handles,
+- `automate.com.wrapper_for_object` requires `args.handle` and returns object
+  metadata only,
+- `automate.com.get_for_command` reports command-state variables (`CMDNAMES`,
+  `CMDACTIVE`, etc.), not a command-context COM pointer.
 
-Fallback surfaces in code:
+Implementation lane:
 
-- `Invoke-AutoCadRoute` and `Invoke-AccoreScr` generate **AutoLISP** and **NETLOAD** scripts.
-- `Invoke-FullAutoCadCadJob` uses deterministic `arxload`/`ARX` + `ARIADNE_NATIVE_JOB`
-  staging workflow.
-- `Get-AutoLispExtractScr` returns a constrained `.lsp` script that writes one JSON file
-  and quits.
+- router lane: `fallback_safe_surface`
+- dispatcher: `Invoke-SafeFallbackOperation`
+- host: running full AutoCAD COM session (`GetActiveObject`) only
 
-## 3) AutoLISP and .NET adapter constraints
+## 3) Implemented AutoLISP safe-script fallback
 
-- **AutoLISP adapter:** only known, static scripts shipped by router code paths,
-  no user-supplied script text.
-- **Managed adapter:** only `.NET` command entry points loaded via `NETLOAD` and invoked by
-  router-defined command names (e.g. `ARIADNE_CAD_JOB`, `ARIADNE_DWG_GEOM_EXTRACT`,
-  `ARIADNE_DWG_DBX_EXTRACT`).
+`module.load.lisp` is implemented as a **router-authored AutoLISP adapter load**.
+It does **not** accept arbitrary script paths or arbitrary LISP text.
 
-Any fallback proposal must use these adapters or be declared `hard_blocked`.
+Current allow-listed adapter names:
 
-## 4) Test hooks
+- `safe_status`
 
-The policy is validated by:
+Behavior:
 
-- `tests/unit/test_m08_operation_coverage.py`:
-  - raw commands are never agent-exposed (`agent_exposed == false`).
-  - every blocked op has a `blocker_ref`.
-- `tests/unit/test_m08a_catalog_reopen.py`:
-  - raw command owner/ticket check.
-  - v1 escape still forbidden.
-- this ticket's patch artifacts and report files.
+- stages a DWG copy (or uses `test_native/blank.dwg` when no input was supplied),
+- writes a fixed `.lsp` status adapter and a fixed `.scr` launcher,
+- runs the launcher through `accoreconsole`,
+- reads back a status file,
+- returns the managed adapter map below.
 
-## 5) References
+This is the only accepted LISP fallback surface here.
 
-- `docs/M08_REMAINING_BATCH_PLAN.md` (Pane B/FALLBACK hard-block target)
-- `docs/M08_FAMILY_HANDLER_CONTRACT.md`
-- `config/policy.v2.json` (raw-command prohibition)
+## 4) Managed .NET adapter map
+
+Allow-listed managed adapters are documented and surfaced by the safe fallback:
+
+- `NETLOAD` → `Ariadne.DwgGeometryExtractor.dll` → `ARIADNE_CAD_JOB`
+- `NETLOAD` → `Ariadne.DwgGeometryExtractor.dll` → `ARIADNE_DWG_GEOM_EXTRACT`
+- `NETLOAD` → `Ariadne.DwgGeometryExtractor.dll` → `ARIADNE_DWG_DBX_EXTRACT`
+
+The mapping is returned as metadata; no arbitrary managed command name is accepted.
+
+## 5) OLE remains bounded / honest
+
+Still blocked:
+
+- `embed.ole.frame` → `HOST_UNAVAILABLE`
+- `module.lifecycle.on_ole_unload` → `HOST_UNAVAILABLE`
+
+Rationale:
+
+- `embed.ole.frame` would require a live OLE client item + controlled attended OLE
+  payload contract, which is not available here,
+- `module.lifecycle.on_ole_unload` is a host lifecycle callback, not a safe routed
+  operation.
+
+## 6) Test hooks
+
+Validated by:
+
+- `tests/unit/test_m08o_fallback.py`
+- `tests/unit/test_wave3_remaining_registry_closure.py`
+- `tests/unit/test_wave4x_fallback_surface.py`
 - `tools/operation_coverage_matrix.py`
+
+## 7) References
+
+- `tools/fallback_safe_surface.ps1`
+- `tools/autocad-router.ps1`
+- `docs/M08_REMAINING_BATCH_PLAN.md`
+- `config/policy.v2.json`
 - `config/operations.v2.json`
