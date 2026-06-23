@@ -55,7 +55,8 @@
     "reports/operation_coverage_latest.json",
     "reports/v1_operation_gate_latest.json",
     "packets/tickets/M08O-T02.md",
-    "reports/tickets/M08O-T02.md"
+    "reports/tickets/M08O-T02.md",
+    "reports/tickets/M08O-T02.json"
   ],
   "next": "Continue M08O fallback lane and MERGE-M08-FALLBACK readiness"
 }

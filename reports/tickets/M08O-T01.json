@@ -36,7 +36,8 @@
     "tests/unit/test_m08o_fallback.py",
     "tests/unit/test_m08a_catalog_reopen.py",
     "packets/tickets/M08O-T01.md",
-    "reports/tickets/M08O-T01.md"
+    "reports/tickets/M08O-T01.md",
+    "reports/tickets/M08O-T01.json"
   ],
   "next": "M08O-T02"
 }
