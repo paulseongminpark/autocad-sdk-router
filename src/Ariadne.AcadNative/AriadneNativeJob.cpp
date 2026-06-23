@@ -3122,12 +3122,17 @@ struct AriadneJobCtx
 #include "families/m08f_handlers.inc"   // M08F — SQLite rich IR / query DSL
 #include "families/m08g_handlers.inc"   // M08G — entity-create + entity/geometry modify (staged-write)
 #include "families/m08h_handlers.inc"   // M08H — dimensions / annotations / hatch (staged-write)
+#include "families/m08k_handlers.inc"   // M08K-T01 — custom object/entity lifecycle (native)
+#include "families/m08kc_handlers.inc"  // M08K-T03 — constraints / associativity (native)
+#include "families/m08l_handlers.inc"   // M08L — graphics system: worldDraw / overrules / grips (native)
+#include "families/m08m_handlers.inc"   // M08M — OPM properties + reactors (native)
 
 // op admitted by any family module? (gate admission for not-yet-legacy family ops)
 static bool familyHasOp(const std::string& op)
 {
     return m08cHasOp(op) || m08dHasOp(op) || m08eHasOp(op) || m08fHasOp(op)
-        || m08gHasOp(op) || m08hHasOp(op);
+        || m08gHasOp(op) || m08hHasOp(op)
+        || m08kHasOp(op) || m08kcHasOp(op) || m08lHasOp(op) || m08mHasOp(op);
 }
 
 // route op to its owning family module; true if handled (result appended to r)
@@ -3135,7 +3140,9 @@ static bool tryFamilyDispatch(const std::string& op, const AriadneJobCtx& ctx, s
 {
     return m08cDispatch(op, ctx, r) || m08dDispatch(op, ctx, r)
         || m08eDispatch(op, ctx, r) || m08fDispatch(op, ctx, r)
-        || m08gDispatch(op, ctx, r) || m08hDispatch(op, ctx, r);
+        || m08gDispatch(op, ctx, r) || m08hDispatch(op, ctx, r)
+        || m08kDispatch(op, ctx, r) || m08kcDispatch(op, ctx, r)
+        || m08lDispatch(op, ctx, r) || m08mDispatch(op, ctx, r);
 }
 
 static void ariadneNativeJob()
