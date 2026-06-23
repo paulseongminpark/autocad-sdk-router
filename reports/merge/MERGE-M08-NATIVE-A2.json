@@ -1,0 +1,51 @@
+{
+  "merge_id": "MERGE-M08-NATIVE-A2",
+  "role": "merge_executor",
+  "date": "2026-06-23",
+  "scope": "NATIVE wave batch A2 = M08L (graphics: worldDraw + overrules/grips) + M08M (OPM properties + reactors). Sub-batch of the program's MERGE-M08-NATIVE.",
+  "status": "PASS",
+  "merged": [
+    {"pr": 19, "branch": "cados/M08L", "merge_commit": "d56a5e4", "unit": "m08l", "implemented_ops": 25, "deferred": 2},
+    {"pr": 20, "branch": "cados/M08M", "merge_commit": "a4d4597", "unit": "m08m", "implemented_ops": 44, "deferred": 11}
+  ],
+  "implemented_total": 69,
+  "registry_flips": 66,
+  "deferred_total": 13,
+  "pre_merge_integration": {
+    "worktree": "autocad-sdk-router_INTEG (octopus M08L + M08M off main)",
+    "combined_tu_build_exit": 0,
+    "artifacts": {"Ariadne.AcadNativeDbx.dbx": 48640, "Ariadne.AcadNative.crx": 573952, "Ariadne.AcadNative.arx": 582144},
+    "verified": "m08l* (AcGiWorldDraw collector + AcRxOverrule) + m08m* (AcRxProperty + AcDb*Reactor) coexist in one TU, no static-symbol collision",
+    "pytest": "389 passed"
+  },
+  "registry_reconciliation": {
+    "tool": "tools/reconcile_native_registry.py (auto-discovered m08l + m08m)",
+    "flips": 66, "drift": 4, "conflicts": 0,
+    "implemented": "219 -> 285",
+    "catalogued": "296 -> 230"
+  },
+  "drift_tracked": {
+    "total": 4,
+    "ops": ["extend.customobject.db_defaults (m08k, from A1)", "extend.property.dynamic_props (m08m)", "extend.property.lmv (m08m)", "extend.property.type_promotion (m08m)"],
+    "issue": "These are in a family HasOp+Dispatch but are NOT registry op ids (teammate-invented). Harmless dead handlers (router never routes a non-registry op). m08m spent 3 of its 44 on these instead of registry ops, so a few registry property.* ops may remain catalogued.",
+    "disposition": "Batch C cleanup sweep: remove the 4 spurious HasOp+Dispatch branches + test entries, rebuild, and re-check whether any missed registry property.* ops are now feasible. Does NOT affect closure_gate (counts registry ops only)."
+  },
+  "key_findings": {
+    "m08l_worlddraw": "Real hostless AcGiWorldDraw collector (M08LCollectWorldDraw/Geometry/Traits/Context) driven by AcDbEntity::worldDraw(&collector) — view-independent graphics elaboration works hostless. viewportgeom deferred (needs a live AcGiViewportDraw viewport).",
+    "m08l_no_dimstyle_overrule": "overrule.dimstyle.install deferred: NO AcDbDimStyleOverrule class exists in ObjectARX 2027 (only Object/Properties/Osnap/Transform/Grip/Subentity/Highlight/HighlightState/Visibility/Geometry/Drawable/QueryX overrules).",
+    "m08m_no_lnk2001": "All property/reactor classes are standard exported ACBASE/ACDBCORE2D — no custom-class ::desc() touched, so the M08K LNK2001 wall was avoided. reactor monitor ops PROVE the callback fires (scratch modify in a rolled-back staged txn).",
+    "teammate_idle_is_not_failure": "A2 teammates emitted an early idle_notification during their SDK header de-risking phase (before writing code); a re-engagement nudge surfaced status and both then produced first-try / clean builds. An idle ping != done and != failed."
+  },
+  "post_merge_gate": {
+    "build": "combined integration build exit 0 (above); reconcile changed no C++",
+    "pytest": "402 passed",
+    "closure_gate": {"catalogued": 230, "stub": 0, "closure_gate_pass": false, "m09_allowed": false}
+  },
+  "reject_if_audit": {
+    "original_dwg_changed": false, "save_or_saveas": false, "aced_command_used": false,
+    "raw_command_agent_exposed": false, "frozen_ops_regress": false, "tests_fail": false,
+    "fake_implemented": false, "symbol_collision": false, "drift_silent": false
+  },
+  "closure_note": "closure_gate honestly False: 230 catalogued remain (NATIVE-N 73 + VISLIVE 7 + FALLBACK 38 + deferred READ/WRITE 46 + A1/A2 attended deferrals + 4 drift + misc). M09 blocked.",
+  "next": "User scope was 'A1 A2까지' — A1 + A2 now complete. Remaining per docs/M08_REMAINING_BATCH_PLAN.md: A3 (M08N 73, mostly attended), B (VISLIVE+FALLBACK 45), C (deferred-disposition sweep + the 4 drift), D (closure M08P/Q/R). Awaiting direction."
+}

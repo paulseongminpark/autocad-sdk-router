@@ -2,9 +2,9 @@
 
 - packet: `CADOS_M08_FULL_OPERATION_COVERAGE_CLOSURE`
 - generated_from: `config/operations.v2.json`
-- total operations: **517** · implemented 219 · stub 0 · blocked 2 · catalogued 296 · deprecated 0 · **unknown 0**
-- v1-target: **221** (implemented 219 · blocked 2 · **deferred 0**)
-- agent-exposed ops: 219
+- total operations: **517** · implemented 285 · stub 0 · blocked 2 · catalogued 230 · deprecated 0 · **unknown 0**
+- v1-target: **287** (implemented 285 · blocked 2 · **deferred 0**)
+- agent-exposed ops: 285
 
 ## Gate
 
@@ -30,9 +30,9 @@
 | query | 1 | 0 | 0 | 0 | 1 |
 | write_patch | 8 | 0 | 0 | 12 | 8 |
 | validate_diff | 3 | 0 | 0 | 0 | 3 |
-| render_visual | 0 | 0 | 1 | 11 | 1 |
+| render_visual | 8 | 0 | 1 | 3 | 9 |
 | live | 6 | 0 | 1 | 0 | 7 |
-| native_only | 167 | 0 | 0 | 254 | 167 |
+| native_only | 225 | 0 | 0 | 196 | 225 |
 
 ## Risk class distribution
 
@@ -98,6 +98,35 @@
 | traverse.shell.faces | brep_solids | implemented | read_safe | read | True | m08dDispatch |  |
 | traverse.vertex.edges | brep_solids | implemented | read_safe | read | True | m08dDispatch |  |
 | traverse.vertex.loops | brep_solids | implemented | read_safe | read | True | m08dDispatch |  |
+| automate.property.set | com_activex | implemented | staged_write | write_copy | True | m08mDispatch |  |
+| extend.opm.define_property | com_activex | implemented | read_safe | read | True | m08mDispatch |  |
+| extend.opm.define_property2 | com_activex | implemented | read_safe | read | True | m08mDispatch |  |
+| extend.opm.dialog_property | com_activex | implemented | read_safe | read | True | m08mDispatch |  |
+| extend.opm.enum_property | com_activex | implemented | read_safe | read | True | m08mDispatch |  |
+| extend.opm.get_dispid | com_activex | implemented | read_safe | read | True | m08mDispatch |  |
+| extend.opm.get_manager | com_activex | implemented | read_safe | read | True | m08mDispatch |  |
+| extend.opm.map_category | com_activex | implemented | read_safe | read | True | m08mDispatch |  |
+| extend.opm.per_instance_source | com_activex | implemented | read_safe | read | True | m08mDispatch |  |
+| extend.opm.property_expander | com_activex | implemented | read_safe | read | True | m08mDispatch |  |
+| extend.opm.property_expression | com_activex | implemented | read_safe | read | True | m08mDispatch |  |
+| extend.opm.property_extension | com_activex | implemented | read_safe | read | True | m08mDispatch |  |
+| extend.opm.register_provider | com_activex | implemented | read_safe | read | True | m08mDispatch |  |
+| extend.property.category | com_activex | implemented | live_edit | live_edit | True | m08mDispatch |  |
+| extend.property.com_name | com_activex | implemented | live_edit | live_edit | True | m08mDispatch |  |
+| extend.property.default_value | com_activex | implemented | live_edit | live_edit | True | m08mDispatch |  |
+| extend.property.define | com_activex | implemented | live_edit | live_edit | True | m08mDispatch |  |
+| extend.property.describe | com_activex | implemented | live_edit | live_edit | True | m08mDispatch |  |
+| extend.property.display_as | com_activex | implemented | live_edit | live_edit | True | m08mDispatch |  |
+| extend.property.enum_tag | com_activex | implemented | live_edit | live_edit | True | m08mDispatch |  |
+| extend.property.expose_to_com | com_activex | implemented | live_edit | live_edit | True | m08mDispatch |  |
+| extend.property.filepath | com_activex | implemented | live_edit | live_edit | True | m08mDispatch |  |
+| extend.property.flags | com_activex | implemented | live_edit | live_edit | True | m08mDispatch |  |
+| extend.property.localize_name | com_activex | implemented | live_edit | live_edit | True | m08mDispatch |  |
+| extend.property.refers_to | com_activex | implemented | live_edit | live_edit | True | m08mDispatch |  |
+| extend.property.units | com_activex | implemented | live_edit | live_edit | True | m08mDispatch |  |
+| inspect.property.by_name | com_activex | implemented | read_safe | read | True | m08mDispatch |  |
+| inspect.property.is_readonly | com_activex | implemented | read_safe | read | True | m08mDispatch |  |
+| inspect.property.metadata | com_activex | implemented | read_safe | read | True | m08mDispatch |  |
 | config.assocmanager.evalDisabler | constraints_associativity | implemented | read_safe | read | True | m08kcDispatch |  |
 | define.assocaction.addDependency | constraints_associativity | implemented | staged_write | write_copy | True | m08kcDispatch |  |
 | define.assocaction.create | constraints_associativity | implemented | staged_write | write_copy | True | m08kcDispatch |  |
@@ -155,6 +184,23 @@
 | inspect.runtime.desc | custom_objects_protocols | implemented | read_safe | read | True | m08kDispatch |  |
 | inspect.runtime.isa | custom_objects_protocols | implemented | read_safe | read | True | m08kDispatch |  |
 | inspect.runtime.iskindof | custom_objects_protocols | implemented | read_safe | read | True | m08kDispatch |  |
+| overrule.applicable | custom_objects_protocols | implemented | read_safe | read | True | m08lDispatch |  |
+| overrule.drawable.install | custom_objects_protocols | implemented | read_safe | read | True | m08lDispatch |  |
+| overrule.geometry.install | custom_objects_protocols | implemented | read_safe | read | True | m08lDispatch |  |
+| overrule.global.enable | custom_objects_protocols | implemented | read_safe | read | True | m08lDispatch |  |
+| overrule.grip.install | custom_objects_protocols | implemented | read_safe | read | True | m08lDispatch |  |
+| overrule.highlight.install | custom_objects_protocols | implemented | read_safe | read | True | m08lDispatch |  |
+| overrule.highlightstate.install | custom_objects_protocols | implemented | read_safe | read | True | m08lDispatch |  |
+| overrule.install | custom_objects_protocols | implemented | read_safe | read | True | m08lDispatch |  |
+| overrule.object.install | custom_objects_protocols | implemented | read_safe | read | True | m08lDispatch |  |
+| overrule.osnap.install | custom_objects_protocols | implemented | read_safe | read | True | m08lDispatch |  |
+| overrule.properties.install | custom_objects_protocols | implemented | read_safe | read | True | m08lDispatch |  |
+| overrule.query.has | custom_objects_protocols | implemented | read_safe | read | True | m08lDispatch |  |
+| overrule.queryx.install | custom_objects_protocols | implemented | read_safe | read | True | m08lDispatch |  |
+| overrule.remove | custom_objects_protocols | implemented | read_safe | read | True | m08lDispatch |  |
+| overrule.subentity.install | custom_objects_protocols | implemented | read_safe | read | True | m08lDispatch |  |
+| overrule.transform.install | custom_objects_protocols | implemented | read_safe | read | True | m08lDispatch |  |
+| overrule.visibility.install | custom_objects_protocols | implemented | read_safe | read | True | m08lDispatch |  |
 | diff.before_after | diff | implemented | read_safe | read | True | cad_diff.compute_diff |  |
 | inspect.curve.protocol | entities | implemented | read_safe | read | True | m08dDispatch |  |
 | inspect.entity.common | entities | implemented | read_safe | read | True | m08dDispatch |  |
@@ -219,6 +265,14 @@
 | write.entity.point | geometry_kernel | implemented | staged_write | write_copy | True | m08gDispatch |  |
 | write.entity.polyline | geometry_kernel | implemented | staged_write | write_copy | True | m08gDispatch |  |
 | write.entity.tolerance | geometry_kernel | implemented | staged_write | write_copy | True | m08gDispatch |  |
+| inspect.entity.grips | graphics_system | implemented | read_safe | read | True | m08lDispatch |  |
+| render.context.query | graphics_system | implemented | read_safe | read | True | m08lDispatch |  |
+| render.draw.worldgeom | graphics_system | implemented | read_safe | read | True | m08lDispatch |  |
+| render.drawable.def | graphics_system | implemented | read_safe | read | True | m08lDispatch |  |
+| render.entity.worlddraw_override | graphics_system | implemented | read_safe | read | True | m08lDispatch |  |
+| render.facedata.attach | graphics_system | implemented | read_safe | read | True | m08lDispatch |  |
+| render.polyline.helper | graphics_system | implemented | read_safe | read | True | m08lDispatch |  |
+| render.traits.set | graphics_system | implemented | read_safe | read | True | m08lDispatch |  |
 | inspect.block.count | inspect | implemented | read_safe | read | True | countBlockDefinitions |  |
 | inspect.blocks | inspect | implemented | read_safe | read | True | listBlockDefinitionsDetailed |  |
 | inspect.customclass.count | inspect | implemented | read_safe | read | True | countCustomEntities |  |
@@ -252,6 +306,18 @@
 | patch.apply_staged | patch | implemented | read_safe | read | True | patch_engine.dry_run_plan |  |
 | patch.dry_run | patch | implemented | read_safe | read | True | patch_engine.dry_run_plan |  |
 | query.entities | query | implemented | read_safe | read | True | sqlite_ir_store.query |  |
+| react.config.disable_namespace | reactors_events | implemented | read_safe | read | True | m08mDispatch |  |
+| react.database.attach | reactors_events | implemented | read_safe | read | True | m08mDispatch |  |
+| react.database.monitor | reactors_events | implemented | read_safe | read | True | m08mDispatch |  |
+| react.linker.attach | reactors_events | implemented | read_safe | read | True | m08mDispatch |  |
+| react.linker.monitor | reactors_events | implemented | read_safe | read | True | m08mDispatch |  |
+| react.object.attach_transient | reactors_events | implemented | read_safe | read | True | m08mDispatch |  |
+| react.object.detach_transient | reactors_events | implemented | read_safe | read | True | m08mDispatch |  |
+| react.object.monitor | reactors_events | implemented | read_safe | read | True | m08mDispatch |  |
+| react.persistent.attach | reactors_events | implemented | live_edit | live_edit | True | m08mDispatch |  |
+| react.persistent.detach | reactors_events | implemented | live_edit | live_edit | True | m08mDispatch |  |
+| react.rxevent.attach | reactors_events | implemented | read_safe | read | True | m08mDispatch |  |
+| react.rxevent.monitor | reactors_events | implemented | read_safe | read | True | m08mDispatch |  |
 | inspect.dictionary.get | symbol_tables_dictionaries | implemented | read_safe | read | True | m08eDispatch |  |
 | inspect.dictionary.named_objects | symbol_tables_dictionaries | implemented | read_safe | read | True | m08eDispatch |  |
 | inspect.entity.get_xdata | symbol_tables_dictionaries | implemented | read_safe | read | True | m08eDispatch |  |
@@ -269,4 +335,4 @@
 | write.layout.create | write | implemented | staged_write | write_copy | True | createLayout |  |
 | write.xdata.set | write | implemented | staged_write | write_copy | True | setDatabaseXdata |  |
 
-> Full 517-operation detail (all 13 fields per op) is in `reports/operation_coverage_full_matrix.json` — this table lists only the 221 v1-target ops. The 296 catalogued ops are classified future-version native capability (v1_target=false), not omitted.
+> Full 517-operation detail (all 13 fields per op) is in `reports/operation_coverage_full_matrix.json` — this table lists only the 287 v1-target ops. The 230 catalogued ops are classified future-version native capability (v1_target=false), not omitted.
