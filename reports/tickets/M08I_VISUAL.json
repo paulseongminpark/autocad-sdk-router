@@ -1,0 +1,18 @@
+{
+  "ticket_id": "M08I",
+  "status": "PASS",
+  "branch": "cados/m08i-visual-render-plot",
+  "implemented": [
+    "diff.before_after"
+  ],
+  "hard_blocked": [
+    "render.layout",
+    "plot.config.settings",
+    "plot.engine.run"
+  ],
+  "tests": [
+    "tests/unit/test_visual_report.py",
+    "tests/unit/test_m08a_catalog_reopen.py",
+    "tests/unit/test_m08_operation_coverage.py"
+  ]
+}

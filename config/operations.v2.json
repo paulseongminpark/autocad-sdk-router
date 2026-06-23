@@ -57,8 +57,8 @@
     "operations": 517,
     "by_status": {
       "implemented": 285,
-      "blocked": 2,
-      "catalogued": 230
+      "blocked": 4,
+      "catalogued": 228
     },
     "by_family": {
       "active_document_write_original": 8,
@@ -28154,7 +28154,7 @@
       "id": "plot.config.settings",
       "operation": "plot.config.settings",
       "family": "layouts_plot_publish",
-      "status": "catalogued",
+      "status": "blocked",
       "engine_tier": "managed_also",
       "engines": [
         "managed_also"
@@ -28193,13 +28193,12 @@
       },
       "policy": {
         "source": "config/policy.v2.json",
-        "status_policy": "catalogued_not_runnable",
+        "status_policy": "blocked",
         "default_write_mode": "live_edit",
         "allowed_write_modes": [
           "live_edit"
         ],
-        "no_original_write_default": true,
-        "runtime_behavior": "not_runnable_until_promoted_to_implemented_or_wired"
+        "no_original_write_default": true
       },
       "tests": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
@@ -28213,14 +28212,15 @@
       ],
       "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
       "owner_ticket": "M08I-T01",
-      "implementation_strategy": "managed_dotnet",
-      "evidence_required": "attended_live_pump_session_log"
+      "implementation_strategy": "hard_blocked",
+      "evidence_required": "blocker_ref_and_evidence",
+      "blocked_reason": "Requires full_autocad plot/publish host; page setups / plot settings not runnable headlessly (no-fake-success)."
     },
     {
       "id": "plot.engine.run",
       "operation": "plot.engine.run",
       "family": "layouts_plot_publish",
-      "status": "catalogued",
+      "status": "blocked",
       "engine_tier": "managed_also",
       "engines": [
         "managed_also"
@@ -28259,13 +28259,12 @@
       },
       "policy": {
         "source": "config/policy.v2.json",
-        "status_policy": "catalogued_not_runnable",
+        "status_policy": "blocked",
         "default_write_mode": "read",
         "allowed_write_modes": [
           "read"
         ],
-        "no_original_write_default": true,
-        "runtime_behavior": "not_runnable_until_promoted_to_implemented_or_wired"
+        "no_original_write_default": true
       },
       "tests": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
@@ -28279,8 +28278,9 @@
       ],
       "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
       "owner_ticket": "M08I-T01",
-      "implementation_strategy": "managed_dotnet",
-      "evidence_required": "unit_test+native_extraction_fixture"
+      "implementation_strategy": "hard_blocked",
+      "evidence_required": "blocker_ref_and_evidence",
+      "blocked_reason": "Requires full_autocad plot/publish host; plot engine beginPlot/endPlot not runnable headlessly (no-fake-success)."
     },
     {
       "id": "infra.hostapp.get_services",

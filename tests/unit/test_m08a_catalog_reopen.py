@@ -121,7 +121,7 @@ class TestM08ACatalogReopen(unittest.TestCase):
         by_status = collections.Counter(o.get("status") for o in self.ops)
         self.assertEqual(by_status.get("unknown", 0), 0)
         self.assertGreaterEqual(by_status.get("implemented", 0), 41)
-        self.assertEqual(by_status.get("blocked", 0), 2)
+        self.assertEqual(by_status.get("blocked", 0), 4)
 
 
 if __name__ == "__main__":
