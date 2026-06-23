@@ -262,32 +262,32 @@
     },
     "M08K-T01": {
       "op_count": 47,
-      "open": 45,
-      "implemented": 2,
+      "open": 13,
+      "implemented": 34,
       "blocked": 0,
       "by_family": {
         "extend": 2,
         "custom_objects_protocols": 45
       },
       "by_strategy": {
-        "implemented_v1": 2,
-        "native_arx_cpp": 38,
-        "objectdbx_hostless": 5,
-        "accoreconsole_lisp": 1,
-        "managed_dotnet": 1
+        "implemented_v1": 34,
+        "native_arx_cpp": 10,
+        "objectdbx_hostless": 2,
+        "accoreconsole_lisp": 1
       }
     },
     "M08K-T03": {
       "op_count": 58,
-      "open": 58,
-      "implemented": 0,
+      "open": 33,
+      "implemented": 25,
       "blocked": 0,
       "by_family": {
         "constraints_associativity": 58
       },
       "by_strategy": {
-        "native_arx_cpp": 19,
-        "objectdbx_hostless": 39
+        "native_arx_cpp": 18,
+        "implemented_v1": 25,
+        "objectdbx_hostless": 15
       }
     },
     "M08L-T01": {
@@ -2008,11 +2008,11 @@
     {
       "operation": "config.assocmanager.evalDisabler",
       "family": "constraints_associativity",
-      "status": "catalogued",
+      "status": "implemented",
       "engine_tier": "objectdbx_capable",
       "owner_ticket": "M08K-T03",
-      "implementation_strategy": "objectdbx_hostless",
-      "evidence_required": "unit_test+native_extraction_fixture",
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs",
       "risk_class": "read_safe"
     },
     {
@@ -2028,31 +2028,31 @@
     {
       "operation": "define.assocaction.addDependency",
       "family": "constraints_associativity",
-      "status": "catalogued",
+      "status": "implemented",
       "engine_tier": "objectdbx_capable",
       "owner_ticket": "M08K-T03",
-      "implementation_strategy": "objectdbx_hostless",
-      "evidence_required": "unit_test+staged_diff_fixture_original_unchanged",
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs",
       "risk_class": "staged_write"
     },
     {
       "operation": "define.assocaction.create",
       "family": "constraints_associativity",
-      "status": "catalogued",
+      "status": "implemented",
       "engine_tier": "objectdbx_capable",
       "owner_ticket": "M08K-T03",
-      "implementation_strategy": "objectdbx_hostless",
-      "evidence_required": "unit_test+staged_diff_fixture_original_unchanged",
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs",
       "risk_class": "staged_write"
     },
     {
       "operation": "define.assocaction.valueParam",
       "family": "constraints_associativity",
-      "status": "catalogued",
+      "status": "implemented",
       "engine_tier": "objectdbx_capable",
       "owner_ticket": "M08K-T03",
-      "implementation_strategy": "objectdbx_hostless",
-      "evidence_required": "unit_test+staged_diff_fixture_original_unchanged",
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs",
       "risk_class": "staged_write"
     },
     {
@@ -2098,31 +2098,31 @@
     {
       "operation": "define.assocdependency.attach",
       "family": "constraints_associativity",
-      "status": "catalogued",
+      "status": "implemented",
       "engine_tier": "objectdbx_capable",
       "owner_ticket": "M08K-T03",
-      "implementation_strategy": "objectdbx_hostless",
-      "evidence_required": "unit_test+staged_diff_fixture_original_unchanged",
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs",
       "risk_class": "staged_write"
     },
     {
       "operation": "define.assocgeomdependency.subent",
       "family": "constraints_associativity",
-      "status": "catalogued",
+      "status": "implemented",
       "engine_tier": "objectdbx_capable",
       "owner_ticket": "M08K-T03",
-      "implementation_strategy": "objectdbx_hostless",
-      "evidence_required": "unit_test+staged_diff_fixture_original_unchanged",
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs",
       "risk_class": "staged_write"
     },
     {
       "operation": "define.assocnetwork.addAction",
       "family": "constraints_associativity",
-      "status": "catalogued",
+      "status": "implemented",
       "engine_tier": "objectdbx_capable",
       "owner_ticket": "M08K-T03",
-      "implementation_strategy": "objectdbx_hostless",
-      "evidence_required": "unit_test+staged_diff_fixture_original_unchanged",
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs",
       "risk_class": "staged_write"
     },
     {
@@ -2208,11 +2208,11 @@
     {
       "operation": "define.assocvaluedependency.value",
       "family": "constraints_associativity",
-      "status": "catalogued",
+      "status": "implemented",
       "engine_tier": "objectdbx_capable",
       "owner_ticket": "M08K-T03",
-      "implementation_strategy": "objectdbx_hostless",
-      "evidence_required": "unit_test+staged_diff_fixture_original_unchanged",
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs",
       "risk_class": "staged_write"
     },
     {
@@ -2298,41 +2298,41 @@
     {
       "operation": "define.georef.subent",
       "family": "constraints_associativity",
-      "status": "catalogued",
+      "status": "implemented",
       "engine_tier": "objectdbx_capable",
       "owner_ticket": "M08K-T03",
-      "implementation_strategy": "objectdbx_hostless",
-      "evidence_required": "unit_test+staged_diff_fixture_original_unchanged",
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs",
       "risk_class": "staged_write"
     },
     {
       "operation": "define.parameter.merge",
       "family": "constraints_associativity",
-      "status": "catalogued",
+      "status": "implemented",
       "engine_tier": "objectdbx_capable",
       "owner_ticket": "M08K-T03",
-      "implementation_strategy": "objectdbx_hostless",
-      "evidence_required": "unit_test+staged_diff_fixture_original_unchanged",
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs",
       "risk_class": "staged_write"
     },
     {
       "operation": "define.parameter.variable",
       "family": "constraints_associativity",
-      "status": "catalogued",
+      "status": "implemented",
       "engine_tier": "objectdbx_capable",
       "owner_ticket": "M08K-T03",
-      "implementation_strategy": "objectdbx_hostless",
-      "evidence_required": "unit_test+staged_diff_fixture_original_unchanged",
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs",
       "risk_class": "staged_write"
     },
     {
       "operation": "define.perssubentid.resolve",
       "family": "constraints_associativity",
-      "status": "catalogued",
+      "status": "implemented",
       "engine_tier": "objectdbx_capable",
       "owner_ticket": "M08K-T03",
-      "implementation_strategy": "objectdbx_hostless",
-      "evidence_required": "unit_test+staged_diff_fixture_original_unchanged",
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs",
       "risk_class": "staged_write"
     },
     {
@@ -2408,31 +2408,31 @@
     {
       "operation": "edit.assocnetwork.removeAction",
       "family": "constraints_associativity",
-      "status": "catalogued",
+      "status": "implemented",
       "engine_tier": "objectdbx_capable",
       "owner_ticket": "M08K-T03",
-      "implementation_strategy": "objectdbx_hostless",
-      "evidence_required": "unit_test+staged_diff_fixture_original_unchanged",
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs",
       "risk_class": "staged_write"
     },
     {
       "operation": "edit.constraint.delete",
       "family": "constraints_associativity",
-      "status": "catalogued",
+      "status": "implemented",
       "engine_tier": "objectdbx_capable",
       "owner_ticket": "M08K-T03",
-      "implementation_strategy": "objectdbx_hostless",
-      "evidence_required": "unit_test+staged_diff_fixture_original_unchanged",
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs",
       "risk_class": "staged_write"
     },
     {
       "operation": "inspect.assocaction.dependencies",
       "family": "constraints_associativity",
-      "status": "catalogued",
+      "status": "implemented",
       "engine_tier": "objectdbx_capable",
       "owner_ticket": "M08K-T03",
-      "implementation_strategy": "objectdbx_hostless",
-      "evidence_required": "unit_test+staged_diff_fixture_original_unchanged",
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs",
       "risk_class": "staged_write"
     },
     {
@@ -2448,31 +2448,31 @@
     {
       "operation": "inspect.assocaction.requestToEvaluate",
       "family": "constraints_associativity",
-      "status": "catalogued",
+      "status": "implemented",
       "engine_tier": "objectdbx_capable",
       "owner_ticket": "M08K-T03",
-      "implementation_strategy": "objectdbx_hostless",
-      "evidence_required": "unit_test+staged_diff_fixture_original_unchanged",
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs",
       "risk_class": "staged_write"
     },
     {
       "operation": "inspect.assocarray.identify",
       "family": "constraints_associativity",
-      "status": "catalogued",
+      "status": "implemented",
       "engine_tier": "objectdbx_capable",
       "owner_ticket": "M08K-T03",
-      "implementation_strategy": "objectdbx_hostless",
-      "evidence_required": "unit_test+native_extraction_fixture",
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs",
       "risk_class": "read_safe"
     },
     {
       "operation": "inspect.assocmanager.state",
       "family": "constraints_associativity",
-      "status": "catalogued",
+      "status": "implemented",
       "engine_tier": "objectdbx_capable",
       "owner_ticket": "M08K-T03",
-      "implementation_strategy": "objectdbx_hostless",
-      "evidence_required": "unit_test+native_extraction_fixture",
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs",
       "risk_class": "read_safe"
     },
     {
@@ -2488,21 +2488,21 @@
     {
       "operation": "inspect.assocnetwork.get",
       "family": "constraints_associativity",
-      "status": "catalogued",
+      "status": "implemented",
       "engine_tier": "objectdbx_capable",
       "owner_ticket": "M08K-T03",
-      "implementation_strategy": "objectdbx_hostless",
-      "evidence_required": "unit_test+staged_diff_fixture_original_unchanged",
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs",
       "risk_class": "staged_write"
     },
     {
       "operation": "inspect.assocnetwork.iterate",
       "family": "constraints_associativity",
-      "status": "catalogued",
+      "status": "implemented",
       "engine_tier": "objectdbx_capable",
       "owner_ticket": "M08K-T03",
-      "implementation_strategy": "objectdbx_hostless",
-      "evidence_required": "unit_test+native_extraction_fixture",
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs",
       "risk_class": "read_safe"
     },
     {
@@ -2518,51 +2518,51 @@
     {
       "operation": "inspect.constraint.dimensional.value",
       "family": "constraints_associativity",
-      "status": "catalogued",
+      "status": "implemented",
       "engine_tier": "objectdbx_capable",
       "owner_ticket": "M08K-T03",
-      "implementation_strategy": "objectdbx_hostless",
-      "evidence_required": "unit_test+staged_diff_fixture_original_unchanged",
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs",
       "risk_class": "staged_write"
     },
     {
       "operation": "inspect.constraint.enumerate",
       "family": "constraints_associativity",
-      "status": "catalogued",
+      "status": "implemented",
       "engine_tier": "objectdbx_capable",
       "owner_ticket": "M08K-T03",
-      "implementation_strategy": "objectdbx_hostless",
-      "evidence_required": "unit_test+native_extraction_fixture",
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs",
       "risk_class": "read_safe"
     },
     {
       "operation": "inspect.constraint.node",
       "family": "constraints_associativity",
-      "status": "catalogued",
+      "status": "implemented",
       "engine_tier": "objectdbx_capable",
       "owner_ticket": "M08K-T03",
-      "implementation_strategy": "objectdbx_hostless",
-      "evidence_required": "unit_test+staged_diff_fixture_original_unchanged",
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs",
       "risk_class": "staged_write"
     },
     {
       "operation": "inspect.constraint.status",
       "family": "constraints_associativity",
-      "status": "catalogued",
+      "status": "implemented",
       "engine_tier": "native_arx_only",
       "owner_ticket": "M08K-T03",
-      "implementation_strategy": "native_arx_cpp",
-      "evidence_required": "unit_test+native_extraction_fixture",
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs",
       "risk_class": "read_safe"
     },
     {
       "operation": "inspect.parameter.evaluate",
       "family": "constraints_associativity",
-      "status": "catalogued",
+      "status": "implemented",
       "engine_tier": "objectdbx_capable",
       "owner_ticket": "M08K-T03",
-      "implementation_strategy": "objectdbx_hostless",
-      "evidence_required": "unit_test+native_extraction_fixture",
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs",
       "risk_class": "read_safe"
     },
     {
@@ -2578,81 +2578,81 @@
     {
       "operation": "extend.customclass.declare",
       "family": "custom_objects_protocols",
-      "status": "catalogued",
+      "status": "implemented",
       "engine_tier": "native_arx_only",
       "owner_ticket": "M08K-T01",
-      "implementation_strategy": "native_arx_cpp",
-      "evidence_required": "unit_test+native_extraction_fixture",
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs",
       "risk_class": "read_safe"
     },
     {
       "operation": "extend.customclass.define",
       "family": "custom_objects_protocols",
-      "status": "catalogued",
+      "status": "implemented",
       "engine_tier": "native_arx_only",
       "owner_ticket": "M08K-T01",
-      "implementation_strategy": "native_arx_cpp",
-      "evidence_required": "unit_test+native_extraction_fixture",
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs",
       "risk_class": "read_safe"
     },
     {
       "operation": "extend.customclass.define_cons",
       "family": "custom_objects_protocols",
-      "status": "catalogued",
+      "status": "implemented",
       "engine_tier": "native_arx_only",
       "owner_ticket": "M08K-T01",
-      "implementation_strategy": "native_arx_cpp",
-      "evidence_required": "unit_test+native_extraction_fixture",
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs",
       "risk_class": "read_safe"
     },
     {
       "operation": "extend.customclass.define_dxf",
       "family": "custom_objects_protocols",
-      "status": "catalogued",
+      "status": "implemented",
       "engine_tier": "native_arx_only",
       "owner_ticket": "M08K-T01",
-      "implementation_strategy": "native_arx_cpp",
-      "evidence_required": "unit_test+native_extraction_fixture",
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs",
       "risk_class": "read_safe"
     },
     {
       "operation": "extend.customclass.define_nocons",
       "family": "custom_objects_protocols",
-      "status": "catalogued",
+      "status": "implemented",
       "engine_tier": "native_arx_only",
       "owner_ticket": "M08K-T01",
-      "implementation_strategy": "native_arx_cpp",
-      "evidence_required": "unit_test+native_extraction_fixture",
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs",
       "risk_class": "read_safe"
     },
     {
       "operation": "extend.customclass.rxinit",
       "family": "custom_objects_protocols",
-      "status": "catalogued",
+      "status": "implemented",
       "engine_tier": "native_arx_only",
       "owner_ticket": "M08K-T01",
-      "implementation_strategy": "native_arx_cpp",
-      "evidence_required": "unit_test+native_extraction_fixture",
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs",
       "risk_class": "read_safe"
     },
     {
       "operation": "extend.customclass.unregister",
       "family": "custom_objects_protocols",
-      "status": "catalogued",
+      "status": "implemented",
       "engine_tier": "native_arx_only",
       "owner_ticket": "M08K-T01",
-      "implementation_strategy": "native_arx_cpp",
-      "evidence_required": "unit_test+native_extraction_fixture",
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs",
       "risk_class": "read_safe"
     },
     {
       "operation": "extend.customentity.db_defaults",
       "family": "custom_objects_protocols",
-      "status": "catalogued",
+      "status": "implemented",
       "engine_tier": "native_arx_only",
       "owner_ticket": "M08K-T01",
-      "implementation_strategy": "native_arx_cpp",
-      "evidence_required": "unit_test+native_extraction_fixture",
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs",
       "risk_class": "read_safe"
     },
     {
@@ -2688,21 +2688,21 @@
     {
       "operation": "extend.customentity.explode",
       "family": "custom_objects_protocols",
-      "status": "catalogued",
+      "status": "implemented",
       "engine_tier": "native_arx_only",
       "owner_ticket": "M08K-T01",
-      "implementation_strategy": "native_arx_cpp",
-      "evidence_required": "unit_test+native_extraction_fixture",
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs",
       "risk_class": "read_safe"
     },
     {
       "operation": "extend.customentity.geom_extents",
       "family": "custom_objects_protocols",
-      "status": "catalogued",
+      "status": "implemented",
       "engine_tier": "native_arx_only",
       "owner_ticket": "M08K-T01",
-      "implementation_strategy": "native_arx_cpp",
-      "evidence_required": "unit_test+native_extraction_fixture",
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs",
       "risk_class": "read_safe"
     },
     {
@@ -2718,21 +2718,21 @@
     {
       "operation": "extend.customentity.intersect",
       "family": "custom_objects_protocols",
-      "status": "catalogued",
+      "status": "implemented",
       "engine_tier": "native_arx_only",
       "owner_ticket": "M08K-T01",
-      "implementation_strategy": "native_arx_cpp",
-      "evidence_required": "unit_test+native_extraction_fixture",
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs",
       "risk_class": "read_safe"
     },
     {
       "operation": "extend.customentity.list",
       "family": "custom_objects_protocols",
-      "status": "catalogued",
+      "status": "implemented",
       "engine_tier": "native_arx_only",
       "owner_ticket": "M08K-T01",
-      "implementation_strategy": "native_arx_cpp",
-      "evidence_required": "unit_test+native_extraction_fixture",
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs",
       "risk_class": "read_safe"
     },
     {
@@ -2758,31 +2758,31 @@
     {
       "operation": "extend.customentity.subentpaths",
       "family": "custom_objects_protocols",
-      "status": "catalogued",
+      "status": "implemented",
       "engine_tier": "native_arx_only",
       "owner_ticket": "M08K-T01",
-      "implementation_strategy": "native_arx_cpp",
-      "evidence_required": "unit_test+native_extraction_fixture",
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs",
       "risk_class": "read_safe"
     },
     {
       "operation": "extend.customentity.transform",
       "family": "custom_objects_protocols",
-      "status": "catalogued",
+      "status": "implemented",
       "engine_tier": "native_arx_only",
       "owner_ticket": "M08K-T01",
-      "implementation_strategy": "native_arx_cpp",
-      "evidence_required": "unit_test+native_extraction_fixture",
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs",
       "risk_class": "read_safe"
     },
     {
       "operation": "extend.customobject.deepclone",
       "family": "custom_objects_protocols",
-      "status": "catalogued",
+      "status": "implemented",
       "engine_tier": "native_arx_only",
       "owner_ticket": "M08K-T01",
-      "implementation_strategy": "native_arx_cpp",
-      "evidence_required": "unit_test+native_extraction_fixture",
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs",
       "risk_class": "read_safe"
     },
     {
@@ -2808,21 +2808,21 @@
     {
       "operation": "extend.customobject.filer_dwgin",
       "family": "custom_objects_protocols",
-      "status": "catalogued",
+      "status": "implemented",
       "engine_tier": "objectdbx_capable",
       "owner_ticket": "M08K-T01",
-      "implementation_strategy": "objectdbx_hostless",
-      "evidence_required": "unit_test+native_extraction_fixture",
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs",
       "risk_class": "read_safe"
     },
     {
       "operation": "extend.customobject.filer_dwgout",
       "family": "custom_objects_protocols",
-      "status": "catalogued",
+      "status": "implemented",
       "engine_tier": "objectdbx_capable",
       "owner_ticket": "M08K-T01",
-      "implementation_strategy": "objectdbx_hostless",
-      "evidence_required": "unit_test+staged_diff_fixture_original_unchanged",
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs",
       "risk_class": "staged_write"
     },
     {
@@ -2858,41 +2858,41 @@
     {
       "operation": "extend.customobject.version",
       "family": "custom_objects_protocols",
-      "status": "catalogued",
+      "status": "implemented",
       "engine_tier": "native_arx_only",
       "owner_ticket": "M08K-T01",
-      "implementation_strategy": "native_arx_cpp",
-      "evidence_required": "attended_live_pump_session_log",
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs",
       "risk_class": "live_edit"
     },
     {
       "operation": "extend.customobject.wblockclone",
       "family": "custom_objects_protocols",
-      "status": "catalogued",
+      "status": "implemented",
       "engine_tier": "native_arx_only",
       "owner_ticket": "M08K-T01",
-      "implementation_strategy": "native_arx_cpp",
-      "evidence_required": "unit_test+native_extraction_fixture",
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs",
       "risk_class": "read_safe"
     },
     {
       "operation": "extend.module.entrypoint",
       "family": "custom_objects_protocols",
-      "status": "catalogued",
+      "status": "implemented",
       "engine_tier": "native_arx_only",
       "owner_ticket": "M08K-T01",
-      "implementation_strategy": "native_arx_cpp",
-      "evidence_required": "unit_test+native_extraction_fixture",
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs",
       "risk_class": "read_safe"
     },
     {
       "operation": "extend.object_enabler.build",
       "family": "custom_objects_protocols",
-      "status": "catalogued",
+      "status": "implemented",
       "engine_tier": "objectdbx_capable",
       "owner_ticket": "M08K-T01",
-      "implementation_strategy": "objectdbx_hostless",
-      "evidence_required": "unit_test+native_extraction_fixture",
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs",
       "risk_class": "read_safe"
     },
     {
@@ -2908,11 +2908,11 @@
     {
       "operation": "extend.object_enabler.register_classes",
       "family": "custom_objects_protocols",
-      "status": "catalogued",
+      "status": "implemented",
       "engine_tier": "native_arx_only",
       "owner_ticket": "M08K-T01",
-      "implementation_strategy": "native_arx_cpp",
-      "evidence_required": "unit_test+native_extraction_fixture",
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs",
       "risk_class": "read_safe"
     },
     {
@@ -2928,101 +2928,101 @@
     {
       "operation": "extend.protocol.attach",
       "family": "custom_objects_protocols",
-      "status": "catalogued",
+      "status": "implemented",
       "engine_tier": "native_arx_only",
       "owner_ticket": "M08K-T01",
-      "implementation_strategy": "native_arx_cpp",
-      "evidence_required": "unit_test+native_extraction_fixture",
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs",
       "risk_class": "read_safe"
     },
     {
       "operation": "extend.protocol.declare",
       "family": "custom_objects_protocols",
-      "status": "catalogued",
+      "status": "implemented",
       "engine_tier": "native_arx_only",
       "owner_ticket": "M08K-T01",
-      "implementation_strategy": "native_arx_cpp",
-      "evidence_required": "unit_test+native_extraction_fixture",
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs",
       "risk_class": "read_safe"
     },
     {
       "operation": "extend.protocol.detach",
       "family": "custom_objects_protocols",
-      "status": "catalogued",
+      "status": "implemented",
       "engine_tier": "native_arx_only",
       "owner_ticket": "M08K-T01",
-      "implementation_strategy": "native_arx_cpp",
-      "evidence_required": "unit_test+native_extraction_fixture",
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs",
       "risk_class": "read_safe"
     },
     {
       "operation": "extend.protocol.query",
       "family": "custom_objects_protocols",
-      "status": "catalogued",
+      "status": "implemented",
       "engine_tier": "native_arx_only",
       "owner_ticket": "M08K-T01",
-      "implementation_strategy": "native_arx_cpp",
-      "evidence_required": "unit_test+native_extraction_fixture",
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs",
       "risk_class": "read_safe"
     },
     {
       "operation": "extend.service.register",
       "family": "custom_objects_protocols",
-      "status": "catalogued",
+      "status": "implemented",
       "engine_tier": "native_arx_only",
       "owner_ticket": "M08K-T01",
-      "implementation_strategy": "native_arx_cpp",
-      "evidence_required": "unit_test+native_extraction_fixture",
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs",
       "risk_class": "read_safe"
     },
     {
       "operation": "inspect.proxy.detect",
       "family": "custom_objects_protocols",
-      "status": "catalogued",
+      "status": "implemented",
       "engine_tier": "managed_also",
       "owner_ticket": "M08K-T01",
-      "implementation_strategy": "managed_dotnet",
-      "evidence_required": "unit_test+native_extraction_fixture",
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs",
       "risk_class": "read_safe"
     },
     {
       "operation": "inspect.runtime.cast",
       "family": "custom_objects_protocols",
-      "status": "catalogued",
+      "status": "implemented",
       "engine_tier": "native_arx_only",
       "owner_ticket": "M08K-T01",
-      "implementation_strategy": "native_arx_cpp",
-      "evidence_required": "unit_test+native_extraction_fixture",
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs",
       "risk_class": "read_safe"
     },
     {
       "operation": "inspect.runtime.desc",
       "family": "custom_objects_protocols",
-      "status": "catalogued",
+      "status": "implemented",
       "engine_tier": "native_arx_only",
       "owner_ticket": "M08K-T01",
-      "implementation_strategy": "native_arx_cpp",
-      "evidence_required": "unit_test+native_extraction_fixture",
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs",
       "risk_class": "read_safe"
     },
     {
       "operation": "inspect.runtime.isa",
       "family": "custom_objects_protocols",
-      "status": "catalogued",
+      "status": "implemented",
       "engine_tier": "native_arx_only",
       "owner_ticket": "M08K-T01",
-      "implementation_strategy": "native_arx_cpp",
-      "evidence_required": "unit_test+native_extraction_fixture",
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs",
       "risk_class": "read_safe"
     },
     {
       "operation": "inspect.runtime.iskindof",
       "family": "custom_objects_protocols",
-      "status": "catalogued",
+      "status": "implemented",
       "engine_tier": "native_arx_only",
       "owner_ticket": "M08K-T01",
-      "implementation_strategy": "native_arx_cpp",
-      "evidence_required": "unit_test+native_extraction_fixture",
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs",
       "risk_class": "read_safe"
     },
     {

@@ -2,9 +2,9 @@
 
 - packet: `CADOS_M08_FULL_OPERATION_COVERAGE_CLOSURE`
 - generated_from: `config/operations.v2.json`
-- total operations: **517** · implemented 162 · stub 0 · blocked 2 · catalogued 353 · deprecated 0 · **unknown 0**
-- v1-target: **164** (implemented 162 · blocked 2 · **deferred 0**)
-- agent-exposed ops: 162
+- total operations: **517** · implemented 219 · stub 0 · blocked 2 · catalogued 296 · deprecated 0 · **unknown 0**
+- v1-target: **221** (implemented 219 · blocked 2 · **deferred 0**)
+- agent-exposed ops: 219
 
 ## Gate
 
@@ -32,7 +32,7 @@
 | validate_diff | 3 | 0 | 0 | 0 | 3 |
 | render_visual | 0 | 0 | 1 | 11 | 1 |
 | live | 6 | 0 | 1 | 0 | 7 |
-| native_only | 110 | 0 | 0 | 311 | 110 |
+| native_only | 167 | 0 | 0 | 254 | 167 |
 
 ## Risk class distribution
 
@@ -98,6 +98,63 @@
 | traverse.shell.faces | brep_solids | implemented | read_safe | read | True | m08dDispatch |  |
 | traverse.vertex.edges | brep_solids | implemented | read_safe | read | True | m08dDispatch |  |
 | traverse.vertex.loops | brep_solids | implemented | read_safe | read | True | m08dDispatch |  |
+| config.assocmanager.evalDisabler | constraints_associativity | implemented | read_safe | read | True | m08kcDispatch |  |
+| define.assocaction.addDependency | constraints_associativity | implemented | staged_write | write_copy | True | m08kcDispatch |  |
+| define.assocaction.create | constraints_associativity | implemented | staged_write | write_copy | True | m08kcDispatch |  |
+| define.assocaction.valueParam | constraints_associativity | implemented | staged_write | write_copy | True | m08kcDispatch |  |
+| define.assocdependency.attach | constraints_associativity | implemented | staged_write | write_copy | True | m08kcDispatch |  |
+| define.assocgeomdependency.subent | constraints_associativity | implemented | staged_write | write_copy | True | m08kcDispatch |  |
+| define.assocnetwork.addAction | constraints_associativity | implemented | staged_write | write_copy | True | m08kcDispatch |  |
+| define.assocvaluedependency.value | constraints_associativity | implemented | staged_write | write_copy | True | m08kcDispatch |  |
+| define.georef.subent | constraints_associativity | implemented | staged_write | write_copy | True | m08kcDispatch |  |
+| define.parameter.merge | constraints_associativity | implemented | staged_write | write_copy | True | m08kcDispatch |  |
+| define.parameter.variable | constraints_associativity | implemented | staged_write | write_copy | True | m08kcDispatch |  |
+| define.perssubentid.resolve | constraints_associativity | implemented | staged_write | write_copy | True | m08kcDispatch |  |
+| edit.assocnetwork.removeAction | constraints_associativity | implemented | staged_write | write_copy | True | m08kcDispatch |  |
+| edit.constraint.delete | constraints_associativity | implemented | staged_write | write_copy | True | m08kcDispatch |  |
+| inspect.assocaction.dependencies | constraints_associativity | implemented | staged_write | write_copy | True | m08kcDispatch |  |
+| inspect.assocaction.requestToEvaluate | constraints_associativity | implemented | staged_write | write_copy | True | m08kcDispatch |  |
+| inspect.assocarray.identify | constraints_associativity | implemented | read_safe | read | True | m08kcDispatch |  |
+| inspect.assocmanager.state | constraints_associativity | implemented | read_safe | read | True | m08kcDispatch |  |
+| inspect.assocnetwork.get | constraints_associativity | implemented | staged_write | write_copy | True | m08kcDispatch |  |
+| inspect.assocnetwork.iterate | constraints_associativity | implemented | read_safe | read | True | m08kcDispatch |  |
+| inspect.constraint.dimensional.value | constraints_associativity | implemented | staged_write | write_copy | True | m08kcDispatch |  |
+| inspect.constraint.enumerate | constraints_associativity | implemented | read_safe | read | True | m08kcDispatch |  |
+| inspect.constraint.node | constraints_associativity | implemented | staged_write | write_copy | True | m08kcDispatch |  |
+| inspect.constraint.status | constraints_associativity | implemented | read_safe | read | True | m08kcDispatch |  |
+| inspect.parameter.evaluate | constraints_associativity | implemented | read_safe | read | True | m08kcDispatch |  |
+| extend.customclass.declare | custom_objects_protocols | implemented | read_safe | read | True | m08kDispatch |  |
+| extend.customclass.define | custom_objects_protocols | implemented | read_safe | read | True | m08kDispatch |  |
+| extend.customclass.define_cons | custom_objects_protocols | implemented | read_safe | read | True | m08kDispatch |  |
+| extend.customclass.define_dxf | custom_objects_protocols | implemented | read_safe | read | True | m08kDispatch |  |
+| extend.customclass.define_nocons | custom_objects_protocols | implemented | read_safe | read | True | m08kDispatch |  |
+| extend.customclass.rxinit | custom_objects_protocols | implemented | read_safe | read | True | m08kDispatch |  |
+| extend.customclass.unregister | custom_objects_protocols | implemented | read_safe | read | True | m08kDispatch |  |
+| extend.customentity.db_defaults | custom_objects_protocols | implemented | read_safe | read | True | m08kDispatch |  |
+| extend.customentity.explode | custom_objects_protocols | implemented | read_safe | read | True | m08kDispatch |  |
+| extend.customentity.geom_extents | custom_objects_protocols | implemented | read_safe | read | True | m08kDispatch |  |
+| extend.customentity.intersect | custom_objects_protocols | implemented | read_safe | read | True | m08kDispatch |  |
+| extend.customentity.list | custom_objects_protocols | implemented | read_safe | read | True | m08kDispatch |  |
+| extend.customentity.subentpaths | custom_objects_protocols | implemented | read_safe | read | True | m08kDispatch |  |
+| extend.customentity.transform | custom_objects_protocols | implemented | read_safe | read | True | m08kDispatch |  |
+| extend.customobject.deepclone | custom_objects_protocols | implemented | read_safe | read | True | m08kDispatch |  |
+| extend.customobject.filer_dwgin | custom_objects_protocols | implemented | read_safe | read | True | m08kDispatch |  |
+| extend.customobject.filer_dwgout | custom_objects_protocols | implemented | staged_write | write_copy | True | m08kDispatch |  |
+| extend.customobject.version | custom_objects_protocols | implemented | live_edit | live_edit | True | m08kDispatch |  |
+| extend.customobject.wblockclone | custom_objects_protocols | implemented | read_safe | read | True | m08kDispatch |  |
+| extend.module.entrypoint | custom_objects_protocols | implemented | read_safe | read | True | m08kDispatch |  |
+| extend.object_enabler.build | custom_objects_protocols | implemented | read_safe | read | True | m08kDispatch |  |
+| extend.object_enabler.register_classes | custom_objects_protocols | implemented | read_safe | read | True | m08kDispatch |  |
+| extend.protocol.attach | custom_objects_protocols | implemented | read_safe | read | True | m08kDispatch |  |
+| extend.protocol.declare | custom_objects_protocols | implemented | read_safe | read | True | m08kDispatch |  |
+| extend.protocol.detach | custom_objects_protocols | implemented | read_safe | read | True | m08kDispatch |  |
+| extend.protocol.query | custom_objects_protocols | implemented | read_safe | read | True | m08kDispatch |  |
+| extend.service.register | custom_objects_protocols | implemented | read_safe | read | True | m08kDispatch |  |
+| inspect.proxy.detect | custom_objects_protocols | implemented | read_safe | read | True | m08kDispatch |  |
+| inspect.runtime.cast | custom_objects_protocols | implemented | read_safe | read | True | m08kDispatch |  |
+| inspect.runtime.desc | custom_objects_protocols | implemented | read_safe | read | True | m08kDispatch |  |
+| inspect.runtime.isa | custom_objects_protocols | implemented | read_safe | read | True | m08kDispatch |  |
+| inspect.runtime.iskindof | custom_objects_protocols | implemented | read_safe | read | True | m08kDispatch |  |
 | diff.before_after | diff | implemented | read_safe | read | True | cad_diff.compute_diff |  |
 | inspect.curve.protocol | entities | implemented | read_safe | read | True | m08dDispatch |  |
 | inspect.entity.common | entities | implemented | read_safe | read | True | m08dDispatch |  |
@@ -212,4 +269,4 @@
 | write.layout.create | write | implemented | staged_write | write_copy | True | createLayout |  |
 | write.xdata.set | write | implemented | staged_write | write_copy | True | setDatabaseXdata |  |
 
-> Full 517-operation detail (all 13 fields per op) is in `reports/operation_coverage_full_matrix.json` — this table lists only the 164 v1-target ops. The 353 catalogued ops are classified future-version native capability (v1_target=false), not omitted.
+> Full 517-operation detail (all 13 fields per op) is in `reports/operation_coverage_full_matrix.json` — this table lists only the 221 v1-target ops. The 296 catalogued ops are classified future-version native capability (v1_target=false), not omitted.

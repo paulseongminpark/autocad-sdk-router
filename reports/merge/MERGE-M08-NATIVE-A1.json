@@ -1,0 +1,50 @@
+{
+  "merge_id": "MERGE-M08-NATIVE-A1",
+  "role": "merge_executor",
+  "date": "2026-06-23",
+  "scope": "NATIVE wave batch A1 = M08K-T01 (custom object/entity/protocol lifecycle) + M08K-T03 (constraints/associativity AcDbAssoc*). Sub-batch of the program's MERGE-M08-NATIVE (K/L/M/N).",
+  "status": "PASS",
+  "seam_extension": {"pr": 16, "merge_commit": "f59f1ba", "note": "wired m08k/m08kc/m08l/m08m stubs + generalized reconcile family regex to multi-char unit tokens (m08kc)"},
+  "merged": [
+    {"pr": 17, "branch": "cados/M08K", "merge_commit": "05975b0", "unit": "m08k", "implemented_ops": 33, "deferred": 13},
+    {"pr": 18, "branch": "cados/M08KC", "merge_commit": "c2e9b45", "unit": "m08kc", "implemented_ops": 25, "deferred": 33}
+  ],
+  "implemented_total": 58,
+  "registry_flips": 57,
+  "deferred_total": 46,
+  "pre_merge_integration": {
+    "worktree": "autocad-sdk-router_INTEG (octopus M08K + M08KC off main)",
+    "combined_tu_build_exit": 0,
+    "artifacts": {"Ariadne.AcadNativeDbx.dbx": 48640, "Ariadne.AcadNative.crx": 488960, "Ariadne.AcadNative.arx": 497664},
+    "verified": "m08k* (dictionary-lookup workaround) + m08kc* (AcDbAssoc*) coexist in the single TU, no static-symbol collision",
+    "pytest": "362 passed"
+  },
+  "registry_reconciliation": {
+    "tool": "tools/reconcile_native_registry.py (auto-discovered m08k + m08kc)",
+    "flips": 57, "drift": 1, "conflicts": 0,
+    "implemented": "162 -> 219",
+    "catalogued": "353 -> 296"
+  },
+  "drift_tracked": {
+    "op": "extend.customobject.db_defaults",
+    "issue": "m08k HasOp admits it but it is NOT a registry op id (the legislated op is extend.customentity.db_defaults, which IS implemented). Teammate duplicated db_defaults under both entity+object. Harmless dead handler (router never routes a non-registry op); registry-correct version works.",
+    "disposition": "scheduled for Batch C cleanup sweep (remove the spurious HasOp+Dispatch branch + test, rebuild). Does NOT affect closure_gate (counts registry ops only)."
+  },
+  "key_findings": {
+    "m08k_dbx_export": "The DBX import lib exports only the module extern-C API, NOT custom-class ::desc()/::cast() -> LNK2001 on 7 custom-class symbols. Fixed CHANGE_ONLY-safe via acrxClassDictionary->at(name) lookup + extern-C predicates; pinned by a test. Future families calling Ariadne custom-class ::desc()/::cast() directly will hit the same wall.",
+    "m08kc_solver_discipline": "Every assoc/constraint create wrapped in AcDbAssocNetworkEvaluationDisabler -> the network/array/surface SOLVER is never invoked. assoc-array create/edit deferred because createInstance's layout pass IS the evaluator."
+  },
+  "post_merge_gate": {
+    "build": "combined integration build exit 0 (above); reconcile changed no C++",
+    "pytest": "375 passed",
+    "closure_gate": {"catalogued": 296, "stub": 0, "closure_gate_pass": false, "m09_allowed": false}
+  },
+  "reject_if_audit": {
+    "original_dwg_changed": false, "save_or_saveas": false, "aced_command_used": false,
+    "solver_invoked_in_impl": false, "raw_command_agent_exposed": false, "frozen_ops_regress": false,
+    "tests_fail": false, "fake_implemented": false, "symbol_collision": false, "drift_silent": false
+  },
+  "process_note": "Parallel teammates (m08k-impl/m08kc-impl) each own worktree + ABSOLUTE paths -> no cwd collision. Both shut down cleanly after verification.",
+  "closure_note": "closure_gate honestly False: 296 catalogued remain (NATIVE A2 L/M 82 + N 73 + VISLIVE/FALLBACK 45 + deferred 46 + drift 1). M09 blocked.",
+  "next": "Batch A2 = M08L (graphics 27) + M08M (OPM/reactors 55). seam already wired (stubs on main). Then A3/B/C/D per docs/M08_REMAINING_BATCH_PLAN.md."
+}
