@@ -1,0 +1,37 @@
+{
+  "merge_id": "MERGE-M08-RECONCILE-READ",
+  "role": "merge_executor",
+  "date": "2026-06-23",
+  "scope": "Registry reconciliation for the M08 C/D/E READ wave: 84 native read ops catalogued->implemented in config/operations.v2.json (handler code/build/unit already on main via MERGE-M08-READ).",
+  "status": "PASS",
+  "main_commit": "d11c6ee",
+  "merged": [
+    {"pr": 12, "branch": "cados/M08-RECONCILE-READ", "flips": 84, "drift": 0, "conflicts": 0, "overlaps": 0}
+  ],
+  "registry_delta": {
+    "implemented": "41 -> 125",
+    "catalogued": "474 -> 390",
+    "blocked": 2,
+    "by_family_flips": {"m08c": 11, "m08d": 69, "m08e": 4, "m08f": 0},
+    "totals_and_coverage_synced": true
+  },
+  "evidence_per_op": [
+    "handler: src/Ariadne.AcadNative/families/m08X_handlers.inc:m08XDispatch",
+    "test: tests/unit/test_m08X_handlers.py",
+    "build: native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
+    "merge: reports/merge/MERGE-M08-READ.json"
+  ],
+  "runtime_smoke": "deferred_attended(MERGE-M08-READ) -- recorded in evidence_refs, NOT claimed as run",
+  "tooling": "tools/reconcile_native_registry.py (new, deterministic, no model/network; parses m08XHasOp op-id sets, classifies flip/overlap/conflict/drift honestly, syncs totals+coverage; reusable for WRITE/VISLIVE/NATIVE/FALLBACK waves)",
+  "post_merge_gate": {
+    "build": "skipped -- no C++/.inc changed; native .crx/.arx artifacts unaffected (registry/reports/tool only)",
+    "pytest": "324 passed",
+    "closure_gate": {"catalogued": 390, "stub": 0, "closure_gate_pass": false, "m09_allowed": false}
+  },
+  "reject_if_audit": {
+    "original_dwg_changed": false, "secrets_staged": false, "raw_command_agent_exposed": false,
+    "frozen_ops_regress": false, "tests_fail": false, "fake_implemented": false, "drift_silent": false
+  },
+  "closure_note": "closure_gate honestly False: 390 catalogued remain across the WRITE/VISLIVE/NATIVE/FALLBACK waves. M09 blocked until catalogued/stub/unknown/deferred = 0.",
+  "next": "M08G/H WRITE wave (25 deferred write-lane ops + remaining entity/geometry/dimension/hatch writes); then M08I/J VISLIVE, M08K/L/M/N NATIVE, M08O FALLBACK."
+}
