@@ -2,9 +2,9 @@
 
 - packet: `CADOS_M08_FULL_OPERATION_COVERAGE_CLOSURE`
 - generated_from: `config/operations.v2.json`
-- total operations: **517** · implemented 358 · stub 0 · blocked 9 · catalogued 150 · deprecated 0 · **unknown 0**
-- v1-target: **367** (implemented 358 · blocked 9 · **deferred 0**)
-- agent-exposed ops: 358
+- total operations: **517** · implemented 388 · stub 0 · blocked 9 · catalogued 120 · deprecated 0 · **unknown 0**
+- v1-target: **397** (implemented 388 · blocked 9 · **deferred 0**)
+- agent-exposed ops: 388
 
 ## Gate
 
@@ -26,13 +26,13 @@
 
 | group | implemented | stub | blocked | catalogued | v1_target |
 |---|---|---|---|---|---|
-| read | 34 | 0 | 0 | 19 | 34 |
+| read | 53 | 0 | 0 | 0 | 53 |
 | query | 1 | 0 | 0 | 0 | 1 |
-| write_patch | 8 | 0 | 3 | 9 | 11 |
+| write_patch | 12 | 0 | 3 | 5 | 15 |
 | validate_diff | 3 | 0 | 0 | 0 | 3 |
 | render_visual | 11 | 0 | 0 | 1 | 11 |
 | live | 6 | 0 | 1 | 0 | 7 |
-| native_only | 295 | 0 | 5 | 121 | 300 |
+| native_only | 302 | 0 | 5 | 114 | 307 |
 
 ## Risk class distribution
 
@@ -57,7 +57,11 @@
 | command.menu.invoke | ui_customization | blocked | read_safe | read | False | acedMenuCmd(const ACHAR*) | SAFETY_FORBIDDEN: acedMenuCmd executes arbitrary menu/comman |
 | editor.toolpalette.tool_execute | ui_customization | blocked | read_safe | read | False | AcTcTool::Execute(int nFlag, HWND, POINT, DWORD  | SAFETY_FORBIDDEN: AcTcTool::Execute programmatically fires a |
 | apply.patch | apply | implemented | staged_write | write_copy | True | patch_engine.apply_staged |  |
+| infra.hostapp.provide_services | blocks_xrefs_clone | implemented | read_safe | read | True | m08eDispatch |  |
 | inspect.block.iterate | blocks_xrefs_clone | implemented | read_safe | read | True | m08eDispatch |  |
+| transform.database.deep_clone | blocks_xrefs_clone | implemented | live_edit | live_edit | True | m08eDispatch |  |
+| transform.database.insert_block | blocks_xrefs_clone | implemented | staged_write | write_copy | True | m08eDispatch |  |
+| write.block.append_entity | blocks_xrefs_clone | implemented | staged_write | write_copy | True | m08eDispatch |  |
 | compute.brep.line_containment | brep_solids | implemented | read_safe | read | True | m08dDispatch |  |
 | compute.brep.massprops | brep_solids | implemented | read_safe | read | True | m08dDispatch |  |
 | compute.brep.perimeter | brep_solids | implemented | read_safe | read | True | m08dDispatch |  |
@@ -247,6 +251,7 @@
 | modify.entity.explode | entities | implemented | read_safe | read | True | m08gDispatch |  |
 | write.entity.arc | entities | implemented | staged_write | write_copy | True | m08gDispatch |  |
 | write.entity.attribdef | entities | implemented | staged_write | write_copy | True | m08gDispatch |  |
+| write.entity.attribute | entities | implemented | staged_write | write_copy | True | m08gDispatch |  |
 | write.entity.blockref | entities | implemented | staged_write | write_copy | True | m08gDispatch |  |
 | write.entity.dim.aligned | entities | implemented | staged_write | write_copy | True | m08hDispatch |  |
 | write.entity.dim.angular2line | entities | implemented | staged_write | write_copy | True | m08hDispatch |  |
@@ -260,15 +265,21 @@
 | write.entity.ellipse | entities | implemented | staged_write | write_copy | True | m08gDispatch |  |
 | write.entity.face | entities | implemented | staged_write | write_copy | True | m08gDispatch |  |
 | write.entity.hatch | entities | implemented | staged_write | write_copy | True | m08hDispatch |  |
+| write.entity.leader | entities | implemented | staged_write | write_copy | True | m08hDispatch |  |
 | write.entity.minsert | entities | implemented | staged_write | write_copy | True | m08gDispatch |  |
+| write.entity.mleader | entities | implemented | staged_write | write_copy | True | m08hDispatch |  |
+| write.entity.mline | entities | implemented | staged_write | write_copy | True | m08gDispatch |  |
 | write.entity.mtext | entities | implemented | staged_write | write_copy | True | m08hDispatch |  |
+| write.entity.polyfacemesh | entities | implemented | staged_write | write_copy | True | m08gDispatch |  |
 | write.entity.polygonmesh | entities | implemented | staged_write | write_copy | True | m08gDispatch |  |
 | write.entity.polyline2d | entities | implemented | staged_write | write_copy | True | m08gDispatch |  |
 | write.entity.polyline3d | entities | implemented | staged_write | write_copy | True | m08gDispatch |  |
 | write.entity.ray | entities | implemented | staged_write | write_copy | True | m08gDispatch |  |
 | write.entity.region | entities | implemented | staged_write | write_copy | True | m08gDispatch |  |
+| write.entity.shape | entities | implemented | staged_write | write_copy | True | m08gDispatch |  |
 | write.entity.solid2d | entities | implemented | staged_write | write_copy | True | m08gDispatch |  |
 | write.entity.spline | entities | implemented | staged_write | write_copy | True | m08gDispatch |  |
+| write.entity.table | entities | implemented | staged_write | write_copy | True | m08hDispatch |  |
 | write.entity.text | entities | implemented | staged_write | write_copy | True | m08hDispatch |  |
 | write.entity.trace | entities | implemented | staged_write | write_copy | True | m08gDispatch |  |
 | write.entity.xline | entities | implemented | staged_write | write_copy | True | m08gDispatch |  |
@@ -331,13 +342,26 @@
 | live.reactor.enable | live | implemented | live_edit | live_edit | True | enableEditorReactor |  |
 | live.status | live | implemented | read_safe | read | True | pumpDispatch |  |
 | infra.hostapp.get_services | objectdbx_database | implemented | read_safe | read | True | m08cDispatch |  |
+| infra.hostapp.set_working_db | objectdbx_database | implemented | read_safe | read | True | m08cDispatch |  |
+| inspect.database.dxf_in | objectdbx_database | implemented | read_safe | read | True | m08cDispatch |  |
+| inspect.database.flush_input | objectdbx_database | implemented | read_safe | read | True | m08cDispatch |  |
+| inspect.database.read_dwg | objectdbx_database | implemented | read_safe | read | True | m08cDispatch |  |
+| inspect.database.read_dwg_handle | objectdbx_database | implemented | read_safe | read | True | m08cDispatch |  |
 | inspect.database.summary | objectdbx_database | implemented | read_safe | read | True | InspectDatabaseSummary |  |
 | inspect.database.summaryinfo | objectdbx_database | implemented | read_safe | read | True | m08cDispatch |  |
 | inspect.database.sysvar | objectdbx_database | implemented | staged_write | write_copy | True | m08cDispatch |  |
 | inspect.object.handle | objectdbx_database | implemented | read_safe | read | True | m08cDispatch |  |
 | inspect.object.id | objectdbx_database | implemented | read_safe | read | True | m08cDispatch |  |
 | inspect.object.open | objectdbx_database | implemented | read_safe | read | True | m08cDispatch |  |
+| transaction.manager.get_object | objectdbx_database | implemented | read_safe | read | True | m08cDispatch |  |
+| transaction.manager.start | objectdbx_database | implemented | read_safe | read | True | m08cDispatch |  |
+| transform.database.dxf_out | objectdbx_database | implemented | staged_write | write_copy | True | m08cDispatch |  |
+| transform.database.save_as | objectdbx_database | implemented | staged_write | write_copy | True | m08cDispatch |  |
+| transform.database.save_as_simple | objectdbx_database | implemented | staged_write | write_copy | True | m08cDispatch |  |
 | write.object.cancel | objectdbx_database | implemented | read_safe | read | True | m08cDispatch |  |
+| write.object.close | objectdbx_database | implemented | staged_write | write_copy | True | m08cDispatch |  |
+| write.object.downgrade_open | objectdbx_database | implemented | staged_write | write_copy | True | m08cDispatch |  |
+| write.object.upgrade_open | objectdbx_database | implemented | read_safe | read | True | m08cDispatch |  |
 | patch.apply_staged | patch | implemented | read_safe | read | True | patch_engine.dry_run_plan |  |
 | patch.dry_run | patch | implemented | read_safe | read | True | patch_engine.dry_run_plan |  |
 | query.entities | query | implemented | read_safe | read | True | sqlite_ir_store.query |  |
@@ -361,6 +385,7 @@
 | module.command.register_manual | runtime_commands | implemented | read_safe | read | True | m08nDispatch |  |
 | module.register_mdi | runtime_commands | implemented | read_safe | read | True | m08nDispatch |  |
 | module.register_service | runtime_commands | implemented | read_safe | read | True | m08nDispatch |  |
+| acdb.database.create | symbol_tables_dictionaries | implemented | read_safe | read | True | m08eDispatch |  |
 | inspect.dictionary.get | symbol_tables_dictionaries | implemented | read_safe | read | True | m08eDispatch |  |
 | inspect.dictionary.named_objects | symbol_tables_dictionaries | implemented | read_safe | read | True | m08eDispatch |  |
 | inspect.entity.get_xdata | symbol_tables_dictionaries | implemented | read_safe | read | True | m08eDispatch |  |
@@ -369,7 +394,12 @@
 | inspect.symboltable.layers | symbol_tables_dictionaries | implemented | read_safe | read | True | m08cDispatch |  |
 | inspect.xrecord.get | symbol_tables_dictionaries | implemented | read_safe | read | True | getXrecord |  |
 | transform.database.wblock | symbol_tables_dictionaries | implemented | read_safe | read | True | m08cDispatch |  |
+| transform.database.wblock_clone | symbol_tables_dictionaries | implemented | live_edit | live_edit | True | m08cDispatch |  |
+| write.dictionary.set | symbol_tables_dictionaries | implemented | staged_write | write_copy | True | m08eDispatch |  |
+| write.entity.set_xdata | symbol_tables_dictionaries | implemented | staged_write | write_copy | True | m08eDispatch |  |
 | write.layer.create | symbol_tables_dictionaries | implemented | staged_write | write_copy | True | createLayer |  |
+| write.object.create_ext_dict | symbol_tables_dictionaries | implemented | staged_write | write_copy | True | m08cDispatch |  |
+| write.regapp.register | symbol_tables_dictionaries | implemented | staged_write | write_copy | True | m08cDispatch |  |
 | write.xrecord.set | symbol_tables_dictionaries | implemented | staged_write | write_copy | True | setXrecord |  |
 | editor.command.register | ui_customization | implemented | read_safe | read | True | m08nDispatch |  |
 | editor.command.unregister | ui_customization | implemented | read_safe | read | True | m08nDispatch |  |
@@ -415,4 +445,4 @@
 | write.layout.create | write | implemented | staged_write | write_copy | True | createLayout |  |
 | write.xdata.set | write | implemented | staged_write | write_copy | True | setDatabaseXdata |  |
 
-> Full 517-operation detail (all 13 fields per op) is in `reports/operation_coverage_full_matrix.json` — this table lists only the 367 v1-target ops. The 150 catalogued ops are classified future-version native capability (v1_target=false), not omitted.
+> Full 517-operation detail (all 13 fields per op) is in `reports/operation_coverage_full_matrix.json` — this table lists only the 397 v1-target ops. The 120 catalogued ops are classified future-version native capability (v1_target=false), not omitted.
