@@ -2,9 +2,9 @@
 
 - packet: `CADOS_M08_FULL_OPERATION_COVERAGE_CLOSURE`
 - generated_from: `config/operations.v2.json`
-- total operations: **517** · implemented 457 · stub 0 · blocked 60 · catalogued 0 · deprecated 0 · **unknown 0**
-- v1-target: **517** (implemented 457 · blocked 60 · **deferred 0**)
-- agent-exposed ops: 457
+- total operations: **517** · implemented 459 · stub 0 · blocked 57 · catalogued 0 · deprecated 1 · **unknown 0**
+- v1-target: **516** (implemented 459 · blocked 57 · **deferred 0**)
+- agent-exposed ops: 459
 
 ## Gate
 
@@ -31,16 +31,16 @@
 | write_patch | 16 | 0 | 4 | 0 | 20 |
 | validate_diff | 3 | 0 | 0 | 0 | 3 |
 | render_visual | 10 | 0 | 2 | 0 | 12 |
-| live | 6 | 0 | 1 | 0 | 7 |
-| native_only | 368 | 0 | 53 | 0 | 421 |
+| live | 6 | 0 | 0 | 0 | 6 |
+| native_only | 370 | 0 | 51 | 0 | 421 |
 
 ## Risk class distribution
 
 | risk_class | count |
 |---|---|
 | read_safe | 349 |
-| staged_write | 112 |
-| live_edit | 50 |
+| staged_write | 114 |
+| live_edit | 48 |
 | raw_command | 6 |
 
 ## v1-target operations (the v1 surface — all implemented or hard-blocked)
@@ -80,15 +80,12 @@
 | edit.assocarray.reset | constraints_associativity | blocked | staged_write | write_copy | False | AcDbAssocArrayActionBody::resetArrayItems(arrayE | SAFETY_FORBIDDEN: resetArrayItems performs array re-layout/e |
 | edit.assocarray.source | constraints_associativity | blocked | staged_write | write_copy | False | addSourceEntity(id, basePoint) / removeSourceEnt | SAFETY_FORBIDDEN: source entity edits on associative arrays  |
 | edit.assocarray.transform | constraints_associativity | blocked | staged_write | write_copy | False | AcDbAssocArrayActionBody::transformBy(AcGeMatrix | SAFETY_FORBIDDEN: transformBy on associative array action bo |
-| edit.assocdata.xref | constraints_associativity | blocked | live_edit | live_edit | False | AcDbAssocManager::markSyncUpWithXrefsNeeded(db)  | SAFETY_FORBIDDEN: AcDbAssocManager::syncUpWithXrefs/markSync |
 | inspect.assocaction.evaluate | constraints_associativity | blocked | live_edit | live_edit | False | AcDbAssocAction::evaluate(callback), evaluateDep | SAFETY_FORBIDDEN: AcDbAssocAction::evaluate is the native as |
 | inspect.assocnetwork.evaluate | constraints_associativity | blocked | live_edit | live_edit | False | AcDbAssocManager::evaluateTopLevelNetwork(AcDbDa | SAFETY_FORBIDDEN: AcDbAssocManager::evaluateTopLevelNetwork  |
 | inspect.assocsurface.topology | constraints_associativity | blocked | read_safe | read | False | AcDbAssocSurfaceActionBody::findActionsThatAffec | SAFETY_FORBIDDEN: associative surface topology inspection re |
-| repair.assocdata.audit | constraints_associativity | blocked | live_edit | live_edit | False | AcDbAssocManager::auditAssociativeData(db, trave | SAFETY_FORBIDDEN: AcDbAssocManager::auditAssociativeData per |
 | command.queue.post | editor_input | blocked | raw_command | live_edit | False | acedPostCommand / acedPostCommandPrompt() | SAFETY_FORBIDDEN: raw command dispatch is blocked in M08O fa |
 | plot.config.settings | layouts_plot_publish | blocked | live_edit | live_edit | False | AcDbPlotSettings / AcPlPlotConfig / AcPlPlotConf | SAFETY_FORBIDDEN: exact plot settings operation is a live_ed |
 | plot.engine.run | layouts_plot_publish | blocked | read_safe | read | False | AcPlPlotEngine: beginPlot/beginDocument/beginPag | HOST_UNAVAILABLE: AcPlPlotEngine execution requires a contro |
-| live.apply_patch | live | blocked | live_edit | live_edit | False |  | Requires full_autocad live_edit host + explicit write_origin |
 | module.command.lookup | runtime_commands | blocked | raw_command | read | False | acedRegCmds->lookupCmd2(...) via acedCmdLookup2( | SAFETY_FORBIDDEN: raw command dispatch is blocked in M08O fa |
 | module.command.remove_group | runtime_commands | blocked | read_safe | read | False | AcEdCommandStack::removeGroup(grpName) (+ remove | SAFETY_FORBIDDEN: arbitrary command group removal mutates th |
 | module.entrypoint.define | runtime_commands | blocked | read_safe | read | False | IMPLEMENT_ARX_ENTRYPOINT(classname) (→ IMPLEMENT | SDK_NOT_EXPOSED: entrypoint definition is a compile/link-tim |
@@ -231,6 +228,7 @@
 | define.parameter.merge | constraints_associativity | implemented | staged_write | write_copy | True | m08kcDispatch |  |
 | define.parameter.variable | constraints_associativity | implemented | staged_write | write_copy | True | m08kcDispatch |  |
 | define.perssubentid.resolve | constraints_associativity | implemented | staged_write | write_copy | True | m08kcDispatch |  |
+| edit.assocdata.xref | constraints_associativity | implemented | staged_write | write_copy | True | m08kcDispatch |  |
 | edit.assocnetwork.removeAction | constraints_associativity | implemented | staged_write | write_copy | True | m08kcDispatch |  |
 | edit.constraint.delete | constraints_associativity | implemented | staged_write | write_copy | True | m08kcDispatch |  |
 | inspect.assocaction.dependencies | constraints_associativity | implemented | staged_write | write_copy | True | m08kcDispatch |  |
@@ -244,6 +242,7 @@
 | inspect.constraint.node | constraints_associativity | implemented | staged_write | write_copy | True | m08kcDispatch |  |
 | inspect.constraint.status | constraints_associativity | implemented | read_safe | read | True | m08kcDispatch |  |
 | inspect.parameter.evaluate | constraints_associativity | implemented | read_safe | read | True | m08kcDispatch |  |
+| repair.assocdata.audit | constraints_associativity | implemented | staged_write | write_copy | True | m08kcDispatch |  |
 | extend.customclass.declare | custom_objects_protocols | implemented | read_safe | read | True | m08kDispatch |  |
 | extend.customclass.define | custom_objects_protocols | implemented | read_safe | read | True | m08kDispatch |  |
 | extend.customclass.define_cons | custom_objects_protocols | implemented | read_safe | read | True | m08kDispatch |  |
@@ -565,4 +564,4 @@
 | write.layout.create | write | implemented | staged_write | write_copy | True | createLayout |  |
 | write.xdata.set | write | implemented | staged_write | write_copy | True | setDatabaseXdata |  |
 
-> Full 517-operation detail (all 13 fields per op) is in `reports/operation_coverage_full_matrix.json` — this table lists only the 517 v1-target ops. The 0 catalogued ops are classified future-version native capability (v1_target=false), not omitted.
+> Full 517-operation detail (all 13 fields per op) is in `reports/operation_coverage_full_matrix.json` — this table lists only the 516 v1-target ops. The 0 catalogued ops are classified future-version native capability (v1_target=false), not omitted.

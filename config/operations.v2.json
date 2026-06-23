@@ -56,8 +56,9 @@
   "totals": {
     "operations": 517,
     "by_status": {
-      "blocked": 60,
-      "implemented": 457
+      "blocked": 57,
+      "deprecated": 1,
+      "implemented": 459
     },
     "by_family": {
       "active_document_write_original": 8,
@@ -128,14 +129,14 @@
       "ui_customization": 39
     },
     "operation_records": 517,
-    "implemented": 457,
+    "implemented": 459,
     "wired": 0,
     "stub": 0,
     "catalogued": 0,
-    "blocked": 60,
-    "deprecated": 0,
+    "blocked": 57,
+    "deprecated": 1,
     "unknown": 0,
-    "catalog_classified_ops": 62,
+    "catalog_classified_ops": 480,
     "catalog_unclassified_ops": 0,
     "catalog_classification_status": "complete"
   },
@@ -3076,7 +3077,7 @@
     {
       "id": "live.apply_patch",
       "family": "live",
-      "status": "blocked",
+      "status": "deprecated",
       "engine_tier": "native_arx_only",
       "host_eligibility": [
         "full_autocad"
@@ -3092,7 +3093,7 @@
         "original_write_default": false
       },
       "handler": {
-        "router_lane": "full_autocad",
+        "router_lane": "ARIADNE_NATIVE_JOB",
         "dispatcher_symbol": null,
         "execution_host_class": "full_autocad",
         "composed_of": []
@@ -3104,11 +3105,15 @@
       "summary": "Apply a patch to the live active document. Requires full_autocad + explicit write_original approval.",
       "evidence_refs": [
         "docs/OPERATION_REGISTRY_SPEC.md",
-        "CADOS_M01 Lane D native triage (inspect.database.graph insertion point)"
+        "CADOS_M01 Lane D native triage (inspect.database.graph insertion point)",
+        "reports/tickets/WAVE4X_DB_TXN_WRITE.md",
+        "reports/tickets/WAVE4X_DB_TXN_WRITE.json",
+        "reports/tickets/WAVE4X_DB_TXN_WRITE_OPS.json",
+        "tools/patch_engine.py::apply_staged",
+        "config/operations.v2.json#apply.patch"
       ],
       "target_family_first_class": true,
       "wired_v1": false,
-      "blocked_reason": "Requires full_autocad live_edit host + explicit write_original approval; not implemented (no-fake-success).",
       "operation": "live.apply_patch",
       "hosts": [
         "full_autocad"
@@ -3122,17 +3127,18 @@
       },
       "policy": {
         "source": "config/policy.v2.json",
-        "status_policy": "blocked",
+        "status_policy": "deprecated",
         "default_write_mode": "live_edit",
-        "no_original_write_default": true
+        "no_original_write_default": true,
+        "runtime_behavior": "deprecated_use_staged_governor"
       },
       "tests": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified"
       ],
-      "notes": "Apply a patch to the live active document. Requires full_autocad + explicit write_original approval.",
+      "notes": "Deprecated in WAVE4X. Exact active-document mutation remains intentionally disabled; use apply.patch / patch_engine.apply_staged (or apply_native_staged for a direct native op) on a staged copy.",
       "owner_ticket": "M08J-T01",
-      "implementation_strategy": "hard_blocked",
-      "evidence_required": "blocker_ref_and_evidence"
+      "implementation_strategy": "deprecated_safe_replacement",
+      "evidence_required": "replacement_route_and_evidence"
     },
     {
       "id": "command.invoke.coroutine",
@@ -3885,7 +3891,7 @@
         "original_write_default": false
       },
       "handler": {
-        "router_lane": null,
+        "router_lane": "ARIADNE_NATIVE_JOB",
         "dispatcher_symbol": "m08eDispatch",
         "execution_host_class": "arx_adapter",
         "native_api": "AcDbDatabase::deepCloneObjects(const AcDbObjectIdArray&, const AcDbObjectId& owner, AcDbIdMapping&, bool deferXlation=false)",
@@ -3901,13 +3907,13 @@
       },
       "policy": {
         "source": "config/policy.v2.json",
-        "status_policy": "catalogued_not_runnable",
+        "status_policy": "implemented",
         "default_write_mode": "live_edit",
         "allowed_write_modes": [
           "live_edit"
         ],
         "no_original_write_default": true,
-        "runtime_behavior": "not_runnable_until_promoted_to_implemented_or_wired"
+        "runtime_behavior": "staged_write_copy_only"
       },
       "tests": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
@@ -3922,9 +3928,12 @@
         "src/Ariadne.AcadNative/families/m08e_handlers.inc:m08eDispatch",
         "reports/merge/MERGE-M08-READ.json",
         "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
-        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)"
+        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)",
+        "reports/tickets/WAVE4X_DB_TXN_WRITE.md",
+        "reports/tickets/WAVE4X_DB_TXN_WRITE.json",
+        "reports/tickets/WAVE4X_DB_TXN_WRITE_OPS.json"
       ],
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS. WAVE4X: bounded staged-write route with commit-on-success + journal/diff/validation evidence.",
       "owner_ticket": "M08E-T01",
       "implementation_strategy": "implemented_v1",
       "evidence_required": "existing_tests_and_evidence_refs"
@@ -3960,7 +3969,7 @@
         "original_write_default": false
       },
       "handler": {
-        "router_lane": null,
+        "router_lane": "ARIADNE_NATIVE_JOB",
         "dispatcher_symbol": "m08eDispatch",
         "execution_host_class": "dbx",
         "native_api": "AcDbDatabase::insert(AcDbObjectId& blockId, const ACHAR* pBlockName, AcDbDatabase* pDb, bool preserveSourceDatabase=true)",
@@ -3976,13 +3985,13 @@
       },
       "policy": {
         "source": "config/policy.v2.json",
-        "status_policy": "catalogued_not_runnable",
+        "status_policy": "implemented",
         "default_write_mode": "write_copy",
         "allowed_write_modes": [
           "write_copy"
         ],
         "no_original_write_default": true,
-        "runtime_behavior": "not_runnable_until_promoted_to_implemented_or_wired"
+        "runtime_behavior": "staged_write_copy_only"
       },
       "tests": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
@@ -3997,9 +4006,12 @@
         "src/Ariadne.AcadNative/families/m08e_handlers.inc:m08eDispatch",
         "reports/merge/MERGE-M08-READ.json",
         "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
-        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)"
+        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)",
+        "reports/tickets/WAVE4X_DB_TXN_WRITE.md",
+        "reports/tickets/WAVE4X_DB_TXN_WRITE.json",
+        "reports/tickets/WAVE4X_DB_TXN_WRITE_OPS.json"
       ],
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS. WAVE4X: bounded staged-write route with commit-on-success + journal/diff/validation evidence.",
       "owner_ticket": "M08E-T01",
       "implementation_strategy": "implemented_v1",
       "evidence_required": "existing_tests_and_evidence_refs"
@@ -4035,7 +4047,7 @@
         "original_write_default": false
       },
       "handler": {
-        "router_lane": null,
+        "router_lane": "ARIADNE_NATIVE_JOB",
         "dispatcher_symbol": "m08eDispatch",
         "execution_host_class": "dbx",
         "native_api": "AcDbBlockTableRecord::appendAcDbEntity(AcDbObjectId&, AcDbEntity*)",
@@ -4051,13 +4063,13 @@
       },
       "policy": {
         "source": "config/policy.v2.json",
-        "status_policy": "catalogued_not_runnable",
+        "status_policy": "implemented",
         "default_write_mode": "write_copy",
         "allowed_write_modes": [
           "write_copy"
         ],
         "no_original_write_default": true,
-        "runtime_behavior": "not_runnable_until_promoted_to_implemented_or_wired"
+        "runtime_behavior": "staged_write_copy_only"
       },
       "tests": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
@@ -4072,9 +4084,12 @@
         "src/Ariadne.AcadNative/families/m08e_handlers.inc:m08eDispatch",
         "reports/merge/MERGE-M08-READ.json",
         "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
-        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)"
+        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)",
+        "reports/tickets/WAVE4X_DB_TXN_WRITE.md",
+        "reports/tickets/WAVE4X_DB_TXN_WRITE.json",
+        "reports/tickets/WAVE4X_DB_TXN_WRITE_OPS.json"
       ],
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS. WAVE4X: bounded staged-write route with commit-on-success + journal/diff/validation evidence.",
       "owner_ticket": "M08E-T01",
       "implementation_strategy": "implemented_v1",
       "evidence_required": "existing_tests_and_evidence_refs"
@@ -14585,7 +14600,7 @@
       "id": "edit.assocdata.xref",
       "operation": "edit.assocdata.xref",
       "family": "constraints_associativity",
-      "status": "blocked",
+      "status": "implemented",
       "engine_tier": "native_arx_only",
       "engines": [
         "native_arx_only"
@@ -14600,16 +14615,16 @@
       ],
       "execution_context": "host",
       "write_level": {
-        "default_write_mode": "live_edit",
+        "default_write_mode": "write_copy",
         "allowed_write_modes": [
-          "live_edit"
+          "write_copy"
         ],
         "dwg_persisted": true,
         "original_write_default": false
       },
       "handler": {
-        "router_lane": null,
-        "dispatcher_symbol": null,
+        "router_lane": "ARIADNE_NATIVE_JOB",
+        "dispatcher_symbol": "m08kcDispatch",
         "execution_host_class": "arx_adapter",
         "native_api": "AcDbAssocManager::markSyncUpWithXrefsNeeded(db) / syncUpWithXrefs(hostDb)",
         "composed_of": []
@@ -14624,15 +14639,15 @@
       },
       "policy": {
         "source": "config/policy.v2.json",
-        "status_policy": "blocked_not_runnable",
-        "default_write_mode": "live_edit",
+        "status_policy": "implemented",
+        "default_write_mode": "write_copy",
         "allowed_write_modes": [
-          "live_edit"
+          "write_copy"
         ],
         "no_original_write_default": true,
-        "runtime_behavior": "blocked_after_wave3_reaudit",
-        "agent_exposed": false,
-        "risk_class": "unsafe_solver_or_modeler"
+        "runtime_behavior": "staged_write_copy_only",
+        "agent_exposed": true,
+        "risk_class": "staged_write_safe"
       },
       "tests": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
@@ -14645,13 +14660,17 @@
       "evidence_refs": [
         "config/autocad_native_arx_operation_catalog.json#edit.assocdata.xref",
         "reports/WAVE3_PANE5_ASSOCIATIVITY_REAUDIT.md#edit.assocdata.xref",
-        "tests/unit/test_wave3_pane5_assoc_reaudit.py"
+        "tests/unit/test_wave3_pane5_assoc_reaudit.py",
+        "reports/tickets/WAVE4X_DB_TXN_WRITE.md",
+        "reports/tickets/WAVE4X_DB_TXN_WRITE.json",
+        "reports/tickets/WAVE4X_DB_TXN_WRITE_OPS.json",
+        "tests/unit/test_m08kc_handlers.py",
+        "tools/patch_engine.py::apply_native_staged"
       ],
-      "notes": "Wave3 Pane5 re-audit: not left catalogued. Closed as blocked because the exact operation requires unsafe solver/modeler/full-database repair or xref synchronization execution. Safe read-only alternatives remain separate implemented operations where available.",
+      "notes": "WAVE4X reopened under a bounded staged-write contract: native handler runs on the router-staged copy only, commits on success, and mutation evidence is produced via journal/diff/validation.",
       "owner_ticket": "M08K-T03",
-      "implementation_strategy": "hard_blocked",
-      "evidence_required": "blocker_ref_and_evidence",
-      "blocked_reason": "SAFETY_FORBIDDEN: AcDbAssocManager::syncUpWithXrefs/markSyncUpWithXrefsNeeded crosses drawing references and can schedule/evaluate associative xref synchronization outside a bounded staged-copy contract."
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs"
     },
     {
       "id": "edit.assocnetwork.removeAction",
@@ -15844,7 +15863,7 @@
       "id": "repair.assocdata.audit",
       "operation": "repair.assocdata.audit",
       "family": "constraints_associativity",
-      "status": "blocked",
+      "status": "implemented",
       "engine_tier": "native_arx_only",
       "engines": [
         "native_arx_only"
@@ -15859,16 +15878,16 @@
       ],
       "execution_context": "host",
       "write_level": {
-        "default_write_mode": "live_edit",
+        "default_write_mode": "write_copy",
         "allowed_write_modes": [
-          "live_edit"
+          "write_copy"
         ],
         "dwg_persisted": true,
         "original_write_default": false
       },
       "handler": {
-        "router_lane": null,
-        "dispatcher_symbol": null,
+        "router_lane": "ARIADNE_NATIVE_JOB",
+        "dispatcher_symbol": "m08kcDispatch",
         "execution_host_class": "arx_adapter",
         "native_api": "AcDbAssocManager::auditAssociativeData(db, traverseWholeDatabase)",
         "composed_of": []
@@ -15883,15 +15902,15 @@
       },
       "policy": {
         "source": "config/policy.v2.json",
-        "status_policy": "blocked_not_runnable",
-        "default_write_mode": "live_edit",
+        "status_policy": "implemented",
+        "default_write_mode": "write_copy",
         "allowed_write_modes": [
-          "live_edit"
+          "write_copy"
         ],
         "no_original_write_default": true,
-        "runtime_behavior": "blocked_after_wave3_reaudit",
-        "agent_exposed": false,
-        "risk_class": "unsafe_solver_or_modeler"
+        "runtime_behavior": "staged_write_copy_only",
+        "agent_exposed": true,
+        "risk_class": "staged_write_safe"
       },
       "tests": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
@@ -15904,13 +15923,17 @@
       "evidence_refs": [
         "config/autocad_native_arx_operation_catalog.json#repair.assocdata.audit",
         "reports/WAVE3_PANE5_ASSOCIATIVITY_REAUDIT.md#repair.assocdata.audit",
-        "tests/unit/test_wave3_pane5_assoc_reaudit.py"
+        "tests/unit/test_wave3_pane5_assoc_reaudit.py",
+        "reports/tickets/WAVE4X_DB_TXN_WRITE.md",
+        "reports/tickets/WAVE4X_DB_TXN_WRITE.json",
+        "reports/tickets/WAVE4X_DB_TXN_WRITE_OPS.json",
+        "tests/unit/test_m08kc_handlers.py",
+        "tools/patch_engine.py::apply_native_staged"
       ],
-      "notes": "Wave3 Pane5 re-audit: not left catalogued. Closed as blocked because the exact operation requires unsafe solver/modeler/full-database repair or xref synchronization execution. Safe read-only alternatives remain separate implemented operations where available.",
+      "notes": "WAVE4X reopened under a bounded staged-write contract: native handler runs on the router-staged copy only, commits on success, and mutation evidence is produced via journal/diff/validation.",
       "owner_ticket": "M08K-T03",
-      "implementation_strategy": "hard_blocked",
-      "evidence_required": "blocker_ref_and_evidence",
-      "blocked_reason": "SAFETY_FORBIDDEN: AcDbAssocManager::auditAssociativeData performs full-database associative audit/repair traversal, not read-only inspection, and is not exposed as an agent operation."
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs"
     },
     {
       "id": "extend.customclass.declare",
@@ -29898,7 +29921,7 @@
         "original_write_default": false
       },
       "handler": {
-        "router_lane": null,
+        "router_lane": "ARIADNE_NATIVE_JOB",
         "dispatcher_symbol": "m08cDispatch",
         "execution_host_class": "arx_adapter",
         "native_api": "AcDbTransactionManager::getObject(AcDbObject*& obj, AcDbObjectId id, AcDb::OpenMode=kForRead, bool openErasedObj=false)",
@@ -29914,13 +29937,13 @@
       },
       "policy": {
         "source": "config/policy.v2.json",
-        "status_policy": "catalogued_not_runnable",
+        "status_policy": "implemented",
         "default_write_mode": "read",
         "allowed_write_modes": [
           "read"
         ],
         "no_original_write_default": true,
-        "runtime_behavior": "not_runnable_until_promoted_to_implemented_or_wired"
+        "runtime_behavior": "staged_write_copy_only"
       },
       "tests": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
@@ -29935,9 +29958,12 @@
         "src/Ariadne.AcadNative/families/m08c_handlers.inc:m08cDispatch",
         "reports/merge/MERGE-M08-READ.json",
         "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
-        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)"
+        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)",
+        "reports/tickets/WAVE4X_DB_TXN_WRITE.md",
+        "reports/tickets/WAVE4X_DB_TXN_WRITE.json",
+        "reports/tickets/WAVE4X_DB_TXN_WRITE_OPS.json"
       ],
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS. WAVE4X: bounded staged-write route with commit-on-success + journal/diff/validation evidence.",
       "owner_ticket": "M08B-T03",
       "implementation_strategy": "implemented_v1",
       "evidence_required": "existing_tests_and_evidence_refs"
@@ -29969,7 +29995,7 @@
         "original_write_default": false
       },
       "handler": {
-        "router_lane": null,
+        "router_lane": "ARIADNE_NATIVE_JOB",
         "dispatcher_symbol": "m08cDispatch",
         "execution_host_class": "arx_adapter",
         "native_api": "AcTransactionManager::startTransaction() (via actrTransactionManager / AcApTransactionManager)",
@@ -29985,13 +30011,13 @@
       },
       "policy": {
         "source": "config/policy.v2.json",
-        "status_policy": "catalogued_not_runnable",
+        "status_policy": "implemented",
         "default_write_mode": "read",
         "allowed_write_modes": [
           "read"
         ],
         "no_original_write_default": true,
-        "runtime_behavior": "not_runnable_until_promoted_to_implemented_or_wired"
+        "runtime_behavior": "staged_write_copy_only"
       },
       "tests": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
@@ -30006,9 +30032,12 @@
         "src/Ariadne.AcadNative/families/m08c_handlers.inc:m08cDispatch",
         "reports/merge/MERGE-M08-READ.json",
         "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
-        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)"
+        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)",
+        "reports/tickets/WAVE4X_DB_TXN_WRITE.md",
+        "reports/tickets/WAVE4X_DB_TXN_WRITE.json",
+        "reports/tickets/WAVE4X_DB_TXN_WRITE_OPS.json"
       ],
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS. WAVE4X: bounded staged-write route with commit-on-success + journal/diff/validation evidence.",
       "owner_ticket": "M08B-T03",
       "implementation_strategy": "implemented_v1",
       "evidence_required": "existing_tests_and_evidence_refs"
@@ -30344,7 +30373,7 @@
         "original_write_default": false
       },
       "handler": {
-        "router_lane": null,
+        "router_lane": "ARIADNE_NATIVE_JOB",
         "dispatcher_symbol": "m08cDispatch",
         "execution_host_class": "dbx",
         "native_api": "AcDbObject::close()",
@@ -30360,13 +30389,13 @@
       },
       "policy": {
         "source": "config/policy.v2.json",
-        "status_policy": "catalogued_not_runnable",
+        "status_policy": "implemented",
         "default_write_mode": "write_copy",
         "allowed_write_modes": [
           "write_copy"
         ],
         "no_original_write_default": true,
-        "runtime_behavior": "not_runnable_until_promoted_to_implemented_or_wired"
+        "runtime_behavior": "staged_write_copy_only"
       },
       "tests": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
@@ -30381,9 +30410,12 @@
         "src/Ariadne.AcadNative/families/m08c_handlers.inc:m08cDispatch",
         "reports/merge/MERGE-M08-READ.json",
         "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
-        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)"
+        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)",
+        "reports/tickets/WAVE4X_DB_TXN_WRITE.md",
+        "reports/tickets/WAVE4X_DB_TXN_WRITE.json",
+        "reports/tickets/WAVE4X_DB_TXN_WRITE_OPS.json"
       ],
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS. WAVE4X: bounded staged-write route with commit-on-success + journal/diff/validation evidence.",
       "owner_ticket": "M08C-T01",
       "implementation_strategy": "implemented_v1",
       "evidence_required": "existing_tests_and_evidence_refs"
@@ -30419,7 +30451,7 @@
         "original_write_default": false
       },
       "handler": {
-        "router_lane": null,
+        "router_lane": "ARIADNE_NATIVE_JOB",
         "dispatcher_symbol": "m08cDispatch",
         "execution_host_class": "dbx",
         "native_api": "AcDbObject::downgradeOpen()",
@@ -30435,13 +30467,13 @@
       },
       "policy": {
         "source": "config/policy.v2.json",
-        "status_policy": "catalogued_not_runnable",
+        "status_policy": "implemented",
         "default_write_mode": "write_copy",
         "allowed_write_modes": [
           "write_copy"
         ],
         "no_original_write_default": true,
-        "runtime_behavior": "not_runnable_until_promoted_to_implemented_or_wired"
+        "runtime_behavior": "staged_write_copy_only"
       },
       "tests": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
@@ -30456,9 +30488,12 @@
         "src/Ariadne.AcadNative/families/m08c_handlers.inc:m08cDispatch",
         "reports/merge/MERGE-M08-READ.json",
         "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
-        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)"
+        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)",
+        "reports/tickets/WAVE4X_DB_TXN_WRITE.md",
+        "reports/tickets/WAVE4X_DB_TXN_WRITE.json",
+        "reports/tickets/WAVE4X_DB_TXN_WRITE_OPS.json"
       ],
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS. WAVE4X: bounded staged-write route with commit-on-success + journal/diff/validation evidence.",
       "owner_ticket": "M08C-T01",
       "implementation_strategy": "implemented_v1",
       "evidence_required": "existing_tests_and_evidence_refs"
@@ -30494,7 +30529,7 @@
         "original_write_default": false
       },
       "handler": {
-        "router_lane": null,
+        "router_lane": "ARIADNE_NATIVE_JOB",
         "dispatcher_symbol": "m08cDispatch",
         "execution_host_class": "dbx",
         "native_api": "AcDbObject::upgradeOpen()",
@@ -30510,13 +30545,13 @@
       },
       "policy": {
         "source": "config/policy.v2.json",
-        "status_policy": "catalogued_not_runnable",
+        "status_policy": "implemented",
         "default_write_mode": "read",
         "allowed_write_modes": [
           "read"
         ],
         "no_original_write_default": true,
-        "runtime_behavior": "not_runnable_until_promoted_to_implemented_or_wired"
+        "runtime_behavior": "staged_write_copy_only"
       },
       "tests": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
@@ -30531,9 +30566,12 @@
         "src/Ariadne.AcadNative/families/m08c_handlers.inc:m08cDispatch",
         "reports/merge/MERGE-M08-READ.json",
         "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
-        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)"
+        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)",
+        "reports/tickets/WAVE4X_DB_TXN_WRITE.md",
+        "reports/tickets/WAVE4X_DB_TXN_WRITE.json",
+        "reports/tickets/WAVE4X_DB_TXN_WRITE_OPS.json"
       ],
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS. WAVE4X: bounded staged-write route with commit-on-success + journal/diff/validation evidence.",
       "owner_ticket": "M08C-T01",
       "implementation_strategy": "implemented_v1",
       "evidence_required": "existing_tests_and_evidence_refs"
@@ -34709,7 +34747,7 @@
         "original_write_default": false
       },
       "handler": {
-        "router_lane": null,
+        "router_lane": "ARIADNE_NATIVE_JOB",
         "dispatcher_symbol": "m08eDispatch",
         "execution_host_class": "dbx",
         "native_api": "AcDbDictionary::setAt(const ACHAR* key, AcDbObject* newValue, AcDbObjectId&)",
@@ -34725,13 +34763,13 @@
       },
       "policy": {
         "source": "config/policy.v2.json",
-        "status_policy": "catalogued_not_runnable",
+        "status_policy": "implemented",
         "default_write_mode": "write_copy",
         "allowed_write_modes": [
           "write_copy"
         ],
         "no_original_write_default": true,
-        "runtime_behavior": "not_runnable_until_promoted_to_implemented_or_wired"
+        "runtime_behavior": "staged_write_copy_only"
       },
       "tests": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
@@ -34746,9 +34784,12 @@
         "src/Ariadne.AcadNative/families/m08e_handlers.inc:m08eDispatch",
         "reports/merge/MERGE-M08-READ.json",
         "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
-        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)"
+        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)",
+        "reports/tickets/WAVE4X_DB_TXN_WRITE.md",
+        "reports/tickets/WAVE4X_DB_TXN_WRITE.json",
+        "reports/tickets/WAVE4X_DB_TXN_WRITE_OPS.json"
       ],
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS. WAVE4X: bounded staged-write route with commit-on-success + journal/diff/validation evidence.",
       "owner_ticket": "M08E-T03",
       "implementation_strategy": "implemented_v1",
       "evidence_required": "existing_tests_and_evidence_refs"
@@ -34784,7 +34825,7 @@
         "original_write_default": false
       },
       "handler": {
-        "router_lane": null,
+        "router_lane": "ARIADNE_NATIVE_JOB",
         "dispatcher_symbol": "m08eDispatch",
         "execution_host_class": "dbx",
         "native_api": "AcDbObject::setXData(const resbuf* xdata)",
@@ -34800,13 +34841,13 @@
       },
       "policy": {
         "source": "config/policy.v2.json",
-        "status_policy": "catalogued_not_runnable",
+        "status_policy": "implemented",
         "default_write_mode": "write_copy",
         "allowed_write_modes": [
           "write_copy"
         ],
         "no_original_write_default": true,
-        "runtime_behavior": "not_runnable_until_promoted_to_implemented_or_wired"
+        "runtime_behavior": "staged_write_copy_only"
       },
       "tests": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
@@ -34821,9 +34862,12 @@
         "src/Ariadne.AcadNative/families/m08e_handlers.inc:m08eDispatch",
         "reports/merge/MERGE-M08-READ.json",
         "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
-        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)"
+        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)",
+        "reports/tickets/WAVE4X_DB_TXN_WRITE.md",
+        "reports/tickets/WAVE4X_DB_TXN_WRITE.json",
+        "reports/tickets/WAVE4X_DB_TXN_WRITE_OPS.json"
       ],
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS. WAVE4X: bounded staged-write route with commit-on-success + journal/diff/validation evidence.",
       "owner_ticket": "M08E-T03",
       "implementation_strategy": "implemented_v1",
       "evidence_required": "existing_tests_and_evidence_refs"
@@ -34859,7 +34903,7 @@
         "original_write_default": false
       },
       "handler": {
-        "router_lane": null,
+        "router_lane": "ARIADNE_NATIVE_JOB",
         "dispatcher_symbol": "m08eDispatch",
         "execution_host_class": "dbx",
         "native_api": "AcDbObject::createExtensionDictionary()",
@@ -34875,13 +34919,13 @@
       },
       "policy": {
         "source": "config/policy.v2.json",
-        "status_policy": "catalogued_not_runnable",
+        "status_policy": "implemented",
         "default_write_mode": "write_copy",
         "allowed_write_modes": [
           "write_copy"
         ],
         "no_original_write_default": true,
-        "runtime_behavior": "not_runnable_until_promoted_to_implemented_or_wired"
+        "runtime_behavior": "staged_write_copy_only"
       },
       "tests": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
@@ -34898,9 +34942,12 @@
         "reports/merge/MERGE-M08-READ.json",
         "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
         "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)",
-        "src/Ariadne.AcadNative/families/m08c_handlers.inc:m08cDispatch"
+        "src/Ariadne.AcadNative/families/m08c_handlers.inc:m08cDispatch",
+        "reports/tickets/WAVE4X_DB_TXN_WRITE.md",
+        "reports/tickets/WAVE4X_DB_TXN_WRITE.json",
+        "reports/tickets/WAVE4X_DB_TXN_WRITE_OPS.json"
       ],
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS. WAVE4X: bounded staged-write route with commit-on-success + journal/diff/validation evidence.",
       "owner_ticket": "M08C-T02",
       "implementation_strategy": "implemented_v1",
       "evidence_required": "existing_tests_and_evidence_refs"
@@ -34936,7 +34983,7 @@
         "original_write_default": false
       },
       "handler": {
-        "router_lane": null,
+        "router_lane": "ARIADNE_NATIVE_JOB",
         "dispatcher_symbol": "m08eDispatch",
         "execution_host_class": "dbx",
         "native_api": "AcDbRegAppTable::add(...) / acdbRegApp(...)",
@@ -34952,13 +34999,13 @@
       },
       "policy": {
         "source": "config/policy.v2.json",
-        "status_policy": "catalogued_not_runnable",
+        "status_policy": "implemented",
         "default_write_mode": "write_copy",
         "allowed_write_modes": [
           "write_copy"
         ],
         "no_original_write_default": true,
-        "runtime_behavior": "not_runnable_until_promoted_to_implemented_or_wired"
+        "runtime_behavior": "staged_write_copy_only"
       },
       "tests": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
@@ -34975,9 +35022,12 @@
         "reports/merge/MERGE-M08-READ.json",
         "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
         "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)",
-        "src/Ariadne.AcadNative/families/m08c_handlers.inc:m08cDispatch"
+        "src/Ariadne.AcadNative/families/m08c_handlers.inc:m08cDispatch",
+        "reports/tickets/WAVE4X_DB_TXN_WRITE.md",
+        "reports/tickets/WAVE4X_DB_TXN_WRITE.json",
+        "reports/tickets/WAVE4X_DB_TXN_WRITE_OPS.json"
       ],
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS. WAVE4X: bounded staged-write route with commit-on-success + journal/diff/validation evidence.",
       "owner_ticket": "M08C-T03",
       "implementation_strategy": "implemented_v1",
       "evidence_required": "existing_tests_and_evidence_refs"

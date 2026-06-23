@@ -125,16 +125,17 @@ class TestM08ACatalogReopen(unittest.TestCase):
         self.assertIn("closure_gate", matrix)
 
     def test_status_counts_reflect_wave3_closure(self):
-        # Wave3 closure eliminates the old catalogued/stub escape: every op is now
-        # implemented or hard-blocked.
+        # Wave4X keeps the catalog fully closed: every op is now implemented,
+        # hard-blocked, or deprecated (safe staged replacement / raw-command closure).
         import collections
         by_status = collections.Counter(o.get("status") for o in self.ops)
         self.assertEqual(by_status.get("unknown", 0), 0)
         self.assertEqual(by_status.get("catalogued", 0), 0)
         self.assertEqual(by_status.get("stub", 0), 0)
-        self.assertEqual(by_status.get("implemented", 0), 457)
-        self.assertEqual(by_status.get("blocked", 0), 60)
-        self.assertEqual(by_status.get("implemented", 0) + by_status.get("blocked", 0), len(self.ops))
+        self.assertEqual(by_status.get("implemented", 0), 459)
+        self.assertEqual(by_status.get("blocked", 0), 57)
+        self.assertEqual(by_status.get("deprecated", 0), 1)
+        self.assertEqual(by_status.get("implemented", 0) + by_status.get("blocked", 0) + by_status.get("deprecated", 0), len(self.ops))
 
 
 if __name__ == "__main__":

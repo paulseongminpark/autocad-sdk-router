@@ -388,13 +388,144 @@ static AcDbObjectId m08eDefaultWritableObjectId(AcDbDatabase* pDb)
     return pDb->blockTableId();
 }
 
+static bool m08eFindStringArg(const std::string& job, const char* key, std::string& out)
+{
+    if (jsonFindString(job, key, out) && !out.empty())
+        return true;
+    std::string argsJson;
+    if (jsonFindObject(job, "args", argsJson) && jsonFindString(argsJson, key, out) && !out.empty())
+        return true;
+    out.clear();
+    return false;
+}
+
 static bool m08eResolveOptionalObject(const AriadneJobCtx& ctx, AcDbObjectId& id, std::string& handle)
 {
-    if (jsonFindString(ctx.job, "handle", handle) && !handle.empty())
+    if (m08eFindStringArg(ctx.job, "handle", handle))
+        return resolveHandle(ctx.pDb, handle, id);
+    if (m08eFindStringArg(ctx.job, "object_handle", handle))
         return resolveHandle(ctx.pDb, handle, id);
     id = m08eDefaultWritableObjectId(ctx.pDb);
     handle = handleOfId(id);
     return !id.isNull();
+}
+
+static Acad::ErrorStatus m08eEnsureExtensionDictionary(AcDbObject* pObj, AcDbObjectId& dictId,
+                                                       bool& created)
+{
+    dictId = AcDbObjectId::kNull;
+    created = false;
+    if (pObj == nullptr)
+        return Acad::eNullObjectPointer;
+    dictId = pObj->extensionDictionary();
+    if (dictId.isNull()) {
+        const Acad::ErrorStatus es = pObj->createExtensionDictionary();
+        if (es != Acad::eOk)
+            return es;
+        created = true;
+        dictId = pObj->extensionDictionary();
+    }
+    return dictId.isNull() ? Acad::eNullObjectId : Acad::eOk;
+}
+
+static Acad::ErrorStatus m08eOpenTargetDictionary(const AriadneJobCtx& ctx,
+                                                  AcDbDictionary*& pDict,
+                                                  std::string& dictionaryHandle,
+                                                  std::string& ownerHandle,
+                                                  bool& createdExtDict)
+{
+    pDict = nullptr;
+    dictionaryHandle.clear();
+    ownerHandle.clear();
+    createdExtDict = false;
+
+    std::string dictHex;
+    if (m08eFindStringArg(ctx.job, "dictionary_handle", dictHex)) {
+        AcDbObjectId dictId;
+        if (!resolveHandle(ctx.pDb, dictHex, dictId))
+            return Acad::eNullObjectId;
+        AcDbObject* pObj = nullptr;
+        Acad::ErrorStatus es = acdbOpenObject(pObj, dictId, AcDb::kForWrite);
+        if (es != Acad::eOk || pObj == nullptr)
+            return es != Acad::eOk ? es : Acad::eNullObjectPointer;
+        pDict = AcDbDictionary::cast(pObj);
+        if (pDict == nullptr) {
+            pObj->close();
+            return Acad::eWrongObjectType;
+        }
+        dictionaryHandle = handleOfId(dictId);
+        return Acad::eOk;
+    }
+
+    std::string ownerHex;
+    if (m08eFindStringArg(ctx.job, "owner_handle", ownerHex)) {
+        AcDbObjectId ownerId;
+        if (!resolveHandle(ctx.pDb, ownerHex, ownerId))
+            return Acad::eNullObjectId;
+        AcDbObject* pOwner = nullptr;
+        Acad::ErrorStatus es = acdbOpenObject(pOwner, ownerId, AcDb::kForWrite);
+        if (es != Acad::eOk || pOwner == nullptr)
+            return es != Acad::eOk ? es : Acad::eNullObjectPointer;
+        AcDbObjectId dictId;
+        es = m08eEnsureExtensionDictionary(pOwner, dictId, createdExtDict);
+        pOwner->close();
+        if (es != Acad::eOk)
+            return es;
+        AcDbObject* pObj = nullptr;
+        es = acdbOpenObject(pObj, dictId, AcDb::kForWrite);
+        if (es != Acad::eOk || pObj == nullptr)
+            return es != Acad::eOk ? es : Acad::eNullObjectPointer;
+        pDict = AcDbDictionary::cast(pObj);
+        if (pDict == nullptr) {
+            pObj->close();
+            return Acad::eWrongObjectType;
+        }
+        ownerHandle = ownerHex;
+        dictionaryHandle = handleOfId(dictId);
+        return Acad::eOk;
+    }
+
+    Acad::ErrorStatus es = openAriadneDict(ctx.pDb, AcDb::kForWrite, true, pDict);
+    if (es == Acad::eOk && pDict != nullptr)
+        dictionaryHandle = handleOf(pDict);
+    return es;
+}
+
+static Acad::ErrorStatus m08eSetObjectXdata(AcDbDatabase* pDb, const AcDbObjectId& id,
+                                            const std::string& app, const std::string& value)
+{
+    if (pDb == nullptr || id.isNull())
+        return Acad::eNullObjectId;
+    Acad::ErrorStatus es = ensureRegApp(pDb, app);
+    if (es != Acad::eOk)
+        return es;
+
+    AcDbObject* pObj = nullptr;
+    es = acdbOpenObject(pObj, id, AcDb::kForWrite);
+    if (es != Acad::eOk || pObj == nullptr)
+        return es != Acad::eOk ? es : Acad::eNullObjectPointer;
+
+    const std::wstring appW = asciiToWide(app);
+    const std::wstring valueW = asciiToWide(value);
+    resbuf* rb = acutBuildList(
+        AcDb::kDxfRegAppName, appW.c_str(),
+        AcDb::kDxfXdAsciiString, valueW.c_str(),
+        0);
+    if (rb == nullptr) {
+        pObj->close();
+        return Acad::eOutOfMemory;
+    }
+    es = pObj->setXData(rb);
+    acutRelRb(rb);
+    pObj->close();
+    return es;
+}
+
+static Acad::ErrorStatus m08eCommit(AriadneStagedWriteTransaction& wt, Acad::ErrorStatus es)
+{
+    if (es != Acad::eOk)
+        return es;
+    return wt.commit();
 }
 
 static bool m08eHandleCreateExtDict(const AriadneJobCtx& ctx, std::ostringstream& r)
@@ -411,62 +542,121 @@ static bool m08eHandleCreateExtDict(const AriadneJobCtx& ctx, std::ostringstream
     bool created = false;
     std::string dictHandle;
     if (es == Acad::eOk && pObj != nullptr) {
-        if (pObj->extensionDictionary().isNull()) {
-            es = pObj->createExtensionDictionary();
-            created = (es == Acad::eOk);
-        }
-        AcDbObjectId did = pObj->extensionDictionary();
-        if (!did.isNull()) dictHandle = handleOfId(did);
+        AcDbObjectId did;
+        es = m08eEnsureExtensionDictionary(pObj, did, created);
+        if (es == Acad::eOk && !did.isNull())
+            dictHandle = handleOfId(did);
         pObj->close();
     }
+    const Acad::ErrorStatus commitEs = m08eCommit(wt, es);
     r << "\"result\":{\"handle\":" << njsonStr(handle)
       << ",\"created\":" << (created ? "true" : "false")
       << ",\"extension_dictionary_handle\":" << (dictHandle.empty() ? std::string("null") : njsonStr(dictHandle))
-      << ",\"staged_rolled_back\":true,\"errorstatus\":" << static_cast<int>(es)
-      << "},\"status\":\"ok\"}";
+      << ",\"staged_committed\":" << (commitEs == Acad::eOk ? "true" : "false")
+      << ",\"mutation_errorstatus\":" << static_cast<int>(es)
+      << ",\"commit_errorstatus\":" << static_cast<int>(commitEs)
+      << "},\"status\":\"" << (commitEs == Acad::eOk ? "ok" : "error") << "\"}";
     return true;
 }
 
 static bool m08eHandleRegappRegister(const AriadneJobCtx& ctx, std::ostringstream& r)
 {
     std::string app;
-    if (!jsonFindString(ctx.job, "app", app) || app.empty()) app = "ARIADNE_M08CDEF";
+    if (!m08eFindStringArg(ctx.job, "app", app) || app.empty()) app = "ARIADNE_M08CDEF";
     AriadneStagedWriteTransaction wt(ctx.pDb);
     const Acad::ErrorStatus es = ensureRegApp(ctx.pDb, app);
+    const Acad::ErrorStatus commitEs = m08eCommit(wt, es);
     r << "\"result\":{\"app\":" << njsonStr(app)
-      << ",\"registered\":" << (es == Acad::eOk ? "true" : "false")
-      << ",\"staged_rolled_back\":true,\"errorstatus\":" << static_cast<int>(es)
-      << "},\"status\":\"" << (es == Acad::eOk ? "ok" : "error") << "\"}";
+      << ",\"registered\":" << (commitEs == Acad::eOk ? "true" : "false")
+      << ",\"staged_committed\":" << (commitEs == Acad::eOk ? "true" : "false")
+      << ",\"mutation_errorstatus\":" << static_cast<int>(es)
+      << ",\"commit_errorstatus\":" << static_cast<int>(commitEs)
+      << "},\"status\":\"" << (commitEs == Acad::eOk ? "ok" : "error") << "\"}";
     return true;
 }
 
 static bool m08eHandleDictionarySet(const AriadneJobCtx& ctx, std::ostringstream& r)
 {
     std::string key, value;
-    if (!jsonFindString(ctx.job, "key", key) || key.empty()) key = "M08CDEF_PROBE";
-    if (!jsonFindString(ctx.job, "value", value)) value = "scratch";
+    if (!m08eFindStringArg(ctx.job, "key", key) || key.empty()) key = "M08CDEF_PROBE";
+    if (!m08eFindStringArg(ctx.job, "value", value)) value = "scratch";
     AriadneStagedWriteTransaction wt(ctx.pDb);
-    const Acad::ErrorStatus es = setXrecord(ctx.pDb, key, value);
+
+    AcDbDictionary* pDict = nullptr;
+    std::string dictHandle, ownerHandle;
+    bool createdExtDict = false;
+    Acad::ErrorStatus es = m08eOpenTargetDictionary(ctx, pDict, dictHandle, ownerHandle, createdExtDict);
+    if (es == Acad::eOk && pDict != nullptr) {
+        const std::wstring valueW = asciiToWide(value);
+        resbuf* rb = acutBuildList(AcDb::kDxfText, valueW.c_str(), 0);
+        if (rb == nullptr) {
+            pDict->close();
+            es = Acad::eOutOfMemory;
+        } else {
+            const std::wstring keyW = asciiToWide(key);
+            AcDbObject* pObj = nullptr;
+            es = pDict->getAt(keyW.c_str(), pObj, AcDb::kForWrite);
+            if (es == Acad::eOk) {
+                AcDbXrecord* pXrecord = AcDbXrecord::cast(pObj);
+                if (pXrecord == nullptr) {
+                    pObj->close();
+                    es = Acad::eWrongObjectType;
+                } else {
+                    es = pXrecord->setFromRbChain(*rb);
+                    pXrecord->close();
+                }
+            } else if (es == Acad::eKeyNotFound) {
+                AcDbXrecord* pXrecord = new AcDbXrecord();
+                es = pXrecord->setFromRbChain(*rb);
+                if (es == Acad::eOk) {
+                    AcDbObjectId xrecId;
+                    es = pDict->setAt(keyW.c_str(), pXrecord, xrecId);
+                }
+                if (es == Acad::eOk)
+                    pXrecord->close();
+                else
+                    delete pXrecord;
+            }
+            acutRelRb(rb);
+            pDict->close();
+        }
+    }
+    const Acad::ErrorStatus commitEs = m08eCommit(wt, es);
     r << "\"result\":{\"key\":" << njsonStr(key)
       << ",\"value\":" << njsonStr(value)
-      << ",\"xrecord_set\":" << (es == Acad::eOk ? "true" : "false")
-      << ",\"staged_rolled_back\":true,\"errorstatus\":" << static_cast<int>(es)
-      << "},\"status\":\"" << (es == Acad::eOk ? "ok" : "error") << "\"}";
+      << ",\"dictionary_handle\":" << (dictHandle.empty() ? std::string("null") : njsonStr(dictHandle))
+      << ",\"owner_handle\":" << (ownerHandle.empty() ? std::string("null") : njsonStr(ownerHandle))
+      << ",\"created_extension_dictionary\":" << (createdExtDict ? "true" : "false")
+      << ",\"xrecord_set\":" << (commitEs == Acad::eOk ? "true" : "false")
+      << ",\"staged_committed\":" << (commitEs == Acad::eOk ? "true" : "false")
+      << ",\"mutation_errorstatus\":" << static_cast<int>(es)
+      << ",\"commit_errorstatus\":" << static_cast<int>(commitEs)
+      << "},\"status\":\"" << (commitEs == Acad::eOk ? "ok" : "error") << "\"}";
     return true;
 }
 
 static bool m08eHandleEntitySetXdata(const AriadneJobCtx& ctx, std::ostringstream& r)
 {
     std::string app, value;
-    if (!jsonFindString(ctx.job, "app", app) || app.empty()) app = "ARIADNE_M08CDEF";
-    if (!jsonFindString(ctx.job, "value", value)) value = "scratch";
+    if (!m08eFindStringArg(ctx.job, "app", app) || app.empty()) app = "ARIADNE_M08CDEF";
+    if (!m08eFindStringArg(ctx.job, "value", value)) value = "scratch";
+    AcDbObjectId id;
+    std::string handle;
+    if (!m08eResolveOptionalObject(ctx, id, handle)) {
+        emitNativeError(r, "OBJECT_NOT_FOUND", "write.entity.set_xdata could not resolve object");
+        return true;
+    }
     AriadneStagedWriteTransaction wt(ctx.pDb);
-    const Acad::ErrorStatus es = setDatabaseXdata(ctx.pDb, app, value);
-    r << "\"result\":{\"app\":" << njsonStr(app)
+    const Acad::ErrorStatus es = m08eSetObjectXdata(ctx.pDb, id, app, value);
+    const Acad::ErrorStatus commitEs = m08eCommit(wt, es);
+    r << "\"result\":{\"handle\":" << njsonStr(handle)
+      << ",\"app\":" << njsonStr(app)
       << ",\"value\":" << njsonStr(value)
-      << ",\"xdata_set\":" << (es == Acad::eOk ? "true" : "false")
-      << ",\"staged_rolled_back\":true,\"errorstatus\":" << static_cast<int>(es)
-      << "},\"status\":\"" << (es == Acad::eOk ? "ok" : "error") << "\"}";
+      << ",\"xdata_set\":" << (commitEs == Acad::eOk ? "true" : "false")
+      << ",\"staged_committed\":" << (commitEs == Acad::eOk ? "true" : "false")
+      << ",\"mutation_errorstatus\":" << static_cast<int>(es)
+      << ",\"commit_errorstatus\":" << static_cast<int>(commitEs)
+      << "},\"status\":\"" << (commitEs == Acad::eOk ? "ok" : "error") << "\"}";
     return true;
 }
 
@@ -487,17 +677,20 @@ static bool m08eHandleBlockAppend(const AriadneJobCtx& ctx, std::ostringstream& 
         if (es == Acad::eOk) pLine->close(); else delete pLine;
         pMS->close();
     }
-    r << "\"result\":{\"appended\":" << (es == Acad::eOk ? "true" : "false")
+    const Acad::ErrorStatus commitEs = m08eCommit(wt, es);
+    r << "\"result\":{\"appended\":" << (commitEs == Acad::eOk ? "true" : "false")
       << ",\"new_handle\":" << (lineId.isNull() ? std::string("null") : njsonStr(handleOfId(lineId)))
-      << ",\"staged_rolled_back\":true,\"errorstatus\":" << static_cast<int>(es)
-      << "},\"status\":\"" << (es == Acad::eOk ? "ok" : "error") << "\"}";
+      << ",\"staged_committed\":" << (commitEs == Acad::eOk ? "true" : "false")
+      << ",\"mutation_errorstatus\":" << static_cast<int>(es)
+      << ",\"commit_errorstatus\":" << static_cast<int>(commitEs)
+      << "},\"status\":\"" << (commitEs == Acad::eOk ? "ok" : "error") << "\"}";
     return true;
 }
 
 static bool m08eHandleInsertBlock(const AriadneJobCtx& ctx, std::ostringstream& r)
 {
     std::string name;
-    if (!jsonFindString(ctx.job, "name", name) || name.empty()) name = "ARIADNE_M08CDEF_BLOCK";
+    if (!m08eFindStringArg(ctx.job, "name", name) || name.empty()) name = "ARIADNE_M08CDEF_BLOCK";
     AriadneStagedWriteTransaction wt(ctx.pDb);
     AcDbBlockTable* pBT = nullptr;
     Acad::ErrorStatus es = ctx.pDb->getBlockTable(pBT, AcDb::kForWrite);
@@ -509,11 +702,14 @@ static bool m08eHandleInsertBlock(const AriadneJobCtx& ctx, std::ostringstream& 
         if (es == Acad::eOk) pNew->close(); else delete pNew;
         pBT->close();
     }
+    const Acad::ErrorStatus commitEs = m08eCommit(wt, es);
     r << "\"result\":{\"block_name\":" << njsonStr(name)
-      << ",\"created_block_record\":" << (es == Acad::eOk ? "true" : "false")
+      << ",\"created_block_record\":" << (commitEs == Acad::eOk ? "true" : "false")
       << ",\"block_handle\":" << (btrId.isNull() ? std::string("null") : njsonStr(handleOfId(btrId)))
-      << ",\"staged_rolled_back\":true,\"errorstatus\":" << static_cast<int>(es)
-      << "},\"status\":\"" << (es == Acad::eOk ? "ok" : "error") << "\"}";
+      << ",\"staged_committed\":" << (commitEs == Acad::eOk ? "true" : "false")
+      << ",\"mutation_errorstatus\":" << static_cast<int>(es)
+      << ",\"commit_errorstatus\":" << static_cast<int>(commitEs)
+      << "},\"status\":\"" << (commitEs == Acad::eOk ? "ok" : "error") << "\"}";
     return true;
 }
 
@@ -549,11 +745,14 @@ static bool m08eHandleDeepClone(const AriadneJobCtx& ctx, std::ostringstream& r)
                 cloneHandle = handleOfId(pair.value());
         }
     }
+    const Acad::ErrorStatus commitEs = m08eCommit(wt, es);
     r << "\"result\":{\"source_handle\":" << (firstId.isNull() ? std::string("null") : njsonStr(handleOfId(firstId)))
-      << ",\"cloned\":" << (cloned ? "true" : "false")
+      << ",\"cloned\":" << ((cloned && commitEs == Acad::eOk) ? "true" : "false")
       << ",\"clone_handle\":" << (cloneHandle.empty() ? std::string("null") : njsonStr(cloneHandle))
-      << ",\"staged_rolled_back\":true,\"errorstatus\":" << static_cast<int>(es)
-      << "},\"status\":\"" << (cloned ? "ok" : "error") << "\"}";
+      << ",\"staged_committed\":" << (commitEs == Acad::eOk ? "true" : "false")
+      << ",\"mutation_errorstatus\":" << static_cast<int>(es)
+      << ",\"commit_errorstatus\":" << static_cast<int>(commitEs)
+      << "},\"status\":\"" << ((cloned && commitEs == Acad::eOk) ? "ok" : "error") << "\"}";
     return true;
 }
 

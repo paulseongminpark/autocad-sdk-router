@@ -230,6 +230,8 @@ static bool m08kcHasOp(const std::string& op)
         op == "config.assocmanager.evalDisabler" ||
         op == "config.assoceval.callback" ||
         op == "config.constraint.globalCallback" ||
+        op == "edit.assocdata.xref" ||
+        op == "repair.assocdata.audit" ||
         // dependencies (create / attach / subent) (5)
         op == "define.assocdependency.attach" ||
         op == "define.assocgeomdependency.subent" ||
@@ -293,6 +295,84 @@ static bool m08kcDispatch(const std::string& op, const AriadneJobCtx& ctx, std::
           << ",\"do_not_check_newly_added_constraints\":" << (doNotCheck ? "true" : "false")
           << ",\"mutation_allowed\":false"
           << ",\"evaluated\":false},\"status\":\"ok\"}";
+        return true;
+    }
+    if (op == "edit.assocdata.xref") {
+        AriadneDocumentWriteLock lock;
+        AriadneStagedWriteTransaction wt(pDb);
+        int xrefsBefore = 0, xrefsAfter = 0;
+        std::string namesBefore, namesAfter;
+        listXrefs(pDb, xrefsBefore, namesBefore);
+        const AcDbObjectId netIdBefore = m08kcTopNetworkId(pDb, false);
+        int actionCountBefore = 0, actionCountAfter = 0;
+        if (!netIdBefore.isNull()) {
+            AcDbAssocNetwork* pNet = nullptr;
+            if (acdbOpenObject(pNet, netIdBefore, AcDb::kForRead) == Acad::eOk && pNet != nullptr) {
+                actionCountBefore = pNet->getActions().length();
+                pNet->close();
+            }
+        }
+        AcDbAssocManager::markSyncUpWithXrefsNeeded(pDb);
+        const Acad::ErrorStatus es = AcDbAssocManager::syncUpWithXrefs(pDb);
+        listXrefs(pDb, xrefsAfter, namesAfter);
+        const AcDbObjectId netIdAfter = m08kcTopNetworkId(pDb, false);
+        if (!netIdAfter.isNull()) {
+            AcDbAssocNetwork* pNet = nullptr;
+            if (acdbOpenObject(pNet, netIdAfter, AcDb::kForRead) == Acad::eOk && pNet != nullptr) {
+                actionCountAfter = pNet->getActions().length();
+                pNet->close();
+            }
+        }
+        const Acad::ErrorStatus commitEs = (es == Acad::eOk) ? wt.commit() : es;
+        r << "\"result\":{\"marked_for_sync\":true"
+          << ",\"xref_count_before\":" << xrefsBefore
+          << ",\"xref_count_after\":" << xrefsAfter
+          << ",\"xrefs_before\":" << namesBefore
+          << ",\"xrefs_after\":" << namesAfter
+          << ",\"network_present_before\":" << (netIdBefore.isNull() ? "false" : "true")
+          << ",\"network_present_after\":" << (netIdAfter.isNull() ? "false" : "true")
+          << ",\"action_count_before\":" << actionCountBefore
+          << ",\"action_count_after\":" << actionCountAfter
+          << ",\"staged_committed\":" << (commitEs == Acad::eOk ? "true" : "false")
+          << ",\"mutation_errorstatus\":" << static_cast<int>(es)
+          << ",\"commit_errorstatus\":" << static_cast<int>(commitEs)
+          << "},\"status\":\"" << (commitEs == Acad::eOk ? "ok" : "error") << "\"}";
+        return true;
+    }
+    if (op == "repair.assocdata.audit") {
+        double traverseRaw = 1.0;
+        jsonFindNumber(job, "traverse_whole_database", traverseRaw);
+        const bool traverseWholeDatabase = (traverseRaw != 0.0);
+        AriadneDocumentWriteLock lock;
+        AriadneStagedWriteTransaction wt(pDb);
+        const AcDbObjectId netIdBefore = m08kcTopNetworkId(pDb, false);
+        int actionCountBefore = 0, actionCountAfter = 0;
+        if (!netIdBefore.isNull()) {
+            AcDbAssocNetwork* pNet = nullptr;
+            if (acdbOpenObject(pNet, netIdBefore, AcDb::kForRead) == Acad::eOk && pNet != nullptr) {
+                actionCountBefore = pNet->getActions().length();
+                pNet->close();
+            }
+        }
+        const Acad::ErrorStatus es = AcDbAssocManager::auditAssociativeData(pDb, traverseWholeDatabase);
+        const AcDbObjectId netIdAfter = m08kcTopNetworkId(pDb, false);
+        if (!netIdAfter.isNull()) {
+            AcDbAssocNetwork* pNet = nullptr;
+            if (acdbOpenObject(pNet, netIdAfter, AcDb::kForRead) == Acad::eOk && pNet != nullptr) {
+                actionCountAfter = pNet->getActions().length();
+                pNet->close();
+            }
+        }
+        const Acad::ErrorStatus commitEs = (es == Acad::eOk) ? wt.commit() : es;
+        r << "\"result\":{\"traverse_whole_database\":" << (traverseWholeDatabase ? "true" : "false")
+          << ",\"network_present_before\":" << (netIdBefore.isNull() ? "false" : "true")
+          << ",\"network_present_after\":" << (netIdAfter.isNull() ? "false" : "true")
+          << ",\"action_count_before\":" << actionCountBefore
+          << ",\"action_count_after\":" << actionCountAfter
+          << ",\"staged_committed\":" << (commitEs == Acad::eOk ? "true" : "false")
+          << ",\"mutation_errorstatus\":" << static_cast<int>(es)
+          << ",\"commit_errorstatus\":" << static_cast<int>(commitEs)
+          << "},\"status\":\"" << (commitEs == Acad::eOk ? "ok" : "error") << "\"}";
         return true;
     }
 

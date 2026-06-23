@@ -571,37 +571,56 @@ def _resolve_native_write_op(patch: Dict[str, Any]) -> Tuple[Optional[Dict[str, 
              "native_op": native_op, "args": op.get("args", {}) or {}}, None)
 
 
-def _native_job_doc(native_op: str, args: Dict[str, Any]) -> Dict[str, Any]:
-    """Build a minimal ariadne.cad_job.v2 doc for the native write op.
+def _native_point_like(value: Any) -> Any:
+    """Normalize [x,y,z] / (x,y,z) to {x,y,z}; leave dict/scalars untouched."""
+    if isinstance(value, (list, tuple)) and len(value) >= 2:
+        return {
+            "x": value[0],
+            "y": value[1],
+            "z": value[2] if len(value) >= 3 else 0,
+        }
+    return value
 
-    The native ObjectARX job reads its args (start/end, center/radius, name/
-    color_index, point) from this JobPath JSON. We pass through only the keys the
-    op declares (per cad_job.v2 allOf rules); extra keys are harmless but omitted.
+
+
+def _native_job_doc(native_op: str, args: Dict[str, Any]) -> Dict[str, Any]:
+    """Build an ariadne.cad_job.v2 doc for a native staged-write op.
+
+    Compatibility rule: many native handlers still read top-level JSON keys
+    (`start`, `end`, `handle`, `layer`, ...), while newer family handlers also
+    accept `args.<key>`. Emit BOTH so the staged executor can drive any native
+    op without bespoke per-op JSON shaping.
     """
+    payload: Dict[str, Any] = dict(args or {})
+    if native_op == "write.entity.line":
+        if "start" in payload:
+            payload["start"] = _native_point_like(payload["start"])
+        if "end" in payload:
+            payload["end"] = _native_point_like(payload["end"])
+    elif native_op == "write.entity.circle":
+        if "center" in payload:
+            payload["center"] = _native_point_like(payload["center"])
+    elif native_op == "write.layer.create":
+        name = payload.get("name") or payload.get("layer")
+        if name is not None:
+            payload["name"] = name
+
     job: Dict[str, Any] = {
         "schema": "ariadne.autocad_sdk_job.v2",
         "operation": native_op,
         "write_mode": "write_copy",
-        "policy": {"write_mode": "write_copy", "require_staged_copy": True,
-                   "save": True, "lock_document": True},
+        "policy": {
+            "write_mode": "write_copy",
+            "require_staged_copy": True,
+            "save": True,
+            "lock_document": True,
+        },
         "source_agent": "patch_engine",
-        "args": {},
+        "args": dict(payload),
     }
-    if native_op == "write.entity.line":
-        for k in ("start", "end", "layer"):
-            if k in args:
-                job["args"][k] = args[k]
-    elif native_op == "write.entity.circle":
-        for k in ("center", "radius", "layer"):
-            if k in args:
-                job["args"][k] = args[k]
-    elif native_op == "write.layer.create":
-        # set_layer/create_layer -> ensure the target layer exists.
-        name = args.get("name") or args.get("layer")
-        if name is not None:
-            job["args"]["name"] = name
-        if "color_index" in args:
-            job["args"]["color_index"] = args["color_index"]
+    for key, value in payload.items():
+        if key not in job:
+            job[key] = value
     return job
 
 
@@ -719,6 +738,344 @@ def _result_envelope(status: str, *, patch_id, out_dir, journal_path,
     if extra:
         env.update(extra)
     return env
+
+
+def apply_native_staged(native_op: str, args: Dict[str, Any], dwg_path: str,
+                        out_dir: str, *, request_id: Optional[str] = None,
+                        request_title: Optional[str] = None) -> Dict[str, Any]:
+    """Run one native mutation op through the full staged-copy evidence path.
+
+    This is the generic staged-write governor for native ObjectARX operations
+    that are already implemented in the registry. It never targets the original
+    DWG: stage copy -> pre inspect -> native write_copy op -> post inspect ->
+    diff -> validate -> journal -> original-hash proof.
+    """
+    os.makedirs(out_dir, exist_ok=True)
+    request_id = request_id or (native_op or "native-op") + "-" + _ts()
+    journal: Dict[str, Any] = {
+        "schema": "ariadne.native_staged_operation.journal.v1",
+        "patch_id": request_id,
+        "started_at": _now_iso(),
+        "out_dir": out_dir,
+        "native_operation": native_op,
+        "steps": [],
+    }
+    artifacts: List[Dict[str, Any]] = []
+    journal_path = os.path.join(out_dir, "journal.json")
+    result_path = os.path.join(out_dir, "result.json")
+
+    def _step(name: str, status: str, **fields):
+        rec = {"step": name, "status": status, "at": _now_iso()}
+        rec.update(fields)
+        journal["steps"].append(rec)
+        return rec
+
+    def _finish(env: Dict[str, Any]) -> Dict[str, Any]:
+        journal["finished_at"] = _now_iso()
+        journal["result_status"] = env["status"]
+        _write_json(journal_path, journal)
+        _write_json(result_path, env)
+        return env
+
+    request_doc = {
+        "schema": "ariadne.native_staged_operation.request.v1",
+        "request_id": request_id,
+        "title": request_title or native_op,
+        "operation": native_op,
+        "args": args or {},
+        "source_dwg": dwg_path,
+        "policy": {
+            "staged_copy": True,
+            "write_mode": "write_copy",
+            "allow_original_write": False,
+        },
+    }
+    request_json_path = os.path.join(out_dir, "native_operation.json")
+    try:
+        _write_json(request_json_path, request_doc)
+        artifacts.append({"kind": "native_request", "ref": request_json_path})
+    except OSError:
+        pass
+
+    if not native_op:
+        _step("registry_check", "blocked", reason="native_op missing")
+        return _finish(_result_envelope(
+            "blocked", patch_id=request_id, out_dir=out_dir,
+            journal_path=journal_path, artifacts=artifacts,
+            original_unchanged=None, reason="native_op missing",
+            extra={"native_operation": native_op}))
+
+    registry_status = _registry_status(native_op)
+    if registry_status == "blocked":
+        reason = "registry status blocked for native op %s" % native_op
+        _step("registry_check", "blocked", registry_status=registry_status, reason=reason)
+        return _finish(_result_envelope(
+            "blocked", patch_id=request_id, out_dir=out_dir,
+            journal_path=journal_path, artifacts=artifacts,
+            original_unchanged=None, reason=reason,
+            extra={"native_operation": native_op, "registry_status": registry_status}))
+    if registry_status == "deprecated":
+        reason = "registry status deprecated for native op %s" % native_op
+        _step("registry_check", "deprecated", registry_status=registry_status, reason=reason)
+        return _finish(_result_envelope(
+            "deprecated", patch_id=request_id, out_dir=out_dir,
+            journal_path=journal_path, artifacts=artifacts,
+            original_unchanged=None, reason=reason,
+            extra={"native_operation": native_op, "registry_status": registry_status}))
+    if registry_status not in {"implemented", "wired"}:
+        reason = "native op %s not runnable in registry (status=%r)" % (native_op, registry_status)
+        _step("registry_check", "not_implemented", registry_status=registry_status, reason=reason)
+        return _finish(_result_envelope(
+            "not_implemented", patch_id=request_id, out_dir=out_dir,
+            journal_path=journal_path, artifacts=artifacts,
+            original_unchanged=None, reason=reason,
+            extra={"native_operation": native_op, "registry_status": registry_status}))
+    _step("registry_check", "pass", registry_status=registry_status)
+
+    ir_builder, ir_err = _import_optional("ir_builder")
+    if ir_builder is None or not hasattr(ir_builder, "build_ir_from_database_graph"):
+        _step("import_ir_builder", "not_implemented", reason=ir_err)
+        return _finish(_result_envelope(
+            "not_implemented", patch_id=request_id, out_dir=out_dir,
+            journal_path=journal_path, artifacts=artifacts,
+            original_unchanged=None,
+            reason="ir_builder.build_ir_from_database_graph unavailable: %s" % ir_err,
+            extra={"native_operation": native_op, "registry_status": registry_status}))
+    run_job, runjob_err = _import_optional("run_job")
+    if run_job is None or not hasattr(run_job, "run_router_cad_job"):
+        _step("import_run_job", "not_implemented", reason=runjob_err)
+        return _finish(_result_envelope(
+            "not_implemented", patch_id=request_id, out_dir=out_dir,
+            journal_path=journal_path, artifacts=artifacts,
+            original_unchanged=None,
+            reason="run_job.run_router_cad_job unavailable: %s" % runjob_err,
+            extra={"native_operation": native_op, "registry_status": registry_status}))
+
+    staged = create_staged_copy(dwg_path, out_dir)
+    if not staged["ok"]:
+        _step("create_staged_copy", "blocked", reason=staged.get("reason"))
+        return _finish(_result_envelope(
+            "blocked", patch_id=request_id, out_dir=out_dir,
+            journal_path=journal_path, artifacts=artifacts,
+            original_unchanged=None, reason=staged.get("reason"),
+            extra={"native_operation": native_op, "registry_status": registry_status}))
+    staged_path = staged["staged_path"]
+    original_path = staged["original_path"]
+    original_sha_before = staged["original_sha256"]
+    artifacts.append({"kind": "dwg_staged", "ref": staged_path})
+    _step("create_staged_copy", "pass", staged_path=staged_path,
+          original_path=original_path, original_sha256_before=original_sha_before,
+          original_byte_size=staged.get("original_byte_size"))
+
+    def _original_unchanged() -> Dict[str, Any]:
+        after = _sha256_file(original_path) if original_path else None
+        return {
+            "original_path": original_path,
+            "sha256_before": original_sha_before,
+            "sha256_after": after,
+            "unchanged": (original_sha_before is not None and after == original_sha_before),
+        }
+
+    pre_dir = os.path.join(out_dir, "pre")
+    pre_run = run_job.run_router_cad_job(
+        staged_path, pre_dir, "inspect.database.graph", write_mode="read")
+    pre_ir_path = os.path.join(pre_dir, "dwg_graph_ir.json")
+    pre = _native_full_ir(ir_builder, pre_run, staged_path, original_path,
+                          pre_ir_path, "pre")
+    _step("pre_inspect", "pass" if pre["ok"] else "partial",
+          ir_path=pre.get("ir_path"), entity_count=pre.get("entity_count"),
+          exit_code=pre.get("exit_code"), stdout=pre.get("stdout"),
+          stderr=pre.get("stderr"), reason=pre.get("reason"))
+    if not pre["ok"]:
+        status = "unavailable" if pre_run.get("error") else "partial"
+        return _finish(_result_envelope(
+            status, patch_id=request_id, out_dir=out_dir,
+            journal_path=journal_path, artifacts=artifacts,
+            original_unchanged=_original_unchanged(),
+            reason="pre-inspect failed: %s" % pre.get("reason"),
+            extra={"native_operation": native_op, "registry_status": registry_status}))
+    artifacts.append({"kind": "ir", "ref": pre["ir_path"]})
+
+    apply_dir = os.path.join(out_dir, "apply")
+    os.makedirs(apply_dir, exist_ok=True)
+    job_doc = _native_job_doc(native_op, args or {})
+    job_path = os.path.join(apply_dir, "cad_job.json")
+    _write_json(job_path, job_doc)
+    try:
+        _write_json(os.path.join(out_dir, "cad_job.json"), job_doc)
+    except OSError:
+        pass
+    apply_run = run_job.run_router_cad_job(
+        staged_path, apply_dir, native_op, write_mode="write_copy", job_path=job_path)
+    mutated = apply_run.get("staged_used")
+    staged_output = os.path.join(out_dir, "staged_output.dwg")
+    apply_ok = False
+    if mutated and os.path.isfile(mutated):
+        try:
+            shutil.copy2(mutated, staged_output)
+            apply_ok = True
+        except OSError as exc:
+            _step("apply", "partial",
+                  reason="failed to capture staged_output: %s" % exc,
+                  staged_used=mutated, exit_code=apply_run.get("exit_code"))
+    root_result_json = os.path.join(out_dir, "cad_result.json")
+    src_result_json = apply_run.get("result_json")
+    if src_result_json and os.path.isfile(src_result_json):
+        try:
+            shutil.copy2(src_result_json, root_result_json)
+        except OSError:
+            pass
+
+    if not apply_ok:
+        reason = (apply_run.get("error")
+                  or "native write op returned no mutated staged copy (staged_used=%r)" % mutated)
+        _step("apply", "unavailable" if apply_run.get("error") else "partial",
+              native_op=native_op, staged_used=mutated,
+              exit_code=apply_run.get("exit_code"),
+              stdout=apply_run.get("stdout_path"), stderr=apply_run.get("stderr_path"),
+              reason=reason)
+        status = "unavailable" if apply_run.get("error") else "partial"
+        return _finish(_result_envelope(
+            status, patch_id=request_id, out_dir=out_dir,
+            journal_path=journal_path, artifacts=artifacts,
+            original_unchanged=_original_unchanged(),
+            reason="apply failed: %s" % reason,
+            extra={"native_operation": native_op, "registry_status": registry_status}))
+    artifacts.append({"kind": "dwg_staged", "ref": staged_output})
+    _step("apply", "pass", native_op=native_op,
+          staged_output=staged_output, staged_used=mutated,
+          exit_code=apply_run.get("exit_code"),
+          stdout=apply_run.get("stdout_path"), stderr=apply_run.get("stderr_path"))
+
+    post_dir = os.path.join(out_dir, "post")
+    post_run = run_job.run_router_cad_job(
+        staged_output, post_dir, "inspect.database.graph", write_mode="read")
+    post_ir_path = os.path.join(post_dir, "dwg_graph_ir.json")
+    post = _native_full_ir(ir_builder, post_run, staged_output, original_path,
+                           post_ir_path, "post")
+    _step("post_inspect", "pass" if post["ok"] else "partial",
+          ir_path=post.get("ir_path"), entity_count=post.get("entity_count"),
+          exit_code=post.get("exit_code"), stdout=post.get("stdout"),
+          stderr=post.get("stderr"), reason=post.get("reason"))
+    if not post["ok"]:
+        status = "unavailable" if post_run.get("error") else "partial"
+        return _finish(_result_envelope(
+            status, patch_id=request_id, out_dir=out_dir,
+            journal_path=journal_path, artifacts=artifacts,
+            original_unchanged=_original_unchanged(),
+            reason="post-inspect failed: %s" % post.get("reason"),
+            extra={"native_operation": native_op, "registry_status": registry_status}))
+    artifacts.append({"kind": "ir", "ref": post["ir_path"]})
+    try:
+        shutil.copy2(post["ir_path"], os.path.join(out_dir, "dwg_graph_ir.json"))
+    except OSError:
+        pass
+
+    diff_path = os.path.join(out_dir, "cad_diff.json")
+    diff_summary = None
+    cad_diff_mod, diff_err = _import_optional("cad_diff")
+    if cad_diff_mod is None or not hasattr(cad_diff_mod, "compute_diff"):
+        _step("compute_diff", "not_implemented", reason=diff_err)
+        return _finish(_result_envelope(
+            "partial", patch_id=request_id, out_dir=out_dir,
+            journal_path=journal_path, artifacts=artifacts,
+            original_unchanged=_original_unchanged(),
+            reason="cad_diff sibling unavailable: %s" % diff_err,
+            extra={
+                "native_operation": native_op,
+                "registry_status": registry_status,
+                "pre_ir": pre["ir_path"],
+                "post_ir": post["ir_path"],
+                "staged_output": staged_output,
+            }))
+    try:
+        pre_ir = _load_json_bom(pre["ir_path"])
+        post_ir = _load_json_bom(post["ir_path"])
+        diff = cad_diff_mod.compute_diff(pre_ir, post_ir)
+        _write_json(diff_path, diff)
+        diff_summary = (diff or {}).get("summary")
+        artifacts.append({"kind": "diff", "ref": diff_path})
+        _step("compute_diff", "pass", diff_path=diff_path, summary=diff_summary)
+    except Exception as exc:
+        _step("compute_diff", "partial",
+              reason="compute_diff failed: %s: %s" % (type(exc).__name__, exc))
+        return _finish(_result_envelope(
+            "partial", patch_id=request_id, out_dir=out_dir,
+            journal_path=journal_path, artifacts=artifacts,
+            original_unchanged=_original_unchanged(),
+            reason="compute_diff failed: %s: %s" % (type(exc).__name__, exc),
+            extra={"native_operation": native_op, "registry_status": registry_status}))
+
+    _oc = _original_unchanged()
+    journal["original_unchanged"] = _oc
+    journal["original"] = {
+        "original_path": _oc.get("original_path"),
+        "sha256_before": _oc.get("sha256_before"),
+        "sha256_after": _oc.get("sha256_after"),
+    }
+    _write_json(journal_path, journal)
+
+    validation_status = None
+    validator_mod, val_err = _import_optional("validator")
+    if validator_mod is None or not hasattr(validator_mod, "validate_target"):
+        _step("validate", "not_implemented", reason=val_err)
+        return _finish(_result_envelope(
+            "partial", patch_id=request_id, out_dir=out_dir,
+            journal_path=journal_path, artifacts=artifacts,
+            original_unchanged=_original_unchanged(),
+            reason="validator sibling unavailable: %s" % val_err,
+            diff_summary=diff_summary,
+            extra={"native_operation": native_op, "registry_status": registry_status}))
+    val = _call_validator(validator_mod, diff_path, out_dir, None, ir_path=post["ir_path"])
+    if val["ok"]:
+        report = val["report"]
+        validation_status = (report or {}).get("status")
+        report_path = os.path.join(out_dir, "validation_report.json")
+        _write_json(report_path, report)
+        artifacts.append({"kind": "validation_report", "ref": report_path})
+        _step("validate", "pass", report=report_path,
+              validation_status=validation_status,
+              passed_kwargs=val.get("passed_kwargs"),
+              diff_aware=val.get("diff_aware"))
+    else:
+        _step("validate", "partial", reason=val.get("reason"),
+              passed_kwargs=val.get("passed_kwargs"))
+        return _finish(_result_envelope(
+            "partial", patch_id=request_id, out_dir=out_dir,
+            journal_path=journal_path, artifacts=artifacts,
+            original_unchanged=_original_unchanged(),
+            reason=val.get("reason"), diff_summary=diff_summary,
+            extra={"native_operation": native_op, "registry_status": registry_status}))
+
+    orig_proof = _original_unchanged()
+    if not orig_proof["unchanged"]:
+        _step("original_unchanged_proof", "fail", proof=orig_proof)
+        return _finish(_result_envelope(
+            "blocked", patch_id=request_id, out_dir=out_dir,
+            journal_path=journal_path, artifacts=artifacts,
+            original_unchanged=orig_proof,
+            reason="original DWG changed during staged native op (sha256 before != after)",
+            diff_summary=diff_summary, validation_status=validation_status,
+            extra={"native_operation": native_op, "registry_status": registry_status}))
+    _step("original_unchanged_proof", "pass", proof=orig_proof)
+
+    return _finish(_result_envelope(
+        "ok", patch_id=request_id, out_dir=out_dir,
+        journal_path=journal_path, artifacts=artifacts,
+        original_unchanged=orig_proof,
+        diff_summary=diff_summary, validation_status=validation_status,
+        extra={
+            "native_operation": native_op,
+            "native_args": args or {},
+            "registry_status": registry_status,
+            "request": request_json_path,
+            "pre_ir": pre["ir_path"],
+            "post_ir": post["ir_path"],
+            "staged_output": staged_output,
+            "diff": diff_path,
+            "entity_count_before": pre.get("entity_count"),
+            "entity_count_after": post.get("entity_count"),
+        }))
 
 
 def apply_staged(patch: Dict[str, Any], dwg_path: str, out_dir: str) -> Dict[str, Any]:

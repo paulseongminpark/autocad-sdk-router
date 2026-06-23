@@ -147,6 +147,28 @@ function Get-CadJobJigPointLine {
 
 function Test-NativeP1CadJobOperation {
   param([string]$OperationName)
+  if ([string]::IsNullOrWhiteSpace($OperationName)) { return $false }
+
+  # WAVE4X: any implemented registry op explicitly bound to ARIADNE_NATIVE_JOB is
+  # a native cad-job surface, even if it landed after the original fixed P1 list.
+  try {
+    $registryPath = Join-Path $RouterHome 'config\operations.v2.json'
+    $registry = Read-JsonFile -Path $registryPath
+    $record = @($registry.operations | Where-Object {
+      "$($_.id)" -eq $OperationName -or "$($_.operation)" -eq $OperationName
+    } | Select-Object -First 1)
+    if ($record) {
+      $status = "$($record.status)"
+      $lane = if ($record.handler) { "$($record.handler.router_lane)" } else { '' }
+      if ((@('implemented', 'wired') -contains $status) -and $lane -eq 'ARIADNE_NATIVE_JOB') {
+        return $true
+      }
+    }
+  }
+  catch {
+    # Fall through to the frozen explicit allow-list below.
+  }
+
   return @(
     'inspect.database.summary',
     'inspect.database.graph',
