@@ -1,0 +1,9 @@
+﻿{
+    "schema":  "wave4x.loader_doc_r2.native_build.v1",
+    "started_at":  "2026-06-24T00:43:30.4531422+09:00",
+    "finished_at":  "2026-06-24T00:43:42.3188486+09:00",
+    "command":  "tools\\build_native_acad.ps1",
+    "exit_code":  0,
+    "isolated_output_only":  true,
+    "canonical_deploy":  false
+}

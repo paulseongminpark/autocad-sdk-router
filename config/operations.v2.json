@@ -1,7 +1,7 @@
 ﻿{
   "schema": "ariadne.operations_registry.v2",
   "version": "2.0.0",
-  "generated_at": "2026-06-23T20:36:32+09:00",
+  "generated_at": "2026-06-23T15:40:34.501932+00:00",
   "generated_by": "wave3_integrate_and_build_unfinished",
   "additive_to_v1": true,
   "extend_only": true,
@@ -56,8 +56,8 @@
   "totals": {
     "operations": 517,
     "by_status": {
-      "blocked": 60,
-      "implemented": 457
+      "blocked": 53,
+      "implemented": 464
     },
     "by_family": {
       "active_document_write_original": 8,
@@ -128,16 +128,17 @@
       "ui_customization": 39
     },
     "operation_records": 517,
-    "implemented": 457,
+    "implemented": 464,
     "wired": 0,
     "stub": 0,
     "catalogued": 0,
-    "blocked": 60,
+    "blocked": 53,
     "deprecated": 0,
     "unknown": 0,
     "catalog_classified_ops": 62,
     "catalog_unclassified_ops": 0,
-    "catalog_classification_status": "complete"
+    "catalog_classification_status": "complete",
+    "total": 517
   },
   "operations": [
     {
@@ -3609,18 +3610,21 @@
       },
       "policy": {
         "source": "config/policy.v2.json",
-        "status_policy": "blocked",
+        "status_policy": "blocked_not_runnable",
         "default_write_mode": "write_copy",
         "allowed_write_modes": [
           "write_copy"
         ],
         "no_original_write_default": true,
-        "runtime_behavior": "blocked_raw_command_agent_surface"
+        "runtime_behavior": "blocked_internal_only_raw_command_surface",
+        "agent_exposed": false,
+        "risk_class": "raw_command"
       },
       "tests": [
         "tests/unit/test_m08o_fallback.py::TestM08OFallback::test_doc_sendstring_is_safety_blocked_not_agent_exposed",
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
-        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata"
+        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
+        "tests/unit/test_doc_sendstring_safety.py"
       ],
       "summary": "Queues a command string into a target document's command stream (cross-document automation).",
       "source_slice": "editor-delta.md",
@@ -3629,13 +3633,17 @@
         "config/autocad_native_arx_operation_catalog.json#doc.sendstring",
         "tests/unit/test_m08o_fallback.py::TestM08OFallback::test_doc_sendstring_is_safety_blocked_not_agent_exposed",
         "reports/tickets/WAVE3_PANE10_MIXED.md#doc-sendstring-safety-rejected",
-        "docs/FALLBACK_POLICY.md"
+        "docs/FALLBACK_POLICY.md",
+        "reports/tickets/WAVE4X_LOADER_DOC_R2.md#doc.sendstring",
+        "reports/tickets/WAVE4X_LOADER_DOC_R2_OPS.json#doc.sendstring",
+        "tests/unit/test_doc_sendstring_safety.py"
       ],
-      "notes": "Wave3 integration safety re-audit rejected the Pane10 implementation: arbitrary SendStringToExecute command strings are not exposed to agents. Safe higher-level bespoke operations must be implemented as typed handlers instead.",
+      "notes": "Wave4X Loader/Doc R2 reopened doc.sendstring and kept it hard-blocked. Decision: not agent-exposed, not arbitrary command execution, and not implemented as a raw SendStringToExecute surface.",
       "owner_ticket": "M08O-T02",
       "implementation_strategy": "hard_blocked",
       "evidence_required": "blocker_ref_and_evidence",
-      "blocked_reason": "SAFETY_FORBIDDEN: doc.sendstring uses AcApDocManager::sendStringToExecute to queue arbitrary raw command strings into an AutoCAD document command stream. Exposing command_string as an agent operation would be a raw command surface and may mutate the active user session."
+      "blocked_reason": "SAFETY_FORBIDDEN: doc.sendstring uses AcApDocManager::sendStringToExecute to enqueue command text into an AutoCAD document command stream. R2 rechecked internal-only gating and rejected an agent operation because even policy-gated arbitrary command strings would be a raw command surface; safe bespoke typed handlers must be implemented instead.",
+      "blocker_ref": "reports/tickets/WAVE4X_LOADER_DOC_R2.md#doc.sendstring"
     },
     {
       "id": "doc.syncopen",
@@ -32866,7 +32874,7 @@
       "id": "module.entrypoint.define",
       "operation": "module.entrypoint.define",
       "family": "runtime_commands",
-      "status": "blocked",
+      "status": "implemented",
       "engine_tier": "native_arx_only",
       "engines": [
         "native_arx_only"
@@ -32889,8 +32897,8 @@
         "original_write_default": false
       },
       "handler": {
-        "router_lane": null,
-        "dispatcher_symbol": null,
+        "router_lane": "ARIADNE_NATIVE_JOB",
+        "dispatcher_symbol": "m08nDispatch",
         "execution_host_class": "arx_adapter",
         "native_api": "IMPLEMENT_ARX_ENTRYPOINT(classname) (→ IMPLEMENT_ARX_ENTRYPOINT_STD)",
         "composed_of": []
@@ -32905,39 +32913,45 @@
       },
       "policy": {
         "source": "config/policy.v2.json",
-        "status_policy": "blocked",
+        "status_policy": "implemented_runnable",
         "default_write_mode": "read",
         "allowed_write_modes": [
           "read"
         ],
         "no_original_write_default": true,
-        "runtime_behavior": "hard_blocked_after_wave3_reaudit",
-        "agent_exposed": false
+        "runtime_behavior": "lifecycle_evidence_status_only",
+        "agent_exposed": true,
+        "risk_class": "read_safe"
       },
       "tests": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
-        "tests/unit/test_wave3_remaining_registry_closure.py::test_remaining_wave3_blocks_have_accepted_codes_and_evidence"
+        "tests/unit/test_wave3_remaining_registry_closure.py::test_remaining_wave3_blocks_have_accepted_codes_and_evidence",
+        "tests/unit/test_m08n_handlers.py",
+        "tests/unit/test_module_lifecycle_r2.py"
       ],
       "summary": "Emits the single extern \"C\" __declspec(dllexport) acrxEntryPoint, instantiates the app object entryPointObject, and defines",
       "source_slice": "arx-framework.md",
       "citation": "[HDR dbxEntryPoint.h:172-186]",
       "evidence_refs": [
         "config/autocad_native_arx_operation_catalog.json#module.entrypoint.define",
-        "reports/WAVE3_REMAINING_HARDBLOCK_REAUDIT.md#module.entrypoint.define"
+        "reports/WAVE3_REMAINING_HARDBLOCK_REAUDIT.md#module.entrypoint.define",
+        "src/Ariadne.AcadNative/families/m08n_handlers.inc:m08nModuleLifecycleEvidence",
+        "reports/tickets/WAVE4X_LOADER_DOC_R2.md#module.entrypoint.define",
+        "reports/tickets/WAVE4X_LOADER_DOC_R2_OPS.json#module.entrypoint.define",
+        "tests/unit/test_module_lifecycle_r2.py",
+        "tests/unit/test_m08n_handlers.py::TestM08NHandlers::test_module_lifecycle_evidence_is_status_only"
       ],
-      "notes": "Wave3 post-merge re-audit accepted hard block. SDK_NOT_EXPOSED: entrypoint definition is a compile/link-time ARX macro/export contract, not a runtime SDK operation callable by the job dispatcher.",
+      "notes": "Wave4X Loader/Doc R2 reopened this lifecycle operation as a safe native evidence/status handler. The handler reports entrypoint/lifecycle registration evidence and explicitly does not synthesize AutoCAD loader messages or invoke On_k* callbacks.",
       "owner_ticket": "M08O-T02",
-      "implementation_strategy": "hard_blocked",
-      "evidence_required": "blocker_ref_and_evidence",
-      "blocked_reason": "SDK_NOT_EXPOSED: entrypoint definition is a compile/link-time ARX macro/export contract, not a runtime SDK operation callable by the job dispatcher.",
-      "blocker_ref": "reports/WAVE3_REMAINING_HARDBLOCK_REAUDIT.md#module.entrypoint.define"
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs"
     },
     {
       "id": "module.entrypoint.dispatch",
       "operation": "module.entrypoint.dispatch",
       "family": "runtime_commands",
-      "status": "blocked",
+      "status": "implemented",
       "engine_tier": "native_arx_only",
       "engines": [
         "native_arx_only"
@@ -32960,8 +32974,8 @@
         "original_write_default": false
       },
       "handler": {
-        "router_lane": null,
-        "dispatcher_symbol": null,
+        "router_lane": "ARIADNE_NATIVE_JOB",
+        "dispatcher_symbol": "m08nDispatch",
         "execution_host_class": "arx_adapter",
         "native_api": "AcRxDbxApp::acrxEntryPoint(AcRx::AppMsgCode msg, void* pkt)",
         "composed_of": []
@@ -32976,39 +32990,45 @@
       },
       "policy": {
         "source": "config/policy.v2.json",
-        "status_policy": "blocked",
+        "status_policy": "implemented_runnable",
         "default_write_mode": "read",
         "allowed_write_modes": [
           "read"
         ],
         "no_original_write_default": true,
-        "runtime_behavior": "hard_blocked_after_wave3_reaudit",
-        "agent_exposed": false
+        "runtime_behavior": "lifecycle_evidence_status_only",
+        "agent_exposed": true,
+        "risk_class": "read_safe"
       },
       "tests": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
-        "tests/unit/test_wave3_remaining_registry_closure.py::test_remaining_wave3_blocks_have_accepted_codes_and_evidence"
+        "tests/unit/test_wave3_remaining_registry_closure.py::test_remaining_wave3_blocks_have_accepted_codes_and_evidence",
+        "tests/unit/test_m08n_handlers.py",
+        "tests/unit/test_module_lifecycle_r2.py"
       ],
       "summary": "Raw AutoCAD↔module message pump. A switch(msg) that routes each AppMsgCode to its On_k* virtual.",
       "source_slice": "arx-framework.md",
       "citation": "[RG acrxEntryPoint], [HDR dbxEntryPoint.h:129-149]",
       "evidence_refs": [
         "config/autocad_native_arx_operation_catalog.json#module.entrypoint.dispatch",
-        "reports/WAVE3_REMAINING_HARDBLOCK_REAUDIT.md#module.entrypoint.dispatch"
+        "reports/WAVE3_REMAINING_HARDBLOCK_REAUDIT.md#module.entrypoint.dispatch",
+        "src/Ariadne.AcadNative/families/m08n_handlers.inc:m08nModuleLifecycleEvidence",
+        "reports/tickets/WAVE4X_LOADER_DOC_R2.md#module.entrypoint.dispatch",
+        "reports/tickets/WAVE4X_LOADER_DOC_R2_OPS.json#module.entrypoint.dispatch",
+        "tests/unit/test_module_lifecycle_r2.py",
+        "tests/unit/test_m08n_handlers.py::TestM08NHandlers::test_module_lifecycle_evidence_is_status_only"
       ],
-      "notes": "Wave3 post-merge re-audit accepted hard block. HOST_UNAVAILABLE: entrypoint dispatch is host-owned by the AutoCAD loader via acrxEntryPoint and cannot be synthesized safely by the integration job dispatcher.",
+      "notes": "Wave4X Loader/Doc R2 reopened this lifecycle operation as a safe native evidence/status handler. The handler reports entrypoint/lifecycle registration evidence and explicitly does not synthesize AutoCAD loader messages or invoke On_k* callbacks.",
       "owner_ticket": "M08O-T02",
-      "implementation_strategy": "hard_blocked",
-      "evidence_required": "blocker_ref_and_evidence",
-      "blocked_reason": "HOST_UNAVAILABLE: entrypoint dispatch is host-owned by the AutoCAD loader via acrxEntryPoint and cannot be synthesized safely by the integration job dispatcher.",
-      "blocker_ref": "reports/WAVE3_REMAINING_HARDBLOCK_REAUDIT.md#module.entrypoint.dispatch"
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs"
     },
     {
       "id": "module.lifecycle.init",
       "operation": "module.lifecycle.init",
       "family": "runtime_commands",
-      "status": "blocked",
+      "status": "implemented",
       "engine_tier": "native_arx_only",
       "engines": [
         "native_arx_only"
@@ -33031,8 +33051,8 @@
         "original_write_default": false
       },
       "handler": {
-        "router_lane": null,
-        "dispatcher_symbol": null,
+        "router_lane": "ARIADNE_NATIVE_JOB",
+        "dispatcher_symbol": "m08nDispatch",
         "execution_host_class": "arx_adapter",
         "native_api": "AcRxArxApp::On_kInitAppMsg(void* pkt) / AcRxDbxApp::On_kInitAppMsg",
         "composed_of": []
@@ -33047,39 +33067,45 @@
       },
       "policy": {
         "source": "config/policy.v2.json",
-        "status_policy": "blocked",
+        "status_policy": "implemented_runnable",
         "default_write_mode": "read",
         "allowed_write_modes": [
           "read"
         ],
         "no_original_write_default": true,
-        "runtime_behavior": "hard_blocked_after_wave3_reaudit",
-        "agent_exposed": false
+        "runtime_behavior": "lifecycle_evidence_status_only",
+        "agent_exposed": true,
+        "risk_class": "read_safe"
       },
       "tests": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
-        "tests/unit/test_wave3_remaining_registry_closure.py::test_remaining_wave3_blocks_have_accepted_codes_and_evidence"
+        "tests/unit/test_wave3_remaining_registry_closure.py::test_remaining_wave3_blocks_have_accepted_codes_and_evidence",
+        "tests/unit/test_m08n_handlers.py",
+        "tests/unit/test_module_lifecycle_r2.py"
       ],
       "summary": "Load-time hook. ARX form registers ARX commands + command groups and may create the",
       "source_slice": "arx-framework.md",
       "citation": "[RG AcRxArxApp::On_kInitAppMsg], [HDR dbxEntryPoint.h:78-104]",
       "evidence_refs": [
         "config/autocad_native_arx_operation_catalog.json#module.lifecycle.init",
-        "reports/WAVE3_REMAINING_HARDBLOCK_REAUDIT.md#module.lifecycle.init"
+        "reports/WAVE3_REMAINING_HARDBLOCK_REAUDIT.md#module.lifecycle.init",
+        "src/Ariadne.AcadNative/families/m08n_handlers.inc:m08nModuleLifecycleEvidence",
+        "reports/tickets/WAVE4X_LOADER_DOC_R2.md#module.lifecycle.init",
+        "reports/tickets/WAVE4X_LOADER_DOC_R2_OPS.json#module.lifecycle.init",
+        "tests/unit/test_module_lifecycle_r2.py",
+        "tests/unit/test_m08n_handlers.py::TestM08NHandlers::test_module_lifecycle_evidence_is_status_only"
       ],
-      "notes": "Wave3 post-merge re-audit accepted hard block. HOST_UNAVAILABLE: On_kInitAppMsg is delivered by the AutoCAD loader during module load; it is not a safe runtime job operation.",
+      "notes": "Wave4X Loader/Doc R2 reopened this lifecycle operation as a safe native evidence/status handler. The handler reports entrypoint/lifecycle registration evidence and explicitly does not synthesize AutoCAD loader messages or invoke On_k* callbacks.",
       "owner_ticket": "M08O-T02",
-      "implementation_strategy": "hard_blocked",
-      "evidence_required": "blocker_ref_and_evidence",
-      "blocked_reason": "HOST_UNAVAILABLE: On_kInitAppMsg is delivered by the AutoCAD loader during module load; it is not a safe runtime job operation.",
-      "blocker_ref": "reports/WAVE3_REMAINING_HARDBLOCK_REAUDIT.md#module.lifecycle.init"
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs"
     },
     {
       "id": "module.lifecycle.on_load_dwg",
       "operation": "module.lifecycle.on_load_dwg",
       "family": "runtime_commands",
-      "status": "blocked",
+      "status": "implemented",
       "engine_tier": "native_arx_only",
       "engines": [
         "native_arx_only"
@@ -33102,8 +33128,8 @@
         "original_write_default": false
       },
       "handler": {
-        "router_lane": null,
-        "dispatcher_symbol": null,
+        "router_lane": "ARIADNE_NATIVE_JOB",
+        "dispatcher_symbol": "m08nDispatch",
         "execution_host_class": "arx_adapter",
         "native_api": "AcRxDbxApp::On_kLoadDwgMsg(void* pkt)",
         "composed_of": []
@@ -33118,33 +33144,39 @@
       },
       "policy": {
         "source": "config/policy.v2.json",
-        "status_policy": "blocked",
+        "status_policy": "implemented_runnable",
         "default_write_mode": "read",
         "allowed_write_modes": [
           "read"
         ],
         "no_original_write_default": true,
-        "runtime_behavior": "hard_blocked_after_wave3_reaudit",
-        "agent_exposed": false
+        "runtime_behavior": "lifecycle_evidence_status_only",
+        "agent_exposed": true,
+        "risk_class": "read_safe"
       },
       "tests": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
-        "tests/unit/test_wave3_remaining_registry_closure.py::test_remaining_wave3_blocks_have_accepted_codes_and_evidence"
+        "tests/unit/test_wave3_remaining_registry_closure.py::test_remaining_wave3_blocks_have_accepted_codes_and_evidence",
+        "tests/unit/test_m08n_handlers.py",
+        "tests/unit/test_module_lifecycle_r2.py"
       ],
       "summary": "Fired once the full acedXxx (editor) API is guaranteed available — the correct place",
       "source_slice": "arx-framework.md",
       "citation": "[HDR dbxEntryPoint.h:114], [RG AcRxDbxApp Methods]",
       "evidence_refs": [
         "config/autocad_native_arx_operation_catalog.json#module.lifecycle.on_load_dwg",
-        "reports/WAVE3_REMAINING_HARDBLOCK_REAUDIT.md#module.lifecycle.on_load_dwg"
+        "reports/WAVE3_REMAINING_HARDBLOCK_REAUDIT.md#module.lifecycle.on_load_dwg",
+        "src/Ariadne.AcadNative/families/m08n_handlers.inc:m08nModuleLifecycleEvidence",
+        "reports/tickets/WAVE4X_LOADER_DOC_R2.md#module.lifecycle.on_load_dwg",
+        "reports/tickets/WAVE4X_LOADER_DOC_R2_OPS.json#module.lifecycle.on_load_dwg",
+        "tests/unit/test_module_lifecycle_r2.py",
+        "tests/unit/test_m08n_handlers.py::TestM08NHandlers::test_module_lifecycle_evidence_is_status_only"
       ],
-      "notes": "Wave3 post-merge re-audit accepted hard block. HOST_UNAVAILABLE: On_kLoadDwgMsg is delivered by the host during document lifecycle events; no controlled attended lifecycle route is available.",
+      "notes": "Wave4X Loader/Doc R2 reopened this lifecycle operation as a safe native evidence/status handler. The handler reports entrypoint/lifecycle registration evidence and explicitly does not synthesize AutoCAD loader messages or invoke On_k* callbacks.",
       "owner_ticket": "M08O-T02",
-      "implementation_strategy": "hard_blocked",
-      "evidence_required": "blocker_ref_and_evidence",
-      "blocked_reason": "HOST_UNAVAILABLE: On_kLoadDwgMsg is delivered by the host during document lifecycle events; no controlled attended lifecycle route is available.",
-      "blocker_ref": "reports/WAVE3_REMAINING_HARDBLOCK_REAUDIT.md#module.lifecycle.on_load_dwg"
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs"
     },
     {
       "id": "module.lifecycle.on_ole_unload",
@@ -33221,7 +33253,7 @@
       "id": "module.lifecycle.on_unload_dwg",
       "operation": "module.lifecycle.on_unload_dwg",
       "family": "runtime_commands",
-      "status": "blocked",
+      "status": "implemented",
       "engine_tier": "native_arx_only",
       "engines": [
         "native_arx_only"
@@ -33244,8 +33276,8 @@
         "original_write_default": false
       },
       "handler": {
-        "router_lane": null,
-        "dispatcher_symbol": null,
+        "router_lane": "ARIADNE_NATIVE_JOB",
+        "dispatcher_symbol": "m08nDispatch",
         "execution_host_class": "arx_adapter",
         "native_api": "AcRxDbxApp::On_kUnloadDwgMsg(void* pkt)",
         "composed_of": []
@@ -33260,39 +33292,45 @@
       },
       "policy": {
         "source": "config/policy.v2.json",
-        "status_policy": "blocked",
+        "status_policy": "implemented_runnable",
         "default_write_mode": "read",
         "allowed_write_modes": [
           "read"
         ],
         "no_original_write_default": true,
-        "runtime_behavior": "hard_blocked_after_wave3_reaudit",
-        "agent_exposed": false
+        "runtime_behavior": "lifecycle_evidence_status_only",
+        "agent_exposed": true,
+        "risk_class": "read_safe"
       },
       "tests": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
-        "tests/unit/test_wave3_remaining_registry_closure.py::test_remaining_wave3_blocks_have_accepted_codes_and_evidence"
+        "tests/unit/test_wave3_remaining_registry_closure.py::test_remaining_wave3_blocks_have_accepted_codes_and_evidence",
+        "tests/unit/test_m08n_handlers.py",
+        "tests/unit/test_module_lifecycle_r2.py"
       ],
       "summary": "Per-document unload counterpart of kLoadDwgMsg.",
       "source_slice": "arx-framework.md",
       "citation": "[HDR dbxEntryPoint.h:115]",
       "evidence_refs": [
         "config/autocad_native_arx_operation_catalog.json#module.lifecycle.on_unload_dwg",
-        "reports/WAVE3_REMAINING_HARDBLOCK_REAUDIT.md#module.lifecycle.on_unload_dwg"
+        "reports/WAVE3_REMAINING_HARDBLOCK_REAUDIT.md#module.lifecycle.on_unload_dwg",
+        "src/Ariadne.AcadNative/families/m08n_handlers.inc:m08nModuleLifecycleEvidence",
+        "reports/tickets/WAVE4X_LOADER_DOC_R2.md#module.lifecycle.on_unload_dwg",
+        "reports/tickets/WAVE4X_LOADER_DOC_R2_OPS.json#module.lifecycle.on_unload_dwg",
+        "tests/unit/test_module_lifecycle_r2.py",
+        "tests/unit/test_m08n_handlers.py::TestM08NHandlers::test_module_lifecycle_evidence_is_status_only"
       ],
-      "notes": "Wave3 post-merge re-audit accepted hard block. HOST_UNAVAILABLE: On_kUnloadDwgMsg is host-owned document lifecycle dispatch and unavailable to the headless integration job route.",
+      "notes": "Wave4X Loader/Doc R2 reopened this lifecycle operation as a safe native evidence/status handler. The handler reports entrypoint/lifecycle registration evidence and explicitly does not synthesize AutoCAD loader messages or invoke On_k* callbacks.",
       "owner_ticket": "M08O-T02",
-      "implementation_strategy": "hard_blocked",
-      "evidence_required": "blocker_ref_and_evidence",
-      "blocked_reason": "HOST_UNAVAILABLE: On_kUnloadDwgMsg is host-owned document lifecycle dispatch and unavailable to the headless integration job route.",
-      "blocker_ref": "reports/WAVE3_REMAINING_HARDBLOCK_REAUDIT.md#module.lifecycle.on_unload_dwg"
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs"
     },
     {
       "id": "module.lifecycle.other",
       "operation": "module.lifecycle.other",
       "family": "runtime_commands",
-      "status": "blocked",
+      "status": "implemented",
       "engine_tier": "native_arx_only",
       "engines": [
         "native_arx_only"
@@ -33315,8 +33353,8 @@
         "original_write_default": false
       },
       "handler": {
-        "router_lane": null,
-        "dispatcher_symbol": null,
+        "router_lane": "ARIADNE_NATIVE_JOB",
+        "dispatcher_symbol": "m08nDispatch",
         "execution_host_class": "arx_adapter",
         "native_api": "On_kCfgMsg/On_kEndMsg/On_kQuitMsg/On_kPreQuitMsg/On_kSaveMsg/On_kInvkSubrMsg/On_kDependencyMsg/On_kNoDependencyMsg/On_kInitDialogMsg/On_kEndDialogMsg/On_kNullMsg",
         "composed_of": []
@@ -33331,39 +33369,45 @@
       },
       "policy": {
         "source": "config/policy.v2.json",
-        "status_policy": "blocked",
+        "status_policy": "implemented_runnable",
         "default_write_mode": "read",
         "allowed_write_modes": [
           "read"
         ],
         "no_original_write_default": true,
-        "runtime_behavior": "hard_blocked_after_wave3_reaudit",
-        "agent_exposed": false
+        "runtime_behavior": "lifecycle_evidence_status_only",
+        "agent_exposed": true,
+        "risk_class": "read_safe"
       },
       "tests": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
-        "tests/unit/test_wave3_remaining_registry_closure.py::test_remaining_wave3_blocks_have_accepted_codes_and_evidence"
+        "tests/unit/test_wave3_remaining_registry_closure.py::test_remaining_wave3_blocks_have_accepted_codes_and_evidence",
+        "tests/unit/test_m08n_handlers.py",
+        "tests/unit/test_module_lifecycle_r2.py"
       ],
       "summary": "The remaining 11 dispatched lifecycle messages; all default to kRetOK. Override only the ones",
       "source_slice": "arx-framework.md",
       "citation": "[HDR dbxEntryPoint.h:114-149], [RG AcRxDbxApp Methods]",
       "evidence_refs": [
         "config/autocad_native_arx_operation_catalog.json#module.lifecycle.other",
-        "reports/WAVE3_REMAINING_HARDBLOCK_REAUDIT.md#module.lifecycle.other"
+        "reports/WAVE3_REMAINING_HARDBLOCK_REAUDIT.md#module.lifecycle.other",
+        "src/Ariadne.AcadNative/families/m08n_handlers.inc:m08nModuleLifecycleEvidence",
+        "reports/tickets/WAVE4X_LOADER_DOC_R2.md#module.lifecycle.other",
+        "reports/tickets/WAVE4X_LOADER_DOC_R2_OPS.json#module.lifecycle.other",
+        "tests/unit/test_module_lifecycle_r2.py",
+        "tests/unit/test_m08n_handlers.py::TestM08NHandlers::test_module_lifecycle_evidence_is_status_only"
       ],
-      "notes": "Wave3 post-merge re-audit accepted hard block. HOST_UNAVAILABLE: arbitrary lifecycle message dispatch is host-owned and cannot be simulated safely by the agent job surface.",
+      "notes": "Wave4X Loader/Doc R2 reopened this lifecycle operation as a safe native evidence/status handler. The handler reports entrypoint/lifecycle registration evidence and explicitly does not synthesize AutoCAD loader messages or invoke On_k* callbacks.",
       "owner_ticket": "M08O-T02",
-      "implementation_strategy": "hard_blocked",
-      "evidence_required": "blocker_ref_and_evidence",
-      "blocked_reason": "HOST_UNAVAILABLE: arbitrary lifecycle message dispatch is host-owned and cannot be simulated safely by the agent job surface.",
-      "blocker_ref": "reports/WAVE3_REMAINING_HARDBLOCK_REAUDIT.md#module.lifecycle.other"
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs"
     },
     {
       "id": "module.lifecycle.unload",
       "operation": "module.lifecycle.unload",
       "family": "runtime_commands",
-      "status": "blocked",
+      "status": "implemented",
       "engine_tier": "native_arx_only",
       "engines": [
         "native_arx_only"
@@ -33386,8 +33430,8 @@
         "original_write_default": false
       },
       "handler": {
-        "router_lane": null,
-        "dispatcher_symbol": null,
+        "router_lane": "ARIADNE_NATIVE_JOB",
+        "dispatcher_symbol": "m08nDispatch",
         "execution_host_class": "arx_adapter",
         "native_api": "AcRxArxApp::On_kUnloadAppMsg / AcRxDbxApp::On_kUnloadAppMsg",
         "composed_of": []
@@ -33402,33 +33446,39 @@
       },
       "policy": {
         "source": "config/policy.v2.json",
-        "status_policy": "blocked",
+        "status_policy": "implemented_runnable",
         "default_write_mode": "read",
         "allowed_write_modes": [
           "read"
         ],
         "no_original_write_default": true,
-        "runtime_behavior": "hard_blocked_after_wave3_reaudit",
-        "agent_exposed": false
+        "runtime_behavior": "lifecycle_evidence_status_only",
+        "agent_exposed": true,
+        "risk_class": "read_safe"
       },
       "tests": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
-        "tests/unit/test_wave3_remaining_registry_closure.py::test_remaining_wave3_blocks_have_accepted_codes_and_evidence"
+        "tests/unit/test_wave3_remaining_registry_closure.py::test_remaining_wave3_blocks_have_accepted_codes_and_evidence",
+        "tests/unit/test_m08n_handlers.py",
+        "tests/unit/test_module_lifecycle_r2.py"
       ],
       "summary": "Unload-time hook. ARX form unregisters commands + groups, optionally releases Dynamic Property Manager; DBX",
       "source_slice": "arx-framework.md",
       "citation": "[RG AcRxArxApp::On_kUnloadAppMsg], [RG AcRxDbxApp::On_kUnloadAppMsg], [HDR dbxEntryPoint.h:105-167]",
       "evidence_refs": [
         "config/autocad_native_arx_operation_catalog.json#module.lifecycle.unload",
-        "reports/WAVE3_REMAINING_HARDBLOCK_REAUDIT.md#module.lifecycle.unload"
+        "reports/WAVE3_REMAINING_HARDBLOCK_REAUDIT.md#module.lifecycle.unload",
+        "src/Ariadne.AcadNative/families/m08n_handlers.inc:m08nModuleLifecycleEvidence",
+        "reports/tickets/WAVE4X_LOADER_DOC_R2.md#module.lifecycle.unload",
+        "reports/tickets/WAVE4X_LOADER_DOC_R2_OPS.json#module.lifecycle.unload",
+        "tests/unit/test_module_lifecycle_r2.py",
+        "tests/unit/test_m08n_handlers.py::TestM08NHandlers::test_module_lifecycle_evidence_is_status_only"
       ],
-      "notes": "Wave3 post-merge re-audit accepted hard block. HOST_UNAVAILABLE: On_kUnloadAppMsg is delivered by the loader during module unload; the job dispatcher must not invoke it directly.",
+      "notes": "Wave4X Loader/Doc R2 reopened this lifecycle operation as a safe native evidence/status handler. The handler reports entrypoint/lifecycle registration evidence and explicitly does not synthesize AutoCAD loader messages or invoke On_k* callbacks.",
       "owner_ticket": "M08O-T02",
-      "implementation_strategy": "hard_blocked",
-      "evidence_required": "blocker_ref_and_evidence",
-      "blocked_reason": "HOST_UNAVAILABLE: On_kUnloadAppMsg is delivered by the loader during module unload; the job dispatcher must not invoke it directly.",
-      "blocker_ref": "reports/WAVE3_REMAINING_HARDBLOCK_REAUDIT.md#module.lifecycle.unload"
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs"
     },
     {
       "id": "module.load",
