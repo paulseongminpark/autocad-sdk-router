@@ -92,13 +92,18 @@ class TestM08ACatalogReopen(unittest.TestCase):
         self.assertFalse(self.cg["m09_allowed"],
                          "M09 may not be allowed while the catalog is open")
 
-    # 4 — raw command ops close as deprecated, never agent-exposed
-    def test_raw_command_ops_deprecated_and_owned(self):
+    # 4 — raw command ops hard-blocked by safety policy, never agent-exposed
+    def test_raw_command_ops_hard_blocked_and_owned(self):
         raw = [o for o in self.ops if ocm.is_raw_command(o)]
         self.assertGreater(len(raw), 0, "expected real raw-command ops to exist")
         for o in raw:
-            self.assertEqual(o["implementation_strategy"], "deprecated_raw_command", o.get("id"))
+            self.assertEqual(o["status"], "blocked", o.get("id"))
+            self.assertEqual(o["implementation_strategy"], "hard_blocked", o.get("id"))
             self.assertEqual(o["owner_ticket"], "M08O-T02", o.get("id"))
+            self.assertTrue(o.get("blocked_reason") and "SAFETY_FORBIDDEN" in o.get("blocked_reason", ""),
+                            f"{o.get('id')} missing SAFETY_FORBIDDEN blocker")
+            self.assertIn("docs/FALLBACK_POLICY.md", o.get("evidence_refs") or [],
+                          f"{o.get('id')} missing fallback policy evidence ref")
 
     # surfaced index gap — constraints_associativity gets its proposed lane
     def test_constraints_family_assigned_to_proposed_lane(self):
@@ -121,7 +126,7 @@ class TestM08ACatalogReopen(unittest.TestCase):
         by_status = collections.Counter(o.get("status") for o in self.ops)
         self.assertEqual(by_status.get("unknown", 0), 0)
         self.assertGreaterEqual(by_status.get("implemented", 0), 41)
-        self.assertGreaterEqual(by_status.get("blocked", 0), 2)
+        self.assertGreaterEqual(by_status.get("blocked", 0), 2 + len([o for o in self.ops if ocm.is_raw_command(o)]))
 
 
 if __name__ == "__main__":

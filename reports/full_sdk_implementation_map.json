@@ -387,16 +387,16 @@
     },
     "M08O-T02": {
       "op_count": 22,
-      "open": 22,
+      "open": 17,
       "implemented": 0,
-      "blocked": 0,
+      "blocked": 5,
       "by_family": {
         "active_document_write_original": 3,
         "editor_input": 1,
         "runtime_commands": 18
       },
       "by_strategy": {
-        "deprecated_raw_command": 5,
+        "hard_blocked": 5,
         "native_arx_cpp": 15,
         "accoreconsole_lisp": 2
       }
@@ -836,31 +836,31 @@
     {
       "operation": "command.invoke.coroutine",
       "family": "active_document_write_original",
-      "status": "catalogued",
+      "status": "blocked",
       "engine_tier": "native_arx_only",
       "owner_ticket": "M08O-T02",
-      "implementation_strategy": "deprecated_raw_command",
-      "evidence_required": "contract_test_not_agent_exposed",
+      "implementation_strategy": "hard_blocked",
+      "evidence_required": "blocker_ref_and_evidence",
       "risk_class": "raw_command"
     },
     {
       "operation": "command.invoke.sync",
       "family": "active_document_write_original",
-      "status": "catalogued",
+      "status": "blocked",
       "engine_tier": "accoreconsole_lisp_also",
       "owner_ticket": "M08O-T02",
-      "implementation_strategy": "deprecated_raw_command",
-      "evidence_required": "contract_test_not_agent_exposed",
+      "implementation_strategy": "hard_blocked",
+      "evidence_required": "blocker_ref_and_evidence",
       "risk_class": "raw_command"
     },
     {
       "operation": "command.invoke.sync.resbuf",
       "family": "active_document_write_original",
-      "status": "catalogued",
+      "status": "blocked",
       "engine_tier": "accoreconsole_lisp_also",
       "owner_ticket": "M08O-T02",
-      "implementation_strategy": "deprecated_raw_command",
-      "evidence_required": "contract_test_not_agent_exposed",
+      "implementation_strategy": "hard_blocked",
+      "evidence_required": "blocker_ref_and_evidence",
       "risk_class": "raw_command"
     },
     {
@@ -3206,11 +3206,11 @@
     {
       "operation": "command.queue.post",
       "family": "editor_input",
-      "status": "catalogued",
+      "status": "blocked",
       "engine_tier": "native_arx_only",
       "owner_ticket": "M08O-T02",
-      "implementation_strategy": "deprecated_raw_command",
-      "evidence_required": "contract_test_not_agent_exposed",
+      "implementation_strategy": "hard_blocked",
+      "evidence_required": "blocker_ref_and_evidence",
       "risk_class": "raw_command"
     },
     {
@@ -4846,11 +4846,11 @@
     {
       "operation": "module.command.lookup",
       "family": "runtime_commands",
-      "status": "catalogued",
+      "status": "blocked",
       "engine_tier": "native_arx_only",
       "owner_ticket": "M08O-T02",
-      "implementation_strategy": "deprecated_raw_command",
-      "evidence_required": "contract_test_not_agent_exposed",
+      "implementation_strategy": "hard_blocked",
+      "evidence_required": "blocker_ref_and_evidence",
       "risk_class": "raw_command"
     },
     {

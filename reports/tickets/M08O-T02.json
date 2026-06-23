@@ -1,0 +1,62 @@
+{
+  "ticket_id": "M08O-T02",
+  "phase": "M08O",
+  "status": "PASS",
+  "title": "AutoLISP and .NET fallback adapters",
+  "branch": "cados/m08o-fallback-raw-policy",
+  "commit": "2d5061a",
+  "pr": "",
+  "implemented_ops": [],
+  "hard_blocked_ops": [
+    "command.invoke.coroutine",
+    "command.invoke.sync",
+    "command.invoke.sync.resbuf",
+    "command.queue.post",
+    "module.command.lookup"
+  ],
+  "deprecated_ops": [],
+  "catalogued_remaining": [
+    "module.app.accessor",
+    "module.command.flags",
+    "module.command.remove_group",
+    "module.command.stack_handle",
+    "module.entrypoint.define",
+    "module.entrypoint.dispatch",
+    "module.lifecycle.init",
+    "module.lifecycle.on_load_dwg",
+    "module.lifecycle.on_ole_unload",
+    "module.lifecycle.on_unload_dwg",
+    "module.lifecycle.other",
+    "module.lifecycle.unload",
+    "module.load",
+    "module.load.acad_rx",
+    "module.load.by_app",
+    "module.load.lisp",
+    "module.unload"
+  ],
+  "tests": [
+    "pytest tests/unit/test_m08o_fallback.py -q",
+    "pytest tests/unit/test_m08a_catalog_reopen.py -q",
+    "pytest tests/unit/test_m08_operation_coverage.py -q",
+    "pytest tests/unit/test_cadctl.py -q",
+    "pytest tests/unit -q"
+  ],
+  "artifacts": [
+    "config/operations.v2.json",
+    "docs/FALLBACK_POLICY.md",
+    "docs/M08_REMAINING_BATCH_PLAN.md#m08o-fallback-raw-command-hard-block",
+    "tests/unit/test_m08o_fallback.py",
+    "tests/unit/test_m08a_catalog_reopen.py",
+    "reports/full_sdk_implementation_map.json",
+    "reports/closure_gate_latest.json",
+    "reports/operation_coverage_full_matrix.md",
+    "reports/operation_coverage_full_matrix.json",
+    "reports/operation_coverage_latest.md",
+    "reports/operation_coverage_latest.json",
+    "reports/v1_operation_gate_latest.json",
+    "packets/tickets/M08O-T02.md",
+    "reports/tickets/M08O-T02.md",
+    "reports/tickets/M08O-T02.json"
+  ],
+  "next": "Continue M08O fallback lane and MERGE-M08-FALLBACK readiness"
+}

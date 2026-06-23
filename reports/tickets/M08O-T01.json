@@ -1,0 +1,43 @@
+{
+  "ticket_id": "M08O-T01",
+  "phase": "M08O",
+  "status": "PARTIAL_PASS",
+  "title": "COM bootstrap and load fallback",
+  "branch": "cados/m08o-fallback-raw-policy",
+  "commit": "2d5061a",
+  "pr": "",
+  "implemented_ops": [],
+  "hard_blocked_ops": [],
+  "deprecated_ops": [],
+  "catalogued_remaining": [
+    "automate.com.bridge_objectid",
+    "automate.com.entity_helpers",
+    "automate.com.get_app",
+    "automate.com.get_document",
+    "automate.com.get_for_command",
+    "automate.com.get_winapp",
+    "automate.com.hold_objectref",
+    "automate.com.lock_document",
+    "automate.com.objectid_from_iunknown",
+    "automate.com.send_command",
+    "embed.ole.frame",
+    "extend.members.facet_provider",
+    "inspect.entity.properties",
+    "inspect.members.promoted",
+    "inspect.value.to_string"
+  ],
+  "tests": [
+    "pytest tests/unit/test_m08o_fallback.py -q",
+    "pytest tests/unit/test_m08a_catalog_reopen.py -q",
+    "pytest tests/unit/test_m08_operation_coverage.py -q"
+  ],
+  "artifacts": [
+    "docs/FALLBACK_POLICY.md",
+    "tests/unit/test_m08o_fallback.py",
+    "tests/unit/test_m08a_catalog_reopen.py",
+    "packets/tickets/M08O-T01.md",
+    "reports/tickets/M08O-T01.md",
+    "reports/tickets/M08O-T01.json"
+  ],
+  "next": "M08O-T02"
+}
