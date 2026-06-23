@@ -56,9 +56,9 @@
   "totals": {
     "operations": 517,
     "by_status": {
-      "implemented": 125,
+      "implemented": 162,
       "blocked": 2,
-      "catalogued": 390
+      "catalogued": 353
     },
     "by_family": {
       "active_document_write_original": 8,
@@ -129,10 +129,10 @@
       "ui_customization": 39
     },
     "operation_records": 517,
-    "implemented": 125,
+    "implemented": 162,
     "wired": 0,
     "stub": 0,
-    "catalogued": 390,
+    "catalogued": 353,
     "blocked": 2,
     "deprecated": 0,
     "unknown": 0,
@@ -21544,7 +21544,7 @@
       "id": "modify.curve.offset",
       "operation": "modify.curve.offset",
       "family": "entities",
-      "status": "catalogued",
+      "status": "implemented",
       "engine_tier": "objectdbx_capable",
       "engines": [
         "objectdbx_capable"
@@ -21572,7 +21572,7 @@
       },
       "handler": {
         "router_lane": null,
-        "dispatcher_symbol": null,
+        "dispatcher_symbol": "m08gDispatch",
         "execution_host_class": "dbx",
         "native_api": "AcDbCurve::getOffsetCurves(double offsetDist, AcDbVoidPtrArray& set)",
         "composed_of": []
@@ -21597,24 +21597,29 @@
       },
       "tests": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
-        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata"
+        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
+        "tests/unit/test_m08g_handlers.py"
       ],
       "summary": "Offset a curve by a distance",
       "source_slice": "entities-geometry-graphics.md",
       "citation": "hdr dbcurve.h getOffsetCurves",
       "evidence_refs": [
-        "config/autocad_native_arx_operation_catalog.json#modify.curve.offset"
+        "config/autocad_native_arx_operation_catalog.json#modify.curve.offset",
+        "src/Ariadne.AcadNative/families/m08g_handlers.inc:m08gDispatch",
+        "reports/merge/MERGE-M08-READ.json",
+        "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
+        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)"
       ],
       "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
       "owner_ticket": "M08G-T03",
-      "implementation_strategy": "objectdbx_hostless",
-      "evidence_required": "unit_test+native_extraction_fixture"
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs"
     },
     {
       "id": "modify.curve.split",
       "operation": "modify.curve.split",
       "family": "entities",
-      "status": "catalogued",
+      "status": "implemented",
       "engine_tier": "objectdbx_capable",
       "engines": [
         "objectdbx_capable"
@@ -21642,7 +21647,7 @@
       },
       "handler": {
         "router_lane": null,
-        "dispatcher_symbol": null,
+        "dispatcher_symbol": "m08gDispatch",
         "execution_host_class": "dbx",
         "native_api": "AcDbCurve::getSplitCurves(params/points, AcDbVoidPtrArray& set)",
         "composed_of": []
@@ -21667,24 +21672,29 @@
       },
       "tests": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
-        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata"
+        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
+        "tests/unit/test_m08g_handlers.py"
       ],
       "summary": "Split a curve at params/points",
       "source_slice": "entities-geometry-graphics.md",
       "citation": "hdr dbcurve.h getSplitCurves",
       "evidence_refs": [
-        "config/autocad_native_arx_operation_catalog.json#modify.curve.split"
+        "config/autocad_native_arx_operation_catalog.json#modify.curve.split",
+        "src/Ariadne.AcadNative/families/m08g_handlers.inc:m08gDispatch",
+        "reports/merge/MERGE-M08-READ.json",
+        "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
+        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)"
       ],
       "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
       "owner_ticket": "M08G-T03",
-      "implementation_strategy": "objectdbx_hostless",
-      "evidence_required": "unit_test+native_extraction_fixture"
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs"
     },
     {
       "id": "modify.curve.to_spline",
       "operation": "modify.curve.to_spline",
       "family": "entities",
-      "status": "catalogued",
+      "status": "implemented",
       "engine_tier": "objectdbx_capable",
       "engines": [
         "objectdbx_capable"
@@ -21712,7 +21722,7 @@
       },
       "handler": {
         "router_lane": null,
-        "dispatcher_symbol": null,
+        "dispatcher_symbol": "m08gDispatch",
         "execution_host_class": "dbx",
         "native_api": "AcDbCurve::getSpline(AcDbSpline*& spline)",
         "composed_of": []
@@ -21737,24 +21747,29 @@
       },
       "tests": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
-        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata"
+        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
+        "tests/unit/test_m08g_handlers.py"
       ],
       "summary": "Convert any curve to its spline form",
       "source_slice": "entities-geometry-graphics.md",
       "citation": "hdr dbcurve.h getSpline",
       "evidence_refs": [
-        "config/autocad_native_arx_operation_catalog.json#modify.curve.to_spline"
+        "config/autocad_native_arx_operation_catalog.json#modify.curve.to_spline",
+        "src/Ariadne.AcadNative/families/m08g_handlers.inc:m08gDispatch",
+        "reports/merge/MERGE-M08-READ.json",
+        "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
+        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)"
       ],
       "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
       "owner_ticket": "M08G-T03",
-      "implementation_strategy": "objectdbx_hostless",
-      "evidence_required": "unit_test+native_extraction_fixture"
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs"
     },
     {
       "id": "modify.entity.common",
       "operation": "modify.entity.common",
       "family": "entities",
-      "status": "catalogued",
+      "status": "implemented",
       "engine_tier": "objectdbx_capable",
       "engines": [
         "objectdbx_capable"
@@ -21782,7 +21797,7 @@
       },
       "handler": {
         "router_lane": null,
-        "dispatcher_symbol": null,
+        "dispatcher_symbol": "m08gDispatch",
         "execution_host_class": "dbx",
         "native_api": "AcDbEntity::setColor(AcCmColor&, doSubents), setLayer, setLinetype, setLineWeight, setTransparency, setVisibility",
         "composed_of": []
@@ -21807,24 +21822,29 @@
       },
       "tests": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
-        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata"
+        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
+        "tests/unit/test_m08g_handlers.py"
       ],
       "summary": "Set common graphic properties",
       "source_slice": "entities-geometry-graphics.md",
       "citation": "hdr dbmain.h setColor/setLayer/setLinetype/setLineWeight/setTransparency/setVisibility",
       "evidence_refs": [
-        "config/autocad_native_arx_operation_catalog.json#modify.entity.common"
+        "config/autocad_native_arx_operation_catalog.json#modify.entity.common",
+        "src/Ariadne.AcadNative/families/m08g_handlers.inc:m08gDispatch",
+        "reports/merge/MERGE-M08-READ.json",
+        "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
+        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)"
       ],
       "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
       "owner_ticket": "M08G-T03",
-      "implementation_strategy": "objectdbx_hostless",
-      "evidence_required": "unit_test+staged_diff_fixture_original_unchanged"
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs"
     },
     {
       "id": "modify.entity.copy_transformed",
       "operation": "modify.entity.copy_transformed",
       "family": "entities",
-      "status": "catalogued",
+      "status": "implemented",
       "engine_tier": "objectdbx_capable",
       "engines": [
         "objectdbx_capable"
@@ -21852,7 +21872,7 @@
       },
       "handler": {
         "router_lane": null,
-        "dispatcher_symbol": null,
+        "dispatcher_symbol": "m08gDispatch",
         "execution_host_class": "dbx",
         "native_api": "AcDbEntity::getTransformedCopy(xform, AcDbEntity*& newEnt)",
         "composed_of": []
@@ -21877,24 +21897,29 @@
       },
       "tests": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
-        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata"
+        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
+        "tests/unit/test_m08g_handlers.py"
       ],
       "summary": "Produce a transformed clone (original unchanged)",
       "source_slice": "entities-geometry-graphics.md",
       "citation": "hdr dbmain.h getTransformedCopy (sealed) / subGetTransformedCopy",
       "evidence_refs": [
-        "config/autocad_native_arx_operation_catalog.json#modify.entity.copy_transformed"
+        "config/autocad_native_arx_operation_catalog.json#modify.entity.copy_transformed",
+        "src/Ariadne.AcadNative/families/m08g_handlers.inc:m08gDispatch",
+        "reports/merge/MERGE-M08-READ.json",
+        "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
+        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)"
       ],
       "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
       "owner_ticket": "M08G-T03",
-      "implementation_strategy": "objectdbx_hostless",
-      "evidence_required": "unit_test+native_extraction_fixture"
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs"
     },
     {
       "id": "modify.entity.explode",
       "operation": "modify.entity.explode",
       "family": "entities",
-      "status": "catalogued",
+      "status": "implemented",
       "engine_tier": "objectdbx_capable",
       "engines": [
         "objectdbx_capable"
@@ -21922,7 +21947,7 @@
       },
       "handler": {
         "router_lane": null,
-        "dispatcher_symbol": null,
+        "dispatcher_symbol": "m08gDispatch",
         "execution_host_class": "dbx",
         "native_api": "AcDbEntity::explode(AcDbVoidPtrArray& entitySet)",
         "composed_of": []
@@ -21947,24 +21972,29 @@
       },
       "tests": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
-        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata"
+        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
+        "tests/unit/test_m08g_handlers.py"
       ],
       "summary": "Explode into constituent entities (no DB modify)",
       "source_slice": "entities-geometry-graphics.md",
       "citation": "hdr dbmain.h explode (sealed) / subExplode; ActiveX Explode",
       "evidence_refs": [
-        "config/autocad_native_arx_operation_catalog.json#modify.entity.explode"
+        "config/autocad_native_arx_operation_catalog.json#modify.entity.explode",
+        "src/Ariadne.AcadNative/families/m08g_handlers.inc:m08gDispatch",
+        "reports/merge/MERGE-M08-READ.json",
+        "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
+        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)"
       ],
       "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
       "owner_ticket": "M08G-T03",
-      "implementation_strategy": "objectdbx_hostless",
-      "evidence_required": "unit_test+native_extraction_fixture"
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs"
     },
     {
       "id": "write.entity.arc",
       "operation": "write.entity.arc",
       "family": "entities",
-      "status": "catalogued",
+      "status": "implemented",
       "engine_tier": "objectdbx_capable",
       "engines": [
         "objectdbx_capable"
@@ -21992,7 +22022,7 @@
       },
       "handler": {
         "router_lane": null,
-        "dispatcher_symbol": null,
+        "dispatcher_symbol": "m08gDispatch",
         "execution_host_class": "dbx",
         "native_api": "AcDbArc(center, normal, radius, startAng, endAng) + setStartAngle/setEndAngle",
         "composed_of": []
@@ -22017,24 +22047,29 @@
       },
       "tests": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
-        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata"
+        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
+        "tests/unit/test_m08g_handlers.py"
       ],
       "summary": "Create a circular arc",
       "source_slice": "entities-geometry-graphics.md",
       "citation": "hdr dbents.h AcDbArc ctor + setStartAngle/setEndAngle",
       "evidence_refs": [
-        "config/autocad_native_arx_operation_catalog.json#write.entity.arc"
+        "config/autocad_native_arx_operation_catalog.json#write.entity.arc",
+        "src/Ariadne.AcadNative/families/m08g_handlers.inc:m08gDispatch",
+        "reports/merge/MERGE-M08-READ.json",
+        "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
+        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)"
       ],
       "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
       "owner_ticket": "M08G-T02",
-      "implementation_strategy": "objectdbx_hostless",
-      "evidence_required": "unit_test+staged_diff_fixture_original_unchanged"
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs"
     },
     {
       "id": "write.entity.attribdef",
       "operation": "write.entity.attribdef",
       "family": "entities",
-      "status": "catalogued",
+      "status": "implemented",
       "engine_tier": "objectdbx_capable",
       "engines": [
         "objectdbx_capable"
@@ -22062,7 +22097,7 @@
       },
       "handler": {
         "router_lane": null,
-        "dispatcher_symbol": null,
+        "dispatcher_symbol": "m08gDispatch",
         "execution_host_class": "dbx",
         "native_api": "AcDbAttributeDefinition",
         "composed_of": []
@@ -22087,18 +22122,23 @@
       },
       "tests": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
-        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata"
+        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
+        "tests/unit/test_m08g_handlers.py"
       ],
       "summary": "Create attribute definition (in block def)",
       "source_slice": "entities-geometry-graphics.md",
       "citation": "hdr dbents.h AcDbAttributeDefinition",
       "evidence_refs": [
-        "config/autocad_native_arx_operation_catalog.json#write.entity.attribdef"
+        "config/autocad_native_arx_operation_catalog.json#write.entity.attribdef",
+        "src/Ariadne.AcadNative/families/m08g_handlers.inc:m08gDispatch",
+        "reports/merge/MERGE-M08-READ.json",
+        "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
+        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)"
       ],
       "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
       "owner_ticket": "M08G-T02",
-      "implementation_strategy": "objectdbx_hostless",
-      "evidence_required": "unit_test+staged_diff_fixture_original_unchanged"
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs"
     },
     {
       "id": "write.entity.attribute",
@@ -22174,7 +22214,7 @@
       "id": "write.entity.blockref",
       "operation": "write.entity.blockref",
       "family": "entities",
-      "status": "catalogued",
+      "status": "implemented",
       "engine_tier": "objectdbx_capable",
       "engines": [
         "objectdbx_capable"
@@ -22202,7 +22242,7 @@
       },
       "handler": {
         "router_lane": null,
-        "dispatcher_symbol": null,
+        "dispatcher_symbol": "m08gDispatch",
         "execution_host_class": "dbx",
         "native_api": "AcDbBlockReference(position, blockTableRecordId) + setPosition/setScaleFactors/setRotation/setBlockTableRecord",
         "composed_of": []
@@ -22227,18 +22267,23 @@
       },
       "tests": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
-        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata"
+        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
+        "tests/unit/test_m08g_handlers.py"
       ],
       "summary": "Insert a block reference (INSERT)",
       "source_slice": "entities-geometry-graphics.md",
       "citation": "hdr dbents.h AcDbBlockReference setPosition/setScaleFactors/setRotation/setBlockTableRecord",
       "evidence_refs": [
-        "config/autocad_native_arx_operation_catalog.json#write.entity.blockref"
+        "config/autocad_native_arx_operation_catalog.json#write.entity.blockref",
+        "src/Ariadne.AcadNative/families/m08g_handlers.inc:m08gDispatch",
+        "reports/merge/MERGE-M08-READ.json",
+        "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
+        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)"
       ],
       "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
       "owner_ticket": "M08G-T02",
-      "implementation_strategy": "objectdbx_hostless",
-      "evidence_required": "unit_test+staged_diff_fixture_original_unchanged"
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs"
     },
     {
       "id": "write.entity.body",
@@ -22314,7 +22359,7 @@
       "id": "write.entity.dim.aligned",
       "operation": "write.entity.dim.aligned",
       "family": "entities",
-      "status": "catalogued",
+      "status": "implemented",
       "engine_tier": "objectdbx_capable",
       "engines": [
         "objectdbx_capable"
@@ -22342,7 +22387,7 @@
       },
       "handler": {
         "router_lane": null,
-        "dispatcher_symbol": null,
+        "dispatcher_symbol": "m08hDispatch",
         "execution_host_class": "dbx",
         "native_api": "AcDbAlignedDimension(xLine1Pt, xLine2Pt, dimLinePt, ...)",
         "composed_of": []
@@ -22367,24 +22412,29 @@
       },
       "tests": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
-        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata"
+        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
+        "tests/unit/test_m08h_handlers.py"
       ],
       "summary": "Aligned linear dimension",
       "source_slice": "entities-geometry-graphics.md",
       "citation": "hdr dbdim.h AcDbAlignedDimension; ActiveX IAcadDimension GUID-A9836239",
       "evidence_refs": [
-        "config/autocad_native_arx_operation_catalog.json#write.entity.dim.aligned"
+        "config/autocad_native_arx_operation_catalog.json#write.entity.dim.aligned",
+        "src/Ariadne.AcadNative/families/m08h_handlers.inc:m08hDispatch",
+        "reports/merge/MERGE-M08-READ.json",
+        "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
+        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)"
       ],
       "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
       "owner_ticket": "M08H-T01",
-      "implementation_strategy": "objectdbx_hostless",
-      "evidence_required": "unit_test+staged_diff_fixture_original_unchanged"
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs"
     },
     {
       "id": "write.entity.dim.angular2line",
       "operation": "write.entity.dim.angular2line",
       "family": "entities",
-      "status": "catalogued",
+      "status": "implemented",
       "engine_tier": "objectdbx_capable",
       "engines": [
         "objectdbx_capable"
@@ -22412,7 +22462,7 @@
       },
       "handler": {
         "router_lane": null,
-        "dispatcher_symbol": null,
+        "dispatcher_symbol": "m08hDispatch",
         "execution_host_class": "dbx",
         "native_api": "AcDb2LineAngularDimension(xLine1Start, xLine1End, xLine2Start, xLine2End, arcPt,...)",
         "composed_of": []
@@ -22437,24 +22487,29 @@
       },
       "tests": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
-        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata"
+        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
+        "tests/unit/test_m08h_handlers.py"
       ],
       "summary": "2-line angular dimension",
       "source_slice": "entities-geometry-graphics.md",
       "citation": "hdr dbdim.h AcDb2LineAngularDimension",
       "evidence_refs": [
-        "config/autocad_native_arx_operation_catalog.json#write.entity.dim.angular2line"
+        "config/autocad_native_arx_operation_catalog.json#write.entity.dim.angular2line",
+        "src/Ariadne.AcadNative/families/m08h_handlers.inc:m08hDispatch",
+        "reports/merge/MERGE-M08-READ.json",
+        "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
+        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)"
       ],
       "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
       "owner_ticket": "M08H-T01",
-      "implementation_strategy": "objectdbx_hostless",
-      "evidence_required": "unit_test+staged_diff_fixture_original_unchanged"
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs"
     },
     {
       "id": "write.entity.dim.angular3pt",
       "operation": "write.entity.dim.angular3pt",
       "family": "entities",
-      "status": "catalogued",
+      "status": "implemented",
       "engine_tier": "objectdbx_capable",
       "engines": [
         "objectdbx_capable"
@@ -22482,7 +22537,7 @@
       },
       "handler": {
         "router_lane": null,
-        "dispatcher_symbol": null,
+        "dispatcher_symbol": "m08hDispatch",
         "execution_host_class": "dbx",
         "native_api": "AcDb3PointAngularDimension(centerPt, xLine1Pt, xLine2Pt, arcPt,...)",
         "composed_of": []
@@ -22507,24 +22562,29 @@
       },
       "tests": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
-        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata"
+        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
+        "tests/unit/test_m08h_handlers.py"
       ],
       "summary": "3-point angular dimension",
       "source_slice": "entities-geometry-graphics.md",
       "citation": "hdr dbdim.h AcDb3PointAngularDimension",
       "evidence_refs": [
-        "config/autocad_native_arx_operation_catalog.json#write.entity.dim.angular3pt"
+        "config/autocad_native_arx_operation_catalog.json#write.entity.dim.angular3pt",
+        "src/Ariadne.AcadNative/families/m08h_handlers.inc:m08hDispatch",
+        "reports/merge/MERGE-M08-READ.json",
+        "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
+        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)"
       ],
       "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
       "owner_ticket": "M08H-T01",
-      "implementation_strategy": "objectdbx_hostless",
-      "evidence_required": "unit_test+staged_diff_fixture_original_unchanged"
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs"
     },
     {
       "id": "write.entity.dim.arc",
       "operation": "write.entity.dim.arc",
       "family": "entities",
-      "status": "catalogued",
+      "status": "implemented",
       "engine_tier": "objectdbx_capable",
       "engines": [
         "objectdbx_capable"
@@ -22552,7 +22612,7 @@
       },
       "handler": {
         "router_lane": null,
-        "dispatcher_symbol": null,
+        "dispatcher_symbol": "m08hDispatch",
         "execution_host_class": "dbx",
         "native_api": "AcDbArcDimension(centerPt, xLine1Pt, xLine2Pt, arcPt,...)",
         "composed_of": []
@@ -22577,24 +22637,29 @@
       },
       "tests": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
-        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata"
+        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
+        "tests/unit/test_m08h_handlers.py"
       ],
       "summary": "Arc-length dimension",
       "source_slice": "entities-geometry-graphics.md",
       "citation": "hdr dbdim.h AcDbArcDimension",
       "evidence_refs": [
-        "config/autocad_native_arx_operation_catalog.json#write.entity.dim.arc"
+        "config/autocad_native_arx_operation_catalog.json#write.entity.dim.arc",
+        "src/Ariadne.AcadNative/families/m08h_handlers.inc:m08hDispatch",
+        "reports/merge/MERGE-M08-READ.json",
+        "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
+        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)"
       ],
       "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
       "owner_ticket": "M08H-T01",
-      "implementation_strategy": "objectdbx_hostless",
-      "evidence_required": "unit_test+staged_diff_fixture_original_unchanged"
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs"
     },
     {
       "id": "write.entity.dim.diametric",
       "operation": "write.entity.dim.diametric",
       "family": "entities",
-      "status": "catalogued",
+      "status": "implemented",
       "engine_tier": "objectdbx_capable",
       "engines": [
         "objectdbx_capable"
@@ -22622,7 +22687,7 @@
       },
       "handler": {
         "router_lane": null,
-        "dispatcher_symbol": null,
+        "dispatcher_symbol": "m08hDispatch",
         "execution_host_class": "dbx",
         "native_api": "AcDbDiametricDimension(chordPt, farChordPt, leaderLen,...)",
         "composed_of": []
@@ -22647,24 +22712,29 @@
       },
       "tests": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
-        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata"
+        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
+        "tests/unit/test_m08h_handlers.py"
       ],
       "summary": "Diametric dimension",
       "source_slice": "entities-geometry-graphics.md",
       "citation": "hdr dbdim.h AcDbDiametricDimension",
       "evidence_refs": [
-        "config/autocad_native_arx_operation_catalog.json#write.entity.dim.diametric"
+        "config/autocad_native_arx_operation_catalog.json#write.entity.dim.diametric",
+        "src/Ariadne.AcadNative/families/m08h_handlers.inc:m08hDispatch",
+        "reports/merge/MERGE-M08-READ.json",
+        "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
+        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)"
       ],
       "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
       "owner_ticket": "M08H-T01",
-      "implementation_strategy": "objectdbx_hostless",
-      "evidence_required": "unit_test+staged_diff_fixture_original_unchanged"
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs"
     },
     {
       "id": "write.entity.dim.ordinate",
       "operation": "write.entity.dim.ordinate",
       "family": "entities",
-      "status": "catalogued",
+      "status": "implemented",
       "engine_tier": "objectdbx_capable",
       "engines": [
         "objectdbx_capable"
@@ -22692,7 +22762,7 @@
       },
       "handler": {
         "router_lane": null,
-        "dispatcher_symbol": null,
+        "dispatcher_symbol": "m08hDispatch",
         "execution_host_class": "dbx",
         "native_api": "AcDbOrdinateDimension(useXAxis, definingPt, leaderEndPt,...)",
         "composed_of": []
@@ -22717,24 +22787,29 @@
       },
       "tests": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
-        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata"
+        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
+        "tests/unit/test_m08h_handlers.py"
       ],
       "summary": "Ordinate dimension",
       "source_slice": "entities-geometry-graphics.md",
       "citation": "hdr dbdim.h AcDbOrdinateDimension",
       "evidence_refs": [
-        "config/autocad_native_arx_operation_catalog.json#write.entity.dim.ordinate"
+        "config/autocad_native_arx_operation_catalog.json#write.entity.dim.ordinate",
+        "src/Ariadne.AcadNative/families/m08h_handlers.inc:m08hDispatch",
+        "reports/merge/MERGE-M08-READ.json",
+        "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
+        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)"
       ],
       "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
       "owner_ticket": "M08H-T01",
-      "implementation_strategy": "objectdbx_hostless",
-      "evidence_required": "unit_test+staged_diff_fixture_original_unchanged"
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs"
     },
     {
       "id": "write.entity.dim.radial",
       "operation": "write.entity.dim.radial",
       "family": "entities",
-      "status": "catalogued",
+      "status": "implemented",
       "engine_tier": "objectdbx_capable",
       "engines": [
         "objectdbx_capable"
@@ -22762,7 +22837,7 @@
       },
       "handler": {
         "router_lane": null,
-        "dispatcher_symbol": null,
+        "dispatcher_symbol": "m08hDispatch",
         "execution_host_class": "dbx",
         "native_api": "AcDbRadialDimension(center, chordPt, leaderLen,...)",
         "composed_of": []
@@ -22787,24 +22862,29 @@
       },
       "tests": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
-        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata"
+        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
+        "tests/unit/test_m08h_handlers.py"
       ],
       "summary": "Radial dimension",
       "source_slice": "entities-geometry-graphics.md",
       "citation": "hdr dbdim.h AcDbRadialDimension",
       "evidence_refs": [
-        "config/autocad_native_arx_operation_catalog.json#write.entity.dim.radial"
+        "config/autocad_native_arx_operation_catalog.json#write.entity.dim.radial",
+        "src/Ariadne.AcadNative/families/m08h_handlers.inc:m08hDispatch",
+        "reports/merge/MERGE-M08-READ.json",
+        "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
+        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)"
       ],
       "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
       "owner_ticket": "M08H-T01",
-      "implementation_strategy": "objectdbx_hostless",
-      "evidence_required": "unit_test+staged_diff_fixture_original_unchanged"
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs"
     },
     {
       "id": "write.entity.dim.radiallarge",
       "operation": "write.entity.dim.radiallarge",
       "family": "entities",
-      "status": "catalogued",
+      "status": "implemented",
       "engine_tier": "objectdbx_capable",
       "engines": [
         "objectdbx_capable"
@@ -22832,7 +22912,7 @@
       },
       "handler": {
         "router_lane": null,
-        "dispatcher_symbol": null,
+        "dispatcher_symbol": "m08hDispatch",
         "execution_host_class": "dbx",
         "native_api": "AcDbRadialDimensionLarge(...) (jogged radius)",
         "composed_of": []
@@ -22857,24 +22937,29 @@
       },
       "tests": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
-        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata"
+        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
+        "tests/unit/test_m08h_handlers.py"
       ],
       "summary": "Jogged (large) radial dimension",
       "source_slice": "entities-geometry-graphics.md",
       "citation": "hdr dbdim.h AcDbRadialDimensionLarge",
       "evidence_refs": [
-        "config/autocad_native_arx_operation_catalog.json#write.entity.dim.radiallarge"
+        "config/autocad_native_arx_operation_catalog.json#write.entity.dim.radiallarge",
+        "src/Ariadne.AcadNative/families/m08h_handlers.inc:m08hDispatch",
+        "reports/merge/MERGE-M08-READ.json",
+        "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
+        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)"
       ],
       "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
       "owner_ticket": "M08H-T01",
-      "implementation_strategy": "objectdbx_hostless",
-      "evidence_required": "unit_test+staged_diff_fixture_original_unchanged"
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs"
     },
     {
       "id": "write.entity.dim.rotated",
       "operation": "write.entity.dim.rotated",
       "family": "entities",
-      "status": "catalogued",
+      "status": "implemented",
       "engine_tier": "objectdbx_capable",
       "engines": [
         "objectdbx_capable"
@@ -22902,7 +22987,7 @@
       },
       "handler": {
         "router_lane": null,
-        "dispatcher_symbol": null,
+        "dispatcher_symbol": "m08hDispatch",
         "execution_host_class": "dbx",
         "native_api": "AcDbRotatedDimension(rotation, xLine1Pt, xLine2Pt, dimLinePt,...)",
         "composed_of": []
@@ -22927,24 +23012,29 @@
       },
       "tests": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
-        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata"
+        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
+        "tests/unit/test_m08h_handlers.py"
       ],
       "summary": "Rotated linear dimension",
       "source_slice": "entities-geometry-graphics.md",
       "citation": "hdr dbdim.h AcDbRotatedDimension",
       "evidence_refs": [
-        "config/autocad_native_arx_operation_catalog.json#write.entity.dim.rotated"
+        "config/autocad_native_arx_operation_catalog.json#write.entity.dim.rotated",
+        "src/Ariadne.AcadNative/families/m08h_handlers.inc:m08hDispatch",
+        "reports/merge/MERGE-M08-READ.json",
+        "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
+        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)"
       ],
       "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
       "owner_ticket": "M08H-T01",
-      "implementation_strategy": "objectdbx_hostless",
-      "evidence_required": "unit_test+staged_diff_fixture_original_unchanged"
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs"
     },
     {
       "id": "write.entity.ellipse",
       "operation": "write.entity.ellipse",
       "family": "entities",
-      "status": "catalogued",
+      "status": "implemented",
       "engine_tier": "objectdbx_capable",
       "engines": [
         "objectdbx_capable"
@@ -22972,7 +23062,7 @@
       },
       "handler": {
         "router_lane": null,
-        "dispatcher_symbol": null,
+        "dispatcher_symbol": "m08gDispatch",
         "execution_host_class": "dbx",
         "native_api": "AcDbEllipse::set(center, normal, majorAxis, radiusRatio, start, end)",
         "composed_of": []
@@ -22997,24 +23087,29 @@
       },
       "tests": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
-        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata"
+        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
+        "tests/unit/test_m08g_handlers.py"
       ],
       "summary": "Create an ellipse / elliptical arc",
       "source_slice": "entities-geometry-graphics.md",
       "citation": "hdr dbelipse.h (class AcDbEllipse)",
       "evidence_refs": [
-        "config/autocad_native_arx_operation_catalog.json#write.entity.ellipse"
+        "config/autocad_native_arx_operation_catalog.json#write.entity.ellipse",
+        "src/Ariadne.AcadNative/families/m08g_handlers.inc:m08gDispatch",
+        "reports/merge/MERGE-M08-READ.json",
+        "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
+        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)"
       ],
       "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
       "owner_ticket": "M08G-T02",
-      "implementation_strategy": "objectdbx_hostless",
-      "evidence_required": "unit_test+staged_diff_fixture_original_unchanged"
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs"
     },
     {
       "id": "write.entity.face",
       "operation": "write.entity.face",
       "family": "entities",
-      "status": "catalogued",
+      "status": "implemented",
       "engine_tier": "objectdbx_capable",
       "engines": [
         "objectdbx_capable"
@@ -23042,7 +23137,7 @@
       },
       "handler": {
         "router_lane": null,
-        "dispatcher_symbol": null,
+        "dispatcher_symbol": "m08gDispatch",
         "execution_host_class": "dbx",
         "native_api": "AcDbFace(p0,p1,p2,p3)",
         "composed_of": []
@@ -23067,24 +23162,29 @@
       },
       "tests": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
-        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata"
+        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
+        "tests/unit/test_m08g_handlers.py"
       ],
       "summary": "Create a 3D face (3/4 pts)",
       "source_slice": "entities-geometry-graphics.md",
       "citation": "hdr dbents.h AcDbFace",
       "evidence_refs": [
-        "config/autocad_native_arx_operation_catalog.json#write.entity.face"
+        "config/autocad_native_arx_operation_catalog.json#write.entity.face",
+        "src/Ariadne.AcadNative/families/m08g_handlers.inc:m08gDispatch",
+        "reports/merge/MERGE-M08-READ.json",
+        "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
+        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)"
       ],
       "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
       "owner_ticket": "M08G-T02",
-      "implementation_strategy": "objectdbx_hostless",
-      "evidence_required": "unit_test+staged_diff_fixture_original_unchanged"
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs"
     },
     {
       "id": "write.entity.hatch",
       "operation": "write.entity.hatch",
       "family": "entities",
-      "status": "catalogued",
+      "status": "implemented",
       "engine_tier": "objectdbx_capable",
       "engines": [
         "objectdbx_capable"
@@ -23112,7 +23212,7 @@
       },
       "handler": {
         "router_lane": null,
-        "dispatcher_symbol": null,
+        "dispatcher_symbol": "m08hDispatch",
         "execution_host_class": "dbx",
         "native_api": "AcDbHatch::setPattern/appendLoop/setAssociative/setGradient/setHatchStyle + evaluateHatch()",
         "composed_of": []
@@ -23137,18 +23237,23 @@
       },
       "tests": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
-        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata"
+        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
+        "tests/unit/test_m08h_handlers.py"
       ],
       "summary": "Create a hatch / gradient fill; must call evaluateHatch() to build display",
       "source_slice": "entities-geometry-graphics.md",
       "citation": "hdr dbhatch.h AcDbHatch setPattern/appendLoop/setGradient/setHatchStyle/evaluateHatch/numLoops/getLoopAt",
       "evidence_refs": [
-        "config/autocad_native_arx_operation_catalog.json#write.entity.hatch"
+        "config/autocad_native_arx_operation_catalog.json#write.entity.hatch",
+        "src/Ariadne.AcadNative/families/m08h_handlers.inc:m08hDispatch",
+        "reports/merge/MERGE-M08-READ.json",
+        "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
+        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)"
       ],
       "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
       "owner_ticket": "M08H-T02",
-      "implementation_strategy": "objectdbx_hostless",
-      "evidence_required": "unit_test+staged_diff_fixture_original_unchanged"
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs"
     },
     {
       "id": "write.entity.leader",
@@ -23224,7 +23329,7 @@
       "id": "write.entity.minsert",
       "operation": "write.entity.minsert",
       "family": "entities",
-      "status": "catalogued",
+      "status": "implemented",
       "engine_tier": "objectdbx_capable",
       "engines": [
         "objectdbx_capable"
@@ -23252,7 +23357,7 @@
       },
       "handler": {
         "router_lane": null,
-        "dispatcher_symbol": null,
+        "dispatcher_symbol": "m08gDispatch",
         "execution_host_class": "dbx",
         "native_api": "AcDbMInsertBlock (+ row/col counts, spacing)",
         "composed_of": []
@@ -23277,18 +23382,23 @@
       },
       "tests": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
-        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata"
+        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
+        "tests/unit/test_m08g_handlers.py"
       ],
       "summary": "Insert an array (MINSERT) block",
       "source_slice": "entities-geometry-graphics.md",
       "citation": "hdr dbents.h AcDbMInsertBlock",
       "evidence_refs": [
-        "config/autocad_native_arx_operation_catalog.json#write.entity.minsert"
+        "config/autocad_native_arx_operation_catalog.json#write.entity.minsert",
+        "src/Ariadne.AcadNative/families/m08g_handlers.inc:m08gDispatch",
+        "reports/merge/MERGE-M08-READ.json",
+        "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
+        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)"
       ],
       "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
       "owner_ticket": "M08G-T02",
-      "implementation_strategy": "objectdbx_hostless",
-      "evidence_required": "unit_test+staged_diff_fixture_original_unchanged"
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs"
     },
     {
       "id": "write.entity.mleader",
@@ -23504,7 +23614,7 @@
       "id": "write.entity.mtext",
       "operation": "write.entity.mtext",
       "family": "entities",
-      "status": "catalogued",
+      "status": "implemented",
       "engine_tier": "objectdbx_capable",
       "engines": [
         "objectdbx_capable"
@@ -23532,7 +23642,7 @@
       },
       "handler": {
         "router_lane": null,
-        "dispatcher_symbol": null,
+        "dispatcher_symbol": "m08hDispatch",
         "execution_host_class": "dbx",
         "native_api": "AcDbMText::setContents/setLocation/setTextHeight/setWidth/setAttachment/setTextStyle/setRotation",
         "composed_of": []
@@ -23557,18 +23667,23 @@
       },
       "tests": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
-        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata"
+        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
+        "tests/unit/test_m08h_handlers.py"
       ],
       "summary": "Create multiline text (MTEXT)",
       "source_slice": "entities-geometry-graphics.md",
       "citation": "hdr dbmtext.h AcDbMText setContents/setLocation/setTextHeight/setWidth/setAttachment",
       "evidence_refs": [
-        "config/autocad_native_arx_operation_catalog.json#write.entity.mtext"
+        "config/autocad_native_arx_operation_catalog.json#write.entity.mtext",
+        "src/Ariadne.AcadNative/families/m08h_handlers.inc:m08hDispatch",
+        "reports/merge/MERGE-M08-READ.json",
+        "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
+        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)"
       ],
       "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
       "owner_ticket": "M08H-T01",
-      "implementation_strategy": "objectdbx_hostless",
-      "evidence_required": "unit_test+staged_diff_fixture_original_unchanged"
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs"
     },
     {
       "id": "write.entity.nurbsurface",
@@ -23714,7 +23829,7 @@
       "id": "write.entity.polygonmesh",
       "operation": "write.entity.polygonmesh",
       "family": "entities",
-      "status": "catalogued",
+      "status": "implemented",
       "engine_tier": "objectdbx_capable",
       "engines": [
         "objectdbx_capable"
@@ -23742,7 +23857,7 @@
       },
       "handler": {
         "router_lane": null,
-        "dispatcher_symbol": null,
+        "dispatcher_symbol": "m08gDispatch",
         "execution_host_class": "dbx",
         "native_api": "AcDbPolygonMesh + AcDbPolygonMeshVertex (M×N)",
         "composed_of": []
@@ -23767,24 +23882,29 @@
       },
       "tests": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
-        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata"
+        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
+        "tests/unit/test_m08g_handlers.py"
       ],
       "summary": "Create legacy polygon mesh (M×N grid)",
       "source_slice": "entities-geometry-graphics.md",
       "citation": "hdr dbents.h AcDbPolygonMesh / AcDbPolygonMeshVertex",
       "evidence_refs": [
-        "config/autocad_native_arx_operation_catalog.json#write.entity.polygonmesh"
+        "config/autocad_native_arx_operation_catalog.json#write.entity.polygonmesh",
+        "src/Ariadne.AcadNative/families/m08g_handlers.inc:m08gDispatch",
+        "reports/merge/MERGE-M08-READ.json",
+        "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
+        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)"
       ],
       "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
       "owner_ticket": "M08G-T02",
-      "implementation_strategy": "objectdbx_hostless",
-      "evidence_required": "unit_test+staged_diff_fixture_original_unchanged"
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs"
     },
     {
       "id": "write.entity.polyline2d",
       "operation": "write.entity.polyline2d",
       "family": "entities",
-      "status": "catalogued",
+      "status": "implemented",
       "engine_tier": "objectdbx_capable",
       "engines": [
         "objectdbx_capable"
@@ -23812,7 +23932,7 @@
       },
       "handler": {
         "router_lane": null,
-        "dispatcher_symbol": null,
+        "dispatcher_symbol": "m08gDispatch",
         "execution_host_class": "dbx",
         "native_api": "AcDb2dPolyline + AcDb2dVertex append",
         "composed_of": []
@@ -23837,24 +23957,29 @@
       },
       "tests": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
-        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata"
+        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
+        "tests/unit/test_m08g_handlers.py"
       ],
       "summary": "Create heavyweight 2D polyline (vertex sub-entities)",
       "source_slice": "entities-geometry-graphics.md",
       "citation": "hdr dbents.h AcDb2dPolyline / AcDb2dVertex",
       "evidence_refs": [
-        "config/autocad_native_arx_operation_catalog.json#write.entity.polyline2d"
+        "config/autocad_native_arx_operation_catalog.json#write.entity.polyline2d",
+        "src/Ariadne.AcadNative/families/m08g_handlers.inc:m08gDispatch",
+        "reports/merge/MERGE-M08-READ.json",
+        "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
+        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)"
       ],
       "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
       "owner_ticket": "M08G-T02",
-      "implementation_strategy": "objectdbx_hostless",
-      "evidence_required": "unit_test+staged_diff_fixture_original_unchanged"
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs"
     },
     {
       "id": "write.entity.polyline3d",
       "operation": "write.entity.polyline3d",
       "family": "entities",
-      "status": "catalogued",
+      "status": "implemented",
       "engine_tier": "objectdbx_capable",
       "engines": [
         "objectdbx_capable"
@@ -23882,7 +24007,7 @@
       },
       "handler": {
         "router_lane": null,
-        "dispatcher_symbol": null,
+        "dispatcher_symbol": "m08gDispatch",
         "execution_host_class": "dbx",
         "native_api": "AcDb3dPolyline + AcDb3dPolylineVertex",
         "composed_of": []
@@ -23907,18 +24032,23 @@
       },
       "tests": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
-        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata"
+        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
+        "tests/unit/test_m08g_handlers.py"
       ],
       "summary": "Create 3D polyline",
       "source_slice": "entities-geometry-graphics.md",
       "citation": "hdr dbents.h AcDb3dPolyline / AcDb3dPolylineVertex",
       "evidence_refs": [
-        "config/autocad_native_arx_operation_catalog.json#write.entity.polyline3d"
+        "config/autocad_native_arx_operation_catalog.json#write.entity.polyline3d",
+        "src/Ariadne.AcadNative/families/m08g_handlers.inc:m08gDispatch",
+        "reports/merge/MERGE-M08-READ.json",
+        "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
+        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)"
       ],
       "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
       "owner_ticket": "M08G-T02",
-      "implementation_strategy": "objectdbx_hostless",
-      "evidence_required": "unit_test+staged_diff_fixture_original_unchanged"
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs"
     },
     {
       "id": "write.entity.rasterimage",
@@ -23994,7 +24124,7 @@
       "id": "write.entity.ray",
       "operation": "write.entity.ray",
       "family": "entities",
-      "status": "catalogued",
+      "status": "implemented",
       "engine_tier": "objectdbx_capable",
       "engines": [
         "objectdbx_capable"
@@ -24022,7 +24152,7 @@
       },
       "handler": {
         "router_lane": null,
-        "dispatcher_symbol": null,
+        "dispatcher_symbol": "m08gDispatch",
         "execution_host_class": "dbx",
         "native_api": "AcDbRay (basePt, unitDir)",
         "composed_of": []
@@ -24047,24 +24177,29 @@
       },
       "tests": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
-        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata"
+        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
+        "tests/unit/test_m08g_handlers.py"
       ],
       "summary": "Create a ray (semi-infinite)",
       "source_slice": "entities-geometry-graphics.md",
       "citation": "hdr dbray.h AcDbRay; ActiveX AcadRay family",
       "evidence_refs": [
-        "config/autocad_native_arx_operation_catalog.json#write.entity.ray"
+        "config/autocad_native_arx_operation_catalog.json#write.entity.ray",
+        "src/Ariadne.AcadNative/families/m08g_handlers.inc:m08gDispatch",
+        "reports/merge/MERGE-M08-READ.json",
+        "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
+        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)"
       ],
       "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
       "owner_ticket": "M08G-T02",
-      "implementation_strategy": "objectdbx_hostless",
-      "evidence_required": "unit_test+staged_diff_fixture_original_unchanged"
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs"
     },
     {
       "id": "write.entity.region",
       "operation": "write.entity.region",
       "family": "entities",
-      "status": "catalogued",
+      "status": "implemented",
       "engine_tier": "objectdbx_capable",
       "engines": [
         "objectdbx_capable"
@@ -24092,7 +24227,7 @@
       },
       "handler": {
         "router_lane": null,
-        "dispatcher_symbol": null,
+        "dispatcher_symbol": "m08gDispatch",
         "execution_host_class": "dbx",
         "native_api": "AcDbRegion::createFromCurves(curves, regions) (static)",
         "composed_of": []
@@ -24117,18 +24252,23 @@
       },
       "tests": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
-        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata"
+        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
+        "tests/unit/test_m08g_handlers.py"
       ],
       "summary": "Create planar region(s) from coplanar closed curves",
       "source_slice": "entities-geometry-graphics.md",
       "citation": "hdr dbregion.h AcDbRegion; ActiveX AcadRegion GUID-DFE47717 (AddRegion/Boolean/Explode)",
       "evidence_refs": [
-        "config/autocad_native_arx_operation_catalog.json#write.entity.region"
+        "config/autocad_native_arx_operation_catalog.json#write.entity.region",
+        "src/Ariadne.AcadNative/families/m08g_handlers.inc:m08gDispatch",
+        "reports/merge/MERGE-M08-READ.json",
+        "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
+        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)"
       ],
       "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
       "owner_ticket": "M08G-T02",
-      "implementation_strategy": "objectdbx_hostless",
-      "evidence_required": "unit_test+staged_diff_fixture_original_unchanged"
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs"
     },
     {
       "id": "write.entity.shape",
@@ -24204,7 +24344,7 @@
       "id": "write.entity.solid2d",
       "operation": "write.entity.solid2d",
       "family": "entities",
-      "status": "catalogued",
+      "status": "implemented",
       "engine_tier": "objectdbx_capable",
       "engines": [
         "objectdbx_capable"
@@ -24232,7 +24372,7 @@
       },
       "handler": {
         "router_lane": null,
-        "dispatcher_symbol": null,
+        "dispatcher_symbol": "m08gDispatch",
         "execution_host_class": "dbx",
         "native_api": "AcDbSolid (2D filled quad/tri — SOLID)",
         "composed_of": []
@@ -24257,18 +24397,23 @@
       },
       "tests": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
-        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata"
+        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
+        "tests/unit/test_m08g_handlers.py"
       ],
       "summary": "Create 2D filled solid (SOLID cmd)",
       "source_slice": "entities-geometry-graphics.md",
       "citation": "hdr dbents.h AcDbSolid",
       "evidence_refs": [
-        "config/autocad_native_arx_operation_catalog.json#write.entity.solid2d"
+        "config/autocad_native_arx_operation_catalog.json#write.entity.solid2d",
+        "src/Ariadne.AcadNative/families/m08g_handlers.inc:m08gDispatch",
+        "reports/merge/MERGE-M08-READ.json",
+        "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
+        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)"
       ],
       "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
       "owner_ticket": "M08G-T02",
-      "implementation_strategy": "objectdbx_hostless",
-      "evidence_required": "unit_test+staged_diff_fixture_original_unchanged"
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs"
     },
     {
       "id": "write.entity.solid3d.extrude",
@@ -24624,7 +24769,7 @@
       "id": "write.entity.spline",
       "operation": "write.entity.spline",
       "family": "entities",
-      "status": "catalogued",
+      "status": "implemented",
       "engine_tier": "objectdbx_capable",
       "engines": [
         "objectdbx_capable"
@@ -24652,7 +24797,7 @@
       },
       "handler": {
         "router_lane": null,
-        "dispatcher_symbol": null,
+        "dispatcher_symbol": "m08gDispatch",
         "execution_host_class": "dbx",
         "native_api": "AcDbSpline(...) (fit pts / control pts / NURBS data)",
         "composed_of": []
@@ -24677,18 +24822,23 @@
       },
       "tests": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
-        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata"
+        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
+        "tests/unit/test_m08g_handlers.py"
       ],
       "summary": "Create a spline (cubic fit or NURBS)",
       "source_slice": "entities-geometry-graphics.md",
       "citation": "hdr dbspline.h AcDbSpline",
       "evidence_refs": [
-        "config/autocad_native_arx_operation_catalog.json#write.entity.spline"
+        "config/autocad_native_arx_operation_catalog.json#write.entity.spline",
+        "src/Ariadne.AcadNative/families/m08g_handlers.inc:m08gDispatch",
+        "reports/merge/MERGE-M08-READ.json",
+        "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
+        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)"
       ],
       "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
       "owner_ticket": "M08G-T02",
-      "implementation_strategy": "objectdbx_hostless",
-      "evidence_required": "unit_test+staged_diff_fixture_original_unchanged"
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs"
     },
     {
       "id": "write.entity.subdmesh",
@@ -24904,7 +25054,7 @@
       "id": "write.entity.text",
       "operation": "write.entity.text",
       "family": "entities",
-      "status": "catalogued",
+      "status": "implemented",
       "engine_tier": "objectdbx_capable",
       "engines": [
         "objectdbx_capable"
@@ -24932,7 +25082,7 @@
       },
       "handler": {
         "router_lane": null,
-        "dispatcher_symbol": null,
+        "dispatcher_symbol": "m08hDispatch",
         "execution_host_class": "dbx",
         "native_api": "AcDbText + setTextString/setPosition/setHeight/setRotation/setTextStyle",
         "composed_of": []
@@ -24957,24 +25107,29 @@
       },
       "tests": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
-        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata"
+        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
+        "tests/unit/test_m08h_handlers.py"
       ],
       "summary": "Create single-line text",
       "source_slice": "entities-geometry-graphics.md",
       "citation": "hdr dbents.h AcDbText",
       "evidence_refs": [
-        "config/autocad_native_arx_operation_catalog.json#write.entity.text"
+        "config/autocad_native_arx_operation_catalog.json#write.entity.text",
+        "src/Ariadne.AcadNative/families/m08h_handlers.inc:m08hDispatch",
+        "reports/merge/MERGE-M08-READ.json",
+        "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
+        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)"
       ],
       "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
       "owner_ticket": "M08H-T01",
-      "implementation_strategy": "objectdbx_hostless",
-      "evidence_required": "unit_test+staged_diff_fixture_original_unchanged"
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs"
     },
     {
       "id": "write.entity.trace",
       "operation": "write.entity.trace",
       "family": "entities",
-      "status": "catalogued",
+      "status": "implemented",
       "engine_tier": "objectdbx_capable",
       "engines": [
         "objectdbx_capable"
@@ -25002,7 +25157,7 @@
       },
       "handler": {
         "router_lane": null,
-        "dispatcher_symbol": null,
+        "dispatcher_symbol": "m08gDispatch",
         "execution_host_class": "dbx",
         "native_api": "AcDbTrace",
         "composed_of": []
@@ -25027,18 +25182,23 @@
       },
       "tests": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
-        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata"
+        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
+        "tests/unit/test_m08g_handlers.py"
       ],
       "summary": "Create a TRACE entity",
       "source_slice": "entities-geometry-graphics.md",
       "citation": "hdr dbents.h AcDbTrace",
       "evidence_refs": [
-        "config/autocad_native_arx_operation_catalog.json#write.entity.trace"
+        "config/autocad_native_arx_operation_catalog.json#write.entity.trace",
+        "src/Ariadne.AcadNative/families/m08g_handlers.inc:m08gDispatch",
+        "reports/merge/MERGE-M08-READ.json",
+        "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
+        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)"
       ],
       "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
       "owner_ticket": "M08G-T02",
-      "implementation_strategy": "objectdbx_hostless",
-      "evidence_required": "unit_test+staged_diff_fixture_original_unchanged"
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs"
     },
     {
       "id": "write.entity.wipeout",
@@ -25114,7 +25274,7 @@
       "id": "write.entity.xline",
       "operation": "write.entity.xline",
       "family": "entities",
-      "status": "catalogued",
+      "status": "implemented",
       "engine_tier": "objectdbx_capable",
       "engines": [
         "objectdbx_capable"
@@ -25142,7 +25302,7 @@
       },
       "handler": {
         "router_lane": null,
-        "dispatcher_symbol": null,
+        "dispatcher_symbol": "m08gDispatch",
         "execution_host_class": "dbx",
         "native_api": "AcDbXline (basePt, unitDir)",
         "composed_of": []
@@ -25167,18 +25327,23 @@
       },
       "tests": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
-        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata"
+        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
+        "tests/unit/test_m08g_handlers.py"
       ],
       "summary": "Create an xline (infinite construction line)",
       "source_slice": "entities-geometry-graphics.md",
       "citation": "hdr dbxline.h AcDbXline; ActiveX AcadXline GUID-A223EA11",
       "evidence_refs": [
-        "config/autocad_native_arx_operation_catalog.json#write.entity.xline"
+        "config/autocad_native_arx_operation_catalog.json#write.entity.xline",
+        "src/Ariadne.AcadNative/families/m08g_handlers.inc:m08gDispatch",
+        "reports/merge/MERGE-M08-READ.json",
+        "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
+        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)"
       ],
       "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
       "owner_ticket": "M08G-T02",
-      "implementation_strategy": "objectdbx_hostless",
-      "evidence_required": "unit_test+staged_diff_fixture_original_unchanged"
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs"
     },
     {
       "id": "compute.entity.intersect",
@@ -26540,7 +26705,7 @@
       "id": "modify.entity.transform",
       "operation": "modify.entity.transform",
       "family": "geometry_kernel",
-      "status": "catalogued",
+      "status": "implemented",
       "engine_tier": "objectdbx_capable",
       "engines": [
         "objectdbx_capable"
@@ -26568,7 +26733,7 @@
       },
       "handler": {
         "router_lane": null,
-        "dispatcher_symbol": null,
+        "dispatcher_symbol": "m08gDispatch",
         "execution_host_class": "dbx",
         "native_api": "AcDbEntity::transformBy(const AcGeMatrix3d& xform) (sealed; override subTransformBy)",
         "composed_of": []
@@ -26593,24 +26758,29 @@
       },
       "tests": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
-        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata"
+        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
+        "tests/unit/test_m08g_handlers.py"
       ],
       "summary": "Apply a 3D affine transform (move/rotate/scale/mirror)",
       "source_slice": "entities-geometry-graphics.md",
       "citation": "hdr dbmain.h transformBy (ADESK_SEALED) / subTransformBy",
       "evidence_refs": [
-        "config/autocad_native_arx_operation_catalog.json#modify.entity.transform"
+        "config/autocad_native_arx_operation_catalog.json#modify.entity.transform",
+        "src/Ariadne.AcadNative/families/m08g_handlers.inc:m08gDispatch",
+        "reports/merge/MERGE-M08-READ.json",
+        "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
+        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)"
       ],
       "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
       "owner_ticket": "M08G-T03",
-      "implementation_strategy": "objectdbx_hostless",
-      "evidence_required": "unit_test+staged_diff_fixture_original_unchanged"
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs"
     },
     {
       "id": "write.entity.point",
       "operation": "write.entity.point",
       "family": "geometry_kernel",
-      "status": "catalogued",
+      "status": "implemented",
       "engine_tier": "objectdbx_capable",
       "engines": [
         "objectdbx_capable"
@@ -26638,7 +26808,7 @@
       },
       "handler": {
         "router_lane": null,
-        "dispatcher_symbol": null,
+        "dispatcher_symbol": "m08gDispatch",
         "execution_host_class": "dbx",
         "native_api": "AcDbPoint(const AcGePoint3d&)",
         "composed_of": []
@@ -26663,24 +26833,29 @@
       },
       "tests": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
-        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata"
+        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
+        "tests/unit/test_m08g_handlers.py"
       ],
       "summary": "Create a point entity",
       "source_slice": "entities-geometry-graphics.md",
       "citation": "hdr dbents.h AcDbPoint",
       "evidence_refs": [
-        "config/autocad_native_arx_operation_catalog.json#write.entity.point"
+        "config/autocad_native_arx_operation_catalog.json#write.entity.point",
+        "src/Ariadne.AcadNative/families/m08g_handlers.inc:m08gDispatch",
+        "reports/merge/MERGE-M08-READ.json",
+        "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
+        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)"
       ],
       "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
       "owner_ticket": "M08G-T02",
-      "implementation_strategy": "objectdbx_hostless",
-      "evidence_required": "unit_test+staged_diff_fixture_original_unchanged"
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs"
     },
     {
       "id": "write.entity.polyline",
       "operation": "write.entity.polyline",
       "family": "geometry_kernel",
-      "status": "catalogued",
+      "status": "implemented",
       "engine_tier": "objectdbx_capable",
       "engines": [
         "objectdbx_capable"
@@ -26708,7 +26883,7 @@
       },
       "handler": {
         "router_lane": null,
-        "dispatcher_symbol": null,
+        "dispatcher_symbol": "m08gDispatch",
         "execution_host_class": "dbx",
         "native_api": "AcDbPolyline::addVertexAt(idx, AcGePoint2d, bulge, startW, endW), setClosed, setBulgeAt, setWidthsAt",
         "composed_of": []
@@ -26733,24 +26908,29 @@
       },
       "tests": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
-        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata"
+        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
+        "tests/unit/test_m08g_handlers.py"
       ],
       "summary": "Create lightweight polyline (LWPOLYLINE) with bulges/widths",
       "source_slice": "entities-geometry-graphics.md",
       "citation": "hdr dbpl.h AcDbPolyline addVertexAt/setBulgeAt/setWidthsAt/setClosed/numVerts",
       "evidence_refs": [
-        "config/autocad_native_arx_operation_catalog.json#write.entity.polyline"
+        "config/autocad_native_arx_operation_catalog.json#write.entity.polyline",
+        "src/Ariadne.AcadNative/families/m08g_handlers.inc:m08gDispatch",
+        "reports/merge/MERGE-M08-READ.json",
+        "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
+        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)"
       ],
       "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
       "owner_ticket": "M08G-T02",
-      "implementation_strategy": "objectdbx_hostless",
-      "evidence_required": "unit_test+staged_diff_fixture_original_unchanged"
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs"
     },
     {
       "id": "write.entity.tolerance",
       "operation": "write.entity.tolerance",
       "family": "geometry_kernel",
-      "status": "catalogued",
+      "status": "implemented",
       "engine_tier": "objectdbx_capable",
       "engines": [
         "objectdbx_capable"
@@ -26778,7 +26958,7 @@
       },
       "handler": {
         "router_lane": null,
-        "dispatcher_symbol": null,
+        "dispatcher_symbol": "m08gDispatch",
         "execution_host_class": "dbx",
         "native_api": "AcDbFcf (feature control frame)",
         "composed_of": []
@@ -26803,18 +26983,23 @@
       },
       "tests": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
-        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata"
+        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
+        "tests/unit/test_m08g_handlers.py"
       ],
       "summary": "Create GD&T tolerance / feature-control frame",
       "source_slice": "entities-geometry-graphics.md",
       "citation": "hdr dbfcf.h AcDbFcf; ActiveX AcadTolerance GUID-89AF1685",
       "evidence_refs": [
-        "config/autocad_native_arx_operation_catalog.json#write.entity.tolerance"
+        "config/autocad_native_arx_operation_catalog.json#write.entity.tolerance",
+        "src/Ariadne.AcadNative/families/m08g_handlers.inc:m08gDispatch",
+        "reports/merge/MERGE-M08-READ.json",
+        "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
+        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)"
       ],
       "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
       "owner_ticket": "M08G-T02",
-      "implementation_strategy": "objectdbx_hostless",
-      "evidence_required": "unit_test+staged_diff_fixture_original_unchanged"
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs"
     },
     {
       "id": "inspect.entity.grips",

@@ -2,9 +2,9 @@
 
 - packet: `CADOS_M08_FULL_OPERATION_COVERAGE_CLOSURE`
 - generated_from: `config/operations.v2.json`
-- total operations: **517** · implemented 125 · stub 0 · blocked 2 · catalogued 390 · deprecated 0 · **unknown 0**
-- v1-target: **127** (implemented 125 · blocked 2 · **deferred 0**)
-- agent-exposed ops: 125
+- total operations: **517** · implemented 162 · stub 0 · blocked 2 · catalogued 353 · deprecated 0 · **unknown 0**
+- v1-target: **164** (implemented 162 · blocked 2 · **deferred 0**)
+- agent-exposed ops: 162
 
 ## Gate
 
@@ -32,7 +32,7 @@
 | validate_diff | 3 | 0 | 0 | 0 | 3 |
 | render_visual | 0 | 0 | 1 | 11 | 1 |
 | live | 6 | 0 | 1 | 0 | 7 |
-| native_only | 73 | 0 | 0 | 348 | 73 |
+| native_only | 110 | 0 | 0 | 311 | 110 |
 
 ## Risk class distribution
 
@@ -103,6 +103,39 @@
 | inspect.entity.common | entities | implemented | read_safe | read | True | m08dDispatch |  |
 | inspect.entity.geomextents | entities | implemented | read_safe | read | True | m08dDispatch |  |
 | inspect.entity.osnap | entities | implemented | read_safe | read | True | m08dDispatch |  |
+| modify.curve.offset | entities | implemented | read_safe | read | True | m08gDispatch |  |
+| modify.curve.split | entities | implemented | read_safe | read | True | m08gDispatch |  |
+| modify.curve.to_spline | entities | implemented | read_safe | read | True | m08gDispatch |  |
+| modify.entity.common | entities | implemented | staged_write | write_copy | True | m08gDispatch |  |
+| modify.entity.copy_transformed | entities | implemented | read_safe | read | True | m08gDispatch |  |
+| modify.entity.explode | entities | implemented | read_safe | read | True | m08gDispatch |  |
+| write.entity.arc | entities | implemented | staged_write | write_copy | True | m08gDispatch |  |
+| write.entity.attribdef | entities | implemented | staged_write | write_copy | True | m08gDispatch |  |
+| write.entity.blockref | entities | implemented | staged_write | write_copy | True | m08gDispatch |  |
+| write.entity.dim.aligned | entities | implemented | staged_write | write_copy | True | m08hDispatch |  |
+| write.entity.dim.angular2line | entities | implemented | staged_write | write_copy | True | m08hDispatch |  |
+| write.entity.dim.angular3pt | entities | implemented | staged_write | write_copy | True | m08hDispatch |  |
+| write.entity.dim.arc | entities | implemented | staged_write | write_copy | True | m08hDispatch |  |
+| write.entity.dim.diametric | entities | implemented | staged_write | write_copy | True | m08hDispatch |  |
+| write.entity.dim.ordinate | entities | implemented | staged_write | write_copy | True | m08hDispatch |  |
+| write.entity.dim.radial | entities | implemented | staged_write | write_copy | True | m08hDispatch |  |
+| write.entity.dim.radiallarge | entities | implemented | staged_write | write_copy | True | m08hDispatch |  |
+| write.entity.dim.rotated | entities | implemented | staged_write | write_copy | True | m08hDispatch |  |
+| write.entity.ellipse | entities | implemented | staged_write | write_copy | True | m08gDispatch |  |
+| write.entity.face | entities | implemented | staged_write | write_copy | True | m08gDispatch |  |
+| write.entity.hatch | entities | implemented | staged_write | write_copy | True | m08hDispatch |  |
+| write.entity.minsert | entities | implemented | staged_write | write_copy | True | m08gDispatch |  |
+| write.entity.mtext | entities | implemented | staged_write | write_copy | True | m08hDispatch |  |
+| write.entity.polygonmesh | entities | implemented | staged_write | write_copy | True | m08gDispatch |  |
+| write.entity.polyline2d | entities | implemented | staged_write | write_copy | True | m08gDispatch |  |
+| write.entity.polyline3d | entities | implemented | staged_write | write_copy | True | m08gDispatch |  |
+| write.entity.ray | entities | implemented | staged_write | write_copy | True | m08gDispatch |  |
+| write.entity.region | entities | implemented | staged_write | write_copy | True | m08gDispatch |  |
+| write.entity.solid2d | entities | implemented | staged_write | write_copy | True | m08gDispatch |  |
+| write.entity.spline | entities | implemented | staged_write | write_copy | True | m08gDispatch |  |
+| write.entity.text | entities | implemented | staged_write | write_copy | True | m08hDispatch |  |
+| write.entity.trace | entities | implemented | staged_write | write_copy | True | m08gDispatch |  |
+| write.entity.xline | entities | implemented | staged_write | write_copy | True | m08gDispatch |  |
 | extend.customclass.create | extend | implemented | live_edit | live_edit | True | createCustomEntity |  |
 | extend.customobject.create | extend | implemented | live_edit | live_edit | True | createCustomObject |  |
 | compute.entity.intersect | geometry_kernel | implemented | read_safe | read | True | m08dDispatch |  |
@@ -123,8 +156,12 @@
 | compute.geometry.surface.nurb | geometry_kernel | implemented | read_safe | read | True | m08dDispatch |  |
 | compute.geometry.tolerance | geometry_kernel | implemented | read_safe | read | True | m08dDispatch |  |
 | compute.solid3d.interference | geometry_kernel | implemented | staged_write | write_copy | True | m08dDispatch |  |
+| modify.entity.transform | geometry_kernel | implemented | staged_write | write_copy | True | m08gDispatch |  |
 | write.entity.circle | geometry_kernel | implemented | staged_write | write_copy | True | appendCircle |  |
 | write.entity.line | geometry_kernel | implemented | staged_write | write_copy | True | appendLine |  |
+| write.entity.point | geometry_kernel | implemented | staged_write | write_copy | True | m08gDispatch |  |
+| write.entity.polyline | geometry_kernel | implemented | staged_write | write_copy | True | m08gDispatch |  |
+| write.entity.tolerance | geometry_kernel | implemented | staged_write | write_copy | True | m08gDispatch |  |
 | inspect.block.count | inspect | implemented | read_safe | read | True | countBlockDefinitions |  |
 | inspect.blocks | inspect | implemented | read_safe | read | True | listBlockDefinitionsDetailed |  |
 | inspect.customclass.count | inspect | implemented | read_safe | read | True | countCustomEntities |  |
@@ -175,4 +212,4 @@
 | write.layout.create | write | implemented | staged_write | write_copy | True | createLayout |  |
 | write.xdata.set | write | implemented | staged_write | write_copy | True | setDatabaseXdata |  |
 
-> Full 517-operation detail (all 13 fields per op) is in `reports/operation_coverage_full_matrix.json` — this table lists only the 127 v1-target ops. The 390 catalogued ops are classified future-version native capability (v1_target=false), not omitted.
+> Full 517-operation detail (all 13 fields per op) is in `reports/operation_coverage_full_matrix.json` — this table lists only the 164 v1-target ops. The 353 catalogued ops are classified future-version native capability (v1_target=false), not omitted.

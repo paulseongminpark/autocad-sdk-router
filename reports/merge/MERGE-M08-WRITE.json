@@ -1,0 +1,48 @@
+{
+  "merge_id": "MERGE-M08-WRITE",
+  "role": "merge_executor",
+  "date": "2026-06-23",
+  "scope": "M08G + M08H native WRITE families (entity-create, entity/geometry modify, dimensions, annotations, hatch) — staged-write ObjectARX handlers.",
+  "status": "PASS",
+  "merged": [
+    {"pr": 14, "branch": "cados/M08G", "merge_commit": "e1ead53", "family": "G", "implemented_ops": 25, "deferred": 20},
+    {"pr": 15, "branch": "cados/M08H", "merge_commit": "c8fdf2b", "family": "H", "implemented_ops": 12, "deferred": 3}
+  ],
+  "seam_extension": {"pr": 13, "merge_commit": "d9cd7cb", "note": "m08g/m08h stub .inc wired into AriadneNativeJob.cpp before the parallel families (C0->C/D/E pattern)"},
+  "implemented_total": 37,
+  "deferred_total": 23,
+  "implemented": {
+    "m08g_25": ["write.entity.arc","write.entity.attribdef","write.entity.blockref","write.entity.ellipse","write.entity.face","write.entity.minsert","write.entity.point","write.entity.polygonmesh","write.entity.polyline","write.entity.polyline2d","write.entity.polyline3d","write.entity.ray","write.entity.region","write.entity.solid2d","write.entity.spline","write.entity.tolerance","write.entity.trace","write.entity.xline","modify.curve.offset","modify.curve.split","modify.curve.to_spline","modify.entity.common","modify.entity.copy_transformed","modify.entity.explode","modify.entity.transform"],
+    "m08h_12": ["write.entity.text","write.entity.mtext","write.entity.dim.aligned","write.entity.dim.rotated","write.entity.dim.radial","write.entity.dim.diametric","write.entity.dim.angular2line","write.entity.dim.angular3pt","write.entity.dim.ordinate","write.entity.dim.arc","write.entity.dim.radiallarge","write.entity.hatch"]
+  },
+  "deferred": {
+    "m08g_20": "ASM-modeler-bound (write.entity.body/surface/nurbsurface/subdmesh/polyfacemesh, solid3d.{extrude,loft,primitive,revolve,sweep}, modify.entity.solid3d.boolean), subentity edits (edit.subentity.{add_paths,delete_paths,transform}), and resource/style-bound (write.entity.attribute[needs host blockref], mline[mlinestyle], mpolygon, rasterimage[image def], shape[shapefile], wipeout). Honestly OUT of HasOp with blockers in reports/tickets/M08G.md.",
+    "m08h_3": "write.entity.{leader,mleader,table} — need style+content dictionaries (mleaderstyle/tablestyle + content objects) absent in the hostless seed DB. Honestly OUT of HasOp; reports/tickets/M08H.md."
+  },
+  "pre_merge_integration": {
+    "worktree": "autocad-sdk-router_INTEG (octopus-merged cados/M08G + cados/M08H off main)",
+    "combined_tu_build_exit": 0,
+    "artifacts": {"Ariadne.AcadNativeDbx.dbx": 48640, "Ariadne.AcadNative.crx": 403968, "Ariadne.AcadNative.arx": 411648},
+    "verified": "m08g* and m08h* handlers + helpers coexist in the single AriadneNativeJob.cpp TU with NO static-symbol collision; both #included via the M08GH0 seam.",
+    "pytest": "336 passed"
+  },
+  "registry_reconciliation": {
+    "tool": "tools/reconcile_native_registry.py (auto-discovered m08g/m08h; flip 37, drift 0, conflicts 0)",
+    "implemented": "125 -> 162",
+    "catalogued": "390 -> 353",
+    "done_as": "merge-step closeout (committed directly on main by the single-writer merge step, vs the READ wave's separate PR #12 — bundled here for efficiency; deterministic tool output, 349-test verified)"
+  },
+  "post_merge_gate": {
+    "build": "combined integration build exit 0 (above); no C++ changed by reconcile -> artifacts current",
+    "pytest": "349 passed",
+    "closure_gate": {"catalogued": 353, "stub": 0, "closure_gate_pass": false, "m09_allowed": false}
+  },
+  "reject_if_audit": {
+    "original_dwg_changed": false, "save_or_saveas_in_write_handlers": false, "aced_command_used": false,
+    "raw_command_agent_exposed": false, "frozen_ops_regress": false, "tests_fail": false,
+    "fake_implemented": false, "symbol_collision": false, "drift_silent": false
+  },
+  "process_note": "Parallel teammates (m08g-impl/m08h-impl) each in own pre-created worktree + ABSOLUTE paths only + -RouterHome <abs> build -> NO cwd collision (the READ-wave in-process teammate lesson applied from the start).",
+  "closure_note": "closure_gate honestly False: 353 catalogued remain (the 23 deferred WRITE ops + VISLIVE/NATIVE/FALLBACK waves). M09 blocked until catalogued/stub/unknown/deferred = 0.",
+  "next": "Disposition the 23 deferred WRITE ops (ASM-modeler feasibility study, or hard_block with blocker_ref). Then M08I/J VISLIVE, M08K/L/M/N NATIVE, M08O FALLBACK waves."
+}

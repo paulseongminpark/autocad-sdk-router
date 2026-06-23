@@ -154,8 +154,8 @@
     },
     "M08G-T02": {
       "op_count": 40,
-      "open": 34,
-      "implemented": 6,
+      "open": 16,
+      "implemented": 24,
       "blocked": 0,
       "by_family": {
         "geometry_kernel": 5,
@@ -163,14 +163,14 @@
         "entities": 31
       },
       "by_strategy": {
-        "implemented_v1": 6,
-        "objectdbx_hostless": 34
+        "implemented_v1": 24,
+        "objectdbx_hostless": 16
       }
     },
     "M08G-T03": {
       "op_count": 11,
-      "open": 11,
-      "implemented": 0,
+      "open": 4,
+      "implemented": 7,
       "blocked": 0,
       "by_family": {
         "brep_solids": 3,
@@ -179,31 +179,33 @@
       },
       "by_strategy": {
         "native_arx_cpp": 3,
-        "objectdbx_hostless": 8
+        "implemented_v1": 7,
+        "objectdbx_hostless": 1
       }
     },
     "M08H-T01": {
       "op_count": 14,
-      "open": 14,
-      "implemented": 0,
+      "open": 3,
+      "implemented": 11,
       "blocked": 0,
       "by_family": {
         "entities": 14
       },
       "by_strategy": {
-        "objectdbx_hostless": 14
+        "implemented_v1": 11,
+        "objectdbx_hostless": 3
       }
     },
     "M08H-T02": {
       "op_count": 1,
-      "open": 1,
-      "implemented": 0,
+      "open": 0,
+      "implemented": 1,
       "blocked": 0,
       "by_family": {
         "entities": 1
       },
       "by_strategy": {
-        "objectdbx_hostless": 1
+        "implemented_v1": 1
       }
     },
     "M08I-T01": {
@@ -3516,81 +3518,81 @@
     {
       "operation": "modify.curve.offset",
       "family": "entities",
-      "status": "catalogued",
+      "status": "implemented",
       "engine_tier": "objectdbx_capable",
       "owner_ticket": "M08G-T03",
-      "implementation_strategy": "objectdbx_hostless",
-      "evidence_required": "unit_test+native_extraction_fixture",
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs",
       "risk_class": "read_safe"
     },
     {
       "operation": "modify.curve.split",
       "family": "entities",
-      "status": "catalogued",
+      "status": "implemented",
       "engine_tier": "objectdbx_capable",
       "owner_ticket": "M08G-T03",
-      "implementation_strategy": "objectdbx_hostless",
-      "evidence_required": "unit_test+native_extraction_fixture",
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs",
       "risk_class": "read_safe"
     },
     {
       "operation": "modify.curve.to_spline",
       "family": "entities",
-      "status": "catalogued",
+      "status": "implemented",
       "engine_tier": "objectdbx_capable",
       "owner_ticket": "M08G-T03",
-      "implementation_strategy": "objectdbx_hostless",
-      "evidence_required": "unit_test+native_extraction_fixture",
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs",
       "risk_class": "read_safe"
     },
     {
       "operation": "modify.entity.common",
       "family": "entities",
-      "status": "catalogued",
+      "status": "implemented",
       "engine_tier": "objectdbx_capable",
       "owner_ticket": "M08G-T03",
-      "implementation_strategy": "objectdbx_hostless",
-      "evidence_required": "unit_test+staged_diff_fixture_original_unchanged",
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs",
       "risk_class": "staged_write"
     },
     {
       "operation": "modify.entity.copy_transformed",
       "family": "entities",
-      "status": "catalogued",
+      "status": "implemented",
       "engine_tier": "objectdbx_capable",
       "owner_ticket": "M08G-T03",
-      "implementation_strategy": "objectdbx_hostless",
-      "evidence_required": "unit_test+native_extraction_fixture",
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs",
       "risk_class": "read_safe"
     },
     {
       "operation": "modify.entity.explode",
       "family": "entities",
-      "status": "catalogued",
+      "status": "implemented",
       "engine_tier": "objectdbx_capable",
       "owner_ticket": "M08G-T03",
-      "implementation_strategy": "objectdbx_hostless",
-      "evidence_required": "unit_test+native_extraction_fixture",
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs",
       "risk_class": "read_safe"
     },
     {
       "operation": "write.entity.arc",
       "family": "entities",
-      "status": "catalogued",
+      "status": "implemented",
       "engine_tier": "objectdbx_capable",
       "owner_ticket": "M08G-T02",
-      "implementation_strategy": "objectdbx_hostless",
-      "evidence_required": "unit_test+staged_diff_fixture_original_unchanged",
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs",
       "risk_class": "staged_write"
     },
     {
       "operation": "write.entity.attribdef",
       "family": "entities",
-      "status": "catalogued",
+      "status": "implemented",
       "engine_tier": "objectdbx_capable",
       "owner_ticket": "M08G-T02",
-      "implementation_strategy": "objectdbx_hostless",
-      "evidence_required": "unit_test+staged_diff_fixture_original_unchanged",
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs",
       "risk_class": "staged_write"
     },
     {
@@ -3606,11 +3608,11 @@
     {
       "operation": "write.entity.blockref",
       "family": "entities",
-      "status": "catalogued",
+      "status": "implemented",
       "engine_tier": "objectdbx_capable",
       "owner_ticket": "M08G-T02",
-      "implementation_strategy": "objectdbx_hostless",
-      "evidence_required": "unit_test+staged_diff_fixture_original_unchanged",
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs",
       "risk_class": "staged_write"
     },
     {
@@ -3626,121 +3628,121 @@
     {
       "operation": "write.entity.dim.aligned",
       "family": "entities",
-      "status": "catalogued",
+      "status": "implemented",
       "engine_tier": "objectdbx_capable",
       "owner_ticket": "M08H-T01",
-      "implementation_strategy": "objectdbx_hostless",
-      "evidence_required": "unit_test+staged_diff_fixture_original_unchanged",
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs",
       "risk_class": "staged_write"
     },
     {
       "operation": "write.entity.dim.angular2line",
       "family": "entities",
-      "status": "catalogued",
+      "status": "implemented",
       "engine_tier": "objectdbx_capable",
       "owner_ticket": "M08H-T01",
-      "implementation_strategy": "objectdbx_hostless",
-      "evidence_required": "unit_test+staged_diff_fixture_original_unchanged",
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs",
       "risk_class": "staged_write"
     },
     {
       "operation": "write.entity.dim.angular3pt",
       "family": "entities",
-      "status": "catalogued",
+      "status": "implemented",
       "engine_tier": "objectdbx_capable",
       "owner_ticket": "M08H-T01",
-      "implementation_strategy": "objectdbx_hostless",
-      "evidence_required": "unit_test+staged_diff_fixture_original_unchanged",
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs",
       "risk_class": "staged_write"
     },
     {
       "operation": "write.entity.dim.arc",
       "family": "entities",
-      "status": "catalogued",
+      "status": "implemented",
       "engine_tier": "objectdbx_capable",
       "owner_ticket": "M08H-T01",
-      "implementation_strategy": "objectdbx_hostless",
-      "evidence_required": "unit_test+staged_diff_fixture_original_unchanged",
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs",
       "risk_class": "staged_write"
     },
     {
       "operation": "write.entity.dim.diametric",
       "family": "entities",
-      "status": "catalogued",
+      "status": "implemented",
       "engine_tier": "objectdbx_capable",
       "owner_ticket": "M08H-T01",
-      "implementation_strategy": "objectdbx_hostless",
-      "evidence_required": "unit_test+staged_diff_fixture_original_unchanged",
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs",
       "risk_class": "staged_write"
     },
     {
       "operation": "write.entity.dim.ordinate",
       "family": "entities",
-      "status": "catalogued",
+      "status": "implemented",
       "engine_tier": "objectdbx_capable",
       "owner_ticket": "M08H-T01",
-      "implementation_strategy": "objectdbx_hostless",
-      "evidence_required": "unit_test+staged_diff_fixture_original_unchanged",
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs",
       "risk_class": "staged_write"
     },
     {
       "operation": "write.entity.dim.radial",
       "family": "entities",
-      "status": "catalogued",
+      "status": "implemented",
       "engine_tier": "objectdbx_capable",
       "owner_ticket": "M08H-T01",
-      "implementation_strategy": "objectdbx_hostless",
-      "evidence_required": "unit_test+staged_diff_fixture_original_unchanged",
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs",
       "risk_class": "staged_write"
     },
     {
       "operation": "write.entity.dim.radiallarge",
       "family": "entities",
-      "status": "catalogued",
+      "status": "implemented",
       "engine_tier": "objectdbx_capable",
       "owner_ticket": "M08H-T01",
-      "implementation_strategy": "objectdbx_hostless",
-      "evidence_required": "unit_test+staged_diff_fixture_original_unchanged",
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs",
       "risk_class": "staged_write"
     },
     {
       "operation": "write.entity.dim.rotated",
       "family": "entities",
-      "status": "catalogued",
+      "status": "implemented",
       "engine_tier": "objectdbx_capable",
       "owner_ticket": "M08H-T01",
-      "implementation_strategy": "objectdbx_hostless",
-      "evidence_required": "unit_test+staged_diff_fixture_original_unchanged",
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs",
       "risk_class": "staged_write"
     },
     {
       "operation": "write.entity.ellipse",
       "family": "entities",
-      "status": "catalogued",
+      "status": "implemented",
       "engine_tier": "objectdbx_capable",
       "owner_ticket": "M08G-T02",
-      "implementation_strategy": "objectdbx_hostless",
-      "evidence_required": "unit_test+staged_diff_fixture_original_unchanged",
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs",
       "risk_class": "staged_write"
     },
     {
       "operation": "write.entity.face",
       "family": "entities",
-      "status": "catalogued",
+      "status": "implemented",
       "engine_tier": "objectdbx_capable",
       "owner_ticket": "M08G-T02",
-      "implementation_strategy": "objectdbx_hostless",
-      "evidence_required": "unit_test+staged_diff_fixture_original_unchanged",
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs",
       "risk_class": "staged_write"
     },
     {
       "operation": "write.entity.hatch",
       "family": "entities",
-      "status": "catalogued",
+      "status": "implemented",
       "engine_tier": "objectdbx_capable",
       "owner_ticket": "M08H-T02",
-      "implementation_strategy": "objectdbx_hostless",
-      "evidence_required": "unit_test+staged_diff_fixture_original_unchanged",
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs",
       "risk_class": "staged_write"
     },
     {
@@ -3756,11 +3758,11 @@
     {
       "operation": "write.entity.minsert",
       "family": "entities",
-      "status": "catalogued",
+      "status": "implemented",
       "engine_tier": "objectdbx_capable",
       "owner_ticket": "M08G-T02",
-      "implementation_strategy": "objectdbx_hostless",
-      "evidence_required": "unit_test+staged_diff_fixture_original_unchanged",
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs",
       "risk_class": "staged_write"
     },
     {
@@ -3796,11 +3798,11 @@
     {
       "operation": "write.entity.mtext",
       "family": "entities",
-      "status": "catalogued",
+      "status": "implemented",
       "engine_tier": "objectdbx_capable",
       "owner_ticket": "M08H-T01",
-      "implementation_strategy": "objectdbx_hostless",
-      "evidence_required": "unit_test+staged_diff_fixture_original_unchanged",
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs",
       "risk_class": "staged_write"
     },
     {
@@ -3826,31 +3828,31 @@
     {
       "operation": "write.entity.polygonmesh",
       "family": "entities",
-      "status": "catalogued",
+      "status": "implemented",
       "engine_tier": "objectdbx_capable",
       "owner_ticket": "M08G-T02",
-      "implementation_strategy": "objectdbx_hostless",
-      "evidence_required": "unit_test+staged_diff_fixture_original_unchanged",
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs",
       "risk_class": "staged_write"
     },
     {
       "operation": "write.entity.polyline2d",
       "family": "entities",
-      "status": "catalogued",
+      "status": "implemented",
       "engine_tier": "objectdbx_capable",
       "owner_ticket": "M08G-T02",
-      "implementation_strategy": "objectdbx_hostless",
-      "evidence_required": "unit_test+staged_diff_fixture_original_unchanged",
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs",
       "risk_class": "staged_write"
     },
     {
       "operation": "write.entity.polyline3d",
       "family": "entities",
-      "status": "catalogued",
+      "status": "implemented",
       "engine_tier": "objectdbx_capable",
       "owner_ticket": "M08G-T02",
-      "implementation_strategy": "objectdbx_hostless",
-      "evidence_required": "unit_test+staged_diff_fixture_original_unchanged",
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs",
       "risk_class": "staged_write"
     },
     {
@@ -3866,21 +3868,21 @@
     {
       "operation": "write.entity.ray",
       "family": "entities",
-      "status": "catalogued",
+      "status": "implemented",
       "engine_tier": "objectdbx_capable",
       "owner_ticket": "M08G-T02",
-      "implementation_strategy": "objectdbx_hostless",
-      "evidence_required": "unit_test+staged_diff_fixture_original_unchanged",
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs",
       "risk_class": "staged_write"
     },
     {
       "operation": "write.entity.region",
       "family": "entities",
-      "status": "catalogued",
+      "status": "implemented",
       "engine_tier": "objectdbx_capable",
       "owner_ticket": "M08G-T02",
-      "implementation_strategy": "objectdbx_hostless",
-      "evidence_required": "unit_test+staged_diff_fixture_original_unchanged",
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs",
       "risk_class": "staged_write"
     },
     {
@@ -3896,11 +3898,11 @@
     {
       "operation": "write.entity.solid2d",
       "family": "entities",
-      "status": "catalogued",
+      "status": "implemented",
       "engine_tier": "objectdbx_capable",
       "owner_ticket": "M08G-T02",
-      "implementation_strategy": "objectdbx_hostless",
-      "evidence_required": "unit_test+staged_diff_fixture_original_unchanged",
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs",
       "risk_class": "staged_write"
     },
     {
@@ -3956,11 +3958,11 @@
     {
       "operation": "write.entity.spline",
       "family": "entities",
-      "status": "catalogued",
+      "status": "implemented",
       "engine_tier": "objectdbx_capable",
       "owner_ticket": "M08G-T02",
-      "implementation_strategy": "objectdbx_hostless",
-      "evidence_required": "unit_test+staged_diff_fixture_original_unchanged",
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs",
       "risk_class": "staged_write"
     },
     {
@@ -3996,21 +3998,21 @@
     {
       "operation": "write.entity.text",
       "family": "entities",
-      "status": "catalogued",
+      "status": "implemented",
       "engine_tier": "objectdbx_capable",
       "owner_ticket": "M08H-T01",
-      "implementation_strategy": "objectdbx_hostless",
-      "evidence_required": "unit_test+staged_diff_fixture_original_unchanged",
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs",
       "risk_class": "staged_write"
     },
     {
       "operation": "write.entity.trace",
       "family": "entities",
-      "status": "catalogued",
+      "status": "implemented",
       "engine_tier": "objectdbx_capable",
       "owner_ticket": "M08G-T02",
-      "implementation_strategy": "objectdbx_hostless",
-      "evidence_required": "unit_test+staged_diff_fixture_original_unchanged",
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs",
       "risk_class": "staged_write"
     },
     {
@@ -4026,11 +4028,11 @@
     {
       "operation": "write.entity.xline",
       "family": "entities",
-      "status": "catalogued",
+      "status": "implemented",
       "engine_tier": "objectdbx_capable",
       "owner_ticket": "M08G-T02",
-      "implementation_strategy": "objectdbx_hostless",
-      "evidence_required": "unit_test+staged_diff_fixture_original_unchanged",
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs",
       "risk_class": "staged_write"
     },
     {
@@ -4226,41 +4228,41 @@
     {
       "operation": "modify.entity.transform",
       "family": "geometry_kernel",
-      "status": "catalogued",
+      "status": "implemented",
       "engine_tier": "objectdbx_capable",
       "owner_ticket": "M08G-T03",
-      "implementation_strategy": "objectdbx_hostless",
-      "evidence_required": "unit_test+staged_diff_fixture_original_unchanged",
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs",
       "risk_class": "staged_write"
     },
     {
       "operation": "write.entity.point",
       "family": "geometry_kernel",
-      "status": "catalogued",
+      "status": "implemented",
       "engine_tier": "objectdbx_capable",
       "owner_ticket": "M08G-T02",
-      "implementation_strategy": "objectdbx_hostless",
-      "evidence_required": "unit_test+staged_diff_fixture_original_unchanged",
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs",
       "risk_class": "staged_write"
     },
     {
       "operation": "write.entity.polyline",
       "family": "geometry_kernel",
-      "status": "catalogued",
+      "status": "implemented",
       "engine_tier": "objectdbx_capable",
       "owner_ticket": "M08G-T02",
-      "implementation_strategy": "objectdbx_hostless",
-      "evidence_required": "unit_test+staged_diff_fixture_original_unchanged",
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs",
       "risk_class": "staged_write"
     },
     {
       "operation": "write.entity.tolerance",
       "family": "geometry_kernel",
-      "status": "catalogued",
+      "status": "implemented",
       "engine_tier": "objectdbx_capable",
       "owner_ticket": "M08G-T02",
-      "implementation_strategy": "objectdbx_hostless",
-      "evidence_required": "unit_test+staged_diff_fixture_original_unchanged",
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs",
       "risk_class": "staged_write"
     },
     {
