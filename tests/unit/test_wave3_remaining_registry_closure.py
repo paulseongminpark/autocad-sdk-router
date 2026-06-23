@@ -17,7 +17,6 @@ EXPECTED_BLOCKED_AFTER_REAUDIT = {
     "automate.com.send_command",
     "automate.com.wrapper_for_object",
     "embed.ole.frame",
-    "module.command.remove_group",
     "module.entrypoint.define",
     "module.entrypoint.dispatch",
     "module.lifecycle.init",
@@ -26,11 +25,7 @@ EXPECTED_BLOCKED_AFTER_REAUDIT = {
     "module.lifecycle.on_unload_dwg",
     "module.lifecycle.other",
     "module.lifecycle.unload",
-    "module.load",
-    "module.load.acad_rx",
-    "module.load.by_app",
     "module.load.lisp",
-    "module.unload",
 }
 
 ALLOWED_BLOCKER_CODES = {

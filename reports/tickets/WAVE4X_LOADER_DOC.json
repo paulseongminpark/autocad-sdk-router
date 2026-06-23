@@ -1,0 +1,52 @@
+{
+  "schema": "wave4x.loader_doc.result.v1",
+  "generated_at": "2026-06-23T15:29:08.723015+00:00",
+  "status": "PASS_WITH_HARD_BLOCKS",
+  "root": "D:\\dev\\99_tools\\autocad-sdk-router_w4x_loader_doc",
+  "worktree": "D:\\dev\\99_tools\\autocad-sdk-router_w4x_loader_doc",
+  "branch": "cados/w4x-loader-doc-command",
+  "claim_file": "reports/tickets/WAVE4X_PANE2_LOADER_DOC_CLAIMS.json",
+  "implemented_ops": [
+    "module.command.lookup",
+    "module.command.remove_group",
+    "module.load",
+    "module.load.acad_rx",
+    "module.load.by_app",
+    "module.load.demand_register",
+    "module.unload"
+  ],
+  "still_hard_blocked_ops": [
+    "doc.sendstring",
+    "module.entrypoint.define",
+    "module.entrypoint.dispatch",
+    "module.lifecycle.init",
+    "module.lifecycle.on_load_dwg",
+    "module.lifecycle.on_unload_dwg",
+    "module.lifecycle.other",
+    "module.lifecycle.unload"
+  ],
+  "deprecated_ops": [],
+  "native_build": "ok; dbx=54272 bytes; crx=762880 bytes; arx=771584 bytes; LNK4099 Autodesk PDB warnings only",
+  "attended_required": "No for the seven implemented typed status handlers. Yes for any future attempt to fire host-owned lifecycle callbacks; those remain hard_blocked here.",
+  "tests": {
+    "pytest": "494 passed, 20 skipped",
+    "cadctl_registry_coverage": "status ok; operation_count 517; wired_count 464; by_status implemented=464 blocked=53; consistent=true",
+    "reconcile_native_registry": "dry-run ok; coded=424 flips=0 overlaps=424 conflicts=0 drift=0",
+    "operation_coverage_json": "valid json",
+    "native_build": "ok; dbx=54272 bytes; crx=762880 bytes; arx=771584 bytes; LNK4099 Autodesk PDB warnings only"
+  },
+  "blockers": {
+    "doc.sendstring": "SAFETY_FORBIDDEN: doc.sendstring is a raw command surface because it queues arbitrary command strings into a document command stream; Wave4X keeps it non-agent-exposed and requires bespoke typed handlers instead.",
+    "module.entrypoint.define": "SDK_NOT_EXPOSED: entrypoint definition is a compile/link macro/export contract, not a runtime job operation.",
+    "module.entrypoint.dispatch": "HOST_UNAVAILABLE: acrxEntryPoint dispatch is owned by the AutoCAD loader and cannot be synthesized by the job dispatcher.",
+    "module.lifecycle.init": "HOST_UNAVAILABLE: On_kInitAppMsg is delivered by the AutoCAD loader during module load and is not a runtime job operation.",
+    "module.lifecycle.on_load_dwg": "HOST_UNAVAILABLE: On_kLoadDwgMsg is delivered by host document lifecycle dispatch; no controlled attended lifecycle route is available in this worktree.",
+    "module.lifecycle.on_unload_dwg": "HOST_UNAVAILABLE: On_kUnloadDwgMsg is host-owned document lifecycle dispatch and unavailable to the integration job route.",
+    "module.lifecycle.other": "HOST_UNAVAILABLE: arbitrary lifecycle message dispatch is host-owned and cannot be simulated safely by the agent job surface.",
+    "module.lifecycle.unload": "HOST_UNAVAILABLE: On_kUnloadAppMsg is delivered by the loader during module unload; the job dispatcher must not invoke it directly."
+  },
+  "next": [
+    "Pane 1 may merge this branch after reviewing the Wave4X patch and handoff zip.",
+    "Do not expose doc.sendstring or arbitrary load/unload/lifecycle dispatch without a new typed safety contract."
+  ]
+}

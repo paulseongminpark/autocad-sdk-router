@@ -39,7 +39,6 @@ class TestM08OFallback(unittest.TestCase):
             "command.invoke.sync",
             "command.invoke.sync.resbuf",
             "command.queue.post",
-            "module.command.lookup",
         }
         raw_ops = [o for o in self.ops if o["id"] in raw_ids]
         self.assertEqual(len(raw_ops), len(raw_ids), "expected all raw-command fallback ops to be present")
