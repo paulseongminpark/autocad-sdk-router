@@ -1,0 +1,96 @@
+{
+  "ticket_id": "WAVE3_PANE8_OPM_REACTORS",
+  "status": "PASS",
+  "branch": "cados/wave3-pane8-opm-reactors",
+  "commit": "RECORDED_IN_FINAL_RESULT",
+  "patch": "handoff/pr/WAVE3_PANE8_OPM_REACTORS.patch",
+  "claimed_ops_count": 9,
+  "implemented_ops_count": 9,
+  "implemented_ops": [
+    "react.docmanager.attach",
+    "react.docmanager.monitor",
+    "react.editor.command_monitor",
+    "react.editor.dwg_lifecycle",
+    "react.editor.input_monitor",
+    "react.editor.lisp_monitor",
+    "react.editor.sysvar_monitor",
+    "react.longtx.attach",
+    "react.longtx.monitor"
+  ],
+  "hard_blocked_ops": [],
+  "deprecated_ops": [],
+  "catalogued_remaining": [],
+  "registry": {
+    "implemented": 411,
+    "blocked": 9,
+    "catalogued": 97,
+    "operation_count": 517
+  },
+  "tests": [
+    {
+      "command": "python -m pytest tests -q",
+      "status": "PASS",
+      "summary": "469 passed, 20 skipped"
+    },
+    {
+      "command": "python tools/cadctl_cli.py registry coverage",
+      "status": "PASS",
+      "summary": "consistent=true; implemented=411 blocked=9 catalogued=97"
+    },
+    {
+      "command": "python tools/reconcile_native_registry.py",
+      "status": "PASS",
+      "summary": "dry-run clean for m08m and repo-wide families; flips=0 drift=0 conflicts=0"
+    },
+    {
+      "command": "python -m json.tool reports/operation_coverage_latest.json",
+      "status": "PASS",
+      "summary": "operation_coverage_latest.json parses; implemented=411 blocked=9 catalogued=97"
+    }
+  ],
+  "native_build": {
+    "status": "PASS",
+    "isolated_output": "reports/tickets/native/WAVE3_PANE8_OPM_REACTORS",
+    "details": {
+      "status": "ok",
+      "msbuild": "C:\\Program Files\\Microsoft Visual Studio\\2026\\Community\\MSBuild\\Current\\Bin\\amd64\\MSBuild.exe",
+      "arx_relink_mode": "canonical",
+      "arx_versioned_name": "",
+      "arx_lock_note": "Canonical .arx relinked normally.",
+      "projects": [
+        "D:\\dev\\99_tools\\autocad-sdk-router_wave3_pane8_opm_reactors\\src\\Ariadne.AcadNativeDbx\\Ariadne.AcadNativeDbx.dbx.vcxproj",
+        "D:\\dev\\99_tools\\autocad-sdk-router_wave3_pane8_opm_reactors\\src\\Ariadne.AcadNative\\Ariadne.AcadNative.crx.vcxproj",
+        "D:\\dev\\99_tools\\autocad-sdk-router_wave3_pane8_opm_reactors\\src\\Ariadne.AcadNative\\Ariadne.AcadNative.arx.vcxproj"
+      ],
+      "artifacts": [
+        {
+          "path": "D:\\dev\\99_tools\\autocad-sdk-router_wave3_pane8_opm_reactors\\reports\\tickets\\native\\WAVE3_PANE8_OPM_REACTORS\\bin\\x64\\Release\\Ariadne.AcadNativeDbx.dbx",
+          "exists": true,
+          "bytes": 48640
+        },
+        {
+          "path": "D:\\dev\\99_tools\\autocad-sdk-router_wave3_pane8_opm_reactors\\reports\\tickets\\native\\WAVE3_PANE8_OPM_REACTORS\\bin\\x64\\Release\\Ariadne.AcadNative.crx",
+          "exists": true,
+          "bytes": 690176
+        },
+        {
+          "path": "D:\\dev\\99_tools\\autocad-sdk-router_wave3_pane8_opm_reactors\\reports\\tickets\\native\\WAVE3_PANE8_OPM_REACTORS\\bin\\x64\\Release\\Ariadne.AcadNative.arx",
+          "exists": true,
+          "bytes": 697856
+        }
+      ]
+    }
+  },
+  "artifacts": [
+    "reports/tickets/WAVE3_PANE8_CLAIMS.json",
+    "reports/tickets/WAVE3_PANE8_OPM_REACTORS_PLAN.md",
+    "reports/tickets/WAVE3_PANE8_OPM_REACTORS.md",
+    "reports/tickets/WAVE3_PANE8_OPM_REACTORS.json",
+    "reports/tickets/WAVE3_PANE8_OPM_REACTORS_OPS.json",
+    "reports/tickets/WAVE3_PANE8_OPM_REACTORS_native_build.json",
+    "packets/tickets/WAVE3_PANE8_OPM_REACTORS.md",
+    "handoff/tickets/WAVE3_PANE8_OPM_REACTORS.zip",
+    "handoff/pr/WAVE3_PANE8_OPM_REACTORS.patch"
+  ],
+  "next": "Optional attended follow-up may exercise live command/LISP/dwg-lifecycle/long-transaction callbacks in a dedicated AutoCAD host, but the claimed source/handler/registry/test closure is complete."
+}

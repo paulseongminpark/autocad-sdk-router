@@ -2,9 +2,9 @@
 
 - packet: `CADOS_M08_FULL_OPERATION_COVERAGE_CLOSURE`
 - generated_from: `config/operations.v2.json`
-- total operations: **517** · implemented 435 · stub 0 · blocked 10 · catalogued 72 · deprecated 0 · **unknown 0**
-- v1-target: **445** (implemented 435 · blocked 10 · **deferred 0**)
-- agent-exposed ops: 435
+- total operations: **517** · implemented 444 · stub 0 · blocked 10 · catalogued 63 · deprecated 0 · **unknown 0**
+- v1-target: **454** (implemented 444 · blocked 10 · **deferred 0**)
+- agent-exposed ops: 444
 
 ## Gate
 
@@ -32,7 +32,7 @@
 | validate_diff | 3 | 0 | 0 | 0 | 3 |
 | render_visual | 11 | 0 | 0 | 1 | 11 |
 | live | 6 | 0 | 1 | 0 | 7 |
-| native_only | 349 | 0 | 6 | 66 | 355 |
+| native_only | 358 | 0 | 6 | 57 | 364 |
 
 ## Risk class distribution
 
@@ -415,9 +415,18 @@
 | react.config.disable_namespace | reactors_events | implemented | read_safe | read | True | m08mDispatch |  |
 | react.database.attach | reactors_events | implemented | read_safe | read | True | m08mDispatch |  |
 | react.database.monitor | reactors_events | implemented | read_safe | read | True | m08mDispatch |  |
+| react.docmanager.attach | reactors_events | implemented | read_safe | read | True | m08mDispatch |  |
+| react.docmanager.monitor | reactors_events | implemented | read_safe | read | True | m08mDispatch |  |
+| react.editor.command_monitor | reactors_events | implemented | read_safe | read | True | m08mDispatch |  |
+| react.editor.dwg_lifecycle | reactors_events | implemented | read_safe | read | True | m08mDispatch |  |
+| react.editor.input_monitor | reactors_events | implemented | read_safe | read | True | m08mDispatch |  |
+| react.editor.lisp_monitor | reactors_events | implemented | read_safe | read | True | m08mDispatch |  |
+| react.editor.sysvar_monitor | reactors_events | implemented | read_safe | read | True | m08mDispatch |  |
 | react.entity.monitor | reactors_events | implemented | read_safe | read | True | m08mDispatch |  |
 | react.linker.attach | reactors_events | implemented | read_safe | read | True | m08mDispatch |  |
 | react.linker.monitor | reactors_events | implemented | read_safe | read | True | m08mDispatch |  |
+| react.longtx.attach | reactors_events | implemented | read_safe | read | True | m08mDispatch |  |
+| react.longtx.monitor | reactors_events | implemented | read_safe | read | True | m08mDispatch |  |
 | react.object.attach_transient | reactors_events | implemented | read_safe | read | True | m08mDispatch |  |
 | react.object.detach_transient | reactors_events | implemented | read_safe | read | True | m08mDispatch |  |
 | react.object.monitor | reactors_events | implemented | read_safe | read | True | m08mDispatch |  |
@@ -493,4 +502,4 @@
 | write.layout.create | write | implemented | staged_write | write_copy | True | createLayout |  |
 | write.xdata.set | write | implemented | staged_write | write_copy | True | setDatabaseXdata |  |
 
-> Full 517-operation detail (all 13 fields per op) is in `reports/operation_coverage_full_matrix.json` — this table lists only the 445 v1-target ops. The 72 catalogued ops are classified future-version native capability (v1_target=false), not omitted.
+> Full 517-operation detail (all 13 fields per op) is in `reports/operation_coverage_full_matrix.json` — this table lists only the 454 v1-target ops. The 63 catalogued ops are classified future-version native capability (v1_target=false), not omitted.
