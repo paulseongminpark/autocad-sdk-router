@@ -257,6 +257,185 @@ private:
     AcGiRegenType       m_regen;
 };
 
+// --- AcGiViewportGeometry ---
+class M08LCollectViewportGeometry : public AcGiViewportGeometry
+{
+public:
+    explicit M08LCollectViewportGeometry(M08LGraphicsTally& tally) : m_tally(tally) {}
+
+    // ---- coordinate transforms ----
+    void getModelToWorldTransform(AcGeMatrix3d& m) const override { m.setToIdentity(); }
+    void getWorldToModelTransform(AcGeMatrix3d& m) const override { m.setToIdentity(); }
+    Adesk::Boolean pushModelTransform(const AcGeVector3d&) override { return Adesk::kTrue; }
+    Adesk::Boolean pushModelTransform(const AcGeMatrix3d&) override { return Adesk::kTrue; }
+    Adesk::Boolean popModelTransform() override { return Adesk::kTrue; }
+    AcGeMatrix3d pushPositionTransform(AcGiPositionTransformBehavior, const AcGePoint3d&) override { return AcGeMatrix3d::kIdentity; }
+    AcGeMatrix3d pushPositionTransform(AcGiPositionTransformBehavior, const AcGePoint2d&) override { return AcGeMatrix3d::kIdentity; }
+    AcGeMatrix3d pushScaleTransform(AcGiScaleTransformBehavior, const AcGePoint3d&) override { return AcGeMatrix3d::kIdentity; }
+    AcGeMatrix3d pushScaleTransform(AcGiScaleTransformBehavior, const AcGePoint2d&) override { return AcGeMatrix3d::kIdentity; }
+    AcGeMatrix3d pushOrientationTransform(AcGiOrientationTransformBehavior) override { return AcGeMatrix3d::kIdentity; }
+
+    // ---- primitives ----
+    Adesk::Boolean circle(const AcGePoint3d&, const double, const AcGeVector3d&) const override
+        { ++m_tally.circle; return Adesk::kTrue; }
+    Adesk::Boolean circle(const AcGePoint3d&, const AcGePoint3d&, const AcGePoint3d&) const override
+        { ++m_tally.circle; return Adesk::kTrue; }
+    Adesk::Boolean circularArc(const AcGePoint3d&, const double, const AcGeVector3d&,
+                               const AcGeVector3d&, const double, const AcGiArcType) const override
+        { ++m_tally.circularArc; return Adesk::kTrue; }
+    Adesk::Boolean circularArc(const AcGePoint3d&, const AcGePoint3d&, const AcGePoint3d&,
+                               const AcGiArcType) const override
+        { ++m_tally.circularArc; return Adesk::kTrue; }
+    Adesk::Boolean polyline(const Adesk::UInt32 n, const AcGePoint3d* pv,
+                            const AcGeVector3d*, Adesk::LongPtr) const override
+        { ++m_tally.polyline; m_tally.vertexTotal += n; m_tally.capture(n, pv); return Adesk::kTrue; }
+    Adesk::Boolean polyline(const AcGiPolyline&) const override
+        { ++m_tally.polyline; return Adesk::kTrue; }
+    Adesk::Boolean polyPolyline(Adesk::UInt32, const AcGiPolyline*) const override
+        { ++m_tally.polyPolyline; return Adesk::kTrue; }
+    Adesk::Boolean polygon(const Adesk::UInt32 n, const AcGePoint3d* pv) const override
+        { ++m_tally.polygon; m_tally.vertexTotal += n; m_tally.capture(n, pv); return Adesk::kTrue; }
+    Adesk::Boolean polyPolygon(const Adesk::UInt32, const Adesk::UInt32*, const AcGePoint3d*,
+                               const Adesk::UInt32*, const AcGePoint3d*, const AcCmEntityColor*,
+                               const AcGiLineType*, const AcCmEntityColor*,
+                               const AcCmTransparency*) const override
+        { ++m_tally.polyPolygon; return Adesk::kTrue; }
+    Adesk::Boolean mesh(const Adesk::UInt32 rows, const Adesk::UInt32 cols, const AcGePoint3d* pv,
+                        const AcGiEdgeData*, const AcGiFaceData* pFace, const AcGiVertexData*,
+                        const bool) const override
+        { ++m_tally.mesh; m_tally.vertexTotal += (rows * cols);
+          if (pFace != nullptr) ++m_tally.faceDataSeen; m_tally.capture(rows * cols, pv); return Adesk::kTrue; }
+    Adesk::Boolean shell(const Adesk::UInt32 nv, const AcGePoint3d* pv, const Adesk::UInt32,
+                         const Adesk::Int32*, const AcGiEdgeData*, const AcGiFaceData* pFace,
+                         const AcGiVertexData*, const struct resbuf*, const bool) const override
+        { ++m_tally.shell; m_tally.vertexTotal += nv;
+          if (pFace != nullptr) ++m_tally.faceDataSeen; m_tally.capture(nv, pv); return Adesk::kTrue; }
+    Adesk::Boolean text(const AcGePoint3d&, const AcGeVector3d&, const AcGeVector3d&,
+                        const double, const double, const double, const ACHAR*) const override
+        { ++m_tally.text; return Adesk::kTrue; }
+    Adesk::Boolean text(const AcGePoint3d&, const AcGeVector3d&, const AcGeVector3d&,
+                        const ACHAR*, const Adesk::Int32, const Adesk::Boolean,
+                        const AcGiTextStyle&) const override
+        { ++m_tally.text; return Adesk::kTrue; }
+    Adesk::Boolean xline(const AcGePoint3d&, const AcGePoint3d&) const override
+        { ++m_tally.xline; return Adesk::kTrue; }
+    Adesk::Boolean ray(const AcGePoint3d&, const AcGePoint3d&) const override
+        { ++m_tally.ray; return Adesk::kTrue; }
+    Adesk::Boolean pline(const AcDbPolyline&, Adesk::UInt32, Adesk::UInt32) const override
+        { ++m_tally.pline; return Adesk::kTrue; }
+    Adesk::Boolean draw(AcGiDrawable*) const override
+        { ++m_tally.draw; return Adesk::kTrue; }
+    Adesk::Boolean image(const AcGiImageBGRA32&, const AcGePoint3d&, const AcGeVector3d&,
+                         const AcGeVector3d&, TransparencyMode) const override
+        { ++m_tally.image; return Adesk::kTrue; }
+    Adesk::Boolean rowOfDots(int, const AcGePoint3d&, const AcGeVector3d&) const override
+        { ++m_tally.dots; return Adesk::kTrue; }
+    Adesk::Boolean ellipticalArc(const AcGePoint3d&, const AcGeVector3d&, double, double,
+                                 double, double, double, AcGiArcType) const override
+        { ++m_tally.ellipticalArc; return Adesk::kTrue; }
+    Adesk::Boolean pushClipBoundary(AcGiClipBoundary*) override { return Adesk::kTrue; }
+    void           popClipBoundary() override {}
+    Adesk::Boolean edge(const AcArray<AcGeCurve2d*>&) const override
+        { ++m_tally.edge; return Adesk::kTrue; }
+
+    // ---- AcGiViewportGeometry pure virtuals ----
+    Adesk::Boolean polylineEye(const Adesk::UInt32 numPoints, const AcGePoint3d* vertexes) const override
+        { ++m_tally.polyline; m_tally.vertexTotal += numPoints; m_tally.capture(numPoints, vertexes); return Adesk::kTrue; }
+    Adesk::Boolean polygonEye(const Adesk::UInt32 numPoints, const AcGePoint3d* vertexes) const override
+        { ++m_tally.polygon; m_tally.vertexTotal += numPoints; m_tally.capture(numPoints, vertexes); return Adesk::kTrue; }
+    Adesk::Boolean polylineDc(const Adesk::UInt32 numPoints, const AcGePoint3d* vertexes) const override
+        { ++m_tally.polyline; m_tally.vertexTotal += numPoints; m_tally.capture(numPoints, vertexes); return Adesk::kTrue; }
+    Adesk::Boolean polygonDc(const Adesk::UInt32 numPoints, const AcGePoint3d* vertexes) const override
+        { ++m_tally.polygon; m_tally.vertexTotal += numPoints; m_tally.capture(numPoints, vertexes); return Adesk::kTrue; }
+    Adesk::Boolean rasterImageDc(
+        const AcGePoint3d& origin,
+        const AcGeVector3d& u,
+        const AcGeVector3d& v,
+        const AcGeMatrix2d& pixelToDc,
+        AcDbObjectId entityId,
+        AcGiImageOrg imageOrg,
+        Adesk::UInt32 imageWidth,
+        Adesk::UInt32 imageHeight,
+        Adesk::Int16 imageColorDepth,
+        Adesk::Boolean transparency,
+        ImageSource source,
+        const AcGeVector3d& unrotatedU,
+        const AcGiImageOrg origionalImageOrg,
+        const AcGeMatrix2d& unrotatedPixelToDc,
+        const Adesk::UInt32 unrotatedImageWidth,
+        const Adesk::UInt32 unrotatedImageHeight
+    ) const override { ++m_tally.image; return Adesk::kTrue; }
+    Adesk::Boolean ownerDrawDc(
+        Adesk::Int32                       vpnumber,
+        Adesk::Int32                       left,
+        Adesk::Int32                       top,
+        Adesk::Int32                       right,
+        Adesk::Int32                       bottom,
+        const OwnerDraw*           pOwnerDraw
+    ) const override { return Adesk::kTrue; }
+
+private:
+    M08LGraphicsTally& m_tally;
+};
+
+// --- AcGiViewport ---
+class M08LCollectViewport : public AcGiViewport
+{
+public:
+    void getCameraLocation(AcGePoint3d& loc) const override { loc.set(0, 0, 0); }
+    void getCameraTarget(AcGePoint3d& target) const override { target.set(0, 0, 0); }
+    void getCameraUpVector(AcGeVector3d& up) const override { up.set(0, 1, 0); }
+    void getEyeToWorldTransform(AcGeMatrix3d& m) const override { m.setToIdentity(); }
+    void getWorldToEyeTransform(AcGeMatrix3d& m) const override { m.setToIdentity(); }
+    Adesk::Boolean isPerspective() const override { return Adesk::kFalse; }
+    void getViewportDcCorners(AcGePoint2d& lowerLeft, AcGePoint2d& upperRight) const override { lowerLeft.set(0,0); upperRight.set(100,100); }
+    Adesk::Boolean getFrontAndBackClipValues(Adesk::Boolean& clipFront, Adesk::Boolean& clipBack, double& front, double& back) const override { clipFront = Adesk::kFalse; clipBack = Adesk::kFalse; front = 0; back = 0; return Adesk::kTrue; }
+    double linetypeScaleMultiplier() const override { return 1.0; }
+    void getEyeToModelTransform(AcGeMatrix3d& m) const override { m.setToIdentity(); }
+    void getModelToEyeTransform(AcGeMatrix3d& m) const override { m.setToIdentity(); }
+    
+    Adesk::Boolean doPerspective(AcGePoint3d &) const override { return Adesk::kFalse; }
+    Adesk::Boolean doInversePerspective(AcGePoint3d &) const override { return Adesk::kFalse; }
+    void getNumPixelsInUnitSquare(const AcGePoint3d &,AcGePoint2d &,bool) const override {}
+    Adesk::ULongPtr viewportId() const override { return 0; }
+    Adesk::Int16 acadWindowId() const override { return 0; }
+    double linetypeGenerationCriteria() const override { return 1.0; }
+};
+
+// --- AcGiViewportDraw ---
+class M08LCollectViewportDraw : public AcGiViewportDraw
+{
+public:
+    M08LCollectViewportDraw(AcDbDatabase* pDb, M08LGraphicsTally& tally, AcGiRegenType rt)
+        : m_ctx(pDb), m_geom(tally), m_regen(rt) {}
+
+    // AcGiCommonDraw (pure)
+    AcGiRegenType        regenType() const override { return m_regen; }
+    Adesk::Boolean       regenAbort() const override { return Adesk::kFalse; }
+    AcGiSubEntityTraits& subEntityTraits() const override { return const_cast<M08LCollectTraits&>(m_traits); }
+    AcGiGeometry*        rawGeometry() const override { return const_cast<M08LCollectViewportGeometry*>(&m_geom); }
+    Adesk::Boolean       isDragging() const override { return Adesk::kFalse; }
+    double               deviation(const AcGiDeviationType, const AcGePoint3d&) const override { return 0.0; }
+    Adesk::UInt32        numberOfIsolines() const override { return 4; }
+    AcGiContext*         context() override { return &m_ctx; }
+    
+    // AcGiViewportDraw (pure)
+    AcGiViewport&        viewport() const override { return const_cast<M08LCollectViewport&>(m_viewport); }
+    AcGiViewportGeometry& geometry() const override { return const_cast<M08LCollectViewportGeometry&>(m_geom); }
+    Adesk::UInt32        sequenceNumber() const override { return 0; }
+    Adesk::Boolean       isValidId(const Adesk::ULongPtr) const override { return Adesk::kTrue; }
+    AcDbObjectId         viewportObjectId() const override { return AcDbObjectId::kNull; }
+
+    const M08LCollectTraits& traits() const { return m_traits; }
+
+private:
+    M08LCollectContext          m_ctx;
+    M08LCollectViewportGeometry m_geom;
+    M08LCollectTraits           m_traits;
+    M08LCollectViewport         m_viewport;
+    AcGiRegenType               m_regen;
+};
+
 #endif // ARIADNE_M08L_GRAPHICS
 
 //============================================================================
@@ -421,8 +600,9 @@ static AcGiRegenType m08lRegenType(const std::string& job)
 static bool m08lHasOp(const std::string& op)
 {
     return
-        // T01 — worldDraw / graphics capture (7; render.draw.viewportgeom DEFERRED)
+        // T01 — worldDraw / graphics capture (8)
         op == "render.draw.worldgeom" ||
+        op == "render.draw.viewportgeom" ||
         op == "render.drawable.def" ||
         op == "render.traits.set" ||
         op == "render.polyline.helper" ||
@@ -527,6 +707,63 @@ static bool m08lDispatch(const std::string& op, const AriadneJobCtx& ctx, std::o
         if (tally.extentsSet)
             o << ",\"extents\":{\"min\":" << m08lPointJson(tally.extMin)
               << ",\"max\":" << m08lPointJson(tally.extMax) << "}";
+        r << "\"result\":{" << o.str() << "},\"status\":\"ok\"}";
+        return true;
+    }
+
+    // render.draw.viewportgeom — drive viewportDraw on an entity and report the eye/display-space geometry primitives it emitted.
+    if (op == "render.draw.viewportgeom") {
+        std::string handle;
+        if (!m08lFindHandle(job, handle)) {
+            emitNativeError(r, "MISSING_ARG", op + " requires 'handle'");
+            return true;
+        }
+        AcDbEntity* pEnt = m08lOpenEntity(pDb, handle);
+        if (pEnt == nullptr) {
+            emitNativeError(r, "ENTITY_NOT_FOUND", "no entity for handle " + handle);
+            return true;
+        }
+        AriadneReadTransaction rt(pDb);
+        M08LGraphicsTally tally;
+        M08LCollectWorldDraw wd(pDb, tally, m08lRegenType(job));
+        const Adesk::Boolean drewWorld = pEnt->worldDraw(&wd);
+        Adesk::Boolean drewViewport = Adesk::kFalse;
+        if (!drewWorld) {
+            M08LCollectViewportDraw vd(pDb, tally, m08lRegenType(job));
+            pEnt->viewportDraw(&vd);
+            drewViewport = Adesk::kTrue;
+        }
+        const std::string entClass = (pEnt->isA() != nullptr) ? acharToAscii(pEnt->isA()->name()) : std::string();
+        pEnt->close();
+
+        std::ostringstream o;
+        o << "\"handle\":" << njsonStr(handle)
+          << ",\"entity_class\":" << njsonStr(entClass)
+          << ",\"world_draw_returned\":" << (drewWorld == Adesk::kTrue ? "true" : "false")
+          << ",\"viewport_draw_called\":" << (drewViewport == Adesk::kTrue ? "true" : "false")
+          << ",\"primitive_total\":" << tally.total()
+          << ",\"vertex_total\":" << tally.vertexTotal
+          << ",\"primitives\":{"
+          << "\"circle\":" << tally.circle
+          << ",\"circular_arc\":" << tally.circularArc
+          << ",\"elliptical_arc\":" << tally.ellipticalArc
+          << ",\"polyline\":" << tally.polyline
+          << ",\"polygon\":" << tally.polygon
+          << ",\"poly_polyline\":" << tally.polyPolyline
+          << ",\"poly_polygon\":" << tally.polyPolygon
+          << ",\"mesh\":" << tally.mesh
+          << ",\"shell\":" << tally.shell
+          << ",\"text\":" << tally.text
+          << ",\"xline\":" << tally.xline
+          << ",\"ray\":" << tally.ray
+          << ",\"pline\":" << tally.pline
+          << ",\"image\":" << tally.image
+          << ",\"draw_nested\":" << tally.draw
+          << ",\"edge\":" << tally.edge
+          << ",\"dots\":" << tally.dots
+          << "}";
+        if (tally.haveSample)
+            o << ",\"first_vertex\":" << m08lPointJson(tally.sample);
         r << "\"result\":{" << o.str() << "},\"status\":\"ok\"}";
         return true;
     }

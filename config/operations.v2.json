@@ -56,9 +56,9 @@
   "totals": {
     "operations": 517,
     "by_status": {
-      "implemented": 444,
+      "implemented": 445,
       "blocked": 10,
-      "catalogued": 63
+      "catalogued": 62
     },
     "by_family": {
       "active_document_write_original": 8,
@@ -129,10 +129,10 @@
       "ui_customization": 39
     },
     "operation_records": 517,
-    "implemented": 444,
+    "implemented": 445,
     "wired": 0,
     "stub": 0,
-    "catalogued": 63,
+    "catalogued": 62,
     "blocked": 10,
     "deprecated": 0,
     "unknown": 0,
@@ -28138,7 +28138,7 @@
       "id": "render.draw.viewportgeom",
       "operation": "render.draw.viewportgeom",
       "family": "graphics_system",
-      "status": "catalogued",
+      "status": "implemented",
       "engine_tier": "native_arx_only",
       "engines": [
         "native_arx_only"
@@ -28162,7 +28162,7 @@
       },
       "handler": {
         "router_lane": null,
-        "dispatcher_symbol": null,
+        "dispatcher_symbol": "m08lDispatch",
         "execution_host_class": "arx_adapter",
         "native_api": "AcGiViewportGeometry::polylineEye/polygonEye/polylineDc/polygonDc/rasterImageDc/ownerDrawDc (via AcGiViewportDraw::geometry())",
         "composed_of": []
@@ -28187,18 +28187,23 @@
       },
       "tests": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
-        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata"
+        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
+        "tests/unit/test_m08l_handlers.py"
       ],
       "summary": "Emit viewport/eye/device-coordinate geometry in subViewportDraw (per-viewport graphics)",
       "source_slice": "entities-geometry-graphics.md",
       "citation": "hdr acgi.h AcGiViewportGeometry polylineEye/polygonEye/polylineDc/polygonDc/rasterImageDc/ownerDrawDc/setExtents",
       "evidence_refs": [
-        "config/autocad_native_arx_operation_catalog.json#render.draw.viewportgeom"
+        "config/autocad_native_arx_operation_catalog.json#render.draw.viewportgeom",
+        "src/Ariadne.AcadNative/families/m08l_handlers.inc:m08lDispatch",
+        "reports/merge/MERGE-M08-READ.json",
+        "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
+        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)"
       ],
       "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
       "owner_ticket": "M08L-T01",
-      "implementation_strategy": "native_arx_cpp",
-      "evidence_required": "unit_test+native_extraction_fixture"
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs"
     },
     {
       "id": "render.draw.worldgeom",

@@ -2,9 +2,9 @@
 
 - packet: `CADOS_M08_FULL_OPERATION_COVERAGE_CLOSURE`
 - generated_from: `config/operations.v2.json`
-- total operations: **517** · implemented 444 · stub 0 · blocked 10 · catalogued 63 · deprecated 0 · **unknown 0**
-- v1-target: **454** (implemented 444 · blocked 10 · **deferred 0**)
-- agent-exposed ops: 444
+- total operations: **517** · implemented 445 · stub 0 · blocked 10 · catalogued 62 · deprecated 0 · **unknown 0**
+- v1-target: **455** (implemented 445 · blocked 10 · **deferred 0**)
+- agent-exposed ops: 445
 
 ## Gate
 
@@ -30,7 +30,7 @@
 | query | 1 | 0 | 0 | 0 | 1 |
 | write_patch | 12 | 0 | 3 | 5 | 15 |
 | validate_diff | 3 | 0 | 0 | 0 | 3 |
-| render_visual | 11 | 0 | 0 | 1 | 11 |
+| render_visual | 12 | 0 | 0 | 0 | 12 |
 | live | 6 | 0 | 1 | 0 | 7 |
 | native_only | 358 | 0 | 6 | 57 | 364 |
 
@@ -358,6 +358,7 @@
 | write.entity.tolerance | geometry_kernel | implemented | staged_write | write_copy | True | m08gDispatch |  |
 | inspect.entity.grips | graphics_system | implemented | read_safe | read | True | m08lDispatch |  |
 | render.context.query | graphics_system | implemented | read_safe | read | True | m08lDispatch |  |
+| render.draw.viewportgeom | graphics_system | implemented | read_safe | read | True | m08lDispatch |  |
 | render.draw.worldgeom | graphics_system | implemented | read_safe | read | True | m08lDispatch |  |
 | render.drawable.def | graphics_system | implemented | read_safe | read | True | m08lDispatch |  |
 | render.entity.worlddraw_override | graphics_system | implemented | read_safe | read | True | m08lDispatch |  |
@@ -502,4 +503,4 @@
 | write.layout.create | write | implemented | staged_write | write_copy | True | createLayout |  |
 | write.xdata.set | write | implemented | staged_write | write_copy | True | setDatabaseXdata |  |
 
-> Full 517-operation detail (all 13 fields per op) is in `reports/operation_coverage_full_matrix.json` — this table lists only the 454 v1-target ops. The 63 catalogued ops are classified future-version native capability (v1_target=false), not omitted.
+> Full 517-operation detail (all 13 fields per op) is in `reports/operation_coverage_full_matrix.json` — this table lists only the 455 v1-target ops. The 62 catalogued ops are classified future-version native capability (v1_target=false), not omitted.

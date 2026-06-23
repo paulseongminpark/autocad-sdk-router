@@ -48,9 +48,10 @@ _THIS = os.path.dirname(os.path.abspath(__file__))
 _REPO = os.path.dirname(os.path.dirname(_THIS))
 _INC = os.path.join(_REPO, "src", "Ariadne.AcadNative", "families", "m08l_handlers.inc")
 
-# T01 -- worldDraw / graphics capture (7; render.draw.viewportgeom DEFERRED)
+# T01 -- worldDraw / graphics capture (8)
 _GROUP_T01 = [
     "render.draw.worldgeom",
+    "render.draw.viewportgeom",
     "render.drawable.def",
     "render.traits.set",
     "render.polyline.helper",
@@ -87,7 +88,6 @@ _IMPLEMENTED = _GROUP_T01 + _GROUP_T02_INSTALL + _GROUP_T02_LIFECYCLE
 
 # Deferred ops that must NOT appear in HasOp (honest contract).
 _DEFERRED = [
-    "render.draw.viewportgeom",     # needs a live AcGiViewportDraw (viewport-bound; not hostless)
     "overrule.dimstyle.install",    # no AcDbDimStyleOverrule class in ObjectARX 2027 (header-verified)
 ]
 
@@ -155,17 +155,17 @@ class TestM08LHandlers(unittest.TestCase):
         )
 
     def test_implemented_count(self):
-        # Group totals: T01=7 (render.draw.viewportgeom deferred), T02 install=13
-        # (overrule.dimstyle.install deferred), T02 lifecycle=5. 7+13+5 = 25 real handlers.
-        # The remaining 2 ops of the 27-op brief are the _DEFERRED ones -- left OUT of
+        # Group totals: T01=8 (render.draw.viewportgeom implemented), T02 install=13
+        # (overrule.dimstyle.install deferred), T02 lifecycle=5. 8+13+5 = 26 real handlers.
+        # The remaining 1 op of the 27-op brief is the _DEFERRED one -- left OUT of
         # HasOp on purpose (no fake pass).
-        self.assertEqual(len(_GROUP_T01), 7)
+        self.assertEqual(len(_GROUP_T01), 8)
         self.assertEqual(len(_GROUP_T02_INSTALL), 13)
         self.assertEqual(len(_GROUP_T02_LIFECYCLE), 5)
-        self.assertEqual(len(_IMPLEMENTED), 25)
-        self.assertEqual(len(set(_IMPLEMENTED)), 25, "duplicate op id in the implemented list")
-        self.assertEqual(len(self.hasop), 25)
-        # 25 implemented + 2 deferred == the 27-op brief.
+        self.assertEqual(len(_IMPLEMENTED), 26)
+        self.assertEqual(len(set(_IMPLEMENTED)), 26, "duplicate op id in the implemented list")
+        self.assertEqual(len(self.hasop), 26)
+        # 26 implemented + 1 deferred == the 27-op brief.
         self.assertEqual(len(_IMPLEMENTED) + len(_DEFERRED), 27)
 
     def test_no_deferred_op_in_hasop(self):
