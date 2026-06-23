@@ -48,10 +48,13 @@ _THIS = os.path.dirname(os.path.abspath(__file__))
 _REPO = os.path.dirname(os.path.dirname(_THIS))
 _INC = os.path.join(_REPO, "src", "Ariadne.AcadNative", "families", "m08h_handlers.inc")
 
-# Implemented (12): annotation (2) + dimensions (9) + hatch (1).
+# Implemented (15): annotation (5) + dimensions (9) + hatch (1).
 _ANNOTATION = [
     "write.entity.text",
     "write.entity.mtext",
+    "write.entity.leader",
+    "write.entity.mleader",
+    "write.entity.table",
 ]
 _DIMENSIONS = [
     "write.entity.dim.aligned",
@@ -70,17 +73,10 @@ _HATCH = [
 _IMPLEMENTED = _ANNOTATION + _DIMENSIONS + _HATCH
 
 # Deferred/hard-blocked ops that must NOT appear in HasOp (honest contract).
-# leader  -> AcDbLeader: needs an annotation (mtext/block) association + appendVertex
-#            sequence to be a valid leader; a bare leader with no annotation is degenerate.
-# mleader -> AcDbMLeader: requires an MLeaderStyle dictionary entry + a content block /
-#            mtext content object; the headless seed DB has no usable mleader style/content.
-# table   -> AcDbTable: requires a TableStyle id + a cell/row/column layout; not constructible
-#            into a valid table hostless without a table style in the seed DB.
-_DEFERRED = [
-    "write.entity.leader",
-    "write.entity.mleader",
-    "write.entity.table",
-]
+# The M08G/H-30 expansion closed the former leader/mleader/table deferrals with
+# real AcDbLeader/AcDbMLeader/AcDbTable construction, so the H brief now has no
+# remaining catalogued annotation ops.
+_DEFERRED = []
 
 
 def _read():
@@ -145,15 +141,13 @@ class TestM08HHandlers(unittest.TestCase):
         )
 
     def test_implemented_count(self):
-        # Group totals: annotation=2, dimensions=9, hatch=1 => 12 real staged-write handlers.
-        # The remaining 3 of the 15-op brief are the _DEFERRED (style/content-bound) ones,
-        # left OUT of HasOp on purpose (no fake pass).
-        self.assertEqual(len(_ANNOTATION), 2)
+        # Group totals: annotation=5, dimensions=9, hatch=1 => 15 real staged-write handlers.
+        self.assertEqual(len(_ANNOTATION), 5)
         self.assertEqual(len(_DIMENSIONS), 9)
         self.assertEqual(len(_HATCH), 1)
-        self.assertEqual(len(_IMPLEMENTED), 12)
-        self.assertEqual(len(set(_IMPLEMENTED)), 12, "duplicate op id in the implemented list")
-        self.assertEqual(len(self.hasop), 12)
+        self.assertEqual(len(_IMPLEMENTED), 15)
+        self.assertEqual(len(set(_IMPLEMENTED)), 15, "duplicate op id in the implemented list")
+        self.assertEqual(len(self.hasop), 15)
 
     def test_no_deferred_op_in_hasop(self):
         leaked = sorted(self.hasop & set(_DEFERRED))
@@ -203,6 +197,13 @@ class TestM08HHandlers(unittest.TestCase):
     def test_dimensions_use_default_dimstyle(self):
         # All dimension subclasses take the DB default dim style id when none requested.
         self.assertIn("pDb->dimstyle()", self.src, "dimensions must bind the DB default dim style id")
+
+    def test_annotation_classes_present(self):
+        for cls in ("AcDbLeader", "AcDbMLeader", "AcDbTable"):
+            self.assertIn(cls, self.src, "missing annotation class %s" % cls)
+        self.assertIn("appendVertex", self.src, "leader must append real vertices")
+        self.assertIn("setMText", self.src, "mleader must bind MText content")
+        self.assertIn("setSize(rows, cols)", self.src, "table must build row/column layout")
 
     def test_hatch_is_solid_fill_single_loop(self):
         # The priority hatch target: a solid-fill external loop, evaluated.

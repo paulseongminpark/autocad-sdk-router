@@ -58,21 +58,21 @@ _IMPLEMENTED = [
     "write.object.upgrade_open",
     "write.object.downgrade_open",
     "write.object.close",
-]
-
-# Write-lane / host-mutation / side-db ops M08C deliberately does NOT implement.
-# (Catalog default_write_mode in {write_copy, live_edit} or a host/side-db mutation.)
-_DEFERRED = [
     "inspect.database.read_dwg",
     "inspect.database.read_dwg_handle",
     "inspect.database.dxf_in",
-    "inspect.object.upgrade_open",      # write-intent primitive
     "transform.database.dxf_out",
     "transform.database.save_as",
     "transform.database.save_as_simple",
     "transform.database.wblock_clone",
     "write.object.create_ext_dict",
     "write.regapp.register",
+]
+
+# Write-lane / host-mutation / side-db ops M08C deliberately does NOT implement.
+# (Catalog default_write_mode in {write_copy, live_edit} or a host/side-db mutation.)
+_DEFERRED = [
+    "inspect.object.upgrade_open",      # legacy spelling remains not implemented
 ]
 
 
@@ -138,28 +138,24 @@ class TestM08CHandlers(unittest.TestCase):
         extra = sorted(self.dispatch - self.hasop)
         self.assertEqual(extra, [], "dispatch branches not admitted by HasOp: %s" % extra)
 
-    def test_read_only_no_original_write_tokens(self):
-        # The READ family must never CALL an original-DWG-write / db-mutation API.
-        # Strip // comments first: the file's header + deferral rationale legitimately
-        # NAME these APIs (saveAs / writeDwgFile / upgradeOpen / downgradeOpen) in
-        # prose; the invariant is that none are CALLED in code.
+    def test_no_raw_command_or_original_write_tokens(self):
+        # M08C now includes staged export/object ops. saveAs/dxfOut are allowed only
+        # behind explicit output-path guards; raw command stack and original DWG write
+        # APIs remain forbidden.
         code = re.sub(r"//[^\n]*", "", self.src)
         banned = [
-            r"\bsaveAs\s*\(",
-            r"\bsave\s*\(",
             r"_QSAVE",
             r"\bwriteDwgFile\s*\(",
-            r"\bappendAcDbEntity\s*\(",
-            r"->setAt\s*\(",
-            r"\bcreateExtensionDictionary\s*\(",
-            r"\bwblockCloneObjects\s*\(",
-            r"\bdxfOut\s*\(",
+            r"\bacedCommand\b",
+            r"\bacedCmd\b",
+            r"\bacedInvoke\b",
         ]
         for pat in banned:
-            self.assertIsNone(
-                re.search(pat, code),
-                "READ family must not CALL original-write/mutation API: %s" % pat,
-            )
+            self.assertIsNone(re.search(pat, code), "forbidden command/original-write token: %s" % pat)
+        self.assertIn("m08cFindOutPathArg", self.src, "save/export ops must require explicit output path")
+        self.assertIn("ORIGINAL_WRITE_FORBIDDEN", self.src, "save/export ops must reject input_path == output_path")
+        for expected in ("saveAs", "dxfOut", "upgradeOpen", "downgradeOpen", "createExtensionDictionary", "wblockCloneObjects"):
+            self.assertIn(expected, self.src, "expected staged ObjectDBX API %s" % expected)
 
     def test_wblock_probe_deletes_clone_and_never_saves(self):
         # the wblock op clones to a NEW db, must delete it, must not saveAs it.
@@ -172,6 +168,7 @@ class TestM08CHandlers(unittest.TestCase):
             "wblock must report output_saved:false (never persisted)",
         )
         self.assertNotIn("pOut->saveAs", self.src, "wblock clone must never be saved to disk")
+        self.assertIn("wblockCloneObjects", self.src, "M08G/H-30 adds in-memory wblockCloneObjects")
 
     def test_strings_use_utf8_njsonstr_not_lossy_funnel(self):
         # njsonStr is the canonical UTF-8 writer; the lossy '?' funnel must be absent.

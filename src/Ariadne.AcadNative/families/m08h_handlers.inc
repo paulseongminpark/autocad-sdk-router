@@ -32,6 +32,11 @@
 // enclosing TU; dbdim.h and the AcGe 2D-array headers are pulled in here for this family.
 
 #include "dbdim.h"      // AcDbAlignedDimension / Rotated / Radial / Diametric / angular / ordinate / arc / large
+#include "dblead.h"     // AcDbLeader
+#include "dbmleader.h"  // AcDbMLeader
+#include "dbmleaderstyle.h" // AcDbMLeaderStyle enums
+#include "dbtable.h"    // AcDbTable
+#include "dbTableStyle.h" // AcDbTableStyle
 #include "gept2dar.h"   // AcGePoint2dArray (hatch loop vertices)
 #include "gedblar.h"    // AcGeDoubleArray  (hatch loop bulges)
 #include "gepnt2d.h"    // AcGePoint2d
@@ -56,15 +61,12 @@ static bool m08hReadPoint(const std::string& job, const char* key, AcGePoint3d& 
     return true;
 }
 
-// Parse the "vertices" JSON array (a list of {x,y} objects) into a 2D point array.
+// Parse a JSON array (a list of {x,y,z} objects) into a 3D point array.
 // Hand-rolled to match the file's minimal-JSON convention (jsonFind* are scalar/object only).
-// Scans brace-delimited objects inside the array and pulls x,y from each. z is ignored (hatch
-// loops are planar in the entity ECS). Returns the count appended.
-static int m08hReadVertexArray(const std::string& job, AcGePoint2dArray& outPts)
+static int m08hReadPointArray3d(const std::string& job, const char* key, AcGePoint3dArray& outPts)
 {
     outPts.removeAll();
-    // locate  "vertices"  then the following '['
-    const std::string keyTok = "\"vertices\"";
+    const std::string keyTok = std::string("\"") + key + "\"";
     size_t k = job.find(keyTok);
     if (k == std::string::npos)
         return 0;
@@ -85,12 +87,25 @@ static int m08hReadVertexArray(const std::string& job, AcGePoint2dArray& outPts)
         if (oe == std::string::npos)
             break;
         const std::string objStr = arr.substr(ob, oe - ob + 1);
-        double x = 0.0, y = 0.0;
+        double x = 0.0, y = 0.0, z = 0.0;
         jsonFindNumber(objStr, "x", x);
         jsonFindNumber(objStr, "y", y);
-        outPts.append(AcGePoint2d(x, y));
+        jsonFindNumber(objStr, "z", z);
+        outPts.append(AcGePoint3d(x, y, z));
         pos = oe + 1;
     }
+    return static_cast<int>(outPts.length());
+}
+
+// Parse the "vertices" JSON array (a list of {x,y} objects) into a 2D point array.
+// z is ignored (hatch loops are planar in the entity ECS). Returns the count appended.
+static int m08hReadVertexArray(const std::string& job, AcGePoint2dArray& outPts)
+{
+    outPts.removeAll();
+    AcGePoint3dArray pts3d;
+    const int n = m08hReadPointArray3d(job, "vertices", pts3d);
+    for (int i = 0; i < n; ++i)
+        outPts.append(AcGePoint2d(pts3d[i].x, pts3d[i].y));
     return static_cast<int>(outPts.length());
 }
 
@@ -160,6 +175,9 @@ static bool m08hHasOp(const std::string& op)
 {
     return op == "write.entity.text"
         || op == "write.entity.mtext"
+        || op == "write.entity.leader"
+        || op == "write.entity.mleader"
+        || op == "write.entity.table"
         || op == "write.entity.dim.aligned"
         || op == "write.entity.dim.rotated"
         || op == "write.entity.dim.radial"
@@ -225,6 +243,181 @@ static bool m08hDispatch(const std::string& op, const AriadneJobCtx& ctx, std::o
             return true;
         }
         m08hEmitCreated(r, pDb, "AcDbMText", id, layer);
+        return true;
+    }
+
+    if (op == "write.entity.leader") {
+        std::string layer; jsonFindString(job, "layer", layer);
+        std::string content; jsonFindString(job, "text", content);
+        AcGePoint3dArray verts;
+        if (m08hReadPointArray3d(job, "vertices", verts) < 2) {
+            // Also accept the same "points" key used by curve/polyline writers.
+            m08hReadPointArray3d(job, "points", verts);
+        }
+        if (verts.length() < 2) {
+            emitNativeError(r, "MISSING_ARG", "leader needs vertices/points array with >=2 {x,y,z} points");
+            return true;
+        }
+
+        AcDbObjectId annoId = AcDbObjectId::kNull;
+        std::string annoHandle;
+        if (!content.empty()) {
+            AcDbMText* pAnno = new AcDbMText();
+            pAnno->setDatabaseDefaults(pDb);
+            pAnno->setLocation(verts[verts.length() - 1]);
+            double height = 2.5; jsonFindNumber(job, "height", height);
+            if (height > 0.0)
+                pAnno->setTextHeight(height);
+            pAnno->setContents(utf8ToWide(content).c_str());
+            Acad::ErrorStatus aes = m08hAppend(pDb, layer, pAnno, annoId);
+            if (aes != Acad::eOk) {
+                emitNativeError(r, "ANNOTATION_APPEND_FAILED", "leader annotation mtext append es=" + std::to_string(static_cast<int>(aes)));
+                return true;
+            }
+            annoHandle = handleOfId(annoId);
+        }
+
+        AcDbLeader* pE = new AcDbLeader();
+        pE->setDatabaseDefaults(pDb);
+        pE->setDimensionStyle(pDb->dimstyle());
+        pE->setToStraightLeader();
+        pE->enableArrowHead();
+        for (int i = 0; i < verts.length(); ++i)
+            pE->appendVertex(verts[i]);
+        if (!annoId.isNull())
+            pE->setAnnotationObjId(annoId);
+
+        AcDbObjectId id;
+        const Acad::ErrorStatus es = m08hAppend(pDb, layer, pE, id);
+        if (es != Acad::eOk) {
+            emitNativeError(r, "APPEND_FAILED", "AcDbLeader append es=" + std::to_string(static_cast<int>(es)));
+            return true;
+        }
+        int probes = 0, after = 0; countModelSpace(pDb, after, probes);
+        r << "\"result\":{\"created\":true"
+          << ",\"class\":\"AcDbLeader\""
+          << ",\"handle\":" << njsonStr(handleOfId(id))
+          << ",\"annotation_handle\":" << (annoHandle.empty() ? std::string("null") : njsonStr(annoHandle))
+          << ",\"vertex_count\":" << verts.length()
+          << ",\"layer\":" << njsonStr(layer)
+          << ",\"modelspace_entities_after\":" << after << "},"
+          << "\"status\":\"ok\"}";
+        return true;
+    }
+
+    if (op == "write.entity.mleader") {
+        std::string layer; jsonFindString(job, "layer", layer);
+        std::string content; jsonFindString(job, "text", content);
+        if (content.empty()) content = "MLeader";
+        AcGePoint3dArray verts;
+        if (m08hReadPointArray3d(job, "vertices", verts) < 2)
+            m08hReadPointArray3d(job, "points", verts);
+        if (verts.length() < 2) {
+            emitNativeError(r, "MISSING_ARG", "mleader needs vertices/points array with >=2 {x,y,z} points");
+            return true;
+        }
+        double height = 2.5; jsonFindNumber(job, "height", height);
+
+        AcDbMText mt;
+        mt.setDatabaseDefaults(pDb);
+        mt.setLocation(verts[verts.length() - 1]);
+        if (height > 0.0)
+            mt.setTextHeight(height);
+        mt.setContents(utf8ToWide(content).c_str());
+
+        AcDbMLeader* pE = new AcDbMLeader();
+        pE->setDatabaseDefaults(pDb);
+        pE->setContentType(AcDbMLeaderStyle::kMTextContent);
+        pE->setMText(&mt);
+        if (height > 0.0)
+            pE->setTextHeight(height);
+        pE->setLeaderLineType(AcDbMLeaderStyle::kStraightLeader);
+        int leaderIndex = -1, lineIndex = -1;
+        Acad::ErrorStatus es = pE->addLeader(leaderIndex);
+        if (es == Acad::eOk)
+            es = pE->addLeaderLine(leaderIndex, lineIndex);
+        if (es == Acad::eOk)
+            es = pE->addFirstVertex(lineIndex, verts[0]);
+        for (int i = 1; es == Acad::eOk && i < verts.length(); ++i)
+            es = pE->addLastVertex(lineIndex, verts[i]);
+        if (es != Acad::eOk) {
+            delete pE;
+            emitNativeError(r, "MLEADER_BUILD_FAILED", "AcDbMLeader leader-line build es=" + std::to_string(static_cast<int>(es)));
+            return true;
+        }
+
+        AcDbObjectId id;
+        es = m08hAppend(pDb, layer, pE, id);
+        if (es != Acad::eOk) {
+            emitNativeError(r, "APPEND_FAILED", "AcDbMLeader append es=" + std::to_string(static_cast<int>(es)));
+            return true;
+        }
+        int probes = 0, after = 0; countModelSpace(pDb, after, probes);
+        r << "\"result\":{\"created\":true"
+          << ",\"class\":\"AcDbMLeader\""
+          << ",\"handle\":" << njsonStr(handleOfId(id))
+          << ",\"leader_index\":" << leaderIndex
+          << ",\"leader_line_index\":" << lineIndex
+          << ",\"vertex_count\":" << verts.length()
+          << ",\"layer\":" << njsonStr(layer)
+          << ",\"modelspace_entities_after\":" << after << "},"
+          << "\"status\":\"ok\"}";
+        return true;
+    }
+
+    if (op == "write.entity.table") {
+        std::string layer; jsonFindString(job, "layer", layer);
+        std::string content; jsonFindString(job, "text", content);
+        if (content.empty()) content = "Ariadne";
+        AcGePoint3d pos(0.0, 0.0, 0.0); m08hReadPoint(job, "position", pos);
+        double rowsD = 2.0, colsD = 2.0, rowH = 3.0, colW = 15.0, textH = 2.5;
+        jsonFindNumber(job, "rows", rowsD);
+        jsonFindNumber(job, "columns", colsD);
+        jsonFindNumber(job, "row_height", rowH);
+        jsonFindNumber(job, "column_width", colW);
+        jsonFindNumber(job, "text_height", textH);
+        int rows = static_cast<int>(rowsD); if (rows < 1) rows = 1;
+        int cols = static_cast<int>(colsD); if (cols < 1) cols = 1;
+
+        AcDbTable* pE = new AcDbTable();
+        pE->setDatabaseDefaults(pDb);
+        if (!pDb->tablestyle().isNull())
+            pE->setTableStyle(pDb->tablestyle());
+        pE->setPosition(pos);
+        Acad::ErrorStatus es = pE->setSize(rows, cols);
+        if (es == Acad::eOk) es = pE->setRowHeight(rowH);
+        if (es == Acad::eOk) es = pE->setColumnWidth(colW);
+        for (int rr = 0; es == Acad::eOk && rr < rows; ++rr) {
+            for (int cc = 0; es == Acad::eOk && cc < cols; ++cc) {
+                std::ostringstream cell; cell << content;
+                if (rows * cols > 1) cell << " " << (rr + 1) << "," << (cc + 1);
+                es = pE->setTextString(rr, cc, utf8ToWide(cell.str()).c_str());
+                if (es == Acad::eOk && textH > 0.0)
+                    es = pE->setTextHeight(rr, cc, textH);
+            }
+        }
+        if (es == Acad::eOk)
+            es = pE->generateLayout();
+        if (es != Acad::eOk) {
+            delete pE;
+            emitNativeError(r, "TABLE_BUILD_FAILED", "AcDbTable build es=" + std::to_string(static_cast<int>(es)));
+            return true;
+        }
+        AcDbObjectId id;
+        es = m08hAppend(pDb, layer, pE, id);
+        if (es != Acad::eOk) {
+            emitNativeError(r, "APPEND_FAILED", "AcDbTable append es=" + std::to_string(static_cast<int>(es)));
+            return true;
+        }
+        int probes = 0, after = 0; countModelSpace(pDb, after, probes);
+        r << "\"result\":{\"created\":true"
+          << ",\"class\":\"AcDbTable\""
+          << ",\"handle\":" << njsonStr(handleOfId(id))
+          << ",\"rows\":" << rows
+          << ",\"columns\":" << cols
+          << ",\"layer\":" << njsonStr(layer)
+          << ",\"modelspace_entities_after\":" << after << "},"
+          << "\"status\":\"ok\"}";
         return true;
     }
 

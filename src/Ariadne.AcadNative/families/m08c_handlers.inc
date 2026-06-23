@@ -17,6 +17,7 @@
 // included by the host TU.
 #include <cstring>      // std::memset (acedGetVar resbuf scratch)
 #include "summinfo.h"   // AcDbDatabaseSummaryInfo + acdbGetSummaryInfo
+#include "dbidmap.h"    // AcDbIdMapping for wblockCloneObjects
 
 //---------------------------------------------------------------------------
 // Local helpers (file-static; names m08c-prefixed so they never collide with a
@@ -62,6 +63,43 @@ static bool m08cResolveOptionalObject(const std::string& job, AcDbDatabase* pDb,
     return !id.isNull();
 }
 
+static bool m08cFindPathArg(const std::string& job, std::string& outPath)
+{
+    const char* keys[] = {"path", "input_path", "dwg_path", "dxf_path", "out", "output_path", "output"};
+    for (size_t i = 0; i < sizeof(keys) / sizeof(keys[0]); ++i) {
+        if (jsonFindString(job, keys[i], outPath) && !outPath.empty())
+            return true;
+    }
+    outPath.clear();
+    return false;
+}
+
+static bool m08cFindOutPathArg(const std::string& job, std::string& outPath)
+{
+    const char* keys[] = {"out", "output_path", "output"};
+    for (size_t i = 0; i < sizeof(keys) / sizeof(keys[0]); ++i) {
+        if (jsonFindString(job, keys[i], outPath) && !outPath.empty())
+            return true;
+    }
+    outPath.clear();
+    return false;
+}
+
+static bool m08cReadSideDwg(const std::string& path, AcDbDatabase*& pSide,
+                            Acad::ErrorStatus& es)
+{
+    pSide = new AcDbDatabase(false, true);
+    es = pSide->readDwgFile(utf8ToWide(path).c_str(), AcDbDatabase::kForReadAndAllShare, true);
+    if (es == Acad::eOk)
+        pSide->closeInput(true);
+    if (es != Acad::eOk) {
+        delete pSide;
+        pSide = nullptr;
+        return false;
+    }
+    return true;
+}
+
 static bool m08cHasOp(const std::string& op)
 {
     return op == "infra.hostapp.get_services"
@@ -77,17 +115,288 @@ static bool m08cHasOp(const std::string& op)
         || op == "write.object.cancel"
         || op == "infra.hostapp.set_working_db"
         || op == "inspect.database.flush_input"
-        || op == "transaction.manager.start"
-        || op == "transaction.manager.get_object"
-        || op == "write.object.upgrade_open"
+        || op == "inspect.database.read_dwg"
+        || op == "inspect.database.read_dwg_handle"
+        || op == "inspect.database.dxf_in"
+        || op == "transform.database.dxf_out"
+        || op == "transform.database.save_as"
+        || op == "transform.database.save_as_simple"
+        || op == "write.object.close"
         || op == "write.object.downgrade_open"
-        || op == "write.object.close";
+        || op == "write.object.upgrade_open"
+        || op == "transform.database.wblock_clone"
+        || op == "write.object.create_ext_dict"
+        || op == "write.regapp.register"
+        || op == "transaction.manager.start"
+        || op == "transaction.manager.get_object";
 }
 
 static bool m08cDispatch(const std::string& op, const AriadneJobCtx& ctx, std::ostringstream& r)
 {
     AcDbDatabase* pDb = ctx.pDb;   // working (router-staged) database; non-null (gated upstream)
     const std::string& job = ctx.job;   // raw job JSON (arg parsing via jsonFind*)
+
+    //-----------------------------------------------------------------------
+    // M08G/H-30 staged DB/object operations promoted from catalogued.
+    //-----------------------------------------------------------------------
+    if (op == "infra.hostapp.set_working_db") {
+        AcDbHostApplicationServices* pSvc = acdbHostApplicationServices();
+        if (pSvc == nullptr) {
+            emitNativeError(r, "HOST_SERVICES_UNAVAILABLE", "acdbHostApplicationServices returned null");
+            return true;
+        }
+        AcDbDatabase* previous = pSvc->workingDatabase();
+        pSvc->setWorkingDatabase(pDb);
+        const bool switched = (pSvc->workingDatabase() == pDb);
+        pSvc->setWorkingDatabase(previous);
+        const bool restored = (pSvc->workingDatabase() == previous);
+        r << "\"result\":{\"set_attempted\":true"
+          << ",\"switched\":" << (switched ? "true" : "false")
+          << ",\"restored\":" << (restored ? "true" : "false")
+          << ",\"host_mode\":" << njsonStr(ctx.hostMode) << "},"
+          << "\"status\":\"" << ((switched && restored) ? "ok" : "error") << "\"}";
+        return true;
+    }
+
+    if (op == "inspect.database.read_dwg" || op == "inspect.database.read_dwg_handle") {
+        std::string path;
+        if (!m08cFindPathArg(job, path)) {
+            emitNativeError(r, "MISSING_PATH", op + " requires path/input_path/dwg_path");
+            return true;
+        }
+        AcDbDatabase* pSide = nullptr;
+        Acad::ErrorStatus es = Acad::eOk;
+        if (!m08cReadSideDwg(path, pSide, es)) {
+            emitNativeError(r, "READ_DWG_FAILED", "readDwgFile es=" + std::to_string(static_cast<int>(es)));
+            return true;
+        }
+        int total = 0, probes = 0; countModelSpace(pSide, total, probes);
+        r << "\"result\":{\"read\":true"
+          << ",\"path\":" << njsonStr(path)
+          << ",\"modelspace_entities\":" << total;
+        if (op == "inspect.database.read_dwg_handle") {
+            std::string hex;
+            if (!m08cFindHandleArg(job, hex)) {
+                delete pSide;
+                emitNativeError(r, "MISSING_HANDLE", "inspect.database.read_dwg_handle requires handle");
+                return true;
+            }
+            AcDbObjectId id;
+            const bool found = resolveHandle(pSide, hex, id);
+            r << ",\"handle\":" << njsonStr(hex)
+              << ",\"found\":" << (found ? "true" : "false")
+              << ",\"resolved_handle\":" << njsonStr(found ? handleOfId(id) : std::string());
+        }
+        delete pSide;
+        r << "},\"status\":\"ok\"}";
+        return true;
+    }
+
+    if (op == "inspect.database.dxf_in") {
+        std::string path;
+        if (!m08cFindPathArg(job, path)) {
+            emitNativeError(r, "MISSING_PATH", "inspect.database.dxf_in requires path/input_path/dxf_path");
+            return true;
+        }
+        AcDbDatabase side(true, true);
+        Acad::ErrorStatus es = side.dxfIn(utf8ToWide(path).c_str());
+        int total = 0, probes = 0;
+        if (es == Acad::eOk)
+            countModelSpace(&side, total, probes);
+        r << "\"result\":{\"dxf_in\":" << (es == Acad::eOk ? "true" : "false")
+          << ",\"errorstatus\":" << static_cast<int>(es)
+          << ",\"path\":" << njsonStr(path)
+          << ",\"modelspace_entities\":" << total << "},"
+          << "\"status\":\"" << (es == Acad::eOk ? "ok" : "error") << "\"}";
+        return true;
+    }
+
+    if (op == "inspect.database.flush_input") {
+        Acad::ErrorStatus es = pDb->closeInput(true);
+        r << "\"result\":{\"flushed\":" << (es == Acad::eOk ? "true" : "false")
+          << ",\"errorstatus\":" << static_cast<int>(es)
+          << ",\"staged_db_only\":true},"
+          << "\"status\":\"" << (es == Acad::eOk ? "ok" : "error") << "\"}";
+        return true;
+    }
+
+    if (op == "transform.database.dxf_out" || op == "transform.database.save_as" || op == "transform.database.save_as_simple") {
+        std::string outPath, inPath;
+        if (!m08cFindOutPathArg(job, outPath)) {
+            emitNativeError(r, "MISSING_OUTPUT_PATH", op + " requires out/output_path and never writes the original DWG");
+            return true;
+        }
+        jsonFindString(job, "input_path", inPath);
+        if (!inPath.empty() && inPath == outPath) {
+            emitNativeError(r, "ORIGINAL_WRITE_FORBIDDEN", "output path equals input_path");
+            return true;
+        }
+        Acad::ErrorStatus es = Acad::eOk;
+        if (op == "transform.database.dxf_out")
+            es = pDb->dxfOut(utf8ToWide(outPath).c_str(), 16, AcDb::kDHL_CURRENT, false);
+        else
+            es = pDb->saveAs(utf8ToWide(outPath).c_str(), true, AcDb::kDHL_CURRENT);
+        r << "\"result\":{\"written\":" << (es == Acad::eOk ? "true" : "false")
+          << ",\"errorstatus\":" << static_cast<int>(es)
+          << ",\"output_path\":" << njsonStr(outPath)
+          << ",\"staged_db_only\":true},"
+          << "\"status\":\"" << (es == Acad::eOk ? "ok" : "error") << "\"}";
+        return true;
+    }
+
+    if (op == "write.object.close" || op == "write.object.downgrade_open" || op == "write.object.upgrade_open") {
+        std::string hex;
+        if (!m08cFindHandleArg(job, hex)) {
+            emitNativeError(r, "MISSING_HANDLE", op + " requires a handle/object_handle argument");
+            return true;
+        }
+        AcDbObjectId id;
+        if (!resolveHandle(pDb, hex, id)) {
+            emitNativeError(r, "HANDLE_NOT_FOUND", "no object for handle " + hex);
+            return true;
+        }
+        AcDbObject* pObj = nullptr;
+        Acad::ErrorStatus esOpen = Acad::eOk, esAction = Acad::eOk, esClose = Acad::eOk;
+        if (op == "write.object.close") {
+            esOpen = acdbOpenObject(pObj, id, AcDb::kForRead);
+            if (esOpen == Acad::eOk && pObj != nullptr)
+                esClose = pObj->close();
+        } else if (op == "write.object.downgrade_open") {
+            esOpen = acdbOpenObject(pObj, id, AcDb::kForWrite);
+            if (esOpen == Acad::eOk && pObj != nullptr) {
+                esAction = pObj->downgradeOpen();
+                esClose = pObj->close();
+            }
+        } else {
+            esOpen = acdbOpenObject(pObj, id, AcDb::kForRead);
+            if (esOpen == Acad::eOk && pObj != nullptr) {
+                esAction = pObj->upgradeOpen();
+                if (esAction == Acad::eOk)
+                    pObj->downgradeOpen();
+                esClose = pObj->close();
+            }
+        }
+        const bool ok = (esOpen == Acad::eOk && esAction == Acad::eOk && esClose == Acad::eOk);
+        r << "\"result\":{\"handle\":" << njsonStr(hex)
+          << ",\"open_errorstatus\":" << static_cast<int>(esOpen)
+          << ",\"action_errorstatus\":" << static_cast<int>(esAction)
+          << ",\"close_errorstatus\":" << static_cast<int>(esClose)
+          << ",\"completed\":" << (ok ? "true" : "false") << "},"
+          << "\"status\":\"" << (ok ? "ok" : "error") << "\"}";
+        return true;
+    }
+
+    if (op == "write.object.create_ext_dict") {
+        std::string hex;
+        if (!m08cFindHandleArg(job, hex)) {
+            emitNativeError(r, "MISSING_HANDLE", "write.object.create_ext_dict requires handle/object_handle");
+            return true;
+        }
+        AcDbObjectId id;
+        if (!resolveHandle(pDb, hex, id)) { emitNativeError(r, "HANDLE_NOT_FOUND", "no object for handle " + hex); return true; }
+        AcDbObject* pObj = nullptr;
+        if (acdbOpenObject(pObj, id, AcDb::kForWrite) != Acad::eOk || pObj == nullptr) {
+            emitNativeError(r, "OBJECT_OPEN_FAILED", "could not open object for extension dictionary create");
+            return true;
+        }
+        bool existed = !pObj->extensionDictionary().isNull();
+        Acad::ErrorStatus es = Acad::eOk;
+        if (!existed)
+            es = pObj->createExtensionDictionary();
+        AcDbObjectId dictId = pObj->extensionDictionary();
+        pObj->close();
+        r << "\"result\":{\"created\":" << ((es == Acad::eOk && !existed) ? "true" : "false")
+          << ",\"existed\":" << (existed ? "true" : "false")
+          << ",\"errorstatus\":" << static_cast<int>(es)
+          << ",\"handle\":" << njsonStr(hex)
+          << ",\"extension_dictionary_handle\":" << (dictId.isNull() ? std::string("null") : njsonStr(handleOfId(dictId))) << "},"
+          << "\"status\":\"" << (es == Acad::eOk ? "ok" : "error") << "\"}";
+        return true;
+    }
+
+    if (op == "write.regapp.register") {
+        std::string app;
+        jsonFindString(job, "regapp", app);
+        if (app.empty()) app = "ARIADNE";
+        Acad::ErrorStatus es = pDb->registerApp(utf8ToWide(app).c_str());
+        const bool registered = pDb->isAppRegistered(utf8ToWide(app).c_str());
+        r << "\"result\":{\"registered\":" << (registered ? "true" : "false")
+          << ",\"errorstatus\":" << static_cast<int>(es)
+          << ",\"regapp\":" << njsonStr(app) << "},"
+          << "\"status\":\"" << ((es == Acad::eOk && registered) ? "ok" : "error") << "\"}";
+        return true;
+    }
+
+    if (op == "transform.database.wblock_clone") {
+        std::vector<std::string> handles = jsonFindStringArray(job, "handles");
+        std::string one;
+        if (handles.empty() && m08cFindHandleArg(job, one))
+            handles.push_back(one);
+        if (handles.empty()) { emitNativeError(r, "MISSING_HANDLE", "wblock_clone requires handle or handles"); return true; }
+        AcDbObjectIdArray ids;
+        for (size_t i = 0; i < handles.size(); ++i) {
+            AcDbObjectId id;
+            if (resolveHandle(pDb, handles[i], id)) ids.append(id);
+        }
+        if (ids.isEmpty()) { emitNativeError(r, "HANDLE_NOT_FOUND", "no handles resolved for wblock_clone"); return true; }
+        AcDbDatabase dest(true, true);
+        AcDbBlockTable* pBT = nullptr;
+        AcDbObjectId owner;
+        Acad::ErrorStatus es = dest.getBlockTable(pBT, AcDb::kForRead);
+        if (es == Acad::eOk && pBT != nullptr) { es = pBT->getAt(ACDB_MODEL_SPACE, owner); pBT->close(); }
+        AcDbIdMapping idMap;
+        if (es == Acad::eOk)
+            es = pDb->wblockCloneObjects(ids, owner, idMap, AcDb::kDrcIgnore, false);
+        int total = 0, probes = 0; countModelSpace(&dest, total, probes);
+        r << "\"result\":{\"cloned\":" << (es == Acad::eOk ? "true" : "false")
+          << ",\"errorstatus\":" << static_cast<int>(es)
+          << ",\"input_count\":" << ids.length()
+          << ",\"dest_modelspace_entities\":" << total << "},"
+          << "\"status\":\"" << (es == Acad::eOk ? "ok" : "error") << "\"}";
+        return true;
+    }
+
+    if (op == "transaction.manager.start") {
+        AcDbTransactionManager* mgr = pDb->transactionManager();
+        if (mgr == nullptr) { emitNativeError(r, "TRANSACTION_MANAGER_UNAVAILABLE", "transactionManager returned null"); return true; }
+        const int before = mgr->numActiveTransactions();
+        AcTransaction* txn = mgr->startTransaction();
+        const int during = mgr->numActiveTransactions();
+        Acad::ErrorStatus es = Acad::eOk;
+        if (txn != nullptr)
+            es = mgr->endTransaction();
+        const int after = mgr->numActiveTransactions();
+        r << "\"result\":{\"started\":" << (txn != nullptr ? "true" : "false")
+          << ",\"errorstatus\":" << static_cast<int>(es)
+          << ",\"active_before\":" << before
+          << ",\"active_during\":" << during
+          << ",\"active_after\":" << after << "},"
+          << "\"status\":\"" << ((txn != nullptr && es == Acad::eOk) ? "ok" : "error") << "\"}";
+        return true;
+    }
+
+    if (op == "transaction.manager.get_object") {
+        std::string hex;
+        if (!m08cFindHandleArg(job, hex)) { emitNativeError(r, "MISSING_HANDLE", "transaction.manager.get_object requires handle"); return true; }
+        AcDbObjectId id;
+        if (!resolveHandle(pDb, hex, id)) { emitNativeError(r, "HANDLE_NOT_FOUND", "no object for handle " + hex); return true; }
+        AcDbTransactionManager* mgr = pDb->transactionManager();
+        if (mgr == nullptr) { emitNativeError(r, "TRANSACTION_MANAGER_UNAVAILABLE", "transactionManager returned null"); return true; }
+        AcTransaction* txn = mgr->startTransaction();
+        AcDbObject* pObj = nullptr;
+        Acad::ErrorStatus es = (txn != nullptr) ? txn->getObject(pObj, id, AcDb::kForRead) : Acad::eNullObjectPointer;
+        std::string objectJson = "null";
+        if (es == Acad::eOk && pObj != nullptr)
+            objectJson = std::string("{") + serializeObjectCommon(pObj) + "}";
+        if (txn != nullptr)
+            mgr->endTransaction();
+        r << "\"result\":{\"handle\":" << njsonStr(hex)
+          << ",\"opened\":" << (es == Acad::eOk ? "true" : "false")
+          << ",\"errorstatus\":" << static_cast<int>(es)
+          << ",\"object\":" << objectJson << "},"
+          << "\"status\":\"" << (es == Acad::eOk ? "ok" : "error") << "\"}";
+        return true;
+    }
 
     //-----------------------------------------------------------------------
     // infra.hostapp.get_services — acdbHostApplicationServices() (global, inline).

@@ -37,6 +37,8 @@
 #include "dbxline.h"      // AcDbXline
 #include "dbregion.h"     // AcDbRegion::createFromCurves
 #include "dbfcf.h"        // AcDbFcf (tolerance / feature control frame)
+#include "dbmline.h"      // AcDbMline
+#include "dbmstyle.h"     // AcDbMlineStyle / current mline style id
 
 //============================================================================
 // M08G shared helpers (file-scope statics in this TU; m08g-prefixed to avoid any
@@ -137,6 +139,35 @@ static bool m08gFindHandle(const std::string& job, std::string& out)
         jsonFindString(argsJson, "handle", out) && !out.empty())
         return true;
     return false;
+}
+
+// Parse a JSON array of point objects into an AcGePoint3dArray.
+static int m08gReadPointArray(const std::string& job, const char* key, AcGePoint3dArray& out)
+{
+    out.removeAll();
+    const std::string keyTok = std::string("\"") + key + "\"";
+    size_t p = job.find(keyTok);
+    if (p == std::string::npos)
+        return 0;
+    size_t lb = job.find('[', p);
+    if (lb == std::string::npos)
+        return 0;
+    size_t rb = job.find(']', lb);
+    if (rb == std::string::npos)
+        rb = job.size();
+    size_t scan = lb + 1;
+    while (scan < rb) {
+        size_t ob = job.find('{', scan);
+        if (ob == std::string::npos || ob > rb) break;
+        size_t oe = job.find('}', ob);
+        if (oe == std::string::npos || oe > rb) break;
+        const std::string one = job.substr(ob, oe - ob + 1);
+        double x = 0.0, y = 0.0, z = 0.0;
+        jsonFindNumber(one, "x", x); jsonFindNumber(one, "y", y); jsonFindNumber(one, "z", z);
+        out.append(AcGePoint3d(x, y, z));
+        scan = oe + 1;
+    }
+    return static_cast<int>(out.length());
 }
 
 // Open a model-resident entity for WRITE by hex handle (staged mutation target).
@@ -257,7 +288,11 @@ static bool m08gHasOp(const std::string& op)
         op == "write.entity.polyline2d" ||
         op == "write.entity.polyline3d" ||
         op == "write.entity.attribdef" ||
+        op == "write.entity.attribute" ||
+        op == "write.entity.mline" ||
+        op == "write.entity.shape" ||
         op == "write.entity.polygonmesh" ||
+        op == "write.entity.polyfacemesh" ||
         op == "write.entity.region" ||
         op == "write.entity.blockref" ||
         op == "write.entity.minsert" ||
@@ -528,6 +563,103 @@ static bool m08gDispatch(const std::string& op, const AriadneJobCtx& ctx, std::o
         m08gEmitCreate(r, es, id, layer, ms);
         return true;
     }
+    if (op == "write.entity.attribute") {
+        std::string blockRefHandle;
+        if (!jsonFindString(job, "blockref_handle", blockRefHandle) || blockRefHandle.empty())
+            m08gFindHandle(job, blockRefHandle);
+        if (blockRefHandle.empty()) {
+            emitNativeError(r, "MISSING_ARG", "write.entity.attribute requires blockref_handle/handle for owning AcDbBlockReference");
+            return true;
+        }
+        AcDbObjectId brId;
+        if (!resolveHandle(pDb, blockRefHandle, brId)) {
+            emitNativeError(r, "BLOCKREF_NOT_FOUND", "no block reference for handle " + blockRefHandle);
+            return true;
+        }
+        AcDbBlockReference* pRef = nullptr;
+        if (acdbOpenObject(pRef, brId, AcDb::kForWrite) != Acad::eOk || pRef == nullptr) {
+            emitNativeError(r, "BLOCKREF_OPEN_FAILED", "could not open block reference for write");
+            return true;
+        }
+        AcGePoint3d pos; m08gPoint(job, "position", 0.0, 0.0, 0.0, pos);
+        std::string text, tag;
+        jsonFindString(job, "text", text); if (text.empty()) text = "VALUE";
+        jsonFindString(job, "tag", tag); if (tag.empty()) tag = "ARIADNE";
+        AcDbAttribute* pA = new AcDbAttribute(pos, utf8ToWide(text).c_str(), utf8ToWide(tag).c_str(), pDb->textstyle());
+        double height = 1.0; jsonFindNumber(job, "height", height);
+        if (height > 0.0) pA->setHeight(height);
+        AcDbObjectId attrId;
+        const Acad::ErrorStatus es = pRef->appendAttribute(attrId, pA);
+        if (es == Acad::eOk) pA->close(); else delete pA;
+        pRef->close();
+        int probes = 0, ms = 0; countModelSpace(pDb, ms, probes);
+        r << "\"result\":{\"created\":" << (es == Acad::eOk ? "true" : "false")
+          << ",\"errorstatus\":" << static_cast<int>(es)
+          << ",\"handle\":" << njsonStr(es == Acad::eOk ? handleOfId(attrId) : std::string())
+          << ",\"owner_blockref\":" << njsonStr(blockRefHandle)
+          << ",\"tag\":" << njsonStr(tag)
+          << ",\"modelspace_entities_after\":" << ms << "},"
+          << "\"status\":\"" << (es == Acad::eOk ? "ok" : "error") << "\"}";
+        return true;
+    }
+    if (op == "write.entity.mline") {
+        AcGePoint3dArray pts;
+        if (m08gReadPointArray(job, "points", pts) < 2)
+            m08gReadPointArray(job, "vertices", pts);
+        if (pts.length() < 2) {
+            emitNativeError(r, "MISSING_ARG", "write.entity.mline requires points/vertices array with >=2 {x,y,z}");
+            return true;
+        }
+        AcDbMline* pE = new AcDbMline();
+        pE->setDatabaseDefaults(pDb);
+        const AcDbObjectId styleId = pDb->cmlstyleID();
+        if (!styleId.isNull())
+            pE->setStyle(styleId);
+        double scale = 1.0; jsonFindNumber(job, "scale", scale);
+        if (scale != 0.0) pE->setScale(scale);
+        for (int i = 0; i < pts.length(); ++i)
+            pE->appendSeg(pts[i]);
+        double closed = 0.0;
+        if (jsonFindNumber(job, "closed", closed) && closed != 0.0)
+            pE->setClosedMline(true);
+        AcDbObjectId id; int ms = 0;
+        const Acad::ErrorStatus es = m08gAppendEntity(pDb, layer, pE, id, ms);
+        r << "\"result\":{\"created\":" << (es == Acad::eOk ? "true" : "false")
+          << ",\"errorstatus\":" << static_cast<int>(es)
+          << ",\"handle\":" << njsonStr(es == Acad::eOk ? handleOfId(id) : std::string())
+          << ",\"vertex_count\":" << pts.length()
+          << ",\"layer\":" << njsonStr(layer)
+          << ",\"modelspace_entities_after\":" << ms << "},"
+          << "\"status\":\"" << (es == Acad::eOk ? "ok" : "error") << "\"}";
+        return true;
+    }
+    if (op == "write.entity.shape") {
+        AcGePoint3d pos; m08gPoint(job, "position", 0.0, 0.0, 0.0, pos);
+        double size = 1.0, rotation = 0.0, width = 1.0, num = 0.0;
+        jsonFindNumber(job, "size", size);
+        jsonFindNumber(job, "rotation", rotation);
+        jsonFindNumber(job, "width_factor", width);
+        jsonFindNumber(job, "shape_number", num);
+        std::string name; jsonFindString(job, "name", name);
+        if (name.empty()) name = "ARIADNE";
+        AcDbShape* pE = new AcDbShape(pos, size, rotation, width);
+        pE->setDatabaseDefaults(pDb);
+        if (!pDb->textstyle().isNull())
+            pE->setStyleId(pDb->textstyle());
+        pE->setName(utf8ToWide(name).c_str());
+        if (num > 0.0)
+            pE->setShapeNumber(static_cast<Adesk::Int16>(num));
+        AcDbObjectId id; int ms = 0;
+        const Acad::ErrorStatus es = m08gAppendEntity(pDb, layer, pE, id, ms);
+        r << "\"result\":{\"created\":" << (es == Acad::eOk ? "true" : "false")
+          << ",\"errorstatus\":" << static_cast<int>(es)
+          << ",\"handle\":" << njsonStr(es == Acad::eOk ? handleOfId(id) : std::string())
+          << ",\"name\":" << njsonStr(name)
+          << ",\"layer\":" << njsonStr(layer)
+          << ",\"modelspace_entities_after\":" << ms << "},"
+          << "\"status\":\"" << (es == Acad::eOk ? "ok" : "error") << "\"}";
+        return true;
+    }
     if (op == "write.entity.polygonmesh") {
         // Rectangular polygon mesh from an m x n grid of vertices (one-shot ctor).
         double mD = 0.0, nD = 0.0;
@@ -564,6 +696,62 @@ static bool m08gDispatch(const std::string& op, const AriadneJobCtx& ctx, std::o
         AcDbObjectId id; int ms = 0;
         const Acad::ErrorStatus es = m08gAppendEntity(pDb, layer, pE, id, ms);
         m08gEmitCreate(r, es, id, layer, ms);
+        return true;
+    }
+    if (op == "write.entity.polyfacemesh") {
+        AcGePoint3dArray verts;
+        if (m08gReadPointArray(job, "points", verts) < 3)
+            m08gReadPointArray(job, "vertices", verts);
+        if (verts.length() < 3) {
+            emitNativeError(r, "MISSING_ARG", "write.entity.polyfacemesh requires points/vertices array with >=3 {x,y,z}");
+            return true;
+        }
+        if (verts.length() > 32767) {
+            emitNativeError(r, "INVALID_INPUT", "polyfacemesh vertex count exceeds 32767 index limit");
+            return true;
+        }
+        if (!layer.empty()) { bool c = false; ensureLayer(pDb, layer, 7, c); }
+        AcDbBlockTable* pBT = nullptr;
+        Acad::ErrorStatus es = pDb->getBlockTable(pBT, AcDb::kForRead);
+        if (es != Acad::eOk) { emitNativeError(r, "DB_ERROR", "getBlockTable"); return true; }
+        AcDbBlockTableRecord* pMS = nullptr;
+        es = pBT->getAt(ACDB_MODEL_SPACE, pMS, AcDb::kForWrite);
+        pBT->close();
+        if (es != Acad::eOk) { emitNativeError(r, "DB_ERROR", "getAt modelspace"); return true; }
+        AcDbPolyFaceMesh* pE = new AcDbPolyFaceMesh();
+        if (!layer.empty()) pE->setLayer(asciiToWide(layer).c_str());
+        AcDbObjectId id;
+        es = pMS->appendAcDbEntity(id, pE);
+        pMS->close();
+        if (es != Acad::eOk) { delete pE; emitNativeError(r, "APPEND_FAILED", "appendAcDbEntity polyfacemesh"); return true; }
+        Acad::ErrorStatus childEs = Acad::eOk;
+        for (int i = 0; childEs == Acad::eOk && i < verts.length(); ++i) {
+            AcDbPolyFaceMeshVertex* pV = new AcDbPolyFaceMeshVertex(verts[i]);
+            AcDbObjectId vid;
+            childEs = pE->appendVertex(vid, pV);
+            if (childEs == Acad::eOk) pV->close(); else delete pV;
+        }
+        if (childEs == Acad::eOk) {
+            const Adesk::Int16 i1 = 1, i2 = 2, i3 = 3;
+            const Adesk::Int16 i4 = static_cast<Adesk::Int16>(verts.length() >= 4 ? 4 : 3);
+            AcDbFaceRecord* pF = new AcDbFaceRecord(i1, i2, i3, i4);
+            AcDbObjectId fid;
+            childEs = pE->appendFaceRecord(fid, pF);
+            if (childEs == Acad::eOk) pF->close(); else delete pF;
+        }
+        pE->close();
+        int probes = 0, ms = 0; countModelSpace(pDb, ms, probes);
+        if (childEs != Acad::eOk) {
+            emitNativeError(r, "POLYFACEMESH_BUILD_FAILED", "vertex/face append es=" + std::to_string(static_cast<int>(childEs)));
+            return true;
+        }
+        r << "\"result\":{\"created\":true"
+          << ",\"handle\":" << njsonStr(handleOfId(id))
+          << ",\"vertex_count\":" << verts.length()
+          << ",\"face_count\":1"
+          << ",\"layer\":" << njsonStr(layer)
+          << ",\"modelspace_entities_after\":" << ms << "},"
+          << "\"status\":\"ok\"}";
         return true;
     }
     if (op == "write.entity.region") {

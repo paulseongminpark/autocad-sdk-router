@@ -46,7 +46,7 @@ _THIS = os.path.dirname(os.path.abspath(__file__))
 _REPO = os.path.dirname(os.path.dirname(_THIS))
 _INC = os.path.join(_REPO, "src", "Ariadne.AcadNative", "families", "m08g_handlers.inc")
 
-# Entity-create ops implemented (real AcDb* ctor + appendAcDbEntity). (18)
+# Entity-create ops implemented (real AcDb* ctor + appendAcDbEntity / owner append). (22)
 _CREATE = [
     "write.entity.arc",
     "write.entity.ellipse",
@@ -61,7 +61,11 @@ _CREATE = [
     "write.entity.polyline2d",
     "write.entity.polyline3d",
     "write.entity.attribdef",
+    "write.entity.attribute",
+    "write.entity.mline",
+    "write.entity.shape",
     "write.entity.polygonmesh",
+    "write.entity.polyfacemesh",
     "write.entity.region",
     "write.entity.blockref",
     "write.entity.minsert",
@@ -94,15 +98,11 @@ _DEFERRED = [
     "write.entity.solid3d.revolve",
     "write.entity.solid3d.sweep",
     "modify.entity.solid3d.boolean",
-    # external resource (image def / raster / SHX shape / mline style / hatch-area)
+    # external resource (image def / raster / SHX shape / hatch-area)
     "write.entity.rasterimage",
     "write.entity.wipeout",
-    "write.entity.shape",
-    "write.entity.mline",
     "write.entity.mpolygon",
-    "write.entity.polyfacemesh",
-    # owning-instance / editor-bound subentity association
-    "write.entity.attribute",
+    # editor-bound subentity association
     "edit.subentity.add_paths",
     "edit.subentity.delete_paths",
     "edit.subentity.transform",
@@ -170,17 +170,18 @@ class TestM08GHandlers(unittest.TestCase):
         )
 
     def test_implemented_count(self):
-        # 18 entity-create + 7 modify = 25 real staged-write handlers. The remaining
-        # 20 ops of the 45-op brief are the _DEFERRED set (ASM-modeler / external-
-        # resource / editor-bound), left OUT of HasOp on purpose (no fake pass).
-        self.assertEqual(len(_CREATE), 18)
+        # 22 entity-create + 7 modify = 29 real staged-write handlers after the
+        # M08G/H-30 expansion. The remaining 16 ops of the 45-op brief are the
+        # _DEFERRED set (ASM-modeler / external-resource / editor-bound), left OUT
+        # of HasOp on purpose (no fake pass).
+        self.assertEqual(len(_CREATE), 22)
         self.assertEqual(len(_MODIFY), 7)
-        self.assertEqual(len(_IMPLEMENTED), 25)
-        self.assertEqual(len(set(_IMPLEMENTED)), 25, "duplicate op id in the implemented list")
-        self.assertEqual(len(self.hasop), 25)
-        # the brief is 45 ops total: 25 implemented + 20 deferred.
+        self.assertEqual(len(_IMPLEMENTED), 29)
+        self.assertEqual(len(set(_IMPLEMENTED)), 29, "duplicate op id in the implemented list")
+        self.assertEqual(len(self.hasop), 29)
+        # the brief is 45 ops total: 29 implemented + 16 deferred.
         self.assertEqual(len(_IMPLEMENTED) + len(_DEFERRED), 45)
-        self.assertEqual(len(set(_DEFERRED)), 20, "duplicate op id in the deferred list")
+        self.assertEqual(len(set(_DEFERRED)), 16, "duplicate op id in the deferred list")
 
     def test_minimum_implemented_floor(self):
         # A sane floor independent of the exact list: at least 20 ops, and both the
