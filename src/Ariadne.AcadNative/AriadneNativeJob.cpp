@@ -3122,9 +3122,9 @@ struct AriadneJobCtx
 #include "families/m08f_handlers.inc"   // M08F — SQLite rich IR / query DSL
 #include "families/m08g_handlers.inc"   // M08G — entity-create + entity/geometry modify (staged-write)
 #include "families/m08h_handlers.inc"   // M08H — dimensions / annotations / hatch (staged-write)
-#include "families/m08k_handlers.inc"   // M08K-T01 — custom object/entity lifecycle (native)
-#include "families/m08kc_handlers.inc"  // M08K-T03 — constraints / associativity (native)
 #include "families/m08l_handlers.inc"   // M08L — graphics system: worldDraw / overrules / grips (native)
+#include "families/m08k_handlers.inc"   // M08K-T01 — custom object/entity lifecycle (native; reuses M08L collectors)
+#include "families/m08kc_handlers.inc"  // M08K-T03 — constraints / associativity (native)
 #include "families/m08m_handlers.inc"   // M08M — OPM properties + reactors (native)
 #include "families/m08n_handlers.inc"   // M08N — editor/jig/selection/UI/command lifecycle (native)
 

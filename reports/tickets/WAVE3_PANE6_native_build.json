@@ -1,0 +1,30 @@
+{
+  "schema": "ariadne.cad_os.wave3.pane6.native_build.v1",
+  "status": "ok",
+  "msbuild": "C:/Program Files/Microsoft Visual Studio/2026/Community/MSBuild/Current/Bin/amd64/MSBuild.exe",
+  "configuration": "Release",
+  "platform": "x64",
+  "isolated_output_root": "runs/wave3_pane6_native_build_final",
+  "canonical_deploy": "not_performed",
+  "arx_relink_mode": "canonical",
+  "warnings": [
+    "LNK4099 missing Autodesk rxapi.pdb debug symbols (link succeeded)"
+  ],
+  "artifacts": [
+    {
+      "path": "runs/wave3_pane6_native_build_final/bin/x64/Release/Ariadne.AcadNativeDbx.dbx",
+      "exists": true,
+      "bytes": 54272
+    },
+    {
+      "path": "runs/wave3_pane6_native_build_final/bin/x64/Release/Ariadne.AcadNative.crx",
+      "exists": true,
+      "bytes": 676864
+    },
+    {
+      "path": "runs/wave3_pane6_native_build_final/bin/x64/Release/Ariadne.AcadNative.arx",
+      "exists": true,
+      "bytes": 684544
+    }
+  ]
+}
