@@ -1,8 +1,8 @@
 ﻿{
-    "timestamp":  "2026-06-22T15:56:48.6682574+09:00",
+    "timestamp":  "2026-06-23T18:56:00.9820330+09:00",
     "schema":  "ariadne.autocad_router_status.v2",
     "status":  "ALL_AVAILABLE",
-    "router_home":  "D:\\dev\\99_tools\\autocad-sdk-router",
+    "router_home":  "D:\\dev\\99_tools\\autocad-sdk-router_m08cdef_read_graph_query",
     "python_exe":  "C:\\Users\\PAUL\\AppData\\Local\\Programs\\Python\\Python312\\python.exe",
     "route_count":  11,
     "available_count":  11,
@@ -10,36 +10,27 @@
 
                     ],
     "native_modules":  {
-                           "status":  "PASS",
+                           "status":  "MISSING",
                            "modules":  [
                                            {
-                                               "path":  "D:\\dev\\99_tools\\autocad-sdk-router\\src\\Ariadne.AcadNative\\bin\\x64\\Release\\Ariadne.AcadNativeDbx.dbx",
-                                               "exists":  true,
-                                               "bytes":  48128
+                                               "path":  "D:\\dev\\99_tools\\autocad-sdk-router_m08cdef_read_graph_query\\src\\Ariadne.AcadNative\\bin\\x64\\Release\\Ariadne.AcadNativeDbx.dbx",
+                                               "exists":  false,
+                                               "bytes":  0
                                            },
                                            {
-                                               "path":  "D:\\dev\\99_tools\\autocad-sdk-router\\src\\Ariadne.AcadNative\\bin\\x64\\Release\\Ariadne.AcadNative.crx",
-                                               "exists":  true,
-                                               "bytes":  260096
+                                               "path":  "D:\\dev\\99_tools\\autocad-sdk-router_m08cdef_read_graph_query\\src\\Ariadne.AcadNative\\bin\\x64\\Release\\Ariadne.AcadNative.crx",
+                                               "exists":  false,
+                                               "bytes":  0
                                            },
                                            {
-                                               "path":  "D:\\dev\\99_tools\\autocad-sdk-router\\src\\Ariadne.AcadNative\\bin\\x64\\Release\\Ariadne.AcadNative.arx",
-                                               "exists":  true,
-                                               "bytes":  268288
+                                               "path":  "D:\\dev\\99_tools\\autocad-sdk-router_m08cdef_read_graph_query\\src\\Ariadne.AcadNative\\bin\\x64\\Release\\Ariadne.AcadNative.arx",
+                                               "exists":  false,
+                                               "bytes":  0
                                            }
                                        ],
                            "coreconsole_load":  {
-                                                    "status":  "PASS",
-                                                    "staged_input":  "D:\\dev\\99_tools\\autocad-sdk-router\\staging\\native_status_20260622_155648\\input.dwg",
-                                                    "script":  "D:\\dev\\99_tools\\autocad-sdk-router\\staging\\native_status_20260622_155648\\native_status.scr",
-                                                    "result_file":  "D:\\dev\\99_tools\\autocad-sdk-router\\runs\\native_status_20260622_155648\\native_module_load.txt",
-                                                    "stdout_tail":  "\u0000\r\u0000 | \u0000끆9?\u0000 \u0000Q\u0000U\u0000I\u0000T\u0000\r\u0000 | \u0000\r\u0000 | \u0000\u0015훵?\u0000캐t튪?\u0000\u0004홱?\u0000읊쉬 \u0000Юm??\u0000꽱Ч젹돠황L?\u0000 \u0000\u003c\u0000N\u0000\u003e\u0000\r\u0000 | \u0000\r\u0000 | \u0000L\u0000o\u0000g\u0000F\u0000i\u0000l\u0000e\u0000P\u0000a\u0000t\u0000h\u0000 \u0000h\u0000a\u0000s\u0000 \u0000b\u0000e\u0000e\u0000n\u0000 \u0000r\u0000e\u0000s\u0000t\u0000o\u0000r\u0000e\u0000d\u0000 \u0000t\u0000o\u0000 \u0000\u0027\u0000\u0027\u0000.\u0000\r\u0000",
-                                                    "process_hygiene":  {
-                                                                            "status":  "PASS",
-                                                                            "new_acad_processes":  [
-
-                                                                                                   ]
-                                                                        }
+                                                    "status":  "NOT_RUN",
+                                                    "detail":  "Core Console native module load probe runs only for -Action status."
                                                 }
                        },
     "routes":  [

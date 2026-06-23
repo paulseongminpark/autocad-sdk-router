@@ -57,7 +57,7 @@ $LatestStatusPath = Join-Path $RouterHome 'reports\autocad_router_status_latest.
 $RunsDir = Join-Path $RouterHome 'runs'
 $StagingDir = Join-Path $RouterHome 'staging'
 $NativeExtractorProject = Join-Path $RouterHome 'src\Ariadne.DwgGeometryExtractor\Ariadne.DwgGeometryExtractor.csproj'
-$NativeAcadBinDir = Join-Path $RouterHome 'src\Ariadne.AcadNative\bin\x64\Release'
+$NativeAcadBinDir = if (-not [string]::IsNullOrWhiteSpace($env:ARIADNE_NATIVE_ACAD_BIN_DIR)) { $env:ARIADNE_NATIVE_ACAD_BIN_DIR } else { Join-Path $RouterHome 'src\Ariadne.AcadNative\bin\x64\Release' }
 
 function Read-JsonFile {
   param([string]$Path)

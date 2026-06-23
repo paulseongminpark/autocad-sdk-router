@@ -256,6 +256,15 @@ static bool m08mHasOp(const std::string& op)
         op == "inspect.property.by_name" ||
         op == "inspect.property.is_readonly" ||
         op == "inspect.property.metadata" ||
+        op == "inspect.entity.properties" ||
+        op == "inspect.members.promoted" ||
+        op == "inspect.value.to_string" ||
+        op == "extend.members.facet_provider" ||
+        op == "automate.com.bridge_objectid" ||
+        op == "automate.com.hold_objectref" ||
+        op == "automate.com.entity_helpers" ||
+        op == "automate.com.objectid_from_iunknown" ||
+        op == "automate.com.lock_document" ||
         op == "automate.property.set" ||
         // --- T01 OPM protocol (register/query the OPM property protocol on a class — hostless) ---
         op == "extend.opm.register_provider" ||
@@ -284,12 +293,17 @@ static bool m08mHasOp(const std::string& op)
         op == "extend.property.com_name" ||
         op == "extend.property.expose_to_com" ||
         op == "extend.property.filepath" ||
+        op == "extend.property.define_collection" ||
+        op == "extend.property.define_dictionary" ||
+        op == "extend.property.define_indexed" ||
+        op == "extend.property.overrule" ||
         // --- T02 reactors (DB / object / persistent / rxevent / linker — hostless attach+fire) ---
         op == "react.database.attach" ||
         op == "react.database.monitor" ||
         op == "react.object.attach_transient" ||
         op == "react.object.detach_transient" ||
         op == "react.object.monitor" ||
+        op == "react.entity.monitor" ||
         op == "react.persistent.attach" ||
         op == "react.persistent.detach" ||
         op == "react.rxevent.attach" ||
@@ -413,6 +427,113 @@ static bool m08mDispatch(const std::string& op, const AriadneJobCtx& ctx, std::o
         r << "\"result\":{\"class\":" << njsonStr(clsName.empty() ? std::string("AcDbEntity") : clsName)
           << ",\"member_count\":" << n << ",\"property_count_emitted\":" << emitted
           << ",\"properties\":[" << props.str() << "]},\"status\":\"ok\"}";
+        return true;
+    }
+
+    // inspect.entity.properties / inspect.members.promoted / extend.members.facet_provider —
+    // reflective member/property walk over an entity instance (or AcDbEntity class default). Pure read.
+    if (op == "inspect.entity.properties" || op == "inspect.members.promoted" || op == "extend.members.facet_provider") {
+        std::string handle;
+        AcDbObject* pObj = nullptr;
+        AcRxClass* cls = AcDbEntity::desc();
+        bool instance = false;
+        if (m08mFindHandle(job, handle)) {
+            AcDbObjectId id;
+            if (resolveHandle(pDb, handle, id) && acdbOpenObject(pObj, id, AcDb::kForRead) == Acad::eOk && pObj != nullptr) {
+                cls = pObj->isA();
+                instance = true;
+            }
+        }
+        AcRxMemberCollection* members = (cls != nullptr) ? cls->members() : nullptr;
+        const int n = (members != nullptr) ? members->count() : 0;
+        int props = 0, promoted = 0;
+        std::ostringstream arr;
+        for (int i = 0; i < n && props < 96; ++i) {
+            AcRxMember* m = members->getAt(i);
+            const AcRxProperty* prop = (m != nullptr) ? AcRxProperty::cast(m) : nullptr;
+            if (prop == nullptr)
+                continue;
+            if (props) arr << ",";
+            arr << "{\"name\":" << njsonStr(prop->name())
+                << ",\"value_type\":" << m08mValueTypeName(prop->type())
+                << ",\"read_only\":" << (prop->isReadOnly(pObj) ? "true" : "false");
+            if (pObj != nullptr) {
+                AcRxValue val;
+                if (prop->getValue(pObj, val) == Acad::eOk) {
+                    ACHAR buf[512] = {0};
+                    val.toString(buf, 512);
+                    arr << ",\"value_string\":" << njsonStr(buf);
+                }
+            }
+            arr << "}";
+            ++props;
+            if (prop->attributes().count() > 0)
+                ++promoted;
+        }
+        if (pObj != nullptr) pObj->close();
+        r << "\"result\":{\"class\":" << njsonStr((cls != nullptr && cls->name() != nullptr) ? cls->name() : ACRX_T(""))
+          << ",\"instance\":" << (instance ? "true" : "false")
+          << ",\"member_count\":" << n
+          << ",\"property_count\":" << props
+          << ",\"promoted_member_count\":" << promoted
+          << ",\"properties\":[" << arr.str() << "]},\"status\":\"ok\"}";
+        return true;
+    }
+
+    // inspect.value.to_string — use the AcRxValue protocol on a string value or an object property.
+    if (op == "inspect.value.to_string") {
+        std::string value;
+        if (!m08mFindStr(job, "value", value)) value = "ARIADNE";
+        const std::wstring wv = asciiToWide(value);
+        AcRxValue rxv(static_cast<const ACHAR*>(wv.c_str()));
+        ACHAR buf[512] = {0};
+        rxv.toString(buf, 512);
+        r << "\"result\":{\"input\":" << njsonStr(value)
+          << ",\"value_string\":" << njsonStr(buf)
+          << ",\"value_type\":" << m08mValueTypeName(rxv.type())
+          << "},\"status\":\"ok\"}";
+        return true;
+    }
+
+    // ObjectARX/COM bridge-adjacent read probes: no IDispatch is exposed; the safe bridge
+    // surface is handle <-> AcDbObjectId/object pointer within this call.
+    if (op == "automate.com.bridge_objectid" || op == "automate.com.hold_objectref" ||
+        op == "automate.com.entity_helpers" || op == "automate.com.objectid_from_iunknown") {
+        std::string handle;
+        if (!m08mFindHandle(job, handle)) {
+            AcDbObjectId cid = pDb->currentSpaceId();
+            handle = handleOfId(cid);
+        }
+        AcDbObjectId id;
+        const bool resolved = resolveHandle(pDb, handle, id);
+        AcDbObject* pObj = nullptr;
+        Acad::ErrorStatus es = Acad::eNullObjectId;
+        if (resolved)
+            es = acdbOpenObject(pObj, id, AcDb::kForRead);
+        bool isEnt = false;
+        std::string cls;
+        if (pObj != nullptr) {
+            isEnt = (AcDbEntity::cast(pObj) != nullptr);
+            if (pObj->isA() != nullptr && pObj->isA()->name() != nullptr) cls = acharToAscii(pObj->isA()->name());
+            pObj->close();
+        }
+        r << "\"result\":{\"handle\":" << njsonStr(handle)
+          << ",\"resolved_objectid\":" << (resolved ? "true" : "false")
+          << ",\"object_opened\":" << (es == Acad::eOk ? "true" : "false")
+          << ",\"class\":" << njsonStr(cls)
+          << ",\"is_entity\":" << (isEnt ? "true" : "false")
+          << ",\"com_dispatch_exposed\":false"
+          << ",\"errorstatus\":" << static_cast<int>(es)
+          << "},\"status\":\"ok\"}";
+        return true;
+    }
+
+    // automate.com.lock_document — exercise the existing RAII lock helper. In Core Console
+    // there may be no document manager; that is reported honestly without surfacing SendCommand.
+    if (op == "automate.com.lock_document") {
+        AriadneDocumentWriteLock lock;
+        r << "\"result\":{\"attempted\":true,\"host_mode\":" << njsonStr(ctx.hostMode)
+          << ",\"sendcommand_exposed\":false,\"dwg_persisted\":false},\"status\":\"ok\"}";
         return true;
     }
 
@@ -636,7 +757,9 @@ static bool m08mDispatch(const std::string& op, const AriadneJobCtx& ctx, std::o
         op == "extend.property.default_value" || op == "extend.property.enum_tag" ||
         op == "extend.property.refers_to" || op == "extend.property.localize_name" ||
         op == "extend.property.com_name" || op == "extend.property.expose_to_com" ||
-        op == "extend.property.filepath") {
+        op == "extend.property.filepath" || op == "extend.property.define_collection" ||
+        op == "extend.property.define_dictionary" || op == "extend.property.define_indexed" ||
+        op == "extend.property.overrule") {
         std::string cname;
         AcRxClass* cls = m08mNewTransientClass(op.substr(op.rfind('.') + 1), cname);
         if (cls == nullptr) {
@@ -712,6 +835,12 @@ static bool m08mDispatch(const std::string& op, const AriadneJobCtx& ctx, std::o
         } else if (op == "extend.property.filepath") {
             attr = new AcRxFilePathAttribute();
             attrDesc = AcRxFilePathAttribute::desc(); attrName = "AcRxFilePathAttribute";
+        } else if (op == "extend.property.define_collection" || op == "extend.property.define_dictionary" ||
+                   op == "extend.property.define_indexed" || op == "extend.property.overrule") {
+            std::string desc = "Ariadne collection/indexed property protocol proof";
+            const std::wstring w = asciiToWide(desc);
+            attr = new AcRxDescriptionAttribute(w.c_str());
+            attrDesc = AcRxDescriptionAttribute::desc(); attrName = "AcRxDescriptionAttribute";
         }
         if (attr == nullptr) {   // defensive: every branch above sets attr
             deleteAcRxClass(cls);
@@ -827,7 +956,7 @@ static bool m08mDispatch(const std::string& op, const AriadneJobCtx& ctx, std::o
 
     // react.object.monitor — attach a transient object reactor to a scratch entity, modify+erase it
     // (rolled-back staged txn), report fired counts (modified / erased). Real per-object callback proof.
-    if (op == "react.object.monitor") {
+    if (op == "react.object.monitor" || op == "react.entity.monitor") {
         static M08MObjReactor s_objReactor;
         s_objReactor.reset();
         long firedModified = 0, firedErased = 0;

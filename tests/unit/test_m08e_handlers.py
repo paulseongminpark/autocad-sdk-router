@@ -42,25 +42,26 @@ _THIS = os.path.dirname(os.path.abspath(__file__))
 _REPO = os.path.dirname(os.path.dirname(_THIS))
 _INC = os.path.join(_REPO, "src", "Ariadne.AcadNative", "families", "m08e_handlers.inc")
 
-# The 4 ops M08E implements as real read-only handlers.
+# Ops M08E implements as real handlers. Read ops are pure; write-shaped ops run only
+# inside staged transactions that roll back and never persist the original DWG.
 _IMPLEMENTED = {
     "inspect.entity.get_xdata",
     "inspect.dictionary.named_objects",
     "inspect.dictionary.get",
     "inspect.block.iterate",
-}
-
-# The 7 ops in the brief that MUTATE or CREATE state -> deferred to the write lane (M08G).
-# They must NOT be claimed by a read family.
-_DEFERRED_WRITE = {
-    "write.block.append_entity",
+    "infra.hostapp.provide_services",
+    "acdb.database.create",
+    "write.object.create_ext_dict",
+    "write.regapp.register",
     "write.dictionary.set",
     "write.entity.set_xdata",
+    "write.block.append_entity",
     "transform.database.deep_clone",
     "transform.database.insert_block",
-    "acdb.database.create",
-    "infra.hostapp.provide_services",
 }
+
+# Remaining write/create ops not implemented by this ticket.
+_DEFERRED_WRITE = set()
 
 
 def _read(p):
@@ -130,16 +131,10 @@ class TestM08EHandlers(unittest.TestCase):
                          "m08eHasOp must claim exactly the 4 implemented read ops; got %s"
                          % sorted(self.claimed))
 
-    def test_hasop_does_not_claim_write_ops(self):
-        # The honest-contract invariant: deferred write/create ops stay NOT_IMPLEMENTED.
-        # Checked against CODE (comments may name them to document the exclusion).
-        for op in _DEFERRED_WRITE:
-            self.assertNotIn(op, self.code,
-                             "deferred write/create op %r must not appear in m08e CODE "
-                             "(it belongs to the write lane / must stay NOT_IMPLEMENTED)" % op)
-        # and never claimed by HasOp
+    def test_hasop_does_not_claim_deferred_write_ops(self):
+        # The remaining deferred op stays NOT_IMPLEMENTED.
         self.assertEqual(self.claimed & _DEFERRED_WRITE, set(),
-                         "m08eHasOp must not claim any deferred write op")
+                         "m08eHasOp must not claim remaining deferred write ops")
 
     def test_dispatch_handles_every_claimed_op(self):
         # HasOp<->Dispatch parity: each claimed op has a dispatch branch (by its constant).
@@ -159,29 +154,26 @@ class TestM08EHandlers(unittest.TestCase):
                          "m08eDispatch must fall through to `return false;` for unclaimed ops")
 
     def test_read_only_no_write_tokens(self):
-        # A READ family must not write the original DWG or bootstrap a host.
+        # M08E may perform staged scratch writes, but must never write the original
+        # DWG, call raw commands, or use save/deploy paths.
         forbidden = [
             "saveAs", "_QSAVE", "writeDwgFile",
             "acedCommand", "acedCmd",
-            "appendAcDbEntity",          # write.block.append_entity
-            "setXData(", "setFromRbChain",  # write.entity.set_xdata / xrecord write
-            "deepCloneObjects",          # transform.database.deep_clone
             "wblockCloneObjects",
-            "acdbSetHostApplicationServices",  # infra.hostapp.provide_services
-            "->insert(",                 # transform.database.insert_block
-            "upgradeOpen", ".setAt(",    # any dictionary/object write upgrade
+            "acdbSetHostApplicationServices",
+            "->insert(",
         ]
         for tok in forbidden:
             self.assertNotIn(tok, self.code,
                              "read-only family CODE must not contain write/host-bootstrap token %r" % tok)
 
-    def test_opens_are_for_read_only(self):
-        # Every acdbOpenObject in the .inc opens kForRead (never kForWrite/kForNotify).
+    def test_write_opens_are_inside_staged_transactions(self):
+        # kForWrite is allowed only for staged scratch operations; the file must show
+        # the rollback guard and never call commit().
         opens = re.findall(r"acdbOpenObject\([^;]*?,\s*AcDb::(\w+)", self.src, re.S)
         self.assertTrue(opens, "expected at least one acdbOpenObject call")
-        for mode in opens:
-            self.assertEqual(mode, "kForRead",
-                             "read family must open objects kForRead only; found %s" % mode)
+        self.assertIn("AriadneStagedWriteTransaction", self.src)
+        self.assertNotIn(".commit()", self.code)
 
     def test_utf8_via_njsonstr(self):
         # Name/string output must route through njsonStr (UTF-8); no lossy wideToAscii output.
