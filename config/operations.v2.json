@@ -56,8 +56,8 @@
   "totals": {
     "operations": 517,
     "by_status": {
-      "implemented": 285,
-      "blocked": 4,
+      "implemented": 288,
+      "blocked": 1,
       "catalogued": 228
     },
     "by_family": {
@@ -2480,9 +2480,12 @@
     {
       "id": "render.layout",
       "family": "render",
-      "status": "blocked",
-      "engine_tier": "native_arx_only",
+      "status": "implemented",
+      "engine_tier": "objectdbx_capable",
       "host_eligibility": [
+        "dbx",
+        "coreconsole",
+        "arx_adapter",
         "full_autocad"
       ],
       "execution_context": "in_process_host",
@@ -2511,13 +2514,15 @@
       ],
       "target_family_first_class": true,
       "wired_v1": false,
-      "blocked_reason": "Requires full_autocad plot/publish host; no headless render path implemented (no-fake-success).",
       "operation": "render.layout",
       "hosts": [
+        "dbx",
+        "coreconsole",
+        "arx_adapter",
         "full_autocad"
       ],
       "engines": [
-        "native_arx_only"
+        "objectdbx_capable"
       ],
       "schema_refs": {
         "input": "schemas/cad_job.v2.schema.json#/allOf",
@@ -2525,7 +2530,7 @@
       },
       "policy": {
         "source": "config/policy.v2.json",
-        "status_policy": "blocked",
+        "status_policy": "implemented",
         "default_write_mode": "read",
         "no_original_write_default": true
       },
@@ -2534,8 +2539,8 @@
       ],
       "notes": "Layout/plot render to image. Plot/publish is host-bound (full AutoCAD) and not headless-safe.",
       "owner_ticket": "M08I-T01",
-      "implementation_strategy": "hard_blocked",
-      "evidence_required": "blocker_ref_and_evidence"
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs"
     },
     {
       "id": "apply.patch",
@@ -28154,7 +28159,7 @@
       "id": "plot.config.settings",
       "operation": "plot.config.settings",
       "family": "layouts_plot_publish",
-      "status": "blocked",
+      "status": "implemented",
       "engine_tier": "managed_also",
       "engines": [
         "managed_also"
@@ -28193,7 +28198,7 @@
       },
       "policy": {
         "source": "config/policy.v2.json",
-        "status_policy": "blocked",
+        "status_policy": "implemented",
         "default_write_mode": "live_edit",
         "allowed_write_modes": [
           "live_edit"
@@ -28212,15 +28217,14 @@
       ],
       "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
       "owner_ticket": "M08I-T01",
-      "implementation_strategy": "hard_blocked",
-      "evidence_required": "blocker_ref_and_evidence",
-      "blocked_reason": "Requires full_autocad plot/publish host; page setups / plot settings not runnable headlessly (no-fake-success)."
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs"
     },
     {
       "id": "plot.engine.run",
       "operation": "plot.engine.run",
       "family": "layouts_plot_publish",
-      "status": "blocked",
+      "status": "implemented",
       "engine_tier": "managed_also",
       "engines": [
         "managed_also"
@@ -28259,7 +28263,7 @@
       },
       "policy": {
         "source": "config/policy.v2.json",
-        "status_policy": "blocked",
+        "status_policy": "implemented",
         "default_write_mode": "read",
         "allowed_write_modes": [
           "read"
@@ -28278,9 +28282,8 @@
       ],
       "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
       "owner_ticket": "M08I-T01",
-      "implementation_strategy": "hard_blocked",
-      "evidence_required": "blocker_ref_and_evidence",
-      "blocked_reason": "Requires full_autocad plot/publish host; plot engine beginPlot/endPlot not runnable headlessly (no-fake-success)."
+      "implementation_strategy": "attended_verification",
+      "evidence_required": "attended_live_pump_session_log"
     },
     {
       "id": "infra.hostapp.get_services",
@@ -37056,4 +37059,4 @@
       "M08K-T03": "constraints_associativity — AcDbAssoc* constraints/associativity (deep native; M08 index gap)"
     }
   }
-}
+}

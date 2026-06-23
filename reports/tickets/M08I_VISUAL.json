@@ -3,13 +3,12 @@
   "status": "PASS",
   "branch": "cados/m08i-visual-render-plot",
   "implemented": [
-    "diff.before_after"
-  ],
-  "hard_blocked": [
     "render.layout",
     "plot.config.settings",
-    "plot.engine.run"
+    "plot.engine.run",
+    "diff.before_after"
   ],
+  "hard_blocked": [],
   "tests": [
     "tests/unit/test_visual_report.py",
     "tests/unit/test_m08a_catalog_reopen.py",
