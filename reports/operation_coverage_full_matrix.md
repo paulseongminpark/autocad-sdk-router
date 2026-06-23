@@ -2,8 +2,8 @@
 
 - packet: `CADOS_M08_FULL_OPERATION_COVERAGE_CLOSURE`
 - generated_from: `config/operations.v2.json`
-- total operations: **517** · implemented 451 · stub 0 · blocked 10 · catalogued 56 · deprecated 0 · **unknown 0**
-- v1-target: **461** (implemented 451 · blocked 10 · **deferred 0**)
+- total operations: **517** · implemented 451 · stub 0 · blocked 11 · catalogued 55 · deprecated 0 · **unknown 0**
+- v1-target: **462** (implemented 451 · blocked 11 · **deferred 0**)
 - agent-exposed ops: 451
 
 ## Gate
@@ -28,7 +28,7 @@
 |---|---|---|---|---|---|
 | read | 53 | 0 | 0 | 0 | 53 |
 | query | 1 | 0 | 0 | 0 | 1 |
-| write_patch | 16 | 0 | 3 | 1 | 19 |
+| write_patch | 16 | 0 | 4 | 0 | 20 |
 | validate_diff | 3 | 0 | 0 | 0 | 3 |
 | render_visual | 12 | 0 | 0 | 0 | 12 |
 | live | 6 | 0 | 1 | 0 | 7 |
@@ -39,9 +39,9 @@
 | risk_class | count |
 |---|---|
 | read_safe | 349 |
-| staged_write | 113 |
+| staged_write | 112 |
 | live_edit | 50 |
-| raw_command | 5 |
+| raw_command | 6 |
 
 ## v1-target operations (the v1 surface — all implemented or hard-blocked)
 
@@ -50,6 +50,7 @@
 | command.invoke.coroutine | active_document_write_original | blocked | raw_command | live_edit | False | acedCommandC(AcEdCoroutineCallback, void*, int r | SAFETY_FORBIDDEN: raw command dispatch is blocked in M08O fa |
 | command.invoke.sync | active_document_write_original | blocked | raw_command | live_edit | False | acedCommandS(int rtype, ...) | SAFETY_FORBIDDEN: raw command dispatch is blocked in M08O fa |
 | command.invoke.sync.resbuf | active_document_write_original | blocked | raw_command | live_edit | False | acedCmdS(const resbuf* rb, bool, AcApDocument*) | SAFETY_FORBIDDEN: raw command dispatch is blocked in M08O fa |
+| doc.sendstring | active_document_write_original | blocked | raw_command | write_copy | False | AcApDocManager::sendStringToExecute(AcApDocument | SAFETY_FORBIDDEN: doc.sendstring uses AcApDocManager::sendSt |
 | extend.object_enabler.demand_register | custom_objects_protocols | blocked | read_safe | read | False | Registry keys under HKLM\SOFTWARE\Autodesk\Objec | HARD_BLOCKED_SAFETY_CANONICAL_DEPLOY_PANE1_ONLY: demand-load |
 | command.queue.post | editor_input | blocked | raw_command | live_edit | False | acedPostCommand / acedPostCommandPrompt() | SAFETY_FORBIDDEN: raw command dispatch is blocked in M08O fa |
 | live.apply_patch | live | blocked | live_edit | live_edit | False |  | Requires full_autocad live_edit host + explicit write_origin |
@@ -509,4 +510,4 @@
 | write.layout.create | write | implemented | staged_write | write_copy | True | createLayout |  |
 | write.xdata.set | write | implemented | staged_write | write_copy | True | setDatabaseXdata |  |
 
-> Full 517-operation detail (all 13 fields per op) is in `reports/operation_coverage_full_matrix.json` — this table lists only the 461 v1-target ops. The 56 catalogued ops are classified future-version native capability (v1_target=false), not omitted.
+> Full 517-operation detail (all 13 fields per op) is in `reports/operation_coverage_full_matrix.json` — this table lists only the 462 v1-target ops. The 55 catalogued ops are classified future-version native capability (v1_target=false), not omitted.

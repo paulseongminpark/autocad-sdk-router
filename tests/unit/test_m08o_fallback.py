@@ -57,6 +57,14 @@ class TestM08OFallback(unittest.TestCase):
         self.assertIn(op["id"], self.rows)
         self.assertFalse(self.rows[op["id"]]["agent_exposed"], "automate.com.send_command must remain non-exposed")
 
+    def test_doc_sendstring_is_safety_blocked_not_agent_exposed(self):
+        op = next(o for o in self.ops if o["id"] == "doc.sendstring")
+        self.assertEqual(op["status"], "blocked", "doc.sendstring must not remain open or runnable")
+        self.assertIn("SAFETY_FORBIDDEN", op.get("blocked_reason", ""))
+        self.assertIn("raw command", op.get("blocked_reason", "").lower())
+        self.assertFalse(self.rows["doc.sendstring"]["agent_exposed"])
+        self.assertEqual(self.rows["doc.sendstring"]["risk_class"], "raw_command")
+
     def test_fallback_loaders_documented(self):
         policy = Path(_REPO) / "docs" / "FALLBACK_POLICY.md"
         self.assertTrue(policy.exists())

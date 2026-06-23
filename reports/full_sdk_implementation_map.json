@@ -238,16 +238,15 @@
       }
     },
     "M08J-T03": {
-      "op_count": 5,
-      "open": 1,
+      "op_count": 4,
+      "open": 0,
       "implemented": 4,
       "blocked": 0,
       "by_family": {
-        "active_document_write_original": 5
+        "active_document_write_original": 4
       },
       "by_strategy": {
-        "implemented_v1": 4,
-        "accoreconsole_lisp": 1
+        "implemented_v1": 4
       }
     },
     "M08K-T01": {
@@ -370,17 +369,17 @@
       }
     },
     "M08O-T02": {
-      "op_count": 22,
+      "op_count": 23,
       "open": 15,
       "implemented": 2,
-      "blocked": 5,
+      "blocked": 6,
       "by_family": {
-        "active_document_write_original": 3,
+        "active_document_write_original": 4,
         "editor_input": 1,
         "runtime_commands": 18
       },
       "by_strategy": {
-        "hard_blocked": 5,
+        "hard_blocked": 6,
         "implemented_v1": 2,
         "native_arx_cpp": 13,
         "accoreconsole_lisp": 2
@@ -881,12 +880,12 @@
     {
       "operation": "doc.sendstring",
       "family": "active_document_write_original",
-      "status": "catalogued",
+      "status": "blocked",
       "engine_tier": "accoreconsole_lisp_also",
-      "owner_ticket": "M08J-T03",
-      "implementation_strategy": "accoreconsole_lisp",
-      "evidence_required": "unit_test+staged_diff_fixture_original_unchanged",
-      "risk_class": "staged_write"
+      "owner_ticket": "M08O-T02",
+      "implementation_strategy": "hard_blocked",
+      "evidence_required": "blocker_ref_and_evidence",
+      "risk_class": "raw_command"
     },
     {
       "operation": "doc.syncopen",

@@ -81,7 +81,10 @@ def is_raw_command(op):
     h = op.get("handler") or {}
     nat = h.get("native_api") or ""
     oid = op.get("id") or ""
-    if "acedCommand" in nat or "acedCmd" in nat or "acedInvoke" in nat or "acedPostCommand" in nat:
+    if ("acedCommand" in nat or "acedCmd" in nat or "acedInvoke" in nat
+            or "acedPostCommand" in nat or "sendStringToExecute" in nat):
+        return True
+    if oid == "doc.sendstring":
         return True
     if oid.startswith("command.invoke") or oid.startswith("command.send") or oid.startswith("command.queue"):
         return True

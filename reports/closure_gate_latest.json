@@ -3,10 +3,10 @@
   "ticket_basis": "M08A-T01",
   "totals_by_status": {
     "implemented": 451,
-    "blocked": 10,
-    "catalogued": 56
+    "blocked": 11,
+    "catalogued": 55
   },
-  "catalogued": 56,
+  "catalogued": 55,
   "stub": 0,
   "unknown": 0,
   "deprecated": 0,

@@ -56,9 +56,9 @@
   "totals": {
     "operations": 517,
     "by_status": {
-      "implemented": 451,
-      "blocked": 10,
-      "catalogued": 56
+      "blocked": 11,
+      "catalogued": 55,
+      "implemented": 451
     },
     "by_family": {
       "active_document_write_original": 8,
@@ -132,8 +132,8 @@
     "implemented": 451,
     "wired": 0,
     "stub": 0,
-    "catalogued": 56,
-    "blocked": 10,
+    "catalogued": 55,
+    "blocked": 11,
     "deprecated": 0,
     "unknown": 0,
     "catalog_classified_ops": 480,
@@ -3557,7 +3557,7 @@
       "id": "doc.sendstring",
       "operation": "doc.sendstring",
       "family": "active_document_write_original",
-      "status": "catalogued",
+      "status": "blocked",
       "engine_tier": "accoreconsole_lisp_also",
       "engines": [
         "accoreconsole_lisp_also"
@@ -3600,15 +3600,16 @@
       },
       "policy": {
         "source": "config/policy.v2.json",
-        "status_policy": "catalogued_not_runnable",
+        "status_policy": "blocked",
         "default_write_mode": "write_copy",
         "allowed_write_modes": [
           "write_copy"
         ],
         "no_original_write_default": true,
-        "runtime_behavior": "not_runnable_until_promoted_to_implemented_or_wired"
+        "runtime_behavior": "blocked_raw_command_agent_surface"
       },
       "tests": [
+        "tests/unit/test_m08o_fallback.py::TestM08OFallback::test_doc_sendstring_is_safety_blocked_not_agent_exposed",
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata"
       ],
@@ -3616,12 +3617,16 @@
       "source_slice": "editor-delta.md",
       "citation": "acdocman.h:322,413",
       "evidence_refs": [
-        "config/autocad_native_arx_operation_catalog.json#doc.sendstring"
+        "config/autocad_native_arx_operation_catalog.json#doc.sendstring",
+        "tests/unit/test_m08o_fallback.py::TestM08OFallback::test_doc_sendstring_is_safety_blocked_not_agent_exposed",
+        "reports/tickets/WAVE3_PANE10_MIXED.md#doc-sendstring-safety-rejected",
+        "docs/FALLBACK_POLICY.md"
       ],
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
-      "owner_ticket": "M08J-T03",
-      "implementation_strategy": "accoreconsole_lisp",
-      "evidence_required": "unit_test+staged_diff_fixture_original_unchanged"
+      "notes": "Wave3 integration safety re-audit rejected the Pane10 implementation: arbitrary SendStringToExecute command strings are not exposed to agents. Safe higher-level bespoke operations must be implemented as typed handlers instead.",
+      "owner_ticket": "M08O-T02",
+      "implementation_strategy": "hard_blocked",
+      "evidence_required": "blocker_ref_and_evidence",
+      "blocked_reason": "SAFETY_FORBIDDEN: doc.sendstring uses AcApDocManager::sendStringToExecute to queue arbitrary raw command strings into an AutoCAD document command stream. Exposing command_string as an agent operation would be a raw command surface and may mutate the active user session."
     },
     {
       "id": "doc.syncopen",
