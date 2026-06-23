@@ -1,0 +1,138 @@
+{
+  "schema": "ariadne.cad_os.ticket_ops.v1",
+  "ticket_id": "WAVE3_PANE9_LIVE_EDITOR",
+  "implemented_count": 6,
+  "implemented_ops": [
+    "doc.current",
+    "doc.lock",
+    "doc.new",
+    "doc.syncopen",
+    "module.app.accessor",
+    "module.command.stack_handle"
+  ],
+  "hard_blocked_ops": [],
+  "deprecated_ops": [],
+  "catalogued_remaining_in_scope": [],
+  "rows": [
+    {
+      "operation": "doc.current",
+      "status": "implemented",
+      "family": "active_document_write_original",
+      "owner_ticket": "M08J-T03",
+      "dispatcher_symbol": "m08nDispatch",
+      "tests": [
+        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
+        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
+        "tests/unit/test_m08n_handlers.py"
+      ],
+      "evidence_refs": [
+        "config/autocad_native_arx_operation_catalog.json#doc.current",
+        "src/Ariadne.AcadNative/families/m08n_handlers.inc:m08nDispatch",
+        "reports/merge/MERGE-M08-READ.json",
+        "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
+        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)"
+      ],
+      "write_mode": "read"
+    },
+    {
+      "operation": "doc.lock",
+      "status": "implemented",
+      "family": "active_document_write_original",
+      "owner_ticket": "M08J-T03",
+      "dispatcher_symbol": "m08nDispatch",
+      "tests": [
+        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
+        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
+        "tests/unit/test_m08n_handlers.py"
+      ],
+      "evidence_refs": [
+        "config/autocad_native_arx_operation_catalog.json#doc.lock",
+        "src/Ariadne.AcadNative/families/m08n_handlers.inc:m08nDispatch",
+        "reports/merge/MERGE-M08-READ.json",
+        "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
+        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)"
+      ],
+      "write_mode": "read"
+    },
+    {
+      "operation": "doc.new",
+      "status": "implemented",
+      "family": "active_document_write_original",
+      "owner_ticket": "M08J-T03",
+      "dispatcher_symbol": "m08nDispatch",
+      "tests": [
+        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
+        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
+        "tests/unit/test_m08n_handlers.py"
+      ],
+      "evidence_refs": [
+        "config/autocad_native_arx_operation_catalog.json#doc.new",
+        "src/Ariadne.AcadNative/families/m08n_handlers.inc:m08nDispatch",
+        "reports/merge/MERGE-M08-READ.json",
+        "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
+        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)"
+      ],
+      "write_mode": "write_copy"
+    },
+    {
+      "operation": "doc.syncopen",
+      "status": "implemented",
+      "family": "active_document_write_original",
+      "owner_ticket": "M08J-T03",
+      "dispatcher_symbol": "m08nDispatch",
+      "tests": [
+        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
+        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
+        "tests/unit/test_m08n_handlers.py"
+      ],
+      "evidence_refs": [
+        "config/autocad_native_arx_operation_catalog.json#doc.syncopen",
+        "src/Ariadne.AcadNative/families/m08n_handlers.inc:m08nDispatch",
+        "reports/merge/MERGE-M08-READ.json",
+        "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
+        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)"
+      ],
+      "write_mode": "read"
+    },
+    {
+      "operation": "module.app.accessor",
+      "status": "implemented",
+      "family": "runtime_commands",
+      "owner_ticket": "M08O-T02",
+      "dispatcher_symbol": "m08nDispatch",
+      "tests": [
+        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
+        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
+        "tests/unit/test_m08n_handlers.py"
+      ],
+      "evidence_refs": [
+        "config/autocad_native_arx_operation_catalog.json#module.app.accessor",
+        "src/Ariadne.AcadNative/families/m08n_handlers.inc:m08nDispatch",
+        "reports/merge/MERGE-M08-READ.json",
+        "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
+        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)"
+      ],
+      "write_mode": "read"
+    },
+    {
+      "operation": "module.command.stack_handle",
+      "status": "implemented",
+      "family": "runtime_commands",
+      "owner_ticket": "M08O-T02",
+      "dispatcher_symbol": "m08nDispatch",
+      "tests": [
+        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
+        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
+        "tests/unit/test_m08n_handlers.py"
+      ],
+      "evidence_refs": [
+        "config/autocad_native_arx_operation_catalog.json#module.command.stack_handle",
+        "src/Ariadne.AcadNative/families/m08n_handlers.inc:m08nDispatch",
+        "reports/merge/MERGE-M08-READ.json",
+        "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
+        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)"
+      ],
+      "write_mode": "read"
+    }
+  ]
+}

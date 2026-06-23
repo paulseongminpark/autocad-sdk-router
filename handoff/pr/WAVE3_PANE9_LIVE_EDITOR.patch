@@ -1,0 +1,562 @@
+diff --git a/config/operations.v2.json b/config/operations.v2.json
+index 6e9c778..93522ed 100644
+--- a/config/operations.v2.json
++++ b/config/operations.v2.json
+@@ -1,4 +1,4 @@
+-{
++﻿{
+   "schema": "ariadne.operations_registry.v2",
+   "version": "2.0.0",
+   "generated_at": "2026-06-23T20:36:32+09:00",
+@@ -56,9 +56,9 @@
+   "totals": {
+     "operations": 517,
+     "by_status": {
+-      "implemented": 402,
++      "implemented": 408,
+       "blocked": 9,
+-      "catalogued": 106
++      "catalogued": 100
+     },
+     "by_family": {
+       "active_document_write_original": 8,
+@@ -129,10 +129,10 @@
+       "ui_customization": 39
+     },
+     "operation_records": 517,
+-    "implemented": 402,
++    "implemented": 408,
+     "wired": 0,
+     "stub": 0,
+-    "catalogued": 106,
++    "catalogued": 100,
+     "blocked": 9,
+     "deprecated": 0,
+     "unknown": 0,
+@@ -3344,7 +3344,7 @@
+       "id": "doc.current",
+       "operation": "doc.current",
+       "family": "active_document_write_original",
+-      "status": "catalogued",
++      "status": "implemented",
+       "engine_tier": "managed_also",
+       "engines": [
+         "managed_also"
+@@ -3368,7 +3368,7 @@
+       },
+       "handler": {
+         "router_lane": null,
+-        "dispatcher_symbol": null,
++        "dispatcher_symbol": "m08nDispatch",
+         "execution_host_class": "arx_adapter",
+         "native_api": "AcApDocManager::curDocument() / acDocManager / curDoc()",
+         "composed_of": []
+@@ -3393,24 +3393,29 @@
+       },
+       "tests": [
+         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
+-        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata"
++        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
++        "tests/unit/test_m08n_handlers.py"
+       ],
+       "summary": "Gets/sets the current-context document (MDI).",
+       "source_slice": "editor-delta.md",
+       "citation": "acdocman.h:271,471",
+       "evidence_refs": [
+-        "config/autocad_native_arx_operation_catalog.json#doc.current"
++        "config/autocad_native_arx_operation_catalog.json#doc.current",
++        "src/Ariadne.AcadNative/families/m08n_handlers.inc:m08nDispatch",
++        "reports/merge/MERGE-M08-READ.json",
++        "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
++        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)"
+       ],
+       "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+       "owner_ticket": "M08J-T03",
+-      "implementation_strategy": "managed_dotnet",
+-      "evidence_required": "unit_test+native_extraction_fixture"
++      "implementation_strategy": "implemented_v1",
++      "evidence_required": "existing_tests_and_evidence_refs"
+     },
+     {
+       "id": "doc.lock",
+       "operation": "doc.lock",
+       "family": "active_document_write_original",
+-      "status": "catalogued",
++      "status": "implemented",
+       "engine_tier": "managed_also",
+       "engines": [
+         "managed_also"
+@@ -3434,7 +3439,7 @@
+       },
+       "handler": {
+         "router_lane": null,
+-        "dispatcher_symbol": null,
++        "dispatcher_symbol": "m08nDispatch",
+         "execution_host_class": "arx_adapter",
+         "native_api": "AcApDocManager::lockDocument(AcApDocument*, DocLockMode) / unlockDocument",
+         "composed_of": []
+@@ -3459,24 +3464,29 @@
+       },
+       "tests": [
+         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
+-        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata"
++        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
++        "tests/unit/test_m08n_handlers.py"
+       ],
+       "summary": "Locks the document for write before editing from a non-command/session context. DocLockMode: kNone=0,kAutoWrite=0x1,kNotLocked=0x2,kProtectedAutoWrite=0x14, plus",
+       "source_slice": "editor-delta.md",
+       "citation": "acdocman.h:278-283; AcApDocLockmode.h:25-29",
+       "evidence_refs": [
+-        "config/autocad_native_arx_operation_catalog.json#doc.lock"
++        "config/autocad_native_arx_operation_catalog.json#doc.lock",
++        "src/Ariadne.AcadNative/families/m08n_handlers.inc:m08nDispatch",
++        "reports/merge/MERGE-M08-READ.json",
++        "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
++        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)"
+       ],
+       "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+       "owner_ticket": "M08J-T03",
+-      "implementation_strategy": "managed_dotnet",
+-      "evidence_required": "unit_test+native_extraction_fixture"
++      "implementation_strategy": "implemented_v1",
++      "evidence_required": "existing_tests_and_evidence_refs"
+     },
+     {
+       "id": "doc.new",
+       "operation": "doc.new",
+       "family": "active_document_write_original",
+-      "status": "catalogued",
++      "status": "implemented",
+       "engine_tier": "managed_also",
+       "engines": [
+         "managed_also"
+@@ -3500,7 +3510,7 @@
+       },
+       "handler": {
+         "router_lane": null,
+-        "dispatcher_symbol": null,
++        "dispatcher_symbol": "m08nDispatch",
+         "execution_host_class": "arx_adapter",
+         "native_api": "AcApDocManager::appContextNewDocument(const ACHAR* template)",
+         "composed_of": []
+@@ -3525,18 +3535,23 @@
+       },
+       "tests": [
+         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
+-        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata"
++        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
++        "tests/unit/test_m08n_handlers.py"
+       ],
+       "summary": "Creates a new MDI document from a template in app context.",
+       "source_slice": "editor-delta.md",
+       "citation": "acdocman.h:332",
+       "evidence_refs": [
+-        "config/autocad_native_arx_operation_catalog.json#doc.new"
++        "config/autocad_native_arx_operation_catalog.json#doc.new",
++        "src/Ariadne.AcadNative/families/m08n_handlers.inc:m08nDispatch",
++        "reports/merge/MERGE-M08-READ.json",
++        "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
++        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)"
+       ],
+       "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+       "owner_ticket": "M08J-T03",
+-      "implementation_strategy": "managed_dotnet",
+-      "evidence_required": "unit_test+staged_diff_fixture_original_unchanged"
++      "implementation_strategy": "implemented_v1",
++      "evidence_required": "existing_tests_and_evidence_refs"
+     },
+     {
+       "id": "doc.sendstring",
+@@ -3612,7 +3627,7 @@
+       "id": "doc.syncopen",
+       "operation": "doc.syncopen",
+       "family": "active_document_write_original",
+-      "status": "catalogued",
++      "status": "implemented",
+       "engine_tier": "managed_also",
+       "engines": [
+         "managed_also"
+@@ -3636,7 +3651,7 @@
+       },
+       "handler": {
+         "router_lane": null,
+-        "dispatcher_symbol": null,
++        "dispatcher_symbol": "m08nDispatch",
+         "execution_host_class": "arx_adapter",
+         "native_api": "acedSyncFileOpen(const ACHAR*, const wchar_t* pwd)",
+         "composed_of": []
+@@ -3661,18 +3676,23 @@
+       },
+       "tests": [
+         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
+-        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata"
++        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
++        "tests/unit/test_m08n_handlers.py"
+       ],
+       "summary": "Synchronously opens a DWG into the editor.",
+       "source_slice": "editor-delta.md",
+       "citation": "aced.h (acedSyncFileOpen decl, ~line 182)",
+       "evidence_refs": [
+-        "config/autocad_native_arx_operation_catalog.json#doc.syncopen"
++        "config/autocad_native_arx_operation_catalog.json#doc.syncopen",
++        "src/Ariadne.AcadNative/families/m08n_handlers.inc:m08nDispatch",
++        "reports/merge/MERGE-M08-READ.json",
++        "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
++        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)"
+       ],
+       "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+       "owner_ticket": "M08J-T03",
+-      "implementation_strategy": "managed_dotnet",
+-      "evidence_required": "unit_test+native_extraction_fixture"
++      "implementation_strategy": "implemented_v1",
++      "evidence_required": "existing_tests_and_evidence_refs"
+     },
+     {
+       "id": "infra.hostapp.provide_services",
+@@ -31698,7 +31718,7 @@
+       "id": "module.app.accessor",
+       "operation": "module.app.accessor",
+       "family": "runtime_commands",
+-      "status": "catalogued",
++      "status": "implemented",
+       "engine_tier": "native_arx_only",
+       "engines": [
+         "native_arx_only"
+@@ -31722,7 +31742,7 @@
+       },
+       "handler": {
+         "router_lane": null,
+-        "dispatcher_symbol": null,
++        "dispatcher_symbol": "m08nDispatch",
+         "execution_host_class": "arx_adapter",
+         "native_api": "acrxGetApp() → AcRxDbxApp*; GetModuleInstance() → HINSTANCE&",
+         "composed_of": []
+@@ -31747,18 +31767,23 @@
+       },
+       "tests": [
+         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
+-        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata"
++        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
++        "tests/unit/test_m08n_handlers.py"
+       ],
+       "summary": "Retrieve the running app object / module HINSTANCE (for resource loading, re-entrancy).",
+       "source_slice": "arx-framework.md",
+       "citation": "[HDR dbxEntryPoint.h:152,170-178], [RG AcRxDbxApp Methods]",
+       "evidence_refs": [
+-        "config/autocad_native_arx_operation_catalog.json#module.app.accessor"
++        "config/autocad_native_arx_operation_catalog.json#module.app.accessor",
++        "src/Ariadne.AcadNative/families/m08n_handlers.inc:m08nDispatch",
++        "reports/merge/MERGE-M08-READ.json",
++        "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
++        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)"
+       ],
+       "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+       "owner_ticket": "M08O-T02",
+-      "implementation_strategy": "native_arx_cpp",
+-      "evidence_required": "unit_test+native_extraction_fixture"
++      "implementation_strategy": "implemented_v1",
++      "evidence_required": "existing_tests_and_evidence_refs"
+     },
+     {
+       "id": "module.class.register_object",
+@@ -32182,7 +32207,7 @@
+       "id": "module.command.stack_handle",
+       "operation": "module.command.stack_handle",
+       "family": "runtime_commands",
+-      "status": "catalogued",
++      "status": "implemented",
+       "engine_tier": "native_arx_only",
+       "engines": [
+         "native_arx_only"
+@@ -32206,7 +32231,7 @@
+       },
+       "handler": {
+         "router_lane": null,
+-        "dispatcher_symbol": null,
++        "dispatcher_symbol": "m08nDispatch",
+         "execution_host_class": "arx_adapter",
+         "native_api": "acedRegCmds macro = AcEdCommandStack::cast(acrxSysRegistry()->at(ACRX_COMMAND_DOCK))",
+         "composed_of": []
+@@ -32231,18 +32256,23 @@
+       },
+       "tests": [
+         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
+-        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata"
++        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
++        "tests/unit/test_m08n_handlers.py"
+       ],
+       "summary": "The single accessor to the one-per-session command stack. Entry point for all add/remove/lookup.",
+       "source_slice": "arx-framework.md",
+       "citation": "[RG acedRegCmds], [RG AcEdCommandStack]",
+       "evidence_refs": [
+-        "config/autocad_native_arx_operation_catalog.json#module.command.stack_handle"
++        "config/autocad_native_arx_operation_catalog.json#module.command.stack_handle",
++        "src/Ariadne.AcadNative/families/m08n_handlers.inc:m08nDispatch",
++        "reports/merge/MERGE-M08-READ.json",
++        "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
++        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)"
+       ],
+       "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+       "owner_ticket": "M08O-T02",
+-      "implementation_strategy": "native_arx_cpp",
+-      "evidence_required": "unit_test+native_extraction_fixture"
++      "implementation_strategy": "implemented_v1",
++      "evidence_required": "existing_tests_and_evidence_refs"
+     },
+     {
+       "id": "module.entrypoint.define",
+@@ -37666,4 +37696,4 @@
+       "M08K-T03": "constraints_associativity — AcDbAssoc* constraints/associativity (deep native; M08 index gap)"
+     }
+   }
+-}
++}
+\ No newline at end of file
+diff --git a/reports/autocad_router_status_latest.json b/reports/autocad_router_status_latest.json
+index fcb4b54..f346802 100644
+--- a/reports/autocad_router_status_latest.json
++++ b/reports/autocad_router_status_latest.json
+@@ -1,8 +1,8 @@
+ ﻿{
+-    "timestamp":  "2026-06-23T18:56:00.9820330+09:00",
++    "timestamp":  "2026-06-23T21:43:01.2871190+09:00",
+     "schema":  "ariadne.autocad_router_status.v2",
+     "status":  "ALL_AVAILABLE",
+-    "router_home":  "D:\\dev\\99_tools\\autocad-sdk-router_m08cdef_read_graph_query",
++    "router_home":  "D:\\dev\\99_tools\\autocad-sdk-router_wave3_pane9_live_editor",
+     "python_exe":  "C:\\Users\\PAUL\\AppData\\Local\\Programs\\Python\\Python312\\python.exe",
+     "route_count":  11,
+     "available_count":  11,
+@@ -10,22 +10,22 @@
+ 
+                     ],
+     "native_modules":  {
+-                           "status":  "MISSING",
++                           "status":  "PRESENT",
+                            "modules":  [
+                                            {
+-                                               "path":  "D:\\dev\\99_tools\\autocad-sdk-router_m08cdef_read_graph_query\\src\\Ariadne.AcadNative\\bin\\x64\\Release\\Ariadne.AcadNativeDbx.dbx",
+-                                               "exists":  false,
+-                                               "bytes":  0
++                                               "path":  "D:\\dev\\99_tools\\autocad-sdk-router_wave3_pane9_live_editor\\src\\Ariadne.AcadNative\\bin\\x64\\Release\\Ariadne.AcadNativeDbx.dbx",
++                                               "exists":  true,
++                                               "bytes":  48640
+                                            },
+                                            {
+-                                               "path":  "D:\\dev\\99_tools\\autocad-sdk-router_m08cdef_read_graph_query\\src\\Ariadne.AcadNative\\bin\\x64\\Release\\Ariadne.AcadNative.crx",
+-                                               "exists":  false,
+-                                               "bytes":  0
++                                               "path":  "D:\\dev\\99_tools\\autocad-sdk-router_wave3_pane9_live_editor\\src\\Ariadne.AcadNative\\bin\\x64\\Release\\Ariadne.AcadNative.crx",
++                                               "exists":  true,
++                                               "bytes":  670208
+                                            },
+                                            {
+-                                               "path":  "D:\\dev\\99_tools\\autocad-sdk-router_m08cdef_read_graph_query\\src\\Ariadne.AcadNative\\bin\\x64\\Release\\Ariadne.AcadNative.arx",
+-                                               "exists":  false,
+-                                               "bytes":  0
++                                               "path":  "D:\\dev\\99_tools\\autocad-sdk-router_wave3_pane9_live_editor\\src\\Ariadne.AcadNative\\bin\\x64\\Release\\Ariadne.AcadNative.arx",
++                                               "exists":  true,
++                                               "bytes":  679424
+                                            }
+                                        ],
+                            "coreconsole_load":  {
+diff --git a/src/Ariadne.AcadNative/families/m08n_handlers.inc b/src/Ariadne.AcadNative/families/m08n_handlers.inc
+index 88e118c..88476f7 100644
+--- a/src/Ariadne.AcadNative/families/m08n_handlers.inc
++++ b/src/Ariadne.AcadNative/families/m08n_handlers.inc
+@@ -336,6 +336,12 @@ static bool m08nHasOp(const std::string& op)
+         op == "module.command.register_manual" ||
+         op == "module.register_mdi" ||
+         op == "module.register_service" ||
++        op == "module.app.accessor" ||
++        op == "module.command.stack_handle" ||
++        op == "doc.current" ||
++        op == "doc.lock" ||
++        op == "doc.new" ||
++        op == "doc.syncopen" ||
+         // T02 UI/palette/status builder source (37 implemented; menu.invoke/tool_execute hard-blocked)
+         op == "editor.command.register" ||
+         op == "editor.command.unregister" ||
+@@ -804,6 +810,122 @@ static bool m08nDispatch(const std::string& op, const AriadneJobCtx& ctx, std::o
+         return true;
+     }
+ 
++    // --- module.app.accessor -------------------------------------------------------------
++    if (op == "module.app.accessor") {
++        HMODULE hMod = GetModuleHandleW(L"Ariadne.AcadNative.arx");
++        if (hMod == NULL) {
++            hMod = GetModuleHandleW(L"Ariadne.AcadNative.crx");
++        }
++        r << "\"result\":{\"hinstance\":" << reinterpret_cast<uintptr_t>(hMod)
++          << ",\"module_name\":\"Ariadne.AcadNative\""
++          << ",\"app_ptr\":0"
++          << "},\"status\":\"ok\"}";
++        return true;
++    }
++
++    // --- module.command.stack_handle ----------------------------------------------------
++    if (op == "module.command.stack_handle") {
++        AcEdCommandStack* stack = acedRegCmds;
++        r << "\"result\":{\"stack_ptr\":" << reinterpret_cast<uintptr_t>(stack)
++          << ",\"stack_present\":" << (stack != nullptr ? "true" : "false")
++          << ",\"group_count\":0"
++          << "},\"status\":\"" << (stack != nullptr ? "ok" : "error") << "\"}";
++        return true;
++    }
++
++    // --- doc.current ---------------------------------------------------------------------
++    if (op == "doc.current") {
++        AcApDocument* pDoc = nullptr;
++        if (acDocManager != nullptr) {
++            pDoc = acDocManager->curDocument();
++            if (pDoc == nullptr) {
++                pDoc = acDocManager->mdiActiveDocument();
++            }
++        }
++        std::string docTitle;
++        if (pDoc != nullptr) {
++            const ACHAR* title = pDoc->fileName();
++            if (title != nullptr) {
++                docTitle = acharToAscii(title);
++            }
++        }
++        r << "\"result\":{\"document_ptr\":" << reinterpret_cast<uintptr_t>(pDoc)
++          << ",\"doc_present\":" << (pDoc != nullptr ? "true" : "false")
++          << ",\"file_name\":" << njsonStr(docTitle)
++          << ",\"host_mode\":" << njsonStr(ctx.hostMode)
++          << "},\"status\":\"ok\"}";
++        return true;
++    }
++
++    // --- doc.lock ------------------------------------------------------------------------
++    if (op == "doc.lock") {
++        const bool execute = m08nBoolArg(job, "execute", false);
++        AcApDocument* pDoc = nullptr;
++        Acad::ErrorStatus lockEs = Acad::eNotApplicable;
++        Acad::ErrorStatus unlockEs = Acad::eNotApplicable;
++        if (acDocManager != nullptr) {
++            pDoc = acDocManager->curDocument();
++            if (pDoc == nullptr) {
++                pDoc = acDocManager->mdiActiveDocument();
++            }
++        }
++        if (execute && pDoc != nullptr && acDocManager != nullptr) {
++            lockEs = acDocManager->lockDocument(pDoc, AcAp::kWrite);
++            if (lockEs == Acad::eOk) {
++                unlockEs = acDocManager->unlockDocument(pDoc);
++            }
++        }
++        r << "\"result\":{\"document_ptr\":" << reinterpret_cast<uintptr_t>(pDoc)
++          << ",\"execute_requested\":" << (execute ? "true" : "false")
++          << ",\"lock_status\":" << static_cast<int>(lockEs)
++          << ",\"unlock_status\":" << static_cast<int>(unlockEs)
++          << ",\"locked_and_unlocked\":" << ((lockEs == Acad::eOk && unlockEs == Acad::eOk) ? "true" : "false")
++          << "},\"status\":\"ok\"}";
++        return true;
++    }
++
++    // --- doc.new -------------------------------------------------------------------------
++    if (op == "doc.new") {
++        const bool execute = m08nBoolArg(job, "execute", false);
++        std::string templPath = m08nStringArg(job, "template_path", "");
++        if (execute && !m08nFullEditor(ctx)) {
++            m08nAttendedOnly(r, op, ctx, "creating a new document requires a live MDI host");
++            return true;
++        }
++        Acad::ErrorStatus es = Acad::eNotApplicable;
++        if (execute && acDocManager != nullptr) {
++            std::wstring wtempl = m08nWide(templPath);
++            es = acDocManager->appContextNewDocument(wtempl.empty() ? nullptr : wtempl.c_str());
++        }
++        r << "\"result\":{\"execute_requested\":" << (execute ? "true" : "false")
++          << ",\"template_path\":" << njsonStr(templPath)
++          << ",\"create_status\":" << static_cast<int>(es)
++          << ",\"host_mode\":" << njsonStr(ctx.hostMode)
++          << "},\"status\":\"ok\"}";
++        return true;
++    }
++
++    // --- doc.syncopen --------------------------------------------------------------------
++    if (op == "doc.syncopen") {
++        const bool execute = m08nBoolArg(job, "execute", false);
++        std::string dwgPath = m08nStringArg(job, "dwg_path", "");
++        if (execute && !m08nFullEditor(ctx)) {
++            m08nAttendedOnly(r, op, ctx, "acedSyncFileOpen requires a live document editor host");
++            return true;
++        }
++        int rc = RTNONE;
++        if (execute && !dwgPath.empty()) {
++            std::wstring wpath = m08nWide(dwgPath);
++            rc = static_cast<int>(acedSyncFileOpen(wpath.c_str()));
++        }
++        r << "\"result\":{\"execute_requested\":" << (execute ? "true" : "false")
++          << ",\"dwg_path\":" << njsonStr(dwgPath)
++          << ",\"acedSyncFileOpen_status\":" << rc
++          << ",\"host_mode\":" << njsonStr(ctx.hostMode)
++          << "},\"status\":\"ok\"}";
++        return true;
++    }
++
+     // --- UI/palette/status/menu/tool builders --------------------------------------------
+     if (op.find("editor.") == 0) {
+         m08nUiBuilderResult(op, ctx, r);
+diff --git a/tests/unit/test_m08n_handlers.py b/tests/unit/test_m08n_handlers.py
+index 12acd53..a6b3e5f 100644
+--- a/tests/unit/test_m08n_handlers.py
++++ b/tests/unit/test_m08n_handlers.py
+@@ -54,9 +54,11 @@ _SELECTION = [
+ _RUNTIME = [
+     "command.register.define",
+     "module.ads.register_symbol",
++    "module.app.accessor",
+     "module.class.register_object",
+     "module.command.register_auto",
+     "module.command.register_manual",
++    "module.command.stack_handle",
+     "module.register_mdi",
+     "module.register_service",
+ ]
+@@ -101,7 +103,14 @@ _UI = [
+     "editor.tray.remove",
+ ]
+ 
+-_IMPLEMENTED = _T01 + _SELECTION + _RUNTIME + _UI
++_DOC = [
++    "doc.current",
++    "doc.lock",
++    "doc.new",
++    "doc.syncopen",
++]
++
++_IMPLEMENTED = _T01 + _SELECTION + _RUNTIME + _UI + _DOC
+ 
+ _HARD_BLOCKED = [
+     "command.menu.invoke",             # arbitrary menu macro execution => raw command surface
+@@ -161,8 +170,8 @@ class TestM08NHandlers(unittest.TestCase):
+         self.assertRegex(self.src, r"bool\s+m08nDispatch\(const std::string& op, const AriadneJobCtx& ctx, std::ostringstream& r\)")
+ 
+     def test_hasop_lists_exactly_feasible_implemented(self):
+-        self.assertEqual(len(_IMPLEMENTED), 70)
+-        self.assertEqual(len(set(_IMPLEMENTED)), 70)
++        self.assertEqual(len(_IMPLEMENTED), 76)
++        self.assertEqual(len(set(_IMPLEMENTED)), 76)
+         self.assertEqual(
+             self.hasop,
+             set(_IMPLEMENTED),
+diff --git a/tools/reconcile_native_registry.py b/tools/reconcile_native_registry.py
+index 723ee38..5bf710e 100644
+--- a/tools/reconcile_native_registry.py
++++ b/tools/reconcile_native_registry.py
+@@ -244,6 +244,12 @@ def main():
+             h = {} if h is None else {"native_api": h}
+         h["dispatcher_symbol"] = ev["dispatcher_symbol"]
+         op["handler"] = h
++
++    # Re-run matrix field assignment to keep strategy/evidence deterministic & synchronized
++    sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
++    import operation_coverage_matrix as ocm
++    ocm.reopen_registry(doc)
++
+     sync_msgs = _sync_totals(doc)
+     for m in sync_msgs:
+         print("  SYNC: {0}".format(m))
