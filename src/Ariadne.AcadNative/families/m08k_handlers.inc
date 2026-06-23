@@ -248,7 +248,6 @@ static bool m08kHasOp(const std::string& op)
         op == "extend.customobject.deepclone" ||
         op == "extend.customobject.wblockclone" ||
         op == "extend.customobject.version" ||
-        op == "extend.customobject.db_defaults" ||
         // Custom-entity protocol (real AcDbEntity protocol on the registered AriadneProbe)
         op == "extend.customentity.db_defaults" ||
         op == "extend.customentity.geom_extents" ||
@@ -858,34 +857,6 @@ static bool m08kDispatch(const std::string& op, const AriadneJobCtx& ctx, std::o
           << ",\"clone_handle\":" << njsonStr(!cloneId.isNull() ? handleOfId(cloneId) : std::string())
           << ",\"cloned\":" << (cloned ? "true" : "false")
           << "},\"status\":\"" << (cloned ? "ok" : "error") << "\"}";
-        return true;
-    }
-
-    // extend.customobject.db_defaults — append a transient custom object and apply
-    // setDatabaseDefaults (object-level), proving the db-default protocol on a custom AcDbObject.
-    // (AcDbObject carries setDatabaseDefaults via the entity path; for a pure object we prove the
-    // owner-binding default — append succeeds + ownerId resolves.) Staged-scratch, rolled back.
-    if (op == "extend.customobject.db_defaults") {
-        double valRaw = 1.0;
-        jsonFindNumber(job, "value", valRaw);
-        AriadneStagedWriteTransaction wt(pDb);
-        AcDbObjectId id; std::string key;
-        Acad::ErrorStatus es = m08kAppendRecordToNod(pDb, static_cast<int>(valRaw), id, key);
-        bool ownerResolves = false;
-        std::string ownerHandle;
-        if (es == Acad::eOk && !id.isNull()) {
-            AcDbObject* pObj = nullptr;
-            if (acdbOpenObject(pObj, id, AcDb::kForRead) == Acad::eOk && pObj != nullptr) {
-                ownerResolves = !pObj->ownerId().isNull();
-                ownerHandle = handleOfId(pObj->ownerId());
-                pObj->close();
-            }
-        }
-        r << "\"result\":{\"appended\":" << (es == Acad::eOk ? "true" : "false")
-          << ",\"errorstatus\":" << static_cast<int>(es)
-          << ",\"owner_bound\":" << (ownerResolves ? "true" : "false")
-          << ",\"owner\":" << njsonStr(ownerHandle)
-          << "},\"status\":\"" << ((es == Acad::eOk && ownerResolves) ? "ok" : "error") << "\"}";
         return true;
     }
 

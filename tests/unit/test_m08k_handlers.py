@@ -83,7 +83,6 @@ _OBJECT_LIFECYCLE = [
     "extend.customobject.deepclone",
     "extend.customobject.wblockclone",
     "extend.customobject.version",
-    "extend.customobject.db_defaults",
 ]
 _CUSTOM_ENTITY = [
     "extend.customentity.db_defaults",
@@ -113,6 +112,12 @@ _DEFERRED = [
     "extend.customobject.filer_dxfin",   # DXF in-filer needs a DXF stream (no hostless source w/o file)
     "extend.customobject.filer_dxfout",  # DXF out-filer would emit a file (forbidden on original)
     "extend.object_enabler.demand_register",  # demand-load registry write (install-time, lisp tier)
+]
+
+# Invented / dead handler cleanup: this op was a teammate-added duplicate and must stay out
+# of both HasOp and Dispatch; the registry-correct `extend.customentity.db_defaults` remains.
+_DRIFT = [
+    "extend.customobject.db_defaults",
 ]
 
 
@@ -175,22 +180,30 @@ class TestM08KHandlers(unittest.TestCase):
         )
 
     def test_implemented_count(self):
-        # Group totals: RTTI=5, protocol=4, class-registration=11, object-lifecycle=6,
-        # custom-entity=7. 5+4+11+6+7 = 33 real handlers. The remaining ops of the 45-op
+        # Group totals: RTTI=5, protocol=4, class-registration=11, object-lifecycle=5,
+        # custom-entity=7. 5+4+11+5+7 = 32 real handlers. The remaining ops of the 45-op
         # brief are the 13 _DEFERRED in-app-callback / non-hostless ones -- left OUT of
-        # HasOp on purpose (no fake pass): 33 implemented + 13 deferred contract = honest.
+        # HasOp on purpose (no fake pass): 32 implemented + 13 deferred contract = honest.
         self.assertEqual(len(_RTTI), 5)
         self.assertEqual(len(_PROTOCOL), 4)
         self.assertEqual(len(_CLASS_REG), 11)
-        self.assertEqual(len(_OBJECT_LIFECYCLE), 6)
+        self.assertEqual(len(_OBJECT_LIFECYCLE), 5)
         self.assertEqual(len(_CUSTOM_ENTITY), 7)
-        self.assertEqual(len(_IMPLEMENTED), 33)
-        self.assertEqual(len(set(_IMPLEMENTED)), 33, "duplicate op id in the implemented list")
-        self.assertEqual(len(self.hasop), 33)
+        self.assertEqual(len(_IMPLEMENTED), 32)
+        self.assertEqual(len(set(_IMPLEMENTED)), 32, "duplicate op id in the implemented list")
+        self.assertEqual(len(self.hasop), 32)
 
     def test_no_deferred_op_in_hasop(self):
         leaked = sorted(self.hasop & set(_DEFERRED))
         self.assertEqual(leaked, [], "deferred/editor-bound ops leaked into m08kHasOp: %s" % leaked)
+
+    def test_no_drift_op_in_hasop(self):
+        leaked = sorted(self.hasop & set(_DRIFT))
+        self.assertEqual(leaked, [], "invented/dead ops leaked into m08kHasOp: %s" % leaked)
+
+    def test_no_drift_op_in_dispatch(self):
+        leaked = sorted(self.dispatch & set(_DRIFT))
+        self.assertEqual(leaked, [], "invented/dead ops leaked into m08kDispatch: %s" % leaked)
 
     def test_hasop_dispatch_parity(self):
         missing = sorted(set(_IMPLEMENTED) - self.dispatch)

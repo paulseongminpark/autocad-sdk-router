@@ -82,9 +82,6 @@ _GROUP_AUTHOR = [
     "extend.property.com_name",
     "extend.property.expose_to_com",
     "extend.property.filepath",
-    "extend.property.lmv",
-    "extend.property.dynamic_props",
-    "extend.property.type_promotion",
 ]
 # --- T02 reactors (12) ---
 _GROUP_REACT = [
@@ -118,6 +115,14 @@ _DEFERRED = [
     "react.longtx.attach",            # AcApLongTransactionReactor -- workspace/editor checkout
     "react.longtx.detach",            # AcApLongTransactionReactor
     "react.longtx.monitor",           # AcApLongTransactionReactor
+]
+
+# Invented / dead handler cleanup: these teammate-added duplicates must stay out of
+# both HasOp and Dispatch; the registry-correct property ops remain catalogued.
+_DRIFT = [
+    "extend.property.lmv",
+    "extend.property.dynamic_props",
+    "extend.property.type_promotion",
 ]
 
 
@@ -180,18 +185,26 @@ class TestM08MHandlers(unittest.TestCase):
         )
 
     def test_implemented_count(self):
-        # Group totals: inspect=4, opm=12, author=16, react=12 => 44 real handlers.
+        # Group totals: inspect=4, opm=12, author=13, react=12 => 41 real handlers.
         self.assertEqual(len(_GROUP_INSPECT), 4)
         self.assertEqual(len(_GROUP_OPM), 12)
-        self.assertEqual(len(_GROUP_AUTHOR), 16)
+        self.assertEqual(len(_GROUP_AUTHOR), 13)
         self.assertEqual(len(_GROUP_REACT), 12)
-        self.assertEqual(len(_IMPLEMENTED), 44)
-        self.assertEqual(len(set(_IMPLEMENTED)), 44, "duplicate op id in the implemented list")
-        self.assertEqual(len(self.hasop), 44)
+        self.assertEqual(len(_IMPLEMENTED), 41)
+        self.assertEqual(len(set(_IMPLEMENTED)), 41, "duplicate op id in the implemented list")
+        self.assertEqual(len(self.hasop), 41)
 
     def test_no_deferred_op_in_hasop(self):
         leaked = sorted(self.hasop & set(_DEFERRED))
         self.assertEqual(leaked, [], "deferred attended-reactor ops leaked into m08mHasOp: %s" % leaked)
+
+    def test_no_drift_op_in_hasop(self):
+        leaked = sorted(self.hasop & set(_DRIFT))
+        self.assertEqual(leaked, [], "invented/dead ops leaked into m08mHasOp: %s" % leaked)
+
+    def test_no_drift_op_in_dispatch(self):
+        leaked = sorted(self.dispatch & set(_DRIFT))
+        self.assertEqual(leaked, [], "invented/dead ops leaked into m08mDispatch: %s" % leaked)
 
     def test_hasop_dispatch_parity(self):
         missing = sorted(set(_IMPLEMENTED) - self.dispatch)

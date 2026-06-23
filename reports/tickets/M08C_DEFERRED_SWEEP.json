@@ -1,0 +1,30 @@
+{
+  "status": "PARTIAL_PASS",
+  "branch": "cados/m08c-deferred-sweep",
+  "commit": "unknown",
+  "pr_or_patch": "handoff/tickets/M08C_DEFERRED_SWEEP.patch",
+  "implemented_ops": [],
+  "hard_blocked_ops": [],
+  "deprecated_ops": [
+    "extend.customobject.db_defaults",
+    "extend.property.lmv",
+    "extend.property.dynamic_props",
+    "extend.property.type_promotion"
+  ],
+  "drift_fixed": [
+    "extend.customobject.db_defaults",
+    "extend.property.lmv",
+    "extend.property.dynamic_props",
+    "extend.property.type_promotion"
+  ],
+  "catalogued_remaining_in_scope": 230,
+  "tests": [
+    "python -m pytest tests\\unit\\test_m08k_handlers.py tests\\unit\\test_m08m_handlers.py -q = 31 passed",
+    "python -m pytest tests -q = 447 passed, 20 skipped",
+    "python tools\\cadctl_cli.py registry coverage = ok, consistent",
+    "python -m json.tool reports\\operation_coverage_latest.json = ok",
+    "python tools\\reconcile_native_registry.py = drift 0"
+  ],
+  "blockers": [],
+  "next": "continue the actual feasible READ/WRITE sweep (hostless simple writes/reads) and regenerate registry/report artifacts if any additional ops are promoted"
+}
