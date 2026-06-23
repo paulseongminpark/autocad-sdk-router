@@ -3120,18 +3120,22 @@ struct AriadneJobCtx
 #include "families/m08d_handlers.inc"   // M08D — entities / geometry / brep / annotation read
 #include "families/m08e_handlers.inc"   // M08E — blocks / xrefs-layouts / dictionaries-xdata
 #include "families/m08f_handlers.inc"   // M08F — SQLite rich IR / query DSL
+#include "families/m08g_handlers.inc"   // M08G — entity-create + entity/geometry modify (staged-write)
+#include "families/m08h_handlers.inc"   // M08H — dimensions / annotations / hatch (staged-write)
 
 // op admitted by any family module? (gate admission for not-yet-legacy family ops)
 static bool familyHasOp(const std::string& op)
 {
-    return m08cHasOp(op) || m08dHasOp(op) || m08eHasOp(op) || m08fHasOp(op);
+    return m08cHasOp(op) || m08dHasOp(op) || m08eHasOp(op) || m08fHasOp(op)
+        || m08gHasOp(op) || m08hHasOp(op);
 }
 
 // route op to its owning family module; true if handled (result appended to r)
 static bool tryFamilyDispatch(const std::string& op, const AriadneJobCtx& ctx, std::ostringstream& r)
 {
     return m08cDispatch(op, ctx, r) || m08dDispatch(op, ctx, r)
-        || m08eDispatch(op, ctx, r) || m08fDispatch(op, ctx, r);
+        || m08eDispatch(op, ctx, r) || m08fDispatch(op, ctx, r)
+        || m08gDispatch(op, ctx, r) || m08hDispatch(op, ctx, r);
 }
 
 static void ariadneNativeJob()
