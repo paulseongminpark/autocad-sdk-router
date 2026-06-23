@@ -38,7 +38,7 @@ _THIS = os.path.dirname(os.path.abspath(__file__))
 _REPO = os.path.dirname(os.path.dirname(_THIS))
 _INC = os.path.join(_REPO, "src", "Ariadne.AcadNative", "families", "m08c_handlers.inc")
 
-# The 11 ops M08C implements as real read-only handlers.
+# Ops M08C implements as real non-persisting handlers.
 _IMPLEMENTED = [
     "infra.hostapp.get_services",
     "inspect.database.summaryinfo",
@@ -51,23 +51,25 @@ _IMPLEMENTED = [
     "inspect.symboltable.layers",
     "transform.database.wblock",
     "write.object.cancel",
+    "infra.hostapp.set_working_db",
+    "inspect.database.flush_input",
+    "transaction.manager.start",
+    "transaction.manager.get_object",
+    "write.object.upgrade_open",
+    "write.object.downgrade_open",
+    "write.object.close",
 ]
 
 # Write-lane / host-mutation / side-db ops M08C deliberately does NOT implement.
 # (Catalog default_write_mode in {write_copy, live_edit} or a host/side-db mutation.)
 _DEFERRED = [
-    "infra.hostapp.set_working_db",
     "inspect.database.read_dwg",
     "inspect.database.read_dwg_handle",
     "inspect.database.dxf_in",
-    "inspect.database.flush_input",
     "inspect.object.upgrade_open",      # write-intent primitive
-    "write.object.upgrade_open",        # same op under the write.* spelling
     "transform.database.dxf_out",
     "transform.database.save_as",
     "transform.database.save_as_simple",
-    "write.object.close",
-    "write.object.downgrade_open",
     "transform.database.wblock_clone",
     "write.object.create_ext_dict",
     "write.regapp.register",
@@ -147,8 +149,6 @@ class TestM08CHandlers(unittest.TestCase):
             r"\bsave\s*\(",
             r"_QSAVE",
             r"\bwriteDwgFile\s*\(",
-            r"\bupgradeOpen\s*\(",
-            r"\bdowngradeOpen\s*\(",
             r"\bappendAcDbEntity\s*\(",
             r"->setAt\s*\(",
             r"\bcreateExtensionDictionary\s*\(",

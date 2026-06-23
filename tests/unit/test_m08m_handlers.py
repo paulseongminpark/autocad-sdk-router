@@ -45,11 +45,20 @@ _THIS = os.path.dirname(os.path.abspath(__file__))
 _REPO = os.path.dirname(os.path.dirname(_THIS))
 _INC = os.path.join(_REPO, "src", "Ariadne.AcadNative", "families", "m08m_handlers.inc")
 
-# --- T01 property inspection (4) ---
+# --- T01 property / member / safe ObjectARX bridge inspection (13) ---
 _GROUP_INSPECT = [
     "inspect.property.by_name",
     "inspect.property.is_readonly",
     "inspect.property.metadata",
+    "inspect.entity.properties",
+    "inspect.members.promoted",
+    "inspect.value.to_string",
+    "extend.members.facet_provider",
+    "automate.com.bridge_objectid",
+    "automate.com.hold_objectref",
+    "automate.com.entity_helpers",
+    "automate.com.objectid_from_iunknown",
+    "automate.com.lock_document",
     "automate.property.set",
 ]
 # --- T01 OPM protocol (12) ---
@@ -67,7 +76,7 @@ _GROUP_OPM = [
     "extend.opm.property_expression",
     "extend.opm.property_extension",
 ]
-# --- T01 property authoring (16) ---
+# --- T01 property authoring (17) ---
 _GROUP_AUTHOR = [
     "extend.property.define",
     "extend.property.describe",
@@ -82,6 +91,10 @@ _GROUP_AUTHOR = [
     "extend.property.com_name",
     "extend.property.expose_to_com",
     "extend.property.filepath",
+    "extend.property.define_collection",
+    "extend.property.define_dictionary",
+    "extend.property.define_indexed",
+    "extend.property.overrule",
 ]
 # --- T02 reactors (12) ---
 _GROUP_REACT = [
@@ -90,6 +103,7 @@ _GROUP_REACT = [
     "react.object.attach_transient",
     "react.object.detach_transient",
     "react.object.monitor",
+    "react.entity.monitor",
     "react.persistent.attach",
     "react.persistent.detach",
     "react.rxevent.attach",
@@ -185,14 +199,14 @@ class TestM08MHandlers(unittest.TestCase):
         )
 
     def test_implemented_count(self):
-        # Group totals: inspect=4, opm=12, author=13, react=12 => 41 real handlers.
-        self.assertEqual(len(_GROUP_INSPECT), 4)
+        # Group totals: inspect/bridge=13, opm=12, author=17, react=13 => 55 real handlers.
+        self.assertEqual(len(_GROUP_INSPECT), 13)
         self.assertEqual(len(_GROUP_OPM), 12)
-        self.assertEqual(len(_GROUP_AUTHOR), 13)
-        self.assertEqual(len(_GROUP_REACT), 12)
-        self.assertEqual(len(_IMPLEMENTED), 41)
-        self.assertEqual(len(set(_IMPLEMENTED)), 41, "duplicate op id in the implemented list")
-        self.assertEqual(len(self.hasop), 41)
+        self.assertEqual(len(_GROUP_AUTHOR), 17)
+        self.assertEqual(len(_GROUP_REACT), 13)
+        self.assertEqual(len(_IMPLEMENTED), 55)
+        self.assertEqual(len(set(_IMPLEMENTED)), 55, "duplicate op id in the implemented list")
+        self.assertEqual(len(self.hasop), 55)
 
     def test_no_deferred_op_in_hasop(self):
         leaked = sorted(self.hasop & set(_DEFERRED))

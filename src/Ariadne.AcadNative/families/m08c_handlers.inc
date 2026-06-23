@@ -43,6 +43,25 @@ static bool m08cFindHandleArg(const std::string& job, std::string& outHex)
     return false;
 }
 
+static AcDbObjectId m08cDefaultObjectId(AcDbDatabase* pDb)
+{
+    if (pDb == nullptr)
+        return AcDbObjectId::kNull;
+    AcDbObjectId id = pDb->currentSpaceId();
+    if (!id.isNull())
+        return id;
+    return pDb->blockTableId();
+}
+
+static bool m08cResolveOptionalObject(const std::string& job, AcDbDatabase* pDb, AcDbObjectId& id, std::string& hex)
+{
+    if (m08cFindHandleArg(job, hex))
+        return resolveHandle(pDb, hex, id);
+    id = m08cDefaultObjectId(pDb);
+    hex = handleOfId(id);
+    return !id.isNull();
+}
+
 static bool m08cHasOp(const std::string& op)
 {
     return op == "infra.hostapp.get_services"
@@ -55,7 +74,14 @@ static bool m08cHasOp(const std::string& op)
         || op == "inspect.symboltable.block"
         || op == "inspect.symboltable.layers"
         || op == "transform.database.wblock"
-        || op == "write.object.cancel";
+        || op == "write.object.cancel"
+        || op == "infra.hostapp.set_working_db"
+        || op == "inspect.database.flush_input"
+        || op == "transaction.manager.start"
+        || op == "transaction.manager.get_object"
+        || op == "write.object.upgrade_open"
+        || op == "write.object.downgrade_open"
+        || op == "write.object.close";
 }
 
 static bool m08cDispatch(const std::string& op, const AriadneJobCtx& ctx, std::ostringstream& r)
@@ -394,6 +420,128 @@ static bool m08cDispatch(const std::string& op, const AriadneJobCtx& ctx, std::o
         r << "\"result\":{\"handle\":" << njsonStr(hex)
           << ",\"found\":" << (found ? "true" : "false")
           << ",\"cancelled\":" << (cancelled ? "true" : "false")
+          << ",\"errorstatus\":" << static_cast<int>(es)
+          << "},\"status\":\"ok\"}";
+        return true;
+    }
+
+    //-----------------------------------------------------------------------
+    // M08CDEF sweep: host working-db, lazy-load flush, transaction probes, and
+    // object open-state lifecycle. These do not persist the DWG; the write-open
+    // probes mutate only object open state and immediately close/cancel.
+    //-----------------------------------------------------------------------
+    if (op == "infra.hostapp.set_working_db") {
+        AcDbHostApplicationServices* pSvc = acdbHostApplicationServices();
+        AcDbDatabase* before = (pSvc != nullptr) ? pSvc->workingDatabase() : nullptr;
+        bool setOk = false;
+        bool restored = false;
+        if (pSvc != nullptr) {
+            pSvc->setWorkingDatabase(pDb);
+            setOk = (pSvc->workingDatabase() == pDb);
+            pSvc->setWorkingDatabase(before);
+            restored = (pSvc->workingDatabase() == before);
+        }
+        r << "\"result\":{\"services_present\":" << (pSvc != nullptr ? "true" : "false")
+          << ",\"set_working_db_ok\":" << (setOk ? "true" : "false")
+          << ",\"restored_previous\":" << (restored ? "true" : "false")
+          << ",\"host_mode\":" << njsonStr(ctx.hostMode)
+          << "},\"status\":\"ok\"}";
+        return true;
+    }
+
+    if (op == "inspect.database.flush_input") {
+        int total = 0, probes = 0;
+        const bool counted = countModelSpace(pDb, total, probes);
+        const int layers = countSymbolTable(pDb->layerTableId());
+        const int blocks = countSymbolTable(pDb->blockTableId());
+        const int ltypes = countSymbolTable(pDb->linetypeTableId());
+        r << "\"result\":{\"lazy_load_forced\":" << (counted ? "true" : "false")
+          << ",\"modelspace_count\":" << total
+          << ",\"probe_count\":" << probes
+          << ",\"layer_count\":" << layers
+          << ",\"block_count\":" << blocks
+          << ",\"linetype_count\":" << ltypes
+          << "},\"status\":\"ok\"}";
+        return true;
+    }
+
+    if (op == "transaction.manager.start") {
+        AriadneReadTransaction rt(pDb);
+        r << "\"result\":{\"transaction_started\":" << (rt.active() ? "true" : "false")
+          << ",\"mode\":\"read\",\"rolled_back\":false},\"status\":\"ok\"}";
+        return true;
+    }
+
+    if (op == "transaction.manager.get_object") {
+        std::string hex;
+        AcDbObjectId id;
+        if (!m08cResolveOptionalObject(job, pDb, id, hex)) {
+            emitNativeError(r, "OBJECT_NOT_FOUND", "transaction.manager.get_object could not resolve handle/default object");
+            return true;
+        }
+        AriadneReadTransaction rt(pDb);
+        AcDbObject* pObj = nullptr;
+        const Acad::ErrorStatus es = acdbOpenObject(pObj, id, AcDb::kForRead);
+        r << "\"result\":{\"transaction_started\":" << (rt.active() ? "true" : "false")
+          << ",\"handle\":" << njsonStr(hex)
+          << ",\"opened\":" << ((es == Acad::eOk && pObj != nullptr) ? "true" : "false")
+          << ",\"errorstatus\":" << static_cast<int>(es);
+        if (pObj != nullptr) {
+            r << ",\"object\":{" << serializeObjectCommon(pObj) << "}";
+            pObj->close();
+        }
+        r << "},\"status\":\"ok\"}";
+        return true;
+    }
+
+    if (op == "write.object.upgrade_open" || op == "write.object.downgrade_open" || op == "write.object.close") {
+        std::string hex;
+        AcDbObjectId id;
+        if (!m08cResolveOptionalObject(job, pDb, id, hex)) {
+            emitNativeError(r, "OBJECT_NOT_FOUND", "object lifecycle probe could not resolve handle/default object");
+            return true;
+        }
+        AcDbObject* pObj = nullptr;
+        Acad::ErrorStatus es = Acad::eOk;
+        bool opened = false, upgraded = false, downgraded = false, closed = false;
+        if (op == "write.object.upgrade_open") {
+            es = acdbOpenObject(pObj, id, AcDb::kForRead);
+            opened = (es == Acad::eOk && pObj != nullptr);
+            if (opened) {
+                es = pObj->upgradeOpen();
+                upgraded = (es == Acad::eOk);
+                if (upgraded) {
+                    Acad::ErrorStatus ds = pObj->downgradeOpen();
+                    downgraded = (ds == Acad::eOk);
+                }
+                pObj->close();
+                closed = true;
+            }
+        }
+        else if (op == "write.object.downgrade_open") {
+            es = acdbOpenObject(pObj, id, AcDb::kForWrite);
+            opened = (es == Acad::eOk && pObj != nullptr);
+            if (opened) {
+                Acad::ErrorStatus ds = pObj->downgradeOpen();
+                downgraded = (ds == Acad::eOk);
+                pObj->close();
+                closed = true;
+            }
+        }
+        else {
+            es = acdbOpenObject(pObj, id, AcDb::kForRead);
+            opened = (es == Acad::eOk && pObj != nullptr);
+            if (opened) {
+                pObj->close();
+                closed = true;
+            }
+        }
+        r << "\"result\":{\"handle\":" << njsonStr(hex)
+          << ",\"opened\":" << (opened ? "true" : "false")
+          << ",\"upgraded\":" << (upgraded ? "true" : "false")
+          << ",\"downgraded\":" << (downgraded ? "true" : "false")
+          << ",\"closed\":" << (closed ? "true" : "false")
+          << ",\"dwg_persisted\":false"
           << ",\"errorstatus\":" << static_cast<int>(es)
           << "},\"status\":\"ok\"}";
         return true;

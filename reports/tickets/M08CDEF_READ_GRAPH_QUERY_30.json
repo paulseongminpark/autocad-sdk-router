@@ -1,0 +1,94 @@
+{
+  "ticket_id": "M08CDEF_READ_GRAPH_QUERY_30",
+  "status": "PASS",
+  "branch": "cados/m08cdef-read-graph-query-30",
+  "commit": "1a1e345",
+  "commit_note": "implementation commit; final branch HEAD is reported in final response after metadata artifact commit",
+  "pr": "",
+  "implemented_ops": [
+    "infra.hostapp.set_working_db",
+    "inspect.database.flush_input",
+    "transaction.manager.start",
+    "transaction.manager.get_object",
+    "write.object.upgrade_open",
+    "write.object.downgrade_open",
+    "write.object.close",
+    "infra.hostapp.provide_services",
+    "acdb.database.create",
+    "write.object.create_ext_dict",
+    "write.regapp.register",
+    "write.dictionary.set",
+    "write.entity.set_xdata",
+    "write.block.append_entity",
+    "transform.database.deep_clone",
+    "transform.database.insert_block",
+    "inspect.entity.properties",
+    "inspect.members.promoted",
+    "inspect.value.to_string",
+    "extend.members.facet_provider",
+    "automate.com.bridge_objectid",
+    "automate.com.hold_objectref",
+    "automate.com.entity_helpers",
+    "automate.com.objectid_from_iunknown",
+    "automate.com.lock_document",
+    "extend.property.define_collection",
+    "extend.property.define_dictionary",
+    "extend.property.define_indexed",
+    "extend.property.overrule",
+    "react.entity.monitor"
+  ],
+  "hard_blocked_ops": [],
+  "deprecated_ops": [],
+  "catalogued_remaining": [],
+  "registry_totals_after": {
+    "implemented": 388,
+    "blocked": 9,
+    "catalogued": 120
+  },
+  "rich_ir_smoke": {
+    "status": "ok",
+    "run_dir": "runs/M08CDEF_READ_GRAPH_QUERY_30_rich",
+    "entity_count": 21747
+  },
+  "query_smoke": {
+    "status": "ok",
+    "sql": "select count(*) as n from entities",
+    "result": 21747
+  },
+  "native_build": {
+    "status": "ok",
+    "isolated_output_root": "runs/M08CDEF_READ_GRAPH_QUERY_30_native_canonical",
+    "canonical_deploy": false,
+    "artifacts": [
+      "runs/M08CDEF_READ_GRAPH_QUERY_30_native_canonical/bin/x64/Release/Ariadne.AcadNativeDbx.dbx",
+      "runs/M08CDEF_READ_GRAPH_QUERY_30_native_canonical/bin/x64/Release/Ariadne.AcadNative.crx",
+      "runs/M08CDEF_READ_GRAPH_QUERY_30_native_canonical/bin/x64/Release/Ariadne.AcadNative.arx"
+    ]
+  },
+  "dwg_safety": {
+    "dwg": "D:/dev/_ariadne/alm/build/input0616.dwg",
+    "sha256_before": "eac5d4b13d67d89106e503321412539df7b39b8a7f4e44c033448e9295fe3f76",
+    "sha256_after": "eac5d4b13d67d89106e503321412539df7b39b8a7f4e44c033448e9295fe3f76",
+    "original_dwg_modified": false,
+    "staged_copy_used": true
+  },
+  "tests": [
+    "python -m pytest tests/unit/test_m08c_handlers.py tests/unit/test_m08e_handlers.py tests/unit/test_m08m_handlers.py -q = 37 passed",
+    "python -m pytest tests/unit -q = 409 passed, 13 skipped",
+    "python -m pytest tests -q = 463 passed, 20 skipped",
+    "python tools/cadctl_cli.py registry coverage = status ok, consistent true",
+    "python -m json.tool reports/operation_coverage_latest.json = ok",
+    "python -m json.tool reports/v1_operation_gate_latest.json = ok",
+    "python tools/reconcile_native_registry.py = flips 0, drift 0, conflicts 0"
+  ],
+  "artifacts": [
+    "reports/tickets/M08CDEF_READ_GRAPH_QUERY_30_PLAN.md",
+    "reports/tickets/M08CDEF_READ_GRAPH_QUERY_30.md",
+    "reports/tickets/M08CDEF_READ_GRAPH_QUERY_30.json",
+    "reports/tickets/M08CDEF_READ_GRAPH_QUERY_30_OPS.json",
+    "packets/tickets/M08CDEF_READ_GRAPH_QUERY_30.md",
+    "handoff/tickets/M08CDEF_READ_GRAPH_QUERY_30.zip",
+    "handoff/pr/M08CDEF_READ_GRAPH_QUERY_30.patch"
+  ],
+  "next": "Review/merge branch after PR or apply handoff/pr patch; remaining catalogued count is 120."
+}

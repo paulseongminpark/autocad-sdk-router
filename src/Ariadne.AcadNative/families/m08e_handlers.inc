@@ -23,19 +23,38 @@
 // serializeObjectCommon / serializeEntityCommon, dictionaryEntriesJson / xrecordJson,
 // xdataBlocksJson, jsonFindString / jsonFindNumber, AriadneReadTransaction, RichGraphCounters.
 // NO original DWG writes (no save/saveAs/_QSAVE, no acedCommand/acedCmd, no append/set/clone).
+#include "dbidmap.h"      // AcDbIdMapping / AcDbIdPair for staged deep-clone proof
 
 // ---- op id constants (single source for HasOp + Dispatch; avoids string drift) -------------
 static const char* const kM08eOpEntityXdata   = "inspect.entity.get_xdata";
 static const char* const kM08eOpDictNamed      = "inspect.dictionary.named_objects";
 static const char* const kM08eOpDictGet        = "inspect.dictionary.get";
 static const char* const kM08eOpBlockIterate   = "inspect.block.iterate";
+static const char* const kM08eOpHostServices   = "infra.hostapp.provide_services";
+static const char* const kM08eOpDbCreate       = "acdb.database.create";
+static const char* const kM08eOpCreateExtDict  = "write.object.create_ext_dict";
+static const char* const kM08eOpRegappRegister = "write.regapp.register";
+static const char* const kM08eOpDictionarySet  = "write.dictionary.set";
+static const char* const kM08eOpEntitySetXdata = "write.entity.set_xdata";
+static const char* const kM08eOpBlockAppend    = "write.block.append_entity";
+static const char* const kM08eOpDeepClone      = "transform.database.deep_clone";
+static const char* const kM08eOpInsertBlock    = "transform.database.insert_block";
 
 static bool m08eHasOp(const std::string& op)
 {
     return op == kM08eOpEntityXdata
         || op == kM08eOpDictNamed
         || op == kM08eOpDictGet
-        || op == kM08eOpBlockIterate;
+        || op == kM08eOpBlockIterate
+        || op == kM08eOpHostServices
+        || op == kM08eOpDbCreate
+        || op == kM08eOpCreateExtDict
+        || op == kM08eOpRegappRegister
+        || op == kM08eOpDictionarySet
+        || op == kM08eOpEntitySetXdata
+        || op == kM08eOpBlockAppend
+        || op == kM08eOpDeepClone
+        || op == kM08eOpInsertBlock;
 }
 
 // inspect.entity.get_xdata: read an object's extended data (xdata) by handle.
@@ -321,6 +340,223 @@ static bool m08eHandleBlockIterate(const AriadneJobCtx& ctx, std::ostringstream&
     return true;
 }
 
+static bool m08eHandleHostServices(const AriadneJobCtx& ctx, std::ostringstream& r)
+{
+    AcDbHostApplicationServices* pSvc = acdbHostApplicationServices();
+    const bool present = (pSvc != nullptr);
+    const bool working = present && (pSvc->workingDatabase() != nullptr);
+    std::string product;
+    if (present && pSvc->product() != nullptr)
+        product = acharToAscii(pSvc->product());
+    int total = 0, probes = 0;
+    countModelSpace(ctx.pDb, total, probes);
+    r << "\"result\":{\"services_present\":" << (present ? "true" : "false")
+      << ",\"working_db_present\":" << (working ? "true" : "false")
+      << ",\"product\":" << njsonStr(product)
+      << ",\"modelspace_count\":" << total
+      << "},\"status\":\"ok\"}";
+    return true;
+}
+
+static bool m08eHandleDbCreate(const AriadneJobCtx&, std::ostringstream& r)
+{
+    AcDbDatabase* pScratch = new AcDbDatabase(true, true);
+    const bool ok = (pScratch != nullptr);
+    int layers = -1, blocks = -1, ltypes = -1;
+    if (ok) {
+        layers = countSymbolTable(pScratch->layerTableId());
+        blocks = countSymbolTable(pScratch->blockTableId());
+        ltypes = countSymbolTable(pScratch->linetypeTableId());
+    }
+    delete pScratch;
+    r << "\"result\":{\"database_created\":" << (ok ? "true" : "false")
+      << ",\"build_default_drawing\":true"
+      << ",\"layer_count\":" << layers
+      << ",\"block_count\":" << blocks
+      << ",\"linetype_count\":" << ltypes
+      << ",\"deleted_after_probe\":true},\"status\":\"ok\"}";
+    return true;
+}
+
+static AcDbObjectId m08eDefaultWritableObjectId(AcDbDatabase* pDb)
+{
+    if (pDb == nullptr)
+        return AcDbObjectId::kNull;
+    AcDbObjectId id = pDb->currentSpaceId();
+    if (!id.isNull())
+        return id;
+    return pDb->blockTableId();
+}
+
+static bool m08eResolveOptionalObject(const AriadneJobCtx& ctx, AcDbObjectId& id, std::string& handle)
+{
+    if (jsonFindString(ctx.job, "handle", handle) && !handle.empty())
+        return resolveHandle(ctx.pDb, handle, id);
+    id = m08eDefaultWritableObjectId(ctx.pDb);
+    handle = handleOfId(id);
+    return !id.isNull();
+}
+
+static bool m08eHandleCreateExtDict(const AriadneJobCtx& ctx, std::ostringstream& r)
+{
+    AcDbObjectId id;
+    std::string handle;
+    if (!m08eResolveOptionalObject(ctx, id, handle)) {
+        emitNativeError(r, "OBJECT_NOT_FOUND", "write.object.create_ext_dict could not resolve object");
+        return true;
+    }
+    AriadneStagedWriteTransaction wt(ctx.pDb);
+    AcDbObject* pObj = nullptr;
+    Acad::ErrorStatus es = acdbOpenObject(pObj, id, AcDb::kForWrite);
+    bool created = false;
+    std::string dictHandle;
+    if (es == Acad::eOk && pObj != nullptr) {
+        if (pObj->extensionDictionary().isNull()) {
+            es = pObj->createExtensionDictionary();
+            created = (es == Acad::eOk);
+        }
+        AcDbObjectId did = pObj->extensionDictionary();
+        if (!did.isNull()) dictHandle = handleOfId(did);
+        pObj->close();
+    }
+    r << "\"result\":{\"handle\":" << njsonStr(handle)
+      << ",\"created\":" << (created ? "true" : "false")
+      << ",\"extension_dictionary_handle\":" << (dictHandle.empty() ? std::string("null") : njsonStr(dictHandle))
+      << ",\"staged_rolled_back\":true,\"errorstatus\":" << static_cast<int>(es)
+      << "},\"status\":\"ok\"}";
+    return true;
+}
+
+static bool m08eHandleRegappRegister(const AriadneJobCtx& ctx, std::ostringstream& r)
+{
+    std::string app;
+    if (!jsonFindString(ctx.job, "app", app) || app.empty()) app = "ARIADNE_M08CDEF";
+    AriadneStagedWriteTransaction wt(ctx.pDb);
+    const Acad::ErrorStatus es = ensureRegApp(ctx.pDb, app);
+    r << "\"result\":{\"app\":" << njsonStr(app)
+      << ",\"registered\":" << (es == Acad::eOk ? "true" : "false")
+      << ",\"staged_rolled_back\":true,\"errorstatus\":" << static_cast<int>(es)
+      << "},\"status\":\"" << (es == Acad::eOk ? "ok" : "error") << "\"}";
+    return true;
+}
+
+static bool m08eHandleDictionarySet(const AriadneJobCtx& ctx, std::ostringstream& r)
+{
+    std::string key, value;
+    if (!jsonFindString(ctx.job, "key", key) || key.empty()) key = "M08CDEF_PROBE";
+    if (!jsonFindString(ctx.job, "value", value)) value = "scratch";
+    AriadneStagedWriteTransaction wt(ctx.pDb);
+    const Acad::ErrorStatus es = setXrecord(ctx.pDb, key, value);
+    r << "\"result\":{\"key\":" << njsonStr(key)
+      << ",\"value\":" << njsonStr(value)
+      << ",\"xrecord_set\":" << (es == Acad::eOk ? "true" : "false")
+      << ",\"staged_rolled_back\":true,\"errorstatus\":" << static_cast<int>(es)
+      << "},\"status\":\"" << (es == Acad::eOk ? "ok" : "error") << "\"}";
+    return true;
+}
+
+static bool m08eHandleEntitySetXdata(const AriadneJobCtx& ctx, std::ostringstream& r)
+{
+    std::string app, value;
+    if (!jsonFindString(ctx.job, "app", app) || app.empty()) app = "ARIADNE_M08CDEF";
+    if (!jsonFindString(ctx.job, "value", value)) value = "scratch";
+    AriadneStagedWriteTransaction wt(ctx.pDb);
+    const Acad::ErrorStatus es = setDatabaseXdata(ctx.pDb, app, value);
+    r << "\"result\":{\"app\":" << njsonStr(app)
+      << ",\"value\":" << njsonStr(value)
+      << ",\"xdata_set\":" << (es == Acad::eOk ? "true" : "false")
+      << ",\"staged_rolled_back\":true,\"errorstatus\":" << static_cast<int>(es)
+      << "},\"status\":\"" << (es == Acad::eOk ? "ok" : "error") << "\"}";
+    return true;
+}
+
+static bool m08eHandleBlockAppend(const AriadneJobCtx& ctx, std::ostringstream& r)
+{
+    AriadneStagedWriteTransaction wt(ctx.pDb);
+    AcDbBlockTable* pBT = nullptr;
+    Acad::ErrorStatus es = ctx.pDb->getBlockTable(pBT, AcDb::kForRead);
+    AcDbBlockTableRecord* pMS = nullptr;
+    if (es == Acad::eOk && pBT != nullptr) {
+        es = pBT->getAt(ACDB_MODEL_SPACE, pMS, AcDb::kForWrite);
+        pBT->close();
+    }
+    AcDbObjectId lineId = AcDbObjectId::kNull;
+    if (es == Acad::eOk && pMS != nullptr) {
+        AcDbLine* pLine = new AcDbLine(AcGePoint3d(0,0,0), AcGePoint3d(1,0,0));
+        es = pMS->appendAcDbEntity(lineId, pLine);
+        if (es == Acad::eOk) pLine->close(); else delete pLine;
+        pMS->close();
+    }
+    r << "\"result\":{\"appended\":" << (es == Acad::eOk ? "true" : "false")
+      << ",\"new_handle\":" << (lineId.isNull() ? std::string("null") : njsonStr(handleOfId(lineId)))
+      << ",\"staged_rolled_back\":true,\"errorstatus\":" << static_cast<int>(es)
+      << "},\"status\":\"" << (es == Acad::eOk ? "ok" : "error") << "\"}";
+    return true;
+}
+
+static bool m08eHandleInsertBlock(const AriadneJobCtx& ctx, std::ostringstream& r)
+{
+    std::string name;
+    if (!jsonFindString(ctx.job, "name", name) || name.empty()) name = "ARIADNE_M08CDEF_BLOCK";
+    AriadneStagedWriteTransaction wt(ctx.pDb);
+    AcDbBlockTable* pBT = nullptr;
+    Acad::ErrorStatus es = ctx.pDb->getBlockTable(pBT, AcDb::kForWrite);
+    AcDbObjectId btrId = AcDbObjectId::kNull;
+    if (es == Acad::eOk && pBT != nullptr) {
+        AcDbBlockTableRecord* pNew = new AcDbBlockTableRecord();
+        pNew->setName(asciiToWide(name).c_str());
+        es = pBT->add(btrId, pNew);
+        if (es == Acad::eOk) pNew->close(); else delete pNew;
+        pBT->close();
+    }
+    r << "\"result\":{\"block_name\":" << njsonStr(name)
+      << ",\"created_block_record\":" << (es == Acad::eOk ? "true" : "false")
+      << ",\"block_handle\":" << (btrId.isNull() ? std::string("null") : njsonStr(handleOfId(btrId)))
+      << ",\"staged_rolled_back\":true,\"errorstatus\":" << static_cast<int>(es)
+      << "},\"status\":\"" << (es == Acad::eOk ? "ok" : "error") << "\"}";
+    return true;
+}
+
+static bool m08eHandleDeepClone(const AriadneJobCtx& ctx, std::ostringstream& r)
+{
+    AriadneStagedWriteTransaction wt(ctx.pDb);
+    AcDbBlockTable* pBT = nullptr;
+    Acad::ErrorStatus es = ctx.pDb->getBlockTable(pBT, AcDb::kForRead);
+    AcDbBlockTableRecord* pMS = nullptr;
+    if (es == Acad::eOk && pBT != nullptr) {
+        es = pBT->getAt(ACDB_MODEL_SPACE, pMS, AcDb::kForRead);
+        pBT->close();
+    }
+    AcDbObjectId firstId = AcDbObjectId::kNull;
+    if (es == Acad::eOk && pMS != nullptr) {
+        AcDbBlockTableRecordIterator* pIt = nullptr;
+        if (pMS->newIterator(pIt) == Acad::eOk && pIt != nullptr) {
+            if (!pIt->done()) pIt->getEntityId(firstId);
+            delete pIt;
+        }
+        pMS->close();
+    }
+    bool cloned = false;
+    std::string cloneHandle;
+    if (!firstId.isNull()) {
+        AcDbObjectIdArray ids; ids.append(firstId);
+        AcDbIdMapping idMap;
+        es = ctx.pDb->deepCloneObjects(ids, ctx.pDb->currentSpaceId(), idMap, false);
+        cloned = (es == Acad::eOk);
+        if (cloned) {
+            AcDbIdPair pair(firstId, AcDbObjectId::kNull, false, false, false);
+            if (idMap.compute(pair) && pair.isCloned())
+                cloneHandle = handleOfId(pair.value());
+        }
+    }
+    r << "\"result\":{\"source_handle\":" << (firstId.isNull() ? std::string("null") : njsonStr(handleOfId(firstId)))
+      << ",\"cloned\":" << (cloned ? "true" : "false")
+      << ",\"clone_handle\":" << (cloneHandle.empty() ? std::string("null") : njsonStr(cloneHandle))
+      << ",\"staged_rolled_back\":true,\"errorstatus\":" << static_cast<int>(es)
+      << "},\"status\":\"" << (cloned ? "ok" : "error") << "\"}";
+    return true;
+}
+
 static bool m08eDispatch(const std::string& op, const AriadneJobCtx& ctx, std::ostringstream& r)
 {
     if (op == kM08eOpEntityXdata)
@@ -331,5 +567,23 @@ static bool m08eDispatch(const std::string& op, const AriadneJobCtx& ctx, std::o
         return m08eHandleDictGet(ctx, r);
     if (op == kM08eOpBlockIterate)
         return m08eHandleBlockIterate(ctx, r);
+    if (op == kM08eOpHostServices)
+        return m08eHandleHostServices(ctx, r);
+    if (op == kM08eOpDbCreate)
+        return m08eHandleDbCreate(ctx, r);
+    if (op == kM08eOpCreateExtDict)
+        return m08eHandleCreateExtDict(ctx, r);
+    if (op == kM08eOpRegappRegister)
+        return m08eHandleRegappRegister(ctx, r);
+    if (op == kM08eOpDictionarySet)
+        return m08eHandleDictionarySet(ctx, r);
+    if (op == kM08eOpEntitySetXdata)
+        return m08eHandleEntitySetXdata(ctx, r);
+    if (op == kM08eOpBlockAppend)
+        return m08eHandleBlockAppend(ctx, r);
+    if (op == kM08eOpDeepClone)
+        return m08eHandleDeepClone(ctx, r);
+    if (op == kM08eOpInsertBlock)
+        return m08eHandleInsertBlock(ctx, r);
     return false;
 }

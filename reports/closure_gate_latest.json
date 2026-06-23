@@ -2,11 +2,11 @@
   "schema": "ariadne.cad_os.closure_gate.v1",
   "ticket_basis": "M08A-T01",
   "totals_by_status": {
-    "implemented": 355,
-    "blocked": 10,
-    "catalogued": 152
+    "implemented": 388,
+    "blocked": 9,
+    "catalogued": 120
   },
-  "catalogued": 152,
+  "catalogued": 120,
   "stub": 0,
   "unknown": 0,
   "deprecated": 0,
