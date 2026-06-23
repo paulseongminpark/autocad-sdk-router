@@ -4,7 +4,7 @@
   "status": "PARTIAL_PASS",
   "title": "COM bootstrap and load fallback",
   "branch": "cados/m08o-fallback-raw-policy",
-  "commit": "7b2f563",
+  "commit": "b63caa9",
   "pr": "",
   "implemented_ops": [],
   "hard_blocked_ops": [],
