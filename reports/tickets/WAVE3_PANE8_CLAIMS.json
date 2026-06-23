@@ -1,0 +1,120 @@
+{
+  "schema": "ariadne.cad_os.wave3.pane_claims.v1",
+  "wave": "WAVE3",
+  "pane": 8,
+  "focus": "native_only OPM / property / reactor / event monitor",
+  "generated_at": "2026-06-23T21:00:02+09:00",
+  "source_commit": "023fc16",
+  "source_registry": "config/operations.v2.json",
+  "source_totals": {
+    "implemented": 402,
+    "blocked": 9,
+    "catalogued": 106,
+    "total": 517
+  },
+  "claim_count": 9,
+  "families": {
+    "reactors_events": 9
+  },
+  "claims": [
+    {
+      "operation": "react.docmanager.attach",
+      "family": "reactors_events",
+      "current_status": "catalogued",
+      "recommended_strategy": "implement",
+      "fallback_strategy": "hard_block_only_with_real_evidence",
+      "expected_files": [],
+      "test_requirement": "reactor-smoke+unit+report",
+      "evidence_requirement": "handler+test+report",
+      "notes": ""
+    },
+    {
+      "operation": "react.docmanager.monitor",
+      "family": "reactors_events",
+      "current_status": "catalogued",
+      "recommended_strategy": "implement",
+      "fallback_strategy": "hard_block_only_with_real_evidence",
+      "expected_files": [],
+      "test_requirement": "reactor-smoke+unit+report",
+      "evidence_requirement": "handler+test+report",
+      "notes": ""
+    },
+    {
+      "operation": "react.editor.command_monitor",
+      "family": "reactors_events",
+      "current_status": "catalogued",
+      "recommended_strategy": "implement",
+      "fallback_strategy": "hard_block_only_with_real_evidence",
+      "expected_files": [],
+      "test_requirement": "reactor-smoke+unit+report",
+      "evidence_requirement": "handler+test+report",
+      "notes": ""
+    },
+    {
+      "operation": "react.editor.dwg_lifecycle",
+      "family": "reactors_events",
+      "current_status": "catalogued",
+      "recommended_strategy": "implement",
+      "fallback_strategy": "hard_block_only_with_real_evidence",
+      "expected_files": [],
+      "test_requirement": "reactor-smoke+unit+report",
+      "evidence_requirement": "handler+test+report",
+      "notes": ""
+    },
+    {
+      "operation": "react.editor.input_monitor",
+      "family": "reactors_events",
+      "current_status": "catalogued",
+      "recommended_strategy": "implement",
+      "fallback_strategy": "hard_block_only_with_real_evidence",
+      "expected_files": [],
+      "test_requirement": "reactor-smoke+unit+report",
+      "evidence_requirement": "handler+test+report",
+      "notes": ""
+    },
+    {
+      "operation": "react.editor.lisp_monitor",
+      "family": "reactors_events",
+      "current_status": "catalogued",
+      "recommended_strategy": "implement",
+      "fallback_strategy": "hard_block_only_with_real_evidence",
+      "expected_files": [],
+      "test_requirement": "reactor-smoke+unit+report",
+      "evidence_requirement": "handler+test+report",
+      "notes": ""
+    },
+    {
+      "operation": "react.editor.sysvar_monitor",
+      "family": "reactors_events",
+      "current_status": "catalogued",
+      "recommended_strategy": "implement",
+      "fallback_strategy": "hard_block_only_with_real_evidence",
+      "expected_files": [],
+      "test_requirement": "reactor-smoke+unit+report",
+      "evidence_requirement": "handler+test+report",
+      "notes": ""
+    },
+    {
+      "operation": "react.longtx.attach",
+      "family": "reactors_events",
+      "current_status": "catalogued",
+      "recommended_strategy": "implement",
+      "fallback_strategy": "hard_block_only_with_real_evidence",
+      "expected_files": [],
+      "test_requirement": "reactor-smoke+unit+report",
+      "evidence_requirement": "handler+test+report",
+      "notes": ""
+    },
+    {
+      "operation": "react.longtx.monitor",
+      "family": "reactors_events",
+      "current_status": "catalogued",
+      "recommended_strategy": "implement",
+      "fallback_strategy": "hard_block_only_with_real_evidence",
+      "expected_files": [],
+      "test_requirement": "reactor-smoke+unit+report",
+      "evidence_requirement": "handler+test+report",
+      "notes": ""
+    }
+  ]
+}

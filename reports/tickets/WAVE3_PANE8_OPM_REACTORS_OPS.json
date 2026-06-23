@@ -1,0 +1,245 @@
+{
+  "schema": "ariadne.cad_os.ticket_ops.v1",
+  "ticket_id": "WAVE3_PANE8_OPM_REACTORS",
+  "claimed_count": 9,
+  "implemented_count": 9,
+  "hard_blocked_count": 0,
+  "deprecated_count": 0,
+  "catalogued_remaining_in_scope": [],
+  "rows": [
+    {
+      "operation": "react.docmanager.attach",
+      "status": "implemented",
+      "family": "reactors_events",
+      "owner_ticket": "M08M-T02",
+      "dispatcher_symbol": "m08mDispatch",
+      "engine_tier": "managed_also",
+      "tests": [
+        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
+        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
+        "tests/unit/test_m08m_handlers.py",
+        "tests/unit/test_wave3_pane8_registry.py"
+      ],
+      "evidence_refs": [
+        "config/autocad_native_arx_operation_catalog.json#react.docmanager.attach",
+        "src/Ariadne.AcadNative/families/m08m_handlers.inc:m08mDispatch",
+        "reports/merge/MERGE-M08-READ.json",
+        "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
+        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)",
+        "reports/tickets/WAVE3_PANE8_OPM_REACTORS.md",
+        "reports/tickets/WAVE3_PANE8_OPM_REACTORS.json",
+        "reports/tickets/WAVE3_PANE8_OPM_REACTORS_OPS.json",
+        "build:native_acad isolated exit 0 (reports/tickets/native/WAVE3_PANE8_OPM_REACTORS)"
+      ],
+      "notes": "Wave3 Pane 8 native handler implemented in m08mDispatch. Full-host only for live editor/doc-manager/long-transaction callbacks; handler exposes transient register/unregister, counter snapshots, optional bounded safe probes, and unload cleanup. No raw command dispatch and no original DWG write."
+    },
+    {
+      "operation": "react.docmanager.monitor",
+      "status": "implemented",
+      "family": "reactors_events",
+      "owner_ticket": "M08M-T02",
+      "dispatcher_symbol": "m08mDispatch",
+      "engine_tier": "managed_also",
+      "tests": [
+        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
+        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
+        "tests/unit/test_m08m_handlers.py",
+        "tests/unit/test_wave3_pane8_registry.py"
+      ],
+      "evidence_refs": [
+        "config/autocad_native_arx_operation_catalog.json#react.docmanager.monitor",
+        "src/Ariadne.AcadNative/families/m08m_handlers.inc:m08mDispatch",
+        "reports/merge/MERGE-M08-READ.json",
+        "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
+        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)",
+        "reports/tickets/WAVE3_PANE8_OPM_REACTORS.md",
+        "reports/tickets/WAVE3_PANE8_OPM_REACTORS.json",
+        "reports/tickets/WAVE3_PANE8_OPM_REACTORS_OPS.json",
+        "build:native_acad isolated exit 0 (reports/tickets/native/WAVE3_PANE8_OPM_REACTORS)"
+      ],
+      "notes": "Wave3 Pane 8 native handler implemented in m08mDispatch. Full-host only for live editor/doc-manager/long-transaction callbacks; handler exposes transient register/unregister, counter snapshots, optional bounded safe probes, and unload cleanup. No raw command dispatch and no original DWG write."
+    },
+    {
+      "operation": "react.editor.command_monitor",
+      "status": "implemented",
+      "family": "reactors_events",
+      "owner_ticket": "M08M-T02",
+      "dispatcher_symbol": "m08mDispatch",
+      "engine_tier": "managed_also",
+      "tests": [
+        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
+        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
+        "tests/unit/test_m08m_handlers.py",
+        "tests/unit/test_wave3_pane8_registry.py"
+      ],
+      "evidence_refs": [
+        "config/autocad_native_arx_operation_catalog.json#react.editor.command_monitor",
+        "src/Ariadne.AcadNative/families/m08m_handlers.inc:m08mDispatch",
+        "reports/merge/MERGE-M08-READ.json",
+        "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
+        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)",
+        "reports/tickets/WAVE3_PANE8_OPM_REACTORS.md",
+        "reports/tickets/WAVE3_PANE8_OPM_REACTORS.json",
+        "reports/tickets/WAVE3_PANE8_OPM_REACTORS_OPS.json",
+        "build:native_acad isolated exit 0 (reports/tickets/native/WAVE3_PANE8_OPM_REACTORS)"
+      ],
+      "notes": "Wave3 Pane 8 native handler implemented in m08mDispatch. Full-host only for live editor/doc-manager/long-transaction callbacks; handler exposes transient register/unregister, counter snapshots, optional bounded safe probes, and unload cleanup. No raw command dispatch and no original DWG write."
+    },
+    {
+      "operation": "react.editor.dwg_lifecycle",
+      "status": "implemented",
+      "family": "reactors_events",
+      "owner_ticket": "M08M-T02",
+      "dispatcher_symbol": "m08mDispatch",
+      "engine_tier": "managed_also",
+      "tests": [
+        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
+        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
+        "tests/unit/test_m08m_handlers.py",
+        "tests/unit/test_wave3_pane8_registry.py"
+      ],
+      "evidence_refs": [
+        "config/autocad_native_arx_operation_catalog.json#react.editor.dwg_lifecycle",
+        "src/Ariadne.AcadNative/families/m08m_handlers.inc:m08mDispatch",
+        "reports/merge/MERGE-M08-READ.json",
+        "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
+        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)",
+        "reports/tickets/WAVE3_PANE8_OPM_REACTORS.md",
+        "reports/tickets/WAVE3_PANE8_OPM_REACTORS.json",
+        "reports/tickets/WAVE3_PANE8_OPM_REACTORS_OPS.json",
+        "build:native_acad isolated exit 0 (reports/tickets/native/WAVE3_PANE8_OPM_REACTORS)"
+      ],
+      "notes": "Wave3 Pane 8 native handler implemented in m08mDispatch. Full-host only for live editor/doc-manager/long-transaction callbacks; handler exposes transient register/unregister, counter snapshots, optional bounded safe probes, and unload cleanup. No raw command dispatch and no original DWG write."
+    },
+    {
+      "operation": "react.editor.input_monitor",
+      "status": "implemented",
+      "family": "reactors_events",
+      "owner_ticket": "M08M-T02",
+      "dispatcher_symbol": "m08mDispatch",
+      "engine_tier": "managed_also",
+      "tests": [
+        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
+        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
+        "tests/unit/test_m08m_handlers.py",
+        "tests/unit/test_wave3_pane8_registry.py"
+      ],
+      "evidence_refs": [
+        "config/autocad_native_arx_operation_catalog.json#react.editor.input_monitor",
+        "src/Ariadne.AcadNative/families/m08m_handlers.inc:m08mDispatch",
+        "reports/merge/MERGE-M08-READ.json",
+        "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
+        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)",
+        "reports/tickets/WAVE3_PANE8_OPM_REACTORS.md",
+        "reports/tickets/WAVE3_PANE8_OPM_REACTORS.json",
+        "reports/tickets/WAVE3_PANE8_OPM_REACTORS_OPS.json",
+        "build:native_acad isolated exit 0 (reports/tickets/native/WAVE3_PANE8_OPM_REACTORS)"
+      ],
+      "notes": "Wave3 Pane 8 native handler implemented in m08mDispatch. Full-host only for live editor/doc-manager/long-transaction callbacks; handler exposes transient register/unregister, counter snapshots, optional bounded safe probes, and unload cleanup. No raw command dispatch and no original DWG write."
+    },
+    {
+      "operation": "react.editor.lisp_monitor",
+      "status": "implemented",
+      "family": "reactors_events",
+      "owner_ticket": "M08M-T02",
+      "dispatcher_symbol": "m08mDispatch",
+      "engine_tier": "managed_also",
+      "tests": [
+        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
+        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
+        "tests/unit/test_m08m_handlers.py",
+        "tests/unit/test_wave3_pane8_registry.py"
+      ],
+      "evidence_refs": [
+        "config/autocad_native_arx_operation_catalog.json#react.editor.lisp_monitor",
+        "src/Ariadne.AcadNative/families/m08m_handlers.inc:m08mDispatch",
+        "reports/merge/MERGE-M08-READ.json",
+        "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
+        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)",
+        "reports/tickets/WAVE3_PANE8_OPM_REACTORS.md",
+        "reports/tickets/WAVE3_PANE8_OPM_REACTORS.json",
+        "reports/tickets/WAVE3_PANE8_OPM_REACTORS_OPS.json",
+        "build:native_acad isolated exit 0 (reports/tickets/native/WAVE3_PANE8_OPM_REACTORS)"
+      ],
+      "notes": "Wave3 Pane 8 native handler implemented in m08mDispatch. Full-host only for live editor/doc-manager/long-transaction callbacks; handler exposes transient register/unregister, counter snapshots, optional bounded safe probes, and unload cleanup. No raw command dispatch and no original DWG write."
+    },
+    {
+      "operation": "react.editor.sysvar_monitor",
+      "status": "implemented",
+      "family": "reactors_events",
+      "owner_ticket": "M08M-T02",
+      "dispatcher_symbol": "m08mDispatch",
+      "engine_tier": "managed_also",
+      "tests": [
+        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
+        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
+        "tests/unit/test_m08m_handlers.py",
+        "tests/unit/test_wave3_pane8_registry.py"
+      ],
+      "evidence_refs": [
+        "config/autocad_native_arx_operation_catalog.json#react.editor.sysvar_monitor",
+        "src/Ariadne.AcadNative/families/m08m_handlers.inc:m08mDispatch",
+        "reports/merge/MERGE-M08-READ.json",
+        "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
+        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)",
+        "reports/tickets/WAVE3_PANE8_OPM_REACTORS.md",
+        "reports/tickets/WAVE3_PANE8_OPM_REACTORS.json",
+        "reports/tickets/WAVE3_PANE8_OPM_REACTORS_OPS.json",
+        "build:native_acad isolated exit 0 (reports/tickets/native/WAVE3_PANE8_OPM_REACTORS)"
+      ],
+      "notes": "Wave3 Pane 8 native handler implemented in m08mDispatch. Full-host only for live editor/doc-manager/long-transaction callbacks; handler exposes transient register/unregister, counter snapshots, optional bounded safe probes, and unload cleanup. No raw command dispatch and no original DWG write."
+    },
+    {
+      "operation": "react.longtx.attach",
+      "status": "implemented",
+      "family": "reactors_events",
+      "owner_ticket": "M08M-T02",
+      "dispatcher_symbol": "m08mDispatch",
+      "engine_tier": "native_arx_only",
+      "tests": [
+        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
+        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
+        "tests/unit/test_m08m_handlers.py",
+        "tests/unit/test_wave3_pane8_registry.py"
+      ],
+      "evidence_refs": [
+        "config/autocad_native_arx_operation_catalog.json#react.longtx.attach",
+        "src/Ariadne.AcadNative/families/m08m_handlers.inc:m08mDispatch",
+        "reports/merge/MERGE-M08-READ.json",
+        "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
+        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)",
+        "reports/tickets/WAVE3_PANE8_OPM_REACTORS.md",
+        "reports/tickets/WAVE3_PANE8_OPM_REACTORS.json",
+        "reports/tickets/WAVE3_PANE8_OPM_REACTORS_OPS.json",
+        "build:native_acad isolated exit 0 (reports/tickets/native/WAVE3_PANE8_OPM_REACTORS)"
+      ],
+      "notes": "Wave3 Pane 8 native handler implemented in m08mDispatch. Full-host only for live editor/doc-manager/long-transaction callbacks; handler exposes transient register/unregister, counter snapshots, optional bounded safe probes, and unload cleanup. No raw command dispatch and no original DWG write."
+    },
+    {
+      "operation": "react.longtx.monitor",
+      "status": "implemented",
+      "family": "reactors_events",
+      "owner_ticket": "M08M-T02",
+      "dispatcher_symbol": "m08mDispatch",
+      "engine_tier": "native_arx_only",
+      "tests": [
+        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
+        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
+        "tests/unit/test_m08m_handlers.py",
+        "tests/unit/test_wave3_pane8_registry.py"
+      ],
+      "evidence_refs": [
+        "config/autocad_native_arx_operation_catalog.json#react.longtx.monitor",
+        "src/Ariadne.AcadNative/families/m08m_handlers.inc:m08mDispatch",
+        "reports/merge/MERGE-M08-READ.json",
+        "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
+        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)",
+        "reports/tickets/WAVE3_PANE8_OPM_REACTORS.md",
+        "reports/tickets/WAVE3_PANE8_OPM_REACTORS.json",
+        "reports/tickets/WAVE3_PANE8_OPM_REACTORS_OPS.json",
+        "build:native_acad isolated exit 0 (reports/tickets/native/WAVE3_PANE8_OPM_REACTORS)"
+      ],
+      "notes": "Wave3 Pane 8 native handler implemented in m08mDispatch. Full-host only for live editor/doc-manager/long-transaction callbacks; handler exposes transient register/unregister, counter snapshots, optional bounded safe probes, and unload cleanup. No raw command dispatch and no original DWG write."
+    }
+  ]
+}

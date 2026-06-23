@@ -4391,6 +4391,9 @@ acrxEntryPoint(AcRx::AppMsgCode msg, void* pkt)
             disableEditorReactor(removed);
             disableSelectionMonitor(removed);
             disableObjectOverrule(removed);
+            m08mDisableEditorMonitor(removed);
+            m08mDisableDocManagerMonitor(removed);
+            m08mDisableLongTransactionMonitor(removed);
         }
         acedRegCmds->removeGroup(_T("ARIADNE_NATIVE"));
         acrxUnloadModule(kAriadneDbxModule);

@@ -1,4 +1,4 @@
-{
+﻿{
   "schema": "ariadne.operations_registry.v2",
   "version": "2.0.0",
   "generated_at": "2026-06-23T20:36:32+09:00",
@@ -56,9 +56,9 @@
   "totals": {
     "operations": 517,
     "by_status": {
-      "implemented": 402,
+      "implemented": 411,
       "blocked": 9,
-      "catalogued": 106
+      "catalogued": 97
     },
     "by_family": {
       "active_document_write_original": 8,
@@ -129,10 +129,10 @@
       "ui_customization": 39
     },
     "operation_records": 517,
-    "implemented": 402,
+    "implemented": 411,
     "wired": 0,
     "stub": 0,
-    "catalogued": 106,
+    "catalogued": 97,
     "blocked": 9,
     "deprecated": 0,
     "unknown": 0,
@@ -30252,7 +30252,7 @@
       "id": "react.docmanager.attach",
       "operation": "react.docmanager.attach",
       "family": "reactors_events",
-      "status": "catalogued",
+      "status": "implemented",
       "engine_tier": "managed_also",
       "engines": [
         "managed_also"
@@ -30276,7 +30276,7 @@
       },
       "handler": {
         "router_lane": null,
-        "dispatcher_symbol": null,
+        "dispatcher_symbol": "m08mDispatch",
         "execution_host_class": "arx_adapter",
         "native_api": "acDocManagerPtr()->addReactor(AcApDocManagerReactor*) (registration on the doc-manager)",
         "composed_of": []
@@ -30301,24 +30301,34 @@
       },
       "tests": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
-        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata"
+        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
+        "tests/unit/test_m08m_handlers.py",
+        "tests/unit/test_wave3_pane8_registry.py"
       ],
       "summary": "Register MDI document-manager reactor (document created/activated/destroyed, lock-mode change).",
       "source_slice": "reactors-overrules.md",
       "citation": "acdocman.h:185 (reactor), :468 (acDocManagerPtr())",
       "evidence_refs": [
-        "config/autocad_native_arx_operation_catalog.json#react.docmanager.attach"
+        "config/autocad_native_arx_operation_catalog.json#react.docmanager.attach",
+        "src/Ariadne.AcadNative/families/m08m_handlers.inc:m08mDispatch",
+        "reports/merge/MERGE-M08-READ.json",
+        "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
+        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)",
+        "reports/tickets/WAVE3_PANE8_OPM_REACTORS.md",
+        "reports/tickets/WAVE3_PANE8_OPM_REACTORS.json",
+        "reports/tickets/WAVE3_PANE8_OPM_REACTORS_OPS.json",
+        "build:native_acad isolated exit 0 (reports/tickets/native/WAVE3_PANE8_OPM_REACTORS)"
       ],
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "Wave3 Pane 8 native handler implemented in m08mDispatch. Full-host only for live editor/doc-manager/long-transaction callbacks; handler exposes transient register/unregister, counter snapshots, optional bounded safe probes, and unload cleanup. No raw command dispatch and no original DWG write.",
       "owner_ticket": "M08M-T02",
-      "implementation_strategy": "managed_dotnet",
-      "evidence_required": "unit_test+native_extraction_fixture"
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs"
     },
     {
       "id": "react.docmanager.monitor",
       "operation": "react.docmanager.monitor",
       "family": "reactors_events",
-      "status": "catalogued",
+      "status": "implemented",
       "engine_tier": "managed_also",
       "engines": [
         "managed_also"
@@ -30342,7 +30352,7 @@
       },
       "handler": {
         "router_lane": null,
-        "dispatcher_symbol": null,
+        "dispatcher_symbol": "m08mDispatch",
         "execution_host_class": "arx_adapter",
         "native_api": "AcApDocManagerReactor callbacks: documentCreated / documentToBeDestroyed / documentBecameCurrent / documentActivated / documentLockModeWillChange / documentLockModeChanged / documentLockModeChangeVetoed / documentToBeActivated / documentToBeDeactivated",
         "composed_of": []
@@ -30367,24 +30377,34 @@
       },
       "tests": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
-        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata"
+        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
+        "tests/unit/test_m08m_handlers.py",
+        "tests/unit/test_wave3_pane8_registry.py"
       ],
       "summary": "Per-document MDI lifecycle + lock-mode events.",
       "source_slice": "reactors-overrules.md",
       "citation": "acdocman.h:189-234",
       "evidence_refs": [
-        "config/autocad_native_arx_operation_catalog.json#react.docmanager.monitor"
+        "config/autocad_native_arx_operation_catalog.json#react.docmanager.monitor",
+        "src/Ariadne.AcadNative/families/m08m_handlers.inc:m08mDispatch",
+        "reports/merge/MERGE-M08-READ.json",
+        "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
+        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)",
+        "reports/tickets/WAVE3_PANE8_OPM_REACTORS.md",
+        "reports/tickets/WAVE3_PANE8_OPM_REACTORS.json",
+        "reports/tickets/WAVE3_PANE8_OPM_REACTORS_OPS.json",
+        "build:native_acad isolated exit 0 (reports/tickets/native/WAVE3_PANE8_OPM_REACTORS)"
       ],
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "Wave3 Pane 8 native handler implemented in m08mDispatch. Full-host only for live editor/doc-manager/long-transaction callbacks; handler exposes transient register/unregister, counter snapshots, optional bounded safe probes, and unload cleanup. No raw command dispatch and no original DWG write.",
       "owner_ticket": "M08M-T02",
-      "implementation_strategy": "managed_dotnet",
-      "evidence_required": "unit_test+native_extraction_fixture"
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs"
     },
     {
       "id": "react.editor.command_monitor",
       "operation": "react.editor.command_monitor",
       "family": "reactors_events",
-      "status": "catalogued",
+      "status": "implemented",
       "engine_tier": "managed_also",
       "engines": [
         "managed_also"
@@ -30408,7 +30428,7 @@
       },
       "handler": {
         "router_lane": null,
-        "dispatcher_symbol": null,
+        "dispatcher_symbol": "m08mDispatch",
         "execution_host_class": "arx_adapter",
         "native_api": "AcEditorReactor command callbacks: commandWillStart / commandEnded / commandCancelled / commandFailed / unknownCommand",
         "composed_of": []
@@ -30433,24 +30453,34 @@
       },
       "tests": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
-        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata"
+        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
+        "tests/unit/test_m08m_handlers.py",
+        "tests/unit/test_wave3_pane8_registry.py"
       ],
       "summary": "Monitor interactive AutoCAD command lifecycle. Editor reactors require the full interactive editor (no editor",
       "source_slice": "reactors-overrules.md",
       "citation": "aced.h:376-389; register via acedEditor macro aced.h:697",
       "evidence_refs": [
-        "config/autocad_native_arx_operation_catalog.json#react.editor.command_monitor"
+        "config/autocad_native_arx_operation_catalog.json#react.editor.command_monitor",
+        "src/Ariadne.AcadNative/families/m08m_handlers.inc:m08mDispatch",
+        "reports/merge/MERGE-M08-READ.json",
+        "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
+        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)",
+        "reports/tickets/WAVE3_PANE8_OPM_REACTORS.md",
+        "reports/tickets/WAVE3_PANE8_OPM_REACTORS.json",
+        "reports/tickets/WAVE3_PANE8_OPM_REACTORS_OPS.json",
+        "build:native_acad isolated exit 0 (reports/tickets/native/WAVE3_PANE8_OPM_REACTORS)"
       ],
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "Wave3 Pane 8 native handler implemented in m08mDispatch. Full-host only for live editor/doc-manager/long-transaction callbacks; handler exposes transient register/unregister, counter snapshots, optional bounded safe probes, and unload cleanup. No raw command dispatch and no original DWG write.",
       "owner_ticket": "M08M-T02",
-      "implementation_strategy": "managed_dotnet",
-      "evidence_required": "unit_test+native_extraction_fixture"
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs"
     },
     {
       "id": "react.editor.dwg_lifecycle",
       "operation": "react.editor.dwg_lifecycle",
       "family": "reactors_events",
-      "status": "catalogued",
+      "status": "implemented",
       "engine_tier": "managed_also",
       "engines": [
         "managed_also"
@@ -30474,7 +30504,7 @@
       },
       "handler": {
         "router_lane": null,
-        "dispatcher_symbol": null,
+        "dispatcher_symbol": "m08mDispatch",
         "execution_host_class": "arx_adapter",
         "native_api": "AcEditorReactor::beginDwgOpen / endDwgOpen / beginDocClose / docCloseWillStart / beginCloseAll / beginQuit / quitWillStart / layoutSwitched / fullRegenEnded",
         "composed_of": []
@@ -30499,24 +30529,34 @@
       },
       "tests": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
-        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata"
+        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
+        "tests/unit/test_m08m_handlers.py",
+        "tests/unit/test_wave3_pane8_registry.py"
       ],
       "summary": "Editor-level drawing/session lifecycle + layout + regen events.",
       "source_slice": "reactors-overrules.md",
       "citation": "aced.h:409-410,541-595,681",
       "evidence_refs": [
-        "config/autocad_native_arx_operation_catalog.json#react.editor.dwg_lifecycle"
+        "config/autocad_native_arx_operation_catalog.json#react.editor.dwg_lifecycle",
+        "src/Ariadne.AcadNative/families/m08m_handlers.inc:m08mDispatch",
+        "reports/merge/MERGE-M08-READ.json",
+        "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
+        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)",
+        "reports/tickets/WAVE3_PANE8_OPM_REACTORS.md",
+        "reports/tickets/WAVE3_PANE8_OPM_REACTORS.json",
+        "reports/tickets/WAVE3_PANE8_OPM_REACTORS_OPS.json",
+        "build:native_acad isolated exit 0 (reports/tickets/native/WAVE3_PANE8_OPM_REACTORS)"
       ],
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "Wave3 Pane 8 native handler implemented in m08mDispatch. Full-host only for live editor/doc-manager/long-transaction callbacks; handler exposes transient register/unregister, counter snapshots, optional bounded safe probes, and unload cleanup. No raw command dispatch and no original DWG write.",
       "owner_ticket": "M08M-T02",
-      "implementation_strategy": "managed_dotnet",
-      "evidence_required": "unit_test+native_extraction_fixture"
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs"
     },
     {
       "id": "react.editor.input_monitor",
       "operation": "react.editor.input_monitor",
       "family": "reactors_events",
-      "status": "catalogued",
+      "status": "implemented",
       "engine_tier": "managed_also",
       "engines": [
         "managed_also"
@@ -30540,7 +30580,7 @@
       },
       "handler": {
         "router_lane": null,
-        "dispatcher_symbol": null,
+        "dispatcher_symbol": "m08mDispatch",
         "execution_host_class": "arx_adapter",
         "native_api": "AcEditorReactor::beginDoubleClick / beginRightClick / pickfirstModified",
         "composed_of": []
@@ -30565,24 +30605,34 @@
       },
       "tests": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
-        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata"
+        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
+        "tests/unit/test_m08m_handlers.py",
+        "tests/unit/test_wave3_pane8_registry.py"
       ],
       "summary": "Mouse/selection editor events.",
       "source_slice": "reactors-overrules.md",
       "citation": "aced.h:559-560,541",
       "evidence_refs": [
-        "config/autocad_native_arx_operation_catalog.json#react.editor.input_monitor"
+        "config/autocad_native_arx_operation_catalog.json#react.editor.input_monitor",
+        "src/Ariadne.AcadNative/families/m08m_handlers.inc:m08mDispatch",
+        "reports/merge/MERGE-M08-READ.json",
+        "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
+        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)",
+        "reports/tickets/WAVE3_PANE8_OPM_REACTORS.md",
+        "reports/tickets/WAVE3_PANE8_OPM_REACTORS.json",
+        "reports/tickets/WAVE3_PANE8_OPM_REACTORS_OPS.json",
+        "build:native_acad isolated exit 0 (reports/tickets/native/WAVE3_PANE8_OPM_REACTORS)"
       ],
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "Wave3 Pane 8 native handler implemented in m08mDispatch. Full-host only for live editor/doc-manager/long-transaction callbacks; handler exposes transient register/unregister, counter snapshots, optional bounded safe probes, and unload cleanup. No raw command dispatch and no original DWG write.",
       "owner_ticket": "M08M-T02",
-      "implementation_strategy": "managed_dotnet",
-      "evidence_required": "unit_test+native_extraction_fixture"
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs"
     },
     {
       "id": "react.editor.lisp_monitor",
       "operation": "react.editor.lisp_monitor",
       "family": "reactors_events",
-      "status": "catalogued",
+      "status": "implemented",
       "engine_tier": "managed_also",
       "engines": [
         "managed_also"
@@ -30606,7 +30656,7 @@
       },
       "handler": {
         "router_lane": null,
-        "dispatcher_symbol": null,
+        "dispatcher_symbol": "m08mDispatch",
         "execution_host_class": "arx_adapter",
         "native_api": "AcEditorReactor::lispWillStart / lispEnded / lispCancelled",
         "composed_of": []
@@ -30631,24 +30681,34 @@
       },
       "tests": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
-        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata"
+        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
+        "tests/unit/test_m08m_handlers.py",
+        "tests/unit/test_wave3_pane8_registry.py"
       ],
       "summary": "Notify around LISP evaluation.",
       "source_slice": "reactors-overrules.md",
       "citation": "aced.h:393-395",
       "evidence_refs": [
-        "config/autocad_native_arx_operation_catalog.json#react.editor.lisp_monitor"
+        "config/autocad_native_arx_operation_catalog.json#react.editor.lisp_monitor",
+        "src/Ariadne.AcadNative/families/m08m_handlers.inc:m08mDispatch",
+        "reports/merge/MERGE-M08-READ.json",
+        "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
+        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)",
+        "reports/tickets/WAVE3_PANE8_OPM_REACTORS.md",
+        "reports/tickets/WAVE3_PANE8_OPM_REACTORS.json",
+        "reports/tickets/WAVE3_PANE8_OPM_REACTORS_OPS.json",
+        "build:native_acad isolated exit 0 (reports/tickets/native/WAVE3_PANE8_OPM_REACTORS)"
       ],
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "Wave3 Pane 8 native handler implemented in m08mDispatch. Full-host only for live editor/doc-manager/long-transaction callbacks; handler exposes transient register/unregister, counter snapshots, optional bounded safe probes, and unload cleanup. No raw command dispatch and no original DWG write.",
       "owner_ticket": "M08M-T02",
-      "implementation_strategy": "managed_dotnet",
-      "evidence_required": "unit_test+native_extraction_fixture"
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs"
     },
     {
       "id": "react.editor.sysvar_monitor",
       "operation": "react.editor.sysvar_monitor",
       "family": "reactors_events",
-      "status": "catalogued",
+      "status": "implemented",
       "engine_tier": "managed_also",
       "engines": [
         "managed_also"
@@ -30672,7 +30732,7 @@
       },
       "handler": {
         "router_lane": null,
-        "dispatcher_symbol": null,
+        "dispatcher_symbol": "m08mDispatch",
         "execution_host_class": "arx_adapter",
         "native_api": "AcEditorReactor::sysVarWillChange / sysVarChanged(const ACHAR*, bool)",
         "composed_of": []
@@ -30697,18 +30757,28 @@
       },
       "tests": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
-        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata"
+        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
+        "tests/unit/test_m08m_handlers.py",
+        "tests/unit/test_wave3_pane8_registry.py"
       ],
       "summary": "Notify on system-variable change (the new (const ACHAR*, bool) form; old (const ACHAR*, int)",
       "source_slice": "reactors-overrules.md",
       "citation": "aced.h:472-475",
       "evidence_refs": [
-        "config/autocad_native_arx_operation_catalog.json#react.editor.sysvar_monitor"
+        "config/autocad_native_arx_operation_catalog.json#react.editor.sysvar_monitor",
+        "src/Ariadne.AcadNative/families/m08m_handlers.inc:m08mDispatch",
+        "reports/merge/MERGE-M08-READ.json",
+        "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
+        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)",
+        "reports/tickets/WAVE3_PANE8_OPM_REACTORS.md",
+        "reports/tickets/WAVE3_PANE8_OPM_REACTORS.json",
+        "reports/tickets/WAVE3_PANE8_OPM_REACTORS_OPS.json",
+        "build:native_acad isolated exit 0 (reports/tickets/native/WAVE3_PANE8_OPM_REACTORS)"
       ],
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "Wave3 Pane 8 native handler implemented in m08mDispatch. Full-host only for live editor/doc-manager/long-transaction callbacks; handler exposes transient register/unregister, counter snapshots, optional bounded safe probes, and unload cleanup. No raw command dispatch and no original DWG write.",
       "owner_ticket": "M08M-T02",
-      "implementation_strategy": "managed_dotnet",
-      "evidence_required": "unit_test+native_extraction_fixture"
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs"
     },
     {
       "id": "react.entity.monitor",
@@ -30927,7 +30997,7 @@
       "id": "react.longtx.attach",
       "operation": "react.longtx.attach",
       "family": "reactors_events",
-      "status": "catalogued",
+      "status": "implemented",
       "engine_tier": "native_arx_only",
       "engines": [
         "native_arx_only"
@@ -30951,7 +31021,7 @@
       },
       "handler": {
         "router_lane": null,
-        "dispatcher_symbol": null,
+        "dispatcher_symbol": "m08mDispatch",
         "execution_host_class": "arx_adapter",
         "native_api": "acapLongTransactionManagerPtr()->addReactor(AcApLongTransactionReactor*) / removeReactor(...)",
         "composed_of": []
@@ -30976,24 +31046,34 @@
       },
       "tests": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
-        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata"
+        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
+        "tests/unit/test_m08m_handlers.py",
+        "tests/unit/test_wave3_pane8_registry.py"
       ],
       "summary": "Register a reactor on the long-transaction manager (REFEDIT-style check-out/check-in workflows).",
       "source_slice": "reactors-overrules.md",
       "citation": "lngtrans.h:82-83 (addReactor), :91 (acapLongTransactionManagerPtr())",
       "evidence_refs": [
-        "config/autocad_native_arx_operation_catalog.json#react.longtx.attach"
+        "config/autocad_native_arx_operation_catalog.json#react.longtx.attach",
+        "src/Ariadne.AcadNative/families/m08m_handlers.inc:m08mDispatch",
+        "reports/merge/MERGE-M08-READ.json",
+        "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
+        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)",
+        "reports/tickets/WAVE3_PANE8_OPM_REACTORS.md",
+        "reports/tickets/WAVE3_PANE8_OPM_REACTORS.json",
+        "reports/tickets/WAVE3_PANE8_OPM_REACTORS_OPS.json",
+        "build:native_acad isolated exit 0 (reports/tickets/native/WAVE3_PANE8_OPM_REACTORS)"
       ],
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "Wave3 Pane 8 native handler implemented in m08mDispatch. Full-host only for live editor/doc-manager/long-transaction callbacks; handler exposes transient register/unregister, counter snapshots, optional bounded safe probes, and unload cleanup. No raw command dispatch and no original DWG write.",
       "owner_ticket": "M08M-T02",
-      "implementation_strategy": "native_arx_cpp",
-      "evidence_required": "unit_test+native_extraction_fixture"
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs"
     },
     {
       "id": "react.longtx.monitor",
       "operation": "react.longtx.monitor",
       "family": "reactors_events",
-      "status": "catalogued",
+      "status": "implemented",
       "engine_tier": "native_arx_only",
       "engines": [
         "native_arx_only"
@@ -31017,7 +31097,7 @@
       },
       "handler": {
         "router_lane": null,
-        "dispatcher_symbol": null,
+        "dispatcher_symbol": "m08mDispatch",
         "execution_host_class": "arx_adapter",
         "native_api": "AcApLongTransactionReactor callbacks: beginCheckOut / endCheckOut / beginCheckIn / endCheckIn / abortLongTransaction",
         "composed_of": []
@@ -31042,18 +31122,28 @@
       },
       "tests": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
-        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata"
+        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
+        "tests/unit/test_m08m_handlers.py",
+        "tests/unit/test_wave3_pane8_registry.py"
       ],
       "summary": "Long-transaction (workset check-out/in) lifecycle.",
       "source_slice": "reactors-overrules.md",
       "citation": "lngtrans.h:30-46",
       "evidence_refs": [
-        "config/autocad_native_arx_operation_catalog.json#react.longtx.monitor"
+        "config/autocad_native_arx_operation_catalog.json#react.longtx.monitor",
+        "src/Ariadne.AcadNative/families/m08m_handlers.inc:m08mDispatch",
+        "reports/merge/MERGE-M08-READ.json",
+        "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
+        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)",
+        "reports/tickets/WAVE3_PANE8_OPM_REACTORS.md",
+        "reports/tickets/WAVE3_PANE8_OPM_REACTORS.json",
+        "reports/tickets/WAVE3_PANE8_OPM_REACTORS_OPS.json",
+        "build:native_acad isolated exit 0 (reports/tickets/native/WAVE3_PANE8_OPM_REACTORS)"
       ],
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "Wave3 Pane 8 native handler implemented in m08mDispatch. Full-host only for live editor/doc-manager/long-transaction callbacks; handler exposes transient register/unregister, counter snapshots, optional bounded safe probes, and unload cleanup. No raw command dispatch and no original DWG write.",
       "owner_ticket": "M08M-T02",
-      "implementation_strategy": "native_arx_cpp",
-      "evidence_required": "unit_test+native_extraction_fixture"
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs"
     },
     {
       "id": "react.object.attach_transient",

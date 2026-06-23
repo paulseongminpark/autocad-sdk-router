@@ -3,37 +3,19 @@
 """CAD OS Layer M08M TEST -- native OPM properties + reactors.
 
 Intent (WHY):
-  M08M fills families/m08m_handlers.inc with the feasible-hostless subset of the OPM
-  property protocol (AcRxProperty / AcRxAttribute / AcRxMemberCollection over an
-  AcRxClass) plus DB/object/persistent/rxevent/linker reactors. The invariants that
-  carry business meaning and must fail CI if violated:
+  M08M owns the native AcRxProperty/OPM + reactor family seam. Wave 3 extends the
+  earlier hostless subset with the real full-host editor/doc-manager/long-transaction
+  reactors claimed by Pane 8. CI must fail if the source/registry seam drifts.
 
-  1. HASOP <-> DISPATCH PARITY -- every op id m08mHasOp admits must have an
-     `op == "<id>"` branch in m08mDispatch, and every dispatch branch must be admitted
-     by HasOp. Drift => OPERATION_DISPATCH_MISMATCH at runtime (a catalogued op reads
-     as "implemented" but no handler claims it, or a handler is dead because the gate
-     rejects it). The native build proves it compiles+links; this proves the seam is
-     coherent.
+  Invariants pinned here:
+    1. HasOp <-> Dispatch parity for every implemented op.
+    2. HasOp lists exactly the implemented set (no fake-grow / silent shrink).
+    3. The 9 Wave 3 claimed ops are PRESENT in HasOp.
+    4. No original DWG write / no raw command dispatch tokens.
+    5. Reactor hygiene: add/remove and persistent add/remove stay balanced.
+    6. Full-host cleanup helpers are wired into module unload.
 
-  2. HASOP LISTS EXACTLY THE IMPLEMENTED SET -- guards a silent shrink (a refactor
-     dropping ops) or a silent fake-grow (claiming ops with no handler).
-
-  3. ATTENDED REACTORS ARE NOT IN HASOP (honest contract) -- the editor / doc-manager
-     / long-transaction reactors need the running editor / document manager / workspace
-     subsystem and CANNOT fire hostless. They are DEFERRED: they must NOT appear in
-     m08mHasOp (no fake pass). This test pins that boundary.
-
-  4. NO ORIGINAL-WRITE / NO ACEDCOMMAND (source-level) -- staged-write ONLY on the
-     router-staged db: the .inc must contain no save()/saveAs()/_QSAVE/writeDwgFile
-     token and no acedCommand/acedCmd. Every staged mutation is proven to roll back
-     (the file asserts staged_rolled_back), and all emitted strings route through
-     njsonStr (UTF-8 fidelity; no lossy wideToAscii funnel).
-
-  5. REACTOR HYGIENE -- every reactor attached is detached: addReactor is balanced by
-     removeReactor, addPersistentReactor by removePersistentReactor (no dangling
-     module-lifetime reactor left on the staged db).
-
-  Source-level only (no AutoCAD/build needed). Stdlib only.
+  Source-only: no AutoCAD runtime required.
 """
 from __future__ import annotations
 
@@ -44,8 +26,8 @@ import unittest
 _THIS = os.path.dirname(os.path.abspath(__file__))
 _REPO = os.path.dirname(os.path.dirname(_THIS))
 _INC = os.path.join(_REPO, "src", "Ariadne.AcadNative", "families", "m08m_handlers.inc")
+_SRC = os.path.join(_REPO, "src", "Ariadne.AcadNative", "AriadneNativeJob.cpp")
 
-# --- T01 property / member / safe ObjectARX bridge inspection (13) ---
 _GROUP_INSPECT = [
     "inspect.property.by_name",
     "inspect.property.is_readonly",
@@ -61,7 +43,7 @@ _GROUP_INSPECT = [
     "automate.com.lock_document",
     "automate.property.set",
 ]
-# --- T01 OPM protocol (12) ---
+
 _GROUP_OPM = [
     "extend.opm.register_provider",
     "extend.opm.get_manager",
@@ -76,7 +58,7 @@ _GROUP_OPM = [
     "extend.opm.property_expression",
     "extend.opm.property_extension",
 ]
-# --- T01 property authoring (17) ---
+
 _GROUP_AUTHOR = [
     "extend.property.define",
     "extend.property.describe",
@@ -96,7 +78,7 @@ _GROUP_AUTHOR = [
     "extend.property.define_indexed",
     "extend.property.overrule",
 ]
-# --- T02 reactors (12) ---
+
 _GROUP_REACT = [
     "react.database.attach",
     "react.database.monitor",
@@ -110,79 +92,82 @@ _GROUP_REACT = [
     "react.rxevent.monitor",
     "react.linker.attach",
     "react.linker.monitor",
+    "react.docmanager.attach",
+    "react.docmanager.monitor",
+    "react.editor.command_monitor",
+    "react.editor.dwg_lifecycle",
+    "react.editor.input_monitor",
+    "react.editor.lisp_monitor",
+    "react.editor.sysvar_monitor",
+    "react.longtx.attach",
+    "react.longtx.monitor",
     "react.config.disable_namespace",
 ]
 
 _IMPLEMENTED = _GROUP_INSPECT + _GROUP_OPM + _GROUP_AUTHOR + _GROUP_REACT
 
-# Deferred attended reactors that must NOT appear in HasOp (honest contract):
-# they need the running editor / document manager / long-transaction (workspace)
-# subsystem and cannot fire hostless.
-_DEFERRED = [
-    "react.editor.command_monitor",   # AcEditorReactor -- needs the running editor
-    "react.editor.input_monitor",     # AcEditorReactor
-    "react.editor.lisp_monitor",      # AcEditorReactor
-    "react.editor.sysvar_monitor",    # AcEditorReactor
-    "react.editor.dwg_lifecycle",     # AcEditorReactor
-    "react.docmanager.attach",        # AcApDocManagerReactor -- needs the doc manager
-    "react.docmanager.monitor",       # AcApDocManagerReactor
-    "react.longtx.attach",            # AcApLongTransactionReactor -- workspace/editor checkout
-    "react.longtx.detach",            # AcApLongTransactionReactor
-    "react.longtx.monitor",           # AcApLongTransactionReactor
+_WAVE3_CLAIMED = [
+    "react.docmanager.attach",
+    "react.docmanager.monitor",
+    "react.editor.command_monitor",
+    "react.editor.dwg_lifecycle",
+    "react.editor.input_monitor",
+    "react.editor.lisp_monitor",
+    "react.editor.sysvar_monitor",
+    "react.longtx.attach",
+    "react.longtx.monitor",
 ]
 
-# Invented / dead handler cleanup: these teammate-added duplicates must stay out of
-# both HasOp and Dispatch; the registry-correct property ops remain catalogued.
 _DRIFT = [
     "extend.property.lmv",
     "extend.property.dynamic_props",
     "extend.property.type_promotion",
+    "react.longtx.detach",
 ]
 
 
-def _read():
-    with open(_INC, "r", encoding="utf-8", errors="replace") as f:
+def _read(path: str) -> str:
+    with open(path, "r", encoding="utf-8", errors="replace") as f:
         return f.read()
 
 
-def _code_only(src):
-    """Strip // line-comments and /* */ block-comments so token/balance checks see CODE,
-    not prose. The file legitimately MENTIONS banned tokens (e.g. "never saveAs") and the
-    word "addReactor" in its header/comments; the invariants are about actual calls."""
-    no_block = re.sub(r"/\*.*?\*/", "", src, flags=re.S)
-    no_line = re.sub(r"//[^\n]*", "", no_block)
-    return no_line
+def _code_only(src: str) -> str:
+    src = re.sub(r"/\*.*?\*/", "", src, flags=re.S)
+    return re.sub(r"//[^\n]*", "", src)
 
 
-def _hasop_region(src):
+def _hasop_region(src: str) -> str:
     m = re.search(r"static bool m08mHasOp\(const std::string& op\)\s*\{(.*?)\n\}", src, re.S)
     assert m, "m08mHasOp not found"
     return m.group(1)
 
 
-def _dispatch_region(src):
+def _dispatch_region(src: str) -> str:
     m = re.search(r"static bool m08mDispatch\(.*?\)\s*\{(.*)\n\}\s*$", src, re.S)
     assert m, "m08mDispatch not found"
     return m.group(1)
 
 
-def _hasop_ops(src):
+def _hasop_ops(src: str) -> set[str]:
     return set(re.findall(r'op == "([^"]+)"', _hasop_region(src)))
 
 
-def _dispatch_ops(src):
+def _dispatch_ops(src: str) -> set[str]:
     return set(re.findall(r'op == "([^"]+)"', _dispatch_region(src)))
 
 
 class TestM08MHandlers(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.src = _read()
+        cls.src = _read(_INC)
+        cls.code = _code_only(cls.src)
+        cls.native_job = _read(_SRC)
         cls.hasop = _hasop_ops(cls.src)
         cls.dispatch = _dispatch_ops(cls.src)
 
-    def test_inc_file_exists(self):
-        self.assertTrue(os.path.exists(_INC), f"missing {_INC}")
+    def test_files_exist(self):
+        self.assertTrue(os.path.exists(_INC))
+        self.assertTrue(os.path.exists(_SRC))
 
     def test_signatures_present(self):
         self.assertRegex(self.src, r"bool\s+m08mHasOp\(const std::string& op\)")
@@ -193,43 +178,39 @@ class TestM08MHandlers(unittest.TestCase):
 
     def test_hasop_lists_exactly_implemented(self):
         self.assertEqual(
-            self.hasop, set(_IMPLEMENTED),
-            "m08mHasOp op set drifted; only_in_src=%s missing_from_src=%s"
+            self.hasop,
+            set(_IMPLEMENTED),
+            "m08mHasOp drifted; only_in_src=%s missing=%s"
             % (sorted(self.hasop - set(_IMPLEMENTED)), sorted(set(_IMPLEMENTED) - self.hasop)),
         )
 
-    def test_implemented_count(self):
-        # Group totals: inspect/bridge=13, opm=12, author=17, react=13 => 55 real handlers.
+    def test_implemented_counts(self):
         self.assertEqual(len(_GROUP_INSPECT), 13)
         self.assertEqual(len(_GROUP_OPM), 12)
         self.assertEqual(len(_GROUP_AUTHOR), 17)
-        self.assertEqual(len(_GROUP_REACT), 13)
-        self.assertEqual(len(_IMPLEMENTED), 55)
-        self.assertEqual(len(set(_IMPLEMENTED)), 55, "duplicate op id in the implemented list")
-        self.assertEqual(len(self.hasop), 55)
+        self.assertEqual(len(_GROUP_REACT), 22)
+        self.assertEqual(len(_IMPLEMENTED), 64)
+        self.assertEqual(len(set(_IMPLEMENTED)), 64)
+        self.assertEqual(len(self.hasop), 64)
 
-    def test_no_deferred_op_in_hasop(self):
-        leaked = sorted(self.hasop & set(_DEFERRED))
-        self.assertEqual(leaked, [], "deferred attended-reactor ops leaked into m08mHasOp: %s" % leaked)
+    def test_wave3_claimed_ops_present(self):
+        self.assertEqual(len(_WAVE3_CLAIMED), 9)
+        missing = sorted(set(_WAVE3_CLAIMED) - self.hasop)
+        self.assertEqual(missing, [], "claimed Pane 8 ops missing from HasOp: %s" % missing)
 
-    def test_no_drift_op_in_hasop(self):
-        leaked = sorted(self.hasop & set(_DRIFT))
-        self.assertEqual(leaked, [], "invented/dead ops leaked into m08mHasOp: %s" % leaked)
-
-    def test_no_drift_op_in_dispatch(self):
-        leaked = sorted(self.dispatch & set(_DRIFT))
-        self.assertEqual(leaked, [], "invented/dead ops leaked into m08mDispatch: %s" % leaked)
+    def test_no_drift_ops_in_hasop_or_dispatch(self):
+        leaked_hasop = sorted(self.hasop & set(_DRIFT))
+        leaked_dispatch = sorted(self.dispatch & set(_DRIFT))
+        self.assertEqual(leaked_hasop, [], "drift ops leaked into HasOp: %s" % leaked_hasop)
+        self.assertEqual(leaked_dispatch, [], "drift ops leaked into Dispatch: %s" % leaked_dispatch)
 
     def test_hasop_dispatch_parity(self):
         missing = sorted(set(_IMPLEMENTED) - self.dispatch)
-        self.assertEqual(missing, [], "implemented ops with no dispatch branch: %s" % missing)
         extra = sorted(self.dispatch - self.hasop)
+        self.assertEqual(missing, [], "implemented ops with no dispatch branch: %s" % missing)
         self.assertEqual(extra, [], "dispatch branches not admitted by HasOp: %s" % extra)
 
-    def test_no_original_write_or_acedcommand(self):
-        # staged-write ONLY: never write the original DWG nor drive the command line.
-        # Checked against CODE (comments stripped): the header legitimately says "never saveAs".
-        code = _code_only(self.src)
+    def test_no_original_write_or_raw_command_dispatch(self):
         banned = [
             r"\bsaveAs\b",
             r"\bsave\s*\(",
@@ -240,63 +221,76 @@ class TestM08MHandlers(unittest.TestCase):
             r"\bacedInvoke\b",
         ]
         for pat in banned:
-            self.assertIsNone(
-                re.search(pat, code),
-                "M08M code must not contain original-write/command token: %s" % pat,
-            )
+            self.assertIsNone(re.search(pat, self.code), "unsafe token present: %s" % pat)
 
-    def test_staged_mutations_roll_back(self):
-        # Any staged-write op proves rollback (the staged txn dtor aborts). The file must
-        # never commit() a staged scratch mutation -- it is scratch-only.
-        self.assertIn("staged_rolled_back", self.src,
-                      "staged-write ops must report staged_rolled_back")
-        self.assertNotIn(".commit()", self.src,
-                         "M08M scratch mutations are rolled back; must not commit() staged state")
-        self.assertIn("AriadneStagedWriteTransaction", self.src,
-                      "staged mutations must use the rolled-back staged transaction wrapper")
+    def test_staged_write_tokens_still_present(self):
+        self.assertIn("AriadneStagedWriteTransaction", self.src)
+        self.assertIn("staged_rolled_back", self.src)
+        self.assertNotIn(".commit()", self.src)
 
     def test_reactor_attach_detach_balanced(self):
-        # Reactor hygiene: every attach has a matching detach (no dangling reactor on the db).
-        # Counted over CODE (comments/include-lines stripped) so prose mentions don't skew it.
-        code = _code_only(self.src)
         self.assertEqual(
-            code.count("addReactor"), code.count("removeReactor"),
-            "addReactor/removeReactor are unbalanced -- a reactor was left attached",
+            self.code.count("addReactor"),
+            self.code.count("removeReactor"),
+            "addReactor/removeReactor imbalance",
         )
         self.assertEqual(
-            code.count("addPersistentReactor"), code.count("removePersistentReactor"),
-            "addPersistentReactor/removePersistentReactor are unbalanced",
+            self.code.count("addPersistentReactor"),
+            self.code.count("removePersistentReactor"),
+            "addPersistentReactor/removePersistentReactor imbalance",
         )
 
-    def test_transient_classes_torn_down(self):
-        # Every transient runtime class created for attribute-authoring proofs is deleted
-        # (no class-system leak). newAcRxClass is wrapped by m08mNewTransientClass; each
-        # authoring/opm branch calls deleteAcRxClass.
-        self.assertIn("deleteAcRxClass", self.src,
-                      "transient runtime classes must be torn down with deleteAcRxClass")
+    def test_property_protocol_tokens_present(self):
+        for token in [
+            "AcRxProperty",
+            "AcRxMemberCollection",
+            "AcRxDescriptionAttribute",
+            "AcRxUiPlacementAttribute",
+            "deleteAcRxClass",
+        ]:
+            self.assertIn(token, self.src)
 
-    def test_strings_use_utf8_njsonstr_not_lossy_funnel(self):
-        self.assertIn("njsonStr", self.src, "string emission must route through njsonStr")
-        self.assertNotIn("wideToAscii(", self.src, "must not use the lossy wideToAscii funnel")
+    def test_reactor_base_classes_present(self):
+        for token in [
+            "AcDbDatabaseReactor",
+            "AcDbObjectReactor",
+            "AcRxEventReactor",
+            "AcRxDLinkerReactor",
+            "AcEditorReactor",
+            "AcApDocManagerReactor",
+            "AcApLongTransactionReactor",
+        ]:
+            self.assertIn(token, self.src)
+
+    def test_full_host_gate_and_safe_probe_tokens_present(self):
+        for token in [
+            "m08mFullAutoCadHost",
+            "execute_requested",
+            "acedSSSetFirst",
+            "acedSSAdd",
+            "acedGetVar",
+            "acedSetVar",
+            "lockDocument",
+            "unlockDocument",
+            "acDocManager",
+            "acapLongTransactionManager",
+        ]:
+            self.assertIn(token, self.src)
+
+    def test_unload_cleanup_helpers_wired(self):
+        for token in [
+            "m08mDisableEditorMonitor(removed);",
+            "m08mDisableDocManagerMonitor(removed);",
+            "m08mDisableLongTransactionMonitor(removed);",
+        ]:
+            self.assertIn(token, self.native_job)
+
+    def test_strings_use_njsonstr(self):
+        self.assertIn("njsonStr", self.src)
+        self.assertNotIn("wideToAscii(", self.src)
 
     def test_dispatch_mismatch_guard_present(self):
-        # The terminal guard (no silent fall-through) must exist.
         self.assertIn("OPERATION_DISPATCH_MISMATCH", self.src)
-
-    def test_property_protocol_classes_referenced(self):
-        # The OPM/property implementation must actually touch the property protocol classes
-        # (not a stub): AcRxProperty (get/setValue/isReadOnly) and the AcRxAttribute family.
-        self.assertIn("AcRxProperty", self.src)
-        self.assertIn("AcRxMemberCollection", self.src)
-        self.assertIn("AcRxDescriptionAttribute", self.src)
-        self.assertIn("AcRxUiPlacementAttribute", self.src)
-
-    def test_reactor_base_classes_referenced(self):
-        # The reactor implementation must subclass the real reactor base classes.
-        self.assertIn("AcDbDatabaseReactor", self.src)
-        self.assertIn("AcDbObjectReactor", self.src)
-        self.assertIn("AcRxEventReactor", self.src)
-        self.assertIn("AcRxDLinkerReactor", self.src)
 
 
 if __name__ == "__main__":
