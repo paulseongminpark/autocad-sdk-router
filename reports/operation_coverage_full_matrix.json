@@ -26,20 +26,20 @@
   "totals": {
     "total": 517,
     "by_status": {
-      "implemented": 355,
-      "blocked": 10,
-      "catalogued": 152
+      "implemented": 358,
+      "blocked": 9,
+      "catalogued": 150
     },
-    "implemented": 355,
+    "implemented": 358,
     "wired": 0,
     "stub": 0,
-    "catalogued": 152,
-    "blocked": 10,
+    "catalogued": 150,
+    "blocked": 9,
     "deprecated": 0,
     "unknown": 0,
-    "v1_target_total": 365,
-    "v1_target_implemented": 355,
-    "v1_target_blocked": 10,
+    "v1_target_total": 367,
+    "v1_target_implemented": 358,
+    "v1_target_blocked": 9,
     "v1_target_deferred": 0,
     "by_family": {
       "objectdbx_database": 21,
@@ -84,7 +84,7 @@
       "live_edit": 50,
       "raw_command": 5
     },
-    "agent_exposed_count": 355
+    "agent_exposed_count": 358
   },
   "gate": {
     "all_classified": true,
@@ -884,8 +884,8 @@
       "operation": "render.layout",
       "family": "render",
       "v1_target": true,
-      "status": "blocked",
-      "host_support": "full_autocad",
+      "status": "implemented",
+      "host_support": "dbx|coreconsole|arx_adapter|full_autocad",
       "handler": "",
       "test_ref": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified"
@@ -894,12 +894,12 @@
         "docs/OPERATION_REGISTRY_SPEC.md",
         "CADOS_M01 Lane D native triage (inspect.database.graph insertion point)"
       ],
-      "blocker_ref": "Requires full_autocad plot/publish host; no headless render path implemented (no-fake-success).",
+      "blocker_ref": "",
       "risk_class": "read_safe",
       "write_level": "read",
-      "agent_exposed": false,
+      "agent_exposed": true,
       "notes": "Layout/plot render to image. Plot/publish is host-bound (full AutoCAD) and not headless-safe.",
-      "engine_tier": "native_arx_only",
+      "engine_tier": "objectdbx_capable",
       "mapping_type": "synthetic"
     },
     {
@@ -10093,8 +10093,8 @@
     {
       "operation": "plot.config.settings",
       "family": "layouts_plot_publish",
-      "v1_target": false,
-      "status": "catalogued",
+      "v1_target": true,
+      "status": "implemented",
       "host_support": "arx_adapter|full_autocad",
       "handler": "AcDbPlotSettings / AcPlPlotConfig / AcPlPlotConfigMgr",
       "test_ref": [
@@ -10107,7 +10107,7 @@
       "blocker_ref": "",
       "risk_class": "live_edit",
       "write_level": "live_edit",
-      "agent_exposed": false,
+      "agent_exposed": true,
       "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
       "engine_tier": "managed_also",
       "mapping_type": "exact"
@@ -10115,8 +10115,8 @@
     {
       "operation": "plot.engine.run",
       "family": "layouts_plot_publish",
-      "v1_target": false,
-      "status": "catalogued",
+      "v1_target": true,
+      "status": "implemented",
       "host_support": "arx_adapter|full_autocad",
       "handler": "AcPlPlotEngine: beginPlot/beginDocument/beginPage/endPage/endDocument/endPlot (created via AcPlPlotFactory)",
       "test_ref": [
@@ -10129,7 +10129,7 @@
       "blocker_ref": "",
       "risk_class": "read_safe",
       "write_level": "read",
-      "agent_exposed": false,
+      "agent_exposed": true,
       "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
       "engine_tier": "managed_also",
       "mapping_type": "exact"
@@ -13146,11 +13146,11 @@
     "schema": "ariadne.cad_os.closure_gate.v1",
     "ticket_basis": "M08A-T01",
     "totals_by_status": {
-      "implemented": 355,
-      "blocked": 10,
-      "catalogued": 152
+      "implemented": 358,
+      "blocked": 9,
+      "catalogued": 150
     },
-    "catalogued": 152,
+    "catalogued": 150,
     "stub": 0,
     "unknown": 0,
     "deprecated": 0,

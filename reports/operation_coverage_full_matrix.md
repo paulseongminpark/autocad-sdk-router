@@ -2,9 +2,9 @@
 
 - packet: `CADOS_M08_FULL_OPERATION_COVERAGE_CLOSURE`
 - generated_from: `config/operations.v2.json`
-- total operations: **517** · implemented 355 · stub 0 · blocked 10 · catalogued 152 · deprecated 0 · **unknown 0**
-- v1-target: **365** (implemented 355 · blocked 10 · **deferred 0**)
-- agent-exposed ops: 355
+- total operations: **517** · implemented 358 · stub 0 · blocked 9 · catalogued 150 · deprecated 0 · **unknown 0**
+- v1-target: **367** (implemented 358 · blocked 9 · **deferred 0**)
+- agent-exposed ops: 358
 
 ## Gate
 
@@ -30,7 +30,7 @@
 | query | 1 | 0 | 0 | 0 | 1 |
 | write_patch | 8 | 0 | 3 | 9 | 11 |
 | validate_diff | 3 | 0 | 0 | 0 | 3 |
-| render_visual | 8 | 0 | 1 | 3 | 9 |
+| render_visual | 11 | 0 | 0 | 1 | 11 |
 | live | 6 | 0 | 1 | 0 | 7 |
 | native_only | 295 | 0 | 5 | 121 | 300 |
 
@@ -52,7 +52,6 @@
 | command.invoke.sync.resbuf | active_document_write_original | blocked | raw_command | live_edit | False | acedCmdS(const resbuf* rb, bool, AcApDocument*) | SAFETY_FORBIDDEN: raw command dispatch is blocked in M08O fa |
 | command.queue.post | editor_input | blocked | raw_command | live_edit | False | acedPostCommand / acedPostCommandPrompt() | SAFETY_FORBIDDEN: raw command dispatch is blocked in M08O fa |
 | live.apply_patch | live | blocked | live_edit | live_edit | False |  | Requires full_autocad live_edit host + explicit write_origin |
-| render.layout | render | blocked | read_safe | read | False |  | Requires full_autocad plot/publish host; no headless render  |
 | module.command.lookup | runtime_commands | blocked | raw_command | read | False | acedRegCmds->lookupCmd2(...) via acedCmdLookup2( | SAFETY_FORBIDDEN: raw command dispatch is blocked in M08O fa |
 | module.load.demand_register | runtime_commands | blocked | read_safe | read | False | Registry: HKLM\…\R<ver>\<prodkey>\Applications\< | SAFETY_FORBIDDEN: ObjectARX demand-load registration require |
 | command.menu.invoke | ui_customization | blocked | read_safe | read | False | acedMenuCmd(const ACHAR*) | SAFETY_FORBIDDEN: acedMenuCmd executes arbitrary menu/comman |
@@ -323,6 +322,8 @@
 | inspect.runtime.capabilities | inspect | implemented | read_safe | read | True | runtimeCapabilitiesJson |  |
 | inspect.xdata.get | inspect | implemented | read_safe | read | True | getDatabaseXdata |  |
 | inspect.xref.list | inspect | implemented | read_safe | read | True | listXrefs |  |
+| plot.config.settings | layouts_plot_publish | implemented | live_edit | live_edit | True | AcDbPlotSettings / AcPlPlotConfig / AcPlPlotConf |  |
+| plot.engine.run | layouts_plot_publish | implemented | read_safe | read | True | AcPlPlotEngine: beginPlot/beginDocument/beginPag |  |
 | live.jig.point_probe | live | implemented | live_edit | live_edit | True | runLineJigProbe |  |
 | live.overrule.disable | live | implemented | live_edit | live_edit | True | disableObjectOverrule |  |
 | live.overrule.enable | live | implemented | live_edit | live_edit | True | enableObjectOverrule |  |
@@ -352,6 +353,7 @@
 | react.persistent.detach | reactors_events | implemented | live_edit | live_edit | True | m08mDispatch |  |
 | react.rxevent.attach | reactors_events | implemented | read_safe | read | True | m08mDispatch |  |
 | react.rxevent.monitor | reactors_events | implemented | read_safe | read | True | m08mDispatch |  |
+| render.layout | render | implemented | read_safe | read | True |  |  |
 | command.register.define | runtime_commands | implemented | read_safe | read | True | m08nDispatch |  |
 | module.ads.register_symbol | runtime_commands | implemented | read_safe | read | True | m08nDispatch |  |
 | module.class.register_object | runtime_commands | implemented | staged_write | write_copy | True | m08nDispatch |  |
@@ -413,4 +415,4 @@
 | write.layout.create | write | implemented | staged_write | write_copy | True | createLayout |  |
 | write.xdata.set | write | implemented | staged_write | write_copy | True | setDatabaseXdata |  |
 
-> Full 517-operation detail (all 13 fields per op) is in `reports/operation_coverage_full_matrix.json` — this table lists only the 365 v1-target ops. The 152 catalogued ops are classified future-version native capability (v1_target=false), not omitted.
+> Full 517-operation detail (all 13 fields per op) is in `reports/operation_coverage_full_matrix.json` — this table lists only the 367 v1-target ops. The 150 catalogued ops are classified future-version native capability (v1_target=false), not omitted.
