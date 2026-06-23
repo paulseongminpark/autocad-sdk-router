@@ -46,7 +46,7 @@ _THIS = os.path.dirname(os.path.abspath(__file__))
 _REPO = os.path.dirname(os.path.dirname(_THIS))
 _INC = os.path.join(_REPO, "src", "Ariadne.AcadNative", "families", "m08g_handlers.inc")
 
-# Entity-create ops implemented (real AcDb* ctor + appendAcDbEntity / owner append). (22)
+# Entity-create ops implemented (real AcDb* ctor + appendAcDbEntity / owner append). (34)
 _CREATE = [
     "write.entity.arc",
     "write.entity.ellipse",
@@ -62,8 +62,20 @@ _CREATE = [
     "write.entity.polyline3d",
     "write.entity.attribdef",
     "write.entity.attribute",
+    "write.entity.body",
     "write.entity.mline",
+    "write.entity.mpolygon",
+    "write.entity.nurbsurface",
+    "write.entity.rasterimage",
     "write.entity.shape",
+    "write.entity.solid3d.extrude",
+    "write.entity.solid3d.loft",
+    "write.entity.solid3d.primitive",
+    "write.entity.solid3d.revolve",
+    "write.entity.solid3d.sweep",
+    "write.entity.subdmesh",
+    "write.entity.surface",
+    "write.entity.wipeout",
     "write.entity.polygonmesh",
     "write.entity.polyfacemesh",
     "write.entity.region",
@@ -77,6 +89,7 @@ _MODIFY = [
     "modify.entity.copy_transformed",
     "modify.entity.common",
     "modify.entity.explode",
+    "modify.entity.solid3d.boolean",
     "modify.curve.offset",
     "modify.curve.split",
     "modify.curve.to_spline",
@@ -87,21 +100,6 @@ _IMPLEMENTED = _CREATE + _MODIFY
 # Deferred/hard-blocked ops that must NOT appear in HasOp (honest contract).
 # Blockers documented in reports/tickets/M08G.md.
 _DEFERRED = [
-    # ASM modeler (createExtrudedSolid / createBox / boolean ...) -- not linkable hostless
-    "write.entity.body",
-    "write.entity.surface",
-    "write.entity.nurbsurface",
-    "write.entity.subdmesh",
-    "write.entity.solid3d.extrude",
-    "write.entity.solid3d.loft",
-    "write.entity.solid3d.primitive",
-    "write.entity.solid3d.revolve",
-    "write.entity.solid3d.sweep",
-    "modify.entity.solid3d.boolean",
-    # external resource (image def / raster / SHX shape / hatch-area)
-    "write.entity.rasterimage",
-    "write.entity.wipeout",
-    "write.entity.mpolygon",
     # editor-bound subentity association
     "edit.subentity.add_paths",
     "edit.subentity.delete_paths",
@@ -170,18 +168,17 @@ class TestM08GHandlers(unittest.TestCase):
         )
 
     def test_implemented_count(self):
-        # 22 entity-create + 7 modify = 29 real staged-write handlers after the
-        # M08G/H-30 expansion. The remaining 16 ops of the 45-op brief are the
-        # _DEFERRED set (ASM-modeler / external-resource / editor-bound), left OUT
+        # 34 entity-create + 8 modify = 42 real staged-write handlers after Wave3 Pane2.
+        # The remaining 3 ops of the 45-op brief are editor-bound subentity edits, left OUT
         # of HasOp on purpose (no fake pass).
-        self.assertEqual(len(_CREATE), 22)
-        self.assertEqual(len(_MODIFY), 7)
-        self.assertEqual(len(_IMPLEMENTED), 29)
-        self.assertEqual(len(set(_IMPLEMENTED)), 29, "duplicate op id in the implemented list")
-        self.assertEqual(len(self.hasop), 29)
-        # the brief is 45 ops total: 29 implemented + 16 deferred.
+        self.assertEqual(len(_CREATE), 34)
+        self.assertEqual(len(_MODIFY), 8)
+        self.assertEqual(len(_IMPLEMENTED), 42)
+        self.assertEqual(len(set(_IMPLEMENTED)), 42, "duplicate op id in the implemented list")
+        self.assertEqual(len(self.hasop), 42)
+        # the brief is 45 ops total: 42 implemented + 3 deferred.
         self.assertEqual(len(_IMPLEMENTED) + len(_DEFERRED), 45)
-        self.assertEqual(len(set(_DEFERRED)), 16, "duplicate op id in the deferred list")
+        self.assertEqual(len(set(_DEFERRED)), 3, "duplicate op id in the deferred list")
 
     def test_minimum_implemented_floor(self):
         # A sane floor independent of the exact list: at least 20 ops, and both the
@@ -225,6 +222,10 @@ class TestM08GHandlers(unittest.TestCase):
         self.assertIn("appendAcDbEntity", self.src, "entity-create must append to model space")
         self.assertIn("AcDb::kForWrite", self.src, "modify ops must open the staged target for write")
         self.assertIn("transformBy", self.src, "modify.entity.transform must call transformBy")
+        self.assertIn("createBox", self.src, "solid primitive must call real AcDb3dSolid modeler API")
+        self.assertIn("createExtrudedSolid", self.src, "solid extrude must call real modeler API")
+        self.assertIn("AcDbMPolygon", self.src, "mpolygon must use real AcDbMPolygon")
+        self.assertIn("AcDbRasterImageDef", self.src, "rasterimage must create an image definition")
 
     def test_strings_use_utf8_njsonstr_not_lossy_funnel(self):
         self.assertIn("njsonStr", self.src, "string emission must route through njsonStr")

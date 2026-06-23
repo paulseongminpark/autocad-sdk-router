@@ -1,0 +1,254 @@
+{
+  "schema": "ariadne.cad_os.wave3.pane_claims.v1",
+  "wave": "WAVE3",
+  "pane": 2,
+  "focus": "staged write / annotation / dimension / style heavy ops",
+  "generated_at": "2026-06-23T21:00:02+09:00",
+  "source_commit": "023fc16",
+  "source_registry": "config/operations.v2.json",
+  "source_totals": {
+    "implemented": 402,
+    "blocked": 9,
+    "catalogued": 106,
+    "total": 517
+  },
+  "claim_count": 21,
+  "families": {
+    "entities": 12,
+    "geometry_kernel": 1,
+    "constraints_associativity": 8
+  },
+  "claims": [
+    {
+      "operation": "write.entity.body",
+      "family": "entities",
+      "current_status": "catalogued",
+      "recommended_strategy": "implement",
+      "fallback_strategy": "hard_block_only_with_real_evidence",
+      "expected_files": [],
+      "test_requirement": "handler+unit+native-build+registry",
+      "evidence_requirement": "handler+test+report",
+      "notes": ""
+    },
+    {
+      "operation": "write.entity.mpolygon",
+      "family": "entities",
+      "current_status": "catalogued",
+      "recommended_strategy": "implement",
+      "fallback_strategy": "hard_block_only_with_real_evidence",
+      "expected_files": [],
+      "test_requirement": "handler+unit+native-build+registry",
+      "evidence_requirement": "handler+test+report",
+      "notes": ""
+    },
+    {
+      "operation": "write.entity.nurbsurface",
+      "family": "entities",
+      "current_status": "catalogued",
+      "recommended_strategy": "implement",
+      "fallback_strategy": "hard_block_only_with_real_evidence",
+      "expected_files": [],
+      "test_requirement": "handler+unit+native-build+registry",
+      "evidence_requirement": "handler+test+report",
+      "notes": ""
+    },
+    {
+      "operation": "write.entity.rasterimage",
+      "family": "entities",
+      "current_status": "catalogued",
+      "recommended_strategy": "implement",
+      "fallback_strategy": "hard_block_only_with_real_evidence",
+      "expected_files": [],
+      "test_requirement": "handler+unit+native-build+registry",
+      "evidence_requirement": "handler+test+report",
+      "notes": ""
+    },
+    {
+      "operation": "write.entity.solid3d.extrude",
+      "family": "entities",
+      "current_status": "catalogued",
+      "recommended_strategy": "implement",
+      "fallback_strategy": "hard_block_only_with_real_evidence",
+      "expected_files": [],
+      "test_requirement": "handler+unit+native-build+registry",
+      "evidence_requirement": "handler+test+report",
+      "notes": ""
+    },
+    {
+      "operation": "write.entity.solid3d.loft",
+      "family": "entities",
+      "current_status": "catalogued",
+      "recommended_strategy": "implement",
+      "fallback_strategy": "hard_block_only_with_real_evidence",
+      "expected_files": [],
+      "test_requirement": "handler+unit+native-build+registry",
+      "evidence_requirement": "handler+test+report",
+      "notes": ""
+    },
+    {
+      "operation": "write.entity.solid3d.primitive",
+      "family": "entities",
+      "current_status": "catalogued",
+      "recommended_strategy": "implement",
+      "fallback_strategy": "hard_block_only_with_real_evidence",
+      "expected_files": [],
+      "test_requirement": "handler+unit+native-build+registry",
+      "evidence_requirement": "handler+test+report",
+      "notes": ""
+    },
+    {
+      "operation": "write.entity.solid3d.revolve",
+      "family": "entities",
+      "current_status": "catalogued",
+      "recommended_strategy": "implement",
+      "fallback_strategy": "hard_block_only_with_real_evidence",
+      "expected_files": [],
+      "test_requirement": "handler+unit+native-build+registry",
+      "evidence_requirement": "handler+test+report",
+      "notes": ""
+    },
+    {
+      "operation": "write.entity.solid3d.sweep",
+      "family": "entities",
+      "current_status": "catalogued",
+      "recommended_strategy": "implement",
+      "fallback_strategy": "hard_block_only_with_real_evidence",
+      "expected_files": [],
+      "test_requirement": "handler+unit+native-build+registry",
+      "evidence_requirement": "handler+test+report",
+      "notes": ""
+    },
+    {
+      "operation": "write.entity.subdmesh",
+      "family": "entities",
+      "current_status": "catalogued",
+      "recommended_strategy": "implement",
+      "fallback_strategy": "hard_block_only_with_real_evidence",
+      "expected_files": [],
+      "test_requirement": "handler+unit+native-build+registry",
+      "evidence_requirement": "handler+test+report",
+      "notes": ""
+    },
+    {
+      "operation": "write.entity.surface",
+      "family": "entities",
+      "current_status": "catalogued",
+      "recommended_strategy": "implement",
+      "fallback_strategy": "hard_block_only_with_real_evidence",
+      "expected_files": [],
+      "test_requirement": "handler+unit+native-build+registry",
+      "evidence_requirement": "handler+test+report",
+      "notes": ""
+    },
+    {
+      "operation": "write.entity.wipeout",
+      "family": "entities",
+      "current_status": "catalogued",
+      "recommended_strategy": "implement",
+      "fallback_strategy": "hard_block_only_with_real_evidence",
+      "expected_files": [],
+      "test_requirement": "handler+unit+native-build+registry",
+      "evidence_requirement": "handler+test+report",
+      "notes": ""
+    },
+    {
+      "operation": "modify.entity.solid3d.boolean",
+      "family": "geometry_kernel",
+      "current_status": "catalogued",
+      "recommended_strategy": "implement",
+      "fallback_strategy": "hard_block_only_with_real_evidence",
+      "expected_files": [],
+      "test_requirement": "handler+unit+native-build+registry",
+      "evidence_requirement": "handler+test+report",
+      "notes": ""
+    },
+    {
+      "operation": "define.constraint.addGeometry",
+      "family": "constraints_associativity",
+      "current_status": "catalogued",
+      "recommended_strategy": "implement",
+      "fallback_strategy": "hard_block_only_with_real_evidence",
+      "expected_files": [],
+      "test_requirement": "handler+unit+native-build+registry",
+      "evidence_requirement": "handler+test+report",
+      "notes": ""
+    },
+    {
+      "operation": "define.constraint.autoConstrain",
+      "family": "constraints_associativity",
+      "current_status": "catalogued",
+      "recommended_strategy": "implement",
+      "fallback_strategy": "hard_block_only_with_real_evidence",
+      "expected_files": [],
+      "test_requirement": "handler+unit+native-build+registry",
+      "evidence_requirement": "handler+test+report",
+      "notes": ""
+    },
+    {
+      "operation": "define.constraint.dimensional.angle",
+      "family": "constraints_associativity",
+      "current_status": "catalogued",
+      "recommended_strategy": "implement",
+      "fallback_strategy": "hard_block_only_with_real_evidence",
+      "expected_files": [],
+      "test_requirement": "handler+unit+native-build+registry",
+      "evidence_requirement": "handler+test+report",
+      "notes": ""
+    },
+    {
+      "operation": "define.constraint.dimensional.distance",
+      "family": "constraints_associativity",
+      "current_status": "catalogued",
+      "recommended_strategy": "implement",
+      "fallback_strategy": "hard_block_only_with_real_evidence",
+      "expected_files": [],
+      "test_requirement": "handler+unit+native-build+registry",
+      "evidence_requirement": "handler+test+report",
+      "notes": ""
+    },
+    {
+      "operation": "define.constraint.dimensional.radiusDiameter",
+      "family": "constraints_associativity",
+      "current_status": "catalogued",
+      "recommended_strategy": "implement",
+      "fallback_strategy": "hard_block_only_with_real_evidence",
+      "expected_files": [],
+      "test_requirement": "handler+unit+native-build+registry",
+      "evidence_requirement": "handler+test+report",
+      "notes": ""
+    },
+    {
+      "operation": "define.constraint.geometric",
+      "family": "constraints_associativity",
+      "current_status": "catalogued",
+      "recommended_strategy": "implement",
+      "fallback_strategy": "hard_block_only_with_real_evidence",
+      "expected_files": [],
+      "test_requirement": "handler+unit+native-build+registry",
+      "evidence_requirement": "handler+test+report",
+      "notes": ""
+    },
+    {
+      "operation": "define.constraint.group",
+      "family": "constraints_associativity",
+      "current_status": "catalogued",
+      "recommended_strategy": "implement",
+      "fallback_strategy": "hard_block_only_with_real_evidence",
+      "expected_files": [],
+      "test_requirement": "handler+unit+native-build+registry",
+      "evidence_requirement": "handler+test+report",
+      "notes": ""
+    },
+    {
+      "operation": "define.dimassoc.geometryDriven",
+      "family": "constraints_associativity",
+      "current_status": "catalogued",
+      "recommended_strategy": "implement",
+      "fallback_strategy": "hard_block_only_with_real_evidence",
+      "expected_files": [],
+      "test_requirement": "handler+unit+native-build+registry",
+      "evidence_requirement": "handler+test+report",
+      "notes": ""
+    }
+  ]
+}

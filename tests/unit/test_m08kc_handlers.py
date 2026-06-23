@@ -68,8 +68,16 @@ _DEPENDENCIES = [
     "define.georef.subent",
     "define.perssubentid.resolve",
 ]
-# constraints (read + delete only) (5)
+# constraints (read/delete + Wave3 authoring) (13)
 _CONSTRAINTS = [
+    "define.constraint.group",
+    "define.constraint.addGeometry",
+    "define.constraint.geometric",
+    "define.constraint.autoConstrain",
+    "define.constraint.dimensional.distance",
+    "define.constraint.dimensional.angle",
+    "define.constraint.dimensional.radiusDiameter",
+    "define.dimassoc.geometryDriven",
     "edit.constraint.delete",
     "inspect.constraint.enumerate",
     "inspect.constraint.node",
@@ -104,15 +112,6 @@ _DEFERRED = [
     # in-app evaluation solver (2)
     "inspect.assocaction.evaluate",
     "inspect.assocnetwork.evaluate",
-    # DCM solver-bound constraint authoring (6)
-    "define.constraint.addGeometry",
-    "define.constraint.geometric",
-    "define.constraint.group",
-    "define.constraint.dimensional.angle",
-    "define.constraint.dimensional.distance",
-    "define.constraint.dimensional.radiusDiameter",
-    "define.constraint.autoConstrain",
-    "define.dimassoc.geometryDriven",
     # assoc array create/edit/explode -- the layout pass IS the evaluator (10)
     "define.assocarray.create",
     "define.assocarray.rectangular",
@@ -194,21 +193,21 @@ class TestM08KCHandlers(unittest.TestCase):
         )
 
     def test_implemented_count(self):
-        # Group totals: network/action=11, dependencies=5, constraints=5, parameters=3,
-        # arrays=1. 11+5+5+3+1 = 25 real handlers. The remaining 33 ops of the 58-op brief
+        # Group totals: network/action=11, dependencies=5, constraints=13, parameters=3,
+        # arrays=1. 11+5+13+3+1 = 33 real handlers. The remaining 25 ops of the 58-op brief
         # are the _DEFERRED solver/modeler/callback set -- left OUT of HasOp (no fake pass).
         self.assertEqual(len(_NETWORK_ACTION), 11)
         self.assertEqual(len(_DEPENDENCIES), 5)
-        self.assertEqual(len(_CONSTRAINTS), 5)
+        self.assertEqual(len(_CONSTRAINTS), 13)
         self.assertEqual(len(_PARAMETERS), 3)
         self.assertEqual(len(_ARRAYS), 1)
-        self.assertEqual(len(_IMPLEMENTED), 25)
-        self.assertEqual(len(set(_IMPLEMENTED)), 25, "duplicate op id in the implemented list")
-        self.assertEqual(len(self.hasop), 25)
+        self.assertEqual(len(_IMPLEMENTED), 33)
+        self.assertEqual(len(set(_IMPLEMENTED)), 33, "duplicate op id in the implemented list")
+        self.assertEqual(len(self.hasop), 33)
 
     def test_total_op_budget_is_58(self):
-        # The brief is 58 ops: 25 implemented + 33 deferred, with no overlap.
-        self.assertEqual(len(set(_DEFERRED)), 33, "duplicate op id in the deferred list")
+        # The brief is 58 ops: 33 implemented + 25 deferred, with no overlap.
+        self.assertEqual(len(set(_DEFERRED)), 25, "duplicate op id in the deferred list")
         self.assertEqual(len(set(_IMPLEMENTED)) + len(set(_DEFERRED)), 58)
         self.assertEqual(set(_IMPLEMENTED) & set(_DEFERRED), set(), "an op is both implemented and deferred")
 

@@ -1,0 +1,63 @@
+{
+  "schema": "ariadne.cad_os.ticket_result.v1",
+  "ticket_id": "WAVE3_PANE2_HEAVY_NATIVE_30",
+  "status": "PASS",
+  "branch": "cados/wave3-pane2-heavy-native-30",
+  "commit": "local commit hash reported in final response (not self-embedded)",
+  "pr": "",
+  "worktree": "D:/dev/99_tools/autocad-sdk-router_wave3_pane2",
+  "claim_file": "reports/tickets/WAVE3_PANE2_CLAIMS.json",
+  "claim_count": 21,
+  "implemented_ops": 21,
+  "hard_blocked_ops": 0,
+  "deprecated_ops": 0,
+  "catalogued_remaining_claimed": 0,
+  "global_catalogued_remaining": 85,
+  "closure_gate_pass": false,
+  "closure_gate_note": "global registry still has 85 catalogued ops outside this claim scope; honest fail until follow-up closure",
+  "implemented_operation_ids": [
+    "write.entity.body",
+    "write.entity.mpolygon",
+    "write.entity.nurbsurface",
+    "write.entity.rasterimage",
+    "write.entity.solid3d.extrude",
+    "write.entity.solid3d.loft",
+    "write.entity.solid3d.primitive",
+    "write.entity.solid3d.revolve",
+    "write.entity.solid3d.sweep",
+    "write.entity.subdmesh",
+    "write.entity.surface",
+    "write.entity.wipeout",
+    "modify.entity.solid3d.boolean",
+    "define.constraint.addGeometry",
+    "define.constraint.autoConstrain",
+    "define.constraint.dimensional.angle",
+    "define.constraint.dimensional.distance",
+    "define.constraint.dimensional.radiusDiameter",
+    "define.constraint.geometric",
+    "define.constraint.group",
+    "define.dimassoc.geometryDriven"
+  ],
+  "hard_blocked_operation_ids": [],
+  "deprecated_operation_ids": [],
+  "validation": {
+    "pytest": "469 passed, 20 skipped",
+    "cadctl_registry_coverage": "status ok; consistent true; implemented 423; catalogued 85",
+    "json_tool_operation_coverage_latest": "pass",
+    "json_tool_v1_operation_gate_latest": "pass",
+    "reconcile_native_registry_dry_run": "flips 0; conflicts 0; drift 0",
+    "operation_coverage_matrix": "GATE PASS: True; closure_gate_pass False due to 85 global catalogued ops",
+    "native_isolated_build": "status ok"
+  },
+  "native_build_report": "reports/tickets/WAVE3_PANE2_native_build.json",
+  "ops_report": "reports/tickets/WAVE3_PANE2_HEAVY_NATIVE_30_OPS.json",
+  "attended_smoke": {
+    "status": "not_run",
+    "reason": "no dedicated attended AutoCAD instance/channel acquired"
+  },
+  "safety": {
+    "original_dwg_modified": false,
+    "raw_autocad_command_surface_added": false,
+    "native_build_output_isolated": true
+  }
+}

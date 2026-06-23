@@ -39,6 +39,22 @@
 #include "dbfcf.h"        // AcDbFcf (tolerance / feature control frame)
 #include "dbmline.h"      // AcDbMline
 #include "dbmstyle.h"     // AcDbMlineStyle / current mline style id
+#include "dbsol3d.h"      // AcDb3dSolid heavy modeler operations
+#include "dbbody.h"       // AcDbBody
+#include "dbsurf.h"       // AcDbSurface::createFrom
+#include "dbnurbsurf.h"   // AcDbNurbSurface
+#include "dbSubD.h"       // AcDbSubDMesh
+#include "dbmpolygon.h"   // AcDbMPolygon
+#include "dbSweepOptions.h"
+#include "dbRevolveOptions.h"
+#include "dbLoftOptions.h"
+#include "gekvec.h"       // AcGeKnotVector for NURBS surface
+#include "imgdef.h"       // AcDbRasterImageDef
+#include "imgent.h"       // AcDbRasterImage
+#include "dbwipe.h"       // AcDbWipeout
+
+#pragma comment(lib, "AcMPolygonObj.lib")
+#pragma comment(lib, "acismobj26.lib")
 
 //============================================================================
 // M08G shared helpers (file-scope statics in this TU; m08g-prefixed to avoid any
@@ -267,6 +283,42 @@ static int m08gAppendPieces(AcDbDatabase* pDb, AcDbVoidPtrArray& pieces,
     return appended;
 }
 
+static AcDbPolyline* m08gMakeRectProfile(double w, double h)
+{
+    if (w <= 0.0) w = 1.0;
+    if (h <= 0.0) h = 1.0;
+    AcDbPolyline* p = new AcDbPolyline();
+    p->addVertexAt(0, AcGePoint2d(0.0, 0.0), 0.0);
+    p->addVertexAt(1, AcGePoint2d(w, 0.0), 0.0);
+    p->addVertexAt(2, AcGePoint2d(w, h), 0.0);
+    p->addVertexAt(3, AcGePoint2d(0.0, h), 0.0);
+    p->setClosed(Adesk::kTrue);
+    return p;
+}
+
+static bool m08gRead2dVertices(const std::string& job, AcGePoint2dArray& pts)
+{
+    pts.removeAll();
+    AcGePoint3dArray pts3;
+    if (m08gReadPointArray(job, "vertices", pts3) < 3)
+        m08gReadPointArray(job, "points", pts3);
+    for (int i = 0; i < pts3.length(); ++i)
+        pts.append(AcGePoint2d(pts3[i].x, pts3[i].y));
+    return pts.length() >= 3;
+}
+
+static void m08gEmitModelerCreate(std::ostringstream& r, const char* kind, Acad::ErrorStatus es,
+                                  const AcDbObjectId& id, const std::string& layer, int msAfter)
+{
+    r << "\"result\":{\"created\":" << (es == Acad::eOk ? "true" : "false")
+      << ",\"kind\":" << njsonStr(std::string(kind))
+      << ",\"errorstatus\":" << static_cast<int>(es)
+      << ",\"handle\":" << njsonStr(es == Acad::eOk ? handleOfId(id) : std::string())
+      << ",\"layer\":" << njsonStr(layer)
+      << ",\"modelspace_entities_after\":" << msAfter << "},"
+      << "\"status\":\"" << (es == Acad::eOk ? "ok" : "error") << "\"}";
+}
+
 //============================================================================
 // HasOp — every op id this family IMPLEMENTS (gate admission). Kept in lockstep
 // with the dispatch branches below (asserted by tests/unit/test_m08g_handlers.py).
@@ -289,8 +341,20 @@ static bool m08gHasOp(const std::string& op)
         op == "write.entity.polyline3d" ||
         op == "write.entity.attribdef" ||
         op == "write.entity.attribute" ||
+        op == "write.entity.body" ||
         op == "write.entity.mline" ||
+        op == "write.entity.mpolygon" ||
+        op == "write.entity.nurbsurface" ||
+        op == "write.entity.rasterimage" ||
         op == "write.entity.shape" ||
+        op == "write.entity.solid3d.extrude" ||
+        op == "write.entity.solid3d.loft" ||
+        op == "write.entity.solid3d.primitive" ||
+        op == "write.entity.solid3d.revolve" ||
+        op == "write.entity.solid3d.sweep" ||
+        op == "write.entity.subdmesh" ||
+        op == "write.entity.surface" ||
+        op == "write.entity.wipeout" ||
         op == "write.entity.polygonmesh" ||
         op == "write.entity.polyfacemesh" ||
         op == "write.entity.region" ||
@@ -302,6 +366,7 @@ static bool m08gHasOp(const std::string& op)
         op == "modify.entity.copy_transformed" ||
         op == "modify.entity.common" ||
         op == "modify.entity.explode" ||
+        op == "modify.entity.solid3d.boolean" ||
         op == "modify.curve.offset" ||
         op == "modify.curve.split" ||
         op == "modify.curve.to_spline";
@@ -868,6 +933,198 @@ static bool m08gDispatch(const std::string& op, const AriadneJobCtx& ctx, std::o
         return true;
     }
 
+    if (op == "write.entity.body") {
+        AcDbBody* pE = new AcDbBody();
+        pE->setDatabaseDefaults(pDb);
+        AcDbObjectId id; int ms = 0;
+        const Acad::ErrorStatus es = m08gAppendEntity(pDb, layer, pE, id, ms);
+        m08gEmitModelerCreate(r, "AcDbBody", es, id, layer, ms);
+        return true;
+    }
+    if (op == "write.entity.solid3d.primitive") {
+        std::string primitive; jsonFindString(job, "primitive", primitive);
+        if (primitive.empty()) primitive = "box";
+        double x = 1.0, y = 1.0, z = 1.0, radius = 0.5, height = 1.0, top = 0.0, minor = 0.2;
+        jsonFindNumber(job, "x", x); jsonFindNumber(job, "x_len", x);
+        jsonFindNumber(job, "y", y); jsonFindNumber(job, "y_len", y);
+        jsonFindNumber(job, "z", z); jsonFindNumber(job, "z_len", z);
+        jsonFindNumber(job, "radius", radius); jsonFindNumber(job, "height", height);
+        jsonFindNumber(job, "top_radius", top); jsonFindNumber(job, "minor_radius", minor);
+        AcDb3dSolid* pE = new AcDb3dSolid();
+        pE->setDatabaseDefaults(pDb);
+        Acad::ErrorStatus es = Acad::eOk;
+        if (primitive == "sphere") es = pE->createSphere(radius);
+        else if (primitive == "torus") es = pE->createTorus(radius, minor);
+        else if (primitive == "wedge") es = pE->createWedge(x, y, z);
+        else if (primitive == "pyramid") es = pE->createPyramid(height, 4, radius, top);
+        else if (primitive == "frustum") es = pE->createFrustum(height, radius, radius, top);
+        else es = pE->createBox(x, y, z);
+        if (es != Acad::eOk) { delete pE; emitNativeError(r, "MODELER_CREATE_FAILED", "AcDb3dSolid primitive errorstatus " + std::to_string(static_cast<int>(es))); return true; }
+        AcDbObjectId id; int ms = 0;
+        es = m08gAppendEntity(pDb, layer, pE, id, ms);
+        m08gEmitModelerCreate(r, "AcDb3dSolid", es, id, layer, ms);
+        return true;
+    }
+    if (op == "write.entity.solid3d.extrude") {
+        double w = 1.0, h = 1.0, height = 1.0;
+        jsonFindNumber(job, "width", w); jsonFindNumber(job, "depth", h); jsonFindNumber(job, "height", height);
+        AcDbPolyline* pProfile = m08gMakeRectProfile(w, h);
+        AcDbSweepOptions opts;
+        AcDb3dSolid* pE = new AcDb3dSolid();
+        pE->setDatabaseDefaults(pDb);
+        Acad::ErrorStatus es = pE->createExtrudedSolid(pProfile, AcGeVector3d(0.0, 0.0, height), opts);
+        delete pProfile;
+        if (es != Acad::eOk) { delete pE; emitNativeError(r, "EXTRUDE_FAILED", "createExtrudedSolid errorstatus " + std::to_string(static_cast<int>(es))); return true; }
+        AcDbObjectId id; int ms = 0; es = m08gAppendEntity(pDb, layer, pE, id, ms);
+        m08gEmitModelerCreate(r, "AcDb3dSolid", es, id, layer, ms);
+        return true;
+    }
+    if (op == "write.entity.solid3d.revolve") {
+        double w = 0.5, h = 1.0, angle = 6.28318530717958647692;
+        jsonFindNumber(job, "width", w); jsonFindNumber(job, "height", h); jsonFindNumber(job, "angle", angle);
+        AcDbPolyline* pProfile = m08gMakeRectProfile(w, h);
+        AcDbRevolveOptions opts;
+        AcDb3dSolid* pE = new AcDb3dSolid();
+        pE->setDatabaseDefaults(pDb);
+        Acad::ErrorStatus es = pE->createRevolvedSolid(pProfile, AcGePoint3d(0.0, 0.0, 0.0), AcGeVector3d(0.0, 1.0, 0.0), angle, 0.0, opts);
+        delete pProfile;
+        if (es != Acad::eOk) { delete pE; emitNativeError(r, "REVOLVE_FAILED", "createRevolvedSolid errorstatus " + std::to_string(static_cast<int>(es))); return true; }
+        AcDbObjectId id; int ms = 0; es = m08gAppendEntity(pDb, layer, pE, id, ms);
+        m08gEmitModelerCreate(r, "AcDb3dSolid", es, id, layer, ms);
+        return true;
+    }
+    if (op == "write.entity.solid3d.sweep") {
+        double w = 0.2, h = 0.2, length = 2.0;
+        jsonFindNumber(job, "width", w); jsonFindNumber(job, "height", h); jsonFindNumber(job, "length", length);
+        AcDbPolyline* pProfile = m08gMakeRectProfile(w, h);
+        AcDbLine* pPath = new AcDbLine(AcGePoint3d(0.0, 0.0, 0.0), AcGePoint3d(0.0, 0.0, length));
+        AcDbSweepOptions opts;
+        AcDb3dSolid* pE = new AcDb3dSolid();
+        pE->setDatabaseDefaults(pDb);
+        Acad::ErrorStatus es = pE->createSweptSolid(pProfile, pPath, opts);
+        delete pProfile; delete pPath;
+        if (es != Acad::eOk) { delete pE; emitNativeError(r, "SWEEP_FAILED", "createSweptSolid errorstatus " + std::to_string(static_cast<int>(es))); return true; }
+        AcDbObjectId id; int ms = 0; es = m08gAppendEntity(pDb, layer, pE, id, ms);
+        m08gEmitModelerCreate(r, "AcDb3dSolid", es, id, layer, ms);
+        return true;
+    }
+    if (op == "write.entity.solid3d.loft") {
+        double w1 = 1.0, h1 = 1.0, w2 = 0.5, h2 = 0.5, dz = 1.0;
+        jsonFindNumber(job, "width", w1); jsonFindNumber(job, "depth", h1); jsonFindNumber(job, "top_width", w2); jsonFindNumber(job, "top_depth", h2); jsonFindNumber(job, "height", dz);
+        AcDbPolyline* p1 = m08gMakeRectProfile(w1, h1);
+        AcDbPolyline* p2 = m08gMakeRectProfile(w2, h2);
+        AcGeMatrix3d tr; tr.setToTranslation(AcGeVector3d(0.0, 0.0, dz));
+        p2->transformBy(tr);
+        AcArray<AcDbEntity*> sections; sections.append(p1); sections.append(p2);
+        AcArray<AcDbEntity*> guides;
+        AcDbLoftOptions opts;
+        AcDb3dSolid* pE = new AcDb3dSolid();
+        pE->setDatabaseDefaults(pDb);
+        Acad::ErrorStatus es = pE->createLoftedSolid(sections, guides, nullptr, opts);
+        delete p1; delete p2;
+        if (es != Acad::eOk) { delete pE; emitNativeError(r, "LOFT_FAILED", "createLoftedSolid errorstatus " + std::to_string(static_cast<int>(es))); return true; }
+        AcDbObjectId id; int ms = 0; es = m08gAppendEntity(pDb, layer, pE, id, ms);
+        m08gEmitModelerCreate(r, "AcDb3dSolid", es, id, layer, ms);
+        return true;
+    }
+    if (op == "write.entity.surface") {
+        double w = 1.0, h = 1.0; jsonFindNumber(job, "width", w); jsonFindNumber(job, "height", h);
+        AcDbPolyline* pProfile = m08gMakeRectProfile(w, h);
+        AcDbSurface* pSurf = nullptr;
+        Acad::ErrorStatus es = AcDbSurface::createFrom(pProfile, pSurf);
+        delete pProfile;
+        if (es != Acad::eOk || pSurf == nullptr) { delete pSurf; emitNativeError(r, "SURFACE_CREATE_FAILED", "AcDbSurface::createFrom errorstatus " + std::to_string(static_cast<int>(es))); return true; }
+        AcDbObjectId id; int ms = 0; es = m08gAppendEntity(pDb, layer, pSurf, id, ms);
+        m08gEmitModelerCreate(r, "AcDbSurface", es, id, layer, ms);
+        return true;
+    }
+    if (op == "write.entity.nurbsurface") {
+        AcGePoint3dArray cps;
+        cps.append(AcGePoint3d(0.0, 0.0, 0.0)); cps.append(AcGePoint3d(1.0, 0.0, 0.0));
+        cps.append(AcGePoint3d(0.0, 1.0, 0.0)); cps.append(AcGePoint3d(1.0, 1.0, 0.0));
+        AcGeDoubleArray weights; weights.append(1.0); weights.append(1.0); weights.append(1.0); weights.append(1.0);
+        AcGeKnotVector uKnots; uKnots.append(0.0); uKnots.append(0.0); uKnots.append(1.0); uKnots.append(1.0);
+        AcGeKnotVector vKnots; vKnots.append(0.0); vKnots.append(0.0); vKnots.append(1.0); vKnots.append(1.0);
+        AcDbNurbSurface* pE = new AcDbNurbSurface();
+        pE->setDatabaseDefaults(pDb);
+        Acad::ErrorStatus es = pE->set(1, 1, false, 2, 2, cps, weights, uKnots, vKnots);
+        if (es != Acad::eOk) { delete pE; emitNativeError(r, "NURBSURFACE_SET_FAILED", "AcDbNurbSurface::set errorstatus " + std::to_string(static_cast<int>(es))); return true; }
+        AcDbObjectId id; int ms = 0; es = m08gAppendEntity(pDb, layer, pE, id, ms);
+        m08gEmitModelerCreate(r, "AcDbNurbSurface", es, id, layer, ms);
+        return true;
+    }
+    if (op == "write.entity.subdmesh") {
+        double x = 1.0, y = 1.0, z = 1.0; jsonFindNumber(job, "x_len", x); jsonFindNumber(job, "y_len", y); jsonFindNumber(job, "z_len", z);
+        AcDbSubDMesh* pE = new AcDbSubDMesh();
+        pE->setDatabaseDefaults(pDb);
+        Acad::ErrorStatus es = pE->setBox(x, y, z, 1, 1, 1, 0);
+        if (es != Acad::eOk) { delete pE; emitNativeError(r, "SUBDMESH_SET_FAILED", "AcDbSubDMesh::setBox errorstatus " + std::to_string(static_cast<int>(es))); return true; }
+        AcDbObjectId id; int ms = 0; es = m08gAppendEntity(pDb, layer, pE, id, ms);
+        m08gEmitModelerCreate(r, "AcDbSubDMesh", es, id, layer, ms);
+        return true;
+    }
+    if (op == "write.entity.mpolygon") {
+        AcGePoint2dArray verts;
+        if (!m08gRead2dVertices(job, verts)) {
+            verts.append(AcGePoint2d(0.0, 0.0)); verts.append(AcGePoint2d(1.0, 0.0)); verts.append(AcGePoint2d(1.0, 1.0)); verts.append(AcGePoint2d(0.0, 1.0));
+        }
+        AcGeDoubleArray bulges; for (int i = 0; i < verts.length(); ++i) bulges.append(0.0);
+        AcDbMPolygon* pE = new AcDbMPolygon();
+        pE->setDatabaseDefaults(pDb);
+        pE->setNormal(AcGeVector3d(0.0, 0.0, 1.0));
+        pE->setElevation(0.0);
+        Acad::ErrorStatus es = pE->setPattern(AcDbHatch::kPreDefined, L"SOLID");
+        if (es == Acad::eOk) es = pE->appendMPolygonLoop(verts, bulges, true);
+        if (es == Acad::eOk) es = pE->evaluateHatch();
+        if (es == Acad::eOk) es = pE->balanceDisplay();
+        if (es != Acad::eOk) { delete pE; emitNativeError(r, "MPOLYGON_BUILD_FAILED", "AcDbMPolygon build errorstatus " + std::to_string(static_cast<int>(es))); return true; }
+        AcDbObjectId id; int ms = 0; es = m08gAppendEntity(pDb, layer, pE, id, ms);
+        m08gEmitModelerCreate(r, "AcDbMPolygon", es, id, layer, ms);
+        return true;
+    }
+    if (op == "write.entity.rasterimage") {
+        std::string imagePath; if (!jsonFindString(job, "image_path", imagePath) || imagePath.empty()) { emitNativeError(r, "MISSING_ARG", "write.entity.rasterimage requires image_path"); return true; }
+        AcDbObjectId dictId = AcDbRasterImageDef::imageDictionary(pDb);
+        Acad::ErrorStatus es = Acad::eOk;
+        if (dictId.isNull()) es = AcDbRasterImageDef::createImageDictionary(pDb, dictId);
+        if (es != Acad::eOk || dictId.isNull()) { emitNativeError(r, "IMAGE_DICT_FAILED", "image dictionary errorstatus " + std::to_string(static_cast<int>(es))); return true; }
+        AcDbDictionary* pDict = nullptr;
+        if (acdbOpenObject(pDict, dictId, AcDb::kForWrite) != Acad::eOk || pDict == nullptr) { emitNativeError(r, "IMAGE_DICT_OPEN_FAILED", "could not open image dictionary"); return true; }
+        AcDbRasterImageDef* pDef = new AcDbRasterImageDef();
+        pDef->setSourceFileName(utf8ToWide(imagePath).c_str());
+        pDef->setActiveFileName(utf8ToWide(imagePath).c_str());
+        std::string name = "ARIADNE_IMAGE";
+        jsonFindString(job, "name", name);
+        AcDbObjectId defId;
+        es = pDict->setAt(utf8ToWide(name).c_str(), pDef, defId);
+        pDict->close();
+        if (es == Acad::eOk) pDef->close(); else { delete pDef; emitNativeError(r, "IMAGE_DEF_FAILED", "image def setAt errorstatus " + std::to_string(static_cast<int>(es))); return true; }
+        AcGePoint3d origin; m08gPoint(job, "position", 0.0, 0.0, 0.0, origin);
+        double w = 1.0, h = 1.0; jsonFindNumber(job, "width", w); jsonFindNumber(job, "height", h);
+        AcDbRasterImage* pE = new AcDbRasterImage();
+        pE->setDatabaseDefaults(pDb);
+        pE->setImageDefId(defId);
+        pE->setOrientation(origin, AcGeVector3d(w, 0.0, 0.0), AcGeVector3d(0.0, h, 0.0));
+        AcGeVector2d sz(w, h); pE->setClipBoundaryToWholeImage(sz);
+        AcDbObjectId id; int ms = 0; es = m08gAppendEntity(pDb, layer, pE, id, ms);
+        m08gEmitModelerCreate(r, "AcDbRasterImage", es, id, layer, ms);
+        return true;
+    }
+    if (op == "write.entity.wipeout") {
+        AcGePoint2dArray verts;
+        if (!m08gRead2dVertices(job, verts)) { verts.append(AcGePoint2d(0.0, 0.0)); verts.append(AcGePoint2d(1.0, 0.0)); verts.append(AcGePoint2d(1.0, 1.0)); verts.append(AcGePoint2d(0.0, 1.0)); }
+        Acad::ErrorStatus es = AcDbWipeout::createImageDefinition();
+        if (es != Acad::eOk && es != Acad::eAlreadyInDb) { emitNativeError(r, "WIPEOUT_DEF_FAILED", "AcDbWipeout::createImageDefinition errorstatus " + std::to_string(static_cast<int>(es))); return true; }
+        AcDbWipeout* pE = new AcDbWipeout();
+        pE->setDatabaseDefaults(pDb);
+        pE->setOrientation(AcGePoint3d(0.0, 0.0, 0.0), AcGeVector3d(1.0, 0.0, 0.0), AcGeVector3d(0.0, 1.0, 0.0));
+        es = pE->setClipBoundary(AcDbRasterImage::kPoly, verts);
+        if (es != Acad::eOk) { delete pE; emitNativeError(r, "WIPEOUT_CLIP_FAILED", "setClipBoundary errorstatus " + std::to_string(static_cast<int>(es))); return true; }
+        AcDbObjectId id; int ms = 0; es = m08gAppendEntity(pDb, layer, pE, id, ms);
+        m08gEmitModelerCreate(r, "AcDbWipeout", es, id, layer, ms);
+        return true;
+    }
+
     //========================================================================
     // modify / geometry-edit
     //========================================================================
@@ -968,6 +1225,37 @@ static bool m08gDispatch(const std::string& op, const AriadneJobCtx& ctx, std::o
           << ",\"source\":" << njsonStr(handle)
           << ",\"modelspace_entities_after\":" << ms << "},"
           << "\"status\":\"ok\"}";
+        return true;
+    }
+    if (op == "modify.entity.solid3d.boolean") {
+        std::string handle, otherHandle;
+        if (!m08gFindHandle(job, handle)) { emitNativeError(r, "MISSING_ARG", "modify.entity.solid3d.boolean requires handle"); return true; }
+        if (!jsonFindString(job, "other_handle", otherHandle) || otherHandle.empty()) { emitNativeError(r, "MISSING_ARG", "modify.entity.solid3d.boolean requires other_handle"); return true; }
+        AcDbEntity* pEnt = m08gOpenEntityForWrite(pDb, handle);
+        AcDb3dSolid* pSolid = AcDb3dSolid::cast(pEnt);
+        if (pSolid == nullptr) { if (pEnt) pEnt->close(); emitNativeError(r, "INVALID_INPUT", "target handle is not AcDb3dSolid"); return true; }
+        AcDbObjectId otherId;
+        if (!resolveHandle(pDb, otherHandle, otherId)) { pSolid->close(); emitNativeError(r, "ENTITY_NOT_FOUND", "other_handle not found"); return true; }
+        AcDbEntity* pOtherEnt = nullptr;
+        if (acdbOpenObject(pOtherEnt, otherId, AcDb::kForRead) != Acad::eOk || pOtherEnt == nullptr) { pSolid->close(); emitNativeError(r, "ENTITY_NOT_FOUND", "could not open other_handle"); return true; }
+        AcDb3dSolid* pOther = AcDb3dSolid::cast(pOtherEnt);
+        if (pOther == nullptr) { pOtherEnt->close(); pSolid->close(); emitNativeError(r, "INVALID_INPUT", "other_handle is not AcDb3dSolid"); return true; }
+        AcDb3dSolid* pClone = AcDb3dSolid::cast(pOther->clone());
+        pOther->close();
+        if (pClone == nullptr) { pSolid->close(); emitNativeError(r, "CLONE_FAILED", "could not clone boolean operand"); return true; }
+        std::string boolOp; jsonFindString(job, "bool_op", boolOp); if (boolOp.empty()) boolOp = "unite";
+        AcDb::BoolOperType bop = AcDb::kBoolUnite;
+        if (boolOp == "subtract" || boolOp == "difference") bop = AcDb::kBoolSubtract;
+        else if (boolOp == "intersect" || boolOp == "intersection") bop = AcDb::kBoolIntersect;
+        const Acad::ErrorStatus es = pSolid->booleanOper(bop, pClone);
+        delete pClone;
+        pSolid->close();
+        r << "\"result\":{\"modified\":" << (es == Acad::eOk ? "true" : "false")
+          << ",\"errorstatus\":" << static_cast<int>(es)
+          << ",\"handle\":" << njsonStr(handle)
+          << ",\"other_handle\":" << njsonStr(otherHandle)
+          << ",\"bool_op\":" << njsonStr(boolOp) << "},"
+          << "\"status\":\"" << (es == Acad::eOk ? "ok" : "error") << "\"}";
         return true;
     }
     if (op == "modify.curve.offset") {

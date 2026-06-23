@@ -2,9 +2,9 @@
 
 - packet: `CADOS_M08_FULL_OPERATION_COVERAGE_CLOSURE`
 - generated_from: `config/operations.v2.json`
-- total operations: **517** · implemented 402 · stub 0 · blocked 9 · catalogued 106 · deprecated 0 · **unknown 0**
-- v1-target: **411** (implemented 402 · blocked 9 · **deferred 0**)
-- agent-exposed ops: 402
+- total operations: **517** · implemented 423 · stub 0 · blocked 9 · catalogued 85 · deprecated 0 · **unknown 0**
+- v1-target: **432** (implemented 423 · blocked 9 · **deferred 0**)
+- agent-exposed ops: 423
 
 ## Gate
 
@@ -32,7 +32,7 @@
 | validate_diff | 3 | 0 | 0 | 0 | 3 |
 | render_visual | 11 | 0 | 0 | 1 | 11 |
 | live | 6 | 0 | 1 | 0 | 7 |
-| native_only | 316 | 0 | 5 | 100 | 321 |
+| native_only | 337 | 0 | 5 | 79 | 342 |
 
 ## Risk class distribution
 
@@ -159,6 +159,14 @@
 | define.assocgeomdependency.subent | constraints_associativity | implemented | staged_write | write_copy | True | m08kcDispatch |  |
 | define.assocnetwork.addAction | constraints_associativity | implemented | staged_write | write_copy | True | m08kcDispatch |  |
 | define.assocvaluedependency.value | constraints_associativity | implemented | staged_write | write_copy | True | m08kcDispatch |  |
+| define.constraint.addGeometry | constraints_associativity | implemented | staged_write | write_copy | True | m08kcDispatch |  |
+| define.constraint.autoConstrain | constraints_associativity | implemented | live_edit | live_edit | True | m08kcDispatch |  |
+| define.constraint.dimensional.angle | constraints_associativity | implemented | staged_write | write_copy | True | m08kcDispatch |  |
+| define.constraint.dimensional.distance | constraints_associativity | implemented | staged_write | write_copy | True | m08kcDispatch |  |
+| define.constraint.dimensional.radiusDiameter | constraints_associativity | implemented | staged_write | write_copy | True | m08kcDispatch |  |
+| define.constraint.geometric | constraints_associativity | implemented | staged_write | write_copy | True | m08kcDispatch |  |
+| define.constraint.group | constraints_associativity | implemented | staged_write | write_copy | True | m08kcDispatch |  |
+| define.dimassoc.geometryDriven | constraints_associativity | implemented | live_edit | live_edit | True | m08kcDispatch |  |
 | define.georef.subent | constraints_associativity | implemented | staged_write | write_copy | True | m08kcDispatch |  |
 | define.parameter.merge | constraints_associativity | implemented | staged_write | write_copy | True | m08kcDispatch |  |
 | define.parameter.variable | constraints_associativity | implemented | staged_write | write_copy | True | m08kcDispatch |  |
@@ -266,6 +274,7 @@
 | write.entity.attribdef | entities | implemented | staged_write | write_copy | True | m08gDispatch |  |
 | write.entity.attribute | entities | implemented | staged_write | write_copy | True | m08gDispatch |  |
 | write.entity.blockref | entities | implemented | staged_write | write_copy | True | m08gDispatch |  |
+| write.entity.body | entities | implemented | staged_write | write_copy | True | m08gDispatch |  |
 | write.entity.dim.aligned | entities | implemented | staged_write | write_copy | True | m08hDispatch |  |
 | write.entity.dim.angular2line | entities | implemented | staged_write | write_copy | True | m08hDispatch |  |
 | write.entity.dim.angular3pt | entities | implemented | staged_write | write_copy | True | m08hDispatch |  |
@@ -282,19 +291,30 @@
 | write.entity.minsert | entities | implemented | staged_write | write_copy | True | m08gDispatch |  |
 | write.entity.mleader | entities | implemented | staged_write | write_copy | True | m08hDispatch |  |
 | write.entity.mline | entities | implemented | staged_write | write_copy | True | m08gDispatch |  |
+| write.entity.mpolygon | entities | implemented | staged_write | write_copy | True | m08gDispatch |  |
 | write.entity.mtext | entities | implemented | staged_write | write_copy | True | m08hDispatch |  |
+| write.entity.nurbsurface | entities | implemented | staged_write | write_copy | True | m08gDispatch |  |
 | write.entity.polyfacemesh | entities | implemented | staged_write | write_copy | True | m08gDispatch |  |
 | write.entity.polygonmesh | entities | implemented | staged_write | write_copy | True | m08gDispatch |  |
 | write.entity.polyline2d | entities | implemented | staged_write | write_copy | True | m08gDispatch |  |
 | write.entity.polyline3d | entities | implemented | staged_write | write_copy | True | m08gDispatch |  |
+| write.entity.rasterimage | entities | implemented | staged_write | write_copy | True | m08gDispatch |  |
 | write.entity.ray | entities | implemented | staged_write | write_copy | True | m08gDispatch |  |
 | write.entity.region | entities | implemented | staged_write | write_copy | True | m08gDispatch |  |
 | write.entity.shape | entities | implemented | staged_write | write_copy | True | m08gDispatch |  |
 | write.entity.solid2d | entities | implemented | staged_write | write_copy | True | m08gDispatch |  |
+| write.entity.solid3d.extrude | entities | implemented | staged_write | write_copy | True | m08gDispatch |  |
+| write.entity.solid3d.loft | entities | implemented | staged_write | write_copy | True | m08gDispatch |  |
+| write.entity.solid3d.primitive | entities | implemented | staged_write | write_copy | True | m08gDispatch |  |
+| write.entity.solid3d.revolve | entities | implemented | staged_write | write_copy | True | m08gDispatch |  |
+| write.entity.solid3d.sweep | entities | implemented | staged_write | write_copy | True | m08gDispatch |  |
 | write.entity.spline | entities | implemented | staged_write | write_copy | True | m08gDispatch |  |
+| write.entity.subdmesh | entities | implemented | staged_write | write_copy | True | m08gDispatch |  |
+| write.entity.surface | entities | implemented | staged_write | write_copy | True | m08gDispatch |  |
 | write.entity.table | entities | implemented | staged_write | write_copy | True | m08hDispatch |  |
 | write.entity.text | entities | implemented | staged_write | write_copy | True | m08hDispatch |  |
 | write.entity.trace | entities | implemented | staged_write | write_copy | True | m08gDispatch |  |
+| write.entity.wipeout | entities | implemented | staged_write | write_copy | True | m08gDispatch |  |
 | write.entity.xline | entities | implemented | staged_write | write_copy | True | m08gDispatch |  |
 | extend.customclass.create | extend | implemented | live_edit | live_edit | True | createCustomEntity |  |
 | extend.customobject.create | extend | implemented | live_edit | live_edit | True | createCustomObject |  |
@@ -316,6 +336,7 @@
 | compute.geometry.surface.nurb | geometry_kernel | implemented | read_safe | read | True | m08dDispatch |  |
 | compute.geometry.tolerance | geometry_kernel | implemented | read_safe | read | True | m08dDispatch |  |
 | compute.solid3d.interference | geometry_kernel | implemented | staged_write | write_copy | True | m08dDispatch |  |
+| modify.entity.solid3d.boolean | geometry_kernel | implemented | staged_write | write_copy | True | m08gDispatch |  |
 | modify.entity.transform | geometry_kernel | implemented | staged_write | write_copy | True | m08gDispatch |  |
 | write.entity.circle | geometry_kernel | implemented | staged_write | write_copy | True | appendCircle |  |
 | write.entity.line | geometry_kernel | implemented | staged_write | write_copy | True | appendLine |  |
@@ -459,4 +480,4 @@
 | write.layout.create | write | implemented | staged_write | write_copy | True | createLayout |  |
 | write.xdata.set | write | implemented | staged_write | write_copy | True | setDatabaseXdata |  |
 
-> Full 517-operation detail (all 13 fields per op) is in `reports/operation_coverage_full_matrix.json` — this table lists only the 411 v1-target ops. The 106 catalogued ops are classified future-version native capability (v1_target=false), not omitted.
+> Full 517-operation detail (all 13 fields per op) is in `reports/operation_coverage_full_matrix.json` — this table lists only the 432 v1-target ops. The 85 catalogued ops are classified future-version native capability (v1_target=false), not omitted.

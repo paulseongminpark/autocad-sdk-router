@@ -51,6 +51,7 @@
 #include "AcDbAssocArrayActionBody.h" // AcDbAssocArrayActionBody::isAssociativeArray
 #include "AcDbCompoundObjectId.h"     // AcDbCompoundObjectId (setDependentOnObject arg)
 #include "dbeval.h"                   // AcDbEvalVariant (variable / value-param value)
+#include "dbdimassoc.h"               // AcDbDimAssoc
 
 //============================================================================
 // M08KC shared helpers (file-scope statics; m08kc-prefixed to avoid any collision
@@ -93,6 +94,85 @@ static AcDbObjectId m08kcTopNetworkId(AcDbDatabase* pDb, bool createIfMissing)
     if (pDb == nullptr)
         return AcDbObjectId::kNull;
     return AcDbAssocNetwork::getInstanceFromDatabase(pDb, createIfMissing, ACRX_T(""));
+}
+
+static bool m08kcMakeFullSubentPath(AcDbDatabase* pDb, const std::string& handleHex,
+                                    const std::string& subentType, int subentIndex,
+                                    AcDbFullSubentPath& outPath)
+{
+    AcDbObjectId entId;
+    if (!resolveHandle(pDb, handleHex, entId))
+        return false;
+    AcDbObjectIdArray ids;
+    ids.append(entId);
+    AcDb::SubentType typ = AcDb::kEdgeSubentType;
+    if (subentType == "vertex")
+        typ = AcDb::kVertexSubentType;
+    if (subentIndex <= 0)
+        subentIndex = 1;
+    outPath = AcDbFullSubentPath(ids, AcDbSubentId(typ, subentIndex));
+    return true;
+}
+
+static Acad::ErrorStatus m08kcCreateConstraintGroup(AcDbDatabase* pDb, AcDbObjectId& groupId)
+{
+    groupId = AcDbObjectId::kNull;
+    AcDbAssocNetworkEvaluationDisabler guard(pDb, true);
+    const AcDbObjectId netId = m08kcTopNetworkId(pDb, true);
+    if (netId.isNull())
+        return Acad::eNullObjectId;
+    AcDbAssoc2dConstraintGroup* pGroup = new AcDbAssoc2dConstraintGroup(AcGePlane::kXYPlane);
+    Acad::ErrorStatus es = pDb->addAcDbObject(groupId, pGroup);
+    if (es != Acad::eOk || groupId.isNull()) {
+        delete pGroup;
+        return es;
+    }
+    AcDbAssocNetwork* pNet = nullptr;
+    if (acdbOpenObject(pNet, netId, AcDb::kForWrite) != Acad::eOk || pNet == nullptr) {
+        pGroup->close();
+        return Acad::eNullObjectPointer;
+    }
+    es = pNet->addAction(groupId, true);
+    pNet->close();
+    pGroup->close();
+    return es;
+}
+
+static AcDbAssoc2dConstraintGroup* m08kcOpenOrCreateGroup(AcDbDatabase* pDb, const std::string& job,
+                                                          AcDbObjectId& groupId, Acad::ErrorStatus& es)
+{
+    groupId = AcDbObjectId::kNull;
+    std::string groupHex;
+    if (m08kcFindHandle(job, "group_handle", groupHex) || m08kcFindHandle(job, "constraint_group_handle", groupHex)) {
+        if (!resolveHandle(pDb, groupHex, groupId)) { es = Acad::eNullObjectId; return nullptr; }
+    } else {
+        es = m08kcCreateConstraintGroup(pDb, groupId);
+        if (es != Acad::eOk)
+            return nullptr;
+    }
+    AcDbObject* pObj = nullptr;
+    es = acdbOpenObject(pObj, groupId, AcDb::kForWrite);
+    if (es != Acad::eOk || pObj == nullptr)
+        return nullptr;
+    AcDbAssoc2dConstraintGroup* pGroup = AcDbAssoc2dConstraintGroup::cast(pObj);
+    if (pGroup == nullptr) {
+        pObj->close();
+        es = Acad::eNotThatKindOfClass;
+        return nullptr;
+    }
+    return pGroup;
+}
+
+static Acad::ErrorStatus m08kcAddGeometryForHandle(AcDbDatabase* pDb, AcDbAssoc2dConstraintGroup* pGroup,
+                                                   const std::string& handleHex, AcConstrainedGeometry*& pGeom)
+{
+    pGeom = nullptr;
+    std::string subType = "edge";
+    int subIndex = 1;
+    AcDbFullSubentPath path;
+    if (!m08kcMakeFullSubentPath(pDb, handleHex, subType, subIndex, path))
+        return Acad::eNullObjectId;
+    return pGroup->addConstrainedGeometry(path, pGeom);
 }
 
 // Open an AcDbObject by hex handle for the requested mode. Caller closes. nullptr on miss.
@@ -141,7 +221,15 @@ static bool m08kcHasOp(const std::string& op)
         op == "define.assocvaluedependency.value" ||
         op == "define.georef.subent" ||
         op == "define.perssubentid.resolve" ||
-        // constraints (read + delete only) (5)
+        // constraints (read + delete + Wave3 authoring) (13)
+        op == "define.constraint.group" ||
+        op == "define.constraint.addGeometry" ||
+        op == "define.constraint.geometric" ||
+        op == "define.constraint.autoConstrain" ||
+        op == "define.constraint.dimensional.distance" ||
+        op == "define.constraint.dimensional.angle" ||
+        op == "define.constraint.dimensional.radiusDiameter" ||
+        op == "define.dimassoc.geometryDriven" ||
         op == "edit.constraint.delete" ||
         op == "inspect.constraint.enumerate" ||
         op == "inspect.constraint.node" ||
@@ -166,6 +254,126 @@ static bool m08kcDispatch(const std::string& op, const AriadneJobCtx& ctx, std::
 
     AcDbDatabase* pDb = ctx.pDb;
     const std::string& job = ctx.job;
+
+    //========================================================================
+    // Wave3 Pane2 constraint authoring (solver not top-level evaluated here)
+    //========================================================================
+    if (op == "define.constraint.group") {
+        AcDbObjectId groupId;
+        const Acad::ErrorStatus es = m08kcCreateConstraintGroup(pDb, groupId);
+        if (es != Acad::eOk) { emitNativeError(r, "CONSTRAINT_GROUP_FAILED", "create constraint group errorstatus " + std::to_string(static_cast<int>(es))); return true; }
+        r << "\"result\":{\"created\":true"
+          << ",\"group_handle\":" << njsonStr(handleOfId(groupId))
+          << ",\"evaluated\":false},\"status\":\"ok\"}";
+        return true;
+    }
+    if (op == "define.constraint.addGeometry") {
+        std::string targetHex;
+        if (!m08kcFindHandle(job, "target_handle", targetHex) && !m08kcFindHandle(job, "handle", targetHex)) { emitNativeError(r, "MISSING_ARG", "define.constraint.addGeometry requires target_handle"); return true; }
+        AcDbObjectId groupId; Acad::ErrorStatus es = Acad::eOk;
+        AcDbAssoc2dConstraintGroup* pGroup = m08kcOpenOrCreateGroup(pDb, job, groupId, es);
+        if (pGroup == nullptr) { emitNativeError(r, "CONSTRAINT_GROUP_FAILED", "open/create group errorstatus " + std::to_string(static_cast<int>(es))); return true; }
+        AcDbAssocNetworkEvaluationDisabler guard(pDb, true);
+        AcConstrainedGeometry* pGeom = nullptr;
+        es = m08kcAddGeometryForHandle(pDb, pGroup, targetHex, pGeom);
+        const ACHAR* geomClass = (pGeom != nullptr && pGeom->isA() != nullptr) ? pGeom->isA()->name() : nullptr;
+        pGroup->close();
+        if (es != Acad::eOk && es != Acad::eAlreadyInGroup) { emitNativeError(r, "ADD_GEOMETRY_FAILED", "addConstrainedGeometry errorstatus " + std::to_string(static_cast<int>(es))); return true; }
+        r << "\"result\":{\"added\":true"
+          << ",\"already_in_group\":" << (es == Acad::eAlreadyInGroup ? "true" : "false")
+          << ",\"group_handle\":" << njsonStr(handleOfId(groupId))
+          << ",\"target_handle\":" << njsonStr(targetHex)
+          << ",\"geometry_class\":" << njsonStr(geomClass)
+          << ",\"evaluated\":false},\"status\":\"ok\"}";
+        return true;
+    }
+    if (op == "define.constraint.geometric" || op == "define.constraint.autoConstrain") {
+        std::string targetHex, targetHex2;
+        if (!m08kcFindHandle(job, "target_handle", targetHex) && !m08kcFindHandle(job, "handle", targetHex)) { emitNativeError(r, "MISSING_ARG", op + " requires target_handle"); return true; }
+        m08kcFindHandle(job, "target_handle2", targetHex2);
+        AcDbObjectId groupId; Acad::ErrorStatus es = Acad::eOk;
+        AcDbAssoc2dConstraintGroup* pGroup = m08kcOpenOrCreateGroup(pDb, job, groupId, es);
+        if (pGroup == nullptr) { emitNativeError(r, "CONSTRAINT_GROUP_FAILED", "open/create group errorstatus " + std::to_string(static_cast<int>(es))); return true; }
+        AcDbAssocNetworkEvaluationDisabler guard(pDb, true);
+        AcDbFullSubentPathArray paths;
+        AcDbFullSubentPath p1;
+        if (m08kcMakeFullSubentPath(pDb, targetHex, "edge", 1, p1)) paths.append(p1);
+        AcDbFullSubentPath p2;
+        if (!targetHex2.empty() && m08kcMakeFullSubentPath(pDb, targetHex2, "edge", 1, p2)) paths.append(p2);
+        if (paths.length() == 0) { pGroup->close(); emitNativeError(r, "TARGET_NOT_FOUND", "no valid constrained paths"); return true; }
+        if (op == "define.constraint.autoConstrain") {
+            AcGeTol tol;
+            es = pGroup->autoConstrain(paths, tol, nullptr);
+        } else {
+            std::string type; jsonFindString(job, "constraint_type", type);
+            AcGeomConstraint::GeomConstraintType gtype = AcGeomConstraint::kHorizontal;
+            if (type == "vertical") gtype = AcGeomConstraint::kVertical;
+            else if (type == "parallel") gtype = AcGeomConstraint::kParallel;
+            else if (type == "perpendicular") gtype = AcGeomConstraint::kPerpendicular;
+            else if (type == "coincident") gtype = AcGeomConstraint::kCoincident;
+            AcGeomConstraint* pNew = nullptr;
+            es = pGroup->addGeometricalConstraint(gtype, paths, &pNew, nullptr);
+        }
+        pGroup->close();
+        if (es != Acad::eOk && es != Acad::eAlreadyInGroup) { emitNativeError(r, "CONSTRAINT_CREATE_FAILED", op + " errorstatus " + std::to_string(static_cast<int>(es))); return true; }
+        r << "\"result\":{\"created\":true"
+          << ",\"errorstatus\":" << static_cast<int>(es)
+          << ",\"group_handle\":" << njsonStr(handleOfId(groupId))
+          << ",\"path_count\":" << paths.length()
+          << ",\"evaluated\":false},\"status\":\"ok\"}";
+        return true;
+    }
+    if (op == "define.constraint.dimensional.distance" || op == "define.constraint.dimensional.angle" || op == "define.constraint.dimensional.radiusDiameter") {
+        std::string h1, h2;
+        if (!m08kcFindHandle(job, "target_handle", h1) && !m08kcFindHandle(job, "handle", h1)) { emitNativeError(r, "MISSING_ARG", op + " requires target_handle"); return true; }
+        m08kcFindHandle(job, "target_handle2", h2);
+        AcDbObjectId groupId; Acad::ErrorStatus es = Acad::eOk;
+        AcDbAssoc2dConstraintGroup* pGroup = m08kcOpenOrCreateGroup(pDb, job, groupId, es);
+        if (pGroup == nullptr) { emitNativeError(r, "CONSTRAINT_GROUP_FAILED", "open/create group errorstatus " + std::to_string(static_cast<int>(es))); return true; }
+        AcDbAssocNetworkEvaluationDisabler guard(pDb, true);
+        AcConstrainedGeometry* g1 = nullptr; AcConstrainedGeometry* g2 = nullptr;
+        es = m08kcAddGeometryForHandle(pDb, pGroup, h1, g1);
+        if (es == Acad::eAlreadyInGroup) es = Acad::eOk;
+        if (es == Acad::eOk && !h2.empty()) { es = m08kcAddGeometryForHandle(pDb, pGroup, h2, g2); if (es == Acad::eAlreadyInGroup) es = Acad::eOk; }
+        if (es == Acad::eOk) {
+            if (op == "define.constraint.dimensional.distance") {
+                AcDistanceConstraint* pC = nullptr;
+                es = pGroup->addDistanceConstraint(g1, g2 != nullptr ? g2 : g1, AcDistanceConstraint::kNotDirected, AcDbObjectId::kNull, AcDbObjectId::kNull, nullptr, nullptr, &pC);
+            } else if (op == "define.constraint.dimensional.angle") {
+                AcConstrainedLine* l1 = AcConstrainedLine::cast(g1);
+                AcConstrainedLine* l2 = AcConstrainedLine::cast(g2);
+                if (l1 == nullptr || l2 == nullptr) es = Acad::eInvalidInput;
+                else { AcAngleConstraint* pC = nullptr; es = pGroup->addAngleConstraint(l1, l2, AcAngleConstraint::kParallelAntiClockwise, AcDbObjectId::kNull, AcDbObjectId::kNull, &pC); }
+            } else {
+                AcRadiusDiameterConstraint* pC = nullptr;
+                es = pGroup->addRadiusDiameterConstraint(g1, AcRadiusDiameterConstraint::kCircleRadius, AcDbObjectId::kNull, AcDbObjectId::kNull, &pC);
+            }
+        }
+        pGroup->close();
+        if (es != Acad::eOk && es != Acad::eAlreadyInGroup) { emitNativeError(r, "DIMENSIONAL_CONSTRAINT_FAILED", op + " errorstatus " + std::to_string(static_cast<int>(es))); return true; }
+        r << "\"result\":{\"created\":true"
+          << ",\"errorstatus\":" << static_cast<int>(es)
+          << ",\"group_handle\":" << njsonStr(handleOfId(groupId))
+          << ",\"target_handle\":" << njsonStr(h1)
+          << ",\"target_handle2\":" << njsonStr(h2)
+          << ",\"evaluated\":false},\"status\":\"ok\"}";
+        return true;
+    }
+    if (op == "define.dimassoc.geometryDriven") {
+        std::string dimHex;
+        if (!m08kcFindHandle(job, "dimension_handle", dimHex) && !m08kcFindHandle(job, "handle", dimHex)) { emitNativeError(r, "MISSING_ARG", "define.dimassoc.geometryDriven requires dimension_handle"); return true; }
+        AcDbObjectId dimId;
+        if (!resolveHandle(pDb, dimHex, dimId)) { emitNativeError(r, "DIMENSION_NOT_FOUND", "dimension handle not found"); return true; }
+        AcDbDimAssoc* pAssoc = new AcDbDimAssoc();
+        AcDbObjectId assocId;
+        Acad::ErrorStatus es = pAssoc->post(dimId, assocId, true);
+        if (es != Acad::eOk) { delete pAssoc; emitNativeError(r, "DIMASSOC_POST_FAILED", "AcDbDimAssoc::post errorstatus " + std::to_string(static_cast<int>(es))); return true; }
+        r << "\"result\":{\"created\":true"
+          << ",\"dimassoc_handle\":" << njsonStr(handleOfId(assocId))
+          << ",\"dimension_handle\":" << njsonStr(dimHex)
+          << ",\"geometry_driven\":true},\"status\":\"ok\"}";
+        return true;
+    }
 
     //========================================================================
     // assoc network / action lifecycle + read
