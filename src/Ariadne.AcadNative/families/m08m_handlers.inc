@@ -284,9 +284,6 @@ static bool m08mHasOp(const std::string& op)
         op == "extend.property.com_name" ||
         op == "extend.property.expose_to_com" ||
         op == "extend.property.filepath" ||
-        op == "extend.property.lmv" ||
-        op == "extend.property.dynamic_props" ||
-        op == "extend.property.type_promotion" ||
         // --- T02 reactors (DB / object / persistent / rxevent / linker — hostless attach+fire) ---
         op == "react.database.attach" ||
         op == "react.database.monitor" ||
@@ -639,8 +636,7 @@ static bool m08mDispatch(const std::string& op, const AriadneJobCtx& ctx, std::o
         op == "extend.property.default_value" || op == "extend.property.enum_tag" ||
         op == "extend.property.refers_to" || op == "extend.property.localize_name" ||
         op == "extend.property.com_name" || op == "extend.property.expose_to_com" ||
-        op == "extend.property.filepath" || op == "extend.property.lmv" ||
-        op == "extend.property.dynamic_props" || op == "extend.property.type_promotion") {
+        op == "extend.property.filepath") {
         std::string cname;
         AcRxClass* cls = m08mNewTransientClass(op.substr(op.rfind('.') + 1), cname);
         if (cls == nullptr) {
@@ -716,18 +712,6 @@ static bool m08mDispatch(const std::string& op, const AriadneJobCtx& ctx, std::o
         } else if (op == "extend.property.filepath") {
             attr = new AcRxFilePathAttribute();
             attrDesc = AcRxFilePathAttribute::desc(); attrName = "AcRxFilePathAttribute";
-        } else if (op == "extend.property.lmv") {
-            attr = new AcRxLMVAttribute();
-            attrDesc = AcRxLMVAttribute::desc(); attrName = "AcRxLMVAttribute";
-        } else if (op == "extend.property.dynamic_props") {
-            attr = new AcRxGenerateDynamicPropertiesAttribute();
-            attrDesc = AcRxGenerateDynamicPropertiesAttribute::desc();
-            attrName = "AcRxGenerateDynamicPropertiesAttribute";
-        } else if (op == "extend.property.type_promotion") {
-            std::string props; if (!m08mFindStr(job, "properties", props)) props = "Name";
-            const std::wstring w = asciiToWide(props);
-            attr = new AcRxTypePromotionAttribute(w.c_str());
-            attrDesc = AcRxTypePromotionAttribute::desc(); attrName = "AcRxTypePromotionAttribute";
         }
         if (attr == nullptr) {   // defensive: every branch above sets attr
             deleteAcRxClass(cls);
