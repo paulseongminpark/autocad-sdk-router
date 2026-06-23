@@ -25,6 +25,12 @@ ARIADNE_DBX_API Acad::ErrorStatus ariadneCreateRecordObject(
 
 ARIADNE_DBX_API bool ariadneIsRecordObject(const AcDbObject* object);
 
+ARIADNE_DBX_API Acad::ErrorStatus ariadneRecordValue(const AcDbObject* object, int* valueOut);
+
+ARIADNE_DBX_API Acad::ErrorStatus ariadneRecordSetValue(AcDbObject* object, int value);
+
+ARIADNE_DBX_API bool ariadneRecordPartialUndoAvailable();
+
 ARIADNE_DBX_API bool ariadneProbeProtocolAvailable();
 
 // M07A: count registered AcRxProperty members named "Size" on AriadneProbe::desc()

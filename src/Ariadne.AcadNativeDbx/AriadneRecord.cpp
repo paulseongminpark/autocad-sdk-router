@@ -2,6 +2,7 @@
 #include "AriadneRecord.h"
 
 static const Adesk::Int16 kAriadneRecordVersion = 1;
+static const Adesk::Int16 kAriadneRecordUndoSetValue = 100;
 
 ACRX_DXF_DEFINE_MEMBERS(
     AriadneRecord, AcDbObject,
@@ -33,9 +34,48 @@ Adesk::Int16 AriadneRecord::value() const
 
 Acad::ErrorStatus AriadneRecord::setValue(Adesk::Int16 value)
 {
-    assertWriteEnabled();
+    // Partial undo follows the ObjectARX SDK polysamp pattern: record the old
+    // value through the object's undo filer when AutoCAD supplies one, then make
+    // the mutation. applyPartialUndo replays through setValue(), which records
+    // the redo payload symmetrically.
+    assertWriteEnabled(Adesk::kFalse, Adesk::kTrue);
+    if (mValue == value)
+        return Acad::eOk;
+
+    AcDbDwgFiler* pUndo = undoFiler();
+    if (pUndo != NULL) {
+        pUndo->writeAddress(AriadneRecord::desc());
+        pUndo->writeItem(kAriadneRecordUndoSetValue);
+        pUndo->writeItem(mValue);
+    }
+
     mValue = value;
     return Acad::eOk;
+}
+
+Acad::ErrorStatus AriadneRecord::applyPartialUndo(AcDbDwgFiler* undoFiler, AcRxClass* classObj)
+{
+    if (classObj != AriadneRecord::desc())
+        return AcDbObject::applyPartialUndo(undoFiler, classObj);
+    if (undoFiler == NULL)
+        return Acad::eInvalidInput;
+
+    Adesk::Int16 opCode = 0;
+    Acad::ErrorStatus es = undoFiler->readItem(&opCode);
+    if (es != Acad::eOk)
+        return es;
+
+    switch (opCode) {
+    case kAriadneRecordUndoSetValue: {
+        Adesk::Int16 oldValue = 0;
+        es = undoFiler->readItem(&oldValue);
+        if (es != Acad::eOk)
+            return es;
+        return setValue(oldValue);
+    }
+    default:
+        return Acad::eInvalidInput;
+    }
 }
 
 Acad::ErrorStatus AriadneRecord::dwgOutFields(AcDbDwgFiler* filer) const

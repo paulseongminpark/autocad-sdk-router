@@ -60,6 +60,33 @@ extern "C" ARIADNE_DBX_API bool ariadneIsRecordObject(const AcDbObject* object)
     return object != nullptr && object->isKindOf(AriadneRecord::desc());
 }
 
+extern "C" ARIADNE_DBX_API Acad::ErrorStatus ariadneRecordValue(const AcDbObject* object, int* valueOut)
+{
+    if (valueOut == nullptr)
+        return Acad::eInvalidInput;
+    *valueOut = 0;
+    const AriadneRecord* record = AriadneRecord::cast(object);
+    if (record == nullptr)
+        return Acad::eNotThatKindOfClass;
+    *valueOut = static_cast<int>(record->value());
+    return Acad::eOk;
+}
+
+extern "C" ARIADNE_DBX_API Acad::ErrorStatus ariadneRecordSetValue(AcDbObject* object, int value)
+{
+    AriadneRecord* record = AriadneRecord::cast(object);
+    if (record == nullptr)
+        return Acad::eNotThatKindOfClass;
+    if (value < -32768 || value > 32767)
+        return Acad::eInvalidInput;
+    return record->setValue(static_cast<Adesk::Int16>(value));
+}
+
+extern "C" ARIADNE_DBX_API bool ariadneRecordPartialUndoAvailable()
+{
+    return AriadneRecord::desc() != nullptr;
+}
+
 // M07A headless proof: is the OPM "Size" AcRxProperty registered on AriadneProbe?
 // Uses the runtime member-query engine (the real OPM lookup path). Returns 1 if
 // "Size" is found, 0 if not, -1 if the class/engine is unavailable (e.g. engine

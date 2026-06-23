@@ -17,11 +17,10 @@ Intent (WHY):
   2. HASOP LISTS EXACTLY THE IMPLEMENTED SET -- guards a silent shrink (a refactor
      dropping ops) or a silent fake-grow (claiming ops with no handler).
 
-  3. DEFERRED IN-APP-CALLBACK OPS STAY OUT OF HASOP (honest contract) -- the in-app
-     behavior-callback ops (draw_world / draw_viewport / grips / osnap / stretch /
-     define / embedded / osnap.custom_mode / partial_undo / dxf-filer / demand_register)
-     fire inside a live editor or cannot be driven hostless. They must NOT be admitted by
-     HasOp (they keep returning OPERATION_NOT_IMPLEMENTED). NO FAKES.
+  3. WAVE3 CALLBACK OPS ARE REAL HANDLERS -- the former deferred custom entity/object
+     callbacks now have native class overrides plus m08k dispatcher branches. The only
+     claimed op kept out of HasOp is the install-time demand-register registry write,
+     which is hard-blocked in the registry/report for safety and Pane-1 deploy ownership.
 
   4. STAGED-WRITE-ONLY / NO ORIGINAL-WRITE / NO EDITOR-COMMAND (source-level) -- the
      family operates on the router-staged copy and rolls every scratch mutation back; it
@@ -50,7 +49,7 @@ _THIS = os.path.dirname(os.path.abspath(__file__))
 _REPO = os.path.dirname(os.path.dirname(_THIS))
 _INC = os.path.join(_REPO, "src", "Ariadne.AcadNative", "families", "m08k_handlers.inc")
 
-# --- IMPLEMENTED (33) -- the feasible-hostless subset, grouped ---------------
+# --- IMPLEMENTED (44) -- grouped --------------------------------------------
 _RTTI = [
     "inspect.runtime.cast",
     "inspect.runtime.desc",
@@ -78,13 +77,24 @@ _CLASS_REG = [
     "extend.object_enabler.register_classes",
 ]
 _OBJECT_LIFECYCLE = [
+    "extend.customobject.define",
+    "extend.customobject.embedded",
     "extend.customobject.filer_dwgout",
     "extend.customobject.filer_dwgin",
+    "extend.customobject.filer_dxfout",
+    "extend.customobject.filer_dxfin",
+    "extend.customobject.partial_undo",
     "extend.customobject.deepclone",
     "extend.customobject.wblockclone",
     "extend.customobject.version",
 ]
 _CUSTOM_ENTITY = [
+    "extend.customentity.define",
+    "extend.customentity.draw_world",
+    "extend.customentity.draw_viewport",
+    "extend.customentity.grips",
+    "extend.customentity.osnap",
+    "extend.customentity.stretch",
     "extend.customentity.db_defaults",
     "extend.customentity.geom_extents",
     "extend.customentity.explode",
@@ -93,25 +103,15 @@ _CUSTOM_ENTITY = [
     "extend.customentity.list",
     "extend.customentity.subentpaths",
 ]
+_CUSTOM_OSNAP = [
+    "extend.osnap.custom_mode",
+]
 
-_IMPLEMENTED = _RTTI + _PROTOCOL + _CLASS_REG + _OBJECT_LIFECYCLE + _CUSTOM_ENTITY
+_IMPLEMENTED = _RTTI + _PROTOCOL + _CLASS_REG + _OBJECT_LIFECYCLE + _CUSTOM_ENTITY + _CUSTOM_OSNAP
 
-# --- DEFERRED (must NOT appear in HasOp -- honest contract) ------------------
-# In-app behavior callbacks (fire in a live editor / graphics system) and non-hostless ops.
-_DEFERRED = [
-    "extend.customentity.define",        # defining a NEW compiled class body at runtime is not hostless
-    "extend.customobject.define",        # same
-    "extend.customentity.embedded",      # embedded-object live-edit
-    "extend.customentity.draw_world",    # AcGiWorldDraw callback -- fires in the graphics pipeline
-    "extend.customentity.draw_viewport", # AcGiViewportDraw callback -- per-viewport graphics
-    "extend.customentity.grips",         # grip-point editor protocol
-    "extend.customentity.osnap",         # interactive osnap callback
-    "extend.customentity.stretch",       # stretch (grip-edit) callback
-    "extend.osnap.custom_mode",          # custom osnap mode registration (editor)
-    "extend.customobject.partial_undo",  # applyPartialUndo fires during undo recording (not hostless)
-    "extend.customobject.filer_dxfin",   # DXF in-filer needs a DXF stream (no hostless source w/o file)
-    "extend.customobject.filer_dxfout",  # DXF out-filer would emit a file (forbidden on original)
-    "extend.object_enabler.demand_register",  # demand-load registry write (install-time, lisp tier)
+# --- HARD-BLOCKED (must NOT appear in HasOp; registry/report carries blocker) --
+_HARD_BLOCKED = [
+    "extend.object_enabler.demand_register",  # HKLM demand-load/canonical deploy is Pane 1 only
 ]
 
 # Invented / dead handler cleanup: this op was a teammate-added duplicate and must stay out
@@ -180,22 +180,21 @@ class TestM08KHandlers(unittest.TestCase):
         )
 
     def test_implemented_count(self):
-        # Group totals: RTTI=5, protocol=4, class-registration=11, object-lifecycle=5,
-        # custom-entity=7. 5+4+11+5+7 = 32 real handlers. The remaining ops of the 45-op
-        # brief are the 13 _DEFERRED in-app-callback / non-hostless ones -- left OUT of
-        # HasOp on purpose (no fake pass): 32 implemented + 13 deferred contract = honest.
+        # Group totals: RTTI=5, protocol=4, class-registration=11, object-lifecycle=10,
+        # custom-entity=13, custom-osnap=1. 5+4+11+10+13+1 = 44 real handlers.
         self.assertEqual(len(_RTTI), 5)
         self.assertEqual(len(_PROTOCOL), 4)
         self.assertEqual(len(_CLASS_REG), 11)
-        self.assertEqual(len(_OBJECT_LIFECYCLE), 5)
-        self.assertEqual(len(_CUSTOM_ENTITY), 7)
-        self.assertEqual(len(_IMPLEMENTED), 32)
-        self.assertEqual(len(set(_IMPLEMENTED)), 32, "duplicate op id in the implemented list")
-        self.assertEqual(len(self.hasop), 32)
+        self.assertEqual(len(_OBJECT_LIFECYCLE), 10)
+        self.assertEqual(len(_CUSTOM_ENTITY), 13)
+        self.assertEqual(len(_CUSTOM_OSNAP), 1)
+        self.assertEqual(len(_IMPLEMENTED), 44)
+        self.assertEqual(len(set(_IMPLEMENTED)), 44, "duplicate op id in the implemented list")
+        self.assertEqual(len(self.hasop), 44)
 
-    def test_no_deferred_op_in_hasop(self):
-        leaked = sorted(self.hasop & set(_DEFERRED))
-        self.assertEqual(leaked, [], "deferred/editor-bound ops leaked into m08kHasOp: %s" % leaked)
+    def test_hard_blocked_install_time_op_not_in_hasop(self):
+        leaked = sorted(self.hasop & set(_HARD_BLOCKED))
+        self.assertEqual(leaked, [], "hard-blocked install/deploy ops leaked into m08kHasOp: %s" % leaked)
 
     def test_no_drift_op_in_hasop(self):
         leaked = sorted(self.hasop & set(_DRIFT))
@@ -274,6 +273,16 @@ class TestM08KHandlers(unittest.TestCase):
             "acrxRegisterService",     # service registration
             "getGeomExtents",          # custom-entity geometry protocol
             "transformBy",             # custom-entity transform protocol
+            "worldDraw",               # custom-entity world draw callback
+            "viewportDraw",            # custom-entity viewport draw callback
+            "getGripPoints",           # custom-entity grip protocol
+            "moveGripPointsAt",        # custom-entity grip edit protocol
+            "getOsnapPoints",          # custom-entity osnap protocol
+            "getStretchPoints",        # custom-entity stretch protocol
+            "moveStretchPointsAt",     # custom-entity stretch edit protocol
+            "AcDbCustomOsnapInfo",     # custom osnap PE protocol
+            "addCustomOsnapMode",      # custom osnap manager registration
+            "applyPartialUndo",        # custom object partial undo override
             "getSubentPathsAtGsMarker",# subentity-path protocol
         ]:
             self.assertIn(token, self.code, "expected real ObjectARX call missing: %s" % token)

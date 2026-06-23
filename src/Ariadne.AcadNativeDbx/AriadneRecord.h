@@ -14,6 +14,7 @@ public:
     Adesk::Int16 value() const;
     Acad::ErrorStatus setValue(Adesk::Int16 value);
 
+    virtual Acad::ErrorStatus applyPartialUndo(AcDbDwgFiler* undoFiler, AcRxClass* classObj) override;
     virtual Acad::ErrorStatus dwgInFields(AcDbDwgFiler* filer) override;
     virtual Acad::ErrorStatus dwgOutFields(AcDbDwgFiler* filer) const override;
     virtual Acad::ErrorStatus dxfInFields(AcDbDxfFiler* filer) override;

@@ -2,6 +2,8 @@
 // AriadneProbe.cpp — implementation of the minimal Ariadne custom entity.
 //////////////////////////////////////////////////////////////////////////////
 #include <tchar.h>
+#include <windows.h>
+#include "dbgrip.h"
 #include "AriadneProbe.h"
 // OPM/AcRxProperty surface (M07A): expose AriadneProbe::size() as a runtime
 // property so the Properties palette (attended) and the headless member-query
@@ -190,14 +192,45 @@ Acad::ErrorStatus AriadneProbe::dxfInFields(AcDbDxfFiler* filer)
 }
 
 //----------------------------------------------------------------------------
-// Graphics — AcGi worldDraw (view-independent). Draw a circle marker of radius
-// mSize at mCenter, in the XY plane.
+// Graphics — AcGi worldDraw (view-independent). Compose the probe from a real
+// embedded AcDbCircle and forward its worldDraw. The persisted fields remain the
+// probe's center/size; the embedded circle is rebuilt on demand so custom-object
+// proxy fallback can still round-trip using our compact filers.
 //----------------------------------------------------------------------------
 Adesk::Boolean AriadneProbe::subWorldDraw(AcGiWorldDraw* mode)
 {
     assertReadEnabled();
-    mode->geometry().circle(mCenter, mSize, AcGeVector3d::kZAxis);
-    return Adesk::kTrue;   // fully view-independent; no subViewportDraw needed
+    if (mode == NULL)
+        return Adesk::kFalse;
+
+    AcDbCircle embedded(mCenter, AcGeVector3d::kZAxis, mSize);
+    embedded.setPropertiesFrom(this);
+    if (embedded.worldDraw(mode) != Adesk::kTrue)
+        mode->geometry().circle(mCenter, mSize, AcGeVector3d::kZAxis);
+    return Adesk::kTrue;   // fully view-independent; viewportDraw is an optional overlay
+}
+
+//----------------------------------------------------------------------------
+// Viewport-specific graphics — draw a small diamond in device/viewport space
+// when AutoCAD explicitly asks for a viewport pass. Because subWorldDraw returns
+// kTrue this is normally only exercised by direct viewportDraw probes or special
+// regen paths, but the callback is real and safe when a viewport context exists.
+//----------------------------------------------------------------------------
+void AriadneProbe::subViewportDraw(AcGiViewportDraw* mode)
+{
+    assertReadEnabled();
+    if (mode == NULL)
+        return;
+
+    const double d = (mSize > 0.0) ? (mSize * 0.20) : 0.20;
+    AcGePoint3d pts[5] = {
+        AcGePoint3d(mCenter.x,     mCenter.y + d, mCenter.z),
+        AcGePoint3d(mCenter.x + d, mCenter.y,     mCenter.z),
+        AcGePoint3d(mCenter.x,     mCenter.y - d, mCenter.z),
+        AcGePoint3d(mCenter.x - d, mCenter.y,     mCenter.z),
+        AcGePoint3d(mCenter.x,     mCenter.y + d, mCenter.z)
+    };
+    mode->geometry().polyline(5, pts);
 }
 
 //----------------------------------------------------------------------------
@@ -215,5 +248,161 @@ Acad::ErrorStatus AriadneProbe::subTransformBy(const AcGeMatrix3d& xform)
     assertWriteEnabled();
     mCenter.transformBy(xform);
     mSize *= xform.scale();   // uniform-scale component
+    return Acad::eOk;
+}
+
+//----------------------------------------------------------------------------
+// Grip protocol — expose center + four quadrant points; moving any grip translates
+// the probe by the supplied offset. The rich-grip overload mirrors the legacy
+// point set so both editor protocols are covered.
+//----------------------------------------------------------------------------
+Acad::ErrorStatus AriadneProbe::subGetGripPoints(
+    AcGePoint3dArray& gripPoints,
+    AcDbIntArray& osnapModes,
+    AcDbIntArray& geomIds) const
+{
+    assertReadEnabled();
+    gripPoints.append(mCenter);
+    gripPoints.append(AcGePoint3d(mCenter.x + mSize, mCenter.y, mCenter.z));
+    gripPoints.append(AcGePoint3d(mCenter.x, mCenter.y + mSize, mCenter.z));
+    gripPoints.append(AcGePoint3d(mCenter.x - mSize, mCenter.y, mCenter.z));
+    gripPoints.append(AcGePoint3d(mCenter.x, mCenter.y - mSize, mCenter.z));
+    for (int i = 0; i < 5; ++i) {
+        osnapModes.append(i == 0 ? AcDb::kOsModeCen : AcDb::kOsModeQuad);
+        geomIds.append(i);
+    }
+    return Acad::eOk;
+}
+
+Acad::ErrorStatus AriadneProbe::subGetGripPoints(
+    AcDbGripDataPtrArray& grips,
+    const double /*curViewUnitSize*/,
+    const int /*gripSize*/,
+    const AcGeVector3d& /*curViewDir*/,
+    const int /*bitflags*/) const
+{
+    assertReadEnabled();
+    AcGePoint3dArray pts;
+    AcDbIntArray modes, geomIds;
+    Acad::ErrorStatus es = subGetGripPoints(pts, modes, geomIds);
+    if (es != Acad::eOk)
+        return es;
+    for (int i = 0; i < pts.length(); ++i) {
+        AcDbGripData* gd = new AcDbGripData();
+        gd->setGripPoint(pts[i]);
+        gd->setAppData(reinterpret_cast<void*>(static_cast<Adesk::IntPtr>(i + 1)));
+        grips.append(gd);
+    }
+    return Acad::eOk;
+}
+
+Acad::ErrorStatus AriadneProbe::subMoveGripPointsAt(
+    const AcDbIntArray& indices,
+    const AcGeVector3d& offset)
+{
+    assertWriteEnabled();
+    if (indices.isEmpty())
+        return Acad::eInvalidInput;
+    mCenter += offset;
+    return Acad::eOk;
+}
+
+Acad::ErrorStatus AriadneProbe::subMoveGripPointsAt(
+    const AcDbVoidPtrArray& gripAppData,
+    const AcGeVector3d& offset,
+    const int /*bitflags*/)
+{
+    assertWriteEnabled();
+    if (gripAppData.isEmpty())
+        return Acad::eInvalidInput;
+    mCenter += offset;
+    return Acad::eOk;
+}
+
+//----------------------------------------------------------------------------
+// STRETCH protocol — identical control points to the grip protocol, with the
+// same translate-on-move semantics.
+//----------------------------------------------------------------------------
+Acad::ErrorStatus AriadneProbe::subGetStretchPoints(AcGePoint3dArray& stretchPoints) const
+{
+    assertReadEnabled();
+    AcDbIntArray modes, geomIds;
+    return subGetGripPoints(stretchPoints, modes, geomIds);
+}
+
+Acad::ErrorStatus AriadneProbe::subMoveStretchPointsAt(
+    const AcDbIntArray& indices,
+    const AcGeVector3d& offset)
+{
+    assertWriteEnabled();
+    if (indices.isEmpty())
+        return Acad::eInvalidInput;
+    mCenter += offset;
+    return Acad::eOk;
+}
+
+//----------------------------------------------------------------------------
+// OSNAP protocol — provide center/centroid/node/insert, quadrants, and a nearest
+// fallback for the probe marker. The insertion-matrix overload transforms the
+// computed points for block-reference contexts.
+//----------------------------------------------------------------------------
+Acad::ErrorStatus AriadneProbe::subGetOsnapPoints(
+    AcDb::OsnapMode osnapMode,
+    Adesk::GsMarker /*gsSelectionMark*/,
+    const AcGePoint3d& pickPoint,
+    const AcGePoint3d& /*lastPoint*/,
+    const AcGeMatrix3d& /*viewXform*/,
+    AcGePoint3dArray& snapPoints,
+    AcDbIntArray& geomIds) const
+{
+    assertReadEnabled();
+    switch (osnapMode) {
+    case AcDb::kOsModeCen:
+    case AcDb::kOsModeCentroid:
+    case AcDb::kOsModeNode:
+    case AcDb::kOsModeIns:
+    case AcDb::kOsModeMid:
+        snapPoints.append(mCenter);
+        geomIds.append(0);
+        break;
+    case AcDb::kOsModeEnd:
+    case AcDb::kOsModeQuad:
+        snapPoints.append(AcGePoint3d(mCenter.x + mSize, mCenter.y, mCenter.z)); geomIds.append(1);
+        snapPoints.append(AcGePoint3d(mCenter.x, mCenter.y + mSize, mCenter.z)); geomIds.append(2);
+        snapPoints.append(AcGePoint3d(mCenter.x - mSize, mCenter.y, mCenter.z)); geomIds.append(3);
+        snapPoints.append(AcGePoint3d(mCenter.x, mCenter.y - mSize, mCenter.z)); geomIds.append(4);
+        break;
+    case AcDb::kOsModeNear: {
+        AcGeVector3d v = pickPoint - mCenter;
+        if (v.length() <= 1e-9)
+            v = AcGeVector3d::kXAxis;
+        v.normalize();
+        snapPoints.append(mCenter + (v * mSize));
+        geomIds.append(5);
+        break;
+    }
+    default:
+        return Acad::eOk;
+    }
+    return Acad::eOk;
+}
+
+Acad::ErrorStatus AriadneProbe::subGetOsnapPoints(
+    AcDb::OsnapMode osnapMode,
+    Adesk::GsMarker gsSelectionMark,
+    const AcGePoint3d& pickPoint,
+    const AcGePoint3d& lastPoint,
+    const AcGeMatrix3d& viewXform,
+    AcGePoint3dArray& snapPoints,
+    AcDbIntArray& geomIds,
+    const AcGeMatrix3d& insertionMat) const
+{
+    const int before = snapPoints.length();
+    Acad::ErrorStatus es = subGetOsnapPoints(
+        osnapMode, gsSelectionMark, pickPoint, lastPoint, viewXform, snapPoints, geomIds);
+    if (es != Acad::eOk)
+        return es;
+    for (int i = before; i < snapPoints.length(); ++i)
+        snapPoints[i].transformBy(insertionMat);
     return Acad::eOk;
 }

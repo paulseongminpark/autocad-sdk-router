@@ -1,0 +1,164 @@
+{
+  "schema": "ariadne.cad_os.wave3.pane_claims.v1",
+  "wave": "WAVE3",
+  "pane": 6,
+  "focus": "native_only custom object / filer / protocol / clone / audit / proxy",
+  "generated_at": "2026-06-23T21:00:02+09:00",
+  "source_commit": "023fc16",
+  "source_registry": "config/operations.v2.json",
+  "source_totals": {
+    "implemented": 402,
+    "blocked": 9,
+    "catalogued": 106,
+    "total": 517
+  },
+  "claim_count": 13,
+  "families": {
+    "custom_objects_protocols": 13
+  },
+  "claims": [
+    {
+      "operation": "extend.customentity.define",
+      "family": "custom_objects_protocols",
+      "current_status": "catalogued",
+      "recommended_strategy": "implement",
+      "fallback_strategy": "hard_block_only_with_real_evidence",
+      "expected_files": [],
+      "test_requirement": "handler+unit+native-build+registry",
+      "evidence_requirement": "handler+test+report",
+      "notes": ""
+    },
+    {
+      "operation": "extend.customentity.draw_viewport",
+      "family": "custom_objects_protocols",
+      "current_status": "catalogued",
+      "recommended_strategy": "implement",
+      "fallback_strategy": "hard_block_only_with_real_evidence",
+      "expected_files": [],
+      "test_requirement": "handler+unit+native-build+registry",
+      "evidence_requirement": "handler+test+report",
+      "notes": ""
+    },
+    {
+      "operation": "extend.customentity.draw_world",
+      "family": "custom_objects_protocols",
+      "current_status": "catalogued",
+      "recommended_strategy": "implement",
+      "fallback_strategy": "hard_block_only_with_real_evidence",
+      "expected_files": [],
+      "test_requirement": "handler+unit+native-build+registry",
+      "evidence_requirement": "handler+test+report",
+      "notes": ""
+    },
+    {
+      "operation": "extend.customentity.grips",
+      "family": "custom_objects_protocols",
+      "current_status": "catalogued",
+      "recommended_strategy": "implement",
+      "fallback_strategy": "hard_block_only_with_real_evidence",
+      "expected_files": [],
+      "test_requirement": "handler+unit+native-build+registry",
+      "evidence_requirement": "handler+test+report",
+      "notes": ""
+    },
+    {
+      "operation": "extend.customentity.osnap",
+      "family": "custom_objects_protocols",
+      "current_status": "catalogued",
+      "recommended_strategy": "implement",
+      "fallback_strategy": "hard_block_only_with_real_evidence",
+      "expected_files": [],
+      "test_requirement": "handler+unit+native-build+registry",
+      "evidence_requirement": "handler+test+report",
+      "notes": ""
+    },
+    {
+      "operation": "extend.customentity.stretch",
+      "family": "custom_objects_protocols",
+      "current_status": "catalogued",
+      "recommended_strategy": "implement",
+      "fallback_strategy": "hard_block_only_with_real_evidence",
+      "expected_files": [],
+      "test_requirement": "handler+unit+native-build+registry",
+      "evidence_requirement": "handler+test+report",
+      "notes": ""
+    },
+    {
+      "operation": "extend.customobject.define",
+      "family": "custom_objects_protocols",
+      "current_status": "catalogued",
+      "recommended_strategy": "implement",
+      "fallback_strategy": "hard_block_only_with_real_evidence",
+      "expected_files": [],
+      "test_requirement": "handler+unit+native-build+registry",
+      "evidence_requirement": "handler+test+report",
+      "notes": ""
+    },
+    {
+      "operation": "extend.customobject.embedded",
+      "family": "custom_objects_protocols",
+      "current_status": "catalogued",
+      "recommended_strategy": "implement",
+      "fallback_strategy": "hard_block_only_with_real_evidence",
+      "expected_files": [],
+      "test_requirement": "handler+unit+native-build+registry",
+      "evidence_requirement": "handler+test+report",
+      "notes": ""
+    },
+    {
+      "operation": "extend.customobject.filer_dxfin",
+      "family": "custom_objects_protocols",
+      "current_status": "catalogued",
+      "recommended_strategy": "implement",
+      "fallback_strategy": "hard_block_only_with_real_evidence",
+      "expected_files": [],
+      "test_requirement": "handler+unit+native-build+registry",
+      "evidence_requirement": "handler+test+report",
+      "notes": ""
+    },
+    {
+      "operation": "extend.customobject.filer_dxfout",
+      "family": "custom_objects_protocols",
+      "current_status": "catalogued",
+      "recommended_strategy": "implement",
+      "fallback_strategy": "hard_block_only_with_real_evidence",
+      "expected_files": [],
+      "test_requirement": "handler+unit+native-build+registry",
+      "evidence_requirement": "handler+test+report",
+      "notes": ""
+    },
+    {
+      "operation": "extend.customobject.partial_undo",
+      "family": "custom_objects_protocols",
+      "current_status": "catalogued",
+      "recommended_strategy": "implement",
+      "fallback_strategy": "hard_block_only_with_real_evidence",
+      "expected_files": [],
+      "test_requirement": "handler+unit+native-build+registry",
+      "evidence_requirement": "handler+test+report",
+      "notes": ""
+    },
+    {
+      "operation": "extend.object_enabler.demand_register",
+      "family": "custom_objects_protocols",
+      "current_status": "catalogued",
+      "recommended_strategy": "implement",
+      "fallback_strategy": "hard_block_only_with_real_evidence",
+      "expected_files": [],
+      "test_requirement": "handler+unit+native-build+registry",
+      "evidence_requirement": "handler+test+report",
+      "notes": ""
+    },
+    {
+      "operation": "extend.osnap.custom_mode",
+      "family": "custom_objects_protocols",
+      "current_status": "catalogued",
+      "recommended_strategy": "implement",
+      "fallback_strategy": "hard_block_only_with_real_evidence",
+      "expected_files": [],
+      "test_requirement": "handler+unit+native-build+registry",
+      "evidence_requirement": "handler+test+report",
+      "notes": ""
+    }
+  ]
+}

@@ -40,11 +40,52 @@ public:
     virtual Acad::ErrorStatus dxfOutFields(AcDbDxfFiler* filer) const override;
 
 protected:
-    // Public worldDraw/getGeomExtents/transformBy are ADESK_SEALED in 2027 —
-    // override the protected subXxx virtuals (research: entities + editor-delta).
+    // Public draw/edit protocol methods are ADESK_SEALED in 2027 — override the
+    // protected subXxx virtuals (research: entities + editor-delta).
     virtual Adesk::Boolean    subWorldDraw(AcGiWorldDraw* mode) override;
+    virtual void              subViewportDraw(AcGiViewportDraw* mode) override;
     virtual Acad::ErrorStatus subGetGeomExtents(AcDbExtents& extents) const override;
     virtual Acad::ErrorStatus subTransformBy(const AcGeMatrix3d& xform) override;
+
+    // Editor protocols for the Wave 3 native custom-entity surface.
+    virtual Acad::ErrorStatus subGetGripPoints(
+        AcGePoint3dArray& gripPoints,
+        AcDbIntArray& osnapModes,
+        AcDbIntArray& geomIds) const override;
+    virtual Acad::ErrorStatus subGetGripPoints(
+        AcDbGripDataPtrArray& grips,
+        const double curViewUnitSize,
+        const int gripSize,
+        const AcGeVector3d& curViewDir,
+        const int bitflags) const override;
+    virtual Acad::ErrorStatus subMoveGripPointsAt(
+        const AcDbIntArray& indices,
+        const AcGeVector3d& offset) override;
+    virtual Acad::ErrorStatus subMoveGripPointsAt(
+        const AcDbVoidPtrArray& gripAppData,
+        const AcGeVector3d& offset,
+        const int bitflags) override;
+    virtual Acad::ErrorStatus subGetStretchPoints(AcGePoint3dArray& stretchPoints) const override;
+    virtual Acad::ErrorStatus subMoveStretchPointsAt(
+        const AcDbIntArray& indices,
+        const AcGeVector3d& offset) override;
+    virtual Acad::ErrorStatus subGetOsnapPoints(
+        AcDb::OsnapMode osnapMode,
+        Adesk::GsMarker gsSelectionMark,
+        const AcGePoint3d& pickPoint,
+        const AcGePoint3d& lastPoint,
+        const AcGeMatrix3d& viewXform,
+        AcGePoint3dArray& snapPoints,
+        AcDbIntArray& geomIds) const override;
+    virtual Acad::ErrorStatus subGetOsnapPoints(
+        AcDb::OsnapMode osnapMode,
+        Adesk::GsMarker gsSelectionMark,
+        const AcGePoint3d& pickPoint,
+        const AcGePoint3d& lastPoint,
+        const AcGeMatrix3d& viewXform,
+        AcGePoint3dArray& snapPoints,
+        AcDbIntArray& geomIds,
+        const AcGeMatrix3d& insertionMat) const override;
 
 private:
     AcGePoint3d mCenter;

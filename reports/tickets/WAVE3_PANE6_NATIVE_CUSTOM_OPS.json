@@ -1,0 +1,329 @@
+{
+  "schema": "ariadne.cad_os.wave3.pane6.native_custom.ops.v1",
+  "generated_at": "2026-06-23T21:22:32.969293",
+  "claim_file": "reports/tickets/WAVE3_PANE6_CLAIMS.json",
+  "claimed_ops_count": 13,
+  "implemented_ops_count": 12,
+  "hard_blocked_ops_count": 1,
+  "deprecated_ops_count": 0,
+  "claimed_catalogued_remaining_count": 0,
+  "implemented_ops": [
+    "extend.customentity.define",
+    "extend.customentity.draw_viewport",
+    "extend.customentity.draw_world",
+    "extend.customentity.grips",
+    "extend.customentity.osnap",
+    "extend.customentity.stretch",
+    "extend.customobject.define",
+    "extend.customobject.embedded",
+    "extend.customobject.filer_dxfin",
+    "extend.customobject.filer_dxfout",
+    "extend.customobject.partial_undo",
+    "extend.osnap.custom_mode"
+  ],
+  "hard_blocked_ops": [
+    "extend.object_enabler.demand_register"
+  ],
+  "deprecated_ops": [],
+  "claimed_catalogued_remaining": [],
+  "operations": [
+    {
+      "operation": "extend.customentity.define",
+      "family": "custom_objects_protocols",
+      "closure": "implemented",
+      "registry_status": "implemented",
+      "dispatcher_symbol": "m08kDispatch",
+      "tests": [
+        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
+        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
+        "tests/unit/test_m08k_handlers.py"
+      ],
+      "evidence_refs": [
+        "config/autocad_native_arx_operation_catalog.json#extend.customentity.define",
+        "src/Ariadne.AcadNative/families/m08k_handlers.inc:m08kDispatch",
+        "reports/merge/MERGE-M08-READ.json",
+        "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
+        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)",
+        "reports/tickets/WAVE3_PANE6_NATIVE_CUSTOM.md",
+        "reports/tickets/WAVE3_PANE6_NATIVE_CUSTOM_OPS.json",
+        "reports/tickets/WAVE3_PANE6_native_build.json"
+      ],
+      "blocked_reason": ""
+    },
+    {
+      "operation": "extend.customentity.draw_viewport",
+      "family": "custom_objects_protocols",
+      "closure": "implemented",
+      "registry_status": "implemented",
+      "dispatcher_symbol": "m08kDispatch",
+      "tests": [
+        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
+        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
+        "tests/unit/test_m08k_handlers.py"
+      ],
+      "evidence_refs": [
+        "config/autocad_native_arx_operation_catalog.json#extend.customentity.draw_viewport",
+        "src/Ariadne.AcadNative/families/m08k_handlers.inc:m08kDispatch",
+        "reports/merge/MERGE-M08-READ.json",
+        "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
+        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)",
+        "reports/tickets/WAVE3_PANE6_NATIVE_CUSTOM.md",
+        "reports/tickets/WAVE3_PANE6_NATIVE_CUSTOM_OPS.json",
+        "reports/tickets/WAVE3_PANE6_native_build.json"
+      ],
+      "blocked_reason": ""
+    },
+    {
+      "operation": "extend.customentity.draw_world",
+      "family": "custom_objects_protocols",
+      "closure": "implemented",
+      "registry_status": "implemented",
+      "dispatcher_symbol": "m08kDispatch",
+      "tests": [
+        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
+        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
+        "tests/unit/test_m08k_handlers.py"
+      ],
+      "evidence_refs": [
+        "config/autocad_native_arx_operation_catalog.json#extend.customentity.draw_world",
+        "src/Ariadne.AcadNative/families/m08k_handlers.inc:m08kDispatch",
+        "reports/merge/MERGE-M08-READ.json",
+        "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
+        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)",
+        "reports/tickets/WAVE3_PANE6_NATIVE_CUSTOM.md",
+        "reports/tickets/WAVE3_PANE6_NATIVE_CUSTOM_OPS.json",
+        "reports/tickets/WAVE3_PANE6_native_build.json"
+      ],
+      "blocked_reason": ""
+    },
+    {
+      "operation": "extend.customentity.grips",
+      "family": "custom_objects_protocols",
+      "closure": "implemented",
+      "registry_status": "implemented",
+      "dispatcher_symbol": "m08kDispatch",
+      "tests": [
+        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
+        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
+        "tests/unit/test_m08k_handlers.py"
+      ],
+      "evidence_refs": [
+        "config/autocad_native_arx_operation_catalog.json#extend.customentity.grips",
+        "src/Ariadne.AcadNative/families/m08k_handlers.inc:m08kDispatch",
+        "reports/merge/MERGE-M08-READ.json",
+        "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
+        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)",
+        "reports/tickets/WAVE3_PANE6_NATIVE_CUSTOM.md",
+        "reports/tickets/WAVE3_PANE6_NATIVE_CUSTOM_OPS.json",
+        "reports/tickets/WAVE3_PANE6_native_build.json"
+      ],
+      "blocked_reason": ""
+    },
+    {
+      "operation": "extend.customentity.osnap",
+      "family": "custom_objects_protocols",
+      "closure": "implemented",
+      "registry_status": "implemented",
+      "dispatcher_symbol": "m08kDispatch",
+      "tests": [
+        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
+        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
+        "tests/unit/test_m08k_handlers.py"
+      ],
+      "evidence_refs": [
+        "config/autocad_native_arx_operation_catalog.json#extend.customentity.osnap",
+        "src/Ariadne.AcadNative/families/m08k_handlers.inc:m08kDispatch",
+        "reports/merge/MERGE-M08-READ.json",
+        "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
+        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)",
+        "reports/tickets/WAVE3_PANE6_NATIVE_CUSTOM.md",
+        "reports/tickets/WAVE3_PANE6_NATIVE_CUSTOM_OPS.json",
+        "reports/tickets/WAVE3_PANE6_native_build.json"
+      ],
+      "blocked_reason": ""
+    },
+    {
+      "operation": "extend.customentity.stretch",
+      "family": "custom_objects_protocols",
+      "closure": "implemented",
+      "registry_status": "implemented",
+      "dispatcher_symbol": "m08kDispatch",
+      "tests": [
+        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
+        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
+        "tests/unit/test_m08k_handlers.py"
+      ],
+      "evidence_refs": [
+        "config/autocad_native_arx_operation_catalog.json#extend.customentity.stretch",
+        "src/Ariadne.AcadNative/families/m08k_handlers.inc:m08kDispatch",
+        "reports/merge/MERGE-M08-READ.json",
+        "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
+        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)",
+        "reports/tickets/WAVE3_PANE6_NATIVE_CUSTOM.md",
+        "reports/tickets/WAVE3_PANE6_NATIVE_CUSTOM_OPS.json",
+        "reports/tickets/WAVE3_PANE6_native_build.json"
+      ],
+      "blocked_reason": ""
+    },
+    {
+      "operation": "extend.customobject.define",
+      "family": "custom_objects_protocols",
+      "closure": "implemented",
+      "registry_status": "implemented",
+      "dispatcher_symbol": "m08kDispatch",
+      "tests": [
+        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
+        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
+        "tests/unit/test_m08k_handlers.py"
+      ],
+      "evidence_refs": [
+        "config/autocad_native_arx_operation_catalog.json#extend.customobject.define",
+        "src/Ariadne.AcadNative/families/m08k_handlers.inc:m08kDispatch",
+        "reports/merge/MERGE-M08-READ.json",
+        "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
+        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)",
+        "reports/tickets/WAVE3_PANE6_NATIVE_CUSTOM.md",
+        "reports/tickets/WAVE3_PANE6_NATIVE_CUSTOM_OPS.json",
+        "reports/tickets/WAVE3_PANE6_native_build.json"
+      ],
+      "blocked_reason": ""
+    },
+    {
+      "operation": "extend.customobject.embedded",
+      "family": "custom_objects_protocols",
+      "closure": "implemented",
+      "registry_status": "implemented",
+      "dispatcher_symbol": "m08kDispatch",
+      "tests": [
+        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
+        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
+        "tests/unit/test_m08k_handlers.py"
+      ],
+      "evidence_refs": [
+        "config/autocad_native_arx_operation_catalog.json#extend.customobject.embedded",
+        "src/Ariadne.AcadNative/families/m08k_handlers.inc:m08kDispatch",
+        "reports/merge/MERGE-M08-READ.json",
+        "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
+        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)",
+        "reports/tickets/WAVE3_PANE6_NATIVE_CUSTOM.md",
+        "reports/tickets/WAVE3_PANE6_NATIVE_CUSTOM_OPS.json",
+        "reports/tickets/WAVE3_PANE6_native_build.json"
+      ],
+      "blocked_reason": ""
+    },
+    {
+      "operation": "extend.customobject.filer_dxfin",
+      "family": "custom_objects_protocols",
+      "closure": "implemented",
+      "registry_status": "implemented",
+      "dispatcher_symbol": "m08kDispatch",
+      "tests": [
+        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
+        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
+        "tests/unit/test_m08k_handlers.py"
+      ],
+      "evidence_refs": [
+        "config/autocad_native_arx_operation_catalog.json#extend.customobject.filer_dxfin",
+        "src/Ariadne.AcadNative/families/m08k_handlers.inc:m08kDispatch",
+        "reports/merge/MERGE-M08-READ.json",
+        "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
+        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)",
+        "reports/tickets/WAVE3_PANE6_NATIVE_CUSTOM.md",
+        "reports/tickets/WAVE3_PANE6_NATIVE_CUSTOM_OPS.json",
+        "reports/tickets/WAVE3_PANE6_native_build.json"
+      ],
+      "blocked_reason": ""
+    },
+    {
+      "operation": "extend.customobject.filer_dxfout",
+      "family": "custom_objects_protocols",
+      "closure": "implemented",
+      "registry_status": "implemented",
+      "dispatcher_symbol": "m08kDispatch",
+      "tests": [
+        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
+        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
+        "tests/unit/test_m08k_handlers.py"
+      ],
+      "evidence_refs": [
+        "config/autocad_native_arx_operation_catalog.json#extend.customobject.filer_dxfout",
+        "src/Ariadne.AcadNative/families/m08k_handlers.inc:m08kDispatch",
+        "reports/merge/MERGE-M08-READ.json",
+        "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
+        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)",
+        "reports/tickets/WAVE3_PANE6_NATIVE_CUSTOM.md",
+        "reports/tickets/WAVE3_PANE6_NATIVE_CUSTOM_OPS.json",
+        "reports/tickets/WAVE3_PANE6_native_build.json"
+      ],
+      "blocked_reason": ""
+    },
+    {
+      "operation": "extend.customobject.partial_undo",
+      "family": "custom_objects_protocols",
+      "closure": "implemented",
+      "registry_status": "implemented",
+      "dispatcher_symbol": "m08kDispatch",
+      "tests": [
+        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
+        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
+        "tests/unit/test_m08k_handlers.py"
+      ],
+      "evidence_refs": [
+        "config/autocad_native_arx_operation_catalog.json#extend.customobject.partial_undo",
+        "src/Ariadne.AcadNative/families/m08k_handlers.inc:m08kDispatch",
+        "reports/merge/MERGE-M08-READ.json",
+        "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
+        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)",
+        "reports/tickets/WAVE3_PANE6_NATIVE_CUSTOM.md",
+        "reports/tickets/WAVE3_PANE6_NATIVE_CUSTOM_OPS.json",
+        "reports/tickets/WAVE3_PANE6_native_build.json"
+      ],
+      "blocked_reason": ""
+    },
+    {
+      "operation": "extend.object_enabler.demand_register",
+      "family": "custom_objects_protocols",
+      "closure": "hard_blocked",
+      "registry_status": "blocked",
+      "dispatcher_symbol": null,
+      "tests": [
+        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
+        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
+        "tests/unit/test_m08k_handlers.py::TestM08KHandlers::test_hard_blocked_install_time_op_not_in_hasop"
+      ],
+      "evidence_refs": [
+        "config/autocad_native_arx_operation_catalog.json#extend.object_enabler.demand_register",
+        "reports/tickets/WAVE3_PANE6_NATIVE_CUSTOM_PLAN.md",
+        "reports/tickets/WAVE3_PANE6_NATIVE_CUSTOM.md#hard-blocked-ops",
+        "NATIVE_BUILD_RULE: isolated output only; canonical deploy is Pane 1 only",
+        "reports/tickets/WAVE3_PANE6_NATIVE_CUSTOM.md",
+        "reports/tickets/WAVE3_PANE6_NATIVE_CUSTOM_OPS.json",
+        "reports/tickets/WAVE3_PANE6_native_build.json"
+      ],
+      "blocked_reason": "HARD_BLOCKED_SAFETY_CANONICAL_DEPLOY_PANE1_ONLY: demand-load object-enabler registration writes AutoCAD/ObjectDBX application registry keys and binds a deployed DBX path; Wave3 Pane6 native build rule allows isolated build only and forbids canonical DBX/CRX/ARX deploy. Pane 1 owns canonical deploy/registration."
+    },
+    {
+      "operation": "extend.osnap.custom_mode",
+      "family": "custom_objects_protocols",
+      "closure": "implemented",
+      "registry_status": "implemented",
+      "dispatcher_symbol": "m08kDispatch",
+      "tests": [
+        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
+        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
+        "tests/unit/test_m08k_handlers.py"
+      ],
+      "evidence_refs": [
+        "config/autocad_native_arx_operation_catalog.json#extend.osnap.custom_mode",
+        "src/Ariadne.AcadNative/families/m08k_handlers.inc:m08kDispatch",
+        "reports/merge/MERGE-M08-READ.json",
+        "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
+        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)",
+        "reports/tickets/WAVE3_PANE6_NATIVE_CUSTOM.md",
+        "reports/tickets/WAVE3_PANE6_NATIVE_CUSTOM_OPS.json",
+        "reports/tickets/WAVE3_PANE6_native_build.json"
+      ],
+      "blocked_reason": ""
+    }
+  ]
+}

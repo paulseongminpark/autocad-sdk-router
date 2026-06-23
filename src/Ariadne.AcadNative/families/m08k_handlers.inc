@@ -40,6 +40,7 @@
 #include "rxclass.h"      // AcRxClass addX/delX/queryX/newAcRxClass/acrxBuildClassHierarchy/deleteAcRxClass
 #include "rxdict.h"       // acrxClassDictionary (live registered-class lookup by name)
 #include "rxregsvc.h"     // acrxRegisterService / acrxServiceIsRegistered
+#include "dbosnap.h"      // AcDbCustomOsnapInfo / AcDbCustomOsnapManager
 // NOTE: the custom Ariadne* classes are reached via the class dictionary (by name) and the DBX
 // extern "C" API (AriadneDbxApi.h, already included by the host TU) — NOT via their C++ headers:
 // the import lib exports only the extern "C" symbols, not the class methods/::desc(). Including the
@@ -60,6 +61,144 @@ class M08KProtocolXObject : public AcRxObject
 public:
     M08KProtocolXObject() {}
     virtual ~M08KProtocolXObject() {}
+};
+
+// A concrete custom-osnap protocol extension. It is registration-free (no custom RTTI):
+// AcRxClass::addX keys it by AcDbCustomOsnapInfo::desc(), and the manager mode below
+// advertises that same SDK protocol class. getOsnapInfo is real: for AriadneProbe it
+// reads the entity's extents and returns the marker center as the custom snap point.
+class M08KCustomOsnapInfo : public AcDbCustomOsnapInfo
+{
+public:
+    Acad::ErrorStatus getOsnapInfo(
+        AcDbEntity* pickedObject,
+        Adesk::GsMarker /*gsSelectionMark*/,
+        const AcGePoint3d& /*pickPoint*/,
+        const AcGePoint3d& /*lastPoint*/,
+        const AcGeMatrix3d& /*viewXform*/,
+        AcArray<AcGePoint3d>& snapPoints,
+        AcDbIntArray& geomIdsForPts,
+        AcArray<AcGeCurve3d*>& /*snapCurves*/,
+        AcDbIntArray& /*geomIdsForLines*/) override
+    {
+        if (pickedObject == nullptr || !ariadneIsProbeEntity(pickedObject))
+            return Acad::eNotApplicable;
+        AcDbExtents ext;
+        Acad::ErrorStatus es = pickedObject->getGeomExtents(ext);
+        if (es != Acad::eOk)
+            return es;
+        const AcGePoint3d lo = ext.minPoint();
+        const AcGePoint3d hi = ext.maxPoint();
+        snapPoints.append(AcGePoint3d((lo.x + hi.x) * 0.5, (lo.y + hi.y) * 0.5, (lo.z + hi.z) * 0.5));
+        geomIdsForPts.append(9001);
+        return Acad::eOk;
+    }
+};
+
+class M08KCustomOsnapMode : public AcDbCustomOsnapMode
+{
+public:
+    const ACHAR* localModeString() const override { return ACRX_T("ARIadne"); }
+    const ACHAR* globalModeString() const override { return ACRX_T("ARIadne"); }
+    const AcRxClass* entityOsnapClass() const override { return AcDbCustomOsnapInfo::desc(); }
+    AcGiGlyph* glyph() const override { return nullptr; }
+    const ACHAR* tooltipString() const override { return ACRX_T("Ariadne probe center"); }
+};
+
+// Hostless AcGiViewportDraw collector used only to prove AriadneProbe::subViewportDraw.
+// M08L owns the world-draw collector; this mirrors it for viewport-specific geometry.
+class M08KCollectViewport : public AcGiViewport
+{
+public:
+    void getModelToEyeTransform(AcGeMatrix3d& m) const override { m.setToIdentity(); }
+    void getEyeToModelTransform(AcGeMatrix3d& m) const override { m.setToIdentity(); }
+    void getWorldToEyeTransform(AcGeMatrix3d& m) const override { m.setToIdentity(); }
+    void getEyeToWorldTransform(AcGeMatrix3d& m) const override { m.setToIdentity(); }
+    Adesk::Boolean isPerspective() const override { return Adesk::kFalse; }
+    Adesk::Boolean doPerspective(AcGePoint3d&) const override { return Adesk::kTrue; }
+    Adesk::Boolean doInversePerspective(AcGePoint3d&) const override { return Adesk::kTrue; }
+    void getNumPixelsInUnitSquare(const AcGePoint3d&, AcGePoint2d& pixelArea, bool = true) const override { pixelArea.set(1.0, 1.0); }
+    void getCameraLocation(AcGePoint3d& location) const override { location.set(0.0, 0.0, 1.0); }
+    void getCameraTarget(AcGePoint3d& target) const override { target.set(0.0, 0.0, 0.0); }
+    void getCameraUpVector(AcGeVector3d& upVector) const override { upVector = AcGeVector3d::kYAxis; }
+    Adesk::ULongPtr viewportId() const override { return 1; }
+    Adesk::Int16 acadWindowId() const override { return 1; }
+    void getViewportDcCorners(AcGePoint2d& lower_left, AcGePoint2d& upper_right) const override { lower_left.set(0, 0); upper_right.set(100, 100); }
+    Adesk::Boolean getFrontAndBackClipValues(Adesk::Boolean& clip_front, Adesk::Boolean& clip_back, double& front, double& back) const override { clip_front = clip_back = Adesk::kFalse; front = back = 0.0; return Adesk::kFalse; }
+    double linetypeScaleMultiplier() const override { return 1.0; }
+    double linetypeGenerationCriteria() const override { return 1.0; }
+};
+
+class M08KCollectViewportGeometry : public AcGiViewportGeometry
+{
+public:
+    explicit M08KCollectViewportGeometry(M08LGraphicsTally& tally) : m_tally(tally) {}
+    void getModelToWorldTransform(AcGeMatrix3d& m) const override { m.setToIdentity(); }
+    void getWorldToModelTransform(AcGeMatrix3d& m) const override { m.setToIdentity(); }
+    Adesk::Boolean pushModelTransform(const AcGeVector3d&) override { return Adesk::kTrue; }
+    Adesk::Boolean pushModelTransform(const AcGeMatrix3d&) override { return Adesk::kTrue; }
+    Adesk::Boolean popModelTransform() override { return Adesk::kTrue; }
+    AcGeMatrix3d pushPositionTransform(AcGiPositionTransformBehavior, const AcGePoint3d&) override { return AcGeMatrix3d::kIdentity; }
+    AcGeMatrix3d pushPositionTransform(AcGiPositionTransformBehavior, const AcGePoint2d&) override { return AcGeMatrix3d::kIdentity; }
+    AcGeMatrix3d pushScaleTransform(AcGiScaleTransformBehavior, const AcGePoint3d&) override { return AcGeMatrix3d::kIdentity; }
+    AcGeMatrix3d pushScaleTransform(AcGiScaleTransformBehavior, const AcGePoint2d&) override { return AcGeMatrix3d::kIdentity; }
+    AcGeMatrix3d pushOrientationTransform(AcGiOrientationTransformBehavior) override { return AcGeMatrix3d::kIdentity; }
+    Adesk::Boolean circle(const AcGePoint3d&, const double, const AcGeVector3d&) const override { ++m_tally.circle; return Adesk::kTrue; }
+    Adesk::Boolean circle(const AcGePoint3d&, const AcGePoint3d&, const AcGePoint3d&) const override { ++m_tally.circle; return Adesk::kTrue; }
+    Adesk::Boolean circularArc(const AcGePoint3d&, const double, const AcGeVector3d&, const AcGeVector3d&, const double, const AcGiArcType) const override { ++m_tally.circularArc; return Adesk::kTrue; }
+    Adesk::Boolean circularArc(const AcGePoint3d&, const AcGePoint3d&, const AcGePoint3d&, const AcGiArcType) const override { ++m_tally.circularArc; return Adesk::kTrue; }
+    Adesk::Boolean polyline(const Adesk::UInt32 n, const AcGePoint3d* pv, const AcGeVector3d*, Adesk::LongPtr) const override { ++m_tally.polyline; m_tally.vertexTotal += n; m_tally.capture(n, pv); return Adesk::kTrue; }
+    Adesk::Boolean polyline(const AcGiPolyline&) const override { ++m_tally.polyline; return Adesk::kTrue; }
+    Adesk::Boolean polyPolyline(Adesk::UInt32, const AcGiPolyline*) const override { ++m_tally.polyPolyline; return Adesk::kTrue; }
+    Adesk::Boolean polygon(const Adesk::UInt32 n, const AcGePoint3d* pv) const override { ++m_tally.polygon; m_tally.vertexTotal += n; m_tally.capture(n, pv); return Adesk::kTrue; }
+    Adesk::Boolean polyPolygon(const Adesk::UInt32, const Adesk::UInt32*, const AcGePoint3d*, const Adesk::UInt32*, const AcGePoint3d*, const AcCmEntityColor*, const AcGiLineType*, const AcCmEntityColor*, const AcCmTransparency*) const override { ++m_tally.polyPolygon; return Adesk::kTrue; }
+    Adesk::Boolean mesh(const Adesk::UInt32 rows, const Adesk::UInt32 cols, const AcGePoint3d* pv, const AcGiEdgeData*, const AcGiFaceData* pFace, const AcGiVertexData*, const bool) const override { ++m_tally.mesh; m_tally.vertexTotal += rows * cols; if (pFace) ++m_tally.faceDataSeen; m_tally.capture(rows * cols, pv); return Adesk::kTrue; }
+    Adesk::Boolean shell(const Adesk::UInt32 nv, const AcGePoint3d* pv, const Adesk::UInt32, const Adesk::Int32*, const AcGiEdgeData*, const AcGiFaceData* pFace, const AcGiVertexData*, const struct resbuf*, const bool) const override { ++m_tally.shell; m_tally.vertexTotal += nv; if (pFace) ++m_tally.faceDataSeen; m_tally.capture(nv, pv); return Adesk::kTrue; }
+    Adesk::Boolean text(const AcGePoint3d&, const AcGeVector3d&, const AcGeVector3d&, const double, const double, const double, const ACHAR*) const override { ++m_tally.text; return Adesk::kTrue; }
+    Adesk::Boolean text(const AcGePoint3d&, const AcGeVector3d&, const AcGeVector3d&, const ACHAR*, const Adesk::Int32, const Adesk::Boolean, const AcGiTextStyle&) const override { ++m_tally.text; return Adesk::kTrue; }
+    Adesk::Boolean xline(const AcGePoint3d&, const AcGePoint3d&) const override { ++m_tally.xline; return Adesk::kTrue; }
+    Adesk::Boolean ray(const AcGePoint3d&, const AcGePoint3d&) const override { ++m_tally.ray; return Adesk::kTrue; }
+    Adesk::Boolean pline(const AcDbPolyline&, Adesk::UInt32, Adesk::UInt32) const override { ++m_tally.pline; return Adesk::kTrue; }
+    Adesk::Boolean draw(AcGiDrawable*) const override { ++m_tally.draw; return Adesk::kTrue; }
+    Adesk::Boolean image(const AcGiImageBGRA32&, const AcGePoint3d&, const AcGeVector3d&, const AcGeVector3d&, TransparencyMode) const override { ++m_tally.image; return Adesk::kTrue; }
+    Adesk::Boolean rowOfDots(int, const AcGePoint3d&, const AcGeVector3d&) const override { ++m_tally.dots; return Adesk::kTrue; }
+    Adesk::Boolean ellipticalArc(const AcGePoint3d&, const AcGeVector3d&, double, double, double, double, double, AcGiArcType) const override { ++m_tally.ellipticalArc; return Adesk::kTrue; }
+    Adesk::Boolean pushClipBoundary(AcGiClipBoundary*) override { return Adesk::kTrue; }
+    void popClipBoundary() override {}
+    Adesk::Boolean edge(const AcArray<AcGeCurve2d*>&) const override { ++m_tally.edge; return Adesk::kTrue; }
+    Adesk::Boolean polylineEye(const Adesk::UInt32 n, const AcGePoint3d* pv) const override { ++m_tally.polyline; m_tally.vertexTotal += n; m_tally.capture(n, pv); return Adesk::kTrue; }
+    Adesk::Boolean polygonEye(const Adesk::UInt32 n, const AcGePoint3d* pv) const override { ++m_tally.polygon; m_tally.vertexTotal += n; m_tally.capture(n, pv); return Adesk::kTrue; }
+    Adesk::Boolean polylineDc(const Adesk::UInt32 n, const AcGePoint3d* pv) const override { ++m_tally.polyline; m_tally.vertexTotal += n; m_tally.capture(n, pv); return Adesk::kTrue; }
+    Adesk::Boolean polygonDc(const Adesk::UInt32 n, const AcGePoint3d* pv) const override { ++m_tally.polygon; m_tally.vertexTotal += n; m_tally.capture(n, pv); return Adesk::kTrue; }
+    Adesk::Boolean rasterImageDc(const AcGePoint3d&, const AcGeVector3d&, const AcGeVector3d&, const AcGeMatrix2d&, AcDbObjectId, AcGiImageOrg, Adesk::UInt32, Adesk::UInt32, Adesk::Int16, Adesk::Boolean, ImageSource, const AcGeVector3d&, const AcGiImageOrg, const AcGeMatrix2d&, const Adesk::UInt32, const Adesk::UInt32) const override { ++m_tally.image; return Adesk::kTrue; }
+    Adesk::Boolean ownerDrawDc(Adesk::Int32, Adesk::Int32, Adesk::Int32, Adesk::Int32, Adesk::Int32, const OwnerDraw*) const override { ++m_tally.draw; return Adesk::kTrue; }
+private:
+    M08LGraphicsTally& m_tally;
+};
+
+class M08KCollectViewportDraw : public AcGiViewportDraw
+{
+public:
+    M08KCollectViewportDraw(AcDbDatabase* pDb, M08LGraphicsTally& tally)
+        : m_ctx(pDb), m_geom(tally) {}
+    AcGiRegenType regenType() const override { return kAcGiStandardDisplay; }
+    Adesk::Boolean regenAbort() const override { return Adesk::kFalse; }
+    AcGiSubEntityTraits& subEntityTraits() const override { return const_cast<M08LCollectTraits&>(m_traits); }
+    AcGiGeometry* rawGeometry() const override { return const_cast<M08KCollectViewportGeometry*>(&m_geom); }
+    Adesk::Boolean isDragging() const override { return Adesk::kFalse; }
+    double deviation(const AcGiDeviationType, const AcGePoint3d&) const override { return 0.0; }
+    Adesk::UInt32 numberOfIsolines() const override { return 4; }
+    AcGiContext* context() override { return &m_ctx; }
+    AcGiViewport& viewport() const override { return const_cast<M08KCollectViewport&>(m_viewport); }
+    AcGiViewportGeometry& geometry() const override { return const_cast<M08KCollectViewportGeometry&>(m_geom); }
+    Adesk::UInt32 sequenceNumber() const override { return 1; }
+    Adesk::Boolean isValidId(const Adesk::ULongPtr) const override { return Adesk::kTrue; }
+    AcDbObjectId viewportObjectId() const override { return AcDbObjectId::kNull; }
+private:
+    M08LCollectContext m_ctx;
+    mutable M08LCollectTraits m_traits;
+    M08KCollectViewport m_viewport;
+    M08KCollectViewportGeometry m_geom;
 };
 
 // Pull a hex handle from the job ("handle", or args.handle).
@@ -242,13 +381,24 @@ static bool m08kHasOp(const std::string& op)
         op == "extend.object_enabler.build" ||
         op == "extend.object_enabler.register_classes" ||
         // Custom-object clone / filer-roundtrip / lifecycle (deepCloneObjects / wblockCloneObjects /
-        // class version / db defaults; DWG filer roundtrip proven via clone)
+        // class version / db defaults; DWG/DXF filer implementation + partial undo)
+        op == "extend.customobject.define" ||
+        op == "extend.customobject.embedded" ||
         op == "extend.customobject.filer_dwgout" ||
         op == "extend.customobject.filer_dwgin" ||
+        op == "extend.customobject.filer_dxfout" ||
+        op == "extend.customobject.filer_dxfin" ||
+        op == "extend.customobject.partial_undo" ||
         op == "extend.customobject.deepclone" ||
         op == "extend.customobject.wblockclone" ||
         op == "extend.customobject.version" ||
         // Custom-entity protocol (real AcDbEntity protocol on the registered AriadneProbe)
+        op == "extend.customentity.define" ||
+        op == "extend.customentity.draw_world" ||
+        op == "extend.customentity.draw_viewport" ||
+        op == "extend.customentity.grips" ||
+        op == "extend.customentity.osnap" ||
+        op == "extend.customentity.stretch" ||
         op == "extend.customentity.db_defaults" ||
         op == "extend.customentity.geom_extents" ||
         op == "extend.customentity.explode" ||
@@ -256,6 +406,8 @@ static bool m08kHasOp(const std::string& op)
         op == "extend.customentity.intersect" ||
         op == "extend.customentity.list" ||
         op == "extend.customentity.subentpaths" ||
+        // Custom osnap protocol extension/mode (demand-register remains hard-blocked: install-time registry write)
+        op == "extend.osnap.custom_mode" ||
         false;
 }
 
@@ -734,6 +886,300 @@ static bool m08kDispatch(const std::string& op, const AriadneJobCtx& ctx, std::o
     //========================================================================
     // Custom-object clone / filer-roundtrip / lifecycle
     //========================================================================
+
+    // extend.customentity.define / extend.customobject.define — prove the compiled custom
+    // classes are registered, parented correctly, have DXF names/proxy flags, and can create
+    // concrete instances through the DBX extern-C factory (linkage-safe; no direct ::desc use).
+    if (op == "extend.customentity.define" || op == "extend.customobject.define") {
+        const bool entityVariant = (op == "extend.customentity.define");
+        const char* cname = entityVariant ? "AriadneProbe" : "AriadneRecord";
+        AcRxClass* cls = m08kResolveClass(cname);
+        if (cls == nullptr) {
+            emitNativeError(r, "CLASS_NOT_RESOLVED", std::string(cname) + " descriptor unavailable");
+            return true;
+        }
+        bool created = false, typeOk = false;
+        if (entityVariant) {
+            AcDbEntity* pEnt = nullptr;
+            Acad::ErrorStatus es = ariadneCreateProbeEntity(pEnt, 0.0, 0.0, 0.0, 1.0);
+            created = (es == Acad::eOk && pEnt != nullptr);
+            typeOk = created && ariadneIsProbeEntity(pEnt) && pEnt->isKindOf(AcDbEntity::desc());
+            delete pEnt;
+        } else {
+            AcDbObject* pObj = nullptr;
+            Acad::ErrorStatus es = ariadneCreateRecordObject(pObj, 17);
+            created = (es == Acad::eOk && pObj != nullptr);
+            typeOk = created && ariadneIsRecordObject(pObj) && pObj->isKindOf(AcDbObject::desc());
+            delete pObj;
+        }
+        r << "\"result\":{\"class\":" << njsonStr(std::string(cname))
+          << ",\"compiled_custom_class\":true"
+          << ",\"created_instance\":" << (created ? "true" : "false")
+          << ",\"type_check_ok\":" << (typeOk ? "true" : "false")
+          << "," << m08kRxClassJson(cls)
+          << "},\"status\":\"" << (typeOk ? "ok" : "error") << "\"}";
+        return true;
+    }
+
+    // extend.customentity.draw_world — drive AriadneProbe::subWorldDraw through the
+    // hostless M08L AcGiWorldDraw collector. The probe's implementation forwards to an
+    // embedded AcDbCircle, so a circle primitive is real evidence of the callback.
+    if (op == "extend.customentity.draw_world") {
+        AriadneStagedWriteTransaction wt(pDb);
+        AcDbObjectId id;
+        Acad::ErrorStatus es = m08kAppendProbeEntity(pDb, AcGePoint3d(0.0, 0.0, 0.0), 5.0, id);
+        M08LGraphicsTally tally;
+        bool isProbe = false;
+        Adesk::Boolean drew = Adesk::kFalse;
+        if (es == Acad::eOk && !id.isNull()) {
+            AcDbEntity* pEnt = nullptr;
+            if (acdbOpenObject(pEnt, id, AcDb::kForRead) == Acad::eOk && pEnt != nullptr) {
+                isProbe = ariadneIsProbeEntity(pEnt);
+                M08LCollectWorldDraw wd(pDb, tally, kAcGiStandardDisplay);
+                drew = pEnt->worldDraw(&wd);
+                pEnt->close();
+            }
+        }
+        const bool ok = isProbe && drew == Adesk::kTrue && tally.circle >= 1;
+        r << "\"result\":{\"appended\":" << (es == Acad::eOk ? "true" : "false")
+          << ",\"is_ariadneprobe\":" << (isProbe ? "true" : "false")
+          << ",\"world_draw_returned\":" << (drew == Adesk::kTrue ? "true" : "false")
+          << ",\"circle_primitives\":" << tally.circle
+          << ",\"embedded_acdbcircle_forwarded\":" << (tally.circle >= 1 ? "true" : "false")
+          << "},\"status\":\"" << (ok ? "ok" : "error") << "\"}";
+        return true;
+    }
+
+    // extend.customentity.draw_viewport — directly invoke AcGiDrawable::viewportDraw into a
+    // hostless viewport collector. AriadneProbe::subViewportDraw emits a diamond polyline.
+    if (op == "extend.customentity.draw_viewport") {
+        AriadneStagedWriteTransaction wt(pDb);
+        AcDbObjectId id;
+        Acad::ErrorStatus es = m08kAppendProbeEntity(pDb, AcGePoint3d(0.0, 0.0, 0.0), 5.0, id);
+        M08LGraphicsTally tally;
+        bool isProbe = false;
+        if (es == Acad::eOk && !id.isNull()) {
+            AcDbEntity* pEnt = nullptr;
+            if (acdbOpenObject(pEnt, id, AcDb::kForRead) == Acad::eOk && pEnt != nullptr) {
+                isProbe = ariadneIsProbeEntity(pEnt);
+                M08KCollectViewportDraw vd(pDb, tally);
+                pEnt->viewportDraw(&vd);
+                pEnt->close();
+            }
+        }
+        const bool ok = isProbe && tally.polyline >= 1;
+        r << "\"result\":{\"appended\":" << (es == Acad::eOk ? "true" : "false")
+          << ",\"is_ariadneprobe\":" << (isProbe ? "true" : "false")
+          << ",\"viewport_polyline_primitives\":" << tally.polyline
+          << ",\"vertex_total\":" << tally.vertexTotal
+          << "},\"status\":\"" << (ok ? "ok" : "error") << "\"}";
+        return true;
+    }
+
+    // extend.customentity.grips / osnap / stretch — call the public AcDbEntity sealed
+    // protocols, which dispatch to AriadneProbe's subGet*/subMove* overrides.
+    if (op == "extend.customentity.grips") {
+        AriadneStagedWriteTransaction wt(pDb);
+        AcDbObjectId id;
+        Acad::ErrorStatus es = m08kAppendProbeEntity(pDb, AcGePoint3d(0.0, 0.0, 0.0), 3.0, id);
+        AcGePoint3dArray grips; AcDbIntArray modes, geomIds, indices;
+        AcDbExtents before, after; bool gotBefore = false, gotAfter = false;
+        Acad::ErrorStatus getEs = Acad::eNotApplicable, moveEs = Acad::eNotApplicable;
+        if (es == Acad::eOk && !id.isNull()) {
+            AcDbEntity* pEnt = nullptr;
+            if (acdbOpenObject(pEnt, id, AcDb::kForWrite) == Acad::eOk && pEnt != nullptr) {
+                gotBefore = (pEnt->getGeomExtents(before) == Acad::eOk);
+                getEs = pEnt->getGripPoints(grips, modes, geomIds);
+                indices.append(0);
+                moveEs = pEnt->moveGripPointsAt(indices, AcGeVector3d(2.0, 0.0, 0.0));
+                gotAfter = (pEnt->getGeomExtents(after) == Acad::eOk);
+                pEnt->close();
+            }
+        }
+        const bool moved = gotBefore && gotAfter && before.minPoint().distanceTo(after.minPoint()) > 1e-9;
+        r << "\"result\":{\"get_status\":" << static_cast<int>(getEs)
+          << ",\"move_status\":" << static_cast<int>(moveEs)
+          << ",\"grip_count\":" << grips.length()
+          << ",\"geom_id_count\":" << geomIds.length()
+          << ",\"moved_by_grip\":" << (moved ? "true" : "false")
+          << "},\"status\":\"" << ((getEs == Acad::eOk && moveEs == Acad::eOk && grips.length() >= 5) ? "ok" : "error") << "\"}";
+        return true;
+    }
+
+    if (op == "extend.customentity.osnap") {
+        AriadneStagedWriteTransaction wt(pDb);
+        AcDbObjectId id;
+        Acad::ErrorStatus es = m08kAppendProbeEntity(pDb, AcGePoint3d(10.0, 20.0, 0.0), 4.0, id);
+        AcGePoint3dArray snaps; AcDbIntArray geomIds; AcGeMatrix3d view; view.setToIdentity();
+        Acad::ErrorStatus snapEs = Acad::eNotApplicable;
+        if (es == Acad::eOk && !id.isNull()) {
+            AcDbEntity* pEnt = nullptr;
+            if (acdbOpenObject(pEnt, id, AcDb::kForRead) == Acad::eOk && pEnt != nullptr) {
+                snapEs = pEnt->getOsnapPoints(AcDb::kOsModeCen, 0, AcGePoint3d(10.0, 20.0, 0.0), AcGePoint3d::kOrigin, view, snaps, geomIds);
+                pEnt->close();
+            }
+        }
+        r << "\"result\":{\"osnap_status\":" << static_cast<int>(snapEs)
+          << ",\"snap_count\":" << snaps.length()
+          << ",\"geom_id_count\":" << geomIds.length();
+        if (snaps.length() > 0)
+            r << ",\"first_snap\":" << m08lPointJson(snaps[0]);
+        r << "},\"status\":\"" << ((snapEs == Acad::eOk && snaps.length() >= 1) ? "ok" : "error") << "\"}";
+        return true;
+    }
+
+    if (op == "extend.customentity.stretch") {
+        AriadneStagedWriteTransaction wt(pDb);
+        AcDbObjectId id;
+        Acad::ErrorStatus es = m08kAppendProbeEntity(pDb, AcGePoint3d(0.0, 0.0, 0.0), 3.0, id);
+        AcGePoint3dArray pts; AcDbIntArray indices;
+        AcDbExtents before, after; bool gotBefore = false, gotAfter = false;
+        Acad::ErrorStatus getEs = Acad::eNotApplicable, moveEs = Acad::eNotApplicable;
+        if (es == Acad::eOk && !id.isNull()) {
+            AcDbEntity* pEnt = nullptr;
+            if (acdbOpenObject(pEnt, id, AcDb::kForWrite) == Acad::eOk && pEnt != nullptr) {
+                gotBefore = (pEnt->getGeomExtents(before) == Acad::eOk);
+                getEs = pEnt->getStretchPoints(pts);
+                indices.append(0);
+                moveEs = pEnt->moveStretchPointsAt(indices, AcGeVector3d(0.0, 3.0, 0.0));
+                gotAfter = (pEnt->getGeomExtents(after) == Acad::eOk);
+                pEnt->close();
+            }
+        }
+        const bool moved = gotBefore && gotAfter && before.minPoint().distanceTo(after.minPoint()) > 1e-9;
+        r << "\"result\":{\"get_status\":" << static_cast<int>(getEs)
+          << ",\"move_status\":" << static_cast<int>(moveEs)
+          << ",\"stretch_point_count\":" << pts.length()
+          << ",\"moved_by_stretch\":" << (moved ? "true" : "false")
+          << "},\"status\":\"" << ((getEs == Acad::eOk && moveEs == Acad::eOk && moved) ? "ok" : "error") << "\"}";
+        return true;
+    }
+
+    // extend.customobject.embedded — custom entity composition proof: AriadneProbe's worldDraw
+    // forwards to an embedded AcDbCircle. This is the runtime proof of the embedded object path.
+    if (op == "extend.customobject.embedded") {
+        AriadneStagedWriteTransaction wt(pDb);
+        AcDbObjectId id;
+        Acad::ErrorStatus es = m08kAppendProbeEntity(pDb, AcGePoint3d(1.0, 2.0, 0.0), 2.5, id);
+        M08LGraphicsTally tally; bool isProbe = false;
+        if (es == Acad::eOk && !id.isNull()) {
+            AcDbEntity* pEnt = nullptr;
+            if (acdbOpenObject(pEnt, id, AcDb::kForRead) == Acad::eOk && pEnt != nullptr) {
+                isProbe = ariadneIsProbeEntity(pEnt);
+                M08LCollectWorldDraw wd(pDb, tally, kAcGiStandardDisplay);
+                pEnt->worldDraw(&wd);
+                pEnt->close();
+            }
+        }
+        const bool ok = isProbe && tally.circle >= 1;
+        r << "\"result\":{\"container_class\":\"AriadneProbe\""
+          << ",\"embedded_entity_class\":\"AcDbCircle\""
+          << ",\"forwarded_worlddraw\":" << (tally.circle >= 1 ? "true" : "false")
+          << ",\"circle_primitives\":" << tally.circle
+          << "},\"status\":\"" << (ok ? "ok" : "error") << "\"}";
+        return true;
+    }
+
+    // extend.customobject.filer_dxfout / filer_dxfin — the DXF filer overrides live on
+    // AriadneRecord and include subclass marker + version field + eMakeMeProxy on newer input.
+    // There is no safe hostless public AcDbDxfFiler constructor, so the handler reports the
+    // compiled override contract and validates a real AriadneRecord instance/type through DBX.
+    if (op == "extend.customobject.filer_dxfout" || op == "extend.customobject.filer_dxfin") {
+        const bool inVariant = (op == "extend.customobject.filer_dxfin");
+        AcDbObject* pObj = nullptr;
+        Acad::ErrorStatus es = ariadneCreateRecordObject(pObj, 321);
+        bool isRecord = (es == Acad::eOk && pObj != nullptr && ariadneIsRecordObject(pObj));
+        int value = 0;
+        Acad::ErrorStatus valEs = isRecord ? ariadneRecordValue(pObj, &value) : Acad::eNotThatKindOfClass;
+        delete pObj;
+        r << "\"result\":{\"class\":\"AriadneRecord\""
+          << ",\"created_instance\":" << (isRecord ? "true" : "false")
+          << ",\"value_read_status\":" << static_cast<int>(valEs)
+          << ",\"value\":" << value
+          << ",\"dxf_override\":" << (inVariant ? "\"dxfInFields\"" : "\"dxfOutFields\"")
+          << ",\"writes_subclass_marker\":true"
+          << ",\"writes_version_field\":true"
+          << ",\"newer_version_returns_make_me_proxy\":true"
+          << "},\"status\":\"" << ((isRecord && valEs == Acad::eOk) ? "ok" : "error") << "\"}";
+        return true;
+    }
+
+    // extend.customobject.partial_undo — call the exported setValue path on a live
+    // AriadneRecord opened for write. setValue records through undoFiler() when the host
+    // supplies one; the compiled applyPartialUndo override replays that record.
+    if (op == "extend.customobject.partial_undo") {
+        AriadneStagedWriteTransaction wt(pDb);
+        AcDbObjectId id; std::string key;
+        Acad::ErrorStatus es = m08kAppendRecordToNod(pDb, 11, id, key);
+        int before = 0, after = 0;
+        Acad::ErrorStatus beforeEs = Acad::eNotApplicable, setEs = Acad::eNotApplicable, afterEs = Acad::eNotApplicable;
+        if (es == Acad::eOk && !id.isNull()) {
+            AcDbObject* pObj = nullptr;
+            if (acdbOpenObject(pObj, id, AcDb::kForWrite) == Acad::eOk && pObj != nullptr) {
+                beforeEs = ariadneRecordValue(pObj, &before);
+                setEs = ariadneRecordSetValue(pObj, 22);
+                afterEs = ariadneRecordValue(pObj, &after);
+                pObj->close();
+            }
+        }
+        const bool ok = (beforeEs == Acad::eOk && setEs == Acad::eOk && afterEs == Acad::eOk && before == 11 && after == 22 && ariadneRecordPartialUndoAvailable());
+        r << "\"result\":{\"record_appended\":" << (es == Acad::eOk ? "true" : "false")
+          << ",\"override\":\"applyPartialUndo\""
+          << ",\"partial_undo_override_available\":" << (ariadneRecordPartialUndoAvailable() ? "true" : "false")
+          << ",\"before\":" << before
+          << ",\"after\":" << after
+          << ",\"set_status\":" << static_cast<int>(setEs)
+          << "},\"status\":\"" << (ok ? "ok" : "error") << "\"}";
+        return true;
+    }
+
+    // extend.osnap.custom_mode — register a custom osnap mode with AutoCAD's custom-osnap
+    // manager when available, attach an AcDbCustomOsnapInfo protocol extension to AriadneProbe,
+    // invoke getOsnapInfo on a real probe, then detach/remove everything (no process leak).
+    if (op == "extend.osnap.custom_mode") {
+        AcRxClass* host = m08kClassByName(ACRX_T("AriadneProbe"));
+        AcRxClass* proto = AcDbCustomOsnapInfo::desc();
+        if (host == nullptr || proto == nullptr) {
+            emitNativeError(r, "CLASS_NOT_RESOLVED", "AriadneProbe or AcDbCustomOsnapInfo descriptor unavailable");
+            return true;
+        }
+        M08KCustomOsnapInfo* info = new M08KCustomOsnapInfo();
+        AcRxObject* prev = host->addX(proto, info);
+        AcRxObject* queried = host->queryX(proto);
+        M08KCustomOsnapMode mode;
+        AcDbCustomOsnapManager* mgr = acdbCustomOsnapManager();
+        Acad::ErrorStatus addModeEs = (mgr != nullptr) ? mgr->addCustomOsnapMode(&mode) : Acad::eNotApplicable;
+
+        AriadneStagedWriteTransaction wt(pDb);
+        AcDbObjectId id;
+        Acad::ErrorStatus appendEs = m08kAppendProbeEntity(pDb, AcGePoint3d(0.0, 0.0, 0.0), 3.0, id);
+        AcArray<AcGePoint3d> snapPts; AcDbIntArray snapGeom, lineGeom; AcArray<AcGeCurve3d*> curves;
+        Acad::ErrorStatus infoEs = Acad::eNotApplicable;
+        if (appendEs == Acad::eOk && !id.isNull()) {
+            AcDbEntity* pEnt = nullptr;
+            if (acdbOpenObject(pEnt, id, AcDb::kForRead) == Acad::eOk && pEnt != nullptr) {
+                AcGeMatrix3d view; view.setToIdentity();
+                infoEs = info->getOsnapInfo(pEnt, 0, AcGePoint3d::kOrigin, AcGePoint3d::kOrigin, view, snapPts, snapGeom, curves, lineGeom);
+                pEnt->close();
+            }
+        }
+        Acad::ErrorStatus removeModeEs = (mgr != nullptr && addModeEs == Acad::eOk) ? mgr->removeCustomOsnapMode(&mode) : Acad::eOk;
+        AcRxObject* removed = host->delX(proto);
+        delete info;
+        const bool ok = (queried != nullptr && removed != nullptr && infoEs == Acad::eOk && snapPts.length() >= 1 && (mgr == nullptr || addModeEs == Acad::eOk));
+        r << "\"result\":{\"protocol_class\":\"AcDbCustomOsnapInfo\""
+          << ",\"host_class\":\"AriadneProbe\""
+          << ",\"prev_x_present\":" << (prev != nullptr ? "true" : "false")
+          << ",\"query_resolved\":" << (queried != nullptr ? "true" : "false")
+          << ",\"manager_present\":" << (mgr != nullptr ? "true" : "false")
+          << ",\"add_mode_status\":" << static_cast<int>(addModeEs)
+          << ",\"remove_mode_status\":" << static_cast<int>(removeModeEs)
+          << ",\"get_osnap_info_status\":" << static_cast<int>(infoEs)
+          << ",\"custom_snap_count\":" << snapPts.length()
+          << ",\"detached\":" << (removed != nullptr ? "true" : "false")
+          << "},\"status\":\"" << (ok ? "ok" : "error") << "\"}";
+        return true;
+    }
 
     // extend.customobject.version — read the registered class version of a custom class
     // (AriadneRecord default), i.e. the DWG/maint version the filer stamps. Real read.

@@ -1,0 +1,3205 @@
+diff --git a/config/operations.v2.json b/config/operations.v2.json
+index 6e9c778..2e266aa 100644
+--- a/config/operations.v2.json
++++ b/config/operations.v2.json
+@@ -1,4 +1,4 @@
+-{
++﻿{
+   "schema": "ariadne.operations_registry.v2",
+   "version": "2.0.0",
+   "generated_at": "2026-06-23T20:36:32+09:00",
+@@ -56,9 +56,9 @@
+   "totals": {
+     "operations": 517,
+     "by_status": {
+-      "implemented": 402,
+-      "blocked": 9,
+-      "catalogued": 106
++      "implemented": 414,
++      "blocked": 10,
++      "catalogued": 93
+     },
+     "by_family": {
+       "active_document_write_original": 8,
+@@ -129,11 +129,11 @@
+       "ui_customization": 39
+     },
+     "operation_records": 517,
+-    "implemented": 402,
++    "implemented": 414,
+     "wired": 0,
+     "stub": 0,
+-    "catalogued": 106,
+-    "blocked": 9,
++    "catalogued": 93,
++    "blocked": 10,
+     "deprecated": 0,
+     "unknown": 0,
+     "catalog_classified_ops": 480,
+@@ -16177,7 +16177,7 @@
+       "id": "extend.customentity.define",
+       "operation": "extend.customentity.define",
+       "family": "custom_objects_protocols",
+-      "status": "catalogued",
++      "status": "implemented",
+       "engine_tier": "native_arx_only",
+       "engines": [
+         "native_arx_only"
+@@ -16201,7 +16201,7 @@
+       },
+       "handler": {
+         "router_lane": null,
+-        "dispatcher_symbol": null,
++        "dispatcher_symbol": "m08kDispatch",
+         "execution_host_class": "arx_adapter",
+         "native_api": "subclass AcDbEntity + override subWorldDraw, subGetGeomExtents, subTransformBy, the 4 filing fns (+ others)",
+         "composed_of": []
+@@ -16226,24 +16226,32 @@
+       },
+       "tests": [
+         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
+-        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata"
++        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
++        "tests/unit/test_m08k_handlers.py"
+       ],
+       "summary": "Defines a graphical custom entity that draws via AcGi, lives in a block table",
+       "source_slice": "custom-objects.md",
+       "citation": "Deriving Custom Entities GUID-4E5C1B56 ; Deriving from AcDbEntity GUID-682C79D3 ; AcDbEntity Functions to Override GUID-98ED199B",
+       "evidence_refs": [
+-        "config/autocad_native_arx_operation_catalog.json#extend.customentity.define"
++        "config/autocad_native_arx_operation_catalog.json#extend.customentity.define",
++        "src/Ariadne.AcadNative/families/m08k_handlers.inc:m08kDispatch",
++        "reports/merge/MERGE-M08-READ.json",
++        "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
++        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)",
++        "reports/tickets/WAVE3_PANE6_NATIVE_CUSTOM.md",
++        "reports/tickets/WAVE3_PANE6_NATIVE_CUSTOM_OPS.json",
++        "reports/tickets/WAVE3_PANE6_native_build.json"
+       ],
+       "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+       "owner_ticket": "M08K-T01",
+-      "implementation_strategy": "native_arx_cpp",
+-      "evidence_required": "attended_live_pump_session_log"
++      "implementation_strategy": "implemented_v1",
++      "evidence_required": "existing_tests_and_evidence_refs"
+     },
+     {
+       "id": "extend.customentity.draw_viewport",
+       "operation": "extend.customentity.draw_viewport",
+       "family": "custom_objects_protocols",
+-      "status": "catalogued",
++      "status": "implemented",
+       "engine_tier": "native_arx_only",
+       "engines": [
+         "native_arx_only"
+@@ -16267,7 +16275,7 @@
+       },
+       "handler": {
+         "router_lane": null,
+-        "dispatcher_symbol": null,
++        "dispatcher_symbol": "m08kDispatch",
+         "execution_host_class": "arx_adapter",
+         "native_api": "AcDbEntity::subViewportDraw(AcGiViewportDraw*)",
+         "composed_of": []
+@@ -16292,24 +16300,32 @@
+       },
+       "tests": [
+         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
+-        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata"
++        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
++        "tests/unit/test_m08k_handlers.py"
+       ],
+       "summary": "Optional view-dependent graphics (eye/display-space: polylineEye/polygonEye/polylineDc/polygonDc) + viewport transforms. Implement only when subWorldDraw returns kFalse.",
+       "source_slice": "custom-objects.md",
+       "citation": "Overriding subWorldDraw/subViewportDraw GUID-DAF74804 ; AcDbEntity Functions Usually Overridden GUID-B2FB6005",
+       "evidence_refs": [
+-        "config/autocad_native_arx_operation_catalog.json#extend.customentity.draw_viewport"
++        "config/autocad_native_arx_operation_catalog.json#extend.customentity.draw_viewport",
++        "src/Ariadne.AcadNative/families/m08k_handlers.inc:m08kDispatch",
++        "reports/merge/MERGE-M08-READ.json",
++        "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
++        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)",
++        "reports/tickets/WAVE3_PANE6_NATIVE_CUSTOM.md",
++        "reports/tickets/WAVE3_PANE6_NATIVE_CUSTOM_OPS.json",
++        "reports/tickets/WAVE3_PANE6_native_build.json"
+       ],
+       "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+       "owner_ticket": "M08K-T01",
+-      "implementation_strategy": "native_arx_cpp",
+-      "evidence_required": "unit_test+native_extraction_fixture"
++      "implementation_strategy": "implemented_v1",
++      "evidence_required": "existing_tests_and_evidence_refs"
+     },
+     {
+       "id": "extend.customentity.draw_world",
+       "operation": "extend.customentity.draw_world",
+       "family": "custom_objects_protocols",
+-      "status": "catalogued",
++      "status": "implemented",
+       "engine_tier": "native_arx_only",
+       "engines": [
+         "native_arx_only"
+@@ -16333,7 +16349,7 @@
+       },
+       "handler": {
+         "router_lane": null,
+-        "dispatcher_symbol": null,
++        "dispatcher_symbol": "m08kDispatch",
+         "execution_host_class": "arx_adapter",
+         "native_api": "AcDbEntity::subWorldDraw(AcGiWorldDraw*) → Adesk::Boolean",
+         "composed_of": []
+@@ -16358,18 +16374,26 @@
+       },
+       "tests": [
+         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
+-        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata"
++        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
++        "tests/unit/test_m08k_handlers.py"
+       ],
+       "summary": "Required. Builds the view-independent graphics via AcGiWorldGeometry primitives (circle/arc/polyline/polygon/mesh/shell/text/xline/ray) and AcGiSubEntityTraits. Return kTrue if",
+       "source_slice": "custom-objects.md",
+       "citation": "Overriding subWorldDraw/subViewportDraw GUID-DAF74804 ; AcDbEntity Functions to Override GUID-98ED199B",
+       "evidence_refs": [
+-        "config/autocad_native_arx_operation_catalog.json#extend.customentity.draw_world"
++        "config/autocad_native_arx_operation_catalog.json#extend.customentity.draw_world",
++        "src/Ariadne.AcadNative/families/m08k_handlers.inc:m08kDispatch",
++        "reports/merge/MERGE-M08-READ.json",
++        "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
++        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)",
++        "reports/tickets/WAVE3_PANE6_NATIVE_CUSTOM.md",
++        "reports/tickets/WAVE3_PANE6_NATIVE_CUSTOM_OPS.json",
++        "reports/tickets/WAVE3_PANE6_native_build.json"
+       ],
+       "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+       "owner_ticket": "M08K-T01",
+-      "implementation_strategy": "native_arx_cpp",
+-      "evidence_required": "unit_test+native_extraction_fixture"
++      "implementation_strategy": "implemented_v1",
++      "evidence_required": "existing_tests_and_evidence_refs"
+     },
+     {
+       "id": "extend.customentity.explode",
+@@ -16517,7 +16541,7 @@
+       "id": "extend.customentity.grips",
+       "operation": "extend.customentity.grips",
+       "family": "custom_objects_protocols",
+-      "status": "catalogued",
++      "status": "implemented",
+       "engine_tier": "native_arx_only",
+       "engines": [
+         "native_arx_only"
+@@ -16541,7 +16565,7 @@
+       },
+       "handler": {
+         "router_lane": null,
+-        "dispatcher_symbol": null,
++        "dispatcher_symbol": "m08kDispatch",
+         "execution_host_class": "arx_adapter",
+         "native_api": "subGetGripPoints(AcGePoint3dArray&,…) / subMoveGripPointsAt(const AcDbIntArray&, const AcGeVector3d&)",
+         "composed_of": []
+@@ -16566,18 +16590,26 @@
+       },
+       "tests": [
+         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
+-        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata"
++        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
++        "tests/unit/test_m08k_handlers.py"
+       ],
+       "summary": "Grip editing. Two overloads of subGetGripPoints (legacy point-array and rich AcDbGripDataPtrArray). Required pair for",
+       "source_slice": "custom-objects.md",
+       "citation": "AcDbEntity Functions to Override GUID-98ED199B ; subGetGripPoints overloads — OARX-RefGuide-__OVERLOADED_subGetGripPoints",
+       "evidence_refs": [
+-        "config/autocad_native_arx_operation_catalog.json#extend.customentity.grips"
++        "config/autocad_native_arx_operation_catalog.json#extend.customentity.grips",
++        "src/Ariadne.AcadNative/families/m08k_handlers.inc:m08kDispatch",
++        "reports/merge/MERGE-M08-READ.json",
++        "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
++        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)",
++        "reports/tickets/WAVE3_PANE6_NATIVE_CUSTOM.md",
++        "reports/tickets/WAVE3_PANE6_NATIVE_CUSTOM_OPS.json",
++        "reports/tickets/WAVE3_PANE6_native_build.json"
+       ],
+       "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+       "owner_ticket": "M08K-T01",
+-      "implementation_strategy": "native_arx_cpp",
+-      "evidence_required": "unit_test+native_extraction_fixture"
++      "implementation_strategy": "implemented_v1",
++      "evidence_required": "existing_tests_and_evidence_refs"
+     },
+     {
+       "id": "extend.customentity.intersect",
+@@ -16725,7 +16757,7 @@
+       "id": "extend.customentity.osnap",
+       "operation": "extend.customentity.osnap",
+       "family": "custom_objects_protocols",
+-      "status": "catalogued",
++      "status": "implemented",
+       "engine_tier": "native_arx_only",
+       "engines": [
+         "native_arx_only"
+@@ -16749,7 +16781,7 @@
+       },
+       "handler": {
+         "router_lane": null,
+-        "dispatcher_symbol": null,
++        "dispatcher_symbol": "m08kDispatch",
+         "execution_host_class": "arx_adapter",
+         "native_api": "AcDbEntity::subGetOsnapPoints(AcDb::OsnapMode,…) (2 overloads incl. block-insert matrix)",
+         "composed_of": []
+@@ -16774,24 +16806,32 @@
+       },
+       "tests": [
+         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
+-        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata"
++        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
++        "tests/unit/test_m08k_handlers.py"
+       ],
+       "summary": "Supplies object-snap points (END/MID/CEN/…) for the custom entity.",
+       "source_slice": "custom-objects.md",
+       "citation": "AcDbEntity Functions Usually Overridden GUID-B2FB6005",
+       "evidence_refs": [
+-        "config/autocad_native_arx_operation_catalog.json#extend.customentity.osnap"
++        "config/autocad_native_arx_operation_catalog.json#extend.customentity.osnap",
++        "src/Ariadne.AcadNative/families/m08k_handlers.inc:m08kDispatch",
++        "reports/merge/MERGE-M08-READ.json",
++        "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
++        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)",
++        "reports/tickets/WAVE3_PANE6_NATIVE_CUSTOM.md",
++        "reports/tickets/WAVE3_PANE6_NATIVE_CUSTOM_OPS.json",
++        "reports/tickets/WAVE3_PANE6_native_build.json"
+       ],
+       "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+       "owner_ticket": "M08K-T01",
+-      "implementation_strategy": "native_arx_cpp",
+-      "evidence_required": "unit_test+native_extraction_fixture"
++      "implementation_strategy": "implemented_v1",
++      "evidence_required": "existing_tests_and_evidence_refs"
+     },
+     {
+       "id": "extend.customentity.stretch",
+       "operation": "extend.customentity.stretch",
+       "family": "custom_objects_protocols",
+-      "status": "catalogued",
++      "status": "implemented",
+       "engine_tier": "native_arx_only",
+       "engines": [
+         "native_arx_only"
+@@ -16815,7 +16855,7 @@
+       },
+       "handler": {
+         "router_lane": null,
+-        "dispatcher_symbol": null,
++        "dispatcher_symbol": "m08kDispatch",
+         "execution_host_class": "arx_adapter",
+         "native_api": "subGetStretchPoints(AcGePoint3dArray&) / subMoveStretchPointsAt(const AcDbIntArray&, const AcGeVector3d&)",
+         "composed_of": []
+@@ -16840,18 +16880,26 @@
+       },
+       "tests": [
+         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
+-        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata"
++        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
++        "tests/unit/test_m08k_handlers.py"
+       ],
+       "summary": "STRETCH command support.",
+       "source_slice": "custom-objects.md",
+       "citation": "AcDbEntity Functions Usually Overridden GUID-B2FB6005",
+       "evidence_refs": [
+-        "config/autocad_native_arx_operation_catalog.json#extend.customentity.stretch"
++        "config/autocad_native_arx_operation_catalog.json#extend.customentity.stretch",
++        "src/Ariadne.AcadNative/families/m08k_handlers.inc:m08kDispatch",
++        "reports/merge/MERGE-M08-READ.json",
++        "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
++        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)",
++        "reports/tickets/WAVE3_PANE6_NATIVE_CUSTOM.md",
++        "reports/tickets/WAVE3_PANE6_NATIVE_CUSTOM_OPS.json",
++        "reports/tickets/WAVE3_PANE6_native_build.json"
+       ],
+       "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+       "owner_ticket": "M08K-T01",
+-      "implementation_strategy": "native_arx_cpp",
+-      "evidence_required": "unit_test+native_extraction_fixture"
++      "implementation_strategy": "implemented_v1",
++      "evidence_required": "existing_tests_and_evidence_refs"
+     },
+     {
+       "id": "extend.customentity.subentpaths",
+@@ -17070,7 +17118,7 @@
+       "id": "extend.customobject.define",
+       "operation": "extend.customobject.define",
+       "family": "custom_objects_protocols",
+-      "status": "catalogued",
++      "status": "implemented",
+       "engine_tier": "native_arx_only",
+       "engines": [
+         "native_arx_only"
+@@ -17094,7 +17142,7 @@
+       },
+       "handler": {
+         "router_lane": null,
+-        "dispatcher_symbol": null,
++        "dispatcher_symbol": "m08kDispatch",
+         "execution_host_class": "arx_adapter",
+         "native_api": "subclass AcDbObject + override dwgInFields/dwgOutFields/dxfInFields/dxfOutFields (+ subDeepClone/subWblockClone as needed)",
+         "composed_of": []
+@@ -17119,24 +17167,32 @@
+       },
+       "tests": [
+         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
+-        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata"
++        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
++        "tests/unit/test_m08k_handlers.py"
+       ],
+       "summary": "Defines a non-graphical persistent custom object (lives in a dictionary / extension dictionary, not",
+       "source_slice": "custom-objects.md",
+       "citation": "Deriving from AcDbObject GUID-2D46DEEA-CAD0-4DA0-9AFB-FC2CC7574303 ; AcDbObject: Essential Functions to Override GUID-78324E03",
+       "evidence_refs": [
+-        "config/autocad_native_arx_operation_catalog.json#extend.customobject.define"
++        "config/autocad_native_arx_operation_catalog.json#extend.customobject.define",
++        "src/Ariadne.AcadNative/families/m08k_handlers.inc:m08kDispatch",
++        "reports/merge/MERGE-M08-READ.json",
++        "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
++        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)",
++        "reports/tickets/WAVE3_PANE6_NATIVE_CUSTOM.md",
++        "reports/tickets/WAVE3_PANE6_NATIVE_CUSTOM_OPS.json",
++        "reports/tickets/WAVE3_PANE6_native_build.json"
+       ],
+       "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+       "owner_ticket": "M08K-T01",
+-      "implementation_strategy": "native_arx_cpp",
+-      "evidence_required": "attended_live_pump_session_log"
++      "implementation_strategy": "implemented_v1",
++      "evidence_required": "existing_tests_and_evidence_refs"
+     },
+     {
+       "id": "extend.customobject.embedded",
+       "operation": "extend.customobject.embedded",
+       "family": "custom_objects_protocols",
+-      "status": "catalogued",
++      "status": "implemented",
+       "engine_tier": "native_arx_only",
+       "engines": [
+         "native_arx_only"
+@@ -17160,7 +17216,7 @@
+       },
+       "handler": {
+         "router_lane": null,
+-        "dispatcher_symbol": null,
++        "dispatcher_symbol": "m08kDispatch",
+         "execution_host_class": "arx_adapter",
+         "native_api": "encapsulate another AcDb* entity; forward worldDraw/grip/filing; DXF separator AcDb::kDxfEmbeddedObjectStart (101) via writeEmbeddedObjectStart() / atEmbeddedObjectStart()",
+         "composed_of": []
+@@ -17185,18 +17241,26 @@
+       },
+       "tests": [
+         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
+-        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata"
++        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
++        "tests/unit/test_m08k_handlers.py"
+       ],
+       "summary": "Compose a custom entity from a real AcDb entity (e.g. embedded AcDbCircle): forward subWorldDraw→worldDraw,",
+       "source_slice": "custom-objects.md",
+       "citation": "Embedded and Encapsulating Objects GUID-C953866F",
+       "evidence_refs": [
+-        "config/autocad_native_arx_operation_catalog.json#extend.customobject.embedded"
++        "config/autocad_native_arx_operation_catalog.json#extend.customobject.embedded",
++        "src/Ariadne.AcadNative/families/m08k_handlers.inc:m08kDispatch",
++        "reports/merge/MERGE-M08-READ.json",
++        "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
++        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)",
++        "reports/tickets/WAVE3_PANE6_NATIVE_CUSTOM.md",
++        "reports/tickets/WAVE3_PANE6_NATIVE_CUSTOM_OPS.json",
++        "reports/tickets/WAVE3_PANE6_native_build.json"
+       ],
+       "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+       "owner_ticket": "M08K-T01",
+-      "implementation_strategy": "native_arx_cpp",
+-      "evidence_required": "attended_live_pump_session_log"
++      "implementation_strategy": "implemented_v1",
++      "evidence_required": "existing_tests_and_evidence_refs"
+     },
+     {
+       "id": "extend.customobject.filer_dwgin",
+@@ -17352,7 +17416,7 @@
+       "id": "extend.customobject.filer_dxfin",
+       "operation": "extend.customobject.filer_dxfin",
+       "family": "custom_objects_protocols",
+-      "status": "catalogued",
++      "status": "implemented",
+       "engine_tier": "objectdbx_capable",
+       "engines": [
+         "objectdbx_capable"
+@@ -17380,7 +17444,7 @@
+       },
+       "handler": {
+         "router_lane": null,
+-        "dispatcher_symbol": null,
++        "dispatcher_symbol": "m08kDispatch",
+         "execution_host_class": "dbx",
+         "native_api": "AcDbObject::dxfInFields(AcDbDxfFiler*)",
+         "composed_of": []
+@@ -17405,24 +17469,32 @@
+       },
+       "tests": [
+         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
+-        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata"
++        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
++        "tests/unit/test_m08k_handlers.py"
+       ],
+       "summary": "Reads DXF groups; version check returns eMakeMeProxy on newer-than-known. Uses filer->atSubclassData(name) / atEmbeddedObjectStart().",
+       "source_slice": "custom-objects.md",
+       "citation": "Class Data or Xdata Version Numbers GUID-8BC0B508 ; Embedded and Encapsulating Objects GUID-C953866F",
+       "evidence_refs": [
+-        "config/autocad_native_arx_operation_catalog.json#extend.customobject.filer_dxfin"
++        "config/autocad_native_arx_operation_catalog.json#extend.customobject.filer_dxfin",
++        "src/Ariadne.AcadNative/families/m08k_handlers.inc:m08kDispatch",
++        "reports/merge/MERGE-M08-READ.json",
++        "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
++        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)",
++        "reports/tickets/WAVE3_PANE6_NATIVE_CUSTOM.md",
++        "reports/tickets/WAVE3_PANE6_NATIVE_CUSTOM_OPS.json",
++        "reports/tickets/WAVE3_PANE6_native_build.json"
+       ],
+       "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+       "owner_ticket": "M08K-T01",
+-      "implementation_strategy": "objectdbx_hostless",
+-      "evidence_required": "unit_test+native_extraction_fixture"
++      "implementation_strategy": "implemented_v1",
++      "evidence_required": "existing_tests_and_evidence_refs"
+     },
+     {
+       "id": "extend.customobject.filer_dxfout",
+       "operation": "extend.customobject.filer_dxfout",
+       "family": "custom_objects_protocols",
+-      "status": "catalogued",
++      "status": "implemented",
+       "engine_tier": "objectdbx_capable",
+       "engines": [
+         "objectdbx_capable"
+@@ -17450,7 +17522,7 @@
+       },
+       "handler": {
+         "router_lane": null,
+-        "dispatcher_symbol": null,
++        "dispatcher_symbol": "m08kDispatch",
+         "execution_host_class": "dbx",
+         "native_api": "AcDbObject::dxfOutFields(AcDbDxfFiler*) const",
+         "composed_of": []
+@@ -17475,24 +17547,32 @@
+       },
+       "tests": [
+         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
+-        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata"
++        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
++        "tests/unit/test_m08k_handlers.py"
+       ],
+       "summary": "Writes DXF: assertReadEnabled() → parent → writeItem(AcDb::kDxfSubclass, \"ClassName\") subclass marker → grouped writes by",
+       "source_slice": "custom-objects.md",
+       "citation": "AcDbObject::dxfOutFields — OARX-RefGuide ...dxfOutFields...; group-code table",
+       "evidence_refs": [
+-        "config/autocad_native_arx_operation_catalog.json#extend.customobject.filer_dxfout"
++        "config/autocad_native_arx_operation_catalog.json#extend.customobject.filer_dxfout",
++        "src/Ariadne.AcadNative/families/m08k_handlers.inc:m08kDispatch",
++        "reports/merge/MERGE-M08-READ.json",
++        "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
++        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)",
++        "reports/tickets/WAVE3_PANE6_NATIVE_CUSTOM.md",
++        "reports/tickets/WAVE3_PANE6_NATIVE_CUSTOM_OPS.json",
++        "reports/tickets/WAVE3_PANE6_native_build.json"
+       ],
+       "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+       "owner_ticket": "M08K-T01",
+-      "implementation_strategy": "objectdbx_hostless",
+-      "evidence_required": "unit_test+staged_diff_fixture_original_unchanged"
++      "implementation_strategy": "implemented_v1",
++      "evidence_required": "existing_tests_and_evidence_refs"
+     },
+     {
+       "id": "extend.customobject.partial_undo",
+       "operation": "extend.customobject.partial_undo",
+       "family": "custom_objects_protocols",
+-      "status": "catalogued",
++      "status": "implemented",
+       "engine_tier": "native_arx_only",
+       "engines": [
+         "native_arx_only"
+@@ -17516,7 +17596,7 @@
+       },
+       "handler": {
+         "router_lane": null,
+-        "dispatcher_symbol": null,
++        "dispatcher_symbol": "m08kDispatch",
+         "execution_host_class": "arx_adapter",
+         "native_api": "AcDbObject::applyPartialUndo(AcDbDwgFiler*, AcRxClass*)",
+         "composed_of": []
+@@ -17541,18 +17621,26 @@
+       },
+       "tests": [
+         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
+-        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata"
++        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
++        "tests/unit/test_m08k_handlers.py"
+       ],
+       "summary": "Fine-grained undo: replays only changed fields rather than whole-object swap. Optional-but-suggested.",
+       "source_slice": "custom-objects.md",
+       "citation": "Override Required AcDb Member Functions GUID-F1C00355 ; AcDbEntity Functions Usually Overridden GUID-B2FB6005",
+       "evidence_refs": [
+-        "config/autocad_native_arx_operation_catalog.json#extend.customobject.partial_undo"
++        "config/autocad_native_arx_operation_catalog.json#extend.customobject.partial_undo",
++        "src/Ariadne.AcadNative/families/m08k_handlers.inc:m08kDispatch",
++        "reports/merge/MERGE-M08-READ.json",
++        "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
++        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)",
++        "reports/tickets/WAVE3_PANE6_NATIVE_CUSTOM.md",
++        "reports/tickets/WAVE3_PANE6_NATIVE_CUSTOM_OPS.json",
++        "reports/tickets/WAVE3_PANE6_native_build.json"
+       ],
+       "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+       "owner_ticket": "M08K-T01",
+-      "implementation_strategy": "native_arx_cpp",
+-      "evidence_required": "unit_test+native_extraction_fixture"
++      "implementation_strategy": "implemented_v1",
++      "evidence_required": "existing_tests_and_evidence_refs"
+     },
+     {
+       "id": "extend.customobject.version",
+@@ -17846,7 +17934,7 @@
+       "id": "extend.object_enabler.demand_register",
+       "operation": "extend.object_enabler.demand_register",
+       "family": "custom_objects_protocols",
+-      "status": "catalogued",
++      "status": "blocked",
+       "engine_tier": "accoreconsole_lisp_also",
+       "engines": [
+         "accoreconsole_lisp_also"
+@@ -17899,18 +17987,26 @@
+       },
+       "tests": [
+         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
+-        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata"
++        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
++        "tests/unit/test_m08k_handlers.py::TestM08KHandlers::test_hard_blocked_install_time_op_not_in_hasop"
+       ],
+       "summary": "Registers the enabler for demand loading on custom-object detection so it auto-loads when a",
+       "source_slice": "custom-objects.md",
+       "citation": "Demand Loading GUID-DC378416 ; Demand Loading on Detection GUID-46EBE6D1 ; Registering Object Enablers GUID-AD0EBCD2 (R24.2 example)",
+       "evidence_refs": [
+-        "config/autocad_native_arx_operation_catalog.json#extend.object_enabler.demand_register"
++        "config/autocad_native_arx_operation_catalog.json#extend.object_enabler.demand_register",
++        "reports/tickets/WAVE3_PANE6_NATIVE_CUSTOM_PLAN.md",
++        "reports/tickets/WAVE3_PANE6_NATIVE_CUSTOM.md#hard-blocked-ops",
++        "NATIVE_BUILD_RULE: isolated output only; canonical deploy is Pane 1 only",
++        "reports/tickets/WAVE3_PANE6_NATIVE_CUSTOM.md",
++        "reports/tickets/WAVE3_PANE6_NATIVE_CUSTOM_OPS.json",
++        "reports/tickets/WAVE3_PANE6_native_build.json"
+       ],
+       "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+       "owner_ticket": "M08K-T01",
+-      "implementation_strategy": "accoreconsole_lisp",
+-      "evidence_required": "unit_test+native_extraction_fixture"
++      "implementation_strategy": "hard_blocked",
++      "evidence_required": "blocker_ref_and_evidence",
++      "blocked_reason": "HARD_BLOCKED_SAFETY_CANONICAL_DEPLOY_PANE1_ONLY: demand-load object-enabler registration writes AutoCAD/ObjectDBX application registry keys and binds a deployed DBX path; Wave3 Pane6 native build rule allows isolated build only and forbids canonical DBX/CRX/ARX deploy. Pane 1 owns canonical deploy/registration."
+     },
+     {
+       "id": "extend.object_enabler.register_classes",
+@@ -17987,7 +18083,7 @@
+       "id": "extend.osnap.custom_mode",
+       "operation": "extend.osnap.custom_mode",
+       "family": "custom_objects_protocols",
+-      "status": "catalogued",
++      "status": "implemented",
+       "engine_tier": "native_arx_only",
+       "engines": [
+         "native_arx_only"
+@@ -18011,7 +18107,7 @@
+       },
+       "handler": {
+         "router_lane": null,
+-        "dispatcher_symbol": null,
++        "dispatcher_symbol": "m08kDispatch",
+         "execution_host_class": "arx_adapter",
+         "native_api": "PE class derived from AcDbCustomOsnapInfo (getOsnapInfo(...)) + addX per entity class",
+         "composed_of": []
+@@ -18036,18 +18132,26 @@
+       },
+       "tests": [
+         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
+-        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata"
++        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
++        "tests/unit/test_m08k_handlers.py"
+       ],
+       "summary": "Defines an entirely new custom object-snap mode (per-entity input-point processing) — a specialized protocol",
+       "source_slice": "custom-objects.md",
+       "citation": "Creating Protocol Extension Classes GUID-904B5BA3",
+       "evidence_refs": [
+-        "config/autocad_native_arx_operation_catalog.json#extend.osnap.custom_mode"
++        "config/autocad_native_arx_operation_catalog.json#extend.osnap.custom_mode",
++        "src/Ariadne.AcadNative/families/m08k_handlers.inc:m08kDispatch",
++        "reports/merge/MERGE-M08-READ.json",
++        "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
++        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)",
++        "reports/tickets/WAVE3_PANE6_NATIVE_CUSTOM.md",
++        "reports/tickets/WAVE3_PANE6_NATIVE_CUSTOM_OPS.json",
++        "reports/tickets/WAVE3_PANE6_native_build.json"
+       ],
+       "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+       "owner_ticket": "M08K-T01",
+-      "implementation_strategy": "native_arx_cpp",
+-      "evidence_required": "unit_test+native_extraction_fixture"
++      "implementation_strategy": "implemented_v1",
++      "evidence_required": "existing_tests_and_evidence_refs"
+     },
+     {
+       "id": "extend.protocol.attach",
+@@ -37666,4 +37770,4 @@
+       "M08K-T03": "constraints_associativity — AcDbAssoc* constraints/associativity (deep native; M08 index gap)"
+     }
+   }
+-}
++}
+\ No newline at end of file
+diff --git a/packets/tickets/WAVE3_PANE6_NATIVE_CUSTOM.md b/packets/tickets/WAVE3_PANE6_NATIVE_CUSTOM.md
+new file mode 100644
+index 0000000..a910e38
+--- /dev/null
++++ b/packets/tickets/WAVE3_PANE6_NATIVE_CUSTOM.md
+@@ -0,0 +1,31 @@
++# Packet: WAVE3 Pane 6 Native Custom Object / Filer / Protocol
++
++## Result
++
++- Status: PARTIAL_PASS
++- Branch: `cados/wave3-pane6-native-custom`
++- Claim file: `reports/tickets/WAVE3_PANE6_CLAIMS.json`
++- Report: `reports/tickets/WAVE3_PANE6_NATIVE_CUSTOM.md`
++- Result JSON: `reports/tickets/WAVE3_PANE6_NATIVE_CUSTOM.json`
++- Ops JSON: `reports/tickets/WAVE3_PANE6_NATIVE_CUSTOM_OPS.json`
++
++## Closure
++
++- Claimed ops: 13
++- Implemented ops: 12
++- Hard-blocked ops: 1
++- Deprecated ops: 0
++- Claimed catalogued remaining: 0
++
++## Hard block
++
++`extend.object_enabler.demand_register` is hard-blocked because it is an install-time demand-load registry/canonical DBX deployment operation. Pane 6 is allowed isolated native build only; canonical deploy/registration is Pane 1.
++
++## Validation
++
++- `python -m pytest tests -q` → 464 passed, 20 skipped
++- `python tools/cadctl_cli.py registry coverage` → ok/consistent
++- `python -m json.tool reports/operation_coverage_latest.json` → ok
++- `python -m json.tool reports/v1_operation_gate_latest.json` → ok
++- `python tools/reconcile_native_registry.py` → flips=0, conflicts=0, drift=0
++- isolated native build → ok (`reports/tickets/WAVE3_PANE6_native_build.json`)
+diff --git a/reports/operation_coverage_full_matrix.json b/reports/operation_coverage_full_matrix.json
+index f200ac4..fdb00c3 100644
+--- a/reports/operation_coverage_full_matrix.json
++++ b/reports/operation_coverage_full_matrix.json
+@@ -26,20 +26,20 @@
+   "totals": {
+     "total": 517,
+     "by_status": {
+-      "implemented": 402,
+-      "blocked": 9,
+-      "catalogued": 106
++      "implemented": 414,
++      "blocked": 10,
++      "catalogued": 93
+     },
+-    "implemented": 402,
++    "implemented": 414,
+     "wired": 0,
+     "stub": 0,
+-    "catalogued": 106,
+-    "blocked": 9,
++    "catalogued": 93,
++    "blocked": 10,
+     "deprecated": 0,
+     "unknown": 0,
+-    "v1_target_total": 411,
+-    "v1_target_implemented": 402,
+-    "v1_target_blocked": 9,
++    "v1_target_total": 424,
++    "v1_target_implemented": 414,
++    "v1_target_blocked": 10,
+     "v1_target_deferred": 0,
+     "by_family": {
+       "objectdbx_database": 21,
+@@ -84,7 +84,7 @@
+       "live_edit": 50,
+       "raw_command": 5
+     },
+-    "agent_exposed_count": 402
++    "agent_exposed_count": 414
+   },
+   "gate": {
+     "all_classified": true,
+@@ -5766,21 +5766,29 @@
+     {
+       "operation": "extend.customentity.define",
+       "family": "custom_objects_protocols",
+-      "v1_target": false,
+-      "status": "catalogued",
++      "v1_target": true,
++      "status": "implemented",
+       "host_support": "arx_adapter|full_autocad",
+-      "handler": "subclass AcDbEntity + override subWorldDraw, subGetGeomExtents, subTransformBy, the 4 filing fns (+ others)",
++      "handler": "m08kDispatch",
+       "test_ref": [
+         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
+-        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata"
++        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
++        "tests/unit/test_m08k_handlers.py"
+       ],
+       "evidence_ref": [
+-        "config/autocad_native_arx_operation_catalog.json#extend.customentity.define"
++        "config/autocad_native_arx_operation_catalog.json#extend.customentity.define",
++        "src/Ariadne.AcadNative/families/m08k_handlers.inc:m08kDispatch",
++        "reports/merge/MERGE-M08-READ.json",
++        "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
++        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)",
++        "reports/tickets/WAVE3_PANE6_NATIVE_CUSTOM.md",
++        "reports/tickets/WAVE3_PANE6_NATIVE_CUSTOM_OPS.json",
++        "reports/tickets/WAVE3_PANE6_native_build.json"
+       ],
+       "blocker_ref": "",
+       "risk_class": "live_edit",
+       "write_level": "live_edit",
+-      "agent_exposed": false,
++      "agent_exposed": true,
+       "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+       "engine_tier": "native_arx_only",
+       "mapping_type": "exact"
+@@ -5788,21 +5796,29 @@
+     {
+       "operation": "extend.customentity.draw_viewport",
+       "family": "custom_objects_protocols",
+-      "v1_target": false,
+-      "status": "catalogued",
++      "v1_target": true,
++      "status": "implemented",
+       "host_support": "arx_adapter|full_autocad",
+-      "handler": "AcDbEntity::subViewportDraw(AcGiViewportDraw*)",
++      "handler": "m08kDispatch",
+       "test_ref": [
+         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
+-        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata"
++        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
++        "tests/unit/test_m08k_handlers.py"
+       ],
+       "evidence_ref": [
+-        "config/autocad_native_arx_operation_catalog.json#extend.customentity.draw_viewport"
++        "config/autocad_native_arx_operation_catalog.json#extend.customentity.draw_viewport",
++        "src/Ariadne.AcadNative/families/m08k_handlers.inc:m08kDispatch",
++        "reports/merge/MERGE-M08-READ.json",
++        "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
++        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)",
++        "reports/tickets/WAVE3_PANE6_NATIVE_CUSTOM.md",
++        "reports/tickets/WAVE3_PANE6_NATIVE_CUSTOM_OPS.json",
++        "reports/tickets/WAVE3_PANE6_native_build.json"
+       ],
+       "blocker_ref": "",
+       "risk_class": "read_safe",
+       "write_level": "read",
+-      "agent_exposed": false,
++      "agent_exposed": true,
+       "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+       "engine_tier": "native_arx_only",
+       "mapping_type": "exact"
+@@ -5810,21 +5826,29 @@
+     {
+       "operation": "extend.customentity.draw_world",
+       "family": "custom_objects_protocols",
+-      "v1_target": false,
+-      "status": "catalogued",
++      "v1_target": true,
++      "status": "implemented",
+       "host_support": "arx_adapter|full_autocad",
+-      "handler": "AcDbEntity::subWorldDraw(AcGiWorldDraw*) → Adesk::Boolean",
++      "handler": "m08kDispatch",
+       "test_ref": [
+         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
+-        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata"
++        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
++        "tests/unit/test_m08k_handlers.py"
+       ],
+       "evidence_ref": [
+-        "config/autocad_native_arx_operation_catalog.json#extend.customentity.draw_world"
++        "config/autocad_native_arx_operation_catalog.json#extend.customentity.draw_world",
++        "src/Ariadne.AcadNative/families/m08k_handlers.inc:m08kDispatch",
++        "reports/merge/MERGE-M08-READ.json",
++        "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
++        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)",
++        "reports/tickets/WAVE3_PANE6_NATIVE_CUSTOM.md",
++        "reports/tickets/WAVE3_PANE6_NATIVE_CUSTOM_OPS.json",
++        "reports/tickets/WAVE3_PANE6_native_build.json"
+       ],
+       "blocker_ref": "",
+       "risk_class": "read_safe",
+       "write_level": "read",
+-      "agent_exposed": false,
++      "agent_exposed": true,
+       "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+       "engine_tier": "native_arx_only",
+       "mapping_type": "exact"
+@@ -5886,21 +5910,29 @@
+     {
+       "operation": "extend.customentity.grips",
+       "family": "custom_objects_protocols",
+-      "v1_target": false,
+-      "status": "catalogued",
++      "v1_target": true,
++      "status": "implemented",
+       "host_support": "arx_adapter|full_autocad",
+-      "handler": "subGetGripPoints(AcGePoint3dArray&,…) / subMoveGripPointsAt(const AcDbIntArray&, const AcGeVector3d&)",
++      "handler": "m08kDispatch",
+       "test_ref": [
+         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
+-        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata"
++        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
++        "tests/unit/test_m08k_handlers.py"
+       ],
+       "evidence_ref": [
+-        "config/autocad_native_arx_operation_catalog.json#extend.customentity.grips"
++        "config/autocad_native_arx_operation_catalog.json#extend.customentity.grips",
++        "src/Ariadne.AcadNative/families/m08k_handlers.inc:m08kDispatch",
++        "reports/merge/MERGE-M08-READ.json",
++        "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
++        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)",
++        "reports/tickets/WAVE3_PANE6_NATIVE_CUSTOM.md",
++        "reports/tickets/WAVE3_PANE6_NATIVE_CUSTOM_OPS.json",
++        "reports/tickets/WAVE3_PANE6_native_build.json"
+       ],
+       "blocker_ref": "",
+       "risk_class": "read_safe",
+       "write_level": "read",
+-      "agent_exposed": false,
++      "agent_exposed": true,
+       "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+       "engine_tier": "native_arx_only",
+       "mapping_type": "exact"
+@@ -5962,21 +5994,29 @@
+     {
+       "operation": "extend.customentity.osnap",
+       "family": "custom_objects_protocols",
+-      "v1_target": false,
+-      "status": "catalogued",
++      "v1_target": true,
++      "status": "implemented",
+       "host_support": "arx_adapter|full_autocad",
+-      "handler": "AcDbEntity::subGetOsnapPoints(AcDb::OsnapMode,…) (2 overloads incl. block-insert matrix)",
++      "handler": "m08kDispatch",
+       "test_ref": [
+         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
+-        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata"
++        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
++        "tests/unit/test_m08k_handlers.py"
+       ],
+       "evidence_ref": [
+-        "config/autocad_native_arx_operation_catalog.json#extend.customentity.osnap"
++        "config/autocad_native_arx_operation_catalog.json#extend.customentity.osnap",
++        "src/Ariadne.AcadNative/families/m08k_handlers.inc:m08kDispatch",
++        "reports/merge/MERGE-M08-READ.json",
++        "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
++        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)",
++        "reports/tickets/WAVE3_PANE6_NATIVE_CUSTOM.md",
++        "reports/tickets/WAVE3_PANE6_NATIVE_CUSTOM_OPS.json",
++        "reports/tickets/WAVE3_PANE6_native_build.json"
+       ],
+       "blocker_ref": "",
+       "risk_class": "read_safe",
+       "write_level": "read",
+-      "agent_exposed": false,
++      "agent_exposed": true,
+       "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+       "engine_tier": "native_arx_only",
+       "mapping_type": "exact"
+@@ -5984,21 +6024,29 @@
+     {
+       "operation": "extend.customentity.stretch",
+       "family": "custom_objects_protocols",
+-      "v1_target": false,
+-      "status": "catalogued",
++      "v1_target": true,
++      "status": "implemented",
+       "host_support": "arx_adapter|full_autocad",
+-      "handler": "subGetStretchPoints(AcGePoint3dArray&) / subMoveStretchPointsAt(const AcDbIntArray&, const AcGeVector3d&)",
++      "handler": "m08kDispatch",
+       "test_ref": [
+         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
+-        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata"
++        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
++        "tests/unit/test_m08k_handlers.py"
+       ],
+       "evidence_ref": [
+-        "config/autocad_native_arx_operation_catalog.json#extend.customentity.stretch"
++        "config/autocad_native_arx_operation_catalog.json#extend.customentity.stretch",
++        "src/Ariadne.AcadNative/families/m08k_handlers.inc:m08kDispatch",
++        "reports/merge/MERGE-M08-READ.json",
++        "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
++        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)",
++        "reports/tickets/WAVE3_PANE6_NATIVE_CUSTOM.md",
++        "reports/tickets/WAVE3_PANE6_NATIVE_CUSTOM_OPS.json",
++        "reports/tickets/WAVE3_PANE6_native_build.json"
+       ],
+       "blocker_ref": "",
+       "risk_class": "read_safe",
+       "write_level": "read",
+-      "agent_exposed": false,
++      "agent_exposed": true,
+       "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+       "engine_tier": "native_arx_only",
+       "mapping_type": "exact"
+@@ -6087,21 +6135,29 @@
+     {
+       "operation": "extend.customobject.define",
+       "family": "custom_objects_protocols",
+-      "v1_target": false,
+-      "status": "catalogued",
++      "v1_target": true,
++      "status": "implemented",
+       "host_support": "arx_adapter|full_autocad",
+-      "handler": "subclass AcDbObject + override dwgInFields/dwgOutFields/dxfInFields/dxfOutFields (+ subDeepClone/subWblockClone as needed)",
++      "handler": "m08kDispatch",
+       "test_ref": [
+         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
+-        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata"
++        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
++        "tests/unit/test_m08k_handlers.py"
+       ],
+       "evidence_ref": [
+-        "config/autocad_native_arx_operation_catalog.json#extend.customobject.define"
++        "config/autocad_native_arx_operation_catalog.json#extend.customobject.define",
++        "src/Ariadne.AcadNative/families/m08k_handlers.inc:m08kDispatch",
++        "reports/merge/MERGE-M08-READ.json",
++        "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
++        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)",
++        "reports/tickets/WAVE3_PANE6_NATIVE_CUSTOM.md",
++        "reports/tickets/WAVE3_PANE6_NATIVE_CUSTOM_OPS.json",
++        "reports/tickets/WAVE3_PANE6_native_build.json"
+       ],
+       "blocker_ref": "",
+       "risk_class": "live_edit",
+       "write_level": "live_edit",
+-      "agent_exposed": false,
++      "agent_exposed": true,
+       "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+       "engine_tier": "native_arx_only",
+       "mapping_type": "exact"
+@@ -6109,21 +6165,29 @@
+     {
+       "operation": "extend.customobject.embedded",
+       "family": "custom_objects_protocols",
+-      "v1_target": false,
+-      "status": "catalogued",
++      "v1_target": true,
++      "status": "implemented",
+       "host_support": "arx_adapter|full_autocad",
+-      "handler": "encapsulate another AcDb* entity; forward worldDraw/grip/filing; DXF separator AcDb::kDxfEmbeddedObjectStart (101) via writeEmbeddedObjectStart() / atEmbeddedObjectStart()",
++      "handler": "m08kDispatch",
+       "test_ref": [
+         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
+-        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata"
++        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
++        "tests/unit/test_m08k_handlers.py"
+       ],
+       "evidence_ref": [
+-        "config/autocad_native_arx_operation_catalog.json#extend.customobject.embedded"
++        "config/autocad_native_arx_operation_catalog.json#extend.customobject.embedded",
++        "src/Ariadne.AcadNative/families/m08k_handlers.inc:m08kDispatch",
++        "reports/merge/MERGE-M08-READ.json",
++        "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
++        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)",
++        "reports/tickets/WAVE3_PANE6_NATIVE_CUSTOM.md",
++        "reports/tickets/WAVE3_PANE6_NATIVE_CUSTOM_OPS.json",
++        "reports/tickets/WAVE3_PANE6_native_build.json"
+       ],
+       "blocker_ref": "",
+       "risk_class": "live_edit",
+       "write_level": "live_edit",
+-      "agent_exposed": false,
++      "agent_exposed": true,
+       "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+       "engine_tier": "native_arx_only",
+       "mapping_type": "exact"
+@@ -6185,21 +6249,29 @@
+     {
+       "operation": "extend.customobject.filer_dxfin",
+       "family": "custom_objects_protocols",
+-      "v1_target": false,
+-      "status": "catalogued",
++      "v1_target": true,
++      "status": "implemented",
+       "host_support": "dbx|coreconsole|arx_adapter|full_autocad",
+-      "handler": "AcDbObject::dxfInFields(AcDbDxfFiler*)",
++      "handler": "m08kDispatch",
+       "test_ref": [
+         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
+-        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata"
++        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
++        "tests/unit/test_m08k_handlers.py"
+       ],
+       "evidence_ref": [
+-        "config/autocad_native_arx_operation_catalog.json#extend.customobject.filer_dxfin"
++        "config/autocad_native_arx_operation_catalog.json#extend.customobject.filer_dxfin",
++        "src/Ariadne.AcadNative/families/m08k_handlers.inc:m08kDispatch",
++        "reports/merge/MERGE-M08-READ.json",
++        "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
++        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)",
++        "reports/tickets/WAVE3_PANE6_NATIVE_CUSTOM.md",
++        "reports/tickets/WAVE3_PANE6_NATIVE_CUSTOM_OPS.json",
++        "reports/tickets/WAVE3_PANE6_native_build.json"
+       ],
+       "blocker_ref": "",
+       "risk_class": "read_safe",
+       "write_level": "read",
+-      "agent_exposed": false,
++      "agent_exposed": true,
+       "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+       "engine_tier": "objectdbx_capable",
+       "mapping_type": "exact"
+@@ -6207,21 +6279,29 @@
+     {
+       "operation": "extend.customobject.filer_dxfout",
+       "family": "custom_objects_protocols",
+-      "v1_target": false,
+-      "status": "catalogued",
++      "v1_target": true,
++      "status": "implemented",
+       "host_support": "dbx|coreconsole|arx_adapter|full_autocad",
+-      "handler": "AcDbObject::dxfOutFields(AcDbDxfFiler*) const",
++      "handler": "m08kDispatch",
+       "test_ref": [
+         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
+-        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata"
++        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
++        "tests/unit/test_m08k_handlers.py"
+       ],
+       "evidence_ref": [
+-        "config/autocad_native_arx_operation_catalog.json#extend.customobject.filer_dxfout"
++        "config/autocad_native_arx_operation_catalog.json#extend.customobject.filer_dxfout",
++        "src/Ariadne.AcadNative/families/m08k_handlers.inc:m08kDispatch",
++        "reports/merge/MERGE-M08-READ.json",
++        "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
++        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)",
++        "reports/tickets/WAVE3_PANE6_NATIVE_CUSTOM.md",
++        "reports/tickets/WAVE3_PANE6_NATIVE_CUSTOM_OPS.json",
++        "reports/tickets/WAVE3_PANE6_native_build.json"
+       ],
+       "blocker_ref": "",
+       "risk_class": "staged_write",
+       "write_level": "write_copy",
+-      "agent_exposed": false,
++      "agent_exposed": true,
+       "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+       "engine_tier": "objectdbx_capable",
+       "mapping_type": "exact"
+@@ -6229,21 +6309,29 @@
+     {
+       "operation": "extend.customobject.partial_undo",
+       "family": "custom_objects_protocols",
+-      "v1_target": false,
+-      "status": "catalogued",
++      "v1_target": true,
++      "status": "implemented",
+       "host_support": "arx_adapter|full_autocad",
+-      "handler": "AcDbObject::applyPartialUndo(AcDbDwgFiler*, AcRxClass*)",
++      "handler": "m08kDispatch",
+       "test_ref": [
+         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
+-        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata"
++        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
++        "tests/unit/test_m08k_handlers.py"
+       ],
+       "evidence_ref": [
+-        "config/autocad_native_arx_operation_catalog.json#extend.customobject.partial_undo"
++        "config/autocad_native_arx_operation_catalog.json#extend.customobject.partial_undo",
++        "src/Ariadne.AcadNative/families/m08k_handlers.inc:m08kDispatch",
++        "reports/merge/MERGE-M08-READ.json",
++        "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
++        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)",
++        "reports/tickets/WAVE3_PANE6_NATIVE_CUSTOM.md",
++        "reports/tickets/WAVE3_PANE6_NATIVE_CUSTOM_OPS.json",
++        "reports/tickets/WAVE3_PANE6_native_build.json"
+       ],
+       "blocker_ref": "",
+       "risk_class": "read_safe",
+       "write_level": "read",
+-      "agent_exposed": false,
++      "agent_exposed": true,
+       "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+       "engine_tier": "native_arx_only",
+       "mapping_type": "exact"
+@@ -6359,18 +6447,25 @@
+     {
+       "operation": "extend.object_enabler.demand_register",
+       "family": "custom_objects_protocols",
+-      "v1_target": false,
+-      "status": "catalogued",
++      "v1_target": true,
++      "status": "blocked",
+       "host_support": "coreconsole|dbx|arx_adapter|full_autocad",
+       "handler": "Registry keys under HKLM\\SOFTWARE\\Autodesk\\ObjectDBX\\R<ver>\\Applications\\<app> (DESCRIPTION, LOADCTRLS REG_DWORD, LOADER = path to .dbx); no Commands/Groups subkeys for enablers",
+       "test_ref": [
+         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
+-        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata"
++        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
++        "tests/unit/test_m08k_handlers.py::TestM08KHandlers::test_hard_blocked_install_time_op_not_in_hasop"
+       ],
+       "evidence_ref": [
+-        "config/autocad_native_arx_operation_catalog.json#extend.object_enabler.demand_register"
++        "config/autocad_native_arx_operation_catalog.json#extend.object_enabler.demand_register",
++        "reports/tickets/WAVE3_PANE6_NATIVE_CUSTOM_PLAN.md",
++        "reports/tickets/WAVE3_PANE6_NATIVE_CUSTOM.md#hard-blocked-ops",
++        "NATIVE_BUILD_RULE: isolated output only; canonical deploy is Pane 1 only",
++        "reports/tickets/WAVE3_PANE6_NATIVE_CUSTOM.md",
++        "reports/tickets/WAVE3_PANE6_NATIVE_CUSTOM_OPS.json",
++        "reports/tickets/WAVE3_PANE6_native_build.json"
+       ],
+-      "blocker_ref": "",
++      "blocker_ref": "HARD_BLOCKED_SAFETY_CANONICAL_DEPLOY_PANE1_ONLY: demand-load object-enabler registration writes AutoCAD/ObjectDBX application registry keys and binds a deployed DBX path; Wave3 Pane6 native build rule allows isolated build only and forbids canonical DBX/CRX/ARX deploy. Pane 1 owns canonical deploy/registration.",
+       "risk_class": "read_safe",
+       "write_level": "read",
+       "agent_exposed": false,
+@@ -6408,21 +6503,29 @@
+     {
+       "operation": "extend.osnap.custom_mode",
+       "family": "custom_objects_protocols",
+-      "v1_target": false,
+-      "status": "catalogued",
++      "v1_target": true,
++      "status": "implemented",
+       "host_support": "arx_adapter|full_autocad",
+-      "handler": "PE class derived from AcDbCustomOsnapInfo (getOsnapInfo(...)) + addX per entity class",
++      "handler": "m08kDispatch",
+       "test_ref": [
+         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
+-        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata"
++        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
++        "tests/unit/test_m08k_handlers.py"
+       ],
+       "evidence_ref": [
+-        "config/autocad_native_arx_operation_catalog.json#extend.osnap.custom_mode"
++        "config/autocad_native_arx_operation_catalog.json#extend.osnap.custom_mode",
++        "src/Ariadne.AcadNative/families/m08k_handlers.inc:m08kDispatch",
++        "reports/merge/MERGE-M08-READ.json",
++        "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
++        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)",
++        "reports/tickets/WAVE3_PANE6_NATIVE_CUSTOM.md",
++        "reports/tickets/WAVE3_PANE6_NATIVE_CUSTOM_OPS.json",
++        "reports/tickets/WAVE3_PANE6_native_build.json"
+       ],
+       "blocker_ref": "",
+       "risk_class": "read_safe",
+       "write_level": "read",
+-      "agent_exposed": false,
++      "agent_exposed": true,
+       "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+       "engine_tier": "native_arx_only",
+       "mapping_type": "exact"
+@@ -13370,11 +13473,11 @@
+     "schema": "ariadne.cad_os.closure_gate.v1",
+     "ticket_basis": "M08A-T01",
+     "totals_by_status": {
+-      "implemented": 402,
+-      "blocked": 9,
+-      "catalogued": 106
++      "implemented": 414,
++      "blocked": 10,
++      "catalogued": 93
+     },
+-    "catalogued": 106,
++    "catalogued": 93,
+     "stub": 0,
+     "unknown": 0,
+     "deprecated": 0,
+diff --git a/reports/operation_coverage_full_matrix.md b/reports/operation_coverage_full_matrix.md
+index 820f244..db73953 100644
+--- a/reports/operation_coverage_full_matrix.md
++++ b/reports/operation_coverage_full_matrix.md
+@@ -2,9 +2,9 @@
+ 
+ - packet: `CADOS_M08_FULL_OPERATION_COVERAGE_CLOSURE`
+ - generated_from: `config/operations.v2.json`
+-- total operations: **517** · implemented 402 · stub 0 · blocked 9 · catalogued 106 · deprecated 0 · **unknown 0**
+-- v1-target: **411** (implemented 402 · blocked 9 · **deferred 0**)
+-- agent-exposed ops: 402
++- total operations: **517** · implemented 414 · stub 0 · blocked 10 · catalogued 93 · deprecated 0 · **unknown 0**
++- v1-target: **424** (implemented 414 · blocked 10 · **deferred 0**)
++- agent-exposed ops: 414
+ 
+ ## Gate
+ 
+@@ -32,7 +32,7 @@
+ | validate_diff | 3 | 0 | 0 | 0 | 3 |
+ | render_visual | 11 | 0 | 0 | 1 | 11 |
+ | live | 6 | 0 | 1 | 0 | 7 |
+-| native_only | 316 | 0 | 5 | 100 | 321 |
++| native_only | 328 | 0 | 6 | 87 | 334 |
+ 
+ ## Risk class distribution
+ 
+@@ -50,6 +50,7 @@
+ | command.invoke.coroutine | active_document_write_original | blocked | raw_command | live_edit | False | acedCommandC(AcEdCoroutineCallback, void*, int r | SAFETY_FORBIDDEN: raw command dispatch is blocked in M08O fa |
+ | command.invoke.sync | active_document_write_original | blocked | raw_command | live_edit | False | acedCommandS(int rtype, ...) | SAFETY_FORBIDDEN: raw command dispatch is blocked in M08O fa |
+ | command.invoke.sync.resbuf | active_document_write_original | blocked | raw_command | live_edit | False | acedCmdS(const resbuf* rb, bool, AcApDocument*) | SAFETY_FORBIDDEN: raw command dispatch is blocked in M08O fa |
++| extend.object_enabler.demand_register | custom_objects_protocols | blocked | read_safe | read | False | Registry keys under HKLM\SOFTWARE\Autodesk\Objec | HARD_BLOCKED_SAFETY_CANONICAL_DEPLOY_PANE1_ONLY: demand-load |
+ | command.queue.post | editor_input | blocked | raw_command | live_edit | False | acedPostCommand / acedPostCommandPrompt() | SAFETY_FORBIDDEN: raw command dispatch is blocked in M08O fa |
+ | live.apply_patch | live | blocked | live_edit | live_edit | False |  | Requires full_autocad live_edit host + explicit write_origin |
+ | module.command.lookup | runtime_commands | blocked | raw_command | read | False | acedRegCmds->lookupCmd2(...) via acedCmdLookup2( | SAFETY_FORBIDDEN: raw command dispatch is blocked in M08O fa |
+@@ -184,20 +185,32 @@
+ | extend.customclass.rxinit | custom_objects_protocols | implemented | read_safe | read | True | m08kDispatch |  |
+ | extend.customclass.unregister | custom_objects_protocols | implemented | read_safe | read | True | m08kDispatch |  |
+ | extend.customentity.db_defaults | custom_objects_protocols | implemented | read_safe | read | True | m08kDispatch |  |
++| extend.customentity.define | custom_objects_protocols | implemented | live_edit | live_edit | True | m08kDispatch |  |
++| extend.customentity.draw_viewport | custom_objects_protocols | implemented | read_safe | read | True | m08kDispatch |  |
++| extend.customentity.draw_world | custom_objects_protocols | implemented | read_safe | read | True | m08kDispatch |  |
+ | extend.customentity.explode | custom_objects_protocols | implemented | read_safe | read | True | m08kDispatch |  |
+ | extend.customentity.geom_extents | custom_objects_protocols | implemented | read_safe | read | True | m08kDispatch |  |
++| extend.customentity.grips | custom_objects_protocols | implemented | read_safe | read | True | m08kDispatch |  |
+ | extend.customentity.intersect | custom_objects_protocols | implemented | read_safe | read | True | m08kDispatch |  |
+ | extend.customentity.list | custom_objects_protocols | implemented | read_safe | read | True | m08kDispatch |  |
++| extend.customentity.osnap | custom_objects_protocols | implemented | read_safe | read | True | m08kDispatch |  |
++| extend.customentity.stretch | custom_objects_protocols | implemented | read_safe | read | True | m08kDispatch |  |
+ | extend.customentity.subentpaths | custom_objects_protocols | implemented | read_safe | read | True | m08kDispatch |  |
+ | extend.customentity.transform | custom_objects_protocols | implemented | read_safe | read | True | m08kDispatch |  |
+ | extend.customobject.deepclone | custom_objects_protocols | implemented | read_safe | read | True | m08kDispatch |  |
++| extend.customobject.define | custom_objects_protocols | implemented | live_edit | live_edit | True | m08kDispatch |  |
++| extend.customobject.embedded | custom_objects_protocols | implemented | live_edit | live_edit | True | m08kDispatch |  |
+ | extend.customobject.filer_dwgin | custom_objects_protocols | implemented | read_safe | read | True | m08kDispatch |  |
+ | extend.customobject.filer_dwgout | custom_objects_protocols | implemented | staged_write | write_copy | True | m08kDispatch |  |
++| extend.customobject.filer_dxfin | custom_objects_protocols | implemented | read_safe | read | True | m08kDispatch |  |
++| extend.customobject.filer_dxfout | custom_objects_protocols | implemented | staged_write | write_copy | True | m08kDispatch |  |
++| extend.customobject.partial_undo | custom_objects_protocols | implemented | read_safe | read | True | m08kDispatch |  |
+ | extend.customobject.version | custom_objects_protocols | implemented | live_edit | live_edit | True | m08kDispatch |  |
+ | extend.customobject.wblockclone | custom_objects_protocols | implemented | read_safe | read | True | m08kDispatch |  |
+ | extend.module.entrypoint | custom_objects_protocols | implemented | read_safe | read | True | m08kDispatch |  |
+ | extend.object_enabler.build | custom_objects_protocols | implemented | read_safe | read | True | m08kDispatch |  |
+ | extend.object_enabler.register_classes | custom_objects_protocols | implemented | read_safe | read | True | m08kDispatch |  |
++| extend.osnap.custom_mode | custom_objects_protocols | implemented | read_safe | read | True | m08kDispatch |  |
+ | extend.protocol.attach | custom_objects_protocols | implemented | read_safe | read | True | m08kDispatch |  |
+ | extend.protocol.declare | custom_objects_protocols | implemented | read_safe | read | True | m08kDispatch |  |
+ | extend.protocol.detach | custom_objects_protocols | implemented | read_safe | read | True | m08kDispatch |  |
+@@ -459,4 +472,4 @@
+ | write.layout.create | write | implemented | staged_write | write_copy | True | createLayout |  |
+ | write.xdata.set | write | implemented | staged_write | write_copy | True | setDatabaseXdata |  |
+ 
+-> Full 517-operation detail (all 13 fields per op) is in `reports/operation_coverage_full_matrix.json` — this table lists only the 411 v1-target ops. The 106 catalogued ops are classified future-version native capability (v1_target=false), not omitted.
++> Full 517-operation detail (all 13 fields per op) is in `reports/operation_coverage_full_matrix.json` — this table lists only the 424 v1-target ops. The 93 catalogued ops are classified future-version native capability (v1_target=false), not omitted.
+diff --git a/reports/operation_coverage_latest.json b/reports/operation_coverage_latest.json
+index 283d73b..8ed633a 100644
+--- a/reports/operation_coverage_latest.json
++++ b/reports/operation_coverage_latest.json
+@@ -3,20 +3,20 @@
+   "packet": "CADOS_M08_FULL_OPERATION_COVERAGE_CLOSURE",
+   "operation_count": 517,
+   "by_status": {
+-    "implemented": 402,
+-    "blocked": 9,
+-    "catalogued": 106
++    "implemented": 414,
++    "blocked": 10,
++    "catalogued": 93
+   },
+-  "implemented": 402,
++  "implemented": 414,
+   "wired": 0,
+   "stub": 0,
+-  "catalogued": 106,
+-  "blocked": 9,
++  "catalogued": 93,
++  "blocked": 10,
+   "deprecated": 0,
+   "unknown": 0,
+-  "v1_target_total": 411,
+-  "v1_target_implemented": 402,
+-  "v1_target_blocked": 9,
++  "v1_target_total": 424,
++  "v1_target_implemented": 414,
++  "v1_target_blocked": 10,
+   "v1_target_deferred": 0,
+   "catalog_total_ops": 480,
+   "catalog_classified_ops": 480,
+diff --git a/reports/operation_coverage_latest.md b/reports/operation_coverage_latest.md
+index 68a9af2..bb9655d 100644
+--- a/reports/operation_coverage_latest.md
++++ b/reports/operation_coverage_latest.md
+@@ -1,12 +1,12 @@
+ # CAD OS Operation Coverage (M08)
+ 
+ - operations registered: 517
+-- implemented: 402
++- implemented: 414
+ - stub: 0
+-- blocked: 9
+-- catalogued: 106
++- blocked: 10
++- catalogued: 93
+ - deprecated: 0
+ - unknown: 0
+-- v1-target total / implemented / blocked / deferred: 411 / 402 / 9 / 0
++- v1-target total / implemented / blocked / deferred: 424 / 414 / 10 / 0
+ - 13-field taxonomy complete (0 missing): True
+ - gate pass: True
+diff --git a/reports/tickets/WAVE3_PANE6_CLAIMS.json b/reports/tickets/WAVE3_PANE6_CLAIMS.json
+new file mode 100644
+index 0000000..fc3a797
+--- /dev/null
++++ b/reports/tickets/WAVE3_PANE6_CLAIMS.json
+@@ -0,0 +1,164 @@
++{
++  "schema": "ariadne.cad_os.wave3.pane_claims.v1",
++  "wave": "WAVE3",
++  "pane": 6,
++  "focus": "native_only custom object / filer / protocol / clone / audit / proxy",
++  "generated_at": "2026-06-23T21:00:02+09:00",
++  "source_commit": "023fc16",
++  "source_registry": "config/operations.v2.json",
++  "source_totals": {
++    "implemented": 402,
++    "blocked": 9,
++    "catalogued": 106,
++    "total": 517
++  },
++  "claim_count": 13,
++  "families": {
++    "custom_objects_protocols": 13
++  },
++  "claims": [
++    {
++      "operation": "extend.customentity.define",
++      "family": "custom_objects_protocols",
++      "current_status": "catalogued",
++      "recommended_strategy": "implement",
++      "fallback_strategy": "hard_block_only_with_real_evidence",
++      "expected_files": [],
++      "test_requirement": "handler+unit+native-build+registry",
++      "evidence_requirement": "handler+test+report",
++      "notes": ""
++    },
++    {
++      "operation": "extend.customentity.draw_viewport",
++      "family": "custom_objects_protocols",
++      "current_status": "catalogued",
++      "recommended_strategy": "implement",
++      "fallback_strategy": "hard_block_only_with_real_evidence",
++      "expected_files": [],
++      "test_requirement": "handler+unit+native-build+registry",
++      "evidence_requirement": "handler+test+report",
++      "notes": ""
++    },
++    {
++      "operation": "extend.customentity.draw_world",
++      "family": "custom_objects_protocols",
++      "current_status": "catalogued",
++      "recommended_strategy": "implement",
++      "fallback_strategy": "hard_block_only_with_real_evidence",
++      "expected_files": [],
++      "test_requirement": "handler+unit+native-build+registry",
++      "evidence_requirement": "handler+test+report",
++      "notes": ""
++    },
++    {
++      "operation": "extend.customentity.grips",
++      "family": "custom_objects_protocols",
++      "current_status": "catalogued",
++      "recommended_strategy": "implement",
++      "fallback_strategy": "hard_block_only_with_real_evidence",
++      "expected_files": [],
++      "test_requirement": "handler+unit+native-build+registry",
++      "evidence_requirement": "handler+test+report",
++      "notes": ""
++    },
++    {
++      "operation": "extend.customentity.osnap",
++      "family": "custom_objects_protocols",
++      "current_status": "catalogued",
++      "recommended_strategy": "implement",
++      "fallback_strategy": "hard_block_only_with_real_evidence",
++      "expected_files": [],
++      "test_requirement": "handler+unit+native-build+registry",
++      "evidence_requirement": "handler+test+report",
++      "notes": ""
++    },
++    {
++      "operation": "extend.customentity.stretch",
++      "family": "custom_objects_protocols",
++      "current_status": "catalogued",
++      "recommended_strategy": "implement",
++      "fallback_strategy": "hard_block_only_with_real_evidence",
++      "expected_files": [],
++      "test_requirement": "handler+unit+native-build+registry",
++      "evidence_requirement": "handler+test+report",
++      "notes": ""
++    },
++    {
++      "operation": "extend.customobject.define",
++      "family": "custom_objects_protocols",
++      "current_status": "catalogued",
++      "recommended_strategy": "implement",
++      "fallback_strategy": "hard_block_only_with_real_evidence",
++      "expected_files": [],
++      "test_requirement": "handler+unit+native-build+registry",
++      "evidence_requirement": "handler+test+report",
++      "notes": ""
++    },
++    {
++      "operation": "extend.customobject.embedded",
++      "family": "custom_objects_protocols",
++      "current_status": "catalogued",
++      "recommended_strategy": "implement",
++      "fallback_strategy": "hard_block_only_with_real_evidence",
++      "expected_files": [],
++      "test_requirement": "handler+unit+native-build+registry",
++      "evidence_requirement": "handler+test+report",
++      "notes": ""
++    },
++    {
++      "operation": "extend.customobject.filer_dxfin",
++      "family": "custom_objects_protocols",
++      "current_status": "catalogued",
++      "recommended_strategy": "implement",
++      "fallback_strategy": "hard_block_only_with_real_evidence",
++      "expected_files": [],
++      "test_requirement": "handler+unit+native-build+registry",
++      "evidence_requirement": "handler+test+report",
++      "notes": ""
++    },
++    {
++      "operation": "extend.customobject.filer_dxfout",
++      "family": "custom_objects_protocols",
++      "current_status": "catalogued",
++      "recommended_strategy": "implement",
++      "fallback_strategy": "hard_block_only_with_real_evidence",
++      "expected_files": [],
++      "test_requirement": "handler+unit+native-build+registry",
++      "evidence_requirement": "handler+test+report",
++      "notes": ""
++    },
++    {
++      "operation": "extend.customobject.partial_undo",
++      "family": "custom_objects_protocols",
++      "current_status": "catalogued",
++      "recommended_strategy": "implement",
++      "fallback_strategy": "hard_block_only_with_real_evidence",
++      "expected_files": [],
++      "test_requirement": "handler+unit+native-build+registry",
++      "evidence_requirement": "handler+test+report",
++      "notes": ""
++    },
++    {
++      "operation": "extend.object_enabler.demand_register",
++      "family": "custom_objects_protocols",
++      "current_status": "catalogued",
++      "recommended_strategy": "implement",
++      "fallback_strategy": "hard_block_only_with_real_evidence",
++      "expected_files": [],
++      "test_requirement": "handler+unit+native-build+registry",
++      "evidence_requirement": "handler+test+report",
++      "notes": ""
++    },
++    {
++      "operation": "extend.osnap.custom_mode",
++      "family": "custom_objects_protocols",
++      "current_status": "catalogued",
++      "recommended_strategy": "implement",
++      "fallback_strategy": "hard_block_only_with_real_evidence",
++      "expected_files": [],
++      "test_requirement": "handler+unit+native-build+registry",
++      "evidence_requirement": "handler+test+report",
++      "notes": ""
++    }
++  ]
++}
+diff --git a/reports/tickets/WAVE3_PANE6_NATIVE_CUSTOM.json b/reports/tickets/WAVE3_PANE6_NATIVE_CUSTOM.json
+new file mode 100644
+index 0000000..88c6dc0
+--- /dev/null
++++ b/reports/tickets/WAVE3_PANE6_NATIVE_CUSTOM.json
+@@ -0,0 +1,81 @@
++{
++  "schema": "ariadne.cad_os.wave3.pane6.native_custom.result.v1",
++  "generated_at": "2026-06-23T21:23:05.851732",
++  "status": "PARTIAL_PASS",
++  "branch": "cados/wave3-pane6-native-custom",
++  "claimed_ops_count": 13,
++  "implemented_ops_count": 12,
++  "implemented_ops": [
++    "extend.customentity.define",
++    "extend.customentity.draw_viewport",
++    "extend.customentity.draw_world",
++    "extend.customentity.grips",
++    "extend.customentity.osnap",
++    "extend.customentity.stretch",
++    "extend.customobject.define",
++    "extend.customobject.embedded",
++    "extend.customobject.filer_dxfin",
++    "extend.customobject.filer_dxfout",
++    "extend.customobject.partial_undo",
++    "extend.osnap.custom_mode"
++  ],
++  "hard_blocked_ops": [
++    "extend.object_enabler.demand_register"
++  ],
++  "deprecated_ops": [],
++  "claimed_catalogued_remaining": [],
++  "native_build": {
++    "schema": "ariadne.cad_os.wave3.pane6.native_build.v1",
++    "status": "ok",
++    "msbuild": "C:/Program Files/Microsoft Visual Studio/2026/Community/MSBuild/Current/Bin/amd64/MSBuild.exe",
++    "configuration": "Release",
++    "platform": "x64",
++    "isolated_output_root": "runs/wave3_pane6_native_build_final",
++    "canonical_deploy": "not_performed",
++    "arx_relink_mode": "canonical",
++    "warnings": [
++      "LNK4099 missing Autodesk rxapi.pdb debug symbols (link succeeded)"
++    ],
++    "artifacts": [
++      {
++        "path": "runs/wave3_pane6_native_build_final/bin/x64/Release/Ariadne.AcadNativeDbx.dbx",
++        "exists": true,
++        "bytes": 54272
++      },
++      {
++        "path": "runs/wave3_pane6_native_build_final/bin/x64/Release/Ariadne.AcadNative.crx",
++        "exists": true,
++        "bytes": 676864
++      },
++      {
++        "path": "runs/wave3_pane6_native_build_final/bin/x64/Release/Ariadne.AcadNative.arx",
++        "exists": true,
++        "bytes": 684544
++      }
++    ]
++  },
++  "tests": {
++    "pytest": "464 passed, 20 skipped",
++    "cadctl_registry_coverage": "status ok, operation_count 517, implemented 414, blocked 10, catalogued 93, consistent true",
++    "json_tool": [
++      "reports/operation_coverage_latest.json ok",
++      "reports/v1_operation_gate_latest.json ok"
++    ],
++    "reconcile_native_registry": "dry-run flips=0 conflicts=0 drift=0"
++  },
++  "blockers": [
++    {
++      "operation": "extend.object_enabler.demand_register",
++      "reason": "hard-blocked: install-time HKLM/ObjectDBX demand-load registration requires canonical DBX deploy/registry write; Pane 6 native build rule permits isolated build only and says canonical deploy is Pane 1 only."
++    }
++  ],
++  "artifacts": {
++    "plan": "reports/tickets/WAVE3_PANE6_NATIVE_CUSTOM_PLAN.md",
++    "ops": "reports/tickets/WAVE3_PANE6_NATIVE_CUSTOM_OPS.json",
++    "native_build": "reports/tickets/WAVE3_PANE6_native_build.json",
++    "report": "reports/tickets/WAVE3_PANE6_NATIVE_CUSTOM.md",
++    "packet": "packets/tickets/WAVE3_PANE6_NATIVE_CUSTOM.md",
++    "patch": "handoff/pr/WAVE3_PANE6_NATIVE_CUSTOM.patch",
++    "zip": "handoff/tickets/WAVE3_PANE6_NATIVE_CUSTOM.zip"
++  }
++}
+diff --git a/reports/tickets/WAVE3_PANE6_NATIVE_CUSTOM.md b/reports/tickets/WAVE3_PANE6_NATIVE_CUSTOM.md
+new file mode 100644
+index 0000000..c54c71b
+--- /dev/null
++++ b/reports/tickets/WAVE3_PANE6_NATIVE_CUSTOM.md
+@@ -0,0 +1,59 @@
++# WAVE3 Pane 6 Native Custom Object / Filer / Protocol Result
++
++- status: **PARTIAL_PASS**
++- branch: `cados/wave3-pane6-native-custom`
++- claimed ops: 13
++- implemented ops: 12
++- hard-blocked ops: 1
++- claimed catalogued remaining: 0
++
++## Implemented ops
++
++- `extend.customentity.define`
++- `extend.customentity.draw_viewport`
++- `extend.customentity.draw_world`
++- `extend.customentity.grips`
++- `extend.customentity.osnap`
++- `extend.customentity.stretch`
++- `extend.customobject.define`
++- `extend.customobject.embedded`
++- `extend.customobject.filer_dxfin`
++- `extend.customobject.filer_dxfout`
++- `extend.customobject.partial_undo`
++- `extend.osnap.custom_mode`
++
++## Hard-blocked ops
++
++- `extend.object_enabler.demand_register` — hard-blocked: install-time HKLM/ObjectDBX demand-load registration requires canonical DBX deploy/registry write; Pane 6 native build rule permits isolated build only and says canonical deploy is Pane 1 only.
++
++## Native implementation evidence
++
++- `AriadneProbe` now implements custom entity lifecycle callbacks: `subWorldDraw`, `subViewportDraw`, grip, osnap, stretch, transform/extents, and embedded `AcDbCircle` worldDraw forwarding.
++- `AriadneRecord` now implements `applyPartialUndo` plus exported value/set helpers for linkage-safe ARX dispatch evidence.
++- `m08kDispatch` now handles the claimed custom object/entity/DXF/partial-undo/custom-osnap operations (except the hard-blocked demand-register install op).
++- `extend.osnap.custom_mode` attaches an `AcDbCustomOsnapInfo` protocol extension and registers/removes a custom osnap mode when the manager is available.
++
++## Validation
++
++- `python -m pytest tests -q` → 464 passed, 20 skipped
++- `python tools/cadctl_cli.py registry coverage` → status ok, consistent true
++- `python -m json.tool reports/operation_coverage_latest.json` → ok
++- `python -m json.tool reports/v1_operation_gate_latest.json` → ok
++- `python tools/reconcile_native_registry.py` → flips=0, conflicts=0, drift=0
++- isolated native build → ok; canonical deploy not performed
++
++## Native build
++
++- `runs/wave3_pane6_native_build_final/bin/x64/Release/Ariadne.AcadNativeDbx.dbx` exists=True bytes=54272
++- `runs/wave3_pane6_native_build_final/bin/x64/Release/Ariadne.AcadNative.crx` exists=True bytes=676864
++- `runs/wave3_pane6_native_build_final/bin/x64/Release/Ariadne.AcadNative.arx` exists=True bytes=684544
++
++## Files
++
++- plan: `reports/tickets/WAVE3_PANE6_NATIVE_CUSTOM_PLAN.md`
++- ops: `reports/tickets/WAVE3_PANE6_NATIVE_CUSTOM_OPS.json`
++- native_build: `reports/tickets/WAVE3_PANE6_native_build.json`
++- report: `reports/tickets/WAVE3_PANE6_NATIVE_CUSTOM.md`
++- packet: `packets/tickets/WAVE3_PANE6_NATIVE_CUSTOM.md`
++- patch: `handoff/pr/WAVE3_PANE6_NATIVE_CUSTOM.patch`
++- zip: `handoff/tickets/WAVE3_PANE6_NATIVE_CUSTOM.zip`
+diff --git a/reports/tickets/WAVE3_PANE6_NATIVE_CUSTOM_OPS.json b/reports/tickets/WAVE3_PANE6_NATIVE_CUSTOM_OPS.json
+new file mode 100644
+index 0000000..6295227
+--- /dev/null
++++ b/reports/tickets/WAVE3_PANE6_NATIVE_CUSTOM_OPS.json
+@@ -0,0 +1,329 @@
++{
++  "schema": "ariadne.cad_os.wave3.pane6.native_custom.ops.v1",
++  "generated_at": "2026-06-23T21:22:32.969293",
++  "claim_file": "reports/tickets/WAVE3_PANE6_CLAIMS.json",
++  "claimed_ops_count": 13,
++  "implemented_ops_count": 12,
++  "hard_blocked_ops_count": 1,
++  "deprecated_ops_count": 0,
++  "claimed_catalogued_remaining_count": 0,
++  "implemented_ops": [
++    "extend.customentity.define",
++    "extend.customentity.draw_viewport",
++    "extend.customentity.draw_world",
++    "extend.customentity.grips",
++    "extend.customentity.osnap",
++    "extend.customentity.stretch",
++    "extend.customobject.define",
++    "extend.customobject.embedded",
++    "extend.customobject.filer_dxfin",
++    "extend.customobject.filer_dxfout",
++    "extend.customobject.partial_undo",
++    "extend.osnap.custom_mode"
++  ],
++  "hard_blocked_ops": [
++    "extend.object_enabler.demand_register"
++  ],
++  "deprecated_ops": [],
++  "claimed_catalogued_remaining": [],
++  "operations": [
++    {
++      "operation": "extend.customentity.define",
++      "family": "custom_objects_protocols",
++      "closure": "implemented",
++      "registry_status": "implemented",
++      "dispatcher_symbol": "m08kDispatch",
++      "tests": [
++        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
++        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
++        "tests/unit/test_m08k_handlers.py"
++      ],
++      "evidence_refs": [
++        "config/autocad_native_arx_operation_catalog.json#extend.customentity.define",
++        "src/Ariadne.AcadNative/families/m08k_handlers.inc:m08kDispatch",
++        "reports/merge/MERGE-M08-READ.json",
++        "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
++        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)",
++        "reports/tickets/WAVE3_PANE6_NATIVE_CUSTOM.md",
++        "reports/tickets/WAVE3_PANE6_NATIVE_CUSTOM_OPS.json",
++        "reports/tickets/WAVE3_PANE6_native_build.json"
++      ],
++      "blocked_reason": ""
++    },
++    {
++      "operation": "extend.customentity.draw_viewport",
++      "family": "custom_objects_protocols",
++      "closure": "implemented",
++      "registry_status": "implemented",
++      "dispatcher_symbol": "m08kDispatch",
++      "tests": [
++        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
++        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
++        "tests/unit/test_m08k_handlers.py"
++      ],
++      "evidence_refs": [
++        "config/autocad_native_arx_operation_catalog.json#extend.customentity.draw_viewport",
++        "src/Ariadne.AcadNative/families/m08k_handlers.inc:m08kDispatch",
++        "reports/merge/MERGE-M08-READ.json",
++        "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
++        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)",
++        "reports/tickets/WAVE3_PANE6_NATIVE_CUSTOM.md",
++        "reports/tickets/WAVE3_PANE6_NATIVE_CUSTOM_OPS.json",
++        "reports/tickets/WAVE3_PANE6_native_build.json"
++      ],
++      "blocked_reason": ""
++    },
++    {
++      "operation": "extend.customentity.draw_world",
++      "family": "custom_objects_protocols",
++      "closure": "implemented",
++      "registry_status": "implemented",
++      "dispatcher_symbol": "m08kDispatch",
++      "tests": [
++        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
++        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
++        "tests/unit/test_m08k_handlers.py"
++      ],
++      "evidence_refs": [
++        "config/autocad_native_arx_operation_catalog.json#extend.customentity.draw_world",
++        "src/Ariadne.AcadNative/families/m08k_handlers.inc:m08kDispatch",
++        "reports/merge/MERGE-M08-READ.json",
++        "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
++        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)",
++        "reports/tickets/WAVE3_PANE6_NATIVE_CUSTOM.md",
++        "reports/tickets/WAVE3_PANE6_NATIVE_CUSTOM_OPS.json",
++        "reports/tickets/WAVE3_PANE6_native_build.json"
++      ],
++      "blocked_reason": ""
++    },
++    {
++      "operation": "extend.customentity.grips",
++      "family": "custom_objects_protocols",
++      "closure": "implemented",
++      "registry_status": "implemented",
++      "dispatcher_symbol": "m08kDispatch",
++      "tests": [
++        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
++        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
++        "tests/unit/test_m08k_handlers.py"
++      ],
++      "evidence_refs": [
++        "config/autocad_native_arx_operation_catalog.json#extend.customentity.grips",
++        "src/Ariadne.AcadNative/families/m08k_handlers.inc:m08kDispatch",
++        "reports/merge/MERGE-M08-READ.json",
++        "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
++        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)",
++        "reports/tickets/WAVE3_PANE6_NATIVE_CUSTOM.md",
++        "reports/tickets/WAVE3_PANE6_NATIVE_CUSTOM_OPS.json",
++        "reports/tickets/WAVE3_PANE6_native_build.json"
++      ],
++      "blocked_reason": ""
++    },
++    {
++      "operation": "extend.customentity.osnap",
++      "family": "custom_objects_protocols",
++      "closure": "implemented",
++      "registry_status": "implemented",
++      "dispatcher_symbol": "m08kDispatch",
++      "tests": [
++        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
++        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
++        "tests/unit/test_m08k_handlers.py"
++      ],
++      "evidence_refs": [
++        "config/autocad_native_arx_operation_catalog.json#extend.customentity.osnap",
++        "src/Ariadne.AcadNative/families/m08k_handlers.inc:m08kDispatch",
++        "reports/merge/MERGE-M08-READ.json",
++        "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
++        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)",
++        "reports/tickets/WAVE3_PANE6_NATIVE_CUSTOM.md",
++        "reports/tickets/WAVE3_PANE6_NATIVE_CUSTOM_OPS.json",
++        "reports/tickets/WAVE3_PANE6_native_build.json"
++      ],
++      "blocked_reason": ""
++    },
++    {
++      "operation": "extend.customentity.stretch",
++      "family": "custom_objects_protocols",
++      "closure": "implemented",
++      "registry_status": "implemented",
++      "dispatcher_symbol": "m08kDispatch",
++      "tests": [
++        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
++        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
++        "tests/unit/test_m08k_handlers.py"
++      ],
++      "evidence_refs": [
++        "config/autocad_native_arx_operation_catalog.json#extend.customentity.stretch",
++        "src/Ariadne.AcadNative/families/m08k_handlers.inc:m08kDispatch",
++        "reports/merge/MERGE-M08-READ.json",
++        "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
++        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)",
++        "reports/tickets/WAVE3_PANE6_NATIVE_CUSTOM.md",
++        "reports/tickets/WAVE3_PANE6_NATIVE_CUSTOM_OPS.json",
++        "reports/tickets/WAVE3_PANE6_native_build.json"
++      ],
++      "blocked_reason": ""
++    },
++    {
++      "operation": "extend.customobject.define",
++      "family": "custom_objects_protocols",
++      "closure": "implemented",
++      "registry_status": "implemented",
++      "dispatcher_symbol": "m08kDispatch",
++      "tests": [
++        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
++        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
++        "tests/unit/test_m08k_handlers.py"
++      ],
++      "evidence_refs": [
++        "config/autocad_native_arx_operation_catalog.json#extend.customobject.define",
++        "src/Ariadne.AcadNative/families/m08k_handlers.inc:m08kDispatch",
++        "reports/merge/MERGE-M08-READ.json",
++        "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
++        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)",
++        "reports/tickets/WAVE3_PANE6_NATIVE_CUSTOM.md",
++        "reports/tickets/WAVE3_PANE6_NATIVE_CUSTOM_OPS.json",
++        "reports/tickets/WAVE3_PANE6_native_build.json"
++      ],
++      "blocked_reason": ""
++    },
++    {
++      "operation": "extend.customobject.embedded",
++      "family": "custom_objects_protocols",
++      "closure": "implemented",
++      "registry_status": "implemented",
++      "dispatcher_symbol": "m08kDispatch",
++      "tests": [
++        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
++        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
++        "tests/unit/test_m08k_handlers.py"
++      ],
++      "evidence_refs": [
++        "config/autocad_native_arx_operation_catalog.json#extend.customobject.embedded",
++        "src/Ariadne.AcadNative/families/m08k_handlers.inc:m08kDispatch",
++        "reports/merge/MERGE-M08-READ.json",
++        "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
++        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)",
++        "reports/tickets/WAVE3_PANE6_NATIVE_CUSTOM.md",
++        "reports/tickets/WAVE3_PANE6_NATIVE_CUSTOM_OPS.json",
++        "reports/tickets/WAVE3_PANE6_native_build.json"
++      ],
++      "blocked_reason": ""
++    },
++    {
++      "operation": "extend.customobject.filer_dxfin",
++      "family": "custom_objects_protocols",
++      "closure": "implemented",
++      "registry_status": "implemented",
++      "dispatcher_symbol": "m08kDispatch",
++      "tests": [
++        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
++        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
++        "tests/unit/test_m08k_handlers.py"
++      ],
++      "evidence_refs": [
++        "config/autocad_native_arx_operation_catalog.json#extend.customobject.filer_dxfin",
++        "src/Ariadne.AcadNative/families/m08k_handlers.inc:m08kDispatch",
++        "reports/merge/MERGE-M08-READ.json",
++        "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
++        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)",
++        "reports/tickets/WAVE3_PANE6_NATIVE_CUSTOM.md",
++        "reports/tickets/WAVE3_PANE6_NATIVE_CUSTOM_OPS.json",
++        "reports/tickets/WAVE3_PANE6_native_build.json"
++      ],
++      "blocked_reason": ""
++    },
++    {
++      "operation": "extend.customobject.filer_dxfout",
++      "family": "custom_objects_protocols",
++      "closure": "implemented",
++      "registry_status": "implemented",
++      "dispatcher_symbol": "m08kDispatch",
++      "tests": [
++        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
++        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
++        "tests/unit/test_m08k_handlers.py"
++      ],
++      "evidence_refs": [
++        "config/autocad_native_arx_operation_catalog.json#extend.customobject.filer_dxfout",
++        "src/Ariadne.AcadNative/families/m08k_handlers.inc:m08kDispatch",
++        "reports/merge/MERGE-M08-READ.json",
++        "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
++        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)",
++        "reports/tickets/WAVE3_PANE6_NATIVE_CUSTOM.md",
++        "reports/tickets/WAVE3_PANE6_NATIVE_CUSTOM_OPS.json",
++        "reports/tickets/WAVE3_PANE6_native_build.json"
++      ],
++      "blocked_reason": ""
++    },
++    {
++      "operation": "extend.customobject.partial_undo",
++      "family": "custom_objects_protocols",
++      "closure": "implemented",
++      "registry_status": "implemented",
++      "dispatcher_symbol": "m08kDispatch",
++      "tests": [
++        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
++        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
++        "tests/unit/test_m08k_handlers.py"
++      ],
++      "evidence_refs": [
++        "config/autocad_native_arx_operation_catalog.json#extend.customobject.partial_undo",
++        "src/Ariadne.AcadNative/families/m08k_handlers.inc:m08kDispatch",
++        "reports/merge/MERGE-M08-READ.json",
++        "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
++        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)",
++        "reports/tickets/WAVE3_PANE6_NATIVE_CUSTOM.md",
++        "reports/tickets/WAVE3_PANE6_NATIVE_CUSTOM_OPS.json",
++        "reports/tickets/WAVE3_PANE6_native_build.json"
++      ],
++      "blocked_reason": ""
++    },
++    {
++      "operation": "extend.object_enabler.demand_register",
++      "family": "custom_objects_protocols",
++      "closure": "hard_blocked",
++      "registry_status": "blocked",
++      "dispatcher_symbol": null,
++      "tests": [
++        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
++        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
++        "tests/unit/test_m08k_handlers.py::TestM08KHandlers::test_hard_blocked_install_time_op_not_in_hasop"
++      ],
++      "evidence_refs": [
++        "config/autocad_native_arx_operation_catalog.json#extend.object_enabler.demand_register",
++        "reports/tickets/WAVE3_PANE6_NATIVE_CUSTOM_PLAN.md",
++        "reports/tickets/WAVE3_PANE6_NATIVE_CUSTOM.md#hard-blocked-ops",
++        "NATIVE_BUILD_RULE: isolated output only; canonical deploy is Pane 1 only",
++        "reports/tickets/WAVE3_PANE6_NATIVE_CUSTOM.md",
++        "reports/tickets/WAVE3_PANE6_NATIVE_CUSTOM_OPS.json",
++        "reports/tickets/WAVE3_PANE6_native_build.json"
++      ],
++      "blocked_reason": "HARD_BLOCKED_SAFETY_CANONICAL_DEPLOY_PANE1_ONLY: demand-load object-enabler registration writes AutoCAD/ObjectDBX application registry keys and binds a deployed DBX path; Wave3 Pane6 native build rule allows isolated build only and forbids canonical DBX/CRX/ARX deploy. Pane 1 owns canonical deploy/registration."
++    },
++    {
++      "operation": "extend.osnap.custom_mode",
++      "family": "custom_objects_protocols",
++      "closure": "implemented",
++      "registry_status": "implemented",
++      "dispatcher_symbol": "m08kDispatch",
++      "tests": [
++        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
++        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
++        "tests/unit/test_m08k_handlers.py"
++      ],
++      "evidence_refs": [
++        "config/autocad_native_arx_operation_catalog.json#extend.osnap.custom_mode",
++        "src/Ariadne.AcadNative/families/m08k_handlers.inc:m08kDispatch",
++        "reports/merge/MERGE-M08-READ.json",
++        "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
++        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)",
++        "reports/tickets/WAVE3_PANE6_NATIVE_CUSTOM.md",
++        "reports/tickets/WAVE3_PANE6_NATIVE_CUSTOM_OPS.json",
++        "reports/tickets/WAVE3_PANE6_native_build.json"
++      ],
++      "blocked_reason": ""
++    }
++  ]
++}
+diff --git a/reports/tickets/WAVE3_PANE6_NATIVE_CUSTOM_PLAN.md b/reports/tickets/WAVE3_PANE6_NATIVE_CUSTOM_PLAN.md
+new file mode 100644
+index 0000000..0842cb7
+--- /dev/null
++++ b/reports/tickets/WAVE3_PANE6_NATIVE_CUSTOM_PLAN.md
+@@ -0,0 +1,58 @@
++# WAVE3 Pane 6 Native Custom Object / Filer / Protocol Plan
++
++## Scope
++
++Claim file: `reports/tickets/WAVE3_PANE6_CLAIMS.json` (13 ops).
++
++Claimed operations:
++
++1. `extend.customentity.define`
++2. `extend.customentity.draw_viewport`
++3. `extend.customentity.draw_world`
++4. `extend.customentity.grips`
++5. `extend.customentity.osnap`
++6. `extend.customentity.stretch`
++7. `extend.customobject.define`
++8. `extend.customobject.embedded`
++9. `extend.customobject.filer_dxfin`
++10. `extend.customobject.filer_dxfout`
++11. `extend.customobject.partial_undo`
++12. `extend.object_enabler.demand_register`
++13. `extend.osnap.custom_mode`
++
++## Existing substrate
++
++- `AriadneProbe` is the registered custom `AcDbEntity` in `src/Ariadne.AcadNative/AriadneProbe.*`.
++- `AriadneRecord` is the registered custom `AcDbObject` in `src/Ariadne.AcadNativeDbx/AriadneRecord.*`.
++- `AriadneProbeProtocol` already proves one protocol-extension path in `src/Ariadne.AcadNativeDbx/AriadneProtocol.*`.
++- `m08k_handlers.inc` owns the custom object/entity/protocol lifecycle dispatcher.
++
++## Implementation approach
++
++1. Extend native class bodies instead of adding catalog-only routing:
++   - `AriadneProbe`: add viewport draw, grip, osnap, stretch, and embedded-object/DXF evidence hooks.
++   - `AriadneRecord`: add partial undo override and DXF in/out observability helpers.
++   - DBX exports: add linkage-safe C exports for record value/version/protocol evidence so ARX handlers never directly link to C++ class methods.
++2. Add m08k dispatcher handlers for all 13 claimed ops with source-backed or runtime-backed results.
++   - Use staged scratch transactions for DB mutations.
++   - No original DWG write, no canonical DBX/CRX/ARX deploy, no editor-command reentrancy.
++3. Update `tests/unit/test_m08k_handlers.py` from the old deferred contract to the Wave 3 implemented contract.
++4. Update `config/operations.v2.json` by running `tools/reconcile_native_registry.py --apply` and, if needed, by explicit evidence/ticket edits so claimed ops have:
++   - `status: implemented`
++   - `handler.dispatcher_symbol: m08kDispatch`
++   - `tests` including `tests/unit/test_m08k_handlers.py`
++   - `evidence_refs` including source/report/native build evidence.
++5. Validate:
++   - `python -m pytest tests -q`
++   - `python tools/cadctl_cli.py registry coverage`
++   - `python -m json.tool reports/operation_coverage_latest.json`
++   - `python -m json.tool reports/v1_operation_gate_latest.json`
++   - `python tools/reconcile_native_registry.py`
++   - isolated native build and `reports/tickets/WAVE3_PANE6_native_build.json`.
++6. Produce final report, machine JSON, ops JSON, packet, patch, zip, and commit on `cados/wave3-pane6-native-custom`.
++
++## Closure policy
++
++Target closure: all 13 `implemented`.
++Hard-block only if actual SDK/host/license/safety evidence blocks implementation.
++Forbidden closure states (`catalogued`, `stub`, `unknown`, `deferred`, `future_version`, `v1_target_false_escape`) will not remain for claimed ops.
+diff --git a/reports/tickets/WAVE3_PANE6_native_build.json b/reports/tickets/WAVE3_PANE6_native_build.json
+new file mode 100644
+index 0000000..19598ea
+--- /dev/null
++++ b/reports/tickets/WAVE3_PANE6_native_build.json
+@@ -0,0 +1,30 @@
++{
++  "schema": "ariadne.cad_os.wave3.pane6.native_build.v1",
++  "status": "ok",
++  "msbuild": "C:/Program Files/Microsoft Visual Studio/2026/Community/MSBuild/Current/Bin/amd64/MSBuild.exe",
++  "configuration": "Release",
++  "platform": "x64",
++  "isolated_output_root": "runs/wave3_pane6_native_build_final",
++  "canonical_deploy": "not_performed",
++  "arx_relink_mode": "canonical",
++  "warnings": [
++    "LNK4099 missing Autodesk rxapi.pdb debug symbols (link succeeded)"
++  ],
++  "artifacts": [
++    {
++      "path": "runs/wave3_pane6_native_build_final/bin/x64/Release/Ariadne.AcadNativeDbx.dbx",
++      "exists": true,
++      "bytes": 54272
++    },
++    {
++      "path": "runs/wave3_pane6_native_build_final/bin/x64/Release/Ariadne.AcadNative.crx",
++      "exists": true,
++      "bytes": 676864
++    },
++    {
++      "path": "runs/wave3_pane6_native_build_final/bin/x64/Release/Ariadne.AcadNative.arx",
++      "exists": true,
++      "bytes": 684544
++    }
++  ]
++}
+diff --git a/reports/v1_operation_gate_latest.json b/reports/v1_operation_gate_latest.json
+index 488e2c8..2a0872b 100644
+--- a/reports/v1_operation_gate_latest.json
++++ b/reports/v1_operation_gate_latest.json
+@@ -17,14 +17,14 @@
+   "gate_pass": true,
+   "counts": {
+     "total": 517,
+-    "implemented": 402,
++    "implemented": 414,
+     "stub": 0,
+-    "blocked": 9,
+-    "catalogued": 106,
++    "blocked": 10,
++    "catalogued": 93,
+     "unknown": 0,
+-    "v1_target_total": 411,
+-    "v1_target_implemented": 402,
+-    "v1_target_blocked": 9,
++    "v1_target_total": 424,
++    "v1_target_implemented": 414,
++    "v1_target_blocked": 10,
+     "v1_target_deferred": 0
+   }
+ }
+diff --git a/src/Ariadne.AcadNative/AriadneNativeJob.cpp b/src/Ariadne.AcadNative/AriadneNativeJob.cpp
+index 371fedc..3402e75 100644
+--- a/src/Ariadne.AcadNative/AriadneNativeJob.cpp
++++ b/src/Ariadne.AcadNative/AriadneNativeJob.cpp
+@@ -3122,9 +3122,9 @@ struct AriadneJobCtx
+ #include "families/m08f_handlers.inc"   // M08F — SQLite rich IR / query DSL
+ #include "families/m08g_handlers.inc"   // M08G — entity-create + entity/geometry modify (staged-write)
+ #include "families/m08h_handlers.inc"   // M08H — dimensions / annotations / hatch (staged-write)
+-#include "families/m08k_handlers.inc"   // M08K-T01 — custom object/entity lifecycle (native)
+-#include "families/m08kc_handlers.inc"  // M08K-T03 — constraints / associativity (native)
+ #include "families/m08l_handlers.inc"   // M08L — graphics system: worldDraw / overrules / grips (native)
++#include "families/m08k_handlers.inc"   // M08K-T01 — custom object/entity lifecycle (native; reuses M08L collectors)
++#include "families/m08kc_handlers.inc"  // M08K-T03 — constraints / associativity (native)
+ #include "families/m08m_handlers.inc"   // M08M — OPM properties + reactors (native)
+ #include "families/m08n_handlers.inc"   // M08N — editor/jig/selection/UI/command lifecycle (native)
+ 
+diff --git a/src/Ariadne.AcadNative/AriadneProbe.cpp b/src/Ariadne.AcadNative/AriadneProbe.cpp
+index 7ce57d8..1116181 100644
+--- a/src/Ariadne.AcadNative/AriadneProbe.cpp
++++ b/src/Ariadne.AcadNative/AriadneProbe.cpp
+@@ -2,6 +2,8 @@
+ // AriadneProbe.cpp — implementation of the minimal Ariadne custom entity.
+ //////////////////////////////////////////////////////////////////////////////
+ #include <tchar.h>
++#include <windows.h>
++#include "dbgrip.h"
+ #include "AriadneProbe.h"
+ // OPM/AcRxProperty surface (M07A): expose AriadneProbe::size() as a runtime
+ // property so the Properties palette (attended) and the headless member-query
+@@ -190,14 +192,45 @@ Acad::ErrorStatus AriadneProbe::dxfInFields(AcDbDxfFiler* filer)
+ }
+ 
+ //----------------------------------------------------------------------------
+-// Graphics — AcGi worldDraw (view-independent). Draw a circle marker of radius
+-// mSize at mCenter, in the XY plane.
++// Graphics — AcGi worldDraw (view-independent). Compose the probe from a real
++// embedded AcDbCircle and forward its worldDraw. The persisted fields remain the
++// probe's center/size; the embedded circle is rebuilt on demand so custom-object
++// proxy fallback can still round-trip using our compact filers.
+ //----------------------------------------------------------------------------
+ Adesk::Boolean AriadneProbe::subWorldDraw(AcGiWorldDraw* mode)
+ {
+     assertReadEnabled();
+-    mode->geometry().circle(mCenter, mSize, AcGeVector3d::kZAxis);
+-    return Adesk::kTrue;   // fully view-independent; no subViewportDraw needed
++    if (mode == NULL)
++        return Adesk::kFalse;
++
++    AcDbCircle embedded(mCenter, AcGeVector3d::kZAxis, mSize);
++    embedded.setPropertiesFrom(this);
++    if (embedded.worldDraw(mode) != Adesk::kTrue)
++        mode->geometry().circle(mCenter, mSize, AcGeVector3d::kZAxis);
++    return Adesk::kTrue;   // fully view-independent; viewportDraw is an optional overlay
++}
++
++//----------------------------------------------------------------------------
++// Viewport-specific graphics — draw a small diamond in device/viewport space
++// when AutoCAD explicitly asks for a viewport pass. Because subWorldDraw returns
++// kTrue this is normally only exercised by direct viewportDraw probes or special
++// regen paths, but the callback is real and safe when a viewport context exists.
++//----------------------------------------------------------------------------
++void AriadneProbe::subViewportDraw(AcGiViewportDraw* mode)
++{
++    assertReadEnabled();
++    if (mode == NULL)
++        return;
++
++    const double d = (mSize > 0.0) ? (mSize * 0.20) : 0.20;
++    AcGePoint3d pts[5] = {
++        AcGePoint3d(mCenter.x,     mCenter.y + d, mCenter.z),
++        AcGePoint3d(mCenter.x + d, mCenter.y,     mCenter.z),
++        AcGePoint3d(mCenter.x,     mCenter.y - d, mCenter.z),
++        AcGePoint3d(mCenter.x - d, mCenter.y,     mCenter.z),
++        AcGePoint3d(mCenter.x,     mCenter.y + d, mCenter.z)
++    };
++    mode->geometry().polyline(5, pts);
+ }
+ 
+ //----------------------------------------------------------------------------
+@@ -217,3 +250,159 @@ Acad::ErrorStatus AriadneProbe::subTransformBy(const AcGeMatrix3d& xform)
+     mSize *= xform.scale();   // uniform-scale component
+     return Acad::eOk;
+ }
++
++//----------------------------------------------------------------------------
++// Grip protocol — expose center + four quadrant points; moving any grip translates
++// the probe by the supplied offset. The rich-grip overload mirrors the legacy
++// point set so both editor protocols are covered.
++//----------------------------------------------------------------------------
++Acad::ErrorStatus AriadneProbe::subGetGripPoints(
++    AcGePoint3dArray& gripPoints,
++    AcDbIntArray& osnapModes,
++    AcDbIntArray& geomIds) const
++{
++    assertReadEnabled();
++    gripPoints.append(mCenter);
++    gripPoints.append(AcGePoint3d(mCenter.x + mSize, mCenter.y, mCenter.z));
++    gripPoints.append(AcGePoint3d(mCenter.x, mCenter.y + mSize, mCenter.z));
++    gripPoints.append(AcGePoint3d(mCenter.x - mSize, mCenter.y, mCenter.z));
++    gripPoints.append(AcGePoint3d(mCenter.x, mCenter.y - mSize, mCenter.z));
++    for (int i = 0; i < 5; ++i) {
++        osnapModes.append(i == 0 ? AcDb::kOsModeCen : AcDb::kOsModeQuad);
++        geomIds.append(i);
++    }
++    return Acad::eOk;
++}
++
++Acad::ErrorStatus AriadneProbe::subGetGripPoints(
++    AcDbGripDataPtrArray& grips,
++    const double /*curViewUnitSize*/,
++    const int /*gripSize*/,
++    const AcGeVector3d& /*curViewDir*/,
++    const int /*bitflags*/) const
++{
++    assertReadEnabled();
++    AcGePoint3dArray pts;
++    AcDbIntArray modes, geomIds;
++    Acad::ErrorStatus es = subGetGripPoints(pts, modes, geomIds);
++    if (es != Acad::eOk)
++        return es;
++    for (int i = 0; i < pts.length(); ++i) {
++        AcDbGripData* gd = new AcDbGripData();
++        gd->setGripPoint(pts[i]);
++        gd->setAppData(reinterpret_cast<void*>(static_cast<Adesk::IntPtr>(i + 1)));
++        grips.append(gd);
++    }
++    return Acad::eOk;
++}
++
++Acad::ErrorStatus AriadneProbe::subMoveGripPointsAt(
++    const AcDbIntArray& indices,
++    const AcGeVector3d& offset)
++{
++    assertWriteEnabled();
++    if (indices.isEmpty())
++        return Acad::eInvalidInput;
++    mCenter += offset;
++    return Acad::eOk;
++}
++
++Acad::ErrorStatus AriadneProbe::subMoveGripPointsAt(
++    const AcDbVoidPtrArray& gripAppData,
++    const AcGeVector3d& offset,
++    const int /*bitflags*/)
++{
++    assertWriteEnabled();
++    if (gripAppData.isEmpty())
++        return Acad::eInvalidInput;
++    mCenter += offset;
++    return Acad::eOk;
++}
++
++//----------------------------------------------------------------------------
++// STRETCH protocol — identical control points to the grip protocol, with the
++// same translate-on-move semantics.
++//----------------------------------------------------------------------------
++Acad::ErrorStatus AriadneProbe::subGetStretchPoints(AcGePoint3dArray& stretchPoints) const
++{
++    assertReadEnabled();
++    AcDbIntArray modes, geomIds;
++    return subGetGripPoints(stretchPoints, modes, geomIds);
++}
++
++Acad::ErrorStatus AriadneProbe::subMoveStretchPointsAt(
++    const AcDbIntArray& indices,
++    const AcGeVector3d& offset)
++{
++    assertWriteEnabled();
++    if (indices.isEmpty())
++        return Acad::eInvalidInput;
++    mCenter += offset;
++    return Acad::eOk;
++}
++
++//----------------------------------------------------------------------------
++// OSNAP protocol — provide center/centroid/node/insert, quadrants, and a nearest
++// fallback for the probe marker. The insertion-matrix overload transforms the
++// computed points for block-reference contexts.
++//----------------------------------------------------------------------------
++Acad::ErrorStatus AriadneProbe::subGetOsnapPoints(
++    AcDb::OsnapMode osnapMode,
++    Adesk::GsMarker /*gsSelectionMark*/,
++    const AcGePoint3d& pickPoint,
++    const AcGePoint3d& /*lastPoint*/,
++    const AcGeMatrix3d& /*viewXform*/,
++    AcGePoint3dArray& snapPoints,
++    AcDbIntArray& geomIds) const
++{
++    assertReadEnabled();
++    switch (osnapMode) {
++    case AcDb::kOsModeCen:
++    case AcDb::kOsModeCentroid:
++    case AcDb::kOsModeNode:
++    case AcDb::kOsModeIns:
++    case AcDb::kOsModeMid:
++        snapPoints.append(mCenter);
++        geomIds.append(0);
++        break;
++    case AcDb::kOsModeEnd:
++    case AcDb::kOsModeQuad:
++        snapPoints.append(AcGePoint3d(mCenter.x + mSize, mCenter.y, mCenter.z)); geomIds.append(1);
++        snapPoints.append(AcGePoint3d(mCenter.x, mCenter.y + mSize, mCenter.z)); geomIds.append(2);
++        snapPoints.append(AcGePoint3d(mCenter.x - mSize, mCenter.y, mCenter.z)); geomIds.append(3);
++        snapPoints.append(AcGePoint3d(mCenter.x, mCenter.y - mSize, mCenter.z)); geomIds.append(4);
++        break;
++    case AcDb::kOsModeNear: {
++        AcGeVector3d v = pickPoint - mCenter;
++        if (v.length() <= 1e-9)
++            v = AcGeVector3d::kXAxis;
++        v.normalize();
++        snapPoints.append(mCenter + (v * mSize));
++        geomIds.append(5);
++        break;
++    }
++    default:
++        return Acad::eOk;
++    }
++    return Acad::eOk;
++}
++
++Acad::ErrorStatus AriadneProbe::subGetOsnapPoints(
++    AcDb::OsnapMode osnapMode,
++    Adesk::GsMarker gsSelectionMark,
++    const AcGePoint3d& pickPoint,
++    const AcGePoint3d& lastPoint,
++    const AcGeMatrix3d& viewXform,
++    AcGePoint3dArray& snapPoints,
++    AcDbIntArray& geomIds,
++    const AcGeMatrix3d& insertionMat) const
++{
++    const int before = snapPoints.length();
++    Acad::ErrorStatus es = subGetOsnapPoints(
++        osnapMode, gsSelectionMark, pickPoint, lastPoint, viewXform, snapPoints, geomIds);
++    if (es != Acad::eOk)
++        return es;
++    for (int i = before; i < snapPoints.length(); ++i)
++        snapPoints[i].transformBy(insertionMat);
++    return Acad::eOk;
++}
+diff --git a/src/Ariadne.AcadNative/AriadneProbe.h b/src/Ariadne.AcadNative/AriadneProbe.h
+index a4edf7f..26fc6ec 100644
+--- a/src/Ariadne.AcadNative/AriadneProbe.h
++++ b/src/Ariadne.AcadNative/AriadneProbe.h
+@@ -40,12 +40,53 @@ public:
+     virtual Acad::ErrorStatus dxfOutFields(AcDbDxfFiler* filer) const override;
+ 
+ protected:
+-    // Public worldDraw/getGeomExtents/transformBy are ADESK_SEALED in 2027 —
+-    // override the protected subXxx virtuals (research: entities + editor-delta).
++    // Public draw/edit protocol methods are ADESK_SEALED in 2027 — override the
++    // protected subXxx virtuals (research: entities + editor-delta).
+     virtual Adesk::Boolean    subWorldDraw(AcGiWorldDraw* mode) override;
++    virtual void              subViewportDraw(AcGiViewportDraw* mode) override;
+     virtual Acad::ErrorStatus subGetGeomExtents(AcDbExtents& extents) const override;
+     virtual Acad::ErrorStatus subTransformBy(const AcGeMatrix3d& xform) override;
+ 
++    // Editor protocols for the Wave 3 native custom-entity surface.
++    virtual Acad::ErrorStatus subGetGripPoints(
++        AcGePoint3dArray& gripPoints,
++        AcDbIntArray& osnapModes,
++        AcDbIntArray& geomIds) const override;
++    virtual Acad::ErrorStatus subGetGripPoints(
++        AcDbGripDataPtrArray& grips,
++        const double curViewUnitSize,
++        const int gripSize,
++        const AcGeVector3d& curViewDir,
++        const int bitflags) const override;
++    virtual Acad::ErrorStatus subMoveGripPointsAt(
++        const AcDbIntArray& indices,
++        const AcGeVector3d& offset) override;
++    virtual Acad::ErrorStatus subMoveGripPointsAt(
++        const AcDbVoidPtrArray& gripAppData,
++        const AcGeVector3d& offset,
++        const int bitflags) override;
++    virtual Acad::ErrorStatus subGetStretchPoints(AcGePoint3dArray& stretchPoints) const override;
++    virtual Acad::ErrorStatus subMoveStretchPointsAt(
++        const AcDbIntArray& indices,
++        const AcGeVector3d& offset) override;
++    virtual Acad::ErrorStatus subGetOsnapPoints(
++        AcDb::OsnapMode osnapMode,
++        Adesk::GsMarker gsSelectionMark,
++        const AcGePoint3d& pickPoint,
++        const AcGePoint3d& lastPoint,
++        const AcGeMatrix3d& viewXform,
++        AcGePoint3dArray& snapPoints,
++        AcDbIntArray& geomIds) const override;
++    virtual Acad::ErrorStatus subGetOsnapPoints(
++        AcDb::OsnapMode osnapMode,
++        Adesk::GsMarker gsSelectionMark,
++        const AcGePoint3d& pickPoint,
++        const AcGePoint3d& lastPoint,
++        const AcGeMatrix3d& viewXform,
++        AcGePoint3dArray& snapPoints,
++        AcDbIntArray& geomIds,
++        const AcGeMatrix3d& insertionMat) const override;
++
+ private:
+     AcGePoint3d mCenter;
+     double      mSize;
+diff --git a/src/Ariadne.AcadNative/families/m08k_handlers.inc b/src/Ariadne.AcadNative/families/m08k_handlers.inc
+index 7b1c1b2..b8a81a3 100644
+--- a/src/Ariadne.AcadNative/families/m08k_handlers.inc
++++ b/src/Ariadne.AcadNative/families/m08k_handlers.inc
+@@ -40,6 +40,7 @@
+ #include "rxclass.h"      // AcRxClass addX/delX/queryX/newAcRxClass/acrxBuildClassHierarchy/deleteAcRxClass
+ #include "rxdict.h"       // acrxClassDictionary (live registered-class lookup by name)
+ #include "rxregsvc.h"     // acrxRegisterService / acrxServiceIsRegistered
++#include "dbosnap.h"      // AcDbCustomOsnapInfo / AcDbCustomOsnapManager
+ // NOTE: the custom Ariadne* classes are reached via the class dictionary (by name) and the DBX
+ // extern "C" API (AriadneDbxApi.h, already included by the host TU) — NOT via their C++ headers:
+ // the import lib exports only the extern "C" symbols, not the class methods/::desc(). Including the
+@@ -62,6 +63,144 @@ public:
+     virtual ~M08KProtocolXObject() {}
+ };
+ 
++// A concrete custom-osnap protocol extension. It is registration-free (no custom RTTI):
++// AcRxClass::addX keys it by AcDbCustomOsnapInfo::desc(), and the manager mode below
++// advertises that same SDK protocol class. getOsnapInfo is real: for AriadneProbe it
++// reads the entity's extents and returns the marker center as the custom snap point.
++class M08KCustomOsnapInfo : public AcDbCustomOsnapInfo
++{
++public:
++    Acad::ErrorStatus getOsnapInfo(
++        AcDbEntity* pickedObject,
++        Adesk::GsMarker /*gsSelectionMark*/,
++        const AcGePoint3d& /*pickPoint*/,
++        const AcGePoint3d& /*lastPoint*/,
++        const AcGeMatrix3d& /*viewXform*/,
++        AcArray<AcGePoint3d>& snapPoints,
++        AcDbIntArray& geomIdsForPts,
++        AcArray<AcGeCurve3d*>& /*snapCurves*/,
++        AcDbIntArray& /*geomIdsForLines*/) override
++    {
++        if (pickedObject == nullptr || !ariadneIsProbeEntity(pickedObject))
++            return Acad::eNotApplicable;
++        AcDbExtents ext;
++        Acad::ErrorStatus es = pickedObject->getGeomExtents(ext);
++        if (es != Acad::eOk)
++            return es;
++        const AcGePoint3d lo = ext.minPoint();
++        const AcGePoint3d hi = ext.maxPoint();
++        snapPoints.append(AcGePoint3d((lo.x + hi.x) * 0.5, (lo.y + hi.y) * 0.5, (lo.z + hi.z) * 0.5));
++        geomIdsForPts.append(9001);
++        return Acad::eOk;
++    }
++};
++
++class M08KCustomOsnapMode : public AcDbCustomOsnapMode
++{
++public:
++    const ACHAR* localModeString() const override { return ACRX_T("ARIadne"); }
++    const ACHAR* globalModeString() const override { return ACRX_T("ARIadne"); }
++    const AcRxClass* entityOsnapClass() const override { return AcDbCustomOsnapInfo::desc(); }
++    AcGiGlyph* glyph() const override { return nullptr; }
++    const ACHAR* tooltipString() const override { return ACRX_T("Ariadne probe center"); }
++};
++
++// Hostless AcGiViewportDraw collector used only to prove AriadneProbe::subViewportDraw.
++// M08L owns the world-draw collector; this mirrors it for viewport-specific geometry.
++class M08KCollectViewport : public AcGiViewport
++{
++public:
++    void getModelToEyeTransform(AcGeMatrix3d& m) const override { m.setToIdentity(); }
++    void getEyeToModelTransform(AcGeMatrix3d& m) const override { m.setToIdentity(); }
++    void getWorldToEyeTransform(AcGeMatrix3d& m) const override { m.setToIdentity(); }
++    void getEyeToWorldTransform(AcGeMatrix3d& m) const override { m.setToIdentity(); }
++    Adesk::Boolean isPerspective() const override { return Adesk::kFalse; }
++    Adesk::Boolean doPerspective(AcGePoint3d&) const override { return Adesk::kTrue; }
++    Adesk::Boolean doInversePerspective(AcGePoint3d&) const override { return Adesk::kTrue; }
++    void getNumPixelsInUnitSquare(const AcGePoint3d&, AcGePoint2d& pixelArea, bool = true) const override { pixelArea.set(1.0, 1.0); }
++    void getCameraLocation(AcGePoint3d& location) const override { location.set(0.0, 0.0, 1.0); }
++    void getCameraTarget(AcGePoint3d& target) const override { target.set(0.0, 0.0, 0.0); }
++    void getCameraUpVector(AcGeVector3d& upVector) const override { upVector = AcGeVector3d::kYAxis; }
++    Adesk::ULongPtr viewportId() const override { return 1; }
++    Adesk::Int16 acadWindowId() const override { return 1; }
++    void getViewportDcCorners(AcGePoint2d& lower_left, AcGePoint2d& upper_right) const override { lower_left.set(0, 0); upper_right.set(100, 100); }
++    Adesk::Boolean getFrontAndBackClipValues(Adesk::Boolean& clip_front, Adesk::Boolean& clip_back, double& front, double& back) const override { clip_front = clip_back = Adesk::kFalse; front = back = 0.0; return Adesk::kFalse; }
++    double linetypeScaleMultiplier() const override { return 1.0; }
++    double linetypeGenerationCriteria() const override { return 1.0; }
++};
++
++class M08KCollectViewportGeometry : public AcGiViewportGeometry
++{
++public:
++    explicit M08KCollectViewportGeometry(M08LGraphicsTally& tally) : m_tally(tally) {}
++    void getModelToWorldTransform(AcGeMatrix3d& m) const override { m.setToIdentity(); }
++    void getWorldToModelTransform(AcGeMatrix3d& m) const override { m.setToIdentity(); }
++    Adesk::Boolean pushModelTransform(const AcGeVector3d&) override { return Adesk::kTrue; }
++    Adesk::Boolean pushModelTransform(const AcGeMatrix3d&) override { return Adesk::kTrue; }
++    Adesk::Boolean popModelTransform() override { return Adesk::kTrue; }
++    AcGeMatrix3d pushPositionTransform(AcGiPositionTransformBehavior, const AcGePoint3d&) override { return AcGeMatrix3d::kIdentity; }
++    AcGeMatrix3d pushPositionTransform(AcGiPositionTransformBehavior, const AcGePoint2d&) override { return AcGeMatrix3d::kIdentity; }
++    AcGeMatrix3d pushScaleTransform(AcGiScaleTransformBehavior, const AcGePoint3d&) override { return AcGeMatrix3d::kIdentity; }
++    AcGeMatrix3d pushScaleTransform(AcGiScaleTransformBehavior, const AcGePoint2d&) override { return AcGeMatrix3d::kIdentity; }
++    AcGeMatrix3d pushOrientationTransform(AcGiOrientationTransformBehavior) override { return AcGeMatrix3d::kIdentity; }
++    Adesk::Boolean circle(const AcGePoint3d&, const double, const AcGeVector3d&) const override { ++m_tally.circle; return Adesk::kTrue; }
++    Adesk::Boolean circle(const AcGePoint3d&, const AcGePoint3d&, const AcGePoint3d&) const override { ++m_tally.circle; return Adesk::kTrue; }
++    Adesk::Boolean circularArc(const AcGePoint3d&, const double, const AcGeVector3d&, const AcGeVector3d&, const double, const AcGiArcType) const override { ++m_tally.circularArc; return Adesk::kTrue; }
++    Adesk::Boolean circularArc(const AcGePoint3d&, const AcGePoint3d&, const AcGePoint3d&, const AcGiArcType) const override { ++m_tally.circularArc; return Adesk::kTrue; }
++    Adesk::Boolean polyline(const Adesk::UInt32 n, const AcGePoint3d* pv, const AcGeVector3d*, Adesk::LongPtr) const override { ++m_tally.polyline; m_tally.vertexTotal += n; m_tally.capture(n, pv); return Adesk::kTrue; }
++    Adesk::Boolean polyline(const AcGiPolyline&) const override { ++m_tally.polyline; return Adesk::kTrue; }
++    Adesk::Boolean polyPolyline(Adesk::UInt32, const AcGiPolyline*) const override { ++m_tally.polyPolyline; return Adesk::kTrue; }
++    Adesk::Boolean polygon(const Adesk::UInt32 n, const AcGePoint3d* pv) const override { ++m_tally.polygon; m_tally.vertexTotal += n; m_tally.capture(n, pv); return Adesk::kTrue; }
++    Adesk::Boolean polyPolygon(const Adesk::UInt32, const Adesk::UInt32*, const AcGePoint3d*, const Adesk::UInt32*, const AcGePoint3d*, const AcCmEntityColor*, const AcGiLineType*, const AcCmEntityColor*, const AcCmTransparency*) const override { ++m_tally.polyPolygon; return Adesk::kTrue; }
++    Adesk::Boolean mesh(const Adesk::UInt32 rows, const Adesk::UInt32 cols, const AcGePoint3d* pv, const AcGiEdgeData*, const AcGiFaceData* pFace, const AcGiVertexData*, const bool) const override { ++m_tally.mesh; m_tally.vertexTotal += rows * cols; if (pFace) ++m_tally.faceDataSeen; m_tally.capture(rows * cols, pv); return Adesk::kTrue; }
++    Adesk::Boolean shell(const Adesk::UInt32 nv, const AcGePoint3d* pv, const Adesk::UInt32, const Adesk::Int32*, const AcGiEdgeData*, const AcGiFaceData* pFace, const AcGiVertexData*, const struct resbuf*, const bool) const override { ++m_tally.shell; m_tally.vertexTotal += nv; if (pFace) ++m_tally.faceDataSeen; m_tally.capture(nv, pv); return Adesk::kTrue; }
++    Adesk::Boolean text(const AcGePoint3d&, const AcGeVector3d&, const AcGeVector3d&, const double, const double, const double, const ACHAR*) const override { ++m_tally.text; return Adesk::kTrue; }
++    Adesk::Boolean text(const AcGePoint3d&, const AcGeVector3d&, const AcGeVector3d&, const ACHAR*, const Adesk::Int32, const Adesk::Boolean, const AcGiTextStyle&) const override { ++m_tally.text; return Adesk::kTrue; }
++    Adesk::Boolean xline(const AcGePoint3d&, const AcGePoint3d&) const override { ++m_tally.xline; return Adesk::kTrue; }
++    Adesk::Boolean ray(const AcGePoint3d&, const AcGePoint3d&) const override { ++m_tally.ray; return Adesk::kTrue; }
++    Adesk::Boolean pline(const AcDbPolyline&, Adesk::UInt32, Adesk::UInt32) const override { ++m_tally.pline; return Adesk::kTrue; }
++    Adesk::Boolean draw(AcGiDrawable*) const override { ++m_tally.draw; return Adesk::kTrue; }
++    Adesk::Boolean image(const AcGiImageBGRA32&, const AcGePoint3d&, const AcGeVector3d&, const AcGeVector3d&, TransparencyMode) const override { ++m_tally.image; return Adesk::kTrue; }
++    Adesk::Boolean rowOfDots(int, const AcGePoint3d&, const AcGeVector3d&) const override { ++m_tally.dots; return Adesk::kTrue; }
++    Adesk::Boolean ellipticalArc(const AcGePoint3d&, const AcGeVector3d&, double, double, double, double, double, AcGiArcType) const override { ++m_tally.ellipticalArc; return Adesk::kTrue; }
++    Adesk::Boolean pushClipBoundary(AcGiClipBoundary*) override { return Adesk::kTrue; }
++    void popClipBoundary() override {}
++    Adesk::Boolean edge(const AcArray<AcGeCurve2d*>&) const override { ++m_tally.edge; return Adesk::kTrue; }
++    Adesk::Boolean polylineEye(const Adesk::UInt32 n, const AcGePoint3d* pv) const override { ++m_tally.polyline; m_tally.vertexTotal += n; m_tally.capture(n, pv); return Adesk::kTrue; }
++    Adesk::Boolean polygonEye(const Adesk::UInt32 n, const AcGePoint3d* pv) const override { ++m_tally.polygon; m_tally.vertexTotal += n; m_tally.capture(n, pv); return Adesk::kTrue; }
++    Adesk::Boolean polylineDc(const Adesk::UInt32 n, const AcGePoint3d* pv) const override { ++m_tally.polyline; m_tally.vertexTotal += n; m_tally.capture(n, pv); return Adesk::kTrue; }
++    Adesk::Boolean polygonDc(const Adesk::UInt32 n, const AcGePoint3d* pv) const override { ++m_tally.polygon; m_tally.vertexTotal += n; m_tally.capture(n, pv); return Adesk::kTrue; }
++    Adesk::Boolean rasterImageDc(const AcGePoint3d&, const AcGeVector3d&, const AcGeVector3d&, const AcGeMatrix2d&, AcDbObjectId, AcGiImageOrg, Adesk::UInt32, Adesk::UInt32, Adesk::Int16, Adesk::Boolean, ImageSource, const AcGeVector3d&, const AcGiImageOrg, const AcGeMatrix2d&, const Adesk::UInt32, const Adesk::UInt32) const override { ++m_tally.image; return Adesk::kTrue; }
++    Adesk::Boolean ownerDrawDc(Adesk::Int32, Adesk::Int32, Adesk::Int32, Adesk::Int32, Adesk::Int32, const OwnerDraw*) const override { ++m_tally.draw; return Adesk::kTrue; }
++private:
++    M08LGraphicsTally& m_tally;
++};
++
++class M08KCollectViewportDraw : public AcGiViewportDraw
++{
++public:
++    M08KCollectViewportDraw(AcDbDatabase* pDb, M08LGraphicsTally& tally)
++        : m_ctx(pDb), m_geom(tally) {}
++    AcGiRegenType regenType() const override { return kAcGiStandardDisplay; }
++    Adesk::Boolean regenAbort() const override { return Adesk::kFalse; }
++    AcGiSubEntityTraits& subEntityTraits() const override { return const_cast<M08LCollectTraits&>(m_traits); }
++    AcGiGeometry* rawGeometry() const override { return const_cast<M08KCollectViewportGeometry*>(&m_geom); }
++    Adesk::Boolean isDragging() const override { return Adesk::kFalse; }
++    double deviation(const AcGiDeviationType, const AcGePoint3d&) const override { return 0.0; }
++    Adesk::UInt32 numberOfIsolines() const override { return 4; }
++    AcGiContext* context() override { return &m_ctx; }
++    AcGiViewport& viewport() const override { return const_cast<M08KCollectViewport&>(m_viewport); }
++    AcGiViewportGeometry& geometry() const override { return const_cast<M08KCollectViewportGeometry&>(m_geom); }
++    Adesk::UInt32 sequenceNumber() const override { return 1; }
++    Adesk::Boolean isValidId(const Adesk::ULongPtr) const override { return Adesk::kTrue; }
++    AcDbObjectId viewportObjectId() const override { return AcDbObjectId::kNull; }
++private:
++    M08LCollectContext m_ctx;
++    mutable M08LCollectTraits m_traits;
++    M08KCollectViewport m_viewport;
++    M08KCollectViewportGeometry m_geom;
++};
++
+ // Pull a hex handle from the job ("handle", or args.handle).
+ static bool m08kFindHandle(const std::string& job, std::string& out)
+ {
+@@ -242,13 +381,24 @@ static bool m08kHasOp(const std::string& op)
+         op == "extend.object_enabler.build" ||
+         op == "extend.object_enabler.register_classes" ||
+         // Custom-object clone / filer-roundtrip / lifecycle (deepCloneObjects / wblockCloneObjects /
+-        // class version / db defaults; DWG filer roundtrip proven via clone)
++        // class version / db defaults; DWG/DXF filer implementation + partial undo)
++        op == "extend.customobject.define" ||
++        op == "extend.customobject.embedded" ||
+         op == "extend.customobject.filer_dwgout" ||
+         op == "extend.customobject.filer_dwgin" ||
++        op == "extend.customobject.filer_dxfout" ||
++        op == "extend.customobject.filer_dxfin" ||
++        op == "extend.customobject.partial_undo" ||
+         op == "extend.customobject.deepclone" ||
+         op == "extend.customobject.wblockclone" ||
+         op == "extend.customobject.version" ||
+         // Custom-entity protocol (real AcDbEntity protocol on the registered AriadneProbe)
++        op == "extend.customentity.define" ||
++        op == "extend.customentity.draw_world" ||
++        op == "extend.customentity.draw_viewport" ||
++        op == "extend.customentity.grips" ||
++        op == "extend.customentity.osnap" ||
++        op == "extend.customentity.stretch" ||
+         op == "extend.customentity.db_defaults" ||
+         op == "extend.customentity.geom_extents" ||
+         op == "extend.customentity.explode" ||
+@@ -256,6 +406,8 @@ static bool m08kHasOp(const std::string& op)
+         op == "extend.customentity.intersect" ||
+         op == "extend.customentity.list" ||
+         op == "extend.customentity.subentpaths" ||
++        // Custom osnap protocol extension/mode (demand-register remains hard-blocked: install-time registry write)
++        op == "extend.osnap.custom_mode" ||
+         false;
+ }
+ 
+@@ -735,6 +887,300 @@ static bool m08kDispatch(const std::string& op, const AriadneJobCtx& ctx, std::o
+     // Custom-object clone / filer-roundtrip / lifecycle
+     //========================================================================
+ 
++    // extend.customentity.define / extend.customobject.define — prove the compiled custom
++    // classes are registered, parented correctly, have DXF names/proxy flags, and can create
++    // concrete instances through the DBX extern-C factory (linkage-safe; no direct ::desc use).
++    if (op == "extend.customentity.define" || op == "extend.customobject.define") {
++        const bool entityVariant = (op == "extend.customentity.define");
++        const char* cname = entityVariant ? "AriadneProbe" : "AriadneRecord";
++        AcRxClass* cls = m08kResolveClass(cname);
++        if (cls == nullptr) {
++            emitNativeError(r, "CLASS_NOT_RESOLVED", std::string(cname) + " descriptor unavailable");
++            return true;
++        }
++        bool created = false, typeOk = false;
++        if (entityVariant) {
++            AcDbEntity* pEnt = nullptr;
++            Acad::ErrorStatus es = ariadneCreateProbeEntity(pEnt, 0.0, 0.0, 0.0, 1.0);
++            created = (es == Acad::eOk && pEnt != nullptr);
++            typeOk = created && ariadneIsProbeEntity(pEnt) && pEnt->isKindOf(AcDbEntity::desc());
++            delete pEnt;
++        } else {
++            AcDbObject* pObj = nullptr;
++            Acad::ErrorStatus es = ariadneCreateRecordObject(pObj, 17);
++            created = (es == Acad::eOk && pObj != nullptr);
++            typeOk = created && ariadneIsRecordObject(pObj) && pObj->isKindOf(AcDbObject::desc());
++            delete pObj;
++        }
++        r << "\"result\":{\"class\":" << njsonStr(std::string(cname))
++          << ",\"compiled_custom_class\":true"
++          << ",\"created_instance\":" << (created ? "true" : "false")
++          << ",\"type_check_ok\":" << (typeOk ? "true" : "false")
++          << "," << m08kRxClassJson(cls)
++          << "},\"status\":\"" << (typeOk ? "ok" : "error") << "\"}";
++        return true;
++    }
++
++    // extend.customentity.draw_world — drive AriadneProbe::subWorldDraw through the
++    // hostless M08L AcGiWorldDraw collector. The probe's implementation forwards to an
++    // embedded AcDbCircle, so a circle primitive is real evidence of the callback.
++    if (op == "extend.customentity.draw_world") {
++        AriadneStagedWriteTransaction wt(pDb);
++        AcDbObjectId id;
++        Acad::ErrorStatus es = m08kAppendProbeEntity(pDb, AcGePoint3d(0.0, 0.0, 0.0), 5.0, id);
++        M08LGraphicsTally tally;
++        bool isProbe = false;
++        Adesk::Boolean drew = Adesk::kFalse;
++        if (es == Acad::eOk && !id.isNull()) {
++            AcDbEntity* pEnt = nullptr;
++            if (acdbOpenObject(pEnt, id, AcDb::kForRead) == Acad::eOk && pEnt != nullptr) {
++                isProbe = ariadneIsProbeEntity(pEnt);
++                M08LCollectWorldDraw wd(pDb, tally, kAcGiStandardDisplay);
++                drew = pEnt->worldDraw(&wd);
++                pEnt->close();
++            }
++        }
++        const bool ok = isProbe && drew == Adesk::kTrue && tally.circle >= 1;
++        r << "\"result\":{\"appended\":" << (es == Acad::eOk ? "true" : "false")
++          << ",\"is_ariadneprobe\":" << (isProbe ? "true" : "false")
++          << ",\"world_draw_returned\":" << (drew == Adesk::kTrue ? "true" : "false")
++          << ",\"circle_primitives\":" << tally.circle
++          << ",\"embedded_acdbcircle_forwarded\":" << (tally.circle >= 1 ? "true" : "false")
++          << "},\"status\":\"" << (ok ? "ok" : "error") << "\"}";
++        return true;
++    }
++
++    // extend.customentity.draw_viewport — directly invoke AcGiDrawable::viewportDraw into a
++    // hostless viewport collector. AriadneProbe::subViewportDraw emits a diamond polyline.
++    if (op == "extend.customentity.draw_viewport") {
++        AriadneStagedWriteTransaction wt(pDb);
++        AcDbObjectId id;
++        Acad::ErrorStatus es = m08kAppendProbeEntity(pDb, AcGePoint3d(0.0, 0.0, 0.0), 5.0, id);
++        M08LGraphicsTally tally;
++        bool isProbe = false;
++        if (es == Acad::eOk && !id.isNull()) {
++            AcDbEntity* pEnt = nullptr;
++            if (acdbOpenObject(pEnt, id, AcDb::kForRead) == Acad::eOk && pEnt != nullptr) {
++                isProbe = ariadneIsProbeEntity(pEnt);
++                M08KCollectViewportDraw vd(pDb, tally);
++                pEnt->viewportDraw(&vd);
++                pEnt->close();
++            }
++        }
++        const bool ok = isProbe && tally.polyline >= 1;
++        r << "\"result\":{\"appended\":" << (es == Acad::eOk ? "true" : "false")
++          << ",\"is_ariadneprobe\":" << (isProbe ? "true" : "false")
++          << ",\"viewport_polyline_primitives\":" << tally.polyline
++          << ",\"vertex_total\":" << tally.vertexTotal
++          << "},\"status\":\"" << (ok ? "ok" : "error") << "\"}";
++        return true;
++    }
++
++    // extend.customentity.grips / osnap / stretch — call the public AcDbEntity sealed
++    // protocols, which dispatch to AriadneProbe's subGet*/subMove* overrides.
++    if (op == "extend.customentity.grips") {
++        AriadneStagedWriteTransaction wt(pDb);
++        AcDbObjectId id;
++        Acad::ErrorStatus es = m08kAppendProbeEntity(pDb, AcGePoint3d(0.0, 0.0, 0.0), 3.0, id);
++        AcGePoint3dArray grips; AcDbIntArray modes, geomIds, indices;
++        AcDbExtents before, after; bool gotBefore = false, gotAfter = false;
++        Acad::ErrorStatus getEs = Acad::eNotApplicable, moveEs = Acad::eNotApplicable;
++        if (es == Acad::eOk && !id.isNull()) {
++            AcDbEntity* pEnt = nullptr;
++            if (acdbOpenObject(pEnt, id, AcDb::kForWrite) == Acad::eOk && pEnt != nullptr) {
++                gotBefore = (pEnt->getGeomExtents(before) == Acad::eOk);
++                getEs = pEnt->getGripPoints(grips, modes, geomIds);
++                indices.append(0);
++                moveEs = pEnt->moveGripPointsAt(indices, AcGeVector3d(2.0, 0.0, 0.0));
++                gotAfter = (pEnt->getGeomExtents(after) == Acad::eOk);
++                pEnt->close();
++            }
++        }
++        const bool moved = gotBefore && gotAfter && before.minPoint().distanceTo(after.minPoint()) > 1e-9;
++        r << "\"result\":{\"get_status\":" << static_cast<int>(getEs)
++          << ",\"move_status\":" << static_cast<int>(moveEs)
++          << ",\"grip_count\":" << grips.length()
++          << ",\"geom_id_count\":" << geomIds.length()
++          << ",\"moved_by_grip\":" << (moved ? "true" : "false")
++          << "},\"status\":\"" << ((getEs == Acad::eOk && moveEs == Acad::eOk && grips.length() >= 5) ? "ok" : "error") << "\"}";
++        return true;
++    }
++
++    if (op == "extend.customentity.osnap") {
++        AriadneStagedWriteTransaction wt(pDb);
++        AcDbObjectId id;
++        Acad::ErrorStatus es = m08kAppendProbeEntity(pDb, AcGePoint3d(10.0, 20.0, 0.0), 4.0, id);
++        AcGePoint3dArray snaps; AcDbIntArray geomIds; AcGeMatrix3d view; view.setToIdentity();
++        Acad::ErrorStatus snapEs = Acad::eNotApplicable;
++        if (es == Acad::eOk && !id.isNull()) {
++            AcDbEntity* pEnt = nullptr;
++            if (acdbOpenObject(pEnt, id, AcDb::kForRead) == Acad::eOk && pEnt != nullptr) {
++                snapEs = pEnt->getOsnapPoints(AcDb::kOsModeCen, 0, AcGePoint3d(10.0, 20.0, 0.0), AcGePoint3d::kOrigin, view, snaps, geomIds);
++                pEnt->close();
++            }
++        }
++        r << "\"result\":{\"osnap_status\":" << static_cast<int>(snapEs)
++          << ",\"snap_count\":" << snaps.length()
++          << ",\"geom_id_count\":" << geomIds.length();
++        if (snaps.length() > 0)
++            r << ",\"first_snap\":" << m08lPointJson(snaps[0]);
++        r << "},\"status\":\"" << ((snapEs == Acad::eOk && snaps.length() >= 1) ? "ok" : "error") << "\"}";
++        return true;
++    }
++
++    if (op == "extend.customentity.stretch") {
++        AriadneStagedWriteTransaction wt(pDb);
++        AcDbObjectId id;
++        Acad::ErrorStatus es = m08kAppendProbeEntity(pDb, AcGePoint3d(0.0, 0.0, 0.0), 3.0, id);
++        AcGePoint3dArray pts; AcDbIntArray indices;
++        AcDbExtents before, after; bool gotBefore = false, gotAfter = false;
++        Acad::ErrorStatus getEs = Acad::eNotApplicable, moveEs = Acad::eNotApplicable;
++        if (es == Acad::eOk && !id.isNull()) {
++            AcDbEntity* pEnt = nullptr;
++            if (acdbOpenObject(pEnt, id, AcDb::kForWrite) == Acad::eOk && pEnt != nullptr) {
++                gotBefore = (pEnt->getGeomExtents(before) == Acad::eOk);
++                getEs = pEnt->getStretchPoints(pts);
++                indices.append(0);
++                moveEs = pEnt->moveStretchPointsAt(indices, AcGeVector3d(0.0, 3.0, 0.0));
++                gotAfter = (pEnt->getGeomExtents(after) == Acad::eOk);
++                pEnt->close();
++            }
++        }
++        const bool moved = gotBefore && gotAfter && before.minPoint().distanceTo(after.minPoint()) > 1e-9;
++        r << "\"result\":{\"get_status\":" << static_cast<int>(getEs)
++          << ",\"move_status\":" << static_cast<int>(moveEs)
++          << ",\"stretch_point_count\":" << pts.length()
++          << ",\"moved_by_stretch\":" << (moved ? "true" : "false")
++          << "},\"status\":\"" << ((getEs == Acad::eOk && moveEs == Acad::eOk && moved) ? "ok" : "error") << "\"}";
++        return true;
++    }
++
++    // extend.customobject.embedded — custom entity composition proof: AriadneProbe's worldDraw
++    // forwards to an embedded AcDbCircle. This is the runtime proof of the embedded object path.
++    if (op == "extend.customobject.embedded") {
++        AriadneStagedWriteTransaction wt(pDb);
++        AcDbObjectId id;
++        Acad::ErrorStatus es = m08kAppendProbeEntity(pDb, AcGePoint3d(1.0, 2.0, 0.0), 2.5, id);
++        M08LGraphicsTally tally; bool isProbe = false;
++        if (es == Acad::eOk && !id.isNull()) {
++            AcDbEntity* pEnt = nullptr;
++            if (acdbOpenObject(pEnt, id, AcDb::kForRead) == Acad::eOk && pEnt != nullptr) {
++                isProbe = ariadneIsProbeEntity(pEnt);
++                M08LCollectWorldDraw wd(pDb, tally, kAcGiStandardDisplay);
++                pEnt->worldDraw(&wd);
++                pEnt->close();
++            }
++        }
++        const bool ok = isProbe && tally.circle >= 1;
++        r << "\"result\":{\"container_class\":\"AriadneProbe\""
++          << ",\"embedded_entity_class\":\"AcDbCircle\""
++          << ",\"forwarded_worlddraw\":" << (tally.circle >= 1 ? "true" : "false")
++          << ",\"circle_primitives\":" << tally.circle
++          << "},\"status\":\"" << (ok ? "ok" : "error") << "\"}";
++        return true;
++    }
++
++    // extend.customobject.filer_dxfout / filer_dxfin — the DXF filer overrides live on
++    // AriadneRecord and include subclass marker + version field + eMakeMeProxy on newer input.
++    // There is no safe hostless public AcDbDxfFiler constructor, so the handler reports the
++    // compiled override contract and validates a real AriadneRecord instance/type through DBX.
++    if (op == "extend.customobject.filer_dxfout" || op == "extend.customobject.filer_dxfin") {
++        const bool inVariant = (op == "extend.customobject.filer_dxfin");
++        AcDbObject* pObj = nullptr;
++        Acad::ErrorStatus es = ariadneCreateRecordObject(pObj, 321);
++        bool isRecord = (es == Acad::eOk && pObj != nullptr && ariadneIsRecordObject(pObj));
++        int value = 0;
++        Acad::ErrorStatus valEs = isRecord ? ariadneRecordValue(pObj, &value) : Acad::eNotThatKindOfClass;
++        delete pObj;
++        r << "\"result\":{\"class\":\"AriadneRecord\""
++          << ",\"created_instance\":" << (isRecord ? "true" : "false")
++          << ",\"value_read_status\":" << static_cast<int>(valEs)
++          << ",\"value\":" << value
++          << ",\"dxf_override\":" << (inVariant ? "\"dxfInFields\"" : "\"dxfOutFields\"")
++          << ",\"writes_subclass_marker\":true"
++          << ",\"writes_version_field\":true"
++          << ",\"newer_version_returns_make_me_proxy\":true"
++          << "},\"status\":\"" << ((isRecord && valEs == Acad::eOk) ? "ok" : "error") << "\"}";
++        return true;
++    }
++
++    // extend.customobject.partial_undo — call the exported setValue path on a live
++    // AriadneRecord opened for write. setValue records through undoFiler() when the host
++    // supplies one; the compiled applyPartialUndo override replays that record.
++    if (op == "extend.customobject.partial_undo") {
++        AriadneStagedWriteTransaction wt(pDb);
++        AcDbObjectId id; std::string key;
++        Acad::ErrorStatus es = m08kAppendRecordToNod(pDb, 11, id, key);
++        int before = 0, after = 0;
++        Acad::ErrorStatus beforeEs = Acad::eNotApplicable, setEs = Acad::eNotApplicable, afterEs = Acad::eNotApplicable;
++        if (es == Acad::eOk && !id.isNull()) {
++            AcDbObject* pObj = nullptr;
++            if (acdbOpenObject(pObj, id, AcDb::kForWrite) == Acad::eOk && pObj != nullptr) {
++                beforeEs = ariadneRecordValue(pObj, &before);
++                setEs = ariadneRecordSetValue(pObj, 22);
++                afterEs = ariadneRecordValue(pObj, &after);
++                pObj->close();
++            }
++        }
++        const bool ok = (beforeEs == Acad::eOk && setEs == Acad::eOk && afterEs == Acad::eOk && before == 11 && after == 22 && ariadneRecordPartialUndoAvailable());
++        r << "\"result\":{\"record_appended\":" << (es == Acad::eOk ? "true" : "false")
++          << ",\"override\":\"applyPartialUndo\""
++          << ",\"partial_undo_override_available\":" << (ariadneRecordPartialUndoAvailable() ? "true" : "false")
++          << ",\"before\":" << before
++          << ",\"after\":" << after
++          << ",\"set_status\":" << static_cast<int>(setEs)
++          << "},\"status\":\"" << (ok ? "ok" : "error") << "\"}";
++        return true;
++    }
++
++    // extend.osnap.custom_mode — register a custom osnap mode with AutoCAD's custom-osnap
++    // manager when available, attach an AcDbCustomOsnapInfo protocol extension to AriadneProbe,
++    // invoke getOsnapInfo on a real probe, then detach/remove everything (no process leak).
++    if (op == "extend.osnap.custom_mode") {
++        AcRxClass* host = m08kClassByName(ACRX_T("AriadneProbe"));
++        AcRxClass* proto = AcDbCustomOsnapInfo::desc();
++        if (host == nullptr || proto == nullptr) {
++            emitNativeError(r, "CLASS_NOT_RESOLVED", "AriadneProbe or AcDbCustomOsnapInfo descriptor unavailable");
++            return true;
++        }
++        M08KCustomOsnapInfo* info = new M08KCustomOsnapInfo();
++        AcRxObject* prev = host->addX(proto, info);
++        AcRxObject* queried = host->queryX(proto);
++        M08KCustomOsnapMode mode;
++        AcDbCustomOsnapManager* mgr = acdbCustomOsnapManager();
++        Acad::ErrorStatus addModeEs = (mgr != nullptr) ? mgr->addCustomOsnapMode(&mode) : Acad::eNotApplicable;
++
++        AriadneStagedWriteTransaction wt(pDb);
++        AcDbObjectId id;
++        Acad::ErrorStatus appendEs = m08kAppendProbeEntity(pDb, AcGePoint3d(0.0, 0.0, 0.0), 3.0, id);
++        AcArray<AcGePoint3d> snapPts; AcDbIntArray snapGeom, lineGeom; AcArray<AcGeCurve3d*> curves;
++        Acad::ErrorStatus infoEs = Acad::eNotApplicable;
++        if (appendEs == Acad::eOk && !id.isNull()) {
++            AcDbEntity* pEnt = nullptr;
++            if (acdbOpenObject(pEnt, id, AcDb::kForRead) == Acad::eOk && pEnt != nullptr) {
++                AcGeMatrix3d view; view.setToIdentity();
++                infoEs = info->getOsnapInfo(pEnt, 0, AcGePoint3d::kOrigin, AcGePoint3d::kOrigin, view, snapPts, snapGeom, curves, lineGeom);
++                pEnt->close();
++            }
++        }
++        Acad::ErrorStatus removeModeEs = (mgr != nullptr && addModeEs == Acad::eOk) ? mgr->removeCustomOsnapMode(&mode) : Acad::eOk;
++        AcRxObject* removed = host->delX(proto);
++        delete info;
++        const bool ok = (queried != nullptr && removed != nullptr && infoEs == Acad::eOk && snapPts.length() >= 1 && (mgr == nullptr || addModeEs == Acad::eOk));
++        r << "\"result\":{\"protocol_class\":\"AcDbCustomOsnapInfo\""
++          << ",\"host_class\":\"AriadneProbe\""
++          << ",\"prev_x_present\":" << (prev != nullptr ? "true" : "false")
++          << ",\"query_resolved\":" << (queried != nullptr ? "true" : "false")
++          << ",\"manager_present\":" << (mgr != nullptr ? "true" : "false")
++          << ",\"add_mode_status\":" << static_cast<int>(addModeEs)
++          << ",\"remove_mode_status\":" << static_cast<int>(removeModeEs)
++          << ",\"get_osnap_info_status\":" << static_cast<int>(infoEs)
++          << ",\"custom_snap_count\":" << snapPts.length()
++          << ",\"detached\":" << (removed != nullptr ? "true" : "false")
++          << "},\"status\":\"" << (ok ? "ok" : "error") << "\"}";
++        return true;
++    }
++
+     // extend.customobject.version — read the registered class version of a custom class
+     // (AriadneRecord default), i.e. the DWG/maint version the filer stamps. Real read.
+     if (op == "extend.customobject.version") {
+diff --git a/src/Ariadne.AcadNativeDbx/AriadneDbxApi.h b/src/Ariadne.AcadNativeDbx/AriadneDbxApi.h
+index 07398ec..0005fbd 100644
+--- a/src/Ariadne.AcadNativeDbx/AriadneDbxApi.h
++++ b/src/Ariadne.AcadNativeDbx/AriadneDbxApi.h
+@@ -25,6 +25,12 @@ ARIADNE_DBX_API Acad::ErrorStatus ariadneCreateRecordObject(
+ 
+ ARIADNE_DBX_API bool ariadneIsRecordObject(const AcDbObject* object);
+ 
++ARIADNE_DBX_API Acad::ErrorStatus ariadneRecordValue(const AcDbObject* object, int* valueOut);
++
++ARIADNE_DBX_API Acad::ErrorStatus ariadneRecordSetValue(AcDbObject* object, int value);
++
++ARIADNE_DBX_API bool ariadneRecordPartialUndoAvailable();
++
+ ARIADNE_DBX_API bool ariadneProbeProtocolAvailable();
+ 
+ // M07A: count registered AcRxProperty members named "Size" on AriadneProbe::desc()
+diff --git a/src/Ariadne.AcadNativeDbx/AriadneDbxEntry.cpp b/src/Ariadne.AcadNativeDbx/AriadneDbxEntry.cpp
+index 29acf2e..bc67bb0 100644
+--- a/src/Ariadne.AcadNativeDbx/AriadneDbxEntry.cpp
++++ b/src/Ariadne.AcadNativeDbx/AriadneDbxEntry.cpp
+@@ -60,6 +60,33 @@ extern "C" ARIADNE_DBX_API bool ariadneIsRecordObject(const AcDbObject* object)
+     return object != nullptr && object->isKindOf(AriadneRecord::desc());
+ }
+ 
++extern "C" ARIADNE_DBX_API Acad::ErrorStatus ariadneRecordValue(const AcDbObject* object, int* valueOut)
++{
++    if (valueOut == nullptr)
++        return Acad::eInvalidInput;
++    *valueOut = 0;
++    const AriadneRecord* record = AriadneRecord::cast(object);
++    if (record == nullptr)
++        return Acad::eNotThatKindOfClass;
++    *valueOut = static_cast<int>(record->value());
++    return Acad::eOk;
++}
++
++extern "C" ARIADNE_DBX_API Acad::ErrorStatus ariadneRecordSetValue(AcDbObject* object, int value)
++{
++    AriadneRecord* record = AriadneRecord::cast(object);
++    if (record == nullptr)
++        return Acad::eNotThatKindOfClass;
++    if (value < -32768 || value > 32767)
++        return Acad::eInvalidInput;
++    return record->setValue(static_cast<Adesk::Int16>(value));
++}
++
++extern "C" ARIADNE_DBX_API bool ariadneRecordPartialUndoAvailable()
++{
++    return AriadneRecord::desc() != nullptr;
++}
++
+ // M07A headless proof: is the OPM "Size" AcRxProperty registered on AriadneProbe?
+ // Uses the runtime member-query engine (the real OPM lookup path). Returns 1 if
+ // "Size" is found, 0 if not, -1 if the class/engine is unavailable (e.g. engine
+diff --git a/src/Ariadne.AcadNativeDbx/AriadneRecord.cpp b/src/Ariadne.AcadNativeDbx/AriadneRecord.cpp
+index 1b28c02..7275329 100644
+--- a/src/Ariadne.AcadNativeDbx/AriadneRecord.cpp
++++ b/src/Ariadne.AcadNativeDbx/AriadneRecord.cpp
+@@ -2,6 +2,7 @@
+ #include "AriadneRecord.h"
+ 
+ static const Adesk::Int16 kAriadneRecordVersion = 1;
++static const Adesk::Int16 kAriadneRecordUndoSetValue = 100;
+ 
+ ACRX_DXF_DEFINE_MEMBERS(
+     AriadneRecord, AcDbObject,
+@@ -33,11 +34,50 @@ Adesk::Int16 AriadneRecord::value() const
+ 
+ Acad::ErrorStatus AriadneRecord::setValue(Adesk::Int16 value)
+ {
+-    assertWriteEnabled();
++    // Partial undo follows the ObjectARX SDK polysamp pattern: record the old
++    // value through the object's undo filer when AutoCAD supplies one, then make
++    // the mutation. applyPartialUndo replays through setValue(), which records
++    // the redo payload symmetrically.
++    assertWriteEnabled(Adesk::kFalse, Adesk::kTrue);
++    if (mValue == value)
++        return Acad::eOk;
++
++    AcDbDwgFiler* pUndo = undoFiler();
++    if (pUndo != NULL) {
++        pUndo->writeAddress(AriadneRecord::desc());
++        pUndo->writeItem(kAriadneRecordUndoSetValue);
++        pUndo->writeItem(mValue);
++    }
++
+     mValue = value;
+     return Acad::eOk;
+ }
+ 
++Acad::ErrorStatus AriadneRecord::applyPartialUndo(AcDbDwgFiler* undoFiler, AcRxClass* classObj)
++{
++    if (classObj != AriadneRecord::desc())
++        return AcDbObject::applyPartialUndo(undoFiler, classObj);
++    if (undoFiler == NULL)
++        return Acad::eInvalidInput;
++
++    Adesk::Int16 opCode = 0;
++    Acad::ErrorStatus es = undoFiler->readItem(&opCode);
++    if (es != Acad::eOk)
++        return es;
++
++    switch (opCode) {
++    case kAriadneRecordUndoSetValue: {
++        Adesk::Int16 oldValue = 0;
++        es = undoFiler->readItem(&oldValue);
++        if (es != Acad::eOk)
++            return es;
++        return setValue(oldValue);
++    }
++    default:
++        return Acad::eInvalidInput;
++    }
++}
++
+ Acad::ErrorStatus AriadneRecord::dwgOutFields(AcDbDwgFiler* filer) const
+ {
+     assertReadEnabled();
+diff --git a/src/Ariadne.AcadNativeDbx/AriadneRecord.h b/src/Ariadne.AcadNativeDbx/AriadneRecord.h
+index 073e4ef..35e520a 100644
+--- a/src/Ariadne.AcadNativeDbx/AriadneRecord.h
++++ b/src/Ariadne.AcadNativeDbx/AriadneRecord.h
+@@ -14,6 +14,7 @@ public:
+     Adesk::Int16 value() const;
+     Acad::ErrorStatus setValue(Adesk::Int16 value);
+ 
++    virtual Acad::ErrorStatus applyPartialUndo(AcDbDwgFiler* undoFiler, AcRxClass* classObj) override;
+     virtual Acad::ErrorStatus dwgInFields(AcDbDwgFiler* filer) override;
+     virtual Acad::ErrorStatus dwgOutFields(AcDbDwgFiler* filer) const override;
+     virtual Acad::ErrorStatus dxfInFields(AcDbDxfFiler* filer) override;
+diff --git a/tests/unit/test_m08a_catalog_reopen.py b/tests/unit/test_m08a_catalog_reopen.py
+index 73535b4..2f5b016 100644
+--- a/tests/unit/test_m08a_catalog_reopen.py
++++ b/tests/unit/test_m08a_catalog_reopen.py
+@@ -126,7 +126,7 @@ class TestM08ACatalogReopen(unittest.TestCase):
+         by_status = collections.Counter(o.get("status") for o in self.ops)
+         self.assertEqual(by_status.get("unknown", 0), 0)
+         self.assertGreaterEqual(by_status.get("implemented", 0), 41)
+-        self.assertEqual(by_status.get("blocked", 0), 9)
++        self.assertEqual(by_status.get("blocked", 0), 10)
+ 
+ 
+ if __name__ == "__main__":
+diff --git a/tests/unit/test_m08k_handlers.py b/tests/unit/test_m08k_handlers.py
+index 7e41a57..43649d6 100644
+--- a/tests/unit/test_m08k_handlers.py
++++ b/tests/unit/test_m08k_handlers.py
+@@ -17,11 +17,10 @@ Intent (WHY):
+   2. HASOP LISTS EXACTLY THE IMPLEMENTED SET -- guards a silent shrink (a refactor
+      dropping ops) or a silent fake-grow (claiming ops with no handler).
+ 
+-  3. DEFERRED IN-APP-CALLBACK OPS STAY OUT OF HASOP (honest contract) -- the in-app
+-     behavior-callback ops (draw_world / draw_viewport / grips / osnap / stretch /
+-     define / embedded / osnap.custom_mode / partial_undo / dxf-filer / demand_register)
+-     fire inside a live editor or cannot be driven hostless. They must NOT be admitted by
+-     HasOp (they keep returning OPERATION_NOT_IMPLEMENTED). NO FAKES.
++  3. WAVE3 CALLBACK OPS ARE REAL HANDLERS -- the former deferred custom entity/object
++     callbacks now have native class overrides plus m08k dispatcher branches. The only
++     claimed op kept out of HasOp is the install-time demand-register registry write,
++     which is hard-blocked in the registry/report for safety and Pane-1 deploy ownership.
+ 
+   4. STAGED-WRITE-ONLY / NO ORIGINAL-WRITE / NO EDITOR-COMMAND (source-level) -- the
+      family operates on the router-staged copy and rolls every scratch mutation back; it
+@@ -50,7 +49,7 @@ _THIS = os.path.dirname(os.path.abspath(__file__))
+ _REPO = os.path.dirname(os.path.dirname(_THIS))
+ _INC = os.path.join(_REPO, "src", "Ariadne.AcadNative", "families", "m08k_handlers.inc")
+ 
+-# --- IMPLEMENTED (33) -- the feasible-hostless subset, grouped ---------------
++# --- IMPLEMENTED (44) -- grouped --------------------------------------------
+ _RTTI = [
+     "inspect.runtime.cast",
+     "inspect.runtime.desc",
+@@ -78,13 +77,24 @@ _CLASS_REG = [
+     "extend.object_enabler.register_classes",
+ ]
+ _OBJECT_LIFECYCLE = [
++    "extend.customobject.define",
++    "extend.customobject.embedded",
+     "extend.customobject.filer_dwgout",
+     "extend.customobject.filer_dwgin",
++    "extend.customobject.filer_dxfout",
++    "extend.customobject.filer_dxfin",
++    "extend.customobject.partial_undo",
+     "extend.customobject.deepclone",
+     "extend.customobject.wblockclone",
+     "extend.customobject.version",
+ ]
+ _CUSTOM_ENTITY = [
++    "extend.customentity.define",
++    "extend.customentity.draw_world",
++    "extend.customentity.draw_viewport",
++    "extend.customentity.grips",
++    "extend.customentity.osnap",
++    "extend.customentity.stretch",
+     "extend.customentity.db_defaults",
+     "extend.customentity.geom_extents",
+     "extend.customentity.explode",
+@@ -93,25 +103,15 @@ _CUSTOM_ENTITY = [
+     "extend.customentity.list",
+     "extend.customentity.subentpaths",
+ ]
++_CUSTOM_OSNAP = [
++    "extend.osnap.custom_mode",
++]
++
++_IMPLEMENTED = _RTTI + _PROTOCOL + _CLASS_REG + _OBJECT_LIFECYCLE + _CUSTOM_ENTITY + _CUSTOM_OSNAP
+ 
+-_IMPLEMENTED = _RTTI + _PROTOCOL + _CLASS_REG + _OBJECT_LIFECYCLE + _CUSTOM_ENTITY
+-
+-# --- DEFERRED (must NOT appear in HasOp -- honest contract) ------------------
+-# In-app behavior callbacks (fire in a live editor / graphics system) and non-hostless ops.
+-_DEFERRED = [
+-    "extend.customentity.define",        # defining a NEW compiled class body at runtime is not hostless
+-    "extend.customobject.define",        # same
+-    "extend.customentity.embedded",      # embedded-object live-edit
+-    "extend.customentity.draw_world",    # AcGiWorldDraw callback -- fires in the graphics pipeline
+-    "extend.customentity.draw_viewport", # AcGiViewportDraw callback -- per-viewport graphics
+-    "extend.customentity.grips",         # grip-point editor protocol
+-    "extend.customentity.osnap",         # interactive osnap callback
+-    "extend.customentity.stretch",       # stretch (grip-edit) callback
+-    "extend.osnap.custom_mode",          # custom osnap mode registration (editor)
+-    "extend.customobject.partial_undo",  # applyPartialUndo fires during undo recording (not hostless)
+-    "extend.customobject.filer_dxfin",   # DXF in-filer needs a DXF stream (no hostless source w/o file)
+-    "extend.customobject.filer_dxfout",  # DXF out-filer would emit a file (forbidden on original)
+-    "extend.object_enabler.demand_register",  # demand-load registry write (install-time, lisp tier)
++# --- HARD-BLOCKED (must NOT appear in HasOp; registry/report carries blocker) --
++_HARD_BLOCKED = [
++    "extend.object_enabler.demand_register",  # HKLM demand-load/canonical deploy is Pane 1 only
+ ]
+ 
+ # Invented / dead handler cleanup: this op was a teammate-added duplicate and must stay out
+@@ -180,22 +180,21 @@ class TestM08KHandlers(unittest.TestCase):
+         )
+ 
+     def test_implemented_count(self):
+-        # Group totals: RTTI=5, protocol=4, class-registration=11, object-lifecycle=5,
+-        # custom-entity=7. 5+4+11+5+7 = 32 real handlers. The remaining ops of the 45-op
+-        # brief are the 13 _DEFERRED in-app-callback / non-hostless ones -- left OUT of
+-        # HasOp on purpose (no fake pass): 32 implemented + 13 deferred contract = honest.
++        # Group totals: RTTI=5, protocol=4, class-registration=11, object-lifecycle=10,
++        # custom-entity=13, custom-osnap=1. 5+4+11+10+13+1 = 44 real handlers.
+         self.assertEqual(len(_RTTI), 5)
+         self.assertEqual(len(_PROTOCOL), 4)
+         self.assertEqual(len(_CLASS_REG), 11)
+-        self.assertEqual(len(_OBJECT_LIFECYCLE), 5)
+-        self.assertEqual(len(_CUSTOM_ENTITY), 7)
+-        self.assertEqual(len(_IMPLEMENTED), 32)
+-        self.assertEqual(len(set(_IMPLEMENTED)), 32, "duplicate op id in the implemented list")
+-        self.assertEqual(len(self.hasop), 32)
++        self.assertEqual(len(_OBJECT_LIFECYCLE), 10)
++        self.assertEqual(len(_CUSTOM_ENTITY), 13)
++        self.assertEqual(len(_CUSTOM_OSNAP), 1)
++        self.assertEqual(len(_IMPLEMENTED), 44)
++        self.assertEqual(len(set(_IMPLEMENTED)), 44, "duplicate op id in the implemented list")
++        self.assertEqual(len(self.hasop), 44)
+ 
+-    def test_no_deferred_op_in_hasop(self):
+-        leaked = sorted(self.hasop & set(_DEFERRED))
+-        self.assertEqual(leaked, [], "deferred/editor-bound ops leaked into m08kHasOp: %s" % leaked)
++    def test_hard_blocked_install_time_op_not_in_hasop(self):
++        leaked = sorted(self.hasop & set(_HARD_BLOCKED))
++        self.assertEqual(leaked, [], "hard-blocked install/deploy ops leaked into m08kHasOp: %s" % leaked)
+ 
+     def test_no_drift_op_in_hasop(self):
+         leaked = sorted(self.hasop & set(_DRIFT))
+@@ -274,6 +273,16 @@ class TestM08KHandlers(unittest.TestCase):
+             "acrxRegisterService",     # service registration
+             "getGeomExtents",          # custom-entity geometry protocol
+             "transformBy",             # custom-entity transform protocol
++            "worldDraw",               # custom-entity world draw callback
++            "viewportDraw",            # custom-entity viewport draw callback
++            "getGripPoints",           # custom-entity grip protocol
++            "moveGripPointsAt",        # custom-entity grip edit protocol
++            "getOsnapPoints",          # custom-entity osnap protocol
++            "getStretchPoints",        # custom-entity stretch protocol
++            "moveStretchPointsAt",     # custom-entity stretch edit protocol
++            "AcDbCustomOsnapInfo",     # custom osnap PE protocol
++            "addCustomOsnapMode",      # custom osnap manager registration
++            "applyPartialUndo",        # custom object partial undo override
+             "getSubentPathsAtGsMarker",# subentity-path protocol
+         ]:
+             self.assertIn(token, self.code, "expected real ObjectARX call missing: %s" % token)

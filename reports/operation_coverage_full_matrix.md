@@ -2,9 +2,9 @@
 
 - packet: `CADOS_M08_FULL_OPERATION_COVERAGE_CLOSURE`
 - generated_from: `config/operations.v2.json`
-- total operations: **517** · implemented 423 · stub 0 · blocked 9 · catalogued 85 · deprecated 0 · **unknown 0**
-- v1-target: **432** (implemented 423 · blocked 9 · **deferred 0**)
-- agent-exposed ops: 423
+- total operations: **517** · implemented 435 · stub 0 · blocked 10 · catalogued 72 · deprecated 0 · **unknown 0**
+- v1-target: **445** (implemented 435 · blocked 10 · **deferred 0**)
+- agent-exposed ops: 435
 
 ## Gate
 
@@ -32,7 +32,7 @@
 | validate_diff | 3 | 0 | 0 | 0 | 3 |
 | render_visual | 11 | 0 | 0 | 1 | 11 |
 | live | 6 | 0 | 1 | 0 | 7 |
-| native_only | 337 | 0 | 5 | 79 | 342 |
+| native_only | 349 | 0 | 6 | 66 | 355 |
 
 ## Risk class distribution
 
@@ -50,6 +50,7 @@
 | command.invoke.coroutine | active_document_write_original | blocked | raw_command | live_edit | False | acedCommandC(AcEdCoroutineCallback, void*, int r | SAFETY_FORBIDDEN: raw command dispatch is blocked in M08O fa |
 | command.invoke.sync | active_document_write_original | blocked | raw_command | live_edit | False | acedCommandS(int rtype, ...) | SAFETY_FORBIDDEN: raw command dispatch is blocked in M08O fa |
 | command.invoke.sync.resbuf | active_document_write_original | blocked | raw_command | live_edit | False | acedCmdS(const resbuf* rb, bool, AcApDocument*) | SAFETY_FORBIDDEN: raw command dispatch is blocked in M08O fa |
+| extend.object_enabler.demand_register | custom_objects_protocols | blocked | read_safe | read | False | Registry keys under HKLM\SOFTWARE\Autodesk\Objec | HARD_BLOCKED_SAFETY_CANONICAL_DEPLOY_PANE1_ONLY: demand-load |
 | command.queue.post | editor_input | blocked | raw_command | live_edit | False | acedPostCommand / acedPostCommandPrompt() | SAFETY_FORBIDDEN: raw command dispatch is blocked in M08O fa |
 | live.apply_patch | live | blocked | live_edit | live_edit | False |  | Requires full_autocad live_edit host + explicit write_origin |
 | module.command.lookup | runtime_commands | blocked | raw_command | read | False | acedRegCmds->lookupCmd2(...) via acedCmdLookup2( | SAFETY_FORBIDDEN: raw command dispatch is blocked in M08O fa |
@@ -192,20 +193,32 @@
 | extend.customclass.rxinit | custom_objects_protocols | implemented | read_safe | read | True | m08kDispatch |  |
 | extend.customclass.unregister | custom_objects_protocols | implemented | read_safe | read | True | m08kDispatch |  |
 | extend.customentity.db_defaults | custom_objects_protocols | implemented | read_safe | read | True | m08kDispatch |  |
+| extend.customentity.define | custom_objects_protocols | implemented | live_edit | live_edit | True | m08kDispatch |  |
+| extend.customentity.draw_viewport | custom_objects_protocols | implemented | read_safe | read | True | m08kDispatch |  |
+| extend.customentity.draw_world | custom_objects_protocols | implemented | read_safe | read | True | m08kDispatch |  |
 | extend.customentity.explode | custom_objects_protocols | implemented | read_safe | read | True | m08kDispatch |  |
 | extend.customentity.geom_extents | custom_objects_protocols | implemented | read_safe | read | True | m08kDispatch |  |
+| extend.customentity.grips | custom_objects_protocols | implemented | read_safe | read | True | m08kDispatch |  |
 | extend.customentity.intersect | custom_objects_protocols | implemented | read_safe | read | True | m08kDispatch |  |
 | extend.customentity.list | custom_objects_protocols | implemented | read_safe | read | True | m08kDispatch |  |
+| extend.customentity.osnap | custom_objects_protocols | implemented | read_safe | read | True | m08kDispatch |  |
+| extend.customentity.stretch | custom_objects_protocols | implemented | read_safe | read | True | m08kDispatch |  |
 | extend.customentity.subentpaths | custom_objects_protocols | implemented | read_safe | read | True | m08kDispatch |  |
 | extend.customentity.transform | custom_objects_protocols | implemented | read_safe | read | True | m08kDispatch |  |
 | extend.customobject.deepclone | custom_objects_protocols | implemented | read_safe | read | True | m08kDispatch |  |
+| extend.customobject.define | custom_objects_protocols | implemented | live_edit | live_edit | True | m08kDispatch |  |
+| extend.customobject.embedded | custom_objects_protocols | implemented | live_edit | live_edit | True | m08kDispatch |  |
 | extend.customobject.filer_dwgin | custom_objects_protocols | implemented | read_safe | read | True | m08kDispatch |  |
 | extend.customobject.filer_dwgout | custom_objects_protocols | implemented | staged_write | write_copy | True | m08kDispatch |  |
+| extend.customobject.filer_dxfin | custom_objects_protocols | implemented | read_safe | read | True | m08kDispatch |  |
+| extend.customobject.filer_dxfout | custom_objects_protocols | implemented | staged_write | write_copy | True | m08kDispatch |  |
+| extend.customobject.partial_undo | custom_objects_protocols | implemented | read_safe | read | True | m08kDispatch |  |
 | extend.customobject.version | custom_objects_protocols | implemented | live_edit | live_edit | True | m08kDispatch |  |
 | extend.customobject.wblockclone | custom_objects_protocols | implemented | read_safe | read | True | m08kDispatch |  |
 | extend.module.entrypoint | custom_objects_protocols | implemented | read_safe | read | True | m08kDispatch |  |
 | extend.object_enabler.build | custom_objects_protocols | implemented | read_safe | read | True | m08kDispatch |  |
 | extend.object_enabler.register_classes | custom_objects_protocols | implemented | read_safe | read | True | m08kDispatch |  |
+| extend.osnap.custom_mode | custom_objects_protocols | implemented | read_safe | read | True | m08kDispatch |  |
 | extend.protocol.attach | custom_objects_protocols | implemented | read_safe | read | True | m08kDispatch |  |
 | extend.protocol.declare | custom_objects_protocols | implemented | read_safe | read | True | m08kDispatch |  |
 | extend.protocol.detach | custom_objects_protocols | implemented | read_safe | read | True | m08kDispatch |  |
@@ -480,4 +493,4 @@
 | write.layout.create | write | implemented | staged_write | write_copy | True | createLayout |  |
 | write.xdata.set | write | implemented | staged_write | write_copy | True | setDatabaseXdata |  |
 
-> Full 517-operation detail (all 13 fields per op) is in `reports/operation_coverage_full_matrix.json` — this table lists only the 432 v1-target ops. The 85 catalogued ops are classified future-version native capability (v1_target=false), not omitted.
+> Full 517-operation detail (all 13 fields per op) is in `reports/operation_coverage_full_matrix.json` — this table lists only the 445 v1-target ops. The 72 catalogued ops are classified future-version native capability (v1_target=false), not omitted.

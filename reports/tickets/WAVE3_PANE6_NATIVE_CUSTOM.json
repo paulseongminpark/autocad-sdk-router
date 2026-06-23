@@ -1,0 +1,81 @@
+{
+  "schema": "ariadne.cad_os.wave3.pane6.native_custom.result.v1",
+  "generated_at": "2026-06-23T21:23:05.851732",
+  "status": "PARTIAL_PASS",
+  "branch": "cados/wave3-pane6-native-custom",
+  "claimed_ops_count": 13,
+  "implemented_ops_count": 12,
+  "implemented_ops": [
+    "extend.customentity.define",
+    "extend.customentity.draw_viewport",
+    "extend.customentity.draw_world",
+    "extend.customentity.grips",
+    "extend.customentity.osnap",
+    "extend.customentity.stretch",
+    "extend.customobject.define",
+    "extend.customobject.embedded",
+    "extend.customobject.filer_dxfin",
+    "extend.customobject.filer_dxfout",
+    "extend.customobject.partial_undo",
+    "extend.osnap.custom_mode"
+  ],
+  "hard_blocked_ops": [
+    "extend.object_enabler.demand_register"
+  ],
+  "deprecated_ops": [],
+  "claimed_catalogued_remaining": [],
+  "native_build": {
+    "schema": "ariadne.cad_os.wave3.pane6.native_build.v1",
+    "status": "ok",
+    "msbuild": "C:/Program Files/Microsoft Visual Studio/2026/Community/MSBuild/Current/Bin/amd64/MSBuild.exe",
+    "configuration": "Release",
+    "platform": "x64",
+    "isolated_output_root": "runs/wave3_pane6_native_build_final",
+    "canonical_deploy": "not_performed",
+    "arx_relink_mode": "canonical",
+    "warnings": [
+      "LNK4099 missing Autodesk rxapi.pdb debug symbols (link succeeded)"
+    ],
+    "artifacts": [
+      {
+        "path": "runs/wave3_pane6_native_build_final/bin/x64/Release/Ariadne.AcadNativeDbx.dbx",
+        "exists": true,
+        "bytes": 54272
+      },
+      {
+        "path": "runs/wave3_pane6_native_build_final/bin/x64/Release/Ariadne.AcadNative.crx",
+        "exists": true,
+        "bytes": 676864
+      },
+      {
+        "path": "runs/wave3_pane6_native_build_final/bin/x64/Release/Ariadne.AcadNative.arx",
+        "exists": true,
+        "bytes": 684544
+      }
+    ]
+  },
+  "tests": {
+    "pytest": "464 passed, 20 skipped",
+    "cadctl_registry_coverage": "status ok, operation_count 517, implemented 414, blocked 10, catalogued 93, consistent true",
+    "json_tool": [
+      "reports/operation_coverage_latest.json ok",
+      "reports/v1_operation_gate_latest.json ok"
+    ],
+    "reconcile_native_registry": "dry-run flips=0 conflicts=0 drift=0"
+  },
+  "blockers": [
+    {
+      "operation": "extend.object_enabler.demand_register",
+      "reason": "hard-blocked: install-time HKLM/ObjectDBX demand-load registration requires canonical DBX deploy/registry write; Pane 6 native build rule permits isolated build only and says canonical deploy is Pane 1 only."
+    }
+  ],
+  "artifacts": {
+    "plan": "reports/tickets/WAVE3_PANE6_NATIVE_CUSTOM_PLAN.md",
+    "ops": "reports/tickets/WAVE3_PANE6_NATIVE_CUSTOM_OPS.json",
+    "native_build": "reports/tickets/WAVE3_PANE6_native_build.json",
+    "report": "reports/tickets/WAVE3_PANE6_NATIVE_CUSTOM.md",
+    "packet": "packets/tickets/WAVE3_PANE6_NATIVE_CUSTOM.md",
+    "patch": "handoff/pr/WAVE3_PANE6_NATIVE_CUSTOM.patch",
+    "zip": "handoff/tickets/WAVE3_PANE6_NATIVE_CUSTOM.zip"
+  }
+}
