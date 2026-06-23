@@ -245,6 +245,8 @@ static bool m08kHasOp(const std::string& op)
         // class version / db defaults; DWG filer roundtrip proven via clone)
         op == "extend.customobject.filer_dwgout" ||
         op == "extend.customobject.filer_dwgin" ||
+        op == "extend.customobject.filer_dxfin" ||
+        op == "extend.customobject.filer_dxfout" ||
         op == "extend.customobject.deepclone" ||
         op == "extend.customobject.wblockclone" ||
         op == "extend.customobject.version" ||
@@ -256,6 +258,11 @@ static bool m08kHasOp(const std::string& op)
         op == "extend.customentity.intersect" ||
         op == "extend.customentity.list" ||
         op == "extend.customentity.subentpaths" ||
+        op == "extend.customentity.draw_world" ||
+        op == "extend.customentity.draw_viewport" ||
+        op == "extend.customentity.grips" ||
+        op == "extend.customentity.osnap" ||
+        op == "extend.customentity.stretch" ||
         false;
 }
 
@@ -1080,6 +1087,470 @@ static bool m08kDispatch(const std::string& op, const AriadneJobCtx& ctx, std::o
           << ",\"path_count\":" << numPaths
           << ",\"note\":\"hostless null-marker probe (custom entity has no subentity protocol)\""
           << "},\"status\":\"ok\"}";
+        return true;
+    }
+
+    // extend.customentity.draw_world — append a transient AriadneProbe and trigger worldDraw
+    if (op == "extend.customentity.draw_world") {
+        AriadneStagedWriteTransaction wt(pDb);
+        AcDbObjectId id;
+        Acad::ErrorStatus es = m08kAppendProbeEntity(pDb, AcGePoint3d(0.0, 0.0, 0.0), 4.0, id);
+        Adesk::Boolean drew = Adesk::kFalse;
+        if (es == Acad::eOk && !id.isNull()) {
+            AcDbEntity* pEnt = nullptr;
+            if (acdbOpenObject(pEnt, id, AcDb::kForRead) == Acad::eOk && pEnt != nullptr) {
+                class LocalGeometry : public AcGiWorldGeometry {
+                public:
+                    void getModelToWorldTransform(AcGeMatrix3d& m) const override { m.setToIdentity(); }
+                    void getWorldToModelTransform(AcGeMatrix3d& m) const override { m.setToIdentity(); }
+                    Adesk::Boolean pushModelTransform(const AcGeVector3d&) override { return Adesk::kTrue; }
+                    Adesk::Boolean pushModelTransform(const AcGeMatrix3d&) override { return Adesk::kTrue; }
+                    Adesk::Boolean popModelTransform() override { return Adesk::kTrue; }
+                    AcGeMatrix3d pushPositionTransform(AcGiPositionTransformBehavior, const AcGePoint3d&) override { return AcGeMatrix3d::kIdentity; }
+                    AcGeMatrix3d pushPositionTransform(AcGiPositionTransformBehavior, const AcGePoint2d&) override { return AcGeMatrix3d::kIdentity; }
+                    AcGeMatrix3d pushScaleTransform(AcGiScaleTransformBehavior, const AcGePoint3d&) override { return AcGeMatrix3d::kIdentity; }
+                    AcGeMatrix3d pushScaleTransform(AcGiScaleTransformBehavior, const AcGePoint2d&) override { return AcGeMatrix3d::kIdentity; }
+                    AcGeMatrix3d pushOrientationTransform(AcGiOrientationTransformBehavior) override { return AcGeMatrix3d::kIdentity; }
+                    Adesk::Boolean circle(const AcGePoint3d&, const double, const AcGeVector3d&) const override { return Adesk::kTrue; }
+                    Adesk::Boolean circle(const AcGePoint3d&, const AcGePoint3d&, const AcGePoint3d&) const override { return Adesk::kTrue; }
+                    Adesk::Boolean circularArc(const AcGePoint3d&, const double, const AcGeVector3d&, const AcGeVector3d&, const double, const AcGiArcType) const override { return Adesk::kTrue; }
+                    Adesk::Boolean circularArc(const AcGePoint3d&, const AcGePoint3d&, const AcGePoint3d&, const AcGiArcType) const override { return Adesk::kTrue; }
+                    Adesk::Boolean polyline(const Adesk::UInt32, const AcGePoint3d*, const AcGeVector3d*, Adesk::LongPtr) const override { return Adesk::kTrue; }
+                    Adesk::Boolean polyline(const AcGiPolyline&) const override { return Adesk::kTrue; }
+                    Adesk::Boolean polyPolyline(Adesk::UInt32, const AcGiPolyline*) const override { return Adesk::kTrue; }
+                    Adesk::Boolean polygon(const Adesk::UInt32, const AcGePoint3d*) const override { return Adesk::kTrue; }
+                    Adesk::Boolean polyPolygon(const Adesk::UInt32, const Adesk::UInt32*, const AcGePoint3d*, const Adesk::UInt32*, const AcGePoint3d*, const AcCmEntityColor*, const AcGiLineType*, const AcCmEntityColor*, const AcCmTransparency*) const override { return Adesk::kTrue; }
+                    Adesk::Boolean mesh(const Adesk::UInt32, const Adesk::UInt32, const AcGePoint3d*, const AcGiEdgeData*, const AcGiFaceData*, const AcGiVertexData*, const bool) const override { return Adesk::kTrue; }
+                    Adesk::Boolean shell(const Adesk::UInt32, const AcGePoint3d*, const Adesk::UInt32, const Adesk::Int32*, const AcGiEdgeData*, const AcGiFaceData*, const AcGiVertexData*, const struct resbuf*, const bool) const override { return Adesk::kTrue; }
+                    Adesk::Boolean text(const AcGePoint3d&, const AcGeVector3d&, const AcGeVector3d&, const double, const double, const double, const ACHAR*) const override { return Adesk::kTrue; }
+                    Adesk::Boolean text(const AcGePoint3d&, const AcGeVector3d&, const AcGeVector3d&, const ACHAR*, const Adesk::Int32, const Adesk::Boolean, const AcGiTextStyle&) const override { return Adesk::kTrue; }
+                    Adesk::Boolean xline(const AcGePoint3d&, const AcGePoint3d&) const override { return Adesk::kTrue; }
+                    Adesk::Boolean ray(const AcGePoint3d&, const AcGePoint3d&) const override { return Adesk::kTrue; }
+                    Adesk::Boolean pline(const AcDbPolyline&, Adesk::UInt32, Adesk::UInt32) const override { return Adesk::kTrue; }
+                    Adesk::Boolean draw(AcGiDrawable*) const override { return Adesk::kTrue; }
+                    Adesk::Boolean image(const AcGiImageBGRA32&, const AcGePoint3d&, const AcGeVector3d&, const AcGeVector3d&, TransparencyMode) const override { return Adesk::kTrue; }
+                    Adesk::Boolean rowOfDots(int, const AcGePoint3d&, const AcGeVector3d&) const override { return Adesk::kTrue; }
+                    Adesk::Boolean ellipticalArc(const AcGePoint3d&, const AcGeVector3d&, double, double, double, double, double, AcGiArcType) const override { return Adesk::kTrue; }
+                    Adesk::Boolean pushClipBoundary(AcGiClipBoundary*) override { return Adesk::kTrue; }
+                    void popClipBoundary() override {}
+                    Adesk::Boolean edge(const AcArray<AcGeCurve2d*>&) const override { return Adesk::kTrue; }
+                    void setExtents(AcGePoint3d*) const override {}
+                };
+
+                class LocalContext : public AcGiContext {
+                public:
+                    explicit LocalContext(AcDbDatabase* pDb) : m_pDb(pDb) {}
+                    bool          isPlotGeneration() const override { return false; }
+                    AcDbDatabase* database() const override { return m_pDb; }
+                    bool          isBoundaryClipping() const override { return false; }
+                private:
+                    AcDbDatabase* m_pDb;
+                };
+
+                class LocalTraits : public AcGiSubEntityTraits {
+                public:
+                    void setColor(const Adesk::UInt16) override {}
+                    void setTrueColor(const AcCmEntityColor&) override {}
+                    void setLayer(const AcDbObjectId) override {}
+                    void setLineType(const AcDbObjectId) override {}
+                    void setSelectionMarker(const Adesk::LongPtr) override {}
+                    void setFillType(const AcGiFillType) override {}
+                    void setLineWeight(const AcDb::LineWeight) override {}
+                    void setLineTypeScale(double) override {}
+                    void setThickness(double) override {}
+                    Adesk::UInt16    color() const override { return 256; }
+                    AcCmEntityColor  trueColor() const override { return AcCmEntityColor(); }
+                    AcDbObjectId     layerId() const override { return AcDbObjectId::kNull; }
+                    AcDbObjectId     lineTypeId() const override { return AcDbObjectId::kNull; }
+                    AcGiFillType     fillType() const override { return kAcGiFillNever; }
+                    AcDb::LineWeight lineWeight() const override { return AcDb::kLnWtByLayer; }
+                    double           lineTypeScale() const override { return 1.0; }
+                    double           thickness() const override { return 0.0; }
+                };
+
+                class LocalWorldDraw : public AcGiWorldDraw {
+                public:
+                    LocalWorldDraw(AcDbDatabase* pDb) : m_ctx(pDb) {}
+                    AcGiRegenType        regenType() const override { return kAcGiStandardDisplay; }
+                    Adesk::Boolean       regenAbort() const override { return Adesk::kFalse; }
+                    AcGiSubEntityTraits& subEntityTraits() const override { return const_cast<LocalTraits&>(m_traits); }
+                    AcGiGeometry*        rawGeometry() const override { return const_cast<LocalGeometry*>(&m_geom); }
+                    Adesk::Boolean       isDragging() const override { return Adesk::kFalse; }
+                    double               deviation(const AcGiDeviationType, const AcGePoint3d&) const override { return 0.0; }
+                    Adesk::UInt32        numberOfIsolines() const override { return 4; }
+                    AcGiContext*         context() override { return &m_ctx; }
+                    AcGiWorldGeometry&   geometry() const override { return const_cast<LocalGeometry&>(m_geom); }
+                private:
+                    LocalContext  m_ctx;
+                    LocalGeometry m_geom;
+                    LocalTraits   m_traits;
+                };
+
+                LocalWorldDraw wd(pDb);
+                drew = pEnt->worldDraw(&wd);
+                pEnt->close();
+            }
+        }
+        r << "\"result\":{\"appended\":" << (es == Acad::eOk ? "true" : "false")
+          << ",\"world_draw_returned\":" << (drew == Adesk::kTrue ? "true" : "false")
+          << "},\"status\":\"ok\"}";
+        return true;
+    }
+
+    // extend.customentity.draw_viewport — append a transient AriadneProbe and trigger viewportDraw
+    if (op == "extend.customentity.draw_viewport") {
+        AriadneStagedWriteTransaction wt(pDb);
+        AcDbObjectId id;
+        Acad::ErrorStatus es = m08kAppendProbeEntity(pDb, AcGePoint3d(0.0, 0.0, 0.0), 4.0, id);
+        Adesk::Boolean drewWorld = Adesk::kFalse;
+        Adesk::Boolean drewViewport = Adesk::kFalse;
+        if (es == Acad::eOk && !id.isNull()) {
+            AcDbEntity* pEnt = nullptr;
+            if (acdbOpenObject(pEnt, id, AcDb::kForRead) == Acad::eOk && pEnt != nullptr) {
+                class LocalGeometry : public AcGiWorldGeometry {
+                public:
+                    void getModelToWorldTransform(AcGeMatrix3d& m) const override { m.setToIdentity(); }
+                    void getWorldToModelTransform(AcGeMatrix3d& m) const override { m.setToIdentity(); }
+                    Adesk::Boolean pushModelTransform(const AcGeVector3d&) override { return Adesk::kTrue; }
+                    Adesk::Boolean pushModelTransform(const AcGeMatrix3d&) override { return Adesk::kTrue; }
+                    Adesk::Boolean popModelTransform() override { return Adesk::kTrue; }
+                    AcGeMatrix3d pushPositionTransform(AcGiPositionTransformBehavior, const AcGePoint3d&) override { return AcGeMatrix3d::kIdentity; }
+                    AcGeMatrix3d pushPositionTransform(AcGiPositionTransformBehavior, const AcGePoint2d&) override { return AcGeMatrix3d::kIdentity; }
+                    AcGeMatrix3d pushScaleTransform(AcGiScaleTransformBehavior, const AcGePoint3d&) override { return AcGeMatrix3d::kIdentity; }
+                    AcGeMatrix3d pushScaleTransform(AcGiScaleTransformBehavior, const AcGePoint2d&) override { return AcGeMatrix3d::kIdentity; }
+                    AcGeMatrix3d pushOrientationTransform(AcGiOrientationTransformBehavior) override { return AcGeMatrix3d::kIdentity; }
+                    Adesk::Boolean circle(const AcGePoint3d&, const double, const AcGeVector3d&) const override { return Adesk::kTrue; }
+                    Adesk::Boolean circle(const AcGePoint3d&, const AcGePoint3d&, const AcGePoint3d&) const override { return Adesk::kTrue; }
+                    Adesk::Boolean circularArc(const AcGePoint3d&, const double, const AcGeVector3d&, const AcGeVector3d&, const double, const AcGiArcType) const override { return Adesk::kTrue; }
+                    Adesk::Boolean circularArc(const AcGePoint3d&, const AcGePoint3d&, const AcGePoint3d&, const AcGiArcType) const override { return Adesk::kTrue; }
+                    Adesk::Boolean polyline(const Adesk::UInt32, const AcGePoint3d*, const AcGeVector3d*, Adesk::LongPtr) const override { return Adesk::kTrue; }
+                    Adesk::Boolean polyline(const AcGiPolyline&) const override { return Adesk::kTrue; }
+                    Adesk::Boolean polyPolyline(Adesk::UInt32, const AcGiPolyline*) const override { return Adesk::kTrue; }
+                    Adesk::Boolean polygon(const Adesk::UInt32, const AcGePoint3d*) const override { return Adesk::kTrue; }
+                    Adesk::Boolean polyPolygon(const Adesk::UInt32, const Adesk::UInt32*, const AcGePoint3d*, const Adesk::UInt32*, const AcGePoint3d*, const AcCmEntityColor*, const AcGiLineType*, const AcCmEntityColor*, const AcCmTransparency*) const override { return Adesk::kTrue; }
+                    Adesk::Boolean mesh(const Adesk::UInt32, const Adesk::UInt32, const AcGePoint3d*, const AcGiEdgeData*, const AcGiFaceData*, const AcGiVertexData*, const bool) const override { return Adesk::kTrue; }
+                    Adesk::Boolean shell(const Adesk::UInt32, const AcGePoint3d*, const Adesk::UInt32, const Adesk::Int32*, const AcGiEdgeData*, const AcGiFaceData*, const AcGiVertexData*, const struct resbuf*, const bool) const override { return Adesk::kTrue; }
+                    Adesk::Boolean text(const AcGePoint3d&, const AcGeVector3d&, const AcGeVector3d&, const double, const double, const double, const ACHAR*) const override { return Adesk::kTrue; }
+                    Adesk::Boolean text(const AcGePoint3d&, const AcGeVector3d&, const AcGeVector3d&, const ACHAR*, const Adesk::Int32, const Adesk::Boolean, const AcGiTextStyle&) const override { return Adesk::kTrue; }
+                    Adesk::Boolean xline(const AcGePoint3d&, const AcGePoint3d&) const override { return Adesk::kTrue; }
+                    Adesk::Boolean ray(const AcGePoint3d&, const AcGePoint3d&) const override { return Adesk::kTrue; }
+                    Adesk::Boolean pline(const AcDbPolyline&, Adesk::UInt32, Adesk::UInt32) const override { return Adesk::kTrue; }
+                    Adesk::Boolean draw(AcGiDrawable*) const override { return Adesk::kTrue; }
+                    Adesk::Boolean image(const AcGiImageBGRA32&, const AcGePoint3d&, const AcGeVector3d&, const AcGeVector3d&, TransparencyMode) const override { return Adesk::kTrue; }
+                    Adesk::Boolean rowOfDots(int, const AcGePoint3d&, const AcGeVector3d&) const override { return Adesk::kTrue; }
+                    Adesk::Boolean ellipticalArc(const AcGePoint3d&, const AcGeVector3d&, double, double, double, double, double, AcGiArcType) const override { return Adesk::kTrue; }
+                    Adesk::Boolean pushClipBoundary(AcGiClipBoundary*) override { return Adesk::kTrue; }
+                    void popClipBoundary() override {}
+                    Adesk::Boolean edge(const AcArray<AcGeCurve2d*>&) const override { return Adesk::kTrue; }
+                    void setExtents(AcGePoint3d*) const override {}
+                };
+
+                class LocalContext : public AcGiContext {
+                public:
+                    explicit LocalContext(AcDbDatabase* pDb) : m_pDb(pDb) {}
+                    bool          isPlotGeneration() const override { return false; }
+                    AcDbDatabase* database() const override { return m_pDb; }
+                    bool          isBoundaryClipping() const override { return false; }
+                private:
+                    AcDbDatabase* m_pDb;
+                };
+
+                class LocalTraits : public AcGiSubEntityTraits {
+                public:
+                    void setColor(const Adesk::UInt16) override {}
+                    void setTrueColor(const AcCmEntityColor&) override {}
+                    void setLayer(const AcDbObjectId) override {}
+                    void setLineType(const AcDbObjectId) override {}
+                    void setSelectionMarker(const Adesk::LongPtr) override {}
+                    void setFillType(const AcGiFillType) override {}
+                    void setLineWeight(const AcDb::LineWeight) override {}
+                    void setLineTypeScale(double) override {}
+                    void setThickness(double) override {}
+                    Adesk::UInt16    color() const override { return 256; }
+                    AcCmEntityColor  trueColor() const override { return AcCmEntityColor(); }
+                    AcDbObjectId     layerId() const override { return AcDbObjectId::kNull; }
+                    AcDbObjectId     lineTypeId() const override { return AcDbObjectId::kNull; }
+                    AcGiFillType     fillType() const override { return kAcGiFillNever; }
+                    AcDb::LineWeight lineWeight() const override { return AcDb::kLnWtByLayer; }
+                    double           lineTypeScale() const override { return 1.0; }
+                    double           thickness() const override { return 0.0; }
+                };
+
+                class LocalWorldDraw : public AcGiWorldDraw {
+                public:
+                    LocalWorldDraw(AcDbDatabase* pDb) : m_ctx(pDb) {}
+                    AcGiRegenType        regenType() const override { return kAcGiStandardDisplay; }
+                    Adesk::Boolean       regenAbort() const override { return Adesk::kFalse; }
+                    AcGiSubEntityTraits& subEntityTraits() const override { return const_cast<LocalTraits&>(m_traits); }
+                    AcGiGeometry*        rawGeometry() const override { return const_cast<LocalGeometry*>(&m_geom); }
+                    Adesk::Boolean       isDragging() const override { return Adesk::kFalse; }
+                    double               deviation(const AcGiDeviationType, const AcGePoint3d&) const override { return 0.0; }
+                    Adesk::UInt32        numberOfIsolines() const override { return 4; }
+                    AcGiContext*         context() override { return &m_ctx; }
+                    AcGiWorldGeometry&   geometry() const override { return const_cast<LocalGeometry&>(m_geom); }
+                private:
+                    LocalContext  m_ctx;
+                    LocalGeometry m_geom;
+                    LocalTraits   m_traits;
+                };
+
+                class LocalViewportGeometry : public AcGiViewportGeometry {
+                public:
+                    void getModelToWorldTransform(AcGeMatrix3d& m) const override { m.setToIdentity(); }
+                    void getWorldToModelTransform(AcGeMatrix3d& m) const override { m.setToIdentity(); }
+                    Adesk::Boolean pushModelTransform(const AcGeVector3d&) override { return Adesk::kTrue; }
+                    Adesk::Boolean pushModelTransform(const AcGeMatrix3d&) override { return Adesk::kTrue; }
+                    Adesk::Boolean popModelTransform() override { return Adesk::kTrue; }
+                    AcGeMatrix3d pushPositionTransform(AcGiPositionTransformBehavior, const AcGePoint3d&) override { return AcGeMatrix3d::kIdentity; }
+                    AcGeMatrix3d pushPositionTransform(AcGiPositionTransformBehavior, const AcGePoint2d&) override { return AcGeMatrix3d::kIdentity; }
+                    AcGeMatrix3d pushScaleTransform(AcGiScaleTransformBehavior, const AcGePoint3d&) override { return AcGeMatrix3d::kIdentity; }
+                    AcGeMatrix3d pushScaleTransform(AcGiScaleTransformBehavior, const AcGePoint2d&) override { return AcGeMatrix3d::kIdentity; }
+                    AcGeMatrix3d pushOrientationTransform(AcGiOrientationTransformBehavior) override { return AcGeMatrix3d::kIdentity; }
+                    Adesk::Boolean circle(const AcGePoint3d&, const double, const AcGeVector3d&) const override { return Adesk::kTrue; }
+                    Adesk::Boolean circle(const AcGePoint3d&, const AcGePoint3d&, const AcGePoint3d&) const override { return Adesk::kTrue; }
+                    Adesk::Boolean circularArc(const AcGePoint3d&, const double, const AcGeVector3d&, const AcGeVector3d&, const double, const AcGiArcType) const override { return Adesk::kTrue; }
+                    Adesk::Boolean circularArc(const AcGePoint3d&, const AcGePoint3d&, const AcGePoint3d&, const AcGiArcType) const override { return Adesk::kTrue; }
+                    Adesk::Boolean polyline(const Adesk::UInt32, const AcGePoint3d*, const AcGeVector3d*, Adesk::LongPtr) const override { return Adesk::kTrue; }
+                    Adesk::Boolean polyline(const AcGiPolyline&) const override { return Adesk::kTrue; }
+                    Adesk::Boolean polyPolyline(Adesk::UInt32, const AcGiPolyline*) const override { return Adesk::kTrue; }
+                    Adesk::Boolean polygon(const Adesk::UInt32, const AcGePoint3d*) const override { return Adesk::kTrue; }
+                    Adesk::Boolean polyPolygon(const Adesk::UInt32, const Adesk::UInt32*, const AcGePoint3d*, const Adesk::UInt32*, const AcGePoint3d*, const AcCmEntityColor*, const AcGiLineType*, const AcCmEntityColor*, const AcCmTransparency*) const override { return Adesk::kTrue; }
+                    Adesk::Boolean mesh(const Adesk::UInt32, const Adesk::UInt32, const AcGePoint3d*, const AcGiEdgeData*, const AcGiFaceData*, const AcGiVertexData*, const bool) const override { return Adesk::kTrue; }
+                    Adesk::Boolean shell(const Adesk::UInt32, const AcGePoint3d*, const Adesk::UInt32, const Adesk::Int32*, const AcGiEdgeData*, const AcGiFaceData*, const AcGiVertexData*, const struct resbuf*, const bool) const override { return Adesk::kTrue; }
+                    Adesk::Boolean text(const AcGePoint3d&, const AcGeVector3d&, const AcGeVector3d&, const double, const double, const double, const ACHAR*) const override { return Adesk::kTrue; }
+                    Adesk::Boolean text(const AcGePoint3d&, const AcGeVector3d&, const AcGeVector3d&, const ACHAR*, const Adesk::Int32, const Adesk::Boolean, const AcGiTextStyle&) const override { return Adesk::kTrue; }
+                    Adesk::Boolean xline(const AcGePoint3d&, const AcGePoint3d&) const override { return Adesk::kTrue; }
+                    Adesk::Boolean ray(const AcGePoint3d&, const AcGePoint3d&) const override { return Adesk::kTrue; }
+                    Adesk::Boolean pline(const AcDbPolyline&, Adesk::UInt32, Adesk::UInt32) const override { return Adesk::kTrue; }
+                    Adesk::Boolean draw(AcGiDrawable*) const override { return Adesk::kTrue; }
+                    Adesk::Boolean image(const AcGiImageBGRA32&, const AcGePoint3d&, const AcGeVector3d&, const AcGeVector3d&, TransparencyMode) const override { return Adesk::kTrue; }
+                    Adesk::Boolean rowOfDots(int, const AcGePoint3d&, const AcGeVector3d&) const override { return Adesk::kTrue; }
+                    Adesk::Boolean ellipticalArc(const AcGePoint3d&, const AcGeVector3d&, double, double, double, double, double, AcGiArcType) const override { return Adesk::kTrue; }
+                    Adesk::Boolean pushClipBoundary(AcGiClipBoundary*) override { return Adesk::kTrue; }
+                    void popClipBoundary() override {}
+                    Adesk::Boolean edge(const AcArray<AcGeCurve2d*>&) const override { return Adesk::kTrue; }
+
+                    Adesk::Boolean polylineEye(const Adesk::UInt32, const AcGePoint3d*) const override { return Adesk::kTrue; }
+                    Adesk::Boolean polygonEye(const Adesk::UInt32, const AcGePoint3d*) const override { return Adesk::kTrue; }
+                    Adesk::Boolean polylineDc(const Adesk::UInt32, const AcGePoint3d*) const override { return Adesk::kTrue; }
+                    Adesk::Boolean polygonDc(const Adesk::UInt32, const AcGePoint3d*) const override { return Adesk::kTrue; }
+                    Adesk::Boolean rasterImageDc(
+                        const AcGePoint3d& origin,
+                        const AcGeVector3d& u,
+                        const AcGeVector3d& v,
+                        const AcGeMatrix2d& pixelToDc,
+                        AcDbObjectId entityId,
+                        AcGiImageOrg imageOrg,
+                        Adesk::UInt32 imageWidth,
+                        Adesk::UInt32 imageHeight,
+                        Adesk::Int16 imageColorDepth,
+                        Adesk::Boolean transparency,
+                        ImageSource source,
+                        const AcGeVector3d& unrotatedU,
+                        const AcGiImageOrg origionalImageOrg,
+                        const AcGeMatrix2d& unrotatedPixelToDc,
+                        const Adesk::UInt32 unrotatedImageWidth,
+                        const Adesk::UInt32 unrotatedImageHeight
+                    ) const override { return Adesk::kTrue; }
+                    Adesk::Boolean ownerDrawDc(
+                        Adesk::Int32                       vpnumber,
+                        Adesk::Int32                       left,
+                        Adesk::Int32                       top,
+                        Adesk::Int32                       right,
+                        Adesk::Int32                       bottom,
+                        const OwnerDraw*           pOwnerDraw
+                    ) const override { return Adesk::kTrue; }
+                };
+
+                class LocalViewport : public AcGiViewport {
+                public:
+                    void getCameraLocation(AcGePoint3d& loc) const override { loc.set(0, 0, 0); }
+                    void getCameraTarget(AcGePoint3d& target) const override { target.set(0, 0, 0); }
+                    void getCameraUpVector(AcGeVector3d& up) const override { up.set(0, 1, 0); }
+                    void getEyeToWorldTransform(AcGeMatrix3d& m) const override { m.setToIdentity(); }
+                    void getWorldToEyeTransform(AcGeMatrix3d& m) const override { m.setToIdentity(); }
+                    Adesk::Boolean isPerspective() const override { return Adesk::kFalse; }
+                    void getViewportDcCorners(AcGePoint2d& lowerLeft, AcGePoint2d& upperRight) const override { lowerLeft.set(0,0); upperRight.set(100,100); }
+                    Adesk::Boolean getFrontAndBackClipValues(Adesk::Boolean& clipFront, Adesk::Boolean& clipBack, double& front, double& back) const override { clipFront = Adesk::kFalse; clipBack = Adesk::kFalse; front = 0; back = 0; return Adesk::kTrue; }
+                    double linetypeScaleMultiplier() const override { return 1.0; }
+                    void getEyeToModelTransform(AcGeMatrix3d& m) const override { m.setToIdentity(); }
+                    void getModelToEyeTransform(AcGeMatrix3d& m) const override { m.setToIdentity(); }
+                    
+                    Adesk::Boolean doPerspective(AcGePoint3d &) const override { return Adesk::kFalse; }
+                    Adesk::Boolean doInversePerspective(AcGePoint3d &) const override { return Adesk::kFalse; }
+                    void getNumPixelsInUnitSquare(const AcGePoint3d &,AcGePoint2d &,bool) const override {}
+                    Adesk::ULongPtr viewportId() const override { return 0; }
+                    Adesk::Int16 acadWindowId() const override { return 0; }
+                    double linetypeGenerationCriteria() const override { return 1.0; }
+                };
+
+                class LocalViewportDraw : public AcGiViewportDraw {
+                public:
+                    LocalViewportDraw(AcDbDatabase* pDb) : m_ctx(pDb) {}
+                    AcGiRegenType        regenType() const override { return kAcGiStandardDisplay; }
+                    Adesk::Boolean       regenAbort() const override { return Adesk::kFalse; }
+                    AcGiSubEntityTraits& subEntityTraits() const override { return const_cast<LocalTraits&>(m_traits); }
+                    AcGiGeometry*        rawGeometry() const override { return const_cast<LocalViewportGeometry*>(&m_geom); }
+                    Adesk::Boolean       isDragging() const override { return Adesk::kFalse; }
+                    double               deviation(const AcGiDeviationType, const AcGePoint3d&) const override { return 0.0; }
+                    Adesk::UInt32        numberOfIsolines() const override { return 4; }
+                    AcGiContext*         context() override { return &m_ctx; }
+                    AcGiViewport&        viewport() const override { return const_cast<LocalViewport&>(m_viewport); }
+                    AcGiViewportGeometry& geometry() const override { return const_cast<LocalViewportGeometry&>(m_geom); }
+                    Adesk::UInt32        sequenceNumber() const override { return 0; }
+                    Adesk::Boolean       isValidId(const Adesk::ULongPtr) const override { return Adesk::kTrue; }
+                    AcDbObjectId         viewportObjectId() const override { return AcDbObjectId::kNull; }
+                private:
+                    LocalContext          m_ctx;
+                    LocalViewportGeometry m_geom;
+                    LocalTraits           m_traits;
+                    LocalViewport         m_viewport;
+                };
+
+                LocalWorldDraw wd(pDb);
+                drewWorld = pEnt->worldDraw(&wd);
+                if (!drewWorld) {
+                    LocalViewportDraw vd(pDb);
+                    pEnt->viewportDraw(&vd);
+                    drewViewport = Adesk::kTrue;
+                }
+                pEnt->close();
+            }
+        }
+        r << "\"result\":{\"appended\":" << (es == Acad::eOk ? "true" : "false")
+          << ",\"world_draw_returned\":" << (drewWorld == Adesk::kTrue ? "true" : "false")
+          << ",\"viewport_draw_called\":" << (drewViewport == Adesk::kTrue ? "true" : "false")
+          << "},\"status\":\"ok\"}";
+        return true;
+    }
+
+    // extend.customentity.grips — query grips on custom entity AriadneProbe
+    if (op == "extend.customentity.grips") {
+        AriadneStagedWriteTransaction wt(pDb);
+        AcDbObjectId id;
+        Acad::ErrorStatus es = m08kAppendProbeEntity(pDb, AcGePoint3d(1.0, 2.0, 3.0), 4.0, id);
+        int gripCount = 0;
+        int moveStatus = -1;
+        if (es == Acad::eOk && !id.isNull()) {
+            AcDbEntity* pEnt = nullptr;
+            if (acdbOpenObject(pEnt, id, AcDb::kForWrite) == Acad::eOk && pEnt != nullptr) {
+                AcGePoint3dArray gripPoints;
+                AcDbIntArray osnapModes;
+                AcDbIntArray geomIds;
+                if (pEnt->getGripPoints(gripPoints, osnapModes, geomIds) == Acad::eOk) {
+                    gripCount = gripPoints.length();
+                    if (gripCount > 0) {
+                        AcDbIntArray indices;
+                        indices.append(0);
+                        AcGeVector3d offset(10.0, 20.0, 30.0);
+                        moveStatus = static_cast<int>(pEnt->moveGripPointsAt(indices, offset));
+                    }
+                }
+                pEnt->close();
+            }
+        }
+        r << "\"result\":{\"appended\":" << (es == Acad::eOk ? "true" : "false")
+          << ",\"grip_count\":" << gripCount
+          << ",\"move_status\":" << moveStatus
+          << "},\"status\":\"ok\"}";
+        return true;
+    }
+
+    // extend.customentity.osnap — snap points on custom entity AriadneProbe
+    if (op == "extend.customentity.osnap") {
+        AriadneStagedWriteTransaction wt(pDb);
+        AcDbObjectId id;
+        Acad::ErrorStatus es = m08kAppendProbeEntity(pDb, AcGePoint3d(1.0, 2.0, 3.0), 4.0, id);
+        int snapCount = 0;
+        int snapStatus = -1;
+        if (es == Acad::eOk && !id.isNull()) {
+            AcDbEntity* pEnt = nullptr;
+            if (acdbOpenObject(pEnt, id, AcDb::kForRead) == Acad::eOk && pEnt != nullptr) {
+                AcGePoint3d origin(0.0, 0.0, 0.0);
+                AcGeMatrix3d viewXform;
+                AcGePoint3dArray snapPoints;
+                AcDbIntArray geomIds;
+                Acad::ErrorStatus snapEs = pEnt->getOsnapPoints(AcDb::kOsModeEnd, 0, origin, origin, viewXform, snapPoints, geomIds);
+                snapStatus = static_cast<int>(snapEs);
+                snapCount = snapPoints.length();
+                pEnt->close();
+            }
+        }
+        r << "\"result\":{\"appended\":" << (es == Acad::eOk ? "true" : "false")
+          << ",\"snap_status\":" << snapStatus
+          << ",\"snap_count\":" << snapCount
+          << "},\"status\":\"ok\"}";
+        return true;
+    }
+
+    // extend.customentity.stretch — stretch custom entity AriadneProbe
+    if (op == "extend.customentity.stretch") {
+        AriadneStagedWriteTransaction wt(pDb);
+        AcDbObjectId id;
+        Acad::ErrorStatus es = m08kAppendProbeEntity(pDb, AcGePoint3d(1.0, 2.0, 3.0), 4.0, id);
+        int stretchCount = 0;
+        int moveStatus = -1;
+        if (es == Acad::eOk && !id.isNull()) {
+            AcDbEntity* pEnt = nullptr;
+            if (acdbOpenObject(pEnt, id, AcDb::kForWrite) == Acad::eOk && pEnt != nullptr) {
+                AcGePoint3dArray stretchPoints;
+                if (pEnt->getStretchPoints(stretchPoints) == Acad::eOk) {
+                    stretchCount = stretchPoints.length();
+                    if (stretchCount > 0) {
+                        AcDbIntArray indices;
+                        indices.append(0);
+                        AcGeVector3d offset(10.0, 20.0, 30.0);
+                        moveStatus = static_cast<int>(pEnt->moveStretchPointsAt(indices, offset));
+                    }
+                }
+                pEnt->close();
+            }
+        }
+        r << "\"result\":{\"appended\":" << (es == Acad::eOk ? "true" : "false")
+          << ",\"stretch_count\":" << stretchCount
+          << ",\"move_status\":" << moveStatus
+          << "},\"status\":\"ok\"}";
+        return true;
+    }
+
+    // extend.customobject.filer_dxfin / extend.customobject.filer_dxfout — DXF roundtrip verification
+    if (op == "extend.customobject.filer_dxfin" || op == "extend.customobject.filer_dxfout") {
+        AriadneStagedWriteTransaction wt(pDb);
+        AcDbObjectId srcId; std::string key;
+        Acad::ErrorStatus es = m08kAppendRecordToNod(pDb, 42, srcId, key);
+        bool dxfOutOk = false;
+        bool dxfInOk = false;
+        bool cloneIsRecord = false;
+        if (es == Acad::eOk && !srcId.isNull()) {
+            const ACHAR* dxfPath = ACRX_T("staging/dxf_roundtrip_temp.dxf");
+            if (pDb->dxfOut(dxfPath, 16) == Acad::eOk) {
+                dxfOutOk = true;
+                if (op == "extend.customobject.filer_dxfin") {
+                    AcDbDatabase* pTempDb = new AcDbDatabase(Adesk::kFalse);
+                    if (pTempDb->dxfIn(dxfPath) == Acad::eOk) {
+                        dxfInOk = true;
+                        AcDbDictionary* pNod = nullptr;
+                        if (pTempDb->getNamedObjectsDictionary(pNod, AcDb::kForRead) == Acad::eOk && pNod != nullptr) {
+                            AcDbObject* pObj = nullptr;
+                            if (pNod->getAt(asciiToWide(key).c_str(), pObj, AcDb::kForRead) == Acad::eOk && pObj != nullptr) {
+                                cloneIsRecord = ariadneIsRecordObject(pObj);
+                                pObj->close();
+                            }
+                            pNod->close();
+                        }
+                    }
+                    delete pTempDb;
+                }
+            }
+            _tremove(dxfPath);
+        }
+        r << "\"result\":{\"appended\":" << (es == Acad::eOk ? "true" : "false")
+          << ",\"dxf_out_ok\":" << (dxfOutOk ? "true" : "false");
+        if (op == "extend.customobject.filer_dxfin") {
+            r << ",\"dxf_in_ok\":" << (dxfInOk ? "true" : "false")
+              << ",\"record_reconstructed\":" << (cloneIsRecord ? "true" : "false");
+        }
+        r << "},\"status\":\"ok\"}";
         return true;
     }
 

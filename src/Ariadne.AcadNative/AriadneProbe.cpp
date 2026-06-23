@@ -196,8 +196,89 @@ Acad::ErrorStatus AriadneProbe::dxfInFields(AcDbDxfFiler* filer)
 Adesk::Boolean AriadneProbe::subWorldDraw(AcGiWorldDraw* mode)
 {
     assertReadEnabled();
+    // Return kFalse to force viewportDraw (viewport-dependent graphics) to be called.
+    return Adesk::kFalse;
+}
+
+//----------------------------------------------------------------------------
+// Viewport Draw — AcGi viewportDraw (viewport-dependent graphics).
+//----------------------------------------------------------------------------
+void AriadneProbe::subViewportDraw(AcGiViewportDraw* mode)
+{
+    assertReadEnabled();
+    // Draw a circle marker of radius mSize at mCenter.
     mode->geometry().circle(mCenter, mSize, AcGeVector3d::kZAxis);
-    return Adesk::kTrue;   // fully view-independent; no subViewportDraw needed
+}
+
+//----------------------------------------------------------------------------
+// Grips Editing
+//----------------------------------------------------------------------------
+Acad::ErrorStatus AriadneProbe::subGetGripPoints(
+    AcGePoint3dArray& gripPoints,
+    AcDbIntArray& osnapModes,
+    AcDbIntArray& geomIds) const
+{
+    assertReadEnabled();
+    // Provide center as primary grip point.
+    gripPoints.append(mCenter);
+    gripPoints.append(mCenter + AcGeVector3d::kXAxis * mSize);
+    gripPoints.append(mCenter + AcGeVector3d::kYAxis * mSize);
+    return Acad::eOk;
+}
+
+Acad::ErrorStatus AriadneProbe::subMoveGripPointsAt(
+    const AcDbIntArray& indices,
+    const AcGeVector3d& offset)
+{
+    assertWriteEnabled();
+    for (int i = 0; i < indices.length(); ++i) {
+        if (indices[i] == 0) {
+            mCenter += offset;
+        }
+    }
+    return Acad::eOk;
+}
+
+//----------------------------------------------------------------------------
+// Object Snap Points
+//----------------------------------------------------------------------------
+Acad::ErrorStatus AriadneProbe::subGetOsnapPoints(
+    AcDb::OsnapMode osnapMode,
+    Adesk::GsMarker gsMarker,
+    const AcGePoint3d& pickPoint,
+    const AcGePoint3d& lastPoint,
+    const AcGeMatrix3d& viewXform,
+    AcGePoint3dArray& snapPoints,
+    AcDbIntArray& geomIds) const
+{
+    assertReadEnabled();
+    if (osnapMode == AcDb::kOsModeEnd || osnapMode == AcDb::kOsModeCen) {
+        snapPoints.append(mCenter);
+    }
+    return Acad::eOk;
+}
+
+//----------------------------------------------------------------------------
+// Stretch Points
+//----------------------------------------------------------------------------
+Acad::ErrorStatus AriadneProbe::subGetStretchPoints(AcGePoint3dArray& stretchPoints) const
+{
+    assertReadEnabled();
+    stretchPoints.append(mCenter);
+    return Acad::eOk;
+}
+
+Acad::ErrorStatus AriadneProbe::subMoveStretchPointsAt(
+    const AcDbIntArray& indices,
+    const AcGeVector3d& offset)
+{
+    assertWriteEnabled();
+    for (int i = 0; i < indices.length(); ++i) {
+        if (indices[i] == 0) {
+            mCenter += offset;
+        }
+    }
+    return Acad::eOk;
 }
 
 //----------------------------------------------------------------------------

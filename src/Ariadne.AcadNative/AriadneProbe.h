@@ -43,8 +43,15 @@ protected:
     // Public worldDraw/getGeomExtents/transformBy are ADESK_SEALED in 2027 —
     // override the protected subXxx virtuals (research: entities + editor-delta).
     virtual Adesk::Boolean    subWorldDraw(AcGiWorldDraw* mode) override;
+    virtual void              subViewportDraw(AcGiViewportDraw* mode) override;
     virtual Acad::ErrorStatus subGetGeomExtents(AcDbExtents& extents) const override;
     virtual Acad::ErrorStatus subTransformBy(const AcGeMatrix3d& xform) override;
+
+    virtual Acad::ErrorStatus subGetGripPoints(AcGePoint3dArray& gripPoints, AcDbIntArray& osnapModes, AcDbIntArray& geomIds) const override;
+    virtual Acad::ErrorStatus subMoveGripPointsAt(const AcDbIntArray& indices, const AcGeVector3d& offset) override;
+    virtual Acad::ErrorStatus subGetOsnapPoints(AcDb::OsnapMode osnapMode, Adesk::GsMarker gsMarker, const AcGePoint3d& pickPoint, const AcGePoint3d& lastPoint, const AcGeMatrix3d& viewXform, AcGePoint3dArray& snapPoints, AcDbIntArray& geomIds) const override;
+    virtual Acad::ErrorStatus subGetStretchPoints(AcGePoint3dArray& stretchPoints) const override;
+    virtual Acad::ErrorStatus subMoveStretchPointsAt(const AcDbIntArray& indices, const AcGeVector3d& offset) override;
 
 private:
     AcGePoint3d mCenter;

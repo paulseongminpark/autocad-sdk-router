@@ -83,6 +83,8 @@ _OBJECT_LIFECYCLE = [
     "extend.customobject.deepclone",
     "extend.customobject.wblockclone",
     "extend.customobject.version",
+    "extend.customobject.filer_dxfin",
+    "extend.customobject.filer_dxfout",
 ]
 _CUSTOM_ENTITY = [
     "extend.customentity.db_defaults",
@@ -92,6 +94,11 @@ _CUSTOM_ENTITY = [
     "extend.customentity.intersect",
     "extend.customentity.list",
     "extend.customentity.subentpaths",
+    "extend.customentity.draw_world",
+    "extend.customentity.draw_viewport",
+    "extend.customentity.grips",
+    "extend.customentity.osnap",
+    "extend.customentity.stretch",
 ]
 
 _IMPLEMENTED = _RTTI + _PROTOCOL + _CLASS_REG + _OBJECT_LIFECYCLE + _CUSTOM_ENTITY
@@ -102,15 +109,8 @@ _DEFERRED = [
     "extend.customentity.define",        # defining a NEW compiled class body at runtime is not hostless
     "extend.customobject.define",        # same
     "extend.customentity.embedded",      # embedded-object live-edit
-    "extend.customentity.draw_world",    # AcGiWorldDraw callback -- fires in the graphics pipeline
-    "extend.customentity.draw_viewport", # AcGiViewportDraw callback -- per-viewport graphics
-    "extend.customentity.grips",         # grip-point editor protocol
-    "extend.customentity.osnap",         # interactive osnap callback
-    "extend.customentity.stretch",       # stretch (grip-edit) callback
     "extend.osnap.custom_mode",          # custom osnap mode registration (editor)
     "extend.customobject.partial_undo",  # applyPartialUndo fires during undo recording (not hostless)
-    "extend.customobject.filer_dxfin",   # DXF in-filer needs a DXF stream (no hostless source w/o file)
-    "extend.customobject.filer_dxfout",  # DXF out-filer would emit a file (forbidden on original)
     "extend.object_enabler.demand_register",  # demand-load registry write (install-time, lisp tier)
 ]
 
@@ -180,18 +180,18 @@ class TestM08KHandlers(unittest.TestCase):
         )
 
     def test_implemented_count(self):
-        # Group totals: RTTI=5, protocol=4, class-registration=11, object-lifecycle=5,
-        # custom-entity=7. 5+4+11+5+7 = 32 real handlers. The remaining ops of the 45-op
-        # brief are the 13 _DEFERRED in-app-callback / non-hostless ones -- left OUT of
-        # HasOp on purpose (no fake pass): 32 implemented + 13 deferred contract = honest.
+        # Group totals: RTTI=5, protocol=4, class-registration=11, object-lifecycle=7,
+        # custom-entity=12. 5+4+11+7+12 = 39 real handlers. The remaining ops of the 45-op
+        # brief are the 6 _DEFERRED in-app-callback / non-hostless ones -- left OUT of
+        # HasOp on purpose (no fake pass): 39 implemented + 6 deferred contract = honest.
         self.assertEqual(len(_RTTI), 5)
         self.assertEqual(len(_PROTOCOL), 4)
         self.assertEqual(len(_CLASS_REG), 11)
-        self.assertEqual(len(_OBJECT_LIFECYCLE), 5)
-        self.assertEqual(len(_CUSTOM_ENTITY), 7)
-        self.assertEqual(len(_IMPLEMENTED), 32)
-        self.assertEqual(len(set(_IMPLEMENTED)), 32, "duplicate op id in the implemented list")
-        self.assertEqual(len(self.hasop), 32)
+        self.assertEqual(len(_OBJECT_LIFECYCLE), 7)
+        self.assertEqual(len(_CUSTOM_ENTITY), 12)
+        self.assertEqual(len(_IMPLEMENTED), 39)
+        self.assertEqual(len(set(_IMPLEMENTED)), 39, "duplicate op id in the implemented list")
+        self.assertEqual(len(self.hasop), 39)
 
     def test_no_deferred_op_in_hasop(self):
         leaked = sorted(self.hasop & set(_DEFERRED))
