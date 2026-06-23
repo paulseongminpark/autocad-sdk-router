@@ -46,8 +46,10 @@ static void ariadnePaletteShow()
       << L"Live pump command  : CADAGENT_PUMP\n"
       << L"Pump health command: CADAGENT_STATUS\n"
       << L"Native job command : ARIADNE_NATIVE_JOB / ARIADNE_NATIVE_JOB_ARGS\n"
+      << L"A3 UI builders     : M08N editor/palette/status/tool command handlers\n"
       << L"Working database   : " << (pDb != nullptr ? L"present" : L"none") << L"\n\n"
-      << L"Read-only surface. Mutation routes through the M05 staged-patch governor.";
+      << L"Read-only surface. Mutation routes through the M05 staged-patch governor.\n"
+      << L"No raw command macro/tool execution is exposed to agents.";
     acedAlert(s.str().c_str());
     acutPrintf(_T("\nARIADNE_PALETTE: status surface shown.\n"));
 }

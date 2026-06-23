@@ -1,7 +1,9 @@
 param(
   [string]$Configuration = 'Release',
   [string]$Platform = 'x64',
-  [string]$RouterHome = ''
+  [string]$RouterHome = '',
+  [string]$OutputRoot = '',
+  [string]$TargetSuffix = ''
 )
 
 $ErrorActionPreference = 'Stop'
@@ -30,10 +32,33 @@ $dbxProj = Join-Path $RouterHome 'src\Ariadne.AcadNativeDbx\Ariadne.AcadNativeDb
 $crxProj = Join-Path $RouterHome 'src\Ariadne.AcadNative\Ariadne.AcadNative.crx.vcxproj'
 $arxProj = Join-Path $RouterHome 'src\Ariadne.AcadNative\Ariadne.AcadNative.arx.vcxproj'
 
+$isolatedBuild = -not [string]::IsNullOrWhiteSpace($OutputRoot)
+if ($isolatedBuild) {
+  $OutputRoot = (New-Item -ItemType Directory -Force -Path $OutputRoot).FullName
+}
+
 function Build-Project {
-  param([string]$Project, [string[]]$ExtraProps = @())
+  param([string]$Project, [string]$ObjectSubdir, [string]$TargetBase, [string[]]$ExtraProps = @())
   if (-not (Test-Path -LiteralPath $Project)) { throw "Native project missing: $Project" }
-  $argList = @($Project, "/p:Configuration=$Configuration", "/p:Platform=$Platform") + $ExtraProps + @('/m', '/v:minimal')
+  $props = @("/p:Configuration=$Configuration", "/p:Platform=$Platform")
+  if ($script:isolatedBuild) {
+    $outDir = (Join-Path $script:OutputRoot "bin\$Platform\$Configuration") + '\'
+    $intDir = (Join-Path $script:OutputRoot "obj\$ObjectSubdir\$Platform\$Configuration") + '\'
+    New-Item -ItemType Directory -Force -Path $outDir | Out-Null
+    New-Item -ItemType Directory -Force -Path $intDir | Out-Null
+    $props += "/p:OutDir=$outDir"
+    $props += "/p:IntDir=$intDir"
+    if (-not [string]::IsNullOrWhiteSpace($TargetSuffix)) {
+      $props += "/p:TargetName=$TargetBase$TargetSuffix"
+      if ($ObjectSubdir -eq 'dbx') {
+        # The .crx/.arx projects link against Ariadne.AcadNativeDbx.lib by name.
+        # Keep that import-library leaf canonical inside the isolated OutDir while
+        # the loadable .dbx itself may be version/suffix named.
+        $props += "/p:ImportLibrary=$outDir\Ariadne.AcadNativeDbx.lib"
+      }
+    }
+  }
+  $argList = @($Project) + $props + $ExtraProps + @('/m', '/v:minimal')
   & $msbuild @argList
   $script:LastNativeBuildExitCode = $LASTEXITCODE
 }
@@ -41,23 +66,23 @@ function Build-Project {
 # .dbx + .crx are the headless truth modules (inspect.database.graph runs on the
 # .crx via accoreconsole). They are never held by an attended acad.exe, so they
 # must build cleanly.
-foreach ($p in @($dbxProj, $crxProj)) {
-  Build-Project -Project $p
-  if ($script:LastNativeBuildExitCode -ne 0) { throw "MSBuild failed for $p with exit $script:LastNativeBuildExitCode" }
-}
+Build-Project -Project $dbxProj -ObjectSubdir 'dbx' -TargetBase 'Ariadne.AcadNativeDbx'
+if ($script:LastNativeBuildExitCode -ne 0) { throw "MSBuild failed for $dbxProj with exit $script:LastNativeBuildExitCode" }
+Build-Project -Project $crxProj -ObjectSubdir 'crx' -TargetBase 'Ariadne.AcadNative'
+if ($script:LastNativeBuildExitCode -ne 0) { throw "MSBuild failed for $crxProj with exit $script:LastNativeBuildExitCode" }
 
 # .arx is the attended/live module. A running acad.exe holds the canonical
 # Ariadne.AcadNative.arx (LNK1104). We NEVER kill AutoCAD: instead we relink to a
 # versioned target so the build still proves the .arx compiles + links with the
 # current source, and the live-pump loader can load the versioned module. The
 # canonical .arx relinks automatically on the next lock-free build.
-Build-Project -Project $arxProj
+Build-Project -Project $arxProj -ObjectSubdir 'arx' -TargetBase 'Ariadne.AcadNative'
 $arxCanonicalCode = $script:LastNativeBuildExitCode
 $arxMode = 'canonical'
 $arxVersionedName = ''
 if ($arxCanonicalCode -ne 0) {
   $arxVersionedName = "Ariadne.AcadNative.live_$((Get-Date -Format 'yyyyMMdd_HHmmss'))"
-  Build-Project -Project $arxProj -ExtraProps @("/p:TargetName=$arxVersionedName")
+  Build-Project -Project $arxProj -ObjectSubdir 'arx' -TargetBase 'Ariadne.AcadNative' -ExtraProps @("/p:TargetName=$arxVersionedName")
   $arxVersionedCode = $script:LastNativeBuildExitCode
   if ($arxVersionedCode -ne 0) {
     throw "MSBuild failed for .arx (canonical exit $arxCanonicalCode, versioned exit $arxVersionedCode); not a lock issue."
@@ -65,8 +90,10 @@ if ($arxCanonicalCode -ne 0) {
   $arxMode = 'versioned_lock_bypass'
 }
 
-$bin = Join-Path $RouterHome "src\Ariadne.AcadNative\bin\$Platform\$Configuration"
-$artifactLeaves = @('Ariadne.AcadNativeDbx.dbx', 'Ariadne.AcadNative.crx', 'Ariadne.AcadNative.arx')
+$bin = if ($isolatedBuild) { Join-Path $OutputRoot "bin\$Platform\$Configuration" } else { Join-Path $RouterHome "src\Ariadne.AcadNative\bin\$Platform\$Configuration" }
+$nativeBase = if ([string]::IsNullOrWhiteSpace($TargetSuffix)) { 'Ariadne.AcadNative' } else { "Ariadne.AcadNative$TargetSuffix" }
+$dbxBase = if ([string]::IsNullOrWhiteSpace($TargetSuffix)) { 'Ariadne.AcadNativeDbx' } else { "Ariadne.AcadNativeDbx$TargetSuffix" }
+$artifactLeaves = @("$dbxBase.dbx", "$nativeBase.crx", "$nativeBase.arx")
 if ($arxVersionedName) { $artifactLeaves += "$arxVersionedName.arx" }
 
 [ordered]@{

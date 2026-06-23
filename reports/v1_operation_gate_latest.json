@@ -17,14 +17,14 @@
   "gate_pass": true,
   "counts": {
     "total": 517,
-    "implemented": 285,
+    "implemented": 355,
     "stub": 0,
-    "blocked": 2,
-    "catalogued": 230,
+    "blocked": 5,
+    "catalogued": 157,
     "unknown": 0,
-    "v1_target_total": 287,
-    "v1_target_implemented": 285,
-    "v1_target_blocked": 2,
+    "v1_target_total": 360,
+    "v1_target_implemented": 355,
+    "v1_target_blocked": 5,
     "v1_target_deferred": 0
   }
 }
