@@ -64,11 +64,16 @@ def test_live_apply_patch_is_deprecated_in_favor_of_staged_governor():
     op = ops["live.apply_patch"]
     assert op["status"] == "deprecated"
     assert op["policy"]["status_policy"] == "deprecated"
+    assert op["write_level"]["allowed_write_modes"] == ["read"]
+    assert op["write_level"]["dwg_persisted"] is False
+    assert op["policy"]["agent_exposed"] is False
     notes = op.get("notes", "")
     assert "apply.patch" in notes
     assert "apply_native_staged" in notes
+    assert "live pump" in notes
     evidence = "\n".join(op.get("evidence_refs", []))
     assert "WAVE4X_DB_TXN_WRITE" in evidence
+    assert "WAVE4X_FAST_B_LIVE_APPLY_POLICY_R2" in evidence
 
     host = json.loads(HOST_MATRIX.read_text(encoding="utf-8-sig"))
     live = host["family_host_matrix"]["live.apply_patch"]

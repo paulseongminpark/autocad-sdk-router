@@ -109,6 +109,7 @@ _UI = [
     "editor.toolpalette.scheme_register",
     "editor.toolpalette.stocktool_find",
     "editor.toolpalette.tool_set_command",
+    "editor.toolpalette.tool_execute",
     "editor.toolpalette.window_get",
     "editor.toolpalette.window_show",
     "editor.toolpaletteset.add_palette",
@@ -129,7 +130,6 @@ _IMPLEMENTED = _T01 + _SELECTION + _RUNTIME + _UI + _DOC
 
 _HARD_BLOCKED = [
     "command.menu.invoke",             # arbitrary menu macro execution => raw command surface
-    "editor.toolpalette.tool_execute", # arbitrary tool execution may mutate active/user drawing
 ]
 
 
@@ -184,8 +184,8 @@ class TestM08NHandlers(unittest.TestCase):
         self.assertRegex(self.src, r"bool\s+m08nDispatch\(const std::string& op, const AriadneJobCtx& ctx, std::ostringstream& r\)")
 
     def test_hasop_lists_exactly_feasible_implemented(self):
-        self.assertEqual(len(_IMPLEMENTED), 91)
-        self.assertEqual(len(set(_IMPLEMENTED)), 91)
+        self.assertEqual(len(_IMPLEMENTED), 92)
+        self.assertEqual(len(set(_IMPLEMENTED)), 92)
         self.assertEqual(
             self.hasop,
             set(_IMPLEMENTED),
@@ -194,7 +194,7 @@ class TestM08NHandlers(unittest.TestCase):
         )
 
     def test_hard_blocked_ops_not_in_hasop(self):
-        self.assertEqual(len(_HARD_BLOCKED), 2)
+        self.assertEqual(len(_HARD_BLOCKED), 1)
         leaked = sorted(self.hasop & set(_HARD_BLOCKED))
         self.assertEqual(leaked, [], "hard-blocked raw/registry ops leaked into HasOp: %s" % leaked)
         for op in _HARD_BLOCKED:
@@ -237,6 +237,18 @@ class TestM08NHandlers(unittest.TestCase):
             "acedSSAdd", "acedSSDel", "acedSSFree", "acedSSLength",
         ]:
             self.assertIn(token, self.src)
+
+    def test_toolpalette_execute_is_safe_status_only_not_raw_tool_execution(self):
+        self.assertIn('op == "editor.toolpalette.tool_execute"', self.src)
+        for token in [
+            "bounded_ariadne_palette",
+            "tool_execute_invoked",
+            "safe_status_only",
+            "attended_editor_required",
+            "raw_command_agent_surface",
+        ]:
+            self.assertIn(token, self.src)
+        self.assertNotIn("AcTcTool::Execute(", self.code)
 
     def test_real_jig_and_input_manager_apis_referenced(self):
         for token in [

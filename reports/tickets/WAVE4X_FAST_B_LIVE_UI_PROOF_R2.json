@@ -1,0 +1,55 @@
+{
+  "schema": "ariadne.cad_os.wave4x_fast_b.live_ui_proof_r2.v1",
+  "status": "PASS",
+  "fixture": {
+    "dwg": "staging/dwg_20260624_134436/input.dwg",
+    "handle": "119F5",
+    "subent_type": "edge",
+    "subent_index": 1,
+    "headless_probe": {
+      "subent_type": "edge",
+      "marker": 1,
+      "execute_requested": false,
+      "clear_requested": false,
+      "highlight_all": false,
+      "host_mode": "coreconsole",
+      "attended_editor_required": true,
+      "attended_editor_present": false,
+      "markers_status": 0,
+      "marker_count": 1,
+      "highlight_status": 2,
+      "display_flush": false
+    }
+  },
+  "editor.toolpalette.tool_execute": {
+    "status": "ok",
+    "safe_status_only": true,
+    "tool_execute_invoked": false,
+    "raw_command_agent_surface": false
+  },
+  "ui.subentity.highlight": {
+    "status": "ok",
+    "marker_count": 1,
+    "highlight_status": 0,
+    "display_flush": true
+  },
+  "ui.subentity.clear": {
+    "status": "ok",
+    "highlight_status": 0
+  },
+  "run_ref": "runs/w4x_live_ui_attended_20260624_140841",
+  "artifacts": {
+    "plan": "runs/w4x_live_ui_attended_20260624_140841/attended_plan.json",
+    "result": "runs/w4x_live_ui_attended_20260624_140841/attended_pump_result.json",
+    "shutdown": "runs/w4x_live_ui_attended_20260624_140841/attended_shutdown.json",
+    "screenshot": "runs/w4x_live_ui_attended_20260624_140841/screenshots/acad_window.png"
+  },
+  "safety": {
+    "dedicated_instance": true,
+    "launched_pid_closed": true,
+    "pre_existing_pids": [],
+    "user_session_touched": false,
+    "original_dwg_modified": false,
+    "pipe_up": true
+  }
+}

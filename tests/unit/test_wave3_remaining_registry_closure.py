@@ -6,7 +6,6 @@ REPO = Path(__file__).resolve().parents[2]
 REGISTRY = REPO / "config" / "operations.v2.json"
 
 EXPECTED_BLOCKED_AFTER_REAUDIT = {
-    "ui.subentity.highlight",
     "automate.com.send_command",
     "embed.ole.frame",
     "module.lifecycle.on_ole_unload",
@@ -77,6 +76,16 @@ def test_remaining_wave3_blocks_have_accepted_codes_and_evidence():
         assert "reports/WAVE3_REMAINING_HARDBLOCK_REAUDIT.md" in evidence, oid
         assert op.get("implementation_strategy") == "hard_blocked", oid
         assert op.get("evidence_required") == "blocker_ref_and_evidence", oid
+
+
+def test_wave4x_fast_b_reopened_ui_subentity_highlight_is_implemented():
+    op = _operations()["ui.subentity.highlight"]
+    assert op["status"] == "implemented"
+    assert op["handler"]["dispatcher_symbol"] == "m08dDispatch"
+    assert op["policy"]["agent_exposed"] is True
+    assert op["policy"]["runtime_behavior"] == "attended_graphics_execute_gated"
+    evidence = "\n".join(op.get("evidence_refs") or [])
+    assert "WAVE4X_FAST_B_LIVE_UI_PROOF_R2" in evidence
 
 
 def test_wave4x_reopened_safe_fallback_ops_are_implemented():

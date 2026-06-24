@@ -2,9 +2,9 @@
 
 - packet: `CADOS_M08_FULL_OPERATION_COVERAGE_CLOSURE`
 - generated_from: `config/operations.v2.json`
-- total operations: **517** · implemented 485 · stub 0 · blocked 31 · catalogued 0 · deprecated 1 · **unknown 0**
-- v1-target: **516** (implemented 485 · blocked 31 · **deferred 0**)
-- agent-exposed ops: 485
+- total operations: **517** · implemented 487 · stub 0 · blocked 29 · catalogued 0 · deprecated 1 · **unknown 0**
+- v1-target: **516** (implemented 487 · blocked 29 · **deferred 0**)
+- agent-exposed ops: 487
 
 ## Gate
 
@@ -32,15 +32,15 @@
 | validate_diff | 3 | 0 | 0 | 0 | 3 |
 | render_visual | 12 | 0 | 0 | 0 | 12 |
 | live | 6 | 0 | 0 | 0 | 6 |
-| native_only | 394 | 0 | 27 | 0 | 421 |
+| native_only | 396 | 0 | 25 | 0 | 421 |
 
 ## Risk class distribution
 
 | risk_class | count |
 |---|---|
-| read_safe | 347 |
+| read_safe | 348 |
 | staged_write | 117 |
-| live_edit | 48 |
+| live_edit | 47 |
 | raw_command | 5 |
 
 ## v1-target operations (the v1 surface — all implemented or hard-blocked)
@@ -51,7 +51,6 @@
 | command.invoke.sync | active_document_write_original | blocked | raw_command | live_edit | False | acedCommandS(int rtype, ...) | SAFETY_FORBIDDEN: raw command dispatch is blocked in M08O fa |
 | command.invoke.sync.resbuf | active_document_write_original | blocked | raw_command | live_edit | False | acedCmdS(const resbuf* rb, bool, AcApDocument*) | SAFETY_FORBIDDEN: raw command dispatch is blocked in M08O fa |
 | doc.sendstring | active_document_write_original | blocked | raw_command | write_copy | False | AcApDocManager::sendStringToExecute(AcApDocument | SAFETY_FORBIDDEN: doc.sendstring uses AcApDocManager::sendSt |
-| ui.subentity.highlight | brep_solids | blocked | read_safe | read | False | AcDbEntity::highlight(const AcDbFullSubentPath&, | HOST_UNAVAILABLE: subentity highlight requires a live graphi |
 | automate.com.send_command | com_activex | blocked | read_safe | read | False | (no native export found this session) — via COM: | SAFETY_FORBIDDEN: COM SendCommand is raw command-string disp |
 | embed.ole.frame | com_activex | blocked | live_edit | live_edit | False | AcDbOle2Frame (setOleClientItem(COleClientItem*) | HOST_UNAVAILABLE: AcDbOle2Frame embedding/linking requires a |
 | define.assocarray.create | constraints_associativity | blocked | staged_write | write_copy | False | AcDbAssocArrayActionBody::createInstance(AcDbObj | SAFETY_FORBIDDEN: AcDbAssocArrayActionBody::createInstance p |
@@ -77,7 +76,6 @@
 | command.queue.post | editor_input | blocked | raw_command | live_edit | False | acedPostCommand / acedPostCommandPrompt() | SAFETY_FORBIDDEN: raw command dispatch is blocked in M08O fa |
 | module.lifecycle.on_ole_unload | runtime_commands | blocked | read_safe | read | False | AcRxDbxApp::On_kOleUnloadAppMsg(void* pkt) | HOST_UNAVAILABLE: On_kOleUnloadAppMsg is a host lifecycle ca |
 | command.menu.invoke | ui_customization | blocked | read_safe | read | False | acedMenuCmd(const ACHAR*) | SAFETY_FORBIDDEN: acedMenuCmd executes arbitrary menu/comman |
-| editor.toolpalette.tool_execute | ui_customization | blocked | read_safe | read | False | AcTcTool::Execute(int nFlag, HWND, POINT, DWORD  | SAFETY_FORBIDDEN: AcTcTool::Execute programmatically fires a |
 | doc.current | active_document_write_original | implemented | read_safe | read | True | m08nDispatch |  |
 | doc.lock | active_document_write_original | implemented | read_safe | read | True | m08nDispatch |  |
 | doc.new | active_document_write_original | implemented | staged_write | write_copy | True | m08nDispatch |  |
@@ -141,6 +139,7 @@
 | traverse.shell.faces | brep_solids | implemented | read_safe | read | True | m08dDispatch |  |
 | traverse.vertex.edges | brep_solids | implemented | read_safe | read | True | m08dDispatch |  |
 | traverse.vertex.loops | brep_solids | implemented | read_safe | read | True | m08dDispatch |  |
+| ui.subentity.highlight | brep_solids | implemented | read_safe | read | True | m08dDispatch |  |
 | automate.com.bridge_objectid | com_activex | implemented | read_safe | read | True | m08mDispatch |  |
 | automate.com.entity_helpers | com_activex | implemented | read_safe | read | True | m08mDispatch |  |
 | automate.com.get_app | com_activex | implemented | read_safe | read | True | Invoke-SafeFallbackOperation |  |
@@ -549,6 +548,7 @@
 | editor.toolpalette.scheme_create | ui_customization | implemented | read_safe | read | True | m08nDispatch |  |
 | editor.toolpalette.scheme_register | ui_customization | implemented | read_safe | read | True | m08nDispatch |  |
 | editor.toolpalette.stocktool_find | ui_customization | implemented | read_safe | read | True | m08nDispatch |  |
+| editor.toolpalette.tool_execute | ui_customization | implemented | read_safe | read | True | m08nDispatch |  |
 | editor.toolpalette.tool_set_command | ui_customization | implemented | read_safe | read | True | m08nDispatch |  |
 | editor.toolpalette.window_get | ui_customization | implemented | read_safe | read | True | m08nDispatch |  |
 | editor.toolpalette.window_show | ui_customization | implemented | read_safe | read | True | m08nDispatch |  |

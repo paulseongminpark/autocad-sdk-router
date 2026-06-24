@@ -245,6 +245,7 @@ static bool m08dHasOp(const std::string& op)
         op == "inspect.subentity.color" ||
         op == "inspect.subentity.markers_at_path" ||
         op == "inspect.subentity.path_at_marker" ||
+        op == "ui.subentity.highlight" ||
 #ifdef ARIADNE_M08D_BREP
         // Group C — AcBr BRep
         op == "inspect.brep.from_entity" ||
@@ -771,7 +772,8 @@ static bool m08dDispatch(const std::string& op, const AriadneJobCtx& ctx, std::o
         op == "inspect.subentity.ptr" ||
         op == "inspect.subentity.color" ||
         op == "inspect.subentity.markers_at_path" ||
-        op == "inspect.subentity.path_at_marker") {
+        op == "inspect.subentity.path_at_marker" ||
+        op == "ui.subentity.highlight") {
         std::string handle;
         if (!m08dFindHandle(job, handle)) {
             emitNativeError(r, "MISSING_ARG", op + " requires 'handle'");
@@ -889,6 +891,50 @@ static bool m08dDispatch(const std::string& op, const AriadneJobCtx& ctx, std::o
               << ",\"rgb\":[" << static_cast<int>(color.red())
               << "," << static_cast<int>(color.green())
               << "," << static_cast<int>(color.blue()) << "]"
+              << "},\"status\":\"ok\"}";
+            return true;
+        }
+        if (op == "ui.subentity.highlight") {
+            double executeRaw = 0.0;
+            jsonFindNumber(job, "execute", executeRaw);
+            const bool execute = executeRaw != 0.0;
+            double clearRaw = 0.0;
+            jsonFindNumber(job, "clear", clearRaw);
+            const bool clear = clearRaw != 0.0;
+            double allRaw = 0.0;
+            jsonFindNumber(job, "highlight_all", allRaw);
+            const bool highlightAll = allRaw != 0.0;
+            AcArray<Adesk::GsMarker> markers;
+            const Acad::ErrorStatus markersEs = pEnt->getGsMarkersAtSubentPath(path, markers);
+            const bool attended = ctx.hostMode == "full_autocad" && acedEditor != nullptr;
+            Acad::ErrorStatus es = Acad::eNotApplicable;
+            if (execute) {
+                if (!attended) {
+                    pEnt->close();
+                    emitNativeError(r, "HOST_UNAVAILABLE",
+                                    op + " requires a dedicated full AutoCAD editor host; host_mode=" +
+                                    ctx.hostMode + "; subentity highlight needs a graphics device + display flush");
+                    return true;
+                }
+                es = clear
+                    ? pEnt->unhighlight(path, highlightAll ? Adesk::kTrue : Adesk::kFalse)
+                    : pEnt->highlight(path, highlightAll ? Adesk::kTrue : Adesk::kFalse);
+                if (es == Acad::eOk)
+                    acedUpdateDisplay();
+            }
+            pEnt->close();
+            r << "\"result\":{\"subent_type\":\"" << subTypeStr
+              << "\",\"marker\":" << static_cast<long>(marker)
+              << ",\"execute_requested\":" << (execute ? "true" : "false")
+              << ",\"clear_requested\":" << (clear ? "true" : "false")
+              << ",\"highlight_all\":" << (highlightAll ? "true" : "false")
+              << ",\"host_mode\":" << njsonStr(ctx.hostMode)
+              << ",\"attended_editor_required\":true"
+              << ",\"attended_editor_present\":" << (attended ? "true" : "false")
+              << ",\"markers_status\":" << static_cast<int>(markersEs)
+              << ",\"marker_count\":" << markers.length()
+              << ",\"highlight_status\":" << static_cast<int>(es)
+              << ",\"display_flush\":" << (execute ? "true" : "false")
               << "},\"status\":\"ok\"}";
             return true;
         }

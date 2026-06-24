@@ -56,9 +56,9 @@
   "totals": {
     "operations": 517,
     "by_status": {
-      "blocked": 31,
+      "blocked": 29,
       "deprecated": 1,
-      "implemented": 485
+      "implemented": 487
     },
     "by_family": {
       "active_document_write_original": 8,
@@ -129,11 +129,11 @@
       "ui_customization": 39
     },
     "operation_records": 517,
-    "implemented": 485,
+    "implemented": 487,
     "wired": 0,
     "stub": 0,
     "catalogued": 0,
-    "blocked": 31,
+    "blocked": 29,
     "deprecated": 1,
     "unknown": 0,
     "catalog_classified_ops": 62,
@@ -3084,12 +3084,11 @@
       ],
       "execution_context": "in_process_host",
       "write_level": {
-        "default_write_mode": "live_edit",
+        "default_write_mode": "read",
         "allowed_write_modes": [
-          "live_edit",
-          "write_original"
+          "read"
         ],
-        "dwg_persisted": true,
+        "dwg_persisted": false,
         "original_write_default": false
       },
       "handler": {
@@ -3102,7 +3101,7 @@
       "catalog_op_id": null,
       "input_schema": "schemas/cad_job.v2.schema.json#/allOf",
       "output_schema": "schemas/cad_result.v2.schema.json",
-      "summary": "Apply a patch to the live active document. Requires full_autocad + explicit write_original approval.",
+      "summary": "Deprecated live document patch op. The agent surface returns staged-governor replacement guidance instead of mutating the active document.",
       "evidence_refs": [
         "docs/OPERATION_REGISTRY_SPEC.md",
         "CADOS_M01 Lane D native triage (inspect.database.graph insertion point)",
@@ -3112,7 +3111,8 @@
         "tools/patch_engine.py::apply_staged",
         "config/operations.v2.json#apply.patch",
         "tools/patch_engine.py::apply_native_staged",
-        "tests/unit/test_patch_engine_policy.py::TestApplyNativeStagedLifecycleMocked"
+        "tests/unit/test_patch_engine_policy.py::TestApplyNativeStagedLifecycleMocked",
+        "reports/tickets/WAVE4X_FAST_B_LIVE_APPLY_POLICY_R2.md#live-apply-patch"
       ],
       "target_family_first_class": true,
       "wired_v1": false,
@@ -3130,14 +3130,20 @@
       "policy": {
         "source": "config/policy.v2.json",
         "status_policy": "deprecated",
-        "default_write_mode": "live_edit",
+        "default_write_mode": "read",
+        "allowed_write_modes": [
+          "read"
+        ],
         "no_original_write_default": true,
+        "agent_exposed": false,
         "runtime_behavior": "deprecated_use_staged_governor"
       },
       "tests": [
-        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified"
+        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
+        "tests/unit/test_wave4x_db_txn_write_registry.py::test_live_apply_patch_is_deprecated_in_favor_of_staged_governor",
+        "tests/unit/test_wave4x_fast_b_registry.py::test_live_apply_patch_stays_deprecated_and_points_to_staged_governor"
       ],
-      "notes": "Deprecated in WAVE4X. Exact active-document mutation remains intentionally disabled; use apply.patch / patch_engine.apply_staged (or apply_native_staged for a direct native op) on a staged copy.",
+      "notes": "Deprecated in WAVE4X. live.apply_patch remains policy-denied on the live pump; use apply.patch / patch_engine.apply_staged (or apply_native_staged for a direct native op) on a staged copy.",
       "owner_ticket": "M08J-T01",
       "implementation_strategy": "deprecated_safe_replacement",
       "evidence_required": "replacement_route_and_evidence",
@@ -8084,7 +8090,7 @@
       "id": "ui.subentity.highlight",
       "operation": "ui.subentity.highlight",
       "family": "brep_solids",
-      "status": "blocked",
+      "status": "implemented",
       "engine_tier": "native_arx_only",
       "engines": [
         "native_arx_only"
@@ -8107,8 +8113,8 @@
         "original_write_default": false
       },
       "handler": {
-        "router_lane": null,
-        "dispatcher_symbol": null,
+        "router_lane": "ARIADNE_NATIVE_JOB",
+        "dispatcher_symbol": "m08dDispatch",
         "execution_host_class": "arx_adapter",
         "native_api": "AcDbEntity::highlight(const AcDbFullSubentPath&, Adesk::Boolean all) / unhighlight(...)",
         "composed_of": []
@@ -8123,33 +8129,34 @@
       },
       "policy": {
         "source": "config/policy.v2.json",
-        "status_policy": "blocked",
+        "status_policy": "implemented",
         "default_write_mode": "read",
         "allowed_write_modes": [
           "read"
         ],
         "no_original_write_default": true,
-        "runtime_behavior": "hard_blocked_after_wave3_reaudit",
-        "agent_exposed": false
+        "runtime_behavior": "attended_graphics_execute_gated",
+        "agent_exposed": true
       },
       "tests": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
-        "tests/unit/test_wave3_remaining_registry_closure.py::test_remaining_wave3_blocks_have_accepted_codes_and_evidence"
+        "tests/unit/test_m08d_handlers.py",
+        "tests/unit/test_wave3_remaining_registry_closure.py::test_wave4x_fast_b_reopened_ui_subentity_highlight_is_implemented",
+        "tests/unit/test_wave4x_fast_b_registry.py::test_live_ui_ops_are_implemented_with_safe_contracts"
       ],
       "summary": "Highlight / unhighlight a subentity on screen (requires graphics flush; calls getGsMarkersAtSubentPath internally)",
       "source_slice": "brep-topology.md",
       "citation": "dbmain.h:2048/2051; MCP GUID OARX-RefGuide-AcDbEntity__highlight / __unhighlight",
       "evidence_refs": [
         "config/autocad_native_arx_operation_catalog.json#ui.subentity.highlight",
-        "reports/WAVE3_REMAINING_HARDBLOCK_REAUDIT.md#ui.subentity.highlight"
+        "src/Ariadne.AcadNative/families/m08d_handlers.inc",
+        "reports/tickets/WAVE4X_FAST_B_LIVE_UI_PROOF_R2.md#ui-subentity-highlight"
       ],
-      "notes": "Wave3 post-merge re-audit accepted hard block. HOST_UNAVAILABLE: subentity highlight requires a live graphics/editor selection context and GS refresh; no controlled attended AutoCAD editor host is available in this integration route.",
+      "notes": "Fast B reopens subentity highlight as an attended graphics surface. The handler resolves an explicit subentity path, reports marker availability, and only performs highlight/unhighlight when execute=1 under a dedicated full AutoCAD editor host.",
       "owner_ticket": "M08D-T03",
-      "implementation_strategy": "hard_blocked",
-      "evidence_required": "blocker_ref_and_evidence",
-      "blocked_reason": "HOST_UNAVAILABLE: subentity highlight requires a live graphics/editor selection context and GS refresh; no controlled attended AutoCAD editor host is available in this integration route.",
-      "blocker_ref": "reports/WAVE3_REMAINING_HARDBLOCK_REAUDIT.md#ui.subentity.highlight"
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs"
     },
     {
       "id": "automate.com.bridge_objectid",
@@ -29025,7 +29032,7 @@
         ],
         "no_original_write_default": true,
         "agent_exposed": true,
-        "runtime_behavior": "hard_blocked_after_wave3_render_plot_reaudit"
+        "runtime_behavior": "attended_live_pump_verified"
       },
       "tests": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
@@ -29038,10 +29045,10 @@
       "evidence_refs": [
         "config/autocad_native_arx_operation_catalog.json#plot.config.settings",
         "src/Ariadne.AcadNative/families/m08l_handlers.inc:m08lDispatch",
-        "reports/tickets/WAVE4X_VISUAL_PLOT.md",
+        "reports/tickets/WAVE4X_FAST_B_VISUAL_ATTENDED_R2.md#plot-config-settings",
         "build:native_acad exit 0"
       ],
-      "notes": "Pane7 implemented. Layout plot settings read/write query validation is fully supported via AcDbPlotSettings and AcDbPlotSettingsValidator.",
+      "notes": "Fast B R2 verified plot.config.settings through the dedicated full AutoCAD attended pump. Layout plot settings read/write query validation is supported via AcDbPlotSettings and AcDbPlotSettingsValidator, and the live pump now dispatches this op through the safe attended whitelist.",
       "owner_ticket": "M08I-T01",
       "implementation_strategy": "implemented_v1",
       "evidence_required": "existing_tests_and_evidence_refs"
@@ -29096,7 +29103,7 @@
         ],
         "no_original_write_default": true,
         "agent_exposed": true,
-        "runtime_behavior": "hard_blocked_after_wave3_render_plot_reaudit"
+        "runtime_behavior": "attended_live_pump_verified"
       },
       "tests": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
@@ -29109,10 +29116,10 @@
       "evidence_refs": [
         "config/autocad_native_arx_operation_catalog.json#plot.engine.run",
         "src/Ariadne.AcadNative/families/m08l_handlers.inc:m08lDispatch",
-        "reports/tickets/WAVE4X_VISUAL_PLOT.md",
+        "reports/tickets/WAVE4X_FAST_B_VISUAL_ATTENDED_R2.md#plot-engine-run",
         "build:native_acad exit 0"
       ],
-      "notes": "Pane7 implemented. plot.engine.run tries to create the publish engine using AcPlPlotFactory and reports HOST_UNAVAILABLE honestly if headless.",
+      "notes": "Fast B R2 verified plot.engine.run through the dedicated full AutoCAD attended pump. The handler creates the publish engine via AcPlPlotFactory and still reports HOST_UNAVAILABLE honestly when headless; the pump whitelist closes the former not_implemented gap.",
       "owner_ticket": "M08I-T01",
       "implementation_strategy": "attended_verification",
       "evidence_required": "attended_live_pump_session_log"
@@ -37289,7 +37296,7 @@
       "id": "editor.toolpalette.tool_execute",
       "operation": "editor.toolpalette.tool_execute",
       "family": "ui_customization",
-      "status": "blocked",
+      "status": "implemented",
       "engine_tier": "native_arx_only",
       "engines": [
         "native_arx_only"
@@ -37302,7 +37309,7 @@
         "arx_adapter",
         "full_autocad"
       ],
-      "execution_context": "in_process_host",
+      "execution_context": "host",
       "write_level": {
         "default_write_mode": "read",
         "allowed_write_modes": [
@@ -37312,8 +37319,8 @@
         "original_write_default": false
       },
       "handler": {
-        "router_lane": null,
-        "dispatcher_symbol": null,
+        "router_lane": "ARIADNE_NATIVE_JOB",
+        "dispatcher_symbol": "m08nDispatch",
         "execution_host_class": "arx_adapter",
         "native_api": "AcTcTool::Execute(int nFlag, HWND, POINT, DWORD dwKeyState)",
         "composed_of": []
@@ -37328,34 +37335,33 @@
       },
       "policy": {
         "source": "config/policy.v2.json",
-        "status_policy": "catalogued_not_runnable",
+        "status_policy": "implemented",
         "default_write_mode": "read",
         "allowed_write_modes": [
           "read"
         ],
         "no_original_write_default": true,
-        "runtime_behavior": "not_runnable_until_promoted_to_implemented_or_wired"
+        "runtime_behavior": "safe_status_only_attended_validation",
+        "agent_exposed": true
       },
       "tests": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
-        "tests/unit/test_m08n_handlers.py"
+        "tests/unit/test_m08n_handlers.py",
+        "tests/unit/test_wave4x_fast_b_registry.py::test_live_ui_ops_are_implemented_with_safe_contracts"
       ],
       "summary": "Programmatically fire a tool as if the user clicked/dropped it",
       "source_slice": "ui-customization.md",
       "citation": "AcTc.h:718-721",
       "evidence_refs": [
         "config/autocad_native_arx_operation_catalog.json#editor.toolpalette.tool_execute",
-        "src/Ariadne.AcadNative/families/m08n_handlers.inc:m08nHasOp excludes raw/registry-mutating op",
-        "reports/tickets/M08N-A3_PLAN.md#Blocker criteria",
-        "research/native_arx/editor-delta.md#Operation catalog (PART 1)",
-        "research/native_arx/ui-customization.md#Operation catalog"
+        "src/Ariadne.AcadNative/families/m08n_handlers.inc",
+        "reports/tickets/WAVE4X_FAST_B_LIVE_UI_PROOF_R2.md#editor-toolpalette-tool-execute"
       ],
-      "notes": "M08N-A3 hard-blocked by safety: no raw command/menu/tool execution or AutoCAD demand-load registry mutation is exposed from the agent surface.",
+      "notes": "Fast B reopens toolpalette tool execute as a bounded Ariadne palette status/introspection surface. The handler reports palette/tool metadata and host readiness but never fires a live tool from the agent surface.",
       "owner_ticket": "M08N-T02",
-      "implementation_strategy": "hard_blocked",
-      "evidence_required": "blocker_ref_and_evidence",
-      "blocked_reason": "SAFETY_FORBIDDEN: AcTcTool::Execute programmatically fires a tool and may run arbitrary command/mutation behavior in the active editor; no raw tool execution is exposed to agents."
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs"
     },
     {
       "id": "editor.toolpalette.tool_set_command",

@@ -1,0 +1,81 @@
+{
+  "schema": "ariadne.cad_os.wave4x_fast_b.visual_attended_latest.v1",
+  "status": "PASS",
+  "ran": true,
+  "run_id": "w4x_visual_plot_attended_20260624_140042",
+  "run_ref": "runs/w4x_visual_plot_attended_20260624_140042",
+  "artifacts": {
+    "plan": "runs/w4x_visual_plot_attended_20260624_140042/attended_plan.json",
+    "result": "runs/w4x_visual_plot_attended_20260624_140042/attended_pump_result.json",
+    "shutdown": "runs/w4x_visual_plot_attended_20260624_140042/attended_shutdown.json",
+    "screenshot": "runs/w4x_visual_plot_attended_20260624_140042/screenshots/acad_window.png"
+  },
+  "checks": {
+    "echo": true,
+    "pump_running": true,
+    "host_full_autocad": true,
+    "plot_settings_ok": true,
+    "plot_settings_layout": true,
+    "plot_engine_created": true,
+    "plot_engine_status_ok": true,
+    "stop_ok": true
+  },
+  "responses": {
+    "plot.config.settings": {
+      "schema": "ariadne.cad_pump_frame.v1",
+      "op": "plot.config.settings",
+      "result": {
+        "layout_name": "Model",
+        "plot_cfg_name": "없음",
+        "canonical_media_name": "ISO_A4_(210.00_x_297.00_MM)",
+        "style_sheet": "",
+        "paper_width": 210,
+        "paper_height": 297,
+        "margin_min_x": 7.5,
+        "margin_min_y": 20,
+        "margin_max_x": 7.5,
+        "margin_max_y": 20,
+        "origin_x": 11.55,
+        "origin_y": -13.65,
+        "available_devices": [
+          "없음",
+          "OneNote (Desktop)",
+          "Microsoft Print to PDF",
+          "Canon GX7100 series FAX",
+          "Canon GX7100 series",
+          "AutoCAD PDF (General Documentation).pc3",
+          "AutoCAD PDF (High Quality Print).pc3",
+          "AutoCAD PDF (Smallest File).pc3",
+          "AutoCAD PDF (Web and Mobile).pc3",
+          "Default Windows System Printer.pc3",
+          "DWF6 ePlot.pc3",
+          "DWFx ePlot (XPS Compatible).pc3",
+          "DWG To PDF.pc3",
+          "PublishToWeb JPG.pc3",
+          "PublishToWeb PNG (Transparent).pc3",
+          "PublishToWeb PNG.pc3"
+        ],
+        "available_media": [],
+        "modified": false
+      },
+      "status": "ok"
+    },
+    "plot.engine.run": {
+      "schema": "ariadne.cad_pump_frame.v1",
+      "op": "plot.engine.run",
+      "result": {
+        "engine_created": true,
+        "engine_status": 0
+      },
+      "status": "ok"
+    }
+  },
+  "safety": {
+    "dedicated_instance": true,
+    "launched_pid_closed": true,
+    "pre_existing_pids": [],
+    "user_session_touched": false,
+    "original_dwg_modified": false,
+    "pipe_up": true
+  }
+}
