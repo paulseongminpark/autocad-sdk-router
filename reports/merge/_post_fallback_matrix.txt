@@ -1,0 +1,18 @@
+schema: ariadne.cad_os.operation_coverage_full_matrix.v1
+total: 517 implemented: 467 blocked: 50 catalogued: 0 stub: 0 unknown: 0
+v1_target: 517 impl: 467 blocked: 50 deferred: 0
+risk: {"read_safe": 346, "staged_write": 115, "live_edit": 50, "raw_command": 6}
+agent_exposed_count: 467
+  gate.all_classified = True
+  gate.zero_unknown = True
+  gate.zero_missing_field = True
+  gate.zero_untested_implemented = True
+  gate.zero_v1_target_deferred = True
+  gate.every_blocked_has_blocker_ref = True
+  gate.no_agent_exposed_raw_command = True
+  gate.no_original_write_default = True
+  gate.existing_29_frozen = True
+  gate.v1_target_implemented_or_blocked = True
+  gate.gate_pass = True
+GATE PASS: True
+closure_gate_pass: True (catalogued 0 ¡æ honest fail until M08R)

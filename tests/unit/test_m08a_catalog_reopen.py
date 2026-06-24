@@ -124,17 +124,16 @@ class TestM08ACatalogReopen(unittest.TestCase):
         # and the matrix now also carries the closure_gate
         self.assertIn("closure_gate", matrix)
 
-    def test_status_counts_reflect_wave3_closure(self):
-        # Wave3 closure eliminated the old catalogued/stub escape; Wave4X Pane3 then
-        # reopened 4 former hard-blocks to implemented. The registry therefore stays
-        # fully closed (implemented + blocked only) at the current 461/56 split.
+    def test_status_counts_reflect_wave4x_reopens(self):
+        # Wave4X Pane3 and fallback reopen disjoint safe subsets from blocked to
+        # implemented while preserving the zero-open-state closure invariant.
         import collections
         by_status = collections.Counter(o.get("status") for o in self.ops)
         self.assertEqual(by_status.get("unknown", 0), 0)
         self.assertEqual(by_status.get("catalogued", 0), 0)
         self.assertEqual(by_status.get("stub", 0), 0)
-        self.assertEqual(by_status.get("implemented", 0), 461)
-        self.assertEqual(by_status.get("blocked", 0), 56)
+        self.assertEqual(by_status.get("implemented", 0), 467)
+        self.assertEqual(by_status.get("blocked", 0), 50)
         self.assertEqual(by_status.get("implemented", 0) + by_status.get("blocked", 0), len(self.ops))
 
 

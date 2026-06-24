@@ -1,4 +1,4 @@
-﻿{
+{
   "schema": "ariadne.operations_registry.v2",
   "version": "2.0.0",
   "generated_at": "2026-06-23T20:36:32+09:00",
@@ -56,8 +56,8 @@
   "totals": {
     "operations": 517,
     "by_status": {
-      "implemented": 461,
-      "blocked": 56
+      "blocked": 50,
+      "implemented": 467
     },
     "by_family": {
       "active_document_write_original": 8,
@@ -90,8 +90,8 @@
     "by_engine_tier": {
       "accoreconsole_lisp_also": 20,
       "managed_also": 46,
-      "native_arx_only": 233,
-      "objectdbx_capable": 218
+      "native_arx_only": 232,
+      "objectdbx_capable": 219
     },
     "total": 517
   },
@@ -128,11 +128,11 @@
       "ui_customization": 39
     },
     "operation_records": 517,
-    "implemented": 461,
+    "implemented": 467,
     "wired": 0,
     "stub": 0,
     "catalogued": 0,
-    "blocked": 56,
+    "blocked": 50,
     "deprecated": 0,
     "unknown": 0,
     "catalog_classified_ops": 62,
@@ -3195,9 +3195,10 @@
       "evidence_refs": [
         "config/autocad_native_arx_operation_catalog.json#command.invoke.coroutine",
         "docs/FALLBACK_POLICY.md",
-        "docs/M08_REMAINING_BATCH_PLAN.md#m08o-fallback-raw-command-hard-block"
+        "docs/M08_REMAINING_BATCH_PLAN.md#m08o-fallback-raw-command-hard-block",
+        "reports/tickets/WAVE4X_FALLBACK.md"
       ],
-      "notes": "M04 catalog-only classification for this raw-command API is closed as hard-blocked: raw AutoCAD command dispatch is forbidden in fallback policy and never exposed to agents.",
+      "notes": "Wave4X re-review retained SAFETY_FORBIDDEN. Raw coroutine command dispatch remains blocked.",
       "owner_ticket": "M08O-T02",
       "implementation_strategy": "hard_blocked",
       "evidence_required": "blocker_ref_and_evidence",
@@ -3268,9 +3269,10 @@
       "evidence_refs": [
         "config/autocad_native_arx_operation_catalog.json#command.invoke.sync",
         "docs/FALLBACK_POLICY.md",
-        "docs/M08_REMAINING_BATCH_PLAN.md#m08o-fallback-raw-command-hard-block"
+        "docs/M08_REMAINING_BATCH_PLAN.md#m08o-fallback-raw-command-hard-block",
+        "reports/tickets/WAVE4X_FALLBACK.md"
       ],
-      "notes": "M04 catalog-only classification for this raw-command API is closed as hard-blocked: raw AutoCAD command dispatch is forbidden in fallback policy and never exposed to agents.",
+      "notes": "Wave4X re-review retained SAFETY_FORBIDDEN. Raw sync command dispatch remains blocked.",
       "owner_ticket": "M08O-T02",
       "implementation_strategy": "hard_blocked",
       "evidence_required": "blocker_ref_and_evidence",
@@ -3341,9 +3343,10 @@
       "evidence_refs": [
         "config/autocad_native_arx_operation_catalog.json#command.invoke.sync.resbuf",
         "docs/FALLBACK_POLICY.md",
-        "docs/M08_REMAINING_BATCH_PLAN.md#m08o-fallback-raw-command-hard-block"
+        "docs/M08_REMAINING_BATCH_PLAN.md#m08o-fallback-raw-command-hard-block",
+        "reports/tickets/WAVE4X_FALLBACK.md"
       ],
-      "notes": "M04 catalog-only classification for this raw-command API is closed as hard-blocked: raw AutoCAD command dispatch is forbidden in fallback policy and never exposed to agents.",
+      "notes": "Wave4X re-review retained SAFETY_FORBIDDEN. Raw resbuf command dispatch remains blocked.",
       "owner_ticket": "M08O-T02",
       "implementation_strategy": "hard_blocked",
       "evidence_required": "blocker_ref_and_evidence",
@@ -8268,17 +8271,15 @@
       "id": "automate.com.get_app",
       "operation": "automate.com.get_app",
       "family": "com_activex",
-      "status": "blocked",
+      "status": "implemented",
       "engine_tier": "managed_also",
       "engines": [
         "managed_also"
       ],
       "host_eligibility": [
-        "arx_adapter",
         "full_autocad"
       ],
       "hosts": [
-        "arx_adapter",
         "full_autocad"
       ],
       "execution_context": "host",
@@ -8291,9 +8292,9 @@
         "original_write_default": false
       },
       "handler": {
-        "router_lane": null,
-        "dispatcher_symbol": null,
-        "execution_host_class": "arx_adapter",
+        "router_lane": "full_autocad",
+        "dispatcher_symbol": "Invoke-SafeFallbackOperation",
+        "execution_host_class": "full_autocad",
         "native_api": "acedGetIDispatch(bool bAddRef) (= AcadGetIDispatch)",
         "composed_of": []
       },
@@ -8307,49 +8308,47 @@
       },
       "policy": {
         "source": "config/policy.v2.json",
-        "status_policy": "blocked",
+        "status_policy": "implemented",
         "default_write_mode": "read",
         "allowed_write_modes": [
           "read"
         ],
         "no_original_write_default": true,
-        "runtime_behavior": "hard_blocked_after_wave3_reaudit",
-        "agent_exposed": false
+        "runtime_behavior": "safe_fallback_metadata_only",
+        "agent_exposed": true
       },
       "tests": [
-        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
-        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
-        "tests/unit/test_wave3_remaining_registry_closure.py::test_remaining_wave3_blocks_have_accepted_codes_and_evidence"
+        "tests/unit/test_m08o_fallback.py",
+        "tests/unit/test_wave3_remaining_registry_closure.py",
+        "tests/unit/test_wave4x_fallback_surface.py"
       ],
       "summary": "Get AutoCAD's IDispatch (the AcadApplication automation root) from inside ARX — the entry to",
       "source_slice": "com-activex-opm.md",
       "citation": "aced.h:822-824 (\"AutoCAD's IDispatch pointer\")",
       "evidence_refs": [
         "config/autocad_native_arx_operation_catalog.json#automate.com.get_app",
-        "reports/WAVE3_REMAINING_HARDBLOCK_REAUDIT.md#automate.com.get_app"
+        "docs/FALLBACK_POLICY.md",
+        "tools/fallback_safe_surface.ps1",
+        "reports/tickets/WAVE4X_FALLBACK.md"
       ],
-      "notes": "Wave3 post-merge re-audit accepted hard block. SAFETY_FORBIDDEN: exposing AutoCAD application IDispatch to agents would hand out a raw COM automation root instead of a bounded introspection result.",
+      "notes": "Wave4X reopened the Wave3 hard block as a bounded metadata surface. Returns structured AutoCAD application metadata only; never returns IDispatch or a reusable COM root.",
       "owner_ticket": "M08O-T01",
-      "implementation_strategy": "hard_blocked",
-      "evidence_required": "blocker_ref_and_evidence",
-      "blocked_reason": "SAFETY_FORBIDDEN: exposing AutoCAD application IDispatch to agents would hand out a raw COM automation root instead of a bounded introspection result.",
-      "blocker_ref": "reports/WAVE3_REMAINING_HARDBLOCK_REAUDIT.md#automate.com.get_app"
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs"
     },
     {
       "id": "automate.com.get_document",
       "operation": "automate.com.get_document",
       "family": "com_activex",
-      "status": "blocked",
+      "status": "implemented",
       "engine_tier": "managed_also",
       "engines": [
         "managed_also"
       ],
       "host_eligibility": [
-        "arx_adapter",
         "full_autocad"
       ],
       "hosts": [
-        "arx_adapter",
         "full_autocad"
       ],
       "execution_context": "host",
@@ -8362,9 +8361,9 @@
         "original_write_default": false
       },
       "handler": {
-        "router_lane": null,
-        "dispatcher_symbol": null,
-        "execution_host_class": "arx_adapter",
+        "router_lane": "full_autocad",
+        "dispatcher_symbol": "Invoke-SafeFallbackOperation",
+        "execution_host_class": "full_autocad",
         "native_api": "AcApDocument::GetIDispatch(bool bAddRef)",
         "composed_of": []
       },
@@ -8378,49 +8377,47 @@
       },
       "policy": {
         "source": "config/policy.v2.json",
-        "status_policy": "blocked",
+        "status_policy": "implemented",
         "default_write_mode": "read",
         "allowed_write_modes": [
           "read"
         ],
         "no_original_write_default": true,
-        "runtime_behavior": "hard_blocked_after_wave3_reaudit",
-        "agent_exposed": false
+        "runtime_behavior": "safe_fallback_metadata_only",
+        "agent_exposed": true
       },
       "tests": [
-        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
-        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
-        "tests/unit/test_wave3_remaining_registry_closure.py::test_remaining_wave3_blocks_have_accepted_codes_and_evidence"
+        "tests/unit/test_m08o_fallback.py",
+        "tests/unit/test_wave3_remaining_registry_closure.py",
+        "tests/unit/test_wave4x_fallback_surface.py"
       ],
       "summary": "Get the AcadDocument IDispatch for a given ARX document (bridges AcApDocument* → COM document).",
       "source_slice": "com-activex-opm.md",
       "citation": "acdocman.h:145",
       "evidence_refs": [
         "config/autocad_native_arx_operation_catalog.json#automate.com.get_document",
-        "reports/WAVE3_REMAINING_HARDBLOCK_REAUDIT.md#automate.com.get_document"
+        "docs/FALLBACK_POLICY.md",
+        "tools/fallback_safe_surface.ps1",
+        "reports/tickets/WAVE4X_FALLBACK.md"
       ],
-      "notes": "Wave3 post-merge re-audit accepted hard block. SAFETY_FORBIDDEN: exposing live AcadDocument automation interfaces/pointers to agents is not a bounded read-only contract.",
+      "notes": "Wave4X reopened the Wave3 hard block as a bounded metadata surface. Returns active-document metadata only; never returns an AcadDocument COM handle.",
       "owner_ticket": "M08O-T01",
-      "implementation_strategy": "hard_blocked",
-      "evidence_required": "blocker_ref_and_evidence",
-      "blocked_reason": "SAFETY_FORBIDDEN: exposing live AcadDocument automation interfaces/pointers to agents is not a bounded read-only contract.",
-      "blocker_ref": "reports/WAVE3_REMAINING_HARDBLOCK_REAUDIT.md#automate.com.get_document"
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs"
     },
     {
       "id": "automate.com.get_for_command",
       "operation": "automate.com.get_for_command",
       "family": "com_activex",
-      "status": "blocked",
+      "status": "implemented",
       "engine_tier": "native_arx_only",
       "engines": [
         "native_arx_only"
       ],
       "host_eligibility": [
-        "arx_adapter",
         "full_autocad"
       ],
       "hosts": [
-        "arx_adapter",
         "full_autocad"
       ],
       "execution_context": "host",
@@ -8433,9 +8430,9 @@
         "original_write_default": false
       },
       "handler": {
-        "router_lane": null,
-        "dispatcher_symbol": null,
-        "execution_host_class": "arx_adapter",
+        "router_lane": "full_autocad",
+        "dispatcher_symbol": "Invoke-SafeFallbackOperation",
+        "execution_host_class": "full_autocad",
         "native_api": "acedGetIUnknownForCurrentCommand(LPUNKNOWN& pUnk)",
         "composed_of": []
       },
@@ -8449,49 +8446,47 @@
       },
       "policy": {
         "source": "config/policy.v2.json",
-        "status_policy": "blocked",
+        "status_policy": "implemented",
         "default_write_mode": "read",
         "allowed_write_modes": [
           "read"
         ],
         "no_original_write_default": true,
-        "runtime_behavior": "hard_blocked_after_wave3_reaudit",
-        "agent_exposed": false
+        "runtime_behavior": "safe_fallback_metadata_only",
+        "agent_exposed": true
       },
       "tests": [
-        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
-        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
-        "tests/unit/test_wave3_remaining_registry_closure.py::test_remaining_wave3_blocks_have_accepted_codes_and_evidence"
+        "tests/unit/test_m08o_fallback.py",
+        "tests/unit/test_wave3_remaining_registry_closure.py",
+        "tests/unit/test_wave4x_fallback_surface.py"
       ],
       "summary": "Get the IUnknown associated with the currently executing command (COM context for command-scoped property",
       "source_slice": "com-activex-opm.md",
       "citation": "rxmfcapi.h:177",
       "evidence_refs": [
         "config/autocad_native_arx_operation_catalog.json#automate.com.get_for_command",
-        "reports/WAVE3_REMAINING_HARDBLOCK_REAUDIT.md#automate.com.get_for_command"
+        "docs/FALLBACK_POLICY.md",
+        "tools/fallback_safe_surface.ps1",
+        "reports/tickets/WAVE4X_FALLBACK.md"
       ],
-      "notes": "Wave3 post-merge re-audit accepted hard block. SAFETY_FORBIDDEN: command-context COM acquisition exposes raw automation handles in a live command surface.",
+      "notes": "Wave4X reopened the Wave3 hard block as command-state metadata only. Reports CMDNAMES/CMDACTIVE-style state and never surfaces IUnknown or SendCommand.",
       "owner_ticket": "M08O-T01",
-      "implementation_strategy": "hard_blocked",
-      "evidence_required": "blocker_ref_and_evidence",
-      "blocked_reason": "SAFETY_FORBIDDEN: command-context COM acquisition exposes raw automation handles in a live command surface.",
-      "blocker_ref": "reports/WAVE3_REMAINING_HARDBLOCK_REAUDIT.md#automate.com.get_for_command"
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs"
     },
     {
       "id": "automate.com.get_winapp",
       "operation": "automate.com.get_winapp",
       "family": "com_activex",
-      "status": "blocked",
+      "status": "implemented",
       "engine_tier": "native_arx_only",
       "engines": [
         "native_arx_only"
       ],
       "host_eligibility": [
-        "arx_adapter",
         "full_autocad"
       ],
       "hosts": [
-        "arx_adapter",
         "full_autocad"
       ],
       "execution_context": "host",
@@ -8504,9 +8499,9 @@
         "original_write_default": false
       },
       "handler": {
-        "router_lane": null,
-        "dispatcher_symbol": null,
-        "execution_host_class": "arx_adapter",
+        "router_lane": "full_autocad",
+        "dispatcher_symbol": "Invoke-SafeFallbackOperation",
+        "execution_host_class": "full_autocad",
         "native_api": "acedGetAcadWinApp() → CWinApp*",
         "composed_of": []
       },
@@ -8520,33 +8515,33 @@
       },
       "policy": {
         "source": "config/policy.v2.json",
-        "status_policy": "blocked",
+        "status_policy": "implemented",
         "default_write_mode": "read",
         "allowed_write_modes": [
           "read"
         ],
         "no_original_write_default": true,
-        "runtime_behavior": "hard_blocked_after_wave3_reaudit",
-        "agent_exposed": false
+        "runtime_behavior": "safe_fallback_metadata_only",
+        "agent_exposed": true
       },
       "tests": [
-        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
-        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
-        "tests/unit/test_wave3_remaining_registry_closure.py::test_remaining_wave3_blocks_have_accepted_codes_and_evidence"
+        "tests/unit/test_m08o_fallback.py",
+        "tests/unit/test_wave3_remaining_registry_closure.py",
+        "tests/unit/test_wave4x_fallback_surface.py"
       ],
       "summary": "Get AutoCAD's MFC CWinApp (host window/app object; rarely needed for automation, but the MFC",
       "source_slice": "com-activex-opm.md",
       "citation": "rxmfcapi.h:58-61",
       "evidence_refs": [
         "config/autocad_native_arx_operation_catalog.json#automate.com.get_winapp",
-        "reports/WAVE3_REMAINING_HARDBLOCK_REAUDIT.md#automate.com.get_winapp"
+        "docs/FALLBACK_POLICY.md",
+        "tools/fallback_safe_surface.ps1",
+        "reports/tickets/WAVE4X_FALLBACK.md"
       ],
-      "notes": "Wave3 post-merge re-audit accepted hard block. SAFETY_FORBIDDEN: exposing host application pointers/state is outside the bounded CAD OS introspection surface.",
+      "notes": "Wave4X reopened the Wave3 hard block as bounded window/process metadata only. No CWinApp pointer or raw COM application handle is surfaced.",
       "owner_ticket": "M08O-T01",
-      "implementation_strategy": "hard_blocked",
-      "evidence_required": "blocker_ref_and_evidence",
-      "blocked_reason": "SAFETY_FORBIDDEN: exposing host application pointers/state is outside the bounded CAD OS introspection surface.",
-      "blocker_ref": "reports/WAVE3_REMAINING_HARDBLOCK_REAUDIT.md#automate.com.get_winapp"
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs"
     },
     {
       "id": "automate.com.hold_objectref",
@@ -8823,9 +8818,11 @@
       "citation": "unverified — grep of axtempl.h/axtypes.idl found no SendCommand/PostCommand; the method lives in the type library acax26ENU.tlb (inc-x64), not in a readable .h this session",
       "evidence_refs": [
         "config/autocad_native_arx_operation_catalog.json#automate.com.send_command",
-        "reports/WAVE3_REMAINING_HARDBLOCK_REAUDIT.md#automate.com.send_command"
+        "reports/WAVE3_REMAINING_HARDBLOCK_REAUDIT.md#automate.com.send_command",
+        "docs/FALLBACK_POLICY.md",
+        "reports/tickets/WAVE4X_FALLBACK.md"
       ],
-      "notes": "Wave3 post-merge re-audit accepted hard block. SAFETY_FORBIDDEN: COM SendCommand is raw command-string dispatch and must not be exposed to agents.",
+      "notes": "Wave4X re-review retained the hard block. COM SendCommand remains forbidden; safe fallback now exists for metadata-only COM and router-authored LISP adapters, not raw command text.",
       "owner_ticket": "M08O-T01",
       "implementation_strategy": "hard_blocked",
       "evidence_required": "blocker_ref_and_evidence",
@@ -8836,17 +8833,15 @@
       "id": "automate.com.wrapper_for_object",
       "operation": "automate.com.wrapper_for_object",
       "family": "com_activex",
-      "status": "blocked",
+      "status": "implemented",
       "engine_tier": "native_arx_only",
       "engines": [
         "native_arx_only"
       ],
       "host_eligibility": [
-        "arx_adapter",
         "full_autocad"
       ],
       "hosts": [
-        "arx_adapter",
         "full_autocad"
       ],
       "execution_context": "host",
@@ -8859,9 +8854,9 @@
         "original_write_default": false
       },
       "handler": {
-        "router_lane": null,
-        "dispatcher_symbol": null,
-        "execution_host_class": "arx_adapter",
+        "router_lane": "full_autocad",
+        "dispatcher_symbol": "Invoke-SafeFallbackOperation",
+        "execution_host_class": "full_autocad",
         "native_api": "AcAxGetOleLinkManager() → AcAxOleLinkManager::GetIUnknown(AcDbObject*) / GetIUnknown(AcDbDatabase*) / GetDocIDispatch(AcDbDatabase*) / SetIUnknown(...)",
         "composed_of": []
       },
@@ -8875,33 +8870,33 @@
       },
       "policy": {
         "source": "config/policy.v2.json",
-        "status_policy": "blocked",
+        "status_policy": "implemented",
         "default_write_mode": "read",
         "allowed_write_modes": [
           "read"
         ],
         "no_original_write_default": true,
-        "runtime_behavior": "hard_blocked_after_wave3_reaudit",
-        "agent_exposed": false
+        "runtime_behavior": "safe_fallback_metadata_only",
+        "agent_exposed": true
       },
       "tests": [
-        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
-        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
-        "tests/unit/test_wave3_remaining_registry_closure.py::test_remaining_wave3_blocks_have_accepted_codes_and_evidence"
+        "tests/unit/test_m08o_fallback.py",
+        "tests/unit/test_wave3_remaining_registry_closure.py",
+        "tests/unit/test_wave4x_fallback_surface.py"
       ],
       "summary": "The ARX↔COM wrapper registry: given a DB-resident object/database, get (or set) its COM wrapper",
       "source_slice": "com-activex-opm.md",
       "citation": "oleaprot.h:23-67 (AcAxOleLinkManager, AcAxGetOleLinkManager)",
       "evidence_refs": [
         "config/autocad_native_arx_operation_catalog.json#automate.com.wrapper_for_object",
-        "reports/WAVE3_REMAINING_HARDBLOCK_REAUDIT.md#automate.com.wrapper_for_object"
+        "docs/FALLBACK_POLICY.md",
+        "tools/fallback_safe_surface.ps1",
+        "reports/tickets/WAVE4X_FALLBACK.md"
       ],
-      "notes": "Wave3 post-merge re-audit accepted hard block. SAFETY_FORBIDDEN: wrapping AcDb objects into automation interfaces exposes raw COM object handles to agents.",
+      "notes": "Wave4X reopened the Wave3 hard block as a handle->metadata bridge. args.handle is resolved internally and only bounded object metadata is returned; no COM wrapper escapes.",
       "owner_ticket": "M08O-T01",
-      "implementation_strategy": "hard_blocked",
-      "evidence_required": "blocker_ref_and_evidence",
-      "blocked_reason": "SAFETY_FORBIDDEN: wrapping AcDb objects into automation interfaces exposes raw COM object handles to agents.",
-      "blocker_ref": "reports/WAVE3_REMAINING_HARDBLOCK_REAUDIT.md#automate.com.wrapper_for_object"
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs"
     },
     {
       "id": "automate.property.set",
@@ -9040,9 +9035,11 @@
       "citation": "dbole.h:49-219 (AcDbOleFrame/AcDbOle2Frame)",
       "evidence_refs": [
         "config/autocad_native_arx_operation_catalog.json#embed.ole.frame",
-        "reports/WAVE3_REMAINING_HARDBLOCK_REAUDIT.md#embed.ole.frame"
+        "reports/WAVE3_REMAINING_HARDBLOCK_REAUDIT.md#embed.ole.frame",
+        "docs/FALLBACK_POLICY.md",
+        "reports/tickets/WAVE4X_FALLBACK.md"
       ],
-      "notes": "Wave3 post-merge re-audit accepted hard block. HOST_UNAVAILABLE: AcDbOle2Frame embedding/linking requires a live OLE client item and attended host context; no controlled OLE route or staged payload contract is available.",
+      "notes": "Wave4X re-review retained HOST_UNAVAILABLE. OLE embed/link mutation still lacks a controlled attended payload contract and remains out of bounds.",
       "owner_ticket": "M08O-T01",
       "implementation_strategy": "hard_blocked",
       "evidence_required": "blocker_ref_and_evidence",
@@ -20545,9 +20542,10 @@
       "evidence_refs": [
         "config/autocad_native_arx_operation_catalog.json#command.queue.post",
         "docs/FALLBACK_POLICY.md",
-        "docs/M08_REMAINING_BATCH_PLAN.md#m08o-fallback-raw-command-hard-block"
+        "docs/M08_REMAINING_BATCH_PLAN.md#m08o-fallback-raw-command-hard-block",
+        "reports/tickets/WAVE4X_FALLBACK.md"
       ],
-      "notes": "M04 catalog-only classification for this raw-command API is closed as hard-blocked: raw AutoCAD command dispatch is forbidden in fallback policy and never exposed to agents.",
+      "notes": "Wave4X re-review retained SAFETY_FORBIDDEN. Posted command strings remain blocked.",
       "owner_ticket": "M08O-T02",
       "implementation_strategy": "hard_blocked",
       "evidence_required": "blocker_ref_and_evidence",
@@ -33239,9 +33237,11 @@
       "citation": "[HDR dbxEntryPoint.h:123], [RG AcRxDbxApp Methods]",
       "evidence_refs": [
         "config/autocad_native_arx_operation_catalog.json#module.lifecycle.on_ole_unload",
-        "reports/WAVE3_REMAINING_HARDBLOCK_REAUDIT.md#module.lifecycle.on_ole_unload"
+        "reports/WAVE3_REMAINING_HARDBLOCK_REAUDIT.md#module.lifecycle.on_ole_unload",
+        "docs/FALLBACK_POLICY.md",
+        "reports/tickets/WAVE4X_FALLBACK.md"
       ],
-      "notes": "Wave3 post-merge re-audit accepted hard block. HOST_UNAVAILABLE: On_kOleUnloadAppMsg is a host lifecycle callback and cannot be triggered safely from the CAD OS job surface.",
+      "notes": "Wave4X re-review retained HOST_UNAVAILABLE. This is still a host lifecycle callback, not a routed agent operation.",
       "owner_ticket": "M08O-T02",
       "implementation_strategy": "hard_blocked",
       "evidence_required": "blocker_ref_and_evidence",
@@ -33754,7 +33754,7 @@
       "id": "module.load.lisp",
       "operation": "module.load.lisp",
       "family": "runtime_commands",
-      "status": "blocked",
+      "status": "implemented",
       "engine_tier": "accoreconsole_lisp_also",
       "engines": [
         "accoreconsole_lisp_also"
@@ -33781,8 +33781,8 @@
         "original_write_default": false
       },
       "handler": {
-        "router_lane": null,
-        "dispatcher_symbol": null,
+        "router_lane": "ARIADNE_CAD_JOB",
+        "dispatcher_symbol": "Invoke-SafeFallbackOperation",
         "execution_host_class": "coreconsole",
         "native_api": "(arxload \"name\" [onfailure]) / (arxunload \"name\") / (arx)",
         "composed_of": []
@@ -33797,33 +33797,33 @@
       },
       "policy": {
         "source": "config/policy.v2.json",
-        "status_policy": "blocked",
+        "status_policy": "implemented",
         "default_write_mode": "read",
         "allowed_write_modes": [
           "read"
         ],
         "no_original_write_default": true,
-        "runtime_behavior": "hard_blocked_after_wave3_reaudit",
-        "agent_exposed": false
+        "runtime_behavior": "safe_router_authored_lisp_only",
+        "agent_exposed": true
       },
       "tests": [
-        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
-        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
-        "tests/unit/test_wave3_remaining_registry_closure.py::test_remaining_wave3_blocks_have_accepted_codes_and_evidence"
+        "tests/unit/test_m08o_fallback.py",
+        "tests/unit/test_wave3_remaining_registry_closure.py",
+        "tests/unit/test_wave4x_fallback_surface.py"
       ],
       "summary": "LISP-driven load/unload/list of native modules — usable from an accoreconsole .scr script. The hostless-batch",
       "source_slice": "arx-framework.md",
       "citation": "[DOC arxload], [DOC arxunload], [DOC ARX (Command)]",
       "evidence_refs": [
         "config/autocad_native_arx_operation_catalog.json#module.load.lisp",
-        "reports/WAVE3_REMAINING_HARDBLOCK_REAUDIT.md#module.load.lisp"
+        "docs/FALLBACK_POLICY.md",
+        "tools/fallback_safe_surface.ps1",
+        "reports/tickets/WAVE4X_FALLBACK.md"
       ],
-      "notes": "Wave3 post-merge re-audit accepted hard block. SAFETY_FORBIDDEN: LISP loading executes script code in the AutoCAD host and is not exposed as a raw agent load surface.",
+      "notes": "Wave4X reopened the Wave3 hard block as a router-authored AutoLISP adapter load only. Supported adapter names are allow-listed (currently safe_status); no user path, raw LISP text, or arbitrary command surface is accepted.",
       "owner_ticket": "M08O-T02",
-      "implementation_strategy": "hard_blocked",
-      "evidence_required": "blocker_ref_and_evidence",
-      "blocked_reason": "SAFETY_FORBIDDEN: LISP loading executes script code in the AutoCAD host and is not exposed as a raw agent load surface.",
-      "blocker_ref": "reports/WAVE3_REMAINING_HARDBLOCK_REAUDIT.md#module.load.lisp"
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs"
     },
     {
       "id": "module.register_mdi",
@@ -35077,9 +35077,11 @@
         "src/Ariadne.AcadNative/families/m08n_handlers.inc:m08nHasOp excludes raw/registry-mutating op",
         "reports/tickets/M08N-A3_PLAN.md#Blocker criteria",
         "research/native_arx/editor-delta.md#Operation catalog (PART 1)",
-        "research/native_arx/ui-customization.md#Operation catalog"
+        "research/native_arx/ui-customization.md#Operation catalog",
+        "docs/FALLBACK_POLICY.md",
+        "reports/tickets/WAVE4X_FALLBACK.md"
       ],
-      "notes": "M08N-A3 hard-blocked by safety: no raw command/menu/tool execution or AutoCAD demand-load registry mutation is exposed from the agent surface.",
+      "notes": "Wave4X re-review retained SAFETY_FORBIDDEN. Menu macro invocation is still a raw command surface.",
       "owner_ticket": "M08N-T02",
       "implementation_strategy": "hard_blocked",
       "evidence_required": "blocker_ref_and_evidence",

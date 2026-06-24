@@ -4,12 +4,12 @@
   "registry_schema": "ariadne.operations_registry.v2",
   "registry_version": "2.0.0",
   "operation_count": 517,
-  "wired_count": 463,
+  "wired_count": 467,
   "totals": {
     "operations": 517,
     "by_status": {
-      "blocked": 54,
-      "implemented": 463
+      "blocked": 50,
+      "implemented": 467
     },
     "by_family": {
       "active_document_write_original": 8,
@@ -42,8 +42,8 @@
     "by_engine_tier": {
       "accoreconsole_lisp_also": 20,
       "managed_also": 46,
-      "native_arx_only": 233,
-      "objectdbx_capable": 218
+      "native_arx_only": 232,
+      "objectdbx_capable": 219
     },
     "total": 517
   },
@@ -80,11 +80,11 @@
       "ui_customization": 39
     },
     "operation_records": 517,
-    "implemented": 463,
+    "implemented": 467,
     "wired": 0,
     "stub": 0,
     "catalogued": 0,
-    "blocked": 54,
+    "blocked": 50,
     "deprecated": 0,
     "unknown": 0,
     "catalog_classified_ops": 62,
@@ -92,8 +92,8 @@
     "catalog_classification_status": "complete"
   },
   "computed_by_status": {
-    "implemented": 463,
-    "blocked": 54
+    "implemented": 467,
+    "blocked": 50
   },
   "computed_by_family": {
     "objectdbx_database": 21,

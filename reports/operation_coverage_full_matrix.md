@@ -2,9 +2,9 @@
 
 - packet: `CADOS_M08_FULL_OPERATION_COVERAGE_CLOSURE`
 - generated_from: `config/operations.v2.json`
-- total operations: **517** · implemented 461 · stub 0 · blocked 56 · catalogued 0 · deprecated 0 · **unknown 0**
-- v1-target: **517** (implemented 461 · blocked 56 · **deferred 0**)
-- agent-exposed ops: 461
+- total operations: **517** · implemented 467 · stub 0 · blocked 50 · catalogued 0 · deprecated 0 · **unknown 0**
+- v1-target: **517** (implemented 467 · blocked 50 · **deferred 0**)
+- agent-exposed ops: 467
 
 ## Gate
 
@@ -32,7 +32,7 @@
 | validate_diff | 3 | 0 | 0 | 0 | 3 |
 | render_visual | 10 | 0 | 2 | 0 | 12 |
 | live | 6 | 0 | 1 | 0 | 7 |
-| native_only | 372 | 0 | 49 | 0 | 421 |
+| native_only | 378 | 0 | 43 | 0 | 421 |
 
 ## Risk class distribution
 
@@ -52,12 +52,7 @@
 | command.invoke.sync.resbuf | active_document_write_original | blocked | raw_command | live_edit | False | acedCmdS(const resbuf* rb, bool, AcApDocument*) | SAFETY_FORBIDDEN: raw command dispatch is blocked in M08O fa |
 | doc.sendstring | active_document_write_original | blocked | raw_command | write_copy | False | AcApDocManager::sendStringToExecute(AcApDocument | SAFETY_FORBIDDEN: doc.sendstring uses AcApDocManager::sendSt |
 | ui.subentity.highlight | brep_solids | blocked | read_safe | read | False | AcDbEntity::highlight(const AcDbFullSubentPath&, | HOST_UNAVAILABLE: subentity highlight requires a live graphi |
-| automate.com.get_app | com_activex | blocked | read_safe | read | False | acedGetIDispatch(bool bAddRef) (= AcadGetIDispat | SAFETY_FORBIDDEN: exposing AutoCAD application IDispatch to  |
-| automate.com.get_document | com_activex | blocked | read_safe | read | False | AcApDocument::GetIDispatch(bool bAddRef) | SAFETY_FORBIDDEN: exposing live AcadDocument automation inte |
-| automate.com.get_for_command | com_activex | blocked | read_safe | read | False | acedGetIUnknownForCurrentCommand(LPUNKNOWN& pUnk | SAFETY_FORBIDDEN: command-context COM acquisition exposes ra |
-| automate.com.get_winapp | com_activex | blocked | read_safe | read | False | acedGetAcadWinApp() → CWinApp* | SAFETY_FORBIDDEN: exposing host application pointers/state i |
 | automate.com.send_command | com_activex | blocked | read_safe | read | False | (no native export found this session) — via COM: | SAFETY_FORBIDDEN: COM SendCommand is raw command-string disp |
-| automate.com.wrapper_for_object | com_activex | blocked | read_safe | read | False | AcAxGetOleLinkManager() → AcAxOleLinkManager::Ge | SAFETY_FORBIDDEN: wrapping AcDb objects into automation inte |
 | embed.ole.frame | com_activex | blocked | live_edit | live_edit | False | AcDbOle2Frame (setOleClientItem(COleClientItem*) | HOST_UNAVAILABLE: AcDbOle2Frame embedding/linking requires a |
 | define.assocarray.create | constraints_associativity | blocked | staged_write | write_copy | False | AcDbAssocArrayActionBody::createInstance(AcDbObj | SAFETY_FORBIDDEN: AcDbAssocArrayActionBody::createInstance p |
 | define.assocarray.path | constraints_associativity | blocked | staged_write | write_copy | False | AcDbAssocArrayPathParameters: itemCount, itemSpa | SAFETY_FORBIDDEN: path associative array creation relies on  |
@@ -99,7 +94,6 @@
 | module.load.acad_rx | runtime_commands | blocked | read_safe | read | False | acad.rx file listing module names | SAFETY_FORBIDDEN: ARX demand/load mechanics execute host mod |
 | module.load.by_app | runtime_commands | blocked | read_safe | read | False | acrxLoadApp(const ACHAR* appname, bool asCmd=fal | SAFETY_FORBIDDEN: application-driven module loading executes |
 | module.load.demand_register | runtime_commands | blocked | read_safe | read | False | Registry: HKLM\…\R<ver>\<prodkey>\Applications\< | SAFETY_FORBIDDEN: ObjectARX demand-load registration require |
-| module.load.lisp | runtime_commands | blocked | read_safe | read | False | (arxload "name" [onfailure]) / (arxunload "name" | SAFETY_FORBIDDEN: LISP loading executes script code in the A |
 | module.unload | runtime_commands | blocked | read_safe | read | False | acrxUnloadModule(const ACHAR* moduleName, bool a | SAFETY_FORBIDDEN: acrxUnloadModule can unload host modules a |
 | command.menu.invoke | ui_customization | blocked | read_safe | read | False | acedMenuCmd(const ACHAR*) | SAFETY_FORBIDDEN: acedMenuCmd executes arbitrary menu/comman |
 | editor.toolpalette.tool_execute | ui_customization | blocked | read_safe | read | False | AcTcTool::Execute(int nFlag, HWND, POINT, DWORD  | SAFETY_FORBIDDEN: AcTcTool::Execute programmatically fires a |
@@ -168,9 +162,14 @@
 | traverse.vertex.loops | brep_solids | implemented | read_safe | read | True | m08dDispatch |  |
 | automate.com.bridge_objectid | com_activex | implemented | read_safe | read | True | m08mDispatch |  |
 | automate.com.entity_helpers | com_activex | implemented | read_safe | read | True | m08mDispatch |  |
+| automate.com.get_app | com_activex | implemented | read_safe | read | True | Invoke-SafeFallbackOperation |  |
+| automate.com.get_document | com_activex | implemented | read_safe | read | True | Invoke-SafeFallbackOperation |  |
+| automate.com.get_for_command | com_activex | implemented | read_safe | read | True | Invoke-SafeFallbackOperation |  |
+| automate.com.get_winapp | com_activex | implemented | read_safe | read | True | Invoke-SafeFallbackOperation |  |
 | automate.com.hold_objectref | com_activex | implemented | read_safe | read | True | m08mDispatch |  |
 | automate.com.lock_document | com_activex | implemented | read_safe | read | True | m08mDispatch |  |
 | automate.com.objectid_from_iunknown | com_activex | implemented | read_safe | read | True | m08mDispatch |  |
+| automate.com.wrapper_for_object | com_activex | implemented | read_safe | read | True | Invoke-SafeFallbackOperation |  |
 | automate.property.set | com_activex | implemented | staged_write | write_copy | True | m08mDispatch |  |
 | extend.members.facet_provider | com_activex | implemented | read_safe | read | True | m08mDispatch |  |
 | extend.opm.define_property | com_activex | implemented | read_safe | read | True | m08mDispatch |  |
@@ -503,6 +502,7 @@
 | module.command.register_auto | runtime_commands | implemented | read_safe | read | True | m08nDispatch |  |
 | module.command.register_manual | runtime_commands | implemented | read_safe | read | True | m08nDispatch |  |
 | module.command.stack_handle | runtime_commands | implemented | read_safe | read | True | m08nDispatch |  |
+| module.load.lisp | runtime_commands | implemented | read_safe | read | True | Invoke-SafeFallbackOperation |  |
 | module.register_mdi | runtime_commands | implemented | read_safe | read | True | m08nDispatch |  |
 | module.register_service | runtime_commands | implemented | read_safe | read | True | m08nDispatch |  |
 | acdb.database.create | symbol_tables_dictionaries | implemented | read_safe | read | True | m08eDispatch |  |

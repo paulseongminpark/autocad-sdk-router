@@ -7,12 +7,7 @@ REGISTRY = REPO / "config" / "operations.v2.json"
 
 EXPECTED_BLOCKED_AFTER_REAUDIT = {
     "ui.subentity.highlight",
-    "automate.com.get_app",
-    "automate.com.get_document",
-    "automate.com.get_for_command",
-    "automate.com.get_winapp",
     "automate.com.send_command",
-    "automate.com.wrapper_for_object",
     "embed.ole.frame",
     "module.command.remove_group",
     "module.entrypoint.define",
@@ -26,8 +21,16 @@ EXPECTED_BLOCKED_AFTER_REAUDIT = {
     "module.load",
     "module.load.acad_rx",
     "module.load.by_app",
-    "module.load.lisp",
     "module.unload",
+}
+
+EXPECTED_IMPLEMENTED_AFTER_WAVE4X = {
+    "automate.com.get_app",
+    "automate.com.get_document",
+    "automate.com.get_for_command",
+    "automate.com.get_winapp",
+    "automate.com.wrapper_for_object",
+    "module.load.lisp",
 }
 
 ALLOWED_BLOCKER_CODES = {
@@ -66,6 +69,22 @@ def test_remaining_wave3_blocks_have_accepted_codes_and_evidence():
         assert "reports/WAVE3_REMAINING_HARDBLOCK_REAUDIT.md" in evidence, oid
         assert op.get("implementation_strategy") == "hard_blocked", oid
         assert op.get("evidence_required") == "blocker_ref_and_evidence", oid
+
+
+def test_wave4x_reopened_safe_fallback_ops_are_implemented():
+    ops = _operations()
+    for oid in sorted(EXPECTED_IMPLEMENTED_AFTER_WAVE4X):
+        op = ops[oid]
+        assert op["status"] == "implemented", oid
+        evidence = "\n".join(op.get("evidence_refs") or [])
+        assert "reports/tickets/WAVE4X_FALLBACK.md" in evidence, oid
+        assert op.get("handler", {}).get("dispatcher_symbol") == "Invoke-SafeFallbackOperation", oid
+        if oid == "module.load.lisp":
+            assert op.get("handler", {}).get("router_lane") == "ARIADNE_CAD_JOB", oid
+            assert op.get("handler", {}).get("execution_host_class") == "coreconsole", oid
+        else:
+            assert op.get("handler", {}).get("router_lane") == "full_autocad", oid
+            assert op.get("handler", {}).get("execution_host_class") == "full_autocad", oid
 
 
 def test_module_command_flags_was_reversed_to_implemented():
