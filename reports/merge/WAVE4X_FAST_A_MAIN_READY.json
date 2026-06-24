@@ -1,0 +1,65 @@
+{
+  "schema": "wave4x_fast_a.main_ready.v1",
+  "generated_at": "2026-06-24T04:43:19.982372+00:00",
+  "status": "PASS",
+  "root": "D:\\dev\\99_tools\\autocad-sdk-router_wave4x_fast_a_main_ready",
+  "branch": "cados/wave4x-fast-a-main-ready",
+  "merge_commit": "current git HEAD on cados/wave4x-fast-a-main-ready",
+  "fast_a_branch": "cados/wave4x-fast-a-merge-audit-truth",
+  "fast_a_commit": "4328a0d",
+  "main_dirty": {
+    "tracked_dirty_count": 238,
+    "untracked_count": 23,
+    "original_checkout_touched": "reports/merge dirty-state record only"
+  },
+  "validation": {
+    "tests": "529 passed, 20 skipped",
+    "skip_total": 20,
+    "unexpected_skip_count": 0,
+    "native_build_status": "ok",
+    "v1_gate_pass": true,
+    "operation_count": 517,
+    "counts": {
+      "implemented": 485,
+      "hard_blocked": 31,
+      "deprecated": 1,
+      "catalogued": 0,
+      "stub": 0,
+      "unknown": 0,
+      "deferred": 0
+    }
+  },
+  "native_build": {
+    "status": "ok",
+    "msbuild": "C:\\Program Files\\Microsoft Visual Studio\\2026\\Community\\MSBuild\\Current\\Bin\\amd64\\MSBuild.exe",
+    "arx_relink_mode": "canonical",
+    "arx_versioned_name": "",
+    "arx_lock_note": "Canonical .arx relinked normally.",
+    "projects": [
+      "D:\\dev\\99_tools\\autocad-sdk-router_wave4x_fast_a_main_ready\\src\\Ariadne.AcadNativeDbx\\Ariadne.AcadNativeDbx.dbx.vcxproj",
+      "D:\\dev\\99_tools\\autocad-sdk-router_wave4x_fast_a_main_ready\\src\\Ariadne.AcadNative\\Ariadne.AcadNative.crx.vcxproj",
+      "D:\\dev\\99_tools\\autocad-sdk-router_wave4x_fast_a_main_ready\\src\\Ariadne.AcadNative\\Ariadne.AcadNative.arx.vcxproj"
+    ],
+    "artifacts": [
+      {
+        "path": "D:\\dev\\99_tools\\autocad-sdk-router_wave4x_fast_a_main_ready\\src\\Ariadne.AcadNative\\bin\\x64\\Release\\Ariadne.AcadNativeDbx.dbx",
+        "exists": true,
+        "bytes": 54272
+      },
+      {
+        "path": "D:\\dev\\99_tools\\autocad-sdk-router_wave4x_fast_a_main_ready\\src\\Ariadne.AcadNative\\bin\\x64\\Release\\Ariadne.AcadNative.crx",
+        "exists": true,
+        "bytes": 801280
+      },
+      {
+        "path": "D:\\dev\\99_tools\\autocad-sdk-router_wave4x_fast_a_main_ready\\src\\Ariadne.AcadNative\\bin\\x64\\Release\\Ariadne.AcadNative.arx",
+        "exists": true,
+        "bytes": 809984
+      }
+    ]
+  },
+  "skip_audit": "reports/merge/WAVE4X_FAST_A_MAIN_READY_SKIPS.json",
+  "main_updated": false,
+  "main_update_reason": "original main checkout remains dirty; main-ready branch is valid and ready for later merge/rebase",
+  "next": "Fast B must rebase/apply onto cados/wave4x-fast-a-main-ready"
+}

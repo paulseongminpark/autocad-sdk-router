@@ -1,0 +1,274 @@
+# MAIN DIRTY STATE BEFORE FAST A READY
+
+Generated: 2026-06-24T04:40:27.237407+00:00
+Root: `D:\dev\99_tools\autocad-sdk-router`
+
+Action: record only; no clean/reset/merge performed.
+
+Tracked dirty files: 238
+Untracked files: 23
+
+## Tracked Dirty
+- ` M` `.graphifyignore` - unknown_or_source
+- ` M` `ENVVAR_REPOINT.md` - appears_generated_or_report
+- ` M` `README.md` - appears_generated_or_report
+- ` M` `SDK_ROUTER_USAGE.md` - appears_generated_or_report
+- ` M` `config/autocad_native_arx_operation_catalog.json` - appears_generated_or_report
+- ` M` `config/autocad_official_sdk_catalog.json` - appears_generated_or_report
+- ` M` `config/autocad_router_capabilities.json` - appears_generated_or_report
+- ` M` `config/cad_job_operation_aliases.json` - appears_generated_or_report
+- `MM` `config/operations.v2.json` - appears_generated_or_report
+- ` M` `docs/AUTOCAD_CONTROL_PLANE_STATUS.md` - appears_generated_or_report
+- ` M` `docs/CAD_DIFF_SPEC.md` - appears_generated_or_report
+- ` M` `docs/CAD_OS_V1_ACCEPTANCE.md` - appears_generated_or_report
+- ` M` `docs/DWG_GRAPH_IR_SPEC.md` - appears_generated_or_report
+- ` M` `docs/LIVE_ARX_NAMED_PIPE_DESIGN.md` - appears_generated_or_report
+- ` M` `docs/LIVE_ARX_PUMP_SPIKE_REPORT.md` - appears_generated_or_report
+- ` M` `docs/LIVE_JOB_ARGUMENT_CONTRACT.md` - appears_generated_or_report
+- ` M` `docs/M08_REMAINING_BATCH_PLAN.md` - appears_generated_or_report
+- ` M` `docs/MCP_TOOL_CONTRACT.md` - appears_generated_or_report
+- ` M` `docs/NATIVE_ARX_DBX_DESIGN.md` - appears_generated_or_report
+- ` M` `docs/NATIVE_DEEP_SURFACE_STATUS.md` - appears_generated_or_report
+- ` M` `docs/OPERATION_REGISTRY_SPEC.md` - appears_generated_or_report
+- ` M` `docs/PATCH_ENGINE_SPEC.md` - appears_generated_or_report
+- ` M` `docs/VALIDATION_SPEC.md` - appears_generated_or_report
+- ` M` `docs/VISUAL_VERIFICATION_SPEC.md` - appears_generated_or_report
+- ` M` `docs/superpowers/plans/2026-06-18-p2-native-cad-job-ops.md` - appears_generated_or_report
+- ` M` `docs/superpowers/plans/2026-06-19-phase0-to-phase5-autocad-native-build.md` - appears_generated_or_report
+- ` M` `handoff/LATEST.md` - appears_generated_or_report
+- ` M` `handoff/TAKEOVER.md` - appears_generated_or_report
+- ` M` `handoff/_beads.jsonl` - unknown_or_source
+- ` M` `handoff/mail/INBOX.md` - appears_generated_or_report
+- ` M` `handoff/roles/_index.md` - appears_generated_or_report
+- ` M` `handoff/roles/cad-os-layer.md` - appears_generated_or_report
+- ` M` `handoff/sessions/SESSION_2026-06-22_1333.md` - appears_generated_or_report
+- ` M` `handoff/sessions/SESSION_2026-06-22_1451.md` - appears_generated_or_report
+- ` M` `handoff/zip/index.md` - appears_generated_or_report
+- ` M` `packets/CADOS_M01_FULL_STACK_ULTRACODE_BUILD.md` - appears_generated_or_report
+- ` M` `packets/CADOS_M02_V1_COMPLETION_ULTRACODE.md` - appears_generated_or_report
+- ` M` `packets/CADOS_M03_NATIVE_ROUTER_RICH_IR_COMPLETION.md` - appears_generated_or_report
+- ` M` `packets/CADOS_M04_OPERATION_REGISTRY_AND_TOOL_SURFACE.md` - appears_generated_or_report
+- ` M` `packets/CADOS_M05_PATCH_DIFF_VALIDATION_TRANSACTION.md` - appears_generated_or_report
+- ` M` `packets/CADOS_M06_VISUAL_BATCH_GOLDEN_REGRESSION.md` - appears_generated_or_report
+- ` M` `packets/CADOS_M07A_ATTENDED_SURFACE_VERIFICATION.md` - appears_generated_or_report
+- ` M` `packets/CADOS_M07B_ATTENDED_GUI_VERIFICATION_AND_NATIVE_DEPLOY.md` - appears_generated_or_report
+- ` M` `packets/CADOS_M07_LIVE_ARX_AND_DEEP_NATIVE_SURFACE.md` - appears_generated_or_report
+- ` M` `packets/CADOS_M08_FULL_OPERATION_COVERAGE_CLOSURE.md` - appears_generated_or_report
+- ` M` `packets/PACKET_INDEX.md` - appears_generated_or_report
+- ` M` `reports/AUTO_CAD_ROUTER_AGENT_CONTRACT.md` - appears_generated_or_report
+- ` M` `reports/CADOS_M02_V1_COMPLETION_ULTRACODE.md` - appears_generated_or_report
+- ` M` `reports/CADOS_M03_M04_DETAILED_RESULT.md` - appears_generated_or_report
+- ` M` `reports/CADOS_M03_NATIVE_ROUTER_RICH_IR_COMPLETION.md` - appears_generated_or_report
+- ` M` `reports/CADOS_M04_OPERATION_REGISTRY_AND_TOOL_SURFACE.md` - appears_generated_or_report
+- ` M` `reports/CADOS_M05_PATCH_DIFF_VALIDATION_TRANSACTION.md` - appears_generated_or_report
+- ` M` `reports/CADOS_M07A_ATTENDED_SURFACE_VERIFICATION.md` - appears_generated_or_report
+- ` M` `reports/CADOS_M07B_ATTENDED_GUI_VERIFICATION_AND_NATIVE_DEPLOY.md` - appears_generated_or_report
+- ` M` `reports/CADOS_M07_LIVE_ARX_AND_DEEP_NATIVE_SURFACE.md` - appears_generated_or_report
+- ` M` `reports/CADOS_M08_FULL_OPERATION_COVERAGE_CLOSURE.md` - appears_generated_or_report
+- ` M` `reports/DWG_GEOMETRY_NATIVE_IMPLEMENTATION_PLAN.md` - appears_generated_or_report
+- ` M` `reports/LOCALIZATION_REPORT.md` - appears_generated_or_report
+- ` M` `reports/TRINITY_AUTOCAD_SECTION_DRAFT.md` - appears_generated_or_report
+- ` M` `reports/attended_gui_latest.json` - appears_generated_or_report
+- ` M` `reports/attended_gui_latest.md` - appears_generated_or_report
+- ` M` `reports/attended_shutdown_latest.json` - appears_generated_or_report
+- `MM` `reports/autocad_router_status_latest.json` - appears_generated_or_report
+- ` M` `reports/deep_native_latest.json` - appears_generated_or_report
+- ` M` `reports/deep_native_latest.md` - appears_generated_or_report
+- ` M` `reports/firing_latest.json` - appears_generated_or_report
+- ` M` `reports/journal_latest.md` - appears_generated_or_report
+- ` M` `reports/live_job_args_contract_latest.json` - appears_generated_or_report
+- ` M` `reports/live_pump_latest.json` - appears_generated_or_report
+- ` M` `reports/live_pump_latest.md` - appears_generated_or_report
+- ` M` `reports/merge/MERGE-M08-FOUNDATION.json` - appears_generated_or_report
+- ` M` `reports/merge/MERGE-M08-FOUNDATION.md` - appears_generated_or_report
+- ` M` `reports/merge/MERGE-M08-INFRA.json` - appears_generated_or_report
+- ` M` `reports/merge/MERGE-M08-INFRA.md` - appears_generated_or_report
+- ` M` `reports/merge/MERGE-M08-NATIVE-A1.json` - appears_generated_or_report
+- ` M` `reports/merge/MERGE-M08-NATIVE-A2.json` - appears_generated_or_report
+- ` M` `reports/merge/MERGE-M08-READ.json` - appears_generated_or_report
+- ` M` `reports/merge/MERGE-M08-READ.md` - appears_generated_or_report
+- ` M` `reports/merge/MERGE-M08-RECONCILE-READ.json` - appears_generated_or_report
+- ` M` `reports/merge/MERGE-M08-RECONCILE-READ.md` - appears_generated_or_report
+- ` M` `reports/merge/MERGE-M08-WRITE.json` - appears_generated_or_report
+- ` M` `reports/merge/MERGE-M08-WRITE.md` - appears_generated_or_report
+- ` M` `reports/native_smoke_latest.json` - appears_generated_or_report
+- `MM` `reports/operation_coverage_full_matrix.json` - appears_generated_or_report
+- `MM` `reports/operation_coverage_full_matrix.md` - appears_generated_or_report
+- `MM` `reports/operation_coverage_latest.json` - appears_generated_or_report
+- `MM` `reports/operation_coverage_latest.md` - appears_generated_or_report
+- ` M` `reports/opm_property_latest.json` - appears_generated_or_report
+- ` M` `reports/patch_diff_latest.md` - appears_generated_or_report
+- `AD` `reports/tickets/WAVE4X_VISUAL_PLOT.json` - appears_generated_or_report
+- `AD` `reports/tickets/WAVE4X_VISUAL_PLOT.md` - appears_generated_or_report
+- `AD` `reports/tickets/WAVE4X_VISUAL_PLOT_OPS.json` - appears_generated_or_report
+- `AD` `reports/tickets/WAVE4X_VISUAL_PLOT_PLAN.md` - appears_generated_or_report
+- ` M` `reports/tool_surface_latest.md` - appears_generated_or_report
+- ` M` `reports/v1_acceptance_latest.json` - appears_generated_or_report
+- `MM` `reports/v1_operation_gate_latest.json` - appears_generated_or_report
+- ` M` `reports/validation_latest.md` - appears_generated_or_report
+- ` M` `reports/worlddraw_latest.json` - appears_generated_or_report
+- ` M` `research/native_arx/_AUDIT.md` - appears_generated_or_report
+- ` M` `research/native_arx/_SYNTHESIS_INDEX.md` - appears_generated_or_report
+- ` M` `research/native_arx/_build_catalog.js` - unknown_or_source
+- ` M` `research/native_arx/acdb-core.md` - appears_generated_or_report
+- ` M` `research/native_arx/arx-framework.md` - appears_generated_or_report
+- ` M` `research/native_arx/brep-topology.md` - appears_generated_or_report
+- ` M` `research/native_arx/com-activex-opm.md` - appears_generated_or_report
+- ` M` `research/native_arx/constraints-associativity.md` - appears_generated_or_report
+- ` M` `research/native_arx/custom-objects.md` - appears_generated_or_report
+- ` M` `research/native_arx/editor-delta.md` - appears_generated_or_report
+- ` M` `research/native_arx/entities-geometry-graphics.md` - appears_generated_or_report
+- ` M` `research/native_arx/reactors-overrules.md` - appears_generated_or_report
+- ` M` `research/native_arx/ui-customization.md` - appears_generated_or_report
+- ` M` `schemas/cad_diff.v1.schema.json` - appears_generated_or_report
+- ` M` `schemas/cad_job.schema.json` - appears_generated_or_report
+- ` M` `schemas/cad_job.v2.schema.json` - appears_generated_or_report
+- ` M` `schemas/cad_patch.v1.schema.json` - appears_generated_or_report
+- ` M` `schemas/cad_result.v2.schema.json` - appears_generated_or_report
+- ` M` `schemas/dwg_geometry_extract.schema.json` - appears_generated_or_report
+- ` M` `schemas/dwg_graph_ir.v1.schema.json` - appears_generated_or_report
+- ` M` `schemas/operation_registry.v2.schema.json` - appears_generated_or_report
+- ` M` `schemas/validation_report.v1.schema.json` - appears_generated_or_report
+- ` M` `schemas/visual_artifact.v1.schema.json` - appears_generated_or_report
+- ` M` `set-router-env.ps1` - unknown_or_source
+- ` M` `src/Ariadne.AcadNative/Ariadne.AcadNative.arx.vcxproj` - unknown_or_source
+- ` M` `src/Ariadne.AcadNative/Ariadne.AcadNative.crx.vcxproj` - unknown_or_source
+- `MM` `src/Ariadne.AcadNative/families/m08l_handlers.inc` - unknown_or_source
+- ` M` `src/Ariadne.AcadNativeDbx/Ariadne.AcadNativeDbx.dbx.vcxproj` - unknown_or_source
+- ` M` `src/Ariadne.AcadNativeDbx/AriadneProtocol.cpp` - unknown_or_source
+- ` M` `src/Ariadne.AcadNativeDbx/AriadneProtocol.h` - unknown_or_source
+- ` M` `src/Ariadne.DwgGeometryExtractor/Ariadne.DwgGeometryExtractor.csproj` - unknown_or_source
+- ` M` `src/Ariadne.DwgGeometryExtractor/CadJobDtos.cs` - unknown_or_source
+- ` M` `src/Ariadne.DwgGeometryExtractor/CadJobRunner.cs` - unknown_or_source
+- ` M` `src/Ariadne.DwgGeometryExtractor/Commands.cs` - unknown_or_source
+- ` M` `src/Ariadne.DwgGeometryExtractor/GeometryDtos.cs` - unknown_or_source
+- ` M` `src/Ariadne.DwgGeometryExtractor/GeometryExtractor.cs` - unknown_or_source
+- ` M` `src/Ariadne.DwgGeometryExtractor/JsonWriter.cs` - unknown_or_source
+- ` M` `test_native/count.scr` - appears_generated_or_report
+- ` M` `test_native/count_crx.scr` - appears_generated_or_report
+- ` M` `test_native/create.scr` - appears_generated_or_report
+- ` M` `test_native/create_crx.scr` - appears_generated_or_report
+- ` M` `test_native/diag.scr` - appears_generated_or_report
+- ` M` `test_native/diag2.scr` - appears_generated_or_report
+- ` M` `test_native/diag3.scr` - appears_generated_or_report
+- ` M` `test_native/diag_arx_after_build.scr` - appears_generated_or_report
+- ` M` `test_native/diag_arx_fullacad.scr` - appears_generated_or_report
+- ` M` `test_native/diag_crx_after_build.scr` - appears_generated_or_report
+- ` M` `test_native/diag_dbx_after_build.scr` - appears_generated_or_report
+- ` M` `test_native/diag_dbx_then_arx_after_build.scr` - appears_generated_or_report
+- ` M` `test_native/diag_unload_native.scr` - appears_generated_or_report
+- ` M` `test_native/job_block_count.json` - appears_generated_or_report
+- ` M` `test_native/job_block_create.json` - appears_generated_or_report
+- ` M` `test_native/job_block_insert.json` - appears_generated_or_report
+- ` M` `test_native/job_circle_create.json` - appears_generated_or_report
+- ` M` `test_native/job_count.json` - appears_generated_or_report
+- ` M` `test_native/job_create.json` - appears_generated_or_report
+- ` M` `test_native/job_create_args.json` - appears_generated_or_report
+- ` M` `test_native/job_entity_count_circle.json` - appears_generated_or_report
+- ` M` `test_native/job_fullacad_runtime_capabilities.json` - appears_generated_or_report
+- ` M` `test_native/job_jig_host_support.json` - appears_generated_or_report
+- ` M` `test_native/job_jig_point_probe.json` - appears_generated_or_report
+- ` M` `test_native/job_layer_create.json` - appears_generated_or_report
+- ` M` `test_native/job_layout_create.json` - appears_generated_or_report
+- ` M` `test_native/job_layout_list.json` - appears_generated_or_report
+- ` M` `test_native/job_line_create.json` - appears_generated_or_report
+- ` M` `test_native/job_overrule_disable.json` - appears_generated_or_report
+- ` M` `test_native/job_overrule_enable.json` - appears_generated_or_report
+- ` M` `test_native/job_overrule_registry.json` - appears_generated_or_report
+- ` M` `test_native/job_protocol_queryx.json` - appears_generated_or_report
+- ` M` `test_native/job_reactor_disable.json` - appears_generated_or_report
+- ` M` `test_native/job_reactor_enable.json` - appears_generated_or_report
+- ` M` `test_native/job_reactor_registry.json` - appears_generated_or_report
+- ` M` `test_native/job_record_count.json` - appears_generated_or_report
+- ` M` `test_native/job_record_create.json` - appears_generated_or_report
+- ` M` `test_native/job_runtime_capabilities.json` - appears_generated_or_report
+- ` M` `test_native/job_xdata_get.json` - appears_generated_or_report
+- ` M` `test_native/job_xdata_set.json` - appears_generated_or_report
+- ` M` `test_native/job_xrecord_get.json` - appears_generated_or_report
+- ` M` `test_native/job_xrecord_set.json` - appears_generated_or_report
+- ` M` `test_native/job_xref_list.json` - appears_generated_or_report
+- ` M` `test_native/p2_stateful_batch.json` - appears_generated_or_report
+- ` M` `tests/golden/expected_counts.json` - appears_generated_or_report
+- ` M` `tests/golden/golden_manifest.json` - appears_generated_or_report
+- ` M` `tests/integration/test_live_arx_pump.py` - unknown_or_source
+- ` M` `tests/integration/test_native_graph_router.py` - unknown_or_source
+- ` M` `tests/integration/test_native_inspect_database_graph.py` - unknown_or_source
+- ` M` `tests/smoke/test_cadctl_rich_ir.py` - unknown_or_source
+- ` M` `tests/smoke/test_router_inspect_database_graph.py` - unknown_or_source
+- ` M` `tests/smoke/test_router_status.py` - unknown_or_source
+- ` M` `tests/smoke/test_walking_skeleton.py` - unknown_or_source
+- ` M` `tests/test_cad_job_batch_harness.py` - unknown_or_source
+- ` M` `tests/test_cad_job_control_plane.py` - unknown_or_source
+- ` M` `tests/test_cad_job_operation_aliases.py` - unknown_or_source
+- ` M` `tests/test_dwg_geometry_native_contract.py` - unknown_or_source
+- ` M` `tests/test_libredwg_sidecar.py` - unknown_or_source
+- ` M` `tests/test_native_arx_dbx_contract.py` - unknown_or_source
+- ` M` `tests/unit/test_cad_diff.py` - unknown_or_source
+- ` M` `tests/unit/test_cadctl.py` - unknown_or_source
+- ` M` `tests/unit/test_cados_m06_runner.py` - unknown_or_source
+- ` M` `tests/unit/test_dwg_graph_ir_schema.py` - unknown_or_source
+- ` M` `tests/unit/test_ir_builder.py` - unknown_or_source
+- ` M` `tests/unit/test_m05_cli_contract.py` - unknown_or_source
+- ` M` `tests/unit/test_m07b_pump_gating_and_job_channel.py` - unknown_or_source
+- ` M` `tests/unit/test_m08_operation_coverage.py` - unknown_or_source
+- `MM` `tests/unit/test_m08a_catalog_reopen.py` - unknown_or_source
+- `MM` `tests/unit/test_m08l_handlers.py` - unknown_or_source
+- ` M` `tests/unit/test_mcp_tool_contract.py` - unknown_or_source
+- ` M` `tests/unit/test_non_ascii_fidelity.py` - unknown_or_source
+- ` M` `tests/unit/test_operation_registry_v2.py` - unknown_or_source
+- ` M` `tests/unit/test_operations_v2_registry.py` - unknown_or_source
+- ` M` `tests/unit/test_patch_engine.py` - unknown_or_source
+- ` M` `tests/unit/test_patch_engine_policy.py` - unknown_or_source
+- ` M` `tests/unit/test_pump_frame_codec.py` - unknown_or_source
+- ` M` `tests/unit/test_pump_shutdown_and_deep_native_source.py` - unknown_or_source
+- ` M` `tests/unit/test_router_explain_registry.py` - unknown_or_source
+- ` M` `tests/unit/test_schemas_v2.py` - unknown_or_source
+- ` M` `tests/unit/test_sqlite_ir_store.py` - unknown_or_source
+- ` M` `tests/unit/test_sqlite_ir_store_rich.py` - unknown_or_source
+- ` M` `tests/unit/test_validator.py` - unknown_or_source
+- ` M` `tests/unit/test_validator_gates.py` - unknown_or_source
+- ` M` `tests/unit/test_visual_report.py` - unknown_or_source
+- `MM` `tests/unit/test_wave3_render_plot_registry_safety.py` - unknown_or_source
+- ` M` `tools/attended/run_attended_m07b.ps1` - unknown_or_source
+- ` M` `tools/cad_diff.py` - unknown_or_source
+- ` M` `tools/cadagent_mcp.py` - unknown_or_source
+- ` M` `tools/cadctl.py` - unknown_or_source
+- ` M` `tools/cadctl_cli.py` - unknown_or_source
+- ` M` `tools/cados_m06.py` - unknown_or_source
+- ` M` `tools/ir_builder.py` - unknown_or_source
+- ` M` `tools/normalize_result.py` - unknown_or_source
+- ` M` `tools/patch_engine.py` - unknown_or_source
+- ` M` `tools/probe_routes.py` - unknown_or_source
+- ` M` `tools/route_select.py` - unknown_or_source
+- ` M` `tools/run_cad_job_batch.ps1` - unknown_or_source
+- ` M` `tools/run_job.py` - unknown_or_source
+- ` M` `tools/run_route.py` - unknown_or_source
+- ` M` `tools/sqlite_ir_store.py` - unknown_or_source
+- ` M` `tools/validate_dwg_geometry_extract.py` - unknown_or_source
+- ` M` `tools/validator.py` - unknown_or_source
+- ` M` `tools/visual_report.py` - unknown_or_source
+
+## Untracked
+- `reports/M08_PARALLEL_BUILD_BOARD.json` - appears_generated_or_report
+- `reports/M08_PARALLEL_BUILD_BOARD.md` - appears_generated_or_report
+- `reports/WAVE4_PANE2~6_CLAIMS.json` - appears_generated_or_report
+- `reports/merge/MERGE_WAVE4X_LOADER_DOC.json` - appears_generated_or_report
+- `reports/merge/MERGE_WAVE4X_LOADER_DOC.md` - appears_generated_or_report
+- `reports/merge/MERGE_WAVE4X_VISUAL_PLOT.json` - appears_generated_or_report
+- `reports/merge/MERGE_WAVE4X_VISUAL_PLOT.md` - appears_generated_or_report
+- `reports/remaining_after_wave3_integration.json` - appears_generated_or_report
+- `reports/remaining_after_wave3_integration.md` - appears_generated_or_report
+- `reports/tickets/WAVE4S_SPARK1_MICRO_IMPL_CLAIMS.json` - appears_generated_or_report
+- `reports/tickets/WAVE4S_SPARK2_AGENT_SURFACE_CLAIMS.json` - appears_generated_or_report
+- `reports/tickets/WAVE4S_SPARK3_REGRESSION_AUTOMATION_CLAIMS.json` - appears_generated_or_report
+- `reports/tickets/WAVE4S_SPARK4_EVIDENCE_HARDENING_CLAIMS.json` - appears_generated_or_report
+- `reports/tickets/WAVE4X_CLAIM_SPLIT.json` - appears_generated_or_report
+- `reports/tickets/WAVE4X_CLAIM_SPLIT.md` - appears_generated_or_report
+- `reports/tickets/WAVE4X_PANE1_ASSOC_SOLVER_CLAIMS.json` - appears_generated_or_report
+- `reports/tickets/WAVE4X_PANE2_LOADER_DOC_CLAIMS.json` - appears_generated_or_report
+- `reports/tickets/WAVE4X_PANE3_SUBENTITY_BREP_CLAIMS.json` - appears_generated_or_report
+- `reports/tickets/WAVE4X_PANE4_FALLBACK_COM_OLE_CLAIMS.json` - appears_generated_or_report
+- `reports/tickets/WAVE4X_PANE5_DB_TXN_WRITE_CLAIMS.json` - appears_generated_or_report
+- `reports/tickets/WAVE4X_PANE6_GENERIC_CLOSURE_CLAIMS.json` - appears_generated_or_report
+- `reports/tickets/WAVE4X_PANE7_VISUAL_PLOT_CLAIMS.json` - appears_generated_or_report
+- `reports/tickets/WAVE4X_PANE8_LIVE_EDITOR_UI_CLAIMS.json` - appears_generated_or_report

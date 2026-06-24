@@ -1,0 +1,70 @@
+# WAVE4X FAST A Main Ready Skips
+
+Generated: 2026-06-24T04:43:19.982372+00:00
+
+Total skipped: 20
+
+- 1x `tests\integration\test_live_arx_pump.py`
+  - category: live/attended required
+  - assigned_to: future attended live proof
+  - reason: 96: SKIPPED_ENV: live pump test requires CADOS_LIVE=1
+- 1x `tests\integration\test_native_graph_router.py`
+  - category: live/attended required
+  - assigned_to: future attended live proof
+  - reason: 80: SKIPPED_ENV: live native graph/staged-write disabled (CADOS_LIVE!=1, no golden DWG)
+- 1x `tests\smoke\test_cadctl_rich_ir.py`
+  - category: missing generated fixture/run artifact
+  - assigned_to: fixture generation
+  - reason: 71: SKIPPED_FIXTURE: native_full IR not present: D:\dev\99_tools\autocad-sdk-router_wave4x_fast_a_main_ready\runs\m02_cadctl_rich\dwg_graph_ir.json
+- 1x `tests\smoke\test_cadctl_rich_ir.py`
+  - category: missing generated fixture/run artifact
+  - assigned_to: fixture generation
+  - reason: 80: SKIPPED_FIXTURE: native_full IR not present: D:\dev\99_tools\autocad-sdk-router_wave4x_fast_a_main_ready\runs\m02_cadctl_rich\dwg_graph_ir.json
+- 1x `tests\smoke\test_cadctl_rich_ir.py`
+  - category: missing generated fixture/run artifact
+  - assigned_to: fixture generation
+  - reason: 57: SKIPPED_FIXTURE: native_full IR not present: D:\dev\99_tools\autocad-sdk-router_wave4x_fast_a_main_ready\runs\m02_cadctl_rich\dwg_graph_ir.json
+- 1x `tests\smoke\test_cadctl_rich_ir.py`
+  - category: missing generated fixture/run artifact
+  - assigned_to: fixture generation
+  - reason: 62: SKIPPED_FIXTURE: native_full IR not present: D:\dev\99_tools\autocad-sdk-router_wave4x_fast_a_main_ready\runs\m02_cadctl_rich\dwg_graph_ir.json
+- 1x `tests\smoke\test_router_inspect_database_graph.py`
+  - category: live/attended required
+  - assigned_to: future attended live proof
+  - reason: 127: SKIPPED_ENV: live native inspect disabled (CADOS_LIVE!=1, no golden DWG)
+- 1x `tests\unit\test_dwg_graph_ir_schema.py`
+  - category: live/attended required
+  - assigned_to: future attended live proof
+  - reason: 350: SKIPPED_FIXTURE: live native graph result not present: D:\dev\99_tools\autocad-sdk-router_wave4x_fast_a_main_ready\runs\dwg_truth_autocad_cad_job_20260622_012807\native_cad_job_result.json
+- 1x `tests\unit\test_dwg_graph_ir_schema.py`
+  - category: live/attended required
+  - assigned_to: future attended live proof
+  - reason: 364: SKIPPED_FIXTURE: live native graph result not present: D:\dev\99_tools\autocad-sdk-router_wave4x_fast_a_main_ready\runs\dwg_truth_autocad_cad_job_20260622_012807\native_cad_job_result.json
+- 1x `tests\unit\test_dwg_graph_ir_schema.py`
+  - category: live/attended required
+  - assigned_to: future attended live proof
+  - reason: 373: SKIPPED_FIXTURE: live native graph result not present: D:\dev\99_tools\autocad-sdk-router_wave4x_fast_a_main_ready\runs\dwg_truth_autocad_cad_job_20260622_012807\native_cad_job_result.json
+- 1x `tests\unit\test_dwg_graph_ir_schema.py`
+  - category: live/attended required
+  - assigned_to: future attended live proof
+  - reason: 345: SKIPPED_FIXTURE: live native graph result not present: D:\dev\99_tools\autocad-sdk-router_wave4x_fast_a_main_ready\runs\dwg_truth_autocad_cad_job_20260622_012807\native_cad_job_result.json
+- 5x `C`
+  - category: missing generated fixture/run artifact
+  - assigned_to: fixture generation
+  - reason: \Users\PAUL\AppData\Local\Programs\Python\Python312\Lib\site-packages\_pytest\unittest.py:385: SKIPPED_FIXTURE: native_full IR not present at D:\dev\99_tools\autocad-sdk-router_wave4x_fast_a_main_ready\runs\m02_cadctl_rich\dwg_graph_ir.json (run the m02_cadctl_rich extraction to materialize it)
+- 1x `tests\unit\test_sqlite_ir_store_rich.py`
+  - category: live/attended required
+  - assigned_to: future attended live proof
+  - reason: 147: SKIPPED_FIXTURE: live native_full IR not present: D:\dev\99_tools\autocad-sdk-router_wave4x_fast_a_main_ready\runs\m02_cadctl_rich\dwg_graph_ir.json
+- 1x `tests\unit\test_sqlite_ir_store_rich.py`
+  - category: live/attended required
+  - assigned_to: future attended live proof
+  - reason: 153: SKIPPED_FIXTURE: live native_full IR not present: D:\dev\99_tools\autocad-sdk-router_wave4x_fast_a_main_ready\runs\m02_cadctl_rich\dwg_graph_ir.json
+- 1x `tests\unit\test_sqlite_ir_store_rich.py`
+  - category: live/attended required
+  - assigned_to: future attended live proof
+  - reason: 126: SKIPPED_FIXTURE: live native_full IR not present: D:\dev\99_tools\autocad-sdk-router_wave4x_fast_a_main_ready\runs\m02_cadctl_rich\dwg_graph_ir.json
+- 1x `tests\unit\test_sqlite_ir_store_rich.py`
+  - category: live/attended required
+  - assigned_to: future attended live proof
+  - reason: 135: SKIPPED_FIXTURE: live native_full IR not present: D:\dev\99_tools\autocad-sdk-router_wave4x_fast_a_main_ready\runs\m02_cadctl_rich\dwg_graph_ir.json

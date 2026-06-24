@@ -1,7 +1,9 @@
 {
   "schema": "cad_os.latest_status.v1",
-  "generated_at": "2026-06-24T03:04:03.474829+00:00",
-  "status": "PARTIAL_PASS",
+  "generated_at": "2026-06-24T04:43:19.982372+00:00",
+  "status": "PASS",
+  "branch": "cados/wave4x-fast-a-main-ready",
+  "merge_commit": "current git HEAD on cados/wave4x-fast-a-main-ready",
   "operation_counts": {
     "implemented": 485,
     "hard_blocked": 31,
@@ -12,8 +14,9 @@
     "deferred": 0
   },
   "tests": "529 passed, 20 skipped",
+  "skip_audit": "reports/merge/WAVE4X_FAST_A_MAIN_READY_SKIPS.json",
   "native_build_status": "ok",
-  "integration_branch": "cados/wave4x-fast-a-merge-audit-truth",
-  "integration_commit": "current git HEAD on cados/wave4x-fast-a-merge-audit-truth",
-  "main_merge": "blocked_dirty_main_checkout"
+  "main_updated": false,
+  "main_update_reason": "original main checkout remains dirty; main-ready branch is valid and ready for later merge/rebase",
+  "next": "Fast B must rebase/apply onto cados/wave4x-fast-a-main-ready"
 }
