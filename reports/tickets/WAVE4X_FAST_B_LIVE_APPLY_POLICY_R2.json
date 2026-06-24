@@ -1,0 +1,24 @@
+{
+  "schema": "ariadne.cad_os.wave4x_fast_b.live_apply_policy_r2.v1",
+  "status": "PASS",
+  "decision": "deprecated_safe_replacement",
+  "replacement_ref": "apply.patch + tools/patch_engine.py::apply_native_staged",
+  "status_policy": "deprecated",
+  "allowed_write_modes": [
+    "read"
+  ],
+  "agent_exposed": false,
+  "notes": "Deprecated in WAVE4X. live.apply_patch remains policy-denied on the live pump; use apply.patch / patch_engine.apply_staged (or apply_native_staged for a direct native op) on a staged copy.",
+  "evidence_refs": [
+    "docs/OPERATION_REGISTRY_SPEC.md",
+    "CADOS_M01 Lane D native triage (inspect.database.graph insertion point)",
+    "reports/tickets/WAVE4X_DB_TXN_WRITE.md",
+    "reports/tickets/WAVE4X_DB_TXN_WRITE.json",
+    "reports/tickets/WAVE4X_DB_TXN_WRITE_OPS.json",
+    "tools/patch_engine.py::apply_staged",
+    "config/operations.v2.json#apply.patch",
+    "tools/patch_engine.py::apply_native_staged",
+    "tests/unit/test_patch_engine_policy.py::TestApplyNativeStagedLifecycleMocked",
+    "reports/tickets/WAVE4X_FAST_B_LIVE_APPLY_POLICY_R2.md#live-apply-patch"
+  ]
+}

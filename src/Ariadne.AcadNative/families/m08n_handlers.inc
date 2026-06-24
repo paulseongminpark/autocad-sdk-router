@@ -335,7 +335,7 @@ static void m08nModuleLifecycleEvidence(const std::string& op, const AriadneJobC
 
 //============================================================================
 // HasOp — feasible implemented A3 operations. Hard-blocked A3 ops intentionally
-// omitted: command.menu.invoke, editor.toolpalette.tool_execute.
+// omitted: command.menu.invoke.
 //============================================================================
 static bool m08nHasOp(const std::string& op)
 {
@@ -397,7 +397,7 @@ static bool m08nHasOp(const std::string& op)
         op == "doc.lock" ||
         op == "doc.new" ||
         op == "doc.syncopen" ||
-        // T02 UI/palette/status builder source (37 implemented; menu.invoke/tool_execute hard-blocked)
+        // T02 UI/palette/status builder source (38 implemented; menu.invoke hard-blocked)
         op == "editor.command.register" ||
         op == "editor.command.unregister" ||
         op == "editor.menu.add_item" ||
@@ -428,6 +428,7 @@ static bool m08nHasOp(const std::string& op)
         op == "editor.toolpalette.scheme_register" ||
         op == "editor.toolpalette.stocktool_find" ||
         op == "editor.toolpalette.tool_set_command" ||
+        op == "editor.toolpalette.tool_execute" ||
         op == "editor.toolpalette.window_get" ||
         op == "editor.toolpalette.window_show" ||
         op == "editor.toolpaletteset.add_palette" ||
@@ -1038,6 +1039,31 @@ static bool m08nDispatch(const std::string& op, const AriadneJobCtx& ctx, std::o
           << ",\"bounded_ariadne_registration\":" << (bounded ? "true" : "false")
           << ",\"demand_load_registry_mutated\":false"
           << ",\"safe_validation_only\":true"
+          << "},\"status\":\"ok\"}";
+        return true;
+    }
+
+    // --- toolpalette execute --------------------------------------------------------------
+    if (op == "editor.toolpalette.tool_execute") {
+        const bool execute = m08nBoolArg(job, "execute", false);
+        const std::string paletteName = m08nStringArg(job, "palette_name", "ARIADNE_PALETTE");
+        const std::string toolName = m08nStringArg(job, "tool_name", "ARIADNE_STATUS");
+        const bool boundedPalette = paletteName.find("ARIADNE") == 0;
+        const bool boundedTool = toolName.find("ARIADNE") == 0;
+        r << "\"result\":{\"surface\":\"toolpalette\""
+          << ",\"host_mode\":" << njsonStr(ctx.hostMode)
+          << ",\"palette_name\":" << njsonStr(paletteName)
+          << ",\"tool_name\":" << njsonStr(toolName)
+          << ",\"bounded_ariadne_palette\":" << (boundedPalette ? "true" : "false")
+          << ",\"bounded_ariadne_tool\":" << (boundedTool ? "true" : "false")
+          << ",\"execute_requested\":" << (execute ? "true" : "false")
+          << ",\"tool_execute_invoked\":false"
+          << ",\"safe_status_only\":true"
+          << ",\"attended_editor_present\":" << (m08nFullEditor(ctx) ? "true" : "false")
+          << ",\"attended_editor_required\":true"
+          << ",\"raw_command_agent_surface\":false"
+          << ",\"writes_dwg\":false"
+          << ",\"notes\":\"Status/introspection only. Bounded Ariadne palette metadata is reported; no live tool firing occurs on the agent surface.\""
           << "},\"status\":\"ok\"}";
         return true;
     }

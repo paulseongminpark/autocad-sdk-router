@@ -132,8 +132,8 @@ class TestM08ACatalogReopen(unittest.TestCase):
         self.assertEqual(by_status.get("unknown", 0), 0)
         self.assertEqual(by_status.get("catalogued", 0), 0)
         self.assertEqual(by_status.get("stub", 0), 0)
-        self.assertEqual(by_status.get("implemented", 0), 485)
-        self.assertEqual(by_status.get("blocked", 0), 31)
+        self.assertEqual(by_status.get("implemented", 0), 487)
+        self.assertEqual(by_status.get("blocked", 0), 29)
         self.assertEqual(by_status.get("deprecated", 0), 1)
         self.assertEqual(by_status.get("implemented", 0) + by_status.get("blocked", 0) + by_status.get("deprecated", 0), len(self.ops))
 

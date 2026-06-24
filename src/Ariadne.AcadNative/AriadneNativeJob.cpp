@@ -3148,6 +3148,20 @@ static bool tryFamilyDispatch(const std::string& op, const AriadneJobCtx& ctx, s
         || m08nDispatch(op, ctx, r);
 }
 
+// The live CADAGENT_PUMP surface stays intentionally narrow. Fast B only opens
+// the attended plot/UI proofs that need a dedicated full AutoCAD host; it does
+// not expose the full family table over the pump.
+static bool tryPumpSafeDispatch(const std::string& op, const AriadneJobCtx& ctx, std::ostringstream& r)
+{
+    if (op == "plot.config.settings" || op == "plot.engine.run")
+        return m08lDispatch(op, ctx, r);
+    if (op == "ui.subentity.highlight")
+        return m08dDispatch(op, ctx, r);
+    if (op == "editor.toolpalette.tool_execute")
+        return m08nDispatch(op, ctx, r);
+    return false;
+}
+
 static void ariadneNativeJob()
 {
     const std::wstring inPath = readJobPathSetting(L"ARIADNE_CAD_JOB_IN");
@@ -4232,10 +4246,17 @@ static std::string pumpDispatch(const std::string& req, bool& stop)
         r << "\"status\":\"ok\",\"stopped\":true}";
     }
     else {
+        const AriadneJobCtx ctx{ req, pDb, hostMode };
+        std::ostringstream fr;
+        if (tryPumpSafeDispatch(op, ctx, fr)) {
+            r << fr.str();
+            return r.str();
+        }
         r << "\"status\":\"not_implemented\",\"reason\":\"unknown op ("
           << "read: live.echo/live.status/live.list_documents/live.active_document/live.inspect_entity; "
           << "write-disabled: live.apply_patch; "
           << "attended_only: live.inspect_selection/live.highlight_handles/live.clear_highlight/live.zoom_to_handles/live.render_view; "
+          << "fast_b_safe_attended: plot.config.settings/plot.engine.run/ui.subentity.highlight/editor.toolpalette.tool_execute; "
           << "control: live.stop)\"}";
     }
     return r.str();
@@ -4330,7 +4351,7 @@ static void ariadneCadAgentStatus()
       << ",\"serving\":" << (serving ? "true" : "false")
       << ",\"start_command\":\"CADAGENT_PUMP\""
       << ",\"stop_via\":\"frame:{op:live.stop}\""
-      << ",\"supported_ops\":[\"live.echo\",\"live.status\",\"live.list_documents\",\"live.active_document\",\"live.inspect_entity\",\"live.apply_patch\",\"live.inspect_selection\",\"live.highlight_handles\",\"live.clear_highlight\",\"live.zoom_to_handles\",\"live.render_view\",\"live.stop\"]"
+      << ",\"supported_ops\":[\"live.echo\",\"live.status\",\"live.list_documents\",\"live.active_document\",\"live.inspect_entity\",\"live.apply_patch\",\"live.inspect_selection\",\"live.highlight_handles\",\"live.clear_highlight\",\"live.zoom_to_handles\",\"live.render_view\",\"plot.config.settings\",\"plot.engine.run\",\"ui.subentity.highlight\",\"editor.toolpalette.tool_execute\",\"live.stop\"]"
       << ",\"write_policy\":\"disabled_use_m05_staged_governor\"}";
     acutPrintf(_T("\nCADAGENT_STATUS: %hs\n"), r.str().c_str());
 }

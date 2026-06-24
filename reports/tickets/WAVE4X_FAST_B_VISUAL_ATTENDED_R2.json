@@ -1,0 +1,30 @@
+{
+  "schema": "ariadne.cad_os.wave4x_fast_b.visual_attended_r2.v1",
+  "status": "PASS",
+  "plot.config.settings": {
+    "status": "ok",
+    "layout_name": "Model",
+    "canonical_media_name": "ISO_A4_(210.00_x_297.00_MM)"
+  },
+  "plot.engine.run": {
+    "status": "ok",
+    "engine_created": true,
+    "engine_status": 0
+  },
+  "attended_ran": true,
+  "run_ref": "runs/w4x_visual_plot_attended_20260624_140042",
+  "artifacts": {
+    "plan": "runs/w4x_visual_plot_attended_20260624_140042/attended_plan.json",
+    "result": "runs/w4x_visual_plot_attended_20260624_140042/attended_pump_result.json",
+    "shutdown": "runs/w4x_visual_plot_attended_20260624_140042/attended_shutdown.json",
+    "screenshot": "runs/w4x_visual_plot_attended_20260624_140042/screenshots/acad_window.png"
+  },
+  "safety": {
+    "dedicated_instance": true,
+    "launched_pid_closed": true,
+    "pre_existing_pids": [],
+    "user_session_touched": false,
+    "original_dwg_modified": false,
+    "pipe_up": true
+  }
+}

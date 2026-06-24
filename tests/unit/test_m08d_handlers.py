@@ -78,6 +78,10 @@ _GROUP_C_SUBENT = [
     "inspect.subentity.markers_at_path",
     "inspect.subentity.path_at_marker",
 ]
+# Attended graphics/editor read-safe surface (1)
+_ATTENDED_UI = [
+    "ui.subentity.highlight",
+]
 # Group C -- AcBr BRep topology (48)
 _GROUP_C_BREP = [
     "inspect.brep.from_entity",
@@ -126,12 +130,10 @@ _GROUP_C_BREP = [
     "inspect.loop.face",
 ]
 
-_IMPLEMENTED = _GROUP_A + _GROUP_B + _GROUP_C_SUBENT + _GROUP_C_BREP
+_IMPLEMENTED = _GROUP_A + _GROUP_B + _GROUP_C_SUBENT + _GROUP_C_BREP + _ATTENDED_UI
 
 # Deferred/hard-blocked ops that must NOT appear in HasOp (honest contract).
-_DEFERRED = [
-    "ui.subentity.highlight",            # attended/graphics (live editor + GS flush)
-]
+_DEFERRED = []
 
 
 def _read():
@@ -185,16 +187,17 @@ class TestM08DHandlers(unittest.TestCase):
 
     def test_implemented_count(self):
         # Group totals: A=4 entities, B=18 geometry-kernel, subent=6 (main-path
-        # AcDbEntity subentity reads), brep=44 (AcBr). 4+18+6+44 = 72 real handlers.
-        # The remaining op of the 73-op brief is the editor/graphics _DEFERRED
-        # op -- left OUT of HasOp on purpose (no fake pass).
+        # AcDbEntity subentity reads), brep=44 (AcBr), attended_ui=1. 4+18+6+44+1 = 73
+        # real handlers; the live subentity highlight is implemented as an attended,
+        # graphics-only read-safe surface.
         self.assertEqual(len(_GROUP_A), 4)
         self.assertEqual(len(_GROUP_B), 18)
         self.assertEqual(len(_GROUP_C_SUBENT), 6)
         self.assertEqual(len(_GROUP_C_BREP), 44)
-        self.assertEqual(len(_IMPLEMENTED), 72)
-        self.assertEqual(len(set(_IMPLEMENTED)), 72, "duplicate op id in the implemented list")
-        self.assertEqual(len(self.hasop), 72)
+        self.assertEqual(len(_ATTENDED_UI), 1)
+        self.assertEqual(len(_IMPLEMENTED), 73)
+        self.assertEqual(len(set(_IMPLEMENTED)), 73, "duplicate op id in the implemented list")
+        self.assertEqual(len(self.hasop), 73)
 
     def test_no_deferred_op_in_hasop(self):
         leaked = sorted(self.hasop & set(_DEFERRED))
@@ -249,6 +252,14 @@ class TestM08DHandlers(unittest.TestCase):
         self.assertIn("AcDb3dSolid::cast", self.src)
         self.assertIn("AcDbSurface::cast", self.src)
         self.assertIn("AcDbSubDMesh::cast", self.src)
+
+    def test_subentity_highlight_uses_real_attended_graphics_api(self):
+        self.assertIn('op == "ui.subentity.highlight"', self.src)
+        self.assertIn("highlight(path", self.src)
+        self.assertIn("unhighlight(path", self.src)
+        self.assertIn("getGsMarkersAtSubentPath", self.src)
+        self.assertIn("acedUpdateDisplay()", self.src)
+        self.assertIn("requires a dedicated full AutoCAD editor host", self.src)
 
     def test_acbr_links_real_lib_not_drawbridge(self):
         # AcBr import lib is acbr26.lib (utils\\brep\\lib-x64), NOT AcDrawBridge.lib.

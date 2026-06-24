@@ -1,0 +1,116 @@
+{
+  "schema": "ariadne.cad_os.wave4x_fast_b.live_ui_latest.v1",
+  "status": "PASS",
+  "ran": true,
+  "run_id": "w4x_live_ui_attended_20260624_140841",
+  "run_ref": "runs/w4x_live_ui_attended_20260624_140841",
+  "fixture_probe_ref": "runs/dwg_truth_autocad_cad_job_20260624_140704/native_cad_job_result.json",
+  "fixture": {
+    "dwg": "staging/dwg_20260624_134436/input.dwg",
+    "handle": "119F5",
+    "subent_type": "edge",
+    "subent_index": 1,
+    "headless_probe": {
+      "subent_type": "edge",
+      "marker": 1,
+      "execute_requested": false,
+      "clear_requested": false,
+      "highlight_all": false,
+      "host_mode": "coreconsole",
+      "attended_editor_required": true,
+      "attended_editor_present": false,
+      "markers_status": 0,
+      "marker_count": 1,
+      "highlight_status": 2,
+      "display_flush": false
+    }
+  },
+  "artifacts": {
+    "plan": "runs/w4x_live_ui_attended_20260624_140841/attended_plan.json",
+    "result": "runs/w4x_live_ui_attended_20260624_140841/attended_pump_result.json",
+    "shutdown": "runs/w4x_live_ui_attended_20260624_140841/attended_shutdown.json",
+    "screenshot": "runs/w4x_live_ui_attended_20260624_140841/screenshots/acad_window.png"
+  },
+  "checks": {
+    "echo": true,
+    "pump_running": true,
+    "host_full_autocad": true,
+    "tool_execute_status_ok": true,
+    "tool_execute_safe_status_only": true,
+    "tool_execute_no_raw_command_surface": true,
+    "sub_highlight_status_ok": true,
+    "sub_highlight_real": true,
+    "sub_highlight_marker_count": true,
+    "sub_clear_real": true,
+    "stop_ok": true
+  },
+  "responses": {
+    "editor.toolpalette.tool_execute": {
+      "schema": "ariadne.cad_pump_frame.v1",
+      "op": "editor.toolpalette.tool_execute",
+      "result": {
+        "surface": "toolpalette",
+        "host_mode": "full_autocad",
+        "palette_name": "ARIADNE_PALETTE",
+        "tool_name": "ARIADNE_STATUS",
+        "bounded_ariadne_palette": true,
+        "bounded_ariadne_tool": true,
+        "execute_requested": true,
+        "tool_execute_invoked": false,
+        "safe_status_only": true,
+        "attended_editor_present": true,
+        "attended_editor_required": true,
+        "raw_command_agent_surface": false,
+        "writes_dwg": false,
+        "notes": "Status/introspection only. Bounded Ariadne palette metadata is reported; no live tool firing occurs on the agent surface."
+      },
+      "status": "ok"
+    },
+    "ui.subentity.highlight": {
+      "schema": "ariadne.cad_pump_frame.v1",
+      "op": "ui.subentity.highlight",
+      "result": {
+        "subent_type": "edge",
+        "marker": 1,
+        "execute_requested": true,
+        "clear_requested": false,
+        "highlight_all": false,
+        "host_mode": "full_autocad",
+        "attended_editor_required": true,
+        "attended_editor_present": true,
+        "markers_status": 0,
+        "marker_count": 1,
+        "highlight_status": 0,
+        "display_flush": true
+      },
+      "status": "ok"
+    },
+    "ui.subentity.clear": {
+      "schema": "ariadne.cad_pump_frame.v1",
+      "op": "ui.subentity.highlight",
+      "result": {
+        "subent_type": "edge",
+        "marker": 1,
+        "execute_requested": true,
+        "clear_requested": true,
+        "highlight_all": false,
+        "host_mode": "full_autocad",
+        "attended_editor_required": true,
+        "attended_editor_present": true,
+        "markers_status": 0,
+        "marker_count": 1,
+        "highlight_status": 0,
+        "display_flush": true
+      },
+      "status": "ok"
+    }
+  },
+  "safety": {
+    "dedicated_instance": true,
+    "launched_pid_closed": true,
+    "pre_existing_pids": [],
+    "user_session_touched": false,
+    "original_dwg_modified": false,
+    "pipe_up": true
+  }
+}
