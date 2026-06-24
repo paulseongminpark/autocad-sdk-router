@@ -67,6 +67,13 @@ _RUNTIME = [
     "module.load.by_app",
     "module.load.demand_register",
     "module.unload",
+    "module.entrypoint.define",
+    "module.entrypoint.dispatch",
+    "module.lifecycle.init",
+    "module.lifecycle.on_load_dwg",
+    "module.lifecycle.on_unload_dwg",
+    "module.lifecycle.other",
+    "module.lifecycle.unload",
     "module.register_mdi",
     "module.register_service",
 ]
@@ -177,8 +184,8 @@ class TestM08NHandlers(unittest.TestCase):
         self.assertRegex(self.src, r"bool\s+m08nDispatch\(const std::string& op, const AriadneJobCtx& ctx, std::ostringstream& r\)")
 
     def test_hasop_lists_exactly_feasible_implemented(self):
-        self.assertEqual(len(_IMPLEMENTED), 84)
-        self.assertEqual(len(set(_IMPLEMENTED)), 84)
+        self.assertEqual(len(_IMPLEMENTED), 91)
+        self.assertEqual(len(set(_IMPLEMENTED)), 91)
         self.assertEqual(
             self.hasop,
             set(_IMPLEMENTED),
@@ -246,6 +253,22 @@ class TestM08NHandlers(unittest.TestCase):
             "acrxServiceIsRegistered", "acrxRegisterAppMDIAware",
         ]:
             self.assertIn(token, self.src + self.native_job)
+
+    def test_module_lifecycle_evidence_is_status_only(self):
+        for token in [
+            "m08nModuleLifecycleEvidence",
+            "module.entrypoint.define",
+            "module.entrypoint.dispatch",
+            "module.lifecycle.init",
+            "module.lifecycle.on_load_dwg",
+            "module.lifecycle.on_unload_dwg",
+            "module.lifecycle.other",
+            "module.lifecycle.unload",
+            "actual_lifecycle_callback_invoked",
+            "synthetic_loader_message_dispatched",
+            "lifecycle_evidence_status_only",
+        ]:
+            self.assertIn(token, self.src)
 
     def test_module_command_flags_is_read_only_inventory(self):
         self.assertIn('op == "module.command.flags"', self.src)

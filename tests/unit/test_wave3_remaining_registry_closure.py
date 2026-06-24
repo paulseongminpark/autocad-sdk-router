@@ -9,14 +9,7 @@ EXPECTED_BLOCKED_AFTER_REAUDIT = {
     "ui.subentity.highlight",
     "automate.com.send_command",
     "embed.ole.frame",
-    "module.entrypoint.define",
-    "module.entrypoint.dispatch",
-    "module.lifecycle.init",
-    "module.lifecycle.on_load_dwg",
     "module.lifecycle.on_ole_unload",
-    "module.lifecycle.on_unload_dwg",
-    "module.lifecycle.other",
-    "module.lifecycle.unload",
 }
 
 EXPECTED_IMPLEMENTED_AFTER_WAVE4X = {
@@ -36,6 +29,16 @@ EXPECTED_IMPLEMENTED_AFTER_WAVE4X_LOADER_DOC = {
     "module.load.by_app",
     "module.load.demand_register",
     "module.unload",
+}
+
+EXPECTED_IMPLEMENTED_AFTER_WAVE4X_LOADER_DOC_R2 = {
+    "module.entrypoint.define",
+    "module.entrypoint.dispatch",
+    "module.lifecycle.init",
+    "module.lifecycle.on_load_dwg",
+    "module.lifecycle.on_unload_dwg",
+    "module.lifecycle.other",
+    "module.lifecycle.unload",
 }
 
 ALLOWED_BLOCKER_CODES = {
@@ -99,6 +102,17 @@ def test_wave4x_loader_doc_ops_are_implemented():
         assert op["status"] == "implemented", oid
         evidence = "\n".join(op.get("evidence_refs") or [])
         assert "reports/tickets/WAVE4X_LOADER_DOC.md" in evidence, oid
+        assert op.get("handler", {}).get("dispatcher_symbol") == "m08nDispatch", oid
+        assert op.get("handler", {}).get("router_lane") == "ARIADNE_NATIVE_JOB", oid
+
+
+def test_wave4x_loader_doc_r2_ops_are_implemented():
+    ops = _operations()
+    for oid in sorted(EXPECTED_IMPLEMENTED_AFTER_WAVE4X_LOADER_DOC_R2):
+        op = ops[oid]
+        assert op["status"] == "implemented", oid
+        evidence = "\n".join(op.get("evidence_refs") or [])
+        assert "reports/tickets/WAVE4X_LOADER_DOC_R2.md" in evidence, oid
         assert op.get("handler", {}).get("dispatcher_symbol") == "m08nDispatch", oid
         assert op.get("handler", {}).get("router_lane") == "ARIADNE_NATIVE_JOB", oid
 

@@ -1,0 +1,30 @@
+{
+  "schema": "wave4x.loader_doc_r2.result.v1",
+  "generated_at": "2026-06-23T15:40:34.501932+00:00",
+  "status": "implemented_with_one_hard_block",
+  "branch": "cados/w4x-loader-doc-r2-lifecycle-entrypoints",
+  "implemented_ops": [
+    "module.entrypoint.define",
+    "module.entrypoint.dispatch",
+    "module.lifecycle.init",
+    "module.lifecycle.on_load_dwg",
+    "module.lifecycle.on_unload_dwg",
+    "module.lifecycle.other",
+    "module.lifecycle.unload"
+  ],
+  "still_hard_blocked_ops": [
+    "doc.sendstring"
+  ],
+  "deprecated_ops": [],
+  "doc_sendstring_decision": "hard_blocked_not_agent_exposed_raw_command_surface",
+  "lifecycle_decision": "implemented_as_native_lifecycle_evidence_status_only_no_synthetic_loader_dispatch",
+  "native_build": "exit_0",
+  "tests": {
+    "pytest": "493 passed, 20 skipped",
+    "cadctl_registry_coverage": "status ok; operation_count 517; implemented 464; blocked 53; consistent true",
+    "reconcile_native_registry": "dry-run; coded 424; conflicts 0; drift 0",
+    "json_operation_coverage_latest": "parsed ok"
+  },
+  "validated_at": "2026-06-23T15:44:14.276537+00:00",
+  "native_build_ref": "reports/tickets/WAVE4X_LOADER_DOC_R2_native_build.json"
+}

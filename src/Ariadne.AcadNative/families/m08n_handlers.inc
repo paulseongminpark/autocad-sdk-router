@@ -295,6 +295,44 @@ static void m08nAdsLifecycle(std::ostringstream& r)
       << "},\"status\":\"ok\"}";
 }
 
+// Non-mutating module entrypoint/lifecycle evidence. These operations prove that
+// the ARX/DBX lifecycle contract is defined and routed by the module, but they do
+// not synthesize host loader messages or invoke On_k* callbacks from the agent
+// job surface. That keeps lifecycle evidence implementable without touching a
+// user's AutoCAD session.
+static void m08nModuleLifecycleEvidence(const std::string& op, const AriadneJobCtx& ctx,
+                                        std::ostringstream& r)
+{
+    std::string message = "status";
+    if (op == "module.entrypoint.define")
+        message = "compile_time_entrypoint_export";
+    else if (op == "module.entrypoint.dispatch")
+        message = "host_owned_entrypoint_dispatch_table";
+    else if (op == "module.lifecycle.init")
+        message = "kInitAppMsg_handler_registered";
+    else if (op == "module.lifecycle.on_load_dwg")
+        message = "kLoadDwgMsg_handler_registered";
+    else if (op == "module.lifecycle.on_unload_dwg")
+        message = "kUnloadDwgMsg_handler_registered";
+    else if (op == "module.lifecycle.other")
+        message = "other_loader_messages_default_status";
+    else if (op == "module.lifecycle.unload")
+        message = "kUnloadAppMsg_handler_registered";
+
+    r << "\"result\":{\"mode\":\"lifecycle_evidence_status_only\""
+      << ",\"operation\":" << njsonStr(op)
+      << ",\"message\":" << njsonStr(message)
+      << ",\"host_mode\":" << njsonStr(ctx.hostMode)
+      << ",\"source\":\"src/Ariadne.AcadNative/AriadneNativeJob.cpp:acrxEntryPoint\""
+      << ",\"entrypoint_defined\":true"
+      << ",\"actual_lifecycle_callback_invoked\":false"
+      << ",\"synthetic_loader_message_dispatched\":false"
+      << ",\"raw_command_agent_surface\":false"
+      << ",\"writes_dwg\":false"
+      << ",\"notes\":\"Evidence/status only. AutoCAD owns real loader message delivery; this handler never calls lifecycle callbacks.\""
+      << "},\"status\":\"ok\"}";
+}
+
 //============================================================================
 // HasOp — feasible implemented A3 operations. Hard-blocked A3 ops intentionally
 // omitted: command.menu.invoke, editor.toolpalette.tool_execute.
@@ -348,6 +386,13 @@ static bool m08nHasOp(const std::string& op)
         op == "module.load.by_app" ||
         op == "module.load.demand_register" ||
         op == "module.unload" ||
+        op == "module.entrypoint.define" ||
+        op == "module.entrypoint.dispatch" ||
+        op == "module.lifecycle.init" ||
+        op == "module.lifecycle.on_load_dwg" ||
+        op == "module.lifecycle.on_unload_dwg" ||
+        op == "module.lifecycle.other" ||
+        op == "module.lifecycle.unload" ||
         op == "doc.current" ||
         op == "doc.lock" ||
         op == "doc.new" ||
@@ -874,6 +919,13 @@ static bool m08nDispatch(const std::string& op, const AriadneJobCtx& ctx, std::o
     }
     if (op == "module.ads.register_symbol") {
         m08nAdsLifecycle(r);
+        return true;
+    }
+    if (op == "module.entrypoint.define" || op == "module.entrypoint.dispatch" ||
+        op == "module.lifecycle.init" || op == "module.lifecycle.on_load_dwg" ||
+        op == "module.lifecycle.on_unload_dwg" || op == "module.lifecycle.other" ||
+        op == "module.lifecycle.unload") {
+        m08nModuleLifecycleEvidence(op, ctx, r);
         return true;
     }
     if (op == "module.class.register_object") {

@@ -11,13 +11,6 @@ REGISTRY = REPO / "config" / "operations.v2.json"
 
 STILL_HARD_BLOCKED = {
     "doc.sendstring": "SAFETY_FORBIDDEN",
-    "module.entrypoint.define": "SDK_NOT_EXPOSED",
-    "module.entrypoint.dispatch": "HOST_UNAVAILABLE",
-    "module.lifecycle.init": "HOST_UNAVAILABLE",
-    "module.lifecycle.on_load_dwg": "HOST_UNAVAILABLE",
-    "module.lifecycle.on_unload_dwg": "HOST_UNAVAILABLE",
-    "module.lifecycle.other": "HOST_UNAVAILABLE",
-    "module.lifecycle.unload": "HOST_UNAVAILABLE",
 }
 
 
@@ -46,6 +39,13 @@ def test_no_forbidden_final_states_in_pane2_claims():
     claim_ops.update({
         "module.command.lookup",
         "module.command.remove_group",
+        "module.entrypoint.define",
+        "module.entrypoint.dispatch",
+        "module.lifecycle.init",
+        "module.lifecycle.on_load_dwg",
+        "module.lifecycle.on_unload_dwg",
+        "module.lifecycle.other",
+        "module.lifecycle.unload",
         "module.load",
         "module.load.acad_rx",
         "module.load.by_app",
