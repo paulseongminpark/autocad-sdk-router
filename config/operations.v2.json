@@ -1,4 +1,4 @@
-{
+﻿{
   "schema": "ariadne.operations_registry.v2",
   "version": "2.0.0",
   "generated_at": "2026-06-23T20:36:32+09:00",
@@ -3198,11 +3198,13 @@
           "live_edit"
         ],
         "no_original_write_default": true,
-        "runtime_behavior": "not_runnable_until_promoted_to_implemented_or_wired"
+        "runtime_behavior": "not_runnable_until_promoted_to_implemented_or_wired",
+        "agent_exposed": false
       },
       "tests": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
-        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata"
+        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
+        "tests/unit/test_wave4x_final_a_hardblock_contract.py"
       ],
       "summary": "Coroutine/fiber-based command invocation: fires a callback when the issued command pauses for input, enabling",
       "source_slice": "editor-delta.md",
@@ -3211,13 +3213,30 @@
         "config/autocad_native_arx_operation_catalog.json#command.invoke.coroutine",
         "docs/FALLBACK_POLICY.md",
         "docs/M08_REMAINING_BATCH_PLAN.md#m08o-fallback-raw-command-hard-block",
-        "reports/tickets/WAVE4X_FALLBACK.md"
+        "reports/tickets/WAVE4X_FALLBACK.md",
+        "reports/WAVE4X_FINAL_A_HARDBLOCK_DECISIONS.md#command-invoke-coroutine",
+        "reports/WAVE4X_FINAL_A_HARDBLOCK_REIMPLEMENTATION.md#command-invoke-coroutine",
+        "tests/unit/test_wave4x_final_a_hardblock_contract.py"
       ],
       "notes": "Wave4X re-review retained SAFETY_FORBIDDEN. Raw coroutine command dispatch remains blocked.",
       "owner_ticket": "M08O-T02",
       "implementation_strategy": "hard_blocked",
       "evidence_required": "blocker_ref_and_evidence",
-      "blocked_reason": "SAFETY_FORBIDDEN: raw command dispatch is blocked in M08O fallback policy. Fallbacks are managed/.NET/LISP-only and do not expose direct command strings."
+      "blocked_reason": "SAFETY_FORBIDDEN: raw command dispatch is blocked in M08O fallback policy. Fallbacks are managed/.NET/LISP-only and do not expose direct command strings.",
+      "agent_exposed": false,
+      "blocker_ref": "reports/WAVE4X_FINAL_A_HARDBLOCK_DECISIONS.md#command-invoke-coroutine",
+      "replacement_ref": "typed CAD OS operation handlers only; examples: command.register.define + module.command.lookup + module.command.stack_handle + operation-specific implemented handlers",
+      "hardblock_audit": {
+        "packet": "WAVE4X_FINAL_A_HARDBLOCK_REIMPLEMENTATION",
+        "decision": "remain_hard_blocked_after_reimplementation_audit",
+        "allowed_hardblock_reason": "SAFETY_FORBIDDEN",
+        "why_no_typed_safe_implementation": "The exact SDK operation is raw command string or macro dispatch. A typed safe implementation would be a different operation; CAD OS exposes operation-specific typed handlers instead of a generic raw command API.",
+        "why_no_read_status_introspection_subset": "Executing or queueing a command string has no read-only subset. Command metadata/status is covered by implemented typed operations such as command.register.define, module.command.lookup, and module.command.stack_handle.",
+        "why_no_staged_copy_implementation": "Running arbitrary command text on a staged copy bypasses operation schemas and typed handlers, and could still perform unbounded side effects inside the AutoCAD command processor.",
+        "why_no_attended_dedicated_instance_implementation": "A dedicated attended host would still expose arbitrary command text to an editor command stream. Host isolation does not convert raw command dispatch into a bounded operation.",
+        "why_no_policy_gated_replacement_route": "A policy-gated generic command route would still expose raw command semantics. The replacement is typed CAD OS operations and operation-specific handlers, not command-string execution.",
+        "non_agent_exposure_test": "tests/unit/test_wave4x_final_a_hardblock_contract.py"
+      }
     },
     {
       "id": "command.invoke.sync",
@@ -3272,11 +3291,13 @@
           "live_edit"
         ],
         "no_original_write_default": true,
-        "runtime_behavior": "not_runnable_until_promoted_to_implemented_or_wired"
+        "runtime_behavior": "not_runnable_until_promoted_to_implemented_or_wired",
+        "agent_exposed": false
       },
       "tests": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
-        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata"
+        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
+        "tests/unit/test_wave4x_final_a_hardblock_contract.py"
       ],
       "summary": "Runs a *full* AutoCAD command synchronously via a private command-line processor initialized at the",
       "source_slice": "editor-delta.md",
@@ -3285,13 +3306,30 @@
         "config/autocad_native_arx_operation_catalog.json#command.invoke.sync",
         "docs/FALLBACK_POLICY.md",
         "docs/M08_REMAINING_BATCH_PLAN.md#m08o-fallback-raw-command-hard-block",
-        "reports/tickets/WAVE4X_FALLBACK.md"
+        "reports/tickets/WAVE4X_FALLBACK.md",
+        "reports/WAVE4X_FINAL_A_HARDBLOCK_DECISIONS.md#command-invoke-sync",
+        "reports/WAVE4X_FINAL_A_HARDBLOCK_REIMPLEMENTATION.md#command-invoke-sync",
+        "tests/unit/test_wave4x_final_a_hardblock_contract.py"
       ],
       "notes": "Wave4X re-review retained SAFETY_FORBIDDEN. Raw sync command dispatch remains blocked.",
       "owner_ticket": "M08O-T02",
       "implementation_strategy": "hard_blocked",
       "evidence_required": "blocker_ref_and_evidence",
-      "blocked_reason": "SAFETY_FORBIDDEN: raw command dispatch is blocked in M08O fallback policy. Fallbacks are managed/.NET/LISP-only and do not expose direct command strings."
+      "blocked_reason": "SAFETY_FORBIDDEN: raw command dispatch is blocked in M08O fallback policy. Fallbacks are managed/.NET/LISP-only and do not expose direct command strings.",
+      "agent_exposed": false,
+      "blocker_ref": "reports/WAVE4X_FINAL_A_HARDBLOCK_DECISIONS.md#command-invoke-sync",
+      "replacement_ref": "typed CAD OS operation handlers only; examples: command.register.define + module.command.lookup + module.command.stack_handle + operation-specific implemented handlers",
+      "hardblock_audit": {
+        "packet": "WAVE4X_FINAL_A_HARDBLOCK_REIMPLEMENTATION",
+        "decision": "remain_hard_blocked_after_reimplementation_audit",
+        "allowed_hardblock_reason": "SAFETY_FORBIDDEN",
+        "why_no_typed_safe_implementation": "The exact SDK operation is raw command string or macro dispatch. A typed safe implementation would be a different operation; CAD OS exposes operation-specific typed handlers instead of a generic raw command API.",
+        "why_no_read_status_introspection_subset": "Executing or queueing a command string has no read-only subset. Command metadata/status is covered by implemented typed operations such as command.register.define, module.command.lookup, and module.command.stack_handle.",
+        "why_no_staged_copy_implementation": "Running arbitrary command text on a staged copy bypasses operation schemas and typed handlers, and could still perform unbounded side effects inside the AutoCAD command processor.",
+        "why_no_attended_dedicated_instance_implementation": "A dedicated attended host would still expose arbitrary command text to an editor command stream. Host isolation does not convert raw command dispatch into a bounded operation.",
+        "why_no_policy_gated_replacement_route": "A policy-gated generic command route would still expose raw command semantics. The replacement is typed CAD OS operations and operation-specific handlers, not command-string execution.",
+        "non_agent_exposure_test": "tests/unit/test_wave4x_final_a_hardblock_contract.py"
+      }
     },
     {
       "id": "command.invoke.sync.resbuf",
@@ -3346,11 +3384,13 @@
           "live_edit"
         ],
         "no_original_write_default": true,
-        "runtime_behavior": "not_runnable_until_promoted_to_implemented_or_wired"
+        "runtime_behavior": "not_runnable_until_promoted_to_implemented_or_wired",
+        "agent_exposed": false
       },
       "tests": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
-        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata"
+        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
+        "tests/unit/test_wave4x_final_a_hardblock_contract.py"
       ],
       "summary": "Same as acedCommandS but takes a resbuf chain instead of varargs.",
       "source_slice": "editor-delta.md",
@@ -3359,13 +3399,30 @@
         "config/autocad_native_arx_operation_catalog.json#command.invoke.sync.resbuf",
         "docs/FALLBACK_POLICY.md",
         "docs/M08_REMAINING_BATCH_PLAN.md#m08o-fallback-raw-command-hard-block",
-        "reports/tickets/WAVE4X_FALLBACK.md"
+        "reports/tickets/WAVE4X_FALLBACK.md",
+        "reports/WAVE4X_FINAL_A_HARDBLOCK_DECISIONS.md#command-invoke-sync-resbuf",
+        "reports/WAVE4X_FINAL_A_HARDBLOCK_REIMPLEMENTATION.md#command-invoke-sync-resbuf",
+        "tests/unit/test_wave4x_final_a_hardblock_contract.py"
       ],
       "notes": "Wave4X re-review retained SAFETY_FORBIDDEN. Raw resbuf command dispatch remains blocked.",
       "owner_ticket": "M08O-T02",
       "implementation_strategy": "hard_blocked",
       "evidence_required": "blocker_ref_and_evidence",
-      "blocked_reason": "SAFETY_FORBIDDEN: raw command dispatch is blocked in M08O fallback policy. Fallbacks are managed/.NET/LISP-only and do not expose direct command strings."
+      "blocked_reason": "SAFETY_FORBIDDEN: raw command dispatch is blocked in M08O fallback policy. Fallbacks are managed/.NET/LISP-only and do not expose direct command strings.",
+      "agent_exposed": false,
+      "blocker_ref": "reports/WAVE4X_FINAL_A_HARDBLOCK_DECISIONS.md#command-invoke-sync-resbuf",
+      "replacement_ref": "typed CAD OS operation handlers only; examples: command.register.define + module.command.lookup + module.command.stack_handle + operation-specific implemented handlers",
+      "hardblock_audit": {
+        "packet": "WAVE4X_FINAL_A_HARDBLOCK_REIMPLEMENTATION",
+        "decision": "remain_hard_blocked_after_reimplementation_audit",
+        "allowed_hardblock_reason": "SAFETY_FORBIDDEN",
+        "why_no_typed_safe_implementation": "The exact SDK operation is raw command string or macro dispatch. A typed safe implementation would be a different operation; CAD OS exposes operation-specific typed handlers instead of a generic raw command API.",
+        "why_no_read_status_introspection_subset": "Executing or queueing a command string has no read-only subset. Command metadata/status is covered by implemented typed operations such as command.register.define, module.command.lookup, and module.command.stack_handle.",
+        "why_no_staged_copy_implementation": "Running arbitrary command text on a staged copy bypasses operation schemas and typed handlers, and could still perform unbounded side effects inside the AutoCAD command processor.",
+        "why_no_attended_dedicated_instance_implementation": "A dedicated attended host would still expose arbitrary command text to an editor command stream. Host isolation does not convert raw command dispatch into a bounded operation.",
+        "why_no_policy_gated_replacement_route": "A policy-gated generic command route would still expose raw command semantics. The replacement is typed CAD OS operations and operation-specific handlers, not command-string execution.",
+        "non_agent_exposure_test": "tests/unit/test_wave4x_final_a_hardblock_contract.py"
+      }
     },
     {
       "id": "doc.current",
@@ -3642,7 +3699,8 @@
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
         "tests/unit/test_m08_doc_lifecycle.py::test_lifecycle_and_doc_raw_surfaces_remain_hard_blocked_with_wave4x_evidence",
-        "tests/unit/test_doc_sendstring_safety.py"
+        "tests/unit/test_doc_sendstring_safety.py",
+        "tests/unit/test_wave4x_final_a_hardblock_contract.py"
       ],
       "summary": "Queues a command string into a target document's command stream (cross-document automation).",
       "source_slice": "editor-delta.md",
@@ -3657,7 +3715,10 @@
         "tests/unit/test_m08_doc_lifecycle.py",
         "reports/tickets/WAVE4X_LOADER_DOC_R2.md#doc.sendstring",
         "reports/tickets/WAVE4X_LOADER_DOC_R2_OPS.json#doc.sendstring",
-        "tests/unit/test_doc_sendstring_safety.py"
+        "tests/unit/test_doc_sendstring_safety.py",
+        "reports/WAVE4X_FINAL_A_HARDBLOCK_DECISIONS.md#doc-sendstring",
+        "reports/WAVE4X_FINAL_A_HARDBLOCK_REIMPLEMENTATION.md#doc-sendstring",
+        "tests/unit/test_wave4x_final_a_hardblock_contract.py"
       ],
       "notes": "Wave4X Loader/Doc R2 reopened doc.sendstring and kept it hard-blocked. Decision: not agent-exposed, not arbitrary command execution, and not implemented as a raw SendStringToExecute surface.",
       "owner_ticket": "M08O-T02",
@@ -3665,7 +3726,19 @@
       "evidence_required": "blocker_ref_and_evidence",
       "blocked_reason": "SAFETY_FORBIDDEN: doc.sendstring uses AcApDocManager::sendStringToExecute to enqueue command text into an AutoCAD document command stream. R2 rechecked internal-only gating and rejected an agent operation because even policy-gated arbitrary command strings would be a raw command surface; safe bespoke typed handlers must be implemented instead.",
       "blocker_ref": "reports/tickets/WAVE4X_LOADER_DOC_R2.md#doc.sendstring",
-      "agent_exposed": false
+      "agent_exposed": false,
+      "replacement_ref": "typed CAD OS operation handlers only; examples: command.register.define + module.command.lookup + module.command.stack_handle + operation-specific implemented handlers",
+      "hardblock_audit": {
+        "packet": "WAVE4X_FINAL_A_HARDBLOCK_REIMPLEMENTATION",
+        "decision": "remain_hard_blocked_after_reimplementation_audit",
+        "allowed_hardblock_reason": "SAFETY_FORBIDDEN",
+        "why_no_typed_safe_implementation": "The exact SDK operation is raw command string or macro dispatch. A typed safe implementation would be a different operation; CAD OS exposes operation-specific typed handlers instead of a generic raw command API.",
+        "why_no_read_status_introspection_subset": "Executing or queueing a command string has no read-only subset. Command metadata/status is covered by implemented typed operations such as command.register.define, module.command.lookup, and module.command.stack_handle.",
+        "why_no_staged_copy_implementation": "Running arbitrary command text on a staged copy bypasses operation schemas and typed handlers, and could still perform unbounded side effects inside the AutoCAD command processor.",
+        "why_no_attended_dedicated_instance_implementation": "A dedicated attended host would still expose arbitrary command text to an editor command stream. Host isolation does not convert raw command dispatch into a bounded operation.",
+        "why_no_policy_gated_replacement_route": "A policy-gated generic command route would still expose raw command semantics. The replacement is typed CAD OS operations and operation-specific handlers, not command-string execution.",
+        "non_agent_exposure_test": "tests/unit/test_wave4x_final_a_hardblock_contract.py"
+      }
     },
     {
       "id": "doc.syncopen",
@@ -8848,7 +8921,8 @@
       "tests": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
-        "tests/unit/test_wave3_remaining_registry_closure.py::test_remaining_wave3_blocks_have_accepted_codes_and_evidence"
+        "tests/unit/test_wave3_remaining_registry_closure.py::test_remaining_wave3_blocks_have_accepted_codes_and_evidence",
+        "tests/unit/test_wave4x_final_a_hardblock_contract.py"
       ],
       "summary": "Send a command string to the live document command line. No ARX C++ export",
       "source_slice": "com-activex-opm.md",
@@ -8857,14 +8931,30 @@
         "config/autocad_native_arx_operation_catalog.json#automate.com.send_command",
         "reports/WAVE3_REMAINING_HARDBLOCK_REAUDIT.md#automate.com.send_command",
         "docs/FALLBACK_POLICY.md",
-        "reports/tickets/WAVE4X_FALLBACK.md"
+        "reports/tickets/WAVE4X_FALLBACK.md",
+        "reports/WAVE4X_FINAL_A_HARDBLOCK_DECISIONS.md#automate-com-send_command",
+        "reports/WAVE4X_FINAL_A_HARDBLOCK_REIMPLEMENTATION.md#automate-com-send_command",
+        "tests/unit/test_wave4x_final_a_hardblock_contract.py"
       ],
       "notes": "Wave4X re-review retained the hard block. COM SendCommand remains forbidden; safe fallback now exists for metadata-only COM and router-authored LISP adapters, not raw command text.",
       "owner_ticket": "M08O-T01",
       "implementation_strategy": "hard_blocked",
       "evidence_required": "blocker_ref_and_evidence",
       "blocked_reason": "SAFETY_FORBIDDEN: COM SendCommand is raw command-string dispatch and must not be exposed to agents.",
-      "blocker_ref": "reports/WAVE3_REMAINING_HARDBLOCK_REAUDIT.md#automate.com.send_command"
+      "blocker_ref": "reports/WAVE3_REMAINING_HARDBLOCK_REAUDIT.md#automate.com.send_command",
+      "agent_exposed": false,
+      "replacement_ref": "typed CAD OS operation handlers only; examples: command.register.define + module.command.lookup + module.command.stack_handle + operation-specific implemented handlers",
+      "hardblock_audit": {
+        "packet": "WAVE4X_FINAL_A_HARDBLOCK_REIMPLEMENTATION",
+        "decision": "remain_hard_blocked_after_reimplementation_audit",
+        "allowed_hardblock_reason": "SAFETY_FORBIDDEN",
+        "why_no_typed_safe_implementation": "The exact SDK operation is raw command string or macro dispatch. A typed safe implementation would be a different operation; CAD OS exposes operation-specific typed handlers instead of a generic raw command API.",
+        "why_no_read_status_introspection_subset": "Executing or queueing a command string has no read-only subset. Command metadata/status is covered by implemented typed operations such as command.register.define, module.command.lookup, and module.command.stack_handle.",
+        "why_no_staged_copy_implementation": "Running arbitrary command text on a staged copy bypasses operation schemas and typed handlers, and could still perform unbounded side effects inside the AutoCAD command processor.",
+        "why_no_attended_dedicated_instance_implementation": "A dedicated attended host would still expose arbitrary command text to an editor command stream. Host isolation does not convert raw command dispatch into a bounded operation.",
+        "why_no_policy_gated_replacement_route": "A policy-gated generic command route would still expose raw command semantics. The replacement is typed CAD OS operations and operation-specific handlers, not command-string execution.",
+        "non_agent_exposure_test": "tests/unit/test_wave4x_final_a_hardblock_contract.py"
+      }
     },
     {
       "id": "automate.com.wrapper_for_object",
@@ -9065,7 +9155,8 @@
       "tests": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
-        "tests/unit/test_wave3_remaining_registry_closure.py::test_remaining_wave3_blocks_have_accepted_codes_and_evidence"
+        "tests/unit/test_wave3_remaining_registry_closure.py::test_remaining_wave3_blocks_have_accepted_codes_and_evidence",
+        "tests/unit/test_wave4x_final_a_hardblock_contract.py"
       ],
       "summary": "Create/inspect an embedded or linked OLE object as a real DWG entity (the OLEFRAME).",
       "source_slice": "com-activex-opm.md",
@@ -9074,14 +9165,30 @@
         "config/autocad_native_arx_operation_catalog.json#embed.ole.frame",
         "reports/WAVE3_REMAINING_HARDBLOCK_REAUDIT.md#embed.ole.frame",
         "docs/FALLBACK_POLICY.md",
-        "reports/tickets/WAVE4X_FALLBACK.md"
+        "reports/tickets/WAVE4X_FALLBACK.md",
+        "reports/WAVE4X_FINAL_A_HARDBLOCK_DECISIONS.md#embed-ole-frame",
+        "reports/WAVE4X_FINAL_A_HARDBLOCK_REIMPLEMENTATION.md#embed-ole-frame",
+        "tests/unit/test_wave4x_final_a_hardblock_contract.py"
       ],
       "notes": "Wave4X re-review retained HOST_UNAVAILABLE. OLE embed/link mutation still lacks a controlled attended payload contract and remains out of bounds.",
       "owner_ticket": "M08O-T01",
       "implementation_strategy": "hard_blocked",
       "evidence_required": "blocker_ref_and_evidence",
       "blocked_reason": "HOST_UNAVAILABLE: AcDbOle2Frame embedding/linking requires a live OLE client item and attended host context; no controlled OLE route or staged payload contract is available.",
-      "blocker_ref": "reports/WAVE3_REMAINING_HARDBLOCK_REAUDIT.md#embed.ole.frame"
+      "blocker_ref": "reports/WAVE3_REMAINING_HARDBLOCK_REAUDIT.md#embed.ole.frame",
+      "agent_exposed": false,
+      "replacement_ref": "automate.com.wrapper_for_object + automate.com.entity_helpers (metadata-only; no OLE embed/link mutation)",
+      "hardblock_audit": {
+        "packet": "WAVE4X_FINAL_A_HARDBLOCK_REIMPLEMENTATION",
+        "decision": "remain_hard_blocked_after_reimplementation_audit",
+        "allowed_hardblock_reason": "HOST_UNAVAILABLE",
+        "why_no_typed_safe_implementation": "AcDbOle2Frame embedding/linking requires a live OLE client item/server and payload contract. Existing COM metadata routes do not create or mutate OLE frame entities.",
+        "why_no_read_status_introspection_subset": "Metadata-only COM/ObjectId routes are implemented separately. No controlled OLE frame fixture/payload contract exists to prove a bounded AcDbOle2Frame introspection subset for this exact op.",
+        "why_no_staged_copy_implementation": "Embedding or linking OLE into a staged copy still requires live OLE server state and binary payload handling outside CAD OS typed patch contracts.",
+        "why_no_attended_dedicated_instance_implementation": "A controlled attended OLE route has not been proven available and would need a dedicated OLE client item harness; no user AutoCAD session may be touched.",
+        "why_no_policy_gated_replacement_route": "Policy-gated replacement is metadata-only through automate.com.wrapper_for_object and automate.com.entity_helpers; OLE embed/link mutation remains blocked.",
+        "non_agent_exposure_test": "tests/unit/test_wave4x_final_a_hardblock_contract.py"
+      }
     },
     {
       "id": "extend.members.facet_provider",
@@ -12175,7 +12282,8 @@
       "tests": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
-        "tests/unit/test_wave3_pane5_assoc_reaudit.py"
+        "tests/unit/test_wave3_pane5_assoc_reaudit.py",
+        "tests/unit/test_wave4x_final_a_hardblock_contract.py"
       ],
       "summary": "The associative-array factory. Wraps source entities into a single array entity (an anonymous BTR)",
       "source_slice": "constraints-associativity.md",
@@ -12183,13 +12291,30 @@
       "evidence_refs": [
         "config/autocad_native_arx_operation_catalog.json#define.assocarray.create",
         "reports/WAVE3_PANE5_ASSOCIATIVITY_REAUDIT.md#define.assocarray.create",
-        "tests/unit/test_wave3_pane5_assoc_reaudit.py"
+        "tests/unit/test_wave3_pane5_assoc_reaudit.py",
+        "reports/WAVE4X_FINAL_A_HARDBLOCK_DECISIONS.md#define-assocarray-create",
+        "reports/WAVE4X_FINAL_A_HARDBLOCK_REIMPLEMENTATION.md#define-assocarray-create",
+        "tests/unit/test_wave4x_final_a_hardblock_contract.py"
       ],
       "notes": "Wave3 Pane5 re-audit: not left catalogued. Closed as blocked because the exact operation requires unsafe solver/modeler/full-database repair or xref synchronization execution. Safe read-only alternatives remain separate implemented operations where available.",
       "owner_ticket": "M08K-T03",
       "implementation_strategy": "hard_blocked",
       "evidence_required": "blocker_ref_and_evidence",
-      "blocked_reason": "SAFETY_FORBIDDEN: AcDbAssocArrayActionBody::createInstance performs associative array layout/evaluation. CAD OS currently exposes only read-only identify for arrays; creating layout is not a solver-free operation."
+      "blocked_reason": "SAFETY_FORBIDDEN: AcDbAssocArrayActionBody::createInstance performs associative array layout/evaluation. CAD OS currently exposes only read-only identify for arrays; creating layout is not a solver-free operation.",
+      "agent_exposed": false,
+      "blocker_ref": "reports/WAVE4X_FINAL_A_HARDBLOCK_DECISIONS.md#define-assocarray-create",
+      "replacement_ref": "inspect.assocarray.identify + inspect.assocmanager.state + repair.assocdata.audit",
+      "hardblock_audit": {
+        "packet": "WAVE4X_FINAL_A_HARDBLOCK_REIMPLEMENTATION",
+        "decision": "remain_hard_blocked_after_reimplementation_audit",
+        "allowed_hardblock_reason": "SAFETY_FORBIDDEN",
+        "why_no_typed_safe_implementation": "The exact assoc-array operation invokes layout creation, item replacement, reset, transform, or explode semantics that rely on AcDbAssocArrayActionBody evaluation. The solver-free typed subset is implemented as separate read/status/audit operations.",
+        "why_no_read_status_introspection_subset": "Read/status coverage exists separately through inspect.assocarray.identify, inspect.assocmanager.state, and related assoc network inspection. Reclassifying this mutating op as read-only would hide implementation debt.",
+        "why_no_staged_copy_implementation": "A staged copy prevents original DWG writes but does not make associative layout evaluation bounded or solver-free; the evaluator may recompute dependencies and generated geometry.",
+        "why_no_attended_dedicated_instance_implementation": "A dedicated attended host does not remove the unsafe evaluator semantics; the blocker is solver execution, not only host availability.",
+        "why_no_policy_gated_replacement_route": "Policy-gated replacement exists through inspect.assocarray.identify, inspect.assocmanager.state, and repair.assocdata.audit; the mutating array operation itself remains blocked.",
+        "non_agent_exposure_test": "tests/unit/test_wave4x_final_a_hardblock_contract.py"
+      }
     },
     {
       "id": "define.assocarray.path",
@@ -12251,7 +12376,8 @@
       "tests": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
-        "tests/unit/test_wave3_pane5_assoc_reaudit.py"
+        "tests/unit/test_wave3_pane5_assoc_reaudit.py",
+        "tests/unit/test_wave4x_final_a_hardblock_contract.py"
       ],
       "summary": "Parameter object for a path array along a curve.",
       "source_slice": "constraints-associativity.md",
@@ -12259,13 +12385,30 @@
       "evidence_refs": [
         "config/autocad_native_arx_operation_catalog.json#define.assocarray.path",
         "reports/WAVE3_PANE5_ASSOCIATIVITY_REAUDIT.md#define.assocarray.path",
-        "tests/unit/test_wave3_pane5_assoc_reaudit.py"
+        "tests/unit/test_wave3_pane5_assoc_reaudit.py",
+        "reports/WAVE4X_FINAL_A_HARDBLOCK_DECISIONS.md#define-assocarray-path",
+        "reports/WAVE4X_FINAL_A_HARDBLOCK_REIMPLEMENTATION.md#define-assocarray-path",
+        "tests/unit/test_wave4x_final_a_hardblock_contract.py"
       ],
       "notes": "Wave3 Pane5 re-audit: not left catalogued. Closed as blocked because the exact operation requires unsafe solver/modeler/full-database repair or xref synchronization execution. Safe read-only alternatives remain separate implemented operations where available.",
       "owner_ticket": "M08K-T03",
       "implementation_strategy": "hard_blocked",
       "evidence_required": "blocker_ref_and_evidence",
-      "blocked_reason": "SAFETY_FORBIDDEN: path associative array creation relies on AcDbAssocArrayActionBody::createInstance and path layout evaluation."
+      "blocked_reason": "SAFETY_FORBIDDEN: path associative array creation relies on AcDbAssocArrayActionBody::createInstance and path layout evaluation.",
+      "agent_exposed": false,
+      "blocker_ref": "reports/WAVE4X_FINAL_A_HARDBLOCK_DECISIONS.md#define-assocarray-path",
+      "replacement_ref": "inspect.assocarray.identify + inspect.assocmanager.state + repair.assocdata.audit",
+      "hardblock_audit": {
+        "packet": "WAVE4X_FINAL_A_HARDBLOCK_REIMPLEMENTATION",
+        "decision": "remain_hard_blocked_after_reimplementation_audit",
+        "allowed_hardblock_reason": "SAFETY_FORBIDDEN",
+        "why_no_typed_safe_implementation": "The exact assoc-array operation invokes layout creation, item replacement, reset, transform, or explode semantics that rely on AcDbAssocArrayActionBody evaluation. The solver-free typed subset is implemented as separate read/status/audit operations.",
+        "why_no_read_status_introspection_subset": "Read/status coverage exists separately through inspect.assocarray.identify, inspect.assocmanager.state, and related assoc network inspection. Reclassifying this mutating op as read-only would hide implementation debt.",
+        "why_no_staged_copy_implementation": "A staged copy prevents original DWG writes but does not make associative layout evaluation bounded or solver-free; the evaluator may recompute dependencies and generated geometry.",
+        "why_no_attended_dedicated_instance_implementation": "A dedicated attended host does not remove the unsafe evaluator semantics; the blocker is solver execution, not only host availability.",
+        "why_no_policy_gated_replacement_route": "Policy-gated replacement exists through inspect.assocarray.identify, inspect.assocmanager.state, and repair.assocdata.audit; the mutating array operation itself remains blocked.",
+        "non_agent_exposure_test": "tests/unit/test_wave4x_final_a_hardblock_contract.py"
+      }
     },
     {
       "id": "define.assocarray.polar",
@@ -12327,7 +12470,8 @@
       "tests": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
-        "tests/unit/test_wave3_pane5_assoc_reaudit.py"
+        "tests/unit/test_wave3_pane5_assoc_reaudit.py",
+        "tests/unit/test_wave4x_final_a_hardblock_contract.py"
       ],
       "summary": "Parameter object for a polar array.",
       "source_slice": "constraints-associativity.md",
@@ -12335,13 +12479,30 @@
       "evidence_refs": [
         "config/autocad_native_arx_operation_catalog.json#define.assocarray.polar",
         "reports/WAVE3_PANE5_ASSOCIATIVITY_REAUDIT.md#define.assocarray.polar",
-        "tests/unit/test_wave3_pane5_assoc_reaudit.py"
+        "tests/unit/test_wave3_pane5_assoc_reaudit.py",
+        "reports/WAVE4X_FINAL_A_HARDBLOCK_DECISIONS.md#define-assocarray-polar",
+        "reports/WAVE4X_FINAL_A_HARDBLOCK_REIMPLEMENTATION.md#define-assocarray-polar",
+        "tests/unit/test_wave4x_final_a_hardblock_contract.py"
       ],
       "notes": "Wave3 Pane5 re-audit: not left catalogued. Closed as blocked because the exact operation requires unsafe solver/modeler/full-database repair or xref synchronization execution. Safe read-only alternatives remain separate implemented operations where available.",
       "owner_ticket": "M08K-T03",
       "implementation_strategy": "hard_blocked",
       "evidence_required": "blocker_ref_and_evidence",
-      "blocked_reason": "SAFETY_FORBIDDEN: polar associative array creation relies on AcDbAssocArrayActionBody::createInstance and parameter layout evaluation."
+      "blocked_reason": "SAFETY_FORBIDDEN: polar associative array creation relies on AcDbAssocArrayActionBody::createInstance and parameter layout evaluation.",
+      "agent_exposed": false,
+      "blocker_ref": "reports/WAVE4X_FINAL_A_HARDBLOCK_DECISIONS.md#define-assocarray-polar",
+      "replacement_ref": "inspect.assocarray.identify + inspect.assocmanager.state + repair.assocdata.audit",
+      "hardblock_audit": {
+        "packet": "WAVE4X_FINAL_A_HARDBLOCK_REIMPLEMENTATION",
+        "decision": "remain_hard_blocked_after_reimplementation_audit",
+        "allowed_hardblock_reason": "SAFETY_FORBIDDEN",
+        "why_no_typed_safe_implementation": "The exact assoc-array operation invokes layout creation, item replacement, reset, transform, or explode semantics that rely on AcDbAssocArrayActionBody evaluation. The solver-free typed subset is implemented as separate read/status/audit operations.",
+        "why_no_read_status_introspection_subset": "Read/status coverage exists separately through inspect.assocarray.identify, inspect.assocmanager.state, and related assoc network inspection. Reclassifying this mutating op as read-only would hide implementation debt.",
+        "why_no_staged_copy_implementation": "A staged copy prevents original DWG writes but does not make associative layout evaluation bounded or solver-free; the evaluator may recompute dependencies and generated geometry.",
+        "why_no_attended_dedicated_instance_implementation": "A dedicated attended host does not remove the unsafe evaluator semantics; the blocker is solver execution, not only host availability.",
+        "why_no_policy_gated_replacement_route": "Policy-gated replacement exists through inspect.assocarray.identify, inspect.assocmanager.state, and repair.assocdata.audit; the mutating array operation itself remains blocked.",
+        "non_agent_exposure_test": "tests/unit/test_wave4x_final_a_hardblock_contract.py"
+      }
     },
     {
       "id": "define.assocarray.rectangular",
@@ -12403,7 +12564,8 @@
       "tests": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
-        "tests/unit/test_wave3_pane5_assoc_reaudit.py"
+        "tests/unit/test_wave3_pane5_assoc_reaudit.py",
+        "tests/unit/test_wave4x_final_a_hardblock_contract.py"
       ],
       "summary": "Parameter object for a rectangular array (cols × rows × levels). Pass to createInstance.",
       "source_slice": "constraints-associativity.md",
@@ -12411,13 +12573,30 @@
       "evidence_refs": [
         "config/autocad_native_arx_operation_catalog.json#define.assocarray.rectangular",
         "reports/WAVE3_PANE5_ASSOCIATIVITY_REAUDIT.md#define.assocarray.rectangular",
-        "tests/unit/test_wave3_pane5_assoc_reaudit.py"
+        "tests/unit/test_wave3_pane5_assoc_reaudit.py",
+        "reports/WAVE4X_FINAL_A_HARDBLOCK_DECISIONS.md#define-assocarray-rectangular",
+        "reports/WAVE4X_FINAL_A_HARDBLOCK_REIMPLEMENTATION.md#define-assocarray-rectangular",
+        "tests/unit/test_wave4x_final_a_hardblock_contract.py"
       ],
       "notes": "Wave3 Pane5 re-audit: not left catalogued. Closed as blocked because the exact operation requires unsafe solver/modeler/full-database repair or xref synchronization execution. Safe read-only alternatives remain separate implemented operations where available.",
       "owner_ticket": "M08K-T03",
       "implementation_strategy": "hard_blocked",
       "evidence_required": "blocker_ref_and_evidence",
-      "blocked_reason": "SAFETY_FORBIDDEN: rectangular associative array creation relies on AcDbAssocArrayActionBody::createInstance and parameter layout evaluation."
+      "blocked_reason": "SAFETY_FORBIDDEN: rectangular associative array creation relies on AcDbAssocArrayActionBody::createInstance and parameter layout evaluation.",
+      "agent_exposed": false,
+      "blocker_ref": "reports/WAVE4X_FINAL_A_HARDBLOCK_DECISIONS.md#define-assocarray-rectangular",
+      "replacement_ref": "inspect.assocarray.identify + inspect.assocmanager.state + repair.assocdata.audit",
+      "hardblock_audit": {
+        "packet": "WAVE4X_FINAL_A_HARDBLOCK_REIMPLEMENTATION",
+        "decision": "remain_hard_blocked_after_reimplementation_audit",
+        "allowed_hardblock_reason": "SAFETY_FORBIDDEN",
+        "why_no_typed_safe_implementation": "The exact assoc-array operation invokes layout creation, item replacement, reset, transform, or explode semantics that rely on AcDbAssocArrayActionBody evaluation. The solver-free typed subset is implemented as separate read/status/audit operations.",
+        "why_no_read_status_introspection_subset": "Read/status coverage exists separately through inspect.assocarray.identify, inspect.assocmanager.state, and related assoc network inspection. Reclassifying this mutating op as read-only would hide implementation debt.",
+        "why_no_staged_copy_implementation": "A staged copy prevents original DWG writes but does not make associative layout evaluation bounded or solver-free; the evaluator may recompute dependencies and generated geometry.",
+        "why_no_attended_dedicated_instance_implementation": "A dedicated attended host does not remove the unsafe evaluator semantics; the blocker is solver execution, not only host availability.",
+        "why_no_policy_gated_replacement_route": "Policy-gated replacement exists through inspect.assocarray.identify, inspect.assocmanager.state, and repair.assocdata.audit; the mutating array operation itself remains blocked.",
+        "non_agent_exposure_test": "tests/unit/test_wave4x_final_a_hardblock_contract.py"
+      }
     },
     {
       "id": "define.assocdependency.attach",
@@ -12700,7 +12879,8 @@
       "tests": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
-        "tests/unit/test_wave3_pane5_assoc_reaudit.py"
+        "tests/unit/test_wave3_pane5_assoc_reaudit.py",
+        "tests/unit/test_wave4x_final_a_hardblock_contract.py"
       ],
       "summary": "Associative blend surface between two profiles.",
       "source_slice": "constraints-associativity.md",
@@ -12708,13 +12888,30 @@
       "evidence_refs": [
         "config/autocad_native_arx_operation_catalog.json#define.assocsurface.blend",
         "reports/WAVE3_PANE5_ASSOCIATIVITY_REAUDIT.md#define.assocsurface.blend",
-        "tests/unit/test_wave3_pane5_assoc_reaudit.py"
+        "tests/unit/test_wave3_pane5_assoc_reaudit.py",
+        "reports/WAVE4X_FINAL_A_HARDBLOCK_DECISIONS.md#define-assocsurface-blend",
+        "reports/WAVE4X_FINAL_A_HARDBLOCK_REIMPLEMENTATION.md#define-assocsurface-blend",
+        "tests/unit/test_wave4x_final_a_hardblock_contract.py"
       ],
       "notes": "Wave3 Pane5 re-audit: not left catalogued. Closed as blocked because the exact operation requires unsafe solver/modeler/full-database repair or xref synchronization execution. Safe read-only alternatives remain separate implemented operations where available.",
       "owner_ticket": "M08K-T03",
       "implementation_strategy": "hard_blocked",
       "evidence_required": "blocker_ref_and_evidence",
-      "blocked_reason": "SAFETY_FORBIDDEN: AcDbAssocBlendSurfaceActionBody::createInstance enters ASM associative surface creation/modeler evaluation. CAD OS has no bounded, solver-free staged handler for this modeler action."
+      "blocked_reason": "SAFETY_FORBIDDEN: AcDbAssocBlendSurfaceActionBody::createInstance enters ASM associative surface creation/modeler evaluation. CAD OS has no bounded, solver-free staged handler for this modeler action.",
+      "agent_exposed": false,
+      "blocker_ref": "reports/WAVE4X_FINAL_A_HARDBLOCK_DECISIONS.md#define-assocsurface-blend",
+      "replacement_ref": "inspect.assocsurface.topology + repair.assocdata.audit",
+      "hardblock_audit": {
+        "packet": "WAVE4X_FINAL_A_HARDBLOCK_REIMPLEMENTATION",
+        "decision": "remain_hard_blocked_after_reimplementation_audit",
+        "allowed_hardblock_reason": "SAFETY_FORBIDDEN",
+        "why_no_typed_safe_implementation": "The exact associative-surface operation enters ASM/modeler action-body creation or result mutation. The safe typed subset is implemented as inspect.assocsurface.topology and staged assoc-data audit.",
+        "why_no_read_status_introspection_subset": "Read-only topology/status coverage is already implemented as inspect.assocsurface.topology. The blocked operation cannot be relabeled as that subset without faking the requested modeler action.",
+        "why_no_staged_copy_implementation": "A staged copy contains the blast radius but still invokes the associative modeler/evaluator and can create or recompute complex surface bodies outside a bounded CAD OS contract.",
+        "why_no_attended_dedicated_instance_implementation": "Attended/full AutoCAD would supply a host, but the unresolved risk is unbounded ASM/evaluator execution rather than headless-host absence.",
+        "why_no_policy_gated_replacement_route": "Policy-gated replacement exists through inspect.assocsurface.topology and repair.assocdata.audit; the modeler action body operation remains blocked.",
+        "non_agent_exposure_test": "tests/unit/test_wave4x_final_a_hardblock_contract.py"
+      }
     },
     {
       "id": "define.assocsurface.extrude",
@@ -12772,7 +12969,8 @@
       "tests": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
-        "tests/unit/test_wave3_pane5_assoc_reaudit.py"
+        "tests/unit/test_wave3_pane5_assoc_reaudit.py",
+        "tests/unit/test_wave4x_final_a_hardblock_contract.py"
       ],
       "summary": "Associative extruded surface from a profile + direction.",
       "source_slice": "constraints-associativity.md",
@@ -12780,13 +12978,30 @@
       "evidence_refs": [
         "config/autocad_native_arx_operation_catalog.json#define.assocsurface.extrude",
         "reports/WAVE3_PANE5_ASSOCIATIVITY_REAUDIT.md#define.assocsurface.extrude",
-        "tests/unit/test_wave3_pane5_assoc_reaudit.py"
+        "tests/unit/test_wave3_pane5_assoc_reaudit.py",
+        "reports/WAVE4X_FINAL_A_HARDBLOCK_DECISIONS.md#define-assocsurface-extrude",
+        "reports/WAVE4X_FINAL_A_HARDBLOCK_REIMPLEMENTATION.md#define-assocsurface-extrude",
+        "tests/unit/test_wave4x_final_a_hardblock_contract.py"
       ],
       "notes": "Wave3 Pane5 re-audit: not left catalogued. Closed as blocked because the exact operation requires unsafe solver/modeler/full-database repair or xref synchronization execution. Safe read-only alternatives remain separate implemented operations where available.",
       "owner_ticket": "M08K-T03",
       "implementation_strategy": "hard_blocked",
       "evidence_required": "blocker_ref_and_evidence",
-      "blocked_reason": "SAFETY_FORBIDDEN: AcDbAssocExtrudedSurfaceActionBody::createInstance enters ASM associative surface creation/modeler evaluation. CAD OS has no bounded, solver-free staged handler for this modeler action."
+      "blocked_reason": "SAFETY_FORBIDDEN: AcDbAssocExtrudedSurfaceActionBody::createInstance enters ASM associative surface creation/modeler evaluation. CAD OS has no bounded, solver-free staged handler for this modeler action.",
+      "agent_exposed": false,
+      "blocker_ref": "reports/WAVE4X_FINAL_A_HARDBLOCK_DECISIONS.md#define-assocsurface-extrude",
+      "replacement_ref": "inspect.assocsurface.topology + repair.assocdata.audit",
+      "hardblock_audit": {
+        "packet": "WAVE4X_FINAL_A_HARDBLOCK_REIMPLEMENTATION",
+        "decision": "remain_hard_blocked_after_reimplementation_audit",
+        "allowed_hardblock_reason": "SAFETY_FORBIDDEN",
+        "why_no_typed_safe_implementation": "The exact associative-surface operation enters ASM/modeler action-body creation or result mutation. The safe typed subset is implemented as inspect.assocsurface.topology and staged assoc-data audit.",
+        "why_no_read_status_introspection_subset": "Read-only topology/status coverage is already implemented as inspect.assocsurface.topology. The blocked operation cannot be relabeled as that subset without faking the requested modeler action.",
+        "why_no_staged_copy_implementation": "A staged copy contains the blast radius but still invokes the associative modeler/evaluator and can create or recompute complex surface bodies outside a bounded CAD OS contract.",
+        "why_no_attended_dedicated_instance_implementation": "Attended/full AutoCAD would supply a host, but the unresolved risk is unbounded ASM/evaluator execution rather than headless-host absence.",
+        "why_no_policy_gated_replacement_route": "Policy-gated replacement exists through inspect.assocsurface.topology and repair.assocdata.audit; the modeler action body operation remains blocked.",
+        "non_agent_exposure_test": "tests/unit/test_wave4x_final_a_hardblock_contract.py"
+      }
     },
     {
       "id": "define.assocsurface.fillet",
@@ -12844,7 +13059,8 @@
       "tests": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
-        "tests/unit/test_wave3_pane5_assoc_reaudit.py"
+        "tests/unit/test_wave3_pane5_assoc_reaudit.py",
+        "tests/unit/test_wave4x_final_a_hardblock_contract.py"
       ],
       "summary": "Associative fillet surface between two surfaces.",
       "source_slice": "constraints-associativity.md",
@@ -12852,13 +13068,30 @@
       "evidence_refs": [
         "config/autocad_native_arx_operation_catalog.json#define.assocsurface.fillet",
         "reports/WAVE3_PANE5_ASSOCIATIVITY_REAUDIT.md#define.assocsurface.fillet",
-        "tests/unit/test_wave3_pane5_assoc_reaudit.py"
+        "tests/unit/test_wave3_pane5_assoc_reaudit.py",
+        "reports/WAVE4X_FINAL_A_HARDBLOCK_DECISIONS.md#define-assocsurface-fillet",
+        "reports/WAVE4X_FINAL_A_HARDBLOCK_REIMPLEMENTATION.md#define-assocsurface-fillet",
+        "tests/unit/test_wave4x_final_a_hardblock_contract.py"
       ],
       "notes": "Wave3 Pane5 re-audit: not left catalogued. Closed as blocked because the exact operation requires unsafe solver/modeler/full-database repair or xref synchronization execution. Safe read-only alternatives remain separate implemented operations where available.",
       "owner_ticket": "M08K-T03",
       "implementation_strategy": "hard_blocked",
       "evidence_required": "blocker_ref_and_evidence",
-      "blocked_reason": "SAFETY_FORBIDDEN: AcDbAssocFilletSurfaceActionBody::createInstance enters ASM associative surface creation/modeler evaluation. CAD OS has no bounded, solver-free staged handler for this modeler action."
+      "blocked_reason": "SAFETY_FORBIDDEN: AcDbAssocFilletSurfaceActionBody::createInstance enters ASM associative surface creation/modeler evaluation. CAD OS has no bounded, solver-free staged handler for this modeler action.",
+      "agent_exposed": false,
+      "blocker_ref": "reports/WAVE4X_FINAL_A_HARDBLOCK_DECISIONS.md#define-assocsurface-fillet",
+      "replacement_ref": "inspect.assocsurface.topology + repair.assocdata.audit",
+      "hardblock_audit": {
+        "packet": "WAVE4X_FINAL_A_HARDBLOCK_REIMPLEMENTATION",
+        "decision": "remain_hard_blocked_after_reimplementation_audit",
+        "allowed_hardblock_reason": "SAFETY_FORBIDDEN",
+        "why_no_typed_safe_implementation": "The exact associative-surface operation enters ASM/modeler action-body creation or result mutation. The safe typed subset is implemented as inspect.assocsurface.topology and staged assoc-data audit.",
+        "why_no_read_status_introspection_subset": "Read-only topology/status coverage is already implemented as inspect.assocsurface.topology. The blocked operation cannot be relabeled as that subset without faking the requested modeler action.",
+        "why_no_staged_copy_implementation": "A staged copy contains the blast radius but still invokes the associative modeler/evaluator and can create or recompute complex surface bodies outside a bounded CAD OS contract.",
+        "why_no_attended_dedicated_instance_implementation": "Attended/full AutoCAD would supply a host, but the unresolved risk is unbounded ASM/evaluator execution rather than headless-host absence.",
+        "why_no_policy_gated_replacement_route": "Policy-gated replacement exists through inspect.assocsurface.topology and repair.assocdata.audit; the modeler action body operation remains blocked.",
+        "non_agent_exposure_test": "tests/unit/test_wave4x_final_a_hardblock_contract.py"
+      }
     },
     {
       "id": "define.assocsurface.loft",
@@ -12916,7 +13149,8 @@
       "tests": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
-        "tests/unit/test_wave3_pane5_assoc_reaudit.py"
+        "tests/unit/test_wave3_pane5_assoc_reaudit.py",
+        "tests/unit/test_wave4x_final_a_hardblock_contract.py"
       ],
       "summary": "Associative lofted surface through cross-sections (+ guides/path). Shows geom-refs feeding a surface op.",
       "source_slice": "constraints-associativity.md",
@@ -12924,13 +13158,30 @@
       "evidence_refs": [
         "config/autocad_native_arx_operation_catalog.json#define.assocsurface.loft",
         "reports/WAVE3_PANE5_ASSOCIATIVITY_REAUDIT.md#define.assocsurface.loft",
-        "tests/unit/test_wave3_pane5_assoc_reaudit.py"
+        "tests/unit/test_wave3_pane5_assoc_reaudit.py",
+        "reports/WAVE4X_FINAL_A_HARDBLOCK_DECISIONS.md#define-assocsurface-loft",
+        "reports/WAVE4X_FINAL_A_HARDBLOCK_REIMPLEMENTATION.md#define-assocsurface-loft",
+        "tests/unit/test_wave4x_final_a_hardblock_contract.py"
       ],
       "notes": "Wave3 Pane5 re-audit: not left catalogued. Closed as blocked because the exact operation requires unsafe solver/modeler/full-database repair or xref synchronization execution. Safe read-only alternatives remain separate implemented operations where available.",
       "owner_ticket": "M08K-T03",
       "implementation_strategy": "hard_blocked",
       "evidence_required": "blocker_ref_and_evidence",
-      "blocked_reason": "SAFETY_FORBIDDEN: AcDbAssocLoftedSurfaceActionBody::createInstance enters ASM associative surface creation/modeler evaluation. CAD OS has no bounded, solver-free staged handler for this modeler action."
+      "blocked_reason": "SAFETY_FORBIDDEN: AcDbAssocLoftedSurfaceActionBody::createInstance enters ASM associative surface creation/modeler evaluation. CAD OS has no bounded, solver-free staged handler for this modeler action.",
+      "agent_exposed": false,
+      "blocker_ref": "reports/WAVE4X_FINAL_A_HARDBLOCK_DECISIONS.md#define-assocsurface-loft",
+      "replacement_ref": "inspect.assocsurface.topology + repair.assocdata.audit",
+      "hardblock_audit": {
+        "packet": "WAVE4X_FINAL_A_HARDBLOCK_REIMPLEMENTATION",
+        "decision": "remain_hard_blocked_after_reimplementation_audit",
+        "allowed_hardblock_reason": "SAFETY_FORBIDDEN",
+        "why_no_typed_safe_implementation": "The exact associative-surface operation enters ASM/modeler action-body creation or result mutation. The safe typed subset is implemented as inspect.assocsurface.topology and staged assoc-data audit.",
+        "why_no_read_status_introspection_subset": "Read-only topology/status coverage is already implemented as inspect.assocsurface.topology. The blocked operation cannot be relabeled as that subset without faking the requested modeler action.",
+        "why_no_staged_copy_implementation": "A staged copy contains the blast radius but still invokes the associative modeler/evaluator and can create or recompute complex surface bodies outside a bounded CAD OS contract.",
+        "why_no_attended_dedicated_instance_implementation": "Attended/full AutoCAD would supply a host, but the unresolved risk is unbounded ASM/evaluator execution rather than headless-host absence.",
+        "why_no_policy_gated_replacement_route": "Policy-gated replacement exists through inspect.assocsurface.topology and repair.assocdata.audit; the modeler action body operation remains blocked.",
+        "non_agent_exposure_test": "tests/unit/test_wave4x_final_a_hardblock_contract.py"
+      }
     },
     {
       "id": "define.assocsurface.offset",
@@ -12988,7 +13239,8 @@
       "tests": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
-        "tests/unit/test_wave3_pane5_assoc_reaudit.py"
+        "tests/unit/test_wave3_pane5_assoc_reaudit.py",
+        "tests/unit/test_wave4x_final_a_hardblock_contract.py"
       ],
       "summary": "Create an associative offset surface (result follows input surface + offset distance). Canonical surface-factory",
       "source_slice": "constraints-associativity.md",
@@ -12996,13 +13248,30 @@
       "evidence_refs": [
         "config/autocad_native_arx_operation_catalog.json#define.assocsurface.offset",
         "reports/WAVE3_PANE5_ASSOCIATIVITY_REAUDIT.md#define.assocsurface.offset",
-        "tests/unit/test_wave3_pane5_assoc_reaudit.py"
+        "tests/unit/test_wave3_pane5_assoc_reaudit.py",
+        "reports/WAVE4X_FINAL_A_HARDBLOCK_DECISIONS.md#define-assocsurface-offset",
+        "reports/WAVE4X_FINAL_A_HARDBLOCK_REIMPLEMENTATION.md#define-assocsurface-offset",
+        "tests/unit/test_wave4x_final_a_hardblock_contract.py"
       ],
       "notes": "Wave3 Pane5 re-audit: not left catalogued. Closed as blocked because the exact operation requires unsafe solver/modeler/full-database repair or xref synchronization execution. Safe read-only alternatives remain separate implemented operations where available.",
       "owner_ticket": "M08K-T03",
       "implementation_strategy": "hard_blocked",
       "evidence_required": "blocker_ref_and_evidence",
-      "blocked_reason": "SAFETY_FORBIDDEN: AcDbAssocOffsetSurfaceActionBody::createInstance enters ASM associative surface creation/modeler evaluation. CAD OS has no bounded, solver-free staged handler for this modeler action."
+      "blocked_reason": "SAFETY_FORBIDDEN: AcDbAssocOffsetSurfaceActionBody::createInstance enters ASM associative surface creation/modeler evaluation. CAD OS has no bounded, solver-free staged handler for this modeler action.",
+      "agent_exposed": false,
+      "blocker_ref": "reports/WAVE4X_FINAL_A_HARDBLOCK_DECISIONS.md#define-assocsurface-offset",
+      "replacement_ref": "inspect.assocsurface.topology + repair.assocdata.audit",
+      "hardblock_audit": {
+        "packet": "WAVE4X_FINAL_A_HARDBLOCK_REIMPLEMENTATION",
+        "decision": "remain_hard_blocked_after_reimplementation_audit",
+        "allowed_hardblock_reason": "SAFETY_FORBIDDEN",
+        "why_no_typed_safe_implementation": "The exact associative-surface operation enters ASM/modeler action-body creation or result mutation. The safe typed subset is implemented as inspect.assocsurface.topology and staged assoc-data audit.",
+        "why_no_read_status_introspection_subset": "Read-only topology/status coverage is already implemented as inspect.assocsurface.topology. The blocked operation cannot be relabeled as that subset without faking the requested modeler action.",
+        "why_no_staged_copy_implementation": "A staged copy contains the blast radius but still invokes the associative modeler/evaluator and can create or recompute complex surface bodies outside a bounded CAD OS contract.",
+        "why_no_attended_dedicated_instance_implementation": "Attended/full AutoCAD would supply a host, but the unresolved risk is unbounded ASM/evaluator execution rather than headless-host absence.",
+        "why_no_policy_gated_replacement_route": "Policy-gated replacement exists through inspect.assocsurface.topology and repair.assocdata.audit; the modeler action body operation remains blocked.",
+        "non_agent_exposure_test": "tests/unit/test_wave4x_final_a_hardblock_contract.py"
+      }
     },
     {
       "id": "define.assocsurface.patch",
@@ -13060,7 +13329,8 @@
       "tests": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
-        "tests/unit/test_wave3_pane5_assoc_reaudit.py"
+        "tests/unit/test_wave3_pane5_assoc_reaudit.py",
+        "tests/unit/test_wave4x_final_a_hardblock_contract.py"
       ],
       "summary": "Associative patch surface bounded by edges, with constraint curves/points.",
       "source_slice": "constraints-associativity.md",
@@ -13068,13 +13338,30 @@
       "evidence_refs": [
         "config/autocad_native_arx_operation_catalog.json#define.assocsurface.patch",
         "reports/WAVE3_PANE5_ASSOCIATIVITY_REAUDIT.md#define.assocsurface.patch",
-        "tests/unit/test_wave3_pane5_assoc_reaudit.py"
+        "tests/unit/test_wave3_pane5_assoc_reaudit.py",
+        "reports/WAVE4X_FINAL_A_HARDBLOCK_DECISIONS.md#define-assocsurface-patch",
+        "reports/WAVE4X_FINAL_A_HARDBLOCK_REIMPLEMENTATION.md#define-assocsurface-patch",
+        "tests/unit/test_wave4x_final_a_hardblock_contract.py"
       ],
       "notes": "Wave3 Pane5 re-audit: not left catalogued. Closed as blocked because the exact operation requires unsafe solver/modeler/full-database repair or xref synchronization execution. Safe read-only alternatives remain separate implemented operations where available.",
       "owner_ticket": "M08K-T03",
       "implementation_strategy": "hard_blocked",
       "evidence_required": "blocker_ref_and_evidence",
-      "blocked_reason": "SAFETY_FORBIDDEN: AcDbAssocPatchSurfaceActionBody::createInstance enters ASM associative surface creation/modeler evaluation. CAD OS has no bounded, solver-free staged handler for this modeler action."
+      "blocked_reason": "SAFETY_FORBIDDEN: AcDbAssocPatchSurfaceActionBody::createInstance enters ASM associative surface creation/modeler evaluation. CAD OS has no bounded, solver-free staged handler for this modeler action.",
+      "agent_exposed": false,
+      "blocker_ref": "reports/WAVE4X_FINAL_A_HARDBLOCK_DECISIONS.md#define-assocsurface-patch",
+      "replacement_ref": "inspect.assocsurface.topology + repair.assocdata.audit",
+      "hardblock_audit": {
+        "packet": "WAVE4X_FINAL_A_HARDBLOCK_REIMPLEMENTATION",
+        "decision": "remain_hard_blocked_after_reimplementation_audit",
+        "allowed_hardblock_reason": "SAFETY_FORBIDDEN",
+        "why_no_typed_safe_implementation": "The exact associative-surface operation enters ASM/modeler action-body creation or result mutation. The safe typed subset is implemented as inspect.assocsurface.topology and staged assoc-data audit.",
+        "why_no_read_status_introspection_subset": "Read-only topology/status coverage is already implemented as inspect.assocsurface.topology. The blocked operation cannot be relabeled as that subset without faking the requested modeler action.",
+        "why_no_staged_copy_implementation": "A staged copy contains the blast radius but still invokes the associative modeler/evaluator and can create or recompute complex surface bodies outside a bounded CAD OS contract.",
+        "why_no_attended_dedicated_instance_implementation": "Attended/full AutoCAD would supply a host, but the unresolved risk is unbounded ASM/evaluator execution rather than headless-host absence.",
+        "why_no_policy_gated_replacement_route": "Policy-gated replacement exists through inspect.assocsurface.topology and repair.assocdata.audit; the modeler action body operation remains blocked.",
+        "non_agent_exposure_test": "tests/unit/test_wave4x_final_a_hardblock_contract.py"
+      }
     },
     {
       "id": "define.assocsurface.result",
@@ -13132,7 +13419,8 @@
       "tests": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
-        "tests/unit/test_wave3_pane5_assoc_reaudit.py"
+        "tests/unit/test_wave3_pane5_assoc_reaudit.py",
+        "tests/unit/test_wave4x_final_a_hardblock_contract.py"
       ],
       "summary": "Base class for all associative surfaces — wires the action's output AcDbSurface. Subclassed by",
       "source_slice": "constraints-associativity.md",
@@ -13140,13 +13428,30 @@
       "evidence_refs": [
         "config/autocad_native_arx_operation_catalog.json#define.assocsurface.result",
         "reports/WAVE3_PANE5_ASSOCIATIVITY_REAUDIT.md#define.assocsurface.result",
-        "tests/unit/test_wave3_pane5_assoc_reaudit.py"
+        "tests/unit/test_wave3_pane5_assoc_reaudit.py",
+        "reports/WAVE4X_FINAL_A_HARDBLOCK_DECISIONS.md#define-assocsurface-result",
+        "reports/WAVE4X_FINAL_A_HARDBLOCK_REIMPLEMENTATION.md#define-assocsurface-result",
+        "tests/unit/test_wave4x_final_a_hardblock_contract.py"
       ],
       "notes": "Wave3 Pane5 re-audit: not left catalogued. Closed as blocked because the exact operation requires unsafe solver/modeler/full-database repair or xref synchronization execution. Safe read-only alternatives remain separate implemented operations where available.",
       "owner_ticket": "M08K-T03",
       "implementation_strategy": "hard_blocked",
       "evidence_required": "blocker_ref_and_evidence",
-      "blocked_reason": "SAFETY_FORBIDDEN: associative surface result extraction depends on a prior ASM/evaluator-created action body result. CAD OS has no solver-free implementation that can honestly produce the result for arbitrary drawings."
+      "blocked_reason": "SAFETY_FORBIDDEN: associative surface result extraction depends on a prior ASM/evaluator-created action body result. CAD OS has no solver-free implementation that can honestly produce the result for arbitrary drawings.",
+      "agent_exposed": false,
+      "blocker_ref": "reports/WAVE4X_FINAL_A_HARDBLOCK_DECISIONS.md#define-assocsurface-result",
+      "replacement_ref": "inspect.assocsurface.topology + repair.assocdata.audit",
+      "hardblock_audit": {
+        "packet": "WAVE4X_FINAL_A_HARDBLOCK_REIMPLEMENTATION",
+        "decision": "remain_hard_blocked_after_reimplementation_audit",
+        "allowed_hardblock_reason": "SAFETY_FORBIDDEN",
+        "why_no_typed_safe_implementation": "The exact associative-surface operation enters ASM/modeler action-body creation or result mutation. The safe typed subset is implemented as inspect.assocsurface.topology and staged assoc-data audit.",
+        "why_no_read_status_introspection_subset": "Read-only topology/status coverage is already implemented as inspect.assocsurface.topology. The blocked operation cannot be relabeled as that subset without faking the requested modeler action.",
+        "why_no_staged_copy_implementation": "A staged copy contains the blast radius but still invokes the associative modeler/evaluator and can create or recompute complex surface bodies outside a bounded CAD OS contract.",
+        "why_no_attended_dedicated_instance_implementation": "Attended/full AutoCAD would supply a host, but the unresolved risk is unbounded ASM/evaluator execution rather than headless-host absence.",
+        "why_no_policy_gated_replacement_route": "Policy-gated replacement exists through inspect.assocsurface.topology and repair.assocdata.audit; the modeler action body operation remains blocked.",
+        "non_agent_exposure_test": "tests/unit/test_wave4x_final_a_hardblock_contract.py"
+      }
     },
     {
       "id": "define.assocsurface.trim",
@@ -13204,7 +13509,8 @@
       "tests": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
-        "tests/unit/test_wave3_pane5_assoc_reaudit.py"
+        "tests/unit/test_wave3_pane5_assoc_reaudit.py",
+        "tests/unit/test_wave4x_final_a_hardblock_contract.py"
       ],
       "summary": "Associative trimmed surface.",
       "source_slice": "constraints-associativity.md",
@@ -13212,13 +13518,30 @@
       "evidence_refs": [
         "config/autocad_native_arx_operation_catalog.json#define.assocsurface.trim",
         "reports/WAVE3_PANE5_ASSOCIATIVITY_REAUDIT.md#define.assocsurface.trim",
-        "tests/unit/test_wave3_pane5_assoc_reaudit.py"
+        "tests/unit/test_wave3_pane5_assoc_reaudit.py",
+        "reports/WAVE4X_FINAL_A_HARDBLOCK_DECISIONS.md#define-assocsurface-trim",
+        "reports/WAVE4X_FINAL_A_HARDBLOCK_REIMPLEMENTATION.md#define-assocsurface-trim",
+        "tests/unit/test_wave4x_final_a_hardblock_contract.py"
       ],
       "notes": "Wave3 Pane5 re-audit: not left catalogued. Closed as blocked because the exact operation requires unsafe solver/modeler/full-database repair or xref synchronization execution. Safe read-only alternatives remain separate implemented operations where available.",
       "owner_ticket": "M08K-T03",
       "implementation_strategy": "hard_blocked",
       "evidence_required": "blocker_ref_and_evidence",
-      "blocked_reason": "SAFETY_FORBIDDEN: AcDbAssocTrimSurfaceActionBody::createInstance enters ASM associative surface creation/modeler evaluation. CAD OS has no bounded, solver-free staged handler for this modeler action."
+      "blocked_reason": "SAFETY_FORBIDDEN: AcDbAssocTrimSurfaceActionBody::createInstance enters ASM associative surface creation/modeler evaluation. CAD OS has no bounded, solver-free staged handler for this modeler action.",
+      "agent_exposed": false,
+      "blocker_ref": "reports/WAVE4X_FINAL_A_HARDBLOCK_DECISIONS.md#define-assocsurface-trim",
+      "replacement_ref": "inspect.assocsurface.topology + repair.assocdata.audit",
+      "hardblock_audit": {
+        "packet": "WAVE4X_FINAL_A_HARDBLOCK_REIMPLEMENTATION",
+        "decision": "remain_hard_blocked_after_reimplementation_audit",
+        "allowed_hardblock_reason": "SAFETY_FORBIDDEN",
+        "why_no_typed_safe_implementation": "The exact associative-surface operation enters ASM/modeler action-body creation or result mutation. The safe typed subset is implemented as inspect.assocsurface.topology and staged assoc-data audit.",
+        "why_no_read_status_introspection_subset": "Read-only topology/status coverage is already implemented as inspect.assocsurface.topology. The blocked operation cannot be relabeled as that subset without faking the requested modeler action.",
+        "why_no_staged_copy_implementation": "A staged copy contains the blast radius but still invokes the associative modeler/evaluator and can create or recompute complex surface bodies outside a bounded CAD OS contract.",
+        "why_no_attended_dedicated_instance_implementation": "Attended/full AutoCAD would supply a host, but the unresolved risk is unbounded ASM/evaluator execution rather than headless-host absence.",
+        "why_no_policy_gated_replacement_route": "Policy-gated replacement exists through inspect.assocsurface.topology and repair.assocdata.audit; the modeler action body operation remains blocked.",
+        "non_agent_exposure_test": "tests/unit/test_wave4x_final_a_hardblock_contract.py"
+      }
     },
     {
       "id": "define.assocvaluedependency.value",
@@ -14243,7 +14566,8 @@
       "tests": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
-        "tests/unit/test_wave3_pane5_assoc_reaudit.py"
+        "tests/unit/test_wave3_pane5_assoc_reaudit.py",
+        "tests/unit/test_wave4x_final_a_hardblock_contract.py"
       ],
       "summary": "Burst the array into independent entities (removes associativity).",
       "source_slice": "constraints-associativity.md",
@@ -14251,13 +14575,30 @@
       "evidence_refs": [
         "config/autocad_native_arx_operation_catalog.json#edit.assocarray.explode",
         "reports/WAVE3_PANE5_ASSOCIATIVITY_REAUDIT.md#edit.assocarray.explode",
-        "tests/unit/test_wave3_pane5_assoc_reaudit.py"
+        "tests/unit/test_wave3_pane5_assoc_reaudit.py",
+        "reports/WAVE4X_FINAL_A_HARDBLOCK_DECISIONS.md#edit-assocarray-explode",
+        "reports/WAVE4X_FINAL_A_HARDBLOCK_REIMPLEMENTATION.md#edit-assocarray-explode",
+        "tests/unit/test_wave4x_final_a_hardblock_contract.py"
       ],
       "notes": "Wave3 Pane5 re-audit: not left catalogued. Closed as blocked because the exact operation requires unsafe solver/modeler/full-database repair or xref synchronization execution. Safe read-only alternatives remain separate implemented operations where available.",
       "owner_ticket": "M08K-T03",
       "implementation_strategy": "hard_blocked",
       "evidence_required": "blocker_ref_and_evidence",
-      "blocked_reason": "SAFETY_FORBIDDEN: associative array explode mutates the staged database through array action body expansion and is not exposed as a bounded CAD OS operation."
+      "blocked_reason": "SAFETY_FORBIDDEN: associative array explode mutates the staged database through array action body expansion and is not exposed as a bounded CAD OS operation.",
+      "agent_exposed": false,
+      "blocker_ref": "reports/WAVE4X_FINAL_A_HARDBLOCK_DECISIONS.md#edit-assocarray-explode",
+      "replacement_ref": "inspect.assocarray.identify + inspect.assocmanager.state + repair.assocdata.audit",
+      "hardblock_audit": {
+        "packet": "WAVE4X_FINAL_A_HARDBLOCK_REIMPLEMENTATION",
+        "decision": "remain_hard_blocked_after_reimplementation_audit",
+        "allowed_hardblock_reason": "SAFETY_FORBIDDEN",
+        "why_no_typed_safe_implementation": "The exact assoc-array operation invokes layout creation, item replacement, reset, transform, or explode semantics that rely on AcDbAssocArrayActionBody evaluation. The solver-free typed subset is implemented as separate read/status/audit operations.",
+        "why_no_read_status_introspection_subset": "Read/status coverage exists separately through inspect.assocarray.identify, inspect.assocmanager.state, and related assoc network inspection. Reclassifying this mutating op as read-only would hide implementation debt.",
+        "why_no_staged_copy_implementation": "A staged copy prevents original DWG writes but does not make associative layout evaluation bounded or solver-free; the evaluator may recompute dependencies and generated geometry.",
+        "why_no_attended_dedicated_instance_implementation": "A dedicated attended host does not remove the unsafe evaluator semantics; the blocker is solver execution, not only host availability.",
+        "why_no_policy_gated_replacement_route": "Policy-gated replacement exists through inspect.assocarray.identify, inspect.assocmanager.state, and repair.assocdata.audit; the mutating array operation itself remains blocked.",
+        "non_agent_exposure_test": "tests/unit/test_wave4x_final_a_hardblock_contract.py"
+      }
     },
     {
       "id": "edit.assocarray.item",
@@ -14319,7 +14660,8 @@
       "tests": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
-        "tests/unit/test_wave3_pane5_assoc_reaudit.py"
+        "tests/unit/test_wave3_pane5_assoc_reaudit.py",
+        "tests/unit/test_wave4x_final_a_hardblock_contract.py"
       ],
       "summary": "Override a single array item: move/transform, delete, or read it (items addressed by AcDbItemLocator",
       "source_slice": "constraints-associativity.md",
@@ -14327,13 +14669,30 @@
       "evidence_refs": [
         "config/autocad_native_arx_operation_catalog.json#edit.assocarray.item",
         "reports/WAVE3_PANE5_ASSOCIATIVITY_REAUDIT.md#edit.assocarray.item",
-        "tests/unit/test_wave3_pane5_assoc_reaudit.py"
+        "tests/unit/test_wave3_pane5_assoc_reaudit.py",
+        "reports/WAVE4X_FINAL_A_HARDBLOCK_DECISIONS.md#edit-assocarray-item",
+        "reports/WAVE4X_FINAL_A_HARDBLOCK_REIMPLEMENTATION.md#edit-assocarray-item",
+        "tests/unit/test_wave4x_final_a_hardblock_contract.py"
       ],
       "notes": "Wave3 Pane5 re-audit: not left catalogued. Closed as blocked because the exact operation requires unsafe solver/modeler/full-database repair or xref synchronization execution. Safe read-only alternatives remain separate implemented operations where available.",
       "owner_ticket": "M08K-T03",
       "implementation_strategy": "hard_blocked",
       "evidence_required": "blocker_ref_and_evidence",
-      "blocked_reason": "SAFETY_FORBIDDEN: associative array item edits require item locator/layout evaluation and can trigger array body recomputation; no bounded solver-free agent handler exists."
+      "blocked_reason": "SAFETY_FORBIDDEN: associative array item edits require item locator/layout evaluation and can trigger array body recomputation; no bounded solver-free agent handler exists.",
+      "agent_exposed": false,
+      "blocker_ref": "reports/WAVE4X_FINAL_A_HARDBLOCK_DECISIONS.md#edit-assocarray-item",
+      "replacement_ref": "inspect.assocarray.identify + inspect.assocmanager.state + repair.assocdata.audit",
+      "hardblock_audit": {
+        "packet": "WAVE4X_FINAL_A_HARDBLOCK_REIMPLEMENTATION",
+        "decision": "remain_hard_blocked_after_reimplementation_audit",
+        "allowed_hardblock_reason": "SAFETY_FORBIDDEN",
+        "why_no_typed_safe_implementation": "The exact assoc-array operation invokes layout creation, item replacement, reset, transform, or explode semantics that rely on AcDbAssocArrayActionBody evaluation. The solver-free typed subset is implemented as separate read/status/audit operations.",
+        "why_no_read_status_introspection_subset": "Read/status coverage exists separately through inspect.assocarray.identify, inspect.assocmanager.state, and related assoc network inspection. Reclassifying this mutating op as read-only would hide implementation debt.",
+        "why_no_staged_copy_implementation": "A staged copy prevents original DWG writes but does not make associative layout evaluation bounded or solver-free; the evaluator may recompute dependencies and generated geometry.",
+        "why_no_attended_dedicated_instance_implementation": "A dedicated attended host does not remove the unsafe evaluator semantics; the blocker is solver execution, not only host availability.",
+        "why_no_policy_gated_replacement_route": "Policy-gated replacement exists through inspect.assocarray.identify, inspect.assocmanager.state, and repair.assocdata.audit; the mutating array operation itself remains blocked.",
+        "non_agent_exposure_test": "tests/unit/test_wave4x_final_a_hardblock_contract.py"
+      }
     },
     {
       "id": "edit.assocarray.itemReplace",
@@ -14395,7 +14754,8 @@
       "tests": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
-        "tests/unit/test_wave3_pane5_assoc_reaudit.py"
+        "tests/unit/test_wave3_pane5_assoc_reaudit.py",
+        "tests/unit/test_wave4x_final_a_hardblock_contract.py"
       ],
       "summary": "Replace selected array items with substitute entities (the ARRAYEDIT→Replace flow); track which items are",
       "source_slice": "constraints-associativity.md",
@@ -14403,13 +14763,30 @@
       "evidence_refs": [
         "config/autocad_native_arx_operation_catalog.json#edit.assocarray.itemReplace",
         "reports/WAVE3_PANE5_ASSOCIATIVITY_REAUDIT.md#edit.assocarray.itemReplace",
-        "tests/unit/test_wave3_pane5_assoc_reaudit.py"
+        "tests/unit/test_wave3_pane5_assoc_reaudit.py",
+        "reports/WAVE4X_FINAL_A_HARDBLOCK_DECISIONS.md#edit-assocarray-itemReplace",
+        "reports/WAVE4X_FINAL_A_HARDBLOCK_REIMPLEMENTATION.md#edit-assocarray-itemReplace",
+        "tests/unit/test_wave4x_final_a_hardblock_contract.py"
       ],
       "notes": "Wave3 Pane5 re-audit: not left catalogued. Closed as blocked because the exact operation requires unsafe solver/modeler/full-database repair or xref synchronization execution. Safe read-only alternatives remain separate implemented operations where available.",
       "owner_ticket": "M08K-T03",
       "implementation_strategy": "hard_blocked",
       "evidence_required": "blocker_ref_and_evidence",
-      "blocked_reason": "SAFETY_FORBIDDEN: associative array item replacement requires source-item substitution and array body recomputation; no bounded solver-free agent handler exists."
+      "blocked_reason": "SAFETY_FORBIDDEN: associative array item replacement requires source-item substitution and array body recomputation; no bounded solver-free agent handler exists.",
+      "agent_exposed": false,
+      "blocker_ref": "reports/WAVE4X_FINAL_A_HARDBLOCK_DECISIONS.md#edit-assocarray-itemReplace",
+      "replacement_ref": "inspect.assocarray.identify + inspect.assocmanager.state + repair.assocdata.audit",
+      "hardblock_audit": {
+        "packet": "WAVE4X_FINAL_A_HARDBLOCK_REIMPLEMENTATION",
+        "decision": "remain_hard_blocked_after_reimplementation_audit",
+        "allowed_hardblock_reason": "SAFETY_FORBIDDEN",
+        "why_no_typed_safe_implementation": "The exact assoc-array operation invokes layout creation, item replacement, reset, transform, or explode semantics that rely on AcDbAssocArrayActionBody evaluation. The solver-free typed subset is implemented as separate read/status/audit operations.",
+        "why_no_read_status_introspection_subset": "Read/status coverage exists separately through inspect.assocarray.identify, inspect.assocmanager.state, and related assoc network inspection. Reclassifying this mutating op as read-only would hide implementation debt.",
+        "why_no_staged_copy_implementation": "A staged copy prevents original DWG writes but does not make associative layout evaluation bounded or solver-free; the evaluator may recompute dependencies and generated geometry.",
+        "why_no_attended_dedicated_instance_implementation": "A dedicated attended host does not remove the unsafe evaluator semantics; the blocker is solver execution, not only host availability.",
+        "why_no_policy_gated_replacement_route": "Policy-gated replacement exists through inspect.assocarray.identify, inspect.assocmanager.state, and repair.assocdata.audit; the mutating array operation itself remains blocked.",
+        "non_agent_exposure_test": "tests/unit/test_wave4x_final_a_hardblock_contract.py"
+      }
     },
     {
       "id": "edit.assocarray.reset",
@@ -14471,7 +14848,8 @@
       "tests": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
-        "tests/unit/test_wave3_pane5_assoc_reaudit.py"
+        "tests/unit/test_wave3_pane5_assoc_reaudit.py",
+        "tests/unit/test_wave4x_final_a_hardblock_contract.py"
       ],
       "summary": "Reset item overrides back to the array rule.",
       "source_slice": "constraints-associativity.md",
@@ -14479,13 +14857,30 @@
       "evidence_refs": [
         "config/autocad_native_arx_operation_catalog.json#edit.assocarray.reset",
         "reports/WAVE3_PANE5_ASSOCIATIVITY_REAUDIT.md#edit.assocarray.reset",
-        "tests/unit/test_wave3_pane5_assoc_reaudit.py"
+        "tests/unit/test_wave3_pane5_assoc_reaudit.py",
+        "reports/WAVE4X_FINAL_A_HARDBLOCK_DECISIONS.md#edit-assocarray-reset",
+        "reports/WAVE4X_FINAL_A_HARDBLOCK_REIMPLEMENTATION.md#edit-assocarray-reset",
+        "tests/unit/test_wave4x_final_a_hardblock_contract.py"
       ],
       "notes": "Wave3 Pane5 re-audit: not left catalogued. Closed as blocked because the exact operation requires unsafe solver/modeler/full-database repair or xref synchronization execution. Safe read-only alternatives remain separate implemented operations where available.",
       "owner_ticket": "M08K-T03",
       "implementation_strategy": "hard_blocked",
       "evidence_required": "blocker_ref_and_evidence",
-      "blocked_reason": "SAFETY_FORBIDDEN: resetArrayItems performs array re-layout/evaluation and is intentionally not exposed to agents."
+      "blocked_reason": "SAFETY_FORBIDDEN: resetArrayItems performs array re-layout/evaluation and is intentionally not exposed to agents.",
+      "agent_exposed": false,
+      "blocker_ref": "reports/WAVE4X_FINAL_A_HARDBLOCK_DECISIONS.md#edit-assocarray-reset",
+      "replacement_ref": "inspect.assocarray.identify + inspect.assocmanager.state + repair.assocdata.audit",
+      "hardblock_audit": {
+        "packet": "WAVE4X_FINAL_A_HARDBLOCK_REIMPLEMENTATION",
+        "decision": "remain_hard_blocked_after_reimplementation_audit",
+        "allowed_hardblock_reason": "SAFETY_FORBIDDEN",
+        "why_no_typed_safe_implementation": "The exact assoc-array operation invokes layout creation, item replacement, reset, transform, or explode semantics that rely on AcDbAssocArrayActionBody evaluation. The solver-free typed subset is implemented as separate read/status/audit operations.",
+        "why_no_read_status_introspection_subset": "Read/status coverage exists separately through inspect.assocarray.identify, inspect.assocmanager.state, and related assoc network inspection. Reclassifying this mutating op as read-only would hide implementation debt.",
+        "why_no_staged_copy_implementation": "A staged copy prevents original DWG writes but does not make associative layout evaluation bounded or solver-free; the evaluator may recompute dependencies and generated geometry.",
+        "why_no_attended_dedicated_instance_implementation": "A dedicated attended host does not remove the unsafe evaluator semantics; the blocker is solver execution, not only host availability.",
+        "why_no_policy_gated_replacement_route": "Policy-gated replacement exists through inspect.assocarray.identify, inspect.assocmanager.state, and repair.assocdata.audit; the mutating array operation itself remains blocked.",
+        "non_agent_exposure_test": "tests/unit/test_wave4x_final_a_hardblock_contract.py"
+      }
     },
     {
       "id": "edit.assocarray.source",
@@ -14547,7 +14942,8 @@
       "tests": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
-        "tests/unit/test_wave3_pane5_assoc_reaudit.py"
+        "tests/unit/test_wave3_pane5_assoc_reaudit.py",
+        "tests/unit/test_wave4x_final_a_hardblock_contract.py"
       ],
       "summary": "Edit the source-entity set / base point that the array replicates.",
       "source_slice": "constraints-associativity.md",
@@ -14555,13 +14951,30 @@
       "evidence_refs": [
         "config/autocad_native_arx_operation_catalog.json#edit.assocarray.source",
         "reports/WAVE3_PANE5_ASSOCIATIVITY_REAUDIT.md#edit.assocarray.source",
-        "tests/unit/test_wave3_pane5_assoc_reaudit.py"
+        "tests/unit/test_wave3_pane5_assoc_reaudit.py",
+        "reports/WAVE4X_FINAL_A_HARDBLOCK_DECISIONS.md#edit-assocarray-source",
+        "reports/WAVE4X_FINAL_A_HARDBLOCK_REIMPLEMENTATION.md#edit-assocarray-source",
+        "tests/unit/test_wave4x_final_a_hardblock_contract.py"
       ],
       "notes": "Wave3 Pane5 re-audit: not left catalogued. Closed as blocked because the exact operation requires unsafe solver/modeler/full-database repair or xref synchronization execution. Safe read-only alternatives remain separate implemented operations where available.",
       "owner_ticket": "M08K-T03",
       "implementation_strategy": "hard_blocked",
       "evidence_required": "blocker_ref_and_evidence",
-      "blocked_reason": "SAFETY_FORBIDDEN: source entity edits on associative arrays require action body recomputation and can mutate layout through the evaluator."
+      "blocked_reason": "SAFETY_FORBIDDEN: source entity edits on associative arrays require action body recomputation and can mutate layout through the evaluator.",
+      "agent_exposed": false,
+      "blocker_ref": "reports/WAVE4X_FINAL_A_HARDBLOCK_DECISIONS.md#edit-assocarray-source",
+      "replacement_ref": "inspect.assocarray.identify + inspect.assocmanager.state + repair.assocdata.audit",
+      "hardblock_audit": {
+        "packet": "WAVE4X_FINAL_A_HARDBLOCK_REIMPLEMENTATION",
+        "decision": "remain_hard_blocked_after_reimplementation_audit",
+        "allowed_hardblock_reason": "SAFETY_FORBIDDEN",
+        "why_no_typed_safe_implementation": "The exact assoc-array operation invokes layout creation, item replacement, reset, transform, or explode semantics that rely on AcDbAssocArrayActionBody evaluation. The solver-free typed subset is implemented as separate read/status/audit operations.",
+        "why_no_read_status_introspection_subset": "Read/status coverage exists separately through inspect.assocarray.identify, inspect.assocmanager.state, and related assoc network inspection. Reclassifying this mutating op as read-only would hide implementation debt.",
+        "why_no_staged_copy_implementation": "A staged copy prevents original DWG writes but does not make associative layout evaluation bounded or solver-free; the evaluator may recompute dependencies and generated geometry.",
+        "why_no_attended_dedicated_instance_implementation": "A dedicated attended host does not remove the unsafe evaluator semantics; the blocker is solver execution, not only host availability.",
+        "why_no_policy_gated_replacement_route": "Policy-gated replacement exists through inspect.assocarray.identify, inspect.assocmanager.state, and repair.assocdata.audit; the mutating array operation itself remains blocked.",
+        "non_agent_exposure_test": "tests/unit/test_wave4x_final_a_hardblock_contract.py"
+      }
     },
     {
       "id": "edit.assocarray.transform",
@@ -14623,7 +15036,8 @@
       "tests": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
-        "tests/unit/test_wave3_pane5_assoc_reaudit.py"
+        "tests/unit/test_wave3_pane5_assoc_reaudit.py",
+        "tests/unit/test_wave4x_final_a_hardblock_contract.py"
       ],
       "summary": "Transform the whole array as a unit.",
       "source_slice": "constraints-associativity.md",
@@ -14631,13 +15045,30 @@
       "evidence_refs": [
         "config/autocad_native_arx_operation_catalog.json#edit.assocarray.transform",
         "reports/WAVE3_PANE5_ASSOCIATIVITY_REAUDIT.md#edit.assocarray.transform",
-        "tests/unit/test_wave3_pane5_assoc_reaudit.py"
+        "tests/unit/test_wave3_pane5_assoc_reaudit.py",
+        "reports/WAVE4X_FINAL_A_HARDBLOCK_DECISIONS.md#edit-assocarray-transform",
+        "reports/WAVE4X_FINAL_A_HARDBLOCK_REIMPLEMENTATION.md#edit-assocarray-transform",
+        "tests/unit/test_wave4x_final_a_hardblock_contract.py"
       ],
       "notes": "Wave3 Pane5 re-audit: not left catalogued. Closed as blocked because the exact operation requires unsafe solver/modeler/full-database repair or xref synchronization execution. Safe read-only alternatives remain separate implemented operations where available.",
       "owner_ticket": "M08K-T03",
       "implementation_strategy": "hard_blocked",
       "evidence_required": "blocker_ref_and_evidence",
-      "blocked_reason": "SAFETY_FORBIDDEN: transformBy on associative array action bodies can trigger layout/evaluator semantics; no bounded solver-free agent handler exists."
+      "blocked_reason": "SAFETY_FORBIDDEN: transformBy on associative array action bodies can trigger layout/evaluator semantics; no bounded solver-free agent handler exists.",
+      "agent_exposed": false,
+      "blocker_ref": "reports/WAVE4X_FINAL_A_HARDBLOCK_DECISIONS.md#edit-assocarray-transform",
+      "replacement_ref": "inspect.assocarray.identify + inspect.assocmanager.state + repair.assocdata.audit",
+      "hardblock_audit": {
+        "packet": "WAVE4X_FINAL_A_HARDBLOCK_REIMPLEMENTATION",
+        "decision": "remain_hard_blocked_after_reimplementation_audit",
+        "allowed_hardblock_reason": "SAFETY_FORBIDDEN",
+        "why_no_typed_safe_implementation": "The exact assoc-array operation invokes layout creation, item replacement, reset, transform, or explode semantics that rely on AcDbAssocArrayActionBody evaluation. The solver-free typed subset is implemented as separate read/status/audit operations.",
+        "why_no_read_status_introspection_subset": "Read/status coverage exists separately through inspect.assocarray.identify, inspect.assocmanager.state, and related assoc network inspection. Reclassifying this mutating op as read-only would hide implementation debt.",
+        "why_no_staged_copy_implementation": "A staged copy prevents original DWG writes but does not make associative layout evaluation bounded or solver-free; the evaluator may recompute dependencies and generated geometry.",
+        "why_no_attended_dedicated_instance_implementation": "A dedicated attended host does not remove the unsafe evaluator semantics; the blocker is solver execution, not only host availability.",
+        "why_no_policy_gated_replacement_route": "Policy-gated replacement exists through inspect.assocarray.identify, inspect.assocmanager.state, and repair.assocdata.audit; the mutating array operation itself remains blocked.",
+        "non_agent_exposure_test": "tests/unit/test_wave4x_final_a_hardblock_contract.py"
+      }
     },
     {
       "id": "edit.assocdata.xref",
@@ -14996,7 +15427,8 @@
       "tests": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
-        "tests/unit/test_wave3_pane5_assoc_reaudit.py"
+        "tests/unit/test_wave3_pane5_assoc_reaudit.py",
+        "tests/unit/test_wave4x_final_a_hardblock_contract.py"
       ],
       "summary": "Evaluate a single action; read/set its AcDbAssocStatus.",
       "source_slice": "constraints-associativity.md",
@@ -15004,13 +15436,30 @@
       "evidence_refs": [
         "config/autocad_native_arx_operation_catalog.json#inspect.assocaction.evaluate",
         "reports/WAVE3_PANE5_ASSOCIATIVITY_REAUDIT.md#inspect.assocaction.evaluate",
-        "tests/unit/test_wave3_pane5_assoc_reaudit.py"
+        "tests/unit/test_wave3_pane5_assoc_reaudit.py",
+        "reports/WAVE4X_FINAL_A_HARDBLOCK_DECISIONS.md#inspect-assocaction-evaluate",
+        "reports/WAVE4X_FINAL_A_HARDBLOCK_REIMPLEMENTATION.md#inspect-assocaction-evaluate",
+        "tests/unit/test_wave4x_final_a_hardblock_contract.py"
       ],
       "notes": "Wave3 Pane5 re-audit: not left catalogued. Closed as blocked because the exact operation requires unsafe solver/modeler/full-database repair or xref synchronization execution. Safe read-only alternatives remain separate implemented operations where available.",
       "owner_ticket": "M08K-T03",
       "implementation_strategy": "hard_blocked",
       "evidence_required": "blocker_ref_and_evidence",
-      "blocked_reason": "SAFETY_FORBIDDEN: AcDbAssocAction::evaluate is the native associative solver entry. Exposing it as an agent operation would run arbitrary evaluation callbacks and mutate the staged database outside CAD OS bounded semantics."
+      "blocked_reason": "SAFETY_FORBIDDEN: AcDbAssocAction::evaluate is the native associative solver entry. Exposing it as an agent operation would run arbitrary evaluation callbacks and mutate the staged database outside CAD OS bounded semantics.",
+      "agent_exposed": false,
+      "blocker_ref": "reports/WAVE4X_FINAL_A_HARDBLOCK_DECISIONS.md#inspect-assocaction-evaluate",
+      "replacement_ref": "inspect.assocaction.dependencies + inspect.assocaction.requestToEvaluate + inspect.assocmanager.state",
+      "hardblock_audit": {
+        "packet": "WAVE4X_FINAL_A_HARDBLOCK_REIMPLEMENTATION",
+        "decision": "remain_hard_blocked_after_reimplementation_audit",
+        "allowed_hardblock_reason": "SAFETY_FORBIDDEN",
+        "why_no_typed_safe_implementation": "AcDbAssocAction::evaluate runs a single action evaluator callback. CAD OS implements safe typed inspection around the network, not evaluator execution.",
+        "why_no_read_status_introspection_subset": "Read/status coverage exists through inspect.assocaction.dependencies, inspect.assocaction.requestToEvaluate, and inspect.assocmanager.state. Calling this operation name without evaluating would be a fake PASS.",
+        "why_no_staged_copy_implementation": "A staged copy avoids original writes but still executes arbitrary action/network callbacks and dependency recomputation.",
+        "why_no_attended_dedicated_instance_implementation": "A dedicated AutoCAD instance still runs the same evaluator/callback graph; host isolation does not bound user-defined or object-enabler behavior.",
+        "why_no_policy_gated_replacement_route": "Policy-gated replacement exists through inspect.assocaction.dependencies, inspect.assocaction.requestToEvaluate, and inspect.assocmanager.state; evaluator execution remains blocked.",
+        "non_agent_exposure_test": "tests/unit/test_wave4x_final_a_hardblock_contract.py"
+      }
     },
     {
       "id": "inspect.assocaction.requestToEvaluate",
@@ -15293,7 +15742,8 @@
       "tests": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
-        "tests/unit/test_wave3_pane5_assoc_reaudit.py"
+        "tests/unit/test_wave3_pane5_assoc_reaudit.py",
+        "tests/unit/test_wave4x_final_a_hardblock_contract.py"
       ],
       "summary": "The core recompute. Evaluate every dirty action in the database's top network in dependency",
       "source_slice": "constraints-associativity.md",
@@ -15301,13 +15751,30 @@
       "evidence_refs": [
         "config/autocad_native_arx_operation_catalog.json#inspect.assocnetwork.evaluate",
         "reports/WAVE3_PANE5_ASSOCIATIVITY_REAUDIT.md#inspect.assocnetwork.evaluate",
-        "tests/unit/test_wave3_pane5_assoc_reaudit.py"
+        "tests/unit/test_wave3_pane5_assoc_reaudit.py",
+        "reports/WAVE4X_FINAL_A_HARDBLOCK_DECISIONS.md#inspect-assocnetwork-evaluate",
+        "reports/WAVE4X_FINAL_A_HARDBLOCK_REIMPLEMENTATION.md#inspect-assocnetwork-evaluate",
+        "tests/unit/test_wave4x_final_a_hardblock_contract.py"
       ],
       "notes": "Wave3 Pane5 re-audit: not left catalogued. Closed as blocked because the exact operation requires unsafe solver/modeler/full-database repair or xref synchronization execution. Safe read-only alternatives remain separate implemented operations where available.",
       "owner_ticket": "M08K-T03",
       "implementation_strategy": "hard_blocked",
       "evidence_required": "blocker_ref_and_evidence",
-      "blocked_reason": "SAFETY_FORBIDDEN: AcDbAssocManager::evaluateTopLevelNetwork is the top-level associative solver. Exposing it as an agent operation would run arbitrary network evaluation/callback code."
+      "blocked_reason": "SAFETY_FORBIDDEN: AcDbAssocManager::evaluateTopLevelNetwork is the top-level associative solver. Exposing it as an agent operation would run arbitrary network evaluation/callback code.",
+      "agent_exposed": false,
+      "blocker_ref": "reports/WAVE4X_FINAL_A_HARDBLOCK_DECISIONS.md#inspect-assocnetwork-evaluate",
+      "replacement_ref": "inspect.assocnetwork.get + inspect.assocnetwork.iterate + inspect.assocmanager.state",
+      "hardblock_audit": {
+        "packet": "WAVE4X_FINAL_A_HARDBLOCK_REIMPLEMENTATION",
+        "decision": "remain_hard_blocked_after_reimplementation_audit",
+        "allowed_hardblock_reason": "SAFETY_FORBIDDEN",
+        "why_no_typed_safe_implementation": "AcDbAssocManager::evaluateTopLevelNetwork runs the top-level network evaluator. CAD OS implements safe typed inspection around the network, not evaluator execution.",
+        "why_no_read_status_introspection_subset": "Read/status coverage exists through inspect.assocnetwork.get, inspect.assocnetwork.iterate, and inspect.assocmanager.state. Calling this operation name without evaluating would be a fake PASS.",
+        "why_no_staged_copy_implementation": "A staged copy avoids original writes but still executes arbitrary action/network callbacks and dependency recomputation.",
+        "why_no_attended_dedicated_instance_implementation": "A dedicated AutoCAD instance still runs the same evaluator/callback graph; host isolation does not bound user-defined or object-enabler behavior.",
+        "why_no_policy_gated_replacement_route": "Policy-gated replacement exists through inspect.assocnetwork.get, inspect.assocnetwork.iterate, and inspect.assocmanager.state; evaluator execution remains blocked.",
+        "non_agent_exposure_test": "tests/unit/test_wave4x_final_a_hardblock_contract.py"
+      }
     },
     {
       "id": "inspect.assocnetwork.get",
@@ -20575,11 +21042,13 @@
           "live_edit"
         ],
         "no_original_write_default": true,
-        "runtime_behavior": "not_runnable_until_promoted_to_implemented_or_wired"
+        "runtime_behavior": "not_runnable_until_promoted_to_implemented_or_wired",
+        "agent_exposed": false
       },
       "tests": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
-        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata"
+        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
+        "tests/unit/test_wave4x_final_a_hardblock_contract.py"
       ],
       "summary": "Queues a command string to run when the editor is next idle (cannot run",
       "source_slice": "editor-delta.md",
@@ -20588,13 +21057,30 @@
         "config/autocad_native_arx_operation_catalog.json#command.queue.post",
         "docs/FALLBACK_POLICY.md",
         "docs/M08_REMAINING_BATCH_PLAN.md#m08o-fallback-raw-command-hard-block",
-        "reports/tickets/WAVE4X_FALLBACK.md"
+        "reports/tickets/WAVE4X_FALLBACK.md",
+        "reports/WAVE4X_FINAL_A_HARDBLOCK_DECISIONS.md#command-queue-post",
+        "reports/WAVE4X_FINAL_A_HARDBLOCK_REIMPLEMENTATION.md#command-queue-post",
+        "tests/unit/test_wave4x_final_a_hardblock_contract.py"
       ],
       "notes": "Wave4X re-review retained SAFETY_FORBIDDEN. Posted command strings remain blocked.",
       "owner_ticket": "M08O-T02",
       "implementation_strategy": "hard_blocked",
       "evidence_required": "blocker_ref_and_evidence",
-      "blocked_reason": "SAFETY_FORBIDDEN: raw command dispatch is blocked in M08O fallback policy. Fallbacks are managed/.NET/LISP-only and do not expose direct command strings."
+      "blocked_reason": "SAFETY_FORBIDDEN: raw command dispatch is blocked in M08O fallback policy. Fallbacks are managed/.NET/LISP-only and do not expose direct command strings.",
+      "agent_exposed": false,
+      "blocker_ref": "reports/WAVE4X_FINAL_A_HARDBLOCK_DECISIONS.md#command-queue-post",
+      "replacement_ref": "typed CAD OS operation handlers only; examples: command.register.define + module.command.lookup + module.command.stack_handle + operation-specific implemented handlers",
+      "hardblock_audit": {
+        "packet": "WAVE4X_FINAL_A_HARDBLOCK_REIMPLEMENTATION",
+        "decision": "remain_hard_blocked_after_reimplementation_audit",
+        "allowed_hardblock_reason": "SAFETY_FORBIDDEN",
+        "why_no_typed_safe_implementation": "The exact SDK operation is raw command string or macro dispatch. A typed safe implementation would be a different operation; CAD OS exposes operation-specific typed handlers instead of a generic raw command API.",
+        "why_no_read_status_introspection_subset": "Executing or queueing a command string has no read-only subset. Command metadata/status is covered by implemented typed operations such as command.register.define, module.command.lookup, and module.command.stack_handle.",
+        "why_no_staged_copy_implementation": "Running arbitrary command text on a staged copy bypasses operation schemas and typed handlers, and could still perform unbounded side effects inside the AutoCAD command processor.",
+        "why_no_attended_dedicated_instance_implementation": "A dedicated attended host would still expose arbitrary command text to an editor command stream. Host isolation does not convert raw command dispatch into a bounded operation.",
+        "why_no_policy_gated_replacement_route": "A policy-gated generic command route would still expose raw command semantics. The replacement is typed CAD OS operations and operation-specific handlers, not command-string execution.",
+        "non_agent_exposure_test": "tests/unit/test_wave4x_final_a_hardblock_contract.py"
+      }
     },
     {
       "id": "editor.react.events",
@@ -33324,7 +33810,8 @@
       "tests": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
-        "tests/unit/test_wave3_remaining_registry_closure.py::test_remaining_wave3_blocks_have_accepted_codes_and_evidence"
+        "tests/unit/test_wave3_remaining_registry_closure.py::test_remaining_wave3_blocks_have_accepted_codes_and_evidence",
+        "tests/unit/test_wave4x_final_a_hardblock_contract.py"
       ],
       "summary": "Hook to veto/limit unload while OLE/in-use; override to control unloadability.",
       "source_slice": "arx-framework.md",
@@ -33333,14 +33820,30 @@
         "config/autocad_native_arx_operation_catalog.json#module.lifecycle.on_ole_unload",
         "reports/WAVE3_REMAINING_HARDBLOCK_REAUDIT.md#module.lifecycle.on_ole_unload",
         "docs/FALLBACK_POLICY.md",
-        "reports/tickets/WAVE4X_FALLBACK.md"
+        "reports/tickets/WAVE4X_FALLBACK.md",
+        "reports/WAVE4X_FINAL_A_HARDBLOCK_DECISIONS.md#module-lifecycle-on_ole_unload",
+        "reports/WAVE4X_FINAL_A_HARDBLOCK_REIMPLEMENTATION.md#module-lifecycle-on_ole_unload",
+        "tests/unit/test_wave4x_final_a_hardblock_contract.py"
       ],
       "notes": "Wave4X re-review retained HOST_UNAVAILABLE. This is still a host lifecycle callback, not a routed agent operation.",
       "owner_ticket": "M08O-T02",
       "implementation_strategy": "hard_blocked",
       "evidence_required": "blocker_ref_and_evidence",
       "blocked_reason": "HOST_UNAVAILABLE: On_kOleUnloadAppMsg is a host lifecycle callback and cannot be triggered safely from the CAD OS job surface.",
-      "blocker_ref": "reports/WAVE3_REMAINING_HARDBLOCK_REAUDIT.md#module.lifecycle.on_ole_unload"
+      "blocker_ref": "reports/WAVE3_REMAINING_HARDBLOCK_REAUDIT.md#module.lifecycle.on_ole_unload",
+      "agent_exposed": false,
+      "replacement_ref": "module.lifecycle.unload + module.lifecycle.on_unload_dwg (status/evidence only; no OLE unload callback synthesis)",
+      "hardblock_audit": {
+        "packet": "WAVE4X_FINAL_A_HARDBLOCK_REIMPLEMENTATION",
+        "decision": "remain_hard_blocked_after_reimplementation_audit",
+        "allowed_hardblock_reason": "HOST_UNAVAILABLE",
+        "why_no_typed_safe_implementation": "On_kOleUnloadAppMsg is a host-delivered OLE lifecycle callback. Synthesizing it would fake or interfere with AutoCAD loader/OLE state.",
+        "why_no_read_status_introspection_subset": "Safe lifecycle status/evidence is implemented through module.lifecycle.unload and module.lifecycle.on_unload_dwg; this OLE-specific callback has no read-only invocation subset.",
+        "why_no_staged_copy_implementation": "A staged drawing copy does not create an OLE unload lifecycle event; the callback is tied to host app unload state.",
+        "why_no_attended_dedicated_instance_implementation": "A dedicated instance cannot safely force OLE unload callback delivery without an OLE in-use payload and controlled host lifecycle harness.",
+        "why_no_policy_gated_replacement_route": "Policy-gated replacement is lifecycle status evidence through module.lifecycle.unload and module.lifecycle.on_unload_dwg; OLE unload callback synthesis remains blocked.",
+        "non_agent_exposure_test": "tests/unit/test_wave4x_final_a_hardblock_contract.py"
+      }
     },
     {
       "id": "module.lifecycle.on_unload_dwg",
@@ -35208,12 +35711,14 @@
           "read"
         ],
         "no_original_write_default": true,
-        "runtime_behavior": "not_runnable_until_promoted_to_implemented_or_wired"
+        "runtime_behavior": "not_runnable_until_promoted_to_implemented_or_wired",
+        "agent_exposed": false
       },
       "tests": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
-        "tests/unit/test_m08n_handlers.py"
+        "tests/unit/test_m08n_handlers.py",
+        "tests/unit/test_wave4x_final_a_hardblock_contract.py"
       ],
       "summary": "Issues a menu/macro command string.",
       "source_slice": "editor-delta.md",
@@ -35225,13 +35730,30 @@
         "research/native_arx/editor-delta.md#Operation catalog (PART 1)",
         "research/native_arx/ui-customization.md#Operation catalog",
         "docs/FALLBACK_POLICY.md",
-        "reports/tickets/WAVE4X_FALLBACK.md"
+        "reports/tickets/WAVE4X_FALLBACK.md",
+        "reports/WAVE4X_FINAL_A_HARDBLOCK_DECISIONS.md#command-menu-invoke",
+        "reports/WAVE4X_FINAL_A_HARDBLOCK_REIMPLEMENTATION.md#command-menu-invoke",
+        "tests/unit/test_wave4x_final_a_hardblock_contract.py"
       ],
       "notes": "Wave4X re-review retained SAFETY_FORBIDDEN. Menu macro invocation is still a raw command surface.",
       "owner_ticket": "M08N-T02",
       "implementation_strategy": "hard_blocked",
       "evidence_required": "blocker_ref_and_evidence",
-      "blocked_reason": "SAFETY_FORBIDDEN: acedMenuCmd executes arbitrary menu/command macros in the active editor; exposing it as an agent API would be a raw command surface and may mutate the user session."
+      "blocked_reason": "SAFETY_FORBIDDEN: acedMenuCmd executes arbitrary menu/command macros in the active editor; exposing it as an agent API would be a raw command surface and may mutate the user session.",
+      "agent_exposed": false,
+      "blocker_ref": "reports/WAVE4X_FINAL_A_HARDBLOCK_DECISIONS.md#command-menu-invoke",
+      "replacement_ref": "typed CAD OS operation handlers only; examples: command.register.define + module.command.lookup + module.command.stack_handle + operation-specific implemented handlers",
+      "hardblock_audit": {
+        "packet": "WAVE4X_FINAL_A_HARDBLOCK_REIMPLEMENTATION",
+        "decision": "remain_hard_blocked_after_reimplementation_audit",
+        "allowed_hardblock_reason": "SAFETY_FORBIDDEN",
+        "why_no_typed_safe_implementation": "The exact SDK operation is raw command string or macro dispatch. A typed safe implementation would be a different operation; CAD OS exposes operation-specific typed handlers instead of a generic raw command API.",
+        "why_no_read_status_introspection_subset": "Executing or queueing a command string has no read-only subset. Command metadata/status is covered by implemented typed operations such as command.register.define, module.command.lookup, and module.command.stack_handle.",
+        "why_no_staged_copy_implementation": "Running arbitrary command text on a staged copy bypasses operation schemas and typed handlers, and could still perform unbounded side effects inside the AutoCAD command processor.",
+        "why_no_attended_dedicated_instance_implementation": "A dedicated attended host would still expose arbitrary command text to an editor command stream. Host isolation does not convert raw command dispatch into a bounded operation.",
+        "why_no_policy_gated_replacement_route": "A policy-gated generic command route would still expose raw command semantics. The replacement is typed CAD OS operations and operation-specific handlers, not command-string execution.",
+        "non_agent_exposure_test": "tests/unit/test_wave4x_final_a_hardblock_contract.py"
+      }
     },
     {
       "id": "editor.command.register",

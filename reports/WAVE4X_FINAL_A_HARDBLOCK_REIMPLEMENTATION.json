@@ -1,0 +1,154 @@
+{
+  "schema": "ariadne.cad_os.wave4x_final_a.hardblock_reimplementation.v1",
+  "packet": "WAVE4X_FINAL_A_HARDBLOCK_REIMPLEMENTATION",
+  "generated_at": "2026-06-24T15:10:08.898460+09:00",
+  "branch": "cados/wave4x-final-a-hardblock-reimplementation",
+  "base": "cados/wave4x-fast-a-main-ready@f5f950c",
+  "merged_fast_b": true,
+  "fast_b_ref": "cados/wave4x-fast-b-on-fast-a-truth@ec92ee9",
+  "head_at_report_time": "e67e678",
+  "hardblocks_before": 29,
+  "reimplemented": [],
+  "reimplemented_count": 0,
+  "replaced_with_safe_route_count": 29,
+  "remaining_hardblocks_count": 29,
+  "remaining_hardblocks": [
+    "automate.com.send_command",
+    "command.invoke.coroutine",
+    "command.invoke.sync",
+    "command.invoke.sync.resbuf",
+    "command.menu.invoke",
+    "command.queue.post",
+    "define.assocarray.create",
+    "define.assocarray.path",
+    "define.assocarray.polar",
+    "define.assocarray.rectangular",
+    "define.assocsurface.blend",
+    "define.assocsurface.extrude",
+    "define.assocsurface.fillet",
+    "define.assocsurface.loft",
+    "define.assocsurface.offset",
+    "define.assocsurface.patch",
+    "define.assocsurface.result",
+    "define.assocsurface.trim",
+    "doc.sendstring",
+    "edit.assocarray.explode",
+    "edit.assocarray.item",
+    "edit.assocarray.itemReplace",
+    "edit.assocarray.reset",
+    "edit.assocarray.source",
+    "edit.assocarray.transform",
+    "embed.ole.frame",
+    "inspect.assocaction.evaluate",
+    "inspect.assocnetwork.evaluate",
+    "module.lifecycle.on_ole_unload"
+  ],
+  "blocked_by_code": {
+    "SAFETY_FORBIDDEN": 27,
+    "HOST_UNAVAILABLE": 2
+  },
+  "blocked_by_family": {
+    "active_document_write_original": 4,
+    "com_activex": 2,
+    "constraints_associativity": 20,
+    "editor_input": 1,
+    "runtime_commands": 1,
+    "ui_customization": 1
+  },
+  "raw_command_exposure": {
+    "agent_exposed": false,
+    "blocked_ops": [
+      "automate.com.send_command",
+      "command.invoke.coroutine",
+      "command.invoke.sync",
+      "command.invoke.sync.resbuf",
+      "command.menu.invoke",
+      "command.queue.post",
+      "doc.sendstring"
+    ],
+    "test": "tests/unit/test_wave4x_final_a_hardblock_contract.py"
+  },
+  "live_apply_patch": {
+    "status": "deprecated",
+    "replacement_ref": "apply.patch + tools/patch_engine.py::apply_native_staged"
+  },
+  "tests": {
+    "pytest_tests_q": "546 passed / 20 skipped",
+    "pytest_tests_q_rs": "546 passed / 20 skipped",
+    "new_contract_test": "4 passed",
+    "skips": {
+      "total": 20,
+      "live_or_attended_required": 3,
+      "missing_generated_fixture_or_run_artifact": 17,
+      "unexpected_skip": 0,
+      "notes": [
+        "CADOS_LIVE/native graph/inspect tests remain skipped without live env or golden DWG.",
+        "m02_cadctl_rich and dwg_truth_autocad run artifacts are not materialized in this worktree."
+      ]
+    }
+  },
+  "native_build": {
+    "schema": "ariadne.cad_os.wave4x_final_a.native_build.v1",
+    "command": "tools\\build_native_acad.ps1",
+    "exit_code": 0,
+    "status": "ok",
+    "log_ref": "reports\\WAVE4X_FINAL_A_NATIVE_BUILD.log",
+    "parsed": {
+      "status": "ok",
+      "msbuild": "C:\\Program Files\\Microsoft Visual Studio\\2026\\Community\\MSBuild\\Current\\Bin\\amd64\\MSBuild.exe",
+      "arx_relink_mode": "canonical",
+      "arx_versioned_name": "",
+      "arx_lock_note": "Canonical .arx relinked normally.",
+      "projects": [
+        "D:\\dev\\99_tools\\autocad-sdk-router_wave4x_final_a_hardblock\\src\\Ariadne.AcadNativeDbx\\Ariadne.AcadNativeDbx.dbx.vcxproj",
+        "D:\\dev\\99_tools\\autocad-sdk-router_wave4x_final_a_hardblock\\src\\Ariadne.AcadNative\\Ariadne.AcadNative.crx.vcxproj",
+        "D:\\dev\\99_tools\\autocad-sdk-router_wave4x_final_a_hardblock\\src\\Ariadne.AcadNative\\Ariadne.AcadNative.arx.vcxproj"
+      ],
+      "artifacts": [
+        {
+          "path": "D:\\dev\\99_tools\\autocad-sdk-router_wave4x_final_a_hardblock\\src\\Ariadne.AcadNative\\bin\\x64\\Release\\Ariadne.AcadNativeDbx.dbx",
+          "exists": true,
+          "bytes": 54272
+        },
+        {
+          "path": "D:\\dev\\99_tools\\autocad-sdk-router_wave4x_final_a_hardblock\\src\\Ariadne.AcadNative\\bin\\x64\\Release\\Ariadne.AcadNative.crx",
+          "exists": true,
+          "bytes": 804352
+        },
+        {
+          "path": "D:\\dev\\99_tools\\autocad-sdk-router_wave4x_final_a_hardblock\\src\\Ariadne.AcadNative\\bin\\x64\\Release\\Ariadne.AcadNative.arx",
+          "exists": true,
+          "bytes": 812544
+        }
+      ]
+    },
+    "generated_at": "2026-06-24T15:07:01.4580726+09:00"
+  },
+  "operation_counts_after": {
+    "implemented": 487,
+    "hard_blocked": 29,
+    "deprecated": 1,
+    "catalogued": 0,
+    "stub": 0,
+    "unknown": 0,
+    "deferred": 0
+  },
+  "dwg_safety": {
+    "original_dwg_modified": false,
+    "evidence": "No DWG/DXF/3DM path appears in git status for this worktree; work was registry/tests/reports/native build only."
+  },
+  "reports": [
+    "reports/WAVE4X_FINAL_A_BASELINE.md",
+    "reports/WAVE4X_FINAL_A_BASELINE.json",
+    "reports/WAVE4X_FINAL_A_HARDBLOCK_TARGETS.md",
+    "reports/WAVE4X_FINAL_A_HARDBLOCK_TARGETS.json",
+    "reports/WAVE4X_FINAL_A_HARDBLOCK_DECISIONS.md",
+    "reports/WAVE4X_FINAL_A_HARDBLOCK_DECISIONS.json",
+    "reports/WAVE4X_FINAL_A_HARDBLOCK_REIMPLEMENTATION.md",
+    "reports/WAVE4X_FINAL_A_HARDBLOCK_REIMPLEMENTATION.json",
+    "reports/WAVE4X_FINAL_A_NATIVE_BUILD.log",
+    "reports/WAVE4X_FINAL_A_NATIVE_BUILD.json",
+    "handoff/NEXT_STEP.md",
+    "handoff/zip/WAVE4X_FINAL_A_HARDBLOCK_REIMPLEMENTATION.zip"
+  ]
+}

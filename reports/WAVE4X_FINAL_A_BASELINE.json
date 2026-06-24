@@ -1,0 +1,23 @@
+{
+  "schema": "ariadne.cad_os.wave4x_final_a.baseline.v1",
+  "packet": "WAVE4X_FINAL_A_HARDBLOCK_REIMPLEMENTATION",
+  "generated_at": "2026-06-24T15:10:08.898460+09:00",
+  "base": "cados/wave4x-fast-a-main-ready@f5f950c",
+  "merged_fast_b": "cados/wave4x-fast-b-on-fast-a-truth@ec92ee9",
+  "branch": "cados/wave4x-final-a-hardblock-reimplementation",
+  "head_at_report_time": "e67e678",
+  "operation_counts": {
+    "implemented": 487,
+    "hard_blocked": 29,
+    "deprecated": 1,
+    "catalogued": 0,
+    "stub": 0,
+    "unknown": 0,
+    "deferred": 0
+  },
+  "coverage_gate_pass": true,
+  "closure_gate_pass": true,
+  "tests_baseline_after_merge": "542 passed / 20 skipped before Final A contract test was added",
+  "tests_final": "546 passed / 20 skipped",
+  "native_build": "ok"
+}

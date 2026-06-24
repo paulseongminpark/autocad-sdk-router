@@ -1143,13 +1143,17 @@
       "handler": "acedCommandC(AcEdCoroutineCallback, void*, int rtype, ...) / acedCmdC(...)",
       "test_ref": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
-        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata"
+        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
+        "tests/unit/test_wave4x_final_a_hardblock_contract.py"
       ],
       "evidence_ref": [
         "config/autocad_native_arx_operation_catalog.json#command.invoke.coroutine",
         "docs/FALLBACK_POLICY.md",
         "docs/M08_REMAINING_BATCH_PLAN.md#m08o-fallback-raw-command-hard-block",
-        "reports/tickets/WAVE4X_FALLBACK.md"
+        "reports/tickets/WAVE4X_FALLBACK.md",
+        "reports/WAVE4X_FINAL_A_HARDBLOCK_DECISIONS.md#command-invoke-coroutine",
+        "reports/WAVE4X_FINAL_A_HARDBLOCK_REIMPLEMENTATION.md#command-invoke-coroutine",
+        "tests/unit/test_wave4x_final_a_hardblock_contract.py"
       ],
       "blocker_ref": "SAFETY_FORBIDDEN: raw command dispatch is blocked in M08O fallback policy. Fallbacks are managed/.NET/LISP-only and do not expose direct command strings.",
       "risk_class": "raw_command",
@@ -1168,13 +1172,17 @@
       "handler": "acedCommandS(int rtype, ...)",
       "test_ref": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
-        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata"
+        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
+        "tests/unit/test_wave4x_final_a_hardblock_contract.py"
       ],
       "evidence_ref": [
         "config/autocad_native_arx_operation_catalog.json#command.invoke.sync",
         "docs/FALLBACK_POLICY.md",
         "docs/M08_REMAINING_BATCH_PLAN.md#m08o-fallback-raw-command-hard-block",
-        "reports/tickets/WAVE4X_FALLBACK.md"
+        "reports/tickets/WAVE4X_FALLBACK.md",
+        "reports/WAVE4X_FINAL_A_HARDBLOCK_DECISIONS.md#command-invoke-sync",
+        "reports/WAVE4X_FINAL_A_HARDBLOCK_REIMPLEMENTATION.md#command-invoke-sync",
+        "tests/unit/test_wave4x_final_a_hardblock_contract.py"
       ],
       "blocker_ref": "SAFETY_FORBIDDEN: raw command dispatch is blocked in M08O fallback policy. Fallbacks are managed/.NET/LISP-only and do not expose direct command strings.",
       "risk_class": "raw_command",
@@ -1193,13 +1201,17 @@
       "handler": "acedCmdS(const resbuf* rb, bool, AcApDocument*)",
       "test_ref": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
-        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata"
+        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
+        "tests/unit/test_wave4x_final_a_hardblock_contract.py"
       ],
       "evidence_ref": [
         "config/autocad_native_arx_operation_catalog.json#command.invoke.sync.resbuf",
         "docs/FALLBACK_POLICY.md",
         "docs/M08_REMAINING_BATCH_PLAN.md#m08o-fallback-raw-command-hard-block",
-        "reports/tickets/WAVE4X_FALLBACK.md"
+        "reports/tickets/WAVE4X_FALLBACK.md",
+        "reports/WAVE4X_FINAL_A_HARDBLOCK_DECISIONS.md#command-invoke-sync-resbuf",
+        "reports/WAVE4X_FINAL_A_HARDBLOCK_REIMPLEMENTATION.md#command-invoke-sync-resbuf",
+        "tests/unit/test_wave4x_final_a_hardblock_contract.py"
       ],
       "blocker_ref": "SAFETY_FORBIDDEN: raw command dispatch is blocked in M08O fallback policy. Fallbacks are managed/.NET/LISP-only and do not expose direct command strings.",
       "risk_class": "raw_command",
@@ -1302,7 +1314,8 @@
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
         "tests/unit/test_m08_doc_lifecycle.py::test_lifecycle_and_doc_raw_surfaces_remain_hard_blocked_with_wave4x_evidence",
-        "tests/unit/test_doc_sendstring_safety.py"
+        "tests/unit/test_doc_sendstring_safety.py",
+        "tests/unit/test_wave4x_final_a_hardblock_contract.py"
       ],
       "evidence_ref": [
         "config/autocad_native_arx_operation_catalog.json#doc.sendstring",
@@ -1314,7 +1327,10 @@
         "tests/unit/test_m08_doc_lifecycle.py",
         "reports/tickets/WAVE4X_LOADER_DOC_R2.md#doc.sendstring",
         "reports/tickets/WAVE4X_LOADER_DOC_R2_OPS.json#doc.sendstring",
-        "tests/unit/test_doc_sendstring_safety.py"
+        "tests/unit/test_doc_sendstring_safety.py",
+        "reports/WAVE4X_FINAL_A_HARDBLOCK_DECISIONS.md#doc-sendstring",
+        "reports/WAVE4X_FINAL_A_HARDBLOCK_REIMPLEMENTATION.md#doc-sendstring",
+        "tests/unit/test_wave4x_final_a_hardblock_contract.py"
       ],
       "blocker_ref": "SAFETY_FORBIDDEN: doc.sendstring uses AcApDocManager::sendStringToExecute to enqueue command text into an AutoCAD document command stream. R2 rechecked internal-only gating and rejected an agent operation because even policy-gated arbitrary command strings would be a raw command surface; safe bespoke typed handlers must be implemented instead.",
       "risk_class": "raw_command",
@@ -3224,13 +3240,17 @@
       "test_ref": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
-        "tests/unit/test_wave3_remaining_registry_closure.py::test_remaining_wave3_blocks_have_accepted_codes_and_evidence"
+        "tests/unit/test_wave3_remaining_registry_closure.py::test_remaining_wave3_blocks_have_accepted_codes_and_evidence",
+        "tests/unit/test_wave4x_final_a_hardblock_contract.py"
       ],
       "evidence_ref": [
         "config/autocad_native_arx_operation_catalog.json#automate.com.send_command",
         "reports/WAVE3_REMAINING_HARDBLOCK_REAUDIT.md#automate.com.send_command",
         "docs/FALLBACK_POLICY.md",
-        "reports/tickets/WAVE4X_FALLBACK.md"
+        "reports/tickets/WAVE4X_FALLBACK.md",
+        "reports/WAVE4X_FINAL_A_HARDBLOCK_DECISIONS.md#automate-com-send_command",
+        "reports/WAVE4X_FINAL_A_HARDBLOCK_REIMPLEMENTATION.md#automate-com-send_command",
+        "tests/unit/test_wave4x_final_a_hardblock_contract.py"
       ],
       "blocker_ref": "SAFETY_FORBIDDEN: COM SendCommand is raw command-string dispatch and must not be exposed to agents.",
       "risk_class": "read_safe",
@@ -3303,13 +3323,17 @@
       "test_ref": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
-        "tests/unit/test_wave3_remaining_registry_closure.py::test_remaining_wave3_blocks_have_accepted_codes_and_evidence"
+        "tests/unit/test_wave3_remaining_registry_closure.py::test_remaining_wave3_blocks_have_accepted_codes_and_evidence",
+        "tests/unit/test_wave4x_final_a_hardblock_contract.py"
       ],
       "evidence_ref": [
         "config/autocad_native_arx_operation_catalog.json#embed.ole.frame",
         "reports/WAVE3_REMAINING_HARDBLOCK_REAUDIT.md#embed.ole.frame",
         "docs/FALLBACK_POLICY.md",
-        "reports/tickets/WAVE4X_FALLBACK.md"
+        "reports/tickets/WAVE4X_FALLBACK.md",
+        "reports/WAVE4X_FINAL_A_HARDBLOCK_DECISIONS.md#embed-ole-frame",
+        "reports/WAVE4X_FINAL_A_HARDBLOCK_REIMPLEMENTATION.md#embed-ole-frame",
+        "tests/unit/test_wave4x_final_a_hardblock_contract.py"
       ],
       "blocker_ref": "HOST_UNAVAILABLE: AcDbOle2Frame embedding/linking requires a live OLE client item and attended host context; no controlled OLE route or staged payload contract is available.",
       "risk_class": "live_edit",
@@ -4469,12 +4493,16 @@
       "test_ref": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
-        "tests/unit/test_wave3_pane5_assoc_reaudit.py"
+        "tests/unit/test_wave3_pane5_assoc_reaudit.py",
+        "tests/unit/test_wave4x_final_a_hardblock_contract.py"
       ],
       "evidence_ref": [
         "config/autocad_native_arx_operation_catalog.json#define.assocarray.create",
         "reports/WAVE3_PANE5_ASSOCIATIVITY_REAUDIT.md#define.assocarray.create",
-        "tests/unit/test_wave3_pane5_assoc_reaudit.py"
+        "tests/unit/test_wave3_pane5_assoc_reaudit.py",
+        "reports/WAVE4X_FINAL_A_HARDBLOCK_DECISIONS.md#define-assocarray-create",
+        "reports/WAVE4X_FINAL_A_HARDBLOCK_REIMPLEMENTATION.md#define-assocarray-create",
+        "tests/unit/test_wave4x_final_a_hardblock_contract.py"
       ],
       "blocker_ref": "SAFETY_FORBIDDEN: AcDbAssocArrayActionBody::createInstance performs associative array layout/evaluation. CAD OS currently exposes only read-only identify for arrays; creating layout is not a solver-free operation.",
       "risk_class": "staged_write",
@@ -4494,12 +4522,16 @@
       "test_ref": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
-        "tests/unit/test_wave3_pane5_assoc_reaudit.py"
+        "tests/unit/test_wave3_pane5_assoc_reaudit.py",
+        "tests/unit/test_wave4x_final_a_hardblock_contract.py"
       ],
       "evidence_ref": [
         "config/autocad_native_arx_operation_catalog.json#define.assocarray.path",
         "reports/WAVE3_PANE5_ASSOCIATIVITY_REAUDIT.md#define.assocarray.path",
-        "tests/unit/test_wave3_pane5_assoc_reaudit.py"
+        "tests/unit/test_wave3_pane5_assoc_reaudit.py",
+        "reports/WAVE4X_FINAL_A_HARDBLOCK_DECISIONS.md#define-assocarray-path",
+        "reports/WAVE4X_FINAL_A_HARDBLOCK_REIMPLEMENTATION.md#define-assocarray-path",
+        "tests/unit/test_wave4x_final_a_hardblock_contract.py"
       ],
       "blocker_ref": "SAFETY_FORBIDDEN: path associative array creation relies on AcDbAssocArrayActionBody::createInstance and path layout evaluation.",
       "risk_class": "staged_write",
@@ -4519,12 +4551,16 @@
       "test_ref": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
-        "tests/unit/test_wave3_pane5_assoc_reaudit.py"
+        "tests/unit/test_wave3_pane5_assoc_reaudit.py",
+        "tests/unit/test_wave4x_final_a_hardblock_contract.py"
       ],
       "evidence_ref": [
         "config/autocad_native_arx_operation_catalog.json#define.assocarray.polar",
         "reports/WAVE3_PANE5_ASSOCIATIVITY_REAUDIT.md#define.assocarray.polar",
-        "tests/unit/test_wave3_pane5_assoc_reaudit.py"
+        "tests/unit/test_wave3_pane5_assoc_reaudit.py",
+        "reports/WAVE4X_FINAL_A_HARDBLOCK_DECISIONS.md#define-assocarray-polar",
+        "reports/WAVE4X_FINAL_A_HARDBLOCK_REIMPLEMENTATION.md#define-assocarray-polar",
+        "tests/unit/test_wave4x_final_a_hardblock_contract.py"
       ],
       "blocker_ref": "SAFETY_FORBIDDEN: polar associative array creation relies on AcDbAssocArrayActionBody::createInstance and parameter layout evaluation.",
       "risk_class": "staged_write",
@@ -4544,12 +4580,16 @@
       "test_ref": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
-        "tests/unit/test_wave3_pane5_assoc_reaudit.py"
+        "tests/unit/test_wave3_pane5_assoc_reaudit.py",
+        "tests/unit/test_wave4x_final_a_hardblock_contract.py"
       ],
       "evidence_ref": [
         "config/autocad_native_arx_operation_catalog.json#define.assocarray.rectangular",
         "reports/WAVE3_PANE5_ASSOCIATIVITY_REAUDIT.md#define.assocarray.rectangular",
-        "tests/unit/test_wave3_pane5_assoc_reaudit.py"
+        "tests/unit/test_wave3_pane5_assoc_reaudit.py",
+        "reports/WAVE4X_FINAL_A_HARDBLOCK_DECISIONS.md#define-assocarray-rectangular",
+        "reports/WAVE4X_FINAL_A_HARDBLOCK_REIMPLEMENTATION.md#define-assocarray-rectangular",
+        "tests/unit/test_wave4x_final_a_hardblock_contract.py"
       ],
       "blocker_ref": "SAFETY_FORBIDDEN: rectangular associative array creation relies on AcDbAssocArrayActionBody::createInstance and parameter layout evaluation.",
       "risk_class": "staged_write",
@@ -4650,12 +4690,16 @@
       "test_ref": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
-        "tests/unit/test_wave3_pane5_assoc_reaudit.py"
+        "tests/unit/test_wave3_pane5_assoc_reaudit.py",
+        "tests/unit/test_wave4x_final_a_hardblock_contract.py"
       ],
       "evidence_ref": [
         "config/autocad_native_arx_operation_catalog.json#define.assocsurface.blend",
         "reports/WAVE3_PANE5_ASSOCIATIVITY_REAUDIT.md#define.assocsurface.blend",
-        "tests/unit/test_wave3_pane5_assoc_reaudit.py"
+        "tests/unit/test_wave3_pane5_assoc_reaudit.py",
+        "reports/WAVE4X_FINAL_A_HARDBLOCK_DECISIONS.md#define-assocsurface-blend",
+        "reports/WAVE4X_FINAL_A_HARDBLOCK_REIMPLEMENTATION.md#define-assocsurface-blend",
+        "tests/unit/test_wave4x_final_a_hardblock_contract.py"
       ],
       "blocker_ref": "SAFETY_FORBIDDEN: AcDbAssocBlendSurfaceActionBody::createInstance enters ASM associative surface creation/modeler evaluation. CAD OS has no bounded, solver-free staged handler for this modeler action.",
       "risk_class": "live_edit",
@@ -4675,12 +4719,16 @@
       "test_ref": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
-        "tests/unit/test_wave3_pane5_assoc_reaudit.py"
+        "tests/unit/test_wave3_pane5_assoc_reaudit.py",
+        "tests/unit/test_wave4x_final_a_hardblock_contract.py"
       ],
       "evidence_ref": [
         "config/autocad_native_arx_operation_catalog.json#define.assocsurface.extrude",
         "reports/WAVE3_PANE5_ASSOCIATIVITY_REAUDIT.md#define.assocsurface.extrude",
-        "tests/unit/test_wave3_pane5_assoc_reaudit.py"
+        "tests/unit/test_wave3_pane5_assoc_reaudit.py",
+        "reports/WAVE4X_FINAL_A_HARDBLOCK_DECISIONS.md#define-assocsurface-extrude",
+        "reports/WAVE4X_FINAL_A_HARDBLOCK_REIMPLEMENTATION.md#define-assocsurface-extrude",
+        "tests/unit/test_wave4x_final_a_hardblock_contract.py"
       ],
       "blocker_ref": "SAFETY_FORBIDDEN: AcDbAssocExtrudedSurfaceActionBody::createInstance enters ASM associative surface creation/modeler evaluation. CAD OS has no bounded, solver-free staged handler for this modeler action.",
       "risk_class": "live_edit",
@@ -4700,12 +4748,16 @@
       "test_ref": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
-        "tests/unit/test_wave3_pane5_assoc_reaudit.py"
+        "tests/unit/test_wave3_pane5_assoc_reaudit.py",
+        "tests/unit/test_wave4x_final_a_hardblock_contract.py"
       ],
       "evidence_ref": [
         "config/autocad_native_arx_operation_catalog.json#define.assocsurface.fillet",
         "reports/WAVE3_PANE5_ASSOCIATIVITY_REAUDIT.md#define.assocsurface.fillet",
-        "tests/unit/test_wave3_pane5_assoc_reaudit.py"
+        "tests/unit/test_wave3_pane5_assoc_reaudit.py",
+        "reports/WAVE4X_FINAL_A_HARDBLOCK_DECISIONS.md#define-assocsurface-fillet",
+        "reports/WAVE4X_FINAL_A_HARDBLOCK_REIMPLEMENTATION.md#define-assocsurface-fillet",
+        "tests/unit/test_wave4x_final_a_hardblock_contract.py"
       ],
       "blocker_ref": "SAFETY_FORBIDDEN: AcDbAssocFilletSurfaceActionBody::createInstance enters ASM associative surface creation/modeler evaluation. CAD OS has no bounded, solver-free staged handler for this modeler action.",
       "risk_class": "live_edit",
@@ -4725,12 +4777,16 @@
       "test_ref": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
-        "tests/unit/test_wave3_pane5_assoc_reaudit.py"
+        "tests/unit/test_wave3_pane5_assoc_reaudit.py",
+        "tests/unit/test_wave4x_final_a_hardblock_contract.py"
       ],
       "evidence_ref": [
         "config/autocad_native_arx_operation_catalog.json#define.assocsurface.loft",
         "reports/WAVE3_PANE5_ASSOCIATIVITY_REAUDIT.md#define.assocsurface.loft",
-        "tests/unit/test_wave3_pane5_assoc_reaudit.py"
+        "tests/unit/test_wave3_pane5_assoc_reaudit.py",
+        "reports/WAVE4X_FINAL_A_HARDBLOCK_DECISIONS.md#define-assocsurface-loft",
+        "reports/WAVE4X_FINAL_A_HARDBLOCK_REIMPLEMENTATION.md#define-assocsurface-loft",
+        "tests/unit/test_wave4x_final_a_hardblock_contract.py"
       ],
       "blocker_ref": "SAFETY_FORBIDDEN: AcDbAssocLoftedSurfaceActionBody::createInstance enters ASM associative surface creation/modeler evaluation. CAD OS has no bounded, solver-free staged handler for this modeler action.",
       "risk_class": "live_edit",
@@ -4750,12 +4806,16 @@
       "test_ref": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
-        "tests/unit/test_wave3_pane5_assoc_reaudit.py"
+        "tests/unit/test_wave3_pane5_assoc_reaudit.py",
+        "tests/unit/test_wave4x_final_a_hardblock_contract.py"
       ],
       "evidence_ref": [
         "config/autocad_native_arx_operation_catalog.json#define.assocsurface.offset",
         "reports/WAVE3_PANE5_ASSOCIATIVITY_REAUDIT.md#define.assocsurface.offset",
-        "tests/unit/test_wave3_pane5_assoc_reaudit.py"
+        "tests/unit/test_wave3_pane5_assoc_reaudit.py",
+        "reports/WAVE4X_FINAL_A_HARDBLOCK_DECISIONS.md#define-assocsurface-offset",
+        "reports/WAVE4X_FINAL_A_HARDBLOCK_REIMPLEMENTATION.md#define-assocsurface-offset",
+        "tests/unit/test_wave4x_final_a_hardblock_contract.py"
       ],
       "blocker_ref": "SAFETY_FORBIDDEN: AcDbAssocOffsetSurfaceActionBody::createInstance enters ASM associative surface creation/modeler evaluation. CAD OS has no bounded, solver-free staged handler for this modeler action.",
       "risk_class": "live_edit",
@@ -4775,12 +4835,16 @@
       "test_ref": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
-        "tests/unit/test_wave3_pane5_assoc_reaudit.py"
+        "tests/unit/test_wave3_pane5_assoc_reaudit.py",
+        "tests/unit/test_wave4x_final_a_hardblock_contract.py"
       ],
       "evidence_ref": [
         "config/autocad_native_arx_operation_catalog.json#define.assocsurface.patch",
         "reports/WAVE3_PANE5_ASSOCIATIVITY_REAUDIT.md#define.assocsurface.patch",
-        "tests/unit/test_wave3_pane5_assoc_reaudit.py"
+        "tests/unit/test_wave3_pane5_assoc_reaudit.py",
+        "reports/WAVE4X_FINAL_A_HARDBLOCK_DECISIONS.md#define-assocsurface-patch",
+        "reports/WAVE4X_FINAL_A_HARDBLOCK_REIMPLEMENTATION.md#define-assocsurface-patch",
+        "tests/unit/test_wave4x_final_a_hardblock_contract.py"
       ],
       "blocker_ref": "SAFETY_FORBIDDEN: AcDbAssocPatchSurfaceActionBody::createInstance enters ASM associative surface creation/modeler evaluation. CAD OS has no bounded, solver-free staged handler for this modeler action.",
       "risk_class": "live_edit",
@@ -4800,12 +4864,16 @@
       "test_ref": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
-        "tests/unit/test_wave3_pane5_assoc_reaudit.py"
+        "tests/unit/test_wave3_pane5_assoc_reaudit.py",
+        "tests/unit/test_wave4x_final_a_hardblock_contract.py"
       ],
       "evidence_ref": [
         "config/autocad_native_arx_operation_catalog.json#define.assocsurface.result",
         "reports/WAVE3_PANE5_ASSOCIATIVITY_REAUDIT.md#define.assocsurface.result",
-        "tests/unit/test_wave3_pane5_assoc_reaudit.py"
+        "tests/unit/test_wave3_pane5_assoc_reaudit.py",
+        "reports/WAVE4X_FINAL_A_HARDBLOCK_DECISIONS.md#define-assocsurface-result",
+        "reports/WAVE4X_FINAL_A_HARDBLOCK_REIMPLEMENTATION.md#define-assocsurface-result",
+        "tests/unit/test_wave4x_final_a_hardblock_contract.py"
       ],
       "blocker_ref": "SAFETY_FORBIDDEN: associative surface result extraction depends on a prior ASM/evaluator-created action body result. CAD OS has no solver-free implementation that can honestly produce the result for arbitrary drawings.",
       "risk_class": "live_edit",
@@ -4825,12 +4893,16 @@
       "test_ref": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
-        "tests/unit/test_wave3_pane5_assoc_reaudit.py"
+        "tests/unit/test_wave3_pane5_assoc_reaudit.py",
+        "tests/unit/test_wave4x_final_a_hardblock_contract.py"
       ],
       "evidence_ref": [
         "config/autocad_native_arx_operation_catalog.json#define.assocsurface.trim",
         "reports/WAVE3_PANE5_ASSOCIATIVITY_REAUDIT.md#define.assocsurface.trim",
-        "tests/unit/test_wave3_pane5_assoc_reaudit.py"
+        "tests/unit/test_wave3_pane5_assoc_reaudit.py",
+        "reports/WAVE4X_FINAL_A_HARDBLOCK_DECISIONS.md#define-assocsurface-trim",
+        "reports/WAVE4X_FINAL_A_HARDBLOCK_REIMPLEMENTATION.md#define-assocsurface-trim",
+        "tests/unit/test_wave4x_final_a_hardblock_contract.py"
       ],
       "blocker_ref": "SAFETY_FORBIDDEN: AcDbAssocTrimSurfaceActionBody::createInstance enters ASM associative surface creation/modeler evaluation. CAD OS has no bounded, solver-free staged handler for this modeler action.",
       "risk_class": "live_edit",
@@ -5201,12 +5273,16 @@
       "test_ref": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
-        "tests/unit/test_wave3_pane5_assoc_reaudit.py"
+        "tests/unit/test_wave3_pane5_assoc_reaudit.py",
+        "tests/unit/test_wave4x_final_a_hardblock_contract.py"
       ],
       "evidence_ref": [
         "config/autocad_native_arx_operation_catalog.json#edit.assocarray.explode",
         "reports/WAVE3_PANE5_ASSOCIATIVITY_REAUDIT.md#edit.assocarray.explode",
-        "tests/unit/test_wave3_pane5_assoc_reaudit.py"
+        "tests/unit/test_wave3_pane5_assoc_reaudit.py",
+        "reports/WAVE4X_FINAL_A_HARDBLOCK_DECISIONS.md#edit-assocarray-explode",
+        "reports/WAVE4X_FINAL_A_HARDBLOCK_REIMPLEMENTATION.md#edit-assocarray-explode",
+        "tests/unit/test_wave4x_final_a_hardblock_contract.py"
       ],
       "blocker_ref": "SAFETY_FORBIDDEN: associative array explode mutates the staged database through array action body expansion and is not exposed as a bounded CAD OS operation.",
       "risk_class": "live_edit",
@@ -5226,12 +5302,16 @@
       "test_ref": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
-        "tests/unit/test_wave3_pane5_assoc_reaudit.py"
+        "tests/unit/test_wave3_pane5_assoc_reaudit.py",
+        "tests/unit/test_wave4x_final_a_hardblock_contract.py"
       ],
       "evidence_ref": [
         "config/autocad_native_arx_operation_catalog.json#edit.assocarray.item",
         "reports/WAVE3_PANE5_ASSOCIATIVITY_REAUDIT.md#edit.assocarray.item",
-        "tests/unit/test_wave3_pane5_assoc_reaudit.py"
+        "tests/unit/test_wave3_pane5_assoc_reaudit.py",
+        "reports/WAVE4X_FINAL_A_HARDBLOCK_DECISIONS.md#edit-assocarray-item",
+        "reports/WAVE4X_FINAL_A_HARDBLOCK_REIMPLEMENTATION.md#edit-assocarray-item",
+        "tests/unit/test_wave4x_final_a_hardblock_contract.py"
       ],
       "blocker_ref": "SAFETY_FORBIDDEN: associative array item edits require item locator/layout evaluation and can trigger array body recomputation; no bounded solver-free agent handler exists.",
       "risk_class": "staged_write",
@@ -5251,12 +5331,16 @@
       "test_ref": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
-        "tests/unit/test_wave3_pane5_assoc_reaudit.py"
+        "tests/unit/test_wave3_pane5_assoc_reaudit.py",
+        "tests/unit/test_wave4x_final_a_hardblock_contract.py"
       ],
       "evidence_ref": [
         "config/autocad_native_arx_operation_catalog.json#edit.assocarray.itemReplace",
         "reports/WAVE3_PANE5_ASSOCIATIVITY_REAUDIT.md#edit.assocarray.itemReplace",
-        "tests/unit/test_wave3_pane5_assoc_reaudit.py"
+        "tests/unit/test_wave3_pane5_assoc_reaudit.py",
+        "reports/WAVE4X_FINAL_A_HARDBLOCK_DECISIONS.md#edit-assocarray-itemReplace",
+        "reports/WAVE4X_FINAL_A_HARDBLOCK_REIMPLEMENTATION.md#edit-assocarray-itemReplace",
+        "tests/unit/test_wave4x_final_a_hardblock_contract.py"
       ],
       "blocker_ref": "SAFETY_FORBIDDEN: associative array item replacement requires source-item substitution and array body recomputation; no bounded solver-free agent handler exists.",
       "risk_class": "staged_write",
@@ -5276,12 +5360,16 @@
       "test_ref": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
-        "tests/unit/test_wave3_pane5_assoc_reaudit.py"
+        "tests/unit/test_wave3_pane5_assoc_reaudit.py",
+        "tests/unit/test_wave4x_final_a_hardblock_contract.py"
       ],
       "evidence_ref": [
         "config/autocad_native_arx_operation_catalog.json#edit.assocarray.reset",
         "reports/WAVE3_PANE5_ASSOCIATIVITY_REAUDIT.md#edit.assocarray.reset",
-        "tests/unit/test_wave3_pane5_assoc_reaudit.py"
+        "tests/unit/test_wave3_pane5_assoc_reaudit.py",
+        "reports/WAVE4X_FINAL_A_HARDBLOCK_DECISIONS.md#edit-assocarray-reset",
+        "reports/WAVE4X_FINAL_A_HARDBLOCK_REIMPLEMENTATION.md#edit-assocarray-reset",
+        "tests/unit/test_wave4x_final_a_hardblock_contract.py"
       ],
       "blocker_ref": "SAFETY_FORBIDDEN: resetArrayItems performs array re-layout/evaluation and is intentionally not exposed to agents.",
       "risk_class": "staged_write",
@@ -5301,12 +5389,16 @@
       "test_ref": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
-        "tests/unit/test_wave3_pane5_assoc_reaudit.py"
+        "tests/unit/test_wave3_pane5_assoc_reaudit.py",
+        "tests/unit/test_wave4x_final_a_hardblock_contract.py"
       ],
       "evidence_ref": [
         "config/autocad_native_arx_operation_catalog.json#edit.assocarray.source",
         "reports/WAVE3_PANE5_ASSOCIATIVITY_REAUDIT.md#edit.assocarray.source",
-        "tests/unit/test_wave3_pane5_assoc_reaudit.py"
+        "tests/unit/test_wave3_pane5_assoc_reaudit.py",
+        "reports/WAVE4X_FINAL_A_HARDBLOCK_DECISIONS.md#edit-assocarray-source",
+        "reports/WAVE4X_FINAL_A_HARDBLOCK_REIMPLEMENTATION.md#edit-assocarray-source",
+        "tests/unit/test_wave4x_final_a_hardblock_contract.py"
       ],
       "blocker_ref": "SAFETY_FORBIDDEN: source entity edits on associative arrays require action body recomputation and can mutate layout through the evaluator.",
       "risk_class": "staged_write",
@@ -5326,12 +5418,16 @@
       "test_ref": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
-        "tests/unit/test_wave3_pane5_assoc_reaudit.py"
+        "tests/unit/test_wave3_pane5_assoc_reaudit.py",
+        "tests/unit/test_wave4x_final_a_hardblock_contract.py"
       ],
       "evidence_ref": [
         "config/autocad_native_arx_operation_catalog.json#edit.assocarray.transform",
         "reports/WAVE3_PANE5_ASSOCIATIVITY_REAUDIT.md#edit.assocarray.transform",
-        "tests/unit/test_wave3_pane5_assoc_reaudit.py"
+        "tests/unit/test_wave3_pane5_assoc_reaudit.py",
+        "reports/WAVE4X_FINAL_A_HARDBLOCK_DECISIONS.md#edit-assocarray-transform",
+        "reports/WAVE4X_FINAL_A_HARDBLOCK_REIMPLEMENTATION.md#edit-assocarray-transform",
+        "tests/unit/test_wave4x_final_a_hardblock_contract.py"
       ],
       "blocker_ref": "SAFETY_FORBIDDEN: transformBy on associative array action bodies can trigger layout/evaluator semantics; no bounded solver-free agent handler exists.",
       "risk_class": "staged_write",
@@ -5462,12 +5558,16 @@
       "test_ref": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
-        "tests/unit/test_wave3_pane5_assoc_reaudit.py"
+        "tests/unit/test_wave3_pane5_assoc_reaudit.py",
+        "tests/unit/test_wave4x_final_a_hardblock_contract.py"
       ],
       "evidence_ref": [
         "config/autocad_native_arx_operation_catalog.json#inspect.assocaction.evaluate",
         "reports/WAVE3_PANE5_ASSOCIATIVITY_REAUDIT.md#inspect.assocaction.evaluate",
-        "tests/unit/test_wave3_pane5_assoc_reaudit.py"
+        "tests/unit/test_wave3_pane5_assoc_reaudit.py",
+        "reports/WAVE4X_FINAL_A_HARDBLOCK_DECISIONS.md#inspect-assocaction-evaluate",
+        "reports/WAVE4X_FINAL_A_HARDBLOCK_REIMPLEMENTATION.md#inspect-assocaction-evaluate",
+        "tests/unit/test_wave4x_final_a_hardblock_contract.py"
       ],
       "blocker_ref": "SAFETY_FORBIDDEN: AcDbAssocAction::evaluate is the native associative solver entry. Exposing it as an agent operation would run arbitrary evaluation callbacks and mutate the staged database outside CAD OS bounded semantics.",
       "risk_class": "live_edit",
@@ -5568,12 +5668,16 @@
       "test_ref": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
-        "tests/unit/test_wave3_pane5_assoc_reaudit.py"
+        "tests/unit/test_wave3_pane5_assoc_reaudit.py",
+        "tests/unit/test_wave4x_final_a_hardblock_contract.py"
       ],
       "evidence_ref": [
         "config/autocad_native_arx_operation_catalog.json#inspect.assocnetwork.evaluate",
         "reports/WAVE3_PANE5_ASSOCIATIVITY_REAUDIT.md#inspect.assocnetwork.evaluate",
-        "tests/unit/test_wave3_pane5_assoc_reaudit.py"
+        "tests/unit/test_wave3_pane5_assoc_reaudit.py",
+        "reports/WAVE4X_FINAL_A_HARDBLOCK_DECISIONS.md#inspect-assocnetwork-evaluate",
+        "reports/WAVE4X_FINAL_A_HARDBLOCK_REIMPLEMENTATION.md#inspect-assocnetwork-evaluate",
+        "tests/unit/test_wave4x_final_a_hardblock_contract.py"
       ],
       "blocker_ref": "SAFETY_FORBIDDEN: AcDbAssocManager::evaluateTopLevelNetwork is the top-level associative solver. Exposing it as an agent operation would run arbitrary network evaluation/callback code.",
       "risk_class": "live_edit",
@@ -7587,13 +7691,17 @@
       "handler": "acedPostCommand / acedPostCommandPrompt()",
       "test_ref": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
-        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata"
+        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
+        "tests/unit/test_wave4x_final_a_hardblock_contract.py"
       ],
       "evidence_ref": [
         "config/autocad_native_arx_operation_catalog.json#command.queue.post",
         "docs/FALLBACK_POLICY.md",
         "docs/M08_REMAINING_BATCH_PLAN.md#m08o-fallback-raw-command-hard-block",
-        "reports/tickets/WAVE4X_FALLBACK.md"
+        "reports/tickets/WAVE4X_FALLBACK.md",
+        "reports/WAVE4X_FINAL_A_HARDBLOCK_DECISIONS.md#command-queue-post",
+        "reports/WAVE4X_FINAL_A_HARDBLOCK_REIMPLEMENTATION.md#command-queue-post",
+        "tests/unit/test_wave4x_final_a_hardblock_contract.py"
       ],
       "blocker_ref": "SAFETY_FORBIDDEN: raw command dispatch is blocked in M08O fallback policy. Fallbacks are managed/.NET/LISP-only and do not expose direct command strings.",
       "risk_class": "raw_command",
@@ -12341,13 +12449,17 @@
       "test_ref": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
-        "tests/unit/test_wave3_remaining_registry_closure.py::test_remaining_wave3_blocks_have_accepted_codes_and_evidence"
+        "tests/unit/test_wave3_remaining_registry_closure.py::test_remaining_wave3_blocks_have_accepted_codes_and_evidence",
+        "tests/unit/test_wave4x_final_a_hardblock_contract.py"
       ],
       "evidence_ref": [
         "config/autocad_native_arx_operation_catalog.json#module.lifecycle.on_ole_unload",
         "reports/WAVE3_REMAINING_HARDBLOCK_REAUDIT.md#module.lifecycle.on_ole_unload",
         "docs/FALLBACK_POLICY.md",
-        "reports/tickets/WAVE4X_FALLBACK.md"
+        "reports/tickets/WAVE4X_FALLBACK.md",
+        "reports/WAVE4X_FINAL_A_HARDBLOCK_DECISIONS.md#module-lifecycle-on_ole_unload",
+        "reports/WAVE4X_FINAL_A_HARDBLOCK_REIMPLEMENTATION.md#module-lifecycle-on_ole_unload",
+        "tests/unit/test_wave4x_final_a_hardblock_contract.py"
       ],
       "blocker_ref": "HOST_UNAVAILABLE: On_kOleUnloadAppMsg is a host lifecycle callback and cannot be triggered safely from the CAD OS job surface.",
       "risk_class": "read_safe",
@@ -13060,7 +13172,8 @@
       "test_ref": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
-        "tests/unit/test_m08n_handlers.py"
+        "tests/unit/test_m08n_handlers.py",
+        "tests/unit/test_wave4x_final_a_hardblock_contract.py"
       ],
       "evidence_ref": [
         "config/autocad_native_arx_operation_catalog.json#command.menu.invoke",
@@ -13069,7 +13182,10 @@
         "research/native_arx/editor-delta.md#Operation catalog (PART 1)",
         "research/native_arx/ui-customization.md#Operation catalog",
         "docs/FALLBACK_POLICY.md",
-        "reports/tickets/WAVE4X_FALLBACK.md"
+        "reports/tickets/WAVE4X_FALLBACK.md",
+        "reports/WAVE4X_FINAL_A_HARDBLOCK_DECISIONS.md#command-menu-invoke",
+        "reports/WAVE4X_FINAL_A_HARDBLOCK_REIMPLEMENTATION.md#command-menu-invoke",
+        "tests/unit/test_wave4x_final_a_hardblock_contract.py"
       ],
       "blocker_ref": "SAFETY_FORBIDDEN: acedMenuCmd executes arbitrary menu/command macros in the active editor; exposing it as an agent API would be a raw command surface and may mutate the user session.",
       "risk_class": "read_safe",

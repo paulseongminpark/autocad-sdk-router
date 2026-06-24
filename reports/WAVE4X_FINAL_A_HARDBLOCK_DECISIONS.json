@@ -1,0 +1,277 @@
+{
+  "schema": "ariadne.cad_os.wave4x_final_a.hardblock_decisions.v1",
+  "packet": "WAVE4X_FINAL_A_HARDBLOCK_REIMPLEMENTATION",
+  "generated_at": "2026-06-24T15:10:08.898460+09:00",
+  "decisions": [
+    {
+      "operation": "automate.com.send_command",
+      "final_state": "hard_blocked",
+      "blocker_code": "SAFETY_FORBIDDEN",
+      "agent_exposed": false,
+      "replacement_ref": "typed CAD OS operation handlers only; examples: command.register.define + module.command.lookup + module.command.stack_handle + operation-specific implemented handlers",
+      "decision": "kept_blocked_only_after Final A re-audit because exact op remains unsafe/unavailable; safe subset/replacement is separately implemented where feasible",
+      "non_agent_exposure_test": "tests/unit/test_wave4x_final_a_hardblock_contract.py"
+    },
+    {
+      "operation": "command.invoke.coroutine",
+      "final_state": "hard_blocked",
+      "blocker_code": "SAFETY_FORBIDDEN",
+      "agent_exposed": false,
+      "replacement_ref": "typed CAD OS operation handlers only; examples: command.register.define + module.command.lookup + module.command.stack_handle + operation-specific implemented handlers",
+      "decision": "kept_blocked_only_after Final A re-audit because exact op remains unsafe/unavailable; safe subset/replacement is separately implemented where feasible",
+      "non_agent_exposure_test": "tests/unit/test_wave4x_final_a_hardblock_contract.py"
+    },
+    {
+      "operation": "command.invoke.sync",
+      "final_state": "hard_blocked",
+      "blocker_code": "SAFETY_FORBIDDEN",
+      "agent_exposed": false,
+      "replacement_ref": "typed CAD OS operation handlers only; examples: command.register.define + module.command.lookup + module.command.stack_handle + operation-specific implemented handlers",
+      "decision": "kept_blocked_only_after Final A re-audit because exact op remains unsafe/unavailable; safe subset/replacement is separately implemented where feasible",
+      "non_agent_exposure_test": "tests/unit/test_wave4x_final_a_hardblock_contract.py"
+    },
+    {
+      "operation": "command.invoke.sync.resbuf",
+      "final_state": "hard_blocked",
+      "blocker_code": "SAFETY_FORBIDDEN",
+      "agent_exposed": false,
+      "replacement_ref": "typed CAD OS operation handlers only; examples: command.register.define + module.command.lookup + module.command.stack_handle + operation-specific implemented handlers",
+      "decision": "kept_blocked_only_after Final A re-audit because exact op remains unsafe/unavailable; safe subset/replacement is separately implemented where feasible",
+      "non_agent_exposure_test": "tests/unit/test_wave4x_final_a_hardblock_contract.py"
+    },
+    {
+      "operation": "command.menu.invoke",
+      "final_state": "hard_blocked",
+      "blocker_code": "SAFETY_FORBIDDEN",
+      "agent_exposed": false,
+      "replacement_ref": "typed CAD OS operation handlers only; examples: command.register.define + module.command.lookup + module.command.stack_handle + operation-specific implemented handlers",
+      "decision": "kept_blocked_only_after Final A re-audit because exact op remains unsafe/unavailable; safe subset/replacement is separately implemented where feasible",
+      "non_agent_exposure_test": "tests/unit/test_wave4x_final_a_hardblock_contract.py"
+    },
+    {
+      "operation": "command.queue.post",
+      "final_state": "hard_blocked",
+      "blocker_code": "SAFETY_FORBIDDEN",
+      "agent_exposed": false,
+      "replacement_ref": "typed CAD OS operation handlers only; examples: command.register.define + module.command.lookup + module.command.stack_handle + operation-specific implemented handlers",
+      "decision": "kept_blocked_only_after Final A re-audit because exact op remains unsafe/unavailable; safe subset/replacement is separately implemented where feasible",
+      "non_agent_exposure_test": "tests/unit/test_wave4x_final_a_hardblock_contract.py"
+    },
+    {
+      "operation": "define.assocarray.create",
+      "final_state": "hard_blocked",
+      "blocker_code": "SAFETY_FORBIDDEN",
+      "agent_exposed": false,
+      "replacement_ref": "inspect.assocarray.identify + inspect.assocmanager.state + repair.assocdata.audit",
+      "decision": "kept_blocked_only_after Final A re-audit because exact op remains unsafe/unavailable; safe subset/replacement is separately implemented where feasible",
+      "non_agent_exposure_test": "tests/unit/test_wave4x_final_a_hardblock_contract.py"
+    },
+    {
+      "operation": "define.assocarray.path",
+      "final_state": "hard_blocked",
+      "blocker_code": "SAFETY_FORBIDDEN",
+      "agent_exposed": false,
+      "replacement_ref": "inspect.assocarray.identify + inspect.assocmanager.state + repair.assocdata.audit",
+      "decision": "kept_blocked_only_after Final A re-audit because exact op remains unsafe/unavailable; safe subset/replacement is separately implemented where feasible",
+      "non_agent_exposure_test": "tests/unit/test_wave4x_final_a_hardblock_contract.py"
+    },
+    {
+      "operation": "define.assocarray.polar",
+      "final_state": "hard_blocked",
+      "blocker_code": "SAFETY_FORBIDDEN",
+      "agent_exposed": false,
+      "replacement_ref": "inspect.assocarray.identify + inspect.assocmanager.state + repair.assocdata.audit",
+      "decision": "kept_blocked_only_after Final A re-audit because exact op remains unsafe/unavailable; safe subset/replacement is separately implemented where feasible",
+      "non_agent_exposure_test": "tests/unit/test_wave4x_final_a_hardblock_contract.py"
+    },
+    {
+      "operation": "define.assocarray.rectangular",
+      "final_state": "hard_blocked",
+      "blocker_code": "SAFETY_FORBIDDEN",
+      "agent_exposed": false,
+      "replacement_ref": "inspect.assocarray.identify + inspect.assocmanager.state + repair.assocdata.audit",
+      "decision": "kept_blocked_only_after Final A re-audit because exact op remains unsafe/unavailable; safe subset/replacement is separately implemented where feasible",
+      "non_agent_exposure_test": "tests/unit/test_wave4x_final_a_hardblock_contract.py"
+    },
+    {
+      "operation": "define.assocsurface.blend",
+      "final_state": "hard_blocked",
+      "blocker_code": "SAFETY_FORBIDDEN",
+      "agent_exposed": false,
+      "replacement_ref": "inspect.assocsurface.topology + repair.assocdata.audit",
+      "decision": "kept_blocked_only_after Final A re-audit because exact op remains unsafe/unavailable; safe subset/replacement is separately implemented where feasible",
+      "non_agent_exposure_test": "tests/unit/test_wave4x_final_a_hardblock_contract.py"
+    },
+    {
+      "operation": "define.assocsurface.extrude",
+      "final_state": "hard_blocked",
+      "blocker_code": "SAFETY_FORBIDDEN",
+      "agent_exposed": false,
+      "replacement_ref": "inspect.assocsurface.topology + repair.assocdata.audit",
+      "decision": "kept_blocked_only_after Final A re-audit because exact op remains unsafe/unavailable; safe subset/replacement is separately implemented where feasible",
+      "non_agent_exposure_test": "tests/unit/test_wave4x_final_a_hardblock_contract.py"
+    },
+    {
+      "operation": "define.assocsurface.fillet",
+      "final_state": "hard_blocked",
+      "blocker_code": "SAFETY_FORBIDDEN",
+      "agent_exposed": false,
+      "replacement_ref": "inspect.assocsurface.topology + repair.assocdata.audit",
+      "decision": "kept_blocked_only_after Final A re-audit because exact op remains unsafe/unavailable; safe subset/replacement is separately implemented where feasible",
+      "non_agent_exposure_test": "tests/unit/test_wave4x_final_a_hardblock_contract.py"
+    },
+    {
+      "operation": "define.assocsurface.loft",
+      "final_state": "hard_blocked",
+      "blocker_code": "SAFETY_FORBIDDEN",
+      "agent_exposed": false,
+      "replacement_ref": "inspect.assocsurface.topology + repair.assocdata.audit",
+      "decision": "kept_blocked_only_after Final A re-audit because exact op remains unsafe/unavailable; safe subset/replacement is separately implemented where feasible",
+      "non_agent_exposure_test": "tests/unit/test_wave4x_final_a_hardblock_contract.py"
+    },
+    {
+      "operation": "define.assocsurface.offset",
+      "final_state": "hard_blocked",
+      "blocker_code": "SAFETY_FORBIDDEN",
+      "agent_exposed": false,
+      "replacement_ref": "inspect.assocsurface.topology + repair.assocdata.audit",
+      "decision": "kept_blocked_only_after Final A re-audit because exact op remains unsafe/unavailable; safe subset/replacement is separately implemented where feasible",
+      "non_agent_exposure_test": "tests/unit/test_wave4x_final_a_hardblock_contract.py"
+    },
+    {
+      "operation": "define.assocsurface.patch",
+      "final_state": "hard_blocked",
+      "blocker_code": "SAFETY_FORBIDDEN",
+      "agent_exposed": false,
+      "replacement_ref": "inspect.assocsurface.topology + repair.assocdata.audit",
+      "decision": "kept_blocked_only_after Final A re-audit because exact op remains unsafe/unavailable; safe subset/replacement is separately implemented where feasible",
+      "non_agent_exposure_test": "tests/unit/test_wave4x_final_a_hardblock_contract.py"
+    },
+    {
+      "operation": "define.assocsurface.result",
+      "final_state": "hard_blocked",
+      "blocker_code": "SAFETY_FORBIDDEN",
+      "agent_exposed": false,
+      "replacement_ref": "inspect.assocsurface.topology + repair.assocdata.audit",
+      "decision": "kept_blocked_only_after Final A re-audit because exact op remains unsafe/unavailable; safe subset/replacement is separately implemented where feasible",
+      "non_agent_exposure_test": "tests/unit/test_wave4x_final_a_hardblock_contract.py"
+    },
+    {
+      "operation": "define.assocsurface.trim",
+      "final_state": "hard_blocked",
+      "blocker_code": "SAFETY_FORBIDDEN",
+      "agent_exposed": false,
+      "replacement_ref": "inspect.assocsurface.topology + repair.assocdata.audit",
+      "decision": "kept_blocked_only_after Final A re-audit because exact op remains unsafe/unavailable; safe subset/replacement is separately implemented where feasible",
+      "non_agent_exposure_test": "tests/unit/test_wave4x_final_a_hardblock_contract.py"
+    },
+    {
+      "operation": "doc.sendstring",
+      "final_state": "hard_blocked",
+      "blocker_code": "SAFETY_FORBIDDEN",
+      "agent_exposed": false,
+      "replacement_ref": "typed CAD OS operation handlers only; examples: command.register.define + module.command.lookup + module.command.stack_handle + operation-specific implemented handlers",
+      "decision": "kept_blocked_only_after Final A re-audit because exact op remains unsafe/unavailable; safe subset/replacement is separately implemented where feasible",
+      "non_agent_exposure_test": "tests/unit/test_wave4x_final_a_hardblock_contract.py"
+    },
+    {
+      "operation": "edit.assocarray.explode",
+      "final_state": "hard_blocked",
+      "blocker_code": "SAFETY_FORBIDDEN",
+      "agent_exposed": false,
+      "replacement_ref": "inspect.assocarray.identify + inspect.assocmanager.state + repair.assocdata.audit",
+      "decision": "kept_blocked_only_after Final A re-audit because exact op remains unsafe/unavailable; safe subset/replacement is separately implemented where feasible",
+      "non_agent_exposure_test": "tests/unit/test_wave4x_final_a_hardblock_contract.py"
+    },
+    {
+      "operation": "edit.assocarray.item",
+      "final_state": "hard_blocked",
+      "blocker_code": "SAFETY_FORBIDDEN",
+      "agent_exposed": false,
+      "replacement_ref": "inspect.assocarray.identify + inspect.assocmanager.state + repair.assocdata.audit",
+      "decision": "kept_blocked_only_after Final A re-audit because exact op remains unsafe/unavailable; safe subset/replacement is separately implemented where feasible",
+      "non_agent_exposure_test": "tests/unit/test_wave4x_final_a_hardblock_contract.py"
+    },
+    {
+      "operation": "edit.assocarray.itemReplace",
+      "final_state": "hard_blocked",
+      "blocker_code": "SAFETY_FORBIDDEN",
+      "agent_exposed": false,
+      "replacement_ref": "inspect.assocarray.identify + inspect.assocmanager.state + repair.assocdata.audit",
+      "decision": "kept_blocked_only_after Final A re-audit because exact op remains unsafe/unavailable; safe subset/replacement is separately implemented where feasible",
+      "non_agent_exposure_test": "tests/unit/test_wave4x_final_a_hardblock_contract.py"
+    },
+    {
+      "operation": "edit.assocarray.reset",
+      "final_state": "hard_blocked",
+      "blocker_code": "SAFETY_FORBIDDEN",
+      "agent_exposed": false,
+      "replacement_ref": "inspect.assocarray.identify + inspect.assocmanager.state + repair.assocdata.audit",
+      "decision": "kept_blocked_only_after Final A re-audit because exact op remains unsafe/unavailable; safe subset/replacement is separately implemented where feasible",
+      "non_agent_exposure_test": "tests/unit/test_wave4x_final_a_hardblock_contract.py"
+    },
+    {
+      "operation": "edit.assocarray.source",
+      "final_state": "hard_blocked",
+      "blocker_code": "SAFETY_FORBIDDEN",
+      "agent_exposed": false,
+      "replacement_ref": "inspect.assocarray.identify + inspect.assocmanager.state + repair.assocdata.audit",
+      "decision": "kept_blocked_only_after Final A re-audit because exact op remains unsafe/unavailable; safe subset/replacement is separately implemented where feasible",
+      "non_agent_exposure_test": "tests/unit/test_wave4x_final_a_hardblock_contract.py"
+    },
+    {
+      "operation": "edit.assocarray.transform",
+      "final_state": "hard_blocked",
+      "blocker_code": "SAFETY_FORBIDDEN",
+      "agent_exposed": false,
+      "replacement_ref": "inspect.assocarray.identify + inspect.assocmanager.state + repair.assocdata.audit",
+      "decision": "kept_blocked_only_after Final A re-audit because exact op remains unsafe/unavailable; safe subset/replacement is separately implemented where feasible",
+      "non_agent_exposure_test": "tests/unit/test_wave4x_final_a_hardblock_contract.py"
+    },
+    {
+      "operation": "embed.ole.frame",
+      "final_state": "hard_blocked",
+      "blocker_code": "HOST_UNAVAILABLE",
+      "agent_exposed": false,
+      "replacement_ref": "automate.com.wrapper_for_object + automate.com.entity_helpers (metadata-only; no OLE embed/link mutation)",
+      "decision": "kept_blocked_only_after Final A re-audit because exact op remains unsafe/unavailable; safe subset/replacement is separately implemented where feasible",
+      "non_agent_exposure_test": "tests/unit/test_wave4x_final_a_hardblock_contract.py"
+    },
+    {
+      "operation": "inspect.assocaction.evaluate",
+      "final_state": "hard_blocked",
+      "blocker_code": "SAFETY_FORBIDDEN",
+      "agent_exposed": false,
+      "replacement_ref": "inspect.assocaction.dependencies + inspect.assocaction.requestToEvaluate + inspect.assocmanager.state",
+      "decision": "kept_blocked_only_after Final A re-audit because exact op remains unsafe/unavailable; safe subset/replacement is separately implemented where feasible",
+      "non_agent_exposure_test": "tests/unit/test_wave4x_final_a_hardblock_contract.py"
+    },
+    {
+      "operation": "inspect.assocnetwork.evaluate",
+      "final_state": "hard_blocked",
+      "blocker_code": "SAFETY_FORBIDDEN",
+      "agent_exposed": false,
+      "replacement_ref": "inspect.assocnetwork.get + inspect.assocnetwork.iterate + inspect.assocmanager.state",
+      "decision": "kept_blocked_only_after Final A re-audit because exact op remains unsafe/unavailable; safe subset/replacement is separately implemented where feasible",
+      "non_agent_exposure_test": "tests/unit/test_wave4x_final_a_hardblock_contract.py"
+    },
+    {
+      "operation": "module.lifecycle.on_ole_unload",
+      "final_state": "hard_blocked",
+      "blocker_code": "HOST_UNAVAILABLE",
+      "agent_exposed": false,
+      "replacement_ref": "module.lifecycle.unload + module.lifecycle.on_unload_dwg (status/evidence only; no OLE unload callback synthesis)",
+      "decision": "kept_blocked_only_after Final A re-audit because exact op remains unsafe/unavailable; safe subset/replacement is separately implemented where feasible",
+      "non_agent_exposure_test": "tests/unit/test_wave4x_final_a_hardblock_contract.py"
+    }
+  ],
+  "summary": {
+    "reimplemented_exact_ops": 0,
+    "replaced_with_safe_routes": 29,
+    "remaining_hardblocks": 29,
+    "blocked_by_code": {
+      "SAFETY_FORBIDDEN": 27,
+      "HOST_UNAVAILABLE": 2
+    }
+  }
+}
