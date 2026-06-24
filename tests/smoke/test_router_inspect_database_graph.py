@@ -40,6 +40,7 @@ for _p in (_REPO, os.path.join(_REPO, "tools")):
 _JSON_ENCODING = "utf-8-sig"
 _ACCORECONSOLE = r"C:\Program Files\Autodesk\AutoCAD 2027\accoreconsole.exe"
 _GOLDEN_DWG = os.path.join(_REPO, "staging", "dwg_20260617_191504", "input.dwg")
+_TRACKED_GOLDEN_DWG = os.path.join(_REPO, "tests", "fixtures", "native_sample.dwg")
 _OPERATIONS_V2 = os.path.join(_REPO, "config", "operations.v2.json")
 
 _TRUTHFUL = {"ok", "blocked", "partial", "unavailable", "not_implemented"}
@@ -53,11 +54,17 @@ def _accoreconsole_present():
     return which("accoreconsole") is not None or which("accoreconsole.exe") is not None
 
 
+def _golden_dwg():
+    if os.path.isfile(_GOLDEN_DWG):
+        return _GOLDEN_DWG
+    return _TRACKED_GOLDEN_DWG
+
+
 def _live_enabled():
     """Live native run requires explicit opt-in AND a host AND the golden DWG."""
     return (os.environ.get("CADOS_LIVE") == "1"
             and _accoreconsole_present()
-            and os.path.isfile(_GOLDEN_DWG))
+            and os.path.isfile(_golden_dwg()))
 
 
 def _sha256(path):
@@ -117,18 +124,19 @@ class TestInspectDatabaseGraphLive(unittest.TestCase):
                 reasons.append("CADOS_LIVE!=1")
             if not _accoreconsole_present():
                 reasons.append("no accoreconsole")
-            if not os.path.isfile(_GOLDEN_DWG):
+            if not os.path.isfile(_golden_dwg()):
                 reasons.append("no golden DWG")
             self.skipTest("SKIPPED_ENV: live native inspect disabled (%s)"
                           % ", ".join(reasons))
         import cadctl
         self.cad = cadctl.Cad()
+        self.golden_dwg = _golden_dwg()
 
     def test_native_inspect_rich_is_consistent_and_safe(self):
-        sha_before = _sha256(_GOLDEN_DWG)
-        size_before = os.path.getsize(_GOLDEN_DWG)
+        sha_before = _sha256(self.golden_dwg)
+        size_before = os.path.getsize(self.golden_dwg)
         with tempfile.TemporaryDirectory(prefix="rich_inspect_") as out_dir:
-            env = self.cad.inspect(_GOLDEN_DWG, out_dir, mode="graph",
+            env = self.cad.inspect(self.golden_dwg, out_dir, mode="graph",
                                    include_rich=True)
             self.assertEqual(env.get("schema"), "ariadne.cadctl.inspect.v1")
             self.assertIn(env.get("status"), _TRUTHFUL,
@@ -148,9 +156,9 @@ class TestInspectDatabaseGraphLive(unittest.TestCase):
                 # the golden DWG is 21747 -- if we got ok, it must be that.
                 self.assertEqual(ir["diagnostics"]["entity_count"], _GOLDEN_TOTAL)
         # INVARIANT: the original was never written.
-        self.assertEqual(_sha256(_GOLDEN_DWG), sha_before,
+        self.assertEqual(_sha256(self.golden_dwg), sha_before,
                          "ORIGINAL golden DWG MODIFIED -- invariant breach")
-        self.assertEqual(os.path.getsize(_GOLDEN_DWG), size_before)
+        self.assertEqual(os.path.getsize(self.golden_dwg), size_before)
 
 
 if __name__ == "__main__":

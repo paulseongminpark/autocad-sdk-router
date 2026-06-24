@@ -1,6 +1,7 @@
 {
   "schema": "ariadne.cad_os.closure_gate.v1",
-  "ticket_basis": "M08A-T01",
+  "packet": "CADOS_V1_RC1_FINAL_INTEGRATION",
+  "generated_at": "2026-06-24T06:47:56.984845+00:00",
   "totals_by_status": {
     "implemented": 487,
     "deprecated": 1,
@@ -9,18 +10,19 @@
   "catalogued": 0,
   "stub": 0,
   "unknown": 0,
-  "deprecated": 1,
+  "deferred": 0,
   "checks": {
     "every_op_has_owner_ticket": true,
     "every_open_op_has_strategy_and_evidence": true,
     "zero_catalogued": true,
     "zero_stub": true,
     "zero_unknown": true,
-    "v1_target_escape_banned": true
+    "zero_deferred": true,
+    "v1_target_escape_banned": true,
+    "raw_command_agent_exposure_zero": true,
+    "tests_zero_skipped": true,
+    "native_build_ok": true
   },
   "closure_gate_pass": true,
-  "m09_blocked_until_m08r": true,
-  "m09_allowed": true,
-  "ops_without_owner_ticket": [],
-  "open_ops_missing_plan": []
+  "release_freeze_candidate": true
 }

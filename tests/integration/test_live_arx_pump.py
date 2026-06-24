@@ -27,6 +27,13 @@ _REPO = Path(__file__).resolve().parents[2]
 _ACCORE = r"C:\Program Files\Autodesk\AutoCAD 2027\accoreconsole.exe"
 _BIN = _REPO / "src" / "Ariadne.AcadNative" / "bin" / "x64" / "Release"
 _GOLDEN = _REPO / "staging" / "dwg_20260617_191504" / "input.dwg"
+_TRACKED_GOLDEN = _REPO / "tests" / "fixtures" / "native_sample.dwg"
+
+
+def _golden_dwg() -> Path:
+    if _GOLDEN.is_file():
+        return _GOLDEN
+    return _TRACKED_GOLDEN
 
 
 def _encode_frame(op: str, **kw) -> bytes:
@@ -90,7 +97,7 @@ class TestLiveArxPumpRoundTrip(unittest.TestCase):
         dbx = _BIN / "Ariadne.AcadNativeDbx.dbx"
         if not (crx.is_file() and dbx.is_file()):
             self.skipTest("SKIPPED_ENV: native .crx/.dbx not built")
-        if not _GOLDEN.is_file():
+        if not _golden_dwg().is_file():
             self.skipTest("SKIPPED_FIXTURE: golden DWG absent")
 
     def test_pump_echo_status_list_stop(self):
@@ -102,7 +109,7 @@ class TestLiveArxPumpRoundTrip(unittest.TestCase):
         test = _REPO / "runs" / "m02_pump_test_pytest"
         test.mkdir(parents=True, exist_ok=True)
         staged = test / "input.dwg"
-        shutil.copy2(_GOLDEN, staged)
+        shutil.copy2(_golden_dwg(), staged)
         scr = test / "pump.scr"
         scr.write_text(
             '(setvar "SECURELOAD" 0)\n(setvar "FILEDIA" 0)\n(setvar "CMDECHO" 0)\n'

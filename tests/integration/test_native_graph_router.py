@@ -36,6 +36,7 @@ for _p in (_REPO, os.path.join(_REPO, "tools")):
 
 _ACCORECONSOLE = r"C:\Program Files\Autodesk\AutoCAD 2027\accoreconsole.exe"
 _GOLDEN_DWG = os.path.join(_REPO, "staging", "dwg_20260617_191504", "input.dwg")
+_TRACKED_GOLDEN_DWG = os.path.join(_REPO, "tests", "fixtures", "native_sample.dwg")
 
 PATCH_SCHEMA_ID = "ariadne.cad_patch.v1"
 _TRUTHFUL = {"ok", "blocked", "partial", "unavailable", "not_implemented"}
@@ -48,10 +49,16 @@ def _accoreconsole_present():
     return which("accoreconsole") is not None or which("accoreconsole.exe") is not None
 
 
+def _golden_dwg():
+    if os.path.isfile(_GOLDEN_DWG):
+        return _GOLDEN_DWG
+    return _TRACKED_GOLDEN_DWG
+
+
 def _live_enabled():
     return (os.environ.get("CADOS_LIVE") == "1"
             and _accoreconsole_present()
-            and os.path.isfile(_GOLDEN_DWG))
+            and os.path.isfile(_golden_dwg()))
 
 
 def _sha256(path):
@@ -70,25 +77,26 @@ class TestNativeGraphStagedWriteLive(unittest.TestCase):
                 reasons.append("CADOS_LIVE!=1")
             if not _accoreconsole_present():
                 reasons.append("no accoreconsole")
-            if not os.path.isfile(_GOLDEN_DWG):
+            if not os.path.isfile(_golden_dwg()):
                 reasons.append("no golden DWG")
             self.skipTest("SKIPPED_ENV: live native graph/staged-write disabled (%s)"
                           % ", ".join(reasons))
         import patch_engine
         self.pe = patch_engine
+        self.golden_dwg = _golden_dwg()
 
     def test_staged_line_write_is_truthful_and_protects_original(self):
-        sha_before = _sha256(_GOLDEN_DWG)
-        size_before = os.path.getsize(_GOLDEN_DWG)
+        sha_before = _sha256(self.golden_dwg)
+        size_before = os.path.getsize(self.golden_dwg)
         out_dir = os.path.join(
             _REPO, "runs", "test_native_graph_router_%s" % os.getpid())
         patch = {
             "schema": PATCH_SCHEMA_ID,
-            "patch_id": "itest-line-%s" % os.getpid(),
-            "target_dwg": {
-                "staged_path": os.path.join(out_dir, "staged_input.dwg"),
-                "original_path": _GOLDEN_DWG,
-            },
+                "patch_id": "itest-line-%s" % os.getpid(),
+                "target_dwg": {
+                    "staged_path": os.path.join(out_dir, "staged_input.dwg"),
+                    "original_path": self.golden_dwg,
+                },
             "operations": [
                 {"step_id": "s1", "operation": "create_line",
                  "args": {"start": {"x": 0, "y": 0, "z": 0},
@@ -99,7 +107,7 @@ class TestNativeGraphStagedWriteLive(unittest.TestCase):
             "policy": {"staged_copy": True, "write_mode": "write_copy"},
         }
         try:
-            res = self.pe.apply_staged(patch, _GOLDEN_DWG, out_dir)
+            res = self.pe.apply_staged(patch, self.golden_dwg, out_dir)
         finally:
             pass
 
@@ -108,9 +116,9 @@ class TestNativeGraphStagedWriteLive(unittest.TestCase):
         self.assertIn(res.get("status"), _TRUTHFUL,
                       "apply_staged returned a non-truthful status: %r"
                       % res.get("status"))
-        self.assertEqual(_sha256(_GOLDEN_DWG), sha_before,
+        self.assertEqual(_sha256(self.golden_dwg), sha_before,
                          "ORIGINAL golden DWG MODIFIED during staged write")
-        self.assertEqual(os.path.getsize(_GOLDEN_DWG), size_before)
+        self.assertEqual(os.path.getsize(self.golden_dwg), size_before)
 
         # original_unchanged proof must never assert the original changed.
         proof = res.get("original_unchanged")

@@ -1,8 +1,11 @@
-# NEXT STEP - CAD OS Wave4X FINAL B
+# NEXT STEP
 
-Status: PASS
+## CADOS V1 RC1
+- Status: **PASS**
+- Branch: `cados/cad-os-v1-rc1`
+- Tests: 566 passed / 0 skipped (`CADOS_LIVE=1`)
+- Native build: ok
+- Main updated: no; original main checkout is dirty and was not touched.
 
-1. Merge `cados/wave4x-final-b-skipped-test-execution` with the final integration branch.
-2. Keep `CADOS_LIVE=1` for release-candidate validation when rerunning the full suite.
-3. Preserve `runs/m02_cadctl_rich/` and the generated native graph run as golden evidence for future smoke/unit reuse.
-4. Do not reintroduce the stale timestamped native graph fixture path; resolve via `runs/m02_cadctl_rich/cad_result.json -> result_ref`.
+## Next Packet
+`CADOS_M09_V1_RELEASE_FREEZE_AND_DAEDALUS_HANDOFF`

@@ -1,9 +1,11 @@
 {
   "schema": "cad_os.latest_status.v1",
-  "generated_at": "2026-06-24T06:11:18.027997+00:00",
+  "generated_at": "2026-06-24T06:47:56.984845+00:00",
   "status": "PASS",
-  "branch": "cados/wave4x-final-b-skipped-test-execution",
-  "base_branch": "cados/wave4x-fast-b-on-fast-a-truth",
+  "branch": "cados/cad-os-v1-rc1",
+  "head_at_report_generation": "d3cac1c",
+  "base_branch": "cados/wave4x-final-a-hardblock-reimplementation",
+  "merged_branch": "cados/wave4x-final-b-skipped-test-execution",
   "operation_counts": {
     "implemented": 487,
     "hard_blocked": 29,
@@ -13,14 +15,21 @@
     "unknown": 0,
     "deferred": 0
   },
-  "tests": "562 passed, 0 skipped (CADOS_LIVE=1)",
-  "skip_baseline": "reports/WAVE4X_FINAL_B_SKIP_BASELINE.json",
-  "skip_execution": "reports/WAVE4X_FINAL_B_SKIPPED_TEST_EXECUTION.json",
-  "remaining_skips": "reports/WAVE4X_FINAL_B_REMAINING_SKIPS.json",
+  "tests": "566 passed, 0 skipped (CADOS_LIVE=1)",
   "native_build_status": "ok",
+  "raw_command_agent_exposure": 0,
+  "original_dwg_modified": false,
   "fixture_generation": {
     "m02_cadctl_rich": "runs/m02_cadctl_rich/dwg_graph_ir.json",
-    "native_graph_result": "runs/dwg_truth_autocad_cad_job_20260624_150300/native_cad_job_result.json"
+    "clean_worktree_source": "tests/fixtures/native_sample.dwg"
   },
-  "next": "Merge Final A + Final B into a release candidate branch."
+  "reports": {
+    "coverage": "reports/operation_coverage_latest.json",
+    "matrix": "reports/operation_coverage_full_matrix.json",
+    "v1_gate": "reports/v1_operation_gate_latest.json",
+    "closure": "reports/closure_gate_latest.json",
+    "tests": "reports/release/CADOS_V1_RC1_TESTS.json",
+    "native_build": "reports/release/CADOS_V1_RC1_NATIVE_BUILD.json"
+  },
+  "next": "CADOS_M09_V1_RELEASE_FREEZE_AND_DAEDALUS_HANDOFF"
 }

@@ -39,6 +39,8 @@ for _p in (_REPO, os.path.join(_REPO, "tools")):
     if _p not in sys.path:
         sys.path.insert(0, _p)
 
+from tests.live_fixture_utils import ensure_m02_cadctl_rich_fixture
+
 # The live native_full IR fixture (21747 entities) the M02 contract pins.
 _LIVE_IR = os.path.join(_REPO, "runs", "m02_cadctl_rich", "dwg_graph_ir.json")
 
@@ -103,8 +105,12 @@ class TestRichStoreOnLiveNativeFullIr(unittest.TestCase):
 
     def setUp(self):
         if not os.path.isfile(_LIVE_IR):
-            self.skipTest("SKIPPED_FIXTURE: live native_full IR not present: %s"
-                          % _LIVE_IR)
+            ok, reason = ensure_m02_cadctl_rich_fixture(_REPO)
+            if not ok:
+                self.skipTest(
+                    "SKIPPED_FIXTURE: live native_full IR not present: %s (%s)"
+                    % (_LIVE_IR, reason)
+                )
         import ir_builder
         import sqlite_ir_store
         self.store = sqlite_ir_store

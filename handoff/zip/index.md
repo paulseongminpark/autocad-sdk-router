@@ -1,11 +1,9 @@
-# CAD OS Handoff Zip Index
+# CADOS V1 RC1 Handoff Zip Index
 
-- `CADOS_M08_FULL_OPERATION_COVERAGE_CLOSURE.zip`: M08 **PASS** — full 517-op coverage closure. 13-field taxonomy over all ops (0 unknown / 0 missing / 0 v1-target deferred); v1 operation gate 11/11. implemented 41 / stub 0 / blocked 2 / catalogued 474. 3 native inspect ops built (`inspect.layers`/`blocks`/`entities` → listLayerRecords/listBlockDefinitionsDetailed/listModelSpaceEntities) + accoreconsole-smoked (70/245/21747 == M03 truth; UTF-8 preserved); `live.status` promoted (pumpDispatch). Generator `tools/operation_coverage_matrix.py`; tests `tests/unit/test_m08_operation_coverage.py`. reports/{operation_coverage_full_matrix.json+md, v1_operation_gate_latest.json, operation_coverage_latest.json+md, validation_latest.json, latest_status.json, CADOS_M08 report, build_native_m08.log}, docs/{CAD_OS_BUILD_STATUS, CAD_OS_FULL_STACK_HANDOFF, CAD_OS_V1_ACCEPTANCE}.md, config/operations.v2.json, src/Ariadne.AcadNative/AriadneNativeJob.cpp, runs/m08_inspect_ops/, handoff state. Native build canonical .dbx 48128 / .crx 260096 / .arx 268288. Golden read-only; no push.
+Bundle: `handoff/zip/CADOS_V1_RC1_FINAL_INTEGRATION.zip`
 
-- `CADOS_M07B_ATTENDED_GUI_VERIFICATION_AND_NATIVE_DEPLOY.zip`: M07B **PASS** — pump-gating real execution (attended), `ARIADNE_NATIVE_JOB_ARGS` env-file job channel, MFC-free palette, dedicated-instance attended GUI verification (live pump + worldDraw circle + OPM panel + custom-entity creation), **deep-native firing CLOSED** (reactor/overrule/selmon live counts headless+attended; `reports/firing_latest.json`, `runs/m07b_firing/seq{0,1}_out.json`), reports/docs/screenshots. README, docs/{CAD_OS_BUILD_STATUS, CAD_OS_FULL_STACK_HANDOFF, CAD_OS_V1_ACCEPTANCE, LIVE_JOB_ARGUMENT_CONTRACT, NATIVE_DEEP_SURFACE_STATUS}.md, reports/{latest_status, live_pump, deep_native, attended_gui, opm_property, worlddraw, native_smoke, live_job_args_contract, attended_shutdown, v1_acceptance}_latest.json + CADOS_M07B report, runs/cados_m07b_attended_20260622_123505/{screenshots/acad_window.png, attended_pump_result.json}
-- `CADOS_M07_LIVE_ARX_AND_DEEP_NATIVE_SURFACE.zip`: M07 live ARX pump completion (12 ops + CADAGENT_STATUS), deep-native status matrix, native source edits, unit tests, reports, docs, and handoff state
-- `CADOS_M06_VISUAL_BATCH_GOLDEN_REGRESSION.zip`: M06 visual verification, batch runner, golden regression, performance, reports, docs, and handoff state
-- `CADOS_M05_PATCH_DIFF_VALIDATION_TRANSACTION.zip`: M05 staged patch, diff, validation, journal, reports, docs, and handoff state
-- `CADOS_M03_NATIVE_ROUTER_RICH_IR_COMPLETION.zip`: M03 reports and handoff state
-- `CADOS_M04_OPERATION_REGISTRY_AND_TOOL_SURFACE.zip`: M04 reports and handoff state
-- `CADOS_M03_M04_DETAILED_RESULT_BUNDLE.zip`: combined M03/M04 detailed reports, packet reports, evidence JSON/MD files, docs, and handoff state
+Included:
+- release reports under `reports/release/`
+- latest operation coverage and gate JSON
+- build status and handoff docs
+- Daedalus external handoff files

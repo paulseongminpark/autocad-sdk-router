@@ -44,6 +44,8 @@ for _p in (_REPO, os.path.join(_REPO, "tools")):
     if _p not in sys.path:
         sys.path.insert(0, _p)
 
+from tests.live_fixture_utils import ensure_m02_cadctl_rich_fixture
+
 _SCHEMAS = os.path.join(_REPO, "schemas")
 _GOLDEN = os.path.join(_REPO, "tests", "golden")
 _JSON_ENCODING = "utf-8-sig"
@@ -58,6 +60,8 @@ def _resolve_live_native_result():
     explicit = os.environ.get("CADOS_LIVE_NATIVE_RESULT")
     if explicit and os.path.isfile(explicit):
         return explicit
+
+    ensure_m02_cadctl_rich_fixture(_REPO)
 
     def _read_json(path: Path | str):
         with open(path, "r", encoding=_JSON_ENCODING) as fh:

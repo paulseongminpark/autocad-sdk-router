@@ -32,6 +32,8 @@ for _p in (_REPO, os.path.join(_REPO, "tools")):
     if _p not in sys.path:
         sys.path.insert(0, _p)
 
+from tests.live_fixture_utils import ensure_m02_cadctl_rich_fixture
+
 _JSON_ENCODING = "utf-8-sig"
 _LIVE_IR = os.path.join(_REPO, "runs", "m02_cadctl_rich", "dwg_graph_ir.json")
 _GOLDEN_DIR = os.path.join(_REPO, "tests", "golden")
@@ -48,7 +50,12 @@ def _load_json(path):
 class TestLiveNativeFullIr(unittest.TestCase):
     def setUp(self):
         if not os.path.isfile(_LIVE_IR):
-            self.skipTest("SKIPPED_FIXTURE: native_full IR not present: %s" % _LIVE_IR)
+            ok, reason = ensure_m02_cadctl_rich_fixture(_REPO)
+            if not ok:
+                self.skipTest(
+                    "SKIPPED_FIXTURE: native_full IR not present: %s (%s)"
+                    % (_LIVE_IR, reason)
+                )
         # Load via ir_builder.load_ir so we exercise the producer's own BOM-tolerant
         # reader (the path consumers actually use), not an ad-hoc open.
         import ir_builder

@@ -1,35 +1,10 @@
-# CAD OS V1 Acceptance Latest
+# CAD OS V1 Acceptance
 
-- status: IN_PROGRESS (v1 freeze is M09; M03–M08 closed)
-- M03: PASS
-- M04: PASS
-- M05: PASS
-- M06: PASS
-- M07: PARTIAL_PASS (live ARX pump complete + headless-verified 17/17; deep native 7 implemented / 3 attended_blocked / 0 design_only)
-- M07A: implemented + build-verified (selection monitor + AcRxProperty/OPM)
-- M07B: PASS (pump-gating real execution attended + ARIADNE_NATIVE_JOB_ARGS env-file channel + MFC-free palette + dedicated-instance attended GUI; deep-native firing CLOSED — reactor 1/1 + overrule 2/3 + selmon 1/1 headless+attended)
-- M08: **PASS** (full operation coverage closure)
-- operation catalog: 517 ops, **100% classified, 0 unknown, 13-field taxonomy complete (0 missing)**
-- operation status rollup: implemented 41 / stub 0 / blocked 2 / catalogued 474 (cadctl consistent=true)
-- v1-target: 43 (implemented 41 + hard-blocked 2 [`render.layout`, `live.apply_patch`]) — **0 deferred**
-- v1 operation gate: **11/11 PASS** (`reports/v1_operation_gate_latest.json`)
-- M08 implementation sweep: `inspect.layers` / `inspect.blocks` / `inspect.entities` built natively + accoreconsole-smoked (70 layers / 245 block defs / 21747 entities, cross-validates M03 truth; UTF-8 non-ASCII preserved, code-point verified); `live.status` promoted (M07 pump)
-- coverage matrix: `reports/operation_coverage_full_matrix.json` (+ `.md`), generator `tools/operation_coverage_matrix.py` (deterministic)
-- no agent-exposed raw command: PASS (5 raw-command ops all catalogued, 0 exposed)
-- no original-write default: PASS (all 517 ops original_write_default=false)
-- existing 29 wired ops frozen + runnable: PASS
-- catalog classified: 480/480
-- staged patch apply: PASS
-- CAD diff: PASS
-- validator: PASS (14/14 gates, `reports/validation_latest.json`)
-- visual verification: PASS
-- batch runner: PASS
-- golden regression: PASS
-- performance report: PASS
-- live ARX pump (12 ops + CADAGENT_STATUS): PASS (headless + attended)
-- thread safety (no worker AcDb): PASS (main-thread pump)
-- deep native surface implemented-or-hard-blocked: PASS (10 impl/verified, 0 attended_blocked)
-- native build canonical: .dbx 48128 / .crx 260096 / .arx 268288
-- original DWG modified: no (`27dbf6b95ff72a89fd53b153891187365b9e8ebc4c05a97cfed307057bf49bc8` before/after)
-- full pytest: 313 passed, 3 skipped (default) · 316 passed, 0 skipped (`CADOS_LIVE=1`)
-- next: CADOS_M09_V1_RELEASE_FREEZE_AND_DAEDALUS_HANDOFF
+- [x] Final A integrated: `50c8c89`
+- [x] Final B integrated: `9c505b2f281ebaff875e59b332a25cc3fff671f2`
+- [x] Operation unfinished states are zero: catalogued=0, stub=0, unknown=0, deferred=0
+- [x] Tests pass with zero skips: 566 passed / 0 skipped
+- [x] Native canonical build passes: ok
+- [x] Raw command agent exposure is zero
+- [x] Original DWG unchanged
+- [x] Daedalus handoff updated

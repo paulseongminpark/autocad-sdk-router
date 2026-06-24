@@ -1,0 +1,10 @@
+{
+    "schema":  "ariadne.cad_os.v1_rc1.tests.v1",
+    "command":  "set CADOS_LIVE=1 \u0026\u0026 python -m pytest tests -q -rs",
+    "exit_code":  0,
+    "status":  "ok",
+    "passed":  566,
+    "skipped":  0,
+    "log_ref":  "reports\\release\\CADOS_V1_RC1_TESTS.log",
+    "generated_at":  "2026-06-24T15:45:36.5459030+09:00"
+}

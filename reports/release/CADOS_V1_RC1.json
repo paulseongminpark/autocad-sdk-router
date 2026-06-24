@@ -1,0 +1,108 @@
+{
+  "schema": "ariadne.cad_os.v1_rc1.final_integration.v1",
+  "packet": "CADOS_V1_RC1_FINAL_INTEGRATION",
+  "generated_at": "2026-06-24T06:47:56.984845+00:00",
+  "status": "PASS",
+  "branch": "cados/cad-os-v1-rc1",
+  "head_at_report_generation": "d3cac1c",
+  "base": {
+    "final_a_branch": "cados/wave4x-final-a-hardblock-reimplementation",
+    "commit": "50c8c89"
+  },
+  "merged": {
+    "final_b_branch": "cados/wave4x-final-b-skipped-test-execution",
+    "commit": "9c505b2f281ebaff875e59b332a25cc3fff671f2"
+  },
+  "operation_counts": {
+    "implemented": 487,
+    "hard_blocked": 29,
+    "deprecated": 1,
+    "catalogued": 0,
+    "stub": 0,
+    "unknown": 0,
+    "deferred": 0
+  },
+  "tests": {
+    "schema": "ariadne.cad_os.v1_rc1.tests.v1",
+    "command": "set CADOS_LIVE=1 && python -m pytest tests -q -rs",
+    "exit_code": 0,
+    "status": "ok",
+    "passed": 566,
+    "skipped": 0,
+    "log_ref": "reports\\release\\CADOS_V1_RC1_TESTS.log",
+    "generated_at": "2026-06-24T15:45:36.5459030+09:00"
+  },
+  "native_build": {
+    "schema": "ariadne.cad_os.v1_rc1.native_build.v1",
+    "command": "tools\\build_native_acad.ps1",
+    "exit_code": 0,
+    "status": "ok",
+    "log_ref": "reports\\release\\CADOS_V1_RC1_NATIVE_BUILD.log",
+    "parsed": {
+      "status": "ok",
+      "msbuild": "C:\\Program Files\\Microsoft Visual Studio\\2026\\Community\\MSBuild\\Current\\Bin\\amd64\\MSBuild.exe",
+      "arx_relink_mode": "canonical",
+      "arx_versioned_name": "",
+      "arx_lock_note": "Canonical .arx relinked normally.",
+      "projects": [
+        "D:\\dev\\99_tools\\autocad-sdk-router_cados_v1_rc1\\src\\Ariadne.AcadNativeDbx\\Ariadne.AcadNativeDbx.dbx.vcxproj",
+        "D:\\dev\\99_tools\\autocad-sdk-router_cados_v1_rc1\\src\\Ariadne.AcadNative\\Ariadne.AcadNative.crx.vcxproj",
+        "D:\\dev\\99_tools\\autocad-sdk-router_cados_v1_rc1\\src\\Ariadne.AcadNative\\Ariadne.AcadNative.arx.vcxproj"
+      ],
+      "artifacts": [
+        {
+          "path": "D:\\dev\\99_tools\\autocad-sdk-router_cados_v1_rc1\\src\\Ariadne.AcadNative\\bin\\x64\\Release\\Ariadne.AcadNativeDbx.dbx",
+          "exists": true,
+          "bytes": 54272
+        },
+        {
+          "path": "D:\\dev\\99_tools\\autocad-sdk-router_cados_v1_rc1\\src\\Ariadne.AcadNative\\bin\\x64\\Release\\Ariadne.AcadNative.crx",
+          "exists": true,
+          "bytes": 804352
+        },
+        {
+          "path": "D:\\dev\\99_tools\\autocad-sdk-router_cados_v1_rc1\\src\\Ariadne.AcadNative\\bin\\x64\\Release\\Ariadne.AcadNative.arx",
+          "exists": true,
+          "bytes": 812544
+        }
+      ]
+    },
+    "generated_at": "2026-06-24T15:30:25.8273638+09:00"
+  },
+  "hardblocks": {
+    "count": 29,
+    "report": "reports/release/CADOS_V1_RC1_HARDBLOCKS.json"
+  },
+  "dwg_safety": {
+    "original_dwg_modified": false,
+    "report": "reports/release/CADOS_V1_RC1_DWG_SAFETY.json"
+  },
+  "raw_command_exposure": {
+    "agent_exposed_count": 0,
+    "agent_exposed_ops": []
+  },
+  "doc_sendstring": {
+    "status": "blocked",
+    "agent_exposed": false,
+    "blocker_code": "SAFETY_FORBIDDEN"
+  },
+  "live_apply_patch": {
+    "status": "deprecated",
+    "replacement_ref": "apply.patch + tools/patch_engine.py::apply_native_staged"
+  },
+  "plot_engine_run": {
+    "status": "implemented",
+    "attended_verification": "preserved by Fast B visual proof and RC zero-skip live suite"
+  },
+  "reports": {
+    "coverage": "reports/operation_coverage_latest.json",
+    "matrix": "reports/operation_coverage_full_matrix.json",
+    "v1_gate": "reports/v1_operation_gate_latest.json",
+    "closure": "reports/closure_gate_latest.json",
+    "tests": "reports/release/CADOS_V1_RC1_TESTS.json",
+    "native_build": "reports/release/CADOS_V1_RC1_NATIVE_BUILD.json"
+  },
+  "main_updated": false,
+  "main_update_reason": "Original main checkout is dirty; packet required a clean RC worktree and no main modification.",
+  "next": "CADOS_M09_V1_RELEASE_FREEZE_AND_DAEDALUS_HANDOFF"
+}

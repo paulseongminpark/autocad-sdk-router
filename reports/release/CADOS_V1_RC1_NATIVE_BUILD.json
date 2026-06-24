@@ -1,0 +1,37 @@
+{
+    "schema":  "ariadne.cad_os.v1_rc1.native_build.v1",
+    "command":  "tools\\build_native_acad.ps1",
+    "exit_code":  0,
+    "status":  "ok",
+    "log_ref":  "reports\\release\\CADOS_V1_RC1_NATIVE_BUILD.log",
+    "parsed":  {
+                   "status":  "ok",
+                   "msbuild":  "C:\\Program Files\\Microsoft Visual Studio\\2026\\Community\\MSBuild\\Current\\Bin\\amd64\\MSBuild.exe",
+                   "arx_relink_mode":  "canonical",
+                   "arx_versioned_name":  "",
+                   "arx_lock_note":  "Canonical .arx relinked normally.",
+                   "projects":  [
+                                    "D:\\dev\\99_tools\\autocad-sdk-router_cados_v1_rc1\\src\\Ariadne.AcadNativeDbx\\Ariadne.AcadNativeDbx.dbx.vcxproj",
+                                    "D:\\dev\\99_tools\\autocad-sdk-router_cados_v1_rc1\\src\\Ariadne.AcadNative\\Ariadne.AcadNative.crx.vcxproj",
+                                    "D:\\dev\\99_tools\\autocad-sdk-router_cados_v1_rc1\\src\\Ariadne.AcadNative\\Ariadne.AcadNative.arx.vcxproj"
+                                ],
+                   "artifacts":  [
+                                     {
+                                         "path":  "D:\\dev\\99_tools\\autocad-sdk-router_cados_v1_rc1\\src\\Ariadne.AcadNative\\bin\\x64\\Release\\Ariadne.AcadNativeDbx.dbx",
+                                         "exists":  true,
+                                         "bytes":  54272
+                                     },
+                                     {
+                                         "path":  "D:\\dev\\99_tools\\autocad-sdk-router_cados_v1_rc1\\src\\Ariadne.AcadNative\\bin\\x64\\Release\\Ariadne.AcadNative.crx",
+                                         "exists":  true,
+                                         "bytes":  804352
+                                     },
+                                     {
+                                         "path":  "D:\\dev\\99_tools\\autocad-sdk-router_cados_v1_rc1\\src\\Ariadne.AcadNative\\bin\\x64\\Release\\Ariadne.AcadNative.arx",
+                                         "exists":  true,
+                                         "bytes":  812544
+                                     }
+                                 ]
+               },
+    "generated_at":  "2026-06-24T15:30:25.8273638+09:00"
+}

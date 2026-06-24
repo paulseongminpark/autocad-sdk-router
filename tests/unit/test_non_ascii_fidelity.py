@@ -45,6 +45,8 @@ for _p in (_REPO, os.path.join(_REPO, "tools")):
     if _p not in sys.path:
         sys.path.insert(0, _p)
 
+from tests.live_fixture_utils import ensure_m02_cadctl_rich_fixture
+
 # Live native_full IR (golden, 21747 entities). Read-only fixture.
 _IR_PATH = os.path.join(_REPO, "runs", "m02_cadctl_rich", "dwg_graph_ir.json")
 
@@ -80,11 +82,12 @@ class TestNonAsciiLayerFidelity(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         if not os.path.exists(_IR_PATH):
-            raise unittest.SkipTest(
-                "SKIPPED_FIXTURE: native_full IR not present at %s "
-                "(run the m02_cadctl_rich extraction to materialize it)"
-                % _IR_PATH
-            )
+            ok, reason = ensure_m02_cadctl_rich_fixture(_REPO)
+            if not ok:
+                raise unittest.SkipTest(
+                    "SKIPPED_FIXTURE: native_full IR not present at %s (%s)"
+                    % (_IR_PATH, reason)
+                )
         with open(_IR_PATH, "r", encoding="utf-8-sig") as fh:
             cls.ir = json.load(fh)
         symtabs = cls.ir.get("symbol_tables") or {}

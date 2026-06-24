@@ -1,0 +1,27 @@
+{
+  "schema": "ariadne.cad_os.v1_rc1.dwg_safety.v1",
+  "generated_at": "2026-06-24T06:47:56.984845+00:00",
+  "status": "PASS",
+  "original_dwg_modified": false,
+  "tracked_cad_file_status": "",
+  "hashes": [
+    {
+      "path": "tests\\fixtures\\native_sample.dwg",
+      "sha256": "EAC5D4B13D67D89106E503321412539DF7B39B8A7F4E44C033448E9295FE3F76",
+      "bytes": 2559361
+    },
+    {
+      "path": "staging\\dwg_20260617_191504\\input.dwg",
+      "sha256": "27DBF6B95FF72A89FD53B153891187365B9E8EBC4C05A97CFED307057BF49BC8",
+      "bytes": 2524981
+    }
+  ],
+  "staged_copies_only": true,
+  "write_original_default": false,
+  "matrix_gate_no_original_write_default": true,
+  "evidence": [
+    "reports/release/CADOS_V1_RC1_TESTS.log",
+    "tests/integration/test_native_graph_router.py",
+    "tests/smoke/test_router_inspect_database_graph.py"
+  ]
+}
