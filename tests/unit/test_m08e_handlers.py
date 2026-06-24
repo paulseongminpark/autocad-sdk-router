@@ -1,34 +1,26 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""CAD OS Layer M08E TEST -- native READ family E (blocks / dictionaries / xdata-xrecords).
+"""CAD OS Layer M08E TEST -- dictionaries / xdata-xrecords with staged writes.
 
 Intent (WHY):
-  M08E fills families/m08e_handlers.inc with the READ-ONLY ObjectARX handlers for the
-  block / dictionary / xdata-xrecord surface. The load-bearing properties this test
-  pins (so they can't silently regress in a refactor or a careless merge):
+  M08E now owns a mixed surface: read handlers PLUS bounded staged-write dictionary /
+  xdata / clone helpers. The load-bearing properties this test pins:
 
-    1. HasOp<->Dispatch parity for the IMPLEMENTED ops. m08eHasOp() admits an op into
-       the dispatcher gate (familyHasOp); m08eDispatch() must actually handle each one.
-       If HasOp claims an op the dispatcher doesn't route, the runtime surfaces
-       OPERATION_DISPATCH_MISMATCH -- this test fails first, at source level.
+    1. HasOp<->Dispatch parity for the IMPLEMENTED ops. If HasOp claims an op the
+       dispatcher must route it, or runtime would surface OPERATION_DISPATCH_MISMATCH.
 
-    2. The WRITE/create/clone ops in the M08E brief are NOT claimed. M08E is a READ
-       family; write.block.append_entity / write.dictionary.set / write.entity.set_xdata
-       / transform.database.deep_clone / transform.database.insert_block /
-       acdb.database.create / infra.hostapp.provide_services mutate or create state and
-       belong to the write lane (M08G). They must stay OUT of m08eHasOp so they keep
-       returning the honest OPERATION_NOT_IMPLEMENTED -- never a fabricated read result.
+    2. Staged-write proof. The write-shaped ops must use AriadneStagedWriteTransaction
+       AND explicitly commit on success. A rollback-only scratch probe would not be
+       enough evidence for a real mutation surface.
 
-    3. Read-only proof: the .inc must contain none of the original-DWG-write / host-bootstrap
-       tokens (save/saveAs/_QSAVE, acedCommand/acedCmd, appendAcDbEntity, setXData(,
-       setFromRbChain, deepCloneObjects, ->insert(, acdbSetHostApplicationServices). A
-       read family that grows a write call is a contract breach, caught here.
+    3. No-original-write proof. The .inc may mutate ctx.pDb, but must not call
+       save/saveAs/_QSAVE/writeDwgFile or raw command APIs. The router-staged copy is
+       the only writable target.
 
-    4. UTF-8 fidelity: name/string emission goes through njsonStr (preserve Korean layer
-       and block names); the lossy wideToAscii() '?' funnel must not be used for output.
+    4. UTF-8 fidelity: string emission uses njsonStr; the lossy wideToAscii funnel is
+       forbidden.
 
-  Source-level only (no AutoCAD / no build needed). The native build
-  (tools/build_native_acad.ps1) separately proves the .inc compiles + links (exit 0).
+  Source-level only (no AutoCAD / no build needed). The native build proves compile+link.
 
 Stdlib only. Discoverable by pytest and unittest.
 """
@@ -42,8 +34,8 @@ _THIS = os.path.dirname(os.path.abspath(__file__))
 _REPO = os.path.dirname(os.path.dirname(_THIS))
 _INC = os.path.join(_REPO, "src", "Ariadne.AcadNative", "families", "m08e_handlers.inc")
 
-# Ops M08E implements as real handlers. Read ops are pure; write-shaped ops run only
-# inside staged transactions that roll back and never persist the original DWG.
+# Ops M08E implements as real handlers. Read ops are pure; write-shaped ops mutate
+# only the router-staged copy and must commit that staged transaction.
 _IMPLEMENTED = {
     "inspect.entity.get_xdata",
     "inspect.dictionary.named_objects",
@@ -128,7 +120,7 @@ class TestM08EHandlers(unittest.TestCase):
 
     def test_hasop_claims_exactly_implemented(self):
         self.assertEqual(self.claimed, _IMPLEMENTED,
-                         "m08eHasOp must claim exactly the 4 implemented read ops; got %s"
+                         "m08eHasOp must claim exactly the implemented staged-safe op set; got %s"
                          % sorted(self.claimed))
 
     def test_hasop_does_not_claim_deferred_write_ops(self):
@@ -153,9 +145,9 @@ class TestM08EHandlers(unittest.TestCase):
         self.assertRegex(self.dispatch, r"return false;\s*$",
                          "m08eDispatch must fall through to `return false;` for unclaimed ops")
 
-    def test_read_only_no_write_tokens(self):
-        # M08E may perform staged scratch writes, but must never write the original
-        # DWG, call raw commands, or use save/deploy paths.
+    def test_no_original_write_tokens(self):
+        # M08E may mutate the staged copy, but must never write the original DWG,
+        # call raw commands, or use save/deploy paths.
         forbidden = [
             "saveAs", "_QSAVE", "writeDwgFile",
             "acedCommand", "acedCmd",
@@ -167,13 +159,15 @@ class TestM08EHandlers(unittest.TestCase):
             self.assertNotIn(tok, self.code,
                              "read-only family CODE must not contain write/host-bootstrap token %r" % tok)
 
-    def test_write_opens_are_inside_staged_transactions(self):
-        # kForWrite is allowed only for staged scratch operations; the file must show
-        # the rollback guard and never call commit().
+    def test_write_ops_are_staged_and_committed(self):
+        # kForWrite is allowed only inside staged transactions, and successful write
+        # handlers must commit the staged mutation instead of rolling everything back.
         opens = re.findall(r"acdbOpenObject\([^;]*?,\s*AcDb::(\w+)", self.src, re.S)
         self.assertTrue(opens, "expected at least one acdbOpenObject call")
         self.assertIn("AriadneStagedWriteTransaction", self.src)
-        self.assertNotIn(".commit()", self.code)
+        self.assertIn("m08eCommit(", self.src)
+        self.assertIn("staged_committed", self.src)
+        self.assertNotIn("staged_rolled_back", self.code)
 
     def test_utf8_via_njsonstr(self):
         # Name/string output must route through njsonStr (UTF-8); no lossy wideToAscii output.

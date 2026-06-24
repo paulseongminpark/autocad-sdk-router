@@ -547,6 +547,8 @@ def impl_strategy(op):
         return "hard_blocked"
     if is_raw_command(op):
         return "deprecated_raw_command"
+    if st == "deprecated":
+        return "deprecated_safe_replacement"
     wl = op.get("write_level") or {}
     if wl.get("default_write_mode") == "write_original" or wl.get("original_write_default") is True:
         return "hard_blocked_original_write_forbidden"
@@ -569,6 +571,8 @@ def evidence_required(op):
         return "blocker_ref_and_evidence"
     if is_raw_command(op):
         return "contract_test_not_agent_exposed"
+    if st == "deprecated":
+        return "replacement_route_and_evidence"
     wl = op.get("write_level") or {}
     dwm = wl.get("default_write_mode")
     if dwm == "write_original" or wl.get("original_write_default") is True:

@@ -1,4 +1,4 @@
-{
+﻿{
   "schema": "ariadne.autocad_host_matrix.v2",
   "version": "2.0.0",
   "generated_at": "2026-06-22",
@@ -668,8 +668,8 @@
       "headless": false,
       "attended_required": true,
       "engine_tier": "native_arx_only",
-      "status": "blocked",
-      "blocked_reason": "Live active-document edit requires attended full AutoCAD + explicit write_original approval."
+      "status": "deprecated",
+      "notes": "Deprecated in WAVE4X; use apply.patch / staged native mutation evidence paths instead of active-document mutation."
     }
   },
   "catalog_family_default_host": {

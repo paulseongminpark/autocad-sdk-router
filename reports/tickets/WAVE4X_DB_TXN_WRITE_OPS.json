@@ -1,0 +1,127 @@
+{
+  "implemented": [
+    {
+      "id": "transaction.manager.start",
+      "status": "implemented",
+      "owner_ticket": "M08B-T03",
+      "implementation_strategy": "implemented_v1",
+      "handler": "m08cDispatch"
+    },
+    {
+      "id": "transaction.manager.get_object",
+      "status": "implemented",
+      "owner_ticket": "M08B-T03",
+      "implementation_strategy": "implemented_v1",
+      "handler": "m08cDispatch"
+    },
+    {
+      "id": "write.object.close",
+      "status": "implemented",
+      "owner_ticket": "M08C-T01",
+      "implementation_strategy": "implemented_v1",
+      "handler": "m08cDispatch"
+    },
+    {
+      "id": "write.object.upgrade_open",
+      "status": "implemented",
+      "owner_ticket": "M08C-T01",
+      "implementation_strategy": "implemented_v1",
+      "handler": "m08cDispatch"
+    },
+    {
+      "id": "write.object.downgrade_open",
+      "status": "implemented",
+      "owner_ticket": "M08C-T01",
+      "implementation_strategy": "implemented_v1",
+      "handler": "m08cDispatch"
+    },
+    {
+      "id": "write.object.create_ext_dict",
+      "status": "implemented",
+      "owner_ticket": "M08C-T02",
+      "implementation_strategy": "implemented_v1",
+      "handler": "m08eDispatch"
+    },
+    {
+      "id": "write.regapp.register",
+      "status": "implemented",
+      "owner_ticket": "M08C-T03",
+      "implementation_strategy": "implemented_v1",
+      "handler": "m08eDispatch"
+    },
+    {
+      "id": "write.dictionary.set",
+      "status": "implemented",
+      "owner_ticket": "M08E-T03",
+      "implementation_strategy": "implemented_v1",
+      "handler": "m08eDispatch"
+    },
+    {
+      "id": "write.entity.set_xdata",
+      "status": "implemented",
+      "owner_ticket": "M08E-T03",
+      "implementation_strategy": "implemented_v1",
+      "handler": "m08eDispatch"
+    },
+    {
+      "id": "write.block.append_entity",
+      "status": "implemented",
+      "owner_ticket": "M08E-T01",
+      "implementation_strategy": "implemented_v1",
+      "handler": "m08eDispatch"
+    },
+    {
+      "id": "transform.database.deep_clone",
+      "status": "implemented",
+      "owner_ticket": "M08E-T01",
+      "implementation_strategy": "implemented_v1",
+      "handler": "m08eDispatch"
+    },
+    {
+      "id": "transform.database.insert_block",
+      "status": "implemented",
+      "owner_ticket": "M08E-T01",
+      "implementation_strategy": "implemented_v1",
+      "handler": "m08eDispatch"
+    },
+    {
+      "id": "edit.assocdata.xref",
+      "status": "implemented",
+      "owner_ticket": "M08K-T03",
+      "implementation_strategy": "implemented_v1",
+      "handler": "m08kcDispatch"
+    },
+    {
+      "id": "repair.assocdata.audit",
+      "status": "implemented",
+      "owner_ticket": "M08K-T03",
+      "implementation_strategy": "implemented_v1",
+      "handler": "m08kcDispatch"
+    }
+  ],
+  "deprecated": [
+    {
+      "id": "live.apply_patch",
+      "status": "deprecated",
+      "owner_ticket": "M08J-T01",
+      "implementation_strategy": "deprecated_safe_replacement"
+    }
+  ],
+  "claims": [
+    {
+      "id": "edit.assocdata.xref",
+      "status": "implemented",
+      "notes": "WAVE4X reopened under a bounded staged-write contract: native handler runs on the router-staged copy only, commits on success, and mutation evidence is produced via journal/diff/validation."
+    },
+    {
+      "id": "repair.assocdata.audit",
+      "status": "implemented",
+      "notes": "WAVE4X reopened under a bounded staged-write contract: native handler runs on the router-staged copy only, commits on success, and mutation evidence is produced via journal/diff/validation."
+    },
+    {
+      "id": "live.apply_patch",
+      "status": "deprecated",
+      "notes": "Deprecated in WAVE4X. Exact active-document mutation remains intentionally disabled; use apply.patch / patch_engine.apply_staged (or apply_native_staged for a direct native op) on a staged copy."
+    }
+  ]
+}
