@@ -1,0 +1,44 @@
+{
+  "ticket_id": "WAVE4X_VISUAL_PLOT",
+  "status": "PASS",
+  "branch": "cados/w4x-visual-plot",
+  "commit": "bc0832a",
+  "commit_note": "implementation commit; final branch HEAD is reported in final response after metadata artifact commit",
+  "pr": "",
+  "implemented_ops": [
+    "plot.config.settings",
+    "plot.engine.run"
+  ],
+  "hard_blocked_ops": [],
+  "deprecated_ops": [],
+  "catalogued_remaining": [],
+  "registry_totals_after": {
+    "implemented": 459,
+    "blocked": 58
+  },
+  "native_build": {
+    "status": "ok",
+    "isolated_output_root": "runs/M08-NATIVE-canonical",
+    "canonical_deploy": false,
+    "artifacts": [
+      "src/Ariadne.AcadNative/bin/x64/Release/Ariadne.AcadNativeDbx.dbx",
+      "src/Ariadne.AcadNative/bin/x64/Release/Ariadne.AcadNative.crx",
+      "src/Ariadne.AcadNative/bin/x64/Release/Ariadne.AcadNative.arx"
+    ]
+  },
+  "tests": [
+    "python -m pytest D:\\dev\\99_tools\\autocad-sdk-router_w4x_visual\\tests\\unit\\test_m08l_handlers.py -q = 13 passed",
+    "python -m pytest D:\\dev\\99_tools\\autocad-sdk-router_w4x_visual\\tests -q = 487 passed, 20 skipped",
+    "python tools/cadctl_cli.py registry coverage = status ok, consistent true",
+    "python tools/operation_coverage_matrix.py = GATE PASS true, closure_gate_pass true"
+  ],
+  "artifacts": [
+    "reports/tickets/WAVE4X_VISUAL_PLOT_PLAN.md",
+    "reports/tickets/WAVE4X_VISUAL_PLOT.md",
+    "reports/tickets/WAVE4X_VISUAL_PLOT.json",
+    "reports/tickets/WAVE4X_VISUAL_PLOT_OPS.json",
+    "handoff/tickets/WAVE4X_VISUAL_PLOT.zip",
+    "handoff/pr/WAVE4X_VISUAL_PLOT.patch"
+  ],
+  "next": "Verify native builds inside staged environments. Merge branch cados/w4x-visual-plot back to main on Pane 1."
+}

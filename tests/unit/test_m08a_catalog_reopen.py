@@ -132,8 +132,8 @@ class TestM08ACatalogReopen(unittest.TestCase):
         self.assertEqual(by_status.get("unknown", 0), 0)
         self.assertEqual(by_status.get("catalogued", 0), 0)
         self.assertEqual(by_status.get("stub", 0), 0)
-        self.assertEqual(by_status.get("implemented", 0), 481)
-        self.assertEqual(by_status.get("blocked", 0), 36)
+        self.assertEqual(by_status.get("implemented", 0), 483)
+        self.assertEqual(by_status.get("blocked", 0), 34)
         self.assertEqual(by_status.get("implemented", 0) + by_status.get("blocked", 0), len(self.ops))
 
 

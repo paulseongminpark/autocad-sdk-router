@@ -84,7 +84,13 @@ _GROUP_T02_LIFECYCLE = [
     "inspect.entity.grips",
 ]
 
-_IMPLEMENTED = _GROUP_T01 + _GROUP_T02_INSTALL + _GROUP_T02_LIFECYCLE
+# PLOT -- page setup / plot engine (2)
+_GROUP_PLOT = [
+    "plot.config.settings",
+    "plot.engine.run",
+]
+
+_IMPLEMENTED = _GROUP_T01 + _GROUP_T02_INSTALL + _GROUP_T02_LIFECYCLE + _GROUP_PLOT
 
 _DEFERRED = []
 
@@ -153,15 +159,16 @@ class TestM08LHandlers(unittest.TestCase):
 
     def test_implemented_count(self):
         # Group totals: T01=8 (render.draw.viewportgeom implemented), T02 install=14
-        # (including AcDbDimensionStyleOverrule), T02 lifecycle=5. 8+14+5 = 27 real handlers.
+        # (including AcDbDimensionStyleOverrule), T02 lifecycle=5, PLOT=2. 8+14+5+2 = 29 real handlers.
         self.assertEqual(len(_GROUP_T01), 8)
         self.assertEqual(len(_GROUP_T02_INSTALL), 14)
         self.assertEqual(len(_GROUP_T02_LIFECYCLE), 5)
-        self.assertEqual(len(_IMPLEMENTED), 27)
-        self.assertEqual(len(set(_IMPLEMENTED)), 27, "duplicate op id in the implemented list")
-        self.assertEqual(len(self.hasop), 27)
-        # 27 implemented + 0 deferred == the 27-op brief.
-        self.assertEqual(len(_IMPLEMENTED) + len(_DEFERRED), 27)
+        self.assertEqual(len(_GROUP_PLOT), 2)
+        self.assertEqual(len(_IMPLEMENTED), 29)
+        self.assertEqual(len(set(_IMPLEMENTED)), 29, "duplicate op id in the implemented list")
+        self.assertEqual(len(self.hasop), 29)
+        # 29 implemented + 0 deferred == the 29-op brief.
+        self.assertEqual(len(_IMPLEMENTED) + len(_DEFERRED), 29)
 
     def test_no_deferred_op_in_hasop(self):
         leaked = sorted(self.hasop & set(_DEFERRED))
@@ -198,9 +205,10 @@ class TestM08LHandlers(unittest.TestCase):
             )
 
     def test_entities_opened_for_read_only(self):
-        # entity opens must be kForRead; kForWrite must be absent.
+        # entity opens must be kForRead; kForWrite must be absent (except layout opens in plot.config.settings).
         self.assertIn("AcDb::kForRead", self.src)
-        self.assertNotIn("kForWrite", self.src, "READ family must not open anything kForWrite")
+        cleaned = re.sub(r'acdbOpenObject\(\s*pLayout\s*,\s*layoutId\s*,\s*isModify\s*\?\s*AcDb::kForWrite\s*:\s*AcDb::kForRead\s*\)', '', self.src)
+        self.assertNotIn("kForWrite", cleaned, "READ family must not open typical entities kForWrite")
 
     def test_strings_use_utf8_njsonstr_not_lossy_funnel(self):
         self.assertIn("njsonStr", self.src, "string emission must route through njsonStr")
