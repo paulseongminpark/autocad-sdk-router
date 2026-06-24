@@ -113,6 +113,38 @@ class TestCadctlStatusReadOnly(unittest.TestCase):
         self.assertIn("registry", out)
         self.assertEqual(out["registry"].get("unknown"), 0)
 
+    def test_global_json_flag_is_accepted_for_all_commands(self):
+        for cmd in [
+            ["--json", "registry", "list"],
+            ["--json", "registry", "coverage"],
+            ["--json", "explain", "inspect.database.graph"],
+        ]:
+            proc = subprocess.run(
+                [sys.executable, os.path.join(_REPO, "tools", "cadctl_cli.py"), *cmd],
+                cwd=_REPO,
+                text=True,
+                capture_output=True,
+            )
+            self.assertEqual(proc.returncode, 0, proc.stderr)
+            out = json.loads(proc.stdout)
+            self.assertIn(out.get("status"), {
+                "ok", "partial", "blocked", "unavailable", "not_implemented", "error",
+                "planned", "rejected",
+            }, f"unexpected status for {cmd}: {out.get('status')}")
+
+    def test_explain_alias_routes_to_registry(self):
+        proc = subprocess.run(
+            [sys.executable, os.path.join(_REPO, "tools", "cadctl_cli.py"),
+             "explain", "inspect.database.graph"],
+            cwd=_REPO,
+            text=True,
+            capture_output=True,
+        )
+        self.assertEqual(proc.returncode, 0, proc.stderr)
+        out = json.loads(proc.stdout)
+        self.assertEqual(out.get("status"), "ok")
+        self.assertEqual(out.get("operation"), "inspect.database.graph")
+
 
 class TestCadctlRegistry(unittest.TestCase):
     """registry_list / registry_coverage are truthful pure reads."""

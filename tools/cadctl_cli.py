@@ -49,6 +49,13 @@ def build_parser() -> argparse.ArgumentParser:
         prog="cadctl",
         description="CAD OS Layer control surface (truthful router orchestrator).",
     )
+    # JSON output is always the wire format in this CLI; this flag is kept for
+    # caller compatibility and to allow global usage (`cadctl --json <command>`).
+    p.add_argument(
+        "--json",
+        action="store_true",
+        help="kept for compatibility; output is always JSON",
+    )
     sub = p.add_subparsers(dest="command", required=True)
 
     status_p = sub.add_parser("status", help="read the published router status (read-only)")
@@ -80,6 +87,9 @@ def build_parser() -> argparse.ArgumentParser:
     reg_sub.add_parser("coverage", help="operation coverage summary")
     reg_explain = reg_sub.add_parser("explain", help="full registry record for one operation")
     reg_explain.add_argument("op_id", help="operation id, e.g. inspect.database.graph")
+
+    explain = sub.add_parser("explain", help="alias for registry explain")
+    explain.add_argument("op_id", help="operation id, e.g. inspect.database.graph")
 
     patch = sub.add_parser("patch", help="patch shell commands")
     patch_sub = patch.add_subparsers(dest="patch_command", required=True)
@@ -156,6 +166,8 @@ def main(argv: list[str] | None = None) -> int:
                 return _emit(cad.registry_coverage())
             if args.registry_command == "explain":
                 return _emit(cad.registry_explain(args.op_id))
+        if args.command == "explain":
+            return _emit(cad.registry_explain(args.op_id))
         if args.command == "patch":
             if args.patch_command == "dry-run":
                 patch_doc = _load_patch_arg(args)
