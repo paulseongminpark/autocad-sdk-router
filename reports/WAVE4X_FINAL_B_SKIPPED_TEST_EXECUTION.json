@@ -1,0 +1,53 @@
+{
+  "schema": "ariadne.cad_os.wave4x_final_b.skipped_test_execution.v1",
+  "status": "PASS",
+  "skips_before": 20,
+  "skips_after": 0,
+  "tests_executed_after_fixture_generation": [
+    "tests/integration/test_live_arx_pump.py::TestLiveArxPumpRoundTrip::test_pump_echo_status_list_stop",
+    "tests/integration/test_native_graph_router.py::TestNativeGraphStagedWriteLive::test_staged_line_write_is_truthful_and_protects_original",
+    "tests/smoke/test_cadctl_rich_ir.py::TestLiveNativeFullIr::test_by_type_matches_pinned_expected_counts",
+    "tests/smoke/test_cadctl_rich_ir.py::TestLiveNativeFullIr::test_realized_entities_recompute_by_type",
+    "tests/smoke/test_cadctl_rich_ir.py::TestLiveNativeFullIr::test_schema_and_coverage_level",
+    "tests/smoke/test_cadctl_rich_ir.py::TestLiveNativeFullIr::test_truth_gate_21747",
+    "tests/smoke/test_router_inspect_database_graph.py::TestInspectDatabaseGraphLive::test_native_inspect_rich_is_consistent_and_safe",
+    "tests/unit/test_dwg_graph_ir_schema.py::TestLiveNativeResultTruthGate::test_build_ir_holds_21747_three_ways",
+    "tests/unit/test_dwg_graph_ir_schema.py::TestLiveNativeResultTruthGate::test_by_type_histogram_matches_ground_truth",
+    "tests/unit/test_dwg_graph_ir_schema.py::TestLiveNativeResultTruthGate::test_live_ir_schema_conforms",
+    "tests/unit/test_dwg_graph_ir_schema.py::TestLiveNativeResultTruthGate::test_result_object_is_the_consumable_shape",
+    "tests/unit/test_non_ascii_fidelity.py::TestNonAsciiLayerFidelity::test_every_layer_name_roundtrips_utf8",
+    "tests/unit/test_non_ascii_fidelity.py::TestNonAsciiLayerFidelity::test_golden_hangul_layer_present",
+    "tests/unit/test_non_ascii_fidelity.py::TestNonAsciiLayerFidelity::test_layers_present",
+    "tests/unit/test_non_ascii_fidelity.py::TestNonAsciiLayerFidelity::test_no_replacement_char_in_any_layer_name",
+    "tests/unit/test_non_ascii_fidelity.py::TestNonAsciiLayerFidelity::test_some_layer_name_is_hangul",
+    "tests/unit/test_sqlite_ir_store_rich.py::TestRichStoreOnLiveNativeFullIr::test_block_table_records_match_btr_count",
+    "tests/unit/test_sqlite_ir_store_rich.py::TestRichStoreOnLiveNativeFullIr::test_by_type_query_matches_entities_by_type",
+    "tests/unit/test_sqlite_ir_store_rich.py::TestRichStoreOnLiveNativeFullIr::test_entities_row_count_is_21747_via_query",
+    "tests/unit/test_sqlite_ir_store_rich.py::TestRichStoreOnLiveNativeFullIr::test_rich_counts_match_ground_truth_via_query"
+  ],
+  "fixtures_created": [
+    "staging/dwg_20260617_191504/input.dwg (copied from repo golden source into this worktree)",
+    "runs/m02_cadctl_rich/cad_job.json",
+    "runs/m02_cadctl_rich/cad_result.json",
+    "runs/m02_cadctl_rich/dwg_graph_ir.json",
+    "runs/dwg_truth_autocad_cad_job_20260624_150300/native_cad_job_result.json"
+  ],
+  "live_tests_run": {
+    "ran": true,
+    "env": "CADOS_LIVE=1",
+    "result": "11 passed in targeted live rerun; 562 passed in full CADOS_LIVE=1 suite",
+    "nodeids": [
+      "tests/integration/test_live_arx_pump.py::TestLiveArxPumpRoundTrip::test_pump_echo_status_list_stop",
+      "tests/integration/test_native_graph_router.py::TestNativeGraphStagedWriteLive::test_staged_line_write_is_truthful_and_protects_original",
+      "tests/smoke/test_router_inspect_database_graph.py::TestInspectDatabaseGraphLive::test_native_inspect_rich_is_consistent_and_safe"
+    ]
+  },
+  "attended_tests_run": {
+    "ran": false,
+    "result": "No skipped pytest gate required dedicated full AutoCAD attended UI. All baseline skips were fixture-gated or CADOS_LIVE-gated headless tests.",
+    "nodeids": []
+  },
+  "remaining_skips": [],
+  "remaining_skip_count": 0,
+  "source_xml": "reports/WAVE4X_FINAL_B_SKIP_FINAL.xml"
+}

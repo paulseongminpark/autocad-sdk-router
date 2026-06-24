@@ -1,7 +1,8 @@
-# NEXT STEP
+# NEXT STEP - CAD OS Wave4X FINAL B
 
-Current branch: `cados/wave4x-final-a-hardblock-reimplementation`
+Status: PASS
 
-Final A hardblock reimplementation is PASS on this branch. Fast B is merged, coverage is regenerated, native build is PASS, and tests are `546 passed / 20 skipped`.
-
-Next executor should run Final B skipped-test execution on `cados/wave4x-final-a-hardblock-reimplementation` or merge this branch with Final B skipped-test closure into a final RC branch. Do not merge to main until the dirty main checkout is intentionally handled.
+1. Merge `cados/wave4x-final-b-skipped-test-execution` with the final integration branch.
+2. Keep `CADOS_LIVE=1` for release-candidate validation when rerunning the full suite.
+3. Preserve `runs/m02_cadctl_rich/` and the generated native graph run as golden evidence for future smoke/unit reuse.
+4. Do not reintroduce the stale timestamped native graph fixture path; resolve via `runs/m02_cadctl_rich/cad_result.json -> result_ref`.

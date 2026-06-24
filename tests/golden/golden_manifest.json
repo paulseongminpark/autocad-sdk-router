@@ -1,6 +1,6 @@
 {
   "schema": "ariadne.cad_os.golden_manifest.v1",
-  "description": "CAD OS golden-fixture manifest through CADOS M06. Pins the live, real artifacts the smoke/integration tests assert against. Counts are the cross-engine ground truth for the golden DWG (21747 modelspace entities). Paths are relative to the repo root (D:\\dev\\99_tools\\autocad-sdk-router). Legacy M02 paths are preserved for existing smoke tests; M06 adds visual, batch, golden, and scale references without replacing earlier evidence.",
+  "description": "CAD OS golden-fixture manifest through CADOS M06. Pins the live, real artifacts the smoke/integration tests assert against. Counts are the cross-engine ground truth for the golden DWG (21747 modelspace entities). Paths are relative to the repo root (D:\\dev\\99_tools\\autocad-sdk-router). The live native graph result is resolved dynamically from the rich inspect envelope's result_ref so stale timestamped run folders are not required.",
   "golden_dwg": {
     "path": "staging/dwg_20260617_191504/input.dwg",
     "role": "READ-ONLY original; truth = 21747 modelspace entities. Tests stage their own copy and NEVER write this path.",
@@ -13,7 +13,9 @@
     "entity_count": 21747
   },
   "native_graph_result": {
-    "path": "runs/dwg_truth_autocad_cad_job_20260622_012807/native_cad_job_result.json",
+    "path": "runs/m02_cadctl_rich/cad_result.json",
+    "result_ref_field": "result_ref",
+    "resolved_result_path": "runs/dwg_truth_autocad_cad_job_20260624_150300/native_cad_job_result.json",
     "result_object_key": "result",
     "modelspace_entities": 21747,
     "consumed_by": "ir_builder.build_ir_from_database_graph"

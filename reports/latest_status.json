@@ -1,9 +1,9 @@
 {
-  "schema": "ariadne.cad_os.latest_status.v1",
-  "packet": "WAVE4X_FINAL_A_HARDBLOCK_REIMPLEMENTATION",
-  "generated_at": "2026-06-24T15:10:08.898460+09:00",
-  "branch": "cados/wave4x-final-a-hardblock-reimplementation",
+  "schema": "cad_os.latest_status.v1",
+  "generated_at": "2026-06-24T06:11:18.027997+00:00",
   "status": "PASS",
+  "branch": "cados/wave4x-final-b-skipped-test-execution",
+  "base_branch": "cados/wave4x-fast-b-on-fast-a-truth",
   "operation_counts": {
     "implemented": 487,
     "hard_blocked": 29,
@@ -13,25 +13,14 @@
     "unknown": 0,
     "deferred": 0
   },
-  "tests": "546 passed / 20 skipped",
-  "skips": {
-    "total": 20,
-    "live_or_attended_required": 3,
-    "missing_generated_fixture_or_run_artifact": 17,
-    "unexpected_skip": 0,
-    "notes": [
-      "CADOS_LIVE/native graph/inspect tests remain skipped without live env or golden DWG.",
-      "m02_cadctl_rich and dwg_truth_autocad run artifacts are not materialized in this worktree."
-    ]
-  },
+  "tests": "562 passed, 0 skipped (CADOS_LIVE=1)",
+  "skip_baseline": "reports/WAVE4X_FINAL_B_SKIP_BASELINE.json",
+  "skip_execution": "reports/WAVE4X_FINAL_B_SKIPPED_TEST_EXECUTION.json",
+  "remaining_skips": "reports/WAVE4X_FINAL_B_REMAINING_SKIPS.json",
   "native_build_status": "ok",
-  "v1_gate_pass": true,
-  "closure_gate_pass": true,
-  "remaining_hardblocks": 29,
-  "raw_command_agent_exposed": false,
-  "live_apply_patch": {
-    "status": "deprecated",
-    "replacement_ref": "apply.patch + tools/patch_engine.py::apply_native_staged"
+  "fixture_generation": {
+    "m02_cadctl_rich": "runs/m02_cadctl_rich/dwg_graph_ir.json",
+    "native_graph_result": "runs/dwg_truth_autocad_cad_job_20260624_150300/native_cad_job_result.json"
   },
-  "next": "Run Final B skipped-test execution on this branch or merge both into a final RC branch."
+  "next": "Merge Final A + Final B into a release candidate branch."
 }
