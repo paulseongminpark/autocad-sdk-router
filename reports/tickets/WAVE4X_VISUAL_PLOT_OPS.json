@@ -1,0 +1,156 @@
+{
+  "schema": "wave4x.ops.v1",
+  "ticket_id": "WAVE4X_VISUAL_PLOT",
+  "implemented_count": 2,
+  "implemented_ops": [
+    "plot.config.settings",
+    "plot.engine.run"
+  ],
+  "hard_blocked_ops": [],
+  "deprecated_ops": [],
+  "catalogued_remaining_in_scope": [],
+  "rows": [
+    {
+      "id": "plot.config.settings",
+      "operation": "plot.config.settings",
+      "family": "layouts_plot_publish",
+      "status": "implemented",
+      "engine_tier": "managed_also",
+      "engines": [
+        "managed_also"
+      ],
+      "host_eligibility": [
+        "arx_adapter",
+        "full_autocad"
+      ],
+      "hosts": [
+        "arx_adapter",
+        "full_autocad"
+      ],
+      "execution_context": "in_process_host",
+      "write_level": {
+        "default_write_mode": "live_edit",
+        "allowed_write_modes": [
+          "live_edit"
+        ],
+        "dwg_persisted": true,
+        "original_write_default": false
+      },
+      "handler": {
+        "router_lane": "ARIADNE_CAD_JOB",
+        "dispatcher_symbol": "m08lDispatch",
+        "execution_host_class": "arx_adapter",
+        "native_api": "AcDbPlotSettings / AcPlPlotConfig / AcPlPlotConfigMgr",
+        "composed_of": []
+      },
+      "mapping_type": "exact",
+      "catalog_op_id": "plot.config.settings",
+      "input_schema": "schemas/cad_job.v2.schema.json#/allOf",
+      "output_schema": "schemas/cad_result.v2.schema.json",
+      "schema_refs": {
+        "input": "schemas/cad_job.v2.schema.json#/allOf",
+        "output": "schemas/cad_result.v2.schema.json"
+      },
+      "policy": {
+        "source": "config/policy.v2.json",
+        "status_policy": "implemented",
+        "default_write_mode": "live_edit",
+        "allowed_write_modes": [
+          "live_edit"
+        ],
+        "no_original_write_default": true,
+        "agent_exposed": true,
+        "runtime_behavior": "hard_blocked_after_wave3_render_plot_reaudit"
+      },
+      "tests": [
+        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
+        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
+        "tests/unit/test_wave3_render_plot_registry_safety.py"
+      ],
+      "summary": "Reads/writes named page setups / plot configs; AcDbPlotSettings is a DB object so it",
+      "source_slice": "editor-delta.md",
+      "citation": "AcPlPlotConfig.h, AcPlPlotConfigMgr.h present; AcDbPlotSettings is a dbents object (unverified exact line)",
+      "evidence_refs": [
+        "config/autocad_native_arx_operation_catalog.json#plot.config.settings",
+        "src/Ariadne.AcadNative/families/m08l_handlers.inc:m08lDispatch",
+        "reports/tickets/WAVE4X_VISUAL_PLOT.md",
+        "build:native_acad exit 0"
+      ],
+      "notes": "Pane7 implemented. Layout plot settings read/write query validation is fully supported via AcDbPlotSettings and AcDbPlotSettingsValidator.",
+      "owner_ticket": "M08I-T01",
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs"
+    },
+    {
+      "id": "plot.engine.run",
+      "operation": "plot.engine.run",
+      "family": "layouts_plot_publish",
+      "status": "implemented",
+      "engine_tier": "managed_also",
+      "engines": [
+        "managed_also"
+      ],
+      "host_eligibility": [
+        "arx_adapter",
+        "full_autocad"
+      ],
+      "hosts": [
+        "arx_adapter",
+        "full_autocad"
+      ],
+      "execution_context": "hostless_dbx_in_accoreconsole",
+      "write_level": {
+        "default_write_mode": "read",
+        "allowed_write_modes": [
+          "read"
+        ],
+        "dwg_persisted": false,
+        "original_write_default": false
+      },
+      "handler": {
+        "router_lane": "ARIADNE_CAD_JOB",
+        "dispatcher_symbol": "m08lDispatch",
+        "execution_host_class": "arx_adapter",
+        "native_api": "AcPlPlotEngine: beginPlot/beginDocument/beginPage/endPage/endDocument/endPlot (created via AcPlPlotFactory)",
+        "composed_of": []
+      },
+      "mapping_type": "exact",
+      "catalog_op_id": "plot.engine.run",
+      "input_schema": "schemas/cad_job.v2.schema.json#/allOf",
+      "output_schema": "schemas/cad_result.v2.schema.json",
+      "schema_refs": {
+        "input": "schemas/cad_job.v2.schema.json#/allOf",
+        "output": "schemas/cad_result.v2.schema.json"
+      },
+      "policy": {
+        "source": "config/policy.v2.json",
+        "status_policy": "implemented",
+        "default_write_mode": "read",
+        "allowed_write_modes": [
+          "read"
+        ],
+        "no_original_write_default": true,
+        "agent_exposed": true,
+        "runtime_behavior": "hard_blocked_after_wave3_render_plot_reaudit"
+      },
+      "tests": [
+        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
+        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
+        "tests/unit/test_wave3_render_plot_registry_safety.py"
+      ],
+      "summary": "Drives the full plot/publish pipeline (also preview engine). Operates on AcPlPlotInfo/AcPlPlotPageInfo.",
+      "source_slice": "editor-delta.md",
+      "citation": "AcPlPlotEngine.h:62-79; AcPlPlotInfo.h, AcPlPlotFactory.h present",
+      "evidence_refs": [
+        "config/autocad_native_arx_operation_catalog.json#plot.engine.run",
+        "src/Ariadne.AcadNative/families/m08l_handlers.inc:m08lDispatch",
+        "reports/tickets/WAVE4X_VISUAL_PLOT.md",
+        "build:native_acad exit 0"
+      ],
+      "notes": "Pane7 implemented. plot.engine.run tries to create the publish engine using AcPlPlotFactory and reports HOST_UNAVAILABLE honestly if headless.",
+      "owner_ticket": "M08I-T01",
+      "implementation_strategy": "attended_verification",
+      "evidence_required": "attended_live_pump_session_log"
+    }
+  ]
+}

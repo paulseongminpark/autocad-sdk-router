@@ -57,9 +57,23 @@ _RUNTIME = [
     "module.app.accessor",
     "module.class.register_object",
     "module.command.flags",
+    "module.command.lookup",
     "module.command.register_auto",
     "module.command.register_manual",
+    "module.command.remove_group",
     "module.command.stack_handle",
+    "module.load",
+    "module.load.acad_rx",
+    "module.load.by_app",
+    "module.load.demand_register",
+    "module.unload",
+    "module.entrypoint.define",
+    "module.entrypoint.dispatch",
+    "module.lifecycle.init",
+    "module.lifecycle.on_load_dwg",
+    "module.lifecycle.on_unload_dwg",
+    "module.lifecycle.other",
+    "module.lifecycle.unload",
     "module.register_mdi",
     "module.register_service",
 ]
@@ -115,7 +129,6 @@ _IMPLEMENTED = _T01 + _SELECTION + _RUNTIME + _UI + _DOC
 
 _HARD_BLOCKED = [
     "command.menu.invoke",             # arbitrary menu macro execution => raw command surface
-    "module.load.demand_register",     # registry/AutoCAD autoload mutation outside ticket scope
     "editor.toolpalette.tool_execute", # arbitrary tool execution may mutate active/user drawing
 ]
 
@@ -171,8 +184,8 @@ class TestM08NHandlers(unittest.TestCase):
         self.assertRegex(self.src, r"bool\s+m08nDispatch\(const std::string& op, const AriadneJobCtx& ctx, std::ostringstream& r\)")
 
     def test_hasop_lists_exactly_feasible_implemented(self):
-        self.assertEqual(len(_IMPLEMENTED), 77)
-        self.assertEqual(len(set(_IMPLEMENTED)), 77)
+        self.assertEqual(len(_IMPLEMENTED), 91)
+        self.assertEqual(len(set(_IMPLEMENTED)), 91)
         self.assertEqual(
             self.hasop,
             set(_IMPLEMENTED),
@@ -181,7 +194,7 @@ class TestM08NHandlers(unittest.TestCase):
         )
 
     def test_hard_blocked_ops_not_in_hasop(self):
-        self.assertEqual(len(_HARD_BLOCKED), 3)
+        self.assertEqual(len(_HARD_BLOCKED), 2)
         leaked = sorted(self.hasop & set(_HARD_BLOCKED))
         self.assertEqual(leaked, [], "hard-blocked raw/registry ops leaked into HasOp: %s" % leaked)
         for op in _HARD_BLOCKED:
@@ -241,12 +254,51 @@ class TestM08NHandlers(unittest.TestCase):
         ]:
             self.assertIn(token, self.src + self.native_job)
 
+    def test_module_lifecycle_evidence_is_status_only(self):
+        for token in [
+            "m08nModuleLifecycleEvidence",
+            "module.entrypoint.define",
+            "module.entrypoint.dispatch",
+            "module.lifecycle.init",
+            "module.lifecycle.on_load_dwg",
+            "module.lifecycle.on_unload_dwg",
+            "module.lifecycle.other",
+            "module.lifecycle.unload",
+            "actual_lifecycle_callback_invoked",
+            "synthetic_loader_message_dispatched",
+            "lifecycle_evidence_status_only",
+        ]:
+            self.assertIn(token, self.src)
+
     def test_module_command_flags_is_read_only_inventory(self):
         self.assertIn('op == "module.command.flags"', self.src)
         self.assertIn("ACRX_CMD_MODAL", self.src)
         self.assertIn("ACRX_CMD_TRANSPARENT", self.src)
         self.assertIn("ACRX_CMD_SESSION", self.src)
         self.assertIn('"read_only":true', self.src)
+
+    def test_wave4x_loader_doc_safe_status_handlers_present(self):
+        for op in [
+            "module.command.lookup",
+            "module.command.remove_group",
+            "module.load",
+            "module.load.acad_rx",
+            "module.load.by_app",
+            "module.load.demand_register",
+            "module.unload",
+        ]:
+            self.assertIn('op == "%s"' % op, self.src)
+        for token in [
+            "lookupGlobalCmd",
+            "ARIADNE_W4X_LOADER_DOC",
+            "acrxDynamicLinker",
+            "acad_rx_checked",
+            "demand_load_plan",
+            'demand_load_registry_mutated',
+            'module_unload_invoked',
+            'raw_command_agent_surface',
+        ]:
+            self.assertIn(token, self.src)
 
     def test_selection_filter_structure_present(self):
         self.assertIn("m08nBuildTypeFilter", self.src)

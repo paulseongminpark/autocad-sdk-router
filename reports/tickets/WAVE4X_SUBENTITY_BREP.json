@@ -1,0 +1,29 @@
+{
+  "schema": "ariadne.cad_os.wave4x.subentity_brep.result.v1",
+  "generated_at": "2026-06-23T23:59:00+09:00",
+  "status": "PASS",
+  "branch": "cados/w4x-subentity-brep",
+  "claim_file": "reports/tickets/WAVE4X_PANE3_SUBENTITY_BREP_CLAIMS.json",
+  "plan_file": "reports/tickets/WAVE4X_SUBENTITY_BREP_PLAN.md",
+  "implemented_ops_count": 4,
+  "hard_blocked_ops_count": 0,
+  "implemented_ops": [
+    "edit.subentity.add_paths",
+    "edit.subentity.delete_paths",
+    "edit.subentity.transform",
+    "inspect.assocsurface.topology"
+  ],
+  "hard_blocked_ops": [],
+  "validation": {
+    "pytest": "494 passed, 20 skipped",
+    "registry_coverage": "status ok, consistent true, implemented 461, blocked 56",
+    "reconcile_native_registry": "dry-run ok, flips 0, conflicts 0, drift 0, coded 421",
+    "native_build": "status ok"
+  },
+  "files": {
+    "report_md": "reports/tickets/WAVE4X_SUBENTITY_BREP.md",
+    "report_json": "reports/tickets/WAVE4X_SUBENTITY_BREP.json",
+    "ops_json": "reports/tickets/WAVE4X_SUBENTITY_BREP_OPS.json",
+    "native_build_json": "reports/tickets/WAVE4X_SUBENTITY_BREP_native_build.json"
+  }
+}

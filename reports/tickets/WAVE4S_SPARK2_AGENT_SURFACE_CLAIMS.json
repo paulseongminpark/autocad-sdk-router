@@ -1,0 +1,146 @@
+{
+  "schema": "wave4s.spark_claims.v1",
+  "generated_at": "2026-06-23T15:32:38.514697+00:00",
+  "root": "D:\\dev\\99_tools\\autocad-sdk-router",
+  "role": "Pane 1 merge/claim allocator",
+  "spark": "SPARK2_AGENT_SURFACE",
+  "intent": "cadctl/MCP/tool surface gaps, policy gates, explain/status wrappers, and Daedalus-consumable metadata",
+  "current_known_truth": {
+    "implemented": 457,
+    "blocked": 60,
+    "catalogued": 0,
+    "stub": 0,
+    "unknown": 0,
+    "deferred": 0,
+    "tests": {
+      "passed": 504,
+      "skipped": 3
+    }
+  },
+  "ownership_rules": {
+    "canonical_native_deploy_owned_by_spark": false,
+    "main_merge_owned_by_spark": false,
+    "raw_command_surface_allowed": false,
+    "weaken_safety_allowed": false,
+    "primary_duplicate_requires_secondary_mode": true
+  },
+  "claims": [
+    {
+      "operation": "command.invoke.coroutine",
+      "mode": "secondary_implementation_or_evidence",
+      "current_status": "blocked",
+      "goal": "add_policy_gate",
+      "expected_files": [
+        "tools/cadctl_cli.py",
+        "tools/operation_coverage_matrix.py",
+        "tests/unit/test_m08o_fallback.py",
+        "docs/FALLBACK_POLICY.md"
+      ],
+      "test_requirement": "Assert raw command operations cannot be cadctl/MCP/agent exposed even if wrappers are added.",
+      "evidence_requirement": "Coverage matrix row must show agent_exposed false and risk_class raw_command.",
+      "do_not_overlap_with": [
+        "reports/tickets/WAVE4X_PANE4_FALLBACK_COM_OLE_CLAIMS.json"
+      ]
+    },
+    {
+      "operation": "command.invoke.sync",
+      "mode": "secondary_implementation_or_evidence",
+      "current_status": "blocked",
+      "goal": "add_policy_gate",
+      "expected_files": [
+        "tools/cadctl_cli.py",
+        "tools/operation_coverage_matrix.py",
+        "tests/unit/test_m08o_fallback.py",
+        "docs/FALLBACK_POLICY.md"
+      ],
+      "test_requirement": "Assert sync raw command dispatch remains blocked and non-agent-exposed.",
+      "evidence_requirement": "Policy evidence must cite SAFETY_FORBIDDEN and no wrapper may accept command text.",
+      "do_not_overlap_with": [
+        "reports/tickets/WAVE4X_PANE4_FALLBACK_COM_OLE_CLAIMS.json"
+      ]
+    },
+    {
+      "operation": "command.invoke.sync.resbuf",
+      "mode": "secondary_implementation_or_evidence",
+      "current_status": "blocked",
+      "goal": "add_policy_gate",
+      "expected_files": [
+        "tools/cadctl_cli.py",
+        "tools/operation_coverage_matrix.py",
+        "tests/unit/test_m08o_fallback.py",
+        "docs/FALLBACK_POLICY.md"
+      ],
+      "test_requirement": "Assert resbuf raw command dispatch remains blocked and non-agent-exposed.",
+      "evidence_requirement": "Policy evidence must prove no resbuf command invocation reaches cadctl/MCP.",
+      "do_not_overlap_with": [
+        "reports/tickets/WAVE4X_PANE4_FALLBACK_COM_OLE_CLAIMS.json"
+      ]
+    },
+    {
+      "operation": "command.queue.post",
+      "mode": "secondary_implementation_or_evidence",
+      "current_status": "blocked",
+      "goal": "add_policy_gate",
+      "expected_files": [
+        "tools/cadctl_cli.py",
+        "tools/operation_coverage_matrix.py",
+        "tests/unit/test_m08o_fallback.py",
+        "docs/FALLBACK_POLICY.md"
+      ],
+      "test_requirement": "Add/verify queue-post exposure guard for Daedalus/cadctl metadata.",
+      "evidence_requirement": "Evidence must show queue posting is not a runnable agent operation.",
+      "do_not_overlap_with": [
+        "reports/tickets/WAVE4X_PANE4_FALLBACK_COM_OLE_CLAIMS.json"
+      ]
+    },
+    {
+      "operation": "doc.sendstring",
+      "mode": "secondary_implementation_or_evidence",
+      "current_status": "blocked",
+      "goal": "add_policy_gate",
+      "expected_files": [
+        "tools/cadctl_cli.py",
+        "tools/operation_coverage_matrix.py",
+        "tests/unit/test_m08o_fallback.py",
+        "docs/FALLBACK_POLICY.md"
+      ],
+      "test_requirement": "Keep SendStringToExecute blocked as raw command surface; expose only typed bespoke handlers.",
+      "evidence_requirement": "Evidence must show no command_string input is accepted by agent-facing surfaces.",
+      "do_not_overlap_with": [
+        "reports/tickets/WAVE4X_PANE2_LOADER_DOC_CLAIMS.json"
+      ]
+    },
+    {
+      "operation": "automate.com.send_command",
+      "mode": "secondary_implementation_or_evidence",
+      "current_status": "blocked",
+      "goal": "add_policy_gate",
+      "expected_files": [
+        "tools/cadctl_cli.py",
+        "tools/operation_coverage_matrix.py",
+        "tests/unit/test_m08o_fallback.py",
+        "docs/FALLBACK_POLICY.md"
+      ],
+      "test_requirement": "Guard COM SendCommand from cadctl/MCP exposure.",
+      "evidence_requirement": "Evidence must show COM send_command remains non-agent-exposed and blocked.",
+      "do_not_overlap_with": [
+        "reports/tickets/WAVE4X_PANE4_FALLBACK_COM_OLE_CLAIMS.json"
+      ]
+    },
+    {
+      "operation": "wave4s.agent_surface.capability_metadata",
+      "mode": "primary",
+      "current_status": "support_gap",
+      "goal": "add_evidence",
+      "expected_files": [
+        "tools/cadctl_cli.py",
+        "tools/cadctl.py",
+        "reports/operation_coverage_latest.json",
+        "reports/tickets/WAVE4S_SPARK2_AGENT_SURFACE.md"
+      ],
+      "test_requirement": "Emit Daedalus-consumable safe capability metadata from registry/coverage without weakening policy.",
+      "evidence_requirement": "Evidence must include deterministic JSON and raw-command/original-write exposure guards.",
+      "do_not_overlap_with": []
+    }
+  ]
+}

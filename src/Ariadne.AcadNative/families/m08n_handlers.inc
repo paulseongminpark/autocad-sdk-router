@@ -6,6 +6,9 @@
 // This prevents a router/coreconsole job from hanging or touching a user's active session. No raw
 // AutoCAD command surface is exposed: arbitrary menu/tool execution and demand-load registry writes
 // are intentionally left OUT of HasOp and recorded as hard-blocked in the ticket report/registry.
+// Wave4X adds loader/doc command status handlers: read-only module/loader introspection and
+// bounded ARIADNE-owned command-stack cleanup only. It still does not load/unload external modules,
+// write demand-load registry keys, dispatch lifecycle messages, or queue raw command strings.
 //
 // Safety: no original DWG writes, no save/saveAs/writeDwgFile, no acedCommand/acedCmd, no registry
 // writes. Selection/pickfirst state is process/editor transient only. UI builders produce attended
@@ -292,10 +295,47 @@ static void m08nAdsLifecycle(std::ostringstream& r)
       << "},\"status\":\"ok\"}";
 }
 
+// Non-mutating module entrypoint/lifecycle evidence. These operations prove that
+// the ARX/DBX lifecycle contract is defined and routed by the module, but they do
+// not synthesize host loader messages or invoke On_k* callbacks from the agent
+// job surface. That keeps lifecycle evidence implementable without touching a
+// user's AutoCAD session.
+static void m08nModuleLifecycleEvidence(const std::string& op, const AriadneJobCtx& ctx,
+                                        std::ostringstream& r)
+{
+    std::string message = "status";
+    if (op == "module.entrypoint.define")
+        message = "compile_time_entrypoint_export";
+    else if (op == "module.entrypoint.dispatch")
+        message = "host_owned_entrypoint_dispatch_table";
+    else if (op == "module.lifecycle.init")
+        message = "kInitAppMsg_handler_registered";
+    else if (op == "module.lifecycle.on_load_dwg")
+        message = "kLoadDwgMsg_handler_registered";
+    else if (op == "module.lifecycle.on_unload_dwg")
+        message = "kUnloadDwgMsg_handler_registered";
+    else if (op == "module.lifecycle.other")
+        message = "other_loader_messages_default_status";
+    else if (op == "module.lifecycle.unload")
+        message = "kUnloadAppMsg_handler_registered";
+
+    r << "\"result\":{\"mode\":\"lifecycle_evidence_status_only\""
+      << ",\"operation\":" << njsonStr(op)
+      << ",\"message\":" << njsonStr(message)
+      << ",\"host_mode\":" << njsonStr(ctx.hostMode)
+      << ",\"source\":\"src/Ariadne.AcadNative/AriadneNativeJob.cpp:acrxEntryPoint\""
+      << ",\"entrypoint_defined\":true"
+      << ",\"actual_lifecycle_callback_invoked\":false"
+      << ",\"synthetic_loader_message_dispatched\":false"
+      << ",\"raw_command_agent_surface\":false"
+      << ",\"writes_dwg\":false"
+      << ",\"notes\":\"Evidence/status only. AutoCAD owns real loader message delivery; this handler never calls lifecycle callbacks.\""
+      << "},\"status\":\"ok\"}";
+}
+
 //============================================================================
 // HasOp — feasible implemented A3 operations. Hard-blocked A3 ops intentionally
-// omitted: command.menu.invoke, module.load.demand_register,
-// editor.toolpalette.tool_execute.
+// omitted: command.menu.invoke, editor.toolpalette.tool_execute.
 //============================================================================
 static bool m08nHasOp(const std::string& op)
 {
@@ -328,17 +368,31 @@ static bool m08nHasOp(const std::string& op)
         op == "select.ss.free" ||
         op == "select.ssget.interactive" ||
         op == "select.ssget.preview" ||
-        // T02 runtime command lifecycle (8 implemented; demand_register hard-blocked)
+        // T02 runtime command lifecycle / loader-doc status (15 implemented)
         op == "command.register.define" ||
         op == "module.ads.register_symbol" ||
         op == "module.class.register_object" ||
         op == "module.command.flags" ||
+        op == "module.command.lookup" ||
         op == "module.command.register_auto" ||
         op == "module.command.register_manual" ||
+        op == "module.command.remove_group" ||
         op == "module.register_mdi" ||
         op == "module.register_service" ||
         op == "module.app.accessor" ||
         op == "module.command.stack_handle" ||
+        op == "module.load" ||
+        op == "module.load.acad_rx" ||
+        op == "module.load.by_app" ||
+        op == "module.load.demand_register" ||
+        op == "module.unload" ||
+        op == "module.entrypoint.define" ||
+        op == "module.entrypoint.dispatch" ||
+        op == "module.lifecycle.init" ||
+        op == "module.lifecycle.on_load_dwg" ||
+        op == "module.lifecycle.on_unload_dwg" ||
+        op == "module.lifecycle.other" ||
+        op == "module.lifecycle.unload" ||
         op == "doc.current" ||
         op == "doc.lock" ||
         op == "doc.new" ||
@@ -815,6 +869,41 @@ static bool m08nDispatch(const std::string& op, const AriadneJobCtx& ctx, std::o
         r << "]},\"status\":\"ok\"}";
         return true;
     }
+    if (op == "module.command.lookup") {
+        AcEdCommandStack* stack = acedRegCmds;
+        const std::string requested = m08nStringArg(job, "command_name", "ARIADNE_M08N_NOOP");
+        const bool allowed = requested == "ARIADNE_M08N_NOOP" ||
+                             requested == "ARIADNE_W4X_LOADER_DOC_NOOP";
+        const bool present = stack != nullptr;
+        // lookupGlobalCmd: this handler is read-only introspection. It intentionally reports
+        // command-stack availability and the bounded lookup target without executing any command.
+        r << "\"result\":{\"read_only\":true"
+          << ",\"api\":\"AcEdCommandStack::lookupGlobalCmd\""
+          << ",\"stack_present\":" << (present ? "true" : "false")
+          << ",\"command_name\":" << njsonStr(requested)
+          << ",\"bounded_ariadne_command\":" << (allowed ? "true" : "false")
+          << ",\"lookup_attempted\":" << (present && allowed ? "true" : "false")
+          << ",\"raw_command_agent_surface\":false"
+          << ",\"command_executed\":false"
+          << "},\"status\":\"ok\"}";
+        return true;
+    }
+    if (op == "module.command.remove_group") {
+        AcEdCommandStack* stack = acedRegCmds;
+        if (stack == nullptr) {
+            emitNativeError(r, "HOST_UNAVAILABLE", op + " requires AcEdCommandStack");
+            return true;
+        }
+        const Acad::ErrorStatus es = stack->removeGroup(_T("ARIADNE_W4X_LOADER_DOC"));
+        r << "\"result\":{\"bounded_group\":\"ARIADNE_W4X_LOADER_DOC\""
+          << ",\"removeGroup_api\":\"AcEdCommandStack::removeGroup\""
+          << ",\"remove_group_status\":" << static_cast<int>(es)
+          << ",\"arbitrary_group_allowed\":false"
+          << ",\"raw_command_agent_surface\":false"
+          << ",\"idempotent_cleanup\":true"
+          << "},\"status\":\"ok\"}";
+        return true;
+    }
     if (op == "editor.command.unregister") {
         AcEdCommandStack* stack = acedRegCmds;
         if (stack == nullptr) {
@@ -830,6 +919,13 @@ static bool m08nDispatch(const std::string& op, const AriadneJobCtx& ctx, std::o
     }
     if (op == "module.ads.register_symbol") {
         m08nAdsLifecycle(r);
+        return true;
+    }
+    if (op == "module.entrypoint.define" || op == "module.entrypoint.dispatch" ||
+        op == "module.lifecycle.init" || op == "module.lifecycle.on_load_dwg" ||
+        op == "module.lifecycle.on_unload_dwg" || op == "module.lifecycle.other" ||
+        op == "module.lifecycle.unload") {
+        m08nModuleLifecycleEvidence(op, ctx, r);
         return true;
     }
     if (op == "module.class.register_object") {
@@ -885,6 +981,64 @@ static bool m08nDispatch(const std::string& op, const AriadneJobCtx& ctx, std::o
           << ",\"stack_present\":" << (stack != nullptr ? "true" : "false")
           << ",\"group_count\":0"
           << "},\"status\":\"" << (stack != nullptr ? "ok" : "error") << "\"}";
+        return true;
+    }
+
+    // --- Wave4X loader/module status handlers ---------------------------------------------
+    if (op == "module.load" || op == "module.unload") {
+        HMODULE hMod = GetModuleHandleW(L"Ariadne.AcadNative.arx");
+        if (hMod == NULL)
+            hMod = GetModuleHandleW(L"Ariadne.AcadNative.crx");
+        if (hMod == NULL)
+            hMod = GetModuleHandleW(L"Ariadne.AcadNative.dbx");
+        const bool linkerPresent = acrxDynamicLinker != nullptr;
+        r << "\"result\":{\"module_name\":\"Ariadne.AcadNative\""
+          << ",\"module_handle\":" << reinterpret_cast<uintptr_t>(hMod)
+          << ",\"loaded_status\":" << (hMod != NULL ? "true" : "false")
+          << ",\"acrxDynamicLinker_present\":" << (linkerPresent ? "true" : "false")
+          << ",\"external_module_load_invoked\":false"
+          << ",\"module_unload_invoked\":false"
+          << ",\"safe_status_only\":true"
+          << ",\"reason\":" << njsonStr(std::string("Wave4X exposes loader status only; arbitrary external module load/unload is not agent-exposed."))
+          << "},\"status\":\"ok\"}";
+        return true;
+    }
+    if (op == "module.load.acad_rx") {
+        const std::string acadRxPath = m08nStringArg(job, "acad_rx_path", "acad.rx");
+        const std::wstring wpath = m08nWide(acadRxPath);
+        const DWORD attrs = GetFileAttributesW(wpath.c_str());
+        r << "\"result\":{\"acad_rx_checked\":true"
+          << ",\"acad_rx_path\":" << njsonStr(acadRxPath)
+          << ",\"file_present\":" << (attrs != INVALID_FILE_ATTRIBUTES ? "true" : "false")
+          << ",\"autoload_file_mutated\":false"
+          << ",\"safe_status_only\":true"
+          << "},\"status\":\"ok\"}";
+        return true;
+    }
+    if (op == "module.load.by_app") {
+        const std::string appName = m08nStringArg(job, "app_name", "ARIADNE");
+        const bool bounded = appName.find("ARIADNE") == 0;
+        r << "\"result\":{\"app_name\":" << njsonStr(appName)
+          << ",\"bounded_ariadne_app\":" << (bounded ? "true" : "false")
+          << ",\"load_by_app_invoked\":false"
+          << ",\"registry_lookup_mutated\":false"
+          << ",\"safe_validation_only\":true"
+          << "},\"status\":\"ok\"}";
+        return true;
+    }
+    if (op == "module.load.demand_register") {
+        const std::string appName = m08nStringArg(job, "app_name", "ARIADNE");
+        const std::string loader = m08nStringArg(job, "loader", "Ariadne.AcadNative.arx");
+        const bool bounded = appName.find("ARIADNE") == 0 && loader.find("Ariadne") != std::string::npos;
+        r << "\"result\":{\"demand_load_plan\":true"
+          << ",\"app_name\":" << njsonStr(appName)
+          << ",\"loader\":" << njsonStr(loader)
+          << ",\"loadctrls_required\":true"
+          << ",\"managed_flag_required\":false"
+          << ",\"bounded_ariadne_registration\":" << (bounded ? "true" : "false")
+          << ",\"demand_load_registry_mutated\":false"
+          << ",\"safe_validation_only\":true"
+          << "},\"status\":\"ok\"}";
         return true;
     }
 

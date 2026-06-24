@@ -1,0 +1,160 @@
+{
+  "schema": "wave4x.loader_doc_r2.ops.v1",
+  "generated_at": "2026-06-23T15:40:34.501932+00:00",
+  "targets": [
+    "doc.sendstring",
+    "module.entrypoint.define",
+    "module.entrypoint.dispatch",
+    "module.lifecycle.init",
+    "module.lifecycle.on_load_dwg",
+    "module.lifecycle.on_unload_dwg",
+    "module.lifecycle.other",
+    "module.lifecycle.unload"
+  ],
+  "implemented_ops": [
+    "module.entrypoint.define",
+    "module.entrypoint.dispatch",
+    "module.lifecycle.init",
+    "module.lifecycle.on_load_dwg",
+    "module.lifecycle.on_unload_dwg",
+    "module.lifecycle.other",
+    "module.lifecycle.unload"
+  ],
+  "still_hard_blocked_ops": [
+    "doc.sendstring"
+  ],
+  "deprecated_ops": [],
+  "operations": [
+    {
+      "operation": "doc.sendstring",
+      "final_state": "hard_blocked",
+      "decision": "not_agent_exposed_raw_command_surface",
+      "handler": null,
+      "agent_exposed": false,
+      "writes_dwg": false,
+      "raw_command_agent_surface": true,
+      "blocker": "SAFETY_FORBIDDEN",
+      "blocked_reason": "SAFETY_FORBIDDEN: doc.sendstring uses AcApDocManager::sendStringToExecute to enqueue command text into an AutoCAD document command stream. R2 rechecked internal-only gating and rejected an agent operation because even policy-gated arbitrary command strings would be a raw command surface; safe bespoke typed handlers must be implemented instead.",
+      "evidence_refs": [
+        "tests/unit/test_doc_sendstring_safety.py",
+        "reports/tickets/WAVE4X_LOADER_DOC_R2.md#doc.sendstring"
+      ]
+    },
+    {
+      "operation": "module.entrypoint.define",
+      "final_state": "implemented",
+      "decision": "native_lifecycle_evidence_status_only",
+      "handler": "m08nDispatch",
+      "agent_exposed": true,
+      "writes_dwg": false,
+      "raw_command_agent_surface": false,
+      "actual_lifecycle_callback_invoked": false,
+      "synthetic_loader_message_dispatched": false,
+      "evidence_refs": [
+        "src/Ariadne.AcadNative/families/m08n_handlers.inc:m08nModuleLifecycleEvidence",
+        "tests/unit/test_module_lifecycle_r2.py"
+      ]
+    },
+    {
+      "operation": "module.entrypoint.dispatch",
+      "final_state": "implemented",
+      "decision": "native_lifecycle_evidence_status_only",
+      "handler": "m08nDispatch",
+      "agent_exposed": true,
+      "writes_dwg": false,
+      "raw_command_agent_surface": false,
+      "actual_lifecycle_callback_invoked": false,
+      "synthetic_loader_message_dispatched": false,
+      "evidence_refs": [
+        "src/Ariadne.AcadNative/families/m08n_handlers.inc:m08nModuleLifecycleEvidence",
+        "tests/unit/test_module_lifecycle_r2.py"
+      ]
+    },
+    {
+      "operation": "module.lifecycle.init",
+      "final_state": "implemented",
+      "decision": "native_lifecycle_evidence_status_only",
+      "handler": "m08nDispatch",
+      "agent_exposed": true,
+      "writes_dwg": false,
+      "raw_command_agent_surface": false,
+      "actual_lifecycle_callback_invoked": false,
+      "synthetic_loader_message_dispatched": false,
+      "evidence_refs": [
+        "src/Ariadne.AcadNative/families/m08n_handlers.inc:m08nModuleLifecycleEvidence",
+        "tests/unit/test_module_lifecycle_r2.py"
+      ]
+    },
+    {
+      "operation": "module.lifecycle.on_load_dwg",
+      "final_state": "implemented",
+      "decision": "native_lifecycle_evidence_status_only",
+      "handler": "m08nDispatch",
+      "agent_exposed": true,
+      "writes_dwg": false,
+      "raw_command_agent_surface": false,
+      "actual_lifecycle_callback_invoked": false,
+      "synthetic_loader_message_dispatched": false,
+      "evidence_refs": [
+        "src/Ariadne.AcadNative/families/m08n_handlers.inc:m08nModuleLifecycleEvidence",
+        "tests/unit/test_module_lifecycle_r2.py"
+      ]
+    },
+    {
+      "operation": "module.lifecycle.on_unload_dwg",
+      "final_state": "implemented",
+      "decision": "native_lifecycle_evidence_status_only",
+      "handler": "m08nDispatch",
+      "agent_exposed": true,
+      "writes_dwg": false,
+      "raw_command_agent_surface": false,
+      "actual_lifecycle_callback_invoked": false,
+      "synthetic_loader_message_dispatched": false,
+      "evidence_refs": [
+        "src/Ariadne.AcadNative/families/m08n_handlers.inc:m08nModuleLifecycleEvidence",
+        "tests/unit/test_module_lifecycle_r2.py"
+      ]
+    },
+    {
+      "operation": "module.lifecycle.other",
+      "final_state": "implemented",
+      "decision": "native_lifecycle_evidence_status_only",
+      "handler": "m08nDispatch",
+      "agent_exposed": true,
+      "writes_dwg": false,
+      "raw_command_agent_surface": false,
+      "actual_lifecycle_callback_invoked": false,
+      "synthetic_loader_message_dispatched": false,
+      "evidence_refs": [
+        "src/Ariadne.AcadNative/families/m08n_handlers.inc:m08nModuleLifecycleEvidence",
+        "tests/unit/test_module_lifecycle_r2.py"
+      ]
+    },
+    {
+      "operation": "module.lifecycle.unload",
+      "final_state": "implemented",
+      "decision": "native_lifecycle_evidence_status_only",
+      "handler": "m08nDispatch",
+      "agent_exposed": true,
+      "writes_dwg": false,
+      "raw_command_agent_surface": false,
+      "actual_lifecycle_callback_invoked": false,
+      "synthetic_loader_message_dispatched": false,
+      "evidence_refs": [
+        "src/Ariadne.AcadNative/families/m08n_handlers.inc:m08nModuleLifecycleEvidence",
+        "tests/unit/test_module_lifecycle_r2.py"
+      ]
+    }
+  ],
+  "validated_at": "2026-06-23T15:44:14.276537+00:00",
+  "tests": {
+    "pytest": "493 passed, 20 skipped",
+    "cadctl_registry_coverage": "status ok; operation_count 517; implemented 464; blocked 53; consistent true",
+    "reconcile_native_registry": "dry-run; coded 424; conflicts 0; drift 0",
+    "json_operation_coverage_latest": "parsed ok"
+  },
+  "native_build": {
+    "exit_code": 0,
+    "ref": "reports/tickets/WAVE4X_LOADER_DOC_R2_native_build.json"
+  }
+}

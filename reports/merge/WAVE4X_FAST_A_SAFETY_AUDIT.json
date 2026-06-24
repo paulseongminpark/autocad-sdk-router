@@ -1,0 +1,161 @@
+{
+  "doc_sendstring": {
+    "status": "blocked",
+    "blocked_reason": "SAFETY_FORBIDDEN: doc.sendstring uses AcApDocManager::sendStringToExecute to enqueue command text into an AutoCAD document command stream. R2 rechecked internal-only gating and rejected an agent operation because even policy-gated arbitrary command strings would be a raw command surface; safe bespoke typed handlers must be implemented instead.",
+    "agent_exposed_policy": false,
+    "agent_exposed": false
+  },
+  "raw_command_exposure": [
+    [
+      "command.invoke.coroutine",
+      "blocked",
+      null,
+      null,
+      "SAFETY_FORBIDDEN: raw command dispatch is blocked in M08O fallback policy. Fallbacks are managed/.NET/LISP-only and do not expose direct command strings."
+    ],
+    [
+      "command.invoke.sync",
+      "blocked",
+      null,
+      null,
+      "SAFETY_FORBIDDEN: raw command dispatch is blocked in M08O fallback policy. Fallbacks are managed/.NET/LISP-only and do not expose direct command strings."
+    ],
+    [
+      "command.invoke.sync.resbuf",
+      "blocked",
+      null,
+      null,
+      "SAFETY_FORBIDDEN: raw command dispatch is blocked in M08O fallback policy. Fallbacks are managed/.NET/LISP-only and do not expose direct command strings."
+    ],
+    [
+      "doc.sendstring",
+      "blocked",
+      false,
+      false,
+      "SAFETY_FORBIDDEN: doc.sendstring uses AcApDocManager::sendStringToExecute to enqueue command text into an AutoCAD document command stream. R2 rechecked internal-only gating and rejected an agent operation because even policy-gated arbitrary command strings would be a raw command surface; safe bespoke typed handlers must be implemented instead."
+    ],
+    [
+      "automate.com.send_command",
+      "blocked",
+      false,
+      null,
+      "SAFETY_FORBIDDEN: COM SendCommand is raw command-string dispatch and must not be exposed to agents."
+    ],
+    [
+      "define.assocsurface.result",
+      "blocked",
+      false,
+      null,
+      "SAFETY_FORBIDDEN: associative surface result extraction depends on a prior ASM/evaluator-created action body result. CAD OS has no solver-free implementation that can honestly produce the result for arbitrary drawings."
+    ],
+    [
+      "extend.customentity.draw_viewport",
+      "implemented",
+      null,
+      null,
+      null
+    ],
+    [
+      "extend.customentity.draw_world",
+      "implemented",
+      null,
+      null,
+      null
+    ],
+    [
+      "overrule.drawable.install",
+      "implemented",
+      null,
+      null,
+      null
+    ],
+    [
+      "command.queue.post",
+      "blocked",
+      null,
+      null,
+      "SAFETY_FORBIDDEN: raw command dispatch is blocked in M08O fallback policy. Fallbacks are managed/.NET/LISP-only and do not expose direct command strings."
+    ],
+    [
+      "render.draw.viewportgeom",
+      "implemented",
+      null,
+      null,
+      null
+    ],
+    [
+      "render.draw.worldgeom",
+      "implemented",
+      null,
+      null,
+      null
+    ],
+    [
+      "render.drawable.def",
+      "implemented",
+      null,
+      null,
+      null
+    ],
+    [
+      "render.entity.worlddraw_override",
+      "implemented",
+      null,
+      null,
+      null
+    ],
+    [
+      "command.menu.invoke",
+      "blocked",
+      null,
+      null,
+      "SAFETY_FORBIDDEN: acedMenuCmd executes arbitrary menu/command macros in the active editor; exposing it as an agent API would be a raw command surface and may mutate the user session."
+    ],
+    [
+      "editor.toolpalette.tool_execute",
+      "blocked",
+      null,
+      null,
+      "SAFETY_FORBIDDEN: AcTcTool::Execute programmatically fires a tool and may run arbitrary command/mutation behavior in the active editor; no raw tool execution is exposed to agents."
+    ]
+  ],
+  "synthetic_ops": [],
+  "live_apply_patch": {
+    "status": "deprecated",
+    "replacement_ref": "apply.patch + tools/patch_engine.py::apply_native_staged",
+    "evidence_refs": [
+      "docs/OPERATION_REGISTRY_SPEC.md",
+      "CADOS_M01 Lane D native triage (inspect.database.graph insertion point)",
+      "reports/tickets/WAVE4X_DB_TXN_WRITE.md",
+      "reports/tickets/WAVE4X_DB_TXN_WRITE.json",
+      "reports/tickets/WAVE4X_DB_TXN_WRITE_OPS.json",
+      "tools/patch_engine.py::apply_staged",
+      "config/operations.v2.json#apply.patch",
+      "tools/patch_engine.py::apply_native_staged",
+      "tests/unit/test_patch_engine_policy.py::TestApplyNativeStagedLifecycleMocked"
+    ],
+    "write_original": null,
+    "policy": {
+      "source": "config/policy.v2.json",
+      "status_policy": "deprecated",
+      "default_write_mode": "live_edit",
+      "no_original_write_default": true,
+      "runtime_behavior": "deprecated_use_staged_governor"
+    }
+  },
+  "plot_engine_run": {
+    "status": "implemented",
+    "evidence_refs": [
+      "config/autocad_native_arx_operation_catalog.json#plot.engine.run",
+      "src/Ariadne.AcadNative/families/m08l_handlers.inc:m08lDispatch",
+      "reports/tickets/WAVE4X_VISUAL_PLOT.md",
+      "build:native_acad exit 0"
+    ],
+    "attended": {}
+  },
+  "counts": {
+    "implemented": 485,
+    "deprecated": 1,
+    "blocked": 31
+  }
+}

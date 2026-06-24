@@ -83,7 +83,7 @@ _CREATE = [
     "write.entity.minsert",
     "write.entity.tolerance",
 ]
-# Modify / geometry-edit ops implemented. (7)
+# Modify / geometry-edit ops implemented. (11)
 _MODIFY = [
     "modify.entity.transform",
     "modify.entity.copy_transformed",
@@ -93,18 +93,18 @@ _MODIFY = [
     "modify.curve.offset",
     "modify.curve.split",
     "modify.curve.to_spline",
+    "edit.subentity.add_paths",
+    "edit.subentity.delete_paths",
+    "edit.subentity.transform",
 ]
 
 _IMPLEMENTED = _CREATE + _MODIFY
 
 # Deferred/hard-blocked ops that must NOT appear in HasOp (honest contract).
-# Blockers documented in reports/tickets/M08G.md.
-_DEFERRED = [
-    # editor-bound subentity association
-    "edit.subentity.add_paths",
-    "edit.subentity.delete_paths",
-    "edit.subentity.transform",
-]
+# The original 3 editor-bound subentity mutations were reopened in Wave4X with an
+# explicit staged AcDbFullSubentPath contract, so this family currently has no
+# remaining deferred op tracked by this source-level test.
+_DEFERRED = []
 
 
 def _read():
@@ -168,17 +168,15 @@ class TestM08GHandlers(unittest.TestCase):
         )
 
     def test_implemented_count(self):
-        # 34 entity-create + 8 modify = 42 real staged-write handlers after Wave3 Pane2.
-        # The remaining 3 ops of the 45-op brief are editor-bound subentity edits, left OUT
-        # of HasOp on purpose (no fake pass).
+        # 34 entity-create + 11 modify/subentity-edit = the full 45-op staged-write brief.
         self.assertEqual(len(_CREATE), 34)
-        self.assertEqual(len(_MODIFY), 8)
-        self.assertEqual(len(_IMPLEMENTED), 42)
-        self.assertEqual(len(set(_IMPLEMENTED)), 42, "duplicate op id in the implemented list")
-        self.assertEqual(len(self.hasop), 42)
-        # the brief is 45 ops total: 42 implemented + 3 deferred.
+        self.assertEqual(len(_MODIFY), 11)
+        self.assertEqual(len(_IMPLEMENTED), 45)
+        self.assertEqual(len(set(_IMPLEMENTED)), 45, "duplicate op id in the implemented list")
+        self.assertEqual(len(self.hasop), 45)
+        # the brief is 45 ops total: all are now implemented in this family.
         self.assertEqual(len(_IMPLEMENTED) + len(_DEFERRED), 45)
-        self.assertEqual(len(set(_DEFERRED)), 3, "duplicate op id in the deferred list")
+        self.assertEqual(len(set(_DEFERRED)), 0, "duplicate op id in the deferred list")
 
     def test_minimum_implemented_floor(self):
         # A sane floor independent of the exact list: at least 20 ops, and both the
@@ -247,6 +245,18 @@ class TestM08GHandlers(unittest.TestCase):
         self.assertIn("getSpline", self.src)
         # the void-ptr-array piece appender frees failed/unappendable elements.
         self.assertRegex(self.src, r"delete static_cast<AcDbEntity\*>")
+
+    def test_subentity_write_ops_use_real_apis_and_explicit_path_contract(self):
+        self.assertIn('op == "edit.subentity.add_paths"', self.src)
+        self.assertIn('op == "edit.subentity.delete_paths"', self.src)
+        self.assertIn('op == "edit.subentity.transform"', self.src)
+        self.assertIn("AcDbFullSubentPathArray", self.src)
+        self.assertIn("m08gReadSubentPaths", self.src)
+        self.assertIn("addSubentPaths", self.src)
+        self.assertIn("deleteSubentPaths", self.src)
+        self.assertIn("transformSubentPathsBy", self.src)
+        self.assertIn("getGsMarkersAtSubentPath", self.src)
+        self.assertIn("getSubentPathGeomExtents", self.src)
 
 
 if __name__ == "__main__":

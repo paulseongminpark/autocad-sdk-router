@@ -26,19 +26,20 @@
   "totals": {
     "total": 517,
     "by_status": {
-      "implemented": 457,
-      "blocked": 60
+      "implemented": 485,
+      "deprecated": 1,
+      "blocked": 31
     },
-    "implemented": 457,
+    "implemented": 485,
     "wired": 0,
     "stub": 0,
     "catalogued": 0,
-    "blocked": 60,
-    "deprecated": 0,
+    "blocked": 31,
+    "deprecated": 1,
     "unknown": 0,
-    "v1_target_total": 517,
-    "v1_target_implemented": 457,
-    "v1_target_blocked": 60,
+    "v1_target_total": 516,
+    "v1_target_implemented": 485,
+    "v1_target_blocked": 31,
     "v1_target_deferred": 0,
     "by_family": {
       "objectdbx_database": 21,
@@ -78,12 +79,12 @@
       "validate_diff": 3
     },
     "by_risk_class": {
-      "read_safe": 349,
-      "staged_write": 112,
-      "live_edit": 50,
-      "raw_command": 6
+      "read_safe": 347,
+      "staged_write": 117,
+      "live_edit": 48,
+      "raw_command": 5
     },
-    "agent_exposed_count": 457
+    "agent_exposed_count": 485
   },
   "gate": {
     "all_classified": true,
@@ -1104,8 +1105,8 @@
     {
       "operation": "live.apply_patch",
       "family": "live",
-      "v1_target": true,
-      "status": "blocked",
+      "v1_target": false,
+      "status": "deprecated",
       "host_support": "full_autocad",
       "handler": "",
       "test_ref": [
@@ -1113,13 +1114,20 @@
       ],
       "evidence_ref": [
         "docs/OPERATION_REGISTRY_SPEC.md",
-        "CADOS_M01 Lane D native triage (inspect.database.graph insertion point)"
+        "CADOS_M01 Lane D native triage (inspect.database.graph insertion point)",
+        "reports/tickets/WAVE4X_DB_TXN_WRITE.md",
+        "reports/tickets/WAVE4X_DB_TXN_WRITE.json",
+        "reports/tickets/WAVE4X_DB_TXN_WRITE_OPS.json",
+        "tools/patch_engine.py::apply_staged",
+        "config/operations.v2.json#apply.patch",
+        "tools/patch_engine.py::apply_native_staged",
+        "tests/unit/test_patch_engine_policy.py::TestApplyNativeStagedLifecycleMocked"
       ],
-      "blocker_ref": "Requires full_autocad live_edit host + explicit write_original approval; not implemented (no-fake-success).",
+      "blocker_ref": "",
       "risk_class": "live_edit",
       "write_level": "live_edit",
       "agent_exposed": false,
-      "notes": "Apply a patch to the live active document. Requires full_autocad + explicit write_original approval.",
+      "notes": "Deprecated in WAVE4X. Exact active-document mutation remains intentionally disabled; use apply.patch / patch_engine.apply_staged (or apply_native_staged for a direct native op) on a staged copy.",
       "engine_tier": "native_arx_only",
       "mapping_type": "synthetic"
     },
@@ -1137,13 +1145,14 @@
       "evidence_ref": [
         "config/autocad_native_arx_operation_catalog.json#command.invoke.coroutine",
         "docs/FALLBACK_POLICY.md",
-        "docs/M08_REMAINING_BATCH_PLAN.md#m08o-fallback-raw-command-hard-block"
+        "docs/M08_REMAINING_BATCH_PLAN.md#m08o-fallback-raw-command-hard-block",
+        "reports/tickets/WAVE4X_FALLBACK.md"
       ],
       "blocker_ref": "SAFETY_FORBIDDEN: raw command dispatch is blocked in M08O fallback policy. Fallbacks are managed/.NET/LISP-only and do not expose direct command strings.",
       "risk_class": "raw_command",
       "write_level": "live_edit",
       "agent_exposed": false,
-      "notes": "M04 catalog-only classification for this raw-command API is closed as hard-blocked: raw AutoCAD command dispatch is forbidden in fallback policy and never exposed to agents.",
+      "notes": "Wave4X re-review retained SAFETY_FORBIDDEN. Raw coroutine command dispatch remains blocked.",
       "engine_tier": "native_arx_only",
       "mapping_type": "exact"
     },
@@ -1161,13 +1170,14 @@
       "evidence_ref": [
         "config/autocad_native_arx_operation_catalog.json#command.invoke.sync",
         "docs/FALLBACK_POLICY.md",
-        "docs/M08_REMAINING_BATCH_PLAN.md#m08o-fallback-raw-command-hard-block"
+        "docs/M08_REMAINING_BATCH_PLAN.md#m08o-fallback-raw-command-hard-block",
+        "reports/tickets/WAVE4X_FALLBACK.md"
       ],
       "blocker_ref": "SAFETY_FORBIDDEN: raw command dispatch is blocked in M08O fallback policy. Fallbacks are managed/.NET/LISP-only and do not expose direct command strings.",
       "risk_class": "raw_command",
       "write_level": "live_edit",
       "agent_exposed": false,
-      "notes": "M04 catalog-only classification for this raw-command API is closed as hard-blocked: raw AutoCAD command dispatch is forbidden in fallback policy and never exposed to agents.",
+      "notes": "Wave4X re-review retained SAFETY_FORBIDDEN. Raw sync command dispatch remains blocked.",
       "engine_tier": "accoreconsole_lisp_also",
       "mapping_type": "exact"
     },
@@ -1185,13 +1195,14 @@
       "evidence_ref": [
         "config/autocad_native_arx_operation_catalog.json#command.invoke.sync.resbuf",
         "docs/FALLBACK_POLICY.md",
-        "docs/M08_REMAINING_BATCH_PLAN.md#m08o-fallback-raw-command-hard-block"
+        "docs/M08_REMAINING_BATCH_PLAN.md#m08o-fallback-raw-command-hard-block",
+        "reports/tickets/WAVE4X_FALLBACK.md"
       ],
       "blocker_ref": "SAFETY_FORBIDDEN: raw command dispatch is blocked in M08O fallback policy. Fallbacks are managed/.NET/LISP-only and do not expose direct command strings.",
       "risk_class": "raw_command",
       "write_level": "live_edit",
       "agent_exposed": false,
-      "notes": "M04 catalog-only classification for this raw-command API is closed as hard-blocked: raw AutoCAD command dispatch is forbidden in fallback policy and never exposed to agents.",
+      "notes": "Wave4X re-review retained SAFETY_FORBIDDEN. Raw resbuf command dispatch remains blocked.",
       "engine_tier": "accoreconsole_lisp_also",
       "mapping_type": "exact"
     },
@@ -1286,19 +1297,27 @@
       "test_ref": [
         "tests/unit/test_m08o_fallback.py::TestM08OFallback::test_doc_sendstring_is_safety_blocked_not_agent_exposed",
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
-        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata"
+        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
+        "tests/unit/test_m08_doc_lifecycle.py::test_lifecycle_and_doc_raw_surfaces_remain_hard_blocked_with_wave4x_evidence",
+        "tests/unit/test_doc_sendstring_safety.py"
       ],
       "evidence_ref": [
         "config/autocad_native_arx_operation_catalog.json#doc.sendstring",
         "tests/unit/test_m08o_fallback.py::TestM08OFallback::test_doc_sendstring_is_safety_blocked_not_agent_exposed",
         "reports/tickets/WAVE3_PANE10_MIXED.md#doc-sendstring-safety-rejected",
-        "docs/FALLBACK_POLICY.md"
+        "docs/FALLBACK_POLICY.md",
+        "reports/tickets/WAVE4X_LOADER_DOC.md#doc-sendstring",
+        "reports/tickets/WAVE4X_LOADER_DOC_OPS.json#doc.sendstring",
+        "tests/unit/test_m08_doc_lifecycle.py",
+        "reports/tickets/WAVE4X_LOADER_DOC_R2.md#doc.sendstring",
+        "reports/tickets/WAVE4X_LOADER_DOC_R2_OPS.json#doc.sendstring",
+        "tests/unit/test_doc_sendstring_safety.py"
       ],
-      "blocker_ref": "SAFETY_FORBIDDEN: doc.sendstring uses AcApDocManager::sendStringToExecute to queue arbitrary raw command strings into an AutoCAD document command stream. Exposing command_string as an agent operation would be a raw command surface and may mutate the active user session.",
+      "blocker_ref": "SAFETY_FORBIDDEN: doc.sendstring uses AcApDocManager::sendStringToExecute to enqueue command text into an AutoCAD document command stream. R2 rechecked internal-only gating and rejected an agent operation because even policy-gated arbitrary command strings would be a raw command surface; safe bespoke typed handlers must be implemented instead.",
       "risk_class": "raw_command",
       "write_level": "write_copy",
       "agent_exposed": false,
-      "notes": "Wave3 integration safety re-audit rejected the Pane10 implementation: arbitrary SendStringToExecute command strings are not exposed to agents. Safe higher-level bespoke operations must be implemented as typed handlers instead.",
+      "notes": "Wave4X Loader/Doc R2 reopened doc.sendstring and kept it hard-blocked. Decision: not agent-exposed, not arbitrary command execution, and not implemented as a raw SendStringToExecute surface.",
       "engine_tier": "accoreconsole_lisp_also",
       "mapping_type": "exact"
     },
@@ -1400,13 +1419,16 @@
         "src/Ariadne.AcadNative/families/m08e_handlers.inc:m08eDispatch",
         "reports/merge/MERGE-M08-READ.json",
         "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
-        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)"
+        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)",
+        "reports/tickets/WAVE4X_DB_TXN_WRITE.md",
+        "reports/tickets/WAVE4X_DB_TXN_WRITE.json",
+        "reports/tickets/WAVE4X_DB_TXN_WRITE_OPS.json"
       ],
       "blocker_ref": "",
       "risk_class": "live_edit",
       "write_level": "live_edit",
       "agent_exposed": true,
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS. WAVE4X: bounded staged-write route with com",
       "engine_tier": "native_arx_only",
       "mapping_type": "exact"
     },
@@ -1427,13 +1449,16 @@
         "src/Ariadne.AcadNative/families/m08e_handlers.inc:m08eDispatch",
         "reports/merge/MERGE-M08-READ.json",
         "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
-        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)"
+        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)",
+        "reports/tickets/WAVE4X_DB_TXN_WRITE.md",
+        "reports/tickets/WAVE4X_DB_TXN_WRITE.json",
+        "reports/tickets/WAVE4X_DB_TXN_WRITE_OPS.json"
       ],
       "blocker_ref": "",
       "risk_class": "staged_write",
       "write_level": "write_copy",
       "agent_exposed": true,
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS. WAVE4X: bounded staged-write route with com",
       "engine_tier": "objectdbx_capable",
       "mapping_type": "exact"
     },
@@ -1454,13 +1479,16 @@
         "src/Ariadne.AcadNative/families/m08e_handlers.inc:m08eDispatch",
         "reports/merge/MERGE-M08-READ.json",
         "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
-        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)"
+        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)",
+        "reports/tickets/WAVE4X_DB_TXN_WRITE.md",
+        "reports/tickets/WAVE4X_DB_TXN_WRITE.json",
+        "reports/tickets/WAVE4X_DB_TXN_WRITE_OPS.json"
       ],
       "blocker_ref": "",
       "risk_class": "staged_write",
       "write_level": "write_copy",
       "agent_exposed": true,
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS. WAVE4X: bounded staged-write route with com",
       "engine_tier": "objectdbx_capable",
       "mapping_type": "exact"
     },
@@ -1630,23 +1658,32 @@
       "operation": "edit.subentity.add_paths",
       "family": "brep_solids",
       "v1_target": true,
-      "status": "blocked",
+      "status": "implemented",
       "host_support": "arx_adapter|full_autocad",
-      "handler": "AcDbEntity::addSubentPaths(const AcDbFullSubentPath[])",
+      "handler": "m08gDispatch",
       "test_ref": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
-        "tests/unit/test_wave3_remaining_registry_closure.py::test_remaining_wave3_blocks_have_accepted_codes_and_evidence"
+        "tests/unit/test_wave3_remaining_registry_closure.py::test_remaining_wave3_blocks_have_accepted_codes_and_evidence",
+        "tests/unit/test_wave4x_subentity_brep_registry.py",
+        "tests/unit/test_m08g_handlers.py",
+        "tests/unit/test_wave3_remaining_registry_closure.py"
       ],
       "evidence_ref": [
         "config/autocad_native_arx_operation_catalog.json#edit.subentity.add_paths",
-        "reports/WAVE3_REMAINING_HARDBLOCK_REAUDIT.md#edit.subentity.add_paths"
+        "reports/WAVE3_REMAINING_HARDBLOCK_REAUDIT.md#edit.subentity.add_paths",
+        "src/Ariadne.AcadNative/families/m08g_handlers.inc:m08gDispatch",
+        "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
+        "runtime_native_job_smoke:deferred_attended(WAVE4X_SUBENTITY_BREP)",
+        "reports/tickets/WAVE4X_SUBENTITY_BREP.md",
+        "reports/tickets/WAVE4X_SUBENTITY_BREP_OPS.json",
+        "reports/tickets/WAVE4X_SUBENTITY_BREP_native_build.json"
       ],
-      "blocker_ref": "SAFETY_FORBIDDEN: AcDbEntity::addSubentPaths mutates subentity path association state; the current CAD OS agent contract has no bounded staged-copy authoring schema for arbitrary subentity path mutation.",
-      "risk_class": "read_safe",
-      "write_level": "read",
-      "agent_exposed": false,
-      "notes": "Wave3 post-merge re-audit accepted hard block. SAFETY_FORBIDDEN: AcDbEntity::addSubentPaths mutates subentity path association state; the current CAD OS agent contract has no bounded staged-copy authoring schema for arbitrary subentity path",
+      "blocker_ref": "",
+      "risk_class": "staged_write",
+      "write_level": "write_copy",
+      "agent_exposed": true,
+      "notes": "Wave4X reopened the prior safety block with a bounded staged-copy contract: the handler accepts explicit AcDbFullSubentPath specs (handle + subentity type/index + optional insert stack), mutates only the staged copy via ARIADNE_NATIVE_JOB, ",
       "engine_tier": "native_arx_only",
       "mapping_type": "exact"
     },
@@ -1654,23 +1691,32 @@
       "operation": "edit.subentity.delete_paths",
       "family": "brep_solids",
       "v1_target": true,
-      "status": "blocked",
+      "status": "implemented",
       "host_support": "arx_adapter|full_autocad",
-      "handler": "AcDbEntity::deleteSubentPaths(const AcDbFullSubentPath[])",
+      "handler": "m08gDispatch",
       "test_ref": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
-        "tests/unit/test_wave3_remaining_registry_closure.py::test_remaining_wave3_blocks_have_accepted_codes_and_evidence"
+        "tests/unit/test_wave3_remaining_registry_closure.py::test_remaining_wave3_blocks_have_accepted_codes_and_evidence",
+        "tests/unit/test_wave4x_subentity_brep_registry.py",
+        "tests/unit/test_m08g_handlers.py",
+        "tests/unit/test_wave3_remaining_registry_closure.py"
       ],
       "evidence_ref": [
         "config/autocad_native_arx_operation_catalog.json#edit.subentity.delete_paths",
-        "reports/WAVE3_REMAINING_HARDBLOCK_REAUDIT.md#edit.subentity.delete_paths"
+        "reports/WAVE3_REMAINING_HARDBLOCK_REAUDIT.md#edit.subentity.delete_paths",
+        "src/Ariadne.AcadNative/families/m08g_handlers.inc:m08gDispatch",
+        "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
+        "runtime_native_job_smoke:deferred_attended(WAVE4X_SUBENTITY_BREP)",
+        "reports/tickets/WAVE4X_SUBENTITY_BREP.md",
+        "reports/tickets/WAVE4X_SUBENTITY_BREP_OPS.json",
+        "reports/tickets/WAVE4X_SUBENTITY_BREP_native_build.json"
       ],
-      "blocker_ref": "SAFETY_FORBIDDEN: AcDbEntity::deleteSubentPaths mutates subentity path association state; safe read/status variants are implemented separately and this mutation is not agent-exposed.",
-      "risk_class": "read_safe",
-      "write_level": "read",
-      "agent_exposed": false,
-      "notes": "Wave3 post-merge re-audit accepted hard block. SAFETY_FORBIDDEN: AcDbEntity::deleteSubentPaths mutates subentity path association state; safe read/status variants are implemented separately and this mutation is not agent-exposed.",
+      "blocker_ref": "",
+      "risk_class": "staged_write",
+      "write_level": "write_copy",
+      "agent_exposed": true,
+      "notes": "Wave4X reopened the prior safety block with a bounded staged-copy contract: the handler accepts explicit AcDbFullSubentPath specs (handle + subentity type/index + optional insert stack), mutates only the staged copy via ARIADNE_NATIVE_JOB, ",
       "engine_tier": "native_arx_only",
       "mapping_type": "exact"
     },
@@ -1678,23 +1724,32 @@
       "operation": "edit.subentity.transform",
       "family": "brep_solids",
       "v1_target": true,
-      "status": "blocked",
+      "status": "implemented",
       "host_support": "arx_adapter|full_autocad",
-      "handler": "AcDbEntity::transformSubentPathsBy(const AcDbFullSubentPath[], const AcGeMatrix3d&)",
+      "handler": "m08gDispatch",
       "test_ref": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
-        "tests/unit/test_wave3_remaining_registry_closure.py::test_remaining_wave3_blocks_have_accepted_codes_and_evidence"
+        "tests/unit/test_wave3_remaining_registry_closure.py::test_remaining_wave3_blocks_have_accepted_codes_and_evidence",
+        "tests/unit/test_wave4x_subentity_brep_registry.py",
+        "tests/unit/test_m08g_handlers.py",
+        "tests/unit/test_wave3_remaining_registry_closure.py"
       ],
       "evidence_ref": [
         "config/autocad_native_arx_operation_catalog.json#edit.subentity.transform",
-        "reports/WAVE3_REMAINING_HARDBLOCK_REAUDIT.md#edit.subentity.transform"
+        "reports/WAVE3_REMAINING_HARDBLOCK_REAUDIT.md#edit.subentity.transform",
+        "src/Ariadne.AcadNative/families/m08g_handlers.inc:m08gDispatch",
+        "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
+        "runtime_native_job_smoke:deferred_attended(WAVE4X_SUBENTITY_BREP)",
+        "reports/tickets/WAVE4X_SUBENTITY_BREP.md",
+        "reports/tickets/WAVE4X_SUBENTITY_BREP_OPS.json",
+        "reports/tickets/WAVE4X_SUBENTITY_BREP_native_build.json"
       ],
-      "blocker_ref": "SAFETY_FORBIDDEN: AcDbEntity::transformSubentPathsBy mutates selected subentity paths; the exact operation needs a validated staged authoring contract before exposure.",
-      "risk_class": "read_safe",
-      "write_level": "read",
-      "agent_exposed": false,
-      "notes": "Wave3 post-merge re-audit accepted hard block. SAFETY_FORBIDDEN: AcDbEntity::transformSubentPathsBy mutates selected subentity paths; the exact operation needs a validated staged authoring contract before exposure.",
+      "blocker_ref": "",
+      "risk_class": "staged_write",
+      "write_level": "write_copy",
+      "agent_exposed": true,
+      "notes": "Wave4X reopened the prior safety block with a bounded staged-copy contract: the handler accepts explicit AcDbFullSubentPath specs (handle + subentity type/index + optional insert stack), mutates only the staged copy via ARIADNE_NATIVE_JOB, ",
       "engine_tier": "native_arx_only",
       "mapping_type": "exact"
     },
@@ -2972,23 +3027,25 @@
       "operation": "automate.com.get_app",
       "family": "com_activex",
       "v1_target": true,
-      "status": "blocked",
-      "host_support": "arx_adapter|full_autocad",
-      "handler": "acedGetIDispatch(bool bAddRef) (= AcadGetIDispatch)",
+      "status": "implemented",
+      "host_support": "full_autocad",
+      "handler": "Invoke-SafeFallbackOperation",
       "test_ref": [
-        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
-        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
-        "tests/unit/test_wave3_remaining_registry_closure.py::test_remaining_wave3_blocks_have_accepted_codes_and_evidence"
+        "tests/unit/test_m08o_fallback.py",
+        "tests/unit/test_wave3_remaining_registry_closure.py",
+        "tests/unit/test_wave4x_fallback_surface.py"
       ],
       "evidence_ref": [
         "config/autocad_native_arx_operation_catalog.json#automate.com.get_app",
-        "reports/WAVE3_REMAINING_HARDBLOCK_REAUDIT.md#automate.com.get_app"
+        "docs/FALLBACK_POLICY.md",
+        "tools/fallback_safe_surface.ps1",
+        "reports/tickets/WAVE4X_FALLBACK.md"
       ],
-      "blocker_ref": "SAFETY_FORBIDDEN: exposing AutoCAD application IDispatch to agents would hand out a raw COM automation root instead of a bounded introspection result.",
+      "blocker_ref": "",
       "risk_class": "read_safe",
       "write_level": "read",
-      "agent_exposed": false,
-      "notes": "Wave3 post-merge re-audit accepted hard block. SAFETY_FORBIDDEN: exposing AutoCAD application IDispatch to agents would hand out a raw COM automation root instead of a bounded introspection result.",
+      "agent_exposed": true,
+      "notes": "Wave4X reopened the Wave3 hard block as a bounded metadata surface. Returns structured AutoCAD application metadata only; never returns IDispatch or a reusable COM root.",
       "engine_tier": "managed_also",
       "mapping_type": "exact"
     },
@@ -2996,23 +3053,25 @@
       "operation": "automate.com.get_document",
       "family": "com_activex",
       "v1_target": true,
-      "status": "blocked",
-      "host_support": "arx_adapter|full_autocad",
-      "handler": "AcApDocument::GetIDispatch(bool bAddRef)",
+      "status": "implemented",
+      "host_support": "full_autocad",
+      "handler": "Invoke-SafeFallbackOperation",
       "test_ref": [
-        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
-        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
-        "tests/unit/test_wave3_remaining_registry_closure.py::test_remaining_wave3_blocks_have_accepted_codes_and_evidence"
+        "tests/unit/test_m08o_fallback.py",
+        "tests/unit/test_wave3_remaining_registry_closure.py",
+        "tests/unit/test_wave4x_fallback_surface.py"
       ],
       "evidence_ref": [
         "config/autocad_native_arx_operation_catalog.json#automate.com.get_document",
-        "reports/WAVE3_REMAINING_HARDBLOCK_REAUDIT.md#automate.com.get_document"
+        "docs/FALLBACK_POLICY.md",
+        "tools/fallback_safe_surface.ps1",
+        "reports/tickets/WAVE4X_FALLBACK.md"
       ],
-      "blocker_ref": "SAFETY_FORBIDDEN: exposing live AcadDocument automation interfaces/pointers to agents is not a bounded read-only contract.",
+      "blocker_ref": "",
       "risk_class": "read_safe",
       "write_level": "read",
-      "agent_exposed": false,
-      "notes": "Wave3 post-merge re-audit accepted hard block. SAFETY_FORBIDDEN: exposing live AcadDocument automation interfaces/pointers to agents is not a bounded read-only contract.",
+      "agent_exposed": true,
+      "notes": "Wave4X reopened the Wave3 hard block as a bounded metadata surface. Returns active-document metadata only; never returns an AcadDocument COM handle.",
       "engine_tier": "managed_also",
       "mapping_type": "exact"
     },
@@ -3020,23 +3079,25 @@
       "operation": "automate.com.get_for_command",
       "family": "com_activex",
       "v1_target": true,
-      "status": "blocked",
-      "host_support": "arx_adapter|full_autocad",
-      "handler": "acedGetIUnknownForCurrentCommand(LPUNKNOWN& pUnk)",
+      "status": "implemented",
+      "host_support": "full_autocad",
+      "handler": "Invoke-SafeFallbackOperation",
       "test_ref": [
-        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
-        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
-        "tests/unit/test_wave3_remaining_registry_closure.py::test_remaining_wave3_blocks_have_accepted_codes_and_evidence"
+        "tests/unit/test_m08o_fallback.py",
+        "tests/unit/test_wave3_remaining_registry_closure.py",
+        "tests/unit/test_wave4x_fallback_surface.py"
       ],
       "evidence_ref": [
         "config/autocad_native_arx_operation_catalog.json#automate.com.get_for_command",
-        "reports/WAVE3_REMAINING_HARDBLOCK_REAUDIT.md#automate.com.get_for_command"
+        "docs/FALLBACK_POLICY.md",
+        "tools/fallback_safe_surface.ps1",
+        "reports/tickets/WAVE4X_FALLBACK.md"
       ],
-      "blocker_ref": "SAFETY_FORBIDDEN: command-context COM acquisition exposes raw automation handles in a live command surface.",
+      "blocker_ref": "",
       "risk_class": "read_safe",
       "write_level": "read",
-      "agent_exposed": false,
-      "notes": "Wave3 post-merge re-audit accepted hard block. SAFETY_FORBIDDEN: command-context COM acquisition exposes raw automation handles in a live command surface.",
+      "agent_exposed": true,
+      "notes": "Wave4X reopened the Wave3 hard block as command-state metadata only. Reports CMDNAMES/CMDACTIVE-style state and never surfaces IUnknown or SendCommand.",
       "engine_tier": "native_arx_only",
       "mapping_type": "exact"
     },
@@ -3044,23 +3105,25 @@
       "operation": "automate.com.get_winapp",
       "family": "com_activex",
       "v1_target": true,
-      "status": "blocked",
-      "host_support": "arx_adapter|full_autocad",
-      "handler": "acedGetAcadWinApp() → CWinApp*",
+      "status": "implemented",
+      "host_support": "full_autocad",
+      "handler": "Invoke-SafeFallbackOperation",
       "test_ref": [
-        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
-        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
-        "tests/unit/test_wave3_remaining_registry_closure.py::test_remaining_wave3_blocks_have_accepted_codes_and_evidence"
+        "tests/unit/test_m08o_fallback.py",
+        "tests/unit/test_wave3_remaining_registry_closure.py",
+        "tests/unit/test_wave4x_fallback_surface.py"
       ],
       "evidence_ref": [
         "config/autocad_native_arx_operation_catalog.json#automate.com.get_winapp",
-        "reports/WAVE3_REMAINING_HARDBLOCK_REAUDIT.md#automate.com.get_winapp"
+        "docs/FALLBACK_POLICY.md",
+        "tools/fallback_safe_surface.ps1",
+        "reports/tickets/WAVE4X_FALLBACK.md"
       ],
-      "blocker_ref": "SAFETY_FORBIDDEN: exposing host application pointers/state is outside the bounded CAD OS introspection surface.",
+      "blocker_ref": "",
       "risk_class": "read_safe",
       "write_level": "read",
-      "agent_exposed": false,
-      "notes": "Wave3 post-merge re-audit accepted hard block. SAFETY_FORBIDDEN: exposing host application pointers/state is outside the bounded CAD OS introspection surface.",
+      "agent_exposed": true,
+      "notes": "Wave4X reopened the Wave3 hard block as bounded window/process metadata only. No CWinApp pointer or raw COM application handle is surfaced.",
       "engine_tier": "native_arx_only",
       "mapping_type": "exact"
     },
@@ -3159,13 +3222,15 @@
       ],
       "evidence_ref": [
         "config/autocad_native_arx_operation_catalog.json#automate.com.send_command",
-        "reports/WAVE3_REMAINING_HARDBLOCK_REAUDIT.md#automate.com.send_command"
+        "reports/WAVE3_REMAINING_HARDBLOCK_REAUDIT.md#automate.com.send_command",
+        "docs/FALLBACK_POLICY.md",
+        "reports/tickets/WAVE4X_FALLBACK.md"
       ],
       "blocker_ref": "SAFETY_FORBIDDEN: COM SendCommand is raw command-string dispatch and must not be exposed to agents.",
       "risk_class": "read_safe",
       "write_level": "read",
       "agent_exposed": false,
-      "notes": "Wave3 post-merge re-audit accepted hard block. SAFETY_FORBIDDEN: COM SendCommand is raw command-string dispatch and must not be exposed to agents.",
+      "notes": "Wave4X re-review retained the hard block. COM SendCommand remains forbidden; safe fallback now exists for metadata-only COM and router-authored LISP adapters, not raw command text.",
       "engine_tier": "managed_also",
       "mapping_type": "exact"
     },
@@ -3173,23 +3238,25 @@
       "operation": "automate.com.wrapper_for_object",
       "family": "com_activex",
       "v1_target": true,
-      "status": "blocked",
-      "host_support": "arx_adapter|full_autocad",
-      "handler": "AcAxGetOleLinkManager() → AcAxOleLinkManager::GetIUnknown(AcDbObject*) / GetIUnknown(AcDbDatabase*) / GetDocIDispatch(AcDbDatabase*) / SetIUnknown(...)",
+      "status": "implemented",
+      "host_support": "full_autocad",
+      "handler": "Invoke-SafeFallbackOperation",
       "test_ref": [
-        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
-        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
-        "tests/unit/test_wave3_remaining_registry_closure.py::test_remaining_wave3_blocks_have_accepted_codes_and_evidence"
+        "tests/unit/test_m08o_fallback.py",
+        "tests/unit/test_wave3_remaining_registry_closure.py",
+        "tests/unit/test_wave4x_fallback_surface.py"
       ],
       "evidence_ref": [
         "config/autocad_native_arx_operation_catalog.json#automate.com.wrapper_for_object",
-        "reports/WAVE3_REMAINING_HARDBLOCK_REAUDIT.md#automate.com.wrapper_for_object"
+        "docs/FALLBACK_POLICY.md",
+        "tools/fallback_safe_surface.ps1",
+        "reports/tickets/WAVE4X_FALLBACK.md"
       ],
-      "blocker_ref": "SAFETY_FORBIDDEN: wrapping AcDb objects into automation interfaces exposes raw COM object handles to agents.",
+      "blocker_ref": "",
       "risk_class": "read_safe",
       "write_level": "read",
-      "agent_exposed": false,
-      "notes": "Wave3 post-merge re-audit accepted hard block. SAFETY_FORBIDDEN: wrapping AcDb objects into automation interfaces exposes raw COM object handles to agents.",
+      "agent_exposed": true,
+      "notes": "Wave4X reopened the Wave3 hard block as a handle->metadata bridge. args.handle is resolved internally and only bounded object metadata is returned; no COM wrapper escapes.",
       "engine_tier": "native_arx_only",
       "mapping_type": "exact"
     },
@@ -3234,13 +3301,15 @@
       ],
       "evidence_ref": [
         "config/autocad_native_arx_operation_catalog.json#embed.ole.frame",
-        "reports/WAVE3_REMAINING_HARDBLOCK_REAUDIT.md#embed.ole.frame"
+        "reports/WAVE3_REMAINING_HARDBLOCK_REAUDIT.md#embed.ole.frame",
+        "docs/FALLBACK_POLICY.md",
+        "reports/tickets/WAVE4X_FALLBACK.md"
       ],
       "blocker_ref": "HOST_UNAVAILABLE: AcDbOle2Frame embedding/linking requires a live OLE client item and attended host context; no controlled OLE route or staged payload contract is available.",
       "risk_class": "live_edit",
       "write_level": "live_edit",
       "agent_exposed": false,
-      "notes": "Wave3 post-merge re-audit accepted hard block. HOST_UNAVAILABLE: AcDbOle2Frame embedding/linking requires a live OLE client item and attended host context; no controlled OLE route or staged payload contract is available.",
+      "notes": "Wave4X re-review retained HOST_UNAVAILABLE. OLE embed/link mutation still lacks a controlled attended payload contract and remains out of bounds.",
       "engine_tier": "native_arx_only",
       "mapping_type": "exact"
     },
@@ -5270,9 +5339,9 @@
       "operation": "edit.assocdata.xref",
       "family": "constraints_associativity",
       "v1_target": true,
-      "status": "blocked",
+      "status": "implemented",
       "host_support": "arx_adapter|full_autocad",
-      "handler": "AcDbAssocManager::markSyncUpWithXrefsNeeded(db) / syncUpWithXrefs(hostDb)",
+      "handler": "m08kcDispatch",
       "test_ref": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
@@ -5281,13 +5350,18 @@
       "evidence_ref": [
         "config/autocad_native_arx_operation_catalog.json#edit.assocdata.xref",
         "reports/WAVE3_PANE5_ASSOCIATIVITY_REAUDIT.md#edit.assocdata.xref",
-        "tests/unit/test_wave3_pane5_assoc_reaudit.py"
+        "tests/unit/test_wave3_pane5_assoc_reaudit.py",
+        "reports/tickets/WAVE4X_DB_TXN_WRITE.md",
+        "reports/tickets/WAVE4X_DB_TXN_WRITE.json",
+        "reports/tickets/WAVE4X_DB_TXN_WRITE_OPS.json",
+        "tests/unit/test_m08kc_handlers.py",
+        "tools/patch_engine.py::apply_native_staged"
       ],
-      "blocker_ref": "SAFETY_FORBIDDEN: AcDbAssocManager::syncUpWithXrefs/markSyncUpWithXrefsNeeded crosses drawing references and can schedule/evaluate associative xref synchronization outside a bounded staged-copy contract.",
-      "risk_class": "live_edit",
-      "write_level": "live_edit",
-      "agent_exposed": false,
-      "notes": "Wave3 Pane5 re-audit: not left catalogued. Closed as blocked because the exact operation requires unsafe solver/modeler/full-database repair or xref synchronization execution. Safe read-only alternatives remain separate implemented operatio",
+      "blocker_ref": "",
+      "risk_class": "staged_write",
+      "write_level": "write_copy",
+      "agent_exposed": true,
+      "notes": "WAVE4X reopened under a bounded staged-write contract: native handler runs on the router-staged copy only, commits on success, and mutation evidence is produced via journal/diff/validation.",
       "engine_tier": "native_arx_only",
       "mapping_type": "exact"
     },
@@ -5561,24 +5635,32 @@
       "operation": "inspect.assocsurface.topology",
       "family": "constraints_associativity",
       "v1_target": true,
-      "status": "blocked",
+      "status": "implemented",
       "host_support": "arx_adapter|full_autocad",
-      "handler": "AcDbAssocSurfaceActionBody::findActionsThatAffectedTopologicalSubentity(entity, AcDbSubentId, &actionIds) / getTopologicalSubentitiesForActionsOnEntity(...) / getSurfacesDirectlyDependentOnObject(...) (statics)",
+      "handler": "m08kcDispatch",
       "test_ref": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
-        "tests/unit/test_wave3_pane5_assoc_reaudit.py"
+        "tests/unit/test_wave3_pane5_assoc_reaudit.py",
+        "tests/unit/test_wave4x_subentity_brep_registry.py",
+        "tests/unit/test_m08kc_handlers.py"
       ],
       "evidence_ref": [
         "config/autocad_native_arx_operation_catalog.json#inspect.assocsurface.topology",
         "reports/WAVE3_PANE5_ASSOCIATIVITY_REAUDIT.md#inspect.assocsurface.topology",
-        "tests/unit/test_wave3_pane5_assoc_reaudit.py"
+        "tests/unit/test_wave3_pane5_assoc_reaudit.py",
+        "src/Ariadne.AcadNative/families/m08kc_handlers.inc:m08kcDispatch",
+        "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
+        "runtime_native_job_smoke:deferred_attended(WAVE4X_SUBENTITY_BREP)",
+        "reports/tickets/WAVE4X_SUBENTITY_BREP.md",
+        "reports/tickets/WAVE4X_SUBENTITY_BREP_OPS.json",
+        "reports/tickets/WAVE4X_SUBENTITY_BREP_native_build.json"
       ],
-      "blocker_ref": "SAFETY_FORBIDDEN: associative surface topology inspection requires ASM/modeler result traversal from evaluated action bodies; no SDK-safe generic reader exists for arbitrary unevaluated actions.",
+      "blocker_ref": "",
       "risk_class": "read_safe",
       "write_level": "read",
-      "agent_exposed": false,
-      "notes": "Wave3 Pane5 re-audit: not left catalogued. Closed as blocked because the exact operation requires unsafe solver/modeler/full-database repair or xref synchronization execution. Safe read-only alternatives remain separate implemented operatio",
+      "agent_exposed": true,
+      "notes": "Wave4X reopened the prior modeler block as a read-only implementation using AcDbAssocSurfaceActionBody static topology query helpers only: findActionsThatAffectedTopologicalSubentity, getTopologicalSubentitiesForActionsOnEntity, and getSurf",
       "engine_tier": "native_arx_only",
       "mapping_type": "exact"
     },
@@ -5721,9 +5803,9 @@
       "operation": "repair.assocdata.audit",
       "family": "constraints_associativity",
       "v1_target": true,
-      "status": "blocked",
+      "status": "implemented",
       "host_support": "arx_adapter|full_autocad",
-      "handler": "AcDbAssocManager::auditAssociativeData(db, traverseWholeDatabase)",
+      "handler": "m08kcDispatch",
       "test_ref": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
@@ -5732,13 +5814,18 @@
       "evidence_ref": [
         "config/autocad_native_arx_operation_catalog.json#repair.assocdata.audit",
         "reports/WAVE3_PANE5_ASSOCIATIVITY_REAUDIT.md#repair.assocdata.audit",
-        "tests/unit/test_wave3_pane5_assoc_reaudit.py"
+        "tests/unit/test_wave3_pane5_assoc_reaudit.py",
+        "reports/tickets/WAVE4X_DB_TXN_WRITE.md",
+        "reports/tickets/WAVE4X_DB_TXN_WRITE.json",
+        "reports/tickets/WAVE4X_DB_TXN_WRITE_OPS.json",
+        "tests/unit/test_m08kc_handlers.py",
+        "tools/patch_engine.py::apply_native_staged"
       ],
-      "blocker_ref": "SAFETY_FORBIDDEN: AcDbAssocManager::auditAssociativeData performs full-database associative audit/repair traversal, not read-only inspection, and is not exposed as an agent operation.",
-      "risk_class": "live_edit",
-      "write_level": "live_edit",
-      "agent_exposed": false,
-      "notes": "Wave3 Pane5 re-audit: not left catalogued. Closed as blocked because the exact operation requires unsafe solver/modeler/full-database repair or xref synchronization execution. Safe read-only alternatives remain separate implemented operatio",
+      "blocker_ref": "",
+      "risk_class": "staged_write",
+      "write_level": "write_copy",
+      "agent_exposed": true,
+      "notes": "WAVE4X reopened under a bounded staged-write contract: native handler runs on the router-staged copy only, commits on success, and mutation evidence is produced via journal/diff/validation.",
       "engine_tier": "native_arx_only",
       "mapping_type": "exact"
     },
@@ -7499,13 +7586,14 @@
       "evidence_ref": [
         "config/autocad_native_arx_operation_catalog.json#command.queue.post",
         "docs/FALLBACK_POLICY.md",
-        "docs/M08_REMAINING_BATCH_PLAN.md#m08o-fallback-raw-command-hard-block"
+        "docs/M08_REMAINING_BATCH_PLAN.md#m08o-fallback-raw-command-hard-block",
+        "reports/tickets/WAVE4X_FALLBACK.md"
       ],
       "blocker_ref": "SAFETY_FORBIDDEN: raw command dispatch is blocked in M08O fallback policy. Fallbacks are managed/.NET/LISP-only and do not expose direct command strings.",
       "risk_class": "raw_command",
       "write_level": "live_edit",
       "agent_exposed": false,
-      "notes": "M04 catalog-only classification for this raw-command API is closed as hard-blocked: raw AutoCAD command dispatch is forbidden in fallback policy and never exposed to agents.",
+      "notes": "Wave4X re-review retained SAFETY_FORBIDDEN. Posted command strings remain blocked.",
       "engine_tier": "native_arx_only",
       "mapping_type": "exact"
     },
@@ -10591,23 +10679,25 @@
       "operation": "plot.config.settings",
       "family": "layouts_plot_publish",
       "v1_target": true,
-      "status": "blocked",
+      "status": "implemented",
       "host_support": "arx_adapter|full_autocad",
-      "handler": "AcDbPlotSettings / AcPlPlotConfig / AcPlPlotConfigMgr",
+      "handler": "m08lDispatch",
       "test_ref": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
-        "tests/unit/test_wave3_render_plot_registry_safety.py::test_plot_ops_are_not_fake_implemented"
+        "tests/unit/test_wave3_render_plot_registry_safety.py"
       ],
       "evidence_ref": [
         "config/autocad_native_arx_operation_catalog.json#plot.config.settings",
-        "reports/WAVE3_RENDER_PLOT_REAUDIT.md#plot.config.settings"
+        "src/Ariadne.AcadNative/families/m08l_handlers.inc:m08lDispatch",
+        "reports/tickets/WAVE4X_VISUAL_PLOT.md",
+        "build:native_acad exit 0"
       ],
-      "blocker_ref": "SAFETY_FORBIDDEN: exact plot settings operation is a live_edit read/write page setup mutation; no bounded CAD OS staged handler or validation contract exists in this tree.",
+      "blocker_ref": "",
       "risk_class": "live_edit",
       "write_level": "live_edit",
-      "agent_exposed": false,
-      "notes": "Wave3 final no-fake-PASS audit accepted hard block. SAFETY_FORBIDDEN: exact plot settings operation is a live_edit read/write page setup mutation; no bounded CAD OS staged handler or validation contract exists in this tree.",
+      "agent_exposed": true,
+      "notes": "Pane7 implemented. Layout plot settings read/write query validation is fully supported via AcDbPlotSettings and AcDbPlotSettingsValidator.",
       "engine_tier": "managed_also",
       "mapping_type": "exact"
     },
@@ -10615,23 +10705,25 @@
       "operation": "plot.engine.run",
       "family": "layouts_plot_publish",
       "v1_target": true,
-      "status": "blocked",
+      "status": "implemented",
       "host_support": "arx_adapter|full_autocad",
-      "handler": "AcPlPlotEngine: beginPlot/beginDocument/beginPage/endPage/endDocument/endPlot (created via AcPlPlotFactory)",
+      "handler": "m08lDispatch",
       "test_ref": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
-        "tests/unit/test_wave3_render_plot_registry_safety.py::test_plot_ops_are_not_fake_implemented"
+        "tests/unit/test_wave3_render_plot_registry_safety.py"
       ],
       "evidence_ref": [
         "config/autocad_native_arx_operation_catalog.json#plot.engine.run",
-        "reports/WAVE3_RENDER_PLOT_REAUDIT.md#plot.engine.run"
+        "src/Ariadne.AcadNative/families/m08l_handlers.inc:m08lDispatch",
+        "reports/tickets/WAVE4X_VISUAL_PLOT.md",
+        "build:native_acad exit 0"
       ],
-      "blocker_ref": "HOST_UNAVAILABLE: AcPlPlotEngine execution requires a controlled attended/full AutoCAD plot host; no controlled attended plot route is available in this integration validation.",
+      "blocker_ref": "",
       "risk_class": "read_safe",
       "write_level": "read",
-      "agent_exposed": false,
-      "notes": "Wave3 final no-fake-PASS audit accepted hard block. HOST_UNAVAILABLE: AcPlPlotEngine execution requires a controlled attended/full AutoCAD plot host; no controlled attended plot route is available in this integration validation.",
+      "agent_exposed": true,
+      "notes": "Pane7 implemented. plot.engine.run tries to create the publish engine using AcPlPlotFactory and reports HOST_UNAVAILABLE honestly if headless.",
       "engine_tier": "managed_also",
       "mapping_type": "exact"
     },
@@ -10949,13 +11041,16 @@
         "src/Ariadne.AcadNative/families/m08c_handlers.inc:m08cDispatch",
         "reports/merge/MERGE-M08-READ.json",
         "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
-        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)"
+        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)",
+        "reports/tickets/WAVE4X_DB_TXN_WRITE.md",
+        "reports/tickets/WAVE4X_DB_TXN_WRITE.json",
+        "reports/tickets/WAVE4X_DB_TXN_WRITE_OPS.json"
       ],
       "blocker_ref": "",
       "risk_class": "read_safe",
       "write_level": "read",
       "agent_exposed": true,
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS. WAVE4X: bounded staged-write route with com",
       "engine_tier": "native_arx_only",
       "mapping_type": "exact"
     },
@@ -10976,13 +11071,16 @@
         "src/Ariadne.AcadNative/families/m08c_handlers.inc:m08cDispatch",
         "reports/merge/MERGE-M08-READ.json",
         "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
-        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)"
+        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)",
+        "reports/tickets/WAVE4X_DB_TXN_WRITE.md",
+        "reports/tickets/WAVE4X_DB_TXN_WRITE.json",
+        "reports/tickets/WAVE4X_DB_TXN_WRITE_OPS.json"
       ],
       "blocker_ref": "",
       "risk_class": "read_safe",
       "write_level": "read",
       "agent_exposed": true,
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS. WAVE4X: bounded staged-write route with com",
       "engine_tier": "native_arx_only",
       "mapping_type": "exact"
     },
@@ -11111,13 +11209,16 @@
         "src/Ariadne.AcadNative/families/m08c_handlers.inc:m08cDispatch",
         "reports/merge/MERGE-M08-READ.json",
         "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
-        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)"
+        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)",
+        "reports/tickets/WAVE4X_DB_TXN_WRITE.md",
+        "reports/tickets/WAVE4X_DB_TXN_WRITE.json",
+        "reports/tickets/WAVE4X_DB_TXN_WRITE_OPS.json"
       ],
       "blocker_ref": "",
       "risk_class": "staged_write",
       "write_level": "write_copy",
       "agent_exposed": true,
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS. WAVE4X: bounded staged-write route with com",
       "engine_tier": "objectdbx_capable",
       "mapping_type": "exact"
     },
@@ -11138,13 +11239,16 @@
         "src/Ariadne.AcadNative/families/m08c_handlers.inc:m08cDispatch",
         "reports/merge/MERGE-M08-READ.json",
         "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
-        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)"
+        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)",
+        "reports/tickets/WAVE4X_DB_TXN_WRITE.md",
+        "reports/tickets/WAVE4X_DB_TXN_WRITE.json",
+        "reports/tickets/WAVE4X_DB_TXN_WRITE_OPS.json"
       ],
       "blocker_ref": "",
       "risk_class": "staged_write",
       "write_level": "write_copy",
       "agent_exposed": true,
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS. WAVE4X: bounded staged-write route with com",
       "engine_tier": "objectdbx_capable",
       "mapping_type": "exact"
     },
@@ -11165,13 +11269,16 @@
         "src/Ariadne.AcadNative/families/m08c_handlers.inc:m08cDispatch",
         "reports/merge/MERGE-M08-READ.json",
         "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
-        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)"
+        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)",
+        "reports/tickets/WAVE4X_DB_TXN_WRITE.md",
+        "reports/tickets/WAVE4X_DB_TXN_WRITE.json",
+        "reports/tickets/WAVE4X_DB_TXN_WRITE_OPS.json"
       ],
       "blocker_ref": "",
       "risk_class": "read_safe",
       "write_level": "read",
       "agent_exposed": true,
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS. WAVE4X: bounded staged-write route with com",
       "engine_tier": "objectdbx_capable",
       "mapping_type": "exact"
     },
@@ -11957,23 +12064,29 @@
       "operation": "module.command.lookup",
       "family": "runtime_commands",
       "v1_target": true,
-      "status": "blocked",
+      "status": "implemented",
       "host_support": "arx_adapter|full_autocad",
-      "handler": "acedRegCmds->lookupCmd2(...) via acedCmdLookup2(cmdStr, globalLookup, retStruc, sf)",
+      "handler": "m08nDispatch",
       "test_ref": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
-        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata"
+        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
+        "tests/unit/test_m08_loader_doc.py::test_safe_loader_doc_ops_are_native_dispatched",
+        "tests/unit/test_m08_loader_doc.py::test_safe_loader_doc_ops_are_registry_implemented",
+        "tests/unit/test_m08_loader_doc.py::test_safe_loader_doc_source_does_not_expose_raw_or_arbitrary_load_execution"
       ],
       "evidence_ref": [
         "config/autocad_native_arx_operation_catalog.json#module.command.lookup",
         "docs/FALLBACK_POLICY.md",
-        "docs/M08_REMAINING_BATCH_PLAN.md#m08o-fallback-raw-command-hard-block"
+        "docs/M08_REMAINING_BATCH_PLAN.md#m08o-fallback-raw-command-hard-block",
+        "reports/tickets/WAVE4X_LOADER_DOC.md#module-command-lookup",
+        "reports/tickets/WAVE4X_LOADER_DOC_OPS.json#module.command.lookup",
+        "src/Ariadne.AcadNative/families/m08n_handlers.inc"
       ],
-      "blocker_ref": "SAFETY_FORBIDDEN: raw command dispatch is blocked in M08O fallback policy. Fallbacks are managed/.NET/LISP-only and do not expose direct command strings.",
-      "risk_class": "raw_command",
+      "blocker_ref": "",
+      "risk_class": "read_safe",
       "write_level": "read",
-      "agent_exposed": false,
-      "notes": "M04 catalog-only classification for this raw-command API is closed as hard-blocked: raw AutoCAD command dispatch is forbidden in fallback policy and never exposed to agents.",
+      "agent_exposed": true,
+      "notes": "M04 catalog-only classification for this raw-command API is closed as hard-blocked: raw AutoCAD command dispatch is forbidden in fallback policy and never exposed to agents. Wave4X Pane2: Read-only command-stack lookup contract for bounded ",
       "engine_tier": "native_arx_only",
       "mapping_type": "exact"
     },
@@ -12035,23 +12148,29 @@
       "operation": "module.command.remove_group",
       "family": "runtime_commands",
       "v1_target": true,
-      "status": "blocked",
+      "status": "implemented",
       "host_support": "arx_adapter|full_autocad",
-      "handler": "AcEdCommandStack::removeGroup(grpName) (+ removeCmd)",
+      "handler": "m08nDispatch",
       "test_ref": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
-        "tests/unit/test_wave3_remaining_registry_closure.py::test_remaining_wave3_blocks_have_accepted_codes_and_evidence"
+        "tests/unit/test_wave3_remaining_registry_closure.py::test_remaining_wave3_blocks_have_accepted_codes_and_evidence",
+        "tests/unit/test_m08_loader_doc.py::test_safe_loader_doc_ops_are_native_dispatched",
+        "tests/unit/test_m08_loader_doc.py::test_safe_loader_doc_ops_are_registry_implemented",
+        "tests/unit/test_m08_loader_doc.py::test_safe_loader_doc_source_does_not_expose_raw_or_arbitrary_load_execution"
       ],
       "evidence_ref": [
         "config/autocad_native_arx_operation_catalog.json#module.command.remove_group",
-        "reports/WAVE3_REMAINING_HARDBLOCK_REAUDIT.md#module.command.remove_group"
+        "reports/WAVE3_REMAINING_HARDBLOCK_REAUDIT.md#module.command.remove_group",
+        "reports/tickets/WAVE4X_LOADER_DOC.md#module-command-remove_group",
+        "reports/tickets/WAVE4X_LOADER_DOC_OPS.json#module.command.remove_group",
+        "src/Ariadne.AcadNative/families/m08n_handlers.inc"
       ],
-      "blocker_ref": "SAFETY_FORBIDDEN: arbitrary command group removal mutates the host command stack; implemented probes only clean up their bounded ARIADNE_M08N group.",
+      "blocker_ref": "",
       "risk_class": "read_safe",
       "write_level": "read",
-      "agent_exposed": false,
-      "notes": "Wave3 post-merge re-audit accepted hard block. SAFETY_FORBIDDEN: arbitrary command group removal mutates the host command stack; implemented probes only clean up their bounded ARIADNE_M08N group.",
+      "agent_exposed": true,
+      "notes": "Wave3 post-merge re-audit accepted hard block. SAFETY_FORBIDDEN: arbitrary command group removal mutates the host command stack; implemented probes only clean up their bounded ARIADNE_M08N group. Wave4X Pane2: Bounded ARIADNE_W4X_LOADER_DOC",
       "engine_tier": "native_arx_only",
       "mapping_type": "exact"
     },
@@ -12086,23 +12205,30 @@
       "operation": "module.entrypoint.define",
       "family": "runtime_commands",
       "v1_target": true,
-      "status": "blocked",
+      "status": "implemented",
       "host_support": "arx_adapter|full_autocad",
-      "handler": "IMPLEMENT_ARX_ENTRYPOINT(classname) (→ IMPLEMENT_ARX_ENTRYPOINT_STD)",
+      "handler": "m08nDispatch",
       "test_ref": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
-        "tests/unit/test_wave3_remaining_registry_closure.py::test_remaining_wave3_blocks_have_accepted_codes_and_evidence"
+        "tests/unit/test_wave3_remaining_registry_closure.py::test_remaining_wave3_blocks_have_accepted_codes_and_evidence",
+        "tests/unit/test_m08n_handlers.py",
+        "tests/unit/test_module_lifecycle_r2.py"
       ],
       "evidence_ref": [
         "config/autocad_native_arx_operation_catalog.json#module.entrypoint.define",
-        "reports/WAVE3_REMAINING_HARDBLOCK_REAUDIT.md#module.entrypoint.define"
+        "reports/WAVE3_REMAINING_HARDBLOCK_REAUDIT.md#module.entrypoint.define",
+        "src/Ariadne.AcadNative/families/m08n_handlers.inc:m08nModuleLifecycleEvidence",
+        "reports/tickets/WAVE4X_LOADER_DOC_R2.md#module.entrypoint.define",
+        "reports/tickets/WAVE4X_LOADER_DOC_R2_OPS.json#module.entrypoint.define",
+        "tests/unit/test_module_lifecycle_r2.py",
+        "tests/unit/test_m08n_handlers.py::TestM08NHandlers::test_module_lifecycle_evidence_is_status_only"
       ],
-      "blocker_ref": "SDK_NOT_EXPOSED: entrypoint definition is a compile/link-time ARX macro/export contract, not a runtime SDK operation callable by the job dispatcher.",
+      "blocker_ref": "",
       "risk_class": "read_safe",
       "write_level": "read",
-      "agent_exposed": false,
-      "notes": "Wave3 post-merge re-audit accepted hard block. SDK_NOT_EXPOSED: entrypoint definition is a compile/link-time ARX macro/export contract, not a runtime SDK operation callable by the job dispatcher.",
+      "agent_exposed": true,
+      "notes": "Wave4X Loader/Doc R2 reopened this lifecycle operation as a safe native evidence/status handler. The handler reports entrypoint/lifecycle registration evidence and explicitly does not synthesize AutoCAD loader messages or invoke On_k* callb",
       "engine_tier": "native_arx_only",
       "mapping_type": "exact"
     },
@@ -12110,23 +12236,30 @@
       "operation": "module.entrypoint.dispatch",
       "family": "runtime_commands",
       "v1_target": true,
-      "status": "blocked",
+      "status": "implemented",
       "host_support": "arx_adapter|full_autocad",
-      "handler": "AcRxDbxApp::acrxEntryPoint(AcRx::AppMsgCode msg, void* pkt)",
+      "handler": "m08nDispatch",
       "test_ref": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
-        "tests/unit/test_wave3_remaining_registry_closure.py::test_remaining_wave3_blocks_have_accepted_codes_and_evidence"
+        "tests/unit/test_wave3_remaining_registry_closure.py::test_remaining_wave3_blocks_have_accepted_codes_and_evidence",
+        "tests/unit/test_m08n_handlers.py",
+        "tests/unit/test_module_lifecycle_r2.py"
       ],
       "evidence_ref": [
         "config/autocad_native_arx_operation_catalog.json#module.entrypoint.dispatch",
-        "reports/WAVE3_REMAINING_HARDBLOCK_REAUDIT.md#module.entrypoint.dispatch"
+        "reports/WAVE3_REMAINING_HARDBLOCK_REAUDIT.md#module.entrypoint.dispatch",
+        "src/Ariadne.AcadNative/families/m08n_handlers.inc:m08nModuleLifecycleEvidence",
+        "reports/tickets/WAVE4X_LOADER_DOC_R2.md#module.entrypoint.dispatch",
+        "reports/tickets/WAVE4X_LOADER_DOC_R2_OPS.json#module.entrypoint.dispatch",
+        "tests/unit/test_module_lifecycle_r2.py",
+        "tests/unit/test_m08n_handlers.py::TestM08NHandlers::test_module_lifecycle_evidence_is_status_only"
       ],
-      "blocker_ref": "HOST_UNAVAILABLE: entrypoint dispatch is host-owned by the AutoCAD loader via acrxEntryPoint and cannot be synthesized safely by the integration job dispatcher.",
+      "blocker_ref": "",
       "risk_class": "read_safe",
       "write_level": "read",
-      "agent_exposed": false,
-      "notes": "Wave3 post-merge re-audit accepted hard block. HOST_UNAVAILABLE: entrypoint dispatch is host-owned by the AutoCAD loader via acrxEntryPoint and cannot be synthesized safely by the integration job dispatcher.",
+      "agent_exposed": true,
+      "notes": "Wave4X Loader/Doc R2 reopened this lifecycle operation as a safe native evidence/status handler. The handler reports entrypoint/lifecycle registration evidence and explicitly does not synthesize AutoCAD loader messages or invoke On_k* callb",
       "engine_tier": "native_arx_only",
       "mapping_type": "exact"
     },
@@ -12134,23 +12267,30 @@
       "operation": "module.lifecycle.init",
       "family": "runtime_commands",
       "v1_target": true,
-      "status": "blocked",
+      "status": "implemented",
       "host_support": "arx_adapter|full_autocad",
-      "handler": "AcRxArxApp::On_kInitAppMsg(void* pkt) / AcRxDbxApp::On_kInitAppMsg",
+      "handler": "m08nDispatch",
       "test_ref": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
-        "tests/unit/test_wave3_remaining_registry_closure.py::test_remaining_wave3_blocks_have_accepted_codes_and_evidence"
+        "tests/unit/test_wave3_remaining_registry_closure.py::test_remaining_wave3_blocks_have_accepted_codes_and_evidence",
+        "tests/unit/test_m08n_handlers.py",
+        "tests/unit/test_module_lifecycle_r2.py"
       ],
       "evidence_ref": [
         "config/autocad_native_arx_operation_catalog.json#module.lifecycle.init",
-        "reports/WAVE3_REMAINING_HARDBLOCK_REAUDIT.md#module.lifecycle.init"
+        "reports/WAVE3_REMAINING_HARDBLOCK_REAUDIT.md#module.lifecycle.init",
+        "src/Ariadne.AcadNative/families/m08n_handlers.inc:m08nModuleLifecycleEvidence",
+        "reports/tickets/WAVE4X_LOADER_DOC_R2.md#module.lifecycle.init",
+        "reports/tickets/WAVE4X_LOADER_DOC_R2_OPS.json#module.lifecycle.init",
+        "tests/unit/test_module_lifecycle_r2.py",
+        "tests/unit/test_m08n_handlers.py::TestM08NHandlers::test_module_lifecycle_evidence_is_status_only"
       ],
-      "blocker_ref": "HOST_UNAVAILABLE: On_kInitAppMsg is delivered by the AutoCAD loader during module load; it is not a safe runtime job operation.",
+      "blocker_ref": "",
       "risk_class": "read_safe",
       "write_level": "read",
-      "agent_exposed": false,
-      "notes": "Wave3 post-merge re-audit accepted hard block. HOST_UNAVAILABLE: On_kInitAppMsg is delivered by the AutoCAD loader during module load; it is not a safe runtime job operation.",
+      "agent_exposed": true,
+      "notes": "Wave4X Loader/Doc R2 reopened this lifecycle operation as a safe native evidence/status handler. The handler reports entrypoint/lifecycle registration evidence and explicitly does not synthesize AutoCAD loader messages or invoke On_k* callb",
       "engine_tier": "native_arx_only",
       "mapping_type": "exact"
     },
@@ -12158,23 +12298,30 @@
       "operation": "module.lifecycle.on_load_dwg",
       "family": "runtime_commands",
       "v1_target": true,
-      "status": "blocked",
+      "status": "implemented",
       "host_support": "arx_adapter|full_autocad",
-      "handler": "AcRxDbxApp::On_kLoadDwgMsg(void* pkt)",
+      "handler": "m08nDispatch",
       "test_ref": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
-        "tests/unit/test_wave3_remaining_registry_closure.py::test_remaining_wave3_blocks_have_accepted_codes_and_evidence"
+        "tests/unit/test_wave3_remaining_registry_closure.py::test_remaining_wave3_blocks_have_accepted_codes_and_evidence",
+        "tests/unit/test_m08n_handlers.py",
+        "tests/unit/test_module_lifecycle_r2.py"
       ],
       "evidence_ref": [
         "config/autocad_native_arx_operation_catalog.json#module.lifecycle.on_load_dwg",
-        "reports/WAVE3_REMAINING_HARDBLOCK_REAUDIT.md#module.lifecycle.on_load_dwg"
+        "reports/WAVE3_REMAINING_HARDBLOCK_REAUDIT.md#module.lifecycle.on_load_dwg",
+        "src/Ariadne.AcadNative/families/m08n_handlers.inc:m08nModuleLifecycleEvidence",
+        "reports/tickets/WAVE4X_LOADER_DOC_R2.md#module.lifecycle.on_load_dwg",
+        "reports/tickets/WAVE4X_LOADER_DOC_R2_OPS.json#module.lifecycle.on_load_dwg",
+        "tests/unit/test_module_lifecycle_r2.py",
+        "tests/unit/test_m08n_handlers.py::TestM08NHandlers::test_module_lifecycle_evidence_is_status_only"
       ],
-      "blocker_ref": "HOST_UNAVAILABLE: On_kLoadDwgMsg is delivered by the host during document lifecycle events; no controlled attended lifecycle route is available.",
+      "blocker_ref": "",
       "risk_class": "read_safe",
       "write_level": "read",
-      "agent_exposed": false,
-      "notes": "Wave3 post-merge re-audit accepted hard block. HOST_UNAVAILABLE: On_kLoadDwgMsg is delivered by the host during document lifecycle events; no controlled attended lifecycle route is available.",
+      "agent_exposed": true,
+      "notes": "Wave4X Loader/Doc R2 reopened this lifecycle operation as a safe native evidence/status handler. The handler reports entrypoint/lifecycle registration evidence and explicitly does not synthesize AutoCAD loader messages or invoke On_k* callb",
       "engine_tier": "native_arx_only",
       "mapping_type": "exact"
     },
@@ -12192,13 +12339,15 @@
       ],
       "evidence_ref": [
         "config/autocad_native_arx_operation_catalog.json#module.lifecycle.on_ole_unload",
-        "reports/WAVE3_REMAINING_HARDBLOCK_REAUDIT.md#module.lifecycle.on_ole_unload"
+        "reports/WAVE3_REMAINING_HARDBLOCK_REAUDIT.md#module.lifecycle.on_ole_unload",
+        "docs/FALLBACK_POLICY.md",
+        "reports/tickets/WAVE4X_FALLBACK.md"
       ],
       "blocker_ref": "HOST_UNAVAILABLE: On_kOleUnloadAppMsg is a host lifecycle callback and cannot be triggered safely from the CAD OS job surface.",
       "risk_class": "read_safe",
       "write_level": "read",
       "agent_exposed": false,
-      "notes": "Wave3 post-merge re-audit accepted hard block. HOST_UNAVAILABLE: On_kOleUnloadAppMsg is a host lifecycle callback and cannot be triggered safely from the CAD OS job surface.",
+      "notes": "Wave4X re-review retained HOST_UNAVAILABLE. This is still a host lifecycle callback, not a routed agent operation.",
       "engine_tier": "native_arx_only",
       "mapping_type": "exact"
     },
@@ -12206,23 +12355,30 @@
       "operation": "module.lifecycle.on_unload_dwg",
       "family": "runtime_commands",
       "v1_target": true,
-      "status": "blocked",
+      "status": "implemented",
       "host_support": "arx_adapter|full_autocad",
-      "handler": "AcRxDbxApp::On_kUnloadDwgMsg(void* pkt)",
+      "handler": "m08nDispatch",
       "test_ref": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
-        "tests/unit/test_wave3_remaining_registry_closure.py::test_remaining_wave3_blocks_have_accepted_codes_and_evidence"
+        "tests/unit/test_wave3_remaining_registry_closure.py::test_remaining_wave3_blocks_have_accepted_codes_and_evidence",
+        "tests/unit/test_m08n_handlers.py",
+        "tests/unit/test_module_lifecycle_r2.py"
       ],
       "evidence_ref": [
         "config/autocad_native_arx_operation_catalog.json#module.lifecycle.on_unload_dwg",
-        "reports/WAVE3_REMAINING_HARDBLOCK_REAUDIT.md#module.lifecycle.on_unload_dwg"
+        "reports/WAVE3_REMAINING_HARDBLOCK_REAUDIT.md#module.lifecycle.on_unload_dwg",
+        "src/Ariadne.AcadNative/families/m08n_handlers.inc:m08nModuleLifecycleEvidence",
+        "reports/tickets/WAVE4X_LOADER_DOC_R2.md#module.lifecycle.on_unload_dwg",
+        "reports/tickets/WAVE4X_LOADER_DOC_R2_OPS.json#module.lifecycle.on_unload_dwg",
+        "tests/unit/test_module_lifecycle_r2.py",
+        "tests/unit/test_m08n_handlers.py::TestM08NHandlers::test_module_lifecycle_evidence_is_status_only"
       ],
-      "blocker_ref": "HOST_UNAVAILABLE: On_kUnloadDwgMsg is host-owned document lifecycle dispatch and unavailable to the headless integration job route.",
+      "blocker_ref": "",
       "risk_class": "read_safe",
       "write_level": "read",
-      "agent_exposed": false,
-      "notes": "Wave3 post-merge re-audit accepted hard block. HOST_UNAVAILABLE: On_kUnloadDwgMsg is host-owned document lifecycle dispatch and unavailable to the headless integration job route.",
+      "agent_exposed": true,
+      "notes": "Wave4X Loader/Doc R2 reopened this lifecycle operation as a safe native evidence/status handler. The handler reports entrypoint/lifecycle registration evidence and explicitly does not synthesize AutoCAD loader messages or invoke On_k* callb",
       "engine_tier": "native_arx_only",
       "mapping_type": "exact"
     },
@@ -12230,23 +12386,30 @@
       "operation": "module.lifecycle.other",
       "family": "runtime_commands",
       "v1_target": true,
-      "status": "blocked",
+      "status": "implemented",
       "host_support": "arx_adapter|full_autocad",
-      "handler": "On_kCfgMsg/On_kEndMsg/On_kQuitMsg/On_kPreQuitMsg/On_kSaveMsg/On_kInvkSubrMsg/On_kDependencyMsg/On_kNoDependencyMsg/On_kInitDialogMsg/On_kEndDialogMsg/On_kNullMsg",
+      "handler": "m08nDispatch",
       "test_ref": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
-        "tests/unit/test_wave3_remaining_registry_closure.py::test_remaining_wave3_blocks_have_accepted_codes_and_evidence"
+        "tests/unit/test_wave3_remaining_registry_closure.py::test_remaining_wave3_blocks_have_accepted_codes_and_evidence",
+        "tests/unit/test_m08n_handlers.py",
+        "tests/unit/test_module_lifecycle_r2.py"
       ],
       "evidence_ref": [
         "config/autocad_native_arx_operation_catalog.json#module.lifecycle.other",
-        "reports/WAVE3_REMAINING_HARDBLOCK_REAUDIT.md#module.lifecycle.other"
+        "reports/WAVE3_REMAINING_HARDBLOCK_REAUDIT.md#module.lifecycle.other",
+        "src/Ariadne.AcadNative/families/m08n_handlers.inc:m08nModuleLifecycleEvidence",
+        "reports/tickets/WAVE4X_LOADER_DOC_R2.md#module.lifecycle.other",
+        "reports/tickets/WAVE4X_LOADER_DOC_R2_OPS.json#module.lifecycle.other",
+        "tests/unit/test_module_lifecycle_r2.py",
+        "tests/unit/test_m08n_handlers.py::TestM08NHandlers::test_module_lifecycle_evidence_is_status_only"
       ],
-      "blocker_ref": "HOST_UNAVAILABLE: arbitrary lifecycle message dispatch is host-owned and cannot be simulated safely by the agent job surface.",
+      "blocker_ref": "",
       "risk_class": "read_safe",
       "write_level": "read",
-      "agent_exposed": false,
-      "notes": "Wave3 post-merge re-audit accepted hard block. HOST_UNAVAILABLE: arbitrary lifecycle message dispatch is host-owned and cannot be simulated safely by the agent job surface.",
+      "agent_exposed": true,
+      "notes": "Wave4X Loader/Doc R2 reopened this lifecycle operation as a safe native evidence/status handler. The handler reports entrypoint/lifecycle registration evidence and explicitly does not synthesize AutoCAD loader messages or invoke On_k* callb",
       "engine_tier": "native_arx_only",
       "mapping_type": "exact"
     },
@@ -12254,23 +12417,30 @@
       "operation": "module.lifecycle.unload",
       "family": "runtime_commands",
       "v1_target": true,
-      "status": "blocked",
+      "status": "implemented",
       "host_support": "arx_adapter|full_autocad",
-      "handler": "AcRxArxApp::On_kUnloadAppMsg / AcRxDbxApp::On_kUnloadAppMsg",
+      "handler": "m08nDispatch",
       "test_ref": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
-        "tests/unit/test_wave3_remaining_registry_closure.py::test_remaining_wave3_blocks_have_accepted_codes_and_evidence"
+        "tests/unit/test_wave3_remaining_registry_closure.py::test_remaining_wave3_blocks_have_accepted_codes_and_evidence",
+        "tests/unit/test_m08n_handlers.py",
+        "tests/unit/test_module_lifecycle_r2.py"
       ],
       "evidence_ref": [
         "config/autocad_native_arx_operation_catalog.json#module.lifecycle.unload",
-        "reports/WAVE3_REMAINING_HARDBLOCK_REAUDIT.md#module.lifecycle.unload"
+        "reports/WAVE3_REMAINING_HARDBLOCK_REAUDIT.md#module.lifecycle.unload",
+        "src/Ariadne.AcadNative/families/m08n_handlers.inc:m08nModuleLifecycleEvidence",
+        "reports/tickets/WAVE4X_LOADER_DOC_R2.md#module.lifecycle.unload",
+        "reports/tickets/WAVE4X_LOADER_DOC_R2_OPS.json#module.lifecycle.unload",
+        "tests/unit/test_module_lifecycle_r2.py",
+        "tests/unit/test_m08n_handlers.py::TestM08NHandlers::test_module_lifecycle_evidence_is_status_only"
       ],
-      "blocker_ref": "HOST_UNAVAILABLE: On_kUnloadAppMsg is delivered by the loader during module unload; the job dispatcher must not invoke it directly.",
+      "blocker_ref": "",
       "risk_class": "read_safe",
       "write_level": "read",
-      "agent_exposed": false,
-      "notes": "Wave3 post-merge re-audit accepted hard block. HOST_UNAVAILABLE: On_kUnloadAppMsg is delivered by the loader during module unload; the job dispatcher must not invoke it directly.",
+      "agent_exposed": true,
+      "notes": "Wave4X Loader/Doc R2 reopened this lifecycle operation as a safe native evidence/status handler. The handler reports entrypoint/lifecycle registration evidence and explicitly does not synthesize AutoCAD loader messages or invoke On_k* callb",
       "engine_tier": "native_arx_only",
       "mapping_type": "exact"
     },
@@ -12278,23 +12448,29 @@
       "operation": "module.load",
       "family": "runtime_commands",
       "v1_target": true,
-      "status": "blocked",
+      "status": "implemented",
       "host_support": "arx_adapter|full_autocad",
-      "handler": "acrxLoadModule(const ACHAR* moduleName, bool printit, bool asCmd=false)",
+      "handler": "m08nDispatch",
       "test_ref": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
-        "tests/unit/test_wave3_remaining_registry_closure.py::test_remaining_wave3_blocks_have_accepted_codes_and_evidence"
+        "tests/unit/test_wave3_remaining_registry_closure.py::test_remaining_wave3_blocks_have_accepted_codes_and_evidence",
+        "tests/unit/test_m08_loader_doc.py::test_safe_loader_doc_ops_are_native_dispatched",
+        "tests/unit/test_m08_loader_doc.py::test_safe_loader_doc_ops_are_registry_implemented",
+        "tests/unit/test_m08_loader_doc.py::test_safe_loader_doc_source_does_not_expose_raw_or_arbitrary_load_execution"
       ],
       "evidence_ref": [
         "config/autocad_native_arx_operation_catalog.json#module.load",
-        "reports/WAVE3_REMAINING_HARDBLOCK_REAUDIT.md#module.load"
+        "reports/WAVE3_REMAINING_HARDBLOCK_REAUDIT.md#module.load",
+        "reports/tickets/WAVE4X_LOADER_DOC.md#module-load",
+        "reports/tickets/WAVE4X_LOADER_DOC_OPS.json#module.load",
+        "src/Ariadne.AcadNative/families/m08n_handlers.inc"
       ],
-      "blocker_ref": "SAFETY_FORBIDDEN: acrxLoadModule loads external code into the AutoCAD host process and is not an agent-exposed operation.",
+      "blocker_ref": "",
       "risk_class": "read_safe",
       "write_level": "read",
-      "agent_exposed": false,
-      "notes": "Wave3 post-merge re-audit accepted hard block. SAFETY_FORBIDDEN: acrxLoadModule loads external code into the AutoCAD host process and is not an agent-exposed operation.",
+      "agent_exposed": true,
+      "notes": "Wave3 post-merge re-audit accepted hard block. SAFETY_FORBIDDEN: acrxLoadModule loads external code into the AutoCAD host process and is not an agent-exposed operation. Wave4X Pane2: Read-only current Ariadne native module loaded-status det",
       "engine_tier": "native_arx_only",
       "mapping_type": "exact"
     },
@@ -12302,23 +12478,29 @@
       "operation": "module.load.acad_rx",
       "family": "runtime_commands",
       "v1_target": true,
-      "status": "blocked",
+      "status": "implemented",
       "host_support": "coreconsole|dbx|arx_adapter|full_autocad",
-      "handler": "acad.rx file listing module names",
+      "handler": "m08nDispatch",
       "test_ref": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
-        "tests/unit/test_wave3_remaining_registry_closure.py::test_remaining_wave3_blocks_have_accepted_codes_and_evidence"
+        "tests/unit/test_wave3_remaining_registry_closure.py::test_remaining_wave3_blocks_have_accepted_codes_and_evidence",
+        "tests/unit/test_m08_loader_doc.py::test_safe_loader_doc_ops_are_native_dispatched",
+        "tests/unit/test_m08_loader_doc.py::test_safe_loader_doc_ops_are_registry_implemented",
+        "tests/unit/test_m08_loader_doc.py::test_safe_loader_doc_source_does_not_expose_raw_or_arbitrary_load_execution"
       ],
       "evidence_ref": [
         "config/autocad_native_arx_operation_catalog.json#module.load.acad_rx",
-        "reports/WAVE3_REMAINING_HARDBLOCK_REAUDIT.md#module.load.acad_rx"
+        "reports/WAVE3_REMAINING_HARDBLOCK_REAUDIT.md#module.load.acad_rx",
+        "reports/tickets/WAVE4X_LOADER_DOC.md#module-load-acad_rx",
+        "reports/tickets/WAVE4X_LOADER_DOC_OPS.json#module.load.acad_rx",
+        "src/Ariadne.AcadNative/families/m08n_handlers.inc"
       ],
-      "blocker_ref": "SAFETY_FORBIDDEN: ARX demand/load mechanics execute host modules and mutate runtime loader state.",
+      "blocker_ref": "",
       "risk_class": "read_safe",
       "write_level": "read",
-      "agent_exposed": false,
-      "notes": "Wave3 post-merge re-audit accepted hard block. SAFETY_FORBIDDEN: ARX demand/load mechanics execute host modules and mutate runtime loader state.",
+      "agent_exposed": true,
+      "notes": "Wave3 post-merge re-audit accepted hard block. SAFETY_FORBIDDEN: ARX demand/load mechanics execute host modules and mutate runtime loader state. Wave4X Pane2: Read-only acad.rx file presence/status detection; never mutates autoload files.",
       "engine_tier": "accoreconsole_lisp_also",
       "mapping_type": "exact"
     },
@@ -12326,23 +12508,29 @@
       "operation": "module.load.by_app",
       "family": "runtime_commands",
       "v1_target": true,
-      "status": "blocked",
+      "status": "implemented",
       "host_support": "arx_adapter|full_autocad",
-      "handler": "acrxLoadApp(const ACHAR* appname, bool asCmd=false)",
+      "handler": "m08nDispatch",
       "test_ref": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
-        "tests/unit/test_wave3_remaining_registry_closure.py::test_remaining_wave3_blocks_have_accepted_codes_and_evidence"
+        "tests/unit/test_wave3_remaining_registry_closure.py::test_remaining_wave3_blocks_have_accepted_codes_and_evidence",
+        "tests/unit/test_m08_loader_doc.py::test_safe_loader_doc_ops_are_native_dispatched",
+        "tests/unit/test_m08_loader_doc.py::test_safe_loader_doc_ops_are_registry_implemented",
+        "tests/unit/test_m08_loader_doc.py::test_safe_loader_doc_source_does_not_expose_raw_or_arbitrary_load_execution"
       ],
       "evidence_ref": [
         "config/autocad_native_arx_operation_catalog.json#module.load.by_app",
-        "reports/WAVE3_REMAINING_HARDBLOCK_REAUDIT.md#module.load.by_app"
+        "reports/WAVE3_REMAINING_HARDBLOCK_REAUDIT.md#module.load.by_app",
+        "reports/tickets/WAVE4X_LOADER_DOC.md#module-load-by_app",
+        "reports/tickets/WAVE4X_LOADER_DOC_OPS.json#module.load.by_app",
+        "src/Ariadne.AcadNative/families/m08n_handlers.inc"
       ],
-      "blocker_ref": "SAFETY_FORBIDDEN: application-driven module loading executes external code and mutates process loader state.",
+      "blocker_ref": "",
       "risk_class": "read_safe",
       "write_level": "read",
-      "agent_exposed": false,
-      "notes": "Wave3 post-merge re-audit accepted hard block. SAFETY_FORBIDDEN: application-driven module loading executes external code and mutates process loader state.",
+      "agent_exposed": true,
+      "notes": "Wave3 post-merge re-audit accepted hard block. SAFETY_FORBIDDEN: application-driven module loading executes external code and mutates process loader state. Wave4X Pane2: Read-only registered-app load validation contract; never invokes load-",
       "engine_tier": "native_arx_only",
       "mapping_type": "exact"
     },
@@ -12350,26 +12538,32 @@
       "operation": "module.load.demand_register",
       "family": "runtime_commands",
       "v1_target": true,
-      "status": "blocked",
+      "status": "implemented",
       "host_support": "arx_adapter|full_autocad",
-      "handler": "Registry: HKLM\\…\\R<ver>\\<prodkey>\\Applications\\<app> keys LOADER,DESCRIPTION,LOADCTRLS,MANAGED (+ optional command sub-keys)",
+      "handler": "m08nDispatch",
       "test_ref": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
-        "tests/unit/test_m08n_handlers.py"
+        "tests/unit/test_m08n_handlers.py",
+        "tests/unit/test_m08_loader_doc.py::test_safe_loader_doc_ops_are_native_dispatched",
+        "tests/unit/test_m08_loader_doc.py::test_safe_loader_doc_ops_are_registry_implemented",
+        "tests/unit/test_m08_loader_doc.py::test_safe_loader_doc_source_does_not_expose_raw_or_arbitrary_load_execution"
       ],
       "evidence_ref": [
         "config/autocad_native_arx_operation_catalog.json#module.load.demand_register",
         "src/Ariadne.AcadNative/families/m08n_handlers.inc:m08nHasOp excludes raw/registry-mutating op",
         "reports/tickets/M08N-A3_PLAN.md#Blocker criteria",
         "research/native_arx/editor-delta.md#Operation catalog (PART 1)",
-        "research/native_arx/ui-customization.md#Operation catalog"
+        "research/native_arx/ui-customization.md#Operation catalog",
+        "reports/tickets/WAVE4X_LOADER_DOC.md#module-load-demand_register",
+        "reports/tickets/WAVE4X_LOADER_DOC_OPS.json#module.load.demand_register",
+        "src/Ariadne.AcadNative/families/m08n_handlers.inc"
       ],
-      "blocker_ref": "SAFETY_FORBIDDEN: ObjectARX demand-load registration requires AutoCAD application registry/autoload mutation (LOADER/LOADCTRLS/MANAGED); ticket scope permits source/build artifacts only, not host autoload registry writes.",
+      "blocker_ref": "",
       "risk_class": "read_safe",
       "write_level": "read",
-      "agent_exposed": false,
-      "notes": "M08N-A3 hard-blocked by safety: no raw command/menu/tool execution or AutoCAD demand-load registry mutation is exposed from the agent surface.",
+      "agent_exposed": true,
+      "notes": "M08N-A3 hard-blocked by safety: no raw command/menu/tool execution or AutoCAD demand-load registry mutation is exposed from the agent surface. Wave4X Pane2: Demand-load registration plan validation for bounded Ariadne metadata; never writes",
       "engine_tier": "native_arx_only",
       "mapping_type": "exact"
     },
@@ -12377,23 +12571,25 @@
       "operation": "module.load.lisp",
       "family": "runtime_commands",
       "v1_target": true,
-      "status": "blocked",
+      "status": "implemented",
       "host_support": "coreconsole|dbx|arx_adapter|full_autocad",
-      "handler": "(arxload \"name\" [onfailure]) / (arxunload \"name\") / (arx)",
+      "handler": "Invoke-SafeFallbackOperation",
       "test_ref": [
-        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
-        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
-        "tests/unit/test_wave3_remaining_registry_closure.py::test_remaining_wave3_blocks_have_accepted_codes_and_evidence"
+        "tests/unit/test_m08o_fallback.py",
+        "tests/unit/test_wave3_remaining_registry_closure.py",
+        "tests/unit/test_wave4x_fallback_surface.py"
       ],
       "evidence_ref": [
         "config/autocad_native_arx_operation_catalog.json#module.load.lisp",
-        "reports/WAVE3_REMAINING_HARDBLOCK_REAUDIT.md#module.load.lisp"
+        "docs/FALLBACK_POLICY.md",
+        "tools/fallback_safe_surface.ps1",
+        "reports/tickets/WAVE4X_FALLBACK.md"
       ],
-      "blocker_ref": "SAFETY_FORBIDDEN: LISP loading executes script code in the AutoCAD host and is not exposed as a raw agent load surface.",
+      "blocker_ref": "",
       "risk_class": "read_safe",
       "write_level": "read",
-      "agent_exposed": false,
-      "notes": "Wave3 post-merge re-audit accepted hard block. SAFETY_FORBIDDEN: LISP loading executes script code in the AutoCAD host and is not exposed as a raw agent load surface.",
+      "agent_exposed": true,
+      "notes": "Wave4X reopened the Wave3 hard block as a router-authored AutoLISP adapter load only. Supported adapter names are allow-listed (currently safe_status); no user path, raw LISP text, or arbitrary command surface is accepted.",
       "engine_tier": "accoreconsole_lisp_also",
       "mapping_type": "exact"
     },
@@ -12455,23 +12651,29 @@
       "operation": "module.unload",
       "family": "runtime_commands",
       "v1_target": true,
-      "status": "blocked",
+      "status": "implemented",
       "host_support": "arx_adapter|full_autocad",
-      "handler": "acrxUnloadModule(const ACHAR* moduleName, bool asCmd=false) / acrxUnloadApp(appName, asCmd)",
+      "handler": "m08nDispatch",
       "test_ref": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
-        "tests/unit/test_wave3_remaining_registry_closure.py::test_remaining_wave3_blocks_have_accepted_codes_and_evidence"
+        "tests/unit/test_wave3_remaining_registry_closure.py::test_remaining_wave3_blocks_have_accepted_codes_and_evidence",
+        "tests/unit/test_m08_loader_doc.py::test_safe_loader_doc_ops_are_native_dispatched",
+        "tests/unit/test_m08_loader_doc.py::test_safe_loader_doc_ops_are_registry_implemented",
+        "tests/unit/test_m08_loader_doc.py::test_safe_loader_doc_source_does_not_expose_raw_or_arbitrary_load_execution"
       ],
       "evidence_ref": [
         "config/autocad_native_arx_operation_catalog.json#module.unload",
-        "reports/WAVE3_REMAINING_HARDBLOCK_REAUDIT.md#module.unload"
+        "reports/WAVE3_REMAINING_HARDBLOCK_REAUDIT.md#module.unload",
+        "reports/tickets/WAVE4X_LOADER_DOC.md#module-unload",
+        "reports/tickets/WAVE4X_LOADER_DOC_OPS.json#module.unload",
+        "src/Ariadne.AcadNative/families/m08n_handlers.inc"
       ],
-      "blocker_ref": "SAFETY_FORBIDDEN: acrxUnloadModule can unload host modules and destabilize the running process; it remains non-agent-exposed.",
+      "blocker_ref": "",
       "risk_class": "read_safe",
       "write_level": "read",
-      "agent_exposed": false,
-      "notes": "Wave3 post-merge re-audit accepted hard block. SAFETY_FORBIDDEN: acrxUnloadModule can unload host modules and destabilize the running process; it remains non-agent-exposed.",
+      "agent_exposed": true,
+      "notes": "Wave3 post-merge re-audit accepted hard block. SAFETY_FORBIDDEN: acrxUnloadModule can unload host modules and destabilize the running process; it remains non-agent-exposed. Wave4X Pane2: Read-only unload safety/status contract for the curre",
       "engine_tier": "native_arx_only",
       "mapping_type": "exact"
     },
@@ -12735,13 +12937,16 @@
         "src/Ariadne.AcadNative/families/m08e_handlers.inc:m08eDispatch",
         "reports/merge/MERGE-M08-READ.json",
         "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
-        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)"
+        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)",
+        "reports/tickets/WAVE4X_DB_TXN_WRITE.md",
+        "reports/tickets/WAVE4X_DB_TXN_WRITE.json",
+        "reports/tickets/WAVE4X_DB_TXN_WRITE_OPS.json"
       ],
       "blocker_ref": "",
       "risk_class": "staged_write",
       "write_level": "write_copy",
       "agent_exposed": true,
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS. WAVE4X: bounded staged-write route with com",
       "engine_tier": "objectdbx_capable",
       "mapping_type": "exact"
     },
@@ -12762,13 +12967,16 @@
         "src/Ariadne.AcadNative/families/m08e_handlers.inc:m08eDispatch",
         "reports/merge/MERGE-M08-READ.json",
         "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
-        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)"
+        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)",
+        "reports/tickets/WAVE4X_DB_TXN_WRITE.md",
+        "reports/tickets/WAVE4X_DB_TXN_WRITE.json",
+        "reports/tickets/WAVE4X_DB_TXN_WRITE_OPS.json"
       ],
       "blocker_ref": "",
       "risk_class": "staged_write",
       "write_level": "write_copy",
       "agent_exposed": true,
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS. WAVE4X: bounded staged-write route with com",
       "engine_tier": "objectdbx_capable",
       "mapping_type": "exact"
     },
@@ -12791,13 +12999,16 @@
         "reports/merge/MERGE-M08-READ.json",
         "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
         "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)",
-        "src/Ariadne.AcadNative/families/m08c_handlers.inc:m08cDispatch"
+        "src/Ariadne.AcadNative/families/m08c_handlers.inc:m08cDispatch",
+        "reports/tickets/WAVE4X_DB_TXN_WRITE.md",
+        "reports/tickets/WAVE4X_DB_TXN_WRITE.json",
+        "reports/tickets/WAVE4X_DB_TXN_WRITE_OPS.json"
       ],
       "blocker_ref": "",
       "risk_class": "staged_write",
       "write_level": "write_copy",
       "agent_exposed": true,
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS. WAVE4X: bounded staged-write route with com",
       "engine_tier": "objectdbx_capable",
       "mapping_type": "exact"
     },
@@ -12820,13 +13031,16 @@
         "reports/merge/MERGE-M08-READ.json",
         "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
         "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)",
-        "src/Ariadne.AcadNative/families/m08c_handlers.inc:m08cDispatch"
+        "src/Ariadne.AcadNative/families/m08c_handlers.inc:m08cDispatch",
+        "reports/tickets/WAVE4X_DB_TXN_WRITE.md",
+        "reports/tickets/WAVE4X_DB_TXN_WRITE.json",
+        "reports/tickets/WAVE4X_DB_TXN_WRITE_OPS.json"
       ],
       "blocker_ref": "",
       "risk_class": "staged_write",
       "write_level": "write_copy",
       "agent_exposed": true,
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS. WAVE4X: bounded staged-write route with com",
       "engine_tier": "objectdbx_capable",
       "mapping_type": "exact"
     },
@@ -12847,13 +13061,15 @@
         "src/Ariadne.AcadNative/families/m08n_handlers.inc:m08nHasOp excludes raw/registry-mutating op",
         "reports/tickets/M08N-A3_PLAN.md#Blocker criteria",
         "research/native_arx/editor-delta.md#Operation catalog (PART 1)",
-        "research/native_arx/ui-customization.md#Operation catalog"
+        "research/native_arx/ui-customization.md#Operation catalog",
+        "docs/FALLBACK_POLICY.md",
+        "reports/tickets/WAVE4X_FALLBACK.md"
       ],
       "blocker_ref": "SAFETY_FORBIDDEN: acedMenuCmd executes arbitrary menu/command macros in the active editor; exposing it as an agent API would be a raw command surface and may mutate the user session.",
       "risk_class": "read_safe",
       "write_level": "read",
       "agent_exposed": false,
-      "notes": "M08N-A3 hard-blocked by safety: no raw command/menu/tool execution or AutoCAD demand-load registry mutation is exposed from the agent surface.",
+      "notes": "Wave4X re-review retained SAFETY_FORBIDDEN. Menu macro invocation is still a raw command surface.",
       "engine_tier": "native_arx_only",
       "mapping_type": "exact"
     },
@@ -13888,13 +14104,14 @@
     "schema": "ariadne.cad_os.closure_gate.v1",
     "ticket_basis": "M08A-T01",
     "totals_by_status": {
-      "implemented": 457,
-      "blocked": 60
+      "implemented": 485,
+      "deprecated": 1,
+      "blocked": 31
     },
     "catalogued": 0,
     "stub": 0,
     "unknown": 0,
-    "deprecated": 0,
+    "deprecated": 1,
     "checks": {
       "every_op_has_owner_ticket": true,
       "every_open_op_has_strategy_and_evidence": true,

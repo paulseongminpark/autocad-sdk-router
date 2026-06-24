@@ -6,31 +6,39 @@ REPO = Path(__file__).resolve().parents[2]
 REGISTRY = REPO / "config" / "operations.v2.json"
 
 EXPECTED_BLOCKED_AFTER_REAUDIT = {
-    "edit.subentity.add_paths",
-    "edit.subentity.delete_paths",
-    "edit.subentity.transform",
     "ui.subentity.highlight",
+    "automate.com.send_command",
+    "embed.ole.frame",
+    "module.lifecycle.on_ole_unload",
+}
+
+EXPECTED_IMPLEMENTED_AFTER_WAVE4X = {
     "automate.com.get_app",
     "automate.com.get_document",
     "automate.com.get_for_command",
     "automate.com.get_winapp",
-    "automate.com.send_command",
     "automate.com.wrapper_for_object",
-    "embed.ole.frame",
+    "module.load.lisp",
+}
+
+EXPECTED_IMPLEMENTED_AFTER_WAVE4X_LOADER_DOC = {
+    "module.command.lookup",
     "module.command.remove_group",
+    "module.load",
+    "module.load.acad_rx",
+    "module.load.by_app",
+    "module.load.demand_register",
+    "module.unload",
+}
+
+EXPECTED_IMPLEMENTED_AFTER_WAVE4X_LOADER_DOC_R2 = {
     "module.entrypoint.define",
     "module.entrypoint.dispatch",
     "module.lifecycle.init",
     "module.lifecycle.on_load_dwg",
-    "module.lifecycle.on_ole_unload",
     "module.lifecycle.on_unload_dwg",
     "module.lifecycle.other",
     "module.lifecycle.unload",
-    "module.load",
-    "module.load.acad_rx",
-    "module.load.by_app",
-    "module.load.lisp",
-    "module.unload",
 }
 
 ALLOWED_BLOCKER_CODES = {
@@ -71,6 +79,44 @@ def test_remaining_wave3_blocks_have_accepted_codes_and_evidence():
         assert op.get("evidence_required") == "blocker_ref_and_evidence", oid
 
 
+def test_wave4x_reopened_safe_fallback_ops_are_implemented():
+    ops = _operations()
+    for oid in sorted(EXPECTED_IMPLEMENTED_AFTER_WAVE4X):
+        op = ops[oid]
+        assert op["status"] == "implemented", oid
+        evidence = "\n".join(op.get("evidence_refs") or [])
+        assert "reports/tickets/WAVE4X_FALLBACK.md" in evidence, oid
+        assert op.get("handler", {}).get("dispatcher_symbol") == "Invoke-SafeFallbackOperation", oid
+        if oid == "module.load.lisp":
+            assert op.get("handler", {}).get("router_lane") == "ARIADNE_CAD_JOB", oid
+            assert op.get("handler", {}).get("execution_host_class") == "coreconsole", oid
+        else:
+            assert op.get("handler", {}).get("router_lane") == "full_autocad", oid
+            assert op.get("handler", {}).get("execution_host_class") == "full_autocad", oid
+
+
+def test_wave4x_loader_doc_ops_are_implemented():
+    ops = _operations()
+    for oid in sorted(EXPECTED_IMPLEMENTED_AFTER_WAVE4X_LOADER_DOC):
+        op = ops[oid]
+        assert op["status"] == "implemented", oid
+        evidence = "\n".join(op.get("evidence_refs") or [])
+        assert "reports/tickets/WAVE4X_LOADER_DOC.md" in evidence, oid
+        assert op.get("handler", {}).get("dispatcher_symbol") == "m08nDispatch", oid
+        assert op.get("handler", {}).get("router_lane") == "ARIADNE_NATIVE_JOB", oid
+
+
+def test_wave4x_loader_doc_r2_ops_are_implemented():
+    ops = _operations()
+    for oid in sorted(EXPECTED_IMPLEMENTED_AFTER_WAVE4X_LOADER_DOC_R2):
+        op = ops[oid]
+        assert op["status"] == "implemented", oid
+        evidence = "\n".join(op.get("evidence_refs") or [])
+        assert "reports/tickets/WAVE4X_LOADER_DOC_R2.md" in evidence, oid
+        assert op.get("handler", {}).get("dispatcher_symbol") == "m08nDispatch", oid
+        assert op.get("handler", {}).get("router_lane") == "ARIADNE_NATIVE_JOB", oid
+
+
 def test_module_command_flags_was_reversed_to_implemented():
     op = _operations()["module.command.flags"]
     assert op["status"] == "implemented"
@@ -87,3 +133,13 @@ def test_inspect_subentity_color_was_reversed_to_implemented():
     evidence = "\n".join(op.get("evidence_refs") or [])
     assert "tests/unit/test_m08d_handlers.py::TestM08DHandlers::test_subentity_color_read_uses_real_apis" in evidence
     assert "reports/WAVE3_REMAINING_HARDBLOCK_REAUDIT.md#inspect.subentity.color" in evidence
+
+
+def test_subentity_writes_were_reopened_to_implemented():
+    ops = _operations()
+    for oid in ("edit.subentity.add_paths", "edit.subentity.delete_paths", "edit.subentity.transform"):
+        op = ops[oid]
+        assert op["status"] == "implemented", oid
+        assert op["handler"]["dispatcher_symbol"] == "m08gDispatch", oid
+        evidence = "\n".join(op.get("evidence_refs") or [])
+        assert "WAVE4X_SUBENTITY_BREP" in evidence, oid

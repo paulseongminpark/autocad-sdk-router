@@ -1,0 +1,24 @@
+{
+  "schema": "ariadne.cad_os.wave4x.subentity_brep.native_build.v1",
+  "generated_at": "2026-06-23T23:59:00+09:00",
+  "status": "ok",
+  "router_home": "D:\\dev\\99_tools\\autocad-sdk-router_w4x_subentity",
+  "command": "powershell.exe -NoProfile -ExecutionPolicy Bypass -File tools\\build_native_acad.ps1 -RouterHome D:\\dev\\99_tools\\autocad-sdk-router_w4x_subentity",
+  "artifacts": [
+    {
+      "path": "src/Ariadne.AcadNative/bin/x64/Release/Ariadne.AcadNativeDbx.dbx",
+      "exists": true,
+      "bytes": 54272
+    },
+    {
+      "path": "src/Ariadne.AcadNative/bin/x64/Release/Ariadne.AcadNative.crx",
+      "exists": true,
+      "bytes": 777216
+    },
+    {
+      "path": "src/Ariadne.AcadNative/bin/x64/Release/Ariadne.AcadNative.arx",
+      "exists": true,
+      "bytes": 785920
+    }
+  ]
+}

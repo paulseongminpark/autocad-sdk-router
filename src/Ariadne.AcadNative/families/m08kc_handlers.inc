@@ -49,6 +49,7 @@
 #include "AcDbAssoc2dConstraintGroup.h" // AcDbAssoc2dConstraintGroup (getConstraints, deleteConstraint)
 #include "AcGeomConstraint.h"         // AcGeomConstraint (isEnabled / isActive; type via RTTI)
 #include "AcDbAssocArrayActionBody.h" // AcDbAssocArrayActionBody::isAssociativeArray
+#include "AcDbAssocSurfaceActionBody.h" // assoc surface topology statics (read-only)
 #include "AcDbCompoundObjectId.h"     // AcDbCompoundObjectId (setDependentOnObject arg)
 #include "dbeval.h"                   // AcDbEvalVariant (variable / value-param value)
 #include "dbdimassoc.h"               // AcDbDimAssoc
@@ -208,6 +209,83 @@ static std::string m08kcIntArrayJson(const AcArray<int>& values)
     return out.str();
 }
 
+static const char* m08kcSubentTypeName(AcDb::SubentType type)
+{
+    switch (type) {
+        case AcDb::kFaceSubentType:   return "face";
+        case AcDb::kEdgeSubentType:   return "edge";
+        case AcDb::kVertexSubentType: return "vertex";
+        case AcDb::kNullSubentType:   return "null";
+        default:                      return "other";
+    }
+}
+
+static AcDb::SubentType m08kcResolveSubentType(const std::string& job, std::string& nameOut,
+                                               int& codeOut, bool& explicitOut)
+{
+    explicitOut = false;
+    nameOut = "face";
+    codeOut = 1;
+    std::string token;
+    if (jsonFindString(job, "subent_type", token) || jsonFindString(job, "type", token)) {
+        explicitOut = true;
+        std::string lower(token);
+        for (size_t i = 0; i < lower.size(); ++i) {
+            if (lower[i] >= 'A' && lower[i] <= 'Z')
+                lower[i] = static_cast<char>(lower[i] - 'A' + 'a');
+        }
+        if (lower == "edge" || lower == "0") { nameOut = "edge"; codeOut = 0; return AcDb::kEdgeSubentType; }
+        if (lower == "vertex" || lower == "2") { nameOut = "vertex"; codeOut = 2; return AcDb::kVertexSubentType; }
+        if (lower == "null") { nameOut = "null"; codeOut = 3; return AcDb::kNullSubentType; }
+        return AcDb::kFaceSubentType;
+    }
+    double raw = 0.0;
+    if (jsonFindNumber(job, "subent_type", raw) || jsonFindNumber(job, "type", raw)) {
+        explicitOut = true;
+        const int st = static_cast<int>(raw);
+        if (st == 0) { nameOut = "edge"; codeOut = 0; return AcDb::kEdgeSubentType; }
+        if (st == 2) { nameOut = "vertex"; codeOut = 2; return AcDb::kVertexSubentType; }
+        if (st == 3) { nameOut = "null"; codeOut = 3; return AcDb::kNullSubentType; }
+        return AcDb::kFaceSubentType;
+    }
+    return AcDb::kFaceSubentType;
+}
+
+static std::string m08kcObjectIdHandleArrayJson(const AcDbObjectIdArray& ids)
+{
+    std::ostringstream out;
+    out << "[";
+    for (int i = 0; i < ids.length(); ++i) {
+        if (i)
+            out << ",";
+        out << njsonStr(handleOfId(ids[i]));
+    }
+    out << "]";
+    return out.str();
+}
+
+static std::string m08kcSubentIdJson(const AcDbSubentId& sid)
+{
+    std::ostringstream out;
+    out << "{\"subent_type\":" << njsonStr(std::string(m08kcSubentTypeName(sid.type())))
+        << ",\"subent_type_code\":" << static_cast<int>(sid.type())
+        << ",\"subent_index\":" << static_cast<long>(sid.index()) << "}";
+    return out.str();
+}
+
+static std::string m08kcSubentIdArrayJson(const AcArray<AcDbSubentId>& ids)
+{
+    std::ostringstream out;
+    out << "[";
+    for (int i = 0; i < ids.length(); ++i) {
+        if (i)
+            out << ",";
+        out << m08kcSubentIdJson(ids[i]);
+    }
+    out << "]";
+    return out.str();
+}
+
 //============================================================================
 // HasOp — every op id this family IMPLEMENTS (gate admission). Kept in lockstep
 // with the dispatch branches below (asserted by tests/unit/test_m08kc_handlers.py).
@@ -230,6 +308,8 @@ static bool m08kcHasOp(const std::string& op)
         op == "config.assocmanager.evalDisabler" ||
         op == "config.assoceval.callback" ||
         op == "config.constraint.globalCallback" ||
+        op == "edit.assocdata.xref" ||
+        op == "repair.assocdata.audit" ||
         // dependencies (create / attach / subent) (5)
         op == "define.assocdependency.attach" ||
         op == "define.assocgeomdependency.subent" ||
@@ -254,8 +334,9 @@ static bool m08kcHasOp(const std::string& op)
         op == "define.parameter.variable" ||
         op == "define.parameter.merge" ||
         op == "inspect.parameter.evaluate" ||
-        // assoc arrays — read-only identify (1)
-        op == "inspect.assocarray.identify";
+        // assoc arrays / assoc-surface topology reads (2)
+        op == "inspect.assocarray.identify" ||
+        op == "inspect.assocsurface.topology";
 }
 
 //============================================================================
@@ -293,6 +374,84 @@ static bool m08kcDispatch(const std::string& op, const AriadneJobCtx& ctx, std::
           << ",\"do_not_check_newly_added_constraints\":" << (doNotCheck ? "true" : "false")
           << ",\"mutation_allowed\":false"
           << ",\"evaluated\":false},\"status\":\"ok\"}";
+        return true;
+    }
+    if (op == "edit.assocdata.xref") {
+        AriadneDocumentWriteLock lock;
+        AriadneStagedWriteTransaction wt(pDb);
+        int xrefsBefore = 0, xrefsAfter = 0;
+        std::string namesBefore, namesAfter;
+        listXrefs(pDb, xrefsBefore, namesBefore);
+        const AcDbObjectId netIdBefore = m08kcTopNetworkId(pDb, false);
+        int actionCountBefore = 0, actionCountAfter = 0;
+        if (!netIdBefore.isNull()) {
+            AcDbAssocNetwork* pNet = nullptr;
+            if (acdbOpenObject(pNet, netIdBefore, AcDb::kForRead) == Acad::eOk && pNet != nullptr) {
+                actionCountBefore = pNet->getActions().length();
+                pNet->close();
+            }
+        }
+        AcDbAssocManager::markSyncUpWithXrefsNeeded(pDb);
+        const Acad::ErrorStatus es = AcDbAssocManager::syncUpWithXrefs(pDb);
+        listXrefs(pDb, xrefsAfter, namesAfter);
+        const AcDbObjectId netIdAfter = m08kcTopNetworkId(pDb, false);
+        if (!netIdAfter.isNull()) {
+            AcDbAssocNetwork* pNet = nullptr;
+            if (acdbOpenObject(pNet, netIdAfter, AcDb::kForRead) == Acad::eOk && pNet != nullptr) {
+                actionCountAfter = pNet->getActions().length();
+                pNet->close();
+            }
+        }
+        const Acad::ErrorStatus commitEs = (es == Acad::eOk) ? wt.commit() : es;
+        r << "\"result\":{\"marked_for_sync\":true"
+          << ",\"xref_count_before\":" << xrefsBefore
+          << ",\"xref_count_after\":" << xrefsAfter
+          << ",\"xrefs_before\":" << namesBefore
+          << ",\"xrefs_after\":" << namesAfter
+          << ",\"network_present_before\":" << (netIdBefore.isNull() ? "false" : "true")
+          << ",\"network_present_after\":" << (netIdAfter.isNull() ? "false" : "true")
+          << ",\"action_count_before\":" << actionCountBefore
+          << ",\"action_count_after\":" << actionCountAfter
+          << ",\"staged_committed\":" << (commitEs == Acad::eOk ? "true" : "false")
+          << ",\"mutation_errorstatus\":" << static_cast<int>(es)
+          << ",\"commit_errorstatus\":" << static_cast<int>(commitEs)
+          << "},\"status\":\"" << (commitEs == Acad::eOk ? "ok" : "error") << "\"}";
+        return true;
+    }
+    if (op == "repair.assocdata.audit") {
+        double traverseRaw = 1.0;
+        jsonFindNumber(job, "traverse_whole_database", traverseRaw);
+        const bool traverseWholeDatabase = (traverseRaw != 0.0);
+        AriadneDocumentWriteLock lock;
+        AriadneStagedWriteTransaction wt(pDb);
+        const AcDbObjectId netIdBefore = m08kcTopNetworkId(pDb, false);
+        int actionCountBefore = 0, actionCountAfter = 0;
+        if (!netIdBefore.isNull()) {
+            AcDbAssocNetwork* pNet = nullptr;
+            if (acdbOpenObject(pNet, netIdBefore, AcDb::kForRead) == Acad::eOk && pNet != nullptr) {
+                actionCountBefore = pNet->getActions().length();
+                pNet->close();
+            }
+        }
+        const Acad::ErrorStatus es = AcDbAssocManager::auditAssociativeData(pDb, traverseWholeDatabase);
+        const AcDbObjectId netIdAfter = m08kcTopNetworkId(pDb, false);
+        if (!netIdAfter.isNull()) {
+            AcDbAssocNetwork* pNet = nullptr;
+            if (acdbOpenObject(pNet, netIdAfter, AcDb::kForRead) == Acad::eOk && pNet != nullptr) {
+                actionCountAfter = pNet->getActions().length();
+                pNet->close();
+            }
+        }
+        const Acad::ErrorStatus commitEs = (es == Acad::eOk) ? wt.commit() : es;
+        r << "\"result\":{\"traverse_whole_database\":" << (traverseWholeDatabase ? "true" : "false")
+          << ",\"network_present_before\":" << (netIdBefore.isNull() ? "false" : "true")
+          << ",\"network_present_after\":" << (netIdAfter.isNull() ? "false" : "true")
+          << ",\"action_count_before\":" << actionCountBefore
+          << ",\"action_count_after\":" << actionCountAfter
+          << ",\"staged_committed\":" << (commitEs == Acad::eOk ? "true" : "false")
+          << ",\"mutation_errorstatus\":" << static_cast<int>(es)
+          << ",\"commit_errorstatus\":" << static_cast<int>(commitEs)
+          << "},\"status\":\"" << (commitEs == Acad::eOk ? "ok" : "error") << "\"}";
         return true;
     }
 
@@ -693,6 +852,93 @@ static bool m08kcDispatch(const std::string& op, const AriadneJobCtx& ctx, std::
           << ",\"network_present\":" << (netId.isNull() ? "false" : "true")
           << ",\"action_count\":" << actionCount << "},"
           << "\"status\":\"ok\"}";
+        return true;
+    }
+
+    // inspect.assocsurface.topology — read-only assoc-surface topology/introspection for
+    // ASM-based entities. This uses the public static query helpers only; no evaluation,
+    // repair, xref sync, or modeler mutation is invoked.
+    if (op == "inspect.assocsurface.topology") {
+        std::string targetHex;
+        if (!m08kcFindHandle(job, "target_handle", targetHex) && !m08kcFindHandle(job, "handle", targetHex)) {
+            emitNativeError(r, "MISSING_ARG", "inspect.assocsurface.topology requires 'target_handle'"); return true;
+        }
+        AriadneReadTransaction tr(pDb);
+        AcDbObjectId entId;
+        if (!resolveHandle(pDb, targetHex, entId)) { emitNativeError(r, "TARGET_NOT_FOUND", "no entity for handle " + targetHex); return true; }
+        AcDbEntity* pEnt = nullptr;
+        if (acdbOpenObject(pEnt, entId, AcDb::kForRead) != Acad::eOk || pEnt == nullptr) {
+            emitNativeError(r, "TARGET_NOT_FOUND", "open failed " + targetHex); return true;
+        }
+
+        double adjacentD = 0.0;
+        jsonFindNumber(job, "also_use_adjacent_topology", adjacentD);
+        const bool useAdjacent = (adjacentD != 0.0);
+
+        AcDbObjectIdArray dependentSurfaceIds;
+        const Acad::ErrorStatus depEs =
+            AcDbAssocSurfaceActionBody::getSurfacesDirectlyDependentOnObject(pEnt, dependentSurfaceIds);
+
+        AcDbObjectIdArray topoActionIds;
+        AcArray<AcArray<AcDbSubentId> > topoSubentIds;
+        const Acad::ErrorStatus topoEs =
+            AcDbAssocSurfaceActionBody::getTopologicalSubentitiesForActionsOnEntity(
+                pEnt, useAdjacent, topoActionIds, topoSubentIds);
+
+        std::string queryTypeName;
+        int queryTypeCode = 1;
+        bool explicitType = false;
+        const AcDb::SubentType queryType =
+            m08kcResolveSubentType(job, queryTypeName, queryTypeCode, explicitType);
+        double subIndexD = 1.0;
+        const bool explicitIndex =
+            jsonFindNumber(job, "subent_index", subIndexD) ||
+            jsonFindNumber(job, "marker", subIndexD) ||
+            jsonFindNumber(job, "index", subIndexD);
+        const bool attemptedFind = explicitType || explicitIndex;
+        AcDbObjectIdArray findActionIds;
+        Acad::ErrorStatus findEs = Acad::eNotApplicable;
+        if (attemptedFind) {
+            const long subIndex = static_cast<long>(subIndexD > 0.0 ? subIndexD : 1.0);
+            findEs = AcDbAssocSurfaceActionBody::findActionsThatAffectedTopologicalSubentity(
+                pEnt, AcDbSubentId(queryType, static_cast<Adesk::GsMarker>(subIndex)), findActionIds);
+        }
+
+        std::ostringstream topoJson;
+        topoJson << "[";
+        const int topoCount = topoActionIds.length();
+        for (int i = 0; i < topoCount; ++i) {
+            if (i)
+                topoJson << ",";
+            topoJson << "{\"action_handle\":" << njsonStr(handleOfId(topoActionIds[i]))
+                     << ",\"subentities\":";
+            if (i < topoSubentIds.length())
+                topoJson << m08kcSubentIdArrayJson(topoSubentIds[i]);
+            else
+                topoJson << "[]";
+            topoJson << "}";
+        }
+        topoJson << "]";
+
+        r << "\"result\":{\"target_handle\":" << njsonStr(targetHex)
+          << ",\"entity_class\":" << njsonStr(pEnt->isA() != nullptr ? pEnt->isA()->name() : ACRX_T(""))
+          << ",\"adjacent_topology\":" << (useAdjacent ? "true" : "false")
+          << ",\"topology_status\":" << static_cast<int>(topoEs)
+          << ",\"topology_action_count\":" << topoCount
+          << ",\"topology_actions\":" << topoJson.str()
+          << ",\"dependent_surfaces_status\":" << static_cast<int>(depEs)
+          << ",\"dependent_surface_count\":" << dependentSurfaceIds.length()
+          << ",\"dependent_surface_handles\":" << m08kcObjectIdHandleArrayJson(dependentSurfaceIds)
+          << ",\"find_actions_attempted\":" << (attemptedFind ? "true" : "false")
+          << ",\"find_actions_status\":" << static_cast<int>(findEs)
+          << ",\"find_action_count\":" << findActionIds.length()
+          << ",\"find_action_handles\":" << m08kcObjectIdHandleArrayJson(findActionIds);
+        if (attemptedFind)
+            r << ",\"query_subent_type\":" << njsonStr(queryTypeName)
+              << ",\"query_subent_type_code\":" << queryTypeCode
+              << ",\"query_subent_index\":" << static_cast<long>(subIndexD > 0.0 ? subIndexD : 1.0);
+        r << "},\"status\":\"ok\"}";
+        pEnt->close();
         return true;
     }
 

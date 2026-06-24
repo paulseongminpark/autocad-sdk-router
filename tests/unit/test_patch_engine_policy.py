@@ -380,5 +380,60 @@ class TestApplyStagedLifecycleMocked(unittest.TestCase):
             self.assertEqual(_sha256(original), sha_before)
 
 
+class TestApplyNativeStagedLifecycleMocked(unittest.TestCase):
+    def setUp(self):
+        import patch_engine
+        self.pe = patch_engine
+
+    def test_native_dictionary_set_runs_staged_lifecycle_and_flattens_args(self):
+        with tempfile.TemporaryDirectory(prefix="native_stage_") as tmp:
+            original = os.path.join(tmp, "orig.dwg")
+            with open(original, "wb") as fh:
+                fh.write(b"ORIGINAL-DWG-BYTES-DO-NOT-TOUCH")
+            sha_before = _sha256(original)
+            out_dir = os.path.join(tmp, "run")
+            fake = _FakeRunJob(original,
+                               _native_result(["2A7"]),
+                               _native_result(["2A7"]))
+            import run_job as real_run_job
+            orig_fn = real_run_job.run_router_cad_job
+            real_run_job.run_router_cad_job = fake.run_router_cad_job
+            try:
+                res = self.pe.apply_native_staged(
+                    "write.dictionary.set",
+                    {"key": "BUILD_MARKER", "value": "wave4x", "owner_handle": "2A7"},
+                    original,
+                    out_dir,
+                    request_id="native-dict-set",
+                )
+            finally:
+                real_run_job.run_router_cad_job = orig_fn
+
+            self.assertIn(res["status"], _TRUTHFUL)
+            self.assertEqual(_sha256(original), sha_before)
+            self.assertTrue(os.path.isfile(os.path.join(out_dir, "journal.json")))
+            self.assertTrue(fake.calls)
+            for c in fake.calls:
+                self.assertNotEqual(c["staged"], os.path.abspath(original))
+
+            with open(os.path.join(out_dir, "apply", "cad_job.json"), "r", encoding="utf-8") as fh:
+                job_doc = json.load(fh)
+            self.assertEqual(job_doc["operation"], "write.dictionary.set")
+            self.assertEqual(job_doc["key"], "BUILD_MARKER")
+            self.assertEqual(job_doc["args"]["key"], "BUILD_MARKER")
+            self.assertEqual(job_doc["owner_handle"], "2A7")
+
+    def test_native_unknown_op_degrades_not_implemented_before_disk_mutation(self):
+        with tempfile.TemporaryDirectory(prefix="native_stage_ni_") as tmp:
+            original = os.path.join(tmp, "orig.dwg")
+            with open(original, "wb") as fh:
+                fh.write(b"ORIG")
+            sha_before = _sha256(original)
+            out_dir = os.path.join(tmp, "run")
+            res = self.pe.apply_native_staged("write.entity.nope", {"x": 1}, original, out_dir)
+            self.assertEqual(res["status"], "not_implemented")
+            self.assertEqual(_sha256(original), sha_before)
+
+
 if __name__ == "__main__":
     unittest.main()

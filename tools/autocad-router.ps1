@@ -58,6 +58,7 @@ $RunsDir = Join-Path $RouterHome 'runs'
 $StagingDir = Join-Path $RouterHome 'staging'
 $NativeExtractorProject = Join-Path $RouterHome 'src\Ariadne.DwgGeometryExtractor\Ariadne.DwgGeometryExtractor.csproj'
 $NativeAcadBinDir = if (-not [string]::IsNullOrWhiteSpace($env:ARIADNE_NATIVE_ACAD_BIN_DIR)) { $env:ARIADNE_NATIVE_ACAD_BIN_DIR } else { Join-Path $RouterHome 'src\Ariadne.AcadNative\bin\x64\Release' }
+. (Join-Path $RouterHome 'tools\fallback_safe_surface.ps1')
 
 function Read-JsonFile {
   param([string]$Path)
@@ -147,6 +148,28 @@ function Get-CadJobJigPointLine {
 
 function Test-NativeP1CadJobOperation {
   param([string]$OperationName)
+  if ([string]::IsNullOrWhiteSpace($OperationName)) { return $false }
+
+  # WAVE4X: any implemented registry op explicitly bound to ARIADNE_NATIVE_JOB is
+  # a native cad-job surface, even if it landed after the original fixed P1 list.
+  try {
+    $registryPath = Join-Path $RouterHome 'config\operations.v2.json'
+    $registry = Read-JsonFile -Path $registryPath
+    $record = @($registry.operations | Where-Object {
+      "$($_.id)" -eq $OperationName -or "$($_.operation)" -eq $OperationName
+    } | Select-Object -First 1)
+    if ($record) {
+      $status = "$($record.status)"
+      $lane = if ($record.handler) { "$($record.handler.router_lane)" } else { '' }
+      if ((@('implemented', 'wired') -contains $status) -and $lane -eq 'ARIADNE_NATIVE_JOB') {
+        return $true
+      }
+    }
+  }
+  catch {
+    # Fall through to the frozen explicit allow-list below.
+  }
+
   return @(
     'inspect.database.summary',
     'inspect.database.graph',
@@ -1269,7 +1292,11 @@ switch ($Action) {
     $sel = $selection.selected_route
   if ($sel -eq 'dwg_truth_autocad') {
     $effectiveWriteMode = Get-EffectiveDwgWriteMode
-    if (
+    $safeFallbackExec = Invoke-SafeFallbackOperation -Capabilities $capabilities
+    if ($null -ne $safeFallbackExec) {
+      $exec = $safeFallbackExec
+    }
+    elseif (
       ($HostMode -eq 'full_autocad' -or $effectiveWriteMode -eq 'live_edit') -and
       (-not [string]::IsNullOrWhiteSpace($JobPath) -or -not [string]::IsNullOrWhiteSpace($Operation))
     ) {

@@ -1,0 +1,87 @@
+========================================================================
+RECONCILE native registry  (mode: DRY-RUN)
+  registry: 517 ops
+========================================================================
+
+[m08c] m08c_handlers.inc
+  coded HasOp ops : 27
+  -> flip (catalogued/stub -> implemented): 0
+  -> already implemented (skip)           : 27
+  -> conflict (blocked/deprecated)        : 0
+  -> DRIFT (not in registry)              : 0
+
+[m08d] m08d_handlers.inc
+  coded HasOp ops : 72
+  -> flip (catalogued/stub -> implemented): 0
+  -> already implemented (skip)           : 72
+  -> conflict (blocked/deprecated)        : 0
+  -> DRIFT (not in registry)              : 0
+
+[m08e] m08e_handlers.inc
+  coded HasOp ops : 13
+  -> flip (catalogued/stub -> implemented): 0
+  -> already implemented (skip)           : 13
+  -> conflict (blocked/deprecated)        : 0
+  -> DRIFT (not in registry)              : 0
+
+[m08f] m08f_handlers.inc
+  coded HasOp ops : 0
+  -> flip (catalogued/stub -> implemented): 0
+  -> already implemented (skip)           : 0
+  -> conflict (blocked/deprecated)        : 0
+  -> DRIFT (not in registry)              : 0
+
+[m08g] m08g_handlers.inc
+  coded HasOp ops : 45
+  -> flip (catalogued/stub -> implemented): 0
+  -> already implemented (skip)           : 45
+  -> conflict (blocked/deprecated)        : 0
+  -> DRIFT (not in registry)              : 0
+
+[m08h] m08h_handlers.inc
+  coded HasOp ops : 15
+  -> flip (catalogued/stub -> implemented): 0
+  -> already implemented (skip)           : 15
+  -> conflict (blocked/deprecated)        : 0
+  -> DRIFT (not in registry)              : 0
+
+[m08k] m08k_handlers.inc
+  coded HasOp ops : 45
+  -> flip (catalogued/stub -> implemented): 0
+  -> already implemented (skip)           : 45
+  -> conflict (blocked/deprecated)        : 0
+  -> DRIFT (not in registry)              : 0
+
+[m08kc] m08kc_handlers.inc
+  coded HasOp ops : 38
+  -> flip (catalogued/stub -> implemented): 0
+  -> already implemented (skip)           : 38
+  -> conflict (blocked/deprecated)        : 0
+  -> DRIFT (not in registry)              : 0
+
+[m08l] m08l_handlers.inc
+  coded HasOp ops : 29
+  -> flip (catalogued/stub -> implemented): 0
+  -> already implemented (skip)           : 29
+  -> conflict (blocked/deprecated)        : 0
+  -> DRIFT (not in registry)              : 0
+
+[m08m] m08m_handlers.inc
+  coded HasOp ops : 64
+  -> flip (catalogued/stub -> implemented): 0
+  -> already implemented (skip)           : 64
+  -> conflict (blocked/deprecated)        : 0
+  -> DRIFT (not in registry)              : 0
+
+[m08n] m08n_handlers.inc
+  coded HasOp ops : 91
+  -> flip (catalogued/stub -> implemented): 0
+  -> already implemented (skip)           : 91
+  -> conflict (blocked/deprecated)        : 0
+  -> DRIFT (not in registry)              : 0
+
+------------------------------------------------------------------------
+TOTALS: coded=439  flips=0  overlaps=439  conflicts=0  drift=0
+  catalogued before: 0  ->  projected after: 0
+
+(DRY-RUN — no file written. Re-run with --apply to write.)

@@ -307,6 +307,300 @@ static bool m08gRead2dVertices(const std::string& job, AcGePoint2dArray& pts)
     return pts.length() >= 3;
 }
 
+static const char* m08gSubentTypeName(AcDb::SubentType type)
+{
+    switch (type) {
+        case AcDb::kFaceSubentType:   return "face";
+        case AcDb::kEdgeSubentType:   return "edge";
+        case AcDb::kVertexSubentType: return "vertex";
+        case AcDb::kNullSubentType:   return "null";
+        default:                      return "other";
+    }
+}
+
+static bool m08gResolveSubentHandle(const std::string& primary, const std::string* fallback,
+                                    std::string& out)
+{
+    if ((jsonFindString(primary, "handle", out) ||
+         jsonFindString(primary, "target_handle", out) ||
+         jsonFindString(primary, "entity_handle", out)) && !out.empty())
+        return true;
+    if (fallback != nullptr &&
+        (jsonFindString(*fallback, "handle", out) ||
+         jsonFindString(*fallback, "target_handle", out) ||
+         jsonFindString(*fallback, "entity_handle", out)) && !out.empty())
+        return true;
+    out.clear();
+    return false;
+}
+
+static bool m08gMapSubentTypeToken(const std::string& token, AcDb::SubentType& outType,
+                                   std::string& outName)
+{
+    std::string lower(token);
+    for (size_t i = 0; i < lower.size(); ++i) {
+        if (lower[i] >= 'A' && lower[i] <= 'Z')
+            lower[i] = static_cast<char>(lower[i] - 'A' + 'a');
+    }
+    if (lower == "face" || lower == "1") {
+        outType = AcDb::kFaceSubentType;
+        outName = "face";
+        return true;
+    }
+    if (lower == "vertex" || lower == "2") {
+        outType = AcDb::kVertexSubentType;
+        outName = "vertex";
+        return true;
+    }
+    if (lower == "null") {
+        outType = AcDb::kNullSubentType;
+        outName = "null";
+        return true;
+    }
+    outType = AcDb::kEdgeSubentType;
+    outName = "edge";
+    return true;
+}
+
+static AcDb::SubentType m08gResolveSubentType(const std::string& primary,
+                                              const std::string* fallback,
+                                              std::string& outName)
+{
+    std::string token;
+    AcDb::SubentType type = AcDb::kFaceSubentType;
+    outName = "face";
+    if (jsonFindString(primary, "subent_type", token) || jsonFindString(primary, "type", token) ||
+        (fallback != nullptr &&
+         (jsonFindString(*fallback, "subent_type", token) || jsonFindString(*fallback, "type", token)))) {
+        m08gMapSubentTypeToken(token, type, outName);
+        return type;
+    }
+    double raw = 1.0;
+    if (jsonFindNumber(primary, "subent_type", raw) || jsonFindNumber(primary, "type", raw) ||
+        (fallback != nullptr &&
+         (jsonFindNumber(*fallback, "subent_type", raw) || jsonFindNumber(*fallback, "type", raw)))) {
+        m08gMapSubentTypeToken(std::to_string(static_cast<int>(raw)), type, outName);
+        return type;
+    }
+    return type;
+}
+
+static long m08gResolveSubentIndex(const std::string& primary, const std::string* fallback)
+{
+    double raw = 1.0;
+    if (jsonFindNumber(primary, "subent_index", raw) || jsonFindNumber(primary, "marker", raw) ||
+        jsonFindNumber(primary, "index", raw) ||
+        (fallback != nullptr &&
+         (jsonFindNumber(*fallback, "subent_index", raw) ||
+          jsonFindNumber(*fallback, "marker", raw) ||
+          jsonFindNumber(*fallback, "index", raw)))) {
+        const long idx = static_cast<long>(raw);
+        return idx > 0 ? idx : 1;
+    }
+    return 1;
+}
+
+static std::vector<std::string> m08gResolveInsertStack(const std::string& primary,
+                                                       const std::string* fallback)
+{
+    std::vector<std::string> ids = jsonFindStringArray(primary, "insert_stack");
+    if (ids.empty()) ids = jsonFindStringArray(primary, "inserts");
+    if (ids.empty()) ids = jsonFindStringArray(primary, "ent_and_insert_stack");
+    if (ids.empty() && fallback != nullptr) ids = jsonFindStringArray(*fallback, "insert_stack");
+    if (ids.empty() && fallback != nullptr) ids = jsonFindStringArray(*fallback, "inserts");
+    if (ids.empty() && fallback != nullptr) ids = jsonFindStringArray(*fallback, "ent_and_insert_stack");
+    return ids;
+}
+
+static std::vector<std::string> m08gFindObjectArray(const std::string& j, const char* key)
+{
+    std::vector<std::string> out;
+    const std::string k = std::string("\"") + key + "\"";
+    size_t p = j.find(k);
+    if (p == std::string::npos)
+        return out;
+    p = j.find('[', p + k.size());
+    if (p == std::string::npos)
+        return out;
+
+    bool inString = false;
+    bool escaped = false;
+    int depth = 0;
+    size_t start = std::string::npos;
+    for (size_t i = p + 1; i < j.size(); ++i) {
+        const char c = j[i];
+        if (inString) {
+            if (escaped) escaped = false;
+            else if (c == '\\') escaped = true;
+            else if (c == '"') inString = false;
+            continue;
+        }
+        if (c == '"') {
+            inString = true;
+            continue;
+        }
+        if (c == ']') {
+            if (depth == 0)
+                break;
+        }
+        if (c == '{') {
+            if (depth == 0)
+                start = i;
+            ++depth;
+            continue;
+        }
+        if (c == '}') {
+            --depth;
+            if (depth == 0 && start != std::string::npos) {
+                out.push_back(j.substr(start, i - start + 1));
+                start = std::string::npos;
+            }
+        }
+    }
+    return out;
+}
+
+static bool m08gParseSubentPathSpec(const std::string& primary, const std::string* fallback,
+                                    AcDbDatabase* pDb, AcDbFullSubentPath& outPath,
+                                    std::string& error)
+{
+    error.clear();
+    std::string handleHex;
+    if (!m08gResolveSubentHandle(primary, fallback, handleHex)) {
+        error = "missing handle/target_handle";
+        return false;
+    }
+    AcDbObjectId entId;
+    if (!resolveHandle(pDb, handleHex, entId)) {
+        error = "no entity for handle " + handleHex;
+        return false;
+    }
+    std::string typeName;
+    const AcDb::SubentType subType = m08gResolveSubentType(primary, fallback, typeName);
+    const long subIndex = m08gResolveSubentIndex(primary, fallback);
+    AcDbObjectIdArray ids;
+    ids.append(entId);
+    const std::vector<std::string> insertIds = m08gResolveInsertStack(primary, fallback);
+    for (size_t i = 0; i < insertIds.size(); ++i) {
+        AcDbObjectId insertId;
+        if (!resolveHandle(pDb, insertIds[i], insertId)) {
+            error = "insert stack handle not found: " + insertIds[i];
+            return false;
+        }
+        ids.append(insertId);
+    }
+    outPath = AcDbFullSubentPath(ids, AcDbSubentId(subType, static_cast<Adesk::GsMarker>(subIndex)));
+    return true;
+}
+
+static int m08gReadSubentPaths(const std::string& job, AcDbDatabase* pDb,
+                               AcDbFullSubentPathArray& outPaths,
+                               std::string& rootHandleOut, std::string& error)
+{
+    outPaths.removeAll();
+    rootHandleOut.clear();
+    error.clear();
+
+    std::string argsJson;
+    const bool hasArgs = jsonFindObject(job, "args", argsJson);
+    const std::string* argsPtr = hasArgs ? &argsJson : nullptr;
+
+    std::vector<std::string> pathObjs = m08gFindObjectArray(job, "paths");
+    if (pathObjs.empty() && argsPtr != nullptr)
+        pathObjs = m08gFindObjectArray(*argsPtr, "paths");
+
+    if (!pathObjs.empty()) {
+        AcDbObjectId rootId = AcDbObjectId::kNull;
+        for (size_t i = 0; i < pathObjs.size(); ++i) {
+            AcDbFullSubentPath path;
+            if (!m08gParseSubentPathSpec(pathObjs[i], nullptr, pDb, path, error))
+                return 0;
+            const AcDbObjectIdArray& ids = path.objectIds();
+            if (ids.length() < 1) {
+                error = "subentity path has no owning entity";
+                return 0;
+            }
+            if (rootId.isNull()) {
+                rootId = ids[0];
+                rootHandleOut = handleOfId(rootId);
+            } else if (ids[0] != rootId) {
+                error = "all paths must target the same owning entity";
+                return 0;
+            }
+            outPaths.append(path);
+        }
+        return static_cast<int>(outPaths.length());
+    }
+
+    AcDbFullSubentPath single;
+    if (!m08gParseSubentPathSpec(job, argsPtr, pDb, single, error))
+        return 0;
+    const AcDbObjectIdArray& ids = single.objectIds();
+    if (ids.length() < 1) {
+        error = "subentity path has no owning entity";
+        return 0;
+    }
+    rootHandleOut = handleOfId(ids[0]);
+    outPaths.append(single);
+    return static_cast<int>(outPaths.length());
+}
+
+static std::string m08gPathObjectIdsJson(const AcDbFullSubentPath& path)
+{
+    std::ostringstream arr;
+    arr << "[";
+    const AcDbObjectIdArray& ids = path.objectIds();
+    for (int i = 0; i < ids.length(); ++i) {
+        if (i) arr << ",";
+        arr << njsonStr(handleOfId(ids[i]));
+    }
+    arr << "]";
+    return arr.str();
+}
+
+static std::string m08gSubentReadbackJson(AcDbEntity* pEnt, const AcDbFullSubentPathArray& paths)
+{
+    std::ostringstream arr;
+    arr << "[";
+    if (pEnt == nullptr) {
+        arr << "]";
+        return arr.str();
+    }
+    for (int i = 0; i < paths.length(); ++i) {
+        if (i) arr << ",";
+        const AcDbFullSubentPath& path = paths[i];
+        AcDbEntity* pSub = pEnt->subentPtr(path);
+        AcDbExtents ext;
+        const Acad::ErrorStatus extEs = pEnt->getSubentPathGeomExtents(path, ext);
+        AcArray<Adesk::GsMarker> markers;
+        const Acad::ErrorStatus markerEs = pEnt->getGsMarkersAtSubentPath(path, markers);
+
+        arr << "{\"subent_type\":" << njsonStr(std::string(m08gSubentTypeName(path.subentId().type())))
+            << ",\"subent_index\":" << static_cast<long>(path.subentId().index())
+            << ",\"object_path\":" << m08gPathObjectIdsJson(path)
+            << ",\"materialized\":" << (pSub != nullptr ? "true" : "false")
+            << ",\"markers_status\":" << static_cast<int>(markerEs)
+            << ",\"marker_count\":" << markers.length()
+            << ",\"markers\":[";
+        for (int m = 0; m < markers.length(); ++m) {
+            if (m) arr << ",";
+            arr << static_cast<long>(markers[m]);
+        }
+        arr << "]"
+            << ",\"extents_status\":" << static_cast<int>(extEs);
+        if (extEs == Acad::eOk)
+            arr << ",\"min\":" << m08dPointJson(ext.minPoint())
+                << ",\"max\":" << m08dPointJson(ext.maxPoint());
+        if (pSub != nullptr) {
+            arr << ",\"sub_class\":" << njsonStr(pSub->isA() != nullptr ? pSub->isA()->name() : ACRX_T(""));
+            delete pSub;
+        }
+        arr << "}";
+    }
+    arr << "]";
+    return arr.str();
+}
+
 static void m08gEmitModelerCreate(std::ostringstream& r, const char* kind, Acad::ErrorStatus es,
                                   const AcDbObjectId& id, const std::string& layer, int msAfter)
 {
@@ -369,7 +663,11 @@ static bool m08gHasOp(const std::string& op)
         op == "modify.entity.solid3d.boolean" ||
         op == "modify.curve.offset" ||
         op == "modify.curve.split" ||
-        op == "modify.curve.to_spline";
+        op == "modify.curve.to_spline" ||
+        // explicit staged subentity path mutation
+        op == "edit.subentity.add_paths" ||
+        op == "edit.subentity.delete_paths" ||
+        op == "edit.subentity.transform";
 }
 
 //============================================================================
@@ -1380,6 +1678,46 @@ static bool m08gDispatch(const std::string& op, const AriadneJobCtx& ctx, std::o
           << ",\"handle\":" << njsonStr(es == Acad::eOk ? handleOfId(id) : std::string())
           << ",\"modelspace_entities_after\":" << ms << "},"
           << "\"status\":\"" << (es == Acad::eOk ? "ok" : "error") << "\"}";
+        return true;
+    }
+
+    if (op == "edit.subentity.add_paths" ||
+        op == "edit.subentity.delete_paths" ||
+        op == "edit.subentity.transform") {
+        AcDbFullSubentPathArray paths;
+        std::string targetHandle, parseError;
+        const int pathCount = m08gReadSubentPaths(job, pDb, paths, targetHandle, parseError);
+        if (pathCount <= 0) {
+            emitNativeError(r, "INVALID_PATH_SPEC", op + " requires explicit subentity path(s): " + parseError);
+            return true;
+        }
+        AcDbEntity* pEnt = m08gOpenEntityForWrite(pDb, targetHandle);
+        if (pEnt == nullptr) {
+            emitNativeError(r, "ENTITY_NOT_FOUND", "no writable entity for handle " + targetHandle);
+            return true;
+        }
+        const std::string beforeJson = m08gSubentReadbackJson(pEnt, paths);
+        Acad::ErrorStatus es = Acad::eNotApplicable;
+        AcGeMatrix3d xform;
+        if (op == "edit.subentity.add_paths") {
+            es = pEnt->addSubentPaths(paths);
+        } else if (op == "edit.subentity.delete_paths") {
+            es = pEnt->deleteSubentPaths(paths);
+        } else {
+            xform = m08gReadTransform(job);
+            es = pEnt->transformSubentPathsBy(paths, xform);
+        }
+        const std::string afterJson = m08gSubentReadbackJson(pEnt, paths);
+        pEnt->close();
+        r << "\"result\":{\"target_handle\":" << njsonStr(targetHandle)
+          << ",\"path_count\":" << pathCount
+          << ",\"mutation\":" << njsonStr(op)
+          << ",\"errorstatus\":" << static_cast<int>(es)
+          << ",\"before\":" << beforeJson
+          << ",\"after\":" << afterJson;
+        if (op == "edit.subentity.transform")
+            r << ",\"transform\":" << m08dMatrixJson(xform);
+        r << "},\"status\":\"" << (es == Acad::eOk ? "ok" : "error") << "\"}";
         return true;
     }
 

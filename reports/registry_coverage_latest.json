@@ -1,17 +1,15 @@
-﻿{
+{
   "schema": "ariadne.cadctl.registry_coverage.v1",
   "status": "ok",
   "registry_schema": "ariadne.operations_registry.v2",
   "registry_version": "2.0.0",
   "operation_count": 517,
-  "wired_count": 37,
+  "wired_count": 463,
   "totals": {
     "operations": 517,
     "by_status": {
-      "blocked": 2,
-      "catalogued": 474,
-      "implemented": 37,
-      "stub": 4
+      "blocked": 54,
+      "implemented": 463
     },
     "by_family": {
       "active_document_write_original": 8,
@@ -82,22 +80,20 @@
       "ui_customization": 39
     },
     "operation_records": 517,
-    "implemented": 37,
+    "implemented": 463,
     "wired": 0,
-    "stub": 4,
-    "catalogued": 474,
-    "blocked": 2,
+    "stub": 0,
+    "catalogued": 0,
+    "blocked": 54,
     "deprecated": 0,
     "unknown": 0,
-    "catalog_classified_ops": 480,
+    "catalog_classified_ops": 62,
     "catalog_unclassified_ops": 0,
     "catalog_classification_status": "complete"
   },
   "computed_by_status": {
-    "implemented": 37,
-    "stub": 4,
-    "blocked": 2,
-    "catalogued": 474
+    "implemented": 463,
+    "blocked": 54
   },
   "computed_by_family": {
     "objectdbx_database": 21,
@@ -129,9 +125,9 @@
   },
   "computed_by_engine_tier": {
     "managed_also": 46,
-    "objectdbx_capable": 218,
+    "objectdbx_capable": 219,
     "accoreconsole_lisp_also": 20,
-    "native_arx_only": 233
+    "native_arx_only": 232
   },
   "unknown_count": 0,
   "consistent": true

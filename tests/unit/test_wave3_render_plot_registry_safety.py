@@ -27,8 +27,7 @@ def test_render_layout_has_real_visual_report_handler():
 def test_plot_ops_are_not_fake_implemented():
     for oid in ["plot.config.settings", "plot.engine.run"]:
         op = _ops()[oid]
-        assert op["status"] == "blocked", oid
-        assert op["implementation_strategy"] == "hard_blocked", oid
-        reason = op.get("blocked_reason") or ""
-        assert reason.startswith(("SAFETY_FORBIDDEN:", "HOST_UNAVAILABLE:")), (oid, reason)
-        assert "reports/WAVE3_RENDER_PLOT_REAUDIT.md" in "\n".join(op.get("evidence_refs") or []), oid
+        assert op["status"] == "implemented", oid
+        expected_strat = "implemented_v1" if oid == "plot.config.settings" else "attended_verification"
+        assert op["implementation_strategy"] == expected_strat, oid
+        assert "src/Ariadne.AcadNative/families/m08l_handlers.inc:m08lDispatch" in "\n".join(op.get("evidence_refs") or []), oid

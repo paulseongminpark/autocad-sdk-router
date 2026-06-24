@@ -1,0 +1,53 @@
+{
+  "schema": "wave4x.fallback.result.v1",
+  "branch": "cados/w4x-fallback-com-ole",
+  "worktree": "D:\\dev\\99_tools\\autocad-sdk-router_w4x_fallback",
+  "implemented_ops": [
+    "automate.com.get_app",
+    "automate.com.get_document",
+    "automate.com.get_for_command",
+    "automate.com.get_winapp",
+    "automate.com.wrapper_for_object",
+    "module.load.lisp"
+  ],
+  "still_hard_blocked_ops": [
+    {
+      "operation": "automate.com.send_command",
+      "blocked_reason": "SAFETY_FORBIDDEN: COM SendCommand is raw command-string dispatch and must not be exposed to agents."
+    },
+    {
+      "operation": "command.invoke.coroutine",
+      "blocked_reason": "SAFETY_FORBIDDEN: raw command dispatch is blocked in M08O fallback policy. Fallbacks are managed/.NET/LISP-only and do not expose direct command strings."
+    },
+    {
+      "operation": "command.invoke.sync",
+      "blocked_reason": "SAFETY_FORBIDDEN: raw command dispatch is blocked in M08O fallback policy. Fallbacks are managed/.NET/LISP-only and do not expose direct command strings."
+    },
+    {
+      "operation": "command.invoke.sync.resbuf",
+      "blocked_reason": "SAFETY_FORBIDDEN: raw command dispatch is blocked in M08O fallback policy. Fallbacks are managed/.NET/LISP-only and do not expose direct command strings."
+    },
+    {
+      "operation": "command.menu.invoke",
+      "blocked_reason": "SAFETY_FORBIDDEN: acedMenuCmd executes arbitrary menu/command macros in the active editor; exposing it as an agent API would be a raw command surface and may mutate the user session."
+    },
+    {
+      "operation": "command.queue.post",
+      "blocked_reason": "SAFETY_FORBIDDEN: raw command dispatch is blocked in M08O fallback policy. Fallbacks are managed/.NET/LISP-only and do not expose direct command strings."
+    },
+    {
+      "operation": "embed.ole.frame",
+      "blocked_reason": "HOST_UNAVAILABLE: AcDbOle2Frame embedding/linking requires a live OLE client item and attended host context; no controlled OLE route or staged payload contract is available."
+    },
+    {
+      "operation": "module.lifecycle.on_ole_unload",
+      "blocked_reason": "HOST_UNAVAILABLE: On_kOleUnloadAppMsg is a host lifecycle callback and cannot be triggered safely from the CAD OS job surface."
+    }
+  ],
+  "raw_command_exposed": false,
+  "validation": {
+    "pytest": "495 passed, 20 skipped",
+    "operation_coverage": "implemented 463 / blocked 54 / gate_pass true",
+    "cadctl_registry_coverage": "wired_count 463 / consistent true"
+  }
+}
