@@ -1,8 +1,8 @@
 ﻿{
-    "timestamp":  "2026-06-24T00:45:19.7165990+09:00",
+    "timestamp":  "2026-06-24T11:52:14.2072066+09:00",
     "schema":  "ariadne.autocad_router_status.v2",
     "status":  "ALL_AVAILABLE",
-    "router_home":  "D:\\dev\\99_tools\\autocad-sdk-router_w4x_subentity",
+    "router_home":  "D:\\dev\\99_tools\\autocad-sdk-router_wave4x_fast_a_merge",
     "python_exe":  "C:\\Users\\PAUL\\AppData\\Local\\Programs\\Python\\Python312\\python.exe",
     "route_count":  11,
     "available_count":  11,
@@ -10,22 +10,22 @@
 
                     ],
     "native_modules":  {
-                           "status":  "PRESENT",
+                           "status":  "MISSING",
                            "modules":  [
                                            {
-                                               "path":  "D:\\dev\\99_tools\\autocad-sdk-router_w4x_subentity\\src\\Ariadne.AcadNative\\bin\\x64\\Release\\Ariadne.AcadNativeDbx.dbx",
-                                               "exists":  true,
-                                               "bytes":  54272
+                                               "path":  "D:\\dev\\99_tools\\autocad-sdk-router_wave4x_fast_a_merge\\src\\Ariadne.AcadNative\\bin\\x64\\Release\\Ariadne.AcadNativeDbx.dbx",
+                                               "exists":  false,
+                                               "bytes":  0
                                            },
                                            {
-                                               "path":  "D:\\dev\\99_tools\\autocad-sdk-router_w4x_subentity\\src\\Ariadne.AcadNative\\bin\\x64\\Release\\Ariadne.AcadNative.crx",
-                                               "exists":  true,
-                                               "bytes":  777216
+                                               "path":  "D:\\dev\\99_tools\\autocad-sdk-router_wave4x_fast_a_merge\\src\\Ariadne.AcadNative\\bin\\x64\\Release\\Ariadne.AcadNative.crx",
+                                               "exists":  false,
+                                               "bytes":  0
                                            },
                                            {
-                                               "path":  "D:\\dev\\99_tools\\autocad-sdk-router_w4x_subentity\\src\\Ariadne.AcadNative\\bin\\x64\\Release\\Ariadne.AcadNative.arx",
-                                               "exists":  true,
-                                               "bytes":  785920
+                                               "path":  "D:\\dev\\99_tools\\autocad-sdk-router_wave4x_fast_a_merge\\src\\Ariadne.AcadNative\\bin\\x64\\Release\\Ariadne.AcadNative.arx",
+                                               "exists":  false,
+                                               "bytes":  0
                                            }
                                        ],
                            "coreconsole_load":  {

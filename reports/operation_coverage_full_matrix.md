@@ -2,9 +2,9 @@
 
 - packet: `CADOS_M08_FULL_OPERATION_COVERAGE_CLOSURE`
 - generated_from: `config/operations.v2.json`
-- total operations: **517** · implemented 467 · stub 0 · blocked 50 · catalogued 0 · deprecated 0 · **unknown 0**
-- v1-target: **517** (implemented 467 · blocked 50 · **deferred 0**)
-- agent-exposed ops: 467
+- total operations: **517** · implemented 474 · stub 0 · blocked 43 · catalogued 0 · deprecated 0 · **unknown 0**
+- v1-target: **517** (implemented 474 · blocked 43 · **deferred 0**)
+- agent-exposed ops: 474
 
 ## Gate
 
@@ -32,16 +32,16 @@
 | validate_diff | 3 | 0 | 0 | 0 | 3 |
 | render_visual | 10 | 0 | 2 | 0 | 12 |
 | live | 6 | 0 | 1 | 0 | 7 |
-| native_only | 378 | 0 | 43 | 0 | 421 |
+| native_only | 385 | 0 | 36 | 0 | 421 |
 
 ## Risk class distribution
 
 | risk_class | count |
 |---|---|
-| read_safe | 346 |
+| read_safe | 347 |
 | staged_write | 115 |
 | live_edit | 50 |
-| raw_command | 6 |
+| raw_command | 5 |
 
 ## v1-target operations (the v1 surface — all implemented or hard-blocked)
 
@@ -50,7 +50,7 @@
 | command.invoke.coroutine | active_document_write_original | blocked | raw_command | live_edit | False | acedCommandC(AcEdCoroutineCallback, void*, int r | SAFETY_FORBIDDEN: raw command dispatch is blocked in M08O fa |
 | command.invoke.sync | active_document_write_original | blocked | raw_command | live_edit | False | acedCommandS(int rtype, ...) | SAFETY_FORBIDDEN: raw command dispatch is blocked in M08O fa |
 | command.invoke.sync.resbuf | active_document_write_original | blocked | raw_command | live_edit | False | acedCmdS(const resbuf* rb, bool, AcApDocument*) | SAFETY_FORBIDDEN: raw command dispatch is blocked in M08O fa |
-| doc.sendstring | active_document_write_original | blocked | raw_command | write_copy | False | AcApDocManager::sendStringToExecute(AcApDocument | SAFETY_FORBIDDEN: doc.sendstring uses AcApDocManager::sendSt |
+| doc.sendstring | active_document_write_original | blocked | raw_command | write_copy | False | AcApDocManager::sendStringToExecute(AcApDocument | SAFETY_FORBIDDEN: doc.sendstring is a raw command surface be |
 | ui.subentity.highlight | brep_solids | blocked | read_safe | read | False | AcDbEntity::highlight(const AcDbFullSubentPath&, | HOST_UNAVAILABLE: subentity highlight requires a live graphi |
 | automate.com.send_command | com_activex | blocked | read_safe | read | False | (no native export found this session) — via COM: | SAFETY_FORBIDDEN: COM SendCommand is raw command-string disp |
 | embed.ole.frame | com_activex | blocked | live_edit | live_edit | False | AcDbOle2Frame (setOleClientItem(COleClientItem*) | HOST_UNAVAILABLE: AcDbOle2Frame embedding/linking requires a |
@@ -80,21 +80,14 @@
 | plot.config.settings | layouts_plot_publish | blocked | live_edit | live_edit | False | AcDbPlotSettings / AcPlPlotConfig / AcPlPlotConf | SAFETY_FORBIDDEN: exact plot settings operation is a live_ed |
 | plot.engine.run | layouts_plot_publish | blocked | read_safe | read | False | AcPlPlotEngine: beginPlot/beginDocument/beginPag | HOST_UNAVAILABLE: AcPlPlotEngine execution requires a contro |
 | live.apply_patch | live | blocked | live_edit | live_edit | False |  | Requires full_autocad live_edit host + explicit write_origin |
-| module.command.lookup | runtime_commands | blocked | raw_command | read | False | acedRegCmds->lookupCmd2(...) via acedCmdLookup2( | SAFETY_FORBIDDEN: raw command dispatch is blocked in M08O fa |
-| module.command.remove_group | runtime_commands | blocked | read_safe | read | False | AcEdCommandStack::removeGroup(grpName) (+ remove | SAFETY_FORBIDDEN: arbitrary command group removal mutates th |
-| module.entrypoint.define | runtime_commands | blocked | read_safe | read | False | IMPLEMENT_ARX_ENTRYPOINT(classname) (→ IMPLEMENT | SDK_NOT_EXPOSED: entrypoint definition is a compile/link-tim |
-| module.entrypoint.dispatch | runtime_commands | blocked | read_safe | read | False | AcRxDbxApp::acrxEntryPoint(AcRx::AppMsgCode msg, | HOST_UNAVAILABLE: entrypoint dispatch is host-owned by the A |
+| module.entrypoint.define | runtime_commands | blocked | read_safe | read | False | IMPLEMENT_ARX_ENTRYPOINT(classname) (→ IMPLEMENT | SDK_NOT_EXPOSED: entrypoint definition is a compile/link mac |
+| module.entrypoint.dispatch | runtime_commands | blocked | read_safe | read | False | AcRxDbxApp::acrxEntryPoint(AcRx::AppMsgCode msg, | HOST_UNAVAILABLE: acrxEntryPoint dispatch is owned by the Au |
 | module.lifecycle.init | runtime_commands | blocked | read_safe | read | False | AcRxArxApp::On_kInitAppMsg(void* pkt) / AcRxDbxA | HOST_UNAVAILABLE: On_kInitAppMsg is delivered by the AutoCAD |
-| module.lifecycle.on_load_dwg | runtime_commands | blocked | read_safe | read | False | AcRxDbxApp::On_kLoadDwgMsg(void* pkt) | HOST_UNAVAILABLE: On_kLoadDwgMsg is delivered by the host du |
+| module.lifecycle.on_load_dwg | runtime_commands | blocked | read_safe | read | False | AcRxDbxApp::On_kLoadDwgMsg(void* pkt) | HOST_UNAVAILABLE: On_kLoadDwgMsg is delivered by host docume |
 | module.lifecycle.on_ole_unload | runtime_commands | blocked | read_safe | read | False | AcRxDbxApp::On_kOleUnloadAppMsg(void* pkt) | HOST_UNAVAILABLE: On_kOleUnloadAppMsg is a host lifecycle ca |
 | module.lifecycle.on_unload_dwg | runtime_commands | blocked | read_safe | read | False | AcRxDbxApp::On_kUnloadDwgMsg(void* pkt) | HOST_UNAVAILABLE: On_kUnloadDwgMsg is host-owned document li |
 | module.lifecycle.other | runtime_commands | blocked | read_safe | read | False | On_kCfgMsg/On_kEndMsg/On_kQuitMsg/On_kPreQuitMsg | HOST_UNAVAILABLE: arbitrary lifecycle message dispatch is ho |
 | module.lifecycle.unload | runtime_commands | blocked | read_safe | read | False | AcRxArxApp::On_kUnloadAppMsg / AcRxDbxApp::On_kU | HOST_UNAVAILABLE: On_kUnloadAppMsg is delivered by the loade |
-| module.load | runtime_commands | blocked | read_safe | read | False | acrxLoadModule(const ACHAR* moduleName, bool pri | SAFETY_FORBIDDEN: acrxLoadModule loads external code into th |
-| module.load.acad_rx | runtime_commands | blocked | read_safe | read | False | acad.rx file listing module names | SAFETY_FORBIDDEN: ARX demand/load mechanics execute host mod |
-| module.load.by_app | runtime_commands | blocked | read_safe | read | False | acrxLoadApp(const ACHAR* appname, bool asCmd=fal | SAFETY_FORBIDDEN: application-driven module loading executes |
-| module.load.demand_register | runtime_commands | blocked | read_safe | read | False | Registry: HKLM\…\R<ver>\<prodkey>\Applications\< | SAFETY_FORBIDDEN: ObjectARX demand-load registration require |
-| module.unload | runtime_commands | blocked | read_safe | read | False | acrxUnloadModule(const ACHAR* moduleName, bool a | SAFETY_FORBIDDEN: acrxUnloadModule can unload host modules a |
 | command.menu.invoke | ui_customization | blocked | read_safe | read | False | acedMenuCmd(const ACHAR*) | SAFETY_FORBIDDEN: acedMenuCmd executes arbitrary menu/comman |
 | editor.toolpalette.tool_execute | ui_customization | blocked | read_safe | read | False | AcTcTool::Execute(int nFlag, HWND, POINT, DWORD  | SAFETY_FORBIDDEN: AcTcTool::Execute programmatically fires a |
 | doc.current | active_document_write_original | implemented | read_safe | read | True | m08nDispatch |  |
@@ -499,12 +492,19 @@
 | module.app.accessor | runtime_commands | implemented | read_safe | read | True | m08nDispatch |  |
 | module.class.register_object | runtime_commands | implemented | staged_write | write_copy | True | m08nDispatch |  |
 | module.command.flags | runtime_commands | implemented | read_safe | read | True | m08nDispatch |  |
+| module.command.lookup | runtime_commands | implemented | read_safe | read | True | m08nDispatch |  |
 | module.command.register_auto | runtime_commands | implemented | read_safe | read | True | m08nDispatch |  |
 | module.command.register_manual | runtime_commands | implemented | read_safe | read | True | m08nDispatch |  |
+| module.command.remove_group | runtime_commands | implemented | read_safe | read | True | m08nDispatch |  |
 | module.command.stack_handle | runtime_commands | implemented | read_safe | read | True | m08nDispatch |  |
+| module.load | runtime_commands | implemented | read_safe | read | True | m08nDispatch |  |
+| module.load.acad_rx | runtime_commands | implemented | read_safe | read | True | m08nDispatch |  |
+| module.load.by_app | runtime_commands | implemented | read_safe | read | True | m08nDispatch |  |
+| module.load.demand_register | runtime_commands | implemented | read_safe | read | True | m08nDispatch |  |
 | module.load.lisp | runtime_commands | implemented | read_safe | read | True | Invoke-SafeFallbackOperation |  |
 | module.register_mdi | runtime_commands | implemented | read_safe | read | True | m08nDispatch |  |
 | module.register_service | runtime_commands | implemented | read_safe | read | True | m08nDispatch |  |
+| module.unload | runtime_commands | implemented | read_safe | read | True | m08nDispatch |  |
 | acdb.database.create | symbol_tables_dictionaries | implemented | read_safe | read | True | m08eDispatch |  |
 | inspect.dictionary.get | symbol_tables_dictionaries | implemented | read_safe | read | True | m08eDispatch |  |
 | inspect.dictionary.named_objects | symbol_tables_dictionaries | implemented | read_safe | read | True | m08eDispatch |  |

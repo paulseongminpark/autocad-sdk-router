@@ -9,7 +9,6 @@ EXPECTED_BLOCKED_AFTER_REAUDIT = {
     "ui.subentity.highlight",
     "automate.com.send_command",
     "embed.ole.frame",
-    "module.command.remove_group",
     "module.entrypoint.define",
     "module.entrypoint.dispatch",
     "module.lifecycle.init",
@@ -18,10 +17,6 @@ EXPECTED_BLOCKED_AFTER_REAUDIT = {
     "module.lifecycle.on_unload_dwg",
     "module.lifecycle.other",
     "module.lifecycle.unload",
-    "module.load",
-    "module.load.acad_rx",
-    "module.load.by_app",
-    "module.unload",
 }
 
 EXPECTED_IMPLEMENTED_AFTER_WAVE4X = {
@@ -31,6 +26,16 @@ EXPECTED_IMPLEMENTED_AFTER_WAVE4X = {
     "automate.com.get_winapp",
     "automate.com.wrapper_for_object",
     "module.load.lisp",
+}
+
+EXPECTED_IMPLEMENTED_AFTER_WAVE4X_LOADER_DOC = {
+    "module.command.lookup",
+    "module.command.remove_group",
+    "module.load",
+    "module.load.acad_rx",
+    "module.load.by_app",
+    "module.load.demand_register",
+    "module.unload",
 }
 
 ALLOWED_BLOCKER_CODES = {
@@ -85,6 +90,17 @@ def test_wave4x_reopened_safe_fallback_ops_are_implemented():
         else:
             assert op.get("handler", {}).get("router_lane") == "full_autocad", oid
             assert op.get("handler", {}).get("execution_host_class") == "full_autocad", oid
+
+
+def test_wave4x_loader_doc_ops_are_implemented():
+    ops = _operations()
+    for oid in sorted(EXPECTED_IMPLEMENTED_AFTER_WAVE4X_LOADER_DOC):
+        op = ops[oid]
+        assert op["status"] == "implemented", oid
+        evidence = "\n".join(op.get("evidence_refs") or [])
+        assert "reports/tickets/WAVE4X_LOADER_DOC.md" in evidence, oid
+        assert op.get("handler", {}).get("dispatcher_symbol") == "m08nDispatch", oid
+        assert op.get("handler", {}).get("router_lane") == "ARIADNE_NATIVE_JOB", oid
 
 
 def test_module_command_flags_was_reversed_to_implemented():
