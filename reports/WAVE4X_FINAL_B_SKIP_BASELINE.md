@@ -1,0 +1,126 @@
+# WAVE4X Final B Skip Baseline
+
+- skips_before: **20**
+- source_xml: `reports/WAVE4X_FINAL_B_SKIP_BASELINE.xml`
+
+## Skip entries
+- `tests/integration/test_live_arx_pump.py::TestLiveArxPumpRoundTrip::test_pump_echo_status_list_stop`
+  - reason: `SKIPPED_ENV: live pump test requires CADOS_LIVE=1`
+  - required_env: `['CADOS_LIVE=1', 'AutoCAD 2027 accoreconsole', 'native .crx/.dbx built']`
+  - required_fixture: `['staging/dwg_20260617_191504/input.dwg']`
+  - current_blocker: Live env opt-in disabled in baseline.
+  - action_plan: Materialize the golden DWG in this worktree, build native modules, set CADOS_LIVE=1, then rerun the headless CADAGENT_PUMP integration test.
+- `tests/integration/test_native_graph_router.py::TestNativeGraphStagedWriteLive::test_staged_line_write_is_truthful_and_protects_original`
+  - reason: `SKIPPED_ENV: live native graph/staged-write disabled (CADOS_LIVE!=1, no golden DWG)`
+  - required_env: `['CADOS_LIVE=1', 'AutoCAD 2027 accoreconsole']`
+  - required_fixture: `['staging/dwg_20260617_191504/input.dwg']`
+  - current_blocker: Live env opt-in disabled and golden DWG missing in this worktree.
+  - action_plan: Copy the golden DWG into this worktree, set CADOS_LIVE=1, and rerun the staged-write router integration test.
+- `tests/smoke/test_cadctl_rich_ir.py::TestLiveNativeFullIr::test_by_type_matches_pinned_expected_counts`
+  - reason: `SKIPPED_FIXTURE: native_full IR not present: D:\dev\99_tools\autocad-sdk-router_wave4x_final_b_skips\runs\m02_cadctl_rich\dwg_graph_ir.json`
+  - required_env: `[]`
+  - required_fixture: `['runs/m02_cadctl_rich/dwg_graph_ir.json']`
+  - current_blocker: native_full IR fixture missing.
+  - action_plan: Run `python tools\cadctl_cli.py inspect --dwg staging\dwg_20260617_191504\input.dwg --out runs\m02_cadctl_rich --mode graph --include-rich`, then validate the IR.
+- `tests/smoke/test_cadctl_rich_ir.py::TestLiveNativeFullIr::test_realized_entities_recompute_by_type`
+  - reason: `SKIPPED_FIXTURE: native_full IR not present: D:\dev\99_tools\autocad-sdk-router_wave4x_final_b_skips\runs\m02_cadctl_rich\dwg_graph_ir.json`
+  - required_env: `[]`
+  - required_fixture: `['runs/m02_cadctl_rich/dwg_graph_ir.json']`
+  - current_blocker: native_full IR fixture missing.
+  - action_plan: Run `python tools\cadctl_cli.py inspect --dwg staging\dwg_20260617_191504\input.dwg --out runs\m02_cadctl_rich --mode graph --include-rich`, then validate the IR.
+- `tests/smoke/test_cadctl_rich_ir.py::TestLiveNativeFullIr::test_schema_and_coverage_level`
+  - reason: `SKIPPED_FIXTURE: native_full IR not present: D:\dev\99_tools\autocad-sdk-router_wave4x_final_b_skips\runs\m02_cadctl_rich\dwg_graph_ir.json`
+  - required_env: `[]`
+  - required_fixture: `['runs/m02_cadctl_rich/dwg_graph_ir.json']`
+  - current_blocker: native_full IR fixture missing.
+  - action_plan: Run `python tools\cadctl_cli.py inspect --dwg staging\dwg_20260617_191504\input.dwg --out runs\m02_cadctl_rich --mode graph --include-rich`, then validate the IR.
+- `tests/smoke/test_cadctl_rich_ir.py::TestLiveNativeFullIr::test_truth_gate_21747`
+  - reason: `SKIPPED_FIXTURE: native_full IR not present: D:\dev\99_tools\autocad-sdk-router_wave4x_final_b_skips\runs\m02_cadctl_rich\dwg_graph_ir.json`
+  - required_env: `[]`
+  - required_fixture: `['runs/m02_cadctl_rich/dwg_graph_ir.json']`
+  - current_blocker: native_full IR fixture missing.
+  - action_plan: Run `python tools\cadctl_cli.py inspect --dwg staging\dwg_20260617_191504\input.dwg --out runs\m02_cadctl_rich --mode graph --include-rich`, then validate the IR.
+- `tests/smoke/test_router_inspect_database_graph.py::TestInspectDatabaseGraphLive::test_native_inspect_rich_is_consistent_and_safe`
+  - reason: `SKIPPED_ENV: live native inspect disabled (CADOS_LIVE!=1, no golden DWG)`
+  - required_env: `['CADOS_LIVE=1', 'AutoCAD 2027 accoreconsole']`
+  - required_fixture: `['staging/dwg_20260617_191504/input.dwg']`
+  - current_blocker: Live env opt-in disabled and golden DWG missing in this worktree.
+  - action_plan: Copy the golden DWG into this worktree, set CADOS_LIVE=1, and rerun the native inspect smoke test.
+- `tests/unit/test_dwg_graph_ir_schema.py::TestLiveNativeResultTruthGate::test_build_ir_holds_21747_three_ways`
+  - reason: `SKIPPED_FIXTURE: live native graph result not present: D:\dev\99_tools\autocad-sdk-router_wave4x_final_b_skips\runs\dwg_truth_autocad_cad_job_20260622_012807\native_cad_job_result.json`
+  - required_env: `[]`
+  - required_fixture: `['latest native inspect.database.graph result']`
+  - current_blocker: Pinned timestamped native graph artifact missing.
+  - action_plan: Generate a real inspect.database.graph run through cadctl rich inspect and resolve the native result dynamically from cad_result.json -> result_ref.
+- `tests/unit/test_dwg_graph_ir_schema.py::TestLiveNativeResultTruthGate::test_by_type_histogram_matches_ground_truth`
+  - reason: `SKIPPED_FIXTURE: live native graph result not present: D:\dev\99_tools\autocad-sdk-router_wave4x_final_b_skips\runs\dwg_truth_autocad_cad_job_20260622_012807\native_cad_job_result.json`
+  - required_env: `[]`
+  - required_fixture: `['latest native inspect.database.graph result']`
+  - current_blocker: Pinned timestamped native graph artifact missing.
+  - action_plan: Generate a real inspect.database.graph run through cadctl rich inspect and resolve the native result dynamically from cad_result.json -> result_ref.
+- `tests/unit/test_dwg_graph_ir_schema.py::TestLiveNativeResultTruthGate::test_live_ir_schema_conforms`
+  - reason: `SKIPPED_FIXTURE: live native graph result not present: D:\dev\99_tools\autocad-sdk-router_wave4x_final_b_skips\runs\dwg_truth_autocad_cad_job_20260622_012807\native_cad_job_result.json`
+  - required_env: `[]`
+  - required_fixture: `['latest native inspect.database.graph result']`
+  - current_blocker: Pinned timestamped native graph artifact missing.
+  - action_plan: Generate a real inspect.database.graph run through cadctl rich inspect and resolve the native result dynamically from cad_result.json -> result_ref.
+- `tests/unit/test_dwg_graph_ir_schema.py::TestLiveNativeResultTruthGate::test_result_object_is_the_consumable_shape`
+  - reason: `SKIPPED_FIXTURE: live native graph result not present: D:\dev\99_tools\autocad-sdk-router_wave4x_final_b_skips\runs\dwg_truth_autocad_cad_job_20260622_012807\native_cad_job_result.json`
+  - required_env: `[]`
+  - required_fixture: `['latest native inspect.database.graph result']`
+  - current_blocker: Pinned timestamped native graph artifact missing.
+  - action_plan: Generate a real inspect.database.graph run through cadctl rich inspect and resolve the native result dynamically from cad_result.json -> result_ref.
+- `tests/unit/test_non_ascii_fidelity.py::TestNonAsciiLayerFidelity::test_every_layer_name_roundtrips_utf8`
+  - reason: `SKIPPED_FIXTURE: native_full IR not present at D:\dev\99_tools\autocad-sdk-router_wave4x_final_b_skips\runs\m02_cadctl_rich\dwg_graph_ir.json (run the m02_cadctl_rich extraction to materialize it)`
+  - required_env: `[]`
+  - required_fixture: `['runs/m02_cadctl_rich/dwg_graph_ir.json']`
+  - current_blocker: native_full IR fixture missing.
+  - action_plan: Run `python tools\cadctl_cli.py inspect --dwg staging\dwg_20260617_191504\input.dwg --out runs\m02_cadctl_rich --mode graph --include-rich`, then validate the IR.
+- `tests/unit/test_non_ascii_fidelity.py::TestNonAsciiLayerFidelity::test_golden_hangul_layer_present`
+  - reason: `SKIPPED_FIXTURE: native_full IR not present at D:\dev\99_tools\autocad-sdk-router_wave4x_final_b_skips\runs\m02_cadctl_rich\dwg_graph_ir.json (run the m02_cadctl_rich extraction to materialize it)`
+  - required_env: `[]`
+  - required_fixture: `['runs/m02_cadctl_rich/dwg_graph_ir.json']`
+  - current_blocker: native_full IR fixture missing.
+  - action_plan: Run `python tools\cadctl_cli.py inspect --dwg staging\dwg_20260617_191504\input.dwg --out runs\m02_cadctl_rich --mode graph --include-rich`, then validate the IR.
+- `tests/unit/test_non_ascii_fidelity.py::TestNonAsciiLayerFidelity::test_layers_present`
+  - reason: `SKIPPED_FIXTURE: native_full IR not present at D:\dev\99_tools\autocad-sdk-router_wave4x_final_b_skips\runs\m02_cadctl_rich\dwg_graph_ir.json (run the m02_cadctl_rich extraction to materialize it)`
+  - required_env: `[]`
+  - required_fixture: `['runs/m02_cadctl_rich/dwg_graph_ir.json']`
+  - current_blocker: native_full IR fixture missing.
+  - action_plan: Run `python tools\cadctl_cli.py inspect --dwg staging\dwg_20260617_191504\input.dwg --out runs\m02_cadctl_rich --mode graph --include-rich`, then validate the IR.
+- `tests/unit/test_non_ascii_fidelity.py::TestNonAsciiLayerFidelity::test_no_replacement_char_in_any_layer_name`
+  - reason: `SKIPPED_FIXTURE: native_full IR not present at D:\dev\99_tools\autocad-sdk-router_wave4x_final_b_skips\runs\m02_cadctl_rich\dwg_graph_ir.json (run the m02_cadctl_rich extraction to materialize it)`
+  - required_env: `[]`
+  - required_fixture: `['runs/m02_cadctl_rich/dwg_graph_ir.json']`
+  - current_blocker: native_full IR fixture missing.
+  - action_plan: Run `python tools\cadctl_cli.py inspect --dwg staging\dwg_20260617_191504\input.dwg --out runs\m02_cadctl_rich --mode graph --include-rich`, then validate the IR.
+- `tests/unit/test_non_ascii_fidelity.py::TestNonAsciiLayerFidelity::test_some_layer_name_is_hangul`
+  - reason: `SKIPPED_FIXTURE: native_full IR not present at D:\dev\99_tools\autocad-sdk-router_wave4x_final_b_skips\runs\m02_cadctl_rich\dwg_graph_ir.json (run the m02_cadctl_rich extraction to materialize it)`
+  - required_env: `[]`
+  - required_fixture: `['runs/m02_cadctl_rich/dwg_graph_ir.json']`
+  - current_blocker: native_full IR fixture missing.
+  - action_plan: Run `python tools\cadctl_cli.py inspect --dwg staging\dwg_20260617_191504\input.dwg --out runs\m02_cadctl_rich --mode graph --include-rich`, then validate the IR.
+- `tests/unit/test_sqlite_ir_store_rich.py::TestRichStoreOnLiveNativeFullIr::test_block_table_records_match_btr_count`
+  - reason: `SKIPPED_FIXTURE: live native_full IR not present: D:\dev\99_tools\autocad-sdk-router_wave4x_final_b_skips\runs\m02_cadctl_rich\dwg_graph_ir.json`
+  - required_env: `[]`
+  - required_fixture: `['runs/m02_cadctl_rich/dwg_graph_ir.json']`
+  - current_blocker: native_full IR fixture missing.
+  - action_plan: Run `python tools\cadctl_cli.py inspect --dwg staging\dwg_20260617_191504\input.dwg --out runs\m02_cadctl_rich --mode graph --include-rich`, then validate the IR.
+- `tests/unit/test_sqlite_ir_store_rich.py::TestRichStoreOnLiveNativeFullIr::test_by_type_query_matches_entities_by_type`
+  - reason: `SKIPPED_FIXTURE: live native_full IR not present: D:\dev\99_tools\autocad-sdk-router_wave4x_final_b_skips\runs\m02_cadctl_rich\dwg_graph_ir.json`
+  - required_env: `[]`
+  - required_fixture: `['runs/m02_cadctl_rich/dwg_graph_ir.json']`
+  - current_blocker: native_full IR fixture missing.
+  - action_plan: Run `python tools\cadctl_cli.py inspect --dwg staging\dwg_20260617_191504\input.dwg --out runs\m02_cadctl_rich --mode graph --include-rich`, then validate the IR.
+- `tests/unit/test_sqlite_ir_store_rich.py::TestRichStoreOnLiveNativeFullIr::test_entities_row_count_is_21747_via_query`
+  - reason: `SKIPPED_FIXTURE: live native_full IR not present: D:\dev\99_tools\autocad-sdk-router_wave4x_final_b_skips\runs\m02_cadctl_rich\dwg_graph_ir.json`
+  - required_env: `[]`
+  - required_fixture: `['runs/m02_cadctl_rich/dwg_graph_ir.json']`
+  - current_blocker: native_full IR fixture missing.
+  - action_plan: Run `python tools\cadctl_cli.py inspect --dwg staging\dwg_20260617_191504\input.dwg --out runs\m02_cadctl_rich --mode graph --include-rich`, then validate the IR.
+- `tests/unit/test_sqlite_ir_store_rich.py::TestRichStoreOnLiveNativeFullIr::test_rich_counts_match_ground_truth_via_query`
+  - reason: `SKIPPED_FIXTURE: live native_full IR not present: D:\dev\99_tools\autocad-sdk-router_wave4x_final_b_skips\runs\m02_cadctl_rich\dwg_graph_ir.json`
+  - required_env: `[]`
+  - required_fixture: `['runs/m02_cadctl_rich/dwg_graph_ir.json']`
+  - current_blocker: native_full IR fixture missing.
+  - action_plan: Run `python tools\cadctl_cli.py inspect --dwg staging\dwg_20260617_191504\input.dwg --out runs\m02_cadctl_rich --mode graph --include-rich`, then validate the IR.

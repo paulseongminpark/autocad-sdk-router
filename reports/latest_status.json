@@ -1,19 +1,26 @@
 {
   "schema": "cad_os.latest_status.v1",
-  "generated_at": "2026-06-24T03:04:03.474829+00:00",
-  "status": "PARTIAL_PASS",
+  "generated_at": "2026-06-24T06:11:18.027997+00:00",
+  "status": "PASS",
+  "branch": "cados/wave4x-final-b-skipped-test-execution",
+  "base_branch": "cados/wave4x-fast-b-on-fast-a-truth",
   "operation_counts": {
-    "implemented": 485,
-    "hard_blocked": 31,
+    "implemented": 487,
+    "hard_blocked": 29,
     "deprecated": 1,
     "catalogued": 0,
     "stub": 0,
     "unknown": 0,
     "deferred": 0
   },
-  "tests": "529 passed, 20 skipped",
+  "tests": "562 passed, 0 skipped (CADOS_LIVE=1)",
+  "skip_baseline": "reports/WAVE4X_FINAL_B_SKIP_BASELINE.json",
+  "skip_execution": "reports/WAVE4X_FINAL_B_SKIPPED_TEST_EXECUTION.json",
+  "remaining_skips": "reports/WAVE4X_FINAL_B_REMAINING_SKIPS.json",
   "native_build_status": "ok",
-  "integration_branch": "cados/wave4x-fast-a-merge-audit-truth",
-  "integration_commit": "current git HEAD on cados/wave4x-fast-a-merge-audit-truth",
-  "main_merge": "blocked_dirty_main_checkout"
+  "fixture_generation": {
+    "m02_cadctl_rich": "runs/m02_cadctl_rich/dwg_graph_ir.json",
+    "native_graph_result": "runs/dwg_truth_autocad_cad_job_20260624_150300/native_cad_job_result.json"
+  },
+  "next": "Merge Final A + Final B into a release candidate branch."
 }

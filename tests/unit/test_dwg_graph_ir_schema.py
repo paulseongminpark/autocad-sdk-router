@@ -36,6 +36,7 @@ import json
 import os
 import sys
 import unittest
+from pathlib import Path
 
 _THIS = os.path.dirname(os.path.abspath(__file__))
 _REPO = os.path.dirname(os.path.dirname(_THIS))
@@ -47,11 +48,52 @@ _SCHEMAS = os.path.join(_REPO, "schemas")
 _GOLDEN = os.path.join(_REPO, "tests", "golden")
 _JSON_ENCODING = "utf-8-sig"
 
+def _resolve_live_native_result():
+    """Find the real native inspect.database.graph result artifact.
+
+    Prefer the latest cadctl rich inspect envelope when present, then fall back
+    to the newest native cad-job run carrying inspect.database.graph. Keep the
+    legacy pinned path as a final fallback for older checkouts.
+    """
+    explicit = os.environ.get("CADOS_LIVE_NATIVE_RESULT")
+    if explicit and os.path.isfile(explicit):
+        return explicit
+
+    def _read_json(path: Path | str):
+        with open(path, "r", encoding=_JSON_ENCODING) as fh:
+            return json.load(fh)
+
+    rich_result = Path(_REPO) / "runs" / "m02_cadctl_rich" / "cad_result.json"
+    if rich_result.is_file():
+        try:
+            payload = _read_json(rich_result)
+            ref = payload.get("result_ref")
+            if ref and os.path.isfile(ref):
+                return ref
+        except Exception:
+            pass
+
+    runs_dir = Path(_REPO) / "runs"
+    if runs_dir.is_dir():
+        for run_dir in sorted(runs_dir.glob("dwg_truth_autocad_cad_job_*"), reverse=True):
+            candidate = run_dir / "native_cad_job_result.json"
+            if not candidate.is_file():
+                continue
+            try:
+                payload = _read_json(candidate)
+            except Exception:
+                continue
+            if payload.get("operation") == "inspect.database.graph":
+                return str(candidate)
+
+    return os.path.join(
+        _REPO, "runs", "dwg_truth_autocad_cad_job_20260622_012807",
+        "native_cad_job_result.json")
+
+
 # The live native graph result the M02 contract pins (the ``.result`` object is
 # what build_ir_from_database_graph consumes).
-_LIVE_NATIVE_RESULT = os.path.join(
-    _REPO, "runs", "dwg_truth_autocad_cad_job_20260622_012807",
-    "native_cad_job_result.json")
+_LIVE_NATIVE_RESULT = _resolve_live_native_result()
 
 # Cross-engine ground truth for the golden DWG.
 _GOLDEN_TOTAL = 21747

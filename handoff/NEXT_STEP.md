@@ -1,8 +1,8 @@
-# NEXT STEP - CAD OS Wave4X FAST A
+# NEXT STEP - CAD OS Wave4X FINAL B
 
-Status: PARTIAL_PASS
+Status: PASS
 
-1. Review `reports/WAVE4X_FAST_A_MERGE_AUDIT_TRUTH.md`.
-2. Rework held Spark3/Spark4 tests against current counts implemented=485, blocked=31, deprecated=1 and keep M09 blocked until user approval.
-3. Run controlled attended plot verification for `plot.engine.run`.
-4. Merge integration branch to main only after the dirty main checkout is reconciled.
+1. Merge `cados/wave4x-final-b-skipped-test-execution` with the final integration branch.
+2. Keep `CADOS_LIVE=1` for release-candidate validation when rerunning the full suite.
+3. Preserve `runs/m02_cadctl_rich/` and the generated native graph run as golden evidence for future smoke/unit reuse.
+4. Do not reintroduce the stale timestamped native graph fixture path; resolve via `runs/m02_cadctl_rich/cad_result.json -> result_ref`.
