@@ -1,0 +1,170 @@
+{
+  "schema": "wave4x_fast_a.branch_audit.v1",
+  "generated_at": "2026-06-24T03:04:03.474829+00:00",
+  "root": "D:\\dev\\99_tools\\autocad-sdk-router_wave4x_fast_a_merge",
+  "merged": [
+    {
+      "branch": "cados/w4x-subentity-brep",
+      "commit": "154a6f6",
+      "decision": "MERGE_NOW",
+      "result": "merged",
+      "notes": "subentity path and assoc surface topology handlers/tests"
+    },
+    {
+      "branch": "cados/w4x-fallback-com-ole",
+      "commit": "49244a4",
+      "decision": "MERGE_NOW",
+      "result": "merged",
+      "notes": "safe COM/OLE metadata and LISP fallback; raw command exposure remains blocked"
+    },
+    {
+      "branch": "cados/w4x-loader-doc-command",
+      "commit": "ab94832",
+      "decision": "MERGE_NOW",
+      "result": "merged",
+      "notes": "module load/command typed handlers; doc.sendstring remains hard-blocked"
+    },
+    {
+      "branch": "cados/w4x-loader-doc-r2-lifecycle-entrypoints",
+      "commit": "c8d6281",
+      "decision": "MERGE_NOW",
+      "result": "merged",
+      "notes": "lifecycle entrypoint/status handlers; doc.sendstring SAFETY_FORBIDDEN"
+    },
+    {
+      "branch": "cados/w4x-visual-plot",
+      "commit": "7adc82e",
+      "decision": "MERGE_NOW",
+      "result": "merged",
+      "notes": "plot.config.settings and plot.engine.run implemented; attended verification debt preserved"
+    },
+    {
+      "branch": "cados/w4x-db-txn-write",
+      "commit": "36f3817",
+      "decision": "MERGE_NOW",
+      "result": "merged",
+      "notes": "staged DB txn/write handlers; live.apply_patch deprecated with replacement_ref"
+    },
+    {
+      "branch": "cados/w4x-generic-closure-audit",
+      "commit": "19c6577",
+      "decision": "MERGE_NOW",
+      "result": "merged",
+      "notes": "synthetic-operation guard only; no synthetic op added"
+    },
+    {
+      "branch": "cados/w4s-spark2-agent-surface",
+      "commit": "1cd6182",
+      "decision": "MERGE_NOW",
+      "result": "merged",
+      "notes": "cadctl --json and explain alias surface"
+    }
+  ],
+  "held": [
+    {
+      "item": "WAVE4S_SPARK1_MICRO_IMPL / cados/w4s-spark1-micro-impl",
+      "decision": "HOLD_REWORK",
+      "reason": "evidence-only branch at main; keep blocked, do not merge as implementation"
+    },
+    {
+      "item": "WAVE4S_SPARK3_REGRESSION_AUTOMATION / cados/w4s-spark3-regression-automation",
+      "decision": "HOLD_REWORK",
+      "reason": "uncommitted worktree-only tests are pinned to pre-merge 457/60 counts and assert m09_allowed true; conflicts with packet rule that M09 remains blocked until user approval"
+    },
+    {
+      "item": "WAVE4S_SPARK4_EVIDENCE_HARDENING / cados/w4s-spark4-evidence-hardening",
+      "decision": "HOLD_REWORK",
+      "reason": "uncommitted worktree-only tests are stale, contain an undefined _SOURCE_INDEX helper reference, and assume zero deprecated ops; not safe to transplant without rework"
+    },
+    {
+      "item": "WAVE4X_VISUAL_ATTENDED / cados/w4x-visual-plot-attended",
+      "decision": "HOLD_REWORK",
+      "reason": "same code as visual plot branch but attended live run remains pending"
+    },
+    {
+      "item": "WAVE4X_LIVE_UI_APPLY / cados/w4x-live-ui-apply",
+      "decision": "HOLD_REWORK",
+      "reason": "plan-only/main-equivalent worktree; no applied code"
+    },
+    {
+      "item": "cados/w4x-assoc-solver",
+      "decision": "HOLD_REWORK",
+      "reason": "discovered branch outside packet merge order; not merged in this audit wave"
+    }
+  ],
+  "rejected": [
+    {
+      "item": "cados/w4x-generic-closure",
+      "decision": "REJECT",
+      "reason": "contains synthetic bookkeeping operation wave4x.generic_closure.validation_attended_debt; audit branch merged instead"
+    }
+  ],
+  "patch_files": [
+    "M08CDEF_READ_GRAPH_QUERY_30.patch",
+    "M08G_H_WRITE_ANNOTATION_30.patch",
+    "WAVE3_PANE2_HEAVY_NATIVE_30.patch",
+    "WAVE3_PANE6_NATIVE_CUSTOM.patch",
+    "WAVE3_PANE9_LIVE_EDITOR.patch",
+    "WAVE4X_DB_TXN_WRITE.patch",
+    "WAVE4X_LOADER_DOC.patch",
+    "WAVE4X_LOADER_DOC_R2.patch"
+  ],
+  "ticket_json_files": [
+    "M08A-T01.json",
+    "M08A-T02.json",
+    "M08B-T01.json",
+    "M08B-T02.json",
+    "M08B-T03.json",
+    "M08C.json",
+    "M08CDEF_READ_GRAPH_QUERY_30.json",
+    "M08CDEF_READ_GRAPH_QUERY_30_OPS.json",
+    "M08C_DEFERRED_SWEEP.json",
+    "M08D.json",
+    "M08E.json",
+    "M08G_H_WRITE_ANNOTATION_30.json",
+    "M08G_H_WRITE_ANNOTATION_30_native_build.json",
+    "M08I_VISUAL.json",
+    "M08N-A3.json",
+    "M08N-A3_native_build.json",
+    "M08N-A3_registry_coverage.json",
+    "M08O-T01.json",
+    "M08O-T02.json",
+    "WAVE3_PANE2_CLAIMS.json",
+    "WAVE3_PANE2_HEAVY_NATIVE_30.json",
+    "WAVE3_PANE2_HEAVY_NATIVE_30_OPS.json",
+    "WAVE3_PANE2_native_build.json",
+    "WAVE3_PANE6_CLAIMS.json",
+    "WAVE3_PANE6_native_build.json",
+    "WAVE3_PANE6_NATIVE_CUSTOM.json",
+    "WAVE3_PANE6_NATIVE_CUSTOM_OPS.json",
+    "WAVE3_PANE8_CLAIMS.json",
+    "WAVE3_PANE8_OPM_REACTORS.json",
+    "WAVE3_PANE8_OPM_REACTORS_native_build.json",
+    "WAVE3_PANE8_OPM_REACTORS_OPS.json",
+    "WAVE3_PANE9_LIVE_EDITOR.json",
+    "WAVE3_PANE9_LIVE_EDITOR_OPS.json",
+    "WAVE4S_SPARK2_AGENT_SURFACE_CLAIMS.json",
+    "WAVE4X_DB_TXN_WRITE.json",
+    "WAVE4X_DB_TXN_WRITE_OPS.json",
+    "WAVE4X_FALLBACK.json",
+    "WAVE4X_FALLBACK_OPS.json",
+    "WAVE4X_GENERIC_CLOSURE_AUDIT.json",
+    "WAVE4X_LOADER_DOC.json",
+    "WAVE4X_LOADER_DOC_OPS.json",
+    "WAVE4X_LOADER_DOC_R2.json",
+    "WAVE4X_LOADER_DOC_R2_native_build.json",
+    "WAVE4X_LOADER_DOC_R2_OPS.json",
+    "WAVE4X_PANE2_LOADER_DOC_CLAIMS.json",
+    "WAVE4X_PANE3_SUBENTITY_BREP_CLAIMS.json",
+    "WAVE4X_PANE4_FALLBACK_COM_OLE_CLAIMS.json",
+    "WAVE4X_PANE5_DB_TXN_WRITE_CLAIMS.json",
+    "WAVE4X_SUBENTITY_BREP.json",
+    "WAVE4X_SUBENTITY_BREP_native_build.json",
+    "WAVE4X_SUBENTITY_BREP_OPS.json",
+    "WAVE4X_VISUAL_PLOT.json",
+    "WAVE4X_VISUAL_PLOT_OPS.json"
+  ],
+  "notes": [
+    "Branches cados/w4s-spark3-regression-automation and cados/w4s-spark4-evidence-hardening had no commits beyond main; only uncommitted worktree content was present and was held."
+  ]
+}

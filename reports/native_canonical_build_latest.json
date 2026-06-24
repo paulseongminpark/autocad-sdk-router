@@ -1,0 +1,29 @@
+{
+  "status": "ok",
+  "msbuild": "C:\\Program Files\\Microsoft Visual Studio\\2026\\Community\\MSBuild\\Current\\Bin\\amd64\\MSBuild.exe",
+  "arx_relink_mode": "canonical",
+  "arx_versioned_name": "",
+  "arx_lock_note": "Canonical .arx relinked normally.",
+  "projects": [
+    "D:\\dev\\99_tools\\autocad-sdk-router_wave4x_fast_a_merge\\src\\Ariadne.AcadNativeDbx\\Ariadne.AcadNativeDbx.dbx.vcxproj",
+    "D:\\dev\\99_tools\\autocad-sdk-router_wave4x_fast_a_merge\\src\\Ariadne.AcadNative\\Ariadne.AcadNative.crx.vcxproj",
+    "D:\\dev\\99_tools\\autocad-sdk-router_wave4x_fast_a_merge\\src\\Ariadne.AcadNative\\Ariadne.AcadNative.arx.vcxproj"
+  ],
+  "artifacts": [
+    {
+      "path": "D:\\dev\\99_tools\\autocad-sdk-router_wave4x_fast_a_merge\\src\\Ariadne.AcadNative\\bin\\x64\\Release\\Ariadne.AcadNativeDbx.dbx",
+      "exists": true,
+      "bytes": 54272
+    },
+    {
+      "path": "D:\\dev\\99_tools\\autocad-sdk-router_wave4x_fast_a_merge\\src\\Ariadne.AcadNative\\bin\\x64\\Release\\Ariadne.AcadNative.crx",
+      "exists": true,
+      "bytes": 801280
+    },
+    {
+      "path": "D:\\dev\\99_tools\\autocad-sdk-router_wave4x_fast_a_merge\\src\\Ariadne.AcadNative\\bin\\x64\\Release\\Ariadne.AcadNative.arx",
+      "exists": true,
+      "bytes": 809984
+    }
+  ]
+}

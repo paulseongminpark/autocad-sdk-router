@@ -1,46 +1,19 @@
 {
-  "schema": "ariadne.cad_os.latest_status.v1",
-  "generated_at": "2026-06-23T23:39:10+09:00",
-  "status": "PASS",
-  "branch": "cados/wave3-integrate-and-build-unfinished",
+  "schema": "cad_os.latest_status.v1",
+  "generated_at": "2026-06-24T03:04:03.474829+00:00",
+  "status": "PARTIAL_PASS",
   "operation_counts": {
-    "implemented": 457,
-    "blocked": 60
+    "implemented": 485,
+    "hard_blocked": 31,
+    "deprecated": 1,
+    "catalogued": 0,
+    "stub": 0,
+    "unknown": 0,
+    "deferred": 0
   },
-  "closure_gate_pass": true,
-  "tests": {
-    "full_pytest": "487 passed, 20 skipped",
-    "focused_closure": "32 passed; render/plot guard included in full suite",
-    "render_plot_guard": "13 passed with M08A guard",
-    "json_reports": "valid",
-    "raw_command_agent_exposure": 0
-  },
-  "native_build": {
-    "status": "ok",
-    "arx_relink_mode": "canonical",
-    "artifacts": [
-      {
-        "path": "src/Ariadne.AcadNative/bin/x64/Release/Ariadne.AcadNativeDbx.dbx",
-        "bytes": 54272
-      },
-      {
-        "path": "src/Ariadne.AcadNative/bin/x64/Release/Ariadne.AcadNative.crx",
-        "bytes": 756224
-      },
-      {
-        "path": "src/Ariadne.AcadNative/bin/x64/Release/Ariadne.AcadNative.arx",
-        "bytes": 764416
-      }
-    ],
-    "warnings": [
-      "LNK4099 missing Autodesk rxapi.pdb debug symbols"
-    ]
-  },
-  "safety": {
-    "original_dwg_modified": false,
-    "raw_command_agent_exposure": 0,
-    "write_original_default_true_ops": [],
-    "remote_push": false
-  },
-  "primary_report": "reports/WAVE3_INTEGRATED_IMPLEMENT_UNFINISHED.md"
+  "tests": "529 passed, 20 skipped",
+  "native_build_status": "ok",
+  "integration_branch": "cados/wave4x-fast-a-merge-audit-truth",
+  "integration_commit": "current git HEAD on cados/wave4x-fast-a-merge-audit-truth",
+  "main_merge": "blocked_dirty_main_checkout"
 }
