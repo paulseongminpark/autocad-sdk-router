@@ -1,21 +1,27 @@
-# CAD OS Full Stack Handoff
+﻿# CAD OS Full Stack Handoff
 
-Status: **PASS**
-Branch: `cados/cad-os-v1-rc1`
-
-## Verified Commands
-- `python tools\reconcile_native_registry.py`
-- `python tools\cadctl_cli.py registry coverage`
-- `python tools\operation_coverage_matrix.py`
-- `set CADOS_LIVE=1 && python -m pytest tests -q -rs`
-- `tools\build_native_acad.ps1`
+CAD OS v1 RC1 is integrated on cados/cad-os-v1-rc1 from Final A plus Final B. Main remains untouched.
 
 ## Evidence
-- `reports/release/CADOS_V1_RC1.json`
-- `reports/release/CADOS_V1_RC1_TESTS.log`
-- `reports/release/CADOS_V1_RC1_NATIVE_BUILD.log`
-- `reports/release/CADOS_V1_RC1_HARDBLOCKS.md`
-- `reports/release/CADOS_V1_RC1_DWG_SAFETY.md`
 
-## Next Executor
-Run `CADOS_M09_V1_RELEASE_FREEZE_AND_DAEDALUS_HANDOFF` from this RC branch. Do not touch dirty main until the user approves the release merge.
+- RC report: reports/release/CADOS_V1_RC1.json
+- Tests: reports/release/CADOS_V1_RC1_TESTS.json and reports/release/CADOS_V1_RC1_TESTS.log
+- Native build: reports/release/CADOS_V1_RC1_NATIVE_BUILD.json and reports/release/CADOS_V1_RC1_NATIVE_BUILD.log
+- Coverage: reports/operation_coverage_latest.json
+- Full matrix: reports/operation_coverage_full_matrix.json
+- Hardblocks: reports/release/CADOS_V1_RC1_HARDBLOCKS.json
+- DWG safety: reports/release/CADOS_V1_RC1_DWG_SAFETY.json
+- Daedalus external handoff: D:\dev\_ariadne\_daedalus\external\cad_os\
+
+## Current Result
+
+- Status: PASS
+- Tests: 566 passed, 0 skipped
+- Native build: PASS
+- Counts: implemented=487, hard_blocked=29, deprecated=1, catalogued=0, stub=0, unknown=0, deferred=0
+- Raw command exposure: 0
+- Original DWG modified: False
+
+## Next
+
+CADOS_M09_V1_RELEASE_FREEZE_AND_DAEDALUS_HANDOFF.

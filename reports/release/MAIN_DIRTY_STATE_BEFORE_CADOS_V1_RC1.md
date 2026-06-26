@@ -1,317 +1,370 @@
-# Main Dirty State Before CADOS V1 RC1
+﻿# Main Dirty State Before CADOS V1 RC1
 
-- original root: `D:\dev\99_tools\autocad-sdk-router`
-- dirty main touched: `false`
-- tracked dirty entries: 238
-- untracked entries: 25
+- Packet: CADOS_V1_RC1_FINAL_INTEGRATION
+- Captured at: 2026-06-26T13:16:05.2361965+09:00
+- Main path: D:\dev\99_tools\autocad-sdk-router
+- Main branch: main
+- Main HEAD: bc0832ab86bae410a89c8913294b5d7531e9f47b
+- Dirty main modified by this packet: no
+- Reason: packet CHANGE_ONLY excludes dirty main; this file is emitted in the RC worktree.
 
-## Tracked Dirty
+## Dirty Tracked Files
+- [ M] .graphifyignore
+- [ M] ENVVAR_REPOINT.md
+- [ M] README.md
+- [ M] SDK_ROUTER_USAGE.md
+- [ M] config/autocad_native_arx_operation_catalog.json
+- [ M] config/autocad_official_sdk_catalog.json
+- [ M] config/autocad_router_capabilities.json
+- [ M] config/cad_job_operation_aliases.json
+- [MM] config/operations.v2.json
+- [ M] docs/AUTOCAD_CONTROL_PLANE_STATUS.md
+- [ M] docs/CAD_DIFF_SPEC.md
+- [ M] docs/CAD_OS_V1_ACCEPTANCE.md
+- [ M] docs/DWG_GRAPH_IR_SPEC.md
+- [ M] docs/LIVE_ARX_NAMED_PIPE_DESIGN.md
+- [ M] docs/LIVE_ARX_PUMP_SPIKE_REPORT.md
+- [ M] docs/LIVE_JOB_ARGUMENT_CONTRACT.md
+- [ M] docs/M08_REMAINING_BATCH_PLAN.md
+- [ M] docs/MCP_TOOL_CONTRACT.md
+- [ M] docs/NATIVE_ARX_DBX_DESIGN.md
+- [ M] docs/NATIVE_DEEP_SURFACE_STATUS.md
+- [ M] docs/OPERATION_REGISTRY_SPEC.md
+- [ M] docs/PATCH_ENGINE_SPEC.md
+- [ M] docs/VALIDATION_SPEC.md
+- [ M] docs/VISUAL_VERIFICATION_SPEC.md
+- [ M] docs/superpowers/plans/2026-06-18-p2-native-cad-job-ops.md
+- [ M] docs/superpowers/plans/2026-06-19-phase0-to-phase5-autocad-native-build.md
+- [ M] handoff/LATEST.md
+- [ M] handoff/TAKEOVER.md
+- [ M] handoff/_beads.jsonl
+- [ M] handoff/mail/INBOX.md
+- [ M] handoff/roles/_index.md
+- [ M] handoff/roles/cad-os-layer.md
+- [ M] handoff/sessions/SESSION_2026-06-22_1333.md
+- [ M] handoff/sessions/SESSION_2026-06-22_1451.md
+- [ M] handoff/zip/index.md
+- [ M] packets/CADOS_M01_FULL_STACK_ULTRACODE_BUILD.md
+- [ M] packets/CADOS_M02_V1_COMPLETION_ULTRACODE.md
+- [ M] packets/CADOS_M03_NATIVE_ROUTER_RICH_IR_COMPLETION.md
+- [ M] packets/CADOS_M04_OPERATION_REGISTRY_AND_TOOL_SURFACE.md
+- [ M] packets/CADOS_M05_PATCH_DIFF_VALIDATION_TRANSACTION.md
+- [ M] packets/CADOS_M06_VISUAL_BATCH_GOLDEN_REGRESSION.md
+- [ M] packets/CADOS_M07A_ATTENDED_SURFACE_VERIFICATION.md
+- [ M] packets/CADOS_M07B_ATTENDED_GUI_VERIFICATION_AND_NATIVE_DEPLOY.md
+- [ M] packets/CADOS_M07_LIVE_ARX_AND_DEEP_NATIVE_SURFACE.md
+- [ M] packets/CADOS_M08_FULL_OPERATION_COVERAGE_CLOSURE.md
+- [ M] packets/PACKET_INDEX.md
+- [ M] reports/AUTO_CAD_ROUTER_AGENT_CONTRACT.md
+- [ M] reports/CADOS_M02_V1_COMPLETION_ULTRACODE.md
+- [ M] reports/CADOS_M03_M04_DETAILED_RESULT.md
+- [ M] reports/CADOS_M03_NATIVE_ROUTER_RICH_IR_COMPLETION.md
+- [ M] reports/CADOS_M04_OPERATION_REGISTRY_AND_TOOL_SURFACE.md
+- [ M] reports/CADOS_M05_PATCH_DIFF_VALIDATION_TRANSACTION.md
+- [ M] reports/CADOS_M07A_ATTENDED_SURFACE_VERIFICATION.md
+- [ M] reports/CADOS_M07B_ATTENDED_GUI_VERIFICATION_AND_NATIVE_DEPLOY.md
+- [ M] reports/CADOS_M07_LIVE_ARX_AND_DEEP_NATIVE_SURFACE.md
+- [ M] reports/CADOS_M08_FULL_OPERATION_COVERAGE_CLOSURE.md
+- [ M] reports/DWG_GEOMETRY_NATIVE_IMPLEMENTATION_PLAN.md
+- [ M] reports/LOCALIZATION_REPORT.md
+- [ M] reports/TRINITY_AUTOCAD_SECTION_DRAFT.md
+- [ M] reports/attended_gui_latest.json
+- [ M] reports/attended_gui_latest.md
+- [ M] reports/attended_shutdown_latest.json
+- [MM] reports/autocad_router_status_latest.json
+- [ M] reports/deep_native_latest.json
+- [ M] reports/deep_native_latest.md
+- [ M] reports/firing_latest.json
+- [ M] reports/journal_latest.md
+- [ M] reports/live_job_args_contract_latest.json
+- [ M] reports/live_pump_latest.json
+- [ M] reports/live_pump_latest.md
+- [ M] reports/merge/MERGE-M08-FOUNDATION.json
+- [ M] reports/merge/MERGE-M08-FOUNDATION.md
+- [ M] reports/merge/MERGE-M08-INFRA.json
+- [ M] reports/merge/MERGE-M08-INFRA.md
+- [ M] reports/merge/MERGE-M08-NATIVE-A1.json
+- [ M] reports/merge/MERGE-M08-NATIVE-A2.json
+- [ M] reports/merge/MERGE-M08-READ.json
+- [ M] reports/merge/MERGE-M08-READ.md
+- [ M] reports/merge/MERGE-M08-RECONCILE-READ.json
+- [ M] reports/merge/MERGE-M08-RECONCILE-READ.md
+- [ M] reports/merge/MERGE-M08-WRITE.json
+- [ M] reports/merge/MERGE-M08-WRITE.md
+- [ M] reports/native_smoke_latest.json
+- [MM] reports/operation_coverage_full_matrix.json
+- [MM] reports/operation_coverage_full_matrix.md
+- [MM] reports/operation_coverage_latest.json
+- [MM] reports/operation_coverage_latest.md
+- [ M] reports/opm_property_latest.json
+- [ M] reports/patch_diff_latest.md
+- [AD] reports/tickets/WAVE4X_VISUAL_PLOT.json
+- [AD] reports/tickets/WAVE4X_VISUAL_PLOT.md
+- [AD] reports/tickets/WAVE4X_VISUAL_PLOT_OPS.json
+- [AD] reports/tickets/WAVE4X_VISUAL_PLOT_PLAN.md
+- [ M] reports/tool_surface_latest.md
+- [ M] reports/v1_acceptance_latest.json
+- [MM] reports/v1_operation_gate_latest.json
+- [ M] reports/validation_latest.md
+- [ M] reports/worlddraw_latest.json
+- [ M] research/native_arx/_AUDIT.md
+- [ M] research/native_arx/_SYNTHESIS_INDEX.md
+- [ M] research/native_arx/_build_catalog.js
+- [ M] research/native_arx/acdb-core.md
+- [ M] research/native_arx/arx-framework.md
+- [ M] research/native_arx/brep-topology.md
+- [ M] research/native_arx/com-activex-opm.md
+- [ M] research/native_arx/constraints-associativity.md
+- [ M] research/native_arx/custom-objects.md
+- [ M] research/native_arx/editor-delta.md
+- [ M] research/native_arx/entities-geometry-graphics.md
+- [ M] research/native_arx/reactors-overrules.md
+- [ M] research/native_arx/ui-customization.md
+- [ M] schemas/cad_diff.v1.schema.json
+- [ M] schemas/cad_job.schema.json
+- [ M] schemas/cad_job.v2.schema.json
+- [ M] schemas/cad_patch.v1.schema.json
+- [ M] schemas/cad_result.v2.schema.json
+- [ M] schemas/dwg_geometry_extract.schema.json
+- [ M] schemas/dwg_graph_ir.v1.schema.json
+- [ M] schemas/operation_registry.v2.schema.json
+- [ M] schemas/validation_report.v1.schema.json
+- [ M] schemas/visual_artifact.v1.schema.json
+- [ M] set-router-env.ps1
+- [ M] src/Ariadne.AcadNative/Ariadne.AcadNative.arx.vcxproj
+- [ M] src/Ariadne.AcadNative/Ariadne.AcadNative.crx.vcxproj
+- [MM] src/Ariadne.AcadNative/families/m08l_handlers.inc
+- [ M] src/Ariadne.AcadNativeDbx/Ariadne.AcadNativeDbx.dbx.vcxproj
+- [ M] src/Ariadne.AcadNativeDbx/AriadneProtocol.cpp
+- [ M] src/Ariadne.AcadNativeDbx/AriadneProtocol.h
+- [ M] src/Ariadne.DwgGeometryExtractor/Ariadne.DwgGeometryExtractor.csproj
+- [ M] src/Ariadne.DwgGeometryExtractor/CadJobDtos.cs
+- [ M] src/Ariadne.DwgGeometryExtractor/CadJobRunner.cs
+- [ M] src/Ariadne.DwgGeometryExtractor/Commands.cs
+- [ M] src/Ariadne.DwgGeometryExtractor/GeometryDtos.cs
+- [ M] src/Ariadne.DwgGeometryExtractor/GeometryExtractor.cs
+- [ M] src/Ariadne.DwgGeometryExtractor/JsonWriter.cs
+- [ M] test_native/count.scr
+- [ M] test_native/count_crx.scr
+- [ M] test_native/create.scr
+- [ M] test_native/create_crx.scr
+- [ M] test_native/diag.scr
+- [ M] test_native/diag2.scr
+- [ M] test_native/diag3.scr
+- [ M] test_native/diag_arx_after_build.scr
+- [ M] test_native/diag_arx_fullacad.scr
+- [ M] test_native/diag_crx_after_build.scr
+- [ M] test_native/diag_dbx_after_build.scr
+- [ M] test_native/diag_dbx_then_arx_after_build.scr
+- [ M] test_native/diag_unload_native.scr
+- [ M] test_native/job_block_count.json
+- [ M] test_native/job_block_create.json
+- [ M] test_native/job_block_insert.json
+- [ M] test_native/job_circle_create.json
+- [ M] test_native/job_count.json
+- [ M] test_native/job_create.json
+- [ M] test_native/job_create_args.json
+- [ M] test_native/job_entity_count_circle.json
+- [ M] test_native/job_fullacad_runtime_capabilities.json
+- [ M] test_native/job_jig_host_support.json
+- [ M] test_native/job_jig_point_probe.json
+- [ M] test_native/job_layer_create.json
+- [ M] test_native/job_layout_create.json
+- [ M] test_native/job_layout_list.json
+- [ M] test_native/job_line_create.json
+- [ M] test_native/job_overrule_disable.json
+- [ M] test_native/job_overrule_enable.json
+- [ M] test_native/job_overrule_registry.json
+- [ M] test_native/job_protocol_queryx.json
+- [ M] test_native/job_reactor_disable.json
+- [ M] test_native/job_reactor_enable.json
+- [ M] test_native/job_reactor_registry.json
+- [ M] test_native/job_record_count.json
+- [ M] test_native/job_record_create.json
+- [ M] test_native/job_runtime_capabilities.json
+- [ M] test_native/job_xdata_get.json
+- [ M] test_native/job_xdata_set.json
+- [ M] test_native/job_xrecord_get.json
+- [ M] test_native/job_xrecord_set.json
+- [ M] test_native/job_xref_list.json
+- [ M] test_native/p2_stateful_batch.json
+- [ M] tests/golden/expected_counts.json
+- [ M] tests/golden/golden_manifest.json
+- [ M] tests/integration/test_live_arx_pump.py
+- [ M] tests/integration/test_native_graph_router.py
+- [ M] tests/integration/test_native_inspect_database_graph.py
+- [ M] tests/smoke/test_cadctl_rich_ir.py
+- [ M] tests/smoke/test_router_inspect_database_graph.py
+- [ M] tests/smoke/test_router_status.py
+- [ M] tests/smoke/test_walking_skeleton.py
+- [ M] tests/test_cad_job_batch_harness.py
+- [ M] tests/test_cad_job_control_plane.py
+- [ M] tests/test_cad_job_operation_aliases.py
+- [ M] tests/test_dwg_geometry_native_contract.py
+- [ M] tests/test_libredwg_sidecar.py
+- [ M] tests/test_native_arx_dbx_contract.py
+- [ M] tests/unit/test_cad_diff.py
+- [ M] tests/unit/test_cadctl.py
+- [ M] tests/unit/test_cados_m06_runner.py
+- [ M] tests/unit/test_dwg_graph_ir_schema.py
+- [ M] tests/unit/test_ir_builder.py
+- [ M] tests/unit/test_m05_cli_contract.py
+- [ M] tests/unit/test_m07b_pump_gating_and_job_channel.py
+- [ M] tests/unit/test_m08_operation_coverage.py
+- [MM] tests/unit/test_m08a_catalog_reopen.py
+- [MM] tests/unit/test_m08l_handlers.py
+- [ M] tests/unit/test_mcp_tool_contract.py
+- [ M] tests/unit/test_non_ascii_fidelity.py
+- [ M] tests/unit/test_operation_registry_v2.py
+- [ M] tests/unit/test_operations_v2_registry.py
+- [ M] tests/unit/test_patch_engine.py
+- [ M] tests/unit/test_patch_engine_policy.py
+- [ M] tests/unit/test_pump_frame_codec.py
+- [ M] tests/unit/test_pump_shutdown_and_deep_native_source.py
+- [ M] tests/unit/test_router_explain_registry.py
+- [ M] tests/unit/test_schemas_v2.py
+- [ M] tests/unit/test_sqlite_ir_store.py
+- [ M] tests/unit/test_sqlite_ir_store_rich.py
+- [ M] tests/unit/test_validator.py
+- [ M] tests/unit/test_validator_gates.py
+- [ M] tests/unit/test_visual_report.py
+- [MM] tests/unit/test_wave3_render_plot_registry_safety.py
+- [ M] tools/attended/run_attended_m07b.ps1
+- [ M] tools/cad_diff.py
+- [ M] tools/cadagent_mcp.py
+- [ M] tools/cadctl.py
+- [ M] tools/cadctl_cli.py
+- [ M] tools/cados_m06.py
+- [ M] tools/ir_builder.py
+- [ M] tools/normalize_result.py
+- [ M] tools/patch_engine.py
+- [ M] tools/probe_routes.py
+- [ M] tools/route_select.py
+- [ M] tools/run_cad_job_batch.ps1
+- [ M] tools/run_job.py
+- [ M] tools/run_route.py
+- [ M] tools/sqlite_ir_store.py
+- [ M] tools/validate_dwg_geometry_extract.py
+- [ M] tools/validator.py
+- [ M] tools/visual_report.py
 
-- ` M .graphifyignore`
-- ` M ENVVAR_REPOINT.md`
-- ` M README.md`
-- ` M SDK_ROUTER_USAGE.md`
-- ` M config/autocad_native_arx_operation_catalog.json`
-- ` M config/autocad_official_sdk_catalog.json`
-- ` M config/autocad_router_capabilities.json`
-- ` M config/cad_job_operation_aliases.json`
-- `MM config/operations.v2.json`
-- ` M docs/AUTOCAD_CONTROL_PLANE_STATUS.md`
-- ` M docs/CAD_DIFF_SPEC.md`
-- ` M docs/CAD_OS_V1_ACCEPTANCE.md`
-- ` M docs/DWG_GRAPH_IR_SPEC.md`
-- ` M docs/LIVE_ARX_NAMED_PIPE_DESIGN.md`
-- ` M docs/LIVE_ARX_PUMP_SPIKE_REPORT.md`
-- ` M docs/LIVE_JOB_ARGUMENT_CONTRACT.md`
-- ` M docs/M08_REMAINING_BATCH_PLAN.md`
-- ` M docs/MCP_TOOL_CONTRACT.md`
-- ` M docs/NATIVE_ARX_DBX_DESIGN.md`
-- ` M docs/NATIVE_DEEP_SURFACE_STATUS.md`
-- ` M docs/OPERATION_REGISTRY_SPEC.md`
-- ` M docs/PATCH_ENGINE_SPEC.md`
-- ` M docs/VALIDATION_SPEC.md`
-- ` M docs/VISUAL_VERIFICATION_SPEC.md`
-- ` M docs/superpowers/plans/2026-06-18-p2-native-cad-job-ops.md`
-- ` M docs/superpowers/plans/2026-06-19-phase0-to-phase5-autocad-native-build.md`
-- ` M handoff/LATEST.md`
-- ` M handoff/TAKEOVER.md`
-- ` M handoff/_beads.jsonl`
-- ` M handoff/mail/INBOX.md`
-- ` M handoff/roles/_index.md`
-- ` M handoff/roles/cad-os-layer.md`
-- ` M handoff/sessions/SESSION_2026-06-22_1333.md`
-- ` M handoff/sessions/SESSION_2026-06-22_1451.md`
-- ` M handoff/zip/index.md`
-- ` M packets/CADOS_M01_FULL_STACK_ULTRACODE_BUILD.md`
-- ` M packets/CADOS_M02_V1_COMPLETION_ULTRACODE.md`
-- ` M packets/CADOS_M03_NATIVE_ROUTER_RICH_IR_COMPLETION.md`
-- ` M packets/CADOS_M04_OPERATION_REGISTRY_AND_TOOL_SURFACE.md`
-- ` M packets/CADOS_M05_PATCH_DIFF_VALIDATION_TRANSACTION.md`
-- ` M packets/CADOS_M06_VISUAL_BATCH_GOLDEN_REGRESSION.md`
-- ` M packets/CADOS_M07A_ATTENDED_SURFACE_VERIFICATION.md`
-- ` M packets/CADOS_M07B_ATTENDED_GUI_VERIFICATION_AND_NATIVE_DEPLOY.md`
-- ` M packets/CADOS_M07_LIVE_ARX_AND_DEEP_NATIVE_SURFACE.md`
-- ` M packets/CADOS_M08_FULL_OPERATION_COVERAGE_CLOSURE.md`
-- ` M packets/PACKET_INDEX.md`
-- ` M reports/AUTO_CAD_ROUTER_AGENT_CONTRACT.md`
-- ` M reports/CADOS_M02_V1_COMPLETION_ULTRACODE.md`
-- ` M reports/CADOS_M03_M04_DETAILED_RESULT.md`
-- ` M reports/CADOS_M03_NATIVE_ROUTER_RICH_IR_COMPLETION.md`
-- ` M reports/CADOS_M04_OPERATION_REGISTRY_AND_TOOL_SURFACE.md`
-- ` M reports/CADOS_M05_PATCH_DIFF_VALIDATION_TRANSACTION.md`
-- ` M reports/CADOS_M07A_ATTENDED_SURFACE_VERIFICATION.md`
-- ` M reports/CADOS_M07B_ATTENDED_GUI_VERIFICATION_AND_NATIVE_DEPLOY.md`
-- ` M reports/CADOS_M07_LIVE_ARX_AND_DEEP_NATIVE_SURFACE.md`
-- ` M reports/CADOS_M08_FULL_OPERATION_COVERAGE_CLOSURE.md`
-- ` M reports/DWG_GEOMETRY_NATIVE_IMPLEMENTATION_PLAN.md`
-- ` M reports/LOCALIZATION_REPORT.md`
-- ` M reports/TRINITY_AUTOCAD_SECTION_DRAFT.md`
-- ` M reports/attended_gui_latest.json`
-- ` M reports/attended_gui_latest.md`
-- ` M reports/attended_shutdown_latest.json`
-- `MM reports/autocad_router_status_latest.json`
-- ` M reports/deep_native_latest.json`
-- ` M reports/deep_native_latest.md`
-- ` M reports/firing_latest.json`
-- ` M reports/journal_latest.md`
-- ` M reports/live_job_args_contract_latest.json`
-- ` M reports/live_pump_latest.json`
-- ` M reports/live_pump_latest.md`
-- ` M reports/merge/MERGE-M08-FOUNDATION.json`
-- ` M reports/merge/MERGE-M08-FOUNDATION.md`
-- ` M reports/merge/MERGE-M08-INFRA.json`
-- ` M reports/merge/MERGE-M08-INFRA.md`
-- ` M reports/merge/MERGE-M08-NATIVE-A1.json`
-- ` M reports/merge/MERGE-M08-NATIVE-A2.json`
-- ` M reports/merge/MERGE-M08-READ.json`
-- ` M reports/merge/MERGE-M08-READ.md`
-- ` M reports/merge/MERGE-M08-RECONCILE-READ.json`
-- ` M reports/merge/MERGE-M08-RECONCILE-READ.md`
-- ` M reports/merge/MERGE-M08-WRITE.json`
-- ` M reports/merge/MERGE-M08-WRITE.md`
-- ` M reports/native_smoke_latest.json`
-- `MM reports/operation_coverage_full_matrix.json`
-- `MM reports/operation_coverage_full_matrix.md`
-- `MM reports/operation_coverage_latest.json`
-- `MM reports/operation_coverage_latest.md`
-- ` M reports/opm_property_latest.json`
-- ` M reports/patch_diff_latest.md`
-- `AD reports/tickets/WAVE4X_VISUAL_PLOT.json`
-- `AD reports/tickets/WAVE4X_VISUAL_PLOT.md`
-- `AD reports/tickets/WAVE4X_VISUAL_PLOT_OPS.json`
-- `AD reports/tickets/WAVE4X_VISUAL_PLOT_PLAN.md`
-- ` M reports/tool_surface_latest.md`
-- ` M reports/v1_acceptance_latest.json`
-- `MM reports/v1_operation_gate_latest.json`
-- ` M reports/validation_latest.md`
-- ` M reports/worlddraw_latest.json`
-- ` M research/native_arx/_AUDIT.md`
-- ` M research/native_arx/_SYNTHESIS_INDEX.md`
-- ` M research/native_arx/_build_catalog.js`
-- ` M research/native_arx/acdb-core.md`
-- ` M research/native_arx/arx-framework.md`
-- ` M research/native_arx/brep-topology.md`
-- ` M research/native_arx/com-activex-opm.md`
-- ` M research/native_arx/constraints-associativity.md`
-- ` M research/native_arx/custom-objects.md`
-- ` M research/native_arx/editor-delta.md`
-- ` M research/native_arx/entities-geometry-graphics.md`
-- ` M research/native_arx/reactors-overrules.md`
-- ` M research/native_arx/ui-customization.md`
-- ` M schemas/cad_diff.v1.schema.json`
-- ` M schemas/cad_job.schema.json`
-- ` M schemas/cad_job.v2.schema.json`
-- ` M schemas/cad_patch.v1.schema.json`
-- ` M schemas/cad_result.v2.schema.json`
-- ` M schemas/dwg_geometry_extract.schema.json`
-- ` M schemas/dwg_graph_ir.v1.schema.json`
-- ` M schemas/operation_registry.v2.schema.json`
-- ` M schemas/validation_report.v1.schema.json`
-- ` M schemas/visual_artifact.v1.schema.json`
-- ` M set-router-env.ps1`
-- ` M src/Ariadne.AcadNative/Ariadne.AcadNative.arx.vcxproj`
-- ` M src/Ariadne.AcadNative/Ariadne.AcadNative.crx.vcxproj`
-- `MM src/Ariadne.AcadNative/families/m08l_handlers.inc`
-- ` M src/Ariadne.AcadNativeDbx/Ariadne.AcadNativeDbx.dbx.vcxproj`
-- ` M src/Ariadne.AcadNativeDbx/AriadneProtocol.cpp`
-- ` M src/Ariadne.AcadNativeDbx/AriadneProtocol.h`
-- ` M src/Ariadne.DwgGeometryExtractor/Ariadne.DwgGeometryExtractor.csproj`
-- ` M src/Ariadne.DwgGeometryExtractor/CadJobDtos.cs`
-- ` M src/Ariadne.DwgGeometryExtractor/CadJobRunner.cs`
-- ` M src/Ariadne.DwgGeometryExtractor/Commands.cs`
-- ` M src/Ariadne.DwgGeometryExtractor/GeometryDtos.cs`
-- ` M src/Ariadne.DwgGeometryExtractor/GeometryExtractor.cs`
-- ` M src/Ariadne.DwgGeometryExtractor/JsonWriter.cs`
-- ` M test_native/count.scr`
-- ` M test_native/count_crx.scr`
-- ` M test_native/create.scr`
-- ` M test_native/create_crx.scr`
-- ` M test_native/diag.scr`
-- ` M test_native/diag2.scr`
-- ` M test_native/diag3.scr`
-- ` M test_native/diag_arx_after_build.scr`
-- ` M test_native/diag_arx_fullacad.scr`
-- ` M test_native/diag_crx_after_build.scr`
-- ` M test_native/diag_dbx_after_build.scr`
-- ` M test_native/diag_dbx_then_arx_after_build.scr`
-- ` M test_native/diag_unload_native.scr`
-- ` M test_native/job_block_count.json`
-- ` M test_native/job_block_create.json`
-- ` M test_native/job_block_insert.json`
-- ` M test_native/job_circle_create.json`
-- ` M test_native/job_count.json`
-- ` M test_native/job_create.json`
-- ` M test_native/job_create_args.json`
-- ` M test_native/job_entity_count_circle.json`
-- ` M test_native/job_fullacad_runtime_capabilities.json`
-- ` M test_native/job_jig_host_support.json`
-- ` M test_native/job_jig_point_probe.json`
-- ` M test_native/job_layer_create.json`
-- ` M test_native/job_layout_create.json`
-- ` M test_native/job_layout_list.json`
-- ` M test_native/job_line_create.json`
-- ` M test_native/job_overrule_disable.json`
-- ` M test_native/job_overrule_enable.json`
-- ` M test_native/job_overrule_registry.json`
-- ` M test_native/job_protocol_queryx.json`
-- ` M test_native/job_reactor_disable.json`
-- ` M test_native/job_reactor_enable.json`
-- ` M test_native/job_reactor_registry.json`
-- ` M test_native/job_record_count.json`
-- ` M test_native/job_record_create.json`
-- ` M test_native/job_runtime_capabilities.json`
-- ` M test_native/job_xdata_get.json`
-- ` M test_native/job_xdata_set.json`
-- ` M test_native/job_xrecord_get.json`
-- ` M test_native/job_xrecord_set.json`
-- ` M test_native/job_xref_list.json`
-- ` M test_native/p2_stateful_batch.json`
-- ` M tests/golden/expected_counts.json`
-- ` M tests/golden/golden_manifest.json`
-- ` M tests/integration/test_live_arx_pump.py`
-- ` M tests/integration/test_native_graph_router.py`
-- ` M tests/integration/test_native_inspect_database_graph.py`
-- ` M tests/smoke/test_cadctl_rich_ir.py`
-- ` M tests/smoke/test_router_inspect_database_graph.py`
-- ` M tests/smoke/test_router_status.py`
-- ` M tests/smoke/test_walking_skeleton.py`
-- ` M tests/test_cad_job_batch_harness.py`
-- ` M tests/test_cad_job_control_plane.py`
-- ` M tests/test_cad_job_operation_aliases.py`
-- ` M tests/test_dwg_geometry_native_contract.py`
-- ` M tests/test_libredwg_sidecar.py`
-- ` M tests/test_native_arx_dbx_contract.py`
-- ` M tests/unit/test_cad_diff.py`
-- ` M tests/unit/test_cadctl.py`
-- ` M tests/unit/test_cados_m06_runner.py`
-- ` M tests/unit/test_dwg_graph_ir_schema.py`
-- ` M tests/unit/test_ir_builder.py`
-- ` M tests/unit/test_m05_cli_contract.py`
-- ` M tests/unit/test_m07b_pump_gating_and_job_channel.py`
-- ` M tests/unit/test_m08_operation_coverage.py`
-- `MM tests/unit/test_m08a_catalog_reopen.py`
-- `MM tests/unit/test_m08l_handlers.py`
-- ` M tests/unit/test_mcp_tool_contract.py`
-- ` M tests/unit/test_non_ascii_fidelity.py`
-- ` M tests/unit/test_operation_registry_v2.py`
-- ` M tests/unit/test_operations_v2_registry.py`
-- ` M tests/unit/test_patch_engine.py`
-- ` M tests/unit/test_patch_engine_policy.py`
-- ` M tests/unit/test_pump_frame_codec.py`
-- ` M tests/unit/test_pump_shutdown_and_deep_native_source.py`
-- ` M tests/unit/test_router_explain_registry.py`
-- ` M tests/unit/test_schemas_v2.py`
-- ` M tests/unit/test_sqlite_ir_store.py`
-- ` M tests/unit/test_sqlite_ir_store_rich.py`
-- ` M tests/unit/test_validator.py`
-- ` M tests/unit/test_validator_gates.py`
-- ` M tests/unit/test_visual_report.py`
-- `MM tests/unit/test_wave3_render_plot_registry_safety.py`
-- ` M tools/attended/run_attended_m07b.ps1`
-- ` M tools/cad_diff.py`
-- ` M tools/cadagent_mcp.py`
-- ` M tools/cadctl.py`
-- ` M tools/cadctl_cli.py`
-- ` M tools/cados_m06.py`
-- ` M tools/ir_builder.py`
-- ` M tools/normalize_result.py`
-- ` M tools/patch_engine.py`
-- ` M tools/probe_routes.py`
-- ` M tools/route_select.py`
-- ` M tools/run_cad_job_batch.ps1`
-- ` M tools/run_job.py`
-- ` M tools/run_route.py`
-- ` M tools/sqlite_ir_store.py`
-- ` M tools/validate_dwg_geometry_extract.py`
-- ` M tools/validator.py`
-- ` M tools/visual_report.py`
+## Untracked Files
+- [??] reports/M08_PARALLEL_BUILD_BOARD.json
+- [??] reports/M08_PARALLEL_BUILD_BOARD.md
+- [??] reports/WAVE4_PANE2~6_CLAIMS.json
+- [??] reports/merge/MAIN_DIRTY_STATE_BEFORE_FAST_A_READY.json
+- [??] reports/merge/MAIN_DIRTY_STATE_BEFORE_FAST_A_READY.md
+- [??] reports/merge/MERGE_WAVE4X_LOADER_DOC.json
+- [??] reports/merge/MERGE_WAVE4X_LOADER_DOC.md
+- [??] reports/merge/MERGE_WAVE4X_VISUAL_PLOT.json
+- [??] reports/merge/MERGE_WAVE4X_VISUAL_PLOT.md
+- [??] reports/remaining_after_wave3_integration.json
+- [??] reports/remaining_after_wave3_integration.md
+- [??] reports/tickets/WAVE4S_SPARK1_MICRO_IMPL_CLAIMS.json
+- [??] reports/tickets/WAVE4S_SPARK2_AGENT_SURFACE_CLAIMS.json
+- [??] reports/tickets/WAVE4S_SPARK3_REGRESSION_AUTOMATION_CLAIMS.json
+- [??] reports/tickets/WAVE4S_SPARK4_EVIDENCE_HARDENING_CLAIMS.json
+- [??] reports/tickets/WAVE4X_CLAIM_SPLIT.json
+- [??] reports/tickets/WAVE4X_CLAIM_SPLIT.md
+- [??] reports/tickets/WAVE4X_PANE1_ASSOC_SOLVER_CLAIMS.json
+- [??] reports/tickets/WAVE4X_PANE2_LOADER_DOC_CLAIMS.json
+- [??] reports/tickets/WAVE4X_PANE3_SUBENTITY_BREP_CLAIMS.json
+- [??] reports/tickets/WAVE4X_PANE4_FALLBACK_COM_OLE_CLAIMS.json
+- [??] reports/tickets/WAVE4X_PANE5_DB_TXN_WRITE_CLAIMS.json
+- [??] reports/tickets/WAVE4X_PANE6_GENERIC_CLOSURE_CLAIMS.json
+- [??] reports/tickets/WAVE4X_PANE7_VISUAL_PLOT_CLAIMS.json
+- [??] reports/tickets/WAVE4X_PANE8_LIVE_EDITOR_UI_CLAIMS.json
 
-## Untracked
+## Branch List
+- + cados/cad-os-v1-rc1
+- + cados/m08c-deferred-sweep
+- + cados/m08cdef-read-graph-query-30
+- + cados/m08g-h-write-annotation-30
+- + cados/m08i-visual-render-plot
+- + cados/m08n-a3-native-ui
+- + cados/m08o-fallback-raw-policy
+- + cados/w4s-spark1-micro-impl
+- + cados/w4s-spark2-agent-surface
+- + cados/w4s-spark3-regression-automation
+- + cados/w4s-spark4-evidence-hardening
+- + cados/w4x-assoc-solver
+- + cados/w4x-db-txn-write
+- + cados/w4x-fallback-com-ole
+- + cados/w4x-generic-closure
+- + cados/w4x-generic-closure-audit
+- + cados/w4x-live-ui-apply
+- + cados/w4x-loader-doc-command
+- + cados/w4x-loader-doc-r2-lifecycle-entrypoints
+- + cados/w4x-subentity-brep
+- + cados/w4x-visual-plot
+- + cados/w4x-visual-plot-attended
+- + cados/wave3-integrate-and-build-unfinished
+- + cados/wave3-pane10-mixed-burndown
+- + cados/wave3-pane2-heavy-native-30
+- + cados/wave3-pane3-visual-live
+- + cados/wave3-pane4-fallback-lowrisk
+- + cados/wave3-pane5-generic-30
+- + cados/wave3-pane6-native-custom
+- + cados/wave3-pane7-graphics-worlddraw
+- + cados/wave3-pane8-opm-reactors
+- + cados/wave3-pane9-live-editor-ui
+- + cados/wave4x-fast-a-main-ready
+- + cados/wave4x-fast-a-merge-audit-truth
+- + cados/wave4x-fast-b-attended-live-ui-blocker-rework
+- + cados/wave4x-fast-b-on-fast-a-truth
+- + cados/wave4x-final-a-hardblock-reimplementation
+- + cados/wave4x-final-b-skipped-test-execution
+- * main
 
-- `?? reports/M08_PARALLEL_BUILD_BOARD.json`
-- `?? reports/M08_PARALLEL_BUILD_BOARD.md`
-- `?? reports/WAVE4_PANE2~6_CLAIMS.json`
-- `?? reports/merge/MAIN_DIRTY_STATE_BEFORE_FAST_A_READY.json`
-- `?? reports/merge/MAIN_DIRTY_STATE_BEFORE_FAST_A_READY.md`
-- `?? reports/merge/MERGE_WAVE4X_LOADER_DOC.json`
-- `?? reports/merge/MERGE_WAVE4X_LOADER_DOC.md`
-- `?? reports/merge/MERGE_WAVE4X_VISUAL_PLOT.json`
-- `?? reports/merge/MERGE_WAVE4X_VISUAL_PLOT.md`
-- `?? reports/remaining_after_wave3_integration.json`
-- `?? reports/remaining_after_wave3_integration.md`
-- `?? reports/tickets/WAVE4S_SPARK1_MICRO_IMPL_CLAIMS.json`
-- `?? reports/tickets/WAVE4S_SPARK2_AGENT_SURFACE_CLAIMS.json`
-- `?? reports/tickets/WAVE4S_SPARK3_REGRESSION_AUTOMATION_CLAIMS.json`
-- `?? reports/tickets/WAVE4S_SPARK4_EVIDENCE_HARDENING_CLAIMS.json`
-- `?? reports/tickets/WAVE4X_CLAIM_SPLIT.json`
-- `?? reports/tickets/WAVE4X_CLAIM_SPLIT.md`
-- `?? reports/tickets/WAVE4X_PANE1_ASSOC_SOLVER_CLAIMS.json`
-- `?? reports/tickets/WAVE4X_PANE2_LOADER_DOC_CLAIMS.json`
-- `?? reports/tickets/WAVE4X_PANE3_SUBENTITY_BREP_CLAIMS.json`
-- `?? reports/tickets/WAVE4X_PANE4_FALLBACK_COM_OLE_CLAIMS.json`
-- `?? reports/tickets/WAVE4X_PANE5_DB_TXN_WRITE_CLAIMS.json`
-- `?? reports/tickets/WAVE4X_PANE6_GENERIC_CLOSURE_CLAIMS.json`
-- `?? reports/tickets/WAVE4X_PANE7_VISUAL_PLOT_CLAIMS.json`
-- `?? reports/tickets/WAVE4X_PANE8_LIVE_EDITOR_UI_CLAIMS.json`
+## Worktree List
+- D:/dev/99_tools/autocad-sdk-router                               bc0832a [main]
+- D:/dev/99_tools/autocad-sdk-router_cados_v1_rc1                  7a56e44 [cados/cad-os-v1-rc1]
+- D:/dev/99_tools/autocad-sdk-router_m08c_deferred_sweep           52e9997 [cados/m08c-deferred-sweep]
+- D:/dev/99_tools/autocad-sdk-router_m08cdef_read_graph_query      a43416d [cados/m08cdef-read-graph-query-30]
+- D:/dev/99_tools/autocad-sdk-router_m08g_h_write_annotation       3bc6df6 [cados/m08g-h-write-annotation-30]
+- D:/dev/99_tools/autocad-sdk-router_m08i_visual                   e5f450b [cados/m08i-visual-render-plot]
+- D:/dev/99_tools/autocad-sdk-router_m08n_a3                       c588bd6 [cados/m08n-a3-native-ui]
+- D:/dev/99_tools/autocad-sdk-router_m08o_fallback                 9765872 [cados/m08o-fallback-raw-policy]
+- D:/dev/99_tools/autocad-sdk-router_w4s_spark1_micro              bc0832a [cados/w4s-spark1-micro-impl]
+- D:/dev/99_tools/autocad-sdk-router_w4s_spark2_surface            1cd6182 [cados/w4s-spark2-agent-surface]
+- D:/dev/99_tools/autocad-sdk-router_w4s_spark3_regression         bc0832a [cados/w4s-spark3-regression-automation]
+- D:/dev/99_tools/autocad-sdk-router_w4s_spark4_evidence           bc0832a [cados/w4s-spark4-evidence-hardening]
+- D:/dev/99_tools/autocad-sdk-router_w4x_assoc_solver              4d0afd5 [cados/w4x-assoc-solver]
+- D:/dev/99_tools/autocad-sdk-router_w4x_db_txn                    36f3817 [cados/w4x-db-txn-write]
+- D:/dev/99_tools/autocad-sdk-router_w4x_fallback                  49244a4 [cados/w4x-fallback-com-ole]
+- D:/dev/99_tools/autocad-sdk-router_w4x_generic                   98605fb [cados/w4x-generic-closure]
+- D:/dev/99_tools/autocad-sdk-router_w4x_generic_audit             19c6577 [cados/w4x-generic-closure-audit]
+- D:/dev/99_tools/autocad-sdk-router_w4x_live_ui_apply             bc0832a [cados/w4x-live-ui-apply]
+- D:/dev/99_tools/autocad-sdk-router_w4x_loader_doc                ab94832 [cados/w4x-loader-doc-command]
+- D:/dev/99_tools/autocad-sdk-router_w4x_loader_doc_r2             c8d6281 [cados/w4x-loader-doc-r2-lifecycle-entrypoints]
+- D:/dev/99_tools/autocad-sdk-router_w4x_subentity                 154a6f6 [cados/w4x-subentity-brep]
+- D:/dev/99_tools/autocad-sdk-router_w4x_visual                    7adc82e [cados/w4x-visual-plot]
+- D:/dev/99_tools/autocad-sdk-router_w4x_visual_attended           7adc82e [cados/w4x-visual-plot-attended]
+- D:/dev/99_tools/autocad-sdk-router_wave3_integrator              bc0832a [cados/wave3-integrate-and-build-unfinished]
+- D:/dev/99_tools/autocad-sdk-router_wave3_pane10_mixed            8ac5d17 [cados/wave3-pane10-mixed-burndown]
+- D:/dev/99_tools/autocad-sdk-router_wave3_pane2                   0a69a7d [cados/wave3-pane2-heavy-native-30]
+- D:/dev/99_tools/autocad-sdk-router_wave3_pane3_visual_live       3ecd96e [cados/wave3-pane3-visual-live]
+- D:/dev/99_tools/autocad-sdk-router_wave3_pane4_fallback_lowrisk  023fc16 [cados/wave3-pane4-fallback-lowrisk]
+- D:/dev/99_tools/autocad-sdk-router_wave3_pane5                   8e27e3d [cados/wave3-pane5-generic-30]
+- D:/dev/99_tools/autocad-sdk-router_wave3_pane6_native_custom     b071d97 [cados/wave3-pane6-native-custom]
+- D:/dev/99_tools/autocad-sdk-router_wave3_pane7_graphics          023fc16 [cados/wave3-pane7-graphics-worlddraw]
+- D:/dev/99_tools/autocad-sdk-router_wave3_pane8_opm_reactors      58fd8f8 [cados/wave3-pane8-opm-reactors]
+- D:/dev/99_tools/autocad-sdk-router_wave3_pane9_live_editor       c86f405 [cados/wave3-pane9-live-editor-ui]
+- D:/dev/99_tools/autocad-sdk-router_wave4x_fast_a_main_ready      f5f950c [cados/wave4x-fast-a-main-ready]
+- D:/dev/99_tools/autocad-sdk-router_wave4x_fast_a_merge           4328a0d [cados/wave4x-fast-a-merge-audit-truth]
+- D:/dev/99_tools/autocad-sdk-router_wave4x_fast_b_impl            a564b96 [cados/wave4x-fast-b-attended-live-ui-blocker-rework]
+- D:/dev/99_tools/autocad-sdk-router_wave4x_fast_b_on_fast_a_truth ec92ee9 [cados/wave4x-fast-b-on-fast-a-truth]
+- D:/dev/99_tools/autocad-sdk-router_wave4x_final_a_hardblock      50c8c89 [cados/wave4x-final-a-hardblock-reimplementation]
+- D:/dev/99_tools/autocad-sdk-router_wave4x_final_b_skips          9c505b2 [cados/wave4x-final-b-skipped-test-execution]
 
-## Worktrees
-
-- `D:/dev/99_tools/autocad-sdk-router                               bc0832a [main]`
-- `D:/dev/99_tools/autocad-sdk-router_cados_v1_rc1                  50c8c89 [cados/cad-os-v1-rc1]`
-- `D:/dev/99_tools/autocad-sdk-router_m08c_deferred_sweep           52e9997 [cados/m08c-deferred-sweep]`
-- `D:/dev/99_tools/autocad-sdk-router_m08cdef_read_graph_query      a43416d [cados/m08cdef-read-graph-query-30]`
-- `D:/dev/99_tools/autocad-sdk-router_m08g_h_write_annotation       3bc6df6 [cados/m08g-h-write-annotation-30]`
-- `D:/dev/99_tools/autocad-sdk-router_m08i_visual                   e5f450b [cados/m08i-visual-render-plot]`
-- `D:/dev/99_tools/autocad-sdk-router_m08n_a3                       c588bd6 [cados/m08n-a3-native-ui]`
-- `D:/dev/99_tools/autocad-sdk-router_m08o_fallback                 9765872 [cados/m08o-fallback-raw-policy]`
-- `D:/dev/99_tools/autocad-sdk-router_w4s_spark1_micro              bc0832a [cados/w4s-spark1-micro-impl]`
-- `D:/dev/99_tools/autocad-sdk-router_w4s_spark2_surface            1cd6182 [cados/w4s-spark2-agent-surface]`
-- `D:/dev/99_tools/autocad-sdk-router_w4s_spark3_regression         bc0832a [cados/w4s-spark3-regression-automation]`
-- `D:/dev/99_tools/autocad-sdk-router_w4s_spark4_evidence           bc0832a [cados/w4s-spark4-evidence-hardening]`
-- `D:/dev/99_tools/autocad-sdk-router_w4x_assoc_solver              4d0afd5 [cados/w4x-assoc-solver]`
-- `D:/dev/99_tools/autocad-sdk-router_w4x_db_txn                    36f3817 [cados/w4x-db-txn-write]`
-- `D:/dev/99_tools/autocad-sdk-router_w4x_fallback                  49244a4 [cados/w4x-fallback-com-ole]`
-- `D:/dev/99_tools/autocad-sdk-router_w4x_generic                   98605fb [cados/w4x-generic-closure]`
-- `D:/dev/99_tools/autocad-sdk-router_w4x_generic_audit             19c6577 [cados/w4x-generic-closure-audit]`
-- `D:/dev/99_tools/autocad-sdk-router_w4x_live_ui_apply             bc0832a [cados/w4x-live-ui-apply]`
-- `D:/dev/99_tools/autocad-sdk-router_w4x_loader_doc                ab94832 [cados/w4x-loader-doc-command]`
-- `D:/dev/99_tools/autocad-sdk-router_w4x_loader_doc_r2             c8d6281 [cados/w4x-loader-doc-r2-lifecycle-entrypoints]`
-- `D:/dev/99_tools/autocad-sdk-router_w4x_subentity                 154a6f6 [cados/w4x-subentity-brep]`
-- `D:/dev/99_tools/autocad-sdk-router_w4x_visual                    7adc82e [cados/w4x-visual-plot]`
-- `D:/dev/99_tools/autocad-sdk-router_w4x_visual_attended           7adc82e [cados/w4x-visual-plot-attended]`
-- `D:/dev/99_tools/autocad-sdk-router_wave3_integrator              bc0832a [cados/wave3-integrate-and-build-unfinished]`
-- `D:/dev/99_tools/autocad-sdk-router_wave3_pane10_mixed            8ac5d17 [cados/wave3-pane10-mixed-burndown]`
-- `D:/dev/99_tools/autocad-sdk-router_wave3_pane2                   0a69a7d [cados/wave3-pane2-heavy-native-30]`
-- `D:/dev/99_tools/autocad-sdk-router_wave3_pane3_visual_live       3ecd96e [cados/wave3-pane3-visual-live]`
-- `D:/dev/99_tools/autocad-sdk-router_wave3_pane4_fallback_lowrisk  023fc16 [cados/wave3-pane4-fallback-lowrisk]`
-- `D:/dev/99_tools/autocad-sdk-router_wave3_pane5                   8e27e3d [cados/wave3-pane5-generic-30]`
-- `D:/dev/99_tools/autocad-sdk-router_wave3_pane6_native_custom     b071d97 [cados/wave3-pane6-native-custom]`
-- `D:/dev/99_tools/autocad-sdk-router_wave3_pane7_graphics          023fc16 [cados/wave3-pane7-graphics-worlddraw]`
-- `D:/dev/99_tools/autocad-sdk-router_wave3_pane8_opm_reactors      58fd8f8 [cados/wave3-pane8-opm-reactors]`
-- `D:/dev/99_tools/autocad-sdk-router_wave3_pane9_live_editor       c86f405 [cados/wave3-pane9-live-editor-ui]`
-- `D:/dev/99_tools/autocad-sdk-router_wave4x_fast_a_main_ready      f5f950c [cados/wave4x-fast-a-main-ready]`
-- `D:/dev/99_tools/autocad-sdk-router_wave4x_fast_a_merge           4328a0d [cados/wave4x-fast-a-merge-audit-truth]`
-- `D:/dev/99_tools/autocad-sdk-router_wave4x_fast_b_impl            a564b96 [cados/wave4x-fast-b-attended-live-ui-blocker-rework]`
-- `D:/dev/99_tools/autocad-sdk-router_wave4x_fast_b_on_fast_a_truth ec92ee9 [cados/wave4x-fast-b-on-fast-a-truth]`
-- `D:/dev/99_tools/autocad-sdk-router_wave4x_final_a_hardblock      50c8c89 [cados/wave4x-final-a-hardblock-reimplementation]`
-- `D:/dev/99_tools/autocad-sdk-router_wave4x_final_b_skips          9c505b2 [cados/wave4x-final-b-skipped-test-execution]`
+## Recent Main Log
+- bc0832a Integrate Wave3 and close unfinished CAD OS ops
+- 53dde79 Block doc.sendstring raw command surface
+- 416085f Merge branch 'cados/wave3-pane9-live-editor-ui' into cados/wave3-integrate-and-build-unfinished
+- d2d5b19 Merge branch 'cados/wave3-pane3-visual-live' into cados/wave3-integrate-and-build-unfinished
+- 4fbee67 Merge branch 'cados/wave3-pane8-opm-reactors' into cados/wave3-integrate-and-build-unfinished
+- 499a462 Merge branch 'cados/wave3-pane6-native-custom' into cados/wave3-integrate-and-build-unfinished
+- 58fd8f8 WAVE3 Pane8: implement OPM editor/docmanager/longtx reactors
+- 3ecd96e M08L: Fix ObjectARX 2027 compile errors and align unit test expectations
+- c86f405 WAVE3 PANE9: Add ticket reports, patch, zip, and executed packet record
+- d2463c7 WAVE3 PANE9: Implement live app, command stack and document lifecycle handlers

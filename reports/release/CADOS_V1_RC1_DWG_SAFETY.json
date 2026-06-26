@@ -1,27 +1,49 @@
 {
-  "schema": "ariadne.cad_os.v1_rc1.dwg_safety.v1",
-  "generated_at": "2026-06-24T06:47:56.984845+00:00",
-  "status": "PASS",
-  "original_dwg_modified": false,
-  "tracked_cad_file_status": "",
-  "hashes": [
-    {
-      "path": "tests\\fixtures\\native_sample.dwg",
-      "sha256": "EAC5D4B13D67D89106E503321412539DF7B39B8A7F4E44C033448E9295FE3F76",
-      "bytes": 2559361
-    },
-    {
-      "path": "staging\\dwg_20260617_191504\\input.dwg",
-      "sha256": "27DBF6B95FF72A89FD53B153891187365B9E8EBC4C05A97CFED307057BF49BC8",
-      "bytes": 2524981
-    }
-  ],
-  "staged_copies_only": true,
-  "write_original_default": false,
-  "matrix_gate_no_original_write_default": true,
-  "evidence": [
-    "reports/release/CADOS_V1_RC1_TESTS.log",
-    "tests/integration/test_native_graph_router.py",
-    "tests/smoke/test_router_inspect_database_graph.py"
-  ]
+    "schema":  "ariadne.cad_os.v1_rc1.dwg_safety.v1",
+    "packet_id":  "CADOS_V1_RC1_FINAL_INTEGRATION",
+    "generated_at":  "2026-06-26T13:24:21.8393523+09:00",
+    "original_dwg_modified":  false,
+    "tracked_cad_status_clean":  true,
+    "tracked_cad_status":  [
+
+                           ],
+    "tracked_cad_files":  [
+                              {
+                                  "path":  "tests/fixtures/native_sample.dwg",
+                                  "worktree_sha256":  "eac5d4b13d67d89106e503321412539df7b39b8a7f4e44c033448e9295fe3f76",
+                                  "git_blob_head":  "cdad51b019f8e96abf2c39670fe21bc985f803eb",
+                                  "git_blob_worktree":  "4e4987a2d41a94987ce43f2bd94c7589c9b96c65",
+                                  "git_blob_unchanged_from_head":  false,
+                                  "bytes":  2559361,
+                                  "last_write_time":  "2026-06-24T15:23:49.9272864+09:00"
+                              }
+                          ],
+    "known_golden_inputs":  [
+                                {
+                                    "path":  "staging\\dwg_20260617_191504\\input.dwg",
+                                    "exists":  true,
+                                    "sha256":  "27dbf6b95ff72a89fd53b153891187365b9e8ebc4c05a97cfed307057bf49bc8",
+                                    "bytes":  2524981,
+                                    "last_write_time":  "2026-06-17T19:15:06.0000000+09:00"
+                                },
+                                {
+                                    "path":  "tests\\fixtures\\native_sample.dwg",
+                                    "exists":  true,
+                                    "sha256":  "eac5d4b13d67d89106e503321412539df7b39b8a7f4e44c033448e9295fe3f76",
+                                    "bytes":  2559361,
+                                    "last_write_time":  "2026-06-24T15:23:49.9272864+09:00"
+                                }
+                            ],
+    "staged_cad_file_count":  169,
+    "run_cad_file_count":  352,
+    "staged_copies_only":  true,
+    "no_write_original_default":  true,
+    "original_write_default_operation_count":  0,
+    "raw_command_exposure_zero":  true,
+    "live_test_evidence":  [
+                               "python -m pytest tests -q -rs with CADOS_LIVE=1 =\u003e 566 passed, 0 skipped",
+                               "tests/integration/test_native_graph_router.py asserts golden SHA and size unchanged",
+                               "tests/smoke/test_router_inspect_database_graph.py asserts golden SHA and size unchanged",
+                               "tests/integration/test_live_arx_pump.py copies golden DWG to runs/m02_pump_test_pytest/input.dwg before live pump"
+                           ]
 }

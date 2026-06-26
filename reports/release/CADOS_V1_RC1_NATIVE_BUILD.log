@@ -1,32 +1,11 @@
 ﻿msbuild 버전 18.6.3+84d3e95b4(.NET Framework용)
 
-  AriadneDbxEntry.cpp
-  AriadneProtocol.cpp
-  AriadneRecord.cpp
-  AriadneProbe.cpp
-     D:\dev\99_tools\autocad-sdk-router_cados_v1_rc1\src\Ariadne.AcadNativeDbx\..\Ariadne.AcadNative\bin\x64\Release\Ariadne.AcadNativeDbx.lib 라이브러리 및 D:\dev\99_tools\autocad-sdk-router_cados_v1_rc1\src\Ariadne.AcadNativeDbx\..\Ariadne.AcadNative\bin\x64\Release\Ariadne.AcadNativeDbx.exp 개체를 생성하고 있습니다.
-  코드를 생성하고 있습니다.
-  코드를 생성했습니다.
-rxapi.lib(libinit.obj) : warning LNK4099: 'rxapi.pdb' PDB를 'rxapi.lib(libinit.obj)' 또는 'D:\dev\99_tools\autocad-sdk-router_cados_v1_rc1\src\Ariadne.AcadNative\bin\x64\Release\rxapi.pdb'에서 찾을 수 없습니다. 디버그 정보가 없는 것처럼 개체를 링크합니다. [D:\dev\99_tools\autocad-sdk-router_cados_v1_rc1\src\Ariadne.AcadNativeDbx\Ariadne.AcadNativeDbx.dbx.vcxproj]
   Ariadne.AcadNativeDbx.dbx.vcxproj -> D:\dev\99_tools\autocad-sdk-router_cados_v1_rc1\src\Ariadne.AcadNative\bin\x64\Release\Ariadne.AcadNativeDbx.dbx
 msbuild 버전 18.6.3+84d3e95b4(.NET Framework용)
 
-  AriadneNativeJob.cpp
-     D:\dev\99_tools\autocad-sdk-router_cados_v1_rc1\src\Ariadne.AcadNative\obj-crx\x64\Release\Ariadne.AcadNative.lib 라이브러리 및 D:\dev\99_tools\autocad-sdk-router_cados_v1_rc1\src\Ariadne.AcadNative\obj-crx\x64\Release\Ariadne.AcadNative.exp 개체를 생성하고 있습니다.
-  코드를 생성하고 있습니다.
-  코드를 생성했습니다.
-rxapi.lib(nullSubent.obj) : warning LNK4099: 'rxapi.pdb' PDB를 'rxapi.lib(nullSubent.obj)' 또는 'D:\dev\99_tools\autocad-sdk-router_cados_v1_rc1\src\Ariadne.AcadNative\bin\x64\Release\rxapi.pdb'에서 찾을 수 없습니다. 디버그 정보가 없는 것처럼 개체를 링크합니다. [D:\dev\99_tools\autocad-sdk-router_cados_v1_rc1\src\Ariadne.AcadNative\Ariadne.AcadNative.crx.vcxproj]
-rxapi.lib(libinit.obj) : warning LNK4099: 'rxapi.pdb' PDB를 'rxapi.lib(libinit.obj)' 또는 'D:\dev\99_tools\autocad-sdk-router_cados_v1_rc1\src\Ariadne.AcadNative\bin\x64\Release\rxapi.pdb'에서 찾을 수 없습니다. 디버그 정보가 없는 것처럼 개체를 링크합니다. [D:\dev\99_tools\autocad-sdk-router_cados_v1_rc1\src\Ariadne.AcadNative\Ariadne.AcadNative.crx.vcxproj]
   Ariadne.AcadNative.crx.vcxproj -> D:\dev\99_tools\autocad-sdk-router_cados_v1_rc1\src\Ariadne.AcadNative\bin\x64\Release\Ariadne.AcadNative.crx
 msbuild 버전 18.6.3+84d3e95b4(.NET Framework용)
 
-  AriadneNativeJob.cpp
-  AriadnePalette.cpp
-     D:\dev\99_tools\autocad-sdk-router_cados_v1_rc1\src\Ariadne.AcadNative\obj\x64\Release\Ariadne.AcadNative.lib 라이브러리 및 D:\dev\99_tools\autocad-sdk-router_cados_v1_rc1\src\Ariadne.AcadNative\obj\x64\Release\Ariadne.AcadNative.exp 개체를 생성하고 있습니다.
-  코드를 생성하고 있습니다.
-  코드를 생성했습니다.
-rxapi.lib(nullSubent.obj) : warning LNK4099: 'rxapi.pdb' PDB를 'rxapi.lib(nullSubent.obj)' 또는 'D:\dev\99_tools\autocad-sdk-router_cados_v1_rc1\src\Ariadne.AcadNative\bin\x64\Release\rxapi.pdb'에서 찾을 수 없습니다. 디버그 정보가 없는 것처럼 개체를 링크합니다. [D:\dev\99_tools\autocad-sdk-router_cados_v1_rc1\src\Ariadne.AcadNative\Ariadne.AcadNative.arx.vcxproj]
-rxapi.lib(libinit.obj) : warning LNK4099: 'rxapi.pdb' PDB를 'rxapi.lib(libinit.obj)' 또는 'D:\dev\99_tools\autocad-sdk-router_cados_v1_rc1\src\Ariadne.AcadNative\bin\x64\Release\rxapi.pdb'에서 찾을 수 없습니다. 디버그 정보가 없는 것처럼 개체를 링크합니다. [D:\dev\99_tools\autocad-sdk-router_cados_v1_rc1\src\Ariadne.AcadNative\Ariadne.AcadNative.arx.vcxproj]
   Ariadne.AcadNative.arx.vcxproj -> D:\dev\99_tools\autocad-sdk-router_cados_v1_rc1\src\Ariadne.AcadNative\bin\x64\Release\Ariadne.AcadNative.arx
 {
     "status":  "ok",
@@ -57,4 +36,3 @@ rxapi.lib(libinit.obj) : warning LNK4099: 'rxapi.pdb' PDB를 'rxapi.lib(libinit.
                       }
                   ]
 }
-

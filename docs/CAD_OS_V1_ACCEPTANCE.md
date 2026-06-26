@@ -1,10 +1,18 @@
-# CAD OS V1 Acceptance
+﻿# CAD OS V1 Acceptance
 
-- [x] Final A integrated: `50c8c89`
-- [x] Final B integrated: `9c505b2f281ebaff875e59b332a25cc3fff671f2`
-- [x] Operation unfinished states are zero: catalogued=0, stub=0, unknown=0, deferred=0
-- [x] Tests pass with zero skips: 566 passed / 0 skipped
-- [x] Native canonical build passes: ok
-- [x] Raw command agent exposure is zero
-- [x] Original DWG unchanged
-- [x] Daedalus handoff updated
+## RC1 Acceptance Gate
+
+- RC branch created: yes (cados/cad-os-v1-rc1)
+- Final A integrated: yes (50c8c89)
+- Final B integrated: yes (9c505b2)
+- Tests pass with 0 skipped: yes (566 passed, 0 skipped, CADOS_LIVE=1)
+- Native build passes: yes (dbx, crx, arx built)
+- Operation counts: implemented=487, hard_blocked=29, deprecated=1, catalogued=0, stub=0, unknown=0, deferred=0
+- Every hardblock has evidence: True
+- Raw command exposure: 0
+- Original DWG unchanged: True
+- Daedalus handoff updated: yes
+- Dirty main untouched: yes
+- Push performed: no
+
+Evidence root: reports/release/CADOS_V1_RC1.json.
