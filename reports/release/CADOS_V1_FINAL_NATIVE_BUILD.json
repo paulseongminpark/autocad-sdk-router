@@ -1,0 +1,46 @@
+{
+    "schema":  "ariadne.cad_os.v1_final.native_build.v1",
+    "packet_id":  "CADOS_M09_V1_RELEASE_FREEZE_AND_DAEDALUS_HANDOFF",
+    "status":  "PASS",
+    "started_at":  "2026-06-26T13:50:36.6022337+09:00",
+    "ended_at":  "2026-06-26T13:50:47.5878593+09:00",
+    "exit_code":  0,
+    "exception":  null,
+    "log":  "reports/release/CADOS_V1_FINAL_NATIVE_BUILD.log",
+    "native_build":  {
+                         "status":  "ok",
+                         "msbuild":  "C:\\Program Files\\Microsoft Visual Studio\\2026\\Community\\MSBuild\\Current\\Bin\\amd64\\MSBuild.exe",
+                         "arx_relink_mode":  "canonical",
+                         "arx_versioned_name":  "",
+                         "arx_lock_note":  "Canonical .arx relinked normally.",
+                         "projects":  [
+                                          "D:\\dev\\99_tools\\autocad-sdk-router_cados_v1_final\\src\\Ariadne.AcadNativeDbx\\Ariadne.AcadNativeDbx.dbx.vcxproj",
+                                          "D:\\dev\\99_tools\\autocad-sdk-router_cados_v1_final\\src\\Ariadne.AcadNative\\Ariadne.AcadNative.crx.vcxproj",
+                                          "D:\\dev\\99_tools\\autocad-sdk-router_cados_v1_final\\src\\Ariadne.AcadNative\\Ariadne.AcadNative.arx.vcxproj"
+                                      ],
+                         "artifacts":  [
+                                           {
+                                               "path":  "D:\\dev\\99_tools\\autocad-sdk-router_cados_v1_final\\src\\Ariadne.AcadNative\\bin\\x64\\Release\\Ariadne.AcadNativeDbx.dbx",
+                                               "exists":  true,
+                                               "bytes":  54272
+                                           },
+                                           {
+                                               "path":  "D:\\dev\\99_tools\\autocad-sdk-router_cados_v1_final\\src\\Ariadne.AcadNative\\bin\\x64\\Release\\Ariadne.AcadNative.crx",
+                                               "exists":  true,
+                                               "bytes":  804352
+                                           },
+                                           {
+                                               "path":  "D:\\dev\\99_tools\\autocad-sdk-router_cados_v1_final\\src\\Ariadne.AcadNative\\bin\\x64\\Release\\Ariadne.AcadNative.arx",
+                                               "exists":  true,
+                                               "bytes":  812544
+                                           }
+                                       ]
+                     },
+    "requirements":  {
+                         "dbx_build_success":  true,
+                         "crx_build_success":  true,
+                         "arx_build_success":  true,
+                         "unresolved_lock":  false,
+                         "lock_note":  "Canonical .arx relinked normally."
+                     }
+}

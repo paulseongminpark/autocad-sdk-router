@@ -1,0 +1,190 @@
+{
+    "schema":  "ariadne.cad_os.v1_final.release_freeze.v1",
+    "packet":  "CADOS_M09_V1_RELEASE_FREEZE_AND_DAEDALUS_HANDOFF",
+    "version_target":  "CAD OS Layer v1.0",
+    "generated_at":  "2026-06-26T13:55:15.9209821+09:00",
+    "status":  "PASS",
+    "branch":  "cados/cad-os-v1.0-release-freeze",
+    "head_at_report_generation":  "2d5902461d5f3479feb1d59e405d9e11eb40d53f",
+    "source_rc":  {
+                      "branch":  "cados/cad-os-v1-rc1",
+                      "commit":  "2d5902461d5f3479feb1d59e405d9e11eb40d53f"
+                  },
+    "operation_counts":  {
+                             "total":  517,
+                             "implemented":  487,
+                             "hard_blocked":  29,
+                             "deprecated":  1,
+                             "catalogued":  0,
+                             "stub":  0,
+                             "unknown":  0,
+                             "deferred":  0
+                         },
+    "tests":  {
+                  "schema":  "ariadne.cad_os.v1_final.tests.v1",
+                  "packet_id":  "CADOS_M09_V1_RELEASE_FREEZE_AND_DAEDALUS_HANDOFF",
+                  "command":  "CADOS_LIVE=1 python -m pytest tests -q -rs",
+                  "started_at":  "2026-06-26T13:51:42.0251856+09:00",
+                  "ended_at":  "2026-06-26T13:53:17.4197112+09:00",
+                  "exit_code":  0,
+                  "status":  "PASS",
+                  "passed":  566,
+                  "skipped":  0,
+                  "failed":  0,
+                  "log_ref":  "reports/release/CADOS_V1_FINAL_TESTS.log"
+              },
+    "native_build":  {
+                         "schema":  "ariadne.cad_os.v1_final.native_build.v1",
+                         "packet_id":  "CADOS_M09_V1_RELEASE_FREEZE_AND_DAEDALUS_HANDOFF",
+                         "status":  "PASS",
+                         "started_at":  "2026-06-26T13:50:36.6022337+09:00",
+                         "ended_at":  "2026-06-26T13:50:47.5878593+09:00",
+                         "exit_code":  0,
+                         "exception":  null,
+                         "log":  "reports/release/CADOS_V1_FINAL_NATIVE_BUILD.log",
+                         "native_build":  {
+                                              "status":  "ok",
+                                              "msbuild":  "C:\\Program Files\\Microsoft Visual Studio\\2026\\Community\\MSBuild\\Current\\Bin\\amd64\\MSBuild.exe",
+                                              "arx_relink_mode":  "canonical",
+                                              "arx_versioned_name":  "",
+                                              "arx_lock_note":  "Canonical .arx relinked normally.",
+                                              "projects":  [
+                                                               "D:\\dev\\99_tools\\autocad-sdk-router_cados_v1_final\\src\\Ariadne.AcadNativeDbx\\Ariadne.AcadNativeDbx.dbx.vcxproj",
+                                                               "D:\\dev\\99_tools\\autocad-sdk-router_cados_v1_final\\src\\Ariadne.AcadNative\\Ariadne.AcadNative.crx.vcxproj",
+                                                               "D:\\dev\\99_tools\\autocad-sdk-router_cados_v1_final\\src\\Ariadne.AcadNative\\Ariadne.AcadNative.arx.vcxproj"
+                                                           ],
+                                              "artifacts":  [
+                                                                {
+                                                                    "path":  "D:\\dev\\99_tools\\autocad-sdk-router_cados_v1_final\\src\\Ariadne.AcadNative\\bin\\x64\\Release\\Ariadne.AcadNativeDbx.dbx",
+                                                                    "exists":  true,
+                                                                    "bytes":  54272
+                                                                },
+                                                                {
+                                                                    "path":  "D:\\dev\\99_tools\\autocad-sdk-router_cados_v1_final\\src\\Ariadne.AcadNative\\bin\\x64\\Release\\Ariadne.AcadNative.crx",
+                                                                    "exists":  true,
+                                                                    "bytes":  804352
+                                                                },
+                                                                {
+                                                                    "path":  "D:\\dev\\99_tools\\autocad-sdk-router_cados_v1_final\\src\\Ariadne.AcadNative\\bin\\x64\\Release\\Ariadne.AcadNative.arx",
+                                                                    "exists":  true,
+                                                                    "bytes":  812544
+                                                                }
+                                                            ]
+                                          },
+                         "requirements":  {
+                                              "dbx_build_success":  true,
+                                              "crx_build_success":  true,
+                                              "arx_build_success":  true,
+                                              "unresolved_lock":  false,
+                                              "lock_note":  "Canonical .arx relinked normally."
+                                          }
+                     },
+    "closure_gate":  {
+                         "schema":  "ariadne.cad_os.v1_final.closure_gate.v1",
+                         "packet":  "CADOS_M09_V1_RELEASE_FREEZE_AND_DAEDALUS_HANDOFF",
+                         "generated_at":  "2026-06-26T13:55:15.9209821+09:00",
+                         "totals_by_status":  {
+                                                  "implemented":  487,
+                                                  "deprecated":  1,
+                                                  "hard_blocked":  29
+                                              },
+                         "total":  517,
+                         "catalogued":  0,
+                         "stub":  0,
+                         "unknown":  0,
+                         "deferred":  0,
+                         "checks":  {
+                                        "every_op_has_owner_ticket":  true,
+                                        "every_implemented_has_handler_test_evidence":  true,
+                                        "every_hardblock_has_blocker_ref":  true,
+                                        "every_deprecated_has_replacement":  true,
+                                        "zero_catalogued":  true,
+                                        "zero_stub":  true,
+                                        "zero_unknown":  true,
+                                        "zero_deferred":  true,
+                                        "total_closed":  true,
+                                        "raw_command_agent_exposure_zero":  true,
+                                        "no_write_original_default":  true,
+                                        "tests_zero_skipped":  true,
+                                        "native_build_ok":  true,
+                                        "original_dwg_unchanged":  true
+                                    },
+                         "closure_gate_pass":  true,
+                         "release_freeze_candidate":  true
+                     },
+    "hardblocks":  {
+                       "count":  29,
+                       "report":  "reports/release/CADOS_V1_FINAL_HARDBLOCKS.json",
+                       "all_agent_exposed_false":  true,
+                       "every_blocked_has_blocker_ref":  true
+                   },
+    "deprecated":  [
+                       {
+                           "operation":  "live.apply_patch",
+                           "replacement_ref":  "Deprecated in WAVE4X. live.apply_patch remains policy-denied on the live pump; use apply.patch / patch_engine.apply_staged (or apply_native_staged for a direct native op) on a staged copy.",
+                           "evidence_ref":  [
+                                                "docs/OPERATION_REGISTRY_SPEC.md",
+                                                "CADOS_M01 Lane D native triage (inspect.database.graph insertion point)",
+                                                "reports/tickets/WAVE4X_DB_TXN_WRITE.md",
+                                                "reports/tickets/WAVE4X_DB_TXN_WRITE.json",
+                                                "reports/tickets/WAVE4X_DB_TXN_WRITE_OPS.json",
+                                                "tools/patch_engine.py::apply_staged",
+                                                "config/operations.v2.json#apply.patch",
+                                                "tools/patch_engine.py::apply_native_staged",
+                                                "tests/unit/test_patch_engine_policy.py::TestApplyNativeStagedLifecycleMocked",
+                                                "reports/tickets/WAVE4X_FAST_B_LIVE_APPLY_POLICY_R2.md#live-apply-patch"
+                                            ],
+                           "agent_exposed":  false
+                       }
+                   ],
+    "dwg_safety":  {
+                       "original_dwg_modified":  false,
+                       "tracked_cad_status_clean":  true,
+                       "no_write_original_default":  true,
+                       "report":  "reports/release/CADOS_V1_FINAL_DWG_SAFETY.json"
+                   },
+    "raw_command_exposure":  {
+                                 "agent_exposed_count":  0,
+                                 "agent_exposed_ops":  [
+
+                                                       ]
+                             },
+    "main_merge":  {
+                       "schema":  "ariadne.cad_os.v1_final.main_merge_plan.v1",
+                       "packet_id":  "CADOS_M09_V1_RELEASE_FREEZE_AND_DAEDALUS_HANDOFF",
+                       "generated_at":  "2026-06-26T13:55:15.9209821+09:00",
+                       "status":  "BLOCKED_DIRTY_MAIN",
+                       "main_path":  "D:\\dev\\99_tools\\autocad-sdk-router",
+                       "main_branch":  "main",
+                       "main_head":  "bc0832ab86bae410a89c8913294b5d7531e9f47b",
+                       "release_branch":  "cados/cad-os-v1.0-release-freeze",
+                       "release_head":  "2d5902461d5f3479feb1d59e405d9e11eb40d53f",
+                       "dirty_tracked_count":  238,
+                       "untracked_count":  25,
+                       "push_allowed":  false,
+                       "recommended_next_actions":  [
+                                                        "Review reports/release/CADOS_V1_FINAL.json and handoff/zip/CADOS_V1_FINAL_RELEASE_FREEZE.zip",
+                                                        "When ready, start from a clean main worktree or separate merge worktree",
+                                                        "Run: git merge --no-ff cados/cad-os-v1.0-release-freeze",
+                                                        "Run final tests and native build after merge",
+                                                        "Only push after explicit approval in a later packet"
+                                                    ],
+                       "blocked_reason":  "Main checkout has tracked/untracked dirty work; packet forbids reset/clean and forbids touching dirty main."
+                   },
+    "reports":  {
+                    "final_summary":  "reports/release/CADOS_V1_FINAL.json",
+                    "tests":  "reports/release/CADOS_V1_FINAL_TESTS.json",
+                    "native_build":  "reports/release/CADOS_V1_FINAL_NATIVE_BUILD.json",
+                    "coverage":  "reports/operation_coverage_latest.json",
+                    "matrix":  "reports/operation_coverage_full_matrix.json",
+                    "v1_gate":  "reports/v1_operation_gate_latest.json",
+                    "closure":  "reports/closure_gate_latest.json",
+                    "hardblocks":  "reports/release/CADOS_V1_FINAL_HARDBLOCKS.json",
+                    "dwg_safety":  "reports/release/CADOS_V1_FINAL_DWG_SAFETY.json",
+                    "main_dirty_state":  "reports/release/MAIN_DIRTY_STATE_BEFORE_CADOS_V1_FINAL.json",
+                    "main_merge_plan":  "reports/release/CADOS_V1_FINAL_MAIN_MERGE_PLAN.json",
+                    "zip":  "handoff/zip/CADOS_V1_FINAL_RELEASE_FREEZE.zip"
+                },
+    "no_push":  true,
+    "next":  "Daedalus D04 import or explicit clean-main merge packet"
+}

@@ -1,0 +1,22 @@
+{
+    "schema":  "ariadne.cad_os.v1_final.main_merge_plan.v1",
+    "packet_id":  "CADOS_M09_V1_RELEASE_FREEZE_AND_DAEDALUS_HANDOFF",
+    "generated_at":  "2026-06-26T13:55:15.9209821+09:00",
+    "status":  "BLOCKED_DIRTY_MAIN",
+    "main_path":  "D:\\dev\\99_tools\\autocad-sdk-router",
+    "main_branch":  "main",
+    "main_head":  "bc0832ab86bae410a89c8913294b5d7531e9f47b",
+    "release_branch":  "cados/cad-os-v1.0-release-freeze",
+    "release_head":  "2d5902461d5f3479feb1d59e405d9e11eb40d53f",
+    "dirty_tracked_count":  238,
+    "untracked_count":  25,
+    "push_allowed":  false,
+    "recommended_next_actions":  [
+                                     "Review reports/release/CADOS_V1_FINAL.json and handoff/zip/CADOS_V1_FINAL_RELEASE_FREEZE.zip",
+                                     "When ready, start from a clean main worktree or separate merge worktree",
+                                     "Run: git merge --no-ff cados/cad-os-v1.0-release-freeze",
+                                     "Run final tests and native build after merge",
+                                     "Only push after explicit approval in a later packet"
+                                 ],
+    "blocked_reason":  "Main checkout has tracked/untracked dirty work; packet forbids reset/clean and forbids touching dirty main."
+}

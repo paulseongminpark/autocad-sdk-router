@@ -1,11 +1,12 @@
 ﻿# NEXT STEP
 
-## CADOS V1 RC1
+## CAD OS Layer v1.0
 - Status: PASS
-- Branch: cados/cad-os-v1-rc1
+- Branch: cados/cad-os-v1.0-release-freeze
 - Tests: 566 passed / 0 skipped (CADOS_LIVE=1)
 - Native build: PASS
-- Main updated: no; original main checkout is dirty and was not touched.
+- Main merge: BLOCKED_DIRTY_MAIN
+- Push: no
 
 ## Next Packet
-CADOS_M09_V1_RELEASE_FREEZE_AND_DAEDALUS_HANDOFF
+Daedalus D04 import or explicit clean-main merge packet.

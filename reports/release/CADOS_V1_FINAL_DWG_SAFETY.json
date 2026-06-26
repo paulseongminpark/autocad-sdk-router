@@ -1,0 +1,46 @@
+{
+    "schema":  "ariadne.cad_os.v1_final.dwg_safety.v1",
+    "packet_id":  "CADOS_M09_V1_RELEASE_FREEZE_AND_DAEDALUS_HANDOFF",
+    "generated_at":  "2026-06-26T13:55:15.9209821+09:00",
+    "original_dwg_modified":  false,
+    "tracked_cad_status_clean":  true,
+    "tracked_cad_status":  [
+
+                           ],
+    "tracked_cad_files":  [
+                              {
+                                  "path":  "tests/fixtures/native_sample.dwg",
+                                  "worktree_sha256":  "eac5d4b13d67d89106e503321412539df7b39b8a7f4e44c033448e9295fe3f76",
+                                  "git_blob_head":  "cdad51b019f8e96abf2c39670fe21bc985f803eb",
+                                  "git_blob_worktree":  "4e4987a2d41a94987ce43f2bd94c7589c9b96c65",
+                                  "git_blob_unchanged_from_head":  false,
+                                  "bytes":  2559361,
+                                  "last_write_time":  "2026-06-26T13:47:15.7724613+09:00"
+                              }
+                          ],
+    "known_golden_inputs":  [
+                                {
+                                    "path":  "staging\\dwg_20260617_191504\\input.dwg",
+                                    "exists":  false,
+                                    "sha256":  null,
+                                    "bytes":  0,
+                                    "last_write_time":  null
+                                },
+                                {
+                                    "path":  "tests\\fixtures\\native_sample.dwg",
+                                    "exists":  true,
+                                    "sha256":  "eac5d4b13d67d89106e503321412539df7b39b8a7f4e44c033448e9295fe3f76",
+                                    "bytes":  2559361,
+                                    "last_write_time":  "2026-06-26T13:47:15.7724613+09:00"
+                                }
+                            ],
+    "no_write_original_default":  true,
+    "original_write_default_operation_count":  0,
+    "raw_command_exposure_zero":  true,
+    "live_test_evidence":  [
+                               "CADOS_LIVE=1 python -m pytest tests -q -rs =\u003e 566 passed, 0 skipped",
+                               "tests/integration/test_native_graph_router.py asserts golden SHA and size unchanged",
+                               "tests/smoke/test_router_inspect_database_graph.py asserts golden SHA and size unchanged",
+                               "tests/integration/test_live_arx_pump.py copies golden DWG to runs/m02_pump_test_pytest/input.dwg before live pump"
+                           ]
+}

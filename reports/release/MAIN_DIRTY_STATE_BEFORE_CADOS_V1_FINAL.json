@@ -1,0 +1,1153 @@
+{
+    "schema":  "ariadne.cad_os.v1_final.main_dirty_state.v1",
+    "packet_id":  "CADOS_M09_V1_RELEASE_FREEZE_AND_DAEDALUS_HANDOFF",
+    "captured_at":  "2026-06-26T13:55:15.9209821+09:00",
+    "main_path":  "D:\\dev\\99_tools\\autocad-sdk-router",
+    "release_worktree_path":  "D:\\dev\\99_tools\\autocad-sdk-router_cados_v1_final",
+    "main_branch":  "main",
+    "main_head":  "bc0832ab86bae410a89c8913294b5d7531e9f47b",
+    "dirty_tracked_files":  [
+                                {
+                                    "status":  " M",
+                                    "path":  ".graphifyignore"
+                                },
+                                {
+                                    "status":  " M",
+                                    "path":  "ENVVAR_REPOINT.md"
+                                },
+                                {
+                                    "status":  " M",
+                                    "path":  "README.md"
+                                },
+                                {
+                                    "status":  " M",
+                                    "path":  "SDK_ROUTER_USAGE.md"
+                                },
+                                {
+                                    "status":  " M",
+                                    "path":  "config/autocad_native_arx_operation_catalog.json"
+                                },
+                                {
+                                    "status":  " M",
+                                    "path":  "config/autocad_official_sdk_catalog.json"
+                                },
+                                {
+                                    "status":  " M",
+                                    "path":  "config/autocad_router_capabilities.json"
+                                },
+                                {
+                                    "status":  " M",
+                                    "path":  "config/cad_job_operation_aliases.json"
+                                },
+                                {
+                                    "status":  "MM",
+                                    "path":  "config/operations.v2.json"
+                                },
+                                {
+                                    "status":  " M",
+                                    "path":  "docs/AUTOCAD_CONTROL_PLANE_STATUS.md"
+                                },
+                                {
+                                    "status":  " M",
+                                    "path":  "docs/CAD_DIFF_SPEC.md"
+                                },
+                                {
+                                    "status":  " M",
+                                    "path":  "docs/CAD_OS_V1_ACCEPTANCE.md"
+                                },
+                                {
+                                    "status":  " M",
+                                    "path":  "docs/DWG_GRAPH_IR_SPEC.md"
+                                },
+                                {
+                                    "status":  " M",
+                                    "path":  "docs/LIVE_ARX_NAMED_PIPE_DESIGN.md"
+                                },
+                                {
+                                    "status":  " M",
+                                    "path":  "docs/LIVE_ARX_PUMP_SPIKE_REPORT.md"
+                                },
+                                {
+                                    "status":  " M",
+                                    "path":  "docs/LIVE_JOB_ARGUMENT_CONTRACT.md"
+                                },
+                                {
+                                    "status":  " M",
+                                    "path":  "docs/M08_REMAINING_BATCH_PLAN.md"
+                                },
+                                {
+                                    "status":  " M",
+                                    "path":  "docs/MCP_TOOL_CONTRACT.md"
+                                },
+                                {
+                                    "status":  " M",
+                                    "path":  "docs/NATIVE_ARX_DBX_DESIGN.md"
+                                },
+                                {
+                                    "status":  " M",
+                                    "path":  "docs/NATIVE_DEEP_SURFACE_STATUS.md"
+                                },
+                                {
+                                    "status":  " M",
+                                    "path":  "docs/OPERATION_REGISTRY_SPEC.md"
+                                },
+                                {
+                                    "status":  " M",
+                                    "path":  "docs/PATCH_ENGINE_SPEC.md"
+                                },
+                                {
+                                    "status":  " M",
+                                    "path":  "docs/VALIDATION_SPEC.md"
+                                },
+                                {
+                                    "status":  " M",
+                                    "path":  "docs/VISUAL_VERIFICATION_SPEC.md"
+                                },
+                                {
+                                    "status":  " M",
+                                    "path":  "docs/superpowers/plans/2026-06-18-p2-native-cad-job-ops.md"
+                                },
+                                {
+                                    "status":  " M",
+                                    "path":  "docs/superpowers/plans/2026-06-19-phase0-to-phase5-autocad-native-build.md"
+                                },
+                                {
+                                    "status":  " M",
+                                    "path":  "handoff/LATEST.md"
+                                },
+                                {
+                                    "status":  " M",
+                                    "path":  "handoff/TAKEOVER.md"
+                                },
+                                {
+                                    "status":  " M",
+                                    "path":  "handoff/_beads.jsonl"
+                                },
+                                {
+                                    "status":  " M",
+                                    "path":  "handoff/mail/INBOX.md"
+                                },
+                                {
+                                    "status":  " M",
+                                    "path":  "handoff/roles/_index.md"
+                                },
+                                {
+                                    "status":  " M",
+                                    "path":  "handoff/roles/cad-os-layer.md"
+                                },
+                                {
+                                    "status":  " M",
+                                    "path":  "handoff/sessions/SESSION_2026-06-22_1333.md"
+                                },
+                                {
+                                    "status":  " M",
+                                    "path":  "handoff/sessions/SESSION_2026-06-22_1451.md"
+                                },
+                                {
+                                    "status":  " M",
+                                    "path":  "handoff/zip/index.md"
+                                },
+                                {
+                                    "status":  " M",
+                                    "path":  "packets/CADOS_M01_FULL_STACK_ULTRACODE_BUILD.md"
+                                },
+                                {
+                                    "status":  " M",
+                                    "path":  "packets/CADOS_M02_V1_COMPLETION_ULTRACODE.md"
+                                },
+                                {
+                                    "status":  " M",
+                                    "path":  "packets/CADOS_M03_NATIVE_ROUTER_RICH_IR_COMPLETION.md"
+                                },
+                                {
+                                    "status":  " M",
+                                    "path":  "packets/CADOS_M04_OPERATION_REGISTRY_AND_TOOL_SURFACE.md"
+                                },
+                                {
+                                    "status":  " M",
+                                    "path":  "packets/CADOS_M05_PATCH_DIFF_VALIDATION_TRANSACTION.md"
+                                },
+                                {
+                                    "status":  " M",
+                                    "path":  "packets/CADOS_M06_VISUAL_BATCH_GOLDEN_REGRESSION.md"
+                                },
+                                {
+                                    "status":  " M",
+                                    "path":  "packets/CADOS_M07A_ATTENDED_SURFACE_VERIFICATION.md"
+                                },
+                                {
+                                    "status":  " M",
+                                    "path":  "packets/CADOS_M07B_ATTENDED_GUI_VERIFICATION_AND_NATIVE_DEPLOY.md"
+                                },
+                                {
+                                    "status":  " M",
+                                    "path":  "packets/CADOS_M07_LIVE_ARX_AND_DEEP_NATIVE_SURFACE.md"
+                                },
+                                {
+                                    "status":  " M",
+                                    "path":  "packets/CADOS_M08_FULL_OPERATION_COVERAGE_CLOSURE.md"
+                                },
+                                {
+                                    "status":  " M",
+                                    "path":  "packets/PACKET_INDEX.md"
+                                },
+                                {
+                                    "status":  " M",
+                                    "path":  "reports/AUTO_CAD_ROUTER_AGENT_CONTRACT.md"
+                                },
+                                {
+                                    "status":  " M",
+                                    "path":  "reports/CADOS_M02_V1_COMPLETION_ULTRACODE.md"
+                                },
+                                {
+                                    "status":  " M",
+                                    "path":  "reports/CADOS_M03_M04_DETAILED_RESULT.md"
+                                },
+                                {
+                                    "status":  " M",
+                                    "path":  "reports/CADOS_M03_NATIVE_ROUTER_RICH_IR_COMPLETION.md"
+                                },
+                                {
+                                    "status":  " M",
+                                    "path":  "reports/CADOS_M04_OPERATION_REGISTRY_AND_TOOL_SURFACE.md"
+                                },
+                                {
+                                    "status":  " M",
+                                    "path":  "reports/CADOS_M05_PATCH_DIFF_VALIDATION_TRANSACTION.md"
+                                },
+                                {
+                                    "status":  " M",
+                                    "path":  "reports/CADOS_M07A_ATTENDED_SURFACE_VERIFICATION.md"
+                                },
+                                {
+                                    "status":  " M",
+                                    "path":  "reports/CADOS_M07B_ATTENDED_GUI_VERIFICATION_AND_NATIVE_DEPLOY.md"
+                                },
+                                {
+                                    "status":  " M",
+                                    "path":  "reports/CADOS_M07_LIVE_ARX_AND_DEEP_NATIVE_SURFACE.md"
+                                },
+                                {
+                                    "status":  " M",
+                                    "path":  "reports/CADOS_M08_FULL_OPERATION_COVERAGE_CLOSURE.md"
+                                },
+                                {
+                                    "status":  " M",
+                                    "path":  "reports/DWG_GEOMETRY_NATIVE_IMPLEMENTATION_PLAN.md"
+                                },
+                                {
+                                    "status":  " M",
+                                    "path":  "reports/LOCALIZATION_REPORT.md"
+                                },
+                                {
+                                    "status":  " M",
+                                    "path":  "reports/TRINITY_AUTOCAD_SECTION_DRAFT.md"
+                                },
+                                {
+                                    "status":  " M",
+                                    "path":  "reports/attended_gui_latest.json"
+                                },
+                                {
+                                    "status":  " M",
+                                    "path":  "reports/attended_gui_latest.md"
+                                },
+                                {
+                                    "status":  " M",
+                                    "path":  "reports/attended_shutdown_latest.json"
+                                },
+                                {
+                                    "status":  "MM",
+                                    "path":  "reports/autocad_router_status_latest.json"
+                                },
+                                {
+                                    "status":  " M",
+                                    "path":  "reports/deep_native_latest.json"
+                                },
+                                {
+                                    "status":  " M",
+                                    "path":  "reports/deep_native_latest.md"
+                                },
+                                {
+                                    "status":  " M",
+                                    "path":  "reports/firing_latest.json"
+                                },
+                                {
+                                    "status":  " M",
+                                    "path":  "reports/journal_latest.md"
+                                },
+                                {
+                                    "status":  " M",
+                                    "path":  "reports/live_job_args_contract_latest.json"
+                                },
+                                {
+                                    "status":  " M",
+                                    "path":  "reports/live_pump_latest.json"
+                                },
+                                {
+                                    "status":  " M",
+                                    "path":  "reports/live_pump_latest.md"
+                                },
+                                {
+                                    "status":  " M",
+                                    "path":  "reports/merge/MERGE-M08-FOUNDATION.json"
+                                },
+                                {
+                                    "status":  " M",
+                                    "path":  "reports/merge/MERGE-M08-FOUNDATION.md"
+                                },
+                                {
+                                    "status":  " M",
+                                    "path":  "reports/merge/MERGE-M08-INFRA.json"
+                                },
+                                {
+                                    "status":  " M",
+                                    "path":  "reports/merge/MERGE-M08-INFRA.md"
+                                },
+                                {
+                                    "status":  " M",
+                                    "path":  "reports/merge/MERGE-M08-NATIVE-A1.json"
+                                },
+                                {
+                                    "status":  " M",
+                                    "path":  "reports/merge/MERGE-M08-NATIVE-A2.json"
+                                },
+                                {
+                                    "status":  " M",
+                                    "path":  "reports/merge/MERGE-M08-READ.json"
+                                },
+                                {
+                                    "status":  " M",
+                                    "path":  "reports/merge/MERGE-M08-READ.md"
+                                },
+                                {
+                                    "status":  " M",
+                                    "path":  "reports/merge/MERGE-M08-RECONCILE-READ.json"
+                                },
+                                {
+                                    "status":  " M",
+                                    "path":  "reports/merge/MERGE-M08-RECONCILE-READ.md"
+                                },
+                                {
+                                    "status":  " M",
+                                    "path":  "reports/merge/MERGE-M08-WRITE.json"
+                                },
+                                {
+                                    "status":  " M",
+                                    "path":  "reports/merge/MERGE-M08-WRITE.md"
+                                },
+                                {
+                                    "status":  " M",
+                                    "path":  "reports/native_smoke_latest.json"
+                                },
+                                {
+                                    "status":  "MM",
+                                    "path":  "reports/operation_coverage_full_matrix.json"
+                                },
+                                {
+                                    "status":  "MM",
+                                    "path":  "reports/operation_coverage_full_matrix.md"
+                                },
+                                {
+                                    "status":  "MM",
+                                    "path":  "reports/operation_coverage_latest.json"
+                                },
+                                {
+                                    "status":  "MM",
+                                    "path":  "reports/operation_coverage_latest.md"
+                                },
+                                {
+                                    "status":  " M",
+                                    "path":  "reports/opm_property_latest.json"
+                                },
+                                {
+                                    "status":  " M",
+                                    "path":  "reports/patch_diff_latest.md"
+                                },
+                                {
+                                    "status":  "AD",
+                                    "path":  "reports/tickets/WAVE4X_VISUAL_PLOT.json"
+                                },
+                                {
+                                    "status":  "AD",
+                                    "path":  "reports/tickets/WAVE4X_VISUAL_PLOT.md"
+                                },
+                                {
+                                    "status":  "AD",
+                                    "path":  "reports/tickets/WAVE4X_VISUAL_PLOT_OPS.json"
+                                },
+                                {
+                                    "status":  "AD",
+                                    "path":  "reports/tickets/WAVE4X_VISUAL_PLOT_PLAN.md"
+                                },
+                                {
+                                    "status":  " M",
+                                    "path":  "reports/tool_surface_latest.md"
+                                },
+                                {
+                                    "status":  " M",
+                                    "path":  "reports/v1_acceptance_latest.json"
+                                },
+                                {
+                                    "status":  "MM",
+                                    "path":  "reports/v1_operation_gate_latest.json"
+                                },
+                                {
+                                    "status":  " M",
+                                    "path":  "reports/validation_latest.md"
+                                },
+                                {
+                                    "status":  " M",
+                                    "path":  "reports/worlddraw_latest.json"
+                                },
+                                {
+                                    "status":  " M",
+                                    "path":  "research/native_arx/_AUDIT.md"
+                                },
+                                {
+                                    "status":  " M",
+                                    "path":  "research/native_arx/_SYNTHESIS_INDEX.md"
+                                },
+                                {
+                                    "status":  " M",
+                                    "path":  "research/native_arx/_build_catalog.js"
+                                },
+                                {
+                                    "status":  " M",
+                                    "path":  "research/native_arx/acdb-core.md"
+                                },
+                                {
+                                    "status":  " M",
+                                    "path":  "research/native_arx/arx-framework.md"
+                                },
+                                {
+                                    "status":  " M",
+                                    "path":  "research/native_arx/brep-topology.md"
+                                },
+                                {
+                                    "status":  " M",
+                                    "path":  "research/native_arx/com-activex-opm.md"
+                                },
+                                {
+                                    "status":  " M",
+                                    "path":  "research/native_arx/constraints-associativity.md"
+                                },
+                                {
+                                    "status":  " M",
+                                    "path":  "research/native_arx/custom-objects.md"
+                                },
+                                {
+                                    "status":  " M",
+                                    "path":  "research/native_arx/editor-delta.md"
+                                },
+                                {
+                                    "status":  " M",
+                                    "path":  "research/native_arx/entities-geometry-graphics.md"
+                                },
+                                {
+                                    "status":  " M",
+                                    "path":  "research/native_arx/reactors-overrules.md"
+                                },
+                                {
+                                    "status":  " M",
+                                    "path":  "research/native_arx/ui-customization.md"
+                                },
+                                {
+                                    "status":  " M",
+                                    "path":  "schemas/cad_diff.v1.schema.json"
+                                },
+                                {
+                                    "status":  " M",
+                                    "path":  "schemas/cad_job.schema.json"
+                                },
+                                {
+                                    "status":  " M",
+                                    "path":  "schemas/cad_job.v2.schema.json"
+                                },
+                                {
+                                    "status":  " M",
+                                    "path":  "schemas/cad_patch.v1.schema.json"
+                                },
+                                {
+                                    "status":  " M",
+                                    "path":  "schemas/cad_result.v2.schema.json"
+                                },
+                                {
+                                    "status":  " M",
+                                    "path":  "schemas/dwg_geometry_extract.schema.json"
+                                },
+                                {
+                                    "status":  " M",
+                                    "path":  "schemas/dwg_graph_ir.v1.schema.json"
+                                },
+                                {
+                                    "status":  " M",
+                                    "path":  "schemas/operation_registry.v2.schema.json"
+                                },
+                                {
+                                    "status":  " M",
+                                    "path":  "schemas/validation_report.v1.schema.json"
+                                },
+                                {
+                                    "status":  " M",
+                                    "path":  "schemas/visual_artifact.v1.schema.json"
+                                },
+                                {
+                                    "status":  " M",
+                                    "path":  "set-router-env.ps1"
+                                },
+                                {
+                                    "status":  " M",
+                                    "path":  "src/Ariadne.AcadNative/Ariadne.AcadNative.arx.vcxproj"
+                                },
+                                {
+                                    "status":  " M",
+                                    "path":  "src/Ariadne.AcadNative/Ariadne.AcadNative.crx.vcxproj"
+                                },
+                                {
+                                    "status":  "MM",
+                                    "path":  "src/Ariadne.AcadNative/families/m08l_handlers.inc"
+                                },
+                                {
+                                    "status":  " M",
+                                    "path":  "src/Ariadne.AcadNativeDbx/Ariadne.AcadNativeDbx.dbx.vcxproj"
+                                },
+                                {
+                                    "status":  " M",
+                                    "path":  "src/Ariadne.AcadNativeDbx/AriadneProtocol.cpp"
+                                },
+                                {
+                                    "status":  " M",
+                                    "path":  "src/Ariadne.AcadNativeDbx/AriadneProtocol.h"
+                                },
+                                {
+                                    "status":  " M",
+                                    "path":  "src/Ariadne.DwgGeometryExtractor/Ariadne.DwgGeometryExtractor.csproj"
+                                },
+                                {
+                                    "status":  " M",
+                                    "path":  "src/Ariadne.DwgGeometryExtractor/CadJobDtos.cs"
+                                },
+                                {
+                                    "status":  " M",
+                                    "path":  "src/Ariadne.DwgGeometryExtractor/CadJobRunner.cs"
+                                },
+                                {
+                                    "status":  " M",
+                                    "path":  "src/Ariadne.DwgGeometryExtractor/Commands.cs"
+                                },
+                                {
+                                    "status":  " M",
+                                    "path":  "src/Ariadne.DwgGeometryExtractor/GeometryDtos.cs"
+                                },
+                                {
+                                    "status":  " M",
+                                    "path":  "src/Ariadne.DwgGeometryExtractor/GeometryExtractor.cs"
+                                },
+                                {
+                                    "status":  " M",
+                                    "path":  "src/Ariadne.DwgGeometryExtractor/JsonWriter.cs"
+                                },
+                                {
+                                    "status":  " M",
+                                    "path":  "test_native/count.scr"
+                                },
+                                {
+                                    "status":  " M",
+                                    "path":  "test_native/count_crx.scr"
+                                },
+                                {
+                                    "status":  " M",
+                                    "path":  "test_native/create.scr"
+                                },
+                                {
+                                    "status":  " M",
+                                    "path":  "test_native/create_crx.scr"
+                                },
+                                {
+                                    "status":  " M",
+                                    "path":  "test_native/diag.scr"
+                                },
+                                {
+                                    "status":  " M",
+                                    "path":  "test_native/diag2.scr"
+                                },
+                                {
+                                    "status":  " M",
+                                    "path":  "test_native/diag3.scr"
+                                },
+                                {
+                                    "status":  " M",
+                                    "path":  "test_native/diag_arx_after_build.scr"
+                                },
+                                {
+                                    "status":  " M",
+                                    "path":  "test_native/diag_arx_fullacad.scr"
+                                },
+                                {
+                                    "status":  " M",
+                                    "path":  "test_native/diag_crx_after_build.scr"
+                                },
+                                {
+                                    "status":  " M",
+                                    "path":  "test_native/diag_dbx_after_build.scr"
+                                },
+                                {
+                                    "status":  " M",
+                                    "path":  "test_native/diag_dbx_then_arx_after_build.scr"
+                                },
+                                {
+                                    "status":  " M",
+                                    "path":  "test_native/diag_unload_native.scr"
+                                },
+                                {
+                                    "status":  " M",
+                                    "path":  "test_native/job_block_count.json"
+                                },
+                                {
+                                    "status":  " M",
+                                    "path":  "test_native/job_block_create.json"
+                                },
+                                {
+                                    "status":  " M",
+                                    "path":  "test_native/job_block_insert.json"
+                                },
+                                {
+                                    "status":  " M",
+                                    "path":  "test_native/job_circle_create.json"
+                                },
+                                {
+                                    "status":  " M",
+                                    "path":  "test_native/job_count.json"
+                                },
+                                {
+                                    "status":  " M",
+                                    "path":  "test_native/job_create.json"
+                                },
+                                {
+                                    "status":  " M",
+                                    "path":  "test_native/job_create_args.json"
+                                },
+                                {
+                                    "status":  " M",
+                                    "path":  "test_native/job_entity_count_circle.json"
+                                },
+                                {
+                                    "status":  " M",
+                                    "path":  "test_native/job_fullacad_runtime_capabilities.json"
+                                },
+                                {
+                                    "status":  " M",
+                                    "path":  "test_native/job_jig_host_support.json"
+                                },
+                                {
+                                    "status":  " M",
+                                    "path":  "test_native/job_jig_point_probe.json"
+                                },
+                                {
+                                    "status":  " M",
+                                    "path":  "test_native/job_layer_create.json"
+                                },
+                                {
+                                    "status":  " M",
+                                    "path":  "test_native/job_layout_create.json"
+                                },
+                                {
+                                    "status":  " M",
+                                    "path":  "test_native/job_layout_list.json"
+                                },
+                                {
+                                    "status":  " M",
+                                    "path":  "test_native/job_line_create.json"
+                                },
+                                {
+                                    "status":  " M",
+                                    "path":  "test_native/job_overrule_disable.json"
+                                },
+                                {
+                                    "status":  " M",
+                                    "path":  "test_native/job_overrule_enable.json"
+                                },
+                                {
+                                    "status":  " M",
+                                    "path":  "test_native/job_overrule_registry.json"
+                                },
+                                {
+                                    "status":  " M",
+                                    "path":  "test_native/job_protocol_queryx.json"
+                                },
+                                {
+                                    "status":  " M",
+                                    "path":  "test_native/job_reactor_disable.json"
+                                },
+                                {
+                                    "status":  " M",
+                                    "path":  "test_native/job_reactor_enable.json"
+                                },
+                                {
+                                    "status":  " M",
+                                    "path":  "test_native/job_reactor_registry.json"
+                                },
+                                {
+                                    "status":  " M",
+                                    "path":  "test_native/job_record_count.json"
+                                },
+                                {
+                                    "status":  " M",
+                                    "path":  "test_native/job_record_create.json"
+                                },
+                                {
+                                    "status":  " M",
+                                    "path":  "test_native/job_runtime_capabilities.json"
+                                },
+                                {
+                                    "status":  " M",
+                                    "path":  "test_native/job_xdata_get.json"
+                                },
+                                {
+                                    "status":  " M",
+                                    "path":  "test_native/job_xdata_set.json"
+                                },
+                                {
+                                    "status":  " M",
+                                    "path":  "test_native/job_xrecord_get.json"
+                                },
+                                {
+                                    "status":  " M",
+                                    "path":  "test_native/job_xrecord_set.json"
+                                },
+                                {
+                                    "status":  " M",
+                                    "path":  "test_native/job_xref_list.json"
+                                },
+                                {
+                                    "status":  " M",
+                                    "path":  "test_native/p2_stateful_batch.json"
+                                },
+                                {
+                                    "status":  " M",
+                                    "path":  "tests/golden/expected_counts.json"
+                                },
+                                {
+                                    "status":  " M",
+                                    "path":  "tests/golden/golden_manifest.json"
+                                },
+                                {
+                                    "status":  " M",
+                                    "path":  "tests/integration/test_live_arx_pump.py"
+                                },
+                                {
+                                    "status":  " M",
+                                    "path":  "tests/integration/test_native_graph_router.py"
+                                },
+                                {
+                                    "status":  " M",
+                                    "path":  "tests/integration/test_native_inspect_database_graph.py"
+                                },
+                                {
+                                    "status":  " M",
+                                    "path":  "tests/smoke/test_cadctl_rich_ir.py"
+                                },
+                                {
+                                    "status":  " M",
+                                    "path":  "tests/smoke/test_router_inspect_database_graph.py"
+                                },
+                                {
+                                    "status":  " M",
+                                    "path":  "tests/smoke/test_router_status.py"
+                                },
+                                {
+                                    "status":  " M",
+                                    "path":  "tests/smoke/test_walking_skeleton.py"
+                                },
+                                {
+                                    "status":  " M",
+                                    "path":  "tests/test_cad_job_batch_harness.py"
+                                },
+                                {
+                                    "status":  " M",
+                                    "path":  "tests/test_cad_job_control_plane.py"
+                                },
+                                {
+                                    "status":  " M",
+                                    "path":  "tests/test_cad_job_operation_aliases.py"
+                                },
+                                {
+                                    "status":  " M",
+                                    "path":  "tests/test_dwg_geometry_native_contract.py"
+                                },
+                                {
+                                    "status":  " M",
+                                    "path":  "tests/test_libredwg_sidecar.py"
+                                },
+                                {
+                                    "status":  " M",
+                                    "path":  "tests/test_native_arx_dbx_contract.py"
+                                },
+                                {
+                                    "status":  " M",
+                                    "path":  "tests/unit/test_cad_diff.py"
+                                },
+                                {
+                                    "status":  " M",
+                                    "path":  "tests/unit/test_cadctl.py"
+                                },
+                                {
+                                    "status":  " M",
+                                    "path":  "tests/unit/test_cados_m06_runner.py"
+                                },
+                                {
+                                    "status":  " M",
+                                    "path":  "tests/unit/test_dwg_graph_ir_schema.py"
+                                },
+                                {
+                                    "status":  " M",
+                                    "path":  "tests/unit/test_ir_builder.py"
+                                },
+                                {
+                                    "status":  " M",
+                                    "path":  "tests/unit/test_m05_cli_contract.py"
+                                },
+                                {
+                                    "status":  " M",
+                                    "path":  "tests/unit/test_m07b_pump_gating_and_job_channel.py"
+                                },
+                                {
+                                    "status":  " M",
+                                    "path":  "tests/unit/test_m08_operation_coverage.py"
+                                },
+                                {
+                                    "status":  "MM",
+                                    "path":  "tests/unit/test_m08a_catalog_reopen.py"
+                                },
+                                {
+                                    "status":  "MM",
+                                    "path":  "tests/unit/test_m08l_handlers.py"
+                                },
+                                {
+                                    "status":  " M",
+                                    "path":  "tests/unit/test_mcp_tool_contract.py"
+                                },
+                                {
+                                    "status":  " M",
+                                    "path":  "tests/unit/test_non_ascii_fidelity.py"
+                                },
+                                {
+                                    "status":  " M",
+                                    "path":  "tests/unit/test_operation_registry_v2.py"
+                                },
+                                {
+                                    "status":  " M",
+                                    "path":  "tests/unit/test_operations_v2_registry.py"
+                                },
+                                {
+                                    "status":  " M",
+                                    "path":  "tests/unit/test_patch_engine.py"
+                                },
+                                {
+                                    "status":  " M",
+                                    "path":  "tests/unit/test_patch_engine_policy.py"
+                                },
+                                {
+                                    "status":  " M",
+                                    "path":  "tests/unit/test_pump_frame_codec.py"
+                                },
+                                {
+                                    "status":  " M",
+                                    "path":  "tests/unit/test_pump_shutdown_and_deep_native_source.py"
+                                },
+                                {
+                                    "status":  " M",
+                                    "path":  "tests/unit/test_router_explain_registry.py"
+                                },
+                                {
+                                    "status":  " M",
+                                    "path":  "tests/unit/test_schemas_v2.py"
+                                },
+                                {
+                                    "status":  " M",
+                                    "path":  "tests/unit/test_sqlite_ir_store.py"
+                                },
+                                {
+                                    "status":  " M",
+                                    "path":  "tests/unit/test_sqlite_ir_store_rich.py"
+                                },
+                                {
+                                    "status":  " M",
+                                    "path":  "tests/unit/test_validator.py"
+                                },
+                                {
+                                    "status":  " M",
+                                    "path":  "tests/unit/test_validator_gates.py"
+                                },
+                                {
+                                    "status":  " M",
+                                    "path":  "tests/unit/test_visual_report.py"
+                                },
+                                {
+                                    "status":  "MM",
+                                    "path":  "tests/unit/test_wave3_render_plot_registry_safety.py"
+                                },
+                                {
+                                    "status":  " M",
+                                    "path":  "tools/attended/run_attended_m07b.ps1"
+                                },
+                                {
+                                    "status":  " M",
+                                    "path":  "tools/cad_diff.py"
+                                },
+                                {
+                                    "status":  " M",
+                                    "path":  "tools/cadagent_mcp.py"
+                                },
+                                {
+                                    "status":  " M",
+                                    "path":  "tools/cadctl.py"
+                                },
+                                {
+                                    "status":  " M",
+                                    "path":  "tools/cadctl_cli.py"
+                                },
+                                {
+                                    "status":  " M",
+                                    "path":  "tools/cados_m06.py"
+                                },
+                                {
+                                    "status":  " M",
+                                    "path":  "tools/ir_builder.py"
+                                },
+                                {
+                                    "status":  " M",
+                                    "path":  "tools/normalize_result.py"
+                                },
+                                {
+                                    "status":  " M",
+                                    "path":  "tools/patch_engine.py"
+                                },
+                                {
+                                    "status":  " M",
+                                    "path":  "tools/probe_routes.py"
+                                },
+                                {
+                                    "status":  " M",
+                                    "path":  "tools/route_select.py"
+                                },
+                                {
+                                    "status":  " M",
+                                    "path":  "tools/run_cad_job_batch.ps1"
+                                },
+                                {
+                                    "status":  " M",
+                                    "path":  "tools/run_job.py"
+                                },
+                                {
+                                    "status":  " M",
+                                    "path":  "tools/run_route.py"
+                                },
+                                {
+                                    "status":  " M",
+                                    "path":  "tools/sqlite_ir_store.py"
+                                },
+                                {
+                                    "status":  " M",
+                                    "path":  "tools/validate_dwg_geometry_extract.py"
+                                },
+                                {
+                                    "status":  " M",
+                                    "path":  "tools/validator.py"
+                                },
+                                {
+                                    "status":  " M",
+                                    "path":  "tools/visual_report.py"
+                                }
+                            ],
+    "untracked_files":  [
+                            {
+                                "status":  "??",
+                                "path":  "reports/M08_PARALLEL_BUILD_BOARD.json"
+                            },
+                            {
+                                "status":  "??",
+                                "path":  "reports/M08_PARALLEL_BUILD_BOARD.md"
+                            },
+                            {
+                                "status":  "??",
+                                "path":  "reports/WAVE4_PANE2~6_CLAIMS.json"
+                            },
+                            {
+                                "status":  "??",
+                                "path":  "reports/merge/MAIN_DIRTY_STATE_BEFORE_FAST_A_READY.json"
+                            },
+                            {
+                                "status":  "??",
+                                "path":  "reports/merge/MAIN_DIRTY_STATE_BEFORE_FAST_A_READY.md"
+                            },
+                            {
+                                "status":  "??",
+                                "path":  "reports/merge/MERGE_WAVE4X_LOADER_DOC.json"
+                            },
+                            {
+                                "status":  "??",
+                                "path":  "reports/merge/MERGE_WAVE4X_LOADER_DOC.md"
+                            },
+                            {
+                                "status":  "??",
+                                "path":  "reports/merge/MERGE_WAVE4X_VISUAL_PLOT.json"
+                            },
+                            {
+                                "status":  "??",
+                                "path":  "reports/merge/MERGE_WAVE4X_VISUAL_PLOT.md"
+                            },
+                            {
+                                "status":  "??",
+                                "path":  "reports/remaining_after_wave3_integration.json"
+                            },
+                            {
+                                "status":  "??",
+                                "path":  "reports/remaining_after_wave3_integration.md"
+                            },
+                            {
+                                "status":  "??",
+                                "path":  "reports/tickets/WAVE4S_SPARK1_MICRO_IMPL_CLAIMS.json"
+                            },
+                            {
+                                "status":  "??",
+                                "path":  "reports/tickets/WAVE4S_SPARK2_AGENT_SURFACE_CLAIMS.json"
+                            },
+                            {
+                                "status":  "??",
+                                "path":  "reports/tickets/WAVE4S_SPARK3_REGRESSION_AUTOMATION_CLAIMS.json"
+                            },
+                            {
+                                "status":  "??",
+                                "path":  "reports/tickets/WAVE4S_SPARK4_EVIDENCE_HARDENING_CLAIMS.json"
+                            },
+                            {
+                                "status":  "??",
+                                "path":  "reports/tickets/WAVE4X_CLAIM_SPLIT.json"
+                            },
+                            {
+                                "status":  "??",
+                                "path":  "reports/tickets/WAVE4X_CLAIM_SPLIT.md"
+                            },
+                            {
+                                "status":  "??",
+                                "path":  "reports/tickets/WAVE4X_PANE1_ASSOC_SOLVER_CLAIMS.json"
+                            },
+                            {
+                                "status":  "??",
+                                "path":  "reports/tickets/WAVE4X_PANE2_LOADER_DOC_CLAIMS.json"
+                            },
+                            {
+                                "status":  "??",
+                                "path":  "reports/tickets/WAVE4X_PANE3_SUBENTITY_BREP_CLAIMS.json"
+                            },
+                            {
+                                "status":  "??",
+                                "path":  "reports/tickets/WAVE4X_PANE4_FALLBACK_COM_OLE_CLAIMS.json"
+                            },
+                            {
+                                "status":  "??",
+                                "path":  "reports/tickets/WAVE4X_PANE5_DB_TXN_WRITE_CLAIMS.json"
+                            },
+                            {
+                                "status":  "??",
+                                "path":  "reports/tickets/WAVE4X_PANE6_GENERIC_CLOSURE_CLAIMS.json"
+                            },
+                            {
+                                "status":  "??",
+                                "path":  "reports/tickets/WAVE4X_PANE7_VISUAL_PLOT_CLAIMS.json"
+                            },
+                            {
+                                "status":  "??",
+                                "path":  "reports/tickets/WAVE4X_PANE8_LIVE_EDITOR_UI_CLAIMS.json"
+                            }
+                        ],
+    "branch_list":  [
+                        "+ cados/cad-os-v1-rc1",
+                        "+ cados/cad-os-v1.0-release-freeze",
+                        "+ cados/m08c-deferred-sweep",
+                        "+ cados/m08cdef-read-graph-query-30",
+                        "+ cados/m08g-h-write-annotation-30",
+                        "+ cados/m08i-visual-render-plot",
+                        "+ cados/m08n-a3-native-ui",
+                        "+ cados/m08o-fallback-raw-policy",
+                        "+ cados/w4s-spark1-micro-impl",
+                        "+ cados/w4s-spark2-agent-surface",
+                        "+ cados/w4s-spark3-regression-automation",
+                        "+ cados/w4s-spark4-evidence-hardening",
+                        "+ cados/w4x-assoc-solver",
+                        "+ cados/w4x-db-txn-write",
+                        "+ cados/w4x-fallback-com-ole",
+                        "+ cados/w4x-generic-closure",
+                        "+ cados/w4x-generic-closure-audit",
+                        "+ cados/w4x-live-ui-apply",
+                        "+ cados/w4x-loader-doc-command",
+                        "+ cados/w4x-loader-doc-r2-lifecycle-entrypoints",
+                        "+ cados/w4x-subentity-brep",
+                        "+ cados/w4x-visual-plot",
+                        "+ cados/w4x-visual-plot-attended",
+                        "+ cados/wave3-integrate-and-build-unfinished",
+                        "+ cados/wave3-pane10-mixed-burndown",
+                        "+ cados/wave3-pane2-heavy-native-30",
+                        "+ cados/wave3-pane3-visual-live",
+                        "+ cados/wave3-pane4-fallback-lowrisk",
+                        "+ cados/wave3-pane5-generic-30",
+                        "+ cados/wave3-pane6-native-custom",
+                        "+ cados/wave3-pane7-graphics-worlddraw",
+                        "+ cados/wave3-pane8-opm-reactors",
+                        "+ cados/wave3-pane9-live-editor-ui",
+                        "+ cados/wave4x-fast-a-main-ready",
+                        "+ cados/wave4x-fast-a-merge-audit-truth",
+                        "+ cados/wave4x-fast-b-attended-live-ui-blocker-rework",
+                        "+ cados/wave4x-fast-b-on-fast-a-truth",
+                        "+ cados/wave4x-final-a-hardblock-reimplementation",
+                        "+ cados/wave4x-final-b-skipped-test-execution",
+                        "* main"
+                    ],
+    "worktree_list":  [
+                          "D:/dev/99_tools/autocad-sdk-router                               bc0832a [main]",
+                          "D:/dev/99_tools/autocad-sdk-router_cados_v1_final                2d59024 [cados/cad-os-v1.0-release-freeze]",
+                          "D:/dev/99_tools/autocad-sdk-router_cados_v1_rc1                  2d59024 [cados/cad-os-v1-rc1]",
+                          "D:/dev/99_tools/autocad-sdk-router_m08c_deferred_sweep           52e9997 [cados/m08c-deferred-sweep]",
+                          "D:/dev/99_tools/autocad-sdk-router_m08cdef_read_graph_query      a43416d [cados/m08cdef-read-graph-query-30]",
+                          "D:/dev/99_tools/autocad-sdk-router_m08g_h_write_annotation       3bc6df6 [cados/m08g-h-write-annotation-30]",
+                          "D:/dev/99_tools/autocad-sdk-router_m08i_visual                   e5f450b [cados/m08i-visual-render-plot]",
+                          "D:/dev/99_tools/autocad-sdk-router_m08n_a3                       c588bd6 [cados/m08n-a3-native-ui]",
+                          "D:/dev/99_tools/autocad-sdk-router_m08o_fallback                 9765872 [cados/m08o-fallback-raw-policy]",
+                          "D:/dev/99_tools/autocad-sdk-router_w4s_spark1_micro              bc0832a [cados/w4s-spark1-micro-impl]",
+                          "D:/dev/99_tools/autocad-sdk-router_w4s_spark2_surface            1cd6182 [cados/w4s-spark2-agent-surface]",
+                          "D:/dev/99_tools/autocad-sdk-router_w4s_spark3_regression         bc0832a [cados/w4s-spark3-regression-automation]",
+                          "D:/dev/99_tools/autocad-sdk-router_w4s_spark4_evidence           bc0832a [cados/w4s-spark4-evidence-hardening]",
+                          "D:/dev/99_tools/autocad-sdk-router_w4x_assoc_solver              4d0afd5 [cados/w4x-assoc-solver]",
+                          "D:/dev/99_tools/autocad-sdk-router_w4x_db_txn                    36f3817 [cados/w4x-db-txn-write]",
+                          "D:/dev/99_tools/autocad-sdk-router_w4x_fallback                  49244a4 [cados/w4x-fallback-com-ole]",
+                          "D:/dev/99_tools/autocad-sdk-router_w4x_generic                   98605fb [cados/w4x-generic-closure]",
+                          "D:/dev/99_tools/autocad-sdk-router_w4x_generic_audit             19c6577 [cados/w4x-generic-closure-audit]",
+                          "D:/dev/99_tools/autocad-sdk-router_w4x_live_ui_apply             bc0832a [cados/w4x-live-ui-apply]",
+                          "D:/dev/99_tools/autocad-sdk-router_w4x_loader_doc                ab94832 [cados/w4x-loader-doc-command]",
+                          "D:/dev/99_tools/autocad-sdk-router_w4x_loader_doc_r2             c8d6281 [cados/w4x-loader-doc-r2-lifecycle-entrypoints]",
+                          "D:/dev/99_tools/autocad-sdk-router_w4x_subentity                 154a6f6 [cados/w4x-subentity-brep]",
+                          "D:/dev/99_tools/autocad-sdk-router_w4x_visual                    7adc82e [cados/w4x-visual-plot]",
+                          "D:/dev/99_tools/autocad-sdk-router_w4x_visual_attended           7adc82e [cados/w4x-visual-plot-attended]",
+                          "D:/dev/99_tools/autocad-sdk-router_wave3_integrator              bc0832a [cados/wave3-integrate-and-build-unfinished]",
+                          "D:/dev/99_tools/autocad-sdk-router_wave3_pane10_mixed            8ac5d17 [cados/wave3-pane10-mixed-burndown]",
+                          "D:/dev/99_tools/autocad-sdk-router_wave3_pane2                   0a69a7d [cados/wave3-pane2-heavy-native-30]",
+                          "D:/dev/99_tools/autocad-sdk-router_wave3_pane3_visual_live       3ecd96e [cados/wave3-pane3-visual-live]",
+                          "D:/dev/99_tools/autocad-sdk-router_wave3_pane4_fallback_lowrisk  023fc16 [cados/wave3-pane4-fallback-lowrisk]",
+                          "D:/dev/99_tools/autocad-sdk-router_wave3_pane5                   8e27e3d [cados/wave3-pane5-generic-30]",
+                          "D:/dev/99_tools/autocad-sdk-router_wave3_pane6_native_custom     b071d97 [cados/wave3-pane6-native-custom]",
+                          "D:/dev/99_tools/autocad-sdk-router_wave3_pane7_graphics          023fc16 [cados/wave3-pane7-graphics-worlddraw]",
+                          "D:/dev/99_tools/autocad-sdk-router_wave3_pane8_opm_reactors      58fd8f8 [cados/wave3-pane8-opm-reactors]",
+                          "D:/dev/99_tools/autocad-sdk-router_wave3_pane9_live_editor       c86f405 [cados/wave3-pane9-live-editor-ui]",
+                          "D:/dev/99_tools/autocad-sdk-router_wave4x_fast_a_main_ready      f5f950c [cados/wave4x-fast-a-main-ready]",
+                          "D:/dev/99_tools/autocad-sdk-router_wave4x_fast_a_merge           4328a0d [cados/wave4x-fast-a-merge-audit-truth]",
+                          "D:/dev/99_tools/autocad-sdk-router_wave4x_fast_b_impl            a564b96 [cados/wave4x-fast-b-attended-live-ui-blocker-rework]",
+                          "D:/dev/99_tools/autocad-sdk-router_wave4x_fast_b_on_fast_a_truth ec92ee9 [cados/wave4x-fast-b-on-fast-a-truth]",
+                          "D:/dev/99_tools/autocad-sdk-router_wave4x_final_a_hardblock      50c8c89 [cados/wave4x-final-a-hardblock-reimplementation]",
+                          "D:/dev/99_tools/autocad-sdk-router_wave4x_final_b_skips          9c505b2 [cados/wave4x-final-b-skipped-test-execution]"
+                      ],
+    "policy":  {
+                   "main_merge_executed":  false,
+                   "reason":  "Main checkout is dirty; release freeze branch and reports were generated in isolated worktree."
+               }
+}
