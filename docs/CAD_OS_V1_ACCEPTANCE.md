@@ -1,35 +1,40 @@
-# CAD OS V1 Acceptance Latest
+# CAD OS V1 Acceptance — FROZEN
 
-- status: IN_PROGRESS (v1 freeze is M09; M03–M08 closed)
-- M03: PASS
-- M04: PASS
-- M05: PASS
-- M06: PASS
-- M07: PARTIAL_PASS (live ARX pump complete + headless-verified 17/17; deep native 7 implemented / 3 attended_blocked / 0 design_only)
-- M07A: implemented + build-verified (selection monitor + AcRxProperty/OPM)
-- M07B: PASS (pump-gating real execution attended + ARIADNE_NATIVE_JOB_ARGS env-file channel + MFC-free palette + dedicated-instance attended GUI; deep-native firing CLOSED — reactor 1/1 + overrule 2/3 + selmon 1/1 headless+attended)
-- M08: **PASS** (full operation coverage closure)
-- operation catalog: 517 ops, **100% classified, 0 unknown, 13-field taxonomy complete (0 missing)**
-- operation status rollup: implemented 41 / stub 0 / blocked 2 / catalogued 474 (cadctl consistent=true)
-- v1-target: 43 (implemented 41 + hard-blocked 2 [`render.layout`, `live.apply_patch`]) — **0 deferred**
-- v1 operation gate: **11/11 PASS** (`reports/v1_operation_gate_latest.json`)
-- M08 implementation sweep: `inspect.layers` / `inspect.blocks` / `inspect.entities` built natively + accoreconsole-smoked (70 layers / 245 block defs / 21747 entities, cross-validates M03 truth; UTF-8 non-ASCII preserved, code-point verified); `live.status` promoted (M07 pump)
-- coverage matrix: `reports/operation_coverage_full_matrix.json` (+ `.md`), generator `tools/operation_coverage_matrix.py` (deterministic)
-- no agent-exposed raw command: PASS (5 raw-command ops all catalogued, 0 exposed)
-- no original-write default: PASS (all 517 ops original_write_default=false)
-- existing 29 wired ops frozen + runnable: PASS
-- catalog classified: 480/480
-- staged patch apply: PASS
-- CAD diff: PASS
-- validator: PASS (14/14 gates, `reports/validation_latest.json`)
-- visual verification: PASS
-- batch runner: PASS
-- golden regression: PASS
-- performance report: PASS
-- live ARX pump (12 ops + CADAGENT_STATUS): PASS (headless + attended)
-- thread safety (no worker AcDb): PASS (main-thread pump)
-- deep native surface implemented-or-hard-blocked: PASS (10 impl/verified, 0 attended_blocked)
-- native build canonical: .dbx 48128 / .crx 260096 / .arx 268288
-- original DWG modified: no (`27dbf6b95ff72a89fd53b153891187365b9e8ebc4c05a97cfed307057bf49bc8` before/after)
-- full pytest: 313 passed, 3 skipped (default) · 316 passed, 0 skipped (`CADOS_LIVE=1`)
-- next: CADOS_M09_V1_RELEASE_FREEZE_AND_DAEDALUS_HANDOFF
+- status: **V1 FROZEN** (full operation coverage closure; verified native rebuild 2026-06-26)
+- frozen source commit: `bc0832a` (code tag `cad-os-v1.0.0`; this doc/freeze refresh `cad-os-v1.0.1`)
+- milestones: M01 PASS · M02 PASS · M03 PASS · M04 PASS · M05 PASS · M06 PASS · M07 PARTIAL_PASS (attended) · M07A PASS · M07B PASS · **M08 PASS (full operation coverage closure)**
+
+## Operation coverage (the V1 closure claim)
+
+- operation catalog: **517 ops, 100% classified, 0 unknown**
+- status rollup: **implemented 457 / hard-blocked 60 / catalogued 0 / stub 0 / unknown 0 / deprecated 0**
+- closure gate: **PASS** (`closure_gate_pass=true`, `m09_allowed=true`; `reports/closure_gate_latest.json`)
+- honesty audit: all **457 implemented** carry `handler.dispatcher_symbol` + `evidence_refs`; all **60 hard-blocked** carry a `blocker_reason`. Hard-block families: ASM associative solver (assocarray/assocsurface create + evaluate), COM automation roots (IDispatch/SendCommand), host-lifecycle loader callbacks (acrxEntryPoint / module load·unload), subentity-path mutation, and the plot engine/config surface. All are genuine SDK/safety/host limits, not unfinished work.
+
+## Build (verified rebuild from frozen source — 2026-06-26 15:20)
+
+- native: VS2026 MSBuild 18.6.3, Release x64, **exit 0**, combined-TU `.crx` (all `m08*.inc` in one translation unit) linked clean — no symbol collision, no headless-link failure. Artifacts: **`.dbx` 54272 · `.crx` 756224 · `.arx` 764416** (arx relink mode = canonical). Only benign LNK4099 (missing Autodesk rxapi.pdb).
+- managed: dotnet 10.0.300, **exit 0** (`Ariadne.DwgGeometryExtractor.dll`).
+- HEAD source == deployed binary (rebuild produced no new commit; git index clean, 0 staged).
+
+## Verification
+
+- full pytest: **504 passed, 3 skipped** (default); native live tests pass under `CADOS_LIVE=1`.
+- native headless smoke (fresh `.crx`): `inspect.database.graph` golden = **21747** matched 3 ways (envelope == IR diag == len), `coverage_level=native_full`, real accoreconsole launch; **original DWG sha256 + size unchanged**. 3 independent proof layers (live pytest golden · direct `cadctl.inspect` · AutoLISP `.scr` CRXLOAD_OK/DBXLOAD_OK).
+- no agent-exposed raw command: **PASS** (`doc.sendstring`, COM `SendCommand`, and the raw-command ops are hard-blocked / internal-only).
+- no original-write default: **PASS** (staged-write only; originals byte-immutable).
+- validator (14/14 gates) · CAD diff · visual verification · batch runner · golden regression · live ARX pump (headless + attended) · thread safety: **PASS**.
+
+## Plot ops decision (re-examined 2026-06-26)
+
+- `plot.config.settings` + `plot.engine.run` remain **HARD-BLOCKED**. The headless `.crx` cannot link/run `AcPlPlotEngine` (plot host unavailable headless), and a WAVE4X branch that marked them `implemented` (the 459/58 variant) carried explicit **attended verification debt** (plot.engine.run was never actually verified to plot). Adopting it would be a fake-implemented claim.
+- Legitimate path to implementing the plot surface: a dedicated **attended / full-AutoCAD `.arx` build target** (M07B live-pump infra) with real attended plot verification. Future scope; not adopted into V1 to keep closure honest.
+
+## Honest gaps (non-blocking for V1 freeze)
+
+- Dedicated scale/stress benchmark not run — the golden 21747-entity inspect + 504-test suite + combined-TU build serve as the regression evidence.
+- ~9 Wave4 blocked→implemented candidates deferred: visual/plot +2 (needs attended target, see above); loader/doc +7 (re-audit deferred). These would move 457/60 → up to 466/51 only after attended verification / re-audit.
+
+## Next
+
+- Daedalus handoff: see `reports/CADOS_M09_V1_FREEZE.md`.
