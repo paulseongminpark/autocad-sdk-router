@@ -1,33 +1,33 @@
 {
-    "schema":  "ariadne.cad_os.v1_final.closure_gate.v1",
-    "packet":  "CADOS_M09_V1_RELEASE_FREEZE_AND_DAEDALUS_HANDOFF",
-    "generated_at":  "2026-06-26T13:55:15.9209821+09:00",
-    "totals_by_status":  {
-                             "implemented":  487,
-                             "deprecated":  1,
-                             "hard_blocked":  29
-                         },
-    "total":  517,
-    "catalogued":  0,
-    "stub":  0,
-    "unknown":  0,
-    "deferred":  0,
-    "checks":  {
-                   "every_op_has_owner_ticket":  true,
-                   "every_implemented_has_handler_test_evidence":  true,
-                   "every_hardblock_has_blocker_ref":  true,
-                   "every_deprecated_has_replacement":  true,
-                   "zero_catalogued":  true,
-                   "zero_stub":  true,
-                   "zero_unknown":  true,
-                   "zero_deferred":  true,
-                   "total_closed":  true,
-                   "raw_command_agent_exposure_zero":  true,
-                   "no_write_original_default":  true,
-                   "tests_zero_skipped":  true,
-                   "native_build_ok":  true,
-                   "original_dwg_unchanged":  true
-               },
-    "closure_gate_pass":  true,
-    "release_freeze_candidate":  true
+  "schema": "ariadne.cad_os.v1_final.closure_gate.v1",
+  "packet": "CADOS_M09_V1_RELEASE_FREEZE_AND_DAEDALUS_HANDOFF",
+  "generated_at": "2026-06-26T14:16:22.249813+09:00",
+  "totals_by_status": {
+    "implemented": 487,
+    "deprecated": 1,
+    "hard_blocked": 29
+  },
+  "total": 517,
+  "catalogued": 0,
+  "stub": 0,
+  "unknown": 0,
+  "deferred": 0,
+  "checks": {
+    "every_op_has_owner_ticket": true,
+    "every_implemented_has_handler_test_evidence": true,
+    "every_hardblock_has_blocker_ref": true,
+    "every_deprecated_has_replacement": true,
+    "zero_catalogued": true,
+    "zero_stub": true,
+    "zero_unknown": true,
+    "zero_deferred": true,
+    "total_closed": true,
+    "raw_command_agent_exposure_zero": true,
+    "no_write_original_default": true,
+    "tests_zero_skipped": true,
+    "native_build_ok": true,
+    "original_dwg_unchanged": true
+  },
+  "closure_gate_pass": true,
+  "release_freeze_candidate": true
 }

@@ -1,30 +1,27 @@
 {
-  "schema": "cad_os.latest_status.v1",
+  "schema": "ariadne.cad_os.v1_final.acceptance.v1",
+  "packet_id": "CADOS_M09_V1_RELEASE_FREEZE_AND_DAEDALUS_HANDOFF",
   "generated_at": "2026-06-26T14:16:22.249813+09:00",
   "status": "PASS",
-  "version": "CAD OS Layer v1.0.0",
-  "branch": "cados/cad-os-v1.0-final",
-  "head_at_report_generation": "6dbccb4d13a082280dc004922cf1531307f3bc46",
-  "source_rc_commit": "2d5902461d5f3479feb1d59e405d9e11eb40d53f",
-  "operation_counts": {
-    "total": 517,
-    "implemented": 487,
-    "hard_blocked": 29,
-    "deprecated": 1,
-    "catalogued": 0,
-    "stub": 0,
-    "unknown": 0,
-    "deferred": 0
+  "criteria": {
+    "release_branch_created_from_rc1": true,
+    "final_tests_pass_zero_skipped": true,
+    "native_canonical_build_passes": true,
+    "operation_counts_closed": true,
+    "implemented_plus_hardblocked_plus_deprecated_equals_total": true,
+    "every_implemented_has_handler_test_evidence": true,
+    "every_hardblocked_has_required_fields_agent_exposed_false": true,
+    "deprecated_ops_have_replacement": true,
+    "raw_command_agent_exposure_zero": true,
+    "write_original_disabled_by_default": true,
+    "original_dwg_hash_checks_pass": true,
+    "release_reports_and_handoff_zip_produced": true,
+    "daedalus_external_handoff_updated": true,
+    "dirty_main_not_touched": true,
+    "no_push": true
   },
-  "tests": "566 passed, 0 skipped (CADOS_LIVE=1)",
-  "native_build_status": "PASS",
-  "native_build_arx_relink_mode": "canonical",
-  "raw_command_agent_exposure": 0,
-  "original_dwg_modified": false,
-  "no_write_original_default": true,
-  "closure_gate_pass": true,
-  "main_merge_status": "BLOCKED_DIRTY_MAIN",
-  "daedalus_external_path": "D:\\dev\\_ariadne\\_daedalus\\external\\cad_os",
+  "release_branch": "cados/cad-os-v1.0-final",
+  "source_rc_commit": "2d5902461d5f3479feb1d59e405d9e11eb40d53f",
   "reports": {
     "final_summary": "reports/release/CADOS_V1_FINAL.json",
     "acceptance": "reports/release/CADOS_V1_FINAL_ACCEPTANCE.json",
@@ -42,6 +39,5 @@
     "main_dirty_state": "reports/release/CADOS_V1_FINAL_MAIN_DIRTY_STATE.json",
     "main_merge_plan": "reports/release/CADOS_V1_FINAL_MAIN_MERGE_PLAN.json",
     "zip": "handoff/zip/CADOS_M09_V1_RELEASE_FREEZE_AND_DAEDALUS_HANDOFF.zip"
-  },
-  "next": "D04_IMPORT_CAD_OS_CAPABILITIES"
+  }
 }

@@ -1,0 +1,165 @@
+{
+  "schema": "ariadne.cad_os.v1_final.raw_command_audit.v1",
+  "packet_id": "CADOS_M09_V1_RELEASE_FREEZE_AND_DAEDALUS_HANDOFF",
+  "generated_at": "2026-06-26T14:16:22.249813+09:00",
+  "status": "PASS",
+  "raw_command_agent_exposure": 0,
+  "checks": {
+    "raw_command_agent_exposure_zero": true,
+    "doc_sendstring_blocked_non_agent_exposed": true,
+    "sendstring_to_execute_not_agent_tool": true,
+    "command_invoke_blocked_non_agent_exposed": true,
+    "automate_com_send_command_blocked_non_agent_exposed": true,
+    "command_queue_post_blocked_non_agent_exposed": true
+  },
+  "audited_operations": [
+    {
+      "operation": "automate.com.send_command",
+      "family": "com_activex",
+      "status": "blocked",
+      "risk_class": "read_safe",
+      "agent_exposed": false,
+      "blocker_code": "SAFETY_FORBIDDEN",
+      "blocker_ref": "SAFETY_FORBIDDEN: COM SendCommand is raw command-string dispatch and must not be exposed to agents.",
+      "test_ref": [
+        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
+        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
+        "tests/unit/test_wave3_remaining_registry_closure.py::test_remaining_wave3_blocks_have_accepted_codes_and_evidence",
+        "tests/unit/test_wave4x_final_a_hardblock_contract.py"
+      ],
+      "evidence_ref": [
+        "config/autocad_native_arx_operation_catalog.json#automate.com.send_command",
+        "reports/WAVE3_REMAINING_HARDBLOCK_REAUDIT.md#automate.com.send_command",
+        "docs/FALLBACK_POLICY.md",
+        "reports/tickets/WAVE4X_FALLBACK.md",
+        "reports/WAVE4X_FINAL_A_HARDBLOCK_DECISIONS.md#automate-com-send_command",
+        "reports/WAVE4X_FINAL_A_HARDBLOCK_REIMPLEMENTATION.md#automate-com-send_command",
+        "tests/unit/test_wave4x_final_a_hardblock_contract.py"
+      ]
+    },
+    {
+      "operation": "command.invoke.coroutine",
+      "family": "active_document_write_original",
+      "status": "blocked",
+      "risk_class": "raw_command",
+      "agent_exposed": false,
+      "blocker_code": "SAFETY_FORBIDDEN",
+      "blocker_ref": "SAFETY_FORBIDDEN: raw command dispatch is blocked in M08O fallback policy. Fallbacks are managed/.NET/LISP-only and do not expose direct command strings.",
+      "test_ref": [
+        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
+        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
+        "tests/unit/test_wave4x_final_a_hardblock_contract.py"
+      ],
+      "evidence_ref": [
+        "config/autocad_native_arx_operation_catalog.json#command.invoke.coroutine",
+        "docs/FALLBACK_POLICY.md",
+        "docs/M08_REMAINING_BATCH_PLAN.md#m08o-fallback-raw-command-hard-block",
+        "reports/tickets/WAVE4X_FALLBACK.md",
+        "reports/WAVE4X_FINAL_A_HARDBLOCK_DECISIONS.md#command-invoke-coroutine",
+        "reports/WAVE4X_FINAL_A_HARDBLOCK_REIMPLEMENTATION.md#command-invoke-coroutine",
+        "tests/unit/test_wave4x_final_a_hardblock_contract.py"
+      ]
+    },
+    {
+      "operation": "command.invoke.sync",
+      "family": "active_document_write_original",
+      "status": "blocked",
+      "risk_class": "raw_command",
+      "agent_exposed": false,
+      "blocker_code": "SAFETY_FORBIDDEN",
+      "blocker_ref": "SAFETY_FORBIDDEN: raw command dispatch is blocked in M08O fallback policy. Fallbacks are managed/.NET/LISP-only and do not expose direct command strings.",
+      "test_ref": [
+        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
+        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
+        "tests/unit/test_wave4x_final_a_hardblock_contract.py"
+      ],
+      "evidence_ref": [
+        "config/autocad_native_arx_operation_catalog.json#command.invoke.sync",
+        "docs/FALLBACK_POLICY.md",
+        "docs/M08_REMAINING_BATCH_PLAN.md#m08o-fallback-raw-command-hard-block",
+        "reports/tickets/WAVE4X_FALLBACK.md",
+        "reports/WAVE4X_FINAL_A_HARDBLOCK_DECISIONS.md#command-invoke-sync",
+        "reports/WAVE4X_FINAL_A_HARDBLOCK_REIMPLEMENTATION.md#command-invoke-sync",
+        "tests/unit/test_wave4x_final_a_hardblock_contract.py"
+      ]
+    },
+    {
+      "operation": "command.invoke.sync.resbuf",
+      "family": "active_document_write_original",
+      "status": "blocked",
+      "risk_class": "raw_command",
+      "agent_exposed": false,
+      "blocker_code": "SAFETY_FORBIDDEN",
+      "blocker_ref": "SAFETY_FORBIDDEN: raw command dispatch is blocked in M08O fallback policy. Fallbacks are managed/.NET/LISP-only and do not expose direct command strings.",
+      "test_ref": [
+        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
+        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
+        "tests/unit/test_wave4x_final_a_hardblock_contract.py"
+      ],
+      "evidence_ref": [
+        "config/autocad_native_arx_operation_catalog.json#command.invoke.sync.resbuf",
+        "docs/FALLBACK_POLICY.md",
+        "docs/M08_REMAINING_BATCH_PLAN.md#m08o-fallback-raw-command-hard-block",
+        "reports/tickets/WAVE4X_FALLBACK.md",
+        "reports/WAVE4X_FINAL_A_HARDBLOCK_DECISIONS.md#command-invoke-sync-resbuf",
+        "reports/WAVE4X_FINAL_A_HARDBLOCK_REIMPLEMENTATION.md#command-invoke-sync-resbuf",
+        "tests/unit/test_wave4x_final_a_hardblock_contract.py"
+      ]
+    },
+    {
+      "operation": "command.queue.post",
+      "family": "editor_input",
+      "status": "blocked",
+      "risk_class": "raw_command",
+      "agent_exposed": false,
+      "blocker_code": "SAFETY_FORBIDDEN",
+      "blocker_ref": "SAFETY_FORBIDDEN: raw command dispatch is blocked in M08O fallback policy. Fallbacks are managed/.NET/LISP-only and do not expose direct command strings.",
+      "test_ref": [
+        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
+        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
+        "tests/unit/test_wave4x_final_a_hardblock_contract.py"
+      ],
+      "evidence_ref": [
+        "config/autocad_native_arx_operation_catalog.json#command.queue.post",
+        "docs/FALLBACK_POLICY.md",
+        "docs/M08_REMAINING_BATCH_PLAN.md#m08o-fallback-raw-command-hard-block",
+        "reports/tickets/WAVE4X_FALLBACK.md",
+        "reports/WAVE4X_FINAL_A_HARDBLOCK_DECISIONS.md#command-queue-post",
+        "reports/WAVE4X_FINAL_A_HARDBLOCK_REIMPLEMENTATION.md#command-queue-post",
+        "tests/unit/test_wave4x_final_a_hardblock_contract.py"
+      ]
+    },
+    {
+      "operation": "doc.sendstring",
+      "family": "active_document_write_original",
+      "status": "blocked",
+      "risk_class": "raw_command",
+      "agent_exposed": false,
+      "blocker_code": "SAFETY_FORBIDDEN",
+      "blocker_ref": "SAFETY_FORBIDDEN: doc.sendstring uses AcApDocManager::sendStringToExecute to enqueue command text into an AutoCAD document command stream. R2 rechecked internal-only gating and rejected an agent operation because even policy-gated arbitrary command strings would be a raw command surface; safe bespoke typed handlers must be implemented instead.",
+      "test_ref": [
+        "tests/unit/test_m08o_fallback.py::TestM08OFallback::test_doc_sendstring_is_safety_blocked_not_agent_exposed",
+        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
+        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
+        "tests/unit/test_m08_doc_lifecycle.py::test_lifecycle_and_doc_raw_surfaces_remain_hard_blocked_with_wave4x_evidence",
+        "tests/unit/test_doc_sendstring_safety.py",
+        "tests/unit/test_wave4x_final_a_hardblock_contract.py"
+      ],
+      "evidence_ref": [
+        "config/autocad_native_arx_operation_catalog.json#doc.sendstring",
+        "tests/unit/test_m08o_fallback.py::TestM08OFallback::test_doc_sendstring_is_safety_blocked_not_agent_exposed",
+        "reports/tickets/WAVE3_PANE10_MIXED.md#doc-sendstring-safety-rejected",
+        "docs/FALLBACK_POLICY.md",
+        "reports/tickets/WAVE4X_LOADER_DOC.md#doc-sendstring",
+        "reports/tickets/WAVE4X_LOADER_DOC_OPS.json#doc.sendstring",
+        "tests/unit/test_m08_doc_lifecycle.py",
+        "reports/tickets/WAVE4X_LOADER_DOC_R2.md#doc.sendstring",
+        "reports/tickets/WAVE4X_LOADER_DOC_R2_OPS.json#doc.sendstring",
+        "tests/unit/test_doc_sendstring_safety.py",
+        "reports/WAVE4X_FINAL_A_HARDBLOCK_DECISIONS.md#doc-sendstring",
+        "reports/WAVE4X_FINAL_A_HARDBLOCK_REIMPLEMENTATION.md#doc-sendstring",
+        "tests/unit/test_wave4x_final_a_hardblock_contract.py"
+      ]
+    }
+  ]
+}

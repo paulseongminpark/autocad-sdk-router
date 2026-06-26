@@ -1,0 +1,63 @@
+{
+  "schema": "ariadne.cad_os.v1_final.operation_closure.v1",
+  "packet_id": "CADOS_M09_V1_RELEASE_FREEZE_AND_DAEDALUS_HANDOFF",
+  "generated_at": "2026-06-26T14:16:22.249813+09:00",
+  "status": "PASS",
+  "operations": {
+    "total": 517,
+    "implemented": 487,
+    "hard_blocked": 29,
+    "deprecated": 1,
+    "catalogued": 0,
+    "stub": 0,
+    "unknown": 0,
+    "deferred": 0
+  },
+  "checks": {
+    "total_is_517": true,
+    "zero_catalogued": true,
+    "zero_stub": true,
+    "zero_unknown": true,
+    "zero_deferred": true,
+    "no_future_version": true,
+    "no_v1_target_false_escape": true,
+    "statuses_exactly_implemented_hardblocked_deprecated": true,
+    "every_implemented_has_handler": true,
+    "every_implemented_has_test": true,
+    "every_implemented_has_evidence": true,
+    "every_implemented_has_agent_exposure_policy": true,
+    "every_hardblocked_has_required_fields": true,
+    "every_hardblocked_agent_exposed_false": true,
+    "every_hardblocked_reason_allowed": true,
+    "every_deprecated_has_replacement": true
+  },
+  "implemented_missing_handler_ref": [],
+  "implemented_missing_test_ref": [],
+  "implemented_missing_evidence_ref": [],
+  "hardblocked_missing_required_fields": [],
+  "hardblocked_invalid_reason": [],
+  "deprecated_missing_replacement": [],
+  "deprecated_ops": [
+    {
+      "operation": "live.apply_patch",
+      "replacement_ref": "apply.patch + tools/patch_engine.py::apply_native_staged",
+      "test_ref": [
+        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
+        "tests/unit/test_wave4x_db_txn_write_registry.py::test_live_apply_patch_is_deprecated_in_favor_of_staged_governor",
+        "tests/unit/test_wave4x_fast_b_registry.py::test_live_apply_patch_stays_deprecated_and_points_to_staged_governor"
+      ],
+      "evidence_ref": [
+        "docs/OPERATION_REGISTRY_SPEC.md",
+        "CADOS_M01 Lane D native triage (inspect.database.graph insertion point)",
+        "reports/tickets/WAVE4X_DB_TXN_WRITE.md",
+        "reports/tickets/WAVE4X_DB_TXN_WRITE.json",
+        "reports/tickets/WAVE4X_DB_TXN_WRITE_OPS.json",
+        "tools/patch_engine.py::apply_staged",
+        "config/operations.v2.json#apply.patch",
+        "tools/patch_engine.py::apply_native_staged",
+        "tests/unit/test_patch_engine_policy.py::TestApplyNativeStagedLifecycleMocked",
+        "reports/tickets/WAVE4X_FAST_B_LIVE_APPLY_POLICY_R2.md#live-apply-patch"
+      ]
+    }
+  ]
+}

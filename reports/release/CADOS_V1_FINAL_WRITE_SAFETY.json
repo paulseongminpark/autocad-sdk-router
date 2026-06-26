@@ -1,0 +1,35 @@
+{
+  "schema": "ariadne.cad_os.v1_final.write_safety.v1",
+  "packet_id": "CADOS_M09_V1_RELEASE_FREEZE_AND_DAEDALUS_HANDOFF",
+  "generated_at": "2026-06-26T14:16:22.249813+09:00",
+  "status": "PASS",
+  "write_original_default": false,
+  "original_write_default_operation_count": 0,
+  "checks": {
+    "write_original_default_false": true,
+    "policy_default_write_mode_read": true,
+    "raw_command_forbidden_policy_present": true,
+    "live_apply_patch_does_not_bypass_staged_governor": true,
+    "live_apply_patch_replacement_points_to_staged_patch": true,
+    "apply_patch_defaults_to_staged_copy": true,
+    "staged_writes_require_patch_diff_validation_journal": true
+  },
+  "policy_ref": "config/policy.v2.json",
+  "staged_patch_policy": {
+    "default_operation": "apply.patch",
+    "replacement_for_deprecated_live_apply_patch": "apply.patch + tools/patch_engine.py::apply_native_staged",
+    "preconditions": [
+      "copy: original DWG is copied into staging\\golden\\<stamp>\\ before any write; original byte/mtime must remain unchanged.",
+      "backup: a pre-edit backup of the staged copy is retained alongside the working copy.",
+      "journal: every mutating operation is appended to an edit journal (op id, args, timestamp, target handle) before commit.",
+      "validation: post-write validation runs (e.g. entity-count / 3-way gate) and must pass before the staged result is accepted; on failure the staged copy is discarded and status=blocked/error is returned.",
+      "persist_via_qsave: if the staged copy is saved, persistence uses QSAVE, never Database.SaveAs."
+    ],
+    "evidence_ref": [
+      "tools/patch_engine.py::apply_staged",
+      "tests/unit/test_patch_engine_policy.py",
+      "tests/unit/test_validator_gates.py",
+      "reports/CADOS_M05_PATCH_DIFF_VALIDATION_TRANSACTION.md"
+    ]
+  }
+}

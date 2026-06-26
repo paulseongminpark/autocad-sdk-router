@@ -1,5 +1,9 @@
 # AutoCAD SDK Router (local)
 
+## CAD OS Layer v1.0 Release Freeze
+
+Status: PASS. Release branch: cados/cad-os-v1.0-final. Evidence root: reports/release/CADOS_V1_FINAL.json. Handoff zip: handoff/zip/CADOS_M09_V1_RELEASE_FREEZE_AND_DAEDALUS_HANDOFF.zip. Next Daedalus packet: D04_IMPORT_CAD_OS_CAPABILITIES.
+
 Single-entrypoint router over the CAD / geometry toolchain. Agents state an **intent**;
 the router live-probes tool availability, selects the strongest available route (with
 fallback), and executes a real operation. No fake availability, no fake success.

@@ -1,30 +1,19 @@
-﻿# CAD OS Full Stack Handoff
+# CAD OS Full Stack Handoff
 
-CAD OS Layer v1.0 is frozen on cados/cad-os-v1.0-release-freeze from RC1. Main remains untouched because the main checkout is dirty.
+CAD OS Layer v1.0.0 is frozen from cados/cad-os-v1.0-final.
 
-## Evidence
+Use:
+- python tools/cadctl_cli.py status
+- python tools/cadctl_cli.py registry coverage
+- python tools/cadctl_cli.py registry list
+- python tools/cadctl_cli.py registry explain <operation>
+- python tools/cadctl_cli.py inspect --dwg <read-only-or-staged.dwg> --out <run_dir> --include-rich
+- python tools/cadctl_cli.py query --ir <run_dir>\dwg_graph_ir.json --sql "SELECT COUNT(*) FROM entities"
+- python tools/cadctl_cli.py patch dry-run --patch <cad_patch.v1.json>
+- python tools/cadctl_cli.py patch apply-staged --patch <cad_patch.v1.json> --dwg <input.dwg> --out <run_dir>
 
-- Final report: reports/release/CADOS_V1_FINAL.json
-- Tests: reports/release/CADOS_V1_FINAL_TESTS.json and reports/release/CADOS_V1_FINAL_TESTS.log
-- Native build: reports/release/CADOS_V1_FINAL_NATIVE_BUILD.json and reports/release/CADOS_V1_FINAL_NATIVE_BUILD.log
-- Coverage: reports/operation_coverage_latest.json
-- Full matrix: reports/operation_coverage_full_matrix.json
-- Closure gate: reports/closure_gate_latest.json
-- Hardblocks: reports/release/CADOS_V1_FINAL_HARDBLOCKS.json
-- DWG safety: reports/release/CADOS_V1_FINAL_DWG_SAFETY.json
-- Main merge plan: reports/release/CADOS_V1_FINAL_MAIN_MERGE_PLAN.md
-- Release bundle: handoff/zip/CADOS_V1_FINAL_RELEASE_FREEZE.zip
-- Daedalus external handoff: D:\dev\_ariadne\_daedalus\external\cad_os\
+Do not use raw AutoCAD command strings as an agent API. Use typed registry operations and staged patch policy.
 
-## Result
-
-- Status: PASS
-- Tests: 566 passed, 0 skipped
-- Native build: PASS
-- Counts: total=517, implemented=487, hard_blocked=29, deprecated=1, catalogued=0, stub=0, unknown=0, deferred=0
-- Raw command exposure: 0
-- Original DWG modified: False
-
-## Next
-
-Daedalus D04 import or an explicit clean-main merge packet.
+Final report: reports/release/CADOS_V1_FINAL.json
+Handoff zip: handoff/zip/CADOS_M09_V1_RELEASE_FREEZE_AND_DAEDALUS_HANDOFF.zip
+Daedalus next packet: D04_IMPORT_CAD_OS_CAPABILITIES
