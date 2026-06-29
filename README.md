@@ -1,115 +1,127 @@
-# AutoCAD SDK Router (local)
+# CAD OS — AutoCAD SDK control plane for AI agents
 
-Single-entrypoint router over the CAD / geometry toolchain. Agents state an **intent**;
-the router live-probes tool availability, selects the strongest available route (with
-fallback), and executes a real operation. No fake availability, no fake success.
+Let an AI agent (Claude / Codex / Pi / Hermes / Gemini) **drive the AutoCAD SDK
+directly** — hundreds of native ObjectARX/ObjectDBX operations plus inspect / patch /
+diff / validate / query — through one safe MCP server, with original drawings kept
+read-only. CAD OS is a control plane layered *on top of* AutoCAD; you run your own
+AutoCAD, this repo is everything around it.
 
-- **Entrypoint**: `tools\autocad-router.ps1` -- `-Action {status|select|run|explain}`
-- **Contract** (read this): `reports\AUTO_CAD_ROUTER_AGENT_CONTRACT.md`
-- **Capabilities**: `config\autocad_router_capabilities.json`
-- **Live status**: `reports\autocad_router_status_latest.json`
-- **Env binding**: Ariadne tracked wrappers export `ARIADNE_AUTOCAD_ROUTER_*` directly.
-- **CAD OS Layer status**: M03–M06 PASS · M07 PARTIAL_PASS · **M07B PASS** — native ObjectARX rich IR +
-  staged patch/diff/validate + live ARX pump (`CADAGENT_PUMP`, headless + attended) + deep-native
-  firing verified (reactor/overrule/selection-monitor, headless + attended). See
-  `docs/CAD_OS_BUILD_STATUS.md`; build native with `tools/build_native_acad.ps1`; attended verify with
-  `tools/attended/run_attended_m07b.ps1`; firing with `runs/m07b_firing/run_firing.ps1` (dedicated
-  acad.exe, zero COM). Next: `CADOS_M08_FULL_OPERATION_COVERAGE_CLOSURE`. No fake PASS · original DWG
-  read-only · no remote push.
+> **New here? → [`INSTALL.md`](INSTALL.md)** (clone → `install.ps1` → register MCP → use).
+
+## What you get
+
+- **`cadagent` MCP server** (`tools/cadagent_mcp.py`) — 13 `cad.*` tools an agent calls
+  in natural language. The keystone is `cad.run_operation(op_id, args, write_mode)`,
+  a governed gateway to the native operations.
+- **Operation registry** (`config/operations.v2.json`) — the catalog + governance
+  (allow-list, write-mode policy, host eligibility) for every operation.
+- **Router** (`tools/autocad-router.ps1`) — intent/operation → strongest available
+  engine, with live availability probing. No fake availability, no fake success.
+- **Native modules** (`prebuilt/<version>/`) — compiled ObjectARX/ObjectDBX:
+  `.crx` (headless / accoreconsole), `.arx` (attended / full AutoCAD + live pump),
+  `.dbx` (ObjectDBX, host-neutral).
+- **`cadctl`** (`tools/cadctl_cli.py`) — the same safe surface as a CLI.
+- **10 non-AutoCAD geometry routes** — DXF, IFC, STEP/BREP, mesh, point-cloud, geo,
+  PDF/SVG, raster (optional Python deps; not needed for AutoCAD control).
+
+## Status (current)
+
+- Registry: **517 catalogued** = **457 implemented** + **60 blocked** (headless-impossible:
+  need the ASM solid modeler).
+- Of the 457 implemented: **447 native** ops reachable via `cad.run_operation`
+  (exhaustively verified — 447/447 reach the native ObjectARX module, 0 fall-through,
+  golden DWG byte-unchanged), **7** python-layer ops via dedicated tools
+  (`cad.patch_*` / `cad.diff_before_after` / `cad.validate_ir` / `cad.query_entities`),
+  **2** managed, **1** live pump (`cad.live_status`).
+- Plus ~**16 native C++ handlers** (live-pump verbs + firing/probe diagnostics) that
+  exist in the module but are **not yet entered in the registry** — so the real native
+  surface is ≈ **473**. See the 2026-06-29 audit in
+  [`docs/CADOS_M10_FULL_AGENT_CONTROL_PLAN.md`](docs/CADOS_M10_FULL_AGENT_CONTROL_PLAN.md).
+- Tests: `pytest -q` → **510 passed / 3 skipped**.
+- Safety invariants: original DWG **read-only** (staged copy only, sha-verified);
+  `write_original` is **always refused** from the agent surface; blocked/unknown ops are
+  refused, never faked.
 
 ## Quick start
 
 ```powershell
-$R = 'D:\dev\99_tools\autocad-sdk-router\tools\autocad-router.ps1'
-& $R -Action status                                   # what's available now
-& $R -Action select -Intent ifc                       # which route for an intent
-& $R -Action run -Intent dwg  -InputPath drawing.dwg  # DWG truth via AutoCAD SDK control plane
-& $R -Action run -Intent write_original -InputPath drawing.dwg  # original/live-document edit intent
-& $R -Action run -Intent active_document -InputPath drawing.dwg -WriteMode live_edit -HostMode full_autocad -Script job.scr
-& $R -Action run -Intent step -InputPath part.step    # STEP/BREP solid topology
-& $R -Action run -Intent parametric -Out out.step      # generate a new CAD model
+git clone https://github.com/paulseongminpark/autocad-sdk-router.git
+cd autocad-sdk-router
+powershell -ExecutionPolicy Bypass -File .\install.ps1
+# -> paste the printed MCP registration block into your agent; start a new session.
 ```
 
-## Layout
+Prerequisites: **AutoCAD** (team standard 2027; `prebuilt/2027/` ships), **Python 3.10+**
+(the AutoCAD core is pure stdlib + one optional `jsonschema`), **git**. Not required:
+Visual Studio, the ObjectARX SDK, the .NET SDK (only for building binaries yourself or
+the optional geometry routes). Full details + per-agent registration: **[`INSTALL.md`](INSTALL.md)**.
+
+Smoke it directly:
+
+```powershell
+powershell tools\autocad-router.ps1 -Action status               # live tool availability
+python   tools\cadctl_cli.py run --op inspect.layers --dwg <your.dwg>
+```
+
+## The `cad.*` MCP tools
+
+| tool | purpose |
+|---|---|
+| `cad.run_operation(op_id, args, write_mode)` | run any of the 447 native ops (allow-listed; `write_original` refused) |
+| `cad.inspect_drawing` / `cad.query_entities` / `cad.get_entity` | read / query the rich DWG graph IR |
+| `cad.patch_dry_run` → `cad.patch_apply_staged` → `cad.diff_before_after` | change a **staged copy** (original untouched) and diff it |
+| `cad.validate_ir` / `cad.visual_report` | deterministic validation / IR→SVG visual report |
+| `cad.status` / `cad.registry_status` / `cad.registry_explain` / `cad.live_status` | router/registry/liveness introspection |
+
+Discover any op: `powershell tools\autocad-router.ps1 -Action explain -Operation <id>`.
+
+## Routes (11)
+
+| route | engine | needs AutoCAD? |
+|---|---|---|
+| `dwg_truth_autocad` | native ObjectARX/ObjectDBX (+ accoreconsole / full AutoCAD / .NET / LISP adapters) | **yes** |
+| `dxf_fast_secondary` | ezdxf + shapely | no |
+| `ifc_bim_semantic` | ifcopenshell | no |
+| `solid_brep_occ` | cadquery + OCP | no |
+| `parametric_rebuild` | cadquery | no |
+| `dwg_libredwg_sidecar` | LibreDWG CLI (GPL sidecar, separate process) | no |
+| `mesh_analysis` | trimesh + meshio + open3d | no |
+| `pointcloud_route` | open3d + laspy | no |
+| `geo_vector_route` | pyogrio (bundled GDAL) + pyproj | no |
+| `pdf_svg_vector_route` | svgpathtools + svgelements | no |
+| `raster_compare_route` | opencv-headless + scikit-image | no |
+
+Non-AutoCAD routes need Python deps: `install.ps1 -Full` (or `pip install -r requirements-full.txt`).
+
+## AutoCAD version / upgrades
+
+The code is **version-agnostic** — the router auto-detects your installed AutoCAD and
+auto-loads `prebuilt/<version>/`. Only the native binaries are version-coupled: an
+upgrade needs at most a native rebuild (`tools/build_native_acad.ps1`, requires Visual
+Studio + the matching ObjectARX SDK), not a rewrite. Drop the rebuilt `.crx`/`.arx`/`.dbx`
+into `prebuilt/<version>/` and commit. The registry, router, MCP surface, and Python
+layer are unchanged across versions.
+
+## Architecture & specs
 
 ```
 autocad-sdk-router/
-  tools/
-    autocad-router.ps1     # single entrypoint, route dispatch
-    probe_routes.py        # LIVE availability probe (isolated-subprocess per module)
-    run_route.py           # real per-route work engine (non-AutoCAD routes)
-  config/
-    autocad_router_capabilities.json   # routes + official AutoCAD SDK control-plane policy
-  reports/
-    autocad_router_status_latest.json  # live machine status (regenerated each call)
-    AUTO_CAD_ROUTER_AGENT_CONTRACT.md  # the binding contract
-  staging/                 # ASCII-safe writable copies for batch/copy/path-hygiene modes
-  runs/                    # logs, reports, extracts, exports, and change records per run
-  set-router-env.ps1       # session-local ARIADNE_AUTOCAD_ROUTER_* repoint (safe)
-  ENVVAR_REPOINT.md        # exact protected-file diff (apply only with approve P-NN)
+  tools/        autocad-router.ps1 · cadagent_mcp.py · cadctl(_cli).py · patch_engine.py · ...
+  config/       operations.v2.json (registry) · autocad_router_capabilities.json
+  src/          Ariadne.AcadNative (.crx/.arx C++) · Ariadne.AcadNativeDbx (.dbx) · managed extractor
+  prebuilt/     <version>/ compiled native modules (shipped; clone-and-run)
+  schemas/      cad_job / cad_result / dwg_graph_ir / operation_registry (v2)
+  tests/        pytest suite (510 passed / 3 skipped)
 ```
 
-## Routes (11 implemented; spec header says "12" -- see contract section 3)
+- Install & per-agent MCP registration: **[`INSTALL.md`](INSTALL.md)**
+- Full agent-control plan + handler audit: [`docs/CADOS_M10_FULL_AGENT_CONTROL_PLAN.md`](docs/CADOS_M10_FULL_AGENT_CONTROL_PLAN.md)
+- MCP tool contract: [`docs/MCP_TOOL_CONTRACT.md`](docs/MCP_TOOL_CONTRACT.md)
+- Operation registry spec: [`docs/OPERATION_REGISTRY_SPEC.md`](docs/OPERATION_REGISTRY_SPEC.md) · DWG IR: [`docs/DWG_GRAPH_IR_SPEC.md`](docs/DWG_GRAPH_IR_SPEC.md)
+- Native design: [`docs/NATIVE_ARX_DBX_DESIGN.md`](docs/NATIVE_ARX_DBX_DESIGN.md) · patch/diff/validate: [`docs/PATCH_ENGINE_SPEC.md`](docs/PATCH_ENGINE_SPEC.md)
+- Router contract: `reports/AUTO_CAD_ROUTER_AGENT_CONTRACT.md`
 
-| route | engine | available |
-|---|---|---|
-| dwg_truth_autocad | native ObjectARX/ObjectDBX first; accoreconsole/full AutoCAD/.NET/LISP/COM adapters | yes |
-| dxf_fast_secondary | ezdxf + shapely | yes |
-| ifc_bim_semantic | ifcopenshell | yes |
-| solid_brep_occ | cadquery + OCP | yes |
-| parametric_rebuild | cadquery | yes |
-| dwg_libredwg_sidecar | LibreDWG CLI | yes |
-| mesh_analysis | trimesh + meshio + open3d | yes |
-| pointcloud_route | open3d + laspy | yes |
-| geo_vector_route | pyogrio (bundled GDAL) + pyproj | yes |
-| pdf_svg_vector_route | svgpathtools + svgelements | yes |
-| raster_compare_route | opencv-headless + skimage | yes |
+## License
 
-## CAD OS Layer control plane (CADOS_M01)
-
-A stdlib-only Python control plane (`tools\cadctl_cli.py`) layered **on top of** the router:
-typed **DWG Graph IR**, a queryable **SQLite IR store**, a deterministic **validator**, and an
-**Operation Registry v2**. The router and the 29 v1-wired native ops are unchanged.
-
-- **Walking skeleton: PASS** — `inspect -> dwg_graph_ir.v1 -> SQLite -> query -> validate`
-  proven end-to-end on the golden drawing at **21747** modelspace entities (6/6 validation
-  gates; original byte-identical). Report: `reports\walking_skeleton_latest.json`.
-- **Operation Registry v2** (`config\operations.v2.json`): **30 implemented** / 8 stub /
-  2 blocked, 16 catalog families over the 480-op native catalog.
-- **Native `inspect.database.graph`** is built into `Ariadne.AcadNative.crx` and smoked
-  directly at 3 + 291706 entities (`reports\native_graph_smoke_latest.json`); router-wiring is
-  deferred to M02.
-
-```powershell
-$C = 'D:\dev\99_tools\autocad-sdk-router\tools\cadctl_cli.py'
-python $C status                                              # published router status (read-only)
-python $C inspect --dwg <orig.dwg> --out <run_dir>           # stage copy, extract, build IR
-python $C query   --ir <run_dir>\dwg_graph_ir.json --sql "select count(*) as n from entities"
-python $C validate --ir <run_dir>\dwg_graph_ir.json          # deterministic gates
-python $C registry list | python $C registry coverage        # operation registry views
-```
-
-- **Build status (authoritative):** `docs\CAD_OS_BUILD_STATUS.md` (built / deferred / how to
-  run / acceptance = PASS, deferrals D1–D5).
-- **Full-stack handoff:** `docs\CAD_OS_FULL_STACK_HANDOFF.md`.
-- **Operation registry spec:** `docs\OPERATION_REGISTRY_SPEC.md` · **IR spec:**
-  `docs\DWG_GRAPH_IR_SPEC.md`.
-- **Live ARX named-pipe pump:** `docs\LIVE_ARX_NAMED_PIPE_DESIGN.md` (design) — **BUILT in CADOS_M02** as `CADAGENT_PUMP`; runtime-verified headless (see `reports\live_pump_latest.json`).
-
-## CADOS_M02 (v1.0.0 — PASS)
-
-CADOS_M02 took the layer to a **live, validated read + write + visual + live-pump stack** (15/15 acceptance criteria PASS):
-
-- **Rich IR is live:** `python tools\cadctl_cli.py inspect --dwg <p> --out <dir> --include-rich` →
-  `coverage_level=native_full` IR (symbol tables, blocks, layouts, xrefs, dictionaries, xrecords, db-meta; 21747 truth).
-  Native `inspect.database.graph` is **router-wired** (D2 resolved).
-- **Staged patch is real:** `patch_engine.apply_staged(...)` → stage copy → native write (write_copy) → diff → 14/14
-  validation → journal; original byte-unchanged (live: +1 LINE 21747→21748). D5 patch-execution resolved.
-- **`.arx` relink resolved (D1):** versioned `Ariadne.AcadNative.live_m02.arx`; `tools\build_native_acad.ps1` is lock-resilient.
-- **Tests:** `python -m pytest tests -q` → 215 pass / 2 skip.
-- **Non-ASCII (PASS):** layer names are correct Hangul, proven by code points (the earlier "mojibake" was a cp949-console display artifact, retracted).
-- **Visual (PASS):** real IR→SVG `before/after/overlay` + `visual_diff` (`runs\m02_visual`).
-- **Live ARX pump (PASS):** `CADAGENT_PUMP` named-pipe server, runtime-verified headless (`live.echo/status/list_documents/stop`, 21747).
-- **M03 depth (within crit4 PASS):** native hatch boundary geometry, per-entity xdata, extension dictionaries. See `reports\v1_acceptance_latest.md`.
-
-Authoritative M02 report: `reports\CADOS_M02_V1_COMPLETION_ULTRACODE.md`. Re-entry: `handoff\TAKEOVER.md`.
+Proprietary / internal use — see [`LICENSE`](LICENSE). Third-party components (AutoCAD/
+ObjectARX = Autodesk; LibreDWG = GPL sidecar-only; Python packages) keep their own terms.
