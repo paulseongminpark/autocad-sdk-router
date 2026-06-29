@@ -1,5 +1,5 @@
 param(
-  [ValidateSet('status', 'select', 'run', 'explain')]
+  [ValidateSet('status', 'select', 'run', 'explain', 'run-native-batch')]
   [string]$Action = 'status',
   [string]$Intent = 'auto',
   [string]$Route = '',
@@ -15,6 +15,7 @@ param(
   [ValidateSet('auto', 'coreconsole', 'full_autocad')]
   [string]$HostMode = 'auto',
   [string]$Operation = '',
+  [string]$OpListPath = '',
   [string]$RouterHome = '',
   [string]$ConfigPath = '',
   [string]$PythonExe = ''
@@ -57,7 +58,24 @@ $LatestStatusPath = Join-Path $RouterHome 'reports\autocad_router_status_latest.
 $RunsDir = Join-Path $RouterHome 'runs'
 $StagingDir = Join-Path $RouterHome 'staging'
 $NativeExtractorProject = Join-Path $RouterHome 'src\Ariadne.DwgGeometryExtractor\Ariadne.DwgGeometryExtractor.csproj'
-$NativeAcadBinDir = if (-not [string]::IsNullOrWhiteSpace($env:ARIADNE_NATIVE_ACAD_BIN_DIR)) { $env:ARIADNE_NATIVE_ACAD_BIN_DIR } else { Join-Path $RouterHome 'src\Ariadne.AcadNative\bin\x64\Release' }
+$NativeAcadBinDir = if (-not [string]::IsNullOrWhiteSpace($env:ARIADNE_NATIVE_ACAD_BIN_DIR)) {
+  $env:ARIADNE_NATIVE_ACAD_BIN_DIR
+}
+else {
+  # Distribution-first: a cloned repo ships compiled native modules under
+  # prebuilt\<acad-version>\ (committed). Pick the highest version dir that actually
+  # contains the headless .crx. Maintainers testing a FRESH local build set
+  # $env:ARIADNE_NATIVE_ACAD_BIN_DIR to the build output. Final fallback = build output.
+  $prebuiltRoot = Join-Path $RouterHome 'prebuilt'
+  $picked = $null
+  if (Test-Path -LiteralPath $prebuiltRoot) {
+    $picked = Get-ChildItem -LiteralPath $prebuiltRoot -Directory -ErrorAction SilentlyContinue |
+      Sort-Object Name -Descending |
+      Where-Object { Test-Path -LiteralPath (Join-Path $_.FullName 'Ariadne.AcadNative.crx') } |
+      Select-Object -First 1
+  }
+  if ($picked) { $picked.FullName } else { Join-Path $RouterHome 'src\Ariadne.AcadNative\bin\x64\Release' }
+}
 
 function Read-JsonFile {
   param([string]$Path)
@@ -95,6 +113,37 @@ function Resolve-NativeExtractorDll {
     throw "Native DWG geometry extractor build failed (exit $code): $tail"
   }
   return (Resolve-Path -LiteralPath $dll).Path
+}
+
+function Resolve-AcadEnginePath {
+  # Version-agnostic accoreconsole resolution so an AutoCAD upgrade (2027 -> 2028 ...) or a
+  # teammate on a DIFFERENT AutoCAD version needs ZERO code/config edits. Resolution order:
+  #   1) $env:ARIADNE_ACAD_ENGINE_PATH (explicit override)
+  #   2) the capabilities-declared default, if it actually exists on this machine
+  #   3) auto-detect: highest "<ProgramFiles>\Autodesk\AutoCAD 20NN\accoreconsole.exe"
+  #   4) 'accoreconsole' on PATH
+  # Falls back to the default string so the caller's own existence check stays honest.
+  param([string]$Default = '')
+  if (-not [string]::IsNullOrWhiteSpace($env:ARIADNE_ACAD_ENGINE_PATH) -and (Test-Path -LiteralPath $env:ARIADNE_ACAD_ENGINE_PATH)) {
+    return $env:ARIADNE_ACAD_ENGINE_PATH
+  }
+  if (-not [string]::IsNullOrWhiteSpace($Default) -and (Test-Path -LiteralPath $Default)) {
+    return $Default
+  }
+  $bases = @($env:ProgramW6432, ${env:ProgramFiles}, "C:\Program Files") |
+    Where-Object { $_ -and (Test-Path -LiteralPath (Join-Path $_ 'Autodesk')) } |
+    ForEach-Object { Join-Path $_ 'Autodesk' } | Select-Object -Unique
+  foreach ($b in $bases) {
+    $hit = Get-ChildItem -LiteralPath $b -Directory -Filter 'AutoCAD 20*' -ErrorAction SilentlyContinue |
+      Sort-Object Name -Descending |
+      ForEach-Object { Join-Path $_.FullName 'accoreconsole.exe' } |
+      Where-Object { Test-Path -LiteralPath $_ } |
+      Select-Object -First 1
+    if ($hit) { return $hit }
+  }
+  $cmd = Get-Command accoreconsole.exe -ErrorAction SilentlyContinue
+  if ($cmd) { return $cmd.Source }
+  return $Default
 }
 
 function Resolve-NativeAcadModule {
@@ -145,46 +194,57 @@ function Get-CadJobJigPointLine {
   }
 }
 
+$script:_NativeJobOpSet = $null
+
+function Get-NativeJobOpSet {
+  # Build (once per process) the set of op ids whose registry handler routes to the
+  # native ObjectARX job lane (handler.router_lane == 'ARIADNE_NATIVE_JOB'), i.e. the
+  # headless .crx/.dbx dispatch. The registry (operations.v2.json) is the SoT, so this
+  # stays in sync as native handlers are added -- no hand-maintained allow-list drift.
+  if ($null -ne $script:_NativeJobOpSet) { return $script:_NativeJobOpSet }
+  $set = @{}
+  try {
+    $regPath = Join-Path $RouterHome 'config\operations.v2.json'
+    if (Test-Path -LiteralPath $regPath) {
+      $reg = Get-Content -LiteralPath $regPath -Raw -Encoding UTF8 | ConvertFrom-Json
+      foreach ($op in $reg.operations) {
+        $lane = if ($op.handler) { $op.handler.router_lane } else { $null }
+        if ($lane -eq 'ARIADNE_NATIVE_JOB') {
+          $oid = if ($op.id) { $op.id } else { $op.operation }
+          if ($oid) { $set[[string]$oid] = $true }
+        }
+      }
+    }
+  }
+  catch { }
+  $script:_NativeJobOpSet = $set
+  return $set
+}
+
 function Test-NativeP1CadJobOperation {
   param([string]$OperationName)
+  if ([string]::IsNullOrWhiteSpace($OperationName)) { return $false }
+  $set = Get-NativeJobOpSet
+  if ($set.Count -gt 0) { return [bool]$set.ContainsKey($OperationName) }
+  # Legacy explicit fallback -- used ONLY if the registry could not be read.
   return @(
-    'inspect.database.summary',
-    'inspect.database.graph',
-    'write.layer.create',
-    'write.entity.line',
-    'write.entity.circle',
-    'inspect.entity.count',
-    'write.xrecord.set',
-    'inspect.xrecord.get',
-    'write.xdata.set',
-    'inspect.xdata.get',
-    'write.block.simple_create',
-    'write.block.insert',
-    'inspect.block.count',
-    'write.layout.create',
-    'inspect.layout.list',
-    'inspect.xref.list',
-    'inspect.runtime.capabilities',
-    'live.reactor.enable',
-    'inspect.reactor.registry',
-    'live.reactor.disable',
-    'inspect.overrule.registry',
-    'live.overrule.enable',
-    'live.overrule.disable',
-    'inspect.jig.host_support',
-    'live.jig.point_probe',
-    'extend.customclass.create',
-    'inspect.customclass.count',
-    'extend.customobject.create',
-    'inspect.customobject.count',
-    'inspect.protocol.queryx'
+    'inspect.database.summary', 'inspect.database.graph', 'write.layer.create',
+    'write.entity.line', 'write.entity.circle', 'inspect.entity.count',
+    'write.xrecord.set', 'inspect.xrecord.get', 'write.xdata.set', 'inspect.xdata.get',
+    'write.block.simple_create', 'write.block.insert', 'inspect.block.count',
+    'write.layout.create', 'inspect.layout.list', 'inspect.xref.list',
+    'inspect.runtime.capabilities', 'live.reactor.enable', 'inspect.reactor.registry',
+    'live.reactor.disable', 'inspect.overrule.registry', 'live.overrule.enable',
+    'live.overrule.disable', 'inspect.jig.host_support', 'live.jig.point_probe',
+    'extend.customclass.create', 'inspect.customclass.count', 'extend.customobject.create',
+    'inspect.customobject.count', 'inspect.protocol.queryx'
   ) -contains $OperationName
 }
 
 function Test-NativeAcadModules {
   param([object]$Capabilities, [bool]$ProbeCoreConsoleLoad = $false)
   $cap = @($Capabilities.routes | Where-Object { $_.id -eq 'dwg_truth_autocad' }) | Select-Object -First 1
-  $engine = if ($cap) { $cap.engine_path } else { '' }
+  $engine = if ($cap) { Resolve-AcadEnginePath -Default $cap.engine_path } else { Resolve-AcadEnginePath -Default '' }
   $dbx = Join-Path $NativeAcadBinDir 'Ariadne.AcadNativeDbx.dbx'
   $crx = Join-Path $NativeAcadBinDir 'Ariadne.AcadNative.crx'
   $arx = Join-Path $NativeAcadBinDir 'Ariadne.AcadNative.arx'
@@ -455,7 +515,8 @@ function Invoke-AccoreScr {
   # the input is a staged copy or the original DWG path.
   param(
     [string]$Engine, [string]$StagedDwg, [string]$ScrPath, [string]$DwgDir,
-    [string]$RunOut, [hashtable]$EnvVars = @{}, [string]$Tag = 'job'
+    [string]$RunOut, [hashtable]$EnvVars = @{}, [string]$Tag = 'job',
+    [int]$TimeoutMs = 120000
   )
   $stdoutFile = Join-Path $RunOut ("accoreconsole_{0}_stdout.txt" -f $Tag)
   $stderrFile = Join-Path $RunOut ("accoreconsole_{0}_stderr.txt" -f $Tag)
@@ -470,10 +531,10 @@ function Invoke-AccoreScr {
     $p = Start-Process -FilePath $Engine -ArgumentList @('/i', $StagedDwg, '/s', $ScrPath) `
       -WorkingDirectory $DwgDir -PassThru -WindowStyle Hidden `
       -RedirectStandardOutput $stdoutFile -RedirectStandardError $stderrFile
-    $exited = $p.WaitForExit(120000)
+    $exited = $p.WaitForExit($TimeoutMs)
     if (-not $exited) {
       try { $p.Kill() } catch {}
-      return [ordered]@{ ExitCode = -2; StdoutTail = 'accoreconsole timed out (120s)'; Hygiene = $null }
+      return [ordered]@{ ExitCode = -2; StdoutTail = ("accoreconsole timed out ({0}ms)" -f $TimeoutMs); Hygiene = $null }
     }
     $code = $p.ExitCode
   }
@@ -894,7 +955,7 @@ function Invoke-FullAutoCadCadJob {
 function Invoke-DwgWriteOriginalScript {
   param([object]$Capabilities)
   $cap = @($Capabilities.routes | Where-Object { $_.id -eq 'dwg_truth_autocad' }) | Select-Object -First 1
-  $engine = $cap.engine_path
+  $engine = Resolve-AcadEnginePath -Default $cap.engine_path
   if (-not (Test-Path -LiteralPath $engine)) {
     return [ordered]@{ engine_exit_code = -1; engine_output = "accoreconsole not found at $engine" }
   }
@@ -936,7 +997,7 @@ function Invoke-DwgWriteOriginalScript {
 function Invoke-CadJobRoute {
   param([object]$Capabilities)
   $cap = @($Capabilities.routes | Where-Object { $_.id -eq 'dwg_truth_autocad' }) | Select-Object -First 1
-  $engine = $cap.engine_path
+  $engine = Resolve-AcadEnginePath -Default $cap.engine_path
   if (-not (Test-Path -LiteralPath $engine)) {
     return [ordered]@{ engine_exit_code = -1; engine_output = "accoreconsole not found at $engine" }
   }
@@ -1092,6 +1153,133 @@ function Invoke-CadJobRoute {
   }
 }
 
+function Invoke-CadNativeBatchRoute {
+  # EXHAUSTIVE native-op smoke in ONE accoreconsole session. Loads .dbx/.crx ONCE,
+  # then for each op_id in -OpListPath runs ARIADNE_NATIVE_JOB with a fresh per-op
+  # job/result via (setenv) (readJobPathSetting reads acedGetEnv first). accoreconsole
+  # startup (~10s) is paid once, so 454 ops finish in ~1 min instead of ~75. Read mode
+  # only (no QSAVE): the staged copy is mutated in-memory at most and never saved, so
+  # the original AND the on-disk staged copy stay byte-identical. Each op writes its own
+  # result JSON immediately, so a mid-session timeout still yields partial results + the
+  # exact hang point. Purpose: prove every NATIVE_JOB-routed op reaches the native module
+  # (engine=native_objectarx, not the managed fall-through) and classify its outcome.
+  param([object]$Capabilities, [int]$TimeoutMs = 600000)
+  $cap = @($Capabilities.routes | Where-Object { $_.id -eq 'dwg_truth_autocad' }) | Select-Object -First 1
+  $engine = Resolve-AcadEnginePath -Default $cap.engine_path
+  if (-not (Test-Path -LiteralPath $engine)) {
+    return [ordered]@{ status = 'UNAVAILABLE'; detail = "accoreconsole not found at $engine" }
+  }
+  if ([string]::IsNullOrWhiteSpace($InputPath) -or -not (Test-Path -LiteralPath $InputPath)) {
+    return [ordered]@{ status = 'ERROR'; detail = 'run-native-batch requires -InputPath <existing.dwg>.' }
+  }
+  if ([string]::IsNullOrWhiteSpace($OpListPath) -or -not (Test-Path -LiteralPath $OpListPath)) {
+    return [ordered]@{ status = 'ERROR'; detail = "run-native-batch requires -OpListPath <ops.json> (JSON array of op ids). Got: '$OpListPath'" }
+  }
+  $opList = @(Get-Content -LiteralPath $OpListPath -Raw -Encoding UTF8 | ConvertFrom-Json)
+  if ($opList.Count -eq 0) {
+    return [ordered]@{ status = 'ERROR'; detail = "op list is empty: $OpListPath" }
+  }
+
+  $stamp = Get-Date -Format 'yyyyMMdd_HHmmss'
+  $runOut = Join-Path $RunsDir "native_batch_$stamp"
+  $jobsDir = Join-Path $runOut 'jobs'
+  $resDir = Join-Path $runOut 'results'
+  New-Item -ItemType Directory -Force -Path $runOut, $jobsDir, $resDir | Out-Null
+
+  # ASCII-staged read-only copy (never saved).
+  $stageRoot = Join-Path $StagingDir "native_batch_$stamp"
+  New-Item -ItemType Directory -Force -Path $stageRoot | Out-Null
+  $stagedDwg = Join-Path $stageRoot 'input.dwg'
+  Copy-Item -LiteralPath $InputPath -Destination $stagedDwg -Force
+  Set-ItemProperty -LiteralPath $stagedDwg -Name IsReadOnly -Value $false
+  $dwgDir = Split-Path -Parent $stagedDwg
+
+  $dbx = Resolve-NativeAcadModule -LeafName 'Ariadne.AcadNativeDbx.dbx'
+  $crx = Resolve-NativeAcadModule -LeafName 'Ariadne.AcadNative.crx'
+  $dbxFwd = $dbx.Replace('\', '/')
+  $crxFwd = $crx.Replace('\', '/')
+  $trusted = (Split-Path -Parent $crx).Replace('\', '\\')
+
+  $scrLines = [System.Collections.Generic.List[string]]::new()
+  $scrLines.Add('(setvar "SECURELOAD" 0)')
+  $scrLines.Add('(setvar "FILEDIA" 0)')
+  $scrLines.Add('(setvar "CMDECHO" 0)')
+  $scrLines.Add(("(setvar `"TRUSTEDPATHS`" `"$trusted`")"))
+  $scrLines.Add(("(arxload `"$dbxFwd`")"))
+  $scrLines.Add(("(arxload `"$crxFwd`")"))
+
+  $manifest = [System.Collections.Generic.List[object]]::new()
+  $idx = 0
+  foreach ($op in $opList) {
+    $idx += 1
+    $opId = [string]$op
+    if ([string]::IsNullOrWhiteSpace($opId)) { continue }
+    $safe = ('{0:D3}_{1}' -f $idx, ($opId -replace '[^A-Za-z0-9_.-]', '_'))
+    $jobPath = Join-Path $jobsDir ($safe + '.json')
+    $resPath = Join-Path $resDir ($safe + '.json')
+    Write-Json -Payload ([ordered]@{
+      schema     = 'ariadne.autocad_sdk_job.v1'
+      operation  = $opId
+      write_mode = 'read'
+    }) -Path $jobPath | Out-Null
+    $jobFwd = $jobPath.Replace('\', '/')
+    $resFwd = $resPath.Replace('\', '/')
+    $scrLines.Add(('(setenv "ARIADNE_CAD_JOB_IN" "{0}")' -f $jobFwd))
+    $scrLines.Add(('(setenv "ARIADNE_CAD_JOB_OUT" "{0}")' -f $resFwd))
+    $scrLines.Add('(setenv "ARIADNE_CAD_JOB_HOST_MODE" "coreconsole")')
+    $scrLines.Add('ARIADNE_NATIVE_JOB')
+    $manifest.Add([ordered]@{ index = $idx; operation = $opId; result_file = $resPath })
+  }
+  $scrLines.Add('QUIT')
+  $scrLines.Add('')
+  $scrPath = Join-Path $runOut 'native_batch.scr'
+  Set-Content -LiteralPath $scrPath -Value $scrLines -Encoding ASCII
+
+  $r = Invoke-AccoreScr -Engine $engine -StagedDwg $stagedDwg -ScrPath $scrPath -DwgDir $dwgDir -RunOut $runOut -EnvVars @{} -Tag 'native_batch' -TimeoutMs $TimeoutMs
+
+  # Collect per-op results (files written incrementally; survive a timeout kill).
+  $results = [System.Collections.Generic.List[object]]::new()
+  $counts = @{}
+  foreach ($m in $manifest) {
+    $st = 'no_result'; $eng = ''; $code = ''
+    if (Test-Path -LiteralPath $m.result_file) {
+      try {
+        $j = Get-Content -LiteralPath $m.result_file -Raw -Encoding UTF8 | ConvertFrom-Json
+        $eng = "$($j.engine)"
+        $st = "$($j.status)"
+        if ($j.PSObject.Properties.Name -contains 'error' -and $null -ne $j.error) {
+          $code = "$($j.error.code)"
+        }
+        if ([string]::IsNullOrWhiteSpace($code) -and $j.PSObject.Properties.Name -contains 'reason') { $code = "$($j.reason)" }
+      }
+      catch { $st = 'unparseable_result' }
+    }
+    # bucket: ok | host_required | error:<code> | no_result | unparseable_result
+    $bucket = $st
+    if ($st -eq 'error' -and -not [string]::IsNullOrWhiteSpace($code)) { $bucket = "error:$code" }
+    if ($counts.ContainsKey($bucket)) { $counts[$bucket]++ } else { $counts[$bucket] = 1 }
+    $results.Add([ordered]@{ index = $m.index; operation = $m.operation; status = $st; engine = $eng; error_code = $code })
+  }
+
+  $reachedNative = @($results | Where-Object { $_.engine -eq 'native_objectarx' }).Count
+  $noResult = @($results | Where-Object { $_.status -eq 'no_result' }).Count
+
+  [ordered]@{
+    schema           = 'ariadne.autocad_native_batch.v1'
+    status           = if ($r.ExitCode -eq 0 -and $noResult -eq 0) { 'PASS' } elseif ($noResult -gt 0) { 'PARTIAL' } else { 'COMPLETED_WITH_ERRORS' }
+    engine_exit_code = $r.ExitCode
+    ops_total        = $manifest.Count
+    reached_native   = $reachedNative
+    no_result        = $noResult
+    original_input   = $InputPath
+    staged_copy      = $stagedDwg
+    run_out          = $runOut
+    bucket_counts    = ([ordered]@{} + $counts)
+    process_hygiene  = $r.Hygiene
+    results          = $results
+  }
+}
+
 function Invoke-AutoCadRoute {
   # DWG ground-truth via accoreconsole. Priority chain (most authoritative first):
   #   ObjectARX (active document) -> ObjectDBX (side database) -> AutoLISP (ssget count).
@@ -1103,7 +1291,7 @@ function Invoke-AutoCadRoute {
   #   objectdbx = dbx only ; summary = autolisp only.
   param([object]$Capabilities)
   $cap = @($Capabilities.routes | Where-Object { $_.id -eq 'dwg_truth_autocad' }) | Select-Object -First 1
-  $engine = $cap.engine_path
+  $engine = Resolve-AcadEnginePath -Default $cap.engine_path
   if (-not (Test-Path -LiteralPath $engine)) {
     return [ordered]@{ engine_exit_code = -1; engine_output = "accoreconsole not found at $engine" }
   }
@@ -1305,6 +1493,11 @@ switch ($Action) {
       executed_route = $sel
       execution     = $exec
     })
+  }
+  'run-native-batch' {
+    $status = Get-Status -Capabilities $capabilities
+    $batch = Invoke-CadNativeBatchRoute -Capabilities $capabilities
+    Write-Json -Payload $batch
   }
   'explain' {
     if (-not [string]::IsNullOrWhiteSpace($Operation)) {

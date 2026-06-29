@@ -22,6 +22,7 @@ Usage:
 No side effects on CAD files. Read-only.
 """
 import argparse
+import glob
 import importlib.metadata as M
 import json
 import os
@@ -112,10 +113,29 @@ def _cli(candidates):
     return None
 
 
-ACCORECONSOLE_CANDIDATES = [
-    r"C:\Program Files\Autodesk\AutoCAD 2027\accoreconsole.exe",
-    "accoreconsole.exe", "accoreconsole",
-]
+def _detect_accoreconsole_candidates():
+    # Version-agnostic: env override first, then EVERY installed AutoCAD 20NN
+    # (highest version first), then PATH. An AutoCAD upgrade or a teammate on a
+    # different version resolves with zero edits.
+    cands = []
+    env = os.environ.get("ARIADNE_ACAD_ENGINE_PATH")
+    if env:
+        cands.append(env)
+    seen = set()
+    for b in (os.environ.get("ProgramW6432"), os.environ.get("ProgramFiles"), r"C:\Program Files"):
+        if not b:
+            continue
+        adsk = os.path.join(b, "Autodesk")
+        for d in sorted(glob.glob(os.path.join(adsk, "AutoCAD 20*")), reverse=True):
+            exe = os.path.join(d, "accoreconsole.exe")
+            if exe not in seen:
+                seen.add(exe)
+                cands.append(exe)
+    cands += ["accoreconsole.exe", "accoreconsole"]
+    return cands
+
+
+ACCORECONSOLE_CANDIDATES = _detect_accoreconsole_candidates()
 FREECAD_CANDIDATES = [
     r"C:\Users\PAUL\AppData\Local\Programs\FreeCAD 1.1\bin\freecadcmd.exe",
     "freecadcmd.exe", "freecadcmd",

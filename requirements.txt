@@ -1,0 +1,11 @@
+# CAD OS — CORE control plane (DWG-native via AutoCAD).
+#
+# The AutoCAD/DWG core (cad.run_operation, inspect, patch, diff, validate, query,
+# the 457 native ObjectARX ops, and the cadagent MCP server) is PURE PYTHON STDLIB.
+# The only third-party dependency is jsonschema, and even that is optional — the
+# validator/IR modules import-guard it and degrade gracefully if it is absent.
+#
+# So: this one tiny pure-python package is all you need for full AutoCAD control.
+# Python 3.10+ recommended (3.12 matches the build environment).
+
+jsonschema>=4.0

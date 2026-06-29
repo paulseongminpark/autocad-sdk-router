@@ -1,0 +1,31 @@
+# CAD OS — OPTIONAL: the 10 non-AutoCAD geometry routes.
+#
+# NOT needed for AutoCAD/DWG control. Install ONLY if you use these routes:
+#   dxf (ezdxf+shapely) · ifc (ifcopenshell) · step/brep (cadquery+OCP) ·
+#   mesh (trimesh/meshio/open3d) · pointcloud (open3d/laspy) ·
+#   geo (pyogrio/pyproj) · pdf/svg (svgpathtools/svgelements/PyMuPDF) ·
+#   raster (opencv/scikit-image).
+#
+#   pip install -r requirements-full.txt
+#
+# Versions intentionally unpinned (these wheels are platform-sensitive on Windows);
+# pin to your verified set once installed. Some (open3d, cadquery/OCP, PyMuPDF) are
+# large and occasionally need a specific Python/ABI — install on demand, not by default.
+
+-r requirements.txt
+
+ezdxf
+shapely
+ifcopenshell
+cadquery
+trimesh
+meshio
+open3d
+laspy
+pyogrio
+pyproj
+svgpathtools
+svgelements
+PyMuPDF
+opencv-python-headless
+scikit-image
