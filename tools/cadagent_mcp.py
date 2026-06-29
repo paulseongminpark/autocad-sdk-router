@@ -53,7 +53,8 @@ _ROUTER_HOME = os.path.dirname(_THIS_DIR)
 
 SERVER_NAME = "cadagent-mcp"
 SERVER_VERSION = "0.1.0"
-TRANSPORT = "mock"  # stdlib JSON-RPC-over-stdio mock; not a production MCP server
+TRANSPORT = "mock"  # stdlib JSON-RPC-over-stdio; not a 3rd-party MCP lib
+PROTOCOL_VERSION = "2025-06-18"  # MCP spec revision this server speaks
 
 
 # --------------------------------------------------------------------------- #
@@ -101,6 +102,22 @@ def _err(message: str, **extra: Any) -> Dict[str, Any]:
     out = {"ok": False, "status": "error", "error": message}
     out.update(extra)
     return out
+
+
+def _tool_result(payload: Dict[str, Any], is_error: bool = False) -> Dict[str, Any]:
+    """Wrap a handler dict into an MCP CallToolResult.
+
+    Real MCP clients require tools/call results to carry a `content` array of
+    content blocks. We serialise the handler's structured dict as one text block
+    (pretty JSON) AND expose it as `structuredContent` for structured-output
+    clients. Without this wrapper a real client rejects every tool invocation.
+    """
+    return {
+        "content": [{"type": "text",
+                     "text": json.dumps(payload, ensure_ascii=False, indent=2)}],
+        "structuredContent": payload,
+        "isError": bool(is_error),
+    }
 
 
 def _cad():
@@ -336,6 +353,33 @@ def _tool_live_status(args: Dict[str, Any]) -> Dict[str, Any]:
         return _err("cadctl.live_status failed: %r" % exc)
 
 
+def _tool_run_operation(args: Dict[str, Any]) -> Dict[str, Any]:
+    """Drive ANY implemented registry operation through the native job lane.
+
+    The generic agent-control tool: maps an arbitrary op_id onto the headless
+    ObjectARX native-job lane behind a registry allow-list + write-mode gate.
+    blocked / unknown ops are refused (never executed); write_original is never
+    permitted; the original DWG is READ-ONLY (a copy is staged). Delegates to
+    cadctl.Cad.run_operation.
+    """
+    op_id = args.get("op_id") or args.get("operation") or args.get("id")
+    if not op_id:
+        return _err("missing required arg: op_id")
+    cad, e = _cad()
+    if cad is None:
+        return _err(e, delegate="cadctl.Cad.run_operation")
+    try:
+        return {"ok": True, "result": cad.run_operation(
+            op_id,
+            args=args.get("args"),
+            write_mode=args.get("write_mode"),
+            dwg_path=args.get("dwg") or args.get("dwg_path"),
+            out_dir=args.get("out") or args.get("out_dir"),
+        )}
+    except Exception as exc:  # noqa: BLE001
+        return _err("cadctl.run_operation failed: %r" % exc)
+
+
 # --------------------------------------------------------------------------- #
 # Tools manifest (self-describing) and dispatch table
 # --------------------------------------------------------------------------- #
@@ -511,6 +555,31 @@ _TOOLS: List[Dict[str, Any]] = [
         "delegates_to": "cadctl.Cad.live_status",
         "inputSchema": {"type": "object", "properties": {}, "additionalProperties": False},
     },
+    {
+        "name": "cad.run_operation",
+        "description": "Drive ANY implemented registry operation (the native ObjectARX op surface) "
+                       "through the headless native job lane. Allow-list gated: only status=='implemented' "
+                       "ops run; blocked/unknown are refused (executed=false), never faked. Write-mode "
+                       "governance: defaults to the op's registry default_write_mode; an explicit write_mode "
+                       "must be in the op's allowed_write_modes; 'write_original' is NEVER permitted (the "
+                       "original DWG is READ-ONLY -- a copy is staged and its sha verified unchanged). "
+                       "Delegates to cadctl.Cad.run_operation.",
+        "delegates_to": "cadctl.Cad.run_operation",
+        "inputSchema": {
+            "type": "object",
+            "properties": {
+                "op_id": {"type": "string", "description": "Registry operation id, e.g. 'inspect.layers'."},
+                "dwg": {"type": "string", "description": "Source DWG path (read-only original; a copy is staged)."},
+                "out": {"type": "string", "description": "Output run directory (optional)."},
+                "write_mode": {"type": "string",
+                               "description": "read|write_copy|live_edit (default = op's registry default; "
+                                              "write_original is refused)."},
+                "args": {"type": "object", "description": "Optional op-specific arguments for the native job."},
+            },
+            "required": ["op_id"],
+            "additionalProperties": False,
+        },
+    },
 ]
 
 _DISPATCH: Dict[str, Callable[[Dict[str, Any]], Dict[str, Any]]] = {
@@ -526,6 +595,7 @@ _DISPATCH: Dict[str, Callable[[Dict[str, Any]], Dict[str, Any]]] = {
     "cad.diff_before_after": _tool_diff_before_after,
     "cad.visual_report": _tool_visual_report,
     "cad.live_status": _tool_live_status,
+    "cad.run_operation": _tool_run_operation,
 }
 
 
@@ -584,9 +654,13 @@ def handle_rpc(request: Dict[str, Any]) -> Optional[str]:
     is_notification = "id" not in request
 
     if method == "initialize":
-        res = {"serverInfo": {"name": SERVER_NAME, "version": SERVER_VERSION},
-               "transport": TRANSPORT,
-               "capabilities": {"tools": {"listChanged": False}}}
+        # Echo the client's requested protocol version (negotiation); else ours.
+        # Without protocolVersion a real MCP client aborts the handshake -> 0 tools.
+        client_pv = params.get("protocolVersion")
+        res = {"protocolVersion": client_pv or PROTOCOL_VERSION,
+               "capabilities": {"tools": {"listChanged": False}},
+               "serverInfo": {"name": SERVER_NAME, "version": SERVER_VERSION},
+               "transport": TRANSPORT}
         return None if is_notification else _rpc_result(req_id, res)
 
     if method == "tools/list":
@@ -603,9 +677,19 @@ def handle_rpc(request: Dict[str, Any]) -> Optional[str]:
         try:
             result = handler(arguments)
         except Exception as exc:  # noqa: BLE001
-            return None if is_notification else _rpc_error(
-                req_id, -32000, "tool execution error", data=repr(exc))
-        return None if is_notification else _rpc_result(req_id, result)
+            return None if is_notification else _rpc_result(
+                req_id, _tool_result(
+                    {"ok": False, "status": "error",
+                     "error": "tool execution error: %r" % exc}, is_error=True))
+        # MCP CallToolResult: wrap the handler dict in content[] + structuredContent.
+        is_err = isinstance(result, dict) and result.get("ok") is False
+        return None if is_notification else _rpc_result(
+            req_id, _tool_result(result, is_error=is_err))
+
+    if method in ("notifications/initialized", "initialized", "notifications/cancelled"):
+        return None  # ack lifecycle notifications silently (no reply)
+    if method == "ping":
+        return None if is_notification else _rpc_result(req_id, {})
 
     return None if is_notification else _rpc_error(
         req_id, -32601, "unknown method: %s" % method)
@@ -640,7 +724,7 @@ _EXPECTED_TOOLS = {
     "cad.status", "cad.inspect_drawing", "cad.query_entities", "cad.get_entity",
     "cad.validate_ir", "cad.registry_status", "cad.registry_explain",
     "cad.patch_dry_run", "cad.patch_apply_staged", "cad.diff_before_after",
-    "cad.visual_report", "cad.live_status",
+    "cad.visual_report", "cad.live_status", "cad.run_operation",
 }
 
 # Trivial (often invalid/missing) args per tool. The contract: EVERY handler must
@@ -660,6 +744,7 @@ _SELFTEST_ARGS: Dict[str, Dict[str, Any]] = {
     "cad.diff_before_after": {},   # missing args / degraded -> dict
     "cad.visual_report": {"source_ref": "/nonexistent/source.dwg", "kind": "png"},
     "cad.live_status": {},
+    "cad.run_operation": {"op_id": "inspect.database.graph"},  # no dwg -> refusal dict (no accoreconsole)
 }
 
 
@@ -691,17 +776,18 @@ def _selftest() -> int:
             all_dicts = False
         else:
             # surface the handler's own status word when present
-            inner = payload.get("result")
+            sc = payload.get("structuredContent") or {}
+            inner = sc.get("result")
             status_word = None
             if isinstance(inner, dict):
                 status_word = inner.get("status")
-            per_tool[name] = status_word or ("ok" if payload.get("ok") else "err")
+            per_tool[name] = status_word or ("ok" if sc.get("ok") else "err")
 
     listed = handle_rpc({"jsonrpc": "2.0", "id": 1, "method": "tools/list"})
 
     ok = (
         manifest["transport"] == "mock"
-        and len(manifest["tools"]) == 12
+        and len(manifest["tools"]) == 13
         and manifest_names == _EXPECTED_TOOLS
         # manifest and dispatch table must agree exactly (no orphan tools).
         and set(_DISPATCH.keys()) == manifest_names

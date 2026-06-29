@@ -571,6 +571,34 @@ def _resolve_native_write_op(patch: Dict[str, Any]) -> Tuple[Optional[Dict[str, 
              "native_op": native_op, "args": op.get("args", {}) or {}}, None)
 
 
+def _resolve_native_write_ops(patch: Dict[str, Any]) -> Tuple[List[Dict[str, Any]], List[Dict[str, Any]]]:
+    """Resolve EVERY patch operation to its native write op (multi-op apply).
+
+    Returns (applied, deferred): ``applied`` = the ops (in order) that have a live
+    native write handler; ``deferred`` = ops with no handler -- reported, never
+    applied, never faked. apply_staged applies every ``applied`` op in sequence,
+    chaining each op's mutated staged copy into the next op's input.
+    """
+    ops = patch.get("operations") or []
+    applied: List[Dict[str, Any]] = []
+    deferred: List[Dict[str, Any]] = []
+    for i, op in enumerate(ops if isinstance(ops, list) else []):
+        if not isinstance(op, dict):
+            deferred.append({"index": i, "operation": None, "status": "deferred",
+                             "reason": "operation is not an object"})
+            continue
+        patch_op = op.get("operation")
+        native_op = NATIVE_WRITE_OP_MAP.get(patch_op)
+        if native_op is None:
+            deferred.append({"index": i, "operation": patch_op, "status": "deferred",
+                             "reason": "no live native write handler (supported: %s)"
+                                       % sorted(NATIVE_WRITE_OP_MAP)})
+            continue
+        applied.append({"index": i, "step_id": op.get("step_id"), "patch_op": patch_op,
+                        "native_op": native_op, "args": op.get("args", {}) or {}})
+    return applied, deferred
+
+
 def _native_job_doc(native_op: str, args: Dict[str, Any]) -> Dict[str, Any]:
     """Build a minimal ariadne.cad_job.v2 doc for the native write op.
 
@@ -821,23 +849,22 @@ def apply_staged(patch: Dict[str, Any], dwg_path: str, out_dir: str) -> Dict[str
             original_unchanged=None,
             reason="guards failed: %s" % ", ".join(failed)))
 
-    # resolve the native write op BEFORE touching the disk (no-fake-success) ----
-    op_record, op_err = _resolve_native_write_op(patch)
-    if op_record is None:
-        _step("resolve_native_write_op", "not_implemented", reason=op_err)
+    # resolve the native write op(s) BEFORE touching the disk (no-fake-success).
+    # apply_staged applies ALL ops with a live native handler, in order; ops with
+    # no native handler are reported as deferred (never faked).
+    applied_records, deferred_ops = _resolve_native_write_ops(patch)
+    if not applied_records:
+        reason = ("no patch operation has a live native write handler (supported: %s)"
+                  % sorted(NATIVE_WRITE_OP_MAP))
+        _step("resolve_native_write_ops", "not_implemented", reason=reason,
+              deferred=len(deferred_ops))
         return _finish(_result_envelope(
             "not_implemented", patch_id=patch_id, out_dir=out_dir,
             journal_path=journal_path, artifacts=artifacts,
-            original_unchanged=None, reason=op_err))
-    deferred_ops = [
-        {"index": i, "operation": (o.get("operation") if isinstance(o, dict) else None),
-         "status": "deferred",
-         "reason": "apply_staged applies one mutation per call (operations[0] only)"}
-        for i, o in enumerate(patch.get("operations") or []) if i > 0
-    ]
-    _step("resolve_native_write_op", "pass",
-          patch_op=op_record["patch_op"], native_op=op_record["native_op"],
-          deferred=len(deferred_ops))
+            original_unchanged=None, reason=reason, deferred_ops=deferred_ops))
+    _step("resolve_native_write_ops", "pass",
+          applied=[r["native_op"] for r in applied_records],
+          op_count=len(applied_records), deferred=len(deferred_ops))
 
     # sibling lane availability (truthful, before any external command) ---------
     ir_builder, ir_err = _import_optional("ir_builder")
@@ -899,46 +926,60 @@ def apply_staged(patch: Dict[str, Any], dwg_path: str, out_dir: str) -> Dict[str
             reason="pre-inspect failed: %s" % pre.get("reason")))
     artifacts.append({"kind": "ir", "ref": pre["ir_path"]})
 
-    # 6. apply the native write op on the staged copy (write_copy) -------------
-    apply_dir = os.path.join(out_dir, "apply")
-    os.makedirs(apply_dir, exist_ok=True)
-    job_doc = _native_job_doc(op_record["native_op"], op_record["args"])
-    job_path = os.path.join(apply_dir, "cad_job.json")
-    _write_json(job_path, job_doc)
-    apply_run = run_job.run_router_cad_job(
-        staged_path, apply_dir, op_record["native_op"],
-        write_mode="write_copy", job_path=job_path)
-    mutated = apply_run.get("staged_used")  # the router's mutated copy (post-_QSAVE)
-    staged_output = os.path.join(out_dir, "staged_output.dwg")
-    apply_ok = False
-    if mutated and os.path.isfile(mutated):
-        try:
-            shutil.copy2(mutated, staged_output)
-            apply_ok = True
-        except OSError as exc:
-            _step("apply", "partial",
-                  reason="failed to capture staged_output: %s" % exc,
-                  staged_used=mutated, exit_code=apply_run.get("exit_code"))
-    if not apply_ok:
-        reason = (apply_run.get("error")
-                  or "native write op returned no mutated staged copy "
-                     "(staged_used=%r)" % mutated)
-        _step("apply", "unavailable" if apply_run.get("error") else "partial",
-              native_op=op_record["native_op"], staged_used=mutated,
+    # 6. apply EACH native write op on the staged copy, in order (write_copy).
+    # Each op mutates the current staged copy; the router stages + _QSAVEs a copy
+    # and returns it, which we chain as the input to the next op. The original DWG
+    # is never touched. staged_output = the final mutated copy after all ops.
+    current_input = staged_path
+    applied_ok: List[Dict[str, Any]] = []
+    for n, op_record in enumerate(applied_records):
+        apply_dir = os.path.join(out_dir, "apply", "op_%02d" % n)
+        os.makedirs(apply_dir, exist_ok=True)
+        job_doc = _native_job_doc(op_record["native_op"], op_record["args"])
+        job_path = os.path.join(apply_dir, "cad_job.json")
+        _write_json(job_path, job_doc)
+        apply_run = run_job.run_router_cad_job(
+            current_input, apply_dir, op_record["native_op"],
+            write_mode="write_copy", job_path=job_path)
+        mutated = apply_run.get("staged_used")  # router's mutated copy (post-_QSAVE)
+        step_out = os.path.join(apply_dir, "staged_step.dwg")
+        step_ok = False
+        if mutated and os.path.isfile(mutated):
+            try:
+                shutil.copy2(mutated, step_out)
+                step_ok = True
+            except OSError as exc:
+                _step("apply[%d]" % n, "partial",
+                      reason="failed to capture step output: %s" % exc,
+                      native_op=op_record["native_op"], staged_used=mutated)
+        if not step_ok:
+            reason = (apply_run.get("error")
+                      or "native write op returned no mutated staged copy "
+                         "(staged_used=%r)" % mutated)
+            _step("apply[%d]" % n, "unavailable" if apply_run.get("error") else "partial",
+                  native_op=op_record["native_op"], staged_used=mutated,
+                  exit_code=apply_run.get("exit_code"),
+                  stdout=apply_run.get("stdout_path"), stderr=apply_run.get("stderr_path"),
+                  reason=reason)
+            status = "unavailable" if apply_run.get("error") else "partial"
+            return _finish(_result_envelope(
+                status, patch_id=patch_id, out_dir=out_dir,
+                journal_path=journal_path, artifacts=artifacts,
+                original_unchanged=_original_unchanged(),
+                reason="apply[%d] (%s) failed: %s" % (n, op_record["native_op"], reason),
+                deferred_ops=deferred_ops, extra={"applied_ops": applied_ok}))
+        _step("apply[%d]" % n, "pass", native_op=op_record["native_op"],
+              step_output=step_out, staged_used=mutated,
               exit_code=apply_run.get("exit_code"),
-              stdout=apply_run.get("stdout_path"), stderr=apply_run.get("stderr_path"),
-              reason=reason)
-        status = "unavailable" if apply_run.get("error") else "partial"
-        return _finish(_result_envelope(
-            status, patch_id=patch_id, out_dir=out_dir,
-            journal_path=journal_path, artifacts=artifacts,
-            original_unchanged=_original_unchanged(),
-            reason="apply failed: %s" % reason, deferred_ops=deferred_ops))
+              stdout=apply_run.get("stdout_path"), stderr=apply_run.get("stderr_path"))
+        applied_ok.append({"index": op_record["index"], "native_op": op_record["native_op"]})
+        current_input = step_out  # chain: the next op mutates this op's output
+    # final mutated copy after ALL ops
+    staged_output = os.path.join(out_dir, "staged_output.dwg")
+    shutil.copy2(current_input, staged_output)
     artifacts.append({"kind": "dwg_staged", "ref": staged_output})
-    _step("apply", "pass", native_op=op_record["native_op"],
-          staged_output=staged_output, staged_used=mutated,
-          exit_code=apply_run.get("exit_code"),
-          stdout=apply_run.get("stdout_path"), stderr=apply_run.get("stderr_path"))
+    _step("apply", "pass", applied=[r["native_op"] for r in applied_records],
+          op_count=len(applied_records), staged_output=staged_output)
 
     # 7. post-inspect: native_full IR of the mutated output --------------------
     post_dir = os.path.join(out_dir, "post")
@@ -1069,6 +1110,8 @@ def apply_staged(patch: Dict[str, Any], dwg_path: str, out_dir: str) -> Dict[str
         extra={"pre_ir": pre["ir_path"], "post_ir": post["ir_path"],
                "staged_output": staged_output,
                "diff": diff_path,
+               "applied_ops": applied_ok,
+               "op_count_applied": len(applied_ok),
                "entity_count_before": pre.get("entity_count"),
                "entity_count_after": post.get("entity_count")}))
 

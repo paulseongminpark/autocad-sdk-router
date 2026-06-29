@@ -39,7 +39,7 @@ _EXPECTED_TOOLS = {
     "cad.status", "cad.inspect_drawing", "cad.query_entities", "cad.get_entity",
     "cad.validate_ir", "cad.registry_status", "cad.registry_explain",
     "cad.patch_dry_run", "cad.patch_apply_staged", "cad.diff_before_after",
-    "cad.visual_report", "cad.live_status",
+    "cad.visual_report", "cad.live_status", "cad.run_operation",
 }
 
 # Trivial args per tool: deliberately minimal/invalid so handlers report a
@@ -57,6 +57,8 @@ _TRIVIAL_ARGS = {
     "cad.diff_before_after": {},
     "cad.visual_report": {"source_ref": "/nonexistent/source.dwg", "kind": "png"},
     "cad.live_status": {},
+    # op_id only (no dwg) -> run_operation returns a refusal dict; no accoreconsole.
+    "cad.run_operation": {"op_id": "inspect.database.graph"},
 }
 
 
@@ -120,14 +122,18 @@ class TestHandlerDispatchReturnsDict(unittest.TestCase):
             })
             self.assertIsNotNone(resp, "tool %s produced no RPC response" % name)
             obj = json.loads(resp)
-            # tools/call wraps the handler dict in a JSON-RPC "result".
+            # tools/call returns an MCP CallToolResult: content[] + structuredContent.
             self.assertIn("result", obj, "tool %s returned an RPC error: %r"
                           % (name, obj.get("error")))
-            payload = obj["result"]
-            self.assertIsInstance(payload, dict,
+            ctr = obj["result"]
+            self.assertIsInstance(ctr, dict)
+            self.assertIsInstance(ctr.get("content"), list,
+                                  "tool %s result missing content[]" % name)
+            sc = ctr.get("structuredContent")
+            self.assertIsInstance(sc, dict,
                                   "tool %s handler did not return a dict" % name)
             # the handler envelope always carries an 'ok' flag.
-            self.assertIn("ok", payload, "tool %s payload missing 'ok'" % name)
+            self.assertIn("ok", sc, "tool %s payload missing 'ok'" % name)
 
     def test_unknown_tool_is_a_clean_rpc_error_not_a_crash(self):
         resp = self.mcp.handle_rpc({
@@ -144,7 +150,7 @@ class TestHandlerDispatchReturnsDict(unittest.TestCase):
             "jsonrpc": "2.0", "id": 5, "method": "tools/call",
             "params": {"name": "cad.live_status", "arguments": {}},
         })
-        inner = json.loads(resp)["result"]["result"]
+        inner = json.loads(resp)["result"]["structuredContent"]["result"]
         self.assertEqual(inner["status"], "not_implemented")
         self.assertFalse(inner["live"])
 
@@ -155,7 +161,7 @@ class TestHandlerDispatchReturnsDict(unittest.TestCase):
             "jsonrpc": "2.0", "id": 6, "method": "tools/call",
             "params": {"name": "cad.patch_apply_staged", "arguments": {}},
         })
-        payload = json.loads(resp)["result"]
+        payload = json.loads(resp)["result"]["structuredContent"]
         self.assertIsInstance(payload, dict)
         self.assertIn("ok", payload)
 

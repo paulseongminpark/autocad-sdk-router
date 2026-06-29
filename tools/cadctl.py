@@ -668,14 +668,150 @@ class Cad:
     def _registry_operation_status(self, op_id: str | None) -> str | None:
         if not op_id:
             return None
+        rec = self._registry_record(op_id)
+        return rec.get("status") if rec else None
+
+    def _registry_record(self, op_id: str | None) -> dict | None:
+        """Return the full v2 registry record for op_id (by 'id' or 'operation'), or None."""
+        if not op_id:
+            return None
         try:
             reg = _load_json_bom(OPERATIONS_V2)
         except Exception:
             return None
         for rec in reg.get("operations", []) or []:
             if rec.get("id") == op_id or rec.get("operation") == op_id:
-                return rec.get("status")
+                return rec
         return None
+
+    def _run_op_refusal(self, op_id, status_word, reason, out_dir,
+                        registry_status=None, blocked_reason=None) -> dict:
+        env = {
+            "schema": "ariadne.cadctl.run_operation.v1",
+            "operation": op_id,
+            "status": status_word,
+            "executed": False,
+            "registry_operation_status": registry_status,
+            "reason": reason,
+            "out_dir": str(out_dir),
+        }
+        if blocked_reason:
+            env["registry_blocked_reason"] = blocked_reason
+        return env
+
+    # ------------------------------------------------------------- run_operation
+    def run_operation(self, op_id: str, args: dict | None = None,
+                      write_mode: str | None = None, dwg_path: str | None = None,
+                      out_dir: str | None = None) -> dict:
+        """Drive ANY implemented registry operation through the native router job lane.
+
+        The generic agent-control entry point: maps an arbitrary op_id onto the
+        ObjectARX native-job lane (the same lane inspect.database.graph uses),
+        behind a registry allow-list + write-mode governance gate.
+
+        Safety gates (no-fake / original-safe):
+          * op_id must be status=='implemented'. blocked / unknown / not-found ->
+            truthful refusal (executed=False); the op is NEVER run.
+          * write-mode governance: defaults to the op's registry default_write_mode;
+            an explicit write_mode must be in allowed_write_modes; write_original is
+            ALWAYS refused from this surface (the original DWG stays READ-ONLY).
+          * a COPY is staged; the original DWG's sha is verified unchanged.
+        """
+        out_dir_p = Path(out_dir) if out_dir else (self.router_home / "runs" / "run_op" / _ts())
+        out_dir_p.mkdir(parents=True, exist_ok=True)
+
+        # --- registry allow-list gate ---
+        rec = self._registry_record(op_id)
+        if rec is None:
+            return self._run_op_refusal(op_id, "not_found",
+                f"operation '{op_id}' is not in the operation registry", out_dir_p)
+        op_status = rec.get("status")
+        if op_status != "implemented":
+            return self._run_op_refusal(op_id, "blocked",
+                f"operation '{op_id}' has registry status '{op_status}', not 'implemented'; refused",
+                out_dir_p, registry_status=op_status, blocked_reason=rec.get("blocked_reason"))
+
+        # --- write-mode governance ---
+        wl = rec.get("write_level") or {}
+        default_wm = wl.get("default_write_mode") or "read"
+        allowed = set(wl.get("allowed_write_modes") or [default_wm])
+        wm = write_mode or default_wm
+        if wm in ("write_original", "original"):
+            return self._run_op_refusal(op_id, "blocked",
+                "write_mode 'write_original' is never permitted from the agent run surface; "
+                "the original DWG is READ-ONLY (use a staged write_copy)",
+                out_dir_p, registry_status=op_status)
+        if wm not in allowed:
+            return self._run_op_refusal(op_id, "blocked",
+                f"write_mode '{wm}' is not in allowed_write_modes {sorted(allowed)} for '{op_id}'",
+                out_dir_p, registry_status=op_status)
+
+        # --- stage the input DWG (original READ-ONLY) ---
+        if not dwg_path:
+            return self._run_op_refusal(op_id, "blocked",
+                "run_operation requires a dwg_path (a copy is staged); no-input generator ops "
+                "are not yet wired through this surface",
+                out_dir_p, registry_status=op_status)
+        src = Path(dwg_path)
+        if not src.exists():
+            return self._run_op_refusal(op_id, "blocked",
+                f"input DWG not found: {dwg_path}", out_dir_p, registry_status=op_status)
+        sha_before = _sha256_head(src, 64)
+        stage_root = self.staging_golden / _ts()
+        stage_root.mkdir(parents=True, exist_ok=True)
+        staged = stage_root / "input.dwg"
+        shutil.copy2(src, staged)
+        try:
+            os.chmod(staged, 0o666)
+        except OSError:
+            pass
+
+        # --- optional args -> ARIADNE_NATIVE_JOB job file (-JobPath) ---
+        job_path = None
+        if args:
+            job_path = str(out_dir_p / "job_args.json")
+            payload = {"operation": op_id}
+            payload.update(args)
+            Path(job_path).write_text(json.dumps(payload, ensure_ascii=False), encoding="utf-8")
+
+        # --- drive the native job lane on the COPY ---
+        run_res = run_job.run_router_cad_job(str(staged), str(out_dir_p), op_id,
+                                             write_mode=wm, job_path=job_path)
+        sha_after = _sha256_head(src, 64)
+        original_unchanged = (sha_before == sha_after)
+
+        env = {
+            "schema": "ariadne.cadctl.run_operation.v1",
+            "operation": op_id,
+            "executed": True,
+            "registry_operation_status": op_status,
+            "write_mode": wm,
+            "out_dir": str(out_dir_p),
+            "staged_copy": str(staged),
+            "original_unchanged": original_unchanged,
+            "exit_code": run_res.get("exit_code"),
+            "stdout": run_res.get("stdout_path"),
+            "stderr": run_res.get("stderr_path"),
+            "result_ref": run_res.get("result_json"),
+        }
+        if not original_unchanged:
+            env["status"] = "error"
+            env["reason"] = "SAFETY VIOLATION: original DWG sha changed during run_operation"
+            return env
+        if run_res.get("error"):
+            env["status"] = "unavailable"
+            env["reason"] = run_res.get("error")
+            return env
+        result_obj = run_res.get("result")
+        if result_obj is None:
+            env["status"] = "partial"
+            env["reason"] = "native job produced no parseable result JSON"
+            return env
+        native_status = (result_obj.get("status") if isinstance(result_obj, dict) else None) or "ok"
+        env["status"] = native_status if native_status in (
+            "ok", "blocked", "not_implemented", "partial", "error", "unavailable") else "ok"
+        env["result"] = result_obj
+        return env
 
     # ------------------------------------------------------------- shell tools
     def patch_dry_run(self, patch: dict) -> dict:
@@ -867,6 +1003,11 @@ def registry_coverage() -> dict:
 
 def registry_explain(op_id: str) -> dict:
     return Cad().registry_explain(op_id)
+
+
+def run_operation(op_id: str, args: dict | None = None, write_mode: str | None = None,
+                  dwg_path: str | None = None, out_dir: str | None = None) -> dict:
+    return Cad().run_operation(op_id, args, write_mode, dwg_path, out_dir)
 
 
 def patch_dry_run(patch: dict) -> dict:

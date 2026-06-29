@@ -1,0 +1,29 @@
+CAD OS — Proprietary / Internal Use License
+Copyright (c) 2026 Paul Park. All rights reserved.
+
+This software (the "CAD OS Layer" / AutoCAD SDK Router and all accompanying
+source, scripts, configuration, and prebuilt native modules) is proprietary and
+confidential. It is provided for INTERNAL USE by authorized team members and
+collaborators only.
+
+Permitted, for authorized users:
+  - Clone, install, run, and modify within the team for internal work.
+
+Not permitted without prior written consent of the copyright holder:
+  - Redistribution, publication, sublicensing, or sale to any third party.
+  - Public release or posting to any public repository or service.
+
+THIRD-PARTY COMPONENTS (not covered by this license; their own terms apply):
+  - AutoCAD / ObjectARX / ObjectDBX are Autodesk products. Each user must hold a
+    valid AutoCAD license. The Autodesk SDKs are NOT redistributed here.
+  - LibreDWG (GPL) is used ONLY as an optional, separate sidecar CLI process. It
+    is never bundled, linked, or imported into this software. Its GPL terms apply
+    to that binary independently.
+  - Python packages listed in requirements*.txt retain their own licenses.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED. THE AUTHORS ARE NOT LIABLE FOR ANY CLAIM, DAMAGES, OR OTHER LIABILITY
+ARISING FROM ITS USE.
+
+To change these terms (e.g., to open-source under MIT/Apache-2.0), replace this
+file — that is the copyright holder's decision.

@@ -112,6 +112,14 @@ def build_parser() -> argparse.ArgumentParser:
     live_sub = live.add_subparsers(dest="live_command", required=True)
     live_sub.add_parser("status", help="truthful live pump status")
 
+    runop = sub.add_parser("run", help="drive ANY implemented op through the native job lane (allow-list + write-mode gated)")
+    runop.add_argument("--op", required=True, help="registry operation id, e.g. inspect.layers")
+    runop.add_argument("--dwg", help="source DWG (read-only original; a copy is staged)")
+    runop.add_argument("--out", help="output run directory")
+    runop.add_argument("--write-mode", dest="write_mode",
+                       help="read|write_copy|live_edit (default = op's registry default; write_original refused)")
+    runop.add_argument("--args-json", dest="args_json", help="inline JSON of op-specific args")
+
     return p
 
 
@@ -198,6 +206,10 @@ def main(argv: list[str] | None = None) -> int:
         if args.command == "live":
             if args.live_command == "status":
                 return _emit(cad.live_status())
+        if args.command == "run":
+            op_args = json.loads(args.args_json) if getattr(args, "args_json", None) else None
+            return _emit(cad.run_operation(args.op, args=op_args, write_mode=args.write_mode,
+                                           dwg_path=args.dwg, out_dir=args.out))
     except Exception as exc:  # genuine cadctl-side failure
         err = {
             "schema": "ariadne.cadctl.error.v1",
