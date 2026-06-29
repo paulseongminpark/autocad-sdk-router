@@ -1,0 +1,28 @@
+# Line-ending policy. Without this, Windows working copies show ~200 files as
+# "modified" (pure CRLF/LF noise) on `git status` — which hides real changes and
+# invites accidental whitespace-only commits.
+#
+# Repo stores text as LF; checkout is native per platform.
+* text=auto
+
+# PowerShell scripts stay CRLF on checkout (Windows convention; PS also runs LF).
+*.ps1  text eol=crlf
+*.psm1 text eol=crlf
+
+# Binary assets — NEVER apply text/eol normalization (it would corrupt them).
+# The prebuilt native modules especially must stay byte-exact.
+*.crx  binary
+*.arx  binary
+*.dbx  binary
+*.dll  binary
+*.exe  binary
+*.lib  binary
+*.dwg  binary
+*.dxf  binary
+*.png  binary
+*.jpg  binary
+*.jpeg binary
+*.gif  binary
+*.ico  binary
+*.pdf  binary
+*.zip  binary

@@ -58,6 +58,15 @@ graphify-out/
 # ── Handoff bundles (regenerable zips; index.md stays tracked) ──
 handoff/zip/*.zip
 
+# ── Build-wave / session evidence scratch (not part of the distributable) ──
+docs/CADOS_ClaudeCode_Handoff_Report.md
+reports/M08_PARALLEL_BUILD_BOARD.*
+reports/WAVE4*
+reports/remaining_after_wave*
+reports/merge/MERGE_WAVE4*
+reports/merge/MAIN_DIRTY_STATE_*
+reports/tickets/WAVE4*
+
 # ── OS noise ──
 Thumbs.db
 desktop.ini
