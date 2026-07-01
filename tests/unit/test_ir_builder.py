@@ -390,6 +390,34 @@ class TestNativeGraphGeometryLifting(unittest.TestCase):
         self.assertEqual(ent["dim_block_handle"], "1AE")
         self.assertEqual(ent["dim_block_name"], "*D3")
 
+    def test_angular2line_dimension_lifts_line_endpoints_and_arc_point(self):
+        # arc_point here is AutoCAD's own live-verified re-placement (1/3 of
+        # whichever of the 2 lines' 4 apex-sectors the raw ctor-arg's angle
+        # selected, NOT the raw ctor-arg itself -- see op_roundtrip_probe.py's
+        # _angular2line_arc_point), exactly as a real collectModelSpaceGraph
+        # read-back reports it. xline1=(10,0,0)->(30,0,0) (angle 0 from the
+        # apex at (0,0,0)), xline2=(0,10,0)->(0,30,0) (angle 90 deg) -- the
+        # [0,90] sector's 1/3 point sits at 30 deg, radius 40.
+        ent = self._one_entity_ir({
+            "handle": "1B1", "dxf_name": "AcDb2LineAngularDimension", "layer": "0",
+            "owner_handle": "1F", "space": "model",
+            "xline1_start": [10.0, 0.0, 0.0], "xline1_end": [30.0, 0.0, 0.0],
+            "xline2_start": [0.0, 10.0, 0.0], "xline2_end": [0.0, 30.0, 0.0],
+            "arc_point": [34.64101615137755, 20.0, 0.0],
+            "measurement": 1.5707963267948966,
+            "dim_block_handle": "1B2", "dim_block_name": "*D4",
+        })
+        self.assertEqual(ent["dxf_name"], "DIMENSION")
+        self.assertEqual(ent["geometry"], {
+            "kind": "dimension",
+            "xline1_start": [10.0, 0.0, 0.0], "xline1_end": [30.0, 0.0, 0.0],
+            "xline2_start": [0.0, 10.0, 0.0], "xline2_end": [0.0, 30.0, 0.0],
+            "arc_point": [34.64101615137755, 20.0, 0.0],
+            "measurement": 1.5707963267948966,
+        })
+        self.assertEqual(ent["dim_block_handle"], "1B2")
+        self.assertEqual(ent["dim_block_name"], "*D4")
+
     def test_leader_lifts_vertices_and_arrowhead_splined(self):
         ent = self._one_entity_ir({
             "handle": "1AC", "dxf_name": "AcDbLeader", "layer": "0",

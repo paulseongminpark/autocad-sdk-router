@@ -487,6 +487,125 @@ def _expect_create_dimension_arc(args: Dict[str, Any]) -> Dict[str, Any]:
     }
 
 
+def _angular2line_line_intersect(l1s: list, l1e: list, l2s: list, l2e: list):
+    """2D intersection of the INFINITE lines through (l1s,l1e) and (l2s,l2e)
+    -- the implicit "apex" AcDb2LineAngularDimension's arc is drawn around.
+    Neither line's own start/end points are that apex in general (this
+    batch's own valid-arg fixture deliberately keeps both segments OFFSET
+    from it, exactly like a real "dimension the corner between two walls"
+    usage where neither wall's endpoint sits at the corner). Undefined for
+    parallel lines (d==0) -- out of scope, same class of caveat every prior
+    T3a/w3 dimension formula carries for its own degenerate case.
+    """
+    x1, y1 = l1s[0], l1s[1]; x2, y2 = l1e[0], l1e[1]
+    x3, y3 = l2s[0], l2s[1]; x4, y4 = l2e[0], l2e[1]
+    d = (x1 - x2) * (y3 - y4) - (y1 - y2) * (x3 - x4)
+    px = ((x1 * y2 - y1 * x2) * (x3 - x4) - (x1 - x2) * (x3 * y4 - y3 * x4)) / d
+    py = ((x1 * y2 - y1 * x2) * (y3 - y4) - (y1 - y2) * (x3 * y4 - y3 * x4)) / d
+    return [px, py]
+
+
+def _angular2line_sector(l1s: list, l1e: list, l2s: list, l2e: list, arc_point: list):
+    """Shared geometry for AcDb2LineAngularDimension's two derived fields.
+
+    Two (infinite) lines through a common apex split the plane into 4
+    sectors, bounded by the 4 rays {a1, a2, a1+pi, a2+pi} where a1/a2 are
+    xLine1's/xLine2's OWN direction angles (end-start, i.e. which way each
+    input segment points AWAY from the apex -- verified only for that
+    direction convention, see module-level caveat below). Sorting those 4
+    rays CCW gives 4 sectors of widths (span, pi-span, span, pi-span) for
+    some 0 < span <= pi. The input ``arc_point`` arg's OWN angle (relative to
+    the apex) selects exactly one of those 4 sectors -- LIVE-VERIFIED
+    (2026-07-02 w3-ang2 cert, 4 real accoreconsole roundtrips against
+    tests/fixtures/native_sample.dwg: 2 different apex points, 2 different
+    xLine1/xLine2 angle pairs (0/50deg and 170/310deg -- the second
+    deliberately chosen so the 4 sorted sector boundaries are NOT already
+    ray-a1-first, unlike the first pair), arc_point tried at 3 different
+    within-sector angles and 2 different radii at the same angle) that:
+      - "measurement" is EXACTLY that selected sector's angular width, and
+      - the stored "arc_point" (see _angular2line_arc_point) sits at EXACTLY
+        1/3 of that sector's span from its start boundary, at a radius
+        EXACTLY equal to the input arc_point's own distance from the apex --
+        the same 1/3-of-selected-span rule w3-dimarc discovered for
+        AcDbArcDimension.arcPoint(), now confirmed on a structurally
+        different class (2 independent lines, not one arc's 2 xLine points
+        sharing a literal centerPoint arg). All 4 cases matched to float
+        precision (max observed error ~1e-14).
+
+    Returns ``(apex, sector_start, sector_span)`` (angles in radians).
+    """
+    apex = _angular2line_line_intersect(l1s, l1e, l2s, l2e)
+    a1 = math.atan2(l1e[1] - l1s[1], l1e[0] - l1s[0]) % (2 * math.pi)
+    a2 = math.atan2(l2e[1] - l2s[1], l2e[0] - l2s[0]) % (2 * math.pi)
+    bounds = sorted([a1, a2, (a1 + math.pi) % (2 * math.pi), (a2 + math.pi) % (2 * math.pi)])
+    # Unwrap into [bounds[0], bounds[0]+2*pi) so the 4 sector widths are all
+    # positive without any modular wraparound arithmetic.
+    unwrapped = [bounds[0]] + [b + (2 * math.pi if b < bounds[0] else 0.0) for b in bounds[1:]]
+    unwrapped.append(bounds[0] + 2 * math.pi)
+    a_in = math.atan2(arc_point[1] - apex[1], arc_point[0] - apex[0]) % (2 * math.pi)
+    a_in_unwrapped = a_in + (2 * math.pi if a_in < unwrapped[0] else 0.0)
+    for i in range(4):
+        if unwrapped[i] <= a_in_unwrapped <= unwrapped[i + 1]:
+            return apex, unwrapped[i], unwrapped[i + 1] - unwrapped[i]
+    # arc_point exactly on a boundary ray (measure-zero input) -- unreached
+    # by this batch's fixture; not asserted for that edge case.
+    raise ValueError("arc_point angle did not resolve to any of the 4 sectors")
+
+
+def _angular2line_measurement(l1s: list, l1e: list, l2s: list, l2e: list, arc_point: list) -> float:
+    """AcDb2LineAngularDimension's measurement: the angular width (radians)
+    of whichever of the 4 apex sectors the input arc_point arg selects (see
+    _angular2line_sector). Independently computed (not an arg) so
+    ``_expect_create_dimension_angular2line`` can assert it without a live
+    read.
+    """
+    _apex, _start, span = _angular2line_sector(l1s, l1e, l2s, l2e, arc_point)
+    return span
+
+
+def _angular2line_arc_point(l1s: list, l1e: list, l2s: list, l2e: list, arc_point: list) -> list:
+    """AcDb2LineAngularDimension does NOT store the raw ``arc_point`` ctor
+    arg back verbatim -- see _angular2line_sector's docstring for the
+    live-verified 1/3-of-selected-sector-span rule (radius preserved from
+    the input arc_point's own distance to the apex; angle re-anchored).
+    """
+    apex, start, span = _angular2line_sector(l1s, l1e, l2s, l2e, arc_point)
+    third_angle = start + span / 3.0
+    radius = math.hypot(arc_point[0] - apex[0], arc_point[1] - apex[1])
+    az = arc_point[2] if len(arc_point) > 2 else 0.0
+    return [apex[0] + radius * math.cos(third_angle), apex[1] + radius * math.sin(third_angle), az]
+
+
+def _expect_create_dimension_angular2line(args: Dict[str, Any]) -> Dict[str, Any]:
+    # AcDb2LineAngularDimension(xLine1Start, xLine1End, xLine2Start,
+    # xLine2End, arcPoint, dimText, dimStyle) -- write.entity.dim.angular2line
+    # (m08h_handlers.inc) passes xline1_start/xline1_end/xline2_start/
+    # xline2_end/arc_point straight to the ctor. The 4 line-endpoint args are
+    # direct, args-derivable ground truth (live-verified 2026-07-02 w3-ang2
+    # re-cert, identical across all 4 cases regardless of arc_point). arc_point
+    # and measurement are NOT verbatim ctor-arg echoes -- both independently
+    # computed via _angular2line_arc_point / _angular2line_measurement (see
+    # _angular2line_sector's docstring for the live-discovered formula and its
+    # verified scope: non-parallel xLine1/xLine2 only, and only for the
+    # "segment direction points away from the apex" convention this batch's
+    # own fixture used).
+    l1s = _point_to_list(args["xline1_start"])
+    l1e = _point_to_list(args["xline1_end"])
+    l2s = _point_to_list(args["xline2_start"])
+    l2e = _point_to_list(args["xline2_end"])
+    arc_point_arg = _point_to_list(args["arc_point"])
+    return {
+        "dxf_name": "DIMENSION", "layer": args.get("layer") or "0",
+        "geometry": {
+            "kind": "dimension",
+            "xline1_start": l1s, "xline1_end": l1e,
+            "xline2_start": l2s, "xline2_end": l2e,
+            "arc_point": _angular2line_arc_point(l1s, l1e, l2s, l2e, arc_point_arg),
+            "measurement": _angular2line_measurement(l1s, l1e, l2s, l2e, arc_point_arg),
+        },
+    }
+
+
 def _expect_create_leader(args: Dict[str, Any]) -> Dict[str, Any]:
     # write.entity.leader (m08h_handlers.inc) reads "vertices" first, falling
     # back to "points" only when "vertices" yields <2 points -- this batch's
@@ -617,6 +736,11 @@ def _expect_create_mline(args: Dict[str, Any]) -> Dict[str, Any]:
 # dimension subtype (already native-REACHABLE per measure/reachable_matrix.
 # jsonl, but no patch_ops wiring and no collectModelSpaceGraph read branch
 # until this batch).
+#
+# w3-ang2 adds create_dimension_angular2line: same two-part gap as every
+# T3a-batch/w3-dimarc dimension subtype (already native-REACHABLE per
+# measure/reachable_matrix.jsonl, but no patch_ops wiring and no
+# collectModelSpaceGraph read branch until this batch).
 _EXPECTED_ENTITY_BUILDERS: Dict[str, Callable[[Dict[str, Any]], Dict[str, Any]]] = {
     "create_line": _expect_create_line,
     "create_circle": _expect_create_circle,
@@ -634,6 +758,7 @@ _EXPECTED_ENTITY_BUILDERS: Dict[str, Callable[[Dict[str, Any]], Dict[str, Any]]]
     "create_leader": _expect_create_leader,
     "create_mline": _expect_create_mline,
     "create_dimension_arc": _expect_create_dimension_arc,
+    "create_dimension_angular2line": _expect_create_dimension_angular2line,
 }
 
 

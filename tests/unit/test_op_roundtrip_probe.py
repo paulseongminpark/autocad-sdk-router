@@ -332,6 +332,35 @@ class TestExpectedIrForOp(unittest.TestCase):
             "measurement": 50 * math.pi / 2,
         })
 
+    def test_create_dimension_angular2line_builds_dimension_geometry(self):
+        # w3-ang2: collectModelSpaceGraph grew an AcDb2LineAngularDimension
+        # branch. xline1_start/xline1_end/xline2_start/xline2_end are direct
+        # ctor-arg echoes. arc_point is NOT a verbatim echo -- live-verified
+        # (2026-07-02 w3-ang2 re-cert, 4 real accoreconsole roundtrips, 2
+        # different apex points) that AutoCAD re-anchors it to exactly 1/3 of
+        # whichever of the 2 lines' 4 apex-sectors the input arc_point's own
+        # angle selects (same radius as the input arc_point's own distance
+        # from the apex); measurement is the independently-computed selected
+        # sector's angular width. Here xline1=(10,0,0)->(30,0,0) (angle 0
+        # from the implicit apex at (0,0,0)), xline2=(0,10,0)->(0,30,0)
+        # (angle 90 deg), input arc_point at 60 deg / radius 40 (irrelevant
+        # to the result beyond picking the [0,90] sector) -> stored arc_point
+        # at 90/3=30 deg / radius 40, measurement=pi/2.
+        ir = probe.expected_ir_for_op(
+            "create_dimension_angular2line",
+            {"xline1_start": [10, 0, 0], "xline1_end": [30, 0, 0],
+             "xline2_start": [0, 10, 0], "xline2_end": [0, 30, 0],
+             "arc_point": [40 * math.cos(math.pi / 3), 40 * math.sin(math.pi / 3), 0], "layer": "0"})
+        ent = ir["entities"][0]
+        self.assertEqual(ent["dxf_name"], "DIMENSION")
+        self.assertEqual(ent["geometry"], {
+            "kind": "dimension",
+            "xline1_start": [10, 0, 0], "xline1_end": [30, 0, 0],
+            "xline2_start": [0, 10, 0], "xline2_end": [0, 30, 0],
+            "arc_point": [40 * math.cos(math.pi / 6), 40 * math.sin(math.pi / 6), 0.0],
+            "measurement": math.pi / 2,
+        })
+
     def test_create_leader_builds_leader_geometry(self):
         # T3a-batch3: collectModelSpaceGraph grew an AcDbLeader branch.
         # vertices are direct, args-derivable echoes (appendVertex per point,

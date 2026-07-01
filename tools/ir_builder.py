@@ -500,6 +500,7 @@ _NATIVE_CLASS_TO_DXF_KIND = {
     "AcDbDimension": ("DIMENSION", "dimension"),
     "AcDbOrdinateDimension": ("DIMENSION", "dimension"),
     "AcDbArcDimension": ("DIMENSION", "dimension"),
+    "AcDb2LineAngularDimension": ("DIMENSION", "dimension"),
     "AcDbLeader": ("LEADER", "leader"),
     "AcDbMLeader": ("MULTILEADER", "leader"),
     # w3-wbug: AcDbMline's "vertices" (plain [x,y,z] array, no bulge) and
@@ -524,7 +525,9 @@ def _geometry_from_native_entity(raw: dict, kind: str) -> dict:
     has_arrow_head/splined (AcDbLeader) -- reuses the existing generic
     "vertices" lift below, no change needed there). w3-dimarc: arc_point
     (AcDbArcDimension, reuses center/xline1_point/xline2_point/measurement,
-    already lifted).
+    already lifted). w3-ang2: xline1_start/xline1_end/xline2_start/xline2_end
+    (AcDb2LineAngularDimension; arc_point/measurement reuse the existing
+    lifts).
     Returns an IR geometry dict with a valid ``kind``; unrepresented kinds get
     a geometry that carries only ``kind`` (decoded=False is decided by the
     caller).
@@ -533,7 +536,7 @@ def _geometry_from_native_entity(raw: dict, kind: str) -> dict:
     for key in ("start", "end", "center", "position", "scale", "normal",
                 "major_axis", "xline1_point", "xline2_point", "dim_line_point",
                 "chord_point", "far_chord_point", "defining_point", "leader_end_point",
-                "arc_point"):
+                "arc_point", "xline1_start", "xline1_end", "xline2_start", "xline2_end"):
         pt = _as_point3(raw.get(key))
         if pt is not None:
             geom[key] = pt

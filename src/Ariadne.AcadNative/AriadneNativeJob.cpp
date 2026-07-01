@@ -1434,6 +1434,52 @@ static bool collectModelSpaceGraph(AcDbDatabase* pDb, int& total,
                 arr << ",\"dim_block_name\":\"" << jsonEscape(dimBlockName) << "\"";
             }
         }
+        // w3-ang2: AcDb2LineAngularDimension -- a 2-line angular dimension.
+        // Derives directly from AcDbDimension (NOT from AcDbArcDimension or
+        // any other branch above), so cast ordering relative to them is not
+        // load-bearing. xLine1Start/xLine1End/xLine2Start/xLine2End are
+        // extracted under new field names (this op's ctor takes 4 line
+        // endpoints, not the 2-point-per-line "xline1_point"/"xline2_point"
+        // shape the rotated/aligned/arc dimension branches above use) and are
+        // verbatim ctor-arg echoes (live-verified). arcPoint is extracted
+        // too, but is NOT a verbatim echo: LIVE-VERIFIED (2026-07-02 w3-ang2
+        // re-cert, 4 real accoreconsole roundtrips, 2 different apex points)
+        // that AutoCAD re-anchors it to exactly 1/3 of whichever of the 2
+        // lines' 4 apex-sectors the input arcPoint's angle selects, at the
+        // SAME radius as the input arcPoint's own distance from the apex --
+        // the same 1/3-of-span rule w3-dimarc found for AcDbArcDimension's
+        // arcPoint, now confirmed on a structurally different class (see
+        // op_roundtrip_probe.py's _angular2line_sector for the full formula
+        // and its verified scope).
+        else if (AcDb2LineAngularDimension* p2L = AcDb2LineAngularDimension::cast(pEnt)) {
+            const AcGePoint3d l1s = p2L->xLine1Start();
+            const AcGePoint3d l1e = p2L->xLine1End();
+            const AcGePoint3d l2s = p2L->xLine2Start();
+            const AcGePoint3d l2e = p2L->xLine2End();
+            const AcGePoint3d arcPt = p2L->arcPoint();
+            double measurement = 0.0;
+            const bool haveMeasurement = (p2L->measurement(measurement) == Acad::eOk);
+            arr << ",\"xline1_start\":[" << l1s.x << "," << l1s.y << "," << l1s.z << "]"
+                << ",\"xline1_end\":[" << l1e.x << "," << l1e.y << "," << l1e.z << "]"
+                << ",\"xline2_start\":[" << l2s.x << "," << l2s.y << "," << l2s.z << "]"
+                << ",\"xline2_end\":[" << l2e.x << "," << l2e.y << "," << l2e.z << "]"
+                << ",\"arc_point\":[" << arcPt.x << "," << arcPt.y << "," << arcPt.z << "]";
+            if (haveMeasurement)
+                arr << ",\"measurement\":" << measurement;
+            const AcDbObjectId dimBlockId = p2L->dimBlockId();
+            if (!dimBlockId.isNull()) {
+                arr << ",\"dim_block_handle\":\"" << jsonEscape(handleOfId(dimBlockId)) << "\"";
+                std::string dimBlockName;
+                AcDbBlockTableRecord* pDimDef = nullptr;
+                if (acdbOpenObject(pDimDef, dimBlockId, AcDb::kForRead) == Acad::eOk) {
+                    const ACHAR* nameRaw = nullptr;
+                    if (pDimDef->getName(nameRaw) == Acad::eOk)
+                        dimBlockName = acharToAscii(nameRaw);
+                    pDimDef->close();
+                }
+                arr << ",\"dim_block_name\":\"" << jsonEscape(dimBlockName) << "\"";
+            }
+        }
         // T3a-batch3: AcDbLeader -- vertices are direct, args-derivable echoes
         // of write.entity.leader's vertices/points ctor-arg loop (appendVertex
         // per point, no transform). has_arrow_head/splined are deterministic
