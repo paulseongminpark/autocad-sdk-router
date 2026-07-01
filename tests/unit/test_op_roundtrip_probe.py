@@ -275,6 +275,37 @@ class TestExpectedIrForOp(unittest.TestCase):
             "create_spline", {"points": [[0, 0, 0], [10, 0, 0]], "order": 2, "layer": "0"})
         self.assertEqual(ir["entities"][0]["geometry"]["degree"], 1)
 
+    def test_create_dimension_ordinate_builds_dimension_geometry(self):
+        # T3a-batch3: collectModelSpaceGraph grew an AcDbOrdinateDimension
+        # branch. defining_point/leader_end_point/use_x_axis are direct
+        # ctor-arg echoes (no re-anchoring degree of freedom applies here,
+        # unlike aligned/rotated's dim_line_point); measurement is the
+        # independently-computed defining_point.x (use_x_axis=True) -- all
+        # live-verified (2026-07-02 T3a-batch3 re-cert). origin is
+        # deliberately NOT asserted -- see _expect_create_dimension_ordinate's
+        # docstring.
+        ir = probe.expected_ir_for_op(
+            "create_dimension_ordinate",
+            {"defining_point": [10, 5, 0], "leader_end_point": [10, 15, 0], "layer": "0"})
+        ent = ir["entities"][0]
+        self.assertEqual(ent["dxf_name"], "DIMENSION")
+        self.assertEqual(ent["geometry"], {
+            "kind": "dimension", "defining_point": [10, 5, 0],
+            "leader_end_point": [10, 15, 0], "use_x_axis": True, "measurement": 10,
+        })
+        self.assertNotIn("origin", ent["geometry"])
+
+    def test_create_dimension_ordinate_honors_explicit_use_x_axis(self):
+        # use_x_axis=False (live-verified 2026-07-02 T3a-batch3 re-cert):
+        # measurement becomes defining_point.y instead of .x.
+        ir = probe.expected_ir_for_op(
+            "create_dimension_ordinate",
+            {"defining_point": [10, 5, 0], "leader_end_point": [0, 15, 0],
+             "use_x_axis": 0, "layer": "0"})
+        geom = ir["entities"][0]["geometry"]
+        self.assertEqual(geom["use_x_axis"], False)
+        self.assertEqual(geom["measurement"], 5)
+
     def test_unbuildable_op_raises_not_implemented_error(self):
         # create_arc/create_ellipse were the fixtures here pre-T3a; this
         # module has since grown ground-truth builders for both.

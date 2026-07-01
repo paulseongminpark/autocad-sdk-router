@@ -33,7 +33,8 @@
 #include "dbhatch.h"
 #include "dbelipse.h"  // T3a: AcDbEllipse (collectModelSpaceGraph read branch)
 #include "dbdim.h"     // T3a: AcDbRotatedDimension; T3a-batch2: AcDbAlignedDimension/
-                       // AcDbRadialDimension/AcDbDiametricDimension (same header)
+                       // AcDbRadialDimension/AcDbDiametricDimension; T3a-batch3:
+                       // AcDbOrdinateDimension (same header)
 #include "dbspline.h"  // T3a-batch2: AcDbSpline (collectModelSpaceGraph read branch)
 #include "dbxrecrd.h"
 #include "dbsymtb.h"
@@ -1335,6 +1336,42 @@ static bool collectModelSpaceGraph(AcDbDatabase* pDb, int& total,
             if (haveMeasurement)
                 arr << ",\"measurement\":" << measurement;
             const AcDbObjectId dimBlockId = pDia->dimBlockId();
+            if (!dimBlockId.isNull()) {
+                arr << ",\"dim_block_handle\":\"" << jsonEscape(handleOfId(dimBlockId)) << "\"";
+                std::string dimBlockName;
+                AcDbBlockTableRecord* pDimDef = nullptr;
+                if (acdbOpenObject(pDimDef, dimBlockId, AcDb::kForRead) == Acad::eOk) {
+                    const ACHAR* nameRaw = nullptr;
+                    if (pDimDef->getName(nameRaw) == Acad::eOk)
+                        dimBlockName = acharToAscii(nameRaw);
+                    pDimDef->close();
+                }
+                arr << ",\"dim_block_name\":\"" << jsonEscape(dimBlockName) << "\"";
+            }
+        }
+        // T3a-batch3: AcDbOrdinateDimension -- defining_point/leader_end_point
+        // are direct ctor-arg echoes; use_x_axis mirrors isUsingXAxis() (the
+        // write handler passes its own use_x_axis arg straight to the ctor).
+        // measurement is the dimensioned ordinate value, guarded by
+        // measurement()'s own ErrorStatus like every other dimension branch
+        // above. origin() is NOT a write.entity.dim.ordinate ctor arg (the
+        // handler never calls setOrigin -- it stays whatever AutoCAD defaults
+        // it to) so it is extracted for completeness but kept top-level, same
+        // treatment as dim_block_handle/dim_block_name (see op_roundtrip_
+        // probe.py's _expect_create_dimension_ordinate).
+        else if (AcDbOrdinateDimension* pOrd = AcDbOrdinateDimension::cast(pEnt)) {
+            const AcGePoint3d defPt = pOrd->definingPoint();
+            const AcGePoint3d leadEnd = pOrd->leaderEndPoint();
+            const AcGePoint3d origin = pOrd->origin();
+            double measurement = 0.0;
+            const bool haveMeasurement = (pOrd->measurement(measurement) == Acad::eOk);
+            arr << ",\"defining_point\":[" << defPt.x << "," << defPt.y << "," << defPt.z << "]"
+                << ",\"leader_end_point\":[" << leadEnd.x << "," << leadEnd.y << "," << leadEnd.z << "]"
+                << ",\"use_x_axis\":" << (pOrd->isUsingXAxis() ? "true" : "false")
+                << ",\"origin\":[" << origin.x << "," << origin.y << "," << origin.z << "]";
+            if (haveMeasurement)
+                arr << ",\"measurement\":" << measurement;
+            const AcDbObjectId dimBlockId = pOrd->dimBlockId();
             if (!dimBlockId.isNull()) {
                 arr << ",\"dim_block_handle\":\"" << jsonEscape(handleOfId(dimBlockId)) << "\"";
                 std::string dimBlockName;

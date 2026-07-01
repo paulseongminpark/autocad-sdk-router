@@ -368,6 +368,44 @@ def _expect_create_dimension_diametric(args: Dict[str, Any]) -> Dict[str, Any]:
     }
 
 
+def _expect_create_dimension_ordinate(args: Dict[str, Any]) -> Dict[str, Any]:
+    # AcDbOrdinateDimension(useXAxis, definingPoint, leaderEndPoint, dimText,
+    # dimStyle) -- write.entity.dim.ordinate (m08h_handlers.inc) passes
+    # defining_point/leader_end_point/use_x_axis straight to the ctor with no
+    # re-anchoring degree of freedom (unlike aligned/rotated dim_line_point),
+    # so all three are direct, args-derivable ground truth. use_x_axis
+    # defaults to True when the arg is absent, mirroring the handler's own
+    # "useXAxis = true unless use_x_axis is an explicit falsy number" default.
+    #
+    # measurement IS asserted (unlike leader_length/dim_block_handle): LIVE-
+    # VERIFIED (2026-07-02 T3a-batch3 re-cert, 2 real accoreconsole roundtrips
+    # -- one per axis) that an ordinate dimension's measurement is simply the
+    # defining_point's own X (useXAxis) or Y (not useXAxis) coordinate relative
+    # to origin() -- and origin() is always (0,0,0) here since this op never
+    # calls setOrigin. Case 1: use_x_axis=True, defining_point=(10,5,0) ->
+    # measurement=10.0 (the X coordinate). Case 2: use_x_axis=False,
+    # defining_point=(7,12,0) -> measurement=12.0 (the Y coordinate). This is
+    # args-derivable (never a live read) and independently computed here,
+    # exactly like _rotated_dimension_measurement.
+    #
+    # origin is NOT asserted: not a write.entity.dim.ordinate ctor arg at all
+    # (see ir_builder.py/_entity_from_native's top-level "origin" field and
+    # AriadneNativeJob.cpp's AcDbOrdinateDimension branch) -- extracted by the
+    # reader for completeness but kept outside this op's own-args contract.
+    defining_point = _point_to_list(args["defining_point"])
+    leader_end_point = _point_to_list(args["leader_end_point"])
+    use_x_axis = bool(args.get("use_x_axis", True))
+    measurement = defining_point[0] if use_x_axis else defining_point[1]
+    return {
+        "dxf_name": "DIMENSION", "layer": args.get("layer") or "0",
+        "geometry": {
+            "kind": "dimension",
+            "defining_point": defining_point, "leader_end_point": leader_end_point,
+            "use_x_axis": use_x_axis, "measurement": measurement,
+        },
+    }
+
+
 def _expect_create_spline(args: Dict[str, Any]) -> Dict[str, Any]:
     # write.entity.spline (m08g_handlers.inc) always builds a FIT-POINT
     # AcDbSpline: AcDbSpline(fitPts, order, 0.0) -- order defaults to 4.0 (same
@@ -423,6 +461,10 @@ def _expect_create_spline(args: Dict[str, Any]) -> Dict[str, Any]:
 # wiring at all (tools/patch_ops/entities.py, added this batch) and (b) no
 # collectModelSpaceGraph read branch (AriadneNativeJob.cpp, added this batch)
 # -- the same two-part gap create_ellipse/create_dimension had through T1.
+#
+# T3a-batch3 adds create_dimension_ordinate: same two-part gap (already
+# native-REACHABLE per measure/reachable_matrix.jsonl, but no patch_ops wiring
+# and no collectModelSpaceGraph read branch until this batch).
 _EXPECTED_ENTITY_BUILDERS: Dict[str, Callable[[Dict[str, Any]], Dict[str, Any]]] = {
     "create_line": _expect_create_line,
     "create_circle": _expect_create_circle,
@@ -436,6 +478,7 @@ _EXPECTED_ENTITY_BUILDERS: Dict[str, Callable[[Dict[str, Any]], Dict[str, Any]]]
     "create_dimension_aligned": _expect_create_dimension_aligned,
     "create_dimension_radial": _expect_create_dimension_radial,
     "create_dimension_diametric": _expect_create_dimension_diametric,
+    "create_dimension_ordinate": _expect_create_dimension_ordinate,
 }
 
 

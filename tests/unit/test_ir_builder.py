@@ -348,6 +348,24 @@ class TestNativeGraphGeometryLifting(unittest.TestCase):
         self.assertEqual(ent["leader_length"], 5.0)
         self.assertNotIn("leader_length", ent["geometry"])
 
+    def test_ordinate_dimension_lifts_points_and_top_level_origin(self):
+        ent = self._one_entity_ir({
+            "handle": "1AB", "dxf_name": "AcDbOrdinateDimension", "layer": "0",
+            "owner_handle": "1F", "space": "model",
+            "defining_point": [10.0, 5.0, 0.0], "leader_end_point": [10.0, 15.0, 0.0],
+            "use_x_axis": True, "origin": [0.0, 0.0, 0.0], "measurement": 10.0,
+        })
+        self.assertEqual(ent["dxf_name"], "DIMENSION")
+        self.assertEqual(ent["geometry"], {
+            "kind": "dimension", "defining_point": [10.0, 5.0, 0.0],
+            "leader_end_point": [10.0, 15.0, 0.0], "use_x_axis": True, "measurement": 10.0,
+        })
+        # origin is a TOP-LEVEL entity field, never inside "geometry" -- it is
+        # not a write.entity.dim.ordinate ctor arg at all (see op_roundtrip_
+        # probe.py's _expect_create_dimension_ordinate).
+        self.assertEqual(ent["origin"], [0.0, 0.0, 0.0])
+        self.assertNotIn("origin", ent["geometry"])
+
 
 if __name__ == "__main__":
     unittest.main()

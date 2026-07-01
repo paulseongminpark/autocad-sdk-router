@@ -42,6 +42,7 @@ WRITE_OP_MAP: Dict[str, str] = {
     "create_dimension_aligned": "write.entity.dim.aligned",
     "create_dimension_radial": "write.entity.dim.radial",
     "create_dimension_diametric": "write.entity.dim.diametric",
+    "create_dimension_ordinate": "write.entity.dim.ordinate",
 }
 
 
@@ -136,6 +137,12 @@ def build_job_args(native_op: str, args: Dict[str, Any]) -> Optional[Dict[str, A
     if native_op == "write.entity.dim.diametric":
         out: Dict[str, Any] = {}
         for k in ('chord_point', 'far_chord_point', 'leader_length', 'dim_text', 'layer'):
+            if k in args:
+                out[k] = args[k]
+        return out
+    if native_op == "write.entity.dim.ordinate":
+        out: Dict[str, Any] = {}
+        for k in ('defining_point', 'leader_end_point', 'use_x_axis', 'dim_text', 'layer'):
             if k in args:
                 out[k] = args[k]
         return out

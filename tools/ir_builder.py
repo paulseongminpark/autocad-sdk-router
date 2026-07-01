@@ -498,6 +498,7 @@ _NATIVE_CLASS_TO_DXF_KIND = {
     "AcDbRadialDimension": ("DIMENSION", "dimension"),
     "AcDbDiametricDimension": ("DIMENSION", "dimension"),
     "AcDbDimension": ("DIMENSION", "dimension"),
+    "AcDbOrdinateDimension": ("DIMENSION", "dimension"),
     "AcDbLeader": ("LEADER", "leader"),
     "AcDbMLeader": ("MULTILEADER", "leader"),
 }
@@ -511,6 +512,8 @@ def _geometry_from_native_entity(raw: dict, kind: str) -> dict:
     T3a: major_axis/radius_ratio, height, xline1_point/xline2_point/
     dim_line_point/measurement. T3a-batch2: degree/fit_points (spline),
     chord_point/far_chord_point (radial/diametric dims); NOT leader_length --
+    see _entity_from_native, it is lifted top-level instead. T3a-batch3:
+    defining_point/leader_end_point/use_x_axis (ordinate dim); NOT origin --
     see _entity_from_native, it is lifted top-level instead).
     Returns an IR geometry dict with a valid ``kind``; unrepresented kinds get
     a geometry that carries only ``kind`` (decoded=False is decided by the
@@ -519,7 +522,7 @@ def _geometry_from_native_entity(raw: dict, kind: str) -> dict:
     geom: dict = {"kind": kind}
     for key in ("start", "end", "center", "position", "scale", "normal",
                 "major_axis", "xline1_point", "xline2_point", "dim_line_point",
-                "chord_point", "far_chord_point"):
+                "chord_point", "far_chord_point", "defining_point", "leader_end_point"):
         pt = _as_point3(raw.get(key))
         if pt is not None:
             geom[key] = pt
@@ -541,6 +544,8 @@ def _geometry_from_native_entity(raw: dict, kind: str) -> dict:
         geom["pattern_name"] = str(raw.get("pattern_name"))
     if isinstance(raw.get("closed"), bool):
         geom["closed"] = raw["closed"]
+    if isinstance(raw.get("use_x_axis"), bool):
+        geom["use_x_axis"] = raw["use_x_axis"]
     verts = raw.get("vertices")
     if isinstance(verts, list) and verts:
         norm = []
@@ -641,6 +646,14 @@ def _entity_from_native(raw: dict, source_block: dict) -> dict:
         entity["spline_control_points"] = raw["spline_control_points"]
     if isinstance(raw.get("spline_knots"), list) and raw["spline_knots"]:
         entity["spline_knots"] = raw["spline_knots"]
+    # T3a-batch3: an ordinate dimension's origin() -- NOT a write.entity.dim.
+    # ordinate ctor arg (the handler never calls setOrigin), so it is not
+    # derivable from this op's own args alone. Deliberately top-level, NOT
+    # inside "geometry", same treatment as dim_block_handle/name (see
+    # op_roundtrip_probe.py's _expect_create_dimension_ordinate).
+    origin = _as_point3(raw.get("origin"))
+    if origin is not None:
+        entity["origin"] = origin
     return entity
 
 
