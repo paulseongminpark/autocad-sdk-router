@@ -463,6 +463,39 @@ def _expect_create_spline(args: Dict[str, Any]) -> Dict[str, Any]:
     }
 
 
+def _expect_create_mline(args: Dict[str, Any]) -> Dict[str, Any]:
+    # write.entity.mline (m08g_handlers.inc) reads "points" first, falling back
+    # to "vertices" only when "points" yields <2 points (the OPPOSITE
+    # precedence from write.entity.leader's vertices-first order -- mirrored
+    # exactly here, not just copy-pasted). Each vertex is a direct, args-
+    # derivable echo (appendSeg per point, no transform, same plain-array shape
+    # as create_leader's -- an mline vertex has no bulge concept either).
+    # "closed" is a direct echo of the op's own "closed" arg: setClosedMline is
+    # only called when closed is a truthy NUMBER (m08g's own check is
+    # `closed != 0.0` via jsonFindNumber, same convention create_polyline
+    # documents -- a JSON bool literal would not parse as a number). Live-
+    # verified (2026-07-02 w3-wbug re-cert, real accoreconsole roundtrip
+    # against tests/fixtures/native_sample.dwg) diff=0 for exactly these two
+    # fields. style/scale/justification are NOT asserted: none of the three is
+    # an independently-observable geometry field collectModelSpaceGraph
+    # extracts (AcDbMline exposes them via style()/scale()/justification(),
+    # none of which this P-gate's geometry-basis compare reads today) -- out of
+    # scope for this single-entity geometry cert, same treatment
+    # dim_block_handle/spline_control_points got.
+    points_arg = args.get("points") or []
+    if len(points_arg) < 2:
+        points_arg = args.get("vertices") or []
+    vertices = [{"point": _point_to_list(p)} for p in points_arg]
+    closed = bool(args.get("closed", 0))
+    return {
+        "dxf_name": "MLINE", "layer": args.get("layer") or "0",
+        "geometry": {
+            "kind": "mline",
+            "vertices": vertices, "closed": closed,
+        },
+    }
+
+
 # op_name -> args -> a single IR entity (dxf_name/layer/geometry only -- no
 # handle; the P-gate's geometry-basis compare is handle-independent by
 # design). Only ops this module can honestly build ground truth for; an
@@ -491,6 +524,13 @@ def _expect_create_spline(args: Dict[str, Any]) -> Dict[str, Any]:
 # T3a-batch3 adds create_dimension_ordinate / create_leader: same two-part gap
 # (already native-REACHABLE per measure/reachable_matrix.jsonl, but no
 # patch_ops wiring and no collectModelSpaceGraph read branch until this batch).
+#
+# w3-wbug adds create_mline: unlike every T3a-batch kind, this one was NOT
+# already native-REACHABLE -- write.entity.mline's handler had a real bug
+# (appendSeg's ErrorStatus was never checked, so a silently-failing build
+# still reported success with a geometrically-empty MLINE; see
+# m08g_handlers.inc). Fixing that bug plus the same two-part gap (patch_ops
+# wiring + collectModelSpaceGraph read branch) both landed together.
 _EXPECTED_ENTITY_BUILDERS: Dict[str, Callable[[Dict[str, Any]], Dict[str, Any]]] = {
     "create_line": _expect_create_line,
     "create_circle": _expect_create_circle,
@@ -506,6 +546,7 @@ _EXPECTED_ENTITY_BUILDERS: Dict[str, Callable[[Dict[str, Any]], Dict[str, Any]]]
     "create_dimension_diametric": _expect_create_dimension_diametric,
     "create_dimension_ordinate": _expect_create_dimension_ordinate,
     "create_leader": _expect_create_leader,
+    "create_mline": _expect_create_mline,
 }
 
 

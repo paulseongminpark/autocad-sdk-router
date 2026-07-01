@@ -39,6 +39,9 @@
 #include "dblead.h"    // T3a-batch3: AcDbLeader (collectModelSpaceGraph read branch --
                        // families/m08h_handlers.inc's own #include is textually AFTER
                        // collectModelSpaceGraph in this TU, so this needs its own copy)
+#include "dbmline.h"   // w3-wbug: AcDbMline (collectModelSpaceGraph read branch --
+                       // families/m08g_handlers.inc's own #include is textually AFTER
+                       // collectModelSpaceGraph in this TU, so this needs its own copy)
 #include "dbxrecrd.h"
 #include "dbsymtb.h"
 #include "dbcolor.h"
@@ -1415,6 +1418,28 @@ static bool collectModelSpaceGraph(AcDbDatabase* pDb, int& total,
             arr << "]";
             arr << ",\"has_arrow_head\":" << (pLdr->hasArrowHead() ? "true" : "false")
                 << ",\"splined\":" << (pLdr->isSplined() ? "true" : "false");
+        }
+        // w3-wbug: AcDbMline -- vertices are direct, args-derivable echoes of
+        // write.entity.mline's points/vertices ctor-arg loop (appendSeg per
+        // point, no transform). Emitted as a plain [x,y,z]-array "vertices"
+        // (same shape as AcDbLeader above, no bulge concept), so it reuses ir_
+        // builder.py's existing generic "vertices" lift with zero Python change
+        // to that helper -- only a new _NATIVE_CLASS_TO_DXF_KIND entry is
+        // needed. "closed" is a direct echo of write.entity.mline's own
+        // "closed" arg (setClosedMline), mirroring AcDb2dPolyline/3dPolyline's
+        // shape above. Does NOT derive from any other class this chain already
+        // casts to (a direct AcDbEntity subclass), so this branch's position in
+        // the chain is not load-bearing.
+        else if (AcDbMline* pMl = AcDbMline::cast(pEnt)) {
+            const int nVerts = pMl->numVertices();
+            arr << ",\"vertices\":[";
+            for (int vi = 0; vi < nVerts; ++vi) {
+                const AcGePoint3d vp = pMl->vertexAt(vi);
+                if (vi != 0) arr << ",";
+                arr << "[" << vp.x << "," << vp.y << "," << vp.z << "]";
+            }
+            arr << "]";
+            arr << ",\"closed\":" << (pMl->closedMline() ? "true" : "false");
         }
 
         arr << "}";

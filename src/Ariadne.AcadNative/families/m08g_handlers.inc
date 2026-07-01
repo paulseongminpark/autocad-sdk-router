@@ -675,27 +675,60 @@ static bool m08gDispatch(const std::string& op, const AriadneJobCtx& ctx, std::o
             emitNativeError(r, "MISSING_ARG", "write.entity.mline requires points/vertices array with >=2 {x,y,z}");
             return true;
         }
+        // BUGFIX (w3-wbug): the original code called setStyle/setScale/appendSeg
+        // without checking ErrorStatus at all, so a silently-failing appendSeg
+        // still reported created=true/errorstatus=0 with a real, database-
+        // resident but geometrically-empty (numVertices()==0) MLINE. LIVE-
+        // DISCOVERED root cause (op_roundtrip_probe.py direct run against
+        // tests/fixtures/native_sample.dwg): a freshly new()'d AcDbMline's normal
+        // defaults to a zero vector, not +Z -- appendSeg needs a well-defined
+        // normal to project points onto the mline's working plane and fails with
+        // eInvalidNormal (291, C:\ObjectARX 2027\inc\acadstrc.h) on every call
+        // until setNormal() is given a real vector; the original code never
+        // called setNormal at all. Every ObjectARX call that shapes the mline is
+        // now threaded through one ErrorStatus and short-circuits on the first
+        // failure; setNormal/setJustification (neither ever called before) are
+        // now explicit rather than relying on whatever an unset AcDbMline
+        // defaults to.
         AcDbMline* pE = new AcDbMline();
         pE->setDatabaseDefaults(pDb);
+        Acad::ErrorStatus es = pE->setNormal(AcGeVector3d(0.0, 0.0, 1.0));
         const AcDbObjectId styleId = pDb->cmlstyleID();
-        if (!styleId.isNull())
-            pE->setStyle(styleId);
+        if (es == Acad::eOk && !styleId.isNull())
+            es = pE->setStyle(styleId);
+        if (es == Acad::eOk)
+            es = pE->setJustification(Mline::kTop);
         double scale = 1.0; jsonFindNumber(job, "scale", scale);
-        if (scale != 0.0) pE->setScale(scale);
-        for (int i = 0; i < pts.length(); ++i)
-            pE->appendSeg(pts[i]);
+        if (es == Acad::eOk && scale != 0.0)
+            es = pE->setScale(scale);
+        for (int i = 0; es == Acad::eOk && i < pts.length(); ++i)
+            es = pE->appendSeg(pts[i]);
         double closed = 0.0;
-        if (jsonFindNumber(job, "closed", closed) && closed != 0.0)
-            pE->setClosedMline(true);
+        if (es == Acad::eOk && jsonFindNumber(job, "closed", closed) && closed != 0.0)
+            es = pE->setClosedMline(true);
+        if (es != Acad::eOk) {
+            delete pE;
+            emitNativeError(r, "MLINE_BUILD_FAILED", "AcDbMline build errorstatus " + std::to_string(static_cast<int>(es)));
+            return true;
+        }
+        // Defensive, no-fake-success check: capture the REAL vertex count while pE
+        // is still ours to query (m08gAppendEntity closes -- and on failure
+        // delete()s -- pE, so numVertices() must be read before that call).
+        const int builtVertexCount = pE->numVertices();
+        if (builtVertexCount <= 0) {
+            delete pE;
+            emitNativeError(r, "MLINE_EMPTY", "AcDbMline reported eOk at every build step but numVertices()==0");
+            return true;
+        }
         AcDbObjectId id; int ms = 0;
-        const Acad::ErrorStatus es = m08gAppendEntity(pDb, layer, pE, id, ms);
-        r << "\"result\":{\"created\":" << (es == Acad::eOk ? "true" : "false")
-          << ",\"errorstatus\":" << static_cast<int>(es)
-          << ",\"handle\":" << njsonStr(es == Acad::eOk ? handleOfId(id) : std::string())
-          << ",\"vertex_count\":" << pts.length()
+        const Acad::ErrorStatus appendEs = m08gAppendEntity(pDb, layer, pE, id, ms);
+        r << "\"result\":{\"created\":" << (appendEs == Acad::eOk ? "true" : "false")
+          << ",\"errorstatus\":" << static_cast<int>(appendEs)
+          << ",\"handle\":" << njsonStr(appendEs == Acad::eOk ? handleOfId(id) : std::string())
+          << ",\"vertex_count\":" << builtVertexCount
           << ",\"layer\":" << njsonStr(layer)
           << ",\"modelspace_entities_after\":" << ms << "},"
-          << "\"status\":\"" << (es == Acad::eOk ? "ok" : "error") << "\"}";
+          << "\"status\":\"" << (appendEs == Acad::eOk ? "ok" : "error") << "\"}";
         return true;
     }
     if (op == "write.entity.shape") {

@@ -501,6 +501,11 @@ _NATIVE_CLASS_TO_DXF_KIND = {
     "AcDbOrdinateDimension": ("DIMENSION", "dimension"),
     "AcDbLeader": ("LEADER", "leader"),
     "AcDbMLeader": ("MULTILEADER", "leader"),
+    # w3-wbug: AcDbMline's "vertices" (plain [x,y,z] array, no bulge) and
+    # "closed" are BOTH already lifted by _geometry_from_native_entity's
+    # existing generic handling (same shapes AcDbLeader/AcDb2dPolyline already
+    # use) -- this class-map entry is the only change needed here.
+    "AcDbMline": ("MLINE", "mline"),
 }
 
 

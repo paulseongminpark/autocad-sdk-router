@@ -381,6 +381,25 @@ class TestNativeGraphGeometryLifting(unittest.TestCase):
             "has_arrow_head": True, "splined": False,
         })
 
+    def test_mline_lifts_vertices_and_closed(self):
+        # w3-wbug: AcDbMline's "vertices" (plain [x,y,z] array) and "closed"
+        # both reuse the exact same generic lifts AcDbLeader/AcDb2dPolyline
+        # already exercise above -- only the _NATIVE_CLASS_TO_DXF_KIND entry is
+        # new (ir_builder.py itself is unchanged for this kind).
+        ent = self._one_entity_ir({
+            "handle": "1AD", "dxf_name": "AcDbMline", "layer": "0",
+            "owner_handle": "1F", "space": "model",
+            "vertices": [[0.0, 0.0, 0.0], [10.0, 0.0, 0.0], [10.0, 10.0, 0.0]],
+            "closed": False,
+        })
+        self.assertEqual(ent["dxf_name"], "MLINE")
+        self.assertEqual(ent["geometry"], {
+            "kind": "mline",
+            "vertices": [{"point": [0.0, 0.0, 0.0]}, {"point": [10.0, 0.0, 0.0]},
+                        {"point": [10.0, 10.0, 0.0]}],
+            "closed": False,
+        })
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -331,6 +331,40 @@ class TestExpectedIrForOp(unittest.TestCase):
         self.assertEqual(ir["entities"][0]["geometry"]["vertices"],
                          [{"point": [1, 1, 0]}, {"point": [5, 5, 0]}])
 
+    def test_create_mline_builds_mline_geometry(self):
+        # w3-wbug: collectModelSpaceGraph grew an AcDbMline branch alongside the
+        # write.entity.mline native bugfix (appendSeg's ErrorStatus was never
+        # checked before; a silently-failing build reported success with a
+        # geometrically-empty MLINE -- see m08g_handlers.inc). vertices are
+        # direct, args-derivable echoes (appendSeg per point, no transform);
+        # "closed" defaults False when absent -- live-verified (2026-07-02
+        # w3-wbug re-cert) diff=0.
+        ir = probe.expected_ir_for_op(
+            "create_mline",
+            {"points": [[0, 0, 0], [10, 0, 0], [10, 10, 0]], "layer": "0"})
+        ent = ir["entities"][0]
+        self.assertEqual(ent["dxf_name"], "MLINE")
+        self.assertEqual(ent["geometry"], {
+            "kind": "mline",
+            "vertices": [{"point": [0, 0, 0]}, {"point": [10, 0, 0]}, {"point": [10, 10, 0]}],
+            "closed": False,
+        })
+
+    def test_create_mline_falls_back_to_vertices_key(self):
+        # write.entity.mline reads "points" first, falling back to "vertices"
+        # only when "points" yields <2 points -- the OPPOSITE precedence from
+        # write.entity.leader's vertices-first order; mirror that here.
+        ir = probe.expected_ir_for_op(
+            "create_mline", {"vertices": [[1, 1, 0], [5, 5, 0]], "layer": "0"})
+        self.assertEqual(ir["entities"][0]["geometry"]["vertices"],
+                         [{"point": [1, 1, 0]}, {"point": [5, 5, 0]}])
+
+    def test_create_mline_honors_explicit_closed(self):
+        ir = probe.expected_ir_for_op(
+            "create_mline",
+            {"points": [[0, 0, 0], [10, 0, 0], [10, 10, 0]], "closed": 1, "layer": "0"})
+        self.assertEqual(ir["entities"][0]["geometry"]["closed"], True)
+
     def test_unbuildable_op_raises_not_implemented_error(self):
         # create_arc/create_ellipse were the fixtures here pre-T3a; this
         # module has since grown ground-truth builders for both.
