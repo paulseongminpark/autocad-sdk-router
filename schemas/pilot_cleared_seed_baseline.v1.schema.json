@@ -1,0 +1,77 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "ariadne.pilot_cleared_seed_baseline.v1",
+  "title": "Ariadne F4b Pilot Cleared-Copy Seed Baseline v1",
+  "description": "The pinned symbol-table/block-def baseline for fixtures/pilot_cleared_seed.dwg [F4b, RT-FOLD R2-A6]. Written once by tools/mint_pilot_seed.py alongside the fixture + its .sha256 sidecar. All pilot gates (M-B/M-C/M-D) compare Rung-A/Rung-C against this document instead of re-deriving an ad-hoc clear baseline. pre_clear/post_clear are ariadne.dwg_graph_ir.v1-derived count summaries (see tools/mint_pilot_seed.py:extract_baseline_counts); verification is the pass/fail record of tools/mint_pilot_seed.py:verify_cleared over them.",
+  "type": "object",
+  "additionalProperties": true,
+  "required": ["schema", "fixture", "minted_at", "clear_scope", "source", "fixture_sha256", "fixture_byte_size", "pre_clear", "post_clear", "verification"],
+  "properties": {
+    "schema": { "type": "string", "const": "ariadne.pilot_cleared_seed_baseline.v1" },
+    "fixture": { "type": "string", "description": "Repo-relative path of the minted fixture, e.g. fixtures/pilot_cleared_seed.dwg." },
+    "minted_at": { "type": "string", "description": "ISO-8601 UTC timestamp of the mint run." },
+    "clear_scope": { "type": "string", "enum": ["modelspace_entities_only"], "description": "F4b clears modelspace entities only; symbol tables + block definitions + other database-level state are retained." },
+    "source": {
+      "type": "object",
+      "description": "The drawing the fixture was minted from (read-only original; never committed alongside the fixture).",
+      "additionalProperties": true,
+      "required": ["path"],
+      "properties": {
+        "path": { "type": "string" },
+        "sha256": { "type": ["string", "null"] },
+        "byte_size": { "type": ["integer", "null"], "minimum": 0 }
+      }
+    },
+    "fixture_sha256": { "type": "string", "description": "SHA-256 of fixtures/pilot_cleared_seed.dwg's bytes (also recorded in the .sha256 sidecar)." },
+    "fixture_byte_size": { "type": "integer", "minimum": 0 },
+    "pre_clear": { "$ref": "#/$defs/count_summary", "description": "Counts measured on the staged source copy BEFORE the clear." },
+    "post_clear": { "$ref": "#/$defs/count_summary", "description": "Counts measured on the written fixture AFTER the clear. modelspace_entity_count and block_references must be 0; every other field must equal pre_clear's." },
+    "verification": {
+      "type": "object",
+      "description": "tools/mint_pilot_seed.py:verify_cleared(pre_clear, post_clear) result.",
+      "additionalProperties": true,
+      "required": ["ok", "errors"],
+      "properties": {
+        "ok": { "type": "boolean" },
+        "errors": { "type": "array", "items": { "type": "string" } }
+      }
+    }
+  },
+  "$defs": {
+    "count_summary": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": [
+        "modelspace_entity_count", "entities_by_type", "block_definitions",
+        "block_references", "symbol_tables", "xrefs", "dictionaries",
+        "extension_dictionaries", "xrecords", "layouts"
+      ],
+      "properties": {
+        "modelspace_entity_count": { "type": "integer", "minimum": 0, "description": "len(ir.entities); 375 pre-clear for the pinned test.dws source, 0 post-clear." },
+        "entities_by_type": { "type": "object", "description": "dxf_name -> count histogram of ir.entities.", "additionalProperties": { "type": "integer", "minimum": 0 } },
+        "block_definitions": { "type": "integer", "minimum": 0, "description": "len(ir.block_definitions); pinned at 140, retained across the clear." },
+        "block_references": { "type": "integer", "minimum": 0, "description": "len(ir.block_references) (INSERT placements); a modelspace-entity count, cleared to 0." },
+        "symbol_tables": {
+          "type": "object",
+          "description": "Per-table record counts from ir.symbol_tables; all retained across the clear.",
+          "additionalProperties": true,
+          "required": ["layers", "linetypes", "text_styles", "dim_styles", "viewports", "app_ids", "block_table_records"],
+          "properties": {
+            "layers": { "type": "integer", "minimum": 0 },
+            "linetypes": { "type": "integer", "minimum": 0 },
+            "text_styles": { "type": "integer", "minimum": 0 },
+            "dim_styles": { "type": "integer", "minimum": 0 },
+            "viewports": { "type": "integer", "minimum": 0 },
+            "app_ids": { "type": "integer", "minimum": 0 },
+            "block_table_records": { "type": "integer", "minimum": 0 }
+          }
+        },
+        "xrefs": { "type": "integer", "minimum": 0 },
+        "dictionaries": { "type": "integer", "minimum": 0 },
+        "extension_dictionaries": { "type": "integer", "minimum": 0 },
+        "xrecords": { "type": "integer", "minimum": 0 },
+        "layouts": { "type": "integer", "minimum": 0 }
+      }
+    }
+  }
+}
