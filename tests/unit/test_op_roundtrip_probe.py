@@ -183,6 +183,98 @@ class TestExpectedIrForOp(unittest.TestCase):
         self.assertNotIn("dim_block_handle", ent["geometry"])
         self.assertNotIn("dim_block_name", ent["geometry"])
 
+    def test_create_dimension_aligned_builds_dimension_geometry(self):
+        # T3a-batch2: collectModelSpaceGraph grew an AcDbAlignedDimension
+        # branch. dim_line_point/measurement are NOT ctor-arg echoes -- an
+        # aligned dimension re-anchors dim_line_point exactly like a rotated
+        # dimension does (T3a), with the xLine1->xLine2 baseline's own angle
+        # standing in for "rotation" (live-verified 2026-07-02 T3a-batch2
+        # re-cert). xline1=(0,0,0) xline2=(60,80,0) (baseline angle
+        # atan2(80,60), length 100 -- a scaled 3-4-5 triangle) dim_line=
+        # (20,60,0) -> stored dim_line_point (44.0, 92.0, 0.0), measurement
+        # 100.0 (the straight-line xline1->xline2 distance).
+        ir = probe.expected_ir_for_op(
+            "create_dimension_aligned",
+            {"xline1": [0, 0, 0], "xline2": [60, 80, 0], "dim_line": [20, 60, 0], "layer": "0"})
+        ent = ir["entities"][0]
+        self.assertEqual(ent["dxf_name"], "DIMENSION")
+        geom = ent["geometry"]
+        self.assertEqual(geom["kind"], "dimension")
+        self.assertEqual(geom["xline1_point"], [0, 0, 0])
+        self.assertEqual(geom["xline2_point"], [60, 80, 0])
+        self.assertAlmostEqual(geom["dim_line_point"][0], 44.0)
+        self.assertAlmostEqual(geom["dim_line_point"][1], 92.0)
+        self.assertAlmostEqual(geom["dim_line_point"][2], 0.0)
+        self.assertAlmostEqual(geom["measurement"], 100.0)
+        self.assertNotIn("rotation", geom)
+        self.assertNotIn("dim_block_handle", geom)
+        self.assertNotIn("dim_block_name", geom)
+
+    def test_create_dimension_radial_builds_dimension_geometry(self):
+        # T3a-batch2: collectModelSpaceGraph grew an AcDbRadialDimension
+        # branch. center/chord_point are direct ctor-arg echoes (no
+        # rotation-style re-anchoring degree of freedom applies here,
+        # live-verified 2026-07-02 T3a-batch2 re-cert); measurement is the
+        # independently-computed center->chord_point distance (the radius).
+        # leader_length is deliberately NOT asserted -- live-discovered to be
+        # AutoCAD's own recomputed value (see the function's docstring).
+        ir = probe.expected_ir_for_op(
+            "create_dimension_radial",
+            {"center": [0, 0, 0], "chord_point": [10, 0, 0], "leader_length": 5.0, "layer": "0"})
+        ent = ir["entities"][0]
+        self.assertEqual(ent["dxf_name"], "DIMENSION")
+        self.assertEqual(ent["geometry"], {
+            "kind": "dimension", "center": [0, 0, 0], "chord_point": [10, 0, 0],
+            "measurement": 10.0,
+        })
+        self.assertNotIn("leader_length", ent["geometry"])
+
+    def test_create_dimension_diametric_builds_dimension_geometry(self):
+        # T3a-batch2: collectModelSpaceGraph grew an AcDbDiametricDimension
+        # branch. chord_point/far_chord_point are direct ctor-arg echoes
+        # (live-verified 2026-07-02 T3a-batch2 re-cert); measurement is the
+        # independently-computed chord_point<->far_chord_point distance (the
+        # diameter). leader_length is deliberately NOT asserted, same reason
+        # as the radial case above.
+        ir = probe.expected_ir_for_op(
+            "create_dimension_diametric",
+            {"chord_point": [-10, 0, 0], "far_chord_point": [10, 0, 0],
+             "leader_length": 5.0, "layer": "0"})
+        ent = ir["entities"][0]
+        self.assertEqual(ent["dxf_name"], "DIMENSION")
+        self.assertEqual(ent["geometry"], {
+            "kind": "dimension", "chord_point": [-10, 0, 0], "far_chord_point": [10, 0, 0],
+            "measurement": 20.0,
+        })
+        self.assertNotIn("leader_length", ent["geometry"])
+
+    def test_create_spline_builds_spline_geometry(self):
+        # T3a-batch2: collectModelSpaceGraph grew an AcDbSpline branch.
+        # write.entity.spline (m08g_handlers.inc) always builds a fit-point
+        # spline (order defaults to 4.0, never periodic/closed), so degree
+        # (=order-1) / closed (=False) / fit_points (the literal "points" arg)
+        # are direct, args-derivable ground truth -- live-verified
+        # (2026-07-02 T3a-batch2 re-cert) diff=0 for exactly these three.
+        ir = probe.expected_ir_for_op(
+            "create_spline",
+            {"points": [[0, 0, 0], [10, 5, 0], [20, 0, 0], [30, 8, 0]], "layer": "0"})
+        ent = ir["entities"][0]
+        self.assertEqual(ent["dxf_name"], "SPLINE")
+        self.assertEqual(ent["geometry"], {
+            "kind": "spline", "degree": 3, "closed": False,
+            "fit_points": [[0, 0, 0], [10, 5, 0], [20, 0, 0], [30, 8, 0]],
+        })
+        # spline_control_points/spline_knots are NEVER asserted here (see
+        # _expect_create_spline's docstring): AutoCAD's own fit-to-NURBS
+        # conversion result, not derivable from args alone.
+        self.assertNotIn("spline_control_points", ent["geometry"])
+        self.assertNotIn("spline_knots", ent["geometry"])
+
+    def test_create_spline_honors_explicit_order(self):
+        ir = probe.expected_ir_for_op(
+            "create_spline", {"points": [[0, 0, 0], [10, 0, 0]], "order": 2, "layer": "0"})
+        self.assertEqual(ir["entities"][0]["geometry"]["degree"], 1)
+
     def test_unbuildable_op_raises_not_implemented_error(self):
         # create_arc/create_ellipse were the fixtures here pre-T3a; this
         # module has since grown ground-truth builders for both.

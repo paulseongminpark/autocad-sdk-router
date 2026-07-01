@@ -38,6 +38,10 @@ WRITE_OP_MAP: Dict[str, str] = {
     "create_polyline": "write.entity.polyline",
     "create_dimension": "write.entity.dim.rotated",
     "set_entity_xdata": "write.entity.set_xdata",
+    "create_spline": "write.entity.spline",
+    "create_dimension_aligned": "write.entity.dim.aligned",
+    "create_dimension_radial": "write.entity.dim.radial",
+    "create_dimension_diametric": "write.entity.dim.diametric",
 }
 
 
@@ -108,6 +112,30 @@ def build_job_args(native_op: str, args: Dict[str, Any]) -> Optional[Dict[str, A
     if native_op == "write.entity.dim.rotated":
         out: Dict[str, Any] = {}
         for k in ('xline1', 'xline2', 'dim_line', 'dim_text', 'rotation', 'layer'):
+            if k in args:
+                out[k] = args[k]
+        return out
+    if native_op == "write.entity.spline":
+        out: Dict[str, Any] = {}
+        for k in ('points', 'order', 'layer'):
+            if k in args:
+                out[k] = args[k]
+        return out
+    if native_op == "write.entity.dim.aligned":
+        out: Dict[str, Any] = {}
+        for k in ('xline1', 'xline2', 'dim_line', 'dim_text', 'layer'):
+            if k in args:
+                out[k] = args[k]
+        return out
+    if native_op == "write.entity.dim.radial":
+        out: Dict[str, Any] = {}
+        for k in ('center', 'chord_point', 'leader_length', 'dim_text', 'layer'):
+            if k in args:
+                out[k] = args[k]
+        return out
+    if native_op == "write.entity.dim.diametric":
+        out: Dict[str, Any] = {}
+        for k in ('chord_point', 'far_chord_point', 'leader_length', 'dim_text', 'layer'):
             if k in args:
                 out[k] = args[k]
         return out

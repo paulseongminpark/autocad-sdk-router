@@ -32,7 +32,9 @@
 #include "dbpl.h"
 #include "dbhatch.h"
 #include "dbelipse.h"  // T3a: AcDbEllipse (collectModelSpaceGraph read branch)
-#include "dbdim.h"     // T3a: AcDbRotatedDimension (collectModelSpaceGraph read branch)
+#include "dbdim.h"     // T3a: AcDbRotatedDimension; T3a-batch2: AcDbAlignedDimension/
+                       // AcDbRadialDimension/AcDbDiametricDimension (same header)
+#include "dbspline.h"  // T3a-batch2: AcDbSpline (collectModelSpaceGraph read branch)
 #include "dbxrecrd.h"
 #include "dbsymtb.h"
 #include "dbcolor.h"
@@ -1072,6 +1074,53 @@ static bool collectModelSpaceGraph(AcDbDatabase* pDb, int& total,
                 << ",\"end_angle\":" << pEl->endAngle()
                 << ",\"normal\":[" << nrm.x << "," << nrm.y << "," << nrm.z << "]";
         }
+        // T3a-batch2: AcDbSpline, also grouped here with the other curve-ish
+        // primitives (derives from AcDbCurve directly, no cast-order concern).
+        // degree/closed/fit_points are direct, args-derivable echoes of what
+        // write.entity.spline's fit-point ctor (m08g_handlers.inc) was given --
+        // order-1, always non-periodic/non-closed for that op, and the literal
+        // input "points" array -- so those three are honest P-gate ground
+        // truth. spline_control_points/spline_knots are ALSO extracted
+        // (AcDbSpline::getNurbsData, one call) but are AutoCAD's OWN
+        // fit-to-NURBS conversion result, not derivable from this op's own
+        // args alone -- ir_builder.py surfaces them as TOP-LEVEL entity
+        // fields (never inside "geometry"), the exact same treatment T3a gave
+        // dim_block_handle/dim_block_name below, and for the exact same
+        // reason (see op_roundtrip_probe.py's _expect_create_spline).
+        else if (AcDbSpline* pSpl = AcDbSpline::cast(pEnt)) {
+            arr << ",\"degree\":" << pSpl->degree()
+                << ",\"closed\":" << (pSpl->isClosed() ? "true" : "false");
+            const int nFit = pSpl->numFitPoints();
+            arr << ",\"fit_points\":[";
+            for (int fi = 0; fi < nFit; ++fi) {
+                AcGePoint3d fp;
+                if (pSpl->getFitPointAt(fi, fp) != Acad::eOk)
+                    break;
+                if (fi != 0) arr << ",";
+                arr << "[" << fp.x << "," << fp.y << "," << fp.z << "]";
+            }
+            arr << "]";
+            int nurbsDegree = 0;
+            Adesk::Boolean rational = Adesk::kFalse, closedFlag = Adesk::kFalse, periodic = Adesk::kFalse;
+            AcGePoint3dArray ctrlPts;
+            AcGeDoubleArray knots, weights;
+            double ctrlTol = 0.0, knotTol = 0.0;
+            if (pSpl->getNurbsData(nurbsDegree, rational, closedFlag, periodic, ctrlPts, knots,
+                                   weights, ctrlTol, knotTol) == Acad::eOk) {
+                arr << ",\"spline_control_points\":[";
+                for (int ci = 0; ci < ctrlPts.length(); ++ci) {
+                    if (ci != 0) arr << ",";
+                    arr << "[" << ctrlPts[ci].x << "," << ctrlPts[ci].y << "," << ctrlPts[ci].z << "]";
+                }
+                arr << "]";
+                arr << ",\"spline_knots\":[";
+                for (int ki = 0; ki < knots.length(); ++ki) {
+                    if (ki != 0) arr << ",";
+                    arr << knots[ki];
+                }
+                arr << "]";
+            }
+        }
         else if (AcDbBlockReference* pRef = AcDbBlockReference::cast(pEnt)) {
             const AcGePoint3d p = pRef->position();
             const AcGeScale3d sc = pRef->scaleFactors();
@@ -1194,6 +1243,98 @@ static bool collectModelSpaceGraph(AcDbDatabase* pDb, int& total,
             // dim_block_handle/dim_block_name field instead (see op_roundtrip_
             // probe.py's _expect_create_dimension for the full rationale).
             const AcDbObjectId dimBlockId = pDim->dimBlockId();
+            if (!dimBlockId.isNull()) {
+                arr << ",\"dim_block_handle\":\"" << jsonEscape(handleOfId(dimBlockId)) << "\"";
+                std::string dimBlockName;
+                AcDbBlockTableRecord* pDimDef = nullptr;
+                if (acdbOpenObject(pDimDef, dimBlockId, AcDb::kForRead) == Acad::eOk) {
+                    const ACHAR* nameRaw = nullptr;
+                    if (pDimDef->getName(nameRaw) == Acad::eOk)
+                        dimBlockName = acharToAscii(nameRaw);
+                    pDimDef->close();
+                }
+                arr << ",\"dim_block_name\":\"" << jsonEscape(dimBlockName) << "\"";
+            }
+        }
+        // T3a-batch2: AcDbAlignedDimension -- same 3-defining-points +
+        // measurement shape as AcDbRotatedDimension above, minus "rotation":
+        // an aligned dimension has no independent rotation arg -- its
+        // dimension line is always parallel to the xLine1->xLine2 baseline by
+        // definition (that is what "aligned" means). Derives directly from
+        // AcDbDimension (NOT from AcDbRotatedDimension), so cast ordering
+        // relative to it is not load-bearing.
+        else if (AcDbAlignedDimension* pAl = AcDbAlignedDimension::cast(pEnt)) {
+            const AcGePoint3d p1 = pAl->xLine1Point();
+            const AcGePoint3d p2 = pAl->xLine2Point();
+            const AcGePoint3d dl = pAl->dimLinePoint();
+            double measurement = 0.0;
+            const bool haveMeasurement = (pAl->measurement(measurement) == Acad::eOk);
+            arr << ",\"xline1_point\":[" << p1.x << "," << p1.y << "," << p1.z << "]"
+                << ",\"xline2_point\":[" << p2.x << "," << p2.y << "," << p2.z << "]"
+                << ",\"dim_line_point\":[" << dl.x << "," << dl.y << "," << dl.z << "]";
+            if (haveMeasurement)
+                arr << ",\"measurement\":" << measurement;
+            const AcDbObjectId dimBlockId = pAl->dimBlockId();
+            if (!dimBlockId.isNull()) {
+                arr << ",\"dim_block_handle\":\"" << jsonEscape(handleOfId(dimBlockId)) << "\"";
+                std::string dimBlockName;
+                AcDbBlockTableRecord* pDimDef = nullptr;
+                if (acdbOpenObject(pDimDef, dimBlockId, AcDb::kForRead) == Acad::eOk) {
+                    const ACHAR* nameRaw = nullptr;
+                    if (pDimDef->getName(nameRaw) == Acad::eOk)
+                        dimBlockName = acharToAscii(nameRaw);
+                    pDimDef->close();
+                }
+                arr << ",\"dim_block_name\":\"" << jsonEscape(dimBlockName) << "\"";
+            }
+        }
+        // T3a-batch2: AcDbRadialDimension -- center/chord_point are direct
+        // ctor-arg echoes (no rotation-style re-anchoring degree of freedom
+        // applies here); measurement is the dimensioned radius. leaderLength()
+        // is ALSO extracted but live-verified (2026-07-02 re-cert) to be
+        // AutoCAD's own recomputed value (reset to 0 when no leader is
+        // actually needed at the current dimstyle's text/arrow size), not a
+        // ctor-arg echo -- ir_builder.py surfaces it top-level, unasserted
+        // (see op_roundtrip_probe.py's _expect_create_dimension_radial).
+        else if (AcDbRadialDimension* pRad = AcDbRadialDimension::cast(pEnt)) {
+            const AcGePoint3d ctr = pRad->center();
+            const AcGePoint3d chord = pRad->chordPoint();
+            double measurement = 0.0;
+            const bool haveMeasurement = (pRad->measurement(measurement) == Acad::eOk);
+            arr << ",\"center\":[" << ctr.x << "," << ctr.y << "," << ctr.z << "]"
+                << ",\"chord_point\":[" << chord.x << "," << chord.y << "," << chord.z << "]"
+                << ",\"leader_length\":" << pRad->leaderLength();
+            if (haveMeasurement)
+                arr << ",\"measurement\":" << measurement;
+            const AcDbObjectId dimBlockId = pRad->dimBlockId();
+            if (!dimBlockId.isNull()) {
+                arr << ",\"dim_block_handle\":\"" << jsonEscape(handleOfId(dimBlockId)) << "\"";
+                std::string dimBlockName;
+                AcDbBlockTableRecord* pDimDef = nullptr;
+                if (acdbOpenObject(pDimDef, dimBlockId, AcDb::kForRead) == Acad::eOk) {
+                    const ACHAR* nameRaw = nullptr;
+                    if (pDimDef->getName(nameRaw) == Acad::eOk)
+                        dimBlockName = acharToAscii(nameRaw);
+                    pDimDef->close();
+                }
+                arr << ",\"dim_block_name\":\"" << jsonEscape(dimBlockName) << "\"";
+            }
+        }
+        // T3a-batch2: AcDbDiametricDimension -- chord_point/far_chord_point
+        // are direct ctor-arg echoes; measurement is the dimensioned diameter.
+        // leaderLength() has the identical live-discovered non-echo behavior
+        // documented on the AcDbRadialDimension branch above.
+        else if (AcDbDiametricDimension* pDia = AcDbDiametricDimension::cast(pEnt)) {
+            const AcGePoint3d chord = pDia->chordPoint();
+            const AcGePoint3d farChord = pDia->farChordPoint();
+            double measurement = 0.0;
+            const bool haveMeasurement = (pDia->measurement(measurement) == Acad::eOk);
+            arr << ",\"chord_point\":[" << chord.x << "," << chord.y << "," << chord.z << "]"
+                << ",\"far_chord_point\":[" << farChord.x << "," << farChord.y << "," << farChord.z << "]"
+                << ",\"leader_length\":" << pDia->leaderLength();
+            if (haveMeasurement)
+                arr << ",\"measurement\":" << measurement;
+            const AcDbObjectId dimBlockId = pDia->dimBlockId();
             if (!dimBlockId.isNull()) {
                 arr << ",\"dim_block_handle\":\"" << jsonEscape(handleOfId(dimBlockId)) << "\"";
                 std::string dimBlockName;

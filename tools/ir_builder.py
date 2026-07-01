@@ -495,6 +495,8 @@ _NATIVE_CLASS_TO_DXF_KIND = {
     "AcDbViewport": ("VIEWPORT", "viewport"),
     "AcDbRotatedDimension": ("DIMENSION", "dimension"),
     "AcDbAlignedDimension": ("DIMENSION", "dimension"),
+    "AcDbRadialDimension": ("DIMENSION", "dimension"),
+    "AcDbDiametricDimension": ("DIMENSION", "dimension"),
     "AcDbDimension": ("DIMENSION", "dimension"),
     "AcDbLeader": ("LEADER", "leader"),
     "AcDbMLeader": ("MULTILEADER", "leader"),
@@ -507,13 +509,17 @@ def _geometry_from_native_entity(raw: dict, kind: str) -> dict:
     The native collector writes geometry inline on the entity record (start/end,
     center/radius/angles, position/scale/rotation/block_name, text, vertices,
     T3a: major_axis/radius_ratio, height, xline1_point/xline2_point/
-    dim_line_point/measurement). Returns an IR geometry dict with a valid
-    ``kind``; unrepresented kinds get a geometry that carries only ``kind``
-    (decoded=False is decided by the caller).
+    dim_line_point/measurement. T3a-batch2: degree/fit_points (spline),
+    chord_point/far_chord_point (radial/diametric dims); NOT leader_length --
+    see _entity_from_native, it is lifted top-level instead).
+    Returns an IR geometry dict with a valid ``kind``; unrepresented kinds get
+    a geometry that carries only ``kind`` (decoded=False is decided by the
+    caller).
     """
     geom: dict = {"kind": kind}
     for key in ("start", "end", "center", "position", "scale", "normal",
-                "major_axis", "xline1_point", "xline2_point", "dim_line_point"):
+                "major_axis", "xline1_point", "xline2_point", "dim_line_point",
+                "chord_point", "far_chord_point"):
         pt = _as_point3(raw.get(key))
         if pt is not None:
             geom[key] = pt
@@ -522,7 +528,8 @@ def _geometry_from_native_entity(raw: dict, kind: str) -> dict:
         geom["radius"] = radius
     for nk, ik in (("start_angle", "start_angle"), ("end_angle", "end_angle"),
                    ("rotation", "rotation"), ("radius_ratio", "radius_ratio"),
-                   ("height", "height"), ("measurement", "measurement")):
+                   ("height", "height"), ("measurement", "measurement"),
+                   ("degree", "degree")):
         num = _to_number(raw.get(nk))
         if num is not None:
             geom[ik] = num
@@ -551,6 +558,19 @@ def _geometry_from_native_entity(raw: dict, kind: str) -> dict:
                     norm.append(item)
         if norm:
             geom["vertices"] = norm
+    # T3a-batch2: a spline's fit points -- distinct from "vertices" (which
+    # always means an owning polyline/curve's own defining vertices, with an
+    # optional per-vertex bulge); fit points are the plain [x,y,z] points a
+    # fit-point AcDbSpline interpolates through, with no bulge concept.
+    fit_pts = raw.get("fit_points")
+    if isinstance(fit_pts, list) and fit_pts:
+        norm_fp = []
+        for v in fit_pts:
+            pt = _as_point3(v)
+            if pt is not None:
+                norm_fp.append(pt)
+        if norm_fp:
+            geom["fit_points"] = norm_fp
     loops = raw.get("loops")
     if isinstance(loops, list) and loops:
         geom["loops"] = loops
@@ -599,6 +619,28 @@ def _entity_from_native(raw: dict, source_block: dict) -> dict:
         entity["dim_block_handle"] = str(raw["dim_block_handle"])
     if raw.get("dim_block_name"):
         entity["dim_block_name"] = str(raw["dim_block_name"])
+    # T3a-batch2: a radial/diametric dimension's leader_length -- LIVE-
+    # DISCOVERED (2026-07-02 T3a-batch2 re-cert) to NOT survive as a ctor-arg
+    # echo: AutoCAD recomputes/resets it (observed 5.0 -> 0.0 for a
+    # chord_point 10 units from center, well within default text/arrow size,
+    # where no leader is actually needed) as part of its own internal
+    # leader-needed heuristic -- not derivable from this op's own args alone.
+    # Deliberately top-level, NOT inside "geometry", same treatment as
+    # dim_block_handle/name (see op_roundtrip_probe.py's
+    # _expect_create_dimension_radial/_diametric).
+    leader_length = _to_number(raw.get("leader_length"))
+    if leader_length is not None:
+        entity["leader_length"] = leader_length
+    # T3a-batch2: a fit-point spline's NURBS-basis representation (control
+    # points + knot vector) -- deliberately top-level, NOT inside "geometry",
+    # for the same reason dim_block_handle/name are: AutoCAD derives them via
+    # its own proprietary fit-to-NURBS conversion, not from write.entity.
+    # spline's own args alone, so they must never enter the geometry P-gate's
+    # fingerprint (see op_roundtrip_probe.py's _expect_create_spline).
+    if isinstance(raw.get("spline_control_points"), list) and raw["spline_control_points"]:
+        entity["spline_control_points"] = raw["spline_control_points"]
+    if isinstance(raw.get("spline_knots"), list) and raw["spline_knots"]:
+        entity["spline_knots"] = raw["spline_knots"]
     return entity
 
 

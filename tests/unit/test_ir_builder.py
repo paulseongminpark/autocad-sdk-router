@@ -273,6 +273,81 @@ class TestNativeGraphGeometryLifting(unittest.TestCase):
                         {"point": [10.0, 0.0, 0.0], "bulge": 0.0}],
         })
 
+    def test_spline_lifts_degree_closed_fit_points_and_top_level_nurbs_fields(self):
+        ent = self._one_entity_ir({
+            "handle": "1A6", "dxf_name": "AcDbSpline", "layer": "0",
+            "owner_handle": "1F", "space": "model",
+            "degree": 3, "closed": False,
+            "fit_points": [[0.0, 0.0, 0.0], [10.0, 5.0, 0.0], [20.0, 0.0, 0.0]],
+            "spline_control_points": [[0.0, 0.0, 0.0], [6.0, 8.0, 0.0], [20.0, 0.0, 0.0]],
+            "spline_knots": [0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0, 1.0],
+        })
+        self.assertEqual(ent["dxf_name"], "SPLINE")
+        self.assertEqual(ent["geometry"], {
+            "kind": "spline", "degree": 3, "closed": False,
+            "fit_points": [[0.0, 0.0, 0.0], [10.0, 5.0, 0.0], [20.0, 0.0, 0.0]],
+        })
+        # spline_control_points/spline_knots are TOP-LEVEL entity fields, never
+        # inside "geometry" -- see op_roundtrip_probe.py's _expect_create_spline
+        # for why this must hold (AutoCAD's own fit-to-NURBS conversion result,
+        # not derivable from write.entity.spline's args alone).
+        self.assertEqual(ent["spline_control_points"],
+                         [[0.0, 0.0, 0.0], [6.0, 8.0, 0.0], [20.0, 0.0, 0.0]])
+        self.assertEqual(ent["spline_knots"], [0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0, 1.0])
+        self.assertNotIn("spline_control_points", ent["geometry"])
+        self.assertNotIn("spline_knots", ent["geometry"])
+
+    def test_aligned_dimension_lifts_points_and_measurement(self):
+        ent = self._one_entity_ir({
+            "handle": "1A7", "dxf_name": "AcDbAlignedDimension", "layer": "0",
+            "owner_handle": "1F", "space": "model",
+            "xline1_point": [0.0, 0.0, 0.0], "xline2_point": [100.0, 0.0, 0.0],
+            "dim_line_point": [100.0, 20.0, 0.0], "measurement": 100.0,
+            "dim_block_handle": "1A8", "dim_block_name": "*D2",
+        })
+        self.assertEqual(ent["dxf_name"], "DIMENSION")
+        self.assertEqual(ent["geometry"], {
+            "kind": "dimension", "xline1_point": [0.0, 0.0, 0.0],
+            "xline2_point": [100.0, 0.0, 0.0], "dim_line_point": [100.0, 20.0, 0.0],
+            "measurement": 100.0,
+        })
+        self.assertEqual(ent["dim_block_handle"], "1A8")
+        self.assertEqual(ent["dim_block_name"], "*D2")
+
+    def test_radial_dimension_lifts_center_chord_and_top_level_leader_length(self):
+        ent = self._one_entity_ir({
+            "handle": "1A9", "dxf_name": "AcDbRadialDimension", "layer": "0",
+            "owner_handle": "1F", "space": "model",
+            "center": [0.0, 0.0, 0.0], "chord_point": [10.0, 0.0, 0.0],
+            "leader_length": 5.0, "measurement": 10.0,
+        })
+        self.assertEqual(ent["dxf_name"], "DIMENSION")
+        self.assertEqual(ent["geometry"], {
+            "kind": "dimension", "center": [0.0, 0.0, 0.0], "chord_point": [10.0, 0.0, 0.0],
+            "measurement": 10.0,
+        })
+        # leader_length is a TOP-LEVEL entity field, never inside "geometry" --
+        # live-discovered (2026-07-02 T3a-batch2 re-cert) to be AutoCAD's own
+        # recomputed value, not a ctor-arg echo (see op_roundtrip_probe.py's
+        # _expect_create_dimension_radial).
+        self.assertEqual(ent["leader_length"], 5.0)
+        self.assertNotIn("leader_length", ent["geometry"])
+
+    def test_diametric_dimension_lifts_chord_points_and_top_level_leader_length(self):
+        ent = self._one_entity_ir({
+            "handle": "1AA", "dxf_name": "AcDbDiametricDimension", "layer": "0",
+            "owner_handle": "1F", "space": "model",
+            "chord_point": [-10.0, 0.0, 0.0], "far_chord_point": [10.0, 0.0, 0.0],
+            "leader_length": 5.0, "measurement": 20.0,
+        })
+        self.assertEqual(ent["dxf_name"], "DIMENSION")
+        self.assertEqual(ent["geometry"], {
+            "kind": "dimension", "chord_point": [-10.0, 0.0, 0.0],
+            "far_chord_point": [10.0, 0.0, 0.0], "measurement": 20.0,
+        })
+        self.assertEqual(ent["leader_length"], 5.0)
+        self.assertNotIn("leader_length", ent["geometry"])
+
 
 if __name__ == "__main__":
     unittest.main()

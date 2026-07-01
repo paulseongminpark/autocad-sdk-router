@@ -30,6 +30,13 @@ to a live native handler -- see config/promotion_manifest.json and
 tests/unit/test_promote_op.py for the F1-RUNNABLE gate each one cleared. The
 oracle below is extended to the new post-promotion ground truth; this file's
 invariants (aggregate == per-family union, families disjoint) are unaffected.
+
+T3a-batch2 update: 4 more entity ops (create_spline/create_dimension_aligned/
+create_dimension_radial/create_dimension_diametric) were already native-
+REACHABLE (measure/reachable_matrix.jsonl: registry_status=implemented,
+class=REACHABLE) but had no patch_ops.WRITE_OP_MAP entry at all -- this is the
+first patch-level wiring for these four. Oracle extended accordingly; same
+invariants unaffected.
 """
 from __future__ import annotations
 
@@ -59,6 +66,10 @@ _ORIGINAL_NATIVE_WRITE_OP_MAP = {
     "create_polyline": "write.entity.polyline",
     "create_dimension": "write.entity.dim.rotated",
     "set_entity_xdata": "write.entity.set_xdata",
+    "create_spline": "write.entity.spline",
+    "create_dimension_aligned": "write.entity.dim.aligned",
+    "create_dimension_radial": "write.entity.dim.radial",
+    "create_dimension_diametric": "write.entity.dim.diametric",
 }
 
 

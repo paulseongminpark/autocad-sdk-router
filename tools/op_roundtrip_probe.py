@@ -290,6 +290,115 @@ def _expect_create_dimension(args: Dict[str, Any]) -> Dict[str, Any]:
     }
 
 
+def _expect_create_dimension_aligned(args: Dict[str, Any]) -> Dict[str, Any]:
+    # An ALIGNED dimension is a rotated dimension whose "rotation" is not an
+    # independent arg -- it is implicitly the xLine1->xLine2 baseline's own
+    # angle (that is the definition of "aligned": the dimension line is always
+    # parallel to the measured baseline). Live-verified (2026-07-02 T3a-batch2
+    # re-cert) against tests/fixtures/native_sample.dwg: AcDbAlignedDimension
+    # re-anchors dim_line_point EXACTLY like AcDbRotatedDimension does (T3a),
+    # so this reuses _rotated_dimension_line_point/_measurement verbatim with
+    # the baseline angle standing in for "rotation" -- projecting the baseline
+    # vector onto its own direction is just its own length, so measurement
+    # reduces to the straight-line xLine1->xLine2 distance, as expected for an
+    # aligned dimension.
+    xline1 = _point_to_list(args["xline1"])
+    xline2 = _point_to_list(args["xline2"])
+    baseline_rotation = math.atan2(xline2[1] - xline1[1], xline2[0] - xline1[0])
+    dim_line_arg = _point_to_list(args["dim_line"])
+    return {
+        "dxf_name": "DIMENSION", "layer": args.get("layer") or "0",
+        "geometry": {
+            "kind": "dimension",
+            "xline1_point": xline1, "xline2_point": xline2,
+            "dim_line_point": _rotated_dimension_line_point(
+                xline1, xline2, baseline_rotation, dim_line_arg),
+            "measurement": _rotated_dimension_measurement(xline1, xline2, baseline_rotation),
+        },
+    }
+
+
+def _expect_create_dimension_radial(args: Dict[str, Any]) -> Dict[str, Any]:
+    # AcDbRadialDimension has no rotation-style re-anchoring degree of freedom
+    # (unlike aligned/rotated, there is no "dimension line" point independent
+    # of center/chord_point) -- center/chord_point are direct ctor-arg echoes
+    # (live-verified 2026-07-02 T3a-batch2 re-cert). measurement is the
+    # dimensioned radius: the center->chord_point distance, independently
+    # computed (not an arg) so ground truth never needs a live read.
+    #
+    # leader_length is NOT asserted: LIVE-DISCOVERED (2026-07-02 T3a-batch2
+    # re-cert) that it does not survive as a ctor-arg echo -- AutoCAD reset a
+    # requested leader_length=5.0 to 0.0 for a chord_point 10 units from
+    # center (no leader actually needed at default text/arrow size), i.e. it
+    # is AutoCAD's own internal leader-needed recompute, not derivable from
+    # this op's own args alone -- same treatment as dim_block_handle/name.
+    # ir_builder.py surfaces it as a TOP-LEVEL entity field instead.
+    center = _point_to_list(args["center"])
+    chord = _point_to_list(args["chord_point"])
+    dx, dy, dz = chord[0] - center[0], chord[1] - center[1], chord[2] - center[2]
+    measurement = math.sqrt(dx * dx + dy * dy + dz * dz)
+    return {
+        "dxf_name": "DIMENSION", "layer": args.get("layer") or "0",
+        "geometry": {
+            "kind": "dimension",
+            "center": center, "chord_point": chord,
+            "measurement": measurement,
+        },
+    }
+
+
+def _expect_create_dimension_diametric(args: Dict[str, Any]) -> Dict[str, Any]:
+    # AcDbDiametricDimension, same reasoning as radial: chord_point/
+    # far_chord_point are direct ctor-arg echoes (live-verified 2026-07-02
+    # T3a-batch2 re-cert); measurement is the dimensioned diameter, the
+    # chord_point<->far_chord_point distance. leader_length is NOT asserted,
+    # for the identical live-discovered reason documented on
+    # _expect_create_dimension_radial above.
+    chord = _point_to_list(args["chord_point"])
+    far_chord = _point_to_list(args["far_chord_point"])
+    dx, dy, dz = far_chord[0] - chord[0], far_chord[1] - chord[1], far_chord[2] - chord[2]
+    measurement = math.sqrt(dx * dx + dy * dy + dz * dz)
+    return {
+        "dxf_name": "DIMENSION", "layer": args.get("layer") or "0",
+        "geometry": {
+            "kind": "dimension",
+            "chord_point": chord, "far_chord_point": far_chord,
+            "measurement": measurement,
+        },
+    }
+
+
+def _expect_create_spline(args: Dict[str, Any]) -> Dict[str, Any]:
+    # write.entity.spline (m08g_handlers.inc) always builds a FIT-POINT
+    # AcDbSpline: AcDbSpline(fitPts, order, 0.0) -- order defaults to 4.0 (same
+    # default, same "order<2 -> 4" clamp, reproduced here) and is never
+    # periodic/closed. degree/closed/fit_points are therefore direct,
+    # args-derivable ground truth (degree = order-1, closed always False, fit_
+    # points the literal "points" arg) -- live-verified (2026-07-02 T3a-batch2
+    # re-cert) diff=0 for exactly these three fields.
+    #
+    # spline_control_points/spline_knots are NOT asserted here even though the
+    # reader now extracts them: they are AutoCAD's OWN fit-to-NURBS conversion
+    # result (its internal global curve interpolation from the fit points),
+    # not derivable from this op's own args alone without reproducing that
+    # proprietary algorithm -- asserting them would violate expected_ir_for_
+    # op's "ground truth from args alone, never a live read" contract, exactly
+    # like dim_block_handle/dim_block_name. ir_builder.py surfaces both as
+    # TOP-LEVEL entity fields (never inside "geometry") for the same reason.
+    order = args.get("order", 4)
+    if order < 2:
+        order = 4
+    degree = int(order) - 1
+    fit_points = [_point_to_list(p) for p in (args.get("points") or [])]
+    return {
+        "dxf_name": "SPLINE", "layer": args.get("layer") or "0",
+        "geometry": {
+            "kind": "spline",
+            "degree": degree, "closed": False, "fit_points": fit_points,
+        },
+    }
+
+
 # op_name -> args -> a single IR entity (dxf_name/layer/geometry only -- no
 # handle; the P-gate's geometry-basis compare is handle-independent by
 # design). Only ops this module can honestly build ground truth for; an
@@ -307,6 +416,13 @@ def _expect_create_dimension(args: Dict[str, Any]) -> Dict[str, Any]:
 # non-geometry entity data (xdata), which this geometry-basis P-gate does
 # not cover at all (that is cad_op_gate's separate D-half/gate_field_mutation
 # concern).
+#
+# T3a-batch2 adds create_spline / create_dimension_aligned /
+# create_dimension_radial / create_dimension_diametric: all four were already
+# native-REACHABLE (measure/reachable_matrix.jsonl) but had (a) no patch_ops
+# wiring at all (tools/patch_ops/entities.py, added this batch) and (b) no
+# collectModelSpaceGraph read branch (AriadneNativeJob.cpp, added this batch)
+# -- the same two-part gap create_ellipse/create_dimension had through T1.
 _EXPECTED_ENTITY_BUILDERS: Dict[str, Callable[[Dict[str, Any]], Dict[str, Any]]] = {
     "create_line": _expect_create_line,
     "create_circle": _expect_create_circle,
@@ -316,6 +432,10 @@ _EXPECTED_ENTITY_BUILDERS: Dict[str, Callable[[Dict[str, Any]], Dict[str, Any]]]
     "create_mtext": _expect_create_mtext,
     "create_polyline": _expect_create_polyline,
     "create_dimension": _expect_create_dimension,
+    "create_spline": _expect_create_spline,
+    "create_dimension_aligned": _expect_create_dimension_aligned,
+    "create_dimension_radial": _expect_create_dimension_radial,
+    "create_dimension_diametric": _expect_create_dimension_diametric,
 }
 
 
