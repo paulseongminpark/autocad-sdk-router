@@ -45,6 +45,14 @@ graphify-out/
 !tests/fixtures/*.dxf
 *.sv$
 
+# ── EXCEPTION: WAVE-0 top-level fixtures/ (F4 blank-seed mint) ────────────────
+# fixtures/ is a NEW top-level fixture root (distinct from tests/fixtures/ above),
+# introduced by the CADOS Wave-0 plan (D:\dev\.build\cados_plan\final\PLAN.md,
+# F4/F4b/F10) for golden, committed-once DWGs minted by tools/*.py mint scripts.
+# Exempt this node's own fixture explicitly; sibling F4b/F10 nodes exempt theirs
+# the same way (kept narrow/disjoint to avoid cross-node .gitignore collisions).
+!fixtures/blank_seed.dwg
+
 # ── Secrets (defense-in-depth; none currently present) ──
 .env
 .env.*
