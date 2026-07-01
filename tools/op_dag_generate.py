@@ -69,9 +69,17 @@ describes):
     gets ``[]`` -- honestly empty, not a guessed field name.
 
   target_files[] -- path-like tokens parsed out of the op's own
-    citation / evidence_refs / tests registry fields, KEPT ONLY if
-    ``os.path.isfile`` resolves them on THIS worktree at generation time (no
-    invented paths survive). Additionally, the 3 native op_ids that
+    citation / evidence_refs / tests registry fields, KEPT ONLY if the token
+    is NOT under a gitignored, worktree-local evidence root (``runs/``,
+    ``staging/``, ``ErrorReports/`` -- ``.gitignore``'s own "regenerable run +
+    staging evidence" section) AND ``os.path.isfile`` resolves it on THIS
+    worktree at generation time (no invented paths survive). The root
+    exclusion is required, not cosmetic: those roots are never committed, so
+    a path under them can exist on whichever worktree originally ran a
+    probe/build and be absent on every other worktree -- letting one through
+    would make target_files (and therefore ``config/op_dag.json``) a function
+    of local, worktree-variable disk state instead of a pure function of the
+    tracked registry. Additionally, the 3 native op_ids that
     ``tools/patch_engine.NATIVE_WRITE_OP_MAP`` (imported live, never
     hardcoded here) already wires today get ``tools/patch_engine.py`` added,
     since that file demonstrably touches those exact op_ids right now.
@@ -119,6 +127,13 @@ GEOMETRY_FAMILIES = {"entities", "brep_solids", "geometry_kernel"}
 # repo-relative-looking path tokens ending in one of these extensions, pulled
 # out of free-text registry fields (citation / evidence_refs / tests).
 _PATH_TOKEN_RE = re.compile(r"[A-Za-z0-9_./\\-]+\.(?:py|ps1|cs|inc|h|cpp|json|md)\b")
+
+# .gitignore's "Large, regenerable run + staging evidence" roots: never
+# committed, so their on-disk presence varies per worktree. A citation /
+# evidence_refs / tests token under one of these must never survive into
+# target_files even if os.path.isfile happens to resolve True on THIS
+# worktree -- see derive_target_files docstring.
+_WORKTREE_VARIABLE_ROOTS = ("runs/", "staging/", "ErrorReports/")
 
 
 def _load(path: str) -> Dict[str, Any]:
@@ -203,6 +218,8 @@ def _extract_existing_files(*texts: Optional[str]) -> List[str]:
             continue
         for tok in _PATH_TOKEN_RE.findall(text):
             cand = tok.strip(".").replace("\\", "/")
+            if cand.startswith(_WORKTREE_VARIABLE_ROOTS):
+                continue
             if cand not in found and os.path.isfile(os.path.join(ROOT, cand)):
                 found.append(cand)
     return found
@@ -308,10 +325,12 @@ _DERIVATION_RULES = {
     "arg_keys": "schemas/cad_job.v2.schema.json allOf if/then args.properties keys for the 15 "
                 "op_ids that carry one; [] elsewhere (no per-op arg schema authored yet -- "
                 "honest, not guessed)",
-    "target_files": "citation / evidence_refs / tests path-like tokens, kept ONLY if "
-                     "os.path.isfile resolves on this worktree at generation time, plus "
-                     "tools/patch_engine.py for op_ids NATIVE_WRITE_OP_MAP already wires "
-                     "(no invented paths)",
+    "target_files": "citation / evidence_refs / tests path-like tokens, kept ONLY if NOT "
+                     "under a gitignored worktree-local evidence root (runs/, staging/, "
+                     "ErrorReports/) and os.path.isfile resolves on this worktree at "
+                     "generation time, plus tools/patch_engine.py for op_ids "
+                     "NATIVE_WRITE_OP_MAP already wires (no invented paths, no "
+                     "worktree-variable paths)",
     "acceptance_test_id": "registry tests[0] (current best-evidence test ref; F3's future "
                           "per-op W+D roundtrip gate is not built in this tree yet)",
 }

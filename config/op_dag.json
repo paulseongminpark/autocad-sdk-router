@@ -8,7 +8,7 @@
     "persistence_class": "status=='blocked' -> NON_GOAL; family=='live' or write_level.default_write_mode=='live_edit' -> L; default_write_mode=='read' -> R; default_write_mode in (write_copy, write_original): family in {entities, brep_solids, geometry_kernel} -> P else D",
     "predecessors": "handler.composed_of (authored, validated against the catalogue) UNION coarse same-family P|D -> R read-before-write gate (SS2.4 tier-barrier projection); acyclic by construction + defensively re-checked (tests/unit/test_op_dag_generate.py)",
     "arg_keys": "schemas/cad_job.v2.schema.json allOf if/then args.properties keys for the 15 op_ids that carry one; [] elsewhere (no per-op arg schema authored yet -- honest, not guessed)",
-    "target_files": "citation / evidence_refs / tests path-like tokens, kept ONLY if os.path.isfile resolves on this worktree at generation time, plus tools/patch_engine.py for op_ids NATIVE_WRITE_OP_MAP already wires (no invented paths)",
+    "target_files": "citation / evidence_refs / tests path-like tokens, kept ONLY if NOT under a gitignored worktree-local evidence root (runs/, staging/, ErrorReports/) and os.path.isfile resolves on this worktree at generation time, plus tools/patch_engine.py for op_ids NATIVE_WRITE_OP_MAP already wires (no invented paths, no worktree-variable paths)",
     "acceptance_test_id": "registry tests[0] (current best-evidence test ref; F3's future per-op W+D roundtrip gate is not built in this tree yet)"
   },
   "totals": {
@@ -58,9 +58,6 @@
         "docs/OPERATION_REGISTRY_SPEC.md",
         "reports/CADOS_M05_PATCH_DIFF_VALIDATION_TRANSACTION.md",
         "reports/validation_latest.json",
-        "runs/m05_patch_create_line/cad_diff.json",
-        "runs/m05_patch_create_line/journal.json",
-        "runs/m05_patch_create_line/result.json",
         "tests/unit/test_m05_cli_contract.py",
         "tests/unit/test_operation_registry_v2.py",
         "tests/unit/test_patch_engine_policy.py"
@@ -1340,10 +1337,6 @@
         "docs/OPERATION_REGISTRY_SPEC.md",
         "reports/CADOS_M05_PATCH_DIFF_VALIDATION_TRANSACTION.md",
         "reports/validation_latest.json",
-        "runs/m05_diff_check/cad_diff.json",
-        "runs/m05_patch_create_line/cad_diff.json",
-        "runs/m05_patch_create_line/journal.json",
-        "runs/m05_patch_create_line/result.json",
         "tests/unit/test_cad_diff.py",
         "tests/unit/test_m05_cli_contract.py",
         "tests/unit/test_operation_registry_v2.py"
@@ -3695,9 +3688,6 @@
       "target_files": [
         "docs/OPERATION_REGISTRY_SPEC.md",
         "reports/operation_coverage_full_matrix.json",
-        "runs/m08_inspect_ops/inspect_smoke_result.json",
-        "runs/m08_inspect_ops/job_out_inspect_blocks.json",
-        "runs/m08_inspect_ops/run_inspect_smoke.ps1",
         "tests/unit/test_m08_operation_coverage.py",
         "tests/unit/test_operation_registry_v2.py"
       ],
@@ -3968,8 +3958,6 @@
       "arg_keys": [],
       "target_files": [
         "reports/autocad_router_status_latest.json",
-        "runs/m03_rich_ir/cad_result.json",
-        "runs/m03_rich_ir/dwg_graph_ir.json",
         "tests/smoke/test_router_inspect_database_graph.py",
         "tests/unit/test_dwg_graph_ir_schema.py",
         "tests/unit/test_router_explain_registry.py"
@@ -4167,9 +4155,6 @@
       "target_files": [
         "docs/OPERATION_REGISTRY_SPEC.md",
         "reports/operation_coverage_full_matrix.json",
-        "runs/m08_inspect_ops/inspect_smoke_result.json",
-        "runs/m08_inspect_ops/job_out_inspect_entities.json",
-        "runs/m08_inspect_ops/run_inspect_smoke.ps1",
         "tests/unit/test_m08_operation_coverage.py",
         "tests/unit/test_operation_registry_v2.py"
       ],
@@ -4395,9 +4380,6 @@
       "target_files": [
         "docs/OPERATION_REGISTRY_SPEC.md",
         "reports/operation_coverage_full_matrix.json",
-        "runs/m08_inspect_ops/inspect_smoke_result.json",
-        "runs/m08_inspect_ops/job_out_inspect_layers.json",
-        "runs/m08_inspect_ops/run_inspect_smoke.ps1",
         "tests/unit/test_m08_operation_coverage.py",
         "tests/unit/test_operation_registry_v2.py"
       ],
@@ -5071,7 +5053,6 @@
         "docs/OPERATION_REGISTRY_SPEC.md",
         "reports/live_pump_latest.json",
         "reports/operation_coverage_full_matrix.json",
-        "runs/m08_inspect_ops/inspect_smoke_result.json",
         "tests/integration/test_live_arx_pump.py",
         "tests/unit/test_operation_registry_v2.py",
         "tests/unit/test_pump_frame_codec.py"
@@ -5849,8 +5830,6 @@
       "arg_keys": [],
       "target_files": [
         "docs/PATCH_ENGINE_SPEC.md",
-        "runs/m02_patch_live2/cad_diff.json",
-        "runs/m02_patch_live2/validation_report.json",
         "tests/unit/test_patch_engine_policy.py",
         "tools/patch_engine.py"
       ],
@@ -5930,7 +5909,6 @@
       "arg_keys": [],
       "target_files": [
         "docs/OPERATION_REGISTRY_SPEC.md",
-        "runs/m02_cadctl_rich/dwg_graph_ir.json",
         "tools/cadctl.py",
         "tools/sqlite_ir_store.py"
       ],
@@ -6926,7 +6904,6 @@
       "arg_keys": [],
       "target_files": [
         "docs/OPERATION_REGISTRY_SPEC.md",
-        "runs/m02_cadctl_rich/dwg_graph_ir.json",
         "tools/cadctl.py",
         "tools/validator.py"
       ],
@@ -6944,9 +6921,6 @@
         "docs/OPERATION_REGISTRY_SPEC.md",
         "reports/CADOS_M05_PATCH_DIFF_VALIDATION_TRANSACTION.md",
         "reports/validation_latest.json",
-        "runs/m05_patch_create_line/cad_diff.json",
-        "runs/m05_patch_create_line/journal.json",
-        "runs/m05_patch_create_line/result.json",
         "tests/unit/test_operation_registry_v2.py",
         "tests/unit/test_validator_gates.py"
       ],
