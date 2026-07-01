@@ -406,6 +406,87 @@ def _expect_create_dimension_ordinate(args: Dict[str, Any]) -> Dict[str, Any]:
     }
 
 
+def _arc_dimension_signed_span(center: list, p1: list, p2: list, arc_point: list):
+    """Shared geometry for AcDbArcDimension's two derived fields: the radius
+    (center<->xLine1Point distance), xLine1Point's own angle ``a1``, and the
+    SIGNED angular span from ``a1`` to xLine2Point's angle, resolved to
+    whichever rotational direction (CCW, positive, or CW, negative) the input
+    ``arc_point`` arg actually lies in. Returns ``(radius, a1, signed_span)``.
+    """
+    radius = math.hypot(p1[0] - center[0], p1[1] - center[1])
+    a1 = math.atan2(p1[1] - center[1], p1[0] - center[0])
+    a2 = math.atan2(p2[1] - center[1], p2[0] - center[0])
+    a_arc = math.atan2(arc_point[1] - center[1], arc_point[0] - center[0])
+    span_ccw = (a2 - a1) % (2 * math.pi)
+    arc_ccw = (a_arc - a1) % (2 * math.pi)
+    signed_span = span_ccw if arc_ccw <= span_ccw else -(2 * math.pi - span_ccw)
+    return radius, a1, signed_span
+
+
+def _arc_dimension_measurement(center: list, p1: list, p2: list, arc_point: list) -> float:
+    """AcDbArcDimension's measurement: an ARC LENGTH -- radius times the
+    absolute angular span from xLine1Point to xLine2Point (see
+    _arc_dimension_signed_span). Independently computed (not an arg) so
+    ``_expect_create_dimension_arc`` can assert it without a live read.
+    """
+    radius, _a1, signed_span = _arc_dimension_signed_span(center, p1, p2, arc_point)
+    return radius * abs(signed_span)
+
+
+def _arc_dimension_arc_point(center: list, p1: list, p2: list, arc_point: list) -> list:
+    """AcDbArcDimension does NOT store the raw ``arc_point`` ctor arg back
+    verbatim -- live-verified (2026-07-02 w3-dimarc re-cert, 3 real
+    accoreconsole roundtrips against tests/fixtures/native_sample.dwg, each
+    with a DIFFERENT center/radius/span AND a different input arc_point
+    position within the span -- one at the angular midpoint, one at the
+    midpoint again on a rotated/differently-sized arc, one at 90% of the way
+    to xLine2Point): AutoCAD discards the input arcPoint's own position
+    entirely and re-places it at EXACTLY 1/3 of the xLine1Point->xLine2Point
+    angular span (same radius as xLine1Point from centerPoint), measured from
+    xLine1Point in whichever rotational direction the input arc_point arg
+    resolves the span to (see _arc_dimension_signed_span) -- confirmed exact
+    to float precision in all 3 cases (e.g. center=(0,0,0),
+    xline1=(50,0,0) [0 deg], xline2=(0,50,0) [90 deg], input arc_point at 45
+    deg -> stored arc_point at EXACTLY 30 deg = 0 + 90/3, not 45).
+
+    All 3 verification cases had the input arc_point on the SAME (CCW-from-
+    xLine1) side as the resolved short span, with that span < 180 degrees --
+    this ground truth is only asserted for that case; an input arc_point on
+    the opposite (reflex/major-arc) side, or a span >= 180 degrees, is
+    unverified, out of scope (same caveat T3a's rotated-dimension
+    dim_line_point formula carries for a non-parallel baseline).
+    """
+    radius, a1, signed_span = _arc_dimension_signed_span(center, p1, p2, arc_point)
+    third_angle = a1 + signed_span / 3.0
+    cz = center[2] if len(center) > 2 else 0.0
+    return [center[0] + radius * math.cos(third_angle),
+            center[1] + radius * math.sin(third_angle), cz]
+
+
+def _expect_create_dimension_arc(args: Dict[str, Any]) -> Dict[str, Any]:
+    # AcDbArcDimension(centerPoint, xLine1Point, xLine2Point, arcPoint,
+    # dimText, dimStyle) -- write.entity.dim.arc (m08h_handlers.inc) passes
+    # center/xline1/xline2/arc_point straight to the ctor. center/xline1_point/
+    # xline2_point are direct, args-derivable ground truth (live-verified
+    # 2026-07-02 w3-dimarc re-cert). arc_point and measurement are NOT verbatim
+    # ctor-arg echoes -- both independently computed via
+    # _arc_dimension_arc_point / _arc_dimension_measurement (see their
+    # docstrings for the live-discovered formulas and verified scope).
+    center = _point_to_list(args["center"])
+    xline1 = _point_to_list(args["xline1"])
+    xline2 = _point_to_list(args["xline2"])
+    arc_point_arg = _point_to_list(args["arc_point"])
+    return {
+        "dxf_name": "DIMENSION", "layer": args.get("layer") or "0",
+        "geometry": {
+            "kind": "dimension",
+            "center": center, "xline1_point": xline1, "xline2_point": xline2,
+            "arc_point": _arc_dimension_arc_point(center, xline1, xline2, arc_point_arg),
+            "measurement": _arc_dimension_measurement(center, xline1, xline2, arc_point_arg),
+        },
+    }
+
+
 def _expect_create_leader(args: Dict[str, Any]) -> Dict[str, Any]:
     # write.entity.leader (m08h_handlers.inc) reads "vertices" first, falling
     # back to "points" only when "vertices" yields <2 points -- this batch's
@@ -531,6 +612,11 @@ def _expect_create_mline(args: Dict[str, Any]) -> Dict[str, Any]:
 # still reported success with a geometrically-empty MLINE; see
 # m08g_handlers.inc). Fixing that bug plus the same two-part gap (patch_ops
 # wiring + collectModelSpaceGraph read branch) both landed together.
+#
+# w3-dimarc adds create_dimension_arc: same two-part gap as every T3a-batch
+# dimension subtype (already native-REACHABLE per measure/reachable_matrix.
+# jsonl, but no patch_ops wiring and no collectModelSpaceGraph read branch
+# until this batch).
 _EXPECTED_ENTITY_BUILDERS: Dict[str, Callable[[Dict[str, Any]], Dict[str, Any]]] = {
     "create_line": _expect_create_line,
     "create_circle": _expect_create_circle,
@@ -547,6 +633,7 @@ _EXPECTED_ENTITY_BUILDERS: Dict[str, Callable[[Dict[str, Any]], Dict[str, Any]]]
     "create_dimension_ordinate": _expect_create_dimension_ordinate,
     "create_leader": _expect_create_leader,
     "create_mline": _expect_create_mline,
+    "create_dimension_arc": _expect_create_dimension_arc,
 }
 
 

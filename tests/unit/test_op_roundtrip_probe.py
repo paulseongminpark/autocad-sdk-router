@@ -23,6 +23,7 @@ only.
 """
 from __future__ import annotations
 
+import math
 import os
 import sys
 import unittest
@@ -305,6 +306,31 @@ class TestExpectedIrForOp(unittest.TestCase):
         geom = ir["entities"][0]["geometry"]
         self.assertEqual(geom["use_x_axis"], False)
         self.assertEqual(geom["measurement"], 5)
+
+    def test_create_dimension_arc_builds_dimension_geometry(self):
+        # w3-dimarc: collectModelSpaceGraph grew an AcDbArcDimension branch.
+        # center/xline1_point/xline2_point are direct ctor-arg echoes.
+        # arc_point is NOT a verbatim echo -- live-verified (2026-07-02
+        # w3-dimarc re-cert, 3 real accoreconsole roundtrips) that AutoCAD
+        # discards the input arcPoint's own position and re-places it at
+        # exactly 1/3 of the xline1->xline2 angular span (same radius as
+        # xline1 from center); measurement is the independently-computed arc
+        # length (radius * angular span). Here center=(0,0,0),
+        # xline1=(50,0,0) (angle 0), xline2=(0,50,0) (angle 90 deg), input
+        # arc_point at 45 deg (irrelevant to the result beyond picking the
+        # CCW side) -> stored arc_point at 90/3=30 deg, measurement=50*pi/2.
+        ir = probe.expected_ir_for_op(
+            "create_dimension_arc",
+            {"center": [0, 0, 0], "xline1": [50, 0, 0], "xline2": [0, 50, 0],
+             "arc_point": [35.35533905932738, 35.35533905932738, 0], "layer": "0"})
+        ent = ir["entities"][0]
+        self.assertEqual(ent["dxf_name"], "DIMENSION")
+        self.assertEqual(ent["geometry"], {
+            "kind": "dimension", "center": [0, 0, 0],
+            "xline1_point": [50, 0, 0], "xline2_point": [0, 50, 0],
+            "arc_point": [50 * math.cos(math.pi / 6), 50 * math.sin(math.pi / 6), 0.0],
+            "measurement": 50 * math.pi / 2,
+        })
 
     def test_create_leader_builds_leader_geometry(self):
         # T3a-batch3: collectModelSpaceGraph grew an AcDbLeader branch.

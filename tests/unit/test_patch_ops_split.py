@@ -49,6 +49,12 @@ patch_ops wiring alongside a real native bugfix (the handler never checked
 ObjectARX ErrorStatus at all, so a failing appendSeg still reported a fake
 success with a geometrically-empty MLINE -- see m08g_handlers.inc). Oracle
 extended accordingly; same invariants unaffected.
+
+w3-dimarc update: create_dimension_arc (write.entity.dim.arc, AcDbArcDimension)
+was already native-REACHABLE (measure/reachable_matrix.jsonl) but had no
+patch_ops.WRITE_OP_MAP entry -- same two-part gap (patch_ops wiring +
+collectModelSpaceGraph read branch) as every T3a-batch* dimension subtype
+above. Oracle extended accordingly; same invariants unaffected.
 """
 from __future__ import annotations
 
@@ -85,6 +91,7 @@ _ORIGINAL_NATIVE_WRITE_OP_MAP = {
     "create_dimension_ordinate": "write.entity.dim.ordinate",
     "create_leader": "write.entity.leader",
     "create_mline": "write.entity.mline",
+    "create_dimension_arc": "write.entity.dim.arc",
 }
 
 

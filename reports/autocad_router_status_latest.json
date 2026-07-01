@@ -1,8 +1,8 @@
 ﻿{
-    "timestamp":  "2026-07-02T05:06:32.5945240+09:00",
+    "timestamp":  "2026-07-02T07:09:29.6670346+09:00",
     "schema":  "ariadne.autocad_router_status.v2",
     "status":  "ALL_AVAILABLE",
-    "router_home":  "D:\\dev\\99_tools\\autocad-sdk-router__w3_wbug",
+    "router_home":  "D:\\dev\\99_tools\\autocad-sdk-router__w3_dimarc",
     "python_exe":  "C:\\Users\\PAUL\\AppData\\Local\\Programs\\Python\\Python312\\python.exe",
     "route_count":  11,
     "available_count":  11,
@@ -10,27 +10,27 @@
 
                     ],
     "native_modules":  {
-                           "status":  "SKIPPED",
+                           "status":  "PRESENT",
                            "modules":  [
                                            {
-                                               "path":  "D:\\dev\\99_tools\\autocad-sdk-router__w3_wbug\\prebuilt\\2027\\Ariadne.AcadNativeDbx.dbx",
+                                               "path":  "D:\\dev\\99_tools\\autocad-sdk-router__w3_dimarc\\prebuilt\\2027\\Ariadne.AcadNativeDbx.dbx",
                                                "exists":  true,
                                                "bytes":  54272
                                            },
                                            {
-                                               "path":  "D:\\dev\\99_tools\\autocad-sdk-router__w3_wbug\\prebuilt\\2027\\Ariadne.AcadNative.crx",
+                                               "path":  "D:\\dev\\99_tools\\autocad-sdk-router__w3_dimarc\\prebuilt\\2027\\Ariadne.AcadNative.crx",
                                                "exists":  true,
-                                               "bytes":  769536
+                                               "bytes":  770560
                                            },
                                            {
-                                               "path":  "D:\\dev\\99_tools\\autocad-sdk-router__w3_wbug\\prebuilt\\2027\\Ariadne.AcadNative.arx",
+                                               "path":  "D:\\dev\\99_tools\\autocad-sdk-router__w3_dimarc\\prebuilt\\2027\\Ariadne.AcadNative.arx",
                                                "exists":  true,
-                                               "bytes":  777728
+                                               "bytes":  779264
                                            }
                                        ],
                            "coreconsole_load":  {
-                                                    "status":  "SKIPPED",
-                                                    "detail":  "accoreconsole, blank.dwg, DBX, or CRX missing."
+                                                    "status":  "NOT_RUN",
+                                                    "detail":  "Core Console native module load probe runs only for -Action status."
                                                 }
                        },
     "routes":  [

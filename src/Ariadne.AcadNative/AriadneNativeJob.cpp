@@ -1391,6 +1391,49 @@ static bool collectModelSpaceGraph(AcDbDatabase* pDb, int& total,
                 arr << ",\"dim_block_name\":\"" << jsonEscape(dimBlockName) << "\"";
             }
         }
+        // w3-dimarc: AcDbArcDimension -- an arc-length dimension. Derives
+        // directly from AcDbDimension (NOT from any dimension branch above),
+        // so cast ordering relative to them is not load-bearing. centerPoint/
+        // xLine1Point/xLine2Point are extracted under the same field names
+        // (center/xline1_point/xline2_point) the rotated/aligned/ordinate
+        // branches above already use, and are verbatim ctor-arg echoes
+        // (live-verified). arcPoint is extracted too, but the ObjectARX
+        // header documents it as "the point which the arc length dimension's
+        // dimension arc passes through" -- the same placement-only semantic
+        // AcDbRotatedDimension's dimLinePoint has (T3a) -- and it is NOT a
+        // verbatim echo: LIVE-VERIFIED (2026-07-02 w3-dimarc re-cert, 3
+        // roundtrips) that AutoCAD discards the input arcPoint's own position
+        // and re-places it at exactly 1/3 of the xLine1Point->xLine2Point
+        // angular span, same radius as xLine1Point from centerPoint (see
+        // op_roundtrip_probe.py's _arc_dimension_arc_point for the derived
+        // formula and its verified scope).
+        else if (AcDbArcDimension* pArcDim = AcDbArcDimension::cast(pEnt)) {
+            const AcGePoint3d ctr = pArcDim->centerPoint();
+            const AcGePoint3d p1 = pArcDim->xLine1Point();
+            const AcGePoint3d p2 = pArcDim->xLine2Point();
+            const AcGePoint3d arcPt = pArcDim->arcPoint();
+            double measurement = 0.0;
+            const bool haveMeasurement = (pArcDim->measurement(measurement) == Acad::eOk);
+            arr << ",\"center\":[" << ctr.x << "," << ctr.y << "," << ctr.z << "]"
+                << ",\"xline1_point\":[" << p1.x << "," << p1.y << "," << p1.z << "]"
+                << ",\"xline2_point\":[" << p2.x << "," << p2.y << "," << p2.z << "]"
+                << ",\"arc_point\":[" << arcPt.x << "," << arcPt.y << "," << arcPt.z << "]";
+            if (haveMeasurement)
+                arr << ",\"measurement\":" << measurement;
+            const AcDbObjectId dimBlockId = pArcDim->dimBlockId();
+            if (!dimBlockId.isNull()) {
+                arr << ",\"dim_block_handle\":\"" << jsonEscape(handleOfId(dimBlockId)) << "\"";
+                std::string dimBlockName;
+                AcDbBlockTableRecord* pDimDef = nullptr;
+                if (acdbOpenObject(pDimDef, dimBlockId, AcDb::kForRead) == Acad::eOk) {
+                    const ACHAR* nameRaw = nullptr;
+                    if (pDimDef->getName(nameRaw) == Acad::eOk)
+                        dimBlockName = acharToAscii(nameRaw);
+                    pDimDef->close();
+                }
+                arr << ",\"dim_block_name\":\"" << jsonEscape(dimBlockName) << "\"";
+            }
+        }
         // T3a-batch3: AcDbLeader -- vertices are direct, args-derivable echoes
         // of write.entity.leader's vertices/points ctor-arg loop (appendVertex
         // per point, no transform). has_arrow_head/splined are deterministic

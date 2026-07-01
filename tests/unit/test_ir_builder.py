@@ -366,6 +366,30 @@ class TestNativeGraphGeometryLifting(unittest.TestCase):
         self.assertEqual(ent["origin"], [0.0, 0.0, 0.0])
         self.assertNotIn("origin", ent["geometry"])
 
+    def test_arc_dimension_lifts_center_and_arc_point(self):
+        # arc_point here is AutoCAD's own live-verified re-placement (1/3 of
+        # the xline1->xline2 angular span, NOT the raw ctor-arg the op was
+        # given -- see op_roundtrip_probe.py's _arc_dimension_arc_point),
+        # exactly as a real collectModelSpaceGraph read-back reports it.
+        ent = self._one_entity_ir({
+            "handle": "1AD", "dxf_name": "AcDbArcDimension", "layer": "0",
+            "owner_handle": "1F", "space": "model",
+            "center": [0.0, 0.0, 0.0], "xline1_point": [50.0, 0.0, 0.0],
+            "xline2_point": [0.0, 50.0, 0.0],
+            "arc_point": [43.301270189221924, 25.000000000000004, 0.0],
+            "measurement": 78.5398163397448,
+            "dim_block_handle": "1AE", "dim_block_name": "*D3",
+        })
+        self.assertEqual(ent["dxf_name"], "DIMENSION")
+        self.assertEqual(ent["geometry"], {
+            "kind": "dimension", "center": [0.0, 0.0, 0.0],
+            "xline1_point": [50.0, 0.0, 0.0], "xline2_point": [0.0, 50.0, 0.0],
+            "arc_point": [43.301270189221924, 25.000000000000004, 0.0],
+            "measurement": 78.5398163397448,
+        })
+        self.assertEqual(ent["dim_block_handle"], "1AE")
+        self.assertEqual(ent["dim_block_name"], "*D3")
+
     def test_leader_lifts_vertices_and_arrowhead_splined(self):
         ent = self._one_entity_ir({
             "handle": "1AC", "dxf_name": "AcDbLeader", "layer": "0",
