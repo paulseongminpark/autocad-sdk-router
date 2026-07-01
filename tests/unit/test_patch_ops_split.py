@@ -22,6 +22,14 @@ existed and silently ignored 'handle', never reassigning an existing entity's
 layer. This oracle now pins the CORRECTED post-H-5 shape (the real relayer),
 not the original pre-split bug; the F9 partition invariants below (aggregate
 == per-family union, families disjoint) still hold unchanged.
+
+WAVE-1 TIER-1 T1 update (tools/promote_op.py F2 promotion): 8 more entity ops
+(create_arc/create_ellipse/create_mpolygon/create_mtext/create_text/
+create_polyline/create_dimension/set_entity_xdata) went from not_implemented
+to a live native handler -- see config/promotion_manifest.json and
+tests/unit/test_promote_op.py for the F1-RUNNABLE gate each one cleared. The
+oracle below is extended to the new post-promotion ground truth; this file's
+invariants (aggregate == per-family union, families disjoint) are unaffected.
 """
 from __future__ import annotations
 
@@ -36,12 +44,21 @@ for _p in (_REPO, os.path.join(_REPO, "tools")):
         sys.path.insert(0, _p)
 
 # The pre-split NATIVE_WRITE_OP_MAP, pinned as a literal oracle (set_layer
-# corrected per CADOS F8/H-5 -- see module docstring above).
+# corrected per CADOS F8/H-5; 8 new entries added per WAVE-1 TIER-1 T1 -- see
+# module docstring above).
 _ORIGINAL_NATIVE_WRITE_OP_MAP = {
     "create_line": "write.entity.line",
     "create_circle": "write.entity.circle",
     "set_layer": "modify.entity.common",
     "create_layer": "write.layer.create",
+    "create_arc": "write.entity.arc",
+    "create_ellipse": "write.entity.ellipse",
+    "create_mpolygon": "write.entity.mpolygon",
+    "create_mtext": "write.entity.mtext",
+    "create_text": "write.entity.text",
+    "create_polyline": "write.entity.polyline",
+    "create_dimension": "write.entity.dim.rotated",
+    "set_entity_xdata": "write.entity.set_xdata",
 }
 
 

@@ -4,9 +4,11 @@
 
 Owns the entity family's slice of patch_engine.NATIVE_WRITE_OP_MAP /
 _native_job_doc and ir_to_patch's entity IR-op-cases (line/circle/arc/text/
-polyline/dimension/...). create_line, create_circle, and set_layer have a live
-native handler today; the rest degrade to not_implemented / deferred
-(no-fake-success) until a family ticket wires them.
+polyline/dimension/...). create_line, create_circle, set_layer, and (WAVE-1
+TIER-1 T1, via tools/promote_op.py F2 promotion) create_arc/create_ellipse/
+create_mpolygon/create_mtext/create_text/create_polyline/create_dimension/
+set_entity_xdata have a live native handler today; the rest degrade to
+not_implemented / deferred (no-fake-success) until a family ticket wires them.
 
 CADOS F8 / H-5: set_layer is wired here (not patch_ops.tables) because its
 real native handler is modify.entity.common -- an ENTITY mutation
@@ -28,6 +30,14 @@ WRITE_OP_MAP: Dict[str, str] = {
     "create_line": "write.entity.line",
     "create_circle": "write.entity.circle",
     "set_layer": "modify.entity.common",
+    "create_arc": "write.entity.arc",
+    "create_ellipse": "write.entity.ellipse",
+    "create_mpolygon": "write.entity.mpolygon",
+    "create_mtext": "write.entity.mtext",
+    "create_text": "write.entity.text",
+    "create_polyline": "write.entity.polyline",
+    "create_dimension": "write.entity.dim.rotated",
+    "set_entity_xdata": "write.entity.set_xdata",
 }
 
 
@@ -59,6 +69,54 @@ def build_job_args(native_op: str, args: Dict[str, Any]) -> Optional[Dict[str, A
         if "layer" in args:
             out["set_layer"] = args["layer"]
         return out
+    if native_op == "write.entity.arc":
+        out: Dict[str, Any] = {}
+        for k in ('center', 'radius', 'start_angle', 'end_angle', 'layer'):
+            if k in args:
+                out[k] = args[k]
+        return out
+    if native_op == "write.entity.ellipse":
+        out: Dict[str, Any] = {}
+        for k in ('center', 'normal', 'major_axis', 'radius_ratio', 'start_angle', 'end_angle', 'layer'):
+            if k in args:
+                out[k] = args[k]
+        return out
+    if native_op == "write.entity.mpolygon":
+        out: Dict[str, Any] = {}
+        for k in ('points', 'layer'):
+            if k in args:
+                out[k] = args[k]
+        return out
+    if native_op == "write.entity.mtext":
+        out: Dict[str, Any] = {}
+        for k in ('position', 'text', 'height', 'layer'):
+            if k in args:
+                out[k] = args[k]
+        return out
+    if native_op == "write.entity.text":
+        out: Dict[str, Any] = {}
+        for k in ('position', 'text', 'height', 'layer'):
+            if k in args:
+                out[k] = args[k]
+        return out
+    if native_op == "write.entity.polyline":
+        out: Dict[str, Any] = {}
+        for k in ('points', 'closed', 'layer'):
+            if k in args:
+                out[k] = args[k]
+        return out
+    if native_op == "write.entity.dim.rotated":
+        out: Dict[str, Any] = {}
+        for k in ('xline1', 'xline2', 'dim_line', 'dim_text', 'rotation', 'layer'):
+            if k in args:
+                out[k] = args[k]
+        return out
+    if native_op == "write.entity.set_xdata":
+        out: Dict[str, Any] = {}
+        for k in ('app', 'value'):
+            if k in args:
+                out[k] = args[k]
+        return out
     return None
 
 
@@ -82,9 +140,26 @@ def ir_op_for(ent: Dict[str, Any]) -> Optional[Dict[str, Any]]:
     if kind == "circle":
         return {"operation": "create_circle",
                 "args": {"center": _pt(g.get("center")), "radius": g.get("radius"), "layer": layer}}
-    # --- Tier 2 (require family-op promotion to be runnable) ---
+    if kind == "arc":
+        return {"operation": "create_arc",
+                "args": {"center": _pt(g.get("center")), "radius": g.get("radius"),
+                         "start_angle": g.get("start_angle"), "end_angle": g.get("end_angle"),
+                         "layer": layer}}
+    if kind == "ellipse":
+        return {"operation": "create_ellipse",
+                "args": {"center": _pt(g.get("center")), "normal": _pt(g.get("normal")),
+                         "major_axis": _pt(g.get("major_axis")), "radius_ratio": g.get("radius_ratio"),
+                         "start_angle": g.get("start_angle"), "end_angle": g.get("end_angle"),
+                         "layer": layer}}
+    # --- Tier 2 (WAVE-1 TIER-1 T1 promoted create_text/create_polyline to a
+    # live native handler; the gate below is now just "is this IR kind ever
+    # produced", not "is the op runnable") ---
     if kind == "text":
         return {"operation": "create_text",
+                "args": {"position": _pt(g.get("position")), "text": g.get("text"),
+                         "height": g.get("height", 2.5), "layer": layer}}
+    if kind == "mtext":
+        return {"operation": "create_mtext",
                 "args": {"position": _pt(g.get("position")), "text": g.get("text"),
                          "height": g.get("height", 2.5), "layer": layer}}
     if kind in ("lwpolyline", "polyline"):

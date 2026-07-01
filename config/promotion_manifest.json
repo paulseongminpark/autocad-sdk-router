@@ -81,6 +81,94 @@
       "family": "db",
       "state": "pending_f1",
       "notes": "PLAN.md Tier 1 T1.5."
+    },
+    {
+      "patch_op": "create_arc",
+      "native_op": "write.entity.arc",
+      "arg_keys": ["center", "radius", "start_angle", "end_angle", "layer"],
+      "ir_kind": "arc",
+      "persistence_class": "P",
+      "risk": "medium",
+      "family": "entities",
+      "state": "already_promoted",
+      "notes": "WAVE-1 TIER-1 T1. F1 (measure/reachable_matrix.jsonl) classifies write.entity.arc RUNNABLE (valid_arg_probe; native handler src/Ariadne.AcadNative/families/m08g_handlers.inc m08gDispatch, AcDbArc(center,radius,startAng,endAng)). risk=medium: input_validated=false (empty_arg_probe silently builds a default-radius/full-sweep arc instead of erroring) -- not a promotion blocker, but callers must supply real args to avoid a degenerate create."
+    },
+    {
+      "patch_op": "create_ellipse",
+      "native_op": "write.entity.ellipse",
+      "arg_keys": ["center", "normal", "major_axis", "radius_ratio", "start_angle", "end_angle", "layer"],
+      "ir_kind": "ellipse",
+      "persistence_class": "P",
+      "risk": "medium",
+      "family": "entities",
+      "state": "already_promoted",
+      "notes": "WAVE-1 TIER-1 T1. F1 classifies write.entity.ellipse RUNNABLE (valid_arg_probe; m08g_handlers.inc AcDbEllipse(center,normal,major,ratio,sa,ea)). risk=medium: input_validated=false (same silent-default-on-empty-args shape as create_arc)."
+    },
+    {
+      "patch_op": "create_mpolygon",
+      "native_op": "write.entity.mpolygon",
+      "arg_keys": ["points", "layer"],
+      "ir_kind": null,
+      "persistence_class": "P",
+      "risk": "low",
+      "family": "entities",
+      "state": "already_promoted",
+      "notes": "WAVE-1 TIER-1 T1. F1 classifies write.entity.mpolygon RUNNABLE (m08g_handlers.inc AcDbMPolygon, hatch-backed closed polygon; m08gRead2dVertices reads 'vertices' then falls back to 'points', matching tools/fixture_foundry.py's mpolygon fixture args shape). ir_kind=null: 'mpolygon' is not in ir_builder._EXTRACT_KIND_TO_IR_KIND (no IR entity ever carries geometry.kind=='mpolygon' today), so no ir_to_patch case is wired -- Axis A/B only, honestly deferred on the read/IR side until an extraction ticket lands it."
+    },
+    {
+      "patch_op": "create_mtext",
+      "native_op": "write.entity.mtext",
+      "arg_keys": ["position", "text", "height", "layer"],
+      "ir_kind": "mtext",
+      "persistence_class": "P",
+      "risk": "medium",
+      "family": "entities",
+      "state": "already_promoted",
+      "notes": "WAVE-1 TIER-1 T1. F1 classifies write.entity.mtext RUNNABLE (valid_arg_probe; m08h_handlers.inc m08hDispatch, AcDbMText::setContents/setLocation/setTextHeight). risk=medium: input_validated=false (empty_arg_probe still creates an empty-content MText)."
+    },
+    {
+      "patch_op": "create_text",
+      "native_op": "write.entity.text",
+      "arg_keys": ["position", "text", "height", "layer"],
+      "ir_kind": "text",
+      "persistence_class": "P",
+      "risk": "medium",
+      "family": "entities",
+      "state": "already_promoted",
+      "notes": "WAVE-1 TIER-1 T1. F1 classifies write.entity.text RUNNABLE (valid_arg_probe; m08h_handlers.inc AcDbText + setTextString/setPosition/setHeight). risk=medium: input_validated=false (same silent-default-on-empty shape as create_mtext). ir_to_patch case (kind=='text' -> 'create_text') already forward-declared in patch_ops.entities.ir_op_for pre-F2; this row only completes Axis A/B."
+    },
+    {
+      "patch_op": "create_polyline",
+      "native_op": "write.entity.polyline",
+      "arg_keys": ["points", "closed", "layer"],
+      "ir_kind": "lwpolyline",
+      "persistence_class": "P",
+      "risk": "low",
+      "family": "entities",
+      "state": "already_promoted",
+      "notes": "WAVE-1 TIER-1 T1. F1 classifies write.entity.polyline RUNNABLE (valid_arg_probe; input_validated=true -- empty_arg_probe correctly MISSING_ARGs on <2 points, m08g_handlers.inc AcDbPolyline::addVertexAt). native op also accepts 'write.entity.polyline2d' as an alias (same handler); ir_kind='lwpolyline' is the IR-side name (ir_builder._EXTRACT_KIND_TO_IR_KIND) -- ir_to_patch case (kind in ('lwpolyline','polyline') -> 'create_polyline') already forward-declared in patch_ops.entities.ir_op_for pre-F2; this row only completes Axis A/B."
+    },
+    {
+      "patch_op": "create_dimension",
+      "native_op": "write.entity.dim.rotated",
+      "arg_keys": ["xline1", "xline2", "dim_line", "dim_text", "rotation", "layer"],
+      "ir_kind": "dimension",
+      "persistence_class": "P",
+      "risk": "low",
+      "family": "entities",
+      "state": "already_promoted",
+      "notes": "WAVE-1 TIER-1 T1. F1 classifies write.entity.dim.rotated RUNNABLE (valid_arg_probe; input_validated=true -- empty_arg_probe correctly MISSING_ARGs without xline1/xline2/dim_line, m08h_handlers.inc AcDbRotatedDimension). ir_to_patch case (kind=='dimension', gated on xline1_point/xline2_point/dim_line_point all present -> 'create_dimension') already forward-declared in patch_ops.entities.ir_op_for (Tier 3) pre-F2; this row only completes Axis A/B."
+    },
+    {
+      "patch_op": "set_entity_xdata",
+      "native_op": "write.entity.set_xdata",
+      "arg_keys": ["app", "value"],
+      "ir_kind": null,
+      "persistence_class": "D",
+      "risk": "low",
+      "family": "entities",
+      "state": "already_promoted",
+      "notes": "WAVE-1 TIER-1 T1. F1 classifies write.entity.set_xdata RUNNABLE. Distinct native_op from the pre-existing 'set_xdata' patch_op (which targets write.xdata.set) -- named set_entity_xdata to avoid a patch_op collision; same (app,value) arg shape. Current m08e_handlers.inc handler (m08eHandleEntitySetXdata) calls setDatabaseXdata(pDb,...) inside an AriadneStagedWriteTransaction that is always rolled back (result.staged_rolled_back=true) -- proves the write path only, matching the existing set_xdata row's H-9 caveat, not per-entity handle-scoped xdata yet. ir_kind=null: record-level, no ir_to_patch case (same pattern as set_xdata/set_xrecord)."
     }
   ]
 }

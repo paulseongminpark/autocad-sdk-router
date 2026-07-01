@@ -55,10 +55,13 @@ class TestResolveNativeOp(unittest.TestCase):
                         "write.entity.circle")
 
     def test_unwired_op_resolves_to_none(self):
+        # create_arc was the fixture here pre-WAVE-1 TIER-1 T1; promote_op.py
+        # has since wired it for real -- create_hatch remains genuinely
+        # unwired at the patch_ops layer today.
         import patch_ops
-        self.assertIsNone(probe.resolve_native_op("create_arc", patch_ops_mod=patch_ops))
-        self.assertNotIn("create_arc", patch_ops.NATIVE_WRITE_OP_MAP,
-                         "fixture premise: create_arc must genuinely be unwired today")
+        self.assertIsNone(probe.resolve_native_op("create_hatch", patch_ops_mod=patch_ops))
+        self.assertNotIn("create_hatch", patch_ops.NATIVE_WRITE_OP_MAP,
+                         "fixture premise: create_hatch must genuinely be unwired today")
 
     def test_missing_patch_ops_sibling_resolves_to_none(self):
         self.assertIsNone(probe.resolve_native_op("create_line", patch_ops_mod=object()))

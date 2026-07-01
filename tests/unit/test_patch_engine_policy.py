@@ -194,8 +194,11 @@ class TestApplyStagedNoHandlerDegrades(unittest.TestCase):
         self.pe = patch_engine
 
     def test_resolve_native_write_op_rejects_unsupported(self):
-        # delete_entity / create_polyline / move_entity have NO native handler.
-        for op_name in ("delete_entity", "create_polyline", "move_entity"):
+        # delete_entity / create_hatch / move_entity have NO native handler.
+        # (create_polyline was the third fixture here pre-WAVE-1 TIER-1 T1;
+        # tools/promote_op.py has since wired it for real -- write.entity.hatch
+        # remains genuinely unwired at the patch_ops layer today.)
+        for op_name in ("delete_entity", "create_hatch", "move_entity"):
             patch = _good_patch("a/s.dwg", "b/o.dwg")
             patch["operations"] = [{"operation": op_name, "args": {}}]
             rec, err = self.pe._resolve_native_write_op(patch)
