@@ -24,10 +24,18 @@ per-quantity tolerance profile (the AutoCAD COMPARETOLERANCE analog -- see
 ``DEFAULT_GEOMETRY_TOLERANCE``, ``default_tolerance_profile`` and the
 ``geometry_tolerance`` / ``tolerance_profile`` kwargs), so a regenerated drawing
 whose engine reissued every handle can still report zero changes when the
-geometry itself is unchanged. Matching is two-tier: entities with an exact
-fingerprint match on both sides are unchanged; whatever is left is paired by
-``(dxf_name, layer)`` alone and classified via ``classify_change``, so a genuine
-geometry edit becomes ``modified`` rather than a fake added+removed pair.
+geometry itself is unchanged. Matching is three-tier: entities with a
+BYTE-EXACT fingerprint match on both sides are unchanged (tier 1, no
+tolerance involved at all); whatever is left is matched pairwise -- a direct
+``abs(a - b) <= tol`` compare against a same-``(dxf_name, layer)`` leftover on
+the other side, never a hash/bucket (tier 1.5 -- see ``_geometry_within_tolerance``,
+the v2-A5 tolerance-rigor fix: a bucket/hash scheme either collapses distinct
+large coordinates onto one bucket if the per-scalar tolerance is derived from
+each value independently, or false-fails two within-tolerance values that
+straddle a bucket boundary; a direct pairwise compare has neither failure
+mode); whatever STILL doesn't match is paired by ``(dxf_name, layer)`` alone
+and classified via ``classify_change``, so a genuine geometry edit becomes
+``modified`` rather than a fake added+removed pair (tier 2).
 ``"handle"`` remains the default and is completely unaffected by this mode.
 
 Diff scope (``config/diff_scope.json``)
@@ -525,7 +533,13 @@ def _deterministic_diff_id(pre_ir: Dict[str, Any], post_ir: Dict[str, Any],
 #: than guessed at each call site. Anything not listed defaults to "length"
 #: (the common case: most numeric CAD geometry fields are coordinates/lengths).
 _ANGLE_KEYS = frozenset({"start_angle", "end_angle", "rotation"})
-_SCALE_KEYS = frozenset({"scale", "bulge"})
+# v2-A5 tolerance rigor fix: minor_ratio (an ELLIPSE's minor/major axis
+# ratio, see dwg_graph_ir.v1.schema.json) is a dimensionless ratio exactly
+# like scale/bulge -- before this fix it fell through to the "length" default
+# and was compared with the (far looser, magnitude-widening) length
+# tolerance, which could false-pass a real ratio edit smaller than the length
+# tolerance but larger than the scale tolerance.
+_SCALE_KEYS = frozenset({"scale", "bulge", "minor_ratio"})
 
 
 def default_tolerance_profile(geometry_tolerance: float = DEFAULT_GEOMETRY_TOLERANCE
@@ -564,6 +578,16 @@ def _effective_tolerance(kind: str, value: float, profile: Dict[str, Any]) -> fl
     widening is a function of THIS leaf's own magnitude only, so a huge
     coordinate on one field never loosens a sibling angle/scale field's
     tolerance (kinds never share state -- see boundary tests).
+
+    CAUTION for hashing/quantization callers: because the widening scales
+    PROPORTIONALLY to ``value`` (``tol = magnitude * rel_tol``), calling this
+    per-scalar with EACH value's own magnitude to build a ``round(value / tol)``
+    bucket collapses ``value / tol`` to the constant ``1 / rel_tol`` for every
+    magnitude past the threshold -- two genuinely different large coordinates
+    then land on the SAME bucket (large-coordinate false-pass). Hashing/
+    quantization callers must resolve ONE shared tolerance for the whole
+    comparison first via ``_resolve_tolerance_profile`` rather than calling
+    this per-scalar with each leaf's own value.
     """
     base = profile.get(kind, profile.get("length", DEFAULT_GEOMETRY_TOLERANCE))
     if kind != "length":
@@ -575,6 +599,62 @@ def _effective_tolerance(kind: str, value: float, profile: Dict[str, Any]) -> fl
     if magnitude <= threshold:
         return base
     return max(base, magnitude * rel_tol)
+
+
+def _length_leaf_extent(value: Any, kind: str = "length") -> float:
+    """Recursively find the max abs magnitude of any "length"-kind numeric leaf
+    inside a geometry payload (mirrors ``_quantize``'s traversal and per-key
+    kind reclassification, but MEASURES instead of snapping). Used only to
+    seed ``_resolve_tolerance_profile``'s drawing-extent reference magnitude.
+    """
+    if isinstance(value, bool):
+        return 0.0
+    if isinstance(value, (int, float)):
+        return abs(float(value)) if kind == "length" else 0.0
+    if isinstance(value, dict):
+        return max((_length_leaf_extent(v, _quantity_kind(k)) for k, v in value.items()),
+                  default=0.0)
+    if isinstance(value, (list, tuple)):
+        return max((_length_leaf_extent(v, kind) for v in value), default=0.0)
+    return 0.0
+
+
+def _drawing_length_extent(*irs: Dict[str, Any]) -> float:
+    """Max abs magnitude of any "length"-kind geometry leaf across every
+    entity in ``irs`` (0.0 if none) -- the shared reference magnitude
+    ``_resolve_tolerance_profile`` widens the "length" tolerance from, so both
+    sides of a comparison always resolve to the identical tolerance."""
+    extent = 0.0
+    for ir in irs:
+        for e in ((ir or {}).get("entities") or []):
+            if isinstance(e, dict):
+                extent = max(extent, _length_leaf_extent(e.get("geometry")))
+    return extent
+
+
+def _resolve_tolerance_profile(profile: Dict[str, Any], *irs: Dict[str, Any]) -> Dict[str, Any]:
+    """Resolve ``profile``'s "length" tolerance ONCE for this whole comparison
+    (v2-A5 large-coordinate false-pass fix, RT-FOLD F5 tolerance rigor).
+
+    Do NOT re-derive a per-scalar relative tolerance during hashing/matching
+    -- see ``_effective_tolerance``'s caution note. Instead this widens the
+    "length" tolerance exactly ONCE, from the combined drawing extent of
+    ``irs`` (shared by both sides of the comparison, never from an individual
+    scalar's own magnitude), and pins ``large_coordinate_threshold`` to
+    infinity in the returned profile so no downstream per-leaf
+    ``_effective_tolerance("length", ...)`` call can re-derive (and re-break)
+    the widening from its own scalar. This keeps the widening's purpose intact
+    (large-site-scale roundtrip noise still must not false-fail) while
+    restoring the magnitude information that per-scalar widening was
+    destroying (two coordinates that differ by more than the shared tolerance
+    now always land on different buckets/comparisons, regardless of how large
+    both happen to be).
+    """
+    resolved = dict(profile)
+    extent = _drawing_length_extent(*irs)
+    resolved["length"] = _effective_tolerance("length", extent, profile)
+    resolved["large_coordinate_threshold"] = float("inf")
+    return resolved
 
 
 def _quantize(value: Any, profile: Dict[str, Any], kind: str = "length") -> Any:
@@ -639,13 +719,24 @@ def _geometry_fingerprint_multiset(ir: Dict[str, Any], profile: Dict[str, Any]) 
     return fps
 
 
-def _bucket_by_fingerprint(entities: List[Dict[str, Any]], profile: Dict[str, Any]
-                           ) -> Dict[Tuple[Any, Any, Any], List[Dict[str, Any]]]:
-    """Group entities by geometry fingerprint, preserving each bucket's input order."""
+def _exact_fingerprint(entity: Dict[str, Any]) -> Tuple[Any, Any, Any]:
+    """Byte-exact ``(dxf_name, layer, geometry)`` key -- NO tolerance and NO
+    quantization, unlike ``_geometry_fingerprint``. Two entities sharing this
+    key are unambiguously the same geometry regardless of which tolerance
+    profile is active, so this tier can never itself false-pass (collapse two
+    genuinely different values) or false-fail (straddle a rounding boundary)
+    -- see ``_compute_diff_geometry_basis`` tier 1.
+    """
+    return (entity.get("dxf_name"), entity.get("layer"), _canonical(entity.get("geometry")))
+
+
+def _bucket_by_exact_fingerprint(entities: List[Dict[str, Any]]
+                                ) -> Dict[Tuple[Any, Any, Any], List[Dict[str, Any]]]:
+    """Group entities by ``_exact_fingerprint``, preserving each bucket's input order."""
     buckets: Dict[Tuple[Any, Any, Any], List[Dict[str, Any]]] = {}
     for ent in entities:
         if isinstance(ent, dict):
-            buckets.setdefault(_geometry_fingerprint(ent, profile), []).append(ent)
+            buckets.setdefault(_exact_fingerprint(ent), []).append(ent)
     return buckets
 
 
@@ -654,22 +745,119 @@ def _by_handle_sort_key(ent: Dict[str, Any]) -> str:
     return ent.get("handle") or ""
 
 
+def _geometry_within_tolerance(pre_geom: Any, post_geom: Any, profile: Dict[str, Any],
+                               kind: str = "length") -> bool:
+    """True when two geometry payloads are equal within ``profile``'s
+    per-quantity tolerance, leaf-by-leaf, via a DIRECT ``abs(a - b) <= tol``
+    compare -- the pairwise fix for the half-bucket false-fail defect a
+    round()-based hash bucket cannot avoid (two values within tolerance of
+    each other can still straddle a rounding-grid boundary and hash unequal;
+    a direct threshold compare has no grid to straddle in the first place).
+    ``kind`` seeds the classification for scalar leaves; dict keys reclassify
+    their own values via ``_quantity_kind`` as recursion descends and list
+    elements inherit their parent key's kind -- mirrors ``_quantize``'s
+    traversal. A structural mismatch (missing dict key, differing list
+    length, non-numeric type mismatch) is never "within tolerance".
+    """
+    if isinstance(pre_geom, bool) or isinstance(post_geom, bool):
+        return pre_geom == post_geom
+    if isinstance(pre_geom, (int, float)) and isinstance(post_geom, (int, float)):
+        magnitude = max(abs(float(pre_geom)), abs(float(post_geom)))
+        tol = _effective_tolerance(kind, magnitude, profile)
+        return abs(float(pre_geom) - float(post_geom)) <= tol
+    if isinstance(pre_geom, dict) and isinstance(post_geom, dict):
+        if set(pre_geom.keys()) != set(post_geom.keys()):
+            return False
+        return all(_geometry_within_tolerance(pre_geom[k], post_geom[k], profile,
+                                              _quantity_kind(k))
+                  for k in pre_geom)
+    if isinstance(pre_geom, (list, tuple)) and isinstance(post_geom, (list, tuple)):
+        if len(pre_geom) != len(post_geom):
+            return False
+        return all(_geometry_within_tolerance(a, b, profile, kind)
+                  for a, b in zip(pre_geom, post_geom))
+    return pre_geom == post_geom
+
+
+def _match_leftovers_within_tolerance(
+        leftover_pre: List[Dict[str, Any]], leftover_post: List[Dict[str, Any]],
+        profile: Dict[str, Any]
+       ) -> Tuple[List[Dict[str, Any]], List[Dict[str, Any]], int]:
+    """Tier 1.5: pairwise-tolerant match among tier-1 byte-exact-match leftovers.
+
+    Grouped by ``(dxf_name, layer)`` (nothing here matched byte-for-byte, so
+    geometry is otherwise unknown-equal), each remaining pre entity is matched,
+    in handle-sorted order, against the first not-yet-matched post entity
+    (also handle-sorted) whose geometry is ``_geometry_within_tolerance`` --
+    deterministic greedy first-fit, mirroring the handle-sort tie-break used
+    throughout this module. This is what lets floating-point roundtrip jitter
+    (a regenerated drawing whose engine reissued handles AND perturbed a
+    coordinate by less than the tolerance) still report ``unchanged`` without
+    the hash-bucket defects a fingerprint-multiset join cannot avoid.
+
+    Returns ``(still_unmatched_pre, still_unmatched_post, matched_count)``.
+    """
+    def _type_layer(ent: Dict[str, Any]) -> Tuple[Any, Any]:
+        return (ent.get("dxf_name"), ent.get("layer"))
+
+    pre_groups: Dict[Tuple[Any, Any], List[Dict[str, Any]]] = {}
+    for e in leftover_pre:
+        pre_groups.setdefault(_type_layer(e), []).append(e)
+    post_groups: Dict[Tuple[Any, Any], List[Dict[str, Any]]] = {}
+    for e in leftover_post:
+        post_groups.setdefault(_type_layer(e), []).append(e)
+
+    still_pre: List[Dict[str, Any]] = []
+    still_post: List[Dict[str, Any]] = []
+    matched = 0
+
+    for tl in sorted(set(pre_groups) | set(post_groups), key=lambda k: (k[0] or "", k[1] or "")):
+        pre_list = sorted(pre_groups.get(tl, []), key=_by_handle_sort_key)
+        post_list = sorted(post_groups.get(tl, []), key=_by_handle_sort_key)
+        used_post = [False] * len(post_list)
+        for pre_e in pre_list:
+            match_idx = None
+            for j, post_e in enumerate(post_list):
+                if used_post[j]:
+                    continue
+                if _geometry_within_tolerance(pre_e.get("geometry"), post_e.get("geometry"),
+                                              profile):
+                    match_idx = j
+                    break
+            if match_idx is None:
+                still_pre.append(pre_e)
+            else:
+                used_post[match_idx] = True
+                matched += 1
+        still_post.extend(post_e for j, post_e in enumerate(post_list) if not used_post[j])
+
+    return still_pre, still_post, matched
+
+
 def _compute_diff_geometry_basis(pre_ir: Dict[str, Any], post_ir: Dict[str, Any],
                                  tolerance_profile: Dict[str, Any],
                                  diff_scope: Optional[str] = None) -> Dict[str, Any]:
     """compute_diff's geometry-fingerprint join (comparison_basis="geometry").
 
-    Matching is two-tier, both deterministic (ties broken by sorted handle):
+    Matching is three-tier, all deterministic (ties broken by sorted handle):
 
-      1. Entities with an EXACT fingerprint match (``dxf_name``, ``layer``, and
-         geometry equal within ``tolerance_profile``, v2-A5 per-quantity) on
-         both sides are ``unchanged``. Duplicate fingerprints are matched as a
+      1. Entities with a BYTE-EXACT fingerprint match (``dxf_name``, ``layer``,
+         and geometry literally equal -- no tolerance, no quantization) on both
+         sides are ``unchanged``. Duplicate fingerprints are matched as a
          multiset (pairs up to ``min(count_pre, count_post)`` per bucket).
-      2. Whatever is left is paired up by ``(dxf_name, layer)`` alone -- geometry
-         differs, by construction of step 1 -- and classified via
-         ``classify_change``, so a real geometry edit surfaces as ``modified``
-         instead of a fake added+removed pair.
-      3. Anything still unpaired (a type/layer with more entities on one side
+      2. Whatever is left is matched PAIRWISE within ``tolerance_profile``
+         (v2-A5 per-quantity), grouped by ``(dxf_name, layer)`` -- a direct
+         ``abs(a - b) <= tol`` compare (``_geometry_within_tolerance``), never a
+         hash/bucket, so this tier is immune to both the large-coordinate
+         false-pass and the half-bucket false-fail a fingerprint HASH cannot
+         avoid (see ``_resolve_tolerance_profile`` / ``_geometry_within_tolerance``).
+         A match here is also ``unchanged`` (floating-point roundtrip jitter,
+         not a real edit).
+      3. Whatever is STILL left is paired up by ``(dxf_name, layer)`` alone --
+         genuinely different geometry, by construction of steps 1-2 -- and
+         classified via ``classify_change``, so a real geometry edit surfaces as
+         ``modified`` instead of a fake added+removed pair.
+      4. Anything still unpaired (a type/layer with more entities on one side
          than the other) is ``added`` (post-only) / ``removed`` (pre-only).
 
     ``pre_ir`` / ``post_ir`` are expected already scope-filtered (see
@@ -682,14 +870,20 @@ def _compute_diff_geometry_basis(pre_ir: Dict[str, Any], post_ir: Dict[str, Any]
     """
     pre_ir = pre_ir or {}
     post_ir = post_ir or {}
-    profile = tolerance_profile
+    # tolerance_profile stays the RAW, caller-requested profile (surfaced
+    # verbatim in diagnostics below); `profile` is the ONE shared tolerance
+    # resolved from the combined drawing extent (v2-A5 large-coordinate
+    # false-pass fix) used for every match decision + the diff_id hash.
+    profile = _resolve_tolerance_profile(tolerance_profile, pre_ir, post_ir)
 
     pre_entities = [e for e in (pre_ir.get("entities") or []) if isinstance(e, dict)]
     post_entities = [e for e in (post_ir.get("entities") or []) if isinstance(e, dict)]
 
-    # Tier 1: exact fingerprint match -> unchanged (multiset: pair min(count) per bucket).
-    pre_fp = _bucket_by_fingerprint(pre_entities, profile)
-    post_fp = _bucket_by_fingerprint(post_entities, profile)
+    # Tier 1: BYTE-EXACT fingerprint match -> unchanged (multiset: pair
+    # min(count) per bucket). No tolerance/quantization here at all, so this
+    # tier can never itself false-pass or false-fail on a tolerance boundary.
+    pre_fp = _bucket_by_exact_fingerprint(pre_entities)
+    post_fp = _bucket_by_exact_fingerprint(post_entities)
 
     unchanged_count = 0
     leftover_pre: List[Dict[str, Any]] = []
@@ -705,7 +899,13 @@ def _compute_diff_geometry_basis(pre_ir: Dict[str, Any], post_ir: Dict[str, Any]
         leftover_pre.extend(pre_list[n:])
         leftover_post.extend(post_list[n:])
 
-    # Tier 2: pair leftovers by (dxf_name, layer) only -> modified via classify_change.
+    # Tier 1.5: pairwise-tolerant match among the byte-exact-match leftovers
+    # (v2-A5 tolerance rigor fix -- see _match_leftovers_within_tolerance).
+    leftover_pre, leftover_post, tol_matched = _match_leftovers_within_tolerance(
+        leftover_pre, leftover_post, profile)
+    unchanged_count += tol_matched
+
+    # Tier 2: pair remaining leftovers by (dxf_name, layer) only -> modified via classify_change.
     def _type_layer(ent: Dict[str, Any]) -> Tuple[Any, Any]:
         return (ent.get("dxf_name"), ent.get("layer"))
 
@@ -830,8 +1030,10 @@ def _compute_diff_geometry_basis(pre_ir: Dict[str, Any], post_ir: Dict[str, Any]
 
     diagnostics: Dict[str, Any] = {
         "comparison_basis": "geometry",
-        "geometry_tolerance": profile.get("length"),
-        "tolerance_profile": dict(profile),
+        # surfaced verbatim from the caller's request, not the internally
+        # resolved/widened `profile` used for matching -- see the docstring.
+        "geometry_tolerance": tolerance_profile.get("length"),
+        "tolerance_profile": dict(tolerance_profile),
         "warnings": warnings,
         "errors": [],
         "pre_coverage_level": pre_ir.get("coverage_level"),

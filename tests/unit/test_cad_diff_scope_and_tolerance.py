@@ -244,6 +244,155 @@ class TestPerQuantityToleranceBoundary(unittest.TestCase):
         self.assertEqual(diff["summary"]["unchanged"], 1)
 
 
+class TestLargeCoordinateFalsePass(unittest.TestCase):
+    """[F5 tolerance rigor, defect 1] codex Layer-3 WEAK finding: before this
+    fix, ``_effective_tolerance``'s large-coordinate widening was re-derived
+    PER-SCALAR from each value's own magnitude during hashing
+    (``tol = magnitude * rel_tol``), so ``value / tol`` collapsed to the
+    constant ``1 / rel_tol`` for every magnitude past the threshold -- two
+    genuinely different large coordinates (e.g. 2e7 vs 3e7) quantized onto the
+    SAME grid point and hashed as the "same" fingerprint, silently swallowing
+    a real ~1e7-unit edit as unchanged. The fix resolves ONE shared tolerance
+    from the whole drawing's extent (``_resolve_tolerance_profile``) instead
+    of re-deriving it per scalar, and matches leftovers pairwise
+    (``abs(a - b) <= tol``) rather than by fingerprint hash."""
+
+    def test_2e7_vs_3e7_reported_modified(self):
+        import cad_diff
+        pre = _ir([_insert_entity("AAA", (2.0e7, 0.0, 0.0), 0.0)])
+        post = _ir([_insert_entity("ZZZ", (3.0e7, 0.0, 0.0), 0.0)])  # rehandled too
+        diff = cad_diff.compute_diff(pre, post, comparison_basis="geometry")
+        self.assertEqual(diff["summary"]["modified"], 1,
+                         "false-PASS: two genuinely different large coordinates "
+                         "(2e7 vs 3e7) collapsed onto the same fingerprint bucket")
+        self.assertEqual(diff["summary"]["unchanged"], 0)
+        self.assertEqual(diff["summary"]["added"], 0)
+        self.assertEqual(diff["summary"]["removed"], 0)
+
+    def test_other_large_coordinate_pair_also_detected(self):
+        """A second, independent magnitude pair -- proves the fix isn't a
+        one-off coincidence tuned to exactly 2e7/3e7."""
+        import cad_diff
+        pre = _ir([_insert_entity("AAA", (5.0e7, 0.0, 0.0), 0.0)])
+        post = _ir([_insert_entity("ZZZ", (8.0e7, 0.0, 0.0), 0.0)])
+        diff = cad_diff.compute_diff(pre, post, comparison_basis="geometry")
+        self.assertEqual(diff["summary"]["modified"], 1)
+        self.assertEqual(diff["summary"]["unchanged"], 0)
+
+
+class TestHalfBucketBoundaryPairwise(unittest.TestCase):
+    """[F5 tolerance rigor, defect 2] codex Layer-3 WEAK finding:
+    ``round(value / tol)`` is not a true within-tolerance equivalence -- two
+    values within tolerance of each other can straddle a rounding-grid
+    half-integer boundary and hash to DIFFERENT buckets, false-failing
+    geometry that is genuinely unchanged. The fix replaces bucket-hash
+    equality with a direct pairwise ``abs(a - b) <= tol`` compare
+    (``_geometry_within_tolerance``) for anything that doesn't byte-exact
+    match at tier 1 -- a direct threshold compare has no grid to straddle."""
+
+    def test_half_bucket_straddle_within_tolerance_is_equal(self):
+        import cad_diff
+        tol = cad_diff.DEFAULT_GEOMETRY_TOLERANCE  # 1e-6
+        n = 5_000_000
+        # a/tol and b/tol straddle the (n - 0.5) half-integer round() boundary
+        # (round(a/tol) == n-1, round(b/tol) == n) even though |a-b| is only
+        # 0.4*tol -- well within tolerance. A naive hash-bucket join reports
+        # these as DIFFERENT; a genuine tolerant compare must not.
+        a = (n - 0.5 - 0.2) * tol
+        b = (n - 0.5 + 0.2) * tol
+        self.assertLess(abs(a - b), tol)
+        self.assertAlmostEqual(abs(a - b), 0.4 * tol, places=12)
+        self.assertNotEqual(
+            round(a / tol), round(b / tol),
+            "fixture bug: a and b must actually straddle a round()-bucket "
+            "boundary to exercise the half-bucket defect")
+
+        pre = _ir([_insert_entity("AAA", (a, 0.0, 0.0), 0.0)])
+        post = _ir([_insert_entity("ZZZ", (b, 0.0, 0.0), 0.0)])  # rehandled too
+        diff = cad_diff.compute_diff(pre, post, comparison_basis="geometry")
+        self.assertEqual(diff["summary"]["modified"], 0,
+                         "false-FAIL: two values only 0.4*tol apart (well within "
+                         "tolerance) were reported as changed because they "
+                         "straddled a rounding-grid boundary")
+        self.assertEqual(diff["summary"]["unchanged"], 1)
+
+    def test_values_two_tol_apart_are_reported_modified(self):
+        """Mirror sanity check: a real difference (2*tol, well beyond
+        tolerance) must still be detected -- the fix must not over-widen
+        matching into swallowing genuine edits."""
+        import cad_diff
+        tol = cad_diff.DEFAULT_GEOMETRY_TOLERANCE
+        v1 = 5.0
+        v2 = 5.0 + 2 * tol
+        pre = _ir([_insert_entity("AAA", (v1, 0.0, 0.0), 0.0)])
+        post = _ir([_insert_entity("ZZZ", (v2, 0.0, 0.0), 0.0)])
+        diff = cad_diff.compute_diff(pre, post, comparison_basis="geometry")
+        self.assertEqual(diff["summary"]["modified"], 1)
+        self.assertEqual(diff["summary"]["unchanged"], 0)
+
+
+def _ratio_entity(handle, key, value, layer="0"):
+    """A minimal entity carrying a single dimensionless-ratio geometry leaf
+    (``scale``/``bulge``/``minor_ratio``) -- just enough to exercise the
+    scale/relative-tolerance band classification (``_quantity_kind``)."""
+    return {
+        "handle": handle, "class": "AcDbEntity", "dxf_name": "TESTENT",
+        "owner_handle": "1", "space": "model", "layer": layer,
+        "bbox": [], "geometry": {"kind": "ratio_test", key: value},
+        "source": {"extractor": "test", "decoded": True},
+    }
+
+
+class TestScaleRatioToleranceClassification(unittest.TestCase):
+    """[F5 tolerance rigor, defect 3] "scale tolerance exists but is
+    untested": ``scale``/``bulge``/``minor_ratio`` are dimensionless ratios
+    and must be classified/compared under the tight "scale" tolerance band
+    (1e-9), not silently fall through to the far looser "length" default
+    (1e-6) -- a fall-through false-PASSes a real ratio edit that is bigger
+    than the scale tolerance but smaller than the length tolerance.
+    ``minor_ratio`` (an ELLIPSE's minor/major axis ratio, see
+    ``dwg_graph_ir.v1.schema.json``) was missing from ``_SCALE_KEYS`` before
+    this fix and fell through to "length"."""
+
+    def test_keys_classified_as_scale_kind(self):
+        import cad_diff
+        for key in ("scale", "bulge", "minor_ratio"):
+            self.assertEqual(cad_diff._quantity_kind(key), "scale", key)
+
+    def test_ratio_edit_between_scale_and_length_tolerance_is_modified(self):
+        """A delta bigger than the scale tolerance (1e-9) but comfortably
+        smaller than the length tolerance (1e-6) must register as a change
+        for each ratio key -- if a key fell through to "length" this edit
+        would false-pass as unchanged (as ``minor_ratio`` did before this fix)."""
+        import cad_diff
+        profile = cad_diff.default_tolerance_profile()
+        delta = 3e-7
+        self.assertGreater(delta, profile["scale"])
+        self.assertLess(delta, profile["length"])
+        for key in ("scale", "bulge", "minor_ratio"):
+            pre = _ir([_ratio_entity("AAA", key, 1.0)])
+            post = _ir([_ratio_entity("ZZZ", key, 1.0 + delta)])
+            diff = cad_diff.compute_diff(pre, post, comparison_basis="geometry")
+            self.assertEqual(diff["summary"]["modified"], 1,
+                             "false-PASS: a %r delta of %.1e was swallowed by a "
+                             "looser tolerance kind" % (key, delta))
+            self.assertEqual(diff["summary"]["unchanged"], 0, key)
+
+    def test_ratio_noise_within_scale_tolerance_is_unchanged(self):
+        """Mirror case: noise smaller than the scale tolerance must NOT
+        register -- proves the scale tolerance actually applies (not that any
+        difference at all gets flagged)."""
+        import cad_diff
+        profile = cad_diff.default_tolerance_profile()
+        noise = profile["scale"] * 0.1
+        for key in ("scale", "bulge", "minor_ratio"):
+            pre = _ir([_ratio_entity("AAA", key, 1.0)])
+            post = _ir([_ratio_entity("ZZZ", key, 1.0 + noise)])
+            diff = cad_diff.compute_diff(pre, post, comparison_basis="geometry")
+            self.assertEqual(diff["summary"]["modified"], 0, key)
+            self.assertEqual(diff["summary"]["unchanged"], 1, key)
+
+
 class TestDiffScopeLegislation(unittest.TestCase):
     """config/diff_scope.json legislates {modelspace_entities_only|full_database}."""
 
