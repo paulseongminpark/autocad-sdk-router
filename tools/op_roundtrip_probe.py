@@ -117,17 +117,32 @@ def resolve_native_op(op_name: str, *, patch_ops_mod=None) -> Optional[str]:
 #    live read)
 # --------------------------------------------------------------------------- #
 
+def _point_to_list(coords: Any) -> list:
+    """The IR's OWN geometry representation is a plain ``[x, y, z]`` list (see
+    ``added_entities_ir`` / the native extractor's ``actual_ir``) -- distinct
+    from the job-args point-OBJECT shape schemas/cad_job.v2.schema.json
+    requires (``{"x":.., "y":.., "z":..}``, confirmed by test_native/
+    job_line_create.json). Accepts either shape so this stays correct for
+    both CLI-built args (point-object, see ``_as_point_arg``) and any
+    programmatic caller still passing a bare ``[x, y, z]``."""
+    if isinstance(coords, dict):
+        return [coords.get("x", 0.0), coords.get("y", 0.0), coords.get("z", 0.0)]
+    return list(coords)
+
+
 def _expect_create_line(args: Dict[str, Any]) -> Dict[str, Any]:
     return {
         "dxf_name": "LINE", "layer": args.get("layer") or "0",
-        "geometry": {"kind": "line", "start": list(args["start"]), "end": list(args["end"])},
+        "geometry": {"kind": "line", "start": _point_to_list(args["start"]),
+                    "end": _point_to_list(args["end"])},
     }
 
 
 def _expect_create_circle(args: Dict[str, Any]) -> Dict[str, Any]:
     return {
         "dxf_name": "CIRCLE", "layer": args.get("layer") or "0",
-        "geometry": {"kind": "circle", "center": list(args["center"]), "radius": args["radius"]},
+        "geometry": {"kind": "circle", "center": _point_to_list(args["center"]),
+                    "radius": args["radius"]},
     }
 
 
@@ -184,10 +199,20 @@ def added_entities_ir(pre_ir: Dict[str, Any], post_ir: Dict[str, Any], *,
 # P-gate judge (cad_op_gate.check_roundtrip)
 # --------------------------------------------------------------------------- #
 
-def _build_patch(op_name: str, args: Dict[str, Any]) -> Dict[str, Any]:
+def _build_patch(op_name: str, args: Dict[str, Any], dwg_path: str, out_dir: str) -> Dict[str, Any]:
+    # target_dwg is REQUIRED by schemas/cad_patch.v1.schema.json (staged_path
+    # distinct from original_path). apply_staged's own create_staged_copy(dwg_path,
+    # out_dir) always writes to <out_dir>/staged_input.dwg regardless of this
+    # declared value (it does not read target_dwg to decide where to stage) --
+    # so this is the TRUE path, not a placeholder, kept honest with what
+    # create_staged_copy actually produces moments later.
     return {
         "schema": "ariadne.cad_patch.v1",
         "patch_id": "op_roundtrip_probe/%s" % op_name,
+        "target_dwg": {
+            "original_path": os.path.abspath(dwg_path),
+            "staged_path": os.path.join(out_dir, "staged_input.dwg"),
+        },
         "operations": [{"step_id": "s1", "operation": op_name, "args": args}],
         "postconditions": [{"subject": "entity_count", "op": "delta_eq", "value": 1}],
         "policy": {"staged_copy": True, "write_mode": "write_copy"},
@@ -238,7 +263,7 @@ def probe_roundtrip(op_name: str, args: Dict[str, Any], dwg_path: str, out_dir: 
             "reason": "patch_engine.apply_staged unavailable",
         }
 
-    patch = _build_patch(op_name, args)
+    patch = _build_patch(op_name, args, dwg_path, out_dir)
     envelope = apply_fn(patch, dwg_path, out_dir)
     env_status = envelope.get("status")
     if env_status != "ok":
@@ -260,15 +285,19 @@ def probe_roundtrip(op_name: str, args: Dict[str, Any], dwg_path: str, out_dir: 
             "original_unchanged": orig,
         }
 
-    extra = envelope.get("extra") or {}
-    if "pre_ir" not in extra or "post_ir" not in extra:
+    # patch_engine.apply_staged's _result_envelope(..., extra=...) does
+    # env.update(extra) -- i.e. extra fields land at the envelope's TOP LEVEL
+    # (envelope["pre_ir"] / envelope["post_ir"]), there is no nested "extra" key.
+    pre_ir_ref = envelope.get("pre_ir")
+    post_ir_ref = envelope.get("post_ir")
+    if not pre_ir_ref or not post_ir_ref:
         return {
             "schema": SCHEMA_ID, "op_name": op_name, "native_op": native_op,
             "status": gate.STATUS_ERROR, "exit_code": gate.EXIT_ERROR,
-            "reason": "apply_staged envelope reported ok but is missing extra.pre_ir/post_ir",
+            "reason": "apply_staged envelope reported ok but is missing pre_ir/post_ir",
         }
-    pre_ir = _load_ir_maybe(extra["pre_ir"])
-    post_ir = _load_ir_maybe(extra["post_ir"])
+    pre_ir = _load_ir_maybe(pre_ir_ref)
+    post_ir = _load_ir_maybe(post_ir_ref)
     actual_ir = added_entities_ir(pre_ir, post_ir, cad_diff_mod=cad_diff_mod)
 
     tol = geometry_tolerance if geometry_tolerance is not None else gate.DEFAULT_GEOMETRY_TOLERANCE
@@ -298,7 +327,10 @@ def _fake_apply_staged_ok(op_name: str, entity: Dict[str, Any]):
         return {
             "status": "ok",
             "original_unchanged": {"unchanged": True},
-            "extra": {"pre_ir": pre_ir, "post_ir": post_ir},
+            # top-level, mirroring the REAL patch_engine.apply_staged envelope
+            # (_result_envelope(..., extra=...) does env.update(extra) --
+            # there is no nested "extra" key in the real contract).
+            "pre_ir": pre_ir, "post_ir": post_ir,
         }
     return _fn
 
@@ -360,13 +392,20 @@ def main(argv=None) -> int:
     if not args.op_name or not args.dwg_path or not args.out_dir:
         return _selftest()
 
+    def _point_arg(xyz):  # CLI [X, Y, Z] -> the {"x","y","z"} point-object
+        return {"x": xyz[0], "y": xyz[1], "z": xyz[2]}  # shape write.entity.line/
+        # circle actually require (schemas/cad_job.v2.schema.json + test_native/
+        # job_line_create.json) -- a bare list is NOT recognized by the native
+        # dispatcher and silently degenerates to a unit line/circle instead of
+        # erroring, so this must match on the wire, not just satisfy Python.
+
     op_args: Dict[str, Any] = {"layer": args.layer}
     if args.start is not None:
-        op_args["start"] = list(args.start)
+        op_args["start"] = _point_arg(args.start)
     if args.end is not None:
-        op_args["end"] = list(args.end)
+        op_args["end"] = _point_arg(args.end)
     if args.center is not None:
-        op_args["center"] = list(args.center)
+        op_args["center"] = _point_arg(args.center)
     if args.radius is not None:
         op_args["radius"] = args.radius
 

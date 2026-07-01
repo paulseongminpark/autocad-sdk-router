@@ -130,7 +130,11 @@ def _fake_apply_staged(post_entity, *, status="ok", reason=None, original_unchan
             envelope["reason"] = reason
         if status == "ok":
             envelope["original_unchanged"] = {"unchanged": original_unchanged}
-            envelope["extra"] = {"pre_ir": pre_ir, "post_ir": post_ir}
+            # top-level, mirroring the REAL patch_engine.apply_staged envelope
+            # (_result_envelope(..., extra=...) does env.update(extra) -- there
+            # is no nested "extra" key in the real contract).
+            envelope["pre_ir"] = pre_ir
+            envelope["post_ir"] = post_ir
         return envelope
     return _fn
 
