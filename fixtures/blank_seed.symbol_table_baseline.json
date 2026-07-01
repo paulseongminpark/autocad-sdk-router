@@ -1,0 +1,318 @@
+{
+  "schema": "ariadne.blank_seed_symbol_table_baseline.v1",
+  "generated_at": "2026-07-01T09:27:27.202108+00:00",
+  "source_dwg": "fixtures/blank_seed.dwg",
+  "source_dwg_sha256": "292ed593c418d8f8c365ddb0b31d0afed5ae919de7cead1b875be18aa8b44230",
+  "minted_from_template": "C:\\Users\\PAUL\\AppData\\Local\\Autodesk\\AutoCAD 2027\\R26.0\\kor\\Template\\acad.dwt",
+  "captured_via_operation": "inspect.database.graph",
+  "note": "Default symbol-table/graph content of a fresh drawing minted from the kor acad.dwt template. F5 (config/diff_scope.json, full_database scope) subtracts these {handle,name} records from a real drawing's symbol tables so template defaults are never reported as added content. modelspace_entities is expected to be 0.",
+  "baseline": {
+    "modelspace_entities": 0,
+    "entities": [],
+    "database": {
+      "insbase": [
+        0,
+        0,
+        0
+      ],
+      "extents": {
+        "extmin": [
+          1e+20,
+          1e+20,
+          1e+20
+        ],
+        "extmax": [
+          -1e+20,
+          -1e+20,
+          -1e+20
+        ]
+      },
+      "units": {
+        "insunits": 1,
+        "linear_units": 2,
+        "angular_units": 0,
+        "linear_precision": 4,
+        "angular_precision": 0
+      }
+    },
+    "symbol_tables": {
+      "layers": [
+        {
+          "handle": "10",
+          "name": "0",
+          "color_index": 7,
+          "frozen": false,
+          "off": false,
+          "locked": false,
+          "plottable": true,
+          "is_xref_dependent": false
+        }
+      ],
+      "linetypes": [
+        {
+          "handle": "14",
+          "name": "ByBlock"
+        },
+        {
+          "handle": "15",
+          "name": "ByLayer"
+        },
+        {
+          "handle": "16",
+          "name": "Continuous"
+        }
+      ],
+      "text_styles": [
+        {
+          "handle": "11",
+          "name": "Standard"
+        },
+        {
+          "handle": "DC",
+          "name": "주석"
+        }
+      ],
+      "dim_styles": [
+        {
+          "handle": "27",
+          "name": "Standard"
+        },
+        {
+          "handle": "E1",
+          "name": "주석"
+        }
+      ],
+      "viewports": [
+        {
+          "handle": "94",
+          "name": "*Active"
+        }
+      ],
+      "app_ids": [
+        {
+          "handle": "12",
+          "name": "ACAD"
+        },
+        {
+          "handle": "DD",
+          "name": "AcadAnnoPO"
+        },
+        {
+          "handle": "DE",
+          "name": "AcadAnnotative"
+        },
+        {
+          "handle": "DF",
+          "name": "ACAD_DSTYLE_DIMJAG"
+        },
+        {
+          "handle": "E0",
+          "name": "ACAD_DSTYLE_DIMTALN"
+        },
+        {
+          "handle": "107",
+          "name": "ACAD_MLEADERVER"
+        },
+        {
+          "handle": "1A6",
+          "name": "ACAD_NAV_VCDISPLAY"
+        }
+      ]
+    },
+    "block_table_records": [
+      {
+        "handle": "1F",
+        "name": "*Model_Space",
+        "is_layout": true,
+        "is_anonymous": false,
+        "is_xref": false,
+        "entity_count": 0
+      },
+      {
+        "handle": "58",
+        "name": "*Paper_Space",
+        "is_layout": true,
+        "is_anonymous": false,
+        "is_xref": false,
+        "entity_count": 0
+      },
+      {
+        "handle": "5D",
+        "name": "*Paper_Space0",
+        "is_layout": true,
+        "is_anonymous": false,
+        "is_xref": false,
+        "entity_count": 0
+      }
+    ],
+    "block_definitions": [],
+    "layouts": [
+      {
+        "handle": "22",
+        "name": "Model",
+        "tab_order": 0,
+        "block_table_record_handle": "1F"
+      },
+      {
+        "handle": "59",
+        "name": "배치1",
+        "tab_order": 1,
+        "block_table_record_handle": "58"
+      },
+      {
+        "handle": "5E",
+        "name": "배치2",
+        "tab_order": 2,
+        "block_table_record_handle": "5D"
+      }
+    ],
+    "xrefs": [],
+    "dictionaries": [
+      {
+        "name": "ACAD_NAMED_OBJECTS",
+        "entries": [
+          {
+            "key": "ACAD_CIP_PREVIOUS_PRODUCT_INFO",
+            "value_handle": "1A5"
+          },
+          {
+            "key": "ACAD_COLOR",
+            "value_handle": "73"
+          },
+          {
+            "key": "ACAD_DETAILVIEWSTYLE",
+            "value_handle": "1AB"
+          },
+          {
+            "key": "ACAD_GROUP",
+            "value_handle": "D"
+          },
+          {
+            "key": "ACAD_LAYOUT",
+            "value_handle": "1A"
+          },
+          {
+            "key": "ACAD_MATERIAL",
+            "value_handle": "72"
+          },
+          {
+            "key": "ACAD_MLEADERSTYLE",
+            "value_handle": "D7"
+          },
+          {
+            "key": "ACAD_MLINESTYLE",
+            "value_handle": "17"
+          },
+          {
+            "key": "ACAD_PLOTSETTINGS",
+            "value_handle": "19"
+          },
+          {
+            "key": "ACAD_PLOTSTYLENAME",
+            "value_handle": "E"
+          },
+          {
+            "key": "ACAD_SCALELIST",
+            "value_handle": "B6"
+          },
+          {
+            "key": "ACAD_SECTIONVIEWSTYLE",
+            "value_handle": "1A8"
+          },
+          {
+            "key": "ACAD_TABLESTYLE",
+            "value_handle": "86"
+          },
+          {
+            "key": "ACAD_VISUALSTYLE",
+            "value_handle": "99"
+          },
+          {
+            "key": "AcDbVariableDictionary",
+            "value_handle": "66"
+          }
+        ]
+      }
+    ],
+    "extension_dictionaries": [],
+    "xrecords": [
+      {
+        "handle": "1A5",
+        "owner_handle": "C",
+        "key": "ACAD_CIP_PREVIOUS_PRODUCT_INFO",
+        "item_count": 3,
+        "items": [
+          {
+            "code": 300,
+            "value": ""
+          },
+          {
+            "code": 300,
+            "value": ""
+          },
+          {
+            "code": 300,
+            "value": ""
+          }
+        ]
+      }
+    ],
+    "coverage": {
+      "layers": "implemented",
+      "linetypes": "implemented",
+      "text_styles": "implemented",
+      "dim_styles": "implemented",
+      "block_table_records": "implemented",
+      "block_definitions": "implemented",
+      "layouts": "implemented",
+      "xrefs": "implemented",
+      "dictionaries": "implemented",
+      "xrecords": "implemented",
+      "xdata": "implemented",
+      "extension_dictionaries": "implemented",
+      "hatch_loops": "implemented",
+      "proxy_objects": "partial",
+      "counts": {
+        "layers": 1,
+        "linetypes": 3,
+        "text_styles": 2,
+        "dim_styles": 2,
+        "viewports": 1,
+        "app_ids": 7,
+        "block_table_records": 3,
+        "block_definitions": 0,
+        "layouts": 3,
+        "xrefs": 0,
+        "dictionary_entries": 15,
+        "xrecords": 1,
+        "xrecord_items": 3,
+        "xdata_blocks": 0,
+        "xdata_items": 0,
+        "extension_dictionaries": 0,
+        "extension_dictionary_entries": 0,
+        "extension_xrecords": 0,
+        "extension_xrecord_items": 0,
+        "hatch_loops": 0,
+        "hatch_loop_vertices": 0
+      },
+      "sections_present": [
+        "database",
+        "symbol_tables",
+        "block_table_records",
+        "block_definitions",
+        "layouts",
+        "xrefs",
+        "dictionaries",
+        "extension_dictionaries",
+        "xrecords",
+        "xdata",
+        "hatch_loops"
+      ],
+      "sections_skipped": [
+        "groups",
+        "materials",
+        "plot_settings"
+      ]
+    }
+  }
+}
