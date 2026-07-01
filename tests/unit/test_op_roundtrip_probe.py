@@ -361,6 +361,62 @@ class TestExpectedIrForOp(unittest.TestCase):
             "measurement": math.pi / 2,
         })
 
+    def test_create_dimension_angular3pt_builds_dimension_geometry(self):
+        # w3-ang3: collectModelSpaceGraph grew an AcDb3PointAngularDimension
+        # branch. center/xline1_point/xline2_point are direct ctor-arg echoes
+        # (identical ctor shape to create_dimension_arc). arc_point is NOT a
+        # verbatim echo -- live-verified (2026-07-02 w3-ang3 re-cert, 3 real
+        # accoreconsole roundtrips) that AutoCAD re-anchors its ANGLE the same
+        # way create_dimension_arc's arc_point does (1/3 of the xline1->
+        # xline2 span) but preserves its RADIUS from the INPUT arc_point's
+        # own distance to center -- NOT xline1's distance (see the next test,
+        # which uses a different xline-radius vs arc_point-radius to actually
+        # distinguish the two rules; this case alone can't, since the input
+        # arc_point sits at radius 50, same as xline1). measurement is the
+        # plain ANGLE (pi/2), NOT an arc length (unlike create_dimension_arc's
+        # 50*pi/2 for these identical points).
+        ir = probe.expected_ir_for_op(
+            "create_dimension_angular3pt",
+            {"center": [0, 0, 0], "xline1": [50, 0, 0], "xline2": [0, 50, 0],
+             "arc_point": [35.35533905932738, 35.35533905932738, 0], "layer": "0"})
+        ent = ir["entities"][0]
+        self.assertEqual(ent["dxf_name"], "DIMENSION")
+        self.assertEqual(ent["geometry"], {
+            "kind": "dimension", "center": [0, 0, 0],
+            "xline1_point": [50, 0, 0], "xline2_point": [0, 50, 0],
+            "arc_point": [50 * math.cos(math.pi / 6), 50 * math.sin(math.pi / 6), 0.0],
+            "measurement": math.pi / 2,
+        })
+
+    def test_create_dimension_angular3pt_arc_point_radius_is_input_not_xline1(self):
+        # w3-ang3 LIVE DISCOVERY: a first attempt assumed arc_point's
+        # re-anchoring was IDENTICAL to create_dimension_arc's (same radius as
+        # xLine1Point) since the two ops share an identical ctor-arg shape --
+        # that passed the test above (input arc_point radius == xline1
+        # radius there, 50 both, by construction) but FAILED live once the
+        # input arc_point was given a DIFFERENT radius than xline1/xline2
+        # (2 of 3 2026-07-02 w3-ang3 re-cert roundtrips): the stored arc_point
+        # keeps the INPUT arc_point's OWN radius from center, the same rule
+        # create_dimension_angular2line uses for its own apex, NOT xline1's
+        # radius. Here xline1/xline2 sit at radius 30 from center=(10,-5,0)
+        # (angles 20/140 deg), the input arc_point sits at radius 18 (angle 80
+        # deg, inside the [20,140] span) -- live-verified the stored
+        # arc_point comes back at radius 18 (NOT 30), angle 20+120/3=60 deg.
+        cx, cy, r, arc_r = 10.0, -5.0, 30.0, 18.0
+        a1, a2, ain = math.radians(20), math.radians(140), math.radians(80)
+        xline1 = [cx + r * math.cos(a1), cy + r * math.sin(a1), 0.0]
+        xline2 = [cx + r * math.cos(a2), cy + r * math.sin(a2), 0.0]
+        arc_point_arg = [cx + arc_r * math.cos(ain), cy + arc_r * math.sin(ain), 0.0]
+        ir = probe.expected_ir_for_op(
+            "create_dimension_angular3pt",
+            {"center": [cx, cy, 0.0], "xline1": xline1, "xline2": xline2,
+             "arc_point": arc_point_arg, "layer": "0"})
+        geom = ir["entities"][0]["geometry"]
+        third_angle = math.radians(20 + 120 / 3.0)
+        self.assertEqual(geom["arc_point"],
+                          [cx + arc_r * math.cos(third_angle), cy + arc_r * math.sin(third_angle), 0.0])
+        self.assertAlmostEqual(geom["measurement"], math.radians(120), places=12)
+
     def test_create_leader_builds_leader_geometry(self):
         # T3a-batch3: collectModelSpaceGraph grew an AcDbLeader branch.
         # vertices are direct, args-derivable echoes (appendVertex per point,

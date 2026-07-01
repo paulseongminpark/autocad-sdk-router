@@ -1480,6 +1480,71 @@ static bool collectModelSpaceGraph(AcDbDatabase* pDb, int& total,
                 arr << ",\"dim_block_name\":\"" << jsonEscape(dimBlockName) << "\"";
             }
         }
+        // w3-ang3: AcDb3PointAngularDimension -- a 3-point angular dimension.
+        // Derives directly from AcDbDimension (NOT from AcDbArcDimension or
+        // AcDb2LineAngularDimension), so cast ordering relative to them is not
+        // load-bearing. Its ctor (centerPoint, xLine1Point, xLine2Point,
+        // arcPoint, dimText, dimStyle) is IDENTICAL in shape to
+        // AcDbArcDimension's, so this branch reuses the SAME field names
+        // (center/xline1_point/xline2_point/arc_point) the arc-dimension
+        // branch above already uses. center/xLine1Point/xLine2Point are
+        // verbatim ctor-arg echoes (live-verified). arcPoint is NOT a verbatim
+        // echo, and its re-anchoring rule is a HYBRID of the two sibling
+        // angular dims, NOT identical to either alone -- LIVE-VERIFIED
+        // (2026-07-02 w3-ang3 cert, 3 real accoreconsole roundtrips against
+        // tests/fixtures/native_sample.dwg, 3 different center/xLine-radius/
+        // span combinations; the 2nd and 3rd DELIBERATELY gave the input
+        // arcPoint a different distance from centerPoint than xLine1Point/
+        // xLine2Point have, which is what exposed this): AutoCAD re-places
+        // arcPoint's ANGLE at exactly 1/3 of the xLine1Point->xLine2Point
+        // angular span (same direction-resolution rule w3-dimarc found for
+        // AcDbArcDimension.arcPoint()), but preserves the RADIUS as the INPUT
+        // arcPoint's OWN distance from centerPoint -- NOT xLine1Point's
+        // distance from centerPoint (which is what AcDbArcDimension.
+        // arcPoint() uses). The radius rule instead matches
+        // AcDb2LineAngularDimension.arcPoint() (w3-ang2: preserves the input
+        // arc_point's own distance from the apex). A naive "identical to
+        // AcDbArcDimension" first attempt passed case 1 (input arcPoint's
+        // radius == xLine1Point's radius there, 50 both, by construction) but
+        // FAILED cases 2/3 (radius 18/25 vs xLine1's 30/40) until corrected to
+        // this hybrid rule -- confirmed to float precision (max observed
+        // error ~2e-15) once corrected. UNLIKE AcDbArcDimension (an
+        // ARC-LENGTH dimension: measurement = radius * angular span),
+        // measurement here is the plain ANGULAR width in radians -- the SAME
+        // semantic AcDb2LineAngularDimension.measurement() has, and this part
+        // WAS correct on the first attempt (see op_roundtrip_probe.py's
+        // _angular3pt_measurement / _angular3pt_arc_point for the derived
+        // formulas and verified scope, which mirrors _arc_dimension_
+        // signed_span's own caveat: only verified for an input arc_point on
+        // the same CCW-from-xLine1 side as the resolved short span, with that
+        // span < 180 degrees).
+        else if (AcDb3PointAngularDimension* p3pt = AcDb3PointAngularDimension::cast(pEnt)) {
+            const AcGePoint3d ctr = p3pt->centerPoint();
+            const AcGePoint3d p1 = p3pt->xLine1Point();
+            const AcGePoint3d p2 = p3pt->xLine2Point();
+            const AcGePoint3d arcPt = p3pt->arcPoint();
+            double measurement = 0.0;
+            const bool haveMeasurement = (p3pt->measurement(measurement) == Acad::eOk);
+            arr << ",\"center\":[" << ctr.x << "," << ctr.y << "," << ctr.z << "]"
+                << ",\"xline1_point\":[" << p1.x << "," << p1.y << "," << p1.z << "]"
+                << ",\"xline2_point\":[" << p2.x << "," << p2.y << "," << p2.z << "]"
+                << ",\"arc_point\":[" << arcPt.x << "," << arcPt.y << "," << arcPt.z << "]";
+            if (haveMeasurement)
+                arr << ",\"measurement\":" << measurement;
+            const AcDbObjectId dimBlockId = p3pt->dimBlockId();
+            if (!dimBlockId.isNull()) {
+                arr << ",\"dim_block_handle\":\"" << jsonEscape(handleOfId(dimBlockId)) << "\"";
+                std::string dimBlockName;
+                AcDbBlockTableRecord* pDimDef = nullptr;
+                if (acdbOpenObject(pDimDef, dimBlockId, AcDb::kForRead) == Acad::eOk) {
+                    const ACHAR* nameRaw = nullptr;
+                    if (pDimDef->getName(nameRaw) == Acad::eOk)
+                        dimBlockName = acharToAscii(nameRaw);
+                    pDimDef->close();
+                }
+                arr << ",\"dim_block_name\":\"" << jsonEscape(dimBlockName) << "\"";
+            }
+        }
         // T3a-batch3: AcDbLeader -- vertices are direct, args-derivable echoes
         // of write.entity.leader's vertices/points ctor-arg loop (appendVertex
         // per point, no transform). has_arrow_head/splined are deterministic

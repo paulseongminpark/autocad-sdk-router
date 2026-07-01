@@ -606,6 +606,81 @@ def _expect_create_dimension_angular2line(args: Dict[str, Any]) -> Dict[str, Any
     }
 
 
+def _angular3pt_measurement(center: list, p1: list, p2: list, arc_point: list) -> float:
+    """AcDb3PointAngularDimension's measurement: the plain ANGULAR width
+    (radians) of the xLine1Point->xLine2Point span as seen from centerPoint --
+    UNLIKE AcDbArcDimension (an ARC-LENGTH dimension: measurement = radius *
+    angular span), this is a plain angle, the SAME semantic
+    AcDb2LineAngularDimension.measurement() has. Independently computed (not
+    an arg) so ``_expect_create_dimension_angular3pt`` can assert it without a
+    live read. Reuses _arc_dimension_signed_span's direction-resolution logic
+    (the input arc_point's own angle picks which of the two complementary
+    spans is "the" span) -- see that function's docstring for the shared
+    caveat (only verified for an input arc_point on the same CCW-from-xLine1
+    side as the resolved short span, with that span < 180 degrees).
+    """
+    _radius, _a1, signed_span = _arc_dimension_signed_span(center, p1, p2, arc_point)
+    return abs(signed_span)
+
+
+def _angular3pt_arc_point(center: list, p1: list, p2: list, arc_point: list) -> list:
+    """AcDb3PointAngularDimension does NOT store the raw ``arc_point`` ctor
+    arg back verbatim -- LIVE-VERIFIED (2026-07-02 w3-ang3 re-cert, 3 real
+    accoreconsole roundtrips against tests/fixtures/native_sample.dwg, 3
+    different center/xLine-radius/span combinations, the 2nd and 3rd
+    DELIBERATELY giving the input arc_point a DIFFERENT distance from center
+    than xLine1Point/xLine2Point have) that AutoCAD re-places arcPoint's ANGLE
+    at exactly 1/3 of the xLine1Point->xLine2Point angular span (same
+    direction-resolution as _arc_dimension_signed_span/_arc_dimension_
+    arc_point), but preserves the RADIUS as the INPUT arc_point's OWN distance
+    from centerPoint -- NOT xLine1Point's distance from centerPoint, which is
+    what AcDbArcDimension.arcPoint() uses (_arc_dimension_arc_point). This is
+    the SAME radius rule AcDb2LineAngularDimension.arcPoint() uses
+    (_angular2line_arc_point preserves the input arc_point's own distance from
+    the apex) -- i.e. angular3pt's arc_point re-anchoring is a hybrid: angle
+    rule shared with AcDbArcDimension, radius rule shared with
+    AcDb2LineAngularDimension. (case 1 of the 3 live cases used an input
+    arc_point at the SAME radius as xLine1Point by construction -- 50 both --
+    so it could not by itself distinguish the two radius rules; cases 2/3
+    deliberately used a different radius (18 and 25 respectively, vs xLine1's
+    30/40) and matched ONLY the "input arc_point's own radius" rule, to float
+    precision, max observed error ~2e-15.)
+    """
+    _radius, a1, signed_span = _arc_dimension_signed_span(center, p1, p2, arc_point)
+    third_angle = a1 + signed_span / 3.0
+    own_radius = math.hypot(arc_point[0] - center[0], arc_point[1] - center[1])
+    cz = center[2] if len(center) > 2 else 0.0
+    return [center[0] + own_radius * math.cos(third_angle),
+            center[1] + own_radius * math.sin(third_angle), cz]
+
+
+def _expect_create_dimension_angular3pt(args: Dict[str, Any]) -> Dict[str, Any]:
+    # AcDb3PointAngularDimension(centerPoint, xLine1Point, xLine2Point,
+    # arcPoint, dimText, dimStyle) -- write.entity.dim.angular3pt
+    # (m08h_handlers.inc) passes center/xline1/xline2/arc_point straight to the
+    # ctor -- an IDENTICAL ctor-arg shape to write.entity.dim.arc.
+    # center/xline1_point/xline2_point are direct, args-derivable ground truth
+    # (live-verified 2026-07-02 w3-ang3 re-cert). arc_point is NOT a verbatim
+    # ctor-arg echo -- see _angular3pt_arc_point's docstring for the
+    # live-discovered hybrid formula (angle rule shared with
+    # AcDbArcDimension, radius rule shared with AcDb2LineAngularDimension) and
+    # its verified scope. measurement, unlike AcDbArcDimension's arc-length,
+    # is the plain angular span -- see _angular3pt_measurement.
+    center = _point_to_list(args["center"])
+    xline1 = _point_to_list(args["xline1"])
+    xline2 = _point_to_list(args["xline2"])
+    arc_point_arg = _point_to_list(args["arc_point"])
+    return {
+        "dxf_name": "DIMENSION", "layer": args.get("layer") or "0",
+        "geometry": {
+            "kind": "dimension",
+            "center": center, "xline1_point": xline1, "xline2_point": xline2,
+            "arc_point": _angular3pt_arc_point(center, xline1, xline2, arc_point_arg),
+            "measurement": _angular3pt_measurement(center, xline1, xline2, arc_point_arg),
+        },
+    }
+
+
 def _expect_create_leader(args: Dict[str, Any]) -> Dict[str, Any]:
     # write.entity.leader (m08h_handlers.inc) reads "vertices" first, falling
     # back to "points" only when "vertices" yields <2 points -- this batch's
@@ -741,6 +816,11 @@ def _expect_create_mline(args: Dict[str, Any]) -> Dict[str, Any]:
 # T3a-batch/w3-dimarc dimension subtype (already native-REACHABLE per
 # measure/reachable_matrix.jsonl, but no patch_ops wiring and no
 # collectModelSpaceGraph read branch until this batch).
+#
+# w3-ang3 adds create_dimension_angular3pt: same two-part gap as every
+# T3a-batch/w3-dimarc/w3-ang2 dimension subtype (already native-REACHABLE per
+# measure/reachable_matrix.jsonl, but no patch_ops wiring and no
+# collectModelSpaceGraph read branch until this batch).
 _EXPECTED_ENTITY_BUILDERS: Dict[str, Callable[[Dict[str, Any]], Dict[str, Any]]] = {
     "create_line": _expect_create_line,
     "create_circle": _expect_create_circle,
@@ -759,6 +839,7 @@ _EXPECTED_ENTITY_BUILDERS: Dict[str, Callable[[Dict[str, Any]], Dict[str, Any]]]
     "create_mline": _expect_create_mline,
     "create_dimension_arc": _expect_create_dimension_arc,
     "create_dimension_angular2line": _expect_create_dimension_angular2line,
+    "create_dimension_angular3pt": _expect_create_dimension_angular3pt,
 }
 
 

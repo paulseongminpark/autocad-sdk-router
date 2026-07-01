@@ -418,6 +418,41 @@ class TestNativeGraphGeometryLifting(unittest.TestCase):
         self.assertEqual(ent["dim_block_handle"], "1B2")
         self.assertEqual(ent["dim_block_name"], "*D4")
 
+    def test_3pt_angular_dimension_lifts_center_and_arc_point(self):
+        # w3-ang3: collectModelSpaceGraph grew an AcDb3PointAngularDimension
+        # branch, reusing the SAME field names (center/xline1_point/
+        # xline2_point/arc_point/measurement) the arc-dimension branch above
+        # already uses -- no _geometry_from_native_entity allowlist change
+        # needed, only the class-map entry. arc_point here is AutoCAD's own
+        # live-verified re-placement (1/3 of the xline1->xline2 angular span,
+        # at the INPUT arc_point's own radius from center, NOT xline1's
+        # radius like AcDbArcDimension -- see op_roundtrip_probe.py's
+        # _angular3pt_arc_point), exactly as a real collectModelSpaceGraph
+        # read-back reports it: center=(0,0,0), xline1=(50,0,0) (angle 0),
+        # xline2=(0,50,0) (angle 90 deg) -> stored arc_point at 30 deg,
+        # radius 50 (this fixture's input arc_point happened to sit at the
+        # same radius as xline1 -- see op_roundtrip_probe.py's own test for
+        # the case that distinguishes the two radius rules). measurement is
+        # the plain angle (pi/2), not an arc length.
+        ent = self._one_entity_ir({
+            "handle": "1C1", "dxf_name": "AcDb3PointAngularDimension", "layer": "0",
+            "owner_handle": "1F", "space": "model",
+            "center": [0.0, 0.0, 0.0], "xline1_point": [50.0, 0.0, 0.0],
+            "xline2_point": [0.0, 50.0, 0.0],
+            "arc_point": [43.301270189221924, 25.000000000000004, 0.0],
+            "measurement": 1.5707963267948963,
+            "dim_block_handle": "1C2", "dim_block_name": "*D5",
+        })
+        self.assertEqual(ent["dxf_name"], "DIMENSION")
+        self.assertEqual(ent["geometry"], {
+            "kind": "dimension", "center": [0.0, 0.0, 0.0],
+            "xline1_point": [50.0, 0.0, 0.0], "xline2_point": [0.0, 50.0, 0.0],
+            "arc_point": [43.301270189221924, 25.000000000000004, 0.0],
+            "measurement": 1.5707963267948963,
+        })
+        self.assertEqual(ent["dim_block_handle"], "1C2")
+        self.assertEqual(ent["dim_block_name"], "*D5")
+
     def test_leader_lifts_vertices_and_arrowhead_splined(self):
         ent = self._one_entity_ir({
             "handle": "1AC", "dxf_name": "AcDbLeader", "layer": "0",

@@ -501,6 +501,7 @@ _NATIVE_CLASS_TO_DXF_KIND = {
     "AcDbOrdinateDimension": ("DIMENSION", "dimension"),
     "AcDbArcDimension": ("DIMENSION", "dimension"),
     "AcDb2LineAngularDimension": ("DIMENSION", "dimension"),
+    "AcDb3PointAngularDimension": ("DIMENSION", "dimension"),
     "AcDbLeader": ("LEADER", "leader"),
     "AcDbMLeader": ("MULTILEADER", "leader"),
     # w3-wbug: AcDbMline's "vertices" (plain [x,y,z] array, no bulge) and
@@ -527,7 +528,10 @@ def _geometry_from_native_entity(raw: dict, kind: str) -> dict:
     (AcDbArcDimension, reuses center/xline1_point/xline2_point/measurement,
     already lifted). w3-ang2: xline1_start/xline1_end/xline2_start/xline2_end
     (AcDb2LineAngularDimension; arc_point/measurement reuse the existing
-    lifts).
+    lifts). w3-ang3: AcDb3PointAngularDimension reuses center/xline1_point/
+    xline2_point/arc_point/measurement verbatim (identical ctor-arg shape to
+    AcDbArcDimension) -- no allowlist change needed, only the class-map entry
+    above.
     Returns an IR geometry dict with a valid ``kind``; unrepresented kinds get
     a geometry that carries only ``kind`` (decoded=False is decided by the
     caller).
