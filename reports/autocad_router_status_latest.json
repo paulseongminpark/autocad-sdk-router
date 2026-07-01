@@ -1,5 +1,5 @@
 ﻿{
-    "timestamp":  "2026-07-02T03:40:33.6351919+09:00",
+    "timestamp":  "2026-07-02T03:56:59.7139569+09:00",
     "schema":  "ariadne.autocad_router_status.v2",
     "status":  "ALL_AVAILABLE",
     "router_home":  "D:\\dev\\99_tools\\autocad-sdk-router__w3_b3b",
@@ -20,12 +20,12 @@
                                            {
                                                "path":  "D:\\dev\\99_tools\\autocad-sdk-router__w3_b3b\\prebuilt\\2027\\Ariadne.AcadNative.crx",
                                                "exists":  true,
-                                               "bytes":  767488
+                                               "bytes":  768000
                                            },
                                            {
                                                "path":  "D:\\dev\\99_tools\\autocad-sdk-router__w3_b3b\\prebuilt\\2027\\Ariadne.AcadNative.arx",
                                                "exists":  true,
-                                               "bytes":  776192
+                                               "bytes":  776704
                                            }
                                        ],
                            "coreconsole_load":  {

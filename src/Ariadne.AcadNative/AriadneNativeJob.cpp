@@ -36,6 +36,9 @@
                        // AcDbRadialDimension/AcDbDiametricDimension; T3a-batch3:
                        // AcDbOrdinateDimension (same header)
 #include "dbspline.h"  // T3a-batch2: AcDbSpline (collectModelSpaceGraph read branch)
+#include "dblead.h"    // T3a-batch3: AcDbLeader (collectModelSpaceGraph read branch --
+                       // families/m08h_handlers.inc's own #include is textually AFTER
+                       // collectModelSpaceGraph in this TU, so this needs its own copy)
 #include "dbxrecrd.h"
 #include "dbsymtb.h"
 #include "dbcolor.h"
@@ -1384,6 +1387,34 @@ static bool collectModelSpaceGraph(AcDbDatabase* pDb, int& total,
                 }
                 arr << ",\"dim_block_name\":\"" << jsonEscape(dimBlockName) << "\"";
             }
+        }
+        // T3a-batch3: AcDbLeader -- vertices are direct, args-derivable echoes
+        // of write.entity.leader's vertices/points ctor-arg loop (appendVertex
+        // per point, no transform). has_arrow_head/splined are deterministic
+        // constants for THIS op (enableArrowHead()/setToStraightLeader() are
+        // always called, unconditional on any arg) -- extracted and asserted
+        // the same way T3a-batch2 asserted create_spline's always-False
+        // "closed". Emitted as a plain [x,y,z]-array "vertices" (mirrors
+        // AcDb2dPolyline/AcDb3dPolyline above, not AcDbPolyline's {point,bulge}
+        // shape -- a leader vertex has no bulge concept), so it reuses
+        // ir_builder.py's existing generic "vertices" lift with zero Python
+        // change. annotation_handle (setAnnotationObjId) is deliberately NOT
+        // extracted here: this batch's own valid-arg fixture never exercises
+        // the optional annotation (an annotated leader appends a SECOND entity
+        // -- the AcDbMText -- which is out of scope for a single-entity
+        // geometry P-gate cert; see op_roundtrip_probe.py's
+        // _expect_create_leader).
+        else if (AcDbLeader* pLdr = AcDbLeader::cast(pEnt)) {
+            const int nVerts = pLdr->numVertices();
+            arr << ",\"vertices\":[";
+            for (int vi = 0; vi < nVerts; ++vi) {
+                const AcGePoint3d vp = pLdr->vertexAt(vi);
+                if (vi != 0) arr << ",";
+                arr << "[" << vp.x << "," << vp.y << "," << vp.z << "]";
+            }
+            arr << "]";
+            arr << ",\"has_arrow_head\":" << (pLdr->hasArrowHead() ? "true" : "false")
+                << ",\"splined\":" << (pLdr->isSplined() ? "true" : "false");
         }
 
         arr << "}";

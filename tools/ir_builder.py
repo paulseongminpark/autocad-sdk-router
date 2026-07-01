@@ -514,7 +514,9 @@ def _geometry_from_native_entity(raw: dict, kind: str) -> dict:
     chord_point/far_chord_point (radial/diametric dims); NOT leader_length --
     see _entity_from_native, it is lifted top-level instead. T3a-batch3:
     defining_point/leader_end_point/use_x_axis (ordinate dim); NOT origin --
-    see _entity_from_native, it is lifted top-level instead).
+    see _entity_from_native, it is lifted top-level instead. Also T3a-batch3:
+    has_arrow_head/splined (AcDbLeader) -- reuses the existing generic
+    "vertices" lift below, no change needed there).
     Returns an IR geometry dict with a valid ``kind``; unrepresented kinds get
     a geometry that carries only ``kind`` (decoded=False is decided by the
     caller).
@@ -546,6 +548,10 @@ def _geometry_from_native_entity(raw: dict, kind: str) -> dict:
         geom["closed"] = raw["closed"]
     if isinstance(raw.get("use_x_axis"), bool):
         geom["use_x_axis"] = raw["use_x_axis"]
+    if isinstance(raw.get("has_arrow_head"), bool):
+        geom["has_arrow_head"] = raw["has_arrow_head"]
+    if isinstance(raw.get("splined"), bool):
+        geom["splined"] = raw["splined"]
     verts = raw.get("vertices")
     if isinstance(verts, list) and verts:
         norm = []

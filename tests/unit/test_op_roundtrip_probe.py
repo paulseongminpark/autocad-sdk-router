@@ -306,6 +306,31 @@ class TestExpectedIrForOp(unittest.TestCase):
         self.assertEqual(geom["use_x_axis"], False)
         self.assertEqual(geom["measurement"], 5)
 
+    def test_create_leader_builds_leader_geometry(self):
+        # T3a-batch3: collectModelSpaceGraph grew an AcDbLeader branch.
+        # vertices are direct, args-derivable echoes (appendVertex per point,
+        # no transform); has_arrow_head/splined are deterministic constants
+        # for this op (enableArrowHead()/setToStraightLeader() are always
+        # called) -- live-verified (2026-07-02 T3a-batch3 re-cert) diff=0.
+        ir = probe.expected_ir_for_op(
+            "create_leader",
+            {"vertices": [[0, 0, 0], [10, 10, 0], [20, 10, 0]], "layer": "0"})
+        ent = ir["entities"][0]
+        self.assertEqual(ent["dxf_name"], "LEADER")
+        self.assertEqual(ent["geometry"], {
+            "kind": "leader",
+            "vertices": [{"point": [0, 0, 0]}, {"point": [10, 10, 0]}, {"point": [20, 10, 0]}],
+            "has_arrow_head": True, "splined": False,
+        })
+
+    def test_create_leader_falls_back_to_points_key(self):
+        # write.entity.leader reads "vertices" first, falling back to "points"
+        # only when "vertices" yields <2 points -- mirror that fallback here.
+        ir = probe.expected_ir_for_op(
+            "create_leader", {"points": [[1, 1, 0], [5, 5, 0]], "layer": "0"})
+        self.assertEqual(ir["entities"][0]["geometry"]["vertices"],
+                         [{"point": [1, 1, 0]}, {"point": [5, 5, 0]}])
+
     def test_unbuildable_op_raises_not_implemented_error(self):
         # create_arc/create_ellipse were the fixtures here pre-T3a; this
         # module has since grown ground-truth builders for both.

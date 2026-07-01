@@ -406,6 +406,32 @@ def _expect_create_dimension_ordinate(args: Dict[str, Any]) -> Dict[str, Any]:
     }
 
 
+def _expect_create_leader(args: Dict[str, Any]) -> Dict[str, Any]:
+    # write.entity.leader (m08h_handlers.inc) reads "vertices" first, falling
+    # back to "points" only when "vertices" yields <2 points -- this batch's
+    # own fixture always supplies "vertices" directly, so this mirrors that
+    # same order. Each vertex is a direct, args-derivable echo (appendVertex
+    # per point, no transform); has_arrow_head/splined are deterministic
+    # constants for THIS op (enableArrowHead()/setToStraightLeader() are
+    # unconditionally called, never gated on any arg) -- live-verified
+    # (2026-07-02 T3a-batch3 re-cert) diff=0 for exactly these three fields.
+    #
+    # annotation_handle is NOT exercised/asserted here: this batch's fixture
+    # never supplies "text", so no annotation AcDbMText is ever created -- an
+    # annotated leader appends a SECOND, separate entity, which is out of
+    # scope for this single-entity geometry P-gate (see AriadneNativeJob.cpp's
+    # AcDbLeader branch).
+    vertices_arg = args.get("vertices") or args.get("points") or []
+    vertices = [{"point": _point_to_list(p)} for p in vertices_arg]
+    return {
+        "dxf_name": "LEADER", "layer": args.get("layer") or "0",
+        "geometry": {
+            "kind": "leader",
+            "vertices": vertices, "has_arrow_head": True, "splined": False,
+        },
+    }
+
+
 def _expect_create_spline(args: Dict[str, Any]) -> Dict[str, Any]:
     # write.entity.spline (m08g_handlers.inc) always builds a FIT-POINT
     # AcDbSpline: AcDbSpline(fitPts, order, 0.0) -- order defaults to 4.0 (same
@@ -462,9 +488,9 @@ def _expect_create_spline(args: Dict[str, Any]) -> Dict[str, Any]:
 # collectModelSpaceGraph read branch (AriadneNativeJob.cpp, added this batch)
 # -- the same two-part gap create_ellipse/create_dimension had through T1.
 #
-# T3a-batch3 adds create_dimension_ordinate: same two-part gap (already
-# native-REACHABLE per measure/reachable_matrix.jsonl, but no patch_ops wiring
-# and no collectModelSpaceGraph read branch until this batch).
+# T3a-batch3 adds create_dimension_ordinate / create_leader: same two-part gap
+# (already native-REACHABLE per measure/reachable_matrix.jsonl, but no
+# patch_ops wiring and no collectModelSpaceGraph read branch until this batch).
 _EXPECTED_ENTITY_BUILDERS: Dict[str, Callable[[Dict[str, Any]], Dict[str, Any]]] = {
     "create_line": _expect_create_line,
     "create_circle": _expect_create_circle,
@@ -479,6 +505,7 @@ _EXPECTED_ENTITY_BUILDERS: Dict[str, Callable[[Dict[str, Any]], Dict[str, Any]]]
     "create_dimension_radial": _expect_create_dimension_radial,
     "create_dimension_diametric": _expect_create_dimension_diametric,
     "create_dimension_ordinate": _expect_create_dimension_ordinate,
+    "create_leader": _expect_create_leader,
 }
 
 

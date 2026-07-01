@@ -38,10 +38,11 @@ class=REACHABLE) but had no patch_ops.WRITE_OP_MAP entry at all -- this is the
 first patch-level wiring for these four. Oracle extended accordingly; same
 invariants unaffected.
 
-T3a-batch3 update: create_dimension_ordinate (write.entity.dim.ordinate) was
-already native-REACHABLE (measure/reachable_matrix.jsonl) but had no
-patch_ops.WRITE_OP_MAP entry -- same two-part gap as T3a-batch2's four ops.
-Oracle extended accordingly; same invariants unaffected.
+T3a-batch3 update: create_dimension_ordinate (write.entity.dim.ordinate) and
+create_leader (write.entity.leader) were already native-REACHABLE (measure/
+reachable_matrix.jsonl) but had no patch_ops.WRITE_OP_MAP entry -- same
+two-part gap as T3a-batch2's four ops. Oracle extended accordingly; same
+invariants unaffected.
 """
 from __future__ import annotations
 
@@ -76,6 +77,7 @@ _ORIGINAL_NATIVE_WRITE_OP_MAP = {
     "create_dimension_radial": "write.entity.dim.radial",
     "create_dimension_diametric": "write.entity.dim.diametric",
     "create_dimension_ordinate": "write.entity.dim.ordinate",
+    "create_leader": "write.entity.leader",
 }
 
 

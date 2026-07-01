@@ -366,6 +366,21 @@ class TestNativeGraphGeometryLifting(unittest.TestCase):
         self.assertEqual(ent["origin"], [0.0, 0.0, 0.0])
         self.assertNotIn("origin", ent["geometry"])
 
+    def test_leader_lifts_vertices_and_arrowhead_splined(self):
+        ent = self._one_entity_ir({
+            "handle": "1AC", "dxf_name": "AcDbLeader", "layer": "0",
+            "owner_handle": "1F", "space": "model",
+            "vertices": [[0.0, 0.0, 0.0], [10.0, 10.0, 0.0], [20.0, 10.0, 0.0]],
+            "has_arrow_head": True, "splined": False,
+        })
+        self.assertEqual(ent["dxf_name"], "LEADER")
+        self.assertEqual(ent["geometry"], {
+            "kind": "leader",
+            "vertices": [{"point": [0.0, 0.0, 0.0]}, {"point": [10.0, 10.0, 0.0]},
+                        {"point": [20.0, 10.0, 0.0]}],
+            "has_arrow_head": True, "splined": False,
+        })
+
 
 if __name__ == "__main__":
     unittest.main()
