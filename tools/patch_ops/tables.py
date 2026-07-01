@@ -3,10 +3,19 @@
 """patch_ops.tables -- symbol-table write ops (CAD OS Layer, Lane E family
 split).
 
-Symbol-table ops (layer/linetype/dimstyle/textstyle). Only set_layer and
-create_layer (both -> write.layer.create, ensuring the target layer exists)
-have a live native handler today; linetype/dimstyle/textstyle await a family
-ticket.
+Symbol-table ops (layer/linetype/dimstyle/textstyle). Only create_layer
+(-> write.layer.create, ensuring the target layer exists) has a live native
+handler here today; linetype/dimstyle/textstyle await a family ticket.
+
+CADOS F8 / H-5: set_layer used to live in this module, also mapped to
+write.layer.create. That was an active fake-success -- write.layer.create
+only ENSURES a layer exists, it ignores 'handle' and never reassigns an
+existing entity's layer, so a set_layer op "succeeded" without mutating
+anything. set_layer now lives in patch_ops.entities, mapped to the real
+relayer modify.entity.common (which takes 'handle' + 'set_layer' and calls
+AcDbEntity::setLayer on the resolved entity -- see
+src/Ariadne.AcadNative/families/m08g_handlers.inc and the live Lane-A probe
+tools/probe_modify.py::run_probe_common).
 """
 from __future__ import annotations
 
@@ -15,7 +24,6 @@ from typing import Any, Dict, Optional
 # patch op id -> native ObjectARX write op (operations.v2.json, status
 # "implemented"). Only these have a live native handler today.
 WRITE_OP_MAP: Dict[str, str] = {
-    "set_layer": "write.layer.create",
     "create_layer": "write.layer.create",
 }
 
@@ -24,7 +32,7 @@ def build_job_args(native_op: str, args: Dict[str, Any]) -> Optional[Dict[str, A
     """Native job "args" for a symbol-table write op, or None if native_op
     isn't ours."""
     if native_op == "write.layer.create":
-        # set_layer/create_layer -> ensure the target layer exists.
+        # create_layer -> ensure the target layer exists.
         out: Dict[str, Any] = {}
         name = args.get("name") or args.get("layer")
         if name is not None:

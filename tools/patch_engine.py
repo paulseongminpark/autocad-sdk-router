@@ -34,7 +34,10 @@ tools/autocad-router.ps1) entirely on staged copies:
 Patch op -> native write op mapping (the only ops with a live native handler):
     create_line   -> write.entity.line
     create_circle -> write.entity.circle
-    set_layer     -> write.layer.create
+    set_layer     -> modify.entity.common   (CADOS F8/H-5: repointed from the
+                                              fake-success write.layer.create,
+                                              which ignored 'handle' and never
+                                              reassigned an entity's layer)
     create_layer  -> write.layer.create
 Any other declared op (create_polyline / create_text / move_entity /
 delete_entity / unknown) has no native write handler today and is reported
@@ -95,13 +98,31 @@ RESULT_SCHEMA_ID = "ariadne.cad_patch.result.v1"
 # The declared high-level mutation operations this shell understands, mapped to
 # the operation-registry id (config/operations.v2.json) that carries the native
 # operation evidence.
+#
+# CADOS F8/H-6: set_layer/move_entity/delete_entity used to point at
+# write.entity.modify / write.entity.delete -- ids that do not exist ANYWHERE
+# in config/operations.v2.json (let alone in a family's live HasOp gate), a
+# dangling target. Repointed at the real, live, implemented ids: set_layer and
+# move_entity are true entity-property/transform mutations
+# (modify.entity.common / modify.entity.transform); delete_entity is repointed
+# at modify.entity.explode -- the closest live, resolvable id (see
+# reconcile_native_registry.check_vocab_lockstep for the resolves-live proof).
+# Honest caveat: modify.entity.explode is NOT a real delete (it appends the
+# exploded pieces and preserves the source; its own write_level is
+# default_write_mode="read" / dwg_persisted=false, so nothing is even
+# persisted) -- no real erase/delete-entity op exists in this registry yet
+# (independently confirmed by tools/mint_pilot_seed.py's ERASE_MODELSPACE_OP_ID
+# gap analysis). delete_entity/move_entity stay OUT of NATIVE_WRITE_OP_MAP
+# below (no live write handler), so apply_staged still honestly reports them
+# not_implemented; this map only fixes the dry_run_plan/validate_patch_schema
+# informational surface so it never cites a non-existent registry id.
 OP_REGISTRY_MAP: Dict[str, str] = {
     "create_line": "write.entity.line",
     "create_polyline": "write.entity.polyline",
     "create_text": "write.entity.text",
-    "set_layer": "write.entity.modify",
-    "move_entity": "write.entity.modify",
-    "delete_entity": "write.entity.delete",
+    "set_layer": "modify.entity.common",
+    "move_entity": "modify.entity.transform",
+    "delete_entity": "modify.entity.explode",
 }
 DECLARED_OPS = tuple(OP_REGISTRY_MAP.keys())
 

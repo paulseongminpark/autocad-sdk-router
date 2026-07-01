@@ -14,6 +14,14 @@ Intent (WHY -- this pins the PLAN F9 refactor's one hard invariant):
   ops fails loudly here, not downstream in a live AutoCAD apply.
 
 Stdlib only. Discoverable by pytest and ``python -m unittest discover -s tests``.
+
+CADOS F8 / H-5 update: set_layer's pinned target below was corrected from
+write.layer.create to modify.entity.common. The pre-split value
+(write.layer.create) was an active fake-success -- it only ensured a layer
+existed and silently ignored 'handle', never reassigning an existing entity's
+layer. This oracle now pins the CORRECTED post-H-5 shape (the real relayer),
+not the original pre-split bug; the F9 partition invariants below (aggregate
+== per-family union, families disjoint) still hold unchanged.
 """
 from __future__ import annotations
 
@@ -27,11 +35,12 @@ for _p in (_REPO, os.path.join(_REPO, "tools")):
     if _p not in sys.path:
         sys.path.insert(0, _p)
 
-# The pre-split NATIVE_WRITE_OP_MAP, pinned as a literal oracle.
+# The pre-split NATIVE_WRITE_OP_MAP, pinned as a literal oracle (set_layer
+# corrected per CADOS F8/H-5 -- see module docstring above).
 _ORIGINAL_NATIVE_WRITE_OP_MAP = {
     "create_line": "write.entity.line",
     "create_circle": "write.entity.circle",
-    "set_layer": "write.layer.create",
+    "set_layer": "modify.entity.common",
     "create_layer": "write.layer.create",
 }
 
@@ -61,6 +70,13 @@ def _original_native_job_doc(native_op, args):
             job["args"]["name"] = name
         if "color_index" in args:
             job["args"]["color_index"] = args["color_index"]
+    elif native_op == "modify.entity.common":
+        # set_layer's corrected (post-H-5) shape: 'handle' resolves the
+        # target entity, 'layer' becomes the native 'set_layer' field.
+        if "handle" in args:
+            job["args"]["handle"] = args["handle"]
+        if "layer" in args:
+            job["args"]["set_layer"] = args["layer"]
     return job
 
 
@@ -153,8 +169,8 @@ class TestNativeJobDocByteIdentical(unittest.TestCase):
         cases = [
             ("write.entity.line", {"start": [0, 0, 0], "end": [10, 0, 0], "layer": "0"}),
             ("write.entity.circle", {"center": [1, 2, 0], "radius": 5, "layer": "DIM"}),
-            ("write.layer.create", {"name": "WALLS", "color_index": 3}),
-            ("write.layer.create", {"layer": "DOORS"}),  # set_layer's args shape
+            ("write.layer.create", {"name": "WALLS", "color_index": 3}),  # create_layer's args shape
+            ("modify.entity.common", {"handle": "2A", "layer": "DOORS"}),  # set_layer's args shape (F8/H-5)
         ]
         for native_op, args in cases:
             with self.subTest(native_op=native_op, args=args):
