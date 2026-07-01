@@ -187,5 +187,92 @@ class TestRoundTripThroughDisk(unittest.TestCase):
             self.assertEqual(reloaded, ir, "IR did not round-trip through disk")
 
 
+class TestNativeGraphGeometryLifting(unittest.TestCase):
+    """T3a: build_ir_from_database_graph's field lifting for the new
+    collectModelSpaceGraph fields (ellipse/dimension/text/mtext/polyline).
+
+    build_ir_from_database_graph (the ``inspect.database.graph`` -> IR path
+    op_roundtrip_probe's pre/post-inspect actually uses) is otherwise only
+    exercised by live/integration/smoke tests gated on a real AutoCAD run --
+    this feeds it synthetic raw entity dicts shaped exactly like
+    collectModelSpaceGraph's JSON, so the lifting itself is covered without
+    any live runtime.
+    """
+
+    def _one_entity_ir(self, raw_entity):
+        import ir_builder
+        graph_result = {"entities": [raw_entity], "modelspace_entities": 1}
+        ir = ir_builder.build_ir_from_database_graph(graph_result, {"dwg_path": "fake.dwg"})
+        return ir["entities"][0]
+
+    def test_ellipse_lifts_major_axis_and_radius_ratio(self):
+        ent = self._one_entity_ir({
+            "handle": "1A0", "dxf_name": "AcDbEllipse", "layer": "0",
+            "owner_handle": "1F", "space": "model",
+            "center": [1.0, 2.0, 0.0], "major_axis": [3.0, 0.0, 0.0],
+            "radius_ratio": 0.5, "start_angle": 0.0, "end_angle": 6.283185307179586,
+            "normal": [0.0, 0.0, 1.0],
+        })
+        self.assertEqual(ent["dxf_name"], "ELLIPSE")
+        self.assertEqual(ent["geometry"], {
+            "kind": "ellipse", "center": [1.0, 2.0, 0.0], "normal": [0.0, 0.0, 1.0],
+            "major_axis": [3.0, 0.0, 0.0], "radius_ratio": 0.5,
+            "start_angle": 0.0, "end_angle": 6.283185307179586,
+        })
+
+    def test_dimension_lifts_points_measurement_and_top_level_block_fields(self):
+        ent = self._one_entity_ir({
+            "handle": "1A1", "dxf_name": "AcDbRotatedDimension", "layer": "0",
+            "owner_handle": "1F", "space": "model",
+            "xline1_point": [0.0, 0.0, 0.0], "xline2_point": [100.0, 0.0, 0.0],
+            "dim_line_point": [100.0, 20.0, 0.0], "rotation": 0.0, "measurement": 100.0,
+            "dim_block_handle": "1A2", "dim_block_name": "*D1",
+        })
+        self.assertEqual(ent["dxf_name"], "DIMENSION")
+        self.assertEqual(ent["geometry"], {
+            "kind": "dimension", "xline1_point": [0.0, 0.0, 0.0],
+            "xline2_point": [100.0, 0.0, 0.0], "dim_line_point": [100.0, 20.0, 0.0],
+            "rotation": 0.0, "measurement": 100.0,
+        })
+        # dim_block_handle/dim_block_name are TOP-LEVEL entity fields, never
+        # inside "geometry" -- see op_roundtrip_probe.py's
+        # _expect_create_dimension for why this must hold.
+        self.assertEqual(ent["dim_block_handle"], "1A2")
+        self.assertEqual(ent["dim_block_name"], "*D1")
+        self.assertNotIn("dim_block_handle", ent["geometry"])
+        self.assertNotIn("dim_block_name", ent["geometry"])
+
+    def test_text_and_mtext_lift_height(self):
+        text_ent = self._one_entity_ir({
+            "handle": "1A3", "dxf_name": "AcDbText", "layer": "0",
+            "owner_handle": "1F", "space": "model",
+            "position": [1.0, 1.0, 0.0], "text": "hi", "height": 3.5,
+        })
+        self.assertEqual(text_ent["geometry"],
+                         {"kind": "text", "position": [1.0, 1.0, 0.0], "text": "hi", "height": 3.5})
+
+        mtext_ent = self._one_entity_ir({
+            "handle": "1A4", "dxf_name": "AcDbMText", "layer": "0",
+            "owner_handle": "1F", "space": "model",
+            "position": [2.0, 2.0, 0.0], "text": "note", "height": 4.25,
+        })
+        self.assertEqual(mtext_ent["geometry"],
+                         {"kind": "mtext", "position": [2.0, 2.0, 0.0], "text": "note", "height": 4.25})
+
+    def test_polyline_lifts_bulge_and_closed(self):
+        ent = self._one_entity_ir({
+            "handle": "1A5", "dxf_name": "AcDbPolyline", "layer": "0",
+            "owner_handle": "1F", "space": "model", "vertex_count": 2,
+            "closed": True,
+            "vertices": [{"point": [0.0, 0.0, 0.0], "bulge": 0.5},
+                        {"point": [10.0, 0.0, 0.0], "bulge": 0.0}],
+        })
+        self.assertEqual(ent["geometry"], {
+            "kind": "lwpolyline", "closed": True,
+            "vertices": [{"point": [0.0, 0.0, 0.0], "bulge": 0.5},
+                        {"point": [10.0, 0.0, 0.0], "bulge": 0.0}],
+        })
+
+
 if __name__ == "__main__":
     unittest.main()

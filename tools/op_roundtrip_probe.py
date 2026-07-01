@@ -62,6 +62,7 @@ against an injected fake ``apply_staged`` (no live runtime touched).
 from __future__ import annotations
 
 import json
+import math
 import os
 import sys
 from typing import Any, Callable, Dict, Optional
@@ -160,45 +161,132 @@ def _expect_create_arc(args: Dict[str, Any]) -> Dict[str, Any]:
 
 
 def _expect_create_text(args: Dict[str, Any]) -> Dict[str, Any]:
-    # collectModelSpaceGraph's AcDbText branch emits position + text only.
-    # write.entity.text (m08h_handlers.inc) DOES call setHeight -- height is
-    # really on the entity -- but the reader never surfaces it, so an
-    # expected_ir carrying "height" would make every real extraction look
-    # like a mismatch. Ground truth here means "what a real read-back
-    # contains", not "everything the write op accepted".
+    # collectModelSpaceGraph's AcDbText branch (T3a) now also surfaces height
+    # (AcDbText::height()) -- write.entity.text (m08h_handlers.inc) always
+    # calls setHeight(height) for a positive height (default 2.5 when the arg
+    # is absent), so ground truth requires an explicit "height" arg, exactly
+    # like create_arc requires explicit start_angle/end_angle.
     return {
         "dxf_name": "TEXT", "layer": args.get("layer") or "0",
         "geometry": {"kind": "text", "position": _point_to_list(args["position"]),
-                    "text": args.get("text", "")},
+                    "text": args.get("text", ""), "height": args["height"]},
     }
 
 
 def _expect_create_mtext(args: Dict[str, Any]) -> Dict[str, Any]:
-    # Same read-back gap as create_text: AcDbMText's branch emits position +
-    # text only (height is written via setTextHeight but never read back).
+    # Same T3a fix as create_text: AcDbMText's branch now surfaces height
+    # (AcDbMText::textHeight()), a direct echo of setTextHeight(height).
     return {
         "dxf_name": "MTEXT", "layer": args.get("layer") or "0",
         "geometry": {"kind": "mtext", "position": _point_to_list(args["position"]),
-                    "text": args.get("text", "")},
+                    "text": args.get("text", ""), "height": args["height"]},
     }
 
 
 def _expect_create_polyline(args: Dict[str, Any]) -> Dict[str, Any]:
     # write.entity.polyline (m08g_handlers.inc) builds a real AcDbPolyline
-    # (LWPOLYLINE) via addVertexAt(AcGePoint2d(x, y), bulge) -- bulge IS
-    # stored on the entity. But collectModelSpaceGraph's AcDbPolyline branch
-    # walks vertices via getPointAt() ONLY (never getBulgeAt()), and never
-    # reads isClosed() for this class (closed/bulge extraction exists only
-    # for the legacy AcDb2dPolyline/AcDb3dPolyline branches, not the
-    # lightweight polyline create_polyline writes). The honest ground truth
-    # is therefore points-only (z=0.0 -- AcGePoint2d carries no elevation),
-    # no "bulge", no "closed": that is exactly what a real post-write
-    # read-back will contain, whatever the write args asked for.
-    vertices = [{"point": [pt.get("x", 0.0), pt.get("y", 0.0), 0.0]}
+    # (LWPOLYLINE) via addVertexAt(AcGePoint2d(x, y), bulge) and setClosed()
+    # when "closed" is a truthy NUMBER (m08g's own check is `cf != 0.0` via
+    # jsonFindNumber -- a JSON bool literal would not parse as a number, so
+    # callers must pass 0/1, never true/false). collectModelSpaceGraph's
+    # AcDbPolyline branch (T3a) now calls getBulgeAt()/isClosed() too, so
+    # both are direct echoes of the write args.
+    vertices = [{"point": [pt.get("x", 0.0), pt.get("y", 0.0), 0.0],
+                "bulge": pt.get("bulge", 0.0)}
                 for pt in (args.get("points") or [])]
+    closed = bool(args.get("closed", 0))
     return {
         "dxf_name": "LWPOLYLINE", "layer": args.get("layer") or "0",
-        "geometry": {"kind": "lwpolyline", "vertices": vertices},
+        "geometry": {"kind": "lwpolyline", "vertices": vertices, "closed": closed},
+    }
+
+
+def _expect_create_ellipse(args: Dict[str, Any]) -> Dict[str, Any]:
+    # collectModelSpaceGraph's AcDbEllipse branch (T3a) emits center/
+    # major_axis/radius_ratio/start_angle/end_angle/normal -- every ctor arg
+    # write.entity.ellipse passes to AcDbEllipse(center, normal, major, ratio,
+    # sa, ea) verbatim (m08g_handlers.inc), so ground truth is a direct
+    # pass-through, exactly like create_arc's.
+    return {
+        "dxf_name": "ELLIPSE", "layer": args.get("layer") or "0",
+        "geometry": {"kind": "ellipse", "center": _point_to_list(args["center"]),
+                    "normal": _point_to_list(args["normal"]),
+                    "major_axis": _point_to_list(args["major_axis"]),
+                    "radius_ratio": args["radius_ratio"],
+                    "start_angle": args["start_angle"], "end_angle": args["end_angle"]},
+    }
+
+
+def _rotated_dimension_measurement(p1: list, p2: list, rotation: float) -> float:
+    """AcDbRotatedDimension's measurement: the xLine1Point->xLine2Point vector
+    projected onto the dimension line's direction (angle ``rotation`` from the
+    X axis) -- the same projection AutoCAD uses to derive the linear distance
+    a rotated dimension displays. Independently computed (not an arg) so
+    create_dimension's ground truth can assert it without a live read.
+    """
+    dx = p2[0] - p1[0]
+    dy = p2[1] - p1[1]
+    return abs(dx * math.cos(rotation) + dy * math.sin(rotation))
+
+
+def _rotated_dimension_line_point(p1: list, p2: list, rotation: float, dim_line_arg: list) -> list:
+    """AcDbRotatedDimension does NOT store the raw ``dim_line`` ctor arg back
+    verbatim -- live-verified (2026-07-02 T3a re-cert, 2 real accoreconsole
+    roundtrips: rotation=0 and rotation=pi/4) against
+    ``tests/fixtures/native_sample.dwg``: AutoCAD keeps only the PERPENDICULAR
+    offset of the input point relative to xLine1Point (the distance the
+    dimension line sits off the measured baseline) along
+    ``v = (-sin(rotation), cos(rotation))`` -- the along-axis component is
+    discarded and the stored point is re-anchored at xLine2Point instead:
+    ``stored = xLine2Point + offset * v``. Confirmed exactly (to float
+    precision) on both live cases, e.g. xline1=(0,0) xline2=(100,0) rotation=0
+    dim_line=(50,20) -> stored (100.0, 20.0, 0.0), NOT (50, 20, 0).
+
+    Both verification cases used an xLine1Point->xLine2Point baseline
+    PARALLEL to the rotation direction (the common "measure along this axis"
+    case a rotated dimension is normally used for) -- this ground truth is
+    only asserted for that case; a non-parallel baseline is unverified.
+    """
+    ux, uy = math.cos(rotation), math.sin(rotation)
+    vx, vy = -uy, ux
+    dx = dim_line_arg[0] - p1[0]
+    dy = dim_line_arg[1] - p1[1]
+    offset = dx * vx + dy * vy
+    return [p2[0] + offset * vx, p2[1] + offset * vy, p2[2]]
+
+
+def _expect_create_dimension(args: Dict[str, Any]) -> Dict[str, Any]:
+    # collectModelSpaceGraph's AcDbRotatedDimension branch (T3a) emits the 3
+    # defining points + rotation + measurement. xline1_point/xline2_point/
+    # rotation are direct ctor-arg echoes; "measurement" and "dim_line_point"
+    # are NOT -- AutoCAD derives/canonicalizes both internally -- so this
+    # ground truth independently computes the same values
+    # (_rotated_dimension_measurement / _rotated_dimension_line_point) rather
+    # than echoing args.
+    #
+    # dim_block_handle/dim_block_name (the dimension's anonymous defining-
+    # block id/name) are DELIBERATELY absent here even though the reader now
+    # surfaces them: that value is AutoCAD's own incrementing anonymous-block
+    # counter (*D1, *D2, ...), a function of the live drawing's PRE-EXISTING
+    # block count, not of this op's own args -- asserting it here would
+    # violate expected_ir_for_op's "ground truth from args alone, never a
+    # live read" contract. ir_builder.py's _entity_from_native surfaces it as
+    # a top-level field OUTSIDE "geometry" for exactly this reason: it must
+    # never enter this P-gate's geometry-basis fingerprint (cad_diff.py's
+    # comparison_basis="geometry" only ever looks at entity["geometry"]).
+    xline1 = _point_to_list(args["xline1"])
+    xline2 = _point_to_list(args["xline2"])
+    rotation = args["rotation"]
+    dim_line_arg = _point_to_list(args["dim_line"])
+    return {
+        "dxf_name": "DIMENSION", "layer": args.get("layer") or "0",
+        "geometry": {
+            "kind": "dimension",
+            "xline1_point": xline1, "xline2_point": xline2,
+            "dim_line_point": _rotated_dimension_line_point(xline1, xline2, rotation, dim_line_arg),
+            "rotation": rotation,
+            "measurement": _rotated_dimension_measurement(xline1, xline2, rotation),
+        },
     }
 
 
@@ -209,22 +297,11 @@ def _expect_create_polyline(args: Dict[str, Any]) -> Dict[str, Any]:
 # wired natively (a real gap between "can write" and "can independently
 # assert what SHOULD have been written" -- no-fake-success).
 #
-# create_ellipse / create_dimension are DELIBERATELY excluded -- not "not yet
-# extended", a genuine reader-side gap, verified against
-# src/Ariadne.AcadNative/AriadneNativeJob.cpp's collectModelSpaceGraph (the
-# ONLY function inspect.database.graph calls): it casts AcDbLine / AcDbArc /
-# AcDbCircle / AcDbBlockReference / AcDbMText / AcDbText / AcDbPolyline /
-# AcDb2dPolyline / AcDb3dPolyline / AcDbHatch -- there is no AcDbEllipse
-# branch and no AcDbRotatedDimension/AcDbAlignedDimension/AcDbDimension
-# branch at all. write.entity.ellipse / write.entity.dim.rotated
-# (m08g_handlers.inc / m08h_handlers.inc) genuinely create a rich
-# AcDbEllipse / AcDbRotatedDimension entity, but a post-write read via
-# inspect.database.graph reports only ``{"kind": "ellipse"}`` /
-# ``{"kind": "dimension"}`` -- no center/radius_ratio/xline1_point/etc. --
-# so no expected_ir this module could construct would ever fingerprint-match
-# a real read-back. Certifying these would require adding a native
-# extraction branch first (a C++ change, out of this Python-only ticket's
-# scope); asserting them here would be forcing a fake pass, or a hollow one.
+# create_ellipse / create_dimension were EXCLUDED through T1 -- a genuine
+# reader-side gap in collectModelSpaceGraph (no AcDbEllipse or
+# AcDbDimension-subclass read branch at all). T3a added both branches (see
+# src/Ariadne.AcadNative/AriadneNativeJob.cpp), so both are now certifiable
+# and included below.
 # create_mpolygon is excluded because its live write itself fails
 # (errorstatus=409); set_entity_xdata is excluded because it mutates
 # non-geometry entity data (xdata), which this geometry-basis P-gate does
@@ -234,9 +311,11 @@ _EXPECTED_ENTITY_BUILDERS: Dict[str, Callable[[Dict[str, Any]], Dict[str, Any]]]
     "create_line": _expect_create_line,
     "create_circle": _expect_create_circle,
     "create_arc": _expect_create_arc,
+    "create_ellipse": _expect_create_ellipse,
     "create_text": _expect_create_text,
     "create_mtext": _expect_create_mtext,
     "create_polyline": _expect_create_polyline,
+    "create_dimension": _expect_create_dimension,
 }
 
 

@@ -31,6 +31,8 @@
 #include "dbmtext.h"
 #include "dbpl.h"
 #include "dbhatch.h"
+#include "dbelipse.h"  // T3a: AcDbEllipse (collectModelSpaceGraph read branch)
+#include "dbdim.h"     // T3a: AcDbRotatedDimension (collectModelSpaceGraph read branch)
 #include "dbxrecrd.h"
 #include "dbsymtb.h"
 #include "dbcolor.h"
@@ -1056,6 +1058,20 @@ static bool collectModelSpaceGraph(AcDbDatabase* pDb, int& total,
             arr << ",\"center\":[" << c.x << "," << c.y << "," << c.z << "]"
                 << ",\"radius\":" << pCir->radius();
         }
+        // T3a: AcDbEllipse derives from AcDbCurve (not from AcDbCircle/AcDbArc),
+        // so its cast() ordering relative to them is not load-bearing -- placed
+        // here purely to group the curve-ish primitives together.
+        else if (AcDbEllipse* pEl = AcDbEllipse::cast(pEnt)) {
+            const AcGePoint3d c = pEl->center();
+            const AcGeVector3d major = pEl->majorAxis();
+            const AcGeVector3d nrm = pEl->normal();
+            arr << ",\"center\":[" << c.x << "," << c.y << "," << c.z << "]"
+                << ",\"major_axis\":[" << major.x << "," << major.y << "," << major.z << "]"
+                << ",\"radius_ratio\":" << pEl->radiusRatio()
+                << ",\"start_angle\":" << pEl->startAngle()
+                << ",\"end_angle\":" << pEl->endAngle()
+                << ",\"normal\":[" << nrm.x << "," << nrm.y << "," << nrm.z << "]";
+        }
         else if (AcDbBlockReference* pRef = AcDbBlockReference::cast(pEnt)) {
             const AcGePoint3d p = pRef->position();
             const AcGeScale3d sc = pRef->scaleFactors();
@@ -1077,23 +1093,30 @@ static bool collectModelSpaceGraph(AcDbDatabase* pDb, int& total,
         else if (AcDbMText* pM = AcDbMText::cast(pEnt)) {
             const AcGePoint3d p = pM->location();
             arr << ",\"position\":[" << p.x << "," << p.y << "," << p.z << "]"
-                << ",\"text\":\"" << jsonEscape(acharToAscii(pM->contents())) << "\"";
+                << ",\"text\":\"" << jsonEscape(acharToAscii(pM->contents())) << "\""
+                << ",\"height\":" << pM->textHeight();
         }
         else if (AcDbText* pT = AcDbText::cast(pEnt)) {
             const AcGePoint3d p = pT->position();
             arr << ",\"position\":[" << p.x << "," << p.y << "," << p.z << "]"
-                << ",\"text\":\"" << jsonEscape(acharToAscii(pT->textStringConst())) << "\"";
+                << ",\"text\":\"" << jsonEscape(acharToAscii(pT->textStringConst())) << "\""
+                << ",\"height\":" << pT->height();
         }
         else if (AcDbPolyline* pPl = AcDbPolyline::cast(pEnt)) {
             const unsigned int n = pPl->numVerts();
-            arr << ",\"vertex_count\":" << n << ",\"vertices\":[";
+            arr << ",\"vertex_count\":" << n
+                << ",\"closed\":" << (pPl->isClosed() ? "true" : "false")
+                << ",\"vertices\":[";
             for (unsigned int vi = 0; vi < n; ++vi) {
                 AcGePoint3d vp;
                 if (pPl->getPointAt(vi, vp) != Acad::eOk)
                     break;
+                double bulge = 0.0;
+                pPl->getBulgeAt(vi, bulge);
                 if (vi != 0)
                     arr << ",";
-                arr << "[" << vp.x << "," << vp.y << "," << vp.z << "]";
+                arr << "{\"point\":[" << vp.x << "," << vp.y << "," << vp.z << "]"
+                    << ",\"bulge\":" << bulge << "}";
             }
             arr << "]";
         }
@@ -1145,6 +1168,44 @@ static bool collectModelSpaceGraph(AcDbDatabase* pDb, int& total,
                 << ",\"loops\":" << loopsJson;
             richCounters.hatchLoops += loopCount;
             richCounters.hatchLoopVertices += vertexCount;
+        }
+        // T3a: AcDbRotatedDimension -- the one dimension subtype write.entity.
+        // dim.rotated actually creates. Derives directly from AcDbDimension
+        // (NOT from AcDbAlignedDimension), so no other branch here casts to it.
+        else if (AcDbRotatedDimension* pDim = AcDbRotatedDimension::cast(pEnt)) {
+            const AcGePoint3d p1 = pDim->xLine1Point();
+            const AcGePoint3d p2 = pDim->xLine2Point();
+            const AcGePoint3d dl = pDim->dimLinePoint();
+            double measurement = 0.0;
+            const bool haveMeasurement = (pDim->measurement(measurement) == Acad::eOk);
+            arr << ",\"xline1_point\":[" << p1.x << "," << p1.y << "," << p1.z << "]"
+                << ",\"xline2_point\":[" << p2.x << "," << p2.y << "," << p2.z << "]"
+                << ",\"dim_line_point\":[" << dl.x << "," << dl.y << "," << dl.z << "]"
+                << ",\"rotation\":" << pDim->rotation();
+            if (haveMeasurement)
+                arr << ",\"measurement\":" << measurement;
+            // dimBlockId resolved to its anonymous defining block's handle/name --
+            // as cheap as the AcDbBlockReference branch's block_name lookup above
+            // (one extra acdbOpenObject+getName()). Deliberately NOT surfaced by
+            // ir_builder.py inside "geometry": the anonymous block name (*Dn) is a
+            // live-DB-state-dependent counter, not derivable from an op's own args
+            // alone, so it must never enter the P-gate's geometry fingerprint --
+            // ir_builder.py's _entity_from_native lifts it as a top-level
+            // dim_block_handle/dim_block_name field instead (see op_roundtrip_
+            // probe.py's _expect_create_dimension for the full rationale).
+            const AcDbObjectId dimBlockId = pDim->dimBlockId();
+            if (!dimBlockId.isNull()) {
+                arr << ",\"dim_block_handle\":\"" << jsonEscape(handleOfId(dimBlockId)) << "\"";
+                std::string dimBlockName;
+                AcDbBlockTableRecord* pDimDef = nullptr;
+                if (acdbOpenObject(pDimDef, dimBlockId, AcDb::kForRead) == Acad::eOk) {
+                    const ACHAR* nameRaw = nullptr;
+                    if (pDimDef->getName(nameRaw) == Acad::eOk)
+                        dimBlockName = acharToAscii(nameRaw);
+                    pDimDef->close();
+                }
+                arr << ",\"dim_block_name\":\"" << jsonEscape(dimBlockName) << "\"";
+            }
         }
 
         arr << "}";

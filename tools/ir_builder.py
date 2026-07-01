@@ -505,12 +505,15 @@ def _geometry_from_native_entity(raw: dict, kind: str) -> dict:
     """Lift a native graph entity's inline geometry fields into an IR geometry dict.
 
     The native collector writes geometry inline on the entity record (start/end,
-    center/radius/angles, position/scale/rotation/block_name, text, vertices).
-    Returns an IR geometry dict with a valid ``kind``; unrepresented kinds get a
-    geometry that carries only ``kind`` (decoded=False is decided by the caller).
+    center/radius/angles, position/scale/rotation/block_name, text, vertices,
+    T3a: major_axis/radius_ratio, height, xline1_point/xline2_point/
+    dim_line_point/measurement). Returns an IR geometry dict with a valid
+    ``kind``; unrepresented kinds get a geometry that carries only ``kind``
+    (decoded=False is decided by the caller).
     """
     geom: dict = {"kind": kind}
-    for key in ("start", "end", "center", "position", "scale", "normal"):
+    for key in ("start", "end", "center", "position", "scale", "normal",
+                "major_axis", "xline1_point", "xline2_point", "dim_line_point"):
         pt = _as_point3(raw.get(key))
         if pt is not None:
             geom[key] = pt
@@ -518,7 +521,8 @@ def _geometry_from_native_entity(raw: dict, kind: str) -> dict:
     if radius is not None:
         geom["radius"] = radius
     for nk, ik in (("start_angle", "start_angle"), ("end_angle", "end_angle"),
-                   ("rotation", "rotation")):
+                   ("rotation", "rotation"), ("radius_ratio", "radius_ratio"),
+                   ("height", "height"), ("measurement", "measurement")):
         num = _to_number(raw.get(nk))
         if num is not None:
             geom[ik] = num
@@ -586,6 +590,15 @@ def _entity_from_native(raw: dict, source_block: dict) -> dict:
         entity["xdata"] = raw["xdata"]
     if raw.get("extension_dictionary_handle"):
         entity["extension_dictionary_handle"] = str(raw["extension_dictionary_handle"])
+    # T3a: a dimension's defining anonymous block (*Dn) id/name -- deliberately
+    # a top-level field, NOT inside "geometry": *Dn increments with the live
+    # drawing's pre-existing anonymous-block count, so it is not derivable from
+    # an op's own args alone and must never enter the geometry P-gate's
+    # fingerprint (see op_roundtrip_probe.py's _expect_create_dimension).
+    if raw.get("dim_block_handle"):
+        entity["dim_block_handle"] = str(raw["dim_block_handle"])
+    if raw.get("dim_block_name"):
+        entity["dim_block_name"] = str(raw["dim_block_name"])
     return entity
 
 
