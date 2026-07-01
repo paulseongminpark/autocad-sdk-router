@@ -18,6 +18,17 @@ fall back to positional/geometry matching, so a drawing whose engine reissues
 handles would be reported truthfully as wholesale added/removed rather than
 faking a positional match (no-fake-success).
 
+An explicit ``comparison_basis="geometry"`` opts into a handle-INDEPENDENT join
+instead: entities are matched on ``(dxf_name, layer, geometry)`` rounded to a
+tolerance (the AutoCAD COMPARETOLERANCE analog -- see ``DEFAULT_GEOMETRY_TOLERANCE``
+and the ``geometry_tolerance`` kwarg), so a regenerated drawing whose engine
+reissued every handle can still report zero changes when the geometry itself is
+unchanged. Matching is two-tier: entities with an exact fingerprint match on both
+sides are unchanged; whatever is left is paired by ``(dxf_name, layer)`` alone and
+classified via ``classify_change``, so a genuine geometry edit becomes
+``modified`` rather than a fake added+removed pair. ``"handle"`` remains the
+default and is completely unaffected by this mode.
+
 Change taxonomy (``classify_change``)
 -------------------------------------
 For a handle in both IRs the following fields are compared, in this order, and
@@ -47,7 +58,9 @@ Hard rules (CAD OS Layer build invariants)
 
 Public API:
     DIFF_SCHEMA_ID
-    compute_diff(pre_ir: dict, post_ir: dict) -> dict          # cad_diff.v1
+    DEFAULT_GEOMETRY_TOLERANCE
+    compute_diff(pre_ir: dict, post_ir: dict, comparison_basis: str = "handle",
+                 geometry_tolerance: float = DEFAULT_GEOMETRY_TOLERANCE) -> dict
     classify_change(pre_entity: dict, post_entity: dict) -> list[str]
     load_diff(path) -> dict ; write_diff(diff, path) -> str
     load_ir(path) -> dict                                       # BOM-tolerant
@@ -83,6 +96,11 @@ _JSON_ENCODING = "utf-8-sig"
 # compared structurally (see _geometry_changed / _bbox_changed); layer/dxf_name
 # are scalar string compares.
 _SCALAR_COMPARE_FIELDS = ("layer", "dxf_name")
+
+# Default tolerance for comparison_basis="geometry" (the AutoCAD COMPARETOLERANCE
+# analog): numeric geometry leaves within this distance of each other are treated
+# as equal so floating-point roundtrip noise doesn't register as a change.
+DEFAULT_GEOMETRY_TOLERANCE = 1e-6
 
 
 # --------------------------------------------------------------------------- #
@@ -315,15 +333,269 @@ def _deterministic_diff_id(pre_ir: Dict[str, Any], post_ir: Dict[str, Any]) -> s
 
 
 # --------------------------------------------------------------------------- #
+# Geometry-fingerprint join (comparison_basis="geometry")
+# --------------------------------------------------------------------------- #
+
+def _quantize(value: Any, tol: float) -> Any:
+    """Recursively snap numeric leaves in ``value`` onto a ``tol``-wide grid.
+
+    AutoCAD COMPARETOLERANCE analog: two geometries whose numeric leaves differ
+    by less than ``tol`` quantize to the same integer grid point and therefore
+    compare equal once passed through ``_canonical``. ``bool`` is excluded from
+    the numeric branch (it is an int subclass but never a coordinate); ``tol <=
+    0`` disables snapping (falls back to an exact compare).
+    """
+    if isinstance(value, bool) or tol <= 0:
+        return value
+    if isinstance(value, (int, float)):
+        return round(value / tol)
+    if isinstance(value, dict):
+        return {k: _quantize(v, tol) for k, v in value.items()}
+    if isinstance(value, (list, tuple)):
+        return [_quantize(v, tol) for v in value]
+    return value
+
+
+def _geometry_fingerprint(entity: Dict[str, Any], tol: float) -> Tuple[Any, Any, Any]:
+    """Build the ``(dxf_name, layer, geometry)`` join key for basis="geometry".
+
+    Two entities with an equal fingerprint are the same physical entity
+    regardless of DWG handle -- this is what lets ``comparison_basis="geometry"``
+    report zero changes against a regenerated drawing whose engine reissued every
+    handle (a handle-basis diff can never do that; see the module docstring).
+    The geometry leg reuses ``_canonical`` (the same structural normalizer
+    ``_geometry_changed`` uses) over the tolerance-quantized geometry, so two
+    geometries that are structurally equal after quantization hash identically.
+    """
+    geom_key = _canonical(_quantize(entity.get("geometry"), tol))
+    return (entity.get("dxf_name"), entity.get("layer"), geom_key)
+
+
+def _bucket_by_fingerprint(entities: List[Dict[str, Any]], tol: float
+                           ) -> Dict[Tuple[Any, Any, Any], List[Dict[str, Any]]]:
+    """Group entities by geometry fingerprint, preserving each bucket's input order."""
+    buckets: Dict[Tuple[Any, Any, Any], List[Dict[str, Any]]] = {}
+    for ent in entities:
+        if isinstance(ent, dict):
+            buckets.setdefault(_geometry_fingerprint(ent, tol), []).append(ent)
+    return buckets
+
+
+def _by_handle_sort_key(ent: Dict[str, Any]) -> str:
+    """Sort key used to pair up same-bucket entities deterministically."""
+    return ent.get("handle") or ""
+
+
+def _compute_diff_geometry_basis(pre_ir: Dict[str, Any], post_ir: Dict[str, Any],
+                                 geometry_tolerance: float) -> Dict[str, Any]:
+    """compute_diff's geometry-fingerprint join (comparison_basis="geometry").
+
+    Matching is two-tier, both deterministic (ties broken by sorted handle):
+
+      1. Entities with an EXACT fingerprint match (``dxf_name``, ``layer``, and
+         geometry equal within ``geometry_tolerance``) on both sides are
+         ``unchanged``. Duplicate fingerprints are matched as a multiset (pairs
+         up to ``min(count_pre, count_post)`` per bucket).
+      2. Whatever is left is paired up by ``(dxf_name, layer)`` alone -- geometry
+         differs, by construction of step 1 -- and classified via
+         ``classify_change``, so a real geometry edit surfaces as ``modified``
+         instead of a fake added+removed pair.
+      3. Anything still unpaired (a type/layer with more entities on one side
+         than the other) is ``added`` (post-only) / ``removed`` (pre-only).
+
+    Returns a ``cad_diff.v1`` dict shaped identically to ``compute_diff``'s
+    handle-basis output (same summary/changed_handles/projection keys), with
+    ``diagnostics.comparison_basis == "geometry"``.
+    """
+    pre_ir = pre_ir or {}
+    post_ir = post_ir or {}
+    tol = geometry_tolerance
+
+    pre_entities = [e for e in (pre_ir.get("entities") or []) if isinstance(e, dict)]
+    post_entities = [e for e in (post_ir.get("entities") or []) if isinstance(e, dict)]
+
+    # Tier 1: exact fingerprint match -> unchanged (multiset: pair min(count) per bucket).
+    pre_fp = _bucket_by_fingerprint(pre_entities, tol)
+    post_fp = _bucket_by_fingerprint(post_entities, tol)
+
+    unchanged_count = 0
+    leftover_pre: List[Dict[str, Any]] = []
+    leftover_post: List[Dict[str, Any]] = []
+    # key=repr: fingerprints nest arbitrary geometry values (str/float/None mixed),
+    # which is not safely orderable directly -- repr() is always comparable and
+    # deterministic, and this is only an iteration order, not user-visible data.
+    for fp in sorted(set(pre_fp) | set(post_fp), key=repr):
+        pre_list = sorted(pre_fp.get(fp, []), key=_by_handle_sort_key)
+        post_list = sorted(post_fp.get(fp, []), key=_by_handle_sort_key)
+        n = min(len(pre_list), len(post_list))
+        unchanged_count += n
+        leftover_pre.extend(pre_list[n:])
+        leftover_post.extend(post_list[n:])
+
+    # Tier 2: pair leftovers by (dxf_name, layer) only -> modified via classify_change.
+    def _type_layer(ent: Dict[str, Any]) -> Tuple[Any, Any]:
+        return (ent.get("dxf_name"), ent.get("layer"))
+
+    pre_tl: Dict[Tuple[Any, Any], List[Dict[str, Any]]] = {}
+    for e in leftover_pre:
+        pre_tl.setdefault(_type_layer(e), []).append(e)
+    post_tl: Dict[Tuple[Any, Any], List[Dict[str, Any]]] = {}
+    for e in leftover_post:
+        post_tl.setdefault(_type_layer(e), []).append(e)
+
+    changed_handles: List[Dict[str, Any]] = []
+    by_type: Dict[str, Dict[str, int]] = {}
+    layer_changes: List[Dict[str, Any]] = []
+    geometry_changes: List[Dict[str, Any]] = []
+    bbox_changes: List[Dict[str, Any]] = []
+    modified_count = 0
+    added_entities: List[Dict[str, Any]] = []
+    removed_entities: List[Dict[str, Any]] = []
+
+    def _bump(dxf: str, kind: str) -> None:
+        slot = by_type.setdefault(dxf or "", {"added": 0, "removed": 0, "modified": 0})
+        slot[kind] += 1
+
+    for tl in sorted(set(pre_tl) | set(post_tl), key=lambda k: (k[0] or "", k[1] or "")):
+        pre_list = sorted(pre_tl.get(tl, []), key=_by_handle_sort_key)
+        post_list = sorted(post_tl.get(tl, []), key=_by_handle_sort_key)
+        n = min(len(pre_list), len(post_list))
+        for pre_e, post_e in zip(pre_list[:n], post_list[:n]):
+            fields = classify_change(pre_e, post_e)
+            if not fields:
+                # Defensive: an arbitrary same-bucket pairing landed on two
+                # entities that turn out geometry-identical (possible under
+                # duplicate fingerprints split across tier 1/2 by count
+                # mismatch). Correct outcome is unchanged, not a fake modify.
+                unchanged_count += 1
+                continue
+            modified_count += 1
+            dxf = post_e.get("dxf_name", pre_e.get("dxf_name", "")) or ""
+            handle = post_e.get("handle") or pre_e.get("handle") or ""
+            rec: Dict[str, Any] = {
+                "handle": handle,
+                "change": "modified",
+                "fields": _field_delta(pre_e, post_e, fields),
+            }
+            if dxf:
+                rec["dxf_name"] = dxf
+            post_layer = post_e.get("layer")
+            if isinstance(post_layer, str):
+                rec["layer"] = post_layer
+            changed_handles.append(rec)
+            _bump(dxf, "modified")
+
+            if "layer" in fields:
+                layer_changes.append({
+                    "handle": handle, "dxf_name": dxf,
+                    "before": pre_e.get("layer"), "after": post_e.get("layer"),
+                })
+            if "geometry" in fields:
+                geometry_changes.append({
+                    "handle": handle, "dxf_name": dxf,
+                    "changed_keys": [f for f in fields if f.startswith("geometry.")],
+                })
+            if "bbox" in fields:
+                bbox_changes.append({
+                    "handle": handle, "dxf_name": dxf,
+                    "before": pre_e.get("bbox"), "after": post_e.get("bbox"),
+                })
+        added_entities.extend(post_list[n:])
+        removed_entities.extend(pre_list[n:])
+
+    for ent in sorted(added_entities, key=_by_handle_sort_key):
+        dxf = ent.get("dxf_name", "") or ""
+        rec = {"handle": ent.get("handle") or "", "change": "added"}
+        if dxf:
+            rec["dxf_name"] = dxf
+        layer = ent.get("layer")
+        if isinstance(layer, str):
+            rec["layer"] = layer
+        changed_handles.append(rec)
+        _bump(dxf, "added")
+
+    for ent in sorted(removed_entities, key=_by_handle_sort_key):
+        dxf = ent.get("dxf_name", "") or ""
+        rec = {"handle": ent.get("handle") or "", "change": "removed"}
+        if dxf:
+            rec["dxf_name"] = dxf
+        layer = ent.get("layer")
+        if isinstance(layer, str):
+            rec["layer"] = layer
+        changed_handles.append(rec)
+        _bump(dxf, "removed")
+
+    _kind_order = {"added": 0, "removed": 1, "modified": 2}
+    changed_handles.sort(key=lambda r: (_kind_order.get(r["change"], 9), r["handle"]))
+
+    added_count = len(added_entities)
+    deleted_count = len(removed_entities)
+    entity_count_before = len(pre_entities)
+    entity_count_after = len(post_entities)
+
+    summary: Dict[str, Any] = {
+        "added": added_count,
+        "removed": deleted_count,
+        "modified": modified_count,
+        "unchanged": unchanged_count,
+        "entity_count_before": entity_count_before,
+        "entity_count_after": entity_count_after,
+        "by_type": by_type,
+        "created_count": added_count,
+        "deleted_count": deleted_count,
+        "modified_count": modified_count,
+        "unchanged_count": unchanged_count,
+    }
+
+    warnings: List[str] = []
+    if pre_ir.get("schema") != IR_SCHEMA_ID:
+        warnings.append("before IR schema is %r (expected %s)"
+                        % (pre_ir.get("schema"), IR_SCHEMA_ID))
+    if post_ir.get("schema") != IR_SCHEMA_ID:
+        warnings.append("after IR schema is %r (expected %s)"
+                        % (post_ir.get("schema"), IR_SCHEMA_ID))
+
+    diagnostics: Dict[str, Any] = {
+        "comparison_basis": "geometry",
+        "geometry_tolerance": tol,
+        "warnings": warnings,
+        "errors": [],
+        "pre_coverage_level": pre_ir.get("coverage_level"),
+        "post_coverage_level": post_ir.get("coverage_level"),
+    }
+
+    return {
+        "schema": DIFF_SCHEMA_ID,
+        "diff_id": _deterministic_diff_id(pre_ir, post_ir),
+        "before_ref": _state_ref(pre_ir, entity_count_before),
+        "after_ref": _state_ref(post_ir, entity_count_after),
+        "changed_handles": changed_handles,
+        "summary": summary,
+        "diagnostics": diagnostics,
+        "layer_changes": layer_changes,
+        "geometry_changes": geometry_changes,
+        "bbox_changes": bbox_changes,
+    }
+
+
+# --------------------------------------------------------------------------- #
 # Public diff
 # --------------------------------------------------------------------------- #
 
-def compute_diff(pre_ir: Dict[str, Any], post_ir: Dict[str, Any]) -> Dict[str, Any]:
+def compute_diff(pre_ir: Dict[str, Any], post_ir: Dict[str, Any],
+                 comparison_basis: str = "handle",
+                 geometry_tolerance: float = DEFAULT_GEOMETRY_TOLERANCE) -> Dict[str, Any]:
     """Compute a deterministic structural diff between two dwg_graph_ir.v1 IRs.
 
     Args:
         pre_ir:  the 'before' IR document (ariadne.dwg_graph_ir.v1).
         post_ir: the 'after' IR document.
+        comparison_basis: ``"handle"`` (default) joins entities on their DWG
+            handle (see module docstring). ``"geometry"`` instead joins on
+            ``(dxf_name, layer, geometry)`` within ``geometry_tolerance``,
+            independent of handle -- see ``_compute_diff_geometry_basis``.
+        geometry_tolerance: numeric tolerance used only when
+            ``comparison_basis="geometry"`` (the AutoCAD COMPARETOLERANCE analog).
 
     Returns:
         A dict conforming to ``ariadne.cad_diff.v1``. Entities are joined on
@@ -339,6 +611,9 @@ def compute_diff(pre_ir: Dict[str, Any], post_ir: Dict[str, Any]) -> Dict[str, A
         ``summary.by_type`` (per-DXF-type added/removed/modified), and the
         ``layer_changes`` / ``geometry_changes`` / ``bbox_changes`` projections.
     """
+    if comparison_basis == "geometry":
+        return _compute_diff_geometry_basis(pre_ir, post_ir, geometry_tolerance)
+
     pre_ir = pre_ir or {}
     post_ir = post_ir or {}
 
