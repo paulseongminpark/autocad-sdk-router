@@ -16,6 +16,9 @@
 #include <fstream>
 #include <cstdlib>
 #include <vector>
+#include <ios>
+#include <iomanip>
+#include <limits>
 #include <tchar.h>
 #include <windows.h>
 
@@ -55,12 +58,42 @@
 //============================================================================
 // Tiny helpers
 //============================================================================
+// Round-trip-safe double serialization (north-star precision fix).
+//
+// std::ostringstream defaults to defaultfloat + precision(6): 6 SIGNIFICANT
+// figures. Every JSON emitter in this translation unit (this file plus every
+// families/*.inc it #includes below) built its numbers by inserting a bare
+// double into a std::ostringstream, so any coordinate/angle/radius needing
+// more than 6 sig figs was silently truncated on the way out -- e.g. a line
+// endpoint 645229.5 serialized as 645230, an arc end_angle 3.14159265
+// serialized as 3.14159. Both the read/extraction path and the write-op
+// result echo share this same ostringstream idiom, so the loss was symmetric.
+// kJsonDoublePrecision is setprecision(max_digits10) (17): the smallest
+// precision that round-trips every double exactly, with no added notation or
+// trailing-zero padding (defaultfloat, the ostringstream default floatfield,
+// is left untouched -- only the precision changes). Every JSON-building
+// std::ostringstream in this file and in the families/*.inc headers below now
+// calls ".precision(kJsonDoublePrecision)" right after construction so no
+// emission site could be missed; integer/bool/string/handle formatting is
+// unaffected (precision() only governs floating-point conversion).
+static const std::streamsize kJsonDoublePrecision = std::numeric_limits<double>::max_digits10;
+
+// Round-trip-safe formatter for doubles built outside an ostringstream (e.g.
+// std::string "+" concatenation via std::to_string). Same precision contract
+// as kJsonDoublePrecision above.
+static std::string fmtNum(double v)
+{
+    std::ostringstream tmp;
+    tmp << std::defaultfloat << std::setprecision(kJsonDoublePrecision) << v;
+    return tmp.str();
+}
+
 static std::string readAllBytes(const wchar_t* path)
 {
     std::ifstream f(path, std::ios::binary);
     if (!f.good())
         return std::string();
-    std::ostringstream ss;
+    std::ostringstream ss; ss.precision(kJsonDoublePrecision);
     ss << f.rdbuf();
     return ss.str();
 }
@@ -572,7 +605,7 @@ static std::string njsonStr(const std::string& utf8)
 // shape every persisted object carries: handle, RX class name, owner handle.
 static std::string serializeObjectCommon(AcDbObject* pObj)
 {
-    std::ostringstream o;
+    std::ostringstream o; o.precision(kJsonDoublePrecision);
     o << "\"handle\":" << njsonStr(handleOf(pObj));
     const ACHAR* cls = (pObj != nullptr && pObj->isA() != nullptr) ? pObj->isA()->name() : nullptr;
     o << ",\"class\":" << njsonStr(cls);
@@ -584,7 +617,7 @@ static std::string serializeObjectCommon(AcDbObject* pObj)
 // entity-common graphics properties. The base every entity handler reuses.
 static std::string serializeEntityCommon(AcDbEntity* pEnt)
 {
-    std::ostringstream o;
+    std::ostringstream o; o.precision(kJsonDoublePrecision);
     o << serializeObjectCommon(pEnt);
     if (pEnt != nullptr) {
         o << ",\"layer\":" << njsonStr(pEnt->layer());
@@ -628,7 +661,7 @@ static bool resbufCodeIsInt32(short code)
 
 static std::string resbufItemJson(const resbuf* rb)
 {
-    std::ostringstream o;
+    std::ostringstream o; o.precision(kJsonDoublePrecision);
     o << "{\"code\":" << rb->restype;
     const short code = rb->restype;
     if (resbufCodeIsString(code)) {
@@ -665,7 +698,7 @@ static std::string resbufItemJson(const resbuf* rb)
 static std::string resbufItemsJson(resbuf* rb, int& itemCount)
 {
     itemCount = 0;
-    std::ostringstream arr;
+    std::ostringstream arr; arr.precision(kJsonDoublePrecision);
     arr << "[";
     bool first = true;
     for (resbuf* cur = rb; cur != nullptr; cur = cur->rbnext) {
@@ -683,7 +716,7 @@ static std::string xdataBlocksJson(resbuf* rb, int& blockCount, int& itemCount)
 {
     blockCount = 0;
     itemCount = 0;
-    std::ostringstream arr;
+    std::ostringstream arr; arr.precision(kJsonDoublePrecision);
     arr << "[";
     bool firstBlock = true;
     bool blockOpen = false;
@@ -738,7 +771,7 @@ static std::string xrecordJson(AcDbXrecord* pXrec,
         items = resbufItemsJson(rb, itemCount);
         acutRelRb(rb);
     }
-    std::ostringstream o;
+    std::ostringstream o; o.precision(kJsonDoublePrecision);
     o << "{\"handle\":\"" << jsonEscape(handle) << "\""
       << ",\"owner_handle\":\"" << jsonEscape(ownerHandle) << "\""
       << ",\"key\":\"" << jsonEscape(key) << "\""
@@ -753,7 +786,7 @@ static std::string dictionaryEntriesJson(AcDbDictionary* pDict,
                                          bool& xrecordFirst,
                                          RichGraphCounters& counters)
 {
-    std::ostringstream entries;
+    std::ostringstream entries; entries.precision(kJsonDoublePrecision);
     entries << "[";
     bool first = true;
     AcDbDictionaryIterator* pIt = pDict->newIterator();
@@ -816,7 +849,7 @@ static std::string extensionDictionaryJson(const std::string& ownerHandle,
     pDict->close();
     ++counters.extensionDictionaries;
 
-    std::ostringstream o;
+    std::ostringstream o; o.precision(kJsonDoublePrecision);
     o << "{\"owner_handle\":\"" << jsonEscape(ownerHandle) << "\""
       << ",\"handle\":\"" << jsonEscape(dictHandle) << "\""
       << ",\"entries\":" << entries << "}";
@@ -827,7 +860,7 @@ static std::string hatchLoopsJson(AcDbHatch* pHatch, int& loopCount, int& vertex
 {
     loopCount = 0;
     vertexCount = 0;
-    std::ostringstream arr;
+    std::ostringstream arr; arr.precision(kJsonDoublePrecision);
     arr << "[";
     bool firstLoop = true;
     const int loops = pHatch->numLoops();
@@ -914,13 +947,13 @@ static bool collectModelSpaceGraph(AcDbDatabase* pDb, int& total,
                                    RichGraphCounters& richCounters)
 {
     total = 0;
-    std::ostringstream arr;
+    std::ostringstream arr; arr.precision(kJsonDoublePrecision);
     arr << "[";
     bool first = true;
-    std::ostringstream extensionDictionaries;
+    std::ostringstream extensionDictionaries; extensionDictionaries.precision(kJsonDoublePrecision);
     extensionDictionaries << "[";
     bool extensionDictionaryFirst = true;
-    std::ostringstream extensionXrecords;
+    std::ostringstream extensionXrecords; extensionXrecords.precision(kJsonDoublePrecision);
     extensionXrecords << "[";
     bool extensionXrecordFirst = true;
 
@@ -1166,7 +1199,7 @@ static std::string handleOfId(const AcDbObjectId& id)
 static std::string symbolTableRecordsJson(AcDbObjectId tableId, int& count)
 {
     count = 0;
-    std::ostringstream arr;
+    std::ostringstream arr; arr.precision(kJsonDoublePrecision);
     arr << "[";
     bool first = true;
     AcDbSymbolTable* pTable = nullptr;
@@ -1205,7 +1238,7 @@ static std::string symbolTableRecordsJson(AcDbObjectId tableId, int& count)
 static std::string layersRichJson(AcDbDatabase* pDb, int& count)
 {
     count = 0;
-    std::ostringstream arr;
+    std::ostringstream arr; arr.precision(kJsonDoublePrecision);
     arr << "[";
     bool first = true;
     AcDbLayerTable* pLT = nullptr;
@@ -1255,10 +1288,10 @@ static std::string blockTableRecordsJson(AcDbDatabase* pDb, int& btrCount,
 {
     btrCount = 0;
     userBlockDefs = 0;
-    std::ostringstream arr;
+    std::ostringstream arr; arr.precision(kJsonDoublePrecision);
     arr << "[";
     bool first = true;
-    std::ostringstream defs;
+    std::ostringstream defs; defs.precision(kJsonDoublePrecision);
     defs << "[";
     bool dfirst = true;
 
@@ -1324,7 +1357,7 @@ static std::string blockTableRecordsJson(AcDbDatabase* pDb, int& btrCount,
 static std::string layoutsRichJson(AcDbDatabase* pDb, int& count)
 {
     count = 0;
-    std::ostringstream arr;
+    std::ostringstream arr; arr.precision(kJsonDoublePrecision);
     arr << "[";
     bool first = true;
     AcDbDictionary* pLayouts = nullptr;
@@ -1364,7 +1397,7 @@ static std::string layoutsRichJson(AcDbDatabase* pDb, int& count)
 static std::string xrefsRichJson(AcDbDatabase* pDb, int& count)
 {
     count = 0;
-    std::ostringstream arr;
+    std::ostringstream arr; arr.precision(kJsonDoublePrecision);
     arr << "[";
     bool first = true;
     AcDbBlockTable* pBT = nullptr;
@@ -1419,10 +1452,10 @@ static std::string namedObjectDictJson(AcDbDatabase* pDb, int& entryCount,
     entryCount = 0;
     xrecordCount = 0;
     xrecordItemCount = 0;
-    std::ostringstream entries;
+    std::ostringstream entries; entries.precision(kJsonDoublePrecision);
     entries << "[";
     bool efirst = true;
-    std::ostringstream xrecs;
+    std::ostringstream xrecs; xrecs.precision(kJsonDoublePrecision);
     xrecs << "[";
     bool xfirst = true;
 
@@ -1471,7 +1504,7 @@ static std::string databaseMetaJson(AcDbDatabase* pDb)
     const AcGePoint3d ins = pDb->insbase();
     const AcGePoint3d emin = pDb->extmin();
     const AcGePoint3d emax = pDb->extmax();
-    std::ostringstream o;
+    std::ostringstream o; o.precision(kJsonDoublePrecision);
     o << "{\"insbase\":[" << ins.x << "," << ins.y << "," << ins.z << "]"
       << ",\"extents\":{\"extmin\":[" << emin.x << "," << emin.y << "," << emin.z << "]"
       << ",\"extmax\":[" << emax.x << "," << emax.y << "," << emax.z << "]}"
@@ -1492,8 +1525,8 @@ static std::string collectDatabaseGraph(AcDbDatabase* pDb,
                                         const RichGraphCounters& richCounters,
                                         std::string& coverageJson)
 {
-    std::ostringstream sec;
-    std::ostringstream present;
+    std::ostringstream sec; sec.precision(kJsonDoublePrecision);
+    std::ostringstream present; present.precision(kJsonDoublePrecision);
     bool pfirst = true;
     auto addPresent = [&](const char* name) {
         if (!pfirst) present << ",";
@@ -1549,7 +1582,7 @@ static std::string collectDatabaseGraph(AcDbDatabase* pDb,
     addPresent("xdata");
     addPresent("hatch_loops");
 
-    std::ostringstream cov;
+    std::ostringstream cov; cov.precision(kJsonDoublePrecision);
     cov << "{\"layers\":\"implemented\""
         << ",\"linetypes\":\"implemented\""
         << ",\"text_styles\":\"implemented\""
@@ -1990,8 +2023,8 @@ static std::string runLineJigProbe(const std::string& job,
         + "\"drag_status_name\":\"" + acedGetPointStatusName(status) + "\","
         + "\"input_method\":\"acedGetPoint\","
         + "\"fallback_used\":" + (fallbackUsed ? "true" : "false") + ","
-        + "\"base\":[" + std::to_string(x) + "," + std::to_string(y) + "," + std::to_string(z) + "],"
-        + "\"point\":[" + std::to_string(ux) + "," + std::to_string(uy) + "," + std::to_string(uz) + "]}";
+        + "\"base\":[" + fmtNum(x) + "," + fmtNum(y) + "," + fmtNum(z) + "],"
+        + "\"point\":[" + fmtNum(ux) + "," + fmtNum(uy) + "," + fmtNum(uz) + "]}";
 }
 
 static Acad::ErrorStatus ensureLayer(AcDbDatabase* pDb, const std::string& name,
@@ -2390,7 +2423,7 @@ static bool countBlockDefinitions(AcDbDatabase* pDb, const std::string& targetNa
 {
     definitionCount = 0;
     targetFound = false;
-    std::ostringstream names;
+    std::ostringstream names; names.precision(kJsonDoublePrecision);
     names << "[";
     bool first = true;
 
@@ -2442,7 +2475,7 @@ static bool countBlockDefinitions(AcDbDatabase* pDb, const std::string& targetNa
 static bool listLayerRecords(AcDbDatabase* pDb, int& count, std::string& layersJson)
 {
     count = 0;
-    std::ostringstream arr;
+    std::ostringstream arr; arr.precision(kJsonDoublePrecision);
     arr << "[";
     bool first = true;
     AcDbLayerTable* pTable = nullptr;
@@ -2488,7 +2521,7 @@ static bool listBlockDefinitionsDetailed(AcDbDatabase* pDb, int& count,
                                          std::string& blocksJson)
 {
     count = 0;
-    std::ostringstream arr;
+    std::ostringstream arr; arr.precision(kJsonDoublePrecision);
     arr << "[";
     bool first = true;
     AcDbBlockTable* pBT = nullptr;
@@ -2548,7 +2581,7 @@ static bool listModelSpaceEntities(AcDbDatabase* pDb, const std::string& type,
     matching = 0;
     returned = 0;
     truncated = false;
-    std::ostringstream arr;
+    std::ostringstream arr; arr.precision(kJsonDoublePrecision);
     arr << "[";
     bool first = true;
     AcDbBlockTable* pBT = nullptr;
@@ -2740,7 +2773,7 @@ static Acad::ErrorStatus createLayout(AcDbDatabase* pDb, const std::string& name
 static bool listLayouts(AcDbDatabase* pDb, int& layoutCount, std::string& namesJson)
 {
     layoutCount = 0;
-    std::ostringstream names;
+    std::ostringstream names; names.precision(kJsonDoublePrecision);
     names << "[";
     bool first = true;
 
@@ -2772,7 +2805,7 @@ static bool listLayouts(AcDbDatabase* pDb, int& layoutCount, std::string& namesJ
 static bool listXrefs(AcDbDatabase* pDb, int& xrefCount, std::string& namesJson)
 {
     xrefCount = 0;
-    std::ostringstream names;
+    std::ostringstream names; names.precision(kJsonDoublePrecision);
     names << "[";
     bool first = true;
 
@@ -3163,7 +3196,7 @@ static void ariadneNativeJob()
 
     AcDbDatabase* pDb = acdbHostApplicationServices()->workingDatabase();
 
-    std::ostringstream r;
+    std::ostringstream r; r.precision(kJsonDoublePrecision);
     r << "{\"schema\":\"ariadne.autocad_native_job_result.v1\","
       << "\"engine\":\"native_objectarx\","
       << "\"operation\":\"" << op << "\",";
@@ -3924,7 +3957,7 @@ static std::string pumpDispatch(const std::string& req, bool& stop)
     const bool attendedHost = hostIsFullAutoCad();
     const std::string hostMode = attendedHost ? "full_autocad" : "coreconsole";
     AcDbDatabase* pDb = acdbHostApplicationServices()->workingDatabase();
-    std::ostringstream r;
+    std::ostringstream r; r.precision(kJsonDoublePrecision);
     r << "{\"schema\":\"ariadne.cad_pump_frame.v1\",\"op\":\"" << jsonEscape(op) << "\",";
     if (op == "live.echo") {
         std::string msg;
@@ -4006,7 +4039,7 @@ static std::string pumpDispatch(const std::string& req, bool& stop)
                         ? acharToAscii(pEnt->isA()->name()) : std::string();
                     const std::string layer = acharToAscii(pEnt->layer());
                     const std::string ownerStr = handleOfId(pEnt->ownerId());
-                    std::ostringstream e;
+                    std::ostringstream e; e.precision(kJsonDoublePrecision);
                     e << "{\"handle\":\"" << jsonEscape(handleHex) << "\""
                       << ",\"dxf_name\":\"" << jsonEscape(dxfName) << "\""
                       << ",\"layer\":\"" << jsonEscape(layer) << "\""
@@ -4068,7 +4101,7 @@ static std::string pumpDispatch(const std::string& req, bool& stop)
             } else {
                 Adesk::Int32 len = 0;
                 acedSSLength(ss, &len);
-                std::ostringstream sel;
+                std::ostringstream sel; sel.precision(kJsonDoublePrecision);
                 sel << "[";
                 bool firstSel = true;
                 int emitted = 0;
@@ -4320,7 +4353,7 @@ static void ariadneCadAgentStatus()
         hostMode = "coreconsole";
     const bool serving = (InterlockedCompareExchange(&gPumpServing, 0, 0) != 0);
 
-    std::ostringstream r;
+    std::ostringstream r; r.precision(kJsonDoublePrecision);
     r << "{\"schema\":\"ariadne.cad_pump_status.v1\""
       << ",\"command\":\"CADAGENT_STATUS\""
       << ",\"build_id\":\"" << jsonEscape(pumpBuildId()) << "\""

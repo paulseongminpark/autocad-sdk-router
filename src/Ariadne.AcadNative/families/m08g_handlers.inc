@@ -856,7 +856,7 @@ static bool m08gDispatch(const std::string& op, const AriadneJobCtx& ctx, std::o
                 "AcDbRegion::createFromCurves errorstatus " + std::to_string(static_cast<int>(es)));
             return true;
         }
-        std::ostringstream handlesJson;
+        std::ostringstream handlesJson; handlesJson.precision(kJsonDoublePrecision);
         Acad::ErrorStatus appendEs = Acad::eOk;
         const int appended = m08gAppendPieces(pDb, regions, handlesJson, appendEs);
         int probes = 0, ms = 0; countModelSpace(pDb, ms, probes);
@@ -1216,7 +1216,7 @@ static bool m08gDispatch(const std::string& op, const AriadneJobCtx& ctx, std::o
             emitNativeError(r, "EXPLODE_FAILED", "explode errorstatus " + std::to_string(static_cast<int>(exEs)));
             return true;
         }
-        std::ostringstream handlesJson;
+        std::ostringstream handlesJson; handlesJson.precision(kJsonDoublePrecision);
         Acad::ErrorStatus appendEs = Acad::eOk;
         const int appended = m08gAppendPieces(pDb, pieces, handlesJson, appendEs);
         int probes = 0, ms = 0; countModelSpace(pDb, ms, probes);
@@ -1283,7 +1283,7 @@ static bool m08gDispatch(const std::string& op, const AriadneJobCtx& ctx, std::o
             emitNativeError(r, "OFFSET_FAILED", "getOffsetCurves errorstatus " + std::to_string(static_cast<int>(offEs)));
             return true;
         }
-        std::ostringstream handlesJson;
+        std::ostringstream handlesJson; handlesJson.precision(kJsonDoublePrecision);
         Acad::ErrorStatus appendEs = Acad::eOk;
         const int appended = m08gAppendPieces(pDb, offsets, handlesJson, appendEs);
         int probes = 0, ms = 0; countModelSpace(pDb, ms, probes);
@@ -1340,7 +1340,7 @@ static bool m08gDispatch(const std::string& op, const AriadneJobCtx& ctx, std::o
             emitNativeError(r, "SPLIT_FAILED", "getSplitCurves errorstatus " + std::to_string(static_cast<int>(spEs)));
             return true;
         }
-        std::ostringstream handlesJson;
+        std::ostringstream handlesJson; handlesJson.precision(kJsonDoublePrecision);
         Acad::ErrorStatus appendEs = Acad::eOk;
         const int appended = m08gAppendPieces(pDb, segs, handlesJson, appendEs);
         int probes = 0, ms = 0; countModelSpace(pDb, ms, probes);

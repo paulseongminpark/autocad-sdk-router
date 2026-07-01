@@ -121,7 +121,7 @@ static bool m08eHandleDictNamed(const AriadneJobCtx& ctx, std::ostringstream& r)
     }
     const std::string nodHandle = handleOf(pNOD);
 
-    std::ostringstream xrecs;
+    std::ostringstream xrecs; xrecs.precision(kJsonDoublePrecision);
     xrecs << "[";
     bool xrecordFirst = true;
     RichGraphCounters counters;
@@ -209,7 +209,7 @@ static bool m08eHandleDictGet(const AriadneJobCtx& ctx, std::ostringstream& r)
         AcDbDictionary* pChild = AcDbDictionary::cast(pValue);
         if (pChild != nullptr) {
             isDictionary = true;
-            std::ostringstream xrecs;   // discarded: this op reports the child-key list, not xrecord payloads
+            std::ostringstream xrecs; xrecs.precision(kJsonDoublePrecision);   // discarded: this op reports the child-key list, not xrecord payloads
             bool xrecordFirst = true;
             RichGraphCounters counters;
             childEntries = dictionaryEntriesJson(pChild, valueHandle, xrecs, xrecordFirst, counters);
@@ -300,7 +300,7 @@ static bool m08eHandleBlockIterate(const AriadneJobCtx& ctx, std::ostringstream&
         return true;
     }
 
-    std::ostringstream arr;
+    std::ostringstream arr; arr.precision(kJsonDoublePrecision);
     arr << "[";
     bool first = true;
     int count = 0;

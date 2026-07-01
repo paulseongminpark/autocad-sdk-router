@@ -389,7 +389,7 @@ static bool m08hDispatch(const std::string& op, const AriadneJobCtx& ctx, std::o
         if (es == Acad::eOk) es = pE->setColumnWidth(colW);
         for (int rr = 0; es == Acad::eOk && rr < rows; ++rr) {
             for (int cc = 0; es == Acad::eOk && cc < cols; ++cc) {
-                std::ostringstream cell; cell << content;
+                std::ostringstream cell; cell.precision(kJsonDoublePrecision); cell << content;
                 if (rows * cols > 1) cell << " " << (rr + 1) << "," << (cc + 1);
                 es = pE->setTextString(rr, cc, utf8ToWide(cell.str()).c_str());
                 if (es == Acad::eOk && textH > 0.0)

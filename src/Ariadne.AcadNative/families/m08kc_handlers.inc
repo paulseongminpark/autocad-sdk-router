@@ -197,7 +197,7 @@ static std::string m08kcRxClassName(const AcRxObject* p)
 
 static std::string m08kcIntArrayJson(const AcArray<int>& values)
 {
-    std::ostringstream out;
+    std::ostringstream out; out.precision(kJsonDoublePrecision);
     out << "[";
     for (int i = 0; i < values.length(); ++i) {
         if (i)
@@ -578,7 +578,7 @@ static bool m08kcDispatch(const std::string& op, const AriadneJobCtx& ctx, std::
     if (op == "inspect.assocnetwork.iterate") {
         AriadneReadTransaction tr(pDb);
         const AcDbObjectId netId = m08kcTopNetworkId(pDb, false);
-        std::ostringstream arr; arr << "[";
+        std::ostringstream arr; arr.precision(kJsonDoublePrecision); arr << "[";
         int n = 0;
         if (!netId.isNull()) {
             AcDbAssocNetwork* pNet = nullptr;
@@ -620,7 +620,7 @@ static bool m08kcDispatch(const std::string& op, const AriadneJobCtx& ctx, std::
         if (pAction == nullptr) { if (pObj) pObj->close(); emitNativeError(r, "ACTION_NOT_FOUND", "handle " + actionHex + " is not an AcDbAssocAction"); return true; }
         AcDbObjectIdArray depIds;
         const Acad::ErrorStatus es = pAction->getDependencies(true, true, depIds);
-        std::ostringstream arr; arr << "[";
+        std::ostringstream arr; arr.precision(kJsonDoublePrecision); arr << "[";
         int n = 0;
         if (es == Acad::eOk) {
             for (int i = 0; i < depIds.length(); ++i) {
@@ -880,7 +880,7 @@ static bool m08kcDispatch(const std::string& op, const AriadneJobCtx& ctx, std::
         AcDbEntity* pEnt = nullptr;
         if (acdbOpenObject(pEnt, entId, AcDb::kForRead) != Acad::eOk) { emitNativeError(r, "TARGET_NOT_FOUND", "open failed " + targetHex); return true; }
         int count = 0;
-        std::ostringstream arr; arr << "[";
+        std::ostringstream arr; arr.precision(kJsonDoublePrecision); arr << "[";
         for (int marker = 1; marker <= 256; ++marker) {
             // subentPtr takes a full subent PATH (object id chain + subent id); build the
             // single-leaf path for this entity + (type,marker) and resolve it read-only.
@@ -953,7 +953,7 @@ static bool m08kcDispatch(const std::string& op, const AriadneJobCtx& ctx, std::
         if (pGroup == nullptr) { if (pObj) pObj->close(); emitNativeError(r, "GROUP_NOT_FOUND", "handle " + groupHex + " is not an AcDbAssoc2dConstraintGroup"); return true; }
         AcArray<AcGeomConstraint*> cons;
         const Acad::ErrorStatus getEs = pGroup->getConstraints(cons);
-        std::ostringstream arr; arr << "[";
+        std::ostringstream arr; arr.precision(kJsonDoublePrecision); arr << "[";
         int n = 0;
         if (getEs == Acad::eOk) {
             for (int i = 0; i < cons.length(); ++i) {
@@ -1071,7 +1071,7 @@ static bool m08kcDispatch(const std::string& op, const AriadneJobCtx& ctx, std::
         }
         jsonFindString(job, "expression", expression);
         double value = 0.0; const bool hasValue = jsonFindNumber(job, "value", value);
-        if (expression.empty() && hasValue) { std::ostringstream e; e << value; expression = e.str(); }
+        if (expression.empty() && hasValue) { std::ostringstream e; e.precision(kJsonDoublePrecision); e << value; expression = e.str(); }
         if (expression.empty()) expression = "0";
 
         AcDbAssocNetworkEvaluationDisabler guard(pDb, true);
