@@ -1,0 +1,86 @@
+{
+  "schema": "ariadne.cados.promotion_manifest.v1",
+  "version": "1.0.0",
+  "generated_at": "2026-07-01",
+  "generated_by": "CADOS Wave-0 F2 (promotion harness, tools/promote_op.py)",
+  "purpose": "One row per candidate patch_op->native_op promotion (PLAN.md PART 2 sec 2.0 'three promotion axes'). tools/promote_op.py reads this file and atomically applies Axis A (config/operations.v2.json operations[].policy.status_policy flip) + Axis B (the owning tools/patch_ops/<family>.py module's WRITE_OP_MAP entry + build_job_args arg-branch) for a row -- REFUSING the whole promotion unless F1 (measure/reachable_matrix.jsonl) marks native_op RUNNABLE, never RUNNABLE_BUT_DEGENERATE or unprobed. Axis C (C++ reachability) needs no file edit from this tool: F1's live probe already exercises the same AriadneNativeJob.cpp dispatch chain a RUNNABLE verdict implies is already reachable (PLAN.md PART 2 sec 2.0 Axis-C note: 'already ON for the simple entity/annotation/solid create families').",
+  "row_schema": {
+    "patch_op": "cad_patch.v1 operation id (ir_to_patch / patch_engine surface).",
+    "native_op": "config/operations.v2.json operations[].id this patch_op dispatches to.",
+    "arg_keys": "ordered list of args[] keys build_job_args copies through verbatim (matches tools/patch_ops/entities.py's existing branches: 'if k in args: out[k] = args[k]').",
+    "ir_kind": "the IR entity geometry.kind this patch_op regenerates from (ir_to_patch.build_patch_from_ir / patch_ops.ir_op_for), or null for a record-level (non-entity) op with no ir_to_patch builder case yet -- tools/promote_op.py does not generate ir_op_for wiring, only WRITE_OP_MAP + build_job_args (PLAN.md F2 node text).",
+    "persistence_class": "PLAN.md PART 1 sec 1.4 class: P (geometry, diff target = geometry-diff=0) | D (persistent-non-geometry record, diff target = record-diff=0) | R (read/compute) | L (live/non-persistent).",
+    "risk": "low | medium | high -- H2/H4 risk-sequencing tier, informational only; tools/promote_op.py does not gate on this field (tools/reconcile_native_registry.py's F8 coverage gate does).",
+    "family": "optional override for which tools/patch_ops/<family>.py module owns this promotion (entities|blocks|tables|db). Omit to let promote_op.infer_family() derive it from native_op's prefix.",
+    "state": "informational only (not read by tools/promote_op.py): already_promoted | pending_f1.",
+    "notes": "free-text rationale / PLAN.md cross-reference for this row."
+  },
+  "rows": [
+    {
+      "patch_op": "create_line",
+      "native_op": "write.entity.line",
+      "arg_keys": ["start", "end", "layer"],
+      "ir_kind": "line",
+      "persistence_class": "P",
+      "risk": "low",
+      "family": "entities",
+      "state": "already_promoted",
+      "notes": "F9-merged control row -- tools/patch_ops/entities.py already carries this exact map-entry + arg-branch and config/operations.v2.json#write.entity.line is already policy.status_policy=implemented; promote_op reports ALREADY_PROMOTED (idempotent no-op), never re-edits the file. Exercised by F2's own tests against the REAL repo files (read-only; compute_promotion never writes)."
+    },
+    {
+      "patch_op": "create_circle",
+      "native_op": "write.entity.circle",
+      "arg_keys": ["center", "radius", "layer"],
+      "ir_kind": "circle",
+      "persistence_class": "P",
+      "risk": "low",
+      "family": "entities",
+      "state": "already_promoted",
+      "notes": "F9-merged control row -- see create_line."
+    },
+    {
+      "patch_op": "create_block_def",
+      "native_op": "write.block.simple_create",
+      "arg_keys": ["name"],
+      "ir_kind": null,
+      "persistence_class": "D",
+      "risk": "low",
+      "family": "blocks",
+      "state": "pending_f1",
+      "notes": "PLAN.md Tier 1 T1.1 (WAVE-0 exit gate M-A / TIER 1 table). config/operations.v2.json#write.block.simple_create is already policy.status_policy=implemented (Axis A pre-satisfied) but measure/reachable_matrix.jsonl carries no row for it yet -- F1 has not live-probed it, so the Axis-A gate REJECTS until a live F1 sweep classifies it RUNNABLE. tools/patch_ops/blocks.py's WRITE_OP_MAP is still empty for this op_id (Axis B not yet wired)."
+    },
+    {
+      "patch_op": "create_layout",
+      "native_op": "write.layout.create",
+      "arg_keys": ["name"],
+      "ir_kind": null,
+      "persistence_class": "D",
+      "risk": "low",
+      "family": "db",
+      "state": "pending_f1",
+      "notes": "PLAN.md Tier 1 T1.3. Same F1-unprobed gate closure as create_block_def; family=db per tools/patch_ops/db.py's own docstring (catch-all for a database/transform op with no entities/blocks/tables home)."
+    },
+    {
+      "patch_op": "set_xdata",
+      "native_op": "write.xdata.set",
+      "arg_keys": ["app", "value"],
+      "ir_kind": null,
+      "persistence_class": "D",
+      "risk": "low",
+      "family": "db",
+      "state": "pending_f1",
+      "notes": "PLAN.md Tier 1 T1.4 (H-9: proves the write path only, not xdata SOURCE fidelity -- source resbuf_json is NULL until a T5 cross-cutting extraction node)."
+    },
+    {
+      "patch_op": "set_xrecord",
+      "native_op": "write.xrecord.set",
+      "arg_keys": ["key", "value"],
+      "ir_kind": null,
+      "persistence_class": "D",
+      "risk": "low",
+      "family": "db",
+      "state": "pending_f1",
+      "notes": "PLAN.md Tier 1 T1.5."
+    }
+  ]
+}
