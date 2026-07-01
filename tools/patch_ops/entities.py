@@ -48,6 +48,7 @@ WRITE_OP_MAP: Dict[str, str] = {
     "create_dimension_arc": "write.entity.dim.arc",
     "create_dimension_angular2line": "write.entity.dim.angular2line",
     "create_dimension_angular3pt": "write.entity.dim.angular3pt",
+    "create_mleader": "write.entity.mleader",
 }
 
 
@@ -152,6 +153,12 @@ def build_job_args(native_op: str, args: Dict[str, Any]) -> Optional[Dict[str, A
                 out[k] = args[k]
         return out
     if native_op == "write.entity.leader":
+        out: Dict[str, Any] = {}
+        for k in ('vertices', 'points', 'text', 'height', 'layer'):
+            if k in args:
+                out[k] = args[k]
+        return out
+    if native_op == "write.entity.mleader":
         out: Dict[str, Any] = {}
         for k in ('vertices', 'points', 'text', 'height', 'layer'):
             if k in args:

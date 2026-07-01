@@ -69,6 +69,12 @@ reachable_matrix.jsonl) but had no patch_ops.WRITE_OP_MAP entry -- same
 two-part gap (patch_ops wiring + collectModelSpaceGraph read branch) as
 every T3a-batch*/w3-dimarc/w3-ang2 dimension subtype above. Oracle extended
 accordingly; same invariants unaffected.
+
+w3-mleader update: create_mleader (write.entity.mleader, AcDbMLeader) was
+already native-REACHABLE (measure/reachable_matrix.jsonl) but had no
+patch_ops.WRITE_OP_MAP entry -- same two-part gap (patch_ops wiring +
+collectModelSpaceGraph read branch) as create_leader before it. Oracle
+extended accordingly; same invariants unaffected.
 """
 from __future__ import annotations
 
@@ -108,6 +114,7 @@ _ORIGINAL_NATIVE_WRITE_OP_MAP = {
     "create_dimension_arc": "write.entity.dim.arc",
     "create_dimension_angular2line": "write.entity.dim.angular2line",
     "create_dimension_angular3pt": "write.entity.dim.angular3pt",
+    "create_mleader": "write.entity.mleader",
 }
 
 

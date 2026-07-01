@@ -42,6 +42,9 @@
 #include "dbmline.h"   // w3-wbug: AcDbMline (collectModelSpaceGraph read branch --
                        // families/m08g_handlers.inc's own #include is textually AFTER
                        // collectModelSpaceGraph in this TU, so this needs its own copy)
+#include "dbmleader.h" // w3-mleader: AcDbMLeader (collectModelSpaceGraph read branch --
+                       // families/m08h_handlers.inc's own #include is textually AFTER
+                       // collectModelSpaceGraph in this TU, so this needs its own copy)
 #include "dbxrecrd.h"
 #include "dbsymtb.h"
 #include "dbcolor.h"
@@ -1572,6 +1575,52 @@ static bool collectModelSpaceGraph(AcDbDatabase* pDb, int& total,
             arr << "]";
             arr << ",\"has_arrow_head\":" << (pLdr->hasArrowHead() ? "true" : "false")
                 << ",\"splined\":" << (pLdr->isSplined() ? "true" : "false");
+        }
+        // w3-mleader: AcDbMLeader -- a multileader (leader line(s) + MText
+        // content). Does NOT derive from AcDbLeader (a separate, newer,
+        // AcDbEntity-direct class), so this branch's position in the chain is
+        // not load-bearing. write.entity.mleader always builds exactly ONE
+        // leader with exactly ONE leader line (a single addLeader/
+        // addLeaderLine call each), so this branch flattens ALL leader-line
+        // vertices across the whole entity (getLeaderLineIndexes's no-arg
+        // overload -- defensive; expected to be exactly 1 line for this op)
+        // into a single plain [x,y,z]-array "vertices" -- the SAME shape
+        // AcDbLeader/AcDbMline above already use, so it reuses ir_builder.py's
+        // existing generic "vertices" lift with zero Python change.
+        // ir_builder.py's _NATIVE_CLASS_TO_DXF_KIND already had an
+        // AcDbMLeader -> (MULTILEADER, leader) entry from an earlier batch,
+        // so this op needed NO ir_builder.py change at all. mtext()/
+        // contents()/textHeight() mirror the AcDbMText branch above ("text"/
+        // "height") -- write.entity.mleader always calls setMText with a
+        // non-null AcDbMText, so pMT should never be null in practice, but
+        // mtext()'s own doc comment says it CAN return NULL ("if there is no
+        // mtext content"), so this guards it rather than assuming. Per
+        // mtext()'s doc comment ("returned mtext should be deleted"), pMT is
+        // a plain heap copy (NOT database-resident) -- delete, not close().
+        else if (AcDbMLeader* pML = AcDbMLeader::cast(pEnt)) {
+            AcArray<int> lineIdx;
+            pML->getLeaderLineIndexes(lineIdx);
+            arr << ",\"vertices\":[";
+            bool vfirst = true;
+            for (int lj = 0; lj < lineIdx.length(); ++lj) {
+                int nVerts = 0;
+                pML->numVertices(lineIdx[lj], nVerts);
+                for (int vi = 0; vi < nVerts; ++vi) {
+                    AcGePoint3d vp;
+                    if (pML->getVertex(lineIdx[lj], vi, vp) != Acad::eOk)
+                        continue;
+                    if (!vfirst) arr << ",";
+                    vfirst = false;
+                    arr << "[" << vp.x << "," << vp.y << "," << vp.z << "]";
+                }
+            }
+            arr << "]";
+            AcDbMText* pMT = pML->mtext();
+            if (pMT != nullptr) {
+                arr << ",\"text\":\"" << jsonEscape(acharToAscii(pMT->contents())) << "\""
+                    << ",\"height\":" << pMT->textHeight();
+                delete pMT;
+            }
         }
         // w3-wbug: AcDbMline -- vertices are direct, args-derivable echoes of
         // write.entity.mline's points/vertices ctor-arg loop (appendSeg per

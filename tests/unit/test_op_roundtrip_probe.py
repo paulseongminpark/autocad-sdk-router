@@ -442,6 +442,39 @@ class TestExpectedIrForOp(unittest.TestCase):
         self.assertEqual(ir["entities"][0]["geometry"]["vertices"],
                          [{"point": [1, 1, 0]}, {"point": [5, 5, 0]}])
 
+    def test_create_mleader_builds_leader_geometry(self):
+        # w3-mleader: collectModelSpaceGraph grew an AcDbMLeader branch.
+        # vertices are direct, args-derivable echoes (addFirstVertex once +
+        # addLastVertex per remaining point, no transform -- same shape as
+        # create_leader's appendVertex loop); text/height are direct ctor-arg
+        # echoes too (setMText/setTextHeight) -- live-verified (2026-07-02
+        # w3-mleader re-cert, 3 real accoreconsole roundtrips, 2/3/4-vertex
+        # cases) diff=0 for all four fields, no write bug (unlike create_
+        # mline's own appendSeg bug -- create_mleader's addLeaderLine/
+        # addFirstVertex/addLastVertex chain DOES check ErrorStatus at every
+        # step).
+        ir = probe.expected_ir_for_op(
+            "create_mleader",
+            {"vertices": [[0, 0, 0], [15, 10, 0], [30, 0, 0]],
+             "text": "Multi Vertex", "height": 3.0, "layer": "0"})
+        ent = ir["entities"][0]
+        self.assertEqual(ent["dxf_name"], "MULTILEADER")
+        self.assertEqual(ent["geometry"], {
+            "kind": "leader",
+            "vertices": [{"point": [0, 0, 0]}, {"point": [15, 10, 0]}, {"point": [30, 0, 0]}],
+            "text": "Multi Vertex", "height": 3.0,
+        })
+
+    def test_create_mleader_falls_back_to_points_key(self):
+        # write.entity.mleader reads "vertices" first, falling back to
+        # "points" only when "vertices" yields <2 points -- same fallback
+        # create_leader uses.
+        ir = probe.expected_ir_for_op(
+            "create_mleader",
+            {"points": [[1, 1, 0], [5, 5, 0]], "text": "Via points", "height": 2.5, "layer": "0"})
+        self.assertEqual(ir["entities"][0]["geometry"]["vertices"],
+                         [{"point": [1, 1, 0]}, {"point": [5, 5, 0]}])
+
     def test_create_mline_builds_mline_geometry(self):
         # w3-wbug: collectModelSpaceGraph grew an AcDbMline branch alongside the
         # write.entity.mline native bugfix (appendSeg's ErrorStatus was never

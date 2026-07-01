@@ -707,6 +707,33 @@ def _expect_create_leader(args: Dict[str, Any]) -> Dict[str, Any]:
     }
 
 
+def _expect_create_mleader(args: Dict[str, Any]) -> Dict[str, Any]:
+    # write.entity.mleader (m08h_handlers.inc) reads "vertices" first, falling
+    # back to "points" only when "vertices" yields <2 points -- mirrors
+    # create_leader's own arg-reading order exactly. Each vertex is a direct,
+    # args-derivable echo (addFirstVertex once + addLastVertex per remaining
+    # point, no transform -- same shape as create_leader's appendVertex loop).
+    # text/height are both required explicit args here, same convention
+    # create_text/create_mtext use (ground truth requires them explicitly
+    # rather than modeling m08h's own "MLeader"/2.5 defaults for the
+    # absent-arg case).
+    #
+    # Emitted vertices reuse the SAME plain-[x,y,z]-array shape create_leader/
+    # create_mline already use (AriadneNativeJob.cpp's AcDbMLeader branch), so
+    # ir_builder.py's existing generic "vertices" lift needed zero changes;
+    # its _NATIVE_CLASS_TO_DXF_KIND already had an AcDbMLeader entry from an
+    # earlier batch.
+    vertices_arg = args.get("vertices") or args.get("points") or []
+    vertices = [{"point": _point_to_list(p)} for p in vertices_arg]
+    return {
+        "dxf_name": "MULTILEADER", "layer": args.get("layer") or "0",
+        "geometry": {
+            "kind": "leader",
+            "vertices": vertices, "text": args["text"], "height": args["height"],
+        },
+    }
+
+
 def _expect_create_spline(args: Dict[str, Any]) -> Dict[str, Any]:
     # write.entity.spline (m08g_handlers.inc) always builds a FIT-POINT
     # AcDbSpline: AcDbSpline(fitPts, order, 0.0) -- order defaults to 4.0 (same
@@ -821,6 +848,11 @@ def _expect_create_mline(args: Dict[str, Any]) -> Dict[str, Any]:
 # T3a-batch/w3-dimarc/w3-ang2 dimension subtype (already native-REACHABLE per
 # measure/reachable_matrix.jsonl, but no patch_ops wiring and no
 # collectModelSpaceGraph read branch until this batch).
+#
+# w3-mleader adds create_mleader: same two-part gap as create_leader before
+# it (already native-REACHABLE per measure/reachable_matrix.jsonl, but no
+# patch_ops wiring and no collectModelSpaceGraph read branch until this
+# batch).
 _EXPECTED_ENTITY_BUILDERS: Dict[str, Callable[[Dict[str, Any]], Dict[str, Any]]] = {
     "create_line": _expect_create_line,
     "create_circle": _expect_create_circle,
@@ -840,6 +872,7 @@ _EXPECTED_ENTITY_BUILDERS: Dict[str, Callable[[Dict[str, Any]], Dict[str, Any]]]
     "create_dimension_arc": _expect_create_dimension_arc,
     "create_dimension_angular2line": _expect_create_dimension_angular2line,
     "create_dimension_angular3pt": _expect_create_dimension_angular3pt,
+    "create_mleader": _expect_create_mleader,
 }
 
 

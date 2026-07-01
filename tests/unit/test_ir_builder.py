@@ -468,6 +468,27 @@ class TestNativeGraphGeometryLifting(unittest.TestCase):
             "has_arrow_head": True, "splined": False,
         })
 
+    def test_mleader_lifts_vertices_and_text(self):
+        # w3-mleader: AcDbMLeader's "vertices" (plain [x,y,z] array, no bulge)
+        # reuses the exact same generic lift AcDbLeader/AcDbMline already
+        # exercise above; "text"/"height" reuse the same generic lifts
+        # AcDbMText/AcDbText already exercise -- ir_builder.py itself needed
+        # ZERO changes for this kind (its _NATIVE_CLASS_TO_DXF_KIND already
+        # had an AcDbMLeader entry from an earlier batch).
+        ent = self._one_entity_ir({
+            "handle": "1C3", "dxf_name": "AcDbMLeader", "layer": "0",
+            "owner_handle": "1F", "space": "model",
+            "vertices": [[0.0, 0.0, 0.0], [15.0, 10.0, 0.0], [30.0, 0.0, 0.0]],
+            "text": "Multi Vertex", "height": 3.0,
+        })
+        self.assertEqual(ent["dxf_name"], "MULTILEADER")
+        self.assertEqual(ent["geometry"], {
+            "kind": "leader",
+            "vertices": [{"point": [0.0, 0.0, 0.0]}, {"point": [15.0, 10.0, 0.0]},
+                        {"point": [30.0, 0.0, 0.0]}],
+            "text": "Multi Vertex", "height": 3.0,
+        })
+
     def test_mline_lifts_vertices_and_closed(self):
         # w3-wbug: AcDbMline's "vertices" (plain [x,y,z] array) and "closed"
         # both reuse the exact same generic lifts AcDbLeader/AcDb2dPolyline
