@@ -43,6 +43,11 @@ graphify-out/
 # a read-only fixture copy.
 !tests/fixtures/*.dwg
 !tests/fixtures/*.dxf
+
+# F10 fixture_foundry.py golden per-kind fixtures (Lane-A create -> re-inspect
+# -> commit; tools/fixture_foundry.py). Same reasoning as tests/fixtures/
+# above -- these are checked-in, read-only evidence, not staging churn.
+!fixtures/kinds/*.dwg
 *.sv$
 
 # ── Secrets (defense-in-depth; none currently present) ──
