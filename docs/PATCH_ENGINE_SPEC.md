@@ -71,9 +71,21 @@ is `not_implemented`.
 | `create_line` | `write.entity.create` | low |
 | `create_polyline` | `write.entity.create` | low |
 | `create_text` | `write.entity.create` | low |
-| `set_layer` | `write.entity.modify` | medium |
-| `move_entity` | `write.entity.modify` | medium |
-| `delete_entity` | `write.entity.delete` | high |
+| `set_layer` | `modify.entity.common` | medium |
+| `move_entity` | `modify.entity.transform` | medium |
+| `delete_entity` | `modify.entity.explode` | high |
+
+> CADOS F8: `set_layer`/`move_entity`/`delete_entity` used to map to
+> `write.entity.modify`/`write.entity.delete` -- ids that do not exist
+> anywhere in `config/operations.v2.json` (a dangling target neither this
+> table nor a live dispatch could ever resolve). Repointed at the real,
+> `implemented`, live-dispatchable ids above (`tools/reconcile_native_registry.
+> check_vocab_lockstep` now cross-checks this map against the registry + the
+> native HasOp gates on every promotion). `delete_entity`'s target,
+> `modify.entity.explode`, is honestly NOT a delete/erase (it appends the
+> exploded pieces and preserves the source, and its own `write_level` is
+> `default_write_mode="read"` / `dwg_persisted=false` -- nothing is even
+> persisted); no real erase/delete-entity op exists in this registry yet.
 
 Risk roll-up: max over ops; bumped to `high` if the patch mutates/deletes
 existing entities with no `postconditions`; `blocked` if a hard guard fails
@@ -164,16 +176,25 @@ native job via `jsonFind`. The **live** map (the only ops with a native write ha
 |---|---|---|
 | `create_line` | **`write.entity.line`** | `start:[x,y,z]`, `end:[x,y,z]`, `layer` |
 | `create_circle` | **`write.entity.circle`** | `center:[x,y,z]`, `radius`, `layer` |
-| `set_layer` | **`write.layer.create`** | `name`, `color_index` (creates/ensures the layer) |
+| `set_layer` | **`modify.entity.common`** | `handle`, `layer` (resolves the entity by `handle` and REASSIGNS its layer via `set_layer`) |
 | `create_layer` | **`write.layer.create`** | `name`, `color_index` |
 
+> CADOS F8/H-5: `set_layer` used to map to `write.layer.create` too, sharing
+> `create_layer`'s handler -- but that handler only ENSURES a layer exists and
+> never reads `handle`, so a `set_layer` op "succeeded" without ever
+> reassigning the target entity's layer (an active fake-success). It is now
+> wired to the real relayer `modify.entity.common`
+> (`src/Ariadne.AcadNative/families/m08g_handlers.inc`, dispatcher
+> `m08gDispatch`), which resolves `handle` and calls `AcDbEntity::setLayer`.
+>
 > `OP_REGISTRY_MAP` (the M01 plan-only map) still maps the broader declared set
-> (`create_polyline`/`create_text`/`move_entity`/`delete_entity`) to registry families
-> (`write.entity.create`/`modify`/`delete`) for `dry_run_plan`, but those have **no native write
-> handler** yet. In `apply_staged` any op not in `NATIVE_WRITE_OP_MAP` (`create_polyline`,
-> `create_text`, `move_entity`, `delete_entity`, or unknown) returns **`not_implemented`** with a
-> reason — never a fake success. `apply_staged` applies `operations[0]` only per call; later ops are
-> journalled `deferred` ("apply_staged applies one mutation per call").
+> (`create_polyline`/`create_text`/`move_entity`/`delete_entity`) to registry ids
+> (`write.entity.create`/`modify.entity.transform`/`modify.entity.explode`) for `dry_run_plan`, but those
+> (aside from `set_layer` above) have **no native write handler** yet. In `apply_staged` any op not in
+> `NATIVE_WRITE_OP_MAP` (`create_polyline`, `create_text`, `move_entity`, `delete_entity`, or unknown)
+> returns **`not_implemented`** with a reason — never a fake success. `apply_staged` applies
+> `operations[0]` only per call; later ops are journalled `deferred` ("apply_staged applies one
+> mutation per call").
 
 **Artifact layout** (under `out_dir`, as written by the landed `apply_staged`):
 

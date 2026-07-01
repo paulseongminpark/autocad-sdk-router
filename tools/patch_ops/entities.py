@@ -4,9 +4,19 @@
 
 Owns the entity family's slice of patch_engine.NATIVE_WRITE_OP_MAP /
 _native_job_doc and ir_to_patch's entity IR-op-cases (line/circle/arc/text/
-polyline/dimension/...). Only create_line and create_circle have a live native
-handler today; the rest degrade to not_implemented / deferred (no-fake-success)
-until a family ticket wires them.
+polyline/dimension/...). create_line, create_circle, and set_layer have a live
+native handler today; the rest degrade to not_implemented / deferred
+(no-fake-success) until a family ticket wires them.
+
+CADOS F8 / H-5: set_layer is wired here (not patch_ops.tables) because its
+real native handler is modify.entity.common -- an ENTITY mutation
+(AcDbEntity::setLayer on a resolved 'handle'), not a symbol-table op. The
+former mapping (write.layer.create) only ensured a layer existed and silently
+ignored 'handle', so it never actually reassigned anything -- an active
+fake-success. See src/Ariadne.AcadNative/families/m08g_handlers.inc's
+"modify.entity.common" branch and the live Lane-A probe
+tools/probe_modify.py::run_probe_common (R1) for the ground truth this
+mapping is repointed at.
 """
 from __future__ import annotations
 
@@ -17,6 +27,7 @@ from typing import Any, Dict, List, Optional
 WRITE_OP_MAP: Dict[str, str] = {
     "create_line": "write.entity.line",
     "create_circle": "write.entity.circle",
+    "set_layer": "modify.entity.common",
 }
 
 
@@ -33,6 +44,20 @@ def build_job_args(native_op: str, args: Dict[str, Any]) -> Optional[Dict[str, A
         for k in ("center", "radius", "layer"):
             if k in args:
                 out[k] = args[k]
+        return out
+    if native_op == "modify.entity.common":
+        # set_layer -> resolve 'handle' and REASSIGN its layer (the m08g
+        # native dispatcher reads 'handle' from the job root or job.args, and
+        # 'set_layer' as a plain string field anywhere in the job JSON -- see
+        # m08gFindHandle / the "modify.entity.common" branch in
+        # m08g_handlers.inc). Patch-op args use 'layer' (matching
+        # create_line/create_circle's key); the native field name is
+        # 'set_layer', so the two are NOT the same key here on purpose.
+        out = {}
+        if "handle" in args:
+            out["handle"] = args["handle"]
+        if "layer" in args:
+            out["set_layer"] = args["layer"]
         return out
     return None
 
