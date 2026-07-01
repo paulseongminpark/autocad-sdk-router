@@ -87,6 +87,8 @@ _JSON_ENCODING = "utf-8-sig"
 if _THIS_DIR not in sys.path:
     sys.path.insert(0, _THIS_DIR)
 
+import patch_ops  # native write-op map + arg-branches, split by family (PLAN F9)
+
 PATCH_SCHEMA_ID = "ariadne.cad_patch.v1"
 RESULT_SCHEMA_ID = "ariadne.cad_patch.result.v1"
 
@@ -447,13 +449,9 @@ def dry_run_plan(patch: Any) -> Dict[str, Any]:
 
 # Patch op id -> native ObjectARX write op (operations.v2.json, status
 # "implemented"). Only these four declared patch ops have a live native handler;
-# everything else is not_implemented (no-fake-success).
-NATIVE_WRITE_OP_MAP: Dict[str, str] = {
-    "create_line": "write.entity.line",
-    "create_circle": "write.entity.circle",
-    "set_layer": "write.layer.create",
-    "create_layer": "write.layer.create",
-}
+# everything else is not_implemented (no-fake-success). Split by family under
+# tools/patch_ops/ (PLAN F9); this is the aggregate, reproduced exactly.
+NATIVE_WRITE_OP_MAP: Dict[str, str] = patch_ops.NATIVE_WRITE_OP_MAP
 
 
 def _now_iso() -> str:
@@ -605,6 +603,8 @@ def _native_job_doc(native_op: str, args: Dict[str, Any]) -> Dict[str, Any]:
     The native ObjectARX job reads its args (start/end, center/radius, name/
     color_index, point) from this JobPath JSON. We pass through only the keys the
     op declares (per cad_job.v2 allOf rules); extra keys are harmless but omitted.
+    The per-op arg branch is owned by the op's family module under
+    tools/patch_ops/ (PLAN F9); this stays the single job-envelope builder.
     """
     job: Dict[str, Any] = {
         "schema": "ariadne.autocad_sdk_job.v2",
@@ -615,21 +615,7 @@ def _native_job_doc(native_op: str, args: Dict[str, Any]) -> Dict[str, Any]:
         "source_agent": "patch_engine",
         "args": {},
     }
-    if native_op == "write.entity.line":
-        for k in ("start", "end", "layer"):
-            if k in args:
-                job["args"][k] = args[k]
-    elif native_op == "write.entity.circle":
-        for k in ("center", "radius", "layer"):
-            if k in args:
-                job["args"][k] = args[k]
-    elif native_op == "write.layer.create":
-        # set_layer/create_layer -> ensure the target layer exists.
-        name = args.get("name") or args.get("layer")
-        if name is not None:
-            job["args"]["name"] = name
-        if "color_index" in args:
-            job["args"]["color_index"] = args["color_index"]
+    job["args"] = patch_ops.build_job_args(native_op, args)
     return job
 
 
