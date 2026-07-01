@@ -146,15 +146,97 @@ def _expect_create_circle(args: Dict[str, Any]) -> Dict[str, Any]:
     }
 
 
+def _expect_create_arc(args: Dict[str, Any]) -> Dict[str, Any]:
+    # AriadneNativeJob.cpp's collectModelSpaceGraph (the inspect.database.graph
+    # reader every apply_staged pre/post-inspect uses) casts AcDbArc BEFORE
+    # AcDbCircle and emits exactly center/radius/start_angle/end_angle -- no
+    # "normal" -- so that is the full, honest ground truth for a roundtrip.
+    return {
+        "dxf_name": "ARC", "layer": args.get("layer") or "0",
+        "geometry": {"kind": "arc", "center": _point_to_list(args["center"]),
+                    "radius": args["radius"], "start_angle": args["start_angle"],
+                    "end_angle": args["end_angle"]},
+    }
+
+
+def _expect_create_text(args: Dict[str, Any]) -> Dict[str, Any]:
+    # collectModelSpaceGraph's AcDbText branch emits position + text only.
+    # write.entity.text (m08h_handlers.inc) DOES call setHeight -- height is
+    # really on the entity -- but the reader never surfaces it, so an
+    # expected_ir carrying "height" would make every real extraction look
+    # like a mismatch. Ground truth here means "what a real read-back
+    # contains", not "everything the write op accepted".
+    return {
+        "dxf_name": "TEXT", "layer": args.get("layer") or "0",
+        "geometry": {"kind": "text", "position": _point_to_list(args["position"]),
+                    "text": args.get("text", "")},
+    }
+
+
+def _expect_create_mtext(args: Dict[str, Any]) -> Dict[str, Any]:
+    # Same read-back gap as create_text: AcDbMText's branch emits position +
+    # text only (height is written via setTextHeight but never read back).
+    return {
+        "dxf_name": "MTEXT", "layer": args.get("layer") or "0",
+        "geometry": {"kind": "mtext", "position": _point_to_list(args["position"]),
+                    "text": args.get("text", "")},
+    }
+
+
+def _expect_create_polyline(args: Dict[str, Any]) -> Dict[str, Any]:
+    # write.entity.polyline (m08g_handlers.inc) builds a real AcDbPolyline
+    # (LWPOLYLINE) via addVertexAt(AcGePoint2d(x, y), bulge) -- bulge IS
+    # stored on the entity. But collectModelSpaceGraph's AcDbPolyline branch
+    # walks vertices via getPointAt() ONLY (never getBulgeAt()), and never
+    # reads isClosed() for this class (closed/bulge extraction exists only
+    # for the legacy AcDb2dPolyline/AcDb3dPolyline branches, not the
+    # lightweight polyline create_polyline writes). The honest ground truth
+    # is therefore points-only (z=0.0 -- AcGePoint2d carries no elevation),
+    # no "bulge", no "closed": that is exactly what a real post-write
+    # read-back will contain, whatever the write args asked for.
+    vertices = [{"point": [pt.get("x", 0.0), pt.get("y", 0.0), 0.0]}
+                for pt in (args.get("points") or [])]
+    return {
+        "dxf_name": "LWPOLYLINE", "layer": args.get("layer") or "0",
+        "geometry": {"kind": "lwpolyline", "vertices": vertices},
+    }
+
+
 # op_name -> args -> a single IR entity (dxf_name/layer/geometry only -- no
 # handle; the P-gate's geometry-basis compare is handle-independent by
 # design). Only ops this module can honestly build ground truth for; an
 # op_name outside this map is NOT_IMPLEMENTED here even if it happens to be
 # wired natively (a real gap between "can write" and "can independently
 # assert what SHOULD have been written" -- no-fake-success).
+#
+# create_ellipse / create_dimension are DELIBERATELY excluded -- not "not yet
+# extended", a genuine reader-side gap, verified against
+# src/Ariadne.AcadNative/AriadneNativeJob.cpp's collectModelSpaceGraph (the
+# ONLY function inspect.database.graph calls): it casts AcDbLine / AcDbArc /
+# AcDbCircle / AcDbBlockReference / AcDbMText / AcDbText / AcDbPolyline /
+# AcDb2dPolyline / AcDb3dPolyline / AcDbHatch -- there is no AcDbEllipse
+# branch and no AcDbRotatedDimension/AcDbAlignedDimension/AcDbDimension
+# branch at all. write.entity.ellipse / write.entity.dim.rotated
+# (m08g_handlers.inc / m08h_handlers.inc) genuinely create a rich
+# AcDbEllipse / AcDbRotatedDimension entity, but a post-write read via
+# inspect.database.graph reports only ``{"kind": "ellipse"}`` /
+# ``{"kind": "dimension"}`` -- no center/radius_ratio/xline1_point/etc. --
+# so no expected_ir this module could construct would ever fingerprint-match
+# a real read-back. Certifying these would require adding a native
+# extraction branch first (a C++ change, out of this Python-only ticket's
+# scope); asserting them here would be forcing a fake pass, or a hollow one.
+# create_mpolygon is excluded because its live write itself fails
+# (errorstatus=409); set_entity_xdata is excluded because it mutates
+# non-geometry entity data (xdata), which this geometry-basis P-gate does
+# not cover at all (that is cad_op_gate's separate D-half/gate_field_mutation
+# concern).
 _EXPECTED_ENTITY_BUILDERS: Dict[str, Callable[[Dict[str, Any]], Dict[str, Any]]] = {
     "create_line": _expect_create_line,
     "create_circle": _expect_create_circle,
+    "create_arc": _expect_create_arc,
+    "create_text": _expect_create_text,
+    "create_mtext": _expect_create_mtext,
+    "create_polyline": _expect_create_polyline,
 }
 
 

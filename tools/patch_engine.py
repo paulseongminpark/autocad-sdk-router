@@ -31,17 +31,20 @@ tools/autocad-router.ps1) entirely on staged copies:
     -> journal       (ordered steps + every command's stdout/stderr/exit ref +
                       original-unchanged proof)
 
-Patch op -> native write op mapping (the only ops with a live native handler):
-    create_line   -> write.entity.line
-    create_circle -> write.entity.circle
-    set_layer     -> modify.entity.common   (CADOS F8/H-5: repointed from the
-                                              fake-success write.layer.create,
-                                              which ignored 'handle' and never
-                                              reassigned an entity's layer)
-    create_layer  -> write.layer.create
-Any other declared op (create_polyline / create_text / move_entity /
-delete_entity / unknown) has no native write handler today and is reported
-``not_implemented`` -- never a faked success.
+Patch op -> native write op mapping (NATIVE_WRITE_OP_MAP, below, is the live
+list -- this paragraph is a pointer, not a second copy, so it cannot drift
+again). As of WAVE-1 TIER-1 T1 (tools/promote_op.py's F2 promotion, commit
+99ed266) this covers 12 ops across patch_ops/{entities,tables}.py:
+create_line, create_circle, create_arc, create_ellipse, create_mpolygon,
+create_mtext, create_text, create_polyline, create_dimension,
+set_entity_xdata, set_layer (entities.py) + create_layer (tables.py).
+NATIVE_WRITE_OP_MAP proves an op has a live *write* handler; it says nothing
+about whether the op can be *roundtrip-certified* (geometry read back and
+diffed) -- that is a stricter, separate gate: see
+tools/op_roundtrip_probe.py's _EXPECTED_ENTITY_BUILDERS, which independently
+tracks which ops this codebase can build ground-truth geometry for (creating
+an entity with no live native handler mapped here is reported
+``not_implemented`` -- never a faked success).
 
 Hard rules: standard library ONLY; no-fake-success (a route/host/sibling that is
 unavailable => not_implemented/unavailable/partial/blocked with a reason, never a

@@ -90,9 +90,71 @@ class TestExpectedIrForOp(unittest.TestCase):
         ir = probe.expected_ir_for_op("create_line", {"start": [0, 0, 0], "end": [10, 0, 0]})
         self.assertEqual(ir["entities"][0]["layer"], "0")
 
+    def test_create_arc_builds_arc_geometry(self):
+        ir = probe.expected_ir_for_op(
+            "create_arc", {"center": [1, 2, 0], "radius": 5.0,
+                          "start_angle": 0.0, "end_angle": 1.5707963267948966, "layer": "DIM"})
+        ent = ir["entities"][0]
+        self.assertEqual(ent["dxf_name"], "ARC")
+        self.assertEqual(ent["layer"], "DIM")
+        self.assertEqual(ent["geometry"],
+                         {"kind": "arc", "center": [1, 2, 0], "radius": 5.0,
+                          "start_angle": 0.0, "end_angle": 1.5707963267948966})
+        # no "normal" key -- collectModelSpaceGraph's AcDbArc branch never
+        # emits one; including it would make a real read-back mismatch.
+        self.assertNotIn("normal", ent["geometry"])
+
+    def test_create_text_builds_text_geometry_without_height(self):
+        ir = probe.expected_ir_for_op(
+            "create_text", {"position": [0, 0, 0], "text": "hello", "height": 2.5, "layer": "0"})
+        ent = ir["entities"][0]
+        self.assertEqual(ent["dxf_name"], "TEXT")
+        self.assertEqual(ent["geometry"], {"kind": "text", "position": [0, 0, 0], "text": "hello"})
+        self.assertNotIn("height", ent["geometry"],
+                        "height is written (setHeight) but never read back by "
+                        "collectModelSpaceGraph -- it must not appear in ground truth")
+
+    def test_create_mtext_builds_mtext_geometry_without_height(self):
+        ir = probe.expected_ir_for_op(
+            "create_mtext", {"position": [1, 1, 0], "text": "note", "height": 3.0, "layer": "0"})
+        ent = ir["entities"][0]
+        self.assertEqual(ent["dxf_name"], "MTEXT")
+        self.assertEqual(ent["geometry"], {"kind": "mtext", "position": [1, 1, 0], "text": "note"})
+        self.assertNotIn("height", ent["geometry"])
+
+    def test_create_polyline_builds_vertices_without_bulge_or_closed(self):
+        ir = probe.expected_ir_for_op(
+            "create_polyline",
+            {"points": [{"x": 0, "y": 0, "bulge": 0.5}, {"x": 10, "y": 0, "bulge": 0.0}],
+             "closed": 1, "layer": "0"})
+        ent = ir["entities"][0]
+        self.assertEqual(ent["dxf_name"], "LWPOLYLINE")
+        self.assertEqual(ent["geometry"],
+                         {"kind": "lwpolyline",
+                          "vertices": [{"point": [0, 0, 0.0]}, {"point": [10, 0, 0.0]}]})
+        # neither "bulge" (per-vertex) nor "closed" (entity-level) survives
+        # collectModelSpaceGraph's AcDbPolyline branch -- ground truth omits both.
+        self.assertNotIn("closed", ent["geometry"])
+        for v in ent["geometry"]["vertices"]:
+            self.assertNotIn("bulge", v)
+
     def test_unbuildable_op_raises_not_implemented_error(self):
+        # create_arc was the fixture here pre-wfix-allowlist; this module has
+        # since grown a ground-truth builder for it. create_ellipse remains
+        # genuinely unbuildable (collectModelSpaceGraph has no AcDbEllipse
+        # read branch -- see _EXPECTED_ENTITY_BUILDERS's comment).
         with self.assertRaises(NotImplementedError):
-            probe.expected_ir_for_op("create_arc", {})
+            probe.expected_ir_for_op("create_ellipse", {})
+
+    def test_dimension_mpolygon_xdata_remain_unbuildable(self):
+        # create_dimension: same reader gap as create_ellipse (no Dimension
+        # branch in collectModelSpaceGraph). create_mpolygon: live create
+        # fails (errorstatus=409). set_entity_xdata: not a geometry op at
+        # all. All three are wired natively (patch_ops.NATIVE_WRITE_OP_MAP)
+        # but none has a ground-truth builder here.
+        for op_name in ("create_dimension", "create_mpolygon", "set_entity_xdata"):
+            with self.assertRaises(NotImplementedError):
+                probe.expected_ir_for_op(op_name, {})
 
 
 # --------------------------------------------------------------------------- #
@@ -144,9 +206,12 @@ def _fake_apply_staged(post_entity, *, status="ok", reason=None, original_unchan
 
 class TestProbeRoundtrip(unittest.TestCase):
     def test_not_wired_op_is_exit_3_before_any_apply_staged_call(self):
+        # create_arc was the fixture here pre-wfix-allowlist; it is natively
+        # wired AND has a ground-truth builder now. create_hatch remains
+        # genuinely unwired at the patch_ops layer (see TestResolveNativeOp).
         def _must_not_be_called(patch, dwg_path, out_dir):
             raise AssertionError("apply_staged must never be called for an unwired op_name")
-        result = probe.probe_roundtrip("create_arc", {}, "fake.dwg", "fake_out",
+        result = probe.probe_roundtrip("create_hatch", {}, "fake.dwg", "fake_out",
                                        apply_staged=_must_not_be_called)
         self.assertEqual(result["status"], cad_op_gate.STATUS_NOT_IMPLEMENTED)
         self.assertEqual(result["exit_code"], cad_op_gate.EXIT_NOT_IMPLEMENTED)
@@ -160,6 +225,21 @@ class TestProbeRoundtrip(unittest.TestCase):
         self.assertEqual(result["status"], cad_op_gate.STATUS_OK)
         self.assertEqual(result["exit_code"], cad_op_gate.EXIT_OK)
         self.assertEqual(result["native_op"], "write.entity.line")
+
+    def test_matching_arc_roundtrip_is_exit_0(self):
+        # end-to-end wiring for one of the newly-added T1 ground-truth
+        # builders (create_arc), mirroring test_matching_roundtrip_is_exit_0.
+        entity = {"handle": "9F2", "dxf_name": "ARC", "layer": "0",
+                  "geometry": {"kind": "arc", "center": [5.0, 5.0, 0.0], "radius": 2.5,
+                              "start_angle": 0.0, "end_angle": 3.14159265358979}}
+        result = probe.probe_roundtrip(
+            "create_arc",
+            {"center": [5, 5, 0], "radius": 2.5, "start_angle": 0.0,
+             "end_angle": 3.14159265358979, "layer": "0"},
+            "fake.dwg", "fake_out", apply_staged=_fake_apply_staged(entity))
+        self.assertEqual(result["status"], cad_op_gate.STATUS_OK)
+        self.assertEqual(result["exit_code"], cad_op_gate.EXIT_OK)
+        self.assertEqual(result["native_op"], "write.entity.arc")
 
     def test_shifted_roundtrip_is_exit_1(self):
         entity = {"handle": "9F1", "dxf_name": "LINE", "layer": "DIM",
@@ -198,21 +278,23 @@ class TestProbeRoundtrip(unittest.TestCase):
         self.assertEqual(result["exit_code"], cad_op_gate.EXIT_ORIGINAL_MUTATED)
 
     def test_unbuildable_expected_ir_is_exit_3_even_if_natively_wired(self):
-        # a defensive case: an op_name that WERE wired natively but this
-        # module has no ground-truth builder for must still be NOT_IMPLEMENTED
-        # (never silently guessed).
+        # a defensive case: an op_name that IS wired natively but this module
+        # has no ground-truth builder for must still be NOT_IMPLEMENTED
+        # (never silently guessed). create_ellipse is a REAL, permanent
+        # instance of this today (patch_ops.NATIVE_WRITE_OP_MAP really does
+        # map it to write.entity.ellipse -- no fake override needed):
+        # collectModelSpaceGraph has no AcDbEllipse read branch, so this
+        # module correctly refuses to assert ground truth for it.
         import patch_ops
-
-        class _FakePatchOps:
-            NATIVE_WRITE_OP_MAP = dict(patch_ops.NATIVE_WRITE_OP_MAP)
-            NATIVE_WRITE_OP_MAP["create_polyline"] = "write.entity.polyline"
+        self.assertIn("create_ellipse", patch_ops.NATIVE_WRITE_OP_MAP,
+                     "fixture premise: create_ellipse must genuinely be natively wired today")
 
         def _must_not_be_called(patch, dwg_path, out_dir):
             raise AssertionError("apply_staged must never be called without expected-entity ground truth")
 
         result = probe.probe_roundtrip(
-            "create_polyline", {}, "fake.dwg", "fake_out",
-            apply_staged=_must_not_be_called, patch_ops_mod=_FakePatchOps)
+            "create_ellipse", {}, "fake.dwg", "fake_out",
+            apply_staged=_must_not_be_called)
         self.assertEqual(result["status"], cad_op_gate.STATUS_NOT_IMPLEMENTED)
         self.assertEqual(result["exit_code"], cad_op_gate.EXIT_NOT_IMPLEMENTED)
 
