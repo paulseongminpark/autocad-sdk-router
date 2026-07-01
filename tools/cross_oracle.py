@@ -30,10 +30,16 @@ implements the upgraded contract instead:
       reference actually has. This is checked and reported BEFORE the
       value-multiset compare so a silent drop is never merely reported as a
       generic "disagreement".
-  (c) A field the oracle entity carries that is outside the certified set for
-      its kind is ``not_certified`` (exit 3) -- explicit, and never folded
-      into ``ok``. This is how the module honors "a field no oracle engine
-      can supply is not_certified, never a PASS": we simply refuse to
+  (c) A field the oracle entity carries that is outside the ACTIVE certified
+      set for its kind is ``not_certified`` (exit 3) -- explicit, and never
+      folded into ``ok``. "Certified" is a STRICTER bar than merely
+      "recognized by the ``dwg_graph_ir.v1`` schema": a schema-known field
+      (e.g. ``linetype``, ``visible``, ``xdata``) the oracle actually
+      populates but that sits outside ``certified_fields_for_kind``'s active
+      multiset-compare set is ALSO ``not_certified`` -- recognized is not
+      certified, and a schema-legal key must never buy a silent pass on data
+      nobody compared. This is how the module honors "a field no oracle
+      engine can supply is not_certified, never a PASS": we simply refuse to
       silently trust (or silently ignore) data outside the oracle's proven
       capability.
 
@@ -184,10 +190,23 @@ _KNOWN_GEOMETRY_LEAF_FIELDS = frozenset({
     "measurement", "control_points", "degree", "loops", "pattern_name",
 })
 
+# Entity keys that are IDENTITY / PROVENANCE, not oracle-asserted DATA: they
+# say WHICH entity this is or WHERE it came from (a join/grouping key or an
+# extraction-pipeline breadcrumb), never a claim about the entity's own state
+# an independent oracle could agree or disagree with. These are the ONLY
+# recognized entity fields find_uncertified_oracle_fields exempts outright.
+# Every OTHER _KNOWN_ENTITY_FIELDS member (layout, linetype, color_index,
+# lineweight, visible, xdata, extension_dictionary_handle, reactors) is DATA:
+# if the oracle populates one and it is not in the active certified-compare
+# set below, find_uncertified_oracle_fields flags it not_certified rather than
+# silently skipping it (recognized-by-schema != oracle-certified).
+_IDENTITY_PROVENANCE_FIELDS = frozenset({
+    "handle", "object_id", "class", "dxf_name", "owner_handle", "space", "source",
+})
+
 # Top-level fields ACTIVELY multiset-compared by default (a subset of the known
-# set above; the rest -- handle/class/owner_handle/space/source/... -- are
-# recognized IR schema fields but identity/provenance, not comparable DATA, so
-# they are skipped rather than compared). Mirrors cad_diff.py's own
+# set above; "geometry" is handled separately below and _IDENTITY_PROVENANCE_
+# FIELDS are exempt outright -- see above). Mirrors cad_diff.py's own
 # _SCALAR_COMPARE_FIELDS + bbox.
 _DEFAULT_TOP_LEVEL_COMPARE_FIELDS: Tuple[str, ...] = ("layer", "bbox")
 
@@ -343,25 +362,64 @@ def _recognized_geometry_leaves(kind: str,
     return _KNOWN_GEOMETRY_LEAF_FIELDS | set(kind_cfg.get("geometry", ()))
 
 
+def _active_top_level_fields(kind: str,
+                             supported_fields: Optional[Mapping[str, Mapping[str, Sequence[str]]]]
+                             ) -> set:
+    """Top-level field names ACTIVELY multiset-compared for ``kind`` -- the
+    non-``geometry.``-prefixed subset of ``certified_fields_for_kind``. This
+    is the STRICTER "certified" bar find_uncertified_oracle_fields checks a
+    recognized field against (see ``_recognized_top_level_fields`` for the
+    looser "is this key legal at all" bar)."""
+    return {f for f in certified_fields_for_kind(kind, supported_fields) if not f.startswith("geometry.")}
+
+
+def _active_geometry_leaves(kind: str,
+                            supported_fields: Optional[Mapping[str, Mapping[str, Sequence[str]]]]
+                            ) -> set:
+    """Geometry leaf names ACTIVELY multiset-compared for ``kind`` -- the
+    ``geometry.``-prefixed subset of ``certified_fields_for_kind``, unprefixed
+    back down to bare leaf names."""
+    return {f.split(".", 1)[1] for f in certified_fields_for_kind(kind, supported_fields) if f.startswith("geometry.")}
+
+
 def find_uncertified_oracle_fields(oracle_ir: Dict[str, Any],
                                    supported_fields: Optional[Mapping[str, Mapping[str, Sequence[str]]]] = None
                                    ) -> List[Dict[str, Any]]:
-    """Scan the ORACLE IR for any entity/geometry field outside the recognized
-    ``dwg_graph_ir.v1`` schema fields and outside any ``supported_fields``
-    override for its kind. Only the oracle is scanned: the oracle is the
-    reference being certified as trustworthy, not the native pipeline under
-    test (an unexpected native field is exactly what the rest of this module
-    exists to catch, via disagreement/tripwire, not via this scan).
+    """Scan the ORACLE IR for any entity/geometry field that is not fully
+    ORACLE-CERTIFIED for its kind. Only the oracle is scanned: the oracle is
+    the reference being certified as trustworthy, not the native pipeline
+    under test (an unexpected native field is exactly what the rest of this
+    module exists to catch, via disagreement/tripwire, not via this scan).
+
+    Two distinct ways a field fails certification, both reported here:
+
+      1. UNRECOGNIZED -- the key is outside ``dwg_graph_ir.v1``'s own schema
+         (``_KNOWN_ENTITY_FIELDS`` / ``_KNOWN_GEOMETRY_LEAF_FIELDS``) and
+         outside any ``supported_fields`` override for its kind: literally
+         unknown data the oracle is emitting.
+      2. RECOGNIZED BUT NOT ACTIVELY CERTIFIED -- the key IS a legal
+         ``dwg_graph_ir.v1`` field, it is not an identity/provenance field
+         (``_IDENTITY_PROVENANCE_FIELDS`` -- e.g. ``handle``/``class``, which
+         are never oracle-asserted DATA), and it is outside
+         ``certified_fields_for_kind``'s ACTIVE compare set for this kind --
+         yet the oracle actually POPULATED it (present, non-None). Without
+         this check, "recognized by the schema" silently stood in for
+         "certified": a schema-known field such as ``linetype``/``visible``/
+         ``xdata`` could sit outside the active compare set forever and never
+         be flagged, so a genuine oracle-vs-native mismatch on it would PASS
+         by omission -- the exact v2-A1 hole this scan exists to close (see
+         ``test_supported_fields_override_widens_active_comparison``).
 
     Returns a deterministically-sorted list of
     ``{"handle", "kind", "field", "reason"}`` dicts; empty when every oracle
-    field is recognized/certified.
+    field is either identity/provenance or actively certified.
     """
     findings: List[Dict[str, Any]] = []
     for entity in _iter_entities(oracle_ir):
         kind = _kind_of(entity)
         handle = entity.get("handle")
         allowed_top = _recognized_top_level_fields(kind, supported_fields)
+        active_top = _active_top_level_fields(kind, supported_fields)
         for key in entity.keys():
             if key not in allowed_top:
                 findings.append({
@@ -369,16 +427,43 @@ def find_uncertified_oracle_fields(oracle_ir: Dict[str, Any],
                     "reason": "field is not in the recognized dwg_graph_ir.v1 entity "
                               "schema and is not declared oracle-supported for this kind",
                 })
+                continue
+            if key == "geometry" or key in _IDENTITY_PROVENANCE_FIELDS or key in active_top:
+                continue
+            present, _value = _populated(entity, key)
+            if present:
+                findings.append({
+                    "handle": handle, "kind": kind, "field": key,
+                    "reason": "field is a recognized dwg_graph_ir.v1 entity field the "
+                              "oracle populated, but it is outside the ACTIVE oracle-"
+                              "certified compare set for this kind (recognized != "
+                              "certified -- add it to supported_fields to certify it)",
+                })
         geometry = entity.get("geometry")
         if isinstance(geometry, dict):
             allowed_geom = _recognized_geometry_leaves(kind, supported_fields)
+            active_geom = _active_geometry_leaves(kind, supported_fields)
             for key in geometry.keys():
+                field = "geometry.%s" % key
                 if key not in allowed_geom:
                     findings.append({
-                        "handle": handle, "kind": kind, "field": "geometry.%s" % key,
+                        "handle": handle, "kind": kind, "field": field,
                         "reason": "geometry leaf is not in the recognized dwg_graph_ir.v1 "
                                   "geometry schema and is not declared oracle-supported "
                                   "for this kind",
+                    })
+                    continue
+                if key in active_geom:
+                    continue
+                present, _value = _populated(entity, field)
+                if present:
+                    findings.append({
+                        "handle": handle, "kind": kind, "field": field,
+                        "reason": "geometry leaf is a recognized dwg_graph_ir.v1 geometry "
+                                  "field the oracle populated, but it is outside the "
+                                  "ACTIVE oracle-certified compare set for this kind "
+                                  "(recognized != certified -- add it to supported_fields "
+                                  "to certify it)",
                     })
     findings.sort(key=lambda f: (f.get("kind") or "", f.get("field") or "", f.get("handle") or ""))
     return findings

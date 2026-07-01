@@ -177,17 +177,29 @@ class TestCompareMultisetRigor(unittest.TestCase):
         native_entity["linetype"] = "CONTINUOUS"
         oracle, native = _ir(oracle_entity), _ir(native_entity)
 
-        # 'linetype' is a recognized (never not_certified) but NOT actively
-        # compared field by default -- the mismatch is invisible.
+        # 'linetype' is a recognized dwg_graph_ir.v1 entity field the oracle
+        # POPULATED, but it is NOT in the default active compare set -- this
+        # must be not_certified, NEVER a silent 'ok' that papers over the
+        # DASHED/CONTINUOUS mismatch nobody actually compared (the §0.6 v2-A1
+        # hole: "recognized by the schema" is not "oracle-certified").
         default_result = cross_oracle.compare_multiset(oracle, native)
-        self.assertEqual(default_result["status"], cross_oracle.STATUS_OK)
+        self.assertEqual(default_result["status"], cross_oracle.STATUS_NOT_CERTIFIED)
+        self.assertEqual(default_result["exit_code"], cross_oracle.EXIT_NOT_CERTIFIED)
+        self.assertEqual(default_result["disagreements"], [])
+        not_certified_fields = {f["field"] for f in default_result["not_certified_fields"]}
+        self.assertIn("linetype", not_certified_fields)
 
+        # Widening supported_fields to ACTIVELY certify 'linetype' turns the
+        # same oracle-populated mismatch into a genuine, compared disagreement
+        # -- and it must no longer ALSO show up as not_certified, since it is
+        # now part of the active certified set.
         widened = cross_oracle.compare_multiset(
             oracle, native,
             supported_fields={"LINE": {"top": ["layer", "bbox", "linetype"]}})
         self.assertEqual(widened["status"], cross_oracle.STATUS_DISAGREEMENT)
         fields = {d["field"] for d in widened["disagreements"]}
         self.assertIn("linetype", fields)
+        self.assertEqual(widened["not_certified_fields"], [])
 
     def test_certified_fields_for_kind_is_deterministic_and_ordered(self):
         first = cross_oracle.certified_fields_for_kind("LINE")
@@ -215,6 +227,35 @@ class TestFindUncertifiedOracleFields(unittest.TestCase):
         ent["class"] = "AcDbLine"
         ent["owner_handle"] = "1F"
         ent["space"] = "model"
+        findings = cross_oracle.find_uncertified_oracle_fields(_ir(ent))
+        self.assertEqual(findings, [])
+
+    def test_recognized_but_uncompared_data_field_flagged_when_populated(self):
+        """§0.6 v2-A1 hole (codex Layer-3 WEAK finding): 'recognized by the
+        dwg_graph_ir.v1 schema' must not silently stand in for 'oracle-
+        certified'. linetype/visible are legal schema fields but sit outside
+        the DEFAULT active compare set -- if the oracle actually populates
+        one, it must be flagged not_certified, not waved through just because
+        the key happens to be schema-known. On the pre-fix code this asserts
+        {} == {"linetype", "visible"} and fails, because the old scan only
+        checked "is this key in _KNOWN_ENTITY_FIELDS at all", never whether it
+        was in the ACTIVE certified-compare set."""
+        ent = _line_entity("A1")
+        ent["linetype"] = "DASHED"
+        ent["visible"] = True
+        findings = cross_oracle.find_uncertified_oracle_fields(_ir(ent))
+        fields = {f["field"] for f in findings}
+        self.assertEqual(fields, {"linetype", "visible"})
+
+    def test_identity_and_provenance_fields_remain_exempt_even_when_uncompared(self):
+        """Counterpart guard for the fix above: handle/class/owner_handle/
+        space/dxf_name/source are ALSO recognized-but-never-actively-compared,
+        but they are identifiers/provenance, not DATA an oracle could
+        disagree on -- they must stay exempt so the not_certified widening
+        above does not over-flag identity plumbing. 'source' is added fresh
+        (not merely re-set) so this is a real presence check, not a no-op."""
+        ent = _line_entity("A1")
+        ent["source"] = {"extractor": "oracle"}
         findings = cross_oracle.find_uncertified_oracle_fields(_ir(ent))
         self.assertEqual(findings, [])
 
