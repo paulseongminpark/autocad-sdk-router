@@ -51,6 +51,7 @@ WRITE_OP_MAP: Dict[str, str] = {
     "create_mleader": "write.entity.mleader",
     "create_polyline2d": "write.entity.polyline2d",
     "create_polyline3d": "write.entity.polyline3d",
+    "create_polygonmesh": "write.entity.polygonmesh",
 }
 
 
@@ -133,6 +134,18 @@ def build_job_args(native_op: str, args: Dict[str, Any]) -> Optional[Dict[str, A
         # op_roundtrip_probe.py's _expect_create_polyline3d.
         out: Dict[str, Any] = {}
         for k in ('points', 'layer'):
+            if k in args:
+                out[k] = args[k]
+        return out
+    if native_op == "write.entity.polygonmesh":
+        # m08g_handlers.inc's one-shot AcDbPolygonMesh(type, mSize, nSize,
+        # verts, mClosed, nClosed) ctor is called with mClosed/nClosed
+        # HARDCODED to Adesk::kFalse -- there is no "m_closed"/"n_closed" job
+        # field read anywhere in this branch, so only m_size/n_size/points/
+        # layer pass through (see w3-pmesh's op_roundtrip_probe.py
+        # _expect_create_polygonmesh for the live-verified consequence).
+        out: Dict[str, Any] = {}
+        for k in ('m_size', 'n_size', 'points', 'layer'):
             if k in args:
                 out[k] = args[k]
         return out

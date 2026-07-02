@@ -243,6 +243,38 @@ def _expect_create_polyline3d(args: Dict[str, Any]) -> Dict[str, Any]:
     }
 
 
+def _expect_create_polygonmesh(args: Dict[str, Any]) -> Dict[str, Any]:
+    # w3-pmesh: write.entity.polygonmesh (m08g_handlers.inc) builds a genuine
+    # AcDbPolygonMesh via its one-shot ctor: AcDbPolygonMesh(kSimpleMesh,
+    # mSize, nSize, verts, Adesk::kFalse, Adesk::kFalse) -- m_size/n_size and
+    # the flattened "points" array are direct, args-derivable echoes (no
+    # transform, no reordering). Vertices use the SAME plain [x,y,z]-array
+    # shape create_polyline3d/create_mleader already use (a mesh vertex has no
+    # bulge concept either) -- collectModelSpaceGraph's AcDbPolygonMesh branch
+    # walks them via vertexIterator(), the identical owned-sub-entity idiom
+    # AcDb2dPolyline/AcDb3dPolyline already use, so iteration order matches
+    # construction order (live-verified 2026-07-02 w3-pmesh re-cert on an
+    # asymmetric 2x3 grid -- a row/column transposition would have been
+    # visible as a geometry-diff mismatch, and was not).
+    #
+    # m_closed/n_closed are NEVER read from args at all -- the ctor call
+    # hardcodes Adesk::kFalse for both (unlike the ctor's OWN default of
+    # kTrue/kTrue) -- a deterministic constant, always False for this op
+    # regardless of any m_closed/n_closed a caller might (futilely) pass, the
+    # same "handler ignores an arg it never reads" shape create_polyline3d's
+    # "closed" already documented.
+    vertices = [{"point": _point_to_list(p)} for p in (args.get("points") or [])]
+    return {
+        "dxf_name": "POLYLINE", "layer": args.get("layer") or "0",
+        "geometry": {
+            "kind": "polygon_mesh",
+            "m_size": args["m_size"], "n_size": args["n_size"],
+            "m_closed": False, "n_closed": False,
+            "vertices": vertices,
+        },
+    }
+
+
 def _expect_create_ellipse(args: Dict[str, Any]) -> Dict[str, Any]:
     # collectModelSpaceGraph's AcDbEllipse branch (T3a) emits center/
     # major_axis/radius_ratio/start_angle/end_angle/normal -- every ctor arg
@@ -905,6 +937,18 @@ def _expect_create_mline(args: Dict[str, Any]) -> Dict[str, Any]:
 # reachable_matrix.jsonl, but no patch_ops wiring -- like w3-poly2d, needed
 # NO NEW collectModelSpaceGraph read branch (AcDb3dPolyline's own branch
 # pre-dates any wired create op for it).
+#
+# w3-pmesh adds create_polygonmesh: already native-REACHABLE (measure/
+# reachable_matrix.jsonl: registry_status=implemented, class=REACHABLE from
+# its empty-arg probe) but had NEITHER patch_ops wiring NOR a
+# collectModelSpaceGraph read branch at all (unlike every polyline/dimension/
+# leader kind above, AcDbPolygonMesh had never been read before this batch).
+# A live create-only probe (direct patch_engine.apply_staged call, no
+# expected-ir builder yet) confirmed a real, non-attended-only entity first
+# (net modelspace +1, class=AcDbPolygonMesh, original DWG byte-identical)
+# BEFORE the read branch + rebuild were invested in -- ruling out the
+# raster/wipeout/mpolygon demand-loaded-module failure mode this ticket
+# flagged as the risk to check for.
 _EXPECTED_ENTITY_BUILDERS: Dict[str, Callable[[Dict[str, Any]], Dict[str, Any]]] = {
     "create_line": _expect_create_line,
     "create_circle": _expect_create_circle,
@@ -915,6 +959,7 @@ _EXPECTED_ENTITY_BUILDERS: Dict[str, Callable[[Dict[str, Any]], Dict[str, Any]]]
     "create_polyline": _expect_create_polyline,
     "create_polyline2d": _expect_create_polyline2d,
     "create_polyline3d": _expect_create_polyline3d,
+    "create_polygonmesh": _expect_create_polygonmesh,
     "create_dimension": _expect_create_dimension,
     "create_spline": _expect_create_spline,
     "create_dimension_aligned": _expect_create_dimension_aligned,

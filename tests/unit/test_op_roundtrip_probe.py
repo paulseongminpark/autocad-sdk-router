@@ -519,6 +519,31 @@ class TestExpectedIrForOp(unittest.TestCase):
             "closed": False,
         })
 
+    def test_create_polygonmesh_builds_polygon_mesh_geometry(self):
+        # w3-pmesh: write.entity.polygonmesh builds a genuine AcDbPolygonMesh
+        # via its one-shot ctor (mSize/nSize/verts, mClosed/nClosed HARDCODED
+        # to Adesk::kFalse) -- m_size/n_size and the flattened points array are
+        # direct, args-derivable echoes, plain [x,y,z] vertex shape (no bulge,
+        # same shape create_polyline3d/create_mleader already use).
+        # m_closed/n_closed are deterministic constants, always False -- the
+        # handler never reads either field from args at all (live-verified
+        # 2026-07-02 w3-pmesh re-cert).
+        ir = probe.expected_ir_for_op(
+            "create_polygonmesh",
+            {"m_size": 2, "n_size": 3,
+             "points": [{"x": 0, "y": 0, "z": 0}, {"x": 1, "y": 0, "z": 0}, {"x": 2, "y": 0, "z": 0},
+                        {"x": 0, "y": 1, "z": 5}, {"x": 1, "y": 1, "z": 5}, {"x": 2, "y": 1, "z": 5}],
+             "layer": "0"})
+        ent = ir["entities"][0]
+        self.assertEqual(ent["dxf_name"], "POLYLINE")
+        self.assertEqual(ent["geometry"], {
+            "kind": "polygon_mesh",
+            "m_size": 2, "n_size": 3,
+            "m_closed": False, "n_closed": False,
+            "vertices": [{"point": [0, 0, 0]}, {"point": [1, 0, 0]}, {"point": [2, 0, 0]},
+                        {"point": [0, 1, 5]}, {"point": [1, 1, 5]}, {"point": [2, 1, 5]}],
+        })
+
     def test_create_mline_builds_mline_geometry(self):
         # w3-wbug: collectModelSpaceGraph grew an AcDbMline branch alongside the
         # write.entity.mline native bugfix (appendSeg's ErrorStatus was never

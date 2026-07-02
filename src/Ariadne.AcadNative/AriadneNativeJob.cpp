@@ -1219,6 +1219,36 @@ static bool collectModelSpaceGraph(AcDbDatabase* pDb, int& total,
             delete pVi;
             arr << "]";
         }
+        // w3-pmesh: AcDbPolygonMesh (M x N mesh grid) -- the SAME owned-
+        // sub-entity vertexIterator() idiom AcDb2dPolyline/AcDb3dPolyline use
+        // above, walking AcDbPolygonMeshVertex instead (both declared in
+        // dbents.h, already included above -- no new #include needed).
+        // m08g_handlers.inc's one-shot AcDbPolygonMesh ctor hardcodes
+        // mClosed=nClosed=Adesk::kFalse (no "m_closed"/"n_closed" job field is
+        // ever read there), so isMClosed()/isNClosed() are expected to always
+        // read back false for this op -- live-verified 2026-07-02 w3-pmesh
+        // re-cert.
+        else if (AcDbPolygonMesh* pMesh = AcDbPolygonMesh::cast(pEnt)) {
+            arr << ",\"m_size\":" << pMesh->mSize()
+                << ",\"n_size\":" << pMesh->nSize()
+                << ",\"m_closed\":" << (pMesh->isMClosed() ? "true" : "false")
+                << ",\"n_closed\":" << (pMesh->isNClosed() ? "true" : "false")
+                << ",\"vertices\":[";
+            AcDbObjectIterator* pVi = pMesh->vertexIterator();
+            bool vfirst = true;
+            for (; pVi != nullptr && !pVi->done(); pVi->step()) {
+                AcDbPolygonMeshVertex* pV = nullptr;
+                if (acdbOpenObject(pV, pVi->objectId(), AcDb::kForRead) == Acad::eOk) {
+                    const AcGePoint3d vp = pV->position();
+                    if (!vfirst) arr << ",";
+                    vfirst = false;
+                    arr << "[" << vp.x << "," << vp.y << "," << vp.z << "]";
+                    pV->close();
+                }
+            }
+            delete pVi;
+            arr << "]";
+        }
         else if (AcDbHatch* pHatch = AcDbHatch::cast(pEnt)) {
             int loopCount = 0, vertexCount = 0;
             const std::string loopsJson = hatchLoopsJson(pHatch, loopCount, vertexCount);

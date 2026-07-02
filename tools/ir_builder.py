@@ -509,6 +509,12 @@ _NATIVE_CLASS_TO_DXF_KIND = {
     # existing generic handling (same shapes AcDbLeader/AcDb2dPolyline already
     # use) -- this class-map entry is the only change needed here.
     "AcDbMline": ("MLINE", "mline"),
+    # w3-pmesh: AcDbPolygonMesh serializes to DXF as a POLYLINE record too
+    # (like AcDb2dPolyline/AcDb3dPolyline above -- distinguished on disk only
+    # by its group-70 flags), but its geometry shape (m_size/n_size/m_closed/
+    # n_closed grid, no per-vertex bulge) is unrelated to "polyline"'s, hence
+    # its own "polygon_mesh" kind.
+    "AcDbPolygonMesh": ("POLYLINE", "polygon_mesh"),
 }
 
 
@@ -531,7 +537,9 @@ def _geometry_from_native_entity(raw: dict, kind: str) -> dict:
     lifts). w3-ang3: AcDb3PointAngularDimension reuses center/xline1_point/
     xline2_point/arc_point/measurement verbatim (identical ctor-arg shape to
     AcDbArcDimension) -- no allowlist change needed, only the class-map entry
-    above.
+    above. w3-pmesh: m_size/n_size (numbers) + m_closed/n_closed (booleans)
+    for AcDbPolygonMesh; its plain [x,y,z] "vertices" (no bulge) reuse the
+    existing generic vertices lift below, zero change needed there.
     Returns an IR geometry dict with a valid ``kind``; unrepresented kinds get
     a geometry that carries only ``kind`` (decoded=False is decided by the
     caller).
@@ -550,7 +558,7 @@ def _geometry_from_native_entity(raw: dict, kind: str) -> dict:
     for nk, ik in (("start_angle", "start_angle"), ("end_angle", "end_angle"),
                    ("rotation", "rotation"), ("radius_ratio", "radius_ratio"),
                    ("height", "height"), ("measurement", "measurement"),
-                   ("degree", "degree")):
+                   ("degree", "degree"), ("m_size", "m_size"), ("n_size", "n_size")):
         num = _to_number(raw.get(nk))
         if num is not None:
             geom[ik] = num
@@ -568,6 +576,10 @@ def _geometry_from_native_entity(raw: dict, kind: str) -> dict:
         geom["has_arrow_head"] = raw["has_arrow_head"]
     if isinstance(raw.get("splined"), bool):
         geom["splined"] = raw["splined"]
+    if isinstance(raw.get("m_closed"), bool):
+        geom["m_closed"] = raw["m_closed"]
+    if isinstance(raw.get("n_closed"), bool):
+        geom["n_closed"] = raw["n_closed"]
     verts = raw.get("vertices")
     if isinstance(verts, list) and verts:
         norm = []

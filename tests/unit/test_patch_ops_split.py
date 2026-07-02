@@ -90,6 +90,12 @@ had no patch_ops.WRITE_OP_MAP entry -- like w3-poly2d, needed NO NEW
 collectModelSpaceGraph read branch (AcDb3dPolyline's read branch pre-dates
 any wired create op for it, T3a). Oracle extended accordingly; same
 invariants unaffected.
+
+w3-pmesh update: create_polygonmesh (write.entity.polygonmesh, AcDbPolygon
+Mesh) was already native-REACHABLE (measure/reachable_matrix.jsonl) but had
+NEITHER a patch_ops.WRITE_OP_MAP entry NOR a collectModelSpaceGraph read
+branch (unlike w3-poly2d/w3-poly3d, AcDbPolygonMesh had never been read
+before this batch). Oracle extended accordingly; same invariants unaffected.
 """
 from __future__ import annotations
 
@@ -132,6 +138,7 @@ _ORIGINAL_NATIVE_WRITE_OP_MAP = {
     "create_mleader": "write.entity.mleader",
     "create_polyline2d": "write.entity.polyline2d",
     "create_polyline3d": "write.entity.polyline3d",
+    "create_polygonmesh": "write.entity.polygonmesh",
 }
 
 
