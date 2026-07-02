@@ -144,15 +144,6 @@ static std::string wideToUtf8(const std::wstring& wide)
     return out;
 }
 
-static std::wstring asciiToWide(const std::string& value)
-{
-    std::wstring out;
-    out.reserve(value.size());
-    for (char c : value)
-        out.push_back(static_cast<unsigned char>(c));
-    return out;
-}
-
 // M07B: UTF-8 -> UTF-16. Used by the ARIADNE_NATIVE_JOB_ARGS env-file channel to
 // turn JSON path strings (written by the harness as UTF-8) back into wide paths
 // without the lossy ASCII funnel. ASCII input is a strict subset, so ASCII paths
@@ -168,6 +159,25 @@ static std::wstring utf8ToWide(const std::string& s)
     std::wstring w(static_cast<size_t>(n), L'\0');
     MultiByteToWideChar(CP_UTF8, 0, s.c_str(), static_cast<int>(s.size()), &w[0], n);
     return w;
+}
+
+// w3-utf8 fix: despite the historical name, this is the write-path symbol-table
+// name/key/value funnel used by every AcDbBlockTable/AcDbLayerTable/RegAppTable/
+// AcDbLayoutManager/xdata/dictionary lookup and setter in this file and in
+// families/*.inc (block name, layer name, dict key/value, regapp name, layout
+// name, ...). It used to widen each byte 1:1, silently corrupting any non-ASCII
+// input -- e.g. native_sample.dwg's 245 real block definitions are all Korean
+// names, and none of them resolved through AcDbBlockTable::getAt/has because the
+// widened wchar_t sequence never matched the real UTF-16 symbol-table record.
+// The JSON job the harness writes is UTF-8 (same convention as wideToUtf8's
+// read-side counterpart above), so this now delegates to utf8ToWide. ASCII
+// input is a strict subset of UTF-8, so every existing ASCII call site is
+// byte-identical (no regression). The rename to utf8ToWide-only is a deferred
+// cosmetic cleanup -- call sites are unchanged to keep this diff additive, same
+// rationale as acharToAscii's historical-name note below.
+static std::wstring asciiToWide(const std::string& value)
+{
+    return utf8ToWide(value);
 }
 
 static bool moduleDirectory(std::wstring& outDir);

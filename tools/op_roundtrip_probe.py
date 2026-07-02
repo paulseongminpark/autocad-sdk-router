@@ -1085,14 +1085,33 @@ def _expect_create_blockref(args: Dict[str, Any]) -> Dict[str, Any]:
 # m08g_handlers.inc) before this builder was written, so all four fields
 # below are asserted as REAL, live-verified ctor-arg echoes, not aspirational
 # ones. Also unlike every op above: native_sample.dwg's 245 real block
-# definitions are ALL non-ASCII (Korean) names, and this handler resolves
-# "name" via asciiToWide (naive byte-widening, not UTF-8 decode) -- so none
-# of them resolve correctly through this op today. The cert below uses a
-# fresh ASCII block definition created via the already-implemented
-# write.block.simple_create op instead (see runs/w3_insert_probe); the
-# non-ASCII block_name lookup gap is a real, separate, pre-existing
-# limitation this batch does NOT fix (asciiToWide is shared by other
+# definitions are ALL non-ASCII (Korean) names, and at the time of this batch
+# the write handler resolved "name" via asciiToWide (naive byte-widening, not
+# UTF-8 decode), so none of them resolved correctly through this op. The cert
+# below uses a fresh ASCII block definition created via the already-
+# implemented write.block.simple_create op instead (see runs/w3_insert_probe)
+# -- the non-ASCII block_name lookup gap was a real, separate, pre-existing
+# limitation this batch did NOT fix (asciiToWide was shared by other
 # symbol-table name lookups outside this op's scope -- see m08c_handlers.inc).
+#
+# w3-utf8 FIXES the non-ASCII block_name lookup gap noted just above:
+# asciiToWide (AriadneNativeJob.cpp) was a naive per-byte widen, not a UTF-8
+# decode, so a Korean block/layer/dict-key/regapp/layout name from the JSON
+# job never matched the real UTF-16 symbol-table record. It now delegates to
+# the already-existing utf8ToWide helper (same file, previously only used for
+# the ARIADNE_NATIVE_JOB_ARGS path channel) -- ASCII input is a strict subset
+# of UTF-8 so every existing ASCII call site is byte-identical, no call site
+# needed to change. Live-verified (staged copies of this fixture, original
+# READ-ONLY, codepoint-exact comparisons, never console glyphs):
+#   - a freshly created Korean block-def ("테스트블록") round-trips through
+#     write.block.simple_create -> create_blockref (INSERT) diff=0;
+#   - a freshly created Korean layer ("테스트레이어") round-trips through
+#     create_layer -> create_line -> re-extraction diff=0;
+#   - a REAL pre-existing Korean block from this fixture's block table (one
+#     of the 245 -- all 245 are Korean-named) now resolves via
+#     write.entity.blockref, where it previously could not;
+#   - the ASCII cert below (and create_line/create_circle) are unchanged,
+#     diff=0.
 _EXPECTED_ENTITY_BUILDERS: Dict[str, Callable[[Dict[str, Any]], Dict[str, Any]]] = {
     "create_line": _expect_create_line,
     "create_circle": _expect_create_circle,
