@@ -52,6 +52,7 @@ WRITE_OP_MAP: Dict[str, str] = {
     "create_polyline2d": "write.entity.polyline2d",
     "create_polyline3d": "write.entity.polyline3d",
     "create_polygonmesh": "write.entity.polygonmesh",
+    "create_polyfacemesh": "write.entity.polyfacemesh",
 }
 
 
@@ -146,6 +147,20 @@ def build_job_args(native_op: str, args: Dict[str, Any]) -> Optional[Dict[str, A
         # _expect_create_polygonmesh for the live-verified consequence).
         out: Dict[str, Any] = {}
         for k in ('m_size', 'n_size', 'points', 'layer'):
+            if k in args:
+                out[k] = args[k]
+        return out
+    if native_op == "write.entity.polyfacemesh":
+        # m08g_handlers.inc's write.entity.polyfacemesh handler reads ONLY
+        # points/vertices (points first, vertices as fallback if points has
+        # <3 entries) + layer -- it NEVER reads a "faces" job field at all:
+        # appendFaceRecord is called exactly once, with vertex indices
+        # HARDCODED to {1,2,3, len>=4?4:3} (see op_roundtrip_probe.py's
+        # _expect_create_polyfacemesh for the live-verified consequence), the
+        # same "handler ignores an arg it never reads" shape create_polygon
+        # mesh's m_closed/n_closed already documented.
+        out: Dict[str, Any] = {}
+        for k in ('points', 'vertices', 'layer'):
             if k in args:
                 out[k] = args[k]
         return out

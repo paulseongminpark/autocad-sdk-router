@@ -275,6 +275,37 @@ def _expect_create_polygonmesh(args: Dict[str, Any]) -> Dict[str, Any]:
     }
 
 
+def _expect_create_polyfacemesh(args: Dict[str, Any]) -> Dict[str, Any]:
+    # w3-pfmesh: write.entity.polyfacemesh (m08g_handlers.inc) builds a
+    # genuine AcDbPolyFaceMesh: appendVertex() once per "points"/"vertices"
+    # arg entry (plain [x,y,z] position, no bulge -- same vertex shape
+    # create_polygonmesh/create_polyline3d/create_mleader already use) THEN
+    # appendFaceRecord() exactly ONCE, with vertex indices HARDCODED to
+    # {1, 2, 3, len>=4?4:3} -- a deterministic FUNCTION of vertex count, not
+    # an independent "faces" arg (the handler never reads one at all, the
+    # same "handler ignores an arg it never reads" shape create_polygonmesh's
+    # m_closed/n_closed already documented).
+    #
+    # collectModelSpaceGraph's AcDbPolyFaceMesh branch discriminates the SAME
+    # vertexIterator()'s mixed AcDbPolyFaceMeshVertex/AcDbFaceRecord
+    # sub-entities by cast(), so iteration order matches append order
+    # (live-verified 2026-07-02 w3-pfmesh re-cert on a 4-vertex quad -- an
+    # index/order mismatch would have been visible as a geometry-diff
+    # mismatch, and was not).
+    raw_points = args.get("points") or args.get("vertices") or []
+    vertices = [{"point": _point_to_list(p)} for p in raw_points]
+    n = len(vertices)
+    face = [1, 2, 3, 4 if n >= 4 else 3]
+    return {
+        "dxf_name": "POLYLINE", "layer": args.get("layer") or "0",
+        "geometry": {
+            "kind": "poly_face_mesh",
+            "vertices": vertices,
+            "faces": [face],
+        },
+    }
+
+
 def _expect_create_ellipse(args: Dict[str, Any]) -> Dict[str, Any]:
     # collectModelSpaceGraph's AcDbEllipse branch (T3a) emits center/
     # major_axis/radius_ratio/start_angle/end_angle/normal -- every ctor arg
@@ -949,6 +980,18 @@ def _expect_create_mline(args: Dict[str, Any]) -> Dict[str, Any]:
 # BEFORE the read branch + rebuild were invested in -- ruling out the
 # raster/wipeout/mpolygon demand-loaded-module failure mode this ticket
 # flagged as the risk to check for.
+#
+# w3-pfmesh adds create_polyfacemesh: already native-REACHABLE (measure/
+# reachable_matrix.jsonl: registry_status=implemented, class=REACHABLE from
+# its empty-arg probe) but had NEITHER patch_ops wiring NOR a
+# collectModelSpaceGraph read branch at all (same two-part gap as w3-pmesh
+# just above -- AcDbPolyFaceMesh had never been read before this batch,
+# unlike AcDbPolygonMesh/AcDb3dPolyline's read branches, which pre-date any
+# wired create op for them). The SAME de-risking discipline was applied
+# first: a live create-only probe (direct patch_engine.apply_staged call, no
+# expected-ir builder yet) confirmed a real, non-attended-only entity (net
+# modelspace +1, class=AcDbPolyFaceMesh, original DWG byte-identical) BEFORE
+# the read branch + rebuild were invested in.
 _EXPECTED_ENTITY_BUILDERS: Dict[str, Callable[[Dict[str, Any]], Dict[str, Any]]] = {
     "create_line": _expect_create_line,
     "create_circle": _expect_create_circle,
@@ -960,6 +1003,7 @@ _EXPECTED_ENTITY_BUILDERS: Dict[str, Callable[[Dict[str, Any]], Dict[str, Any]]]
     "create_polyline2d": _expect_create_polyline2d,
     "create_polyline3d": _expect_create_polyline3d,
     "create_polygonmesh": _expect_create_polygonmesh,
+    "create_polyfacemesh": _expect_create_polyfacemesh,
     "create_dimension": _expect_create_dimension,
     "create_spline": _expect_create_spline,
     "create_dimension_aligned": _expect_create_dimension_aligned,

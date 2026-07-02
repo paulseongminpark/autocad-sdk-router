@@ -1249,6 +1249,55 @@ static bool collectModelSpaceGraph(AcDbDatabase* pDb, int& total,
             delete pVi;
             arr << "]";
         }
+        // w3-pfmesh: AcDbPolyFaceMesh -- unlike AcDbPolygonMesh's
+        // vertexIterator() above (which yields ONLY AcDbPolygonMeshVertex
+        // sub-entities), this class's vertexIterator() walks BOTH owned
+        // sub-entity kinds m08g_handlers.inc's write.entity.polyfacemesh
+        // handler appends, in append order: N AcDbPolyFaceMeshVertex objects
+        // (one per "points"/"vertices" arg, same plain-position vertex shape
+        // AcDbPolygonMeshVertex/AcDb3dPolylineVertex above already use)
+        // followed by exactly 1 AcDbFaceRecord -- the handler NEVER reads a
+        // "faces" job field at all, it hardcodes a single face referencing
+        // vertex indices {1,2,3, len>=4?4:3} (a deterministic FUNCTION of
+        // vertex count, not an independent arg -- live-verified 2026-07-02
+        // w3-pfmesh re-cert). Both sub-entity kinds derive from AcDbVertex
+        // (dbents.h) so are opened generically via that common base, then
+        // discriminated with AcDbPolyFaceMeshVertex::cast()/AcDbFaceRecord::
+        // cast() -- the SAME open-as-base-then-cast idiom this function's own
+        // top-level entity loop already uses one level up (AcDbEntity* pEnt).
+        else if (AcDbPolyFaceMesh* pFM = AcDbPolyFaceMesh::cast(pEnt)) {
+            std::ostringstream vtx, fac;
+            vtx.precision(kJsonDoublePrecision);
+            fac.precision(kJsonDoublePrecision);
+            bool vfirst = true, ffirst = true;
+            AcDbObjectIterator* pVi = pFM->vertexIterator();
+            for (; pVi != nullptr && !pVi->done(); pVi->step()) {
+                AcDbVertex* pSub = nullptr;
+                if (acdbOpenObject(pSub, pVi->objectId(), AcDb::kForRead) != Acad::eOk)
+                    continue;
+                if (AcDbPolyFaceMeshVertex* pV = AcDbPolyFaceMeshVertex::cast(pSub)) {
+                    const AcGePoint3d vp = pV->position();
+                    if (!vfirst) vtx << ",";
+                    vfirst = false;
+                    vtx << "[" << vp.x << "," << vp.y << "," << vp.z << "]";
+                } else if (AcDbFaceRecord* pF = AcDbFaceRecord::cast(pSub)) {
+                    if (!ffirst) fac << ",";
+                    ffirst = false;
+                    fac << "[";
+                    for (Adesk::UInt16 fi = 0; fi < 4; ++fi) {
+                        Adesk::Int16 vidx = 0;
+                        pF->getVertexAt(fi, vidx);
+                        if (fi) fac << ",";
+                        fac << vidx;
+                    }
+                    fac << "]";
+                }
+                pSub->close();
+            }
+            delete pVi;
+            arr << ",\"vertices\":[" << vtx.str() << "]"
+                << ",\"faces\":[" << fac.str() << "]";
+        }
         else if (AcDbHatch* pHatch = AcDbHatch::cast(pEnt)) {
             int loopCount = 0, vertexCount = 0;
             const std::string loopsJson = hatchLoopsJson(pHatch, loopCount, vertexCount);

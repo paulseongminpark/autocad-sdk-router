@@ -515,6 +515,13 @@ _NATIVE_CLASS_TO_DXF_KIND = {
     # n_closed grid, no per-vertex bulge) is unrelated to "polyline"'s, hence
     # its own "polygon_mesh" kind.
     "AcDbPolygonMesh": ("POLYLINE", "polygon_mesh"),
+    # w3-pfmesh: AcDbPolyFaceMesh serializes to DXF as a POLYLINE record too
+    # (same group-70-flag-distinguished convention as AcDb2dPolyline/AcDb3d
+    # Polyline/AcDbPolygonMesh above), but its geometry shape (a plain vertex
+    # list PLUS a "faces" array of per-face vertex-index tuples -- no m_size/
+    # n_size grid, no bulge) is unrelated to any of theirs, hence its own
+    # "poly_face_mesh" kind.
+    "AcDbPolyFaceMesh": ("POLYLINE", "poly_face_mesh"),
 }
 
 
@@ -539,7 +546,10 @@ def _geometry_from_native_entity(raw: dict, kind: str) -> dict:
     AcDbArcDimension) -- no allowlist change needed, only the class-map entry
     above. w3-pmesh: m_size/n_size (numbers) + m_closed/n_closed (booleans)
     for AcDbPolygonMesh; its plain [x,y,z] "vertices" (no bulge) reuse the
-    existing generic vertices lift below, zero change needed there.
+    existing generic vertices lift below, zero change needed there. w3-pfmesh:
+    AcDbPolyFaceMesh's "vertices" reuse that same generic lift too; its
+    "faces" (per-face vertex-index arrays, no point/bulge shape at all) get
+    their own passthrough below, the same shape "loops" already uses.
     Returns an IR geometry dict with a valid ``kind``; unrepresented kinds get
     a geometry that carries only ``kind`` (decoded=False is decided by the
     caller).
@@ -613,6 +623,13 @@ def _geometry_from_native_entity(raw: dict, kind: str) -> dict:
     loops = raw.get("loops")
     if isinstance(loops, list) and loops:
         geom["loops"] = loops
+    # w3-pfmesh: AcDbPolyFaceMesh's per-face vertex-index arrays (e.g.
+    # [1, 2, 3, 4]) -- unlike "vertices", these are indices, not points, so
+    # they get a bare passthrough with no _as_point3 normalization, the same
+    # zero-transform shape "loops" already uses above.
+    faces = raw.get("faces")
+    if isinstance(faces, list) and faces:
+        geom["faces"] = faces
     return geom
 
 

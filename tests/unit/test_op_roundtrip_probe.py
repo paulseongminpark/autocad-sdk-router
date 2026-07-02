@@ -544,6 +544,28 @@ class TestExpectedIrForOp(unittest.TestCase):
                         {"point": [0, 1, 5]}, {"point": [1, 1, 5]}, {"point": [2, 1, 5]}],
         })
 
+    def test_create_polyfacemesh_builds_poly_face_mesh_geometry(self):
+        # w3-pfmesh: write.entity.polyfacemesh builds a genuine AcDbPolyFace
+        # Mesh: appendVertex() once per "points" entry (plain [x,y,z], no
+        # bulge, same vertex shape create_polygonmesh already uses) THEN
+        # appendFaceRecord() exactly ONCE with vertex indices HARDCODED to
+        # {1,2,3,4} for this 4-vertex quad (n>=4 branch) -- the handler never
+        # reads a "faces" field from args at all (live-verified 2026-07-02
+        # w3-pfmesh re-cert).
+        ir = probe.expected_ir_for_op(
+            "create_polyfacemesh",
+            {"points": [{"x": 0, "y": 0, "z": 0}, {"x": 10, "y": 0, "z": 0},
+                        {"x": 10, "y": 10, "z": 0}, {"x": 0, "y": 10, "z": 0}],
+             "layer": "0"})
+        ent = ir["entities"][0]
+        self.assertEqual(ent["dxf_name"], "POLYLINE")
+        self.assertEqual(ent["geometry"], {
+            "kind": "poly_face_mesh",
+            "vertices": [{"point": [0, 0, 0]}, {"point": [10, 0, 0]},
+                        {"point": [10, 10, 0]}, {"point": [0, 10, 0]}],
+            "faces": [[1, 2, 3, 4]],
+        })
+
     def test_create_mline_builds_mline_geometry(self):
         # w3-wbug: collectModelSpaceGraph grew an AcDbMline branch alongside the
         # write.entity.mline native bugfix (appendSeg's ErrorStatus was never

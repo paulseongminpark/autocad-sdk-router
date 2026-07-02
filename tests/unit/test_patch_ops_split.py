@@ -96,6 +96,15 @@ Mesh) was already native-REACHABLE (measure/reachable_matrix.jsonl) but had
 NEITHER a patch_ops.WRITE_OP_MAP entry NOR a collectModelSpaceGraph read
 branch (unlike w3-poly2d/w3-poly3d, AcDbPolygonMesh had never been read
 before this batch). Oracle extended accordingly; same invariants unaffected.
+
+w3-pfmesh update: create_polyfacemesh (write.entity.polyfacemesh, AcDbPoly
+FaceMesh) was already native-REACHABLE (measure/reachable_matrix.jsonl) but
+had NEITHER a patch_ops.WRITE_OP_MAP entry NOR a collectModelSpaceGraph read
+branch -- same two-part gap as w3-pmesh just above. A live create-only probe
+(direct patch_engine.apply_staged call) de-risked the attended-only trap
+first (net modelspace +1, class=AcDbPolyFaceMesh, original DWG byte-
+identical) before the read branch + rebuild were invested in. Oracle extended
+accordingly; same invariants unaffected.
 """
 from __future__ import annotations
 
@@ -139,6 +148,7 @@ _ORIGINAL_NATIVE_WRITE_OP_MAP = {
     "create_polyline2d": "write.entity.polyline2d",
     "create_polyline3d": "write.entity.polyline3d",
     "create_polygonmesh": "write.entity.polygonmesh",
+    "create_polyfacemesh": "write.entity.polyfacemesh",
 }
 
 
