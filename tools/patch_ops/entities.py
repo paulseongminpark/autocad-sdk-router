@@ -49,6 +49,7 @@ WRITE_OP_MAP: Dict[str, str] = {
     "create_dimension_angular2line": "write.entity.dim.angular2line",
     "create_dimension_angular3pt": "write.entity.dim.angular3pt",
     "create_mleader": "write.entity.mleader",
+    "create_polyline2d": "write.entity.polyline2d",
 }
 
 
@@ -111,6 +112,15 @@ def build_job_args(native_op: str, args: Dict[str, Any]) -> Optional[Dict[str, A
                 out[k] = args[k]
         return out
     if native_op == "write.entity.polyline":
+        out: Dict[str, Any] = {}
+        for k in ('points', 'closed', 'layer'):
+            if k in args:
+                out[k] = args[k]
+        return out
+    if native_op == "write.entity.polyline2d":
+        # ALIAS of write.entity.polyline in m08g_handlers.inc (same handler,
+        # same args) -- see op_roundtrip_probe.py's _expect_create_polyline2d
+        # for why this is NOT a true legacy AcDb2dPolyline.
         out: Dict[str, Any] = {}
         for k in ('points', 'closed', 'layer'):
             if k in args:

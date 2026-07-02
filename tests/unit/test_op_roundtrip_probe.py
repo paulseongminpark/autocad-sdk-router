@@ -475,6 +475,29 @@ class TestExpectedIrForOp(unittest.TestCase):
         self.assertEqual(ir["entities"][0]["geometry"]["vertices"],
                          [{"point": [1, 1, 0]}, {"point": [5, 5, 0]}])
 
+    def test_create_polyline2d_builds_lwpolyline_geometry(self):
+        # w3-poly2d: write.entity.polyline2d is an ALIAS for write.entity.
+        # polyline (m08g_handlers.inc) -- it builds a real AcDbPolyline
+        # (LWPOLYLINE), NOT a true legacy AcDb2dPolyline, despite the op's
+        # own name. Ground truth is therefore IDENTICAL to
+        # _expect_create_polyline's own (vertices/bulge/closed all direct,
+        # args-derivable echoes) -- live-verified (2026-07-02 w3-poly2d
+        # re-cert) diff=0, dxf_name reads back "LWPOLYLINE".
+        ir = probe.expected_ir_for_op(
+            "create_polyline2d",
+            {"points": [{"x": 0, "y": 0, "bulge": 0}, {"x": 10, "y": 0, "bulge": 0.5},
+                        {"x": 10, "y": 10, "bulge": 0}],
+             "closed": 1, "layer": "0"})
+        ent = ir["entities"][0]
+        self.assertEqual(ent["dxf_name"], "LWPOLYLINE")
+        self.assertEqual(ent["geometry"], {
+            "kind": "lwpolyline",
+            "vertices": [{"point": [0, 0, 0.0], "bulge": 0},
+                        {"point": [10, 0, 0.0], "bulge": 0.5},
+                        {"point": [10, 10, 0.0], "bulge": 0}],
+            "closed": True,
+        })
+
     def test_create_mline_builds_mline_geometry(self):
         # w3-wbug: collectModelSpaceGraph grew an AcDbMline branch alongside the
         # write.entity.mline native bugfix (appendSeg's ErrorStatus was never

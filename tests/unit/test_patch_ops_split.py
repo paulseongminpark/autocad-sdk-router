@@ -75,6 +75,14 @@ already native-REACHABLE (measure/reachable_matrix.jsonl) but had no
 patch_ops.WRITE_OP_MAP entry -- same two-part gap (patch_ops wiring +
 collectModelSpaceGraph read branch) as create_leader before it. Oracle
 extended accordingly; same invariants unaffected.
+
+w3-poly2d update: create_polyline2d (write.entity.polyline2d) was already
+native-REACHABLE (measure/reachable_matrix.jsonl) but had no patch_ops.
+WRITE_OP_MAP entry -- UNLIKE every prior batch above, it needed NO NEW
+collectModelSpaceGraph read branch at all: write.entity.polyline2d is an
+alias for write.entity.polyline in m08g_handlers.inc (same AcDbPolyline/
+LWPOLYLINE code path, already read). Oracle extended accordingly; same
+invariants unaffected.
 """
 from __future__ import annotations
 
@@ -115,6 +123,7 @@ _ORIGINAL_NATIVE_WRITE_OP_MAP = {
     "create_dimension_angular2line": "write.entity.dim.angular2line",
     "create_dimension_angular3pt": "write.entity.dim.angular3pt",
     "create_mleader": "write.entity.mleader",
+    "create_polyline2d": "write.entity.polyline2d",
 }
 
 

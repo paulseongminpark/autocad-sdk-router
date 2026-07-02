@@ -201,6 +201,27 @@ def _expect_create_polyline(args: Dict[str, Any]) -> Dict[str, Any]:
     }
 
 
+def _expect_create_polyline2d(args: Dict[str, Any]) -> Dict[str, Any]:
+    # w3-poly2d: write.entity.polyline2d is an ALIAS for write.entity.
+    # polyline in m08g_handlers.inc ("if (op == "write.entity.polyline" ||
+    # op == "write.entity.polyline2d")") -- it does NOT build a true legacy
+    # AcDb2dPolyline; it builds the exact same AcDbPolyline (LWPOLYLINE) via
+    # addVertexAt(AcGePoint2d(x, y), bulge) + setClosed(), byte-for-byte the
+    # same code path create_polyline already exercises (identical args,
+    # identical ground truth -- see _expect_create_polyline above, which
+    # this mirrors verbatim). dxf_name is therefore "LWPOLYLINE" (the REAL
+    # entity class written/read back), not "POLYLINE" (the class name a
+    # true AcDb2dPolyline itself reads back as).
+    vertices = [{"point": [pt.get("x", 0.0), pt.get("y", 0.0), 0.0],
+                "bulge": pt.get("bulge", 0.0)}
+                for pt in (args.get("points") or [])]
+    closed = bool(args.get("closed", 0))
+    return {
+        "dxf_name": "LWPOLYLINE", "layer": args.get("layer") or "0",
+        "geometry": {"kind": "lwpolyline", "vertices": vertices, "closed": closed},
+    }
+
+
 def _expect_create_ellipse(args: Dict[str, Any]) -> Dict[str, Any]:
     # collectModelSpaceGraph's AcDbEllipse branch (T3a) emits center/
     # major_axis/radius_ratio/start_angle/end_angle/normal -- every ctor arg
@@ -853,6 +874,11 @@ def _expect_create_mline(args: Dict[str, Any]) -> Dict[str, Any]:
 # it (already native-REACHABLE per measure/reachable_matrix.jsonl, but no
 # patch_ops wiring and no collectModelSpaceGraph read branch until this
 # batch).
+#
+# w3-poly2d adds create_polyline2d: already native-REACHABLE per measure/
+# reachable_matrix.jsonl, but no patch_ops wiring -- UNLIKE every op above,
+# it needed NO NEW collectModelSpaceGraph read branch at all (polyline2d
+# aliases the already-read AcDbPolyline path).
 _EXPECTED_ENTITY_BUILDERS: Dict[str, Callable[[Dict[str, Any]], Dict[str, Any]]] = {
     "create_line": _expect_create_line,
     "create_circle": _expect_create_circle,
@@ -861,6 +887,7 @@ _EXPECTED_ENTITY_BUILDERS: Dict[str, Callable[[Dict[str, Any]], Dict[str, Any]]]
     "create_text": _expect_create_text,
     "create_mtext": _expect_create_mtext,
     "create_polyline": _expect_create_polyline,
+    "create_polyline2d": _expect_create_polyline2d,
     "create_dimension": _expect_create_dimension,
     "create_spline": _expect_create_spline,
     "create_dimension_aligned": _expect_create_dimension_aligned,
