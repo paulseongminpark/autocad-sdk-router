@@ -716,6 +716,25 @@ def _entity_from_native(raw: dict, source_block: dict) -> dict:
     return entity
 
 
+def _normalize_block_definitions(raw_block_defs, source_block: dict) -> list:
+    """Lift each block_definitions[] entry's raw def_entities[] (native
+    records, same shape as graph_result['entities']) through
+    _entity_from_native so they carry the same normalized IR entity shape
+    ($defs.entity, schemas/dwg_graph_ir.v1.schema.json) as top-level
+    entities[] -- dxf_name/geometry/bbox/source, not raw native fields.
+    def_entities already carries the right owner_handle (the block def's own
+    BTR handle) and space ("block") from the native side
+    (collectEntitiesFromBlock), so no extra plumbing is needed here."""
+    out = []
+    for bd in raw_block_defs or []:
+        bd = dict(bd)
+        raw_def_entities = bd.get("def_entities")
+        if isinstance(raw_def_entities, list) and raw_def_entities:
+            bd["def_entities"] = [_entity_from_native(e, source_block) for e in raw_def_entities]
+        out.append(bd)
+    return out
+
+
 def build_ir_from_database_graph(graph_result: dict, source_meta: dict) -> dict:
     """Normalize a native ``inspect.database.graph`` result into dwg_graph_ir.v1.
 
@@ -834,7 +853,8 @@ def build_ir_from_database_graph(graph_result: dict, source_meta: dict) -> dict:
         "source": source,
         "database": graph_result.get("database") or {"header_vars": {}},
         "symbol_tables": symbol_tables,
-        "block_definitions": graph_result.get("block_definitions") or [],
+        "block_definitions": _normalize_block_definitions(
+            graph_result.get("block_definitions"), source_block),
         "block_references": block_references,
         "xrefs": graph_result.get("xrefs") or [],
         "dictionaries": graph_result.get("dictionaries") or [],

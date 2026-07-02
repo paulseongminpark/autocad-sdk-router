@@ -640,12 +640,15 @@
             "attribute",
             "dimension",
             "leader",
+            "mline",
             "hatch",
             "solid",
             "region",
             "viewport",
             "ray",
             "xline",
+            "polygon_mesh",
+            "poly_face_mesh",
             "proxy",
             "unsupported"
           ]

@@ -946,29 +946,32 @@ static std::string mergeJsonArrays(const std::string& left, const std::string& r
 }
 
 //----------------------------------------------------------------------------
-// collectModelSpaceGraph
+// collectEntitiesFromBlock
 //
-// Pure read: walk ACDB_MODEL_SPACE and emit ONE IR record per entity into a
-// nested JSON array (entitiesJson), and the total entity count (total). Modeled
-// directly on countModelSpace / countModelSpaceEntitiesByType (BlockTable ->
-// ACDB_MODEL_SPACE BTR opened kForRead -> AcDbBlockTableRecordIterator), and it
-// uses the same comma-first appendJsonString / jsonEscape idiom as the other
-// emitters in this file. Floats use the default ostringstream precision, exactly
-// like the existing write.entity.* emitters.
+// w3-blockdef: generalized from the original collectModelSpaceGraph (which is
+// now a thin *Model_Space-only wrapper below) so block-DEFINITION contents
+// can reuse the exact same per-entity extraction the ~25 certified kinds
+// already use, instead of a second hand-maintained copy. Pure read: walk
+// pBTR's owned entities (any block-table-record -- *Model_Space via
+// collectModelSpaceGraph, or a named block def via collectBlockDefinitions)
+// and emit ONE IR record per entity into a nested JSON array (entitiesJson),
+// tagged with the caller-supplied spaceLabel ("model" | "block"), and the
+// total entity count (total). Caller opens/closes pBTR; this function only
+// opens/closes its own entity iterator over it. Uses the same comma-first
+// appendJsonString / jsonEscape idiom as the other emitters in this file.
+// Floats use the default ostringstream precision, exactly like the existing
+// write.entity.* emitters.
 //
-// KNOWN FIDELITY LIMITATION (documented M02 follow-up, NOT fixed this session):
-// every string field (dxf_name from isA()->name(), layer from pEnt->layer(),
-// block reference target name) is funneled through acharToAscii(), which maps any
-// code point > 127 to '?'. So a non-ASCII layer/type name -- e.g. the Korean
-// layer "설비OPEN" present in the workitem drawings -- is emitted as "????????".
-// Widening the ASCII funnel (UTF-8) / vendoring a real JSON library is the
-// explicit M02 follow-up; it is deliberately out of this additive lane.
+// acharToAscii() (despite its historical name) emits UTF-8, not ASCII -- see
+// its own definition below -- so non-ASCII layer/type/text names round-trip
+// correctly here for both spaces; no fidelity limitation to document.
 //----------------------------------------------------------------------------
-static bool collectModelSpaceGraph(AcDbDatabase* pDb, int& total,
-                                   std::string& entitiesJson,
-                                   std::string& extensionDictionariesJson,
-                                   std::string& extensionXrecordsJson,
-                                   RichGraphCounters& richCounters)
+static bool collectEntitiesFromBlock(AcDbBlockTableRecord* pBTR, const char* spaceLabel,
+                                     int& total,
+                                     std::string& entitiesJson,
+                                     std::string& extensionDictionariesJson,
+                                     std::string& extensionXrecordsJson,
+                                     RichGraphCounters& richCounters)
 {
     total = 0;
     std::ostringstream arr; arr.precision(kJsonDoublePrecision);
@@ -981,21 +984,9 @@ static bool collectModelSpaceGraph(AcDbDatabase* pDb, int& total,
     extensionXrecords << "[";
     bool extensionXrecordFirst = true;
 
-    AcDbBlockTable* pBT = nullptr;
-    if (pDb->getBlockTable(pBT, AcDb::kForRead) != Acad::eOk)
-        return false;
-    AcDbBlockTableRecord* pMS = nullptr;
-    if (pBT->getAt(ACDB_MODEL_SPACE, pMS, AcDb::kForRead) != Acad::eOk) {
-        pBT->close();
-        return false;
-    }
-    pBT->close();
-
     AcDbBlockTableRecordIterator* pIt = nullptr;
-    if (pMS->newIterator(pIt) != Acad::eOk) {
-        pMS->close();
+    if (pBTR->newIterator(pIt) != Acad::eOk)
         return false;
-    }
 
     for (pIt->start(); !pIt->done(); pIt->step()) {
         AcDbEntity* pEnt = nullptr;
@@ -1032,7 +1023,7 @@ static bool collectModelSpaceGraph(AcDbDatabase* pDb, int& total,
             << ",\"dxf_name\":\"" << jsonEscape(dxfName) << "\""
             << ",\"layer\":\"" << jsonEscape(layer) << "\""
             << ",\"owner_handle\":\"" << jsonEscape(ownerStr) << "\""
-            << ",\"space\":\"model\"";
+            << ",\"space\":\"" << spaceLabel << "\"";
 
         resbuf* xdata = pEnt->xData(nullptr);
         if (xdata != nullptr) {
@@ -1783,7 +1774,6 @@ static bool collectModelSpaceGraph(AcDbDatabase* pDb, int& total,
     }
 
     delete pIt;
-    pMS->close();
     arr << "]";
     extensionDictionaries << "]";
     extensionXrecords << "]";
@@ -1791,6 +1781,32 @@ static bool collectModelSpaceGraph(AcDbDatabase* pDb, int& total,
     extensionDictionariesJson = extensionDictionaries.str();
     extensionXrecordsJson = extensionXrecords.str();
     return true;
+}
+
+// collectModelSpaceGraph: thin *Model_Space wrapper preserving the exact
+// original signature/behavior. Opens *Model_Space, delegates the actual walk
+// to collectEntitiesFromBlock (spaceLabel="model") above, closes it again.
+static bool collectModelSpaceGraph(AcDbDatabase* pDb, int& total,
+                                   std::string& entitiesJson,
+                                   std::string& extensionDictionariesJson,
+                                   std::string& extensionXrecordsJson,
+                                   RichGraphCounters& richCounters)
+{
+    AcDbBlockTable* pBT = nullptr;
+    if (pDb->getBlockTable(pBT, AcDb::kForRead) != Acad::eOk)
+        return false;
+    AcDbBlockTableRecord* pMS = nullptr;
+    if (pBT->getAt(ACDB_MODEL_SPACE, pMS, AcDb::kForRead) != Acad::eOk) {
+        pBT->close();
+        return false;
+    }
+    pBT->close();
+
+    const bool ok = collectEntitiesFromBlock(
+        pMS, "model", total, entitiesJson, extensionDictionariesJson,
+        extensionXrecordsJson, richCounters);
+    pMS->close();
+    return ok;
 }
 
 //----------------------------------------------------------------------------
@@ -1911,8 +1927,14 @@ static std::string layersRichJson(AcDbDatabase* pDb, int& count)
     return arr.str();
 }
 
-// Block table records + the user-block-definition projection (def geometry is
-// referenced from entities[] by owner_handle, not inlined).
+// Block table records + the user-block-definition projection. w3-blockdef:
+// def geometry is now INLINED under block_definitions[].def_entities (the
+// docs/DWG_GRAPH_IR_SPEC.md Section 4.3 "inlined" strategy) via the SAME
+// collectEntitiesFromBlock per-entity extraction collectModelSpaceGraph
+// uses -- NOT referenced from the top-level entities[] by owner_handle. The
+// flat entities[] stays modelspace-only; its length is the golden-pinned
+// truth-gate numerator (tests/golden/expected_counts.json's
+// modelspace_total), so block-def contents must never be appended there.
 static std::string blockTableRecordsJson(AcDbDatabase* pDb, int& btrCount,
                                          int& userBlockDefs,
                                          std::string& blockDefsJson)
@@ -1947,12 +1969,32 @@ static std::string blockTableRecordsJson(AcDbDatabase* pDb, int& btrCount,
             const bool isLayout = pBTR->isLayout();
             const bool isAnon = pBTR->isAnonymous();
             const bool isXref = pBTR->isFromExternalReference();
+            const bool isUserBlock = !isLayout && !isAnon && !isXref;
             int entityCount = 0;
-            AcDbBlockTableRecordIterator* pEIt = nullptr;
-            if (pBTR->newIterator(pEIt) == Acad::eOk) {
-                for (pEIt->start(); !pEIt->done(); pEIt->step())
-                    ++entityCount;
-                delete pEIt;
+            std::string defEntitiesJson = "[]";
+            if (isUserBlock) {
+                // w3-blockdef: full contents extraction for user block defs
+                // only (*Model_Space/paper-space layouts are already walked
+                // elsewhere; anonymous *U###/*D### and xref block contents
+                // are a documented v1 deferral, same class as attributes/
+                // nested-block recursion). entityCount comes from this SAME
+                // walk, so it can never disagree with len(def_entities).
+                // extension-dictionary/xrecord content and richCounters
+                // aggregation for block-def-owned entities are local/
+                // discarded here (v1 scope) -- the top-level
+                // extension_dictionaries[]/xrecords[]/coverage.counts stay
+                // modelspace-only, byte-identical to before this change.
+                std::string defExtDicts, defExtXrecords;
+                RichGraphCounters localCounters;
+                collectEntitiesFromBlock(pBTR, "block", entityCount, defEntitiesJson,
+                                         defExtDicts, defExtXrecords, localCounters);
+            } else {
+                AcDbBlockTableRecordIterator* pEIt = nullptr;
+                if (pBTR->newIterator(pEIt) == Acad::eOk) {
+                    for (pEIt->start(); !pEIt->done(); pEIt->step())
+                        ++entityCount;
+                    delete pEIt;
+                }
             }
             const std::string handle = handleOf(pBTR);
             if (!first)
@@ -1965,14 +2007,15 @@ static std::string blockTableRecordsJson(AcDbDatabase* pDb, int& btrCount,
                 << ",\"is_xref\":" << (isXref ? "true" : "false")
                 << ",\"entity_count\":" << entityCount << "}";
             ++btrCount;
-            if (!isLayout && !isAnon && !isXref) {
+            if (isUserBlock) {
                 ++userBlockDefs;
                 if (!dfirst)
                     defs << ",";
                 dfirst = false;
                 defs << "{\"handle\":\"" << jsonEscape(handle) << "\""
                      << ",\"name\":\"" << jsonEscape(name) << "\""
-                     << ",\"entity_count\":" << entityCount << "}";
+                     << ",\"entity_count\":" << entityCount
+                     << ",\"def_entities\":" << defEntitiesJson << "}";
             }
             pBTR->close();
         }
