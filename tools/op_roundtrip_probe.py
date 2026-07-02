@@ -210,8 +210,9 @@ def _expect_create_polyline2d(args: Dict[str, Any]) -> Dict[str, Any]:
     # same code path create_polyline already exercises (identical args,
     # identical ground truth -- see _expect_create_polyline above, which
     # this mirrors verbatim). dxf_name is therefore "LWPOLYLINE" (the REAL
-    # entity class written/read back), not "POLYLINE" (the class name a
-    # true AcDb2dPolyline itself reads back as).
+    # entity class written/read back), not "POLYLINE" (the class name
+    # AcDb2dPolyline itself reads back as -- see _expect_create_polyline3d
+    # for a case that DOES read back "POLYLINE").
     vertices = [{"point": [pt.get("x", 0.0), pt.get("y", 0.0), 0.0],
                 "bulge": pt.get("bulge", 0.0)}
                 for pt in (args.get("points") or [])]
@@ -219,6 +220,26 @@ def _expect_create_polyline2d(args: Dict[str, Any]) -> Dict[str, Any]:
     return {
         "dxf_name": "LWPOLYLINE", "layer": args.get("layer") or "0",
         "geometry": {"kind": "lwpolyline", "vertices": vertices, "closed": closed},
+    }
+
+
+def _expect_create_polyline3d(args: Dict[str, Any]) -> Dict[str, Any]:
+    # w3-poly3d: write.entity.polyline3d (m08g_handlers.inc) builds a
+    # genuine AcDb3dPolyline: appendAcDbEntity then appendVertex(new
+    # AcDb3dPolylineVertex(point)) per point, no transform -- vertices are
+    # direct, args-derivable echoes, the SAME plain [x,y,z]-array shape
+    # AcDbLeader/AcDbMline/AcDbMLeader already use (NOT LWPOLYLINE's
+    # {point,bulge} shape -- a 3D polyline vertex has no bulge concept).
+    # "closed" is NEVER read from args at all (no setClosed() call anywhere
+    # in this branch, unlike write.entity.polyline/polyline2d's own "closed"
+    # handling) -- a deterministic constant, always False for this op
+    # regardless of any "closed" arg a caller might pass (live-verified
+    # 2026-07-02 w3-poly3d re-cert: passed closed=1 anyway, still read back
+    # False).
+    vertices = [{"point": _point_to_list(p)} for p in (args.get("points") or [])]
+    return {
+        "dxf_name": "POLYLINE", "layer": args.get("layer") or "0",
+        "geometry": {"kind": "polyline", "vertices": vertices, "closed": False},
     }
 
 
@@ -879,6 +900,11 @@ def _expect_create_mline(args: Dict[str, Any]) -> Dict[str, Any]:
 # reachable_matrix.jsonl, but no patch_ops wiring -- UNLIKE every op above,
 # it needed NO NEW collectModelSpaceGraph read branch at all (polyline2d
 # aliases the already-read AcDbPolyline path).
+#
+# w3-poly3d adds create_polyline3d: already native-REACHABLE per measure/
+# reachable_matrix.jsonl, but no patch_ops wiring -- like w3-poly2d, needed
+# NO NEW collectModelSpaceGraph read branch (AcDb3dPolyline's own branch
+# pre-dates any wired create op for it).
 _EXPECTED_ENTITY_BUILDERS: Dict[str, Callable[[Dict[str, Any]], Dict[str, Any]]] = {
     "create_line": _expect_create_line,
     "create_circle": _expect_create_circle,
@@ -888,6 +914,7 @@ _EXPECTED_ENTITY_BUILDERS: Dict[str, Callable[[Dict[str, Any]], Dict[str, Any]]]
     "create_mtext": _expect_create_mtext,
     "create_polyline": _expect_create_polyline,
     "create_polyline2d": _expect_create_polyline2d,
+    "create_polyline3d": _expect_create_polyline3d,
     "create_dimension": _expect_create_dimension,
     "create_spline": _expect_create_spline,
     "create_dimension_aligned": _expect_create_dimension_aligned,

@@ -498,6 +498,27 @@ class TestExpectedIrForOp(unittest.TestCase):
             "closed": True,
         })
 
+    def test_create_polyline3d_builds_polyline_geometry(self):
+        # w3-poly3d: write.entity.polyline3d builds a genuine AcDb3dPolyline
+        # (appendVertex per point, no transform) -- vertices are direct,
+        # args-derivable echoes, plain [x,y,z] shape (no bulge, unlike
+        # LWPOLYLINE). "closed" is a deterministic constant, always False --
+        # the handler has no setClosed() call at all, so even though this
+        # fixture passes closed=1, ground truth (and the live re-cert) both
+        # show it discarded.
+        ir = probe.expected_ir_for_op(
+            "create_polyline3d",
+            {"points": [{"x": 0, "y": 0, "z": 0}, {"x": 10, "y": 0, "z": 5},
+                        {"x": 10, "y": 10, "z": 8}],
+             "closed": 1, "layer": "0"})
+        ent = ir["entities"][0]
+        self.assertEqual(ent["dxf_name"], "POLYLINE")
+        self.assertEqual(ent["geometry"], {
+            "kind": "polyline",
+            "vertices": [{"point": [0, 0, 0]}, {"point": [10, 0, 5]}, {"point": [10, 10, 8]}],
+            "closed": False,
+        })
+
     def test_create_mline_builds_mline_geometry(self):
         # w3-wbug: collectModelSpaceGraph grew an AcDbMline branch alongside the
         # write.entity.mline native bugfix (appendSeg's ErrorStatus was never

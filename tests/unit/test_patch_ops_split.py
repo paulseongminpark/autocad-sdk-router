@@ -83,6 +83,13 @@ collectModelSpaceGraph read branch at all: write.entity.polyline2d is an
 alias for write.entity.polyline in m08g_handlers.inc (same AcDbPolyline/
 LWPOLYLINE code path, already read). Oracle extended accordingly; same
 invariants unaffected.
+
+w3-poly3d update: create_polyline3d (write.entity.polyline3d, AcDb3d
+Polyline) was already native-REACHABLE (measure/reachable_matrix.jsonl) but
+had no patch_ops.WRITE_OP_MAP entry -- like w3-poly2d, needed NO NEW
+collectModelSpaceGraph read branch (AcDb3dPolyline's read branch pre-dates
+any wired create op for it, T3a). Oracle extended accordingly; same
+invariants unaffected.
 """
 from __future__ import annotations
 
@@ -124,6 +131,7 @@ _ORIGINAL_NATIVE_WRITE_OP_MAP = {
     "create_dimension_angular3pt": "write.entity.dim.angular3pt",
     "create_mleader": "write.entity.mleader",
     "create_polyline2d": "write.entity.polyline2d",
+    "create_polyline3d": "write.entity.polyline3d",
 }
 
 

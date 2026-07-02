@@ -50,6 +50,7 @@ WRITE_OP_MAP: Dict[str, str] = {
     "create_dimension_angular3pt": "write.entity.dim.angular3pt",
     "create_mleader": "write.entity.mleader",
     "create_polyline2d": "write.entity.polyline2d",
+    "create_polyline3d": "write.entity.polyline3d",
 }
 
 
@@ -123,6 +124,15 @@ def build_job_args(native_op: str, args: Dict[str, Any]) -> Optional[Dict[str, A
         # for why this is NOT a true legacy AcDb2dPolyline.
         out: Dict[str, Any] = {}
         for k in ('points', 'closed', 'layer'):
+            if k in args:
+                out[k] = args[k]
+        return out
+    if native_op == "write.entity.polyline3d":
+        # 'closed' deliberately excluded: the write.entity.polyline3d handler
+        # never reads it (no setClosed() call at all) -- see
+        # op_roundtrip_probe.py's _expect_create_polyline3d.
+        out: Dict[str, Any] = {}
+        for k in ('points', 'layer'):
             if k in args:
                 out[k] = args[k]
         return out
