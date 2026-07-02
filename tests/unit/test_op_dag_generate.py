@@ -70,7 +70,8 @@ class TestOpDagBuild(unittest.TestCase):
                           "op_dag node set must equal the operations.v2.json catalogue set "
                           "exactly (missing=%r invented=%r)" % (missing, invented))
         self.assertEqual(len(self.nodes), len(self.catalogue), "no duplicate op_id nodes")
-        self.assertEqual(len(self.nodes), 517, "operations.v2.json is currently 517 ops; a "
+        # w3-dimstyle adds one new op (write.dimstyle.create) -- 517 -> 518.
+        self.assertEqual(len(self.nodes), 518, "operations.v2.json is currently 518 ops; a "
                                                 "count drift here means the catalogue changed "
                                                 "underneath this test, not a generator bug")
 

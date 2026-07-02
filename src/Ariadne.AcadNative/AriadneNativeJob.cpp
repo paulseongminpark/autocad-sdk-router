@@ -1950,6 +1950,63 @@ static std::string layersRichJson(AcDbDatabase* pDb, int& count)
     return arr.str();
 }
 
+// DIMSTYLE table with the D-class TABLES tier's representative DIMVAR subset
+// (w3-dimstyle): AcDbDimStyleTableRecord exposes ~70 dimension variables as
+// individual get/set pairs (dbdimvar.h) -- this surfaces the 10 write.
+// dimstyle.create actually writes today (see DimStylePropertyArgs below),
+// the same "extend as writers land" contract layersRichJson already set for
+// the LAYER table. dimclrd/dimclre/dimclrt are surfaced as a plain
+// colorIndex() int, matching the layer record's own "color_index"
+// convention (AcCmColor's full RGB/book-color shape is out of scope for
+// both tables today).
+static std::string dimStylesRichJson(AcDbDatabase* pDb, int& count)
+{
+    count = 0;
+    std::ostringstream arr; arr.precision(kJsonDoublePrecision);
+    arr << "[";
+    bool first = true;
+    AcDbDimStyleTable* pDST = nullptr;
+    if (pDb->getDimStyleTable(pDST, AcDb::kForRead) != Acad::eOk)
+        return "[]";
+    AcDbDimStyleTableIterator* pIt = nullptr;
+    if (pDST->newIterator(pIt) != Acad::eOk) {
+        pDST->close();
+        return "[]";
+    }
+    for (pIt->start(); !pIt->done(); pIt->step()) {
+        AcDbDimStyleTableRecord* pRec = nullptr;
+        if (pIt->getRecord(pRec, AcDb::kForRead) == Acad::eOk) {
+            const ACHAR* nameRaw = nullptr;
+            std::string name;
+            if (pRec->getName(nameRaw) == Acad::eOk)
+                name = acharToAscii(nameRaw);
+            const std::string handle = handleOf(pRec);
+            if (!first)
+                arr << ",";
+            first = false;
+            arr << "{\"handle\":\"" << jsonEscape(handle) << "\""
+                << ",\"name\":\"" << jsonEscape(name) << "\""
+                << ",\"dimtxt\":" << pRec->dimtxt()
+                << ",\"dimasz\":" << pRec->dimasz()
+                << ",\"dimexe\":" << pRec->dimexe()
+                << ",\"dimexo\":" << pRec->dimexo()
+                << ",\"dimdec\":" << pRec->dimdec()
+                << ",\"dimscale\":" << pRec->dimscale()
+                << ",\"dimclrd\":" << pRec->dimclrd().colorIndex()
+                << ",\"dimclre\":" << pRec->dimclre().colorIndex()
+                << ",\"dimclrt\":" << pRec->dimclrt().colorIndex()
+                << ",\"dimse1\":" << (pRec->dimse1() ? "true" : "false")
+                << "}";
+            ++count;
+            pRec->close();
+        }
+    }
+    delete pIt;
+    pDST->close();
+    arr << "]";
+    return arr.str();
+}
+
 // Block table records + the user-block-definition projection. w3-blockdef:
 // def geometry is now INLINED under block_definitions[].def_entities (the
 // docs/DWG_GRAPH_IR_SPEC.md Section 4.3 "inlined" strategy) via the SAME
@@ -2238,7 +2295,7 @@ static std::string collectDatabaseGraph(AcDbDatabase* pDb,
     const std::string layersJson = layersRichJson(pDb, layerCount);
     const std::string linetypesJson = symbolTableRecordsJson(pDb->linetypeTableId(), ltCount);
     const std::string textStylesJson = symbolTableRecordsJson(pDb->textStyleTableId(), tsCount);
-    const std::string dimStylesJson = symbolTableRecordsJson(pDb->dimStyleTableId(), dsCount);
+    const std::string dimStylesJson = dimStylesRichJson(pDb, dsCount);
     const std::string viewportsJson = symbolTableRecordsJson(pDb->viewportTableId(), vpCount);
     const std::string appIdsJson = symbolTableRecordsJson(pDb->regAppTableId(), raCount);
     sec << ",\"symbol_tables\":{\"layers\":" << layersJson
@@ -2885,6 +2942,108 @@ static Acad::ErrorStatus upsertLayerRecord(AcDbDatabase* pDb, const std::string&
     }
     else {
         delete pLayer;
+    }
+    return es;
+}
+
+// D-class TABLES tier (w3-dimstyle): optional per-field overrides for a
+// DIMSTYLE table record write -- same hasX-flag upsert contract
+// LayerPropertyArgs/applyLayerProperties established above (an absent field
+// is left UNTOUCHED). Covers the representative DIMVAR subset write.
+// dimstyle.create actually supports today out of AcDbDimStyleTableRecord's
+// ~70 dimension variables (dbdimvar.h) -- the rest are an honest gap, not a
+// silent fake (Rule 12).
+struct DimStylePropertyArgs {
+    bool hasDimtxt = false;   double dimtxt = 2.5;
+    bool hasDimasz = false;   double dimasz = 2.5;
+    bool hasDimexe = false;   double dimexe = 1.25;
+    bool hasDimexo = false;   double dimexo = 0.625;
+    bool hasDimdec = false;   int dimdec = 4;
+    bool hasDimscale = false; double dimscale = 1.0;
+    bool hasDimclrd = false;  int dimclrd = 0;
+    bool hasDimclre = false;  int dimclre = 0;
+    bool hasDimclrt = false;  int dimclrt = 0;
+    bool hasDimse1 = false;   bool dimse1 = false;
+};
+
+// Apply every PRESENT field in props onto pRec (open for write -- either a
+// not-yet-added new record or an existing one reopened kForWrite). Mirrors
+// applyLayerProperties' has-flag gating exactly.
+static void applyDimStyleProperties(AcDbDimStyleTableRecord* pRec, const DimStylePropertyArgs& props)
+{
+    if (props.hasDimtxt)
+        pRec->setDimtxt(props.dimtxt);
+    if (props.hasDimasz)
+        pRec->setDimasz(props.dimasz);
+    if (props.hasDimexe)
+        pRec->setDimexe(props.dimexe);
+    if (props.hasDimexo)
+        pRec->setDimexo(props.dimexo);
+    if (props.hasDimdec)
+        pRec->setDimdec(props.dimdec);
+    if (props.hasDimscale)
+        pRec->setDimscale(props.dimscale);
+    if (props.hasDimclrd) {
+        AcCmColor c; c.setColorIndex(static_cast<Adesk::UInt16>(props.dimclrd));
+        pRec->setDimclrd(c);
+    }
+    if (props.hasDimclre) {
+        AcCmColor c; c.setColorIndex(static_cast<Adesk::UInt16>(props.dimclre));
+        pRec->setDimclre(c);
+    }
+    if (props.hasDimclrt) {
+        AcCmColor c; c.setColorIndex(static_cast<Adesk::UInt16>(props.dimclrt));
+        pRec->setDimclrt(c);
+    }
+    if (props.hasDimse1)
+        pRec->setDimse1(props.dimse1);
+}
+
+// D-class TABLES tier: create-or-update a named DIMSTYLE record (write.
+// dimstyle.create's handler) -- mirrors upsertLayerRecord's upsert contract
+// exactly (see its own comment above): a brand-new dimstyle starts from
+// AcDbDimStyleTableRecord's own ctor defaults (no forced non-default field
+// the way a new layer forces color 7), and updating an EXISTING dimstyle
+// applies ONLY the fields present in props; omitted fields are left exactly
+// as they were.
+static Acad::ErrorStatus upsertDimStyleRecord(AcDbDatabase* pDb, const std::string& name,
+                                              const DimStylePropertyArgs& props, bool& created)
+{
+    created = false;
+    if (name.empty())
+        return Acad::eInvalidInput;
+
+    AcDbDimStyleTable* pDST = nullptr;
+    Acad::ErrorStatus es = pDb->getDimStyleTable(pDST, AcDb::kForWrite);
+    if (es != Acad::eOk)
+        return es;
+
+    const std::wstring nameW = asciiToWide(name);
+    AcDbObjectId existingId;
+    if (pDST->getAt(nameW.c_str(), existingId) == Acad::eOk) {
+        pDST->close();
+        AcDbDimStyleTableRecord* pRec = nullptr;
+        es = acdbOpenObject(pRec, existingId, AcDb::kForWrite);
+        if (es != Acad::eOk)
+            return es;
+        applyDimStyleProperties(pRec, props);
+        pRec->close();
+        return Acad::eOk;
+    }
+
+    AcDbDimStyleTableRecord* pRec = new AcDbDimStyleTableRecord();
+    pRec->setName(nameW.c_str());
+    applyDimStyleProperties(pRec, props);
+
+    AcDbObjectId id;
+    es = pDST->add(id, pRec);
+    pDST->close();
+    if (es == Acad::eOk) {
+        created = true;
+        pRec->close();
+    }
+    else {
+        delete pRec;
     }
     return es;
 }
@@ -3889,6 +4048,7 @@ static const AriadneOperationSpec kAriadneNativeOperationTable[] = {
     { "inspect.database.summary", "objectdbx_database" },
     { "inspect.database.graph", "inspect" },
     { "write.layer.create", "symbol_tables_dictionaries" },
+    { "write.dimstyle.create", "symbol_tables_dictionaries" },
     { "write.entity.line", "geometry_kernel" },
     { "write.entity.circle", "geometry_kernel" },
     { "inspect.entity.count", "inspect" },
@@ -4125,6 +4285,49 @@ static void ariadneNativeJob()
           << ",\"name\":\"" << jsonEscape(name) << "\""
           << ",\"linetype_error\":\"" << jsonEscape(linetypeError) << "\""
           << ",\"layers_after\":" << layers << "},"
+          << "\"status\":\"" << (es == Acad::eOk ? "ok" : "error") << "\"}";
+    }
+    else if (op == "write.dimstyle.create") {
+        std::string name;
+        if (!jsonFindString(job, "name", name) || name.empty())
+            name = "ARIADNE_DIMSTYLE";
+
+        // D-class TABLES tier (w3-dimstyle): every property below is OPTIONAL,
+        // same hasX upsert convention write.layer.create uses above -- an
+        // absent field leaves an existing dimstyle's value untouched.
+        // dimse1 travels as a 0/1 number (this file's existing jsonFindNumber
+        // convention -- see "closed"/"is_write"/write.layer.create's flags).
+        DimStylePropertyArgs props;
+        double numRaw = 0.0;
+        props.hasDimtxt = jsonFindNumber(job, "dimtxt", numRaw);
+        props.dimtxt = numRaw;
+        props.hasDimasz = jsonFindNumber(job, "dimasz", numRaw);
+        props.dimasz = numRaw;
+        props.hasDimexe = jsonFindNumber(job, "dimexe", numRaw);
+        props.dimexe = numRaw;
+        props.hasDimexo = jsonFindNumber(job, "dimexo", numRaw);
+        props.dimexo = numRaw;
+        props.hasDimdec = jsonFindNumber(job, "dimdec", numRaw);
+        props.dimdec = static_cast<int>(numRaw);
+        props.hasDimscale = jsonFindNumber(job, "dimscale", numRaw);
+        props.dimscale = numRaw;
+        props.hasDimclrd = jsonFindNumber(job, "dimclrd", numRaw);
+        props.dimclrd = static_cast<int>(numRaw);
+        props.hasDimclre = jsonFindNumber(job, "dimclre", numRaw);
+        props.dimclre = static_cast<int>(numRaw);
+        props.hasDimclrt = jsonFindNumber(job, "dimclrt", numRaw);
+        props.dimclrt = static_cast<int>(numRaw);
+        props.hasDimse1 = jsonFindNumber(job, "dimse1", numRaw);
+        props.dimse1 = (numRaw != 0.0);
+
+        bool created = false;
+        const Acad::ErrorStatus es = upsertDimStyleRecord(pDb, name, props, created);
+        const int dimstylesAfter = countSymbolTable(pDb->dimStyleTableId());
+        r << "\"result\":{\"created\":" << (created ? "true" : "false")
+          << ",\"updated\":" << ((es == Acad::eOk && !created) ? "true" : "false")
+          << ",\"errorstatus\":" << static_cast<int>(es)
+          << ",\"name\":\"" << jsonEscape(name) << "\""
+          << ",\"dimstyles_after\":" << dimstylesAfter << "},"
           << "\"status\":\"" << (es == Acad::eOk ? "ok" : "error") << "\"}";
     }
     else if (op == "write.entity.line") {

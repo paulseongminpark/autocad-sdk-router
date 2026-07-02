@@ -54,10 +54,10 @@
     }
   },
   "totals": {
-    "operations": 517,
+    "operations": 518,
     "by_status": {
       "blocked": 60,
-      "implemented": 457
+      "implemented": 458
     },
     "by_family": {
       "active_document_write_original": 8,
@@ -82,7 +82,7 @@
       "reactors_events": 22,
       "render": 1,
       "runtime_commands": 26,
-      "symbol_tables_dictionaries": 16,
+      "symbol_tables_dictionaries": 17,
       "ui_customization": 39,
       "validate": 2,
       "write": 4
@@ -91,9 +91,9 @@
       "accoreconsole_lisp_also": 20,
       "managed_also": 46,
       "native_arx_only": 233,
-      "objectdbx_capable": 218
+      "objectdbx_capable": 219
     },
-    "total": 517
+    "total": 518
   },
   "coverage": {
     "wired_ops": 33,
@@ -127,8 +127,8 @@
       "symbol_tables_dictionaries": 16,
       "ui_customization": 39
     },
-    "operation_records": 517,
-    "implemented": 457,
+    "operation_records": 518,
+    "implemented": 458,
     "wired": 0,
     "stub": 0,
     "catalogued": 0,
@@ -37750,6 +37750,74 @@
       ],
       "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
       "owner_ticket": "M08N-T02",
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs"
+    },
+    {
+      "id": "write.dimstyle.create",
+      "family": "symbol_tables_dictionaries",
+      "status": "implemented",
+      "engine_tier": "objectdbx_capable",
+      "host_eligibility": [
+        "dbx",
+        "coreconsole",
+        "arx_adapter",
+        "full_autocad"
+      ],
+      "execution_context": "hostless_dbx_in_accoreconsole",
+      "write_level": {
+        "default_write_mode": "write_copy",
+        "allowed_write_modes": [
+          "write_copy",
+          "write_original"
+        ],
+        "dwg_persisted": true,
+        "original_write_default": false
+      },
+      "handler": {
+        "router_lane": "ARIADNE_NATIVE_JOB",
+        "dispatcher_symbol": "upsertDimStyleRecord",
+        "execution_host_class": "dbx",
+        "composed_of": [],
+        "native_api": "AcDbDimStyleTable::add(AcDbObjectId&, AcDbDimStyleTableRecord*) + AcDbDimStyleTableRecord::setDimtxt/setDimasz/setDimexe/setDimexo/setDimdec/setDimscale/setDimclrd/setDimclre/setDimclrt/setDimse1"
+      },
+      "mapping_type": "synthetic",
+      "catalog_op_id": null,
+      "input_schema": "schemas/cad_job.v2.schema.json#/allOf",
+      "output_schema": "schemas/cad_result.v2.schema.json",
+      "summary": "Create-or-update a named DIMSTYLE table record, writing a representative 10-DIMVAR subset (dimtxt/dimasz/dimexe/dimexo/dimdec/dimscale/dimclrd/dimclre/dimclrt/dimse1) of AcDbDimStyleTableRecord's ~70 dimension variables.",
+      "evidence_refs": [
+        "tools/op_roundtrip_probe.py::probe_dimstyle_roundtrip",
+        "tools/patch_ops/tables.py#write.dimstyle.create"
+      ],
+      "phase_batch": "TABLES tier D-class (w3-dimstyle)",
+      "target_family_first_class": false,
+      "wired_v1": false,
+      "operation": "write.dimstyle.create",
+      "hosts": [
+        "dbx",
+        "coreconsole",
+        "arx_adapter",
+        "full_autocad"
+      ],
+      "engines": [
+        "objectdbx_capable"
+      ],
+      "schema_refs": {
+        "input": "schemas/cad_job.v2.schema.json#/allOf",
+        "output": "schemas/cad_result.v2.schema.json"
+      },
+      "policy": {
+        "source": "config/policy.v2.json",
+        "status_policy": "implemented",
+        "default_write_mode": "write_copy",
+        "no_original_write_default": true
+      },
+      "tests": [
+        "tools/op_roundtrip_probe.py::probe_dimstyle_roundtrip"
+      ],
+      "notes": "Create-or-update a named DIMSTYLE table record, writing a representative 10-DIMVAR subset of AcDbDimStyleTableRecord's ~70 dimension variables; the rest are an unwired gap (see tools/patch_ops/tables.py's module docstring).",
+      "owner_ticket": "M08C-T03",
       "implementation_strategy": "implemented_v1",
       "evidence_required": "existing_tests_and_evidence_refs"
     }

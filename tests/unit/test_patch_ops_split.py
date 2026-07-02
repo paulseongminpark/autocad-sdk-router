@@ -129,6 +129,16 @@ verified 2026-07-02 before the fix), even though the operation_registry's own
 native_api documentation already listed setScaleFactors/setRotation as part
 of the intended handler. Fixed alongside this wiring (see m08g_handlers.inc).
 Oracle extended accordingly; same invariants unaffected.
+
+w3-dimstyle update: create_dimstyle (write.dimstyle.create, AcDbDimStyleTable
+Record) gains its first-ever patch_ops wiring -- a brand-new op, unlike every
+prior batch above which each closed a two-part gap on an already-native-
+REACHABLE op. Mirrors create_layer's upsert shape (D-class TABLES tier) for
+the DIMSTYLE symbol table instead of LAYER, writing a representative 10-
+DIMVAR subset of AcDbDimStyleTableRecord's ~70 dimension variables (see
+tools/patch_ops/tables.py's module docstring for the exact set and the
+unwritten-DIMVAR gap). Oracle extended accordingly; same invariants
+unaffected.
 """
 from __future__ import annotations
 
@@ -175,6 +185,7 @@ _ORIGINAL_NATIVE_WRITE_OP_MAP = {
     "create_polyfacemesh": "write.entity.polyfacemesh",
     "create_dimension_radiallarge": "write.entity.dim.radiallarge",
     "create_blockref": "write.entity.blockref",
+    "create_dimstyle": "write.dimstyle.create",
 }
 
 

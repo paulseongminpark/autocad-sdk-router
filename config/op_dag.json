@@ -12,11 +12,11 @@
     "acceptance_test_id": "registry tests[0] (current best-evidence test ref; F3's future per-op W+D roundtrip gate is not built in this tree yet)"
   },
   "totals": {
-    "catalogue_count": 517,
-    "node_count": 517,
-    "edge_count": 1130,
+    "catalogue_count": 518,
+    "node_count": 518,
+    "edge_count": 1139,
     "by_persistence_class": {
-      "D": 48,
+      "D": 49,
       "L": 35,
       "NON_GOAL": 60,
       "P": 55,
@@ -6999,6 +6999,28 @@
         "tests/unit/test_operation_registry_v2.py"
       ],
       "acceptance_test_id": "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
+      "persistence_class": "D"
+    },
+    {
+      "op_id": "write.dimstyle.create",
+      "predecessors": [
+        "acdb.database.create",
+        "inspect.dictionary.get",
+        "inspect.dictionary.named_objects",
+        "inspect.entity.get_xdata",
+        "inspect.object.ext_dict",
+        "inspect.symboltable.block",
+        "inspect.symboltable.layers",
+        "inspect.xrecord.get",
+        "transform.database.wblock"
+      ],
+      "arg_keys": [],
+      "target_files": [
+        "tools/op_roundtrip_probe.py",
+        "tools/patch_engine.py",
+        "tools/patch_ops/tables.py"
+      ],
+      "acceptance_test_id": "tools/op_roundtrip_probe.py::probe_dimstyle_roundtrip",
       "persistence_class": "D"
     },
     {

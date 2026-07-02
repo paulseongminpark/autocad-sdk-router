@@ -3,10 +3,11 @@
 """patch_ops.tables -- symbol-table write ops (CAD OS Layer, Lane E family
 split).
 
-Symbol-table ops (layer/linetype/dimstyle/textstyle). Only create_layer
-(-> write.layer.create) has a live native handler here today; linetype/
-dimstyle/textstyle record writes await a family ticket (only the reference
-BY NAME from a layer record -- see "linetype" below -- is wired).
+Symbol-table ops (layer/linetype/dimstyle/textstyle). create_layer (->
+write.layer.create) and create_dimstyle (-> write.dimstyle.create) have live
+native handlers here today; linetype/textstyle record writes await a family
+ticket (only the reference BY NAME from a layer record -- see "linetype"
+below -- is wired).
 
 CADOS F8 / H-5: set_layer used to live in this module, also mapped to
 write.layer.create. That was an active fake-success -- write.layer.create
@@ -24,6 +25,14 @@ color_index/linetype/lineweight/plottable/frozen/off/locked all round-trip
 through re-extraction (symbol_tables.layers[], see AriadneNativeJob.cpp's
 upsertLayerRecord). Only fields present in ``args`` are forwarded; an absent
 field is left untouched on the native side, never defaulted/injected here.
+
+w3-dimstyle (D-class TABLES tier): write.dimstyle.create is the SAME upsert
+shape for the DIMSTYLE table -- AcDbDimStyleTableRecord exposes ~70
+dimension variables (dbdimvar.h); only a representative subset is wired on
+the native side today (dimtxt/dimasz/dimexe/dimexo/dimdec/dimscale/dimclrd/
+dimclre/dimclrt/dimse1 -- see AriadneNativeJob.cpp's DimStylePropertyArgs).
+The other ~60 DIMVARs are an honest gap: passing them in ``args`` is a
+silent no-op on the wire (never forwarded), not a fake write.
 """
 from __future__ import annotations
 
@@ -33,6 +42,7 @@ from typing import Any, Dict, Optional
 # "implemented"). Only these have a live native handler today.
 WRITE_OP_MAP: Dict[str, str] = {
     "create_layer": "write.layer.create",
+    "create_dimstyle": "write.dimstyle.create",
 }
 
 # Passthrough fields whose native job encoding is identical to the patch-op
@@ -43,6 +53,15 @@ _LAYER_PASSTHROUGH_FIELDS = ("color_index", "linetype", "lineweight")
 # understand JSON true/false tokens -- coerce here so a caller can pass an
 # idiomatic Python bool without silently becoming "false" on the wire.
 _LAYER_FLAG_FIELDS = ("plottable", "frozen", "off", "locked")
+
+# The representative DIMVAR subset write.dimstyle.create's native handler
+# actually reads (DimStylePropertyArgs in AriadneNativeJob.cpp) -- every
+# other DIMVAR name is NOT forwarded (see module docstring's gap note).
+_DIMSTYLE_PASSTHROUGH_FIELDS = (
+    "dimtxt", "dimasz", "dimexe", "dimexo", "dimdec", "dimscale",
+    "dimclrd", "dimclre", "dimclrt",
+)
+_DIMSTYLE_FLAG_FIELDS = ("dimse1",)
 
 
 def build_job_args(native_op: str, args: Dict[str, Any]) -> Optional[Dict[str, Any]]:
@@ -58,6 +77,20 @@ def build_job_args(native_op: str, args: Dict[str, Any]) -> Optional[Dict[str, A
             if key in args:
                 out[key] = args[key]
         for key in _LAYER_FLAG_FIELDS:
+            if key in args:
+                out[key] = int(bool(args[key]))
+        return out
+    if native_op == "write.dimstyle.create":
+        # create_dimstyle -> create-or-update (upsert) the target dimstyle
+        # record. Mirrors write.layer.create's arg-forwarding exactly.
+        out: Dict[str, Any] = {}
+        name = args.get("name")
+        if name is not None:
+            out["name"] = name
+        for key in _DIMSTYLE_PASSTHROUGH_FIELDS:
+            if key in args:
+                out[key] = args[key]
+        for key in _DIMSTYLE_FLAG_FIELDS:
             if key in args:
                 out[key] = int(bool(args[key]))
         return out
