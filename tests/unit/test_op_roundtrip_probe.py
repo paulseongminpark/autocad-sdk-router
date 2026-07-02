@@ -511,6 +511,46 @@ class TestExpectedIrForOp(unittest.TestCase):
         self.assertEqual(ir["entities"][0]["geometry"]["vertices"],
                          [{"point": [1, 1, 0]}, {"point": [5, 5, 0]}])
 
+    def test_create_blockref_builds_block_reference_geometry(self):
+        # w3-insert: collectModelSpaceGraph's AcDbBlockReference branch
+        # pre-dates this op's patch_ops wiring (unlike every op above); the
+        # write handler's own gap was scale/rotation never being applied --
+        # fixed alongside this wiring (m08g_handlers.inc), so all four fields
+        # are direct, args-derivable echoes: position (ctor arg), block_name
+        # (a block-table NAME LOOKUP the write handler resolves, then the
+        # read branch resolves back via blockTableRecord()->getName() -- so
+        # it round-trips as long as the name is real), scale (setScaleFactors)
+        # and rotation (setRotation) both live-verified 2026-07-02 w3-insert
+        # cert against a real accoreconsole roundtrip.
+        ir = probe.expected_ir_for_op(
+            "create_blockref",
+            {"block_name": "AGENT_TEST_BLOCK",
+             "position": {"x": 10.0, "y": 20.0, "z": 0.0},
+             "scale": {"x": 2.0, "y": 3.0, "z": 1.0},
+             "rotation": 0.5, "layer": "0"})
+        ent = ir["entities"][0]
+        self.assertEqual(ent["dxf_name"], "INSERT")
+        self.assertEqual(ent["geometry"], {
+            "kind": "block_reference",
+            "position": [10.0, 20.0, 0.0],
+            "scale": [2.0, 3.0, 1.0],
+            "rotation": 0.5,
+            "block_name": "AGENT_TEST_BLOCK",
+        })
+
+    def test_create_blockref_scale_and_rotation_default_when_omitted(self):
+        # write.entity.blockref's own handler defaults (m08g_handlers.inc:
+        # "m08gPoint(job, "scale", 1.0, 1.0, 1.0, scalePt)" / "double rotation
+        # = 0.0") -- mirrored here so an omitted scale/rotation still asserts
+        # the SAME AcDbBlockReference ctor default the native handler applies.
+        ir = probe.expected_ir_for_op(
+            "create_blockref",
+            {"block_name": "AGENT_TEST_BLOCK",
+             "position": {"x": 0.0, "y": 0.0, "z": 0.0}, "layer": "0"})
+        geom = ir["entities"][0]["geometry"]
+        self.assertEqual(geom["scale"], [1.0, 1.0, 1.0])
+        self.assertEqual(geom["rotation"], 0.0)
+
     def test_create_polyline2d_builds_lwpolyline_geometry(self):
         # w3-poly2d: write.entity.polyline2d is an ALIAS for write.entity.
         # polyline (m08g_handlers.inc) -- it builds a real AcDbPolyline

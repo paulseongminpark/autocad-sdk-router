@@ -54,6 +54,7 @@ WRITE_OP_MAP: Dict[str, str] = {
     "create_polygonmesh": "write.entity.polygonmesh",
     "create_polyfacemesh": "write.entity.polyfacemesh",
     "create_dimension_radiallarge": "write.entity.dim.radiallarge",
+    "create_blockref": "write.entity.blockref",
 }
 
 
@@ -240,6 +241,20 @@ def build_job_args(native_op: str, args: Dict[str, Any]) -> Optional[Dict[str, A
     if native_op == "write.entity.dim.radiallarge":
         out: Dict[str, Any] = {}
         for k in ('center', 'chord_point', 'override_center', 'jog_point', 'jog_angle', 'dim_text', 'layer'):
+            if k in args:
+                out[k] = args[k]
+        return out
+    if native_op == "write.entity.blockref":
+        # w3-insert: op-level arg is "block_name" (matches DWG_GRAPH_IR_SPEC's
+        # block_reference.block_name / the IR geometry field this op's ground
+        # truth is compared against) -- the native job field is "name" (see
+        # m08g_handlers.inc's write.entity.blockref branch), so this is a
+        # rename, not a passthrough, the same shape modify.entity.common's
+        # layer -> set_layer rename above already uses.
+        out = {}
+        if "block_name" in args:
+            out["name"] = args["block_name"]
+        for k in ("position", "scale", "rotation", "layer"):
             if k in args:
                 out[k] = args[k]
         return out

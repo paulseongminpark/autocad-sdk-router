@@ -941,6 +941,35 @@ def _expect_create_mline(args: Dict[str, Any]) -> Dict[str, Any]:
     }
 
 
+def _expect_create_blockref(args: Dict[str, Any]) -> Dict[str, Any]:
+    # w3-insert: write.entity.blockref (m08g_handlers.inc) builds a real
+    # AcDbBlockReference(position, blockId) then -- as of this batch's fix --
+    # also calls setScaleFactors/setRotation from "scale"/"rotation" args
+    # (previously silently dropped; see test_patch_ops_split.py's module
+    # docstring). block_name is NOT an independent ctor-arg echo: it is a
+    # block-table LOOKUP BY NAME (blockTableRecord()->getName() on read), so
+    # this ground truth only holds when "block_name" resolves to a real
+    # pre-existing block definition in the target DWG -- callers are
+    # responsible for that precondition, this builder does not create one.
+    # scale/rotation default to the AcDbBlockReference ctor defaults (1,1,1
+    # / 0.0) when
+    # omitted, matching m08gPoint/jsonFindNumber's own defaults in the
+    # handler -- live-verified 2026-07-02 w3-insert cert (diff=0 for all
+    # four fields against a real accoreconsole roundtrip).
+    scale_arg = args.get("scale")
+    scale = _point_to_list(scale_arg) if scale_arg is not None else [1.0, 1.0, 1.0]
+    return {
+        "dxf_name": "INSERT", "layer": args.get("layer") or "0",
+        "geometry": {
+            "kind": "block_reference",
+            "position": _point_to_list(args["position"]),
+            "scale": scale,
+            "rotation": args.get("rotation", 0.0),
+            "block_name": args["block_name"],
+        },
+    }
+
+
 # op_name -> args -> a single IR entity (dxf_name/layer/geometry only -- no
 # handle; the P-gate's geometry-basis compare is handle-independent by
 # design). Only ops this module can honestly build ground truth for; an
@@ -1040,6 +1069,30 @@ def _expect_create_mline(args: Dict[str, Any]) -> Dict[str, Any]:
 # expected-ir builder yet) confirmed a real, non-attended-only entity (net
 # modelspace +1, class=AcDbRadialDimensionLarge, original DWG byte-identical)
 # BEFORE the read branch + rebuild were invested in.
+#
+# w3-insert adds create_blockref (AcDbBlockReference/INSERT -- the BLOCK/
+# INSERT tier's foundation, and the single most common entity in production
+# DWGs): UNLIKE every op above, this one already had a real m08g_handlers.inc
+# write handler AND a collectModelSpaceGraph read branch (position/scale/
+# rotation/block_name/block_record_handle) BEFORE this batch -- no two-part
+# gap. The real gap was that the write handler read "name"/"position" but
+# never applied "scale"/"rotation" (silently dropped -- a live create-only
+# probe against a real block definition confirmed net modelspace +1,
+# class=AcDbBlockReference, original DWG byte-identical, but scale/rotation
+# read back as the ctor default 1/1/1 and 0.0 regardless of the arg, even
+# though the operation_registry's own native_api note already listed
+# setScaleFactors/setRotation as intended). Fixed in the same handler (see
+# m08g_handlers.inc) before this builder was written, so all four fields
+# below are asserted as REAL, live-verified ctor-arg echoes, not aspirational
+# ones. Also unlike every op above: native_sample.dwg's 245 real block
+# definitions are ALL non-ASCII (Korean) names, and this handler resolves
+# "name" via asciiToWide (naive byte-widening, not UTF-8 decode) -- so none
+# of them resolve correctly through this op today. The cert below uses a
+# fresh ASCII block definition created via the already-implemented
+# write.block.simple_create op instead (see runs/w3_insert_probe); the
+# non-ASCII block_name lookup gap is a real, separate, pre-existing
+# limitation this batch does NOT fix (asciiToWide is shared by other
+# symbol-table name lookups outside this op's scope -- see m08c_handlers.inc).
 _EXPECTED_ENTITY_BUILDERS: Dict[str, Callable[[Dict[str, Any]], Dict[str, Any]]] = {
     "create_line": _expect_create_line,
     "create_circle": _expect_create_circle,
@@ -1065,6 +1118,7 @@ _EXPECTED_ENTITY_BUILDERS: Dict[str, Callable[[Dict[str, Any]], Dict[str, Any]]]
     "create_dimension_angular2line": _expect_create_dimension_angular2line,
     "create_dimension_angular3pt": _expect_create_dimension_angular3pt,
     "create_mleader": _expect_create_mleader,
+    "create_blockref": _expect_create_blockref,
 }
 
 

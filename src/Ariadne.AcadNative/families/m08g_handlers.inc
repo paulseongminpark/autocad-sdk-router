@@ -908,6 +908,16 @@ static bool m08gDispatch(const std::string& op, const AriadneJobCtx& ctx, std::o
             return true;
         }
         AcGePoint3d pos; m08gPoint(job, "position", 0.0, 0.0, 0.0, pos);
+        // w3-insert: scale/rotation were catalogued (registry native_api lists
+        // setScaleFactors/setRotation) but never actually read/applied here --
+        // any caller-supplied scale/rotation silently vanished (read back as
+        // the AcDbBlockReference default 1/1/1 and 0.0 regardless of the arg;
+        // live-verified 2026-07-02 before this fix). "scale" is a {x,y,z}
+        // point-shape arg (DWG_GRAPH_IR_SPEC's block_reference.scale X/Y/Z),
+        // not m08gReadTransform's unrelated uniform-number "scale" -- read via
+        // m08gPoint like every other point/vector arg, default 1,1,1.
+        AcGePoint3d scalePt; m08gPoint(job, "scale", 1.0, 1.0, 1.0, scalePt);
+        double rotation = 0.0; jsonFindNumber(job, "rotation", rotation);
         AcDbBlockTable* pBT = nullptr;
         Acad::ErrorStatus es = pDb->getBlockTable(pBT, AcDb::kForRead);
         if (es != Acad::eOk) { emitNativeError(r, "DB_ERROR", "getBlockTable"); return true; }
@@ -935,6 +945,11 @@ static bool m08gDispatch(const std::string& op, const AriadneJobCtx& ctx, std::o
         } else {
             pRef = new AcDbBlockReference(pos, blockId);
         }
+        // Applies to both branches (AcDbMInsertBlock derives from
+        // AcDbBlockReference, same setters) -- fire-and-forget, matching
+        // setLayer below (no ErrorStatus check anywhere in this handler).
+        pRef->setScaleFactors(AcGeScale3d(scalePt.x, scalePt.y, scalePt.z));
+        pRef->setRotation(rotation);
         if (!layer.empty()) {
             bool c = false; ensureLayer(pDb, layer, 7, c);
             pRef->setLayer(asciiToWide(layer).c_str());

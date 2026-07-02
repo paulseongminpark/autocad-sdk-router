@@ -116,6 +116,19 @@ de-risked the attended-only trap first (net modelspace +1,
 class=AcDbRadialDimensionLarge, original DWG byte-identical) before the read
 branch + rebuild were invested in. Oracle extended accordingly; same
 invariants unaffected.
+
+w3-insert update: create_blockref (write.entity.blockref, AcDbBlockReference/
+INSERT) gains its first-ever patch_ops wiring. UNLIKE every op logged above,
+this one already had BOTH a real m08g_handlers.inc write handler AND a
+collectModelSpaceGraph read branch (position/scale/rotation/block_name/
+block_record_handle) -- the two-part gap every prior wave hit does not apply
+here. The real gap was a THIRD kind: the write handler read "name"/"position"
+but never applied "scale"/"rotation" at all (silently dropped, read back as
+the AcDbBlockReference default 1/1/1 and 0.0 regardless of the arg -- live-
+verified 2026-07-02 before the fix), even though the operation_registry's own
+native_api documentation already listed setScaleFactors/setRotation as part
+of the intended handler. Fixed alongside this wiring (see m08g_handlers.inc).
+Oracle extended accordingly; same invariants unaffected.
 """
 from __future__ import annotations
 
@@ -161,6 +174,7 @@ _ORIGINAL_NATIVE_WRITE_OP_MAP = {
     "create_polygonmesh": "write.entity.polygonmesh",
     "create_polyfacemesh": "write.entity.polyfacemesh",
     "create_dimension_radiallarge": "write.entity.dim.radiallarge",
+    "create_blockref": "write.entity.blockref",
 }
 
 
