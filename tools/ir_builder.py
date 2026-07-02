@@ -522,6 +522,7 @@ _NATIVE_CLASS_TO_DXF_KIND = {
     # n_size grid, no bulge) is unrelated to any of theirs, hence its own
     # "poly_face_mesh" kind.
     "AcDbPolyFaceMesh": ("POLYLINE", "poly_face_mesh"),
+    "AcDbRadialDimensionLarge": ("DIMENSION", "dimension"),
 }
 
 
@@ -550,6 +551,11 @@ def _geometry_from_native_entity(raw: dict, kind: str) -> dict:
     AcDbPolyFaceMesh's "vertices" reuse that same generic lift too; its
     "faces" (per-face vertex-index arrays, no point/bulge shape at all) get
     their own passthrough below, the same shape "loops" already uses.
+    w3-radl: AcDbRadialDimensionLarge reuses center/chord_point/measurement
+    verbatim (identical semantic to AcDbRadialDimension above) and adds two
+    new point keys, override_center/jog_point, plus a new number key,
+    jog_angle -- all three are this class's own jog-symbol placement args,
+    with no prior-batch equivalent.
     Returns an IR geometry dict with a valid ``kind``; unrepresented kinds get
     a geometry that carries only ``kind`` (decoded=False is decided by the
     caller).
@@ -558,7 +564,8 @@ def _geometry_from_native_entity(raw: dict, kind: str) -> dict:
     for key in ("start", "end", "center", "position", "scale", "normal",
                 "major_axis", "xline1_point", "xline2_point", "dim_line_point",
                 "chord_point", "far_chord_point", "defining_point", "leader_end_point",
-                "arc_point", "xline1_start", "xline1_end", "xline2_start", "xline2_end"):
+                "arc_point", "xline1_start", "xline1_end", "xline2_start", "xline2_end",
+                "override_center", "jog_point"):
         pt = _as_point3(raw.get(key))
         if pt is not None:
             geom[key] = pt
@@ -568,7 +575,8 @@ def _geometry_from_native_entity(raw: dict, kind: str) -> dict:
     for nk, ik in (("start_angle", "start_angle"), ("end_angle", "end_angle"),
                    ("rotation", "rotation"), ("radius_ratio", "radius_ratio"),
                    ("height", "height"), ("measurement", "measurement"),
-                   ("degree", "degree"), ("m_size", "m_size"), ("n_size", "n_size")):
+                   ("degree", "degree"), ("m_size", "m_size"), ("n_size", "n_size"),
+                   ("jog_angle", "jog_angle")):
         num = _to_number(raw.get(nk))
         if num is not None:
             geom[ik] = num

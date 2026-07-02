@@ -1627,6 +1627,50 @@ static bool collectModelSpaceGraph(AcDbDatabase* pDb, int& total,
                 arr << ",\"dim_block_name\":\"" << jsonEscape(dimBlockName) << "\"";
             }
         }
+        // w3-radl: AcDbRadialDimensionLarge -- a jogged (large) radius
+        // dimension. Derives directly from AcDbDimension (NOT from
+        // AcDbRadialDimension), so cast ordering relative to it is not
+        // load-bearing (same non-issue w3-dimarc/w3-ang2/w3-ang3 documented
+        // for their own AcDbDimension-direct classes). center/chordPoint are
+        // the SAME "true center of the dimensioned arc" / "point on that arc"
+        // pair AcDbRadialDimension already uses, so measurement (the
+        // dimensioned radius) has the identical semantic: the center<->
+        // chordPoint distance. overrideCenter/jogPoint/jogAngle are the 3
+        // extra jog-symbol placement args write.entity.dim.radiallarge's ctor
+        // takes (m08h_handlers.inc) with no plain-radial equivalent -- all 5
+        // are extracted here; whether each survives as a verbatim ctor-arg
+        // echo or gets AutoCAD-re-anchored (the arc_point pattern w3-dimarc/
+        // w3-ang2/w3-ang3 all found on THEIR placement-only points) is
+        // determined by op_roundtrip_probe.py's live re-cert, not assumed
+        // here.
+        else if (AcDbRadialDimensionLarge* pRadL = AcDbRadialDimensionLarge::cast(pEnt)) {
+            const AcGePoint3d ctr = pRadL->center();
+            const AcGePoint3d chord = pRadL->chordPoint();
+            const AcGePoint3d ovrCtr = pRadL->overrideCenter();
+            const AcGePoint3d jogPt = pRadL->jogPoint();
+            double measurement = 0.0;
+            const bool haveMeasurement = (pRadL->measurement(measurement) == Acad::eOk);
+            arr << ",\"center\":[" << ctr.x << "," << ctr.y << "," << ctr.z << "]"
+                << ",\"chord_point\":[" << chord.x << "," << chord.y << "," << chord.z << "]"
+                << ",\"override_center\":[" << ovrCtr.x << "," << ovrCtr.y << "," << ovrCtr.z << "]"
+                << ",\"jog_point\":[" << jogPt.x << "," << jogPt.y << "," << jogPt.z << "]"
+                << ",\"jog_angle\":" << pRadL->jogAngle();
+            if (haveMeasurement)
+                arr << ",\"measurement\":" << measurement;
+            const AcDbObjectId dimBlockId = pRadL->dimBlockId();
+            if (!dimBlockId.isNull()) {
+                arr << ",\"dim_block_handle\":\"" << jsonEscape(handleOfId(dimBlockId)) << "\"";
+                std::string dimBlockName;
+                AcDbBlockTableRecord* pDimDef = nullptr;
+                if (acdbOpenObject(pDimDef, dimBlockId, AcDb::kForRead) == Acad::eOk) {
+                    const ACHAR* nameRaw = nullptr;
+                    if (pDimDef->getName(nameRaw) == Acad::eOk)
+                        dimBlockName = acharToAscii(nameRaw);
+                    pDimDef->close();
+                }
+                arr << ",\"dim_block_name\":\"" << jsonEscape(dimBlockName) << "\"";
+            }
+        }
         // T3a-batch3: AcDbLeader -- vertices are direct, args-derivable echoes
         // of write.entity.leader's vertices/points ctor-arg loop (appendVertex
         // per point, no transform). has_arrow_head/splined are deterministic

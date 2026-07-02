@@ -473,6 +473,44 @@ def _expect_create_dimension_diametric(args: Dict[str, Any]) -> Dict[str, Any]:
     }
 
 
+def _expect_create_dimension_radiallarge(args: Dict[str, Any]) -> Dict[str, Any]:
+    # AcDbRadialDimensionLarge(center, chordPoint, overrideCenter, jogPoint,
+    # jogAngle, dimText, dimStyle) -- write.entity.dim.radiallarge
+    # (m08h_handlers.inc) passes all 5 geometry args straight to the ctor.
+    # center/chord_point carry the SAME "true center of the dimensioned arc" /
+    # "point on that arc" semantic AcDbRadialDimension already has, so
+    # measurement (the dimensioned radius) is computed identically:
+    # independently, as the center<->chord_point distance (never a live
+    # read), exactly like _expect_create_dimension_radial above.
+    # override_center/jog_point/jog_angle are asserted as direct, verbatim
+    # ctor-arg echoes (live-verified 2026-07-02 w3-radl re-cert) -- UNLIKE
+    # AcDbArcDimension/AcDb2LineAngularDimension/AcDb3PointAngularDimension's
+    # own placement-only arc_point, AutoCAD does NOT re-anchor any of this
+    # class's 3 jog-symbol args: they are independent stored fields (each has
+    # its own plain setCenter/setChordPoint/setOverrideCenter/setJogPoint/
+    # setJogAngle -- the ObjectARX header's cross-updating "PP" variants
+    # (setOverrideCenterPP/setJogPointPP) are documented as "used exclusively
+    # by property palette", i.e. NOT invoked by the plain ctor this handler
+    # calls).
+    center = _point_to_list(args["center"])
+    chord = _point_to_list(args["chord_point"])
+    override_center = _point_to_list(args["override_center"])
+    jog_point = _point_to_list(args["jog_point"])
+    jog_angle = args.get("jog_angle", 0.785398163397448)  # handler default: 45deg
+    dx, dy, dz = chord[0] - center[0], chord[1] - center[1], chord[2] - center[2]
+    measurement = math.sqrt(dx * dx + dy * dy + dz * dz)
+    return {
+        "dxf_name": "DIMENSION", "layer": args.get("layer") or "0",
+        "geometry": {
+            "kind": "dimension",
+            "center": center, "chord_point": chord,
+            "override_center": override_center, "jog_point": jog_point,
+            "jog_angle": jog_angle,
+            "measurement": measurement,
+        },
+    }
+
+
 def _expect_create_dimension_ordinate(args: Dict[str, Any]) -> Dict[str, Any]:
     # AcDbOrdinateDimension(useXAxis, definingPoint, leaderEndPoint, dimText,
     # dimStyle) -- write.entity.dim.ordinate (m08h_handlers.inc) passes
@@ -992,6 +1030,16 @@ def _expect_create_mline(args: Dict[str, Any]) -> Dict[str, Any]:
 # expected-ir builder yet) confirmed a real, non-attended-only entity (net
 # modelspace +1, class=AcDbPolyFaceMesh, original DWG byte-identical) BEFORE
 # the read branch + rebuild were invested in.
+#
+# w3-radl adds create_dimension_radiallarge: the m08h_handlers.inc write
+# handler already existed (core dbdim.h, same acdb import lib as every other
+# dimension subtype -- no demand-loaded engine), but had NEITHER patch_ops
+# wiring NOR a collectModelSpaceGraph read branch at all (same two-part gap
+# as w3-pmesh/w3-pfmesh). The SAME de-risking discipline was applied first: a
+# live create-only probe (direct patch_engine.apply_staged call, no
+# expected-ir builder yet) confirmed a real, non-attended-only entity (net
+# modelspace +1, class=AcDbRadialDimensionLarge, original DWG byte-identical)
+# BEFORE the read branch + rebuild were invested in.
 _EXPECTED_ENTITY_BUILDERS: Dict[str, Callable[[Dict[str, Any]], Dict[str, Any]]] = {
     "create_line": _expect_create_line,
     "create_circle": _expect_create_circle,
@@ -1009,6 +1057,7 @@ _EXPECTED_ENTITY_BUILDERS: Dict[str, Callable[[Dict[str, Any]], Dict[str, Any]]]
     "create_dimension_aligned": _expect_create_dimension_aligned,
     "create_dimension_radial": _expect_create_dimension_radial,
     "create_dimension_diametric": _expect_create_dimension_diametric,
+    "create_dimension_radiallarge": _expect_create_dimension_radiallarge,
     "create_dimension_ordinate": _expect_create_dimension_ordinate,
     "create_leader": _expect_create_leader,
     "create_mline": _expect_create_mline,

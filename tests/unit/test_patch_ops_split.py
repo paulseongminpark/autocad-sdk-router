@@ -105,6 +105,17 @@ branch -- same two-part gap as w3-pmesh just above. A live create-only probe
 first (net modelspace +1, class=AcDbPolyFaceMesh, original DWG byte-
 identical) before the read branch + rebuild were invested in. Oracle extended
 accordingly; same invariants unaffected.
+
+w3-radl update: create_dimension_radiallarge (write.entity.dim.radiallarge,
+AcDbRadialDimensionLarge) already had a real m08h_handlers.inc write handler
+(core dbdim.h, same acdb import lib as every other dimension subtype -- no
+demand-loaded engine) but had NEITHER a patch_ops.WRITE_OP_MAP entry NOR a
+collectModelSpaceGraph read branch -- same two-part gap as w3-pmesh/w3-pfmesh
+above. A live create-only probe (direct patch_engine.apply_staged call)
+de-risked the attended-only trap first (net modelspace +1,
+class=AcDbRadialDimensionLarge, original DWG byte-identical) before the read
+branch + rebuild were invested in. Oracle extended accordingly; same
+invariants unaffected.
 """
 from __future__ import annotations
 
@@ -149,6 +160,7 @@ _ORIGINAL_NATIVE_WRITE_OP_MAP = {
     "create_polyline3d": "write.entity.polyline3d",
     "create_polygonmesh": "write.entity.polygonmesh",
     "create_polyfacemesh": "write.entity.polyfacemesh",
+    "create_dimension_radiallarge": "write.entity.dim.radiallarge",
 }
 
 

@@ -53,6 +53,7 @@ WRITE_OP_MAP: Dict[str, str] = {
     "create_polyline3d": "write.entity.polyline3d",
     "create_polygonmesh": "write.entity.polygonmesh",
     "create_polyfacemesh": "write.entity.polyfacemesh",
+    "create_dimension_radiallarge": "write.entity.dim.radiallarge",
 }
 
 
@@ -233,6 +234,12 @@ def build_job_args(native_op: str, args: Dict[str, Any]) -> Optional[Dict[str, A
     if native_op == "write.entity.dim.angular3pt":
         out: Dict[str, Any] = {}
         for k in ('center', 'xline1', 'xline2', 'arc_point', 'dim_text', 'layer'):
+            if k in args:
+                out[k] = args[k]
+        return out
+    if native_op == "write.entity.dim.radiallarge":
+        out: Dict[str, Any] = {}
+        for k in ('center', 'chord_point', 'override_center', 'jog_point', 'jog_angle', 'dim_text', 'layer'):
             if k in args:
                 out[k] = args[k]
         return out

@@ -348,6 +348,28 @@ class TestNativeGraphGeometryLifting(unittest.TestCase):
         self.assertEqual(ent["leader_length"], 5.0)
         self.assertNotIn("leader_length", ent["geometry"])
 
+    def test_radiallarge_dimension_lifts_jog_fields(self):
+        # w3-radl: center/chord_point carry the SAME semantic AcDbRadialDimension
+        # already uses (measurement = the center<->chord_point distance).
+        # override_center/jog_point/jog_angle are this class's own 3 extra
+        # jog-symbol placement fields -- UNLIKE leader_length (radial/
+        # diametric) or origin (ordinate), all 3 are live-verified (2026-07-02
+        # w3-radl re-cert) to be direct ctor-arg echoes, so they stay INSIDE
+        # "geometry" (asserted by the P-gate), not top-level.
+        ent = self._one_entity_ir({
+            "handle": "1AC5", "dxf_name": "AcDbRadialDimensionLarge", "layer": "0",
+            "owner_handle": "1F", "space": "model",
+            "center": [0.0, 0.0, 0.0], "chord_point": [50.0, 0.0, 0.0],
+            "override_center": [0.0, -80.0, 0.0], "jog_point": [25.0, -40.0, 0.0],
+            "jog_angle": 0.785398163397448, "measurement": 50.0,
+        })
+        self.assertEqual(ent["dxf_name"], "DIMENSION")
+        self.assertEqual(ent["geometry"], {
+            "kind": "dimension", "center": [0.0, 0.0, 0.0], "chord_point": [50.0, 0.0, 0.0],
+            "override_center": [0.0, -80.0, 0.0], "jog_point": [25.0, -40.0, 0.0],
+            "jog_angle": 0.785398163397448, "measurement": 50.0,
+        })
+
     def test_ordinate_dimension_lifts_points_and_top_level_origin(self):
         ent = self._one_entity_ir({
             "handle": "1AB", "dxf_name": "AcDbOrdinateDimension", "layer": "0",

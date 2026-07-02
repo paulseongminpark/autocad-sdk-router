@@ -249,6 +249,42 @@ class TestExpectedIrForOp(unittest.TestCase):
         })
         self.assertNotIn("leader_length", ent["geometry"])
 
+    def test_create_dimension_radiallarge_builds_dimension_geometry(self):
+        # w3-radl: collectModelSpaceGraph grew an AcDbRadialDimensionLarge
+        # branch. center/chord_point carry the SAME semantic AcDbRadialDimension
+        # already uses, so measurement is the identical independently-computed
+        # center->chord_point distance (the radius). UNLIKE AcDbArcDimension/
+        # AcDb2LineAngularDimension/AcDb3PointAngularDimension's own
+        # placement-only arc_point, override_center/jog_point/jog_angle are
+        # asserted as direct, verbatim ctor-arg echoes -- live-verified
+        # (2026-07-02 w3-radl re-cert, 3 real accoreconsole roundtrips against
+        # tests/fixtures/native_sample.dwg, one with a non-zero Z) that
+        # AutoCAD does not re-anchor any of them.
+        ir = probe.expected_ir_for_op(
+            "create_dimension_radiallarge",
+            {"center": [0, 0, 0], "chord_point": [50, 0, 0],
+             "override_center": [0, -80, 0], "jog_point": [25, -40, 0],
+             "jog_angle": 0.785398163397448, "layer": "0"})
+        ent = ir["entities"][0]
+        self.assertEqual(ent["dxf_name"], "DIMENSION")
+        self.assertEqual(ent["geometry"], {
+            "kind": "dimension", "center": [0, 0, 0], "chord_point": [50, 0, 0],
+            "override_center": [0, -80, 0], "jog_point": [25, -40, 0],
+            "jog_angle": 0.785398163397448, "measurement": 50.0,
+        })
+
+    def test_create_dimension_radiallarge_jog_angle_defaults_to_45deg(self):
+        # write.entity.dim.radiallarge's own handler default (m08h_handlers.inc:
+        # "double jogAngle = 0.785398163397448; jsonFindNumber(job, "jog_angle",
+        # jogAngle);") -- mirrored here so an omitted jog_angle arg still
+        # asserts the SAME value the native ctor actually receives.
+        ir = probe.expected_ir_for_op(
+            "create_dimension_radiallarge",
+            {"center": [0, 0, 0], "chord_point": [50, 0, 0],
+             "override_center": [0, -80, 0], "jog_point": [25, -40, 0], "layer": "0"})
+        geom = ir["entities"][0]["geometry"]
+        self.assertAlmostEqual(geom["jog_angle"], 0.785398163397448, places=12)
+
     def test_create_spline_builds_spline_geometry(self):
         # T3a-batch2: collectModelSpaceGraph grew an AcDbSpline branch.
         # write.entity.spline (m08g_handlers.inc) always builds a fit-point
