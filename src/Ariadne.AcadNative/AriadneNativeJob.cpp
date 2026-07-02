@@ -1880,6 +1880,25 @@ static std::string symbolTableRecordsJson(AcDbObjectId tableId, int& count)
     return arr.str();
 }
 
+// Resolve a linetype table record's NAME from its object id -- surfaces a
+// layer's linetype as a human-readable string (matching the entity-level
+// "linetype" field's shape) rather than a raw, engine-local object id. Empty
+// string if the id is null/unresolvable -- never fabricated.
+static std::string linetypeNameOf(AcDbObjectId ltId)
+{
+    if (ltId.isNull())
+        return std::string();
+    AcDbLinetypeTableRecord* pLtRec = nullptr;
+    if (acdbOpenObject(pLtRec, ltId, AcDb::kForRead) != Acad::eOk)
+        return std::string();
+    const ACHAR* nameRaw = nullptr;
+    std::string name;
+    if (pLtRec->getName(nameRaw) == Acad::eOk)
+        name = acharToAscii(nameRaw);
+    pLtRec->close();
+    return name;
+}
+
 // Layer table with color + state flags (the highest-value symbol table; carries
 // the non-ASCII names the D3 fix targets).
 static std::string layersRichJson(AcDbDatabase* pDb, int& count)
@@ -1904,6 +1923,8 @@ static std::string layersRichJson(AcDbDatabase* pDb, int& count)
             if (pRec->getName(nameRaw) == Acad::eOk)
                 name = acharToAscii(nameRaw);
             const int colorIndex = pRec->color().colorIndex();
+            const std::string linetypeName = linetypeNameOf(pRec->linetypeObjectId());
+            const int lineweight = static_cast<int>(pRec->lineWeight());
             const std::string handle = handleOf(pRec);
             if (!first)
                 arr << ",";
@@ -1911,6 +1932,8 @@ static std::string layersRichJson(AcDbDatabase* pDb, int& count)
             arr << "{\"handle\":\"" << jsonEscape(handle) << "\""
                 << ",\"name\":\"" << jsonEscape(name) << "\""
                 << ",\"color_index\":" << colorIndex
+                << ",\"linetype\":\"" << jsonEscape(linetypeName) << "\""
+                << ",\"lineweight\":" << lineweight
                 << ",\"frozen\":" << (pRec->isFrozen() ? "true" : "false")
                 << ",\"off\":" << (pRec->isOff() ? "true" : "false")
                 << ",\"locked\":" << (pRec->isLocked() ? "true" : "false")
@@ -2726,6 +2749,132 @@ static Acad::ErrorStatus ensureLayer(AcDbDatabase* pDb, const std::string& name,
         color.setColorIndex(static_cast<Adesk::UInt16>(colorIndex));
         pLayer->setColor(color);
     }
+
+    AcDbObjectId id;
+    es = pLT->add(id, pLayer);
+    pLT->close();
+    if (es == Acad::eOk) {
+        created = true;
+        pLayer->close();
+    }
+    else {
+        delete pLayer;
+    }
+    return es;
+}
+
+// D-class TABLES tier (w3-tables): optional per-field overrides for a LAYER
+// table record write. Each hasX flag says whether the caller actually
+// supplied that field -- an absent field is left UNTOUCHED (see
+// upsertLayerRecord), which is what lets a "change color_index only" write
+// surface as exactly ONE modified field on re-extraction rather than a
+// silent reset of every other property back to some default.
+struct LayerPropertyArgs {
+    bool hasColor = false;      int colorIndex = 0;
+    bool hasLinetype = false;   std::string linetype;
+    bool hasLineweight = false; int lineweight = 0;
+    bool hasPlottable = false;  bool plottable = true;
+    bool hasFrozen = false;     bool frozen = false;
+    bool hasOff = false;        bool off = false;
+    bool hasLocked = false;     bool locked = false;
+};
+
+// Apply every PRESENT field in props onto pLayer (open for write -- either a
+// not-yet-added new record or an existing one reopened kForWrite). A
+// requested linetype not already loaded into this database is loaded from
+// the standard AutoCAD linetype definition file (acad.lin, resolved via the
+// support-file search path -- the same mechanism the LINETYPE command's own
+// "Load" option uses) and retried once; a name that still can't be resolved
+// is reported in linetypeError rather than silently dropped (no-fake-success).
+static void applyLayerProperties(AcDbLayerTableRecord* pLayer, AcDbDatabase* pDb,
+                                 const LayerPropertyArgs& props, std::string& linetypeError)
+{
+    linetypeError.clear();
+    if (props.hasColor && props.colorIndex > 0) {
+        AcCmColor color;
+        color.setColorIndex(static_cast<Adesk::UInt16>(props.colorIndex));
+        pLayer->setColor(color);
+    }
+    if (props.hasLinetype && !props.linetype.empty()) {
+        const std::wstring ltNameW = asciiToWide(props.linetype);
+        AcDbObjectId ltId;
+        bool resolved = false;
+        AcDbLinetypeTable* pLTT = nullptr;
+        if (pDb->getLinetypeTable(pLTT, AcDb::kForRead) == Acad::eOk) {
+            resolved = (pLTT->getAt(ltNameW.c_str(), ltId) == Acad::eOk);
+            pLTT->close();
+        }
+        if (!resolved) {
+            pDb->loadLineTypeFile(ltNameW.c_str(), L"acad.lin");
+            if (pDb->getLinetypeTable(pLTT, AcDb::kForRead) == Acad::eOk) {
+                resolved = (pLTT->getAt(ltNameW.c_str(), ltId) == Acad::eOk);
+                pLTT->close();
+            }
+        }
+        if (resolved)
+            pLayer->setLinetypeObjectId(ltId);
+        else
+            linetypeError = "linetype '" + props.linetype +
+                             "' not found and could not be loaded from acad.lin";
+    }
+    if (props.hasLineweight)
+        pLayer->setLineWeight(static_cast<AcDb::LineWeight>(props.lineweight));
+    if (props.hasPlottable)
+        pLayer->setIsPlottable(props.plottable);
+    if (props.hasFrozen)
+        pLayer->setIsFrozen(props.frozen);
+    if (props.hasOff)
+        pLayer->setIsOff(props.off);
+    if (props.hasLocked)
+        pLayer->setIsLocked(props.locked);
+}
+
+// D-class TABLES tier: create-or-update a named LAYER record (write.layer.
+// create's handler). A brand-new layer defaults to color 7 when the caller
+// didn't specify one -- matches ensureLayer's long-standing default, so
+// existing create_layer callers with no color_index are unaffected. Updating
+// an EXISTING layer applies ONLY the fields present in props; omitted fields
+// are left exactly as they were. This is the upsert behavior ensureLayer
+// intentionally does not have: ensureLayer's callers (appendLine/
+// appendCircle) only ever need "make sure this layer exists" and a real
+// no-op on an existing layer is correct for them, so ensureLayer stays
+// untouched; this sibling is what write.layer.create uses so it can also
+// update an already-existing layer's properties.
+static Acad::ErrorStatus upsertLayerRecord(AcDbDatabase* pDb, const std::string& name,
+                                           const LayerPropertyArgs& props, bool& created,
+                                           std::string& linetypeError)
+{
+    created = false;
+    linetypeError.clear();
+    if (name.empty())
+        return Acad::eInvalidInput;
+
+    AcDbLayerTable* pLT = nullptr;
+    Acad::ErrorStatus es = pDb->getLayerTable(pLT, AcDb::kForWrite);
+    if (es != Acad::eOk)
+        return es;
+
+    const std::wstring nameW = asciiToWide(name);
+    AcDbObjectId existingId;
+    if (pLT->getAt(nameW.c_str(), existingId) == Acad::eOk) {
+        pLT->close();
+        AcDbLayerTableRecord* pLayer = nullptr;
+        es = acdbOpenObject(pLayer, existingId, AcDb::kForWrite);
+        if (es != Acad::eOk)
+            return es;
+        applyLayerProperties(pLayer, pDb, props, linetypeError);
+        pLayer->close();
+        return Acad::eOk;
+    }
+
+    AcDbLayerTableRecord* pLayer = new AcDbLayerTableRecord();
+    pLayer->setName(nameW.c_str());
+    LayerPropertyArgs createProps = props;
+    if (!createProps.hasColor) {
+        createProps.hasColor = true;
+        createProps.colorIndex = 7;
+    }
+    applyLayerProperties(pLayer, pDb, createProps, linetypeError);
 
     AcDbObjectId id;
     es = pLT->add(id, pLayer);
@@ -3939,19 +4088,42 @@ static void ariadneNativeJob()
         std::string name;
         if (!jsonFindString(job, "name", name) || name.empty())
             name = "ARIADNE_P2";
-        double colorRaw = 7.0;
-        jsonFindNumber(job, "color_index", colorRaw);
+
+        // D-class TABLES tier (w3-tables): every property below is OPTIONAL --
+        // hasX is only true when the caller's job args actually included that
+        // key, so upsertLayerRecord never resets an existing layer's field the
+        // caller didn't ask to change. Booleans travel as 0/1 numbers (the
+        // jsonFindNumber convention this file already uses for e.g. "closed"/
+        // "is_write" -- jsonFindNumber's strtod parse does not understand
+        // JSON true/false tokens).
+        LayerPropertyArgs props;
+        double colorRaw = 0.0;
+        props.hasColor = jsonFindNumber(job, "color_index", colorRaw);
+        props.colorIndex = static_cast<int>(colorRaw);
+        props.hasLinetype = jsonFindString(job, "linetype", props.linetype)
+                             && !props.linetype.empty();
+        double lwRaw = 0.0;
+        props.hasLineweight = jsonFindNumber(job, "lineweight", lwRaw);
+        props.lineweight = static_cast<int>(lwRaw);
+        double flagRaw = 0.0;
+        props.hasPlottable = jsonFindNumber(job, "plottable", flagRaw);
+        props.plottable = (flagRaw != 0.0);
+        props.hasFrozen = jsonFindNumber(job, "frozen", flagRaw);
+        props.frozen = (flagRaw != 0.0);
+        props.hasOff = jsonFindNumber(job, "off", flagRaw);
+        props.off = (flagRaw != 0.0);
+        props.hasLocked = jsonFindNumber(job, "locked", flagRaw);
+        props.locked = (flagRaw != 0.0);
+
         bool created = false;
-        const Acad::ErrorStatus es = ensureLayer(
-            pDb,
-            name,
-            static_cast<int>(colorRaw),
-            created);
+        std::string linetypeError;
+        const Acad::ErrorStatus es = upsertLayerRecord(pDb, name, props, created, linetypeError);
         const int layers = countSymbolTable(pDb->layerTableId());
         r << "\"result\":{\"created\":" << (created ? "true" : "false")
+          << ",\"updated\":" << ((es == Acad::eOk && !created) ? "true" : "false")
           << ",\"errorstatus\":" << static_cast<int>(es)
           << ",\"name\":\"" << jsonEscape(name) << "\""
-          << ",\"color_index\":" << static_cast<int>(colorRaw)
+          << ",\"linetype_error\":\"" << jsonEscape(linetypeError) << "\""
           << ",\"layers_after\":" << layers << "},"
           << "\"status\":\"" << (es == Acad::eOk ? "ok" : "error") << "\"}";
     }

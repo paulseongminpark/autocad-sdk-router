@@ -1,8 +1,8 @@
 ﻿{
-    "timestamp":  "2026-07-02T13:27:51.6480564+09:00",
+    "timestamp":  "2026-07-02T14:20:23.4758691+09:00",
     "schema":  "ariadne.autocad_router_status.v2",
     "status":  "ALL_AVAILABLE",
-    "router_home":  "D:\\dev\\99_tools\\autocad-sdk-router__w3_blockdef",
+    "router_home":  "D:\\dev\\99_tools\\autocad-sdk-router__w3_tables",
     "python_exe":  "C:\\Users\\PAUL\\AppData\\Local\\Programs\\Python\\Python312\\python.exe",
     "route_count":  11,
     "available_count":  11,
@@ -13,19 +13,19 @@
                            "status":  "PRESENT",
                            "modules":  [
                                            {
-                                               "path":  "D:\\dev\\99_tools\\autocad-sdk-router__w3_blockdef\\prebuilt\\2027\\Ariadne.AcadNativeDbx.dbx",
+                                               "path":  "D:\\dev\\99_tools\\autocad-sdk-router__w3_tables\\prebuilt\\2027\\Ariadne.AcadNativeDbx.dbx",
                                                "exists":  true,
                                                "bytes":  54272
                                            },
                                            {
-                                               "path":  "D:\\dev\\99_tools\\autocad-sdk-router__w3_blockdef\\prebuilt\\2027\\Ariadne.AcadNative.crx",
+                                               "path":  "D:\\dev\\99_tools\\autocad-sdk-router__w3_tables\\prebuilt\\2027\\Ariadne.AcadNative.crx",
                                                "exists":  true,
-                                               "bytes":  780288
+                                               "bytes":  784896
                                            },
                                            {
-                                               "path":  "D:\\dev\\99_tools\\autocad-sdk-router__w3_blockdef\\prebuilt\\2027\\Ariadne.AcadNative.arx",
+                                               "path":  "D:\\dev\\99_tools\\autocad-sdk-router__w3_tables\\prebuilt\\2027\\Ariadne.AcadNative.arx",
                                                "exists":  true,
-                                               "bytes":  788480
+                                               "bytes":  793088
                                            }
                                        ],
                            "coreconsole_load":  {

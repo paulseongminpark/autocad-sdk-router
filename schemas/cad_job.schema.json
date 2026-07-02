@@ -103,7 +103,13 @@
             "required": ["name"],
             "properties": {
               "name": { "type": "string", "minLength": 1 },
-              "color_index": { "type": "integer", "minimum": 1, "maximum": 255 }
+              "color_index": { "type": "integer", "minimum": 1, "maximum": 255 },
+              "linetype": { "type": "string", "minLength": 1 },
+              "lineweight": { "type": "integer" },
+              "plottable": { "type": "integer", "enum": [0, 1] },
+              "frozen": { "type": "integer", "enum": [0, 1] },
+              "off": { "type": "integer", "enum": [0, 1] },
+              "locked": { "type": "integer", "enum": [0, 1] }
             }
           }
         }

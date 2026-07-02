@@ -8335,7 +8335,13 @@
       ],
       "arg_keys": [
         "color_index",
-        "name"
+        "frozen",
+        "linetype",
+        "lineweight",
+        "locked",
+        "name",
+        "off",
+        "plottable"
       ],
       "target_files": [
         "config/autocad_native_arx_operation_catalog.json",

@@ -65,7 +65,7 @@ import json
 import math
 import os
 import sys
-from typing import Any, Callable, Dict, Optional
+from typing import Any, Callable, Dict, List, Optional
 
 _THIS_DIR = os.path.dirname(os.path.abspath(__file__))
 _ROUTER_HOME = os.path.dirname(_THIS_DIR)
@@ -1182,13 +1182,20 @@ def added_entities_ir(pre_ir: Dict[str, Any], post_ir: Dict[str, Any], *,
 # P-gate judge (cad_op_gate.check_roundtrip)
 # --------------------------------------------------------------------------- #
 
-def _build_patch(op_name: str, args: Dict[str, Any], dwg_path: str, out_dir: str) -> Dict[str, Any]:
+def _build_patch(op_name: str, args: Dict[str, Any], dwg_path: str, out_dir: str, *,
+                 postconditions: Optional[List[Dict[str, Any]]] = None) -> Dict[str, Any]:
     # target_dwg is REQUIRED by schemas/cad_patch.v1.schema.json (staged_path
     # distinct from original_path). apply_staged's own create_staged_copy(dwg_path,
     # out_dir) always writes to <out_dir>/staged_input.dwg regardless of this
     # declared value (it does not read target_dwg to decide where to stage) --
     # so this is the TRUE path, not a placeholder, kept honest with what
     # create_staged_copy actually produces moments later.
+    #
+    # postconditions defaults to the entity P-gate's "one new entity" shape;
+    # callers whose op doesn't add an entity (e.g. the TABLES-tier
+    # create_layer probe below, which adds a symbol_tables.layers[] record,
+    # not an entities[] one) pass an accurate override instead of inheriting
+    # a postcondition that would silently assert the wrong thing.
     return {
         "schema": "ariadne.cad_patch.v1",
         "patch_id": "op_roundtrip_probe/%s" % op_name,
@@ -1197,7 +1204,8 @@ def _build_patch(op_name: str, args: Dict[str, Any], dwg_path: str, out_dir: str
             "staged_path": os.path.join(out_dir, "staged_input.dwg"),
         },
         "operations": [{"step_id": "s1", "operation": op_name, "args": args}],
-        "postconditions": [{"subject": "entity_count", "op": "delta_eq", "value": 1}],
+        "postconditions": (postconditions if postconditions is not None
+                           else [{"subject": "entity_count", "op": "delta_eq", "value": 1}]),
         "policy": {"staged_copy": True, "write_mode": "write_copy"},
     }
 
@@ -1293,6 +1301,249 @@ def probe_roundtrip(op_name: str, args: Dict[str, Any], dwg_path: str, out_dir: 
         "expected_ir": expected_ir, "actual_ir": actual_ir,
         "original_unchanged": orig, "run_dir": out_dir,
     })
+    return result
+
+
+# --------------------------------------------------------------------------- #
+# TABLES tier (w3-tables, D-class): layer table RECORD-diff driver.
+#
+# symbol_tables.layers[] is not an entity: no handle join through cad_diff, no
+# geometry/bbox, joined by NAME instead (a layer's name is its own unique
+# key). cad_op_gate.check_roundtrip/check_mutation_pair are entity-shaped
+# (cad_diff.compute_diff's join is entities[]-by-handle) so they don't apply
+# here -- this is a sibling, record-level P-/D-gate reusing apply_staged (the
+# real staged write + re-extract) but judging with a flat per-field compare
+# instead of cad_diff's geometry-aware one. Status/exit-code vocabulary is
+# still cad_op_gate's (STATUS_OK/STATUS_FAIL/... EXIT_OK/EXIT_FAIL/...) so a
+# caller of both drivers sees one consistent PASS/FAIL shape.
+# --------------------------------------------------------------------------- #
+
+#: fields write.layer.create can set (AriadneNativeJob.cpp's
+#: LayerPropertyArgs/applyLayerProperties) AND layersRichJson extracts back --
+#: the record-diff's comparable field set. true_color/is_xref_dependent/handle/
+#: name are read-only or not yet write-wired, so they're out of scope here.
+LAYER_RECORD_FIELDS = ("color_index", "linetype", "lineweight",
+                       "plottable", "frozen", "off", "locked")
+
+
+def _layer_by_name(ir: Dict[str, Any], name: str) -> Optional[Dict[str, Any]]:
+    """Find a symbol_tables.layers[] record by name -- the layer table's own
+    join key (unique within a database), unlike an entity handle which is
+    assigned by the engine rather than asserted by the caller."""
+    for rec in ((ir.get("symbol_tables") or {}).get("layers") or []):
+        if isinstance(rec, dict) and rec.get("name") == name:
+            return rec
+    return None
+
+
+def expected_layer_record(args: Dict[str, Any]) -> Dict[str, Any]:
+    """Ground truth = the op's OWN args (never a live read): every
+    LAYER_RECORD_FIELDS key present in ``args`` is asserted verbatim."""
+    return {k: args[k] for k in LAYER_RECORD_FIELDS if k in args}
+
+
+def layer_record_diff(expected: Dict[str, Any],
+                      actual: Optional[Dict[str, Any]]) -> List[str]:
+    """Sorted field names in ``expected`` whose value ``actual`` disagrees
+    with (every expected field, if the record was not found at all). An empty
+    list is "record-diff=0" -- the PASS shape for both create and update."""
+    if actual is None:
+        return sorted(expected)
+    return sorted(k for k, v in expected.items() if actual.get(k) != v)
+
+
+def probe_layer_roundtrip(args: Dict[str, Any], dwg_path: str, out_dir: str, *,
+                          apply_staged: Optional[Callable[[Dict[str, Any], str, str], Dict[str, Any]]] = None,
+                          patch_ops_mod=None, cad_op_gate_mod=None) -> Dict[str, Any]:
+    """create_layer -> re-extract -> record-diff against the op's own args.
+
+    Mirrors probe_roundtrip's pipeline and result shape (status/exit_code
+    drawn from cad_op_gate) but joins/compares a symbol_tables.layers[]
+    record by NAME instead of an entities[] record by handle.
+    """
+    gate = cad_op_gate_mod if cad_op_gate_mod is not None else _import_optional("cad_op_gate")
+    if gate is None:
+        return {"schema": SCHEMA_ID, "op_name": "create_layer", "status": "error",
+                "exit_code": 2, "reason": "cad_op_gate sibling module unavailable"}
+
+    native_op = resolve_native_op("create_layer", patch_ops_mod=patch_ops_mod)
+    if native_op is None:
+        return {
+            "schema": SCHEMA_ID, "op_name": "create_layer", "status": gate.STATUS_NOT_IMPLEMENTED,
+            "exit_code": gate.EXIT_NOT_IMPLEMENTED,
+            "reason": "create_layer has no live native write handler wired "
+                      "(patch_ops.NATIVE_WRITE_OP_MAP)",
+        }
+
+    name = args.get("name")
+    if not name:
+        return {"schema": SCHEMA_ID, "op_name": "create_layer", "native_op": native_op,
+                "status": gate.STATUS_ERROR, "exit_code": gate.EXIT_ERROR,
+                "reason": "args['name'] is required"}
+
+    apply_fn = apply_staged
+    if apply_fn is None:
+        patch_engine = _import_optional("patch_engine")
+        apply_fn = getattr(patch_engine, "apply_staged", None) if patch_engine else None
+    if apply_fn is None:
+        return {
+            "schema": SCHEMA_ID, "op_name": "create_layer", "native_op": native_op,
+            "status": gate.STATUS_NOT_IMPLEMENTED, "exit_code": gate.EXIT_NOT_IMPLEMENTED,
+            "reason": "patch_engine.apply_staged unavailable",
+        }
+
+    patch = _build_patch("create_layer", args, dwg_path, out_dir,
+                         postconditions=[{"subject": "layer_exists", "op": "exists", "value": name}])
+    envelope = apply_fn(patch, dwg_path, out_dir)
+    env_status = envelope.get("status")
+    if env_status != "ok":
+        deferred_reasons = {"not_implemented", "unavailable"}
+        exit_code = gate.EXIT_NOT_IMPLEMENTED if env_status in deferred_reasons else gate.EXIT_ERROR
+        status = gate.STATUS_NOT_IMPLEMENTED if env_status in deferred_reasons else gate.STATUS_ERROR
+        return {
+            "schema": SCHEMA_ID, "op_name": "create_layer", "native_op": native_op,
+            "status": status, "exit_code": exit_code,
+            "reason": envelope.get("reason"), "envelope_status": env_status,
+        }
+
+    orig = envelope.get("original_unchanged") or {}
+    if orig and orig.get("unchanged") is False:
+        return {
+            "schema": SCHEMA_ID, "op_name": "create_layer", "native_op": native_op,
+            "status": gate.STATUS_ORIGINAL_MUTATED, "exit_code": gate.EXIT_ORIGINAL_MUTATED,
+            "reason": "original DWG changed during the live apply -- READ-ONLY invariant violated",
+            "original_unchanged": orig,
+        }
+
+    post_ir_ref = envelope.get("post_ir")
+    if not post_ir_ref:
+        return {
+            "schema": SCHEMA_ID, "op_name": "create_layer", "native_op": native_op,
+            "status": gate.STATUS_ERROR, "exit_code": gate.EXIT_ERROR,
+            "reason": "apply_staged envelope reported ok but is missing post_ir",
+        }
+    post_ir = _load_ir_maybe(post_ir_ref)
+    actual = _layer_by_name(post_ir, name)
+    expected = expected_layer_record(args)
+    diff = layer_record_diff(expected, actual)
+
+    result: Dict[str, Any] = {
+        "schema": SCHEMA_ID, "op_name": "create_layer", "native_op": native_op,
+        "layer_name": name, "expected": expected, "actual": actual, "record_diff": diff,
+        "original_unchanged": orig, "run_dir": out_dir,
+        "staged_output": envelope.get("staged_output"),
+    }
+    if actual is None:
+        result.update(status=gate.STATUS_HOLLOW, exit_code=gate.EXIT_HOLLOW,
+                      reason="layer %r not found in symbol_tables.layers[] after the write" % name)
+    elif diff:
+        result.update(status=gate.STATUS_FAIL, exit_code=gate.EXIT_FAIL,
+                      reason="record-diff is non-zero: field(s) %s do not match what was written"
+                             % diff)
+    else:
+        result.update(status=gate.STATUS_OK, exit_code=gate.EXIT_OK)
+    return result
+
+
+def probe_layer_mutation(name: str, baseline_args: Dict[str, Any], change_args: Dict[str, Any],
+                         dwg_path: str, out_dir: str, *,
+                         apply_staged: Optional[Callable[[Dict[str, Any], str, str], Dict[str, Any]]] = None,
+                         patch_ops_mod=None, cad_op_gate_mod=None) -> Dict[str, Any]:
+    """The D-gate's 'changing color_index -> 1 modified' contract, at the
+    layer-record level: two sequential create_layer writes chained through
+    the SAME staged-copy lineage -- step 1 creates ``name`` with
+    baseline_args, step 2 re-applies create_layer with ONLY change_args onto
+    step 1's own staged_output (never the original dwg_path again). The
+    resulting (pre=after-step-1, post=after-step-2) pair must show exactly
+    change_args' keys as changed -- nothing else moved (replace-not-inject at
+    the field level, mirrors cad_op_gate.check_mutation_pair's identity/
+    exactly-one-field checks, just without an entity handle to key on).
+    """
+    gate = cad_op_gate_mod if cad_op_gate_mod is not None else _import_optional("cad_op_gate")
+    if gate is None:
+        return {"schema": SCHEMA_ID, "op_name": "create_layer", "status": "error",
+                "exit_code": 2, "reason": "cad_op_gate sibling module unavailable"}
+
+    out_dir1 = os.path.join(out_dir, "step1_baseline")
+    step1 = probe_layer_roundtrip(dict(baseline_args, name=name), dwg_path, out_dir1,
+                                  apply_staged=apply_staged, patch_ops_mod=patch_ops_mod,
+                                  cad_op_gate_mod=gate)
+    if step1["status"] != gate.STATUS_OK:
+        step1["reason"] = "baseline step failed: %s" % step1.get("reason")
+        return step1
+    staged_after_1 = step1.get("staged_output")
+    if not staged_after_1:
+        return {"schema": SCHEMA_ID, "op_name": "create_layer", "status": gate.STATUS_ERROR,
+                "exit_code": gate.EXIT_ERROR, "reason": "baseline step produced no staged_output"}
+
+    apply_fn = apply_staged
+    if apply_fn is None:
+        patch_engine = _import_optional("patch_engine")
+        apply_fn = getattr(patch_engine, "apply_staged", None) if patch_engine else None
+    if apply_fn is None:
+        return {"schema": SCHEMA_ID, "op_name": "create_layer", "status": gate.STATUS_NOT_IMPLEMENTED,
+                "exit_code": gate.EXIT_NOT_IMPLEMENTED, "reason": "patch_engine.apply_staged unavailable"}
+    native_op = resolve_native_op("create_layer", patch_ops_mod=patch_ops_mod)
+
+    out_dir2 = os.path.join(out_dir, "step2_change")
+    change_full_args = dict(change_args, name=name)
+    patch2 = _build_patch("create_layer", change_full_args, staged_after_1, out_dir2,
+                          postconditions=[{"subject": "layer_exists", "op": "exists", "value": name}])
+    envelope2 = apply_fn(patch2, staged_after_1, out_dir2)
+    if envelope2.get("status") != "ok":
+        return {
+            "schema": SCHEMA_ID, "op_name": "create_layer", "native_op": native_op,
+            "status": gate.STATUS_ERROR, "exit_code": gate.EXIT_ERROR,
+            "reason": "mutation step failed: %s" % envelope2.get("reason"),
+            "envelope_status": envelope2.get("status"),
+        }
+    orig2 = envelope2.get("original_unchanged") or {}
+    if orig2 and orig2.get("unchanged") is False:
+        return {
+            "schema": SCHEMA_ID, "op_name": "create_layer", "native_op": native_op,
+            "status": gate.STATUS_ORIGINAL_MUTATED, "exit_code": gate.EXIT_ORIGINAL_MUTATED,
+            "reason": "step 1's staged_output changed during step 2's apply -- "
+                      "READ-ONLY invariant violated at the chain link",
+            "original_unchanged": orig2,
+        }
+
+    pre_ir_ref = envelope2.get("pre_ir")
+    post_ir_ref = envelope2.get("post_ir")
+    if not pre_ir_ref or not post_ir_ref:
+        return {
+            "schema": SCHEMA_ID, "op_name": "create_layer", "native_op": native_op,
+            "status": gate.STATUS_ERROR, "exit_code": gate.EXIT_ERROR,
+            "reason": "mutation step envelope missing pre_ir/post_ir",
+        }
+    pre_ir = _load_ir_maybe(pre_ir_ref)
+    post_ir = _load_ir_maybe(post_ir_ref)
+    pre_rec = _layer_by_name(pre_ir, name)
+    post_rec = _layer_by_name(post_ir, name)
+
+    result: Dict[str, Any] = {
+        "schema": SCHEMA_ID, "op_name": "create_layer", "native_op": native_op,
+        "layer_name": name, "pre_record": pre_rec, "post_record": post_rec, "run_dir": out_dir,
+    }
+    if pre_rec is None or post_rec is None:
+        result.update(status=gate.STATUS_HOLLOW, exit_code=gate.EXIT_HOLLOW,
+                      reason="layer %r missing from pre_ir and/or post_ir" % name)
+        return result
+
+    requested = layer_record_diff({k: change_args[k] for k in LAYER_RECORD_FIELDS if k in change_args},
+                                  post_rec)
+    all_changed = sorted(k for k in LAYER_RECORD_FIELDS if pre_rec.get(k) != post_rec.get(k))
+    expected_changed = sorted(change_args.keys())
+    result["changed_fields"] = all_changed
+    if requested:
+        result.update(status=gate.STATUS_HOLLOW, exit_code=gate.EXIT_HOLLOW,
+                      reason="the requested change to %s was not detected on re-extraction "
+                             "(invisible data)" % requested)
+    elif all_changed != expected_changed:
+        result.update(status=gate.STATUS_IRRECONSTRUCTIBLE, exit_code=gate.EXIT_IRRECONSTRUCTIBLE,
+                      reason="expected exactly the changed field set %s, observed %s"
+                             % (expected_changed, all_changed))
+    else:
+        result.update(status=gate.STATUS_OK, exit_code=gate.EXIT_OK)
     return result
 
 
