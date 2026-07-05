@@ -142,10 +142,11 @@ class TestCatalogDenominatorLiveSmoke(unittest.TestCase):
         # p9-tables2 adds one more synthetic op (write.ucs.create, UCS table
         # D-class TABLES tier-2) -- 518 -> 519. See tools/patch_ops/tables.py.
         # p9-tables2 adds a second (write.view.create, VIEW table) -- 519 -> 520.
+        # p9-tables2 adds a third (write.vport.create, VPORT table) -- 520 -> 521.
         ops = cc.load_operations_catalog()
-        self.assertEqual(len(ops), 520,
-                         "the F0 task's own '517-op catalogue' anchor (+3, "
-                         "w3-dimstyle/p9-tables2 UCS+VIEW); if this moves "
+        self.assertEqual(len(ops), 521,
+                         "the F0 task's own '517-op catalogue' anchor (+4, "
+                         "w3-dimstyle/p9-tables2 UCS+VIEW+VPORT); if this moves "
                          "again, the whole WAVE-0 accounting must be recomputed")
 
     def test_live_denominator_lands_near_plan_446_estimate(self):

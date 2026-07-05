@@ -2160,6 +2160,80 @@ static std::string viewsRichJson(AcDbDatabase* pDb, int& count)
     return arr.str();
 }
 
+// TABLES tier-2 (p9-tables2): VPORT table -- the viewport-specific subset
+// VportPropertyArgs (below, near upsertViewRecord) writes: the paperspace/
+// screen rectangle (lower_left/upper_right) plus the SAME shared
+// AcDbAbstractViewTableRecord center/height/width/target/view_direction/
+// twist VIEW already certifies on this base class, plus a handful of
+// viewport-only interactive-editing toggles (ucs_follow_mode/circle_sides/
+// grid_enabled/snap_enabled/snap_angle/ucs_per_viewport).
+//
+// QUIRK (measured on the fixture, see build_log.md): AcDbViewportTable is
+// the one symbol table where AutoCAD itself may legitimately store
+// MULTIPLE records sharing the reserved name "*Active" (one per currently
+// active tiled viewport pane) -- this extractor enumerates every record
+// exactly as UCS/VIEW do above (one JSON element per record, own handle),
+// so "*Active" duplication surfaces here as multiple array elements
+// sharing the same name field. That is the correct, honest representation
+// of what AutoCAD actually stores; record-diff callers must join on a
+// caller-chosen unique name, never on the literal "*Active".
+static std::string vportsRichJson(AcDbDatabase* pDb, int& count)
+{
+    count = 0;
+    std::ostringstream arr; arr.precision(kJsonDoublePrecision);
+    arr << "[";
+    bool first = true;
+    AcDbViewportTable* pVPT = nullptr;
+    if (pDb->getViewportTable(pVPT, AcDb::kForRead) != Acad::eOk)
+        return "[]";
+    AcDbViewportTableIterator* pIt = nullptr;
+    if (pVPT->newIterator(pIt) != Acad::eOk) {
+        pVPT->close();
+        return "[]";
+    }
+    for (pIt->start(); !pIt->done(); pIt->step()) {
+        AcDbViewportTableRecord* pRec = nullptr;
+        if (pIt->getRecord(pRec, AcDb::kForRead) == Acad::eOk) {
+            const ACHAR* nameRaw = nullptr;
+            std::string name;
+            if (pRec->getName(nameRaw) == Acad::eOk)
+                name = acharToAscii(nameRaw);
+            const std::string handle = handleOf(pRec);
+            const AcGePoint2d lowerLeft = pRec->lowerLeftCorner();
+            const AcGePoint2d upperRight = pRec->upperRightCorner();
+            const AcGePoint2d center = pRec->centerPoint();
+            const AcGePoint3d target = pRec->target();
+            const AcGeVector3d viewDir = pRec->viewDirection();
+            if (!first)
+                arr << ",";
+            first = false;
+            arr << "{\"handle\":\"" << jsonEscape(handle) << "\""
+                << ",\"name\":\"" << jsonEscape(name) << "\""
+                << ",\"lower_left\":" << point2Json(lowerLeft.x, lowerLeft.y)
+                << ",\"upper_right\":" << point2Json(upperRight.x, upperRight.y)
+                << ",\"center\":" << point2Json(center.x, center.y)
+                << ",\"height\":" << pRec->height()
+                << ",\"width\":" << pRec->width()
+                << ",\"target\":" << point3Json(target.x, target.y, target.z)
+                << ",\"view_direction\":" << point3Json(viewDir.x, viewDir.y, viewDir.z)
+                << ",\"twist\":" << pRec->viewTwist()
+                << ",\"ucs_follow_mode\":" << (pRec->ucsFollowMode() ? "true" : "false")
+                << ",\"circle_sides\":" << static_cast<int>(pRec->circleSides())
+                << ",\"grid_enabled\":" << (pRec->gridEnabled() ? "true" : "false")
+                << ",\"snap_enabled\":" << (pRec->snapEnabled() ? "true" : "false")
+                << ",\"snap_angle\":" << pRec->snapAngle()
+                << ",\"ucs_per_viewport\":" << (pRec->isUcsSavedWithViewport() ? "true" : "false")
+                << "}";
+            ++count;
+            pRec->close();
+        }
+    }
+    delete pIt;
+    pVPT->close();
+    arr << "]";
+    return arr.str();
+}
+
 // Block table records + the user-block-definition projection. w3-blockdef:
 // def geometry is now INLINED under block_definitions[].def_entities (the
 // docs/DWG_GRAPH_IR_SPEC.md Section 4.3 "inlined" strategy) via the SAME
@@ -2449,14 +2523,14 @@ static std::string collectDatabaseGraph(AcDbDatabase* pDb,
     const std::string linetypesJson = symbolTableRecordsJson(pDb->linetypeTableId(), ltCount);
     const std::string textStylesJson = symbolTableRecordsJson(pDb->textStyleTableId(), tsCount);
     const std::string dimStylesJson = dimStylesRichJson(pDb, dsCount);
-    const std::string viewportsJson = symbolTableRecordsJson(pDb->viewportTableId(), vpCount);
     const std::string appIdsJson = symbolTableRecordsJson(pDb->regAppTableId(), raCount);
-    // p9-tables2: UCS/VIEW tables, rich (record-diff capable) from day one --
-    // unlike viewports/app_ids/linetypes/text_styles above, which still use
-    // the generic {handle,name}-only symbolTableRecordsJson pending their own
+    // p9-tables2: UCS/VIEW/VPORT tables, rich (record-diff capable) from day
+    // one -- unlike app_ids/linetypes/text_styles above, which still use the
+    // generic {handle,name}-only symbolTableRecordsJson pending their own
     // record-diff tickets.
     const std::string ucsJson = ucsRichJson(pDb, ucsCount);
     const std::string viewsJson = viewsRichJson(pDb, viewCount);
+    const std::string viewportsJson = vportsRichJson(pDb, vpCount);
     sec << ",\"symbol_tables\":{\"layers\":" << layersJson
         << ",\"linetypes\":" << linetypesJson
         << ",\"text_styles\":" << textStylesJson
@@ -2504,6 +2578,7 @@ static std::string collectDatabaseGraph(AcDbDatabase* pDb,
         << ",\"dim_styles\":\"implemented\""
         << ",\"ucs\":\"implemented\""
         << ",\"views\":\"implemented\""
+        << ",\"viewports\":\"implemented\""
         << ",\"block_table_records\":\"implemented\""
         << ",\"block_definitions\":\"implemented\""
         << ",\"layouts\":\"implemented\""
@@ -3387,6 +3462,140 @@ static Acad::ErrorStatus upsertViewRecord(AcDbDatabase* pDb, const std::string& 
     AcDbObjectId id;
     es = pVT->add(id, pRec);
     pVT->close();
+    if (es == Acad::eOk) {
+        created = true;
+        pRec->close();
+    }
+    else {
+        delete pRec;
+    }
+    return es;
+}
+
+// TABLES tier-2 (p9-tables2, D-class): optional per-field overrides for a
+// VPORT table record write -- same hasX-flag upsert contract as UCS/VIEW
+// above. AcDbViewportTableRecord derives from the SAME AcDbAbstractView
+// TableRecord base as VIEW (center/height/width/target/view_direction/
+// twist already proven certified there), plus a distinct viewport-only
+// surface: the paperspace/screen rectangle (lowerLeftCorner/
+// upperRightCorner) and a handful of interactive-editing toggles. This
+// pass narrows to that viewport-specific set PLUS the shared base's
+// center/height/width/target/view_direction/twist -- deliberately NOT
+// lens_length/perspective/clip-plane fields, since those are camera
+// fields already proven on this exact shared base class via VIEW;
+// re-certifying them again here would not be a new signal. Excluded
+// (honest gap, not wired here): number() (read-only slot index -- no
+// setter exists in the header); fastZoomsEnabled (the header hardcodes
+// the getter to `true` and the setter is a documented no-op stub -- not a
+// real persisted property); iconEnabled/iconAtOrigin (UCS-icon display
+// toggles); gridIncrements/snapBase/snapIncrements/snapPair/
+// isometricSnapEnabled (additional snap/grid sub-parameters -- one
+// representative field per concern was chosen instead of the full
+// family, same "representative subset" philosophy VIEW already used);
+// the newer "GridDisplay" sub-group (isGridBoundToLimits/isGridAdaptive/
+// isGridSubdivisionRestricted/isGridFollow/gridMajor); background/
+// visualStyle/sunId/lighting/tone-operator (object-id or complex nested
+// refs to other DB objects, same category VIEW already excluded);
+// gsView (a live AcGsView* rendering handle, not persisted DWG data); and
+// the richer UCS query/set API (getUcs/setUcs/isUcsOrthographic/ucsName/
+// elevation/setElevation/setUcsToWorld -- ucs_follow_mode/
+// ucs_per_viewport below are the two simple flags this pass certifies
+// instead).
+//
+// NOTE the asymmetric ObjectARX API for the last flag: the SETTER is
+// setUcsPerViewport(bool) but the GETTER is isUcsSavedWithViewport() --
+// different names for the same underlying property per the ObjectARX
+// header (dbsymtb.h), not a typo on this pass's part.
+struct VportPropertyArgs {
+    bool hasLowerLeft = false;  double lowerLeftX = -1.0, lowerLeftY = -1.0;
+    bool hasUpperRight = false; double upperRightX = 1.0, upperRightY = 1.0;
+    bool hasCenter = false;     double centerX = 0.0, centerY = 0.0;
+    bool hasHeight = false;     double height = 1.0;
+    bool hasWidth = false;      double width = 1.0;
+    bool hasTarget = false;     double targetX = 0.0, targetY = 0.0, targetZ = 0.0;
+    bool hasViewDir = false;    double viewDirX = 0.0, viewDirY = 0.0, viewDirZ = 1.0;
+    bool hasTwist = false;      double twist = 0.0;
+    bool hasUcsFollow = false;  bool ucsFollow = false;
+    bool hasCircleSides = false; int circleSides = 8;
+    bool hasGridEnabled = false; bool gridEnabled = false;
+    bool hasSnapEnabled = false; bool snapEnabled = false;
+    bool hasSnapAngle = false;  double snapAngle = 0.0;
+    bool hasUcsPerViewport = false; bool ucsPerViewport = false;
+};
+
+static void applyVportProperties(AcDbViewportTableRecord* pRec, const VportPropertyArgs& props)
+{
+    if (props.hasLowerLeft)
+        pRec->setLowerLeftCorner(AcGePoint2d(props.lowerLeftX, props.lowerLeftY));
+    if (props.hasUpperRight)
+        pRec->setUpperRightCorner(AcGePoint2d(props.upperRightX, props.upperRightY));
+    if (props.hasCenter)
+        pRec->setCenterPoint(AcGePoint2d(props.centerX, props.centerY));
+    if (props.hasHeight)
+        pRec->setHeight(props.height);
+    if (props.hasWidth)
+        pRec->setWidth(props.width);
+    if (props.hasTarget)
+        pRec->setTarget(AcGePoint3d(props.targetX, props.targetY, props.targetZ));
+    if (props.hasViewDir)
+        pRec->setViewDirection(AcGeVector3d(props.viewDirX, props.viewDirY, props.viewDirZ));
+    if (props.hasTwist)
+        pRec->setViewTwist(props.twist);
+    if (props.hasUcsFollow)
+        pRec->setUcsFollowMode(props.ucsFollow);
+    if (props.hasCircleSides)
+        pRec->setCircleSides(static_cast<Adesk::UInt16>(props.circleSides));
+    if (props.hasGridEnabled)
+        pRec->setGridEnabled(props.gridEnabled);
+    if (props.hasSnapEnabled)
+        pRec->setSnapEnabled(props.snapEnabled);
+    if (props.hasSnapAngle)
+        pRec->setSnapAngle(props.snapAngle);
+    if (props.hasUcsPerViewport)
+        pRec->setUcsPerViewport(props.ucsPerViewport);
+}
+
+// TABLES tier-2: create-or-update a named VPORT record (write.vport.create's
+// handler) -- mirrors upsertViewRecord's upsert contract exactly. QUIRK
+// (measured, see build_log.md): AcDbViewportTable is the one symbol table
+// where AutoCAD itself may store MULTIPLE records sharing the reserved
+// name "*Active" (one per currently active tiled viewport pane) -- getAt
+// on that literal name is therefore ambiguous BY DESIGN, not a bug in this
+// upsert. Unaffected for any caller-chosen name other than "*Active"
+// (ordinary uniqueness applies there, exactly like UCS/VIEW/LAYER);
+// callers of this op should never literally name a record "*Active".
+static Acad::ErrorStatus upsertVportRecord(AcDbDatabase* pDb, const std::string& name,
+                                           const VportPropertyArgs& props, bool& created)
+{
+    created = false;
+    if (name.empty())
+        return Acad::eInvalidInput;
+
+    AcDbViewportTable* pVPT = nullptr;
+    Acad::ErrorStatus es = pDb->getViewportTable(pVPT, AcDb::kForWrite);
+    if (es != Acad::eOk)
+        return es;
+
+    const std::wstring nameW = asciiToWide(name);
+    AcDbObjectId existingId;
+    if (pVPT->getAt(nameW.c_str(), existingId) == Acad::eOk) {
+        pVPT->close();
+        AcDbViewportTableRecord* pRec = nullptr;
+        es = acdbOpenObject(pRec, existingId, AcDb::kForWrite);
+        if (es != Acad::eOk)
+            return es;
+        applyVportProperties(pRec, props);
+        pRec->close();
+        return Acad::eOk;
+    }
+
+    AcDbViewportTableRecord* pRec = new AcDbViewportTableRecord();
+    pRec->setName(nameW.c_str());
+    applyVportProperties(pRec, props);
+
+    AcDbObjectId id;
+    es = pVPT->add(id, pRec);
+    pVPT->close();
     if (es == Acad::eOk) {
         created = true;
         pRec->close();
@@ -4400,6 +4609,7 @@ static const AriadneOperationSpec kAriadneNativeOperationTable[] = {
     { "write.dimstyle.create", "symbol_tables_dictionaries" },
     { "write.ucs.create", "symbol_tables_dictionaries" },
     { "write.view.create", "symbol_tables_dictionaries" },
+    { "write.vport.create", "symbol_tables_dictionaries" },
     { "write.entity.line", "geometry_kernel" },
     { "write.entity.circle", "geometry_kernel" },
     { "inspect.entity.count", "inspect" },
@@ -4752,6 +4962,59 @@ static void ariadneNativeJob()
           << ",\"errorstatus\":" << static_cast<int>(es)
           << ",\"name\":\"" << jsonEscape(name) << "\""
           << ",\"views_after\":" << viewsAfter << "},"
+          << "\"status\":\"" << (es == Acad::eOk ? "ok" : "error") << "\"}";
+    }
+    else if (op == "write.vport.create") {
+        std::string name;
+        if (!jsonFindString(job, "name", name) || name.empty())
+            name = "ARIADNE_VPORT";
+
+        // TABLES tier-2 (p9-tables2): every property below is OPTIONAL, same
+        // hasX upsert convention write.ucs.create/write.view.create use --
+        // an absent field leaves an existing VPORT record's value untouched.
+        // lower_left/upper_right/center are 2-component {"x","y"} points;
+        // target/view_direction are 3-component {"x","y","z"}. ucs_follow_
+        // mode/grid_enabled/snap_enabled/ucs_per_viewport travel as 0/1
+        // numbers (this file's existing jsonFindNumber convention for
+        // boolean-shaped fields); circle_sides is an integer count.
+        VportPropertyArgs props;
+        double zUnused = 0.0;  // lower_left/upper_right/center are 2D points;
+                               // jsonFindPoint3 always fills x/y/z (see VIEW's
+                               // centerZUnused precedent above).
+        props.hasLowerLeft = jsonFindPoint3(job, "lower_left", props.lowerLeftX, props.lowerLeftY, zUnused);
+        props.hasUpperRight = jsonFindPoint3(job, "upper_right", props.upperRightX, props.upperRightY, zUnused);
+        props.hasCenter = jsonFindPoint3(job, "center", props.centerX, props.centerY, zUnused);
+        double numRaw = 0.0;
+        props.hasHeight = jsonFindNumber(job, "height", numRaw);
+        props.height = numRaw;
+        props.hasWidth = jsonFindNumber(job, "width", numRaw);
+        props.width = numRaw;
+        props.hasTarget = jsonFindPoint3(job, "target", props.targetX, props.targetY, props.targetZ);
+        props.hasViewDir = jsonFindPoint3(job, "view_direction", props.viewDirX, props.viewDirY, props.viewDirZ);
+        props.hasTwist = jsonFindNumber(job, "twist", numRaw);
+        props.twist = numRaw;
+        double flagRaw = 0.0;
+        props.hasUcsFollow = jsonFindNumber(job, "ucs_follow_mode", flagRaw);
+        props.ucsFollow = (flagRaw != 0.0);
+        props.hasCircleSides = jsonFindNumber(job, "circle_sides", numRaw);
+        props.circleSides = static_cast<int>(numRaw);
+        props.hasGridEnabled = jsonFindNumber(job, "grid_enabled", flagRaw);
+        props.gridEnabled = (flagRaw != 0.0);
+        props.hasSnapEnabled = jsonFindNumber(job, "snap_enabled", flagRaw);
+        props.snapEnabled = (flagRaw != 0.0);
+        props.hasSnapAngle = jsonFindNumber(job, "snap_angle", numRaw);
+        props.snapAngle = numRaw;
+        props.hasUcsPerViewport = jsonFindNumber(job, "ucs_per_viewport", flagRaw);
+        props.ucsPerViewport = (flagRaw != 0.0);
+
+        bool created = false;
+        const Acad::ErrorStatus es = upsertVportRecord(pDb, name, props, created);
+        const int vportsAfter = countSymbolTable(pDb->viewportTableId());
+        r << "\"result\":{\"created\":" << (created ? "true" : "false")
+          << ",\"updated\":" << ((es == Acad::eOk && !created) ? "true" : "false")
+          << ",\"errorstatus\":" << static_cast<int>(es)
+          << ",\"name\":\"" << jsonEscape(name) << "\""
+          << ",\"vports_after\":" << vportsAfter << "},"
           << "\"status\":\"" << (es == Acad::eOk ? "ok" : "error") << "\"}";
     }
     else if (op == "write.entity.line") {

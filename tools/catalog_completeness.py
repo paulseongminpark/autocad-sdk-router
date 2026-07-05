@@ -85,6 +85,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 import sys
 from pathlib import Path
 from typing import Any, Dict, Iterable, List, Optional, Tuple
@@ -368,11 +369,23 @@ def catalogued_by(class_name: str, text_index: List[Tuple[str, str, str]]) -> Li
     on the full class name, NEVER on the bare dxf_name/keyword -- R3_coverage.md
     G0 measured that a bare "viewport" keyword search false-positives against
     unrelated ops (render.draw.viewportgeom / extend.customentity.draw_viewport).
-    An empty/unknown class name never vacuously matches."""
+    An empty/unknown class name never vacuously matches.
+
+    p9-tables2 fix: a plain substring check ALSO false-positives when
+    class_name is a strict prefix of a DIFFERENT, unrelated ObjectARX class
+    that happens to share it as a naming prefix -- e.g. "AcDbViewport" (the
+    paperspace viewport ENTITY, DXF "VIEWPORT", still genuinely uncatalogued
+    per R3 G0) is a literal textual prefix of "AcDbViewportTable"/
+    "AcDbViewportTableRecord" (the VPORT SYMBOL TABLE this module's own
+    write.vport.create op legitimately documents in its native_api field --
+    a completely different class, not paperspace-viewport coverage). Require
+    a word boundary on both sides so a match only counts when class_name
+    appears as a complete identifier, never merely as someone else's prefix."""
     if not class_name or class_name.startswith("UNKNOWN_CLASS:"):
         return []
+    pattern = re.compile(r"(?<![A-Za-z0-9_])" + re.escape(class_name) + r"(?![A-Za-z0-9_])")
     return [{"source": label, "op_id": op_id}
-            for label, op_id, blob in text_index if class_name in blob]
+            for label, op_id, blob in text_index if pattern.search(blob)]
 
 
 # --------------------------------------------------------------------------- #

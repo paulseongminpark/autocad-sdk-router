@@ -55,6 +55,26 @@ plottable/frozen/off/locked). Excluded (honest gap): isPaperspaceView,
 category_name/layer_state (strings), layout/camera/sun/visual_style/
 background (object-id refs), thumbnail/preview image, annotation scale,
 UCS-per-view association.
+
+p9-tables2 (VPORT): write.vport.create is the SAME upsert shape for the
+VPORT table -- the viewport-specific subset VportPropertyArgs
+(AriadneNativeJob.cpp) writes: the paperspace/screen rectangle
+(lower_left/upper_right) plus the SAME shared AcDbAbstractViewTableRecord
+center/height/width/target/view_direction/twist VIEW already certifies,
+plus viewport-only interactive-editing toggles (ucs_follow_mode/
+circle_sides/grid_enabled/snap_enabled/snap_angle/ucs_per_viewport).
+lower_left/upper_right/center are nested {"x","y"} 2D points; target/
+view_direction are {"x","y","z"}. ucs_follow_mode/grid_enabled/
+snap_enabled/ucs_per_viewport are flag-shaped (bool->int coercion);
+circle_sides is a plain int passthrough. Excluded (honest gap): lens_
+length/perspective/clip-plane fields (already proven on this shared base
+class via VIEW, not re-certified here); number() (read-only); the vestigial
+fastZoomsEnabled; icon/gridIncrements/snapBase/snapIncrements/snapPair/
+isometricSnapEnabled/GridDisplay sub-group (narrowed to one representative
+field per concern); background/visualStyle/sunId/lighting (object-id or
+complex nested refs); the richer UCS query/set API. NOTE: AutoCAD may
+legitimately store multiple VPORT records named "*Active" (one per active
+tiled viewport pane) -- callers of this op must never pass name="*Active".
 """
 from __future__ import annotations
 
@@ -67,6 +87,7 @@ WRITE_OP_MAP: Dict[str, str] = {
     "create_dimstyle": "write.dimstyle.create",
     "create_ucs": "write.ucs.create",
     "create_view": "write.view.create",
+    "create_vport": "write.vport.create",
 }
 
 # Passthrough fields whose native job encoding is identical to the patch-op
@@ -99,6 +120,12 @@ _VIEW_POINT_FIELDS = ("center", "target", "view_direction")
 _VIEW_PASSTHROUGH_FIELDS = ("height", "width", "twist", "lens_length",
                             "front_clip_distance", "back_clip_distance")
 _VIEW_FLAG_FIELDS = ("perspective_enabled", "front_clip_enabled", "back_clip_enabled")
+
+# The viewport-specific subset write.vport.create's native handler reads
+# (VportPropertyArgs in AriadneNativeJob.cpp).
+_VPORT_POINT_FIELDS = ("lower_left", "upper_right", "center", "target", "view_direction")
+_VPORT_PASSTHROUGH_FIELDS = ("height", "width", "twist", "circle_sides", "snap_angle")
+_VPORT_FLAG_FIELDS = ("ucs_follow_mode", "grid_enabled", "snap_enabled", "ucs_per_viewport")
 
 
 def build_job_args(native_op: str, args: Dict[str, Any]) -> Optional[Dict[str, Any]]:
@@ -159,6 +186,26 @@ def build_job_args(native_op: str, args: Dict[str, Any]) -> Optional[Dict[str, A
             if key in args:
                 out[key] = args[key]
         for key in _VIEW_FLAG_FIELDS:
+            if key in args:
+                out[key] = int(bool(args[key]))
+        return out
+    if native_op == "write.vport.create":
+        # create_vport -> create-or-update (upsert) the target VPORT record.
+        # Mirrors write.view.create's arg-forwarding exactly (point fields
+        # verbatim, flag fields bool->int, circle_sides/snap_angle plain
+        # passthrough). Caller is responsible for never naming a record
+        # "*Active" (see module docstring's VPORT quirk note).
+        out = {}
+        name = args.get("name")
+        if name is not None:
+            out["name"] = name
+        for key in _VPORT_POINT_FIELDS:
+            if key in args:
+                out[key] = args[key]
+        for key in _VPORT_PASSTHROUGH_FIELDS:
+            if key in args:
+                out[key] = args[key]
+        for key in _VPORT_FLAG_FIELDS:
             if key in args:
                 out[key] = int(bool(args[key]))
         return out
