@@ -1161,10 +1161,36 @@ static bool m08gDispatch(const std::string& op, const AriadneJobCtx& ctx, std::o
     if (op == "write.entity.wipeout") {
         AcGePoint2dArray verts;
         if (!m08gRead2dVertices(job, verts)) { verts.append(AcGePoint2d(0.0, 0.0)); verts.append(AcGePoint2d(1.0, 0.0)); verts.append(AcGePoint2d(1.0, 1.0)); verts.append(AcGePoint2d(0.0, 1.0)); }
-        Acad::ErrorStatus es = AcDbWipeout::createImageDefinition();
-        if (es != Acad::eOk && es != Acad::eAlreadyInDb) { emitNativeError(r, "WIPEOUT_DEF_FAILED", "AcDbWipeout::createImageDefinition errorstatus " + std::to_string(static_cast<int>(es))); return true; }
+        // BUGFIX (a0-engineprep): the original code called the static, no-arg
+        // AcDbWipeout::createImageDefinition() and then NEVER retrieved or
+        // attached any image-definition id at all -- setImageDefId() was never
+        // called. AcDbWipeout IS-A AcDbRasterImage (dbwipe.h) and, like every
+        // other raster-image entity, is invalid until wired to a database-
+        // resident AcDbRasterImageDef via setImageDefId() (see the working
+        // write.entity.rasterimage branch above, which this now mirrors).
+        // A wipeout has no real backing file, so a placeholder def is minted in
+        // ctx.pDb's own ACAD_IMAGE_DICT the same way rasterimage does
+        // (AcDbRasterImageDef::imageDictionary/createImageDictionary +
+        // AcDbDictionary::setAt) instead of depending on the legacy
+        // createImageDefinition() static helper, which live-probed to
+        // eKeyNotFound (22) against this handler's staged db.
+        AcDbObjectId dictId = AcDbRasterImageDef::imageDictionary(pDb);
+        Acad::ErrorStatus es = Acad::eOk;
+        if (dictId.isNull()) es = AcDbRasterImageDef::createImageDictionary(pDb, dictId);
+        if (es != Acad::eOk || dictId.isNull()) { emitNativeError(r, "WIPEOUT_DICT_FAILED", "image dictionary errorstatus " + std::to_string(static_cast<int>(es))); return true; }
+        AcDbDictionary* pDict = nullptr;
+        if (acdbOpenObject(pDict, dictId, AcDb::kForWrite) != Acad::eOk || pDict == nullptr) { emitNativeError(r, "WIPEOUT_DICT_OPEN_FAILED", "could not open image dictionary"); return true; }
+        AcDbRasterImageDef* pDef = new AcDbRasterImageDef();
+        std::string defName = "ARIADNE_WIPEOUT_IMAGEDEF";
+        jsonFindString(job, "name", defName);
+        AcDbObjectId defId;
+        es = pDict->setAt(utf8ToWide(defName).c_str(), pDef, defId);
+        pDict->close();
+        if (es == Acad::eOk) pDef->close(); else { delete pDef; emitNativeError(r, "WIPEOUT_DEF_FAILED", "image def setAt errorstatus " + std::to_string(static_cast<int>(es))); return true; }
         AcDbWipeout* pE = new AcDbWipeout();
         pE->setDatabaseDefaults(pDb);
+        es = pE->setImageDefId(defId);
+        if (es != Acad::eOk) { delete pE; emitNativeError(r, "WIPEOUT_IMAGEDEFID_FAILED", "setImageDefId errorstatus " + std::to_string(static_cast<int>(es))); return true; }
         pE->setOrientation(AcGePoint3d(0.0, 0.0, 0.0), AcGeVector3d(1.0, 0.0, 0.0), AcGeVector3d(0.0, 1.0, 0.0));
         es = pE->setClipBoundary(AcDbRasterImage::kPoly, verts);
         if (es != Acad::eOk) { delete pE; emitNativeError(r, "WIPEOUT_CLIP_FAILED", "setClipBoundary errorstatus " + std::to_string(static_cast<int>(es))); return true; }
