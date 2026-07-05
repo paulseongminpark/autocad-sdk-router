@@ -654,8 +654,7 @@ def main(argv=None) -> int:
     if args.mint_seed_if_missing and not os.path.isfile(args.seed):
         seed_status = ensure_blank_seed(args.seed, out_dir)
         summary["seed_status"] = {k: v for k, v in seed_status.items() if k != "mint_result"}
-        if not seed_status.get("minted") is False and not os.path.isfile(args.seed):
-            summary["mint_result"] = (seed_status.get("mint_result") or {})
+        summary["mint_result"] = seed_status.get("mint_result")
     regen_target = resolve_regen_target(args.seed, args.dwg)
     summary["regen_target"] = regen_target
 
