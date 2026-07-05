@@ -480,7 +480,7 @@ def apply_promotion(row: Dict[str, Any], *,
         with open(pending.family_path, "w", encoding="utf-8", newline="\n") as fh:
             fh.write(pending.new_family_text)
         _dump_operations_v2(pending.new_operations_v2_doc, pending.operations_v2_path)
-        _verify_axis_b(pending.family_path, result.native_op, row["arg_keys"])
+        _verify_axis_b(pending.family_path, row["patch_op"], result.native_op, row["arg_keys"])
     except Exception:
         revert_promotion(result)
         raise
@@ -488,17 +488,30 @@ def apply_promotion(row: Dict[str, Any], *,
     return result
 
 
-def _verify_axis_b(family_path: str, native_op: str, arg_keys: List[str]) -> None:
+def _verify_axis_b(family_path: str, patch_op: str, native_op: str, arg_keys: List[str]) -> None:
     """H-R4 unknown-op guard: reload the just-written family module fresh
-    (never trust the in-memory pre-edit module) and assert build_job_args
-    actually recognizes native_op with a non-None, arg_keys-shaped result --
-    proof the map entry and its arg branch are not just textually present but
-    behaviorally coherent."""
+    (never trust the in-memory pre-edit module) and assert BOTH halves of
+    Axis B are behaviorally coherent, not just textually present -- a
+    map-only or arg-branch-only write must never pass on the strength of the
+    other half alone:
+      (1) the map half: WRITE_OP_MAP[patch_op] actually resolves to
+          native_op (a wrong or missing map entry must fail here even if
+          some OTHER, unrelated arg branch for native_op happens to exist);
+      (2) the arg-branch half: build_job_args(native_op, ...) recognizes
+          native_op with a non-None, exactly arg_keys-shaped result."""
     import importlib.util
     spec = importlib.util.spec_from_file_location("_promote_op_verify_family", family_path)
     mod = importlib.util.module_from_spec(spec)
     assert spec.loader is not None
     spec.loader.exec_module(mod)
+
+    mapped = mod.WRITE_OP_MAP.get(patch_op)
+    if mapped != native_op:
+        raise PromotionError(
+            "H-R4 unknown-op guard tripped: WRITE_OP_MAP[%r] == %r immediately after promotion, "
+            "expected %r -- map entry missing or written against the wrong native_op"
+            % (patch_op, mapped, native_op))
+
     got = mod.build_job_args(native_op, {k: object() for k in arg_keys})
     if got is None:
         raise PromotionError(
