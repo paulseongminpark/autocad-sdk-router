@@ -139,6 +139,14 @@ DIMVAR subset of AcDbDimStyleTableRecord's ~70 dimension variables (see
 tools/patch_ops/tables.py's module docstring for the exact set and the
 unwritten-DIMVAR gap). Oracle extended accordingly; same invariants
 unaffected.
+
+w3-ltts update: create_linetype (write.linetype.create, AcDbLinetypeTable
+Record) gains its first-ever patch_ops wiring -- another brand-new op, same
+shape as w3-dimstyle just above. Mirrors create_layer/create_dimstyle's
+upsert contract for the LINETYPE symbol table, writing name/description
+(comments) plus a simple dash-only pattern (dash_lengths); complex-linetype
+shape/text embedding is an unwritten gap (see tools/patch_ops/tables.py's
+module docstring). Oracle extended accordingly; same invariants unaffected.
 """
 from __future__ import annotations
 
@@ -186,6 +194,7 @@ _ORIGINAL_NATIVE_WRITE_OP_MAP = {
     "create_dimension_radiallarge": "write.entity.dim.radiallarge",
     "create_blockref": "write.entity.blockref",
     "create_dimstyle": "write.dimstyle.create",
+    "create_linetype": "write.linetype.create",
 }
 
 

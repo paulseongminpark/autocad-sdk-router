@@ -1781,6 +1781,237 @@ def probe_dimstyle_mutation(name: str, baseline_args: Dict[str, Any], change_arg
 
 
 # --------------------------------------------------------------------------- #
+# TABLES tier (w3-ltts, D-class): linetype table RECORD-diff driver.
+#
+# symbol_tables.linetypes[] is, like symbol_tables.layers[]/dim_styles[], not
+# an entity: no handle join through cad_diff, no geometry/bbox, joined by
+# NAME instead. This is the LINETYPE sibling of the LAYER/DIMSTYLE
+# record-diff drivers above -- same apply_staged plumbing, same cad_op_gate
+# status/exit-code vocabulary, same flat per-field compare (dash_lengths
+# compares as a whole list, which Python's != already does element-wise), just
+# a different op_name / symbol-table section / field set.
+# --------------------------------------------------------------------------- #
+
+#: the representative field subset write.linetype.create actually writes
+#: (AriadneNativeJob.cpp's LinetypePropertyArgs/applyLinetypeProperties) AND
+#: linetypesRichJson extracts back -- the record-diff's comparable field set.
+#: Complex-linetype shape/text embedding is an honest gap (see
+#: tools/patch_ops/tables.py's module docstring), out of scope here.
+LINETYPE_RECORD_FIELDS = ("description", "dash_lengths")
+
+
+def _linetype_by_name(ir: Dict[str, Any], name: str) -> Optional[Dict[str, Any]]:
+    """Find a symbol_tables.linetypes[] record by name -- the linetype
+    table's own join key (unique within a database), mirroring
+    _layer_by_name."""
+    for rec in ((ir.get("symbol_tables") or {}).get("linetypes") or []):
+        if isinstance(rec, dict) and rec.get("name") == name:
+            return rec
+    return None
+
+
+def expected_linetype_record(args: Dict[str, Any]) -> Dict[str, Any]:
+    """Ground truth = the op's OWN args (never a live read): every
+    LINETYPE_RECORD_FIELDS key present in ``args`` is asserted verbatim.
+    Mirrors expected_layer_record."""
+    return {k: args[k] for k in LINETYPE_RECORD_FIELDS if k in args}
+
+
+#: linetype_record_diff is IDENTICAL in shape to layer_record_diff (same
+#: "sorted mismatching keys, or every expected key if actual is None"
+#: contract) -- reused directly rather than redefined.
+linetype_record_diff = layer_record_diff
+
+
+def probe_linetype_roundtrip(args: Dict[str, Any], dwg_path: str, out_dir: str, *,
+                             apply_staged: Optional[Callable[[Dict[str, Any], str, str], Dict[str, Any]]] = None,
+                             patch_ops_mod=None, cad_op_gate_mod=None) -> Dict[str, Any]:
+    """create_linetype -> re-extract -> record-diff against the op's own
+    args. Mirrors probe_layer_roundtrip's pipeline and result shape exactly,
+    joining/comparing a symbol_tables.linetypes[] record by NAME."""
+    gate = cad_op_gate_mod if cad_op_gate_mod is not None else _import_optional("cad_op_gate")
+    if gate is None:
+        return {"schema": SCHEMA_ID, "op_name": "create_linetype", "status": "error",
+                "exit_code": 2, "reason": "cad_op_gate sibling module unavailable"}
+
+    native_op = resolve_native_op("create_linetype", patch_ops_mod=patch_ops_mod)
+    if native_op is None:
+        return {
+            "schema": SCHEMA_ID, "op_name": "create_linetype", "status": gate.STATUS_NOT_IMPLEMENTED,
+            "exit_code": gate.EXIT_NOT_IMPLEMENTED,
+            "reason": "create_linetype has no live native write handler wired "
+                      "(patch_ops.NATIVE_WRITE_OP_MAP)",
+        }
+
+    name = args.get("name")
+    if not name:
+        return {"schema": SCHEMA_ID, "op_name": "create_linetype", "native_op": native_op,
+                "status": gate.STATUS_ERROR, "exit_code": gate.EXIT_ERROR,
+                "reason": "args['name'] is required"}
+
+    apply_fn = apply_staged
+    if apply_fn is None:
+        patch_engine = _import_optional("patch_engine")
+        apply_fn = getattr(patch_engine, "apply_staged", None) if patch_engine else None
+    if apply_fn is None:
+        return {
+            "schema": SCHEMA_ID, "op_name": "create_linetype", "native_op": native_op,
+            "status": gate.STATUS_NOT_IMPLEMENTED, "exit_code": gate.EXIT_NOT_IMPLEMENTED,
+            "reason": "patch_engine.apply_staged unavailable",
+        }
+
+    patch = _build_patch("create_linetype", args, dwg_path, out_dir,
+                         postconditions=[{"subject": "linetype_exists", "op": "exists", "value": name}])
+    envelope = apply_fn(patch, dwg_path, out_dir)
+    env_status = envelope.get("status")
+    if env_status != "ok":
+        deferred_reasons = {"not_implemented", "unavailable"}
+        exit_code = gate.EXIT_NOT_IMPLEMENTED if env_status in deferred_reasons else gate.EXIT_ERROR
+        status = gate.STATUS_NOT_IMPLEMENTED if env_status in deferred_reasons else gate.STATUS_ERROR
+        return {
+            "schema": SCHEMA_ID, "op_name": "create_linetype", "native_op": native_op,
+            "status": status, "exit_code": exit_code,
+            "reason": envelope.get("reason"), "envelope_status": env_status,
+        }
+
+    orig = envelope.get("original_unchanged") or {}
+    if orig and orig.get("unchanged") is False:
+        return {
+            "schema": SCHEMA_ID, "op_name": "create_linetype", "native_op": native_op,
+            "status": gate.STATUS_ORIGINAL_MUTATED, "exit_code": gate.EXIT_ORIGINAL_MUTATED,
+            "reason": "original DWG changed during the live apply -- READ-ONLY invariant violated",
+            "original_unchanged": orig,
+        }
+
+    post_ir_ref = envelope.get("post_ir")
+    if not post_ir_ref:
+        return {
+            "schema": SCHEMA_ID, "op_name": "create_linetype", "native_op": native_op,
+            "status": gate.STATUS_ERROR, "exit_code": gate.EXIT_ERROR,
+            "reason": "apply_staged envelope reported ok but is missing post_ir",
+        }
+    post_ir = _load_ir_maybe(post_ir_ref)
+    actual = _linetype_by_name(post_ir, name)
+    expected = expected_linetype_record(args)
+    diff = linetype_record_diff(expected, actual)
+
+    result: Dict[str, Any] = {
+        "schema": SCHEMA_ID, "op_name": "create_linetype", "native_op": native_op,
+        "linetype_name": name, "expected": expected, "actual": actual, "record_diff": diff,
+        "original_unchanged": orig, "run_dir": out_dir,
+        "staged_output": envelope.get("staged_output"),
+    }
+    if actual is None:
+        result.update(status=gate.STATUS_HOLLOW, exit_code=gate.EXIT_HOLLOW,
+                      reason="linetype %r not found in symbol_tables.linetypes[] after the write" % name)
+    elif diff:
+        result.update(status=gate.STATUS_FAIL, exit_code=gate.EXIT_FAIL,
+                      reason="record-diff is non-zero: field(s) %s do not match what was written"
+                             % diff)
+    else:
+        result.update(status=gate.STATUS_OK, exit_code=gate.EXIT_OK)
+    return result
+
+
+def probe_linetype_mutation(name: str, baseline_args: Dict[str, Any], change_args: Dict[str, Any],
+                            dwg_path: str, out_dir: str, *,
+                            apply_staged: Optional[Callable[[Dict[str, Any], str, str], Dict[str, Any]]] = None,
+                            patch_ops_mod=None, cad_op_gate_mod=None) -> Dict[str, Any]:
+    """The D-gate's 'changing one field -> 1 modified' contract, at the
+    linetype-record level. Mirrors probe_layer_mutation's two-step chained-
+    staged-copy pipeline exactly (see its own docstring for the full
+    rationale) -- step 1 creates ``name`` with baseline_args, step 2
+    re-applies create_linetype with ONLY change_args onto step 1's own
+    staged_output."""
+    gate = cad_op_gate_mod if cad_op_gate_mod is not None else _import_optional("cad_op_gate")
+    if gate is None:
+        return {"schema": SCHEMA_ID, "op_name": "create_linetype", "status": "error",
+                "exit_code": 2, "reason": "cad_op_gate sibling module unavailable"}
+
+    out_dir1 = os.path.join(out_dir, "step1_baseline")
+    step1 = probe_linetype_roundtrip(dict(baseline_args, name=name), dwg_path, out_dir1,
+                                     apply_staged=apply_staged, patch_ops_mod=patch_ops_mod,
+                                     cad_op_gate_mod=gate)
+    if step1["status"] != gate.STATUS_OK:
+        step1["reason"] = "baseline step failed: %s" % step1.get("reason")
+        return step1
+    staged_after_1 = step1.get("staged_output")
+    if not staged_after_1:
+        return {"schema": SCHEMA_ID, "op_name": "create_linetype", "status": gate.STATUS_ERROR,
+                "exit_code": gate.EXIT_ERROR, "reason": "baseline step produced no staged_output"}
+
+    apply_fn = apply_staged
+    if apply_fn is None:
+        patch_engine = _import_optional("patch_engine")
+        apply_fn = getattr(patch_engine, "apply_staged", None) if patch_engine else None
+    if apply_fn is None:
+        return {"schema": SCHEMA_ID, "op_name": "create_linetype", "status": gate.STATUS_NOT_IMPLEMENTED,
+                "exit_code": gate.EXIT_NOT_IMPLEMENTED, "reason": "patch_engine.apply_staged unavailable"}
+    native_op = resolve_native_op("create_linetype", patch_ops_mod=patch_ops_mod)
+
+    out_dir2 = os.path.join(out_dir, "step2_change")
+    change_full_args = dict(change_args, name=name)
+    patch2 = _build_patch("create_linetype", change_full_args, staged_after_1, out_dir2,
+                          postconditions=[{"subject": "linetype_exists", "op": "exists", "value": name}])
+    envelope2 = apply_fn(patch2, staged_after_1, out_dir2)
+    if envelope2.get("status") != "ok":
+        return {
+            "schema": SCHEMA_ID, "op_name": "create_linetype", "native_op": native_op,
+            "status": gate.STATUS_ERROR, "exit_code": gate.EXIT_ERROR,
+            "reason": "mutation step failed: %s" % envelope2.get("reason"),
+            "envelope_status": envelope2.get("status"),
+        }
+    orig2 = envelope2.get("original_unchanged") or {}
+    if orig2 and orig2.get("unchanged") is False:
+        return {
+            "schema": SCHEMA_ID, "op_name": "create_linetype", "native_op": native_op,
+            "status": gate.STATUS_ORIGINAL_MUTATED, "exit_code": gate.EXIT_ORIGINAL_MUTATED,
+            "reason": "step 1's staged_output changed during step 2's apply -- "
+                      "READ-ONLY invariant violated at the chain link",
+            "original_unchanged": orig2,
+        }
+
+    pre_ir_ref = envelope2.get("pre_ir")
+    post_ir_ref = envelope2.get("post_ir")
+    if not pre_ir_ref or not post_ir_ref:
+        return {
+            "schema": SCHEMA_ID, "op_name": "create_linetype", "native_op": native_op,
+            "status": gate.STATUS_ERROR, "exit_code": gate.EXIT_ERROR,
+            "reason": "mutation step envelope missing pre_ir/post_ir",
+        }
+    pre_ir = _load_ir_maybe(pre_ir_ref)
+    post_ir = _load_ir_maybe(post_ir_ref)
+    pre_rec = _linetype_by_name(pre_ir, name)
+    post_rec = _linetype_by_name(post_ir, name)
+
+    result: Dict[str, Any] = {
+        "schema": SCHEMA_ID, "op_name": "create_linetype", "native_op": native_op,
+        "linetype_name": name, "pre_record": pre_rec, "post_record": post_rec, "run_dir": out_dir,
+    }
+    if pre_rec is None or post_rec is None:
+        result.update(status=gate.STATUS_HOLLOW, exit_code=gate.EXIT_HOLLOW,
+                      reason="linetype %r missing from pre_ir and/or post_ir" % name)
+        return result
+
+    requested = linetype_record_diff(
+        {k: change_args[k] for k in LINETYPE_RECORD_FIELDS if k in change_args}, post_rec)
+    all_changed = sorted(k for k in LINETYPE_RECORD_FIELDS if pre_rec.get(k) != post_rec.get(k))
+    expected_changed = sorted(change_args.keys())
+    result["changed_fields"] = all_changed
+    if requested:
+        result.update(status=gate.STATUS_HOLLOW, exit_code=gate.EXIT_HOLLOW,
+                      reason="the requested change to %s was not detected on re-extraction "
+                             "(invisible data)" % requested)
+    elif all_changed != expected_changed:
+        result.update(status=gate.STATUS_IRRECONSTRUCTIBLE, exit_code=gate.EXIT_IRRECONSTRUCTIBLE,
+                      reason="expected exactly the changed field set %s, observed %s"
+                             % (expected_changed, all_changed))
+    else:
+        result.update(status=gate.STATUS_OK, exit_code=gate.EXIT_OK)
+    return result
+
+
+# --------------------------------------------------------------------------- #
 # Self-demo (__main__ with no args): injected fake apply_staged, no live
 # runtime touched -- proves the driver's OWN wiring end to end.
 # --------------------------------------------------------------------------- #

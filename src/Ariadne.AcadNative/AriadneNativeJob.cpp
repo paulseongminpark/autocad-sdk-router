@@ -371,6 +371,38 @@ static std::vector<std::string> jsonFindStringArray(const std::string& j, const 
     return out;
 }
 
+// w3-ltts: minimal "key":[n1,n2,...] plain-number-array extractor for
+// LINETYPE dash patterns (AcDbLinetypeTableRecord::setDashLengthAt takes one
+// double per index -- positive=dash, negative=gap, 0=dot, per DXF/AutoCAD
+// LINETYPE semantics; this file has no opinion on the sign, it just
+// round-trips whatever the caller supplies). Mirrors jsonFindStringArray's
+// hand-rolled idiom (no vendored JSON) directly above, but scans bare
+// strtod-parseable numbers instead of quoted strings. Stops at the first ']'.
+static std::vector<double> jsonFindNumberArray(const std::string& j, const char* key)
+{
+    std::vector<double> out;
+    const std::string k = std::string("\"") + key + "\"";
+    size_t p = j.find(k);
+    if (p == std::string::npos) return out;
+    p = j.find('[', p);
+    if (p == std::string::npos) return out;
+    const size_t end = j.find(']', p);
+    if (end == std::string::npos) return out;
+    size_t i = p + 1;
+    while (i < end) {
+        while (i < end && (j[i] == ',' || j[i] == ' ' || j[i] == '\t' ||
+                            j[i] == '\r' || j[i] == '\n'))
+            ++i;
+        if (i >= end) break;
+        char* parseEnd = nullptr;
+        const double value = strtod(j.c_str() + i, &parseEnd);
+        if (parseEnd == j.c_str() + i) break;  // no numeric token here -- stop
+        out.push_back(value);
+        i = static_cast<size_t>(parseEnd - j.c_str());
+    }
+    return out;
+}
+
 static bool parsePointFromObject(const std::string& objectJson, double& x, double& y, double& z)
 {
     if (!jsonFindNumber(objectJson, "x", x))
@@ -2007,6 +2039,66 @@ static std::string dimStylesRichJson(AcDbDatabase* pDb, int& count)
     return arr.str();
 }
 
+// LINETYPE table with the D-class TABLES tier's representative field subset
+// (w3-ltts): AcDbLinetypeTableRecord's own name/comments plus its dash
+// pattern (numDashes()/dashLengthAt(i) -- positive=dash, negative=gap, 0=dot,
+// per DXF/AutoCAD LINETYPE semantics). patternLength() is AutoCAD-maintained
+// FROM the dash array rather than an independent write input, so it is out
+// of scope here -- not part of write.linetype.create's own write contract
+// (see LinetypePropertyArgs below). Complex-linetype shape/text embedding
+// (shapeStyleAt/textAt et al.) is likewise out of scope: this covers simple
+// dash-only patterns only, the same "representative, not exhaustive" scoping
+// dimStylesRichJson already established for DIMVARs above.
+static std::string linetypesRichJson(AcDbDatabase* pDb, int& count)
+{
+    count = 0;
+    std::ostringstream arr; arr.precision(kJsonDoublePrecision);
+    arr << "[";
+    bool first = true;
+    AcDbLinetypeTable* pLTT = nullptr;
+    if (pDb->getLinetypeTable(pLTT, AcDb::kForRead) != Acad::eOk)
+        return "[]";
+    AcDbLinetypeTableIterator* pIt = nullptr;
+    if (pLTT->newIterator(pIt) != Acad::eOk) {
+        pLTT->close();
+        return "[]";
+    }
+    for (pIt->start(); !pIt->done(); pIt->step()) {
+        AcDbLinetypeTableRecord* pRec = nullptr;
+        if (pIt->getRecord(pRec, AcDb::kForRead) == Acad::eOk) {
+            const ACHAR* nameRaw = nullptr;
+            std::string name;
+            if (pRec->getName(nameRaw) == Acad::eOk)
+                name = acharToAscii(nameRaw);
+            const ACHAR* commentsRaw = nullptr;
+            std::string comments;
+            if (pRec->comments(commentsRaw) == Acad::eOk)
+                comments = acharToAscii(commentsRaw);
+            const std::string handle = handleOf(pRec);
+            if (!first)
+                arr << ",";
+            first = false;
+            arr << "{\"handle\":\"" << jsonEscape(handle) << "\""
+                << ",\"name\":\"" << jsonEscape(name) << "\""
+                << ",\"description\":\"" << jsonEscape(comments) << "\""
+                << ",\"dash_lengths\":[";
+            const int numDashes = pRec->numDashes();
+            for (int di = 0; di < numDashes; ++di) {
+                if (di > 0)
+                    arr << ",";
+                arr << pRec->dashLengthAt(di);
+            }
+            arr << "]}";
+            ++count;
+            pRec->close();
+        }
+    }
+    delete pIt;
+    pLTT->close();
+    arr << "]";
+    return arr.str();
+}
+
 // Block table records + the user-block-definition projection. w3-blockdef:
 // def geometry is now INLINED under block_definitions[].def_entities (the
 // docs/DWG_GRAPH_IR_SPEC.md Section 4.3 "inlined" strategy) via the SAME
@@ -2293,7 +2385,7 @@ static std::string collectDatabaseGraph(AcDbDatabase* pDb,
 
     int layerCount = 0, ltCount = 0, tsCount = 0, dsCount = 0, vpCount = 0, raCount = 0;
     const std::string layersJson = layersRichJson(pDb, layerCount);
-    const std::string linetypesJson = symbolTableRecordsJson(pDb->linetypeTableId(), ltCount);
+    const std::string linetypesJson = linetypesRichJson(pDb, ltCount);
     const std::string textStylesJson = symbolTableRecordsJson(pDb->textStyleTableId(), tsCount);
     const std::string dimStylesJson = dimStylesRichJson(pDb, dsCount);
     const std::string viewportsJson = symbolTableRecordsJson(pDb->viewportTableId(), vpCount);
@@ -3038,6 +3130,111 @@ static Acad::ErrorStatus upsertDimStyleRecord(AcDbDatabase* pDb, const std::stri
     AcDbObjectId id;
     es = pDST->add(id, pRec);
     pDST->close();
+    if (es == Acad::eOk) {
+        created = true;
+        pRec->close();
+    }
+    else {
+        delete pRec;
+    }
+    return es;
+}
+
+// D-class TABLES tier (w3-ltts): optional per-field overrides for a LINETYPE
+// table record write -- same hasX-flag upsert contract LayerPropertyArgs/
+// DimStylePropertyArgs established above (an absent field is left
+// UNTOUCHED). Unlike every scalar field so far, the dash pattern is
+// array-shaped: hasDashLengths gates the WHOLE array as one unit, since
+// AutoCAD's own setNumDashes/setDashLengthAt pair has no concept of a
+// partial per-index update (setNumDashes resizes/reallocates the array) --
+// "change the dash pattern" always means "replace it in full". An explicit
+// dash_lengths:[] on an update is indistinguishable from an omitted field
+// (both read as hasDashLengths=false); mirrors write.layer.create's own
+// empty-string-means-absent convention for "linetype" above. A real reset to
+// zero dashes only ever needs a brand-new linetype (which already starts at
+// the AcDbLinetypeTableRecord ctor's own zero-dash default), not an update,
+// so this is not a functional gap in practice.
+struct LinetypePropertyArgs {
+    bool hasDescription = false;  std::string description;
+    bool hasDashLengths = false;  std::vector<double> dashLengths;
+};
+
+// Apply every PRESENT field in props onto pRec (open for write -- either a
+// not-yet-added new record or an existing one reopened kForWrite). Mirrors
+// applyDimStyleProperties' has-flag gating exactly.
+static void applyLinetypeProperties(AcDbLinetypeTableRecord* pRec, const LinetypePropertyArgs& props)
+{
+    if (props.hasDescription) {
+        const std::wstring descW = asciiToWide(props.description);
+        pRec->setComments(descW.c_str());
+    }
+    if (props.hasDashLengths) {
+        pRec->setNumDashes(static_cast<int>(props.dashLengths.size()));
+        for (size_t i = 0; i < props.dashLengths.size(); ++i)
+            pRec->setDashLengthAt(static_cast<int>(i), props.dashLengths[i]);
+    }
+    else if (props.hasDescription) {
+        // EMPIRICAL WORKAROUND (w3-ltts, live-verified via controlled A/B on
+        // staged native_sample.dwg): AutoCAD's core LTYPE persistence ties
+        // the comments field to the dash-pattern recompute trigger --
+        // setComments() alone on an EXISTING (reopened kForWrite) record
+        // does NOT survive save+reload unless setNumDashes/setDashLengthAt
+        // is ALSO called in the same edit session, even to the record's own
+        // unchanged values. A description-only update silently reverted
+        // without this; re-applying the CURRENT pattern verbatim (a no-op on
+        // the dash data itself, and harmless on a brand-new 0-dash record
+        // too) makes it persist correctly. Only reached when the caller did
+        // NOT also supply dash_lengths (that branch above already touches
+        // the pattern for real).
+        const int currentNumDashes = pRec->numDashes();
+        std::vector<double> currentLengths;
+        currentLengths.reserve(static_cast<size_t>(currentNumDashes));
+        for (int i = 0; i < currentNumDashes; ++i)
+            currentLengths.push_back(pRec->dashLengthAt(i));
+        pRec->setNumDashes(currentNumDashes);
+        for (int i = 0; i < currentNumDashes; ++i)
+            pRec->setDashLengthAt(i, currentLengths[i]);
+    }
+}
+
+// D-class TABLES tier: create-or-update a named LINETYPE record (write.
+// linetype.create's handler) -- mirrors upsertDimStyleRecord's upsert
+// contract exactly (see its own comment above): a brand-new linetype starts
+// from AcDbLinetypeTableRecord's own ctor defaults (no forced non-default
+// field), and updating an EXISTING linetype applies ONLY the fields present
+// in props; omitted fields are left exactly as they were.
+static Acad::ErrorStatus upsertLinetypeRecord(AcDbDatabase* pDb, const std::string& name,
+                                              const LinetypePropertyArgs& props, bool& created)
+{
+    created = false;
+    if (name.empty())
+        return Acad::eInvalidInput;
+
+    AcDbLinetypeTable* pLTT = nullptr;
+    Acad::ErrorStatus es = pDb->getLinetypeTable(pLTT, AcDb::kForWrite);
+    if (es != Acad::eOk)
+        return es;
+
+    const std::wstring nameW = asciiToWide(name);
+    AcDbObjectId existingId;
+    if (pLTT->getAt(nameW.c_str(), existingId) == Acad::eOk) {
+        pLTT->close();
+        AcDbLinetypeTableRecord* pRec = nullptr;
+        es = acdbOpenObject(pRec, existingId, AcDb::kForWrite);
+        if (es != Acad::eOk)
+            return es;
+        applyLinetypeProperties(pRec, props);
+        pRec->close();
+        return Acad::eOk;
+    }
+
+    AcDbLinetypeTableRecord* pRec = new AcDbLinetypeTableRecord();
+    pRec->setName(nameW.c_str());
+    applyLinetypeProperties(pRec, props);
+
+    AcDbObjectId id;
+    es = pLTT->add(id, pRec);
+    pLTT->close();
     if (es == Acad::eOk) {
         created = true;
         pRec->close();
@@ -4049,6 +4246,7 @@ static const AriadneOperationSpec kAriadneNativeOperationTable[] = {
     { "inspect.database.graph", "inspect" },
     { "write.layer.create", "symbol_tables_dictionaries" },
     { "write.dimstyle.create", "symbol_tables_dictionaries" },
+    { "write.linetype.create", "symbol_tables_dictionaries" },
     { "write.entity.line", "geometry_kernel" },
     { "write.entity.circle", "geometry_kernel" },
     { "inspect.entity.count", "inspect" },
@@ -4328,6 +4526,34 @@ static void ariadneNativeJob()
           << ",\"errorstatus\":" << static_cast<int>(es)
           << ",\"name\":\"" << jsonEscape(name) << "\""
           << ",\"dimstyles_after\":" << dimstylesAfter << "},"
+          << "\"status\":\"" << (es == Acad::eOk ? "ok" : "error") << "\"}";
+    }
+    else if (op == "write.linetype.create") {
+        std::string name;
+        if (!jsonFindString(job, "name", name) || name.empty())
+            name = "ARIADNE_LINETYPE";
+
+        // D-class TABLES tier (w3-ltts): both properties below are OPTIONAL,
+        // same hasX upsert convention write.layer.create/write.dimstyle.create
+        // use above -- an absent field leaves an existing linetype's value
+        // untouched. dash_lengths is a plain [n1,n2,...] JSON number array
+        // (jsonFindNumberArray) -- positive=dash, negative=gap, 0=dot (DXF/
+        // AutoCAD LINETYPE semantics); supplying it always replaces the WHOLE
+        // pattern (see LinetypePropertyArgs' own comment on the empty-array
+        // simplification).
+        LinetypePropertyArgs props;
+        props.hasDescription = jsonFindString(job, "description", props.description);
+        props.dashLengths = jsonFindNumberArray(job, "dash_lengths");
+        props.hasDashLengths = !props.dashLengths.empty();
+
+        bool created = false;
+        const Acad::ErrorStatus es = upsertLinetypeRecord(pDb, name, props, created);
+        const int linetypesAfter = countSymbolTable(pDb->linetypeTableId());
+        r << "\"result\":{\"created\":" << (created ? "true" : "false")
+          << ",\"updated\":" << ((es == Acad::eOk && !created) ? "true" : "false")
+          << ",\"errorstatus\":" << static_cast<int>(es)
+          << ",\"name\":\"" << jsonEscape(name) << "\""
+          << ",\"linetypes_after\":" << linetypesAfter << "},"
           << "\"status\":\"" << (es == Acad::eOk ? "ok" : "error") << "\"}";
     }
     else if (op == "write.entity.line") {

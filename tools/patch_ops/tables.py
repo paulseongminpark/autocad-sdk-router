@@ -4,10 +4,10 @@
 split).
 
 Symbol-table ops (layer/linetype/dimstyle/textstyle). create_layer (->
-write.layer.create) and create_dimstyle (-> write.dimstyle.create) have live
-native handlers here today; linetype/textstyle record writes await a family
-ticket (only the reference BY NAME from a layer record -- see "linetype"
-below -- is wired).
+write.layer.create), create_dimstyle (-> write.dimstyle.create), and
+create_linetype (-> write.linetype.create) have live native handlers here
+today; textstyle record writes await a family ticket (only the reference BY
+NAME from a layer record -- see "linetype" below -- is wired).
 
 CADOS F8 / H-5: set_layer used to live in this module, also mapped to
 write.layer.create. That was an active fake-success -- write.layer.create
@@ -33,6 +33,21 @@ the native side today (dimtxt/dimasz/dimexe/dimexo/dimdec/dimscale/dimclrd/
 dimclre/dimclrt/dimse1 -- see AriadneNativeJob.cpp's DimStylePropertyArgs).
 The other ~60 DIMVARs are an honest gap: passing them in ``args`` is a
 silent no-op on the wire (never forwarded), not a fake write.
+
+w3-ltts (D-class TABLES tier): write.linetype.create is the SAME upsert
+shape for the LINETYPE table -- name + description (comments) + a simple
+dash pattern (``dash_lengths``, a plain list of numbers: positive=dash,
+negative=gap, 0=dot, per DXF/AutoCAD LINETYPE semantics). Complex-linetype
+shape/text embedding is out of scope (see AriadneNativeJob.cpp's
+linetypesRichJson docstring) -- an honest gap, not a fake write. Supplying
+``dash_lengths`` always replaces the whole pattern; there is no partial
+per-index update (AutoCAD's own setNumDashes/setDashLengthAt pair has no
+concept of one). Live-verified quirk (see AriadneNativeJob.cpp's
+applyLinetypeProperties): AutoCAD's core LTYPE persistence ties the comments
+field to the dash-pattern recompute trigger, so a description-only update on
+an EXISTING linetype silently reverted until the native handler was made to
+re-apply the record's own current dash pattern alongside it -- this is
+handled natively; callers do not need to work around it themselves.
 """
 from __future__ import annotations
 
@@ -43,6 +58,7 @@ from typing import Any, Dict, Optional
 WRITE_OP_MAP: Dict[str, str] = {
     "create_layer": "write.layer.create",
     "create_dimstyle": "write.dimstyle.create",
+    "create_linetype": "write.linetype.create",
 }
 
 # Passthrough fields whose native job encoding is identical to the patch-op
@@ -62,6 +78,12 @@ _DIMSTYLE_PASSTHROUGH_FIELDS = (
     "dimclrd", "dimclre", "dimclrt",
 )
 _DIMSTYLE_FLAG_FIELDS = ("dimse1",)
+
+# The representative field subset write.linetype.create's native handler
+# actually reads (LinetypePropertyArgs in AriadneNativeJob.cpp). dash_lengths
+# is a plain list of numbers -- no bool coercion needed, it travels as a JSON
+# array verbatim (see module docstring's "replaces the whole pattern" note).
+_LINETYPE_PASSTHROUGH_FIELDS = ("description", "dash_lengths")
 
 
 def build_job_args(native_op: str, args: Dict[str, Any]) -> Optional[Dict[str, Any]]:
@@ -93,6 +115,17 @@ def build_job_args(native_op: str, args: Dict[str, Any]) -> Optional[Dict[str, A
         for key in _DIMSTYLE_FLAG_FIELDS:
             if key in args:
                 out[key] = int(bool(args[key]))
+        return out
+    if native_op == "write.linetype.create":
+        # create_linetype -> create-or-update (upsert) the target linetype
+        # record. Mirrors write.layer.create's arg-forwarding exactly.
+        out: Dict[str, Any] = {}
+        name = args.get("name")
+        if name is not None:
+            out["name"] = name
+        for key in _LINETYPE_PASSTHROUGH_FIELDS:
+            if key in args:
+                out[key] = args[key]
         return out
     return None
 
