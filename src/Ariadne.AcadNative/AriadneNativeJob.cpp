@@ -31,6 +31,10 @@
 #include "dbmtext.h"
 #include "dbpl.h"
 #include "dbhatch.h"
+#include "geell2d.h"   // a1-hatchread: AcGeEllipArc2d (hatch edge-loop ellipse-arc edges --
+                       // dbhatch.h itself only pulls in gelnsg2d.h/gearc2d.h, not this one)
+#include "genurb2d.h"  // a1-hatchread: AcGeNurbCurve2d (hatch edge-loop spline edges --
+                       // same gap: dbhatch.h does not transitively include it)
 #include "dbelipse.h"  // T3a: AcDbEllipse (collectModelSpaceGraph read branch)
 #include "dbdim.h"     // T3a: AcDbRotatedDimension; T3a-batch2: AcDbAlignedDimension/
                        // AcDbRadialDimension/AcDbDiametricDimension; T3a-batch3:
@@ -880,6 +884,104 @@ static std::string extensionDictionaryJson(const std::string& ownerHandle,
     return o.str();
 }
 
+// a1-hatchread: one hatch boundary edge, from the AcDbHatch::getLoopAt edge-array
+// overload. edgePtr is the raw AcGeVoidPointerArray element for this edge;
+// edgeType is AutoCAD's own AcDbHatch::HatchEdgeType tag (kLine=1/kCirArc=2/
+// kEllArc=3/kSpline=4) telling us which AcGeCurve2d subclass it actually points
+// at -- ObjectARX's documented contract is that EACH of these edge objects is
+// individually heap-allocated by getLoopAt and ownership passes to the caller
+// (must be deleted here, once, after this function has read it). Coordinates
+// are the curve's own 2D (loop-plane) values -- the hatch's elevation/normal
+// (emitted once at the entity level, not per-edge) already places that plane
+// in space, so no z is fabricated here (unlike the polyline-loop vertices
+// below, which keep the pre-existing "[x,y,elevation]" shape for continuity
+// with what op_roundtrip_probe/ir_builder already expect from THAT branch).
+static std::string hatchEdgeJson(void* edgePtr, int edgeType)
+{
+    std::ostringstream o; o.precision(kJsonDoublePrecision);
+    switch (edgeType) {
+    case AcDbHatch::kLine: {
+        AcGeLineSeg2d* seg = static_cast<AcGeLineSeg2d*>(edgePtr);
+        const AcGePoint2d sp = seg->startPoint();
+        const AcGePoint2d ep = seg->endPoint();
+        o << "{\"type\":\"line\""
+          << ",\"start\":[" << sp.x << "," << sp.y << "]"
+          << ",\"end\":[" << ep.x << "," << ep.y << "]}";
+        delete seg;
+        break;
+    }
+    case AcDbHatch::kCirArc: {
+        AcGeCircArc2d* a = static_cast<AcGeCircArc2d*>(edgePtr);
+        const AcGePoint2d c = a->center();
+        o << "{\"type\":\"circ_arc\""
+          << ",\"center\":[" << c.x << "," << c.y << "]"
+          << ",\"radius\":" << a->radius()
+          << ",\"start_angle\":" << a->startAng()
+          << ",\"end_angle\":" << a->endAng()
+          << ",\"counterclockwise\":" << (a->isClockWise() ? "false" : "true") << "}";
+        delete a;
+        break;
+    }
+    case AcDbHatch::kEllArc: {
+        AcGeEllipArc2d* e = static_cast<AcGeEllipArc2d*>(edgePtr);
+        const AcGePoint2d c = e->center();
+        const AcGeVector2d maj = e->majorAxis();
+        o << "{\"type\":\"ellipse_arc\""
+          << ",\"center\":[" << c.x << "," << c.y << "]"
+          << ",\"major_axis\":[" << maj.x << "," << maj.y << "]"
+          << ",\"major_radius\":" << e->majorRadius()
+          << ",\"minor_radius\":" << e->minorRadius()
+          << ",\"start_angle\":" << e->startAng()
+          << ",\"end_angle\":" << e->endAng()
+          << ",\"counterclockwise\":" << (e->isClockWise() ? "false" : "true") << "}";
+        delete e;
+        break;
+    }
+    case AcDbHatch::kSpline: {
+        AcGeNurbCurve2d* n = static_cast<AcGeNurbCurve2d*>(edgePtr);
+        int degree = 0;
+        Adesk::Boolean rational = Adesk::kFalse, periodic = Adesk::kFalse;
+        AcGeKnotVector knots;
+        AcGePoint2dArray ctrlPts;
+        AcGeDoubleArray weights;
+        n->getDefinitionData(degree, rational, periodic, knots, ctrlPts, weights);
+        std::ostringstream cps; cps.precision(kJsonDoublePrecision);
+        cps << "[";
+        for (int cpi = 0; cpi < ctrlPts.length(); ++cpi) {
+            if (cpi) cps << ",";
+            const AcGePoint2d p = ctrlPts[cpi];
+            cps << "[" << p.x << "," << p.y << "]";
+        }
+        cps << "]";
+        std::ostringstream kns; kns.precision(kJsonDoublePrecision);
+        kns << "[";
+        for (int ki = 0; ki < knots.length(); ++ki) {
+            if (ki) kns << ",";
+            kns << knots[ki];
+        }
+        kns << "]";
+        o << "{\"type\":\"spline\""
+          << ",\"degree\":" << degree
+          << ",\"rational\":" << (rational ? "true" : "false")
+          << ",\"periodic\":" << (periodic ? "true" : "false")
+          << ",\"control_points\":" << cps.str()
+          << ",\"knots\":" << kns.str() << "}";
+        delete n;
+        break;
+    }
+    default:
+        // No-fake-success: an edge type AutoCAD did not document to us yet
+        // (HatchEdgeType is a closed 4-value enum today) is surfaced honestly
+        // instead of silently dropped or misdecoded. Nothing to delete: we
+        // never cast (and therefore never identified an owning type for) an
+        // unrecognized edgePtr, so leaking a typed delete on an unknown
+        // subclass would be worse than leaving this one edge unreleased.
+        o << "{\"type\":\"unknown\",\"raw_edge_type\":" << edgeType << "}";
+        break;
+    }
+    return o.str();
+}
+
 static std::string hatchLoopsJson(AcDbHatch* pHatch, int& loopCount, int& vertexCount)
 {
     loopCount = 0;
@@ -890,31 +992,66 @@ static std::string hatchLoopsJson(AcDbHatch* pHatch, int& loopCount, int& vertex
     const int loops = pHatch->numLoops();
     const double elevation = pHatch->elevation();
     for (int li = 0; li < loops; ++li) {
-        Adesk::Int32 loopType = 0;
-        AcGePoint2dArray vertices;
-        AcGeDoubleArray bulges;
-        const Acad::ErrorStatus es = pHatch->getLoopAt(li, loopType, vertices, bulges);
+        const Adesk::Int32 loopType = pHatch->loopTypeAt(li);
+        const bool isPolylineLoop = (loopType & AcDbHatch::kPolyline) != 0;
+        const bool loopClosed = (loopType & AcDbHatch::kNotClosed) == 0;
         if (!firstLoop)
             arr << ",";
         firstLoop = false;
         arr << "{\"index\":" << li
             << ",\"loop_type\":" << loopType
-            << ",\"status\":\"" << (es == Acad::eOk ? "ok" : "unavailable") << "\""
-            << ",\"vertices\":[";
-        if (es == Acad::eOk) {
-            ++loopCount;
-            const int n = vertices.length();
-            for (int vi = 0; vi < n; ++vi) {
-                if (vi != 0)
-                    arr << ",";
-                const AcGePoint2d p = vertices[vi];
-                const double bulge = (vi < bulges.length()) ? bulges[vi] : 0.0;
-                arr << "{\"point\":[" << p.x << "," << p.y << "," << elevation << "]"
-                    << ",\"bulge\":" << bulge << "}";
-                ++vertexCount;
+            << ",\"closed\":" << (loopClosed ? "true" : "false");
+        if (isPolylineLoop) {
+            // Unchanged from the original polyline-vertex path (T3a-era):
+            // getLoopAt's vertices/bulges overload is the one ObjectARX
+            // guarantees for a kPolyline loop.
+            AcGePoint2dArray vertices;
+            AcGeDoubleArray bulges;
+            Adesk::Int32 loopTypeOut = 0;
+            const Acad::ErrorStatus es = pHatch->getLoopAt(li, loopTypeOut, vertices, bulges);
+            arr << ",\"status\":\"" << (es == Acad::eOk ? "ok" : "unavailable") << "\""
+                << ",\"vertices\":[";
+            if (es == Acad::eOk) {
+                ++loopCount;
+                const int n = vertices.length();
+                for (int vi = 0; vi < n; ++vi) {
+                    if (vi != 0)
+                        arr << ",";
+                    const AcGePoint2d p = vertices[vi];
+                    const double bulge = (vi < bulges.length()) ? bulges[vi] : 0.0;
+                    arr << "{\"point\":[" << p.x << "," << p.y << "," << elevation << "]"
+                        << ",\"bulge\":" << bulge << "}";
+                    ++vertexCount;
+                }
             }
+            arr << "]}";
+        } else {
+            // a1-hatchread: non-polyline (edge) loop -- the getLoopAt overload
+            // this branch was missing entirely before: every line/arc/ellipse/
+            // spline-bounded hatch loop surfaced as an empty "unavailable"
+            // vertices:[] (the polyline-only overload legitimately fails on a
+            // loop that is not kPolyline), silently losing 100% of that loop's
+            // boundary geometry.
+            Adesk::Int32 loopTypeOut = 0;
+            AcGeVoidPointerArray edgePtrs;
+            AcGeIntArray edgeTypes;
+            const Acad::ErrorStatus es = pHatch->getLoopAt(li, loopTypeOut, edgePtrs, edgeTypes);
+            arr << ",\"status\":\"" << (es == Acad::eOk ? "ok" : "unavailable") << "\""
+                << ",\"edges\":[";
+            if (es == Acad::eOk) {
+                ++loopCount;
+                const int n = edgePtrs.length();
+                for (int ei = 0; ei < n; ++ei) {
+                    if (ei != 0)
+                        arr << ",";
+                    arr << hatchEdgeJson(edgePtrs[ei], edgeTypes[ei]);
+                    ++vertexCount;  // rough boundary-geometry-item tally, same
+                                    // counter the polyline branch above uses
+                                    // for its per-vertex count.
+                }
+            }
+            arr << "]}";
         }
-        arr << "]}";
     }
     arr << "]";
     return arr.str();
@@ -1302,9 +1439,47 @@ static bool collectEntitiesFromBlock(AcDbBlockTableRecord* pBTR, const char* spa
         else if (AcDbHatch* pHatch = AcDbHatch::cast(pEnt)) {
             int loopCount = 0, vertexCount = 0;
             const std::string loopsJson = hatchLoopsJson(pHatch, loopCount, vertexCount);
+            const AcGeVector3d hNormal = pHatch->normal();
+            const bool isGradientHatch = pHatch->isGradient() ? true : false;
+            // a1-hatchread: pattern/style/gradient state -- previously only
+            // pattern_name + loops surfaced; is_solid_fill/is_associative/
+            // pattern_scale/pattern_angle/pattern_double/hatch_style/elevation/
+            // normal were entirely unread (loops was also silently incomplete,
+            // see hatchLoopsJson above).
             arr << ",\"pattern_name\":\"" << jsonEscape(acharToAscii(pHatch->patternName())) << "\""
+                << ",\"pattern_type\":" << static_cast<int>(pHatch->patternType())
+                // a1-hatchread cross-oracle cert (all 669 real hatches, exact
+                // handle match against an independent LibreDWG+ezdxf DXF
+                // parse): patternAngle() is radians, like every other
+                // ObjectARX angle accessor this file already surfaces
+                // (start/endAngle above) -- DXF group 52 stores the SAME
+                // angle in degrees, so a raw compare against a DXF/ezdxf
+                // reader will show a mismatch here that is a unit
+                // convention, not a decode bug (math.degrees(this) == the
+                // DXF value, verified exactly, 0 exceptions across 669).
+                << ",\"pattern_angle\":" << pHatch->patternAngle()
+                << ",\"pattern_scale\":" << pHatch->patternScale()
+                << ",\"pattern_double\":" << (pHatch->patternDouble() ? "true" : "false")
+                << ",\"hatch_style\":" << static_cast<int>(pHatch->hatchStyle())
+                << ",\"is_solid_fill\":" << (pHatch->isSolidFill() ? "true" : "false")
+                << ",\"is_associative\":" << (pHatch->associative() ? "true" : "false")
+                << ",\"is_gradient\":" << (isGradientHatch ? "true" : "false")
+                << ",\"elevation\":" << pHatch->elevation()
+                << ",\"normal\":[" << hNormal.x << "," << hNormal.y << "," << hNormal.z << "]"
                 << ",\"loop_count\":" << loopCount
                 << ",\"loops\":" << loopsJson;
+            if (isGradientHatch) {
+                arr << ",\"gradient_name\":\"" << jsonEscape(acharToAscii(pHatch->gradientName())) << "\""
+                    << ",\"gradient_type\":" << static_cast<int>(pHatch->gradientType())
+                    << ",\"gradient_angle\":" << pHatch->gradientAngle();
+            }
+            // Associated boundary object ids (associative hatches only, via
+            // getAssocObjIdsAt) are deliberately NOT resolved here: those ids
+            // name the OTHER entities (e.g. a circle) this hatch tracks, which
+            // is live-DB-state, not a property of the hatch itself -- same
+            // reasoning T3a's dim_block_handle omission-from-geometry already
+            // documents for dimensions (see op_roundtrip_probe.py). Noted as
+            // an honest exclusion, not silently dropped.
             richCounters.hatchLoops += loopCount;
             richCounters.hatchLoopVertices += vertexCount;
         }

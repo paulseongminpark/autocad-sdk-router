@@ -693,10 +693,22 @@
         "degree": { "type": "integer" },
         "loops": {
           "type": "array",
-          "description": "Hatch boundary loops.",
+          "description": "Hatch boundary loops. Each loop item carries index/loop_type/closed/status plus EITHER vertices (kPolyline loops: point+bulge, same shape as polyline-family vertices above) OR edges (non-polyline loops: an ordered array of {type: line|circ_arc|ellipse_arc|spline, ...type-specific params}, 2D loop-plane coordinates -- see elevation/normal for how that plane sits in space). Read-only: this shape has no write.entity.hatch equivalent to roundtrip against on this build (loop authoring there is attended-gated), so it is additionalProperties:true rather than a fully enumerated sub-schema.",
           "items": { "type": "object", "additionalProperties": true }
         },
-        "pattern_name": { "type": "string" }
+        "pattern_name": { "type": "string" },
+        "pattern_type": { "type": "number", "description": "AcDbHatch::HatchPatternType ordinal (0 user-defined, 1 predefined, 2 custom)." },
+        "pattern_angle": { "type": "number" },
+        "pattern_scale": { "type": "number" },
+        "pattern_double": { "type": "boolean" },
+        "hatch_style": { "type": "number", "description": "AcDbHatch::HatchStyle ordinal (0 normal, 1 outer, 2 ignore)." },
+        "is_solid_fill": { "type": "boolean" },
+        "is_associative": { "type": "boolean" },
+        "is_gradient": { "type": "boolean" },
+        "gradient_name": { "type": "string" },
+        "gradient_type": { "type": "number", "description": "AcDbHatch::GradientPatternType ordinal (0 predefined, 1 user-defined). Only meaningful when is_gradient is true." },
+        "gradient_angle": { "type": "number" },
+        "elevation": { "type": "number", "description": "Hatch plane elevation (also folded into each polyline-loop vertex's z)." }
       }
     },
     "entity": {

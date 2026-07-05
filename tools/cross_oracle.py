@@ -188,6 +188,12 @@ _KNOWN_GEOMETRY_LEAF_FIELDS = frozenset({
     "minor_ratio", "start_angle", "end_angle", "normal", "closed", "vertices",
     "text", "height", "rotation", "block_name", "scale", "dimension_type",
     "measurement", "control_points", "degree", "loops", "pattern_name",
+    # a1-hatchread: the rest of AcDbHatch's own state (dwg_graph_ir.v1.
+    # schema.json geometry properties, kept in lockstep with that schema --
+    # see test_cross_oracle.py's own schema<->registry drift check).
+    "pattern_type", "pattern_angle", "pattern_scale", "pattern_double",
+    "hatch_style", "is_solid_fill", "is_associative", "is_gradient",
+    "gradient_name", "gradient_type", "gradient_angle", "elevation",
 })
 
 # Entity keys that are IDENTITY / PROVENANCE, not oracle-asserted DATA: they
