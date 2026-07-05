@@ -292,6 +292,28 @@
       }
     },
     {
+      "if": { "properties": { "operation": { "const": "write.block.append_entity" } } },
+      "then": {
+        "properties": {
+          "args": {
+            "type": "object",
+            "required": ["entity"],
+            "properties": {
+              "block_name": { "type": "string" },
+              "entity": {
+                "type": "object",
+                "required": ["kind"],
+                "properties": {
+                  "kind": { "type": "string", "enum": ["line", "circle", "arc", "text"] }
+                }
+              },
+              "layer": { "type": "string" }
+            }
+          }
+        }
+      }
+    },
+    {
       "if": { "properties": { "operation": { "const": "write.block.insert" } } },
       "then": {
         "properties": {

@@ -15,9 +15,17 @@
 // The WRITE/create/clone ops in the M08E brief (write.block.append_entity, write.dictionary.set,
 // write.entity.set_xdata, transform.database.deep_clone, transform.database.insert_block,
 // acdb.database.create, infra.hostapp.provide_services) MUTATE or CREATE state -> they are NOT
-// part of a read-only family. They are deliberately left OUT of m08eHasOp (so they keep returning
-// the honest OPERATION_NOT_IMPLEMENTED) and recorded as catalogued-remaining in reports/tickets/M08E.md
-// for the M08G write lane. No fabricated results.
+// part of a read-only family, but ARE claimed by m08eHasOp/m08eDispatch below (this header
+// comment + reports/tickets/M08E.md predate that and are stale on this point -- the ops were
+// wired as always-rollback smoke PROBES, not left OPERATION_NOT_IMPLEMENTED). Each wraps its
+// mutation in AriadneStagedWriteTransaction and never calls .commit(), so nothing survives the
+// call -- except write.block.append_entity (p2-blockapp wave), which was graduated to a REAL,
+// persisting primitive: it drops the transaction wrapper (matching every other real write
+// handler in the codebase -- write.entity.line/circle/arc/text/... in m08g/m08h/
+// AriadneNativeJob.cpp) so its appendAcDbEntity() survives to the staged-copy DWG the router job
+// already operates on. It still never touches the ORIGINAL file; that invariant is enforced by
+// the router/registry write_mode policy layer, same as every other write op. The remaining 6 ops
+// stay probe-only (rolled back, no fabricated results).
 //
 // Reuses in-TU primitives only: njsonStr / jsonEscape, handleOf / handleOfId, resolveHandle,
 // serializeObjectCommon / serializeEntityCommon, dictionaryEntriesJson / xrecordJson,
@@ -470,26 +478,199 @@ static bool m08eHandleEntitySetXdata(const AriadneJobCtx& ctx, std::ostringstrea
     return true;
 }
 
+// Build one of the 4 certified entity kinds (line/circle/arc/text) from an "entity" job
+// sub-object -- {"kind":"...", ...kind-specific fields, same field names write.entity.line/
+// circle/arc/text already use}. m08e-local MINIMAL DUPLICATE of the per-kind AcDb* construction
+// m08gAppendEntity/m08hAppend already certify (not a shared refactor: those family .inc files are
+// owned by sibling lanes editing the same TU concurrently, and both hardcode ACDB_MODEL_SPACE
+// anyway, so there is nothing there this handler could call as-is). All 4 classes come from
+// dbents.h, already #included at the top of the TU before any family .inc. On success returns a
+// freshly new()'d AcDbEntity* (caller owns: appendAcDbEntity() or delete() consumes it). On
+// failure returns nullptr and fills errCode/errMsg for an emitNativeError envelope.
+static AcDbEntity* m08eBuildEntityForAppend(const std::string& entityJson,
+                                            std::string& kindOut,
+                                            std::string& errCode,
+                                            std::string& errMsg)
+{
+    jsonFindString(entityJson, "kind", kindOut);
+
+    if (kindOut == "line") {
+        AcGePoint3d start(0.0, 0.0, 0.0), end(1.0, 0.0, 0.0);
+        std::string ptJson;
+        if (jsonFindObject(entityJson, "start", ptJson)) {
+            double x = 0.0, y = 0.0, z = 0.0;
+            jsonFindNumber(ptJson, "x", x); jsonFindNumber(ptJson, "y", y); jsonFindNumber(ptJson, "z", z);
+            start.set(x, y, z);
+        }
+        if (jsonFindObject(entityJson, "end", ptJson)) {
+            double x = 1.0, y = 0.0, z = 0.0;
+            jsonFindNumber(ptJson, "x", x); jsonFindNumber(ptJson, "y", y); jsonFindNumber(ptJson, "z", z);
+            end.set(x, y, z);
+        }
+        return new AcDbLine(start, end);
+    }
+    if (kindOut == "circle") {
+        AcGePoint3d center(0.0, 0.0, 0.0);
+        std::string ptJson;
+        if (jsonFindObject(entityJson, "center", ptJson)) {
+            double x = 0.0, y = 0.0, z = 0.0;
+            jsonFindNumber(ptJson, "x", x); jsonFindNumber(ptJson, "y", y); jsonFindNumber(ptJson, "z", z);
+            center.set(x, y, z);
+        }
+        double radius = 1.0;
+        jsonFindNumber(entityJson, "radius", radius);
+        if (radius <= 0.0) {
+            errCode = "INVALID_INPUT"; errMsg = "entity.kind=circle requires 'radius' > 0";
+            return nullptr;
+        }
+        return new AcDbCircle(center, AcGeVector3d(0.0, 0.0, 1.0), radius);
+    }
+    if (kindOut == "arc") {
+        AcGePoint3d center(0.0, 0.0, 0.0);
+        std::string ptJson;
+        if (jsonFindObject(entityJson, "center", ptJson)) {
+            double x = 0.0, y = 0.0, z = 0.0;
+            jsonFindNumber(ptJson, "x", x); jsonFindNumber(ptJson, "y", y); jsonFindNumber(ptJson, "z", z);
+            center.set(x, y, z);
+        }
+        double radius = 1.0, sa = 0.0, ea = 6.28318530717958647692;
+        jsonFindNumber(entityJson, "radius", radius);
+        jsonFindNumber(entityJson, "start_angle", sa);
+        jsonFindNumber(entityJson, "end_angle", ea);
+        if (radius <= 0.0) {
+            errCode = "INVALID_INPUT"; errMsg = "entity.kind=arc requires 'radius' > 0";
+            return nullptr;
+        }
+        return new AcDbArc(center, radius, sa, ea);
+    }
+    if (kindOut == "text") {
+        AcGePoint3d pos(0.0, 0.0, 0.0);
+        std::string ptJson;
+        if (jsonFindObject(entityJson, "position", ptJson)) {
+            double x = 0.0, y = 0.0, z = 0.0;
+            jsonFindNumber(ptJson, "x", x); jsonFindNumber(ptJson, "y", y); jsonFindNumber(ptJson, "z", z);
+            pos.set(x, y, z);
+        }
+        std::string content;
+        jsonFindString(entityJson, "text", content);
+        double height = 2.5;
+        jsonFindNumber(entityJson, "height", height);
+
+        AcDbText* pText = new AcDbText();
+        pText->setPosition(pos);
+        if (height > 0.0)
+            pText->setHeight(height);
+        pText->setTextString(utf8ToWide(content).c_str());
+        return pText;
+    }
+
+    errCode = "UNSUPPORTED_KIND";
+    errMsg = "write.block.append_entity supports entity.kind in {line,circle,arc,text}; got '" + kindOut + "'";
+    return nullptr;
+}
+
+// write.block.append_entity: append a real entity (line/circle/arc/text, per
+// m08eBuildEntityForAppend above) into a NAMED block-table record ('block_name'), or model space
+// if block_name is omitted. REAL, PERSISTING primitive -- unlike this family's other write ops
+// (see the file header comment), this one does NOT wrap in AriadneStagedWriteTransaction: it
+// mutates ctx.pDb directly, the same no-wrapper shape every other real write handler in the
+// codebase uses (write.entity.line/circle/arc/text/... in m08g_handlers.inc / m08h_handlers.inc /
+// AriadneNativeJob.cpp), so the appended entity survives to the staged-copy DWG the router job
+// already operates on. Still never touches the ORIGINAL file (write_mode policy layer, same as
+// every other write op).
+// APIs: AcDbBlockTable::getAt(name, AcDbBlockTableRecord*&, AcDb::kForWrite) (dbsymtb.h) to
+// resolve the target BTR by name (same read-mode shape m08eHandleBlockIterate above already
+// uses); AcDbBlockTableRecord::appendAcDbEntity(AcDbObjectId&, AcDbEntity*) (dbsymtb.h) to add
+// the built entity to it (acdb-core.md's citation for this op).
 static bool m08eHandleBlockAppend(const AriadneJobCtx& ctx, std::ostringstream& r)
 {
-    AriadneStagedWriteTransaction wt(ctx.pDb);
+    std::string blockName;
+    const bool hasBlockName = jsonFindString(ctx.job, "block_name", blockName) && !blockName.empty();
+
+    std::string entityJson;
+    if (!jsonFindObject(ctx.job, "entity", entityJson)) {
+        emitNativeError(r, "MISSING_ARG", "write.block.append_entity requires an 'entity' object ({kind,...})");
+        return true;
+    }
+
+    std::string kind, buildErrCode, buildErrMsg;
+    AcDbEntity* pEnt = m08eBuildEntityForAppend(entityJson, kind, buildErrCode, buildErrMsg);
+    if (pEnt == nullptr) {
+        if (buildErrCode.empty())
+            emitNativeError(r, "BUILD_FAILED", buildErrMsg);
+        else
+            emitNativeError(r, buildErrCode.c_str(), buildErrMsg);
+        return true;
+    }
+
+    std::string layer;
+    jsonFindString(ctx.job, "layer", layer);
+    if (!layer.empty()) {
+        bool layerCreated = false;
+        const Acad::ErrorStatus layerEs = ensureLayer(ctx.pDb, layer, 7, layerCreated);
+        if (layerEs != Acad::eOk) {
+            delete pEnt;
+            emitNativeError(r, "LAYER_FAILED",
+                            "ensureLayer('" + layer + "') errorstatus " + std::to_string(static_cast<int>(layerEs)));
+            return true;
+        }
+    }
+
     AcDbBlockTable* pBT = nullptr;
     Acad::ErrorStatus es = ctx.pDb->getBlockTable(pBT, AcDb::kForRead);
-    AcDbBlockTableRecord* pMS = nullptr;
-    if (es == Acad::eOk && pBT != nullptr) {
-        es = pBT->getAt(ACDB_MODEL_SPACE, pMS, AcDb::kForWrite);
-        pBT->close();
+    if (es != Acad::eOk || pBT == nullptr) {
+        delete pEnt;
+        emitNativeError(r, "BLOCK_TABLE_OPEN_FAILED", "could not open the block table");
+        return true;
     }
-    AcDbObjectId lineId = AcDbObjectId::kNull;
-    if (es == Acad::eOk && pMS != nullptr) {
-        AcDbLine* pLine = new AcDbLine(AcGePoint3d(0,0,0), AcGePoint3d(1,0,0));
-        es = pMS->appendAcDbEntity(lineId, pLine);
-        if (es == Acad::eOk) pLine->close(); else delete pLine;
-        pMS->close();
+
+    AcDbBlockTableRecord* pBTR = nullptr;
+    es = hasBlockName
+        ? pBT->getAt(asciiToWide(blockName).c_str(), pBTR, AcDb::kForWrite)
+        : pBT->getAt(ACDB_MODEL_SPACE, pBTR, AcDb::kForWrite);
+    pBT->close();
+    if (es != Acad::eOk || pBTR == nullptr) {
+        delete pEnt;
+        emitNativeError(r, "BLOCK_NOT_FOUND",
+                        hasBlockName ? ("no block named '" + blockName + "'")
+                                     : std::string("model space block record not found"));
+        return true;
     }
+
+    const std::string btrHandle = handleOf(pBTR);
+    const std::string btrName = hasBlockName ? blockName : std::string("*MODEL_SPACE");
+
+    if (!layer.empty())
+        pEnt->setLayer(asciiToWide(layer).c_str());
+
+    AcDbObjectId newId;
+    es = pBTR->appendAcDbEntity(newId, pEnt);
+    if (es == Acad::eOk)
+        pEnt->close();
+    else
+        delete pEnt;
+
+    int entityCountAfter = -1;
+    if (es == Acad::eOk) {
+        AcDbBlockTableRecordIterator* pIt = nullptr;
+        if (pBTR->newIterator(pIt) == Acad::eOk && pIt != nullptr) {
+            entityCountAfter = 0;
+            for (pIt->start(); !pIt->done(); pIt->step())
+                ++entityCountAfter;
+            delete pIt;
+        }
+    }
+    pBTR->close();
+
     r << "\"result\":{\"appended\":" << (es == Acad::eOk ? "true" : "false")
-      << ",\"new_handle\":" << (lineId.isNull() ? std::string("null") : njsonStr(handleOfId(lineId)))
-      << ",\"staged_rolled_back\":true,\"errorstatus\":" << static_cast<int>(es)
+      << ",\"block_name\":" << njsonStr(btrName)
+      << ",\"block_handle\":" << njsonStr(btrHandle)
+      << ",\"kind\":" << njsonStr(kind)
+      << ",\"new_handle\":" << (es == Acad::eOk ? njsonStr(handleOfId(newId)) : std::string("null"))
+      << ",\"layer\":" << njsonStr(layer)
+      << ",\"block_entity_count_after\":" << entityCountAfter
+      << ",\"staged_rolled_back\":false"
+      << ",\"errorstatus\":" << static_cast<int>(es)
       << "},\"status\":\"" << (es == Acad::eOk ? "ok" : "error") << "\"}";
     return true;
 }

@@ -6957,13 +6957,21 @@
         "infra.hostapp.provide_services",
         "inspect.block.iterate"
       ],
-      "arg_keys": [],
+      "arg_keys": [
+        "block_name",
+        "entity",
+        "layer"
+      ],
       "target_files": [
+        "/dev/.build/cados_plan/runs/waveP/blockapp/build_log.md",
         "config/autocad_native_arx_operation_catalog.json",
         "reports/merge/MERGE-M08-READ.json",
         "src/Ariadne.AcadNative/families/m08e_handlers.inc",
         "tests/unit/test_m08e_handlers.py",
-        "tests/unit/test_operation_registry_v2.py"
+        "tests/unit/test_operation_registry_v2.py",
+        "tests/unit/test_patch_ops_split.py",
+        "tools/patch_engine.py",
+        "tools/patch_ops/blocks.py"
       ],
       "acceptance_test_id": "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
       "persistence_class": "D"
@@ -6996,7 +7004,8 @@
       ],
       "target_files": [
         "config/cad_job_operation_aliases.json",
-        "tests/test_native_arx_dbx_contract.py"
+        "tests/test_native_arx_dbx_contract.py",
+        "tools/patch_engine.py"
       ],
       "acceptance_test_id": "tests/test_native_arx_dbx_contract.py::createSimpleBlock",
       "persistence_class": "D"
