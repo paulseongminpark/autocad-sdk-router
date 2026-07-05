@@ -189,6 +189,21 @@ nested JSON parsing of it) -- the one shape in this oracle where a
 build_job_args branch's flat per-key passthrough legitimately carries a
 dict-valued arg, not just scalars/points. Oracle extended accordingly; same
 invariants (aggregate == per-family union, families disjoint) unaffected.
+
+wS-solids update: 9 ASM/solids ops (create_solid3d_primitive/_extrude/
+_revolve/_sweep/_loft, create_region, create_surface, create_nurbsurface,
+create_body -- write.entity.solid3d.*/region/surface/nurbsurface/body) gain
+their first-ever patch_ops wiring. All 9 were already native-REACHABLE
+(m08gDispatch/m08gHasOp) but registry policy.status_policy still read the
+stale M04 catalogued_not_runnable despite top-level status already reading
+implemented -- see WaveS0's build_log.md (runs/waveS0_asmprobe) for the live
+accoreconsole probe that found this and config/operations.v2.json for the
+reconcile. Unlike every prior single-kind batch, non-degeneracy here is
+certified by a B6 gate (AcBr bind + status_code==0 + analytic-invariant
+tolerance match) rather than an IR-echo diff -- see tools/asm_probe_driver.py.
+create_body remains wired but CREATED_DEGENERATE (AcBr cannot bind an empty
+AcDbBody; a genuine C++ content-setting gap, not a wiring gap). Oracle
+extended accordingly; same invariants unaffected.
 """
 from __future__ import annotations
 
@@ -250,6 +265,15 @@ _ORIGINAL_NATIVE_WRITE_OP_MAP = {
     "append_block_entity": "write.block.append_entity",
     "create_attribdef": "write.entity.attribdef",
     "create_block_simple": "write.block.simple_create",
+    "create_solid3d_primitive": "write.entity.solid3d.primitive",
+    "create_solid3d_extrude": "write.entity.solid3d.extrude",
+    "create_solid3d_revolve": "write.entity.solid3d.revolve",
+    "create_solid3d_sweep": "write.entity.solid3d.sweep",
+    "create_solid3d_loft": "write.entity.solid3d.loft",
+    "create_region": "write.entity.region",
+    "create_surface": "write.entity.surface",
+    "create_nurbsurface": "write.entity.nurbsurface",
+    "create_body": "write.entity.body",
 }
 
 
