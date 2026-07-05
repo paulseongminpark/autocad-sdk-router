@@ -322,6 +322,63 @@ def _expect_create_ellipse(args: Dict[str, Any]) -> Dict[str, Any]:
     }
 
 
+def _expect_create_face3d(args: Dict[str, Any]) -> Dict[str, Any]:
+    # p8-simple2: write.entity.face (m08g_handlers.inc) builds AcDbFace(p0,
+    # p1, p2, p3) with all 4 edges visible (the ctor's e0vis..e3vis args
+    # default to Adesk::kTrue; the handler never overrides them or reads an
+    # "edge_visibility" job field). collectModelSpaceGraph's AcDbFace branch
+    # reads getVertexAt(0..3) back verbatim -- no reordering in the reader --
+    # so ground truth is a direct pass-through of all 4 points plus the
+    # all-true edge_visibility default.
+    return {
+        "dxf_name": "3DFACE", "layer": args.get("layer") or "0",
+        "geometry": {"kind": "face3d",
+                    "p0": _point_to_list(args["p0"]), "p1": _point_to_list(args["p1"]),
+                    "p2": _point_to_list(args["p2"]), "p3": _point_to_list(args["p3"]),
+                    "edge_visibility": [True, True, True, True]},
+    }
+
+
+def _expect_create_solid2d(args: Dict[str, Any]) -> Dict[str, Any]:
+    # p8-simple2: write.entity.solid2d (m08g_handlers.inc) builds AcDbSolid
+    # (p0, p1, p2, p3); collectModelSpaceGraph's AcDbSolid branch reads
+    # getPointAt(0..3) back verbatim (no reordering in the READER). Live-
+    # verified 2026-07-05 (p8-simple2 re-cert, staged tests/fixtures/
+    # native_sample.dwg, 4 distinct corners p0=(0,0,0) p1=(10,0,0)
+    # p2=(10,10,0) p3=(0,10,0), boundary order -- chosen so any 2/3 swap
+    # would be immediately visible): getPointAt(0..3) returned p0..p3 in
+    # the EXACT SAME order they were constructed with -- no "bow-tie"
+    # storage-order swap measured. (AutoCAD's own SOLID/TRACE bow-tie
+    # convention, where a boundary-ordered quad renders as two crossed
+    # triangles unless points 3/4 are supplied pre-swapped, is a DRAWING/
+    # tessellation detail of how the two triangles (0,1,2)+(1,3,2) are
+    # filled -- not a storage transform ObjectARX applies to what you
+    # pass the ctor.) Also live-verified: the triangular case (job p2==p3)
+    # round-trips as a plain duplicate, no special-casing needed. Ground
+    # truth is therefore a direct args pass-through.
+    return {
+        "dxf_name": "SOLID", "layer": args.get("layer") or "0",
+        "geometry": {"kind": "solid",
+                    "p0": _point_to_list(args["p0"]), "p1": _point_to_list(args["p1"]),
+                    "p2": _point_to_list(args["p2"]), "p3": _point_to_list(args["p3"])},
+    }
+
+
+def _expect_create_trace(args: Dict[str, Any]) -> Dict[str, Any]:
+    # p8-simple2: write.entity.trace (m08g_handlers.inc) builds AcDbTrace(p0,
+    # p1, p2, p3); collectModelSpaceGraph's AcDbTrace branch reads
+    # getPointAt(0..3) back verbatim. Same live-verified (2026-07-05,
+    # p8-simple2 re-cert) plain pass-through convention as create_solid2d
+    # above -- see that function's comment; AcDbTrace's getPointAt showed
+    # the identical no-swap, no-reordering behavior on the same fixture.
+    return {
+        "dxf_name": "TRACE", "layer": args.get("layer") or "0",
+        "geometry": {"kind": "trace",
+                    "p0": _point_to_list(args["p0"]), "p1": _point_to_list(args["p1"]),
+                    "p2": _point_to_list(args["p2"]), "p3": _point_to_list(args["p3"])},
+    }
+
+
 def _rotated_dimension_measurement(p1: list, p2: list, rotation: float) -> float:
     """AcDbRotatedDimension's measurement: the xLine1Point->xLine2Point vector
     projected onto the dimension line's direction (angle ``rotation`` from the
@@ -1138,6 +1195,9 @@ _EXPECTED_ENTITY_BUILDERS: Dict[str, Callable[[Dict[str, Any]], Dict[str, Any]]]
     "create_dimension_angular3pt": _expect_create_dimension_angular3pt,
     "create_mleader": _expect_create_mleader,
     "create_blockref": _expect_create_blockref,
+    "create_face3d": _expect_create_face3d,
+    "create_solid2d": _expect_create_solid2d,
+    "create_trace": _expect_create_trace,
 }
 
 

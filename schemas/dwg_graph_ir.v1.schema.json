@@ -649,6 +649,8 @@
             "xline",
             "polygon_mesh",
             "poly_face_mesh",
+            "face3d",
+            "trace",
             "proxy",
             "unsupported"
           ]
@@ -696,7 +698,16 @@
           "description": "Hatch boundary loops.",
           "items": { "type": "object", "additionalProperties": true }
         },
-        "pattern_name": { "type": "string" }
+        "pattern_name": { "type": "string" },
+        "p0": { "$ref": "#/$defs/point3", "description": "1st vertex of a flat 4-point entity (3DFACE/SOLID/TRACE)." },
+        "p1": { "$ref": "#/$defs/point3", "description": "2nd vertex of a flat 4-point entity (3DFACE/SOLID/TRACE)." },
+        "p2": { "$ref": "#/$defs/point3", "description": "3rd vertex of a flat 4-point entity (3DFACE/SOLID/TRACE)." },
+        "p3": { "$ref": "#/$defs/point3", "description": "4th vertex of a flat 4-point entity (3DFACE/SOLID/TRACE)." },
+        "edge_visibility": {
+          "type": "array",
+          "description": "3DFACE's 4 per-edge visibility flags (AcDbFace::isEdgeVisibleAt).",
+          "items": { "type": "boolean" }
+        }
       }
     },
     "entity": {
