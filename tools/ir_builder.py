@@ -490,8 +490,37 @@ _NATIVE_CLASS_TO_DXF_KIND = {
     "AcDbSpline": ("SPLINE", "spline"),
     "AcDbPoint": ("POINT", "point"),
     "AcDbSolid": ("SOLID", "solid"),
-    "AcDb3dSolid": ("3DSOLID", "solid"),
+    # wS-solids/S8 fix (WaveS0 finding G1): AcDb3dSolid used to share the
+    # IDENTICAL "solid" kind with the unrelated flat-2D AcDbSolid entity right
+    # above -- a consumer filtering IR by geometry.kind could not tell a real
+    # 3D solid from a 2D filled quad without also checking class/dxf_name.
+    # Distinct "solid3d" kind; additive to schemas/dwg_graph_ir.v1.schema.json
+    # (geometry already declares additionalProperties:true).
+    "AcDb3dSolid": ("3DSOLID", "solid3d"),
     "AcDbRegion": ("REGION", "region"),
+    # wS-solids/S8: AcDbSurface/AcDbNurbSurface/AcDbBody previously had NO
+    # entry at all -- geometry.kind fell through to "unsupported" (WaveS0
+    # finding G1/G3). AcDbNurbSurface DERIVES from AcDbSurface but this dict
+    # is keyed on the native reader's own most-derived dxf_name string (see
+    # collectEntitiesFromBlock's cast-order comment in AriadneNativeJob.cpp),
+    # not a cast chain, so no ordering hazard here -- both keys are exact,
+    # disjoint string matches.
+    # LIVE-VERIFIED CORRECTION (same wave): AcDbSurface is an ABSTRACT
+    # ObjectARX base class -- no entity can ever report this exact class
+    # name, so this entry can never fire; kept only as documentation of
+    # intent. write.entity.surface's AcDbSurface::createFrom(profile, ...)
+    # actually returns a concrete AcDbPlaneSurface for the flat closed
+    # profile this handler builds (confirmed via a live case_result.json:
+    # "class":"AcDbPlaneSurface", geometry.kind was silently "unsupported"
+    # before this line was added) -- THAT is the key that must be mapped for
+    # write.entity.surface's real output. A future op that produces a
+    # different concrete AcDbSurface subclass (AcDbExtrudedSurface/
+    # AcDbLoftedSurface/AcDbRevolvedSurface/AcDbSweptSurface) needs its own
+    # entry, live-verified the same way -- do not assume this one covers them.
+    "AcDbSurface": ("SURFACE", "surface"),
+    "AcDbPlaneSurface": ("SURFACE", "surface"),
+    "AcDbNurbSurface": ("NURBSURFACE", "nurbsurface"),
+    "AcDbBody": ("BODY", "body"),
     "AcDbViewport": ("VIEWPORT", "viewport"),
     "AcDbRotatedDimension": ("DIMENSION", "dimension"),
     "AcDbAlignedDimension": ("DIMENSION", "dimension"),
@@ -759,7 +788,17 @@ def _entity_from_native(raw: dict, source_block: dict) -> dict:
         native_class, (native_class or "UNKNOWN", "unsupported"))
     layer = str(raw.get("layer", "") or "")
     geom = _geometry_from_native_entity(raw, kind)
-    bbox = _normalize_bbox(None, geom)
+    # wS-solids/S8 fix: this used to hardcode None, silently discarding
+    # whatever bbox the native side emitted and ALWAYS falling back to
+    # deriving one from geometry points. Harmless for every pre-existing
+    # entity kind (none of them ever emitted a native "bbox" key -- verified:
+    # AriadneNativeJob.cpp's bboxJsonField, added this wave for the 5 ASM/
+    # solids classes, is the ONLY "bbox" JSON emitter in the whole native
+    # codebase), but it silently zeroed out the S8 cast branches' bbox for
+    # solid3d/surface/nurbsurface/region/body -- those kinds have no start/
+    # end/center/vertices geometry fields for _normalize_bbox to fall back
+    # to, so raw.get("bbox") is their ONLY extents signal.
+    bbox = _normalize_bbox(raw.get("bbox"), geom)
     decoded = kind != "unsupported"
 
     entity: dict = {
