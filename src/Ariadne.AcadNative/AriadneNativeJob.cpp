@@ -55,6 +55,16 @@
 #include "dbxline.h"   // w3-simple1: AcDbXline (collectModelSpaceGraph read branch --
                        // families/m08g_handlers.inc's own #include is textually AFTER
                        // collectModelSpaceGraph in this TU, so this needs its own copy)
+#include "dbsol3d.h"   // wS-solids/S8: AcDb3dSolid (collectEntitiesFromBlock read branch --
+                       // families/m08g_handlers.inc's own #include is textually AFTER
+                       // collectEntitiesFromBlock in this TU, so this needs its own copy)
+#include "dbregion.h"  // wS-solids/S8: AcDbRegion (same reason as dbsol3d.h above)
+#include "dbsurf.h"    // wS-solids/S8: AcDbSurface (same reason as dbsol3d.h above)
+#include "dbnurbsurf.h" // wS-solids/S8: AcDbNurbSurface (same reason as dbsol3d.h above --
+                       // MUST be visible for the AcDbNurbSurface::cast branch, which is
+                       // ORDERED BEFORE AcDbSurface::cast in collectEntitiesFromBlock
+                       // since AcDbNurbSurface derives from AcDbSurface)
+#include "dbbody.h"    // wS-solids/S8: AcDbBody (same reason as dbsol3d.h above)
 #include "dbxrecrd.h"
 #include "dbsymtb.h"
 #include "dbcolor.h"
@@ -1120,6 +1130,29 @@ static std::string mergeJsonArrays(const std::string& left, const std::string& r
     return "[" + jsonArrayInner(left) + "," + jsonArrayInner(right) + "]";
 }
 
+// wS-solids/S8: minimal bbox emitter shared by the 5 ASM/solids classes below
+// (AcDb3dSolid/AcDbSurface/AcDbNurbSurface/AcDbRegion/AcDbBody) -- none of
+// them has a per-class cast branch today (WaveS0 finding G3 in build_log.md),
+// so every one extracts as the bare {handle,dxf_name,layer,owner_handle,
+// space} generic record with no geometry signal at all, not even bbox.
+// getGeomExtents is a cheap AcDbEntity virtual (not an AcBr/ASM call) --
+// Tier A per WaveS0's cert design: a real bbox now; richer geometry.
+// brep_envelope (volume/area/centroid/face counts, mirroring the AcBr fields
+// this wave's B6 gate already reads per-op) is deferred to a future Tier B
+// bulk-extraction pass.
+static std::string bboxJsonField(AcDbEntity* pEnt)
+{
+    AcDbExtents ext;
+    if (pEnt->getGeomExtents(ext) != Acad::eOk || !ext.isValid())
+        return std::string();
+    const AcGePoint3d mn = ext.minPoint();
+    const AcGePoint3d mx = ext.maxPoint();
+    std::ostringstream o;
+    o << ",\"bbox\":[" << mn.x << "," << mn.y << "," << mn.z << ","
+      << mx.x << "," << mx.y << "," << mx.z << "]";
+    return o.str();
+}
+
 //----------------------------------------------------------------------------
 // collectEntitiesFromBlock
 //
@@ -2149,6 +2182,34 @@ static bool collectEntitiesFromBlock(AcDbBlockTableRecord* pBTR, const char* spa
             const AcGeVector3d d = pXl->unitDir();
             arr << ",\"base_point\":[" << b.x << "," << b.y << "," << b.z << "]"
                 << ",\"unit_dir\":[" << d.x << "," << d.y << "," << d.z << "]";
+        }
+        // wS-solids/S8: the 5 ASM/solids classes (WaveS0 finding G3) -- Tier A
+        // fix, bbox only (see bboxJsonField above). ir_builder.py's dxf_name
+        // kind table (not this cast chain) assigns the "solid3d"/"surface"/
+        // "nurbsurface"/"region"/"body" geometry.kind discriminator, so
+        // branch ORDER here only controls which extra fields get appended,
+        // not classification -- except ORDER IS LOAD-BEARING for
+        // AcDbNurbSurface vs AcDbSurface specifically: AcDbNurbSurface
+        // DERIVES from AcDbSurface, so its branch must precede AcDbSurface's
+        // or ::cast(pEnt) would match the base-class branch first for every
+        // nurbsurface. AcDb3dSolid/AcDbRegion/AcDbBody are sibling
+        // AcDbModelerGeometry subclasses (no inheritance overlap with each
+        // other or with AcDbSurface), so their relative order is not
+        // load-bearing.
+        else if (AcDb3dSolid* pSol3d = AcDb3dSolid::cast(pEnt)) {
+            arr << bboxJsonField(pSol3d);
+        }
+        else if (AcDbNurbSurface* pNurb = AcDbNurbSurface::cast(pEnt)) {
+            arr << bboxJsonField(pNurb);
+        }
+        else if (AcDbSurface* pSurf = AcDbSurface::cast(pEnt)) {
+            arr << bboxJsonField(pSurf);
+        }
+        else if (AcDbRegion* pReg = AcDbRegion::cast(pEnt)) {
+            arr << bboxJsonField(pReg);
+        }
+        else if (AcDbBody* pBody = AcDbBody::cast(pEnt)) {
+            arr << bboxJsonField(pBody);
         }
 
         arr << "}";
