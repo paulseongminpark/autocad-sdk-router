@@ -46,7 +46,7 @@ _THIS = os.path.dirname(os.path.abspath(__file__))
 _REPO = os.path.dirname(os.path.dirname(_THIS))
 _INC = os.path.join(_REPO, "src", "Ariadne.AcadNative", "families", "m08g_handlers.inc")
 
-# Entity-create ops implemented (real AcDb* ctor + appendAcDbEntity / owner append). (34)
+# Entity-create ops implemented (real AcDb* ctor + appendAcDbEntity / owner append). (35)
 _CREATE = [
     "write.entity.arc",
     "write.entity.ellipse",
@@ -59,6 +59,7 @@ _CREATE = [
     "write.entity.spline",
     "write.entity.polyline",
     "write.entity.polyline2d",
+    "write.entity.polyline2d.deep",
     "write.entity.polyline3d",
     "write.entity.attribdef",
     "write.entity.attribute",
@@ -168,16 +169,20 @@ class TestM08GHandlers(unittest.TestCase):
         )
 
     def test_implemented_count(self):
-        # 34 entity-create + 8 modify = 42 real staged-write handlers after Wave3 Pane2.
-        # The remaining 3 ops of the 45-op brief are editor-bound subentity edits, left OUT
-        # of HasOp on purpose (no fake pass).
-        self.assertEqual(len(_CREATE), 34)
+        # 35 entity-create + 8 modify = 43 real staged-write handlers (34+8=42
+        # after Wave3 Pane2, +1 p4-poly2d: write.entity.polyline2d.deep, the
+        # true legacy AcDb2dPolyline write path). The remaining 3 ops of the
+        # 45-op brief are editor-bound subentity edits, left OUT of HasOp on
+        # purpose (no fake pass).
+        self.assertEqual(len(_CREATE), 35)
         self.assertEqual(len(_MODIFY), 8)
-        self.assertEqual(len(_IMPLEMENTED), 42)
-        self.assertEqual(len(set(_IMPLEMENTED)), 42, "duplicate op id in the implemented list")
-        self.assertEqual(len(self.hasop), 42)
-        # the brief is 45 ops total: 42 implemented + 3 deferred.
-        self.assertEqual(len(_IMPLEMENTED) + len(_DEFERRED), 45)
+        self.assertEqual(len(_IMPLEMENTED), 43)
+        self.assertEqual(len(set(_IMPLEMENTED)), 43, "duplicate op id in the implemented list")
+        self.assertEqual(len(self.hasop), 43)
+        # the original brief was 45 ops total: 42 implemented + 3 deferred.
+        # p4-poly2d added a 46th op (write.entity.polyline2d.deep) outside that
+        # brief -- 43 implemented + 3 deferred = 46.
+        self.assertEqual(len(_IMPLEMENTED) + len(_DEFERRED), 46)
         self.assertEqual(len(set(_DEFERRED)), 3, "duplicate op id in the deferred list")
 
     def test_minimum_implemented_floor(self):

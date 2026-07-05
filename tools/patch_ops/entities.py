@@ -50,6 +50,7 @@ WRITE_OP_MAP: Dict[str, str] = {
     "create_dimension_angular3pt": "write.entity.dim.angular3pt",
     "create_mleader": "write.entity.mleader",
     "create_polyline2d": "write.entity.polyline2d",
+    "create_polyline2d_deep": "write.entity.polyline2d.deep",
     "create_polyline3d": "write.entity.polyline3d",
     "create_polygonmesh": "write.entity.polygonmesh",
     "create_polyfacemesh": "write.entity.polyfacemesh",
@@ -137,6 +138,19 @@ def build_job_args(native_op: str, args: Dict[str, Any]) -> Optional[Dict[str, A
         # op_roundtrip_probe.py's _expect_create_polyline3d.
         out: Dict[str, Any] = {}
         for k in ('points', 'layer'):
+            if k in args:
+                out[k] = args[k]
+        return out
+    if native_op == "write.entity.polyline2d.deep":
+        # p4-poly2d: the TRUE legacy AcDb2dPolyline (NOT the write.entity.
+        # polyline2d alias above) -- per-vertex points carry bulge/
+        # start_width/end_width (unlike write.entity.polyline2d/polyline's
+        # {x,y,bulge}-only points), plus entity-level elevation/closed/
+        # default_start_width/default_end_width. See op_roundtrip_probe.py's
+        # _expect_create_polyline2d_deep.
+        out: Dict[str, Any] = {}
+        for k in ('points', 'closed', 'elevation', 'default_start_width',
+                  'default_end_width', 'layer'):
             if k in args:
                 out[k] = args[k]
         return out

@@ -188,6 +188,11 @@ _KNOWN_GEOMETRY_LEAF_FIELDS = frozenset({
     "minor_ratio", "start_angle", "end_angle", "normal", "closed", "vertices",
     "text", "height", "rotation", "block_name", "scale", "dimension_type",
     "measurement", "control_points", "degree", "loops", "pattern_name",
+    # p4-poly2d: AcDb2dPolyline entity-level fields (elevation/setElevation,
+    # default_start_width+default_end_width/setDefaultStartWidth+
+    # setDefaultEndWidth); per-vertex start_width/end_width live inside
+    # vertices[].items, not here (schemas/dwg_graph_ir.v1.schema.json).
+    "elevation", "default_start_width", "default_end_width",
 })
 
 # Entity keys that are IDENTITY / PROVENANCE, not oracle-asserted DATA: they

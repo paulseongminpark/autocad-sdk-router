@@ -12,14 +12,14 @@
     "acceptance_test_id": "registry tests[0] (current best-evidence test ref; F3's future per-op W+D roundtrip gate is not built in this tree yet)"
   },
   "totals": {
-    "catalogue_count": 518,
-    "node_count": 518,
-    "edge_count": 1139,
+    "catalogue_count": 519,
+    "node_count": 519,
+    "edge_count": 1148,
     "by_persistence_class": {
       "D": 49,
       "L": 35,
       "NON_GOAL": 60,
-      "P": 55,
+      "P": 56,
       "R": 319
     }
   },
@@ -7824,6 +7824,32 @@
         "tools/patch_engine.py"
       ],
       "acceptance_test_id": "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
+      "persistence_class": "P"
+    },
+    {
+      "op_id": "write.entity.polyline2d.deep",
+      "predecessors": [
+        "inspect.curve.protocol",
+        "inspect.entity.common",
+        "inspect.entity.geomextents",
+        "inspect.entity.osnap",
+        "modify.curve.offset",
+        "modify.curve.split",
+        "modify.curve.to_spline",
+        "modify.entity.copy_transformed",
+        "modify.entity.explode"
+      ],
+      "arg_keys": [],
+      "target_files": [
+        "src/Ariadne.AcadNative/AriadneNativeJob.cpp",
+        "src/Ariadne.AcadNative/families/m08g_handlers.inc",
+        "tests/unit/test_m08g_handlers.py",
+        "tests/unit/test_op_roundtrip_probe.py",
+        "tests/unit/test_operation_registry_v2.py",
+        "tests/unit/test_patch_ops_split.py",
+        "tools/patch_engine.py"
+      ],
+      "acceptance_test_id": "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
       "persistence_class": "P"
     },
     {

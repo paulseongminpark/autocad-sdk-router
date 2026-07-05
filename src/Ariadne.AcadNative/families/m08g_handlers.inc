@@ -338,6 +338,7 @@ static bool m08gHasOp(const std::string& op)
         op == "write.entity.spline" ||
         op == "write.entity.polyline" ||
         op == "write.entity.polyline2d" ||
+        op == "write.entity.polyline2d.deep" ||
         op == "write.entity.polyline3d" ||
         op == "write.entity.attribdef" ||
         op == "write.entity.attribute" ||
@@ -607,6 +608,90 @@ static bool m08gDispatch(const std::string& op, const AriadneJobCtx& ctx, std::o
         pMS->close();
         int probes = 0, ms = 0; countModelSpace(pDb, ms, probes);
         if (vEs != Acad::eOk) { emitNativeError(r, "APPEND_FAILED", "appendVertex 3dpolyline"); return true; }
+        m08gEmitCreate(r, Acad::eOk, id, layer, ms);
+        return true;
+    }
+    if (op == "write.entity.polyline2d.deep") {
+        // p4-poly2d: the TRUE legacy AcDb2dPolyline -- distinct from
+        // write.entity.polyline2d above (which is an ALIAS building
+        // AcDbPolyline/LWPOLYLINE, see that branch's comment). Scope:
+        // k2dSimplePoly only (the ctor default polyType()), with per-vertex
+        // bulge/start_width/end_width, a shared elevation, a closed flag, and
+        // polyline-level default widths (AutoCAD's "constant width" case: a
+        // vertex whose own start/end width is 0/0 renders at
+        // defaultStartWidth/defaultEndWidth instead). Curve-fit/spline-fit
+        // poly types (k2dFitCurvePoly/k2dQuadSplinePoly/k2dCubicSplinePoly)
+        // are OUT OF SCOPE: AutoCAD synthesizes extra fit/spline vertices for
+        // those that are not args-derivable, so a diff=0 roundtrip claim
+        // would be dishonest -- left uncertified on purpose.
+        AcGePoint3dArray pts;
+        AcGeDoubleArray bulges, startWidths, endWidths;
+        {
+            const std::string key = "\"points\"";
+            size_t p = job.find(key);
+            if (p != std::string::npos) {
+                size_t lb = job.find('[', p);
+                size_t rb = (lb == std::string::npos) ? std::string::npos : job.find(']', lb);
+                size_t scan = (lb == std::string::npos) ? std::string::npos : lb + 1;
+                while (scan != std::string::npos && rb != std::string::npos && scan < rb) {
+                    size_t ob = job.find('{', scan);
+                    if (ob == std::string::npos || ob > rb) break;
+                    size_t oe = job.find('}', ob);
+                    if (oe == std::string::npos || oe > rb) break;
+                    const std::string one = job.substr(ob, oe - ob + 1);
+                    double x = 0.0, y = 0.0, bulge = 0.0, sw = 0.0, ew = 0.0;
+                    jsonFindNumber(one, "x", x); jsonFindNumber(one, "y", y);
+                    jsonFindNumber(one, "bulge", bulge);
+                    jsonFindNumber(one, "start_width", sw);
+                    jsonFindNumber(one, "end_width", ew);
+                    pts.append(AcGePoint3d(x, y, 0.0));
+                    bulges.append(bulge);
+                    startWidths.append(sw);
+                    endWidths.append(ew);
+                    scan = oe + 1;
+                }
+            }
+        }
+        if (pts.length() < 2) {
+            emitNativeError(r, "MISSING_ARG", "write.entity.polyline2d.deep requires 'points':[>=2 {x,y}]");
+            return true;
+        }
+        double elevation = 0.0; jsonFindNumber(job, "elevation", elevation);
+        bool closed = false;
+        { double cf = 0.0; if (jsonFindNumber(job, "closed", cf)) closed = (cf != 0.0); }
+        double defStartW = 0.0, defEndW = 0.0;
+        jsonFindNumber(job, "default_start_width", defStartW);
+        jsonFindNumber(job, "default_end_width", defEndW);
+        if (!layer.empty()) { bool c = false; ensureLayer(pDb, layer, 7, c); }
+        AcDbBlockTable* pBT = nullptr;
+        Acad::ErrorStatus es = pDb->getBlockTable(pBT, AcDb::kForRead);
+        if (es != Acad::eOk) { emitNativeError(r, "DB_ERROR", "getBlockTable"); return true; }
+        AcDbBlockTableRecord* pMS = nullptr;
+        es = pBT->getAt(ACDB_MODEL_SPACE, pMS, AcDb::kForWrite);
+        pBT->close();
+        if (es != Acad::eOk) { emitNativeError(r, "DB_ERROR", "getAt modelspace"); return true; }
+        AcDb2dPolyline* pE = new AcDb2dPolyline();
+        if (!layer.empty()) pE->setLayer(asciiToWide(layer).c_str());
+        pE->setElevation(elevation);
+        if (closed) pE->setClosed(Adesk::kTrue);
+        pE->setDefaultStartWidth(defStartW);
+        pE->setDefaultEndWidth(defEndW);
+        AcDbObjectId id;
+        es = pMS->appendAcDbEntity(id, pE);
+        if (es != Acad::eOk) { delete pE; pMS->close(); emitNativeError(r, "APPEND_FAILED", "appendAcDbEntity 2dpolyline"); return true; }
+        Acad::ErrorStatus vEs = Acad::eOk;
+        for (int i = 0; i < pts.length(); ++i) {
+            AcDb2dVertex* pV = new AcDb2dVertex(AcGePoint3d(pts[i].x, pts[i].y, elevation),
+                                                 bulges[i], startWidths[i], endWidths[i]);
+            AcDbObjectId vid;
+            const Acad::ErrorStatus e2 = pE->appendVertex(vid, pV);
+            if (e2 == Acad::eOk) pV->close();
+            else { delete pV; vEs = e2; break; }
+        }
+        pE->close();
+        pMS->close();
+        int probes = 0, ms = 0; countModelSpace(pDb, ms, probes);
+        if (vEs != Acad::eOk) { emitNativeError(r, "APPEND_FAILED", "appendVertex 2dpolyline"); return true; }
         m08gEmitCreate(r, Acad::eOk, id, layer, ms);
         return true;
     }

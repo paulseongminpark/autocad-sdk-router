@@ -664,6 +664,9 @@
         "end_angle": { "type": "number" },
         "normal": { "$ref": "#/$defs/point3", "description": "OCS extrusion/normal vector." },
         "closed": { "type": "boolean" },
+        "elevation": { "type": "number", "description": "AcDb2dPolyline OCS elevation (shared Z-plane)." },
+        "default_start_width": { "type": "number", "description": "AcDb2dPolyline default/constant start width applied where a vertex's own start_width is 0." },
+        "default_end_width": { "type": "number", "description": "AcDb2dPolyline default/constant end width applied where a vertex's own end_width is 0." },
         "vertices": {
           "type": "array",
           "description": "Ordered vertices for polyline-family geometry. Each vertex is at minimum a point; LWPOLYLINE vertices may carry a bulge.",
