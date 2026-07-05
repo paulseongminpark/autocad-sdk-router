@@ -55,6 +55,7 @@ WRITE_OP_MAP: Dict[str, str] = {
     "create_polyfacemesh": "write.entity.polyfacemesh",
     "create_dimension_radiallarge": "write.entity.dim.radiallarge",
     "create_blockref": "write.entity.blockref",
+    "create_attribdef": "write.entity.attribdef",
 }
 
 
@@ -257,6 +258,33 @@ def build_job_args(native_op: str, args: Dict[str, Any]) -> Optional[Dict[str, A
         for k in ("position", "scale", "rotation", "layer"):
             if k in args:
                 out[k] = args[k]
+        # p3-insattr: "attributes":[{tag,value,position?,height?}] -- a
+        # plain passthrough (native field name matches the patch-op arg name);
+        # only meaningful when "block_name" already resolves to a block
+        # definition containing matching-tag ATTDEFs (see m08g_handlers.inc's
+        # write.entity.blockref branch, same precondition create_blockref's
+        # "block_name" already documents above).
+        if "attributes" in args:
+            out["attributes"] = args["attributes"]
+        return out
+    if native_op == "write.entity.attribdef":
+        # p3-insattr: plain passthrough -- native field names match the
+        # patch-op arg names 1:1 (see m08g_handlers.inc's write.entity.
+        # attribdef branch). "block" targets a named block definition's own
+        # entity list instead of modelspace (the ATTDEF-as-template case this
+        # op exists for); omitting it preserves the pre-existing modelspace
+        # behavior.
+        out = {}
+        for k in ("position", "text", "tag", "prompt", "height", "block", "layer"):
+            if k in args:
+                out[k] = args[k]
+        # jsonFindNumber's strtod parse does not understand JSON true/false
+        # tokens (see AriadneNativeJob.cpp write.layer.create's comment) --
+        # coerce to 0/1 the same way tables.py's _LAYER_FLAG_FIELDS does, so
+        # an idiomatic Python bool doesn't silently become "false" on the wire.
+        for k in ("constant", "invisible", "verifiable", "preset"):
+            if k in args:
+                out[k] = int(bool(args[k]))
         return out
     if native_op == "write.entity.set_xdata":
         out: Dict[str, Any] = {}

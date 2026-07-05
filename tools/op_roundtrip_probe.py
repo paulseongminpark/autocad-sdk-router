@@ -970,6 +970,37 @@ def _expect_create_blockref(args: Dict[str, Any]) -> Dict[str, Any]:
     }
 
 
+def _expect_create_attribdef(args: Dict[str, Any]) -> Dict[str, Any]:
+    # p3-insattr: write.entity.attribdef (m08g_handlers.inc) builds a real
+    # AcDbAttributeDefinition from position/text/tag/prompt/height plus the
+    # four ObjectARX mode flags (constant/invisible/verifiable/preset) -- all
+    # of these ARE ctor/setter-arg echoes (no live-DB-state derivation, unlike
+    # e.g. a dimension's dim_block_handle), so every field below is asserted
+    # as ground truth. This builder targets the DEFAULT (no "block" arg)
+    # modelspace path, byte-identical to write.entity.attribdef's pre-existing
+    # behavior, so probe_roundtrip's stock "entity_count delta_eq 1" default
+    # postcondition still holds. An ATTDEF created INSIDE a named block
+    # instead (the "block" arg, this batch's actual mission target) is a
+    # block-definition TEMPLATE, not a modelspace entity -- certified
+    # separately by probe_insert_attributes_roundtrip below via a record-level
+    # check, not this generic single-entity P-gate.
+    return {
+        "dxf_name": "ATTDEF", "layer": args.get("layer") or "0",
+        "geometry": {
+            "kind": "attribute",
+            "position": _point_to_list(args.get("position", [0.0, 0.0, 0.0])),
+            "text": args.get("text", ""),
+            "height": args.get("height", 1.0),
+            "tag": args.get("tag", ""),
+            "prompt": args.get("prompt", ""),
+            "constant": bool(args.get("constant", False)),
+            "invisible": bool(args.get("invisible", False)),
+            "verifiable": bool(args.get("verifiable", False)),
+            "preset": bool(args.get("preset", False)),
+        },
+    }
+
+
 # op_name -> args -> a single IR entity (dxf_name/layer/geometry only -- no
 # handle; the P-gate's geometry-basis compare is handle-independent by
 # design). Only ops this module can honestly build ground truth for; an
@@ -1138,6 +1169,7 @@ _EXPECTED_ENTITY_BUILDERS: Dict[str, Callable[[Dict[str, Any]], Dict[str, Any]]]
     "create_dimension_angular3pt": _expect_create_dimension_angular3pt,
     "create_mleader": _expect_create_mleader,
     "create_blockref": _expect_create_blockref,
+    "create_attribdef": _expect_create_attribdef,
 }
 
 
@@ -1835,6 +1867,282 @@ def _selftest() -> int:
     passed = (r_ok["exit_code"] == 0 and r_shifted["exit_code"] == 1 and r_not_wired["exit_code"] == 3)
     print("RESULT              : %s" % ("PASS" if passed else "FAIL"))
     return 0 if passed else 1
+
+
+# --------------------------------------------------------------------------- #
+# p3-insattr: INSERT-with-ATTRIBUTES tier. Neither an ATTDEF-inside-a-block-
+# definition nor an ATTRIB-attached-to-an-INSERT is a simple top-level entity
+# the generic handle-basis P-gate (probe_roundtrip/cad_diff) can join on in
+# one shot: the ATTDEFs live nested under block_definitions[block_name].
+# def_entities[], and the ATTRIBs of interest are the ones grouped on ONE
+# specific newly-created INSERT's geometry.attributes[] -- both are lists
+# joined by "tag" (the caller-asserted, block-unique key), the same shape
+# LAYER_RECORD_FIELDS/_layer_by_name/layer_record_diff already established
+# for symbol_tables.layers[] (joined by "name" instead of a handle) for
+# exactly the same reason. This tier mirrors that precedent.
+# --------------------------------------------------------------------------- #
+
+#: fields asserted verbatim for one block_definitions[].def_entities[] ATTDEF
+#: record (ground truth = the op's own write.entity.attribdef args -- never a
+#: live read). "tag" is the join key, not part of this list. "position" IS
+#: included (unlike ATTRIB's position below) -- an ATTDEF's own position is
+#: block-local, directly caller-supplied, and copied verbatim (no blockref
+#: transform involved), so it is just as independently re-derivable as
+#: height/text and belongs in the same verbatim-field list.
+ATTDEF_RECORD_FIELDS = ("prompt", "text", "height", "position", "constant",
+                        "invisible", "verifiable", "preset")
+
+#: fields asserted verbatim for one attached ATTRIB inside a newly-created
+#: INSERT's geometry.attributes[] record. Deliberately JUST "value" --
+#: position/height on the real ATTRIB are setAttributeFromBlock-transformed
+#: through this INSERT's own blockTransform() (position/scale/rotation
+#: composed with the ATTDEF's own block-local position/height), not
+#: independently re-derivable here without reimplementing ObjectARX's
+#: transform math in Python. Excluding them is an honest scope limit, not a
+#: silent gap (see probe_insert_attributes_roundtrip's docstring).
+ATTRIBUTE_RECORD_FIELDS = ("value",)
+
+
+def _tagged_record_diff(expected: List[Dict[str, Any]], actual: List[Dict[str, Any]],
+                        fields: tuple) -> Dict[str, List[str]]:
+    """``expected``/``actual``: lists of dicts joined by "tag" (a block-unique
+    key the CALLER asserts, unlike an entity handle the engine assigns --
+    the same join-key relationship layer_record_diff's "name" has to a
+    symbol-table record). Returns ``{tag: [bad_field, ...]}`` for every
+    expected tag with a mismatch (``["__missing__"]`` if the tag is absent
+    from ``actual`` entirely); an empty dict is "diff=0" (PASS), mirroring
+    layer_record_diff's empty-list-is-PASS contract at list-of-records scale.
+    """
+    actual_by_tag = {a.get("tag"): a for a in actual if isinstance(a, dict) and a.get("tag")}
+    diffs: Dict[str, List[str]] = {}
+    for exp in expected:
+        tag = exp.get("tag")
+        act = actual_by_tag.get(tag)
+        if act is None:
+            diffs[tag] = ["__missing__"]
+            continue
+        bad = sorted(f for f in fields if f in exp and exp.get(f) != act.get(f))
+        if bad:
+            diffs[tag] = bad
+    return diffs
+
+
+def _block_definition_by_name(ir: Dict[str, Any], name: str) -> Optional[Dict[str, Any]]:
+    """Find a block_definitions[] record by block name (the block table's own
+    join key, unique within a database -- mirrors _layer_by_name)."""
+    for rec in (ir.get("block_definitions") or []):
+        if isinstance(rec, dict) and rec.get("name") == name:
+            return rec
+    return None
+
+
+def probe_insert_attributes_roundtrip(
+        dwg_path: str, out_dir: str, *,
+        block_name: str = "ARIADNE_ATTR_BLOCK",
+        attdefs: Optional[List[Dict[str, Any]]] = None,
+        attributes: Optional[List[Dict[str, Any]]] = None,
+        insert_position=(50.0, 25.0, 0.0), insert_scale=(2.0, 2.0, 1.0),
+        insert_rotation: float = 0.7853981633974483,
+        apply_staged: Optional[Callable[[Dict[str, Any], str, str], Dict[str, Any]]] = None,
+        patch_ops_mod=None, cad_op_gate_mod=None) -> Dict[str, Any]:
+    """The INSERT-with-ATTRIBUTES cert: block-def ATTDEF templates (incl. a
+    Korean tag) + an INSERT bound to matching ATTRIB values (incl. a Korean
+    value), all as ONE staged-write patch.
+
+    Unlike probe_layer_mutation's two-``apply_staged``-call chain (needed
+    there because each call targets a DIFFERENT patch_id/postcondition),
+    patch_engine.apply_staged natively runs a patch's ``operations[]`` list
+    in order against ONE staged copy ("apply EACH native write op on the
+    staged copy, in order" -- patch_engine.py's own docstring), so this needs
+    exactly one real staged write + one re-extraction for all four steps:
+    create_block_simple -> create_attribdef (tag 1) -> create_attribdef (tag
+    2, Korean) -> create_blockref (with "attributes" naming both tags).
+
+    Ground truth (never a live read):
+      - block_definitions[block_name].def_entities: exactly one ATTDEF per
+        ``attdefs`` entry, joined by tag, matching ATTDEF_RECORD_FIELDS
+        verbatim (prompt/text/height/constant/invisible/verifiable/preset --
+        all directly caller-supplied; an ATTDEF's own position is block-LOCAL
+        space with no owning blockref to transform through, so it is asserted
+        too, just not folded into ATTDEF_RECORD_FIELDS's flag/string list).
+      - the newly-created INSERT's geometry.attributes: exactly one ATTRIB
+        per ``attributes`` entry, joined by tag, matching
+        ATTRIBUTE_RECORD_FIELDS verbatim (value only -- see that constant's
+        docstring for why position/height are an honest exclusion here).
+
+    Defaults exercise the Korean-fidelity requirement directly (the second
+    ATTDEF/attribute pair uses a Korean tag/prompt/value) unless the caller
+    overrides ``attdefs``/``attributes``.
+    """
+    gate = cad_op_gate_mod if cad_op_gate_mod is not None else _import_optional("cad_op_gate")
+    if gate is None:
+        return {"schema": SCHEMA_ID, "op_name": "insert_attributes", "status": "error",
+                "exit_code": 2, "reason": "cad_op_gate sibling module unavailable"}
+
+    if attdefs is None:
+        attdefs = [
+            {"tag": "PART_NO", "prompt": "Enter part number", "text": "PN-0000",
+             "height": 2.5, "position": [0.0, 0.0, 0.0]},
+            {"tag": "부품명", "prompt": "부품명을 입력하세요", "text": "기본부품",
+             "height": 3.0, "position": [0.0, -5.0, 0.0], "invisible": True},
+        ]
+    if attributes is None:
+        attributes = [
+            {"tag": attdefs[0]["tag"], "value": "BRK-2048"},
+            {"tag": attdefs[1]["tag"], "value": "브라켓-A"},
+        ]
+
+    patch_ops = patch_ops_mod if patch_ops_mod is not None else _import_optional("patch_ops")
+    if patch_ops is None:
+        return {"schema": SCHEMA_ID, "op_name": "insert_attributes",
+                "status": gate.STATUS_NOT_IMPLEMENTED, "exit_code": gate.EXIT_NOT_IMPLEMENTED,
+                "reason": "patch_ops sibling module unavailable"}
+    for needed in ("create_block_simple", "create_attribdef", "create_blockref"):
+        if resolve_native_op(needed, patch_ops_mod=patch_ops) is None:
+            return {
+                "schema": SCHEMA_ID, "op_name": "insert_attributes",
+                "status": gate.STATUS_NOT_IMPLEMENTED, "exit_code": gate.EXIT_NOT_IMPLEMENTED,
+                "reason": "op_name %r has no live native write handler wired "
+                          "(patch_ops.NATIVE_WRITE_OP_MAP)" % needed,
+            }
+
+    apply_fn = apply_staged
+    if apply_fn is None:
+        patch_engine = _import_optional("patch_engine")
+        apply_fn = getattr(patch_engine, "apply_staged", None) if patch_engine else None
+    if apply_fn is None:
+        return {"schema": SCHEMA_ID, "op_name": "insert_attributes",
+                "status": gate.STATUS_NOT_IMPLEMENTED, "exit_code": gate.EXIT_NOT_IMPLEMENTED,
+                "reason": "patch_engine.apply_staged unavailable"}
+
+    operations = [
+        {"step_id": "s1", "operation": "create_block_simple", "args": {"name": block_name}},
+    ]
+    for i, ad in enumerate(attdefs):
+        args = dict(ad)
+        args["block"] = block_name
+        if "position" in args:
+            # m08gPoint (the native handler's point/vector arg reader) requires
+            # a {"x","y","z"} object on the wire -- a bare list is a DIFFERENT
+            # shape it silently fails to recognize, leaving position at ITS
+            # OWN default (0,0,0) instead of erroring (the same pitfall this
+            # module's CLI _point_arg() already documents for write.entity.
+            # line/circle). attdefs/expected_attdefs stay [x,y,z] lists
+            # everywhere else (matches ir_builder's _as_point3 IR shape); only
+            # this wire hop needs the object form.
+            px, py, pz = args["position"]
+            args["position"] = {"x": px, "y": py, "z": pz}
+        operations.append({"step_id": "s%d" % (i + 2), "operation": "create_attribdef", "args": args})
+    ix, iy, iz = insert_position
+    sx, sy, sz = insert_scale
+    operations.append({
+        "step_id": "s%d" % (len(attdefs) + 2), "operation": "create_blockref",
+        "args": {"block_name": block_name,
+                 "position": {"x": ix, "y": iy, "z": iz},
+                 "scale": {"x": sx, "y": sy, "z": sz},
+                 "rotation": insert_rotation,
+                 "attributes": attributes},
+    })
+    # net modelspace delta: the block-def setup steps add nothing to
+    # modelspace (create_block_simple creates a BTR, not a modelspace
+    # entity; create_attribdef with "block" targets that BTR, not
+    # modelspace either) -- only the final create_blockref step does, and it
+    # adds 1 (the INSERT) + len(attributes) (each appendAttribute()'d ATTRIB
+    # becomes its own modelspace-resident entity too, per m08g_handlers.inc /
+    # the ObjectARX Developer's Guide -- see the AriadneNativeJob.cpp
+    # AcDbBlockReference read-branch comment this batch added).
+    patch = {
+        "schema": "ariadne.cad_patch.v1",
+        "patch_id": "op_roundtrip_probe/insert_attributes",
+        "target_dwg": {
+            "original_path": os.path.abspath(dwg_path),
+            "staged_path": os.path.join(out_dir, "staged_input.dwg"),
+        },
+        "operations": operations,
+        "postconditions": [
+            {"subject": "entity_count", "op": "delta_eq", "value": 1 + len(attributes)},
+        ],
+        "policy": {"staged_copy": True, "write_mode": "write_copy"},
+    }
+    envelope = apply_fn(patch, dwg_path, out_dir)
+    env_status = envelope.get("status")
+    if env_status != "ok":
+        deferred_reasons = {"not_implemented", "unavailable"}
+        exit_code = gate.EXIT_NOT_IMPLEMENTED if env_status in deferred_reasons else gate.EXIT_ERROR
+        status = gate.STATUS_NOT_IMPLEMENTED if env_status in deferred_reasons else gate.STATUS_ERROR
+        return {
+            "schema": SCHEMA_ID, "op_name": "insert_attributes",
+            "status": status, "exit_code": exit_code,
+            "reason": envelope.get("reason"), "envelope_status": env_status,
+        }
+
+    orig = envelope.get("original_unchanged") or {}
+    if orig and orig.get("unchanged") is False:
+        return {
+            "schema": SCHEMA_ID, "op_name": "insert_attributes",
+            "status": gate.STATUS_ORIGINAL_MUTATED, "exit_code": gate.EXIT_ORIGINAL_MUTATED,
+            "reason": "original DWG changed during the live apply -- READ-ONLY invariant violated",
+            "original_unchanged": orig,
+        }
+
+    post_ir_ref = envelope.get("post_ir")
+    if not post_ir_ref:
+        return {"schema": SCHEMA_ID, "op_name": "insert_attributes",
+                "status": gate.STATUS_ERROR, "exit_code": gate.EXIT_ERROR,
+                "reason": "apply_staged envelope reported ok but is missing post_ir"}
+    post_ir = _load_ir_maybe(post_ir_ref)
+
+    block_def = _block_definition_by_name(post_ir, block_name)
+    def_entities = (block_def or {}).get("def_entities") or []
+    expected_attdefs = [
+        {"tag": ad["tag"], "prompt": ad.get("prompt", ""), "text": ad.get("text", ""),
+         "height": ad.get("height", 1.0), "position": list(ad.get("position", [0.0, 0.0, 0.0])),
+         "constant": bool(ad.get("constant", False)),
+         "invisible": bool(ad.get("invisible", False)), "verifiable": bool(ad.get("verifiable", False)),
+         "preset": bool(ad.get("preset", False))}
+        for ad in attdefs
+    ]
+    # each def_entities[] record's type-specific fields (tag/prompt/text/...)
+    # live directly on its "geometry" dict (same shape entities[] uses -- see
+    # ir_builder.py's _entity_from_native); "tag" is also _tagged_record_diff's
+    # join key, so no extra bookkeeping is needed to carry it across.
+    actual_attdefs = [e.get("geometry") or {} for e in def_entities
+                      if isinstance(e, dict) and (e.get("geometry") or {}).get("tag")]
+    attdef_diff = _tagged_record_diff(expected_attdefs, actual_attdefs, ATTDEF_RECORD_FIELDS)
+
+    insert_entity = None
+    for e in (post_ir.get("entities") or []):
+        if not isinstance(e, dict) or e.get("dxf_name") != "INSERT":
+            continue
+        g = e.get("geometry") or {}
+        if g.get("block_name") == block_name:
+            insert_entity = e
+            break
+    actual_attributes = ((insert_entity or {}).get("geometry") or {}).get("attributes") or []
+    attribute_diff = _tagged_record_diff(attributes, actual_attributes, ATTRIBUTE_RECORD_FIELDS)
+
+    result: Dict[str, Any] = {
+        "schema": SCHEMA_ID, "op_name": "insert_attributes",
+        "block_name": block_name, "expected_attdefs": expected_attdefs,
+        "actual_attdefs": actual_attdefs, "attdef_diff": attdef_diff,
+        "expected_attributes": attributes, "actual_attributes": actual_attributes,
+        "attribute_diff": attribute_diff,
+        "original_unchanged": orig, "run_dir": out_dir,
+        "staged_output": envelope.get("staged_output"),
+    }
+    if block_def is None:
+        result.update(status=gate.STATUS_HOLLOW, exit_code=gate.EXIT_HOLLOW,
+                      reason="block %r not found in block_definitions[] after the write" % block_name)
+    elif insert_entity is None:
+        result.update(status=gate.STATUS_HOLLOW, exit_code=gate.EXIT_HOLLOW,
+                      reason="no INSERT entity referencing block %r found after the write" % block_name)
+    elif attdef_diff or attribute_diff:
+        result.update(status=gate.STATUS_FAIL, exit_code=gate.EXIT_FAIL,
+                      reason="record-diff is non-zero: attdef_diff=%s attribute_diff=%s"
+                             % (attdef_diff, attribute_diff))
+    else:
+        result.update(status=gate.STATUS_OK, exit_code=gate.EXIT_OK)
+    return result
 
 
 # --------------------------------------------------------------------------- #

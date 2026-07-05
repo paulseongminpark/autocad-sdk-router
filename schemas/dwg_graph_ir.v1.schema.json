@@ -683,6 +683,27 @@
         "rotation": { "type": "number" },
         "block_name": { "type": "string", "description": "For block_reference geometry: referenced block name." },
         "scale": { "$ref": "#/$defs/point3" },
+        "tag": { "type": "string", "description": "ATTDEF/ATTRIB tag (kind == attribute)." },
+        "prompt": { "type": "string", "description": "ATTDEF prompt text shown at insertion time (kind == attribute; ATTDEF only, not present on ATTRIB instances)." },
+        "constant": { "type": "boolean", "description": "ATTDEF/ATTRIB constant-mode flag: the value is fixed by the ATTDEF and cannot be overridden per-instance." },
+        "invisible": { "type": "boolean", "description": "ATTDEF/ATTRIB invisible-mode flag." },
+        "verifiable": { "type": "boolean", "description": "ATTDEF/ATTRIB verifiable-mode flag." },
+        "preset": { "type": "boolean", "description": "ATTDEF/ATTRIB preset-mode flag." },
+        "attributes": {
+          "type": "array",
+          "description": "For block_reference geometry: ATTRIB values attached to this INSERT, grouped as a convenience (each also round-trips as its own top-level entities[]/def_entities[] record with kind == attribute, same handle).",
+          "items": {
+            "type": "object",
+            "additionalProperties": true,
+            "properties": {
+              "tag": { "type": "string" },
+              "value": { "type": "string" },
+              "handle": { "$ref": "#/$defs/handle" },
+              "position": { "$ref": "#/$defs/point3" },
+              "height": { "type": "number" }
+            }
+          }
+        },
         "dimension_type": { "type": "string" },
         "measurement": { "type": "number", "description": "Dimension measured value." },
         "control_points": {

@@ -586,6 +586,48 @@ def _geometry_from_native_entity(raw: dict, kind: str) -> dict:
         geom["block_name"] = str(raw.get("block_name"))
     if raw.get("pattern_name") is not None:
         geom["pattern_name"] = str(raw.get("pattern_name"))
+    # p3-insattr: ATTDEF/ATTRIB-specific fields (kind == "attribute", both
+    # AcDbAttributeDefinition and AcDbAttribute per _NATIVE_CLASS_TO_DXF_KIND
+    # above) -- tag/prompt are plain strings; the four ATTDEF/ATTRIB mode
+    # flags are booleans the native side only emits when true/false is known
+    # (never guessed), so isinstance(bool) is the correct presence test here,
+    # same idiom "closed"/"has_arrow_head"/"splined" already use below.
+    if raw.get("tag") is not None:
+        geom["tag"] = str(raw.get("tag"))
+    if raw.get("prompt") is not None:
+        geom["prompt"] = str(raw.get("prompt"))
+    for flag_key in ("constant", "invisible", "verifiable", "preset"):
+        if isinstance(raw.get(flag_key), bool):
+            geom[flag_key] = raw[flag_key]
+    # p3-insattr: INSERT's own "attributes" convenience array (ATTRIB tag/
+    # value/position/height grouped on the owning block_reference geometry --
+    # mirrors schemas/dwg_graph_ir.v1.schema.json's $defs/block_reference.
+    # attributes[] shape). The same ATTRIB data also round-trips as its own
+    # top-level entity (kind=="attribute") via the class-map above; this is a
+    # convenience projection, not the only place it lives.
+    raw_attrs = raw.get("attributes")
+    if isinstance(raw_attrs, list) and raw_attrs:
+        norm_attrs = []
+        for one_attr in raw_attrs:
+            if not isinstance(one_attr, dict):
+                continue
+            item: dict = {}
+            if one_attr.get("tag") is not None:
+                item["tag"] = str(one_attr["tag"])
+            if one_attr.get("value") is not None:
+                item["value"] = str(one_attr["value"])
+            if one_attr.get("handle"):
+                item["handle"] = str(one_attr["handle"])
+            attr_pt = _as_point3(one_attr.get("position"))
+            if attr_pt is not None:
+                item["position"] = attr_pt
+            attr_height = _to_number(one_attr.get("height"))
+            if attr_height is not None:
+                item["height"] = attr_height
+            if item:
+                norm_attrs.append(item)
+        if norm_attrs:
+            geom["attributes"] = norm_attrs
     if isinstance(raw.get("closed"), bool):
         geom["closed"] = raw["closed"]
     if isinstance(raw.get("use_x_axis"), bool):

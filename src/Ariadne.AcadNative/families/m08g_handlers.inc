@@ -104,6 +104,26 @@ static Acad::ErrorStatus m08gAppendEntity(AcDbDatabase* pDb, const std::string& 
     return es;
 }
 
+// p3-insattr: like m08gAppendEntity above, but targets an ALREADY-OPEN-FOR-
+// WRITE block table record the caller supplies, instead of the hardcoded
+// ACDB_MODEL_SPACE -- needed for entities that only make sense as block-
+// DEFINITION content (e.g. an ATTDEF template). Caller opens/closes pBlock;
+// this function only owns pEnt (closed on success, delete()'d on failure,
+// same contract as m08gAppendEntity).
+static Acad::ErrorStatus m08gAppendEntityToBlock(AcDbBlockTableRecord* pBlock,
+                                                 AcDbEntity* pEnt, AcDbObjectId& idOut)
+{
+    idOut = AcDbObjectId::kNull;
+    if (pBlock == nullptr || pEnt == nullptr) {
+        delete pEnt;
+        return Acad::eNullObjectPointer;
+    }
+    const Acad::ErrorStatus es = pBlock->appendAcDbEntity(idOut, pEnt);
+    if (es == Acad::eOk) pEnt->close();
+    else delete pEnt;
+    return es;
+}
+
 // Standard create envelope: "result":{created,handle,layer,modelspace_entities_after},"status".
 static void m08gEmitCreate(std::ostringstream& r, Acad::ErrorStatus es,
                            const AcDbObjectId& id, const std::string& layer, int msAfter)
@@ -612,10 +632,16 @@ static bool m08gDispatch(const std::string& op, const AriadneJobCtx& ctx, std::o
     }
     if (op == "write.entity.attribdef") {
         AcGePoint3d pos; m08gPoint(job, "position", 0.0, 0.0, 0.0, pos);
-        std::string text, tag, prompt;
+        std::string text, tag, prompt, blockName;
         jsonFindString(job, "text", text);
         jsonFindString(job, "tag", tag);
         jsonFindString(job, "prompt", prompt);
+        // p3-insattr: optional "block" targets a NAMED block definition's own
+        // entity list (see the m08gAppendEntityToBlock branch below) so this
+        // ATTDEF serves as a real block template; absent "block", behavior is
+        // byte-identical to before this change (modelspace, via
+        // m08gAppendEntity).
+        jsonFindString(job, "block", blockName);
         double height = 1.0; jsonFindNumber(job, "height", height);
         AcDbAttributeDefinition* pE = new AcDbAttributeDefinition();
         pE->setPosition(pos);
@@ -623,6 +649,46 @@ static bool m08gDispatch(const std::string& op, const AriadneJobCtx& ctx, std::o
         if (!text.empty())   pE->setTextString(utf8ToWide(text).c_str());
         if (!tag.empty())    pE->setTag(utf8ToWide(tag).c_str());
         if (!prompt.empty()) pE->setPrompt(utf8ToWide(prompt).c_str());
+        // p3-insattr: the four ATTDEF mode flags (dbents.h). Each is read only
+        // when the job supplies it (jsonFindNumber's bool return), so omitting
+        // them keeps the ObjectARX ctor defaults (all false) -- no silent
+        // behavior change for callers who don't pass them.
+        double flagVal = 0.0;
+        if (jsonFindNumber(job, "constant", flagVal))
+            pE->setConstant(flagVal != 0.0 ? Adesk::kTrue : Adesk::kFalse);
+        if (jsonFindNumber(job, "invisible", flagVal))
+            pE->setInvisible(flagVal != 0.0 ? Adesk::kTrue : Adesk::kFalse);
+        if (jsonFindNumber(job, "verifiable", flagVal))
+            pE->setVerifiable(flagVal != 0.0 ? Adesk::kTrue : Adesk::kFalse);
+        if (jsonFindNumber(job, "preset", flagVal))
+            pE->setPreset(flagVal != 0.0 ? Adesk::kTrue : Adesk::kFalse);
+        if (!blockName.empty()) {
+            AcDbBlockTable* pBT = nullptr;
+            Acad::ErrorStatus bes = pDb->getBlockTable(pBT, AcDb::kForRead);
+            AcDbObjectId targetBlockId;
+            if (bes == Acad::eOk) {
+                bes = pBT->getAt(asciiToWide(blockName).c_str(), targetBlockId);
+                pBT->close();
+            }
+            AcDbBlockTableRecord* pTargetBlock = nullptr;
+            if (bes == Acad::eOk)
+                bes = acdbOpenObject(pTargetBlock, targetBlockId, AcDb::kForWrite);
+            if (bes != Acad::eOk) {
+                delete pE;
+                emitNativeError(r, "BLOCK_NOT_FOUND",
+                                "write.entity.attribdef: no block definition named '" + blockName + "'");
+                return true;
+            }
+            AcDbObjectId id;
+            const Acad::ErrorStatus es = m08gAppendEntityToBlock(pTargetBlock, pE, id);
+            pTargetBlock->close();
+            r << "\"result\":{\"created\":" << (es == Acad::eOk ? "true" : "false")
+              << ",\"errorstatus\":" << static_cast<int>(es)
+              << ",\"handle\":" << njsonStr(es == Acad::eOk ? handleOfId(id) : std::string())
+              << ",\"block\":" << njsonStr(blockName) << "},"
+              << "\"status\":\"" << (es == Acad::eOk ? "ok" : "error") << "\"}";
+            return true;
+        }
         AcDbObjectId id; int ms = 0;
         const Acad::ErrorStatus es = m08gAppendEntity(pDb, layer, pE, id, ms);
         m08gEmitCreate(r, es, id, layer, ms);
@@ -957,6 +1023,82 @@ static bool m08gDispatch(const std::string& op, const AriadneJobCtx& ctx, std::o
         AcDbObjectId id;
         es = pMS->appendAcDbEntity(id, pRef);
         pMS->close();
+        // p3-insattr: optional "attributes":[{tag,value,position?,height?}] --
+        // only meaningful once the block reference is database-resident
+        // (appendAttribute's contract; mirrors the existing write.entity.
+        // attribute handler above, which requires an ALREADY-resident blockref
+        // resolved by handle). Real ObjectARX INSERT+ATTRIB pattern: for each
+        // requested tag, find the matching AcDbAttributeDefinition owned by the
+        // referenced block definition and instantiate a bound AcDbAttribute via
+        // setAttributeFromBlock (copies position/height/rotation/style/flags,
+        // transformed through this block reference's own blockTransform()),
+        // then overwrite the value with the caller's text UNLESS the ATTDEF is
+        // constant (real AutoCAD INSERT behavior: a constant attribute's value
+        // is fixed by its ATTDEF and cannot be overridden per-instance). A tag
+        // with no matching ATTDEF is silently skipped (not an error -- the
+        // blockref itself already succeeded); attributes_created in the result
+        // envelope below is the honest count, so a caller can tell a typo'd tag
+        // from a real failure without this op ever claiming a fake success.
+        int attributesCreated = 0;
+        if (es == Acad::eOk) {
+            const std::string attrsKey = "\"attributes\"";
+            const size_t ap = job.find(attrsKey);
+            if (ap != std::string::npos) {
+                const size_t lb = job.find('[', ap);
+                const size_t rb = (lb == std::string::npos) ? std::string::npos : job.find(']', lb);
+                if (lb != std::string::npos && rb != std::string::npos) {
+                    AcDbBlockTableRecord* pDef = nullptr;
+                    if (acdbOpenObject(pDef, blockId, AcDb::kForRead) == Acad::eOk) {
+                        size_t scan = lb + 1;
+                        while (scan != std::string::npos && scan < rb) {
+                            const size_t ob = job.find('{', scan);
+                            if (ob == std::string::npos || ob > rb) break;
+                            const size_t oe = job.find('}', ob);
+                            if (oe == std::string::npos || oe > rb) break;
+                            const std::string one = job.substr(ob, oe - ob + 1);
+                            std::string reqTag, reqValue;
+                            jsonFindString(one, "tag", reqTag);
+                            jsonFindString(one, "value", reqValue);
+                            if (!reqTag.empty()) {
+                                AcDbBlockTableRecordIterator* pDIt = nullptr;
+                                if (pDef->newIterator(pDIt) == Acad::eOk) {
+                                    for (pDIt->start(); !pDIt->done(); pDIt->step()) {
+                                        AcDbEntity* pDefEnt = nullptr;
+                                        if (pDIt->getEntity(pDefEnt, AcDb::kForRead) != Acad::eOk)
+                                            continue;
+                                        AcDbAttributeDefinition* pAttDef =
+                                            AcDbAttributeDefinition::cast(pDefEnt);
+                                        if (pAttDef != nullptr &&
+                                            acharToAscii(pAttDef->tagConst()) == reqTag) {
+                                            AcDbAttribute* pA = new AcDbAttribute();
+                                            pA->setAttributeFromBlock(pAttDef, pRef->blockTransform());
+                                            std::string posObj;
+                                            if (jsonFindObject(one, "position", posObj)) {
+                                                AcGePoint3d ov; m08gPoint(one, "position", 0.0, 0.0, 0.0, ov);
+                                                pA->setPosition(ov);
+                                            }
+                                            double ovh = 0.0;
+                                            if (jsonFindNumber(one, "height", ovh) && ovh > 0.0)
+                                                pA->setHeight(ovh);
+                                            if (!pAttDef->isConstant())
+                                                pA->setTextString(utf8ToWide(reqValue).c_str());
+                                            AcDbObjectId attrId;
+                                            const Acad::ErrorStatus aes = pRef->appendAttribute(attrId, pA);
+                                            if (aes == Acad::eOk) { pA->close(); ++attributesCreated; }
+                                            else delete pA;
+                                        }
+                                        pDefEnt->close();
+                                    }
+                                    delete pDIt;
+                                }
+                            }
+                            scan = oe + 1;
+                        }
+                        pDef->close();
+                    }
+                }
+            }
+        }
         if (es == Acad::eOk) pRef->close(); else delete pRef;
         int probes = 0, ms = 0; countModelSpace(pDb, ms, probes);
         r << "\"result\":{\"created\":" << (es == Acad::eOk ? "true" : "false")
@@ -964,6 +1106,7 @@ static bool m08gDispatch(const std::string& op, const AriadneJobCtx& ctx, std::o
           << ",\"handle\":" << njsonStr(es == Acad::eOk ? handleOfId(id) : std::string())
           << ",\"block\":" << njsonStr(name)
           << ",\"layer\":" << njsonStr(layer)
+          << ",\"attributes_created\":" << attributesCreated
           << ",\"modelspace_entities_after\":" << ms << "},"
           << "\"status\":\"" << (es == Acad::eOk ? "ok" : "error") << "\"}";
         return true;

@@ -188,6 +188,11 @@ _KNOWN_GEOMETRY_LEAF_FIELDS = frozenset({
     "minor_ratio", "start_angle", "end_angle", "normal", "closed", "vertices",
     "text", "height", "rotation", "block_name", "scale", "dimension_type",
     "measurement", "control_points", "degree", "loops", "pattern_name",
+    # p3-insattr: ATTDEF/ATTRIB fields (kind == "attribute") + the
+    # block_reference convenience "attributes" array (schemas/dwg_graph_ir.
+    # v1.schema.json's geometry.properties).
+    "tag", "prompt", "constant", "invisible", "verifiable", "preset",
+    "attributes",
 })
 
 # Entity keys that are IDENTITY / PROVENANCE, not oracle-asserted DATA: they

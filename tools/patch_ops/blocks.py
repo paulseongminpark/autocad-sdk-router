@@ -3,21 +3,35 @@
 """patch_ops.blocks -- block / insert / BTR write ops (CAD OS Layer, Lane E
 family split).
 
-No patch op in this family has a live native write handler yet; insert_block
-(the block_reference IR-op-case) degrades to not_implemented / deferred
-(no-fake-success) until a family ticket wires a native write.block.* op.
+p3-insattr adds the first live entry: create_block_simple (write.block.
+simple_create) -- creates a NAMED block table record if it doesn't already
+exist (idempotent: re-running with the same name is a no-op, not an error),
+used as the setup step for an ATTDEF-in-block-definition + INSERT-with-
+attributes multi-op patch (see op_roundtrip_probe.py's
+probe_insert_attributes_roundtrip). create_blockref (write.entity.blockref,
+the INSERT itself) is registered in patch_ops.entities instead -- a pre-
+existing placement from the w3-insert wave, not moved here to avoid an
+unrelated refactor.
 """
 from __future__ import annotations
 
 from typing import Any, Dict, Optional
 
-# patch op id -> native ObjectARX write op. Empty until a block/insert/BTR op
-# lands (mirrors patch_ops.entities.WRITE_OP_MAP's shape for the next family).
-WRITE_OP_MAP: Dict[str, str] = {}
+# patch op id -> native ObjectARX write op (mirrors patch_ops.entities.
+# WRITE_OP_MAP's shape).
+WRITE_OP_MAP: Dict[str, str] = {
+    "create_block_simple": "write.block.simple_create",
+}
 
 
 def build_job_args(native_op: str, args: Dict[str, Any]) -> Optional[Dict[str, Any]]:
-    """No block-family native op is wired yet; always None (not our native_op)."""
+    """Native job "args" for a block-family write op, or None if native_op
+    isn't ours."""
+    if native_op == "write.block.simple_create":
+        out: Dict[str, Any] = {}
+        if "name" in args:
+            out["name"] = args["name"]
+        return out
     return None
 
 
