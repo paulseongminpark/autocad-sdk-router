@@ -52,6 +52,7 @@
 #include "imgdef.h"       // AcDbRasterImageDef
 #include "imgent.h"       // AcDbRasterImage
 #include "dbwipe.h"       // AcDbWipeout
+#include "rxdlinkr.h"     // AcRxDynamicLinker / acrxDynamicLinker singleton (wA-cert engine-load fix)
 
 #pragma comment(lib, "AcMPolygonObj.lib")
 #pragma comment(lib, "acismobj26.lib")
@@ -122,6 +123,28 @@ static Acad::ErrorStatus m08gAppendEntityToBlock(AcDbBlockTableRecord* pBlock,
     if (es == Acad::eOk) pEnt->close();
     else delete pEnt;
     return es;
+}
+
+// wA-cert: force-load an AutoCAD engine .dbx module BEFORE constructing
+// entities of a demand-loaded class. AcDbRasterImageDef/AcDbRasterImage/
+// AcDbWipeout (module acismobj26.dbx) and AcDbMPolygon (module
+// AcMPolygonObj26.dbx) are normally registered by AutoCAD's OWN demand-load
+// table only when a document ALREADY containing an object of that class is
+// opened, or a UI command that touches the class runs (e.g. IMAGEATTACH) --
+// neither happens when this ARX module constructs a brand-new instance
+// directly. Live-probed (a0-engineprep headless + r2-attended full acad.exe,
+// both this same wave): without this, AcDbDictionary::setAt / AcDbBlockTable
+// Record::appendAcDbEntity on these classes fails Acad::eNoClassId (409) even
+// inside a full, attended acad.exe session -- not just headless
+// accoreconsole. AcRxDynamicLinker::loadModule is idempotent (returns eOk if
+// the module is already loaded), so calling this unconditionally at the top
+// of every handler that needs the class is safe and cheap.
+static bool m08gLoadEngineModule(const wchar_t* moduleFileName)
+{
+    AcRxDynamicLinker* linker = acrxDynamicLinker;
+    if (linker == nullptr)
+        return false;
+    return linker->loadModule(moduleFileName, /*printit*/ false) == Acad::eOk;
 }
 
 // Standard create envelope: "result":{created,handle,layer,modelspace_entities_after},"status".
@@ -1421,6 +1444,10 @@ static bool m08gDispatch(const std::string& op, const AriadneJobCtx& ctx, std::o
         return true;
     }
     if (op == "write.entity.mpolygon") {
+        // wA-cert: force-load the MPolygon boundary/loop-management engine
+        // (AcMPolygonObj26.dbx) BEFORE any AcDbMPolygon use -- see
+        // m08gLoadEngineModule's doc comment above.
+        const bool mpolyEngineLoaded = m08gLoadEngineModule(L"AcMPolygonObj26.dbx");
         AcGePoint2dArray verts;
         if (!m08gRead2dVertices(job, verts)) {
             verts.append(AcGePoint2d(0.0, 0.0)); verts.append(AcGePoint2d(1.0, 0.0)); verts.append(AcGePoint2d(1.0, 1.0)); verts.append(AcGePoint2d(0.0, 1.0));
@@ -1451,7 +1478,7 @@ static bool m08gDispatch(const std::string& op, const AriadneJobCtx& ctx, std::o
         AcDbObjectId id;
         es = pMS->appendAcDbEntity(id, pE);
         pMS->close();
-        if (es != Acad::eOk) { delete pE; emitNativeError(r, "APPEND_FAILED", "appendAcDbEntity mpolygon errorstatus " + std::to_string(static_cast<int>(es))); return true; }
+        if (es != Acad::eOk) { delete pE; emitNativeError(r, "APPEND_FAILED", "appendAcDbEntity mpolygon errorstatus " + std::to_string(static_cast<int>(es)) + " engine_module_loaded=" + (mpolyEngineLoaded ? "true" : "false")); return true; }
         es = pE->setNormal(AcGeVector3d(0.0, 0.0, 1.0));
         if (es == Acad::eOk) es = pE->setElevation(0.0);
         if (es == Acad::eOk) es = pE->setPattern(AcDbHatch::kPreDefined, L"SOLID");
@@ -1460,11 +1487,15 @@ static bool m08gDispatch(const std::string& op, const AriadneJobCtx& ctx, std::o
         if (es == Acad::eOk) es = pE->balanceDisplay();
         pE->close();
         int probes = 0, ms = 0; countModelSpace(pDb, ms, probes);
-        if (es != Acad::eOk) { emitNativeError(r, "MPOLYGON_BUILD_FAILED", "AcDbMPolygon build errorstatus " + std::to_string(static_cast<int>(es))); return true; }
+        if (es != Acad::eOk) { emitNativeError(r, "MPOLYGON_BUILD_FAILED", "AcDbMPolygon build errorstatus " + std::to_string(static_cast<int>(es)) + " engine_module_loaded=" + (mpolyEngineLoaded ? "true" : "false")); return true; }
         m08gEmitModelerCreate(r, "AcDbMPolygon", Acad::eOk, id, layer, ms);
         return true;
     }
     if (op == "write.entity.rasterimage") {
+        // wA-cert: force-load the ISM/raster engine (acismobj26.dbx) BEFORE any
+        // AcDbRasterImageDef/AcDbRasterImage use -- see m08gLoadEngineModule's
+        // doc comment above.
+        const bool ismEngineLoaded = m08gLoadEngineModule(L"acismobj26.dbx");
         std::string imagePath; if (!jsonFindString(job, "image_path", imagePath) || imagePath.empty()) { emitNativeError(r, "MISSING_ARG", "write.entity.rasterimage requires image_path"); return true; }
         AcDbObjectId dictId = AcDbRasterImageDef::imageDictionary(pDb);
         Acad::ErrorStatus es = Acad::eOk;
@@ -1480,7 +1511,7 @@ static bool m08gDispatch(const std::string& op, const AriadneJobCtx& ctx, std::o
         AcDbObjectId defId;
         es = pDict->setAt(utf8ToWide(name).c_str(), pDef, defId);
         pDict->close();
-        if (es == Acad::eOk) pDef->close(); else { delete pDef; emitNativeError(r, "IMAGE_DEF_FAILED", "image def setAt errorstatus " + std::to_string(static_cast<int>(es))); return true; }
+        if (es == Acad::eOk) pDef->close(); else { delete pDef; emitNativeError(r, "IMAGE_DEF_FAILED", "image def setAt errorstatus " + std::to_string(static_cast<int>(es)) + " engine_module_loaded=" + (ismEngineLoaded ? "true" : "false")); return true; }
         AcGePoint3d origin; m08gPoint(job, "position", 0.0, 0.0, 0.0, origin);
         double w = 1.0, h = 1.0; jsonFindNumber(job, "width", w); jsonFindNumber(job, "height", h);
         AcDbRasterImage* pE = new AcDbRasterImage();
@@ -1493,6 +1524,11 @@ static bool m08gDispatch(const std::string& op, const AriadneJobCtx& ctx, std::o
         return true;
     }
     if (op == "write.entity.wipeout") {
+        // wA-cert: force-load the ISM/raster engine (acismobj26.dbx) BEFORE any
+        // AcDbRasterImageDef/AcDbWipeout use -- see m08gLoadEngineModule's doc
+        // comment above (AcDbWipeout IS-A AcDbRasterImage, same engine as
+        // write.entity.rasterimage above).
+        const bool ismEngineLoaded = m08gLoadEngineModule(L"acismobj26.dbx");
         AcGePoint2dArray verts;
         if (!m08gRead2dVertices(job, verts)) { verts.append(AcGePoint2d(0.0, 0.0)); verts.append(AcGePoint2d(1.0, 0.0)); verts.append(AcGePoint2d(1.0, 1.0)); verts.append(AcGePoint2d(0.0, 1.0)); }
         // BUGFIX (a0-engineprep): the original code called the static, no-arg
@@ -1520,16 +1556,41 @@ static bool m08gDispatch(const std::string& op, const AriadneJobCtx& ctx, std::o
         AcDbObjectId defId;
         es = pDict->setAt(utf8ToWide(defName).c_str(), pDef, defId);
         pDict->close();
-        if (es == Acad::eOk) pDef->close(); else { delete pDef; emitNativeError(r, "WIPEOUT_DEF_FAILED", "image def setAt errorstatus " + std::to_string(static_cast<int>(es))); return true; }
+        if (es == Acad::eOk) pDef->close(); else { delete pDef; emitNativeError(r, "WIPEOUT_DEF_FAILED", "image def setAt errorstatus " + std::to_string(static_cast<int>(es)) + " engine_module_loaded=" + (ismEngineLoaded ? "true" : "false")); return true; }
+
+        // wA-cert BUGFIX v2: setClipBoundary(kPoly, verts) live-probed to
+        // Acad::eInvalidInput(3). First hypothesis (residency -- append the
+        // empty shell via the generic AcDbBlockTableRecord::appendAcDbEntity
+        // FIRST, mirroring the 3dpolyline/polyfacemesh/mpolygon convention in
+        // this file) reproduced the IDENTICAL error -- ruled out. dbwipe.h
+        // reveals AcDbWipeout provides its OWN dedicated
+        // `Acad::ErrorStatus append(AcDbObjectId&)` member -- unusual for a
+        // plain AcDbEntity subclass (most rely solely on the generic
+        // AcDbBlockTableRecord append path), strongly suggesting the generic
+        // append is not this class's intended construction protocol. Reverted
+        // to configure-then-append (matching Autodesk's documented Wipeout
+        // creation pattern) but using the class's own append() instead of
+        // m08gAppendEntity/appendAcDbEntity.
+        if (!layer.empty()) { bool c = false; ensureLayer(pDb, layer, 7, c); }
         AcDbWipeout* pE = new AcDbWipeout();
         pE->setDatabaseDefaults(pDb);
+        if (!layer.empty()) pE->setLayer(asciiToWide(layer).c_str());
         es = pE->setImageDefId(defId);
         if (es != Acad::eOk) { delete pE; emitNativeError(r, "WIPEOUT_IMAGEDEFID_FAILED", "setImageDefId errorstatus " + std::to_string(static_cast<int>(es))); return true; }
         pE->setOrientation(AcGePoint3d(0.0, 0.0, 0.0), AcGeVector3d(1.0, 0.0, 0.0), AcGeVector3d(0.0, 1.0, 0.0));
+        // wA-cert diagnostic split: setClipBoundary and append() previously
+        // shared one error code/status variable, making it impossible to tell
+        // from the JSON error alone which call actually failed when both
+        // return the SAME numeric ErrorStatus by coincidence. Kept as two
+        // distinct checks with distinct error codes.
         es = pE->setClipBoundary(AcDbRasterImage::kPoly, verts);
-        if (es != Acad::eOk) { delete pE; emitNativeError(r, "WIPEOUT_CLIP_FAILED", "setClipBoundary errorstatus " + std::to_string(static_cast<int>(es))); return true; }
-        AcDbObjectId id; int ms = 0; es = m08gAppendEntity(pDb, layer, pE, id, ms);
-        m08gEmitModelerCreate(r, "AcDbWipeout", es, id, layer, ms);
+        if (es != Acad::eOk) { delete pE; emitNativeError(r, "WIPEOUT_CLIP_FAILED", "setClipBoundary errorstatus " + std::to_string(static_cast<int>(es)) + " engine_module_loaded=" + (ismEngineLoaded ? "true" : "false")); return true; }
+        AcDbObjectId id;
+        es = pE->append(id);
+        if (es != Acad::eOk) { delete pE; emitNativeError(r, "WIPEOUT_APPEND_FAILED", "wipeout append() errorstatus " + std::to_string(static_cast<int>(es))); return true; }
+        pE->close();
+        int probes = 0, ms = 0; countModelSpace(pDb, ms, probes);
+        m08gEmitModelerCreate(r, "AcDbWipeout", Acad::eOk, id, layer, ms);
         return true;
     }
 

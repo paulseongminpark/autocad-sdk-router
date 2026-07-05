@@ -35,6 +35,13 @@
                        // dbhatch.h itself only pulls in gelnsg2d.h/gearc2d.h, not this one)
 #include "genurb2d.h"  // a1-hatchread: AcGeNurbCurve2d (hatch edge-loop spline edges --
                        // same gap: dbhatch.h does not transitively include it)
+#include "imgdef.h"    // wA-cert: AcDbRasterImageDef (rasterimage/wipeout read branch --
+                       // m08g_handlers.inc also includes this, but that #include is textually
+                       // AFTER collectEntitiesFromBlock in this TU (families/*.inc are included
+                       // near the end of this file) -- needed here too for the read side)
+#include "imgent.h"    // wA-cert: AcDbRasterImage (rasterimage read branch)
+#include "dbwipe.h"    // wA-cert: AcDbWipeout (wipeout read branch -- IS-A AcDbRasterImage)
+#include "dbmpolygon.h" // wA-cert: AcDbMPolygon (mpolygon read branch)
 #include "dbelipse.h"  // T3a: AcDbEllipse (collectModelSpaceGraph read branch)
 #include "dbdim.h"     // T3a: AcDbRotatedDimension; T3a-batch2: AcDbAlignedDimension/
                        // AcDbRadialDimension/AcDbDiametricDimension; T3a-batch3:
@@ -1656,6 +1663,108 @@ static bool collectEntitiesFromBlock(AcDbBlockTableRecord* pBTR, const char* spa
             // an honest exclusion, not silently dropped.
             richCounters.hatchLoops += loopCount;
             richCounters.hatchLoopVertices += vertexCount;
+        }
+        // wA-cert: AcDbWipeout MUST be cast-checked BEFORE AcDbRasterImage below --
+        // AcDbWipeout IS-A AcDbRasterImage (dbwipe.h), so AcDbRasterImage::cast()
+        // would also succeed for a wipeout instance and swallow it into the plain-
+        // image branch first if the order were reversed (same "more-derived-class-
+        // first" rule this function already follows elsewhere, e.g. AcDbRotatedDimension
+        // before the generic dimension handling below). Shares the same field set as
+        // AcDbRasterImage (origin/u/v/image_size/clip boundary/source file) plus its
+        // own frame() visibility flag.
+        else if (AcDbWipeout* pWipe = AcDbWipeout::cast(pEnt)) {
+            AcGePoint3d origin; AcGeVector3d uVec, vVec;
+            pWipe->getOrientation(origin, uVec, vVec);
+            const AcGeVector2d imgSize = pWipe->imageSize();
+            std::string sourceFileName;
+            const AcDbObjectId defId = pWipe->imageDefId();
+            if (!defId.isNull()) {
+                AcDbRasterImageDef* pDef = nullptr;
+                if (acdbOpenObject(pDef, defId, AcDb::kForRead) == Acad::eOk) {
+                    sourceFileName = wideToUtf8(std::wstring(pDef->sourceFileName()));
+                    pDef->close();
+                }
+            }
+            const AcGePoint2dArray& clipVerts = pWipe->clipBoundary();
+            std::ostringstream clipArr;
+            for (int ci = 0; ci < clipVerts.length(); ++ci) {
+                if (ci) clipArr << ",";
+                clipArr << "[" << clipVerts[ci].x << "," << clipVerts[ci].y << "]";
+            }
+            arr << ",\"kind\":\"wipeout\""
+                << ",\"origin\":[" << origin.x << "," << origin.y << "," << origin.z << "]"
+                << ",\"u_vector\":[" << uVec.x << "," << uVec.y << "," << uVec.z << "]"
+                << ",\"v_vector\":[" << vVec.x << "," << vVec.y << "," << vVec.z << "]"
+                << ",\"image_size\":[" << imgSize.x << "," << imgSize.y << "]"
+                << ",\"clip_boundary_type\":" << static_cast<int>(pWipe->clipBoundaryType())
+                << ",\"clip_boundary\":[" << clipArr.str() << "]"
+                << ",\"source_file_name\":\"" << jsonEscape(sourceFileName) << "\""
+                << ",\"frame_on\":" << (pWipe->frame() ? "true" : "false");
+        }
+        // wA-cert: plain AcDbRasterImage (write.entity.rasterimage). Same field
+        // set as the AcDbWipeout branch above, minus frame_on (Wipeout-only).
+        else if (AcDbRasterImage* pImg = AcDbRasterImage::cast(pEnt)) {
+            AcGePoint3d origin; AcGeVector3d uVec, vVec;
+            pImg->getOrientation(origin, uVec, vVec);
+            const AcGeVector2d imgSize = pImg->imageSize();
+            std::string sourceFileName;
+            const AcDbObjectId defId = pImg->imageDefId();
+            if (!defId.isNull()) {
+                AcDbRasterImageDef* pDef = nullptr;
+                if (acdbOpenObject(pDef, defId, AcDb::kForRead) == Acad::eOk) {
+                    sourceFileName = wideToUtf8(std::wstring(pDef->sourceFileName()));
+                    pDef->close();
+                }
+            }
+            const AcGePoint2dArray& clipVerts = pImg->clipBoundary();
+            std::ostringstream clipArr;
+            for (int ci = 0; ci < clipVerts.length(); ++ci) {
+                if (ci) clipArr << ",";
+                clipArr << "[" << clipVerts[ci].x << "," << clipVerts[ci].y << "]";
+            }
+            arr << ",\"kind\":\"rasterimage\""
+                << ",\"origin\":[" << origin.x << "," << origin.y << "," << origin.z << "]"
+                << ",\"u_vector\":[" << uVec.x << "," << uVec.y << "," << uVec.z << "]"
+                << ",\"v_vector\":[" << vVec.x << "," << vVec.y << "," << vVec.z << "]"
+                << ",\"image_size\":[" << imgSize.x << "," << imgSize.y << "]"
+                << ",\"clip_boundary_type\":" << static_cast<int>(pImg->clipBoundaryType())
+                << ",\"clip_boundary\":[" << clipArr.str() << "]"
+                << ",\"source_file_name\":\"" << jsonEscape(sourceFileName) << "\"";
+        }
+        // wA-cert: AcDbMPolygon -- derives directly from AcDbEntity (dbmpolygon.h),
+        // no relation to AcDbHatch despite sharing the AcDbHatch::HatchPatternType
+        // enum for setPattern() in the write handler, so ordering relative to the
+        // AcDbHatch branch above is not load-bearing.
+        else if (AcDbMPolygon* pMPoly = AcDbMPolygon::cast(pEnt)) {
+            const int mpolyLoopCount = pMPoly->numMPolygonLoops();
+            const double mpolyElevation = pMPoly->elevation();
+            std::ostringstream loopsArr;
+            for (int li = 0; li < mpolyLoopCount; ++li) {
+                AcGePoint2dArray lverts; AcGeDoubleArray lbulges;
+                pMPoly->getMPolygonLoopAt(li, lverts, lbulges);
+                if (li) loopsArr << ",";
+                loopsArr << "{\"index\":" << li << ",\"vertices\":[";
+                for (int vi = 0; vi < lverts.length(); ++vi) {
+                    if (vi) loopsArr << ",";
+                    const double bulge = (vi < lbulges.length()) ? lbulges[vi] : 0.0;
+                    // wA-cert: 3-element [x,y,elevation] point, matching
+                    // AcDbHatch's hatchLoopsJson convention above (broadcasts
+                    // the entity's own flat elevation() as every loop vertex's
+                    // z) -- "loops" is a generic bare-passthrough in
+                    // ir_builder.py's _geometry_from_native_entity, so this
+                    // shape must match the sibling kind it mirrors.
+                    loopsArr << "{\"point\":[" << lverts[vi].x << "," << lverts[vi].y << "," << mpolyElevation << "]"
+                             << ",\"bulge\":" << bulge << "}";
+                }
+                loopsArr << "]}";
+            }
+            const AcGeVector3d mpolyNormal = pMPoly->normal();
+            arr << ",\"kind\":\"mpolygon\""
+                << ",\"pattern_name\":\"" << jsonEscape(acharToAscii(pMPoly->patternName())) << "\""
+                << ",\"elevation\":" << pMPoly->elevation()
+                << ",\"normal\":[" << mpolyNormal.x << "," << mpolyNormal.y << "," << mpolyNormal.z << "]"
+                << ",\"loop_count\":" << mpolyLoopCount
+                << ",\"loops\":[" << loopsArr.str() << "]";
         }
         // T3a: AcDbRotatedDimension -- the one dimension subtype write.entity.
         // dim.rotated actually creates. Derives directly from AcDbDimension
