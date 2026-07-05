@@ -413,15 +413,20 @@ class TestAlreadyPromotedRealControlRows:
         assert _REAL_OPERATIONS_V2.read_text(encoding="utf-8-sig") == before  # untouched
 
 
-class TestRealManifestPendingRowsAllRejected:
-    """The 4 real Tier-1 candidate rows (T1.1/T1.3/T1.4/T1.5) are honestly
-    not yet F1-probed -- every one must REJECT, never fabricate a promotion,
-    and compute_promotion must never write to the real repo."""
+class TestRealManifestPendingRowsNowLiveProbed:
+    """The 4 real Tier-1 candidate rows (T1.1/T1.3/T1.4/T1.5) were honestly
+    unprobed (=> REJECTED) until the 2026-07-06 full 465-op live sweep
+    (sweep_watchdog.ps1 -> measure/reachable_matrix.jsonl, every row
+    classification_source=live_probe). Their native ops now carry real
+    RUNNABLE evidence, so compute_promotion must compute a promotion --
+    while STILL never writing to the real repo (the anti-fabrication
+    intent lives on as: promotion requires live RUNNABLE evidence, and
+    compute_promotion is pure)."""
 
     @pytest.mark.parametrize("patch_op", [
         "create_block_def", "create_layout", "set_xdata", "set_xrecord",
     ])
-    def test_pending_row_rejected_against_real_registry(self, patch_op):
+    def test_live_probed_row_promotes_against_real_registry(self, patch_op):
         rows = po.load_manifest(str(_REAL_MANIFEST))
         row = next(r for r in rows if r["patch_op"] == patch_op)
         matrix = po.load_f1_matrix()
@@ -429,8 +434,8 @@ class TestRealManifestPendingRowsAllRejected:
 
         result = po.compute_promotion(row, matrix=matrix)
 
-        assert result.status == po.REJECTED
-        assert result.f1_class != pr.RUNNABLE
+        assert result.status in (po.PROMOTED, po.ALREADY_PROMOTED)
+        assert result.f1_class == pr.RUNNABLE
         assert _REAL_OPERATIONS_V2.read_text(encoding="utf-8-sig") == before
 
 

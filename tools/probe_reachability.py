@@ -273,6 +273,16 @@ FIXTURES: dict[str, dict] = {
         "evidence": "src/Ariadne.AcadNative/families/m08g_handlers.inc "
                     "(write.entity.ellipse: center/normal/major_axis/radius_ratio keys)",
     },
+    "write.entity.mpolygon": {
+        "args": {"layer": _F1_LAYER, "points": [
+            {"x": 0.0, "y": 0.0}, {"x": 8.0, "y": 0.0},
+            {"x": 8.0, "y": 8.0}, {"x": 0.0, "y": 8.0},
+        ]},
+        "evidence": "src/Ariadne.AcadNative/families/m08g_handlers.inc "
+                    "(write.entity.mpolygon: m08gRead2dVertices 'points':[{x,y}] + layer; "
+                    "append-shell-first then appendMPolygonLoop(closed=true) per a0-engineprep "
+                    "409 fix; AcMPolygonObj26.dbx engine-load in-handler per wA-cert)",
+    },
     # Already-wired v1 ops -- harvested verbatim from existing, already-used
     # fixtures (test_native/job_*.json) and the v2 job schema's if/then rules.
     "write.entity.line": {
