@@ -1324,6 +1324,75 @@ static bool collectEntitiesFromBlock(AcDbBlockTableRecord* pBTR, const char* spa
             }
             arr << ",\"block_name\":\"" << jsonEscape(blockName) << "\""
                 << ",\"block_record_handle\":\"" << jsonEscape(handleOfId(pRef->blockTableRecord())) << "\"";
+            // p3-insattr: attached ATTRIB values, grouped on the INSERT itself.
+            // attributeIterator() walks objects appended via appendAttribute()
+            // (write.entity.blockref's new "attributes" job arg, m08g_handlers.
+            // inc) -- each ALSO appears as its own top-level entity below (see
+            // the AcDbAttribute branch just after this one: appendAttribute
+            // adds it to the same owner space as the block reference, per the
+            // ObjectARX Developer's Guide), so this is a convenience cross-
+            // reference, not the only place the data lives. Mirrors schemas/
+            // dwg_graph_ir.v1.schema.json's $defs/block_reference.attributes[]
+            // shape (tag/value/handle), plus position/height for richer fidelity.
+            {
+                std::ostringstream attrs; attrs.precision(kJsonDoublePrecision);
+                attrs << "[";
+                bool afirst = true;
+                AcDbObjectIterator* pAIt = pRef->attributeIterator();
+                for (; pAIt != nullptr && !pAIt->done(); pAIt->step()) {
+                    AcDbAttribute* pA = nullptr;
+                    if (acdbOpenObject(pA, pAIt->objectId(), AcDb::kForRead) != Acad::eOk)
+                        continue;
+                    const AcGePoint3d ap = pA->position();
+                    if (!afirst) attrs << ",";
+                    afirst = false;
+                    attrs << "{\"handle\":\"" << jsonEscape(handleOfId(pAIt->objectId())) << "\""
+                          << ",\"tag\":\"" << jsonEscape(acharToAscii(pA->tagConst())) << "\""
+                          << ",\"value\":\"" << jsonEscape(acharToAscii(pA->textStringConst())) << "\""
+                          << ",\"position\":[" << ap.x << "," << ap.y << "," << ap.z << "]"
+                          << ",\"height\":" << pA->height() << "}";
+                    pA->close();
+                }
+                delete pAIt;
+                attrs << "]";
+                arr << ",\"attributes\":" << attrs.str();
+            }
+        }
+        // p3-insattr: AcDbAttributeDefinition (ATTDEF) -- derives from AcDbText
+        // (dbents.h), so this branch MUST precede the generic AcDbText cast
+        // below, or every ATTDEF would silently fall into the generic text
+        // shape (position/text/height only -- no tag/prompt/flags). Position/
+        // height/text reuse AcDbText's own accessors (inherited); tag/prompt/
+        // constant/invisible/verifiable/preset are ATTDEF-specific (dbents.h).
+        else if (AcDbAttributeDefinition* pAttDef = AcDbAttributeDefinition::cast(pEnt)) {
+            const AcGePoint3d p = pAttDef->position();
+            arr << ",\"position\":[" << p.x << "," << p.y << "," << p.z << "]"
+                << ",\"text\":\"" << jsonEscape(acharToAscii(pAttDef->textStringConst())) << "\""
+                << ",\"height\":" << pAttDef->height()
+                << ",\"tag\":\"" << jsonEscape(acharToAscii(pAttDef->tagConst())) << "\""
+                << ",\"prompt\":\"" << jsonEscape(acharToAscii(pAttDef->promptConst())) << "\""
+                << ",\"constant\":" << (pAttDef->isConstant() ? "true" : "false")
+                << ",\"invisible\":" << (pAttDef->isInvisible() ? "true" : "false")
+                << ",\"verifiable\":" << (pAttDef->isVerifiable() ? "true" : "false")
+                << ",\"preset\":" << (pAttDef->isPreset() ? "true" : "false");
+        }
+        // p3-insattr: AcDbAttribute (ATTRIB) -- also derives from AcDbText (same
+        // cast-order requirement as AcDbAttributeDefinition above). This branch
+        // is what a standalone top-level ATTRIB entity hits when this function
+        // walks a block/modelspace's own entity iterator (appendAttribute adds
+        // the ATTRIB to the same owner space as its block reference); the
+        // AcDbBlockReference branch above ALSO surfaces the same data grouped
+        // as a convenience "attributes" array on the owning INSERT.
+        else if (AcDbAttribute* pAttr = AcDbAttribute::cast(pEnt)) {
+            const AcGePoint3d p = pAttr->position();
+            arr << ",\"position\":[" << p.x << "," << p.y << "," << p.z << "]"
+                << ",\"text\":\"" << jsonEscape(acharToAscii(pAttr->textStringConst())) << "\""
+                << ",\"height\":" << pAttr->height()
+                << ",\"tag\":\"" << jsonEscape(acharToAscii(pAttr->tagConst())) << "\""
+                << ",\"constant\":" << (pAttr->isConstant() ? "true" : "false")
+                << ",\"invisible\":" << (pAttr->isInvisible() ? "true" : "false")
+                << ",\"verifiable\":" << (pAttr->isVerifiable() ? "true" : "false")
+                << ",\"preset\":" << (pAttr->isPreset() ? "true" : "false");
         }
         else if (AcDbMText* pM = AcDbMText::cast(pEnt)) {
             const AcGePoint3d p = pM->location();

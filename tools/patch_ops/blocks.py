@@ -19,6 +19,17 @@ p2-blockapp wave: two ops gain their first-ever patch_ops wiring.
 insert_block (the block_reference IR-op-case) still degrades to
 not_implemented / deferred (no-fake-success): INSERT itself is
 create_blockref, wired in patch_ops.entities, not this family.
+
+p3-insattr (same wave, concurrent lane) independently wired the SAME native
+op under a second patch-op id: create_block_simple (write.block.
+simple_create), used as the setup step for an ATTDEF-in-block-definition +
+INSERT-with-attributes multi-op patch (see op_roundtrip_probe.py's
+probe_insert_attributes_roundtrip). Both aliases are kept -- each lane's
+oracle/probe references its own id, and two patch-op ids mapping to one
+native op is an established pattern (create_polyline2d). create_blockref
+(write.entity.blockref, the INSERT itself) is registered in
+patch_ops.entities instead -- a pre-existing placement from the w3-insert
+wave, not moved here to avoid an unrelated refactor.
 """
 from __future__ import annotations
 
@@ -29,6 +40,7 @@ from typing import Any, Dict, Optional
 WRITE_OP_MAP: Dict[str, str] = {
     "create_block": "write.block.simple_create",
     "append_block_entity": "write.block.append_entity",
+    "create_block_simple": "write.block.simple_create",
 }
 
 

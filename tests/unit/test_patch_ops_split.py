@@ -248,6 +248,8 @@ _ORIGINAL_NATIVE_WRITE_OP_MAP = {
     "create_xline": "write.entity.xline",
     "create_block": "write.block.simple_create",
     "append_block_entity": "write.block.append_entity",
+    "create_attribdef": "write.entity.attribdef",
+    "create_block_simple": "write.block.simple_create",
 }
 
 

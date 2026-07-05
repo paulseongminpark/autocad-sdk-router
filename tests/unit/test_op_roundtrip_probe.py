@@ -585,6 +585,46 @@ class TestExpectedIrForOp(unittest.TestCase):
         self.assertEqual(geom["scale"], [1.0, 1.0, 1.0])
         self.assertEqual(geom["rotation"], 0.0)
 
+    def test_create_attribdef_builds_attribute_geometry(self):
+        # p3-insattr: write.entity.attribdef (m08g_handlers.inc) builds a real
+        # AcDbAttributeDefinition from position/text/tag/prompt/height plus
+        # the four mode flags -- all ctor/setter-arg echoes, live-verified
+        # 2026-07-05 p3-insattr cert.
+        ir = probe.expected_ir_for_op(
+            "create_attribdef",
+            {"position": {"x": 1.0, "y": 2.0, "z": 0.0}, "text": "DEFAULT",
+             "tag": "PART_NO", "prompt": "Enter part number", "height": 2.5,
+             "invisible": True, "layer": "0"})
+        ent = ir["entities"][0]
+        self.assertEqual(ent["dxf_name"], "ATTDEF")
+        self.assertEqual(ent["geometry"], {
+            "kind": "attribute",
+            "position": [1.0, 2.0, 0.0],
+            "text": "DEFAULT",
+            "height": 2.5,
+            "tag": "PART_NO",
+            "prompt": "Enter part number",
+            "constant": False,
+            "invisible": True,
+            "verifiable": False,
+            "preset": False,
+        })
+
+    def test_create_attribdef_defaults_when_omitted(self):
+        # write.entity.attribdef's own handler defaults: position (0,0,0),
+        # height 1.0 (the local default the handler always applies when
+        # omitted -- see m08g_handlers.inc), all four mode flags false (the
+        # AcDbAttributeDefinition ctor default, never set when the job omits
+        # them).
+        ir = probe.expected_ir_for_op("create_attribdef", {"tag": "T1"})
+        geom = ir["entities"][0]["geometry"]
+        self.assertEqual(geom["position"], [0.0, 0.0, 0.0])
+        self.assertEqual(geom["height"], 1.0)
+        self.assertEqual(geom["text"], "")
+        self.assertEqual(geom["prompt"], "")
+        for flag in ("constant", "invisible", "verifiable", "preset"):
+            self.assertIs(geom[flag], False)
+
     def test_create_polyline2d_builds_lwpolyline_geometry(self):
         # w3-poly2d: write.entity.polyline2d is an ALIAS for write.entity.
         # polyline (m08g_handlers.inc) -- it builds a real AcDbPolyline
@@ -948,6 +988,161 @@ class TestProbeRoundtrip(unittest.TestCase):
         result = probe.probe_roundtrip(
             "create_mpolygon", {}, "fake.dwg", "fake_out",
             apply_staged=_must_not_be_called)
+        self.assertEqual(result["status"], cad_op_gate.STATUS_NOT_IMPLEMENTED)
+        self.assertEqual(result["exit_code"], cad_op_gate.EXIT_NOT_IMPLEMENTED)
+
+
+# --------------------------------------------------------------------------- #
+# p3-insattr: _tagged_record_diff + probe_insert_attributes_roundtrip
+# --------------------------------------------------------------------------- #
+
+class TestTaggedRecordDiff(unittest.TestCase):
+    def test_empty_diff_when_all_fields_match(self):
+        expected = [{"tag": "A", "value": "1"}, {"tag": "B", "value": "2"}]
+        actual = [{"tag": "A", "value": "1"}, {"tag": "B", "value": "2"}]
+        self.assertEqual(probe._tagged_record_diff(expected, actual, ("value",)), {})
+
+    def test_mismatched_field_reported_by_tag(self):
+        expected = [{"tag": "A", "value": "1"}]
+        actual = [{"tag": "A", "value": "WRONG"}]
+        self.assertEqual(probe._tagged_record_diff(expected, actual, ("value",)), {"A": ["value"]})
+
+    def test_missing_tag_reported_as_missing(self):
+        expected = [{"tag": "A", "value": "1"}, {"tag": "B", "value": "2"}]
+        actual = [{"tag": "A", "value": "1"}]
+        self.assertEqual(probe._tagged_record_diff(expected, actual, ("value",)), {"B": ["__missing__"]})
+
+    def test_unlisted_field_not_compared(self):
+        # only fields the caller passes in `fields` are compared -- mirrors
+        # layer_record_diff's allowlist-only contract.
+        expected = [{"tag": "A", "value": "1", "extra": "whatever"}]
+        actual = [{"tag": "A", "value": "1", "extra": "different"}]
+        self.assertEqual(probe._tagged_record_diff(expected, actual, ("value",)), {})
+
+
+def _fake_apply_staged_insert_attributes(*, attdef_records, insert_attributes,
+                                        block_name="ARIADNE_ATTR_BLOCK",
+                                        status="ok", reason=None, original_unchanged=True):
+    def _fn(patch, dwg_path, out_dir):
+        pre_ir = {"schema": IR_SCHEMA_ID, "entities": [], "block_definitions": []}
+        post_ir = {
+            "schema": IR_SCHEMA_ID,
+            "block_definitions": [{
+                "handle": "1BB", "name": block_name, "def_entities": attdef_records,
+            }],
+            "entities": [{
+                "handle": "9FA", "dxf_name": "INSERT", "layer": "0",
+                "geometry": {"kind": "block_reference", "block_name": block_name,
+                            "position": [50.0, 25.0, 0.0], "scale": [2.0, 2.0, 1.0],
+                            "rotation": 0.7853981633974483, "attributes": insert_attributes},
+            }],
+        }
+        envelope = {"status": status}
+        if reason is not None:
+            envelope["reason"] = reason
+        if status == "ok":
+            envelope["original_unchanged"] = {"unchanged": original_unchanged}
+            envelope["pre_ir"] = pre_ir
+            envelope["post_ir"] = post_ir
+            envelope["staged_output"] = os.path.join(out_dir, "staged_output.dwg")
+        return envelope
+    return _fn
+
+
+class TestProbeInsertAttributesRoundtrip(unittest.TestCase):
+    """probe_insert_attributes_roundtrip fully driven through an injected
+    fake apply_staged (same injection discipline TestProbeRoundtrip already
+    established above) -- no accoreconsole invoked by this suite."""
+
+    def _attdefs(self):
+        return [
+            {"tag": "PART_NO", "prompt": "Enter part number", "text": "PN-0000",
+             "height": 2.5, "position": [0.0, 0.0, 0.0]},
+            {"tag": "부품명", "prompt": "부품명을 입력하세요", "text": "기본부품",
+             "height": 3.0, "position": [0.0, -5.0, 0.0], "invisible": True},
+        ]
+
+    def _attributes(self):
+        return [
+            {"tag": "PART_NO", "value": "BRK-2048"},
+            {"tag": "부품명", "value": "브라켓-A"},
+        ]
+
+    def _matching_geometry_records(self, attdefs):
+        # what the native reader's ATTDEF branch (AriadneNativeJob.cpp)
+        # emits for each attdefs[] arg: constant/invisible/verifiable/preset
+        # are ALWAYS present (defaulting False), never omitted.
+        out = []
+        for ad in attdefs:
+            out.append({
+                "kind": "attribute", "tag": ad["tag"], "prompt": ad.get("prompt", ""),
+                "text": ad.get("text", ""), "height": ad.get("height", 1.0),
+                "position": ad.get("position", [0.0, 0.0, 0.0]),
+                "constant": bool(ad.get("constant", False)),
+                "invisible": bool(ad.get("invisible", False)),
+                "verifiable": bool(ad.get("verifiable", False)),
+                "preset": bool(ad.get("preset", False)),
+            })
+        return out
+
+    def _attdef_records(self, attdefs):
+        return [{"handle": "1A%d" % i, "dxf_name": "ATTDEF", "layer": "0", "geometry": g}
+               for i, g in enumerate(self._matching_geometry_records(attdefs))]
+
+    def test_matching_attdefs_and_attributes_is_ok(self):
+        import patch_ops
+        attdefs, attributes = self._attdefs(), self._attributes()
+        fake = _fake_apply_staged_insert_attributes(
+            attdef_records=self._attdef_records(attdefs), insert_attributes=attributes)
+        result = probe.probe_insert_attributes_roundtrip(
+            "fake.dwg", "fake_out", attdefs=attdefs, attributes=attributes,
+            apply_staged=fake, patch_ops_mod=patch_ops)
+        self.assertEqual(result["attdef_diff"], {})
+        self.assertEqual(result["attribute_diff"], {})
+        self.assertEqual(result["status"], cad_op_gate.STATUS_OK)
+        self.assertEqual(result["exit_code"], cad_op_gate.EXIT_OK)
+
+    def test_wrong_attribute_value_is_fail(self):
+        import patch_ops
+        attdefs, attributes = self._attdefs(), self._attributes()
+        wrong_attributes = [dict(attributes[0]), {"tag": attributes[1]["tag"], "value": "WRONG"}]
+        fake = _fake_apply_staged_insert_attributes(
+            attdef_records=self._attdef_records(attdefs), insert_attributes=wrong_attributes)
+        result = probe.probe_insert_attributes_roundtrip(
+            "fake.dwg", "fake_out", attdefs=attdefs, attributes=attributes,
+            apply_staged=fake, patch_ops_mod=patch_ops)
+        self.assertEqual(result["attribute_diff"], {attributes[1]["tag"]: ["value"]})
+        self.assertEqual(result["status"], cad_op_gate.STATUS_FAIL)
+        self.assertEqual(result["exit_code"], cad_op_gate.EXIT_FAIL)
+
+    def test_wrong_attdef_field_is_fail(self):
+        import patch_ops
+        attdefs, attributes = self._attdefs(), self._attributes()
+        records = self._attdef_records(attdefs)
+        records[0]["geometry"]["height"] = 999.0  # simulate a real read-back mismatch
+        fake = _fake_apply_staged_insert_attributes(attdef_records=records, insert_attributes=attributes)
+        result = probe.probe_insert_attributes_roundtrip(
+            "fake.dwg", "fake_out", attdefs=attdefs, attributes=attributes,
+            apply_staged=fake, patch_ops_mod=patch_ops)
+        self.assertEqual(result["attdef_diff"], {attdefs[0]["tag"]: ["height"]})
+        self.assertEqual(result["status"], cad_op_gate.STATUS_FAIL)
+
+    def test_missing_block_definition_is_hollow(self):
+        import patch_ops
+        attdefs, attributes = self._attdefs(), self._attributes()
+        fake = _fake_apply_staged_insert_attributes(
+            attdef_records=[], insert_attributes=attributes, block_name="SOME_OTHER_BLOCK")
+        result = probe.probe_insert_attributes_roundtrip(
+            "fake.dwg", "fake_out", attdefs=attdefs, attributes=attributes,
+            apply_staged=fake, patch_ops_mod=patch_ops)
+        self.assertEqual(result["status"], cad_op_gate.STATUS_HOLLOW)
+        self.assertEqual(result["exit_code"], cad_op_gate.EXIT_HOLLOW)
+
+    def test_not_wired_op_is_exit_3_before_any_apply_staged_call(self):
+        def _must_not_be_called(patch, dwg_path, out_dir):
+            raise AssertionError("apply_staged must never be called without every required op wired")
+        result = probe.probe_insert_attributes_roundtrip(
+            "fake.dwg", "fake_out", patch_ops_mod=object(), apply_staged=_must_not_be_called)
         self.assertEqual(result["status"], cad_op_gate.STATUS_NOT_IMPLEMENTED)
         self.assertEqual(result["exit_code"], cad_op_gate.EXIT_NOT_IMPLEMENTED)
 
