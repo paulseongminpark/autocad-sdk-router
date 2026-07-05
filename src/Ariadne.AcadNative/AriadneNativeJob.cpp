@@ -345,6 +345,28 @@ static bool jsonFindObject(const std::string& j, const char* key, std::string& o
     return false;
 }
 
+// TABLES tier-2 (p9-tables2): parse an optional {"x":..,"y":..,"z":..} nested
+// job-arg object into 3 doubles -- returns true iff ``key`` was present in
+// ``job`` AT ALL (this file's hasX-flag optional-field convention: an absent
+// key means "don't touch this field", not "set it to zero"). A present-but-
+// incomplete object (missing "z", e.g. a 2D caller) defaults the missing
+// component(s) to 0.0 rather than failing the whole field -- callers that
+// only need 2 components (UCS/VIEW/VPORT's AcGePoint2d fields) simply ignore
+// the unused z out-param. Shared by every point/vector-valued symbol-table
+// record field UCS/VIEW/VPORT introduce (layer/dimstyle had none).
+static bool jsonFindPoint3(const std::string& job, const char* key,
+                           double& x, double& y, double& z)
+{
+    std::string obj;
+    if (!jsonFindObject(job, key, obj))
+        return false;
+    x = 0.0; y = 0.0; z = 0.0;
+    jsonFindNumber(obj, "x", x);
+    jsonFindNumber(obj, "y", y);
+    jsonFindNumber(obj, "z", z);
+    return true;
+}
+
 // M07B: minimal "key":["a","b",...] string-array extractor for the live pump
 // `handles` payload. Mirrors the hand-rolled jsonFind* idiom (no vendored JSON);
 // returns raw inter-quote substrings (callers pass forward-slash/ASCII hex, so no
@@ -1899,6 +1921,18 @@ static std::string linetypeNameOf(AcDbObjectId ltId)
     return name;
 }
 
+// TABLES tier-2 (p9-tables2): {"x":..,"y":..,"z":..} emission for a 3-component
+// point/vector record field -- the read-side mirror of jsonFindPoint3, same
+// key shape so a record-diff's flat `actual.get(k) != v` compare (op_
+// roundtrip_probe.py) works directly against the write-side args dict, no
+// coordinate-shape translation needed on either side.
+static std::string point3Json(double x, double y, double z)
+{
+    std::ostringstream s; s.precision(kJsonDoublePrecision);
+    s << "{\"x\":" << x << ",\"y\":" << y << ",\"z\":" << z << "}";
+    return s.str();
+}
+
 // Layer table with color + state flags (the highest-value symbol table; carries
 // the non-ASCII names the D3 fix targets).
 static std::string layersRichJson(AcDbDatabase* pDb, int& count)
@@ -2003,6 +2037,55 @@ static std::string dimStylesRichJson(AcDbDatabase* pDb, int& count)
     }
     delete pIt;
     pDST->close();
+    arr << "]";
+    return arr.str();
+}
+
+// TABLES tier-2 (p9-tables2): UCS table -- AcDbUCSTableRecord's full settable
+// surface (origin/x_axis/y_axis; see UcsPropertyArgs above for the scope
+// note). Unlike layer/dimstyle, every field here is point/vector-valued, so
+// this is the first rich extractor to use point3Json instead of a bare
+// scalar `<<`.
+static std::string ucsRichJson(AcDbDatabase* pDb, int& count)
+{
+    count = 0;
+    std::ostringstream arr; arr.precision(kJsonDoublePrecision);
+    arr << "[";
+    bool first = true;
+    AcDbUCSTable* pUT = nullptr;
+    if (pDb->getUCSTable(pUT, AcDb::kForRead) != Acad::eOk)
+        return "[]";
+    AcDbUCSTableIterator* pIt = nullptr;
+    if (pUT->newIterator(pIt) != Acad::eOk) {
+        pUT->close();
+        return "[]";
+    }
+    for (pIt->start(); !pIt->done(); pIt->step()) {
+        AcDbUCSTableRecord* pRec = nullptr;
+        if (pIt->getRecord(pRec, AcDb::kForRead) == Acad::eOk) {
+            const ACHAR* nameRaw = nullptr;
+            std::string name;
+            if (pRec->getName(nameRaw) == Acad::eOk)
+                name = acharToAscii(nameRaw);
+            const std::string handle = handleOf(pRec);
+            const AcGePoint3d origin = pRec->origin();
+            const AcGeVector3d xAxis = pRec->xAxis();
+            const AcGeVector3d yAxis = pRec->yAxis();
+            if (!first)
+                arr << ",";
+            first = false;
+            arr << "{\"handle\":\"" << jsonEscape(handle) << "\""
+                << ",\"name\":\"" << jsonEscape(name) << "\""
+                << ",\"origin\":" << point3Json(origin.x, origin.y, origin.z)
+                << ",\"x_axis\":" << point3Json(xAxis.x, xAxis.y, xAxis.z)
+                << ",\"y_axis\":" << point3Json(yAxis.x, yAxis.y, yAxis.z)
+                << "}";
+            ++count;
+            pRec->close();
+        }
+    }
+    delete pIt;
+    pUT->close();
     arr << "]";
     return arr.str();
 }
@@ -2291,19 +2374,25 @@ static std::string collectDatabaseGraph(AcDbDatabase* pDb,
     sec << "\"database\":" << databaseMetaJson(pDb);
     addPresent("database");
 
-    int layerCount = 0, ltCount = 0, tsCount = 0, dsCount = 0, vpCount = 0, raCount = 0;
+    int layerCount = 0, ltCount = 0, tsCount = 0, dsCount = 0, vpCount = 0, raCount = 0, ucsCount = 0;
     const std::string layersJson = layersRichJson(pDb, layerCount);
     const std::string linetypesJson = symbolTableRecordsJson(pDb->linetypeTableId(), ltCount);
     const std::string textStylesJson = symbolTableRecordsJson(pDb->textStyleTableId(), tsCount);
     const std::string dimStylesJson = dimStylesRichJson(pDb, dsCount);
     const std::string viewportsJson = symbolTableRecordsJson(pDb->viewportTableId(), vpCount);
     const std::string appIdsJson = symbolTableRecordsJson(pDb->regAppTableId(), raCount);
+    // p9-tables2: UCS table, rich (record-diff capable) from day one -- unlike
+    // viewports/app_ids/linetypes/text_styles above, which still use the
+    // generic {handle,name}-only symbolTableRecordsJson pending their own
+    // record-diff tickets.
+    const std::string ucsJson = ucsRichJson(pDb, ucsCount);
     sec << ",\"symbol_tables\":{\"layers\":" << layersJson
         << ",\"linetypes\":" << linetypesJson
         << ",\"text_styles\":" << textStylesJson
         << ",\"dim_styles\":" << dimStylesJson
         << ",\"viewports\":" << viewportsJson
-        << ",\"app_ids\":" << appIdsJson << "}";
+        << ",\"app_ids\":" << appIdsJson
+        << ",\"ucs\":" << ucsJson << "}";
     addPresent("symbol_tables");
 
     int btrCount = 0, userBlockDefs = 0;
@@ -2341,6 +2430,7 @@ static std::string collectDatabaseGraph(AcDbDatabase* pDb,
         << ",\"linetypes\":\"implemented\""
         << ",\"text_styles\":\"implemented\""
         << ",\"dim_styles\":\"implemented\""
+        << ",\"ucs\":\"implemented\""
         << ",\"block_table_records\":\"implemented\""
         << ",\"block_definitions\":\"implemented\""
         << ",\"layouts\":\"implemented\""
@@ -2357,6 +2447,7 @@ static std::string collectDatabaseGraph(AcDbDatabase* pDb,
         << ",\"dim_styles\":" << dsCount
         << ",\"viewports\":" << vpCount
         << ",\"app_ids\":" << raCount
+        << ",\"ucs\":" << ucsCount
         << ",\"block_table_records\":" << btrCount
         << ",\"block_definitions\":" << userBlockDefs
         << ",\"layouts\":" << layoutCount
@@ -3038,6 +3129,84 @@ static Acad::ErrorStatus upsertDimStyleRecord(AcDbDatabase* pDb, const std::stri
     AcDbObjectId id;
     es = pDST->add(id, pRec);
     pDST->close();
+    if (es == Acad::eOk) {
+        created = true;
+        pRec->close();
+    }
+    else {
+        delete pRec;
+    }
+    return es;
+}
+
+// TABLES tier-2 (p9-tables2, D-class): optional per-field overrides for a UCS
+// table record write -- same hasX-flag upsert contract LayerPropertyArgs/
+// DimStylePropertyArgs established above (an absent field is left UNTOUCHED).
+// AcDbUCSTableRecord (dbsymtb.h) is a small, complete class: origin/xAxis/
+// yAxis are its ENTIRE settable surface (ucsBaseOrigin() is a PER-
+// ORTHOGRAPHIC-VIEW auxiliary point, a different API shape, out of scope) --
+// unlike DIMSTYLE's ~70-DIMVAR partial coverage, this is the FULL record.
+struct UcsPropertyArgs {
+    bool hasOrigin = false; double originX = 0.0, originY = 0.0, originZ = 0.0;
+    bool hasXAxis = false;  double xAxisX = 1.0, xAxisY = 0.0, xAxisZ = 0.0;
+    bool hasYAxis = false;  double yAxisX = 0.0, yAxisY = 1.0, yAxisZ = 0.0;
+};
+
+// Apply every PRESENT field in props onto pRec (open for write -- either a
+// not-yet-added new record or an existing one reopened kForWrite). Mirrors
+// applyLayerProperties/applyDimStyleProperties' has-flag gating exactly. No
+// orthogonality/unit-length normalization is enforced here (the UCS command's
+// own UI invariant, not a AcDbUCSTableRecord setter constraint) -- xAxis/
+// yAxis are stored exactly as given.
+static void applyUcsProperties(AcDbUCSTableRecord* pRec, const UcsPropertyArgs& props)
+{
+    if (props.hasOrigin)
+        pRec->setOrigin(AcGePoint3d(props.originX, props.originY, props.originZ));
+    if (props.hasXAxis)
+        pRec->setXAxis(AcGeVector3d(props.xAxisX, props.xAxisY, props.xAxisZ));
+    if (props.hasYAxis)
+        pRec->setYAxis(AcGeVector3d(props.yAxisX, props.yAxisY, props.yAxisZ));
+}
+
+// TABLES tier-2: create-or-update a named UCS record (write.ucs.create's
+// handler) -- mirrors upsertLayerRecord/upsertDimStyleRecord's upsert
+// contract exactly: a brand-new UCS starts from AcDbUCSTableRecord's own ctor
+// defaults (origin (0,0,0), xAxis (1,0,0), yAxis (0,1,0) -- WCS-aligned, no
+// forced non-default field the way a new layer forces color 7), and updating
+// an EXISTING UCS applies ONLY the fields present in props; omitted fields
+// are left exactly as they were.
+static Acad::ErrorStatus upsertUcsRecord(AcDbDatabase* pDb, const std::string& name,
+                                         const UcsPropertyArgs& props, bool& created)
+{
+    created = false;
+    if (name.empty())
+        return Acad::eInvalidInput;
+
+    AcDbUCSTable* pUT = nullptr;
+    Acad::ErrorStatus es = pDb->getUCSTable(pUT, AcDb::kForWrite);
+    if (es != Acad::eOk)
+        return es;
+
+    const std::wstring nameW = asciiToWide(name);
+    AcDbObjectId existingId;
+    if (pUT->getAt(nameW.c_str(), existingId) == Acad::eOk) {
+        pUT->close();
+        AcDbUCSTableRecord* pRec = nullptr;
+        es = acdbOpenObject(pRec, existingId, AcDb::kForWrite);
+        if (es != Acad::eOk)
+            return es;
+        applyUcsProperties(pRec, props);
+        pRec->close();
+        return Acad::eOk;
+    }
+
+    AcDbUCSTableRecord* pRec = new AcDbUCSTableRecord();
+    pRec->setName(nameW.c_str());
+    applyUcsProperties(pRec, props);
+
+    AcDbObjectId id;
+    es = pUT->add(id, pRec);
+    pUT->close();
     if (es == Acad::eOk) {
         created = true;
         pRec->close();
@@ -4049,6 +4218,7 @@ static const AriadneOperationSpec kAriadneNativeOperationTable[] = {
     { "inspect.database.graph", "inspect" },
     { "write.layer.create", "symbol_tables_dictionaries" },
     { "write.dimstyle.create", "symbol_tables_dictionaries" },
+    { "write.ucs.create", "symbol_tables_dictionaries" },
     { "write.entity.line", "geometry_kernel" },
     { "write.entity.circle", "geometry_kernel" },
     { "inspect.entity.count", "inspect" },
@@ -4328,6 +4498,31 @@ static void ariadneNativeJob()
           << ",\"errorstatus\":" << static_cast<int>(es)
           << ",\"name\":\"" << jsonEscape(name) << "\""
           << ",\"dimstyles_after\":" << dimstylesAfter << "},"
+          << "\"status\":\"" << (es == Acad::eOk ? "ok" : "error") << "\"}";
+    }
+    else if (op == "write.ucs.create") {
+        std::string name;
+        if (!jsonFindString(job, "name", name) || name.empty())
+            name = "ARIADNE_UCS";
+
+        // TABLES tier-2 (p9-tables2): every property below is OPTIONAL, same
+        // hasX upsert convention write.layer.create/write.dimstyle.create use
+        // -- an absent field leaves an existing UCS record's value untouched.
+        // origin/x_axis/y_axis travel as nested {"x","y","z"} objects (this
+        // file's first point/vector-valued job args -- see jsonFindPoint3).
+        UcsPropertyArgs props;
+        props.hasOrigin = jsonFindPoint3(job, "origin", props.originX, props.originY, props.originZ);
+        props.hasXAxis = jsonFindPoint3(job, "x_axis", props.xAxisX, props.xAxisY, props.xAxisZ);
+        props.hasYAxis = jsonFindPoint3(job, "y_axis", props.yAxisX, props.yAxisY, props.yAxisZ);
+
+        bool created = false;
+        const Acad::ErrorStatus es = upsertUcsRecord(pDb, name, props, created);
+        const int ucsAfter = countSymbolTable(pDb->UCSTableId());
+        r << "\"result\":{\"created\":" << (created ? "true" : "false")
+          << ",\"updated\":" << ((es == Acad::eOk && !created) ? "true" : "false")
+          << ",\"errorstatus\":" << static_cast<int>(es)
+          << ",\"name\":\"" << jsonEscape(name) << "\""
+          << ",\"ucs_after\":" << ucsAfter << "},"
           << "\"status\":\"" << (es == Acad::eOk ? "ok" : "error") << "\"}";
     }
     else if (op == "write.entity.line") {

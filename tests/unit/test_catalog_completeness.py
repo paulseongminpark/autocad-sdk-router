@@ -139,11 +139,13 @@ class TestCatalogDenominatorLiveSmoke(unittest.TestCase):
         # w3-dimstyle adds one new synthetic op (write.dimstyle.create,
         # DIMSTYLE table D-class TABLES tier) on top of the F0 517-op
         # anchor -- 517 -> 518. See tools/patch_ops/tables.py.
+        # p9-tables2 adds one more synthetic op (write.ucs.create, UCS table
+        # D-class TABLES tier-2) -- 518 -> 519. See tools/patch_ops/tables.py.
         ops = cc.load_operations_catalog()
-        self.assertEqual(len(ops), 518,
-                         "the F0 task's own '517-op catalogue' anchor (+1, "
-                         "w3-dimstyle); if this moves again, the whole WAVE-0 "
-                         "accounting must be recomputed")
+        self.assertEqual(len(ops), 519,
+                         "the F0 task's own '517-op catalogue' anchor (+2, "
+                         "w3-dimstyle/p9-tables2); if this moves again, the "
+                         "whole WAVE-0 accounting must be recomputed")
 
     def test_live_denominator_lands_near_plan_446_estimate(self):
         ops = cc.load_operations_catalog()

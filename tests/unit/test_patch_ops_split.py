@@ -139,6 +139,14 @@ DIMVAR subset of AcDbDimStyleTableRecord's ~70 dimension variables (see
 tools/patch_ops/tables.py's module docstring for the exact set and the
 unwritten-DIMVAR gap). Oracle extended accordingly; same invariants
 unaffected.
+
+p9-tables2 update: create_ucs (write.ucs.create, AcDbUCSTableRecord) gains
+its first-ever patch_ops wiring -- another brand-new op, same shape as
+w3-dimstyle's addition above. Mirrors create_layer/create_dimstyle's upsert
+contract for the UCS symbol table (origin/x_axis/y_axis -- AcDbUCSTable
+Record's FULL settable surface, a small complete class unlike DIMSTYLE's
+partial DIMVAR subset). Oracle extended accordingly; same invariants
+unaffected.
 """
 from __future__ import annotations
 
@@ -186,6 +194,7 @@ _ORIGINAL_NATIVE_WRITE_OP_MAP = {
     "create_dimension_radiallarge": "write.entity.dim.radiallarge",
     "create_blockref": "write.entity.blockref",
     "create_dimstyle": "write.dimstyle.create",
+    "create_ucs": "write.ucs.create",
 }
 
 

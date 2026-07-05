@@ -33,6 +33,15 @@ the native side today (dimtxt/dimasz/dimexe/dimexo/dimdec/dimscale/dimclrd/
 dimclre/dimclrt/dimse1 -- see AriadneNativeJob.cpp's DimStylePropertyArgs).
 The other ~60 DIMVARs are an honest gap: passing them in ``args`` is a
 silent no-op on the wire (never forwarded), not a fake write.
+
+p9-tables2 (D-class TABLES tier, wave-P2): write.ucs.create is the SAME
+upsert shape for the UCS table -- AcDbUCSTableRecord (dbsymtb.h) is a small,
+COMPLETE class, so origin/x_axis/y_axis is its entire settable surface (not
+a partial subset like DIMSTYLE). These are this module's first point/vector-
+valued fields: each travels as a nested {"x","y","z"} object (see
+AriadneNativeJob.cpp's jsonFindPoint3/UcsPropertyArgs), passed through
+verbatim -- no bool->int coercion needed since none of the 3 fields are
+flag-shaped.
 """
 from __future__ import annotations
 
@@ -43,6 +52,7 @@ from typing import Any, Dict, Optional
 WRITE_OP_MAP: Dict[str, str] = {
     "create_layer": "write.layer.create",
     "create_dimstyle": "write.dimstyle.create",
+    "create_ucs": "write.ucs.create",
 }
 
 # Passthrough fields whose native job encoding is identical to the patch-op
@@ -62,6 +72,12 @@ _DIMSTYLE_PASSTHROUGH_FIELDS = (
     "dimclrd", "dimclre", "dimclrt",
 )
 _DIMSTYLE_FLAG_FIELDS = ("dimse1",)
+
+# The full settable surface write.ucs.create's native handler reads
+# (UcsPropertyArgs in AriadneNativeJob.cpp) -- all 3 are nested {"x","y","z"}
+# point/vector objects, passed through as-is (no bool->int coercion, no
+# passthrough/flag split needed since none are scalar or flag-shaped).
+_UCS_POINT_FIELDS = ("origin", "x_axis", "y_axis")
 
 
 def build_job_args(native_op: str, args: Dict[str, Any]) -> Optional[Dict[str, Any]]:
@@ -93,6 +109,18 @@ def build_job_args(native_op: str, args: Dict[str, Any]) -> Optional[Dict[str, A
         for key in _DIMSTYLE_FLAG_FIELDS:
             if key in args:
                 out[key] = int(bool(args[key]))
+        return out
+    if native_op == "write.ucs.create":
+        # create_ucs -> create-or-update (upsert) the target UCS record.
+        # Mirrors write.layer.create/write.dimstyle.create's arg-forwarding,
+        # just with point/vector-shaped fields instead of scalars.
+        out = {}
+        name = args.get("name")
+        if name is not None:
+            out["name"] = name
+        for key in _UCS_POINT_FIELDS:
+            if key in args:
+                out[key] = args[key]
         return out
     return None
 
