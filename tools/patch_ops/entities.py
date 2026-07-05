@@ -259,6 +259,15 @@ def build_job_args(native_op: str, args: Dict[str, Any]) -> Optional[Dict[str, A
                 out[k] = args[k]
         return out
     if native_op == "write.entity.set_xdata":
+        # DATABASE-level, not entity-level, despite the patch_op name
+        # "set_entity_xdata": the native handler (m08eHandleEntitySetXdata in
+        # m08e_handlers.inc) calls setDatabaseXdata(ctx.pDb, app, value) --
+        # there is no entity handle argument anywhere in this op's shape, and
+        # none should be added here without also updating the registry
+        # summary/native_api text for "write.entity.set_xdata" in
+        # config/operations.v2.json. See the tripwire test in
+        # tests/unit/test_wave1_tier1_entity_wire.py::
+        # TestSetEntityXdataIsDatabaseLevelNotEntityLevel.
         out: Dict[str, Any] = {}
         for k in ('app', 'value'):
             if k in args:

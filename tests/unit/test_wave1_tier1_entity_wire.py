@@ -31,6 +31,7 @@ Discoverable by pytest and ``python -m unittest discover -s tests``.
 """
 from __future__ import annotations
 
+import json
 import os
 import sys
 import unittest
@@ -369,6 +370,98 @@ class TestPromotionStuckAgainstRealRepo(unittest.TestCase):
             self.assertEqual(fh.read(), before_ops)
         with open(fam, "r", encoding="utf-8") as fh:
             self.assertEqual(fh.read(), before_fam)
+
+
+class TestSetEntityXdataIsDatabaseLevelNotEntityLevel(unittest.TestCase):
+    """set_entity_xdata's native handler (m08eHandleEntitySetXdata in
+    src/Ariadne.AcadNative/families/m08e_handlers.inc) calls
+    setDatabaseXdata(ctx.pDb, app, value) -- a DATABASE-level call with no
+    entity handle argument anywhere in its shape. The patch_op name
+    ("set_ENTITY_xdata") overpromises per-entity targeting; renaming it is out
+    of scope (a structural registry/manifest change, not a description-text
+    fix), so this closes the gap with explicit docs instead:
+      (a) set_xdata (native_op write.xdata.set, still F1-pending/REJECTED)
+          and set_entity_xdata (native_op write.entity.set_xdata, promoted)
+          are two genuinely distinct ops that must never collide.
+      (b) config/operations.v2.json's write.entity.set_xdata record now
+          states DATABASE-level scope explicitly in both "summary" and
+          "handler.native_api" (which previously and wrongly claimed
+          AcDbObject::setXData, an entity-level API this handler never
+          calls) -- see the description-text-only diff for this ticket.
+      (c) a tripwire: the moment set_entity_xdata's arg shape grows beyond
+          {app, value} (e.g. an entity "handle"), THIS test fails, forcing
+          whoever makes that change to also revisit the DATABASE-level
+          semantics docs in patch_ops/entities.py and the registry above."""
+
+    @classmethod
+    def setUpClass(cls):
+        manifest_path = os.path.join(_REPO, "config", "promotion_manifest.json")
+        cls.by_patch_op = {r["patch_op"]: r for r in po.load_manifest(manifest_path)}
+        ops_v2_path = os.path.join(_REPO, "config", "operations.v2.json")
+        with open(ops_v2_path, "r", encoding="utf-8-sig") as fh:
+            cls.ops_v2_doc = json.load(fh)
+
+    def _op_record(self, op_id):
+        return next(o for o in self.ops_v2_doc["operations"] if o["id"] == op_id)
+
+    def test_set_xdata_and_set_entity_xdata_are_distinct_manifest_rows(self):
+        # (a) Both exist as real, independent manifest rows with distinct
+        # native_op targets -- never the same op wearing two patch_op names.
+        xdata_row = self.by_patch_op["set_xdata"]
+        entity_xdata_row = self.by_patch_op["set_entity_xdata"]
+        self.assertEqual(xdata_row["native_op"], "write.xdata.set")
+        self.assertEqual(entity_xdata_row["native_op"], "write.entity.set_xdata")
+        self.assertNotEqual(xdata_row["native_op"], entity_xdata_row["native_op"])
+
+    def test_no_key_collision_in_the_aggregate_write_op_map(self):
+        # (a) set_entity_xdata is wired today; set_xdata is honestly not yet
+        # promoted (F1-pending -- see test_promote_op.py::
+        # TestRealManifestPendingRowsAllRejected). If/when set_xdata IS wired,
+        # it must land under its OWN "set_xdata" key with its OWN native_op
+        # (write.xdata.set), never overwrite or alias onto set_entity_xdata's
+        # entry in the merged patch_ops.NATIVE_WRITE_OP_MAP/patch_engine one
+        # (same aggregate dict object -- test_patch_ops_split.py pins that).
+        self.assertEqual(patch_ops.NATIVE_WRITE_OP_MAP.get("set_entity_xdata"),
+                          "write.entity.set_xdata")
+        self.assertNotEqual(patch_ops.NATIVE_WRITE_OP_MAP.get("set_xdata"),
+                             "write.entity.set_xdata")
+        self.assertNotEqual(patch_engine.NATIVE_WRITE_OP_MAP.get("set_xdata"),
+                             "write.entity.set_xdata")
+
+    def test_registry_summary_and_native_api_document_database_level_scope(self):
+        # (b) The registry description text for write.entity.set_xdata must
+        # say DATABASE-level explicitly and must no longer claim the
+        # entity-level AcDbObject::setXData API this handler never calls.
+        rec = self._op_record("write.entity.set_xdata")
+        summary = rec.get("summary", "")
+        native_api = rec.get("handler", {}).get("native_api", "")
+        self.assertIn("DATABASE-level", summary)
+        self.assertIn("setDatabaseXdata", native_api)
+        self.assertIn("DATABASE-level", native_api)
+        self.assertNotIn("AcDbObject::setXData(const resbuf* xdata)", native_api)
+
+    def test_set_entity_xdata_arg_shape_tripwire_no_entity_handle_arg(self):
+        # (c) TRIPWIRE: write.entity.set_xdata accepts EXACTLY {app, value}
+        # today -- no entity handle. If a future change adds a "handle" (or
+        # any entity-targeting) arg key here, THIS ASSERTION MUST FAIL,
+        # forcing the change's author to update the DATABASE-level semantics
+        # docstring in patch_ops/entities.py and the registry summary/
+        # native_api text above BEFORE loosening this assertion.
+        row = self.by_patch_op["set_entity_xdata"]
+        self.assertEqual(
+            set(row["arg_keys"]), {"app", "value"},
+            "write.entity.set_xdata's arg_keys changed beyond {app, value} -- if an "
+            "entity handle was added, this op is no longer purely DATABASE-level; update "
+            "the semantics docstring in patch_ops/entities.py and the registry summary/"
+            "native_api for write.entity.set_xdata in config/operations.v2.json before "
+            "changing this assertion.")
+
+        probe = entities.build_job_args(
+            "write.entity.set_xdata", {"app": "A", "value": "V", "handle": "1A2B"})
+        self.assertEqual(
+            set(probe), {"app", "value"},
+            "build_job_args now passes a key beyond {app, value} through for "
+            "write.entity.set_xdata -- see the assertion message above.")
 
 
 if __name__ == "__main__":
