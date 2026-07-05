@@ -27,7 +27,10 @@ AutoCAD, this repo is everything around it.
 ## Status (current)
 
 - Registry (2026-07-06, post wave-0/S/A): **525 catalogued** = **465 implemented** +
-  **60 blocked** (headless-impossible: need the ASM solid modeler).
+  **60 blocked**. The blocked set is a mixed hard-block class, not one cause:
+  constraints/associativity 23 (DCM solver), runtime commands 16 (acedCommand
+  policy-forbidden), COM/ActiveX 7, active-document write_original 4 (policy),
+  BRep/solids 4, layouts/plot 2, UI 2, live 1, editor input 1.
 - Router lanes: **455** `ARIADNE_NATIVE_JOB` + 2 `ARIADNE_CAD_JOB` + 2 `full_autocad`
   + 66 unrouted (60 = the blocked set). The earlier 447/447 generic-reachability sweep
   predates the +8 wave-0 ops (dimstyle/linetype/textstyle/ucs/view/vport/xdata/
