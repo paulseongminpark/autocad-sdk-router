@@ -344,8 +344,78 @@ def test_resolvable_ops_report_mixed_patch():
 
 
 # --------------------------------------------------------------------------- #
-# post_ir_path -- declares apply_staged's own stable output-layout convention
+# pre_ir_path / post_ir_path -- declare apply_staged's stable output layout
 # --------------------------------------------------------------------------- #
 
 def test_post_ir_path_matches_apply_staged_layout():
     assert frc.post_ir_path("/some/run/dir") == os.path.join("/some/run/dir", "post", "dwg_graph_ir.json")
+
+
+def test_pre_ir_path_matches_apply_staged_layout():
+    assert frc.pre_ir_path("/some/run/dir") == os.path.join("/some/run/dir", "pre", "dwg_graph_ir.json")
+
+
+# --------------------------------------------------------------------------- #
+# resolve_regen_target -- the blank-seed-optional fallback logic
+# --------------------------------------------------------------------------- #
+
+def test_resolve_regen_target_uses_seed_when_present(tmp_path):
+    seed = tmp_path / "blank_seed.dwg"
+    seed.write_bytes(b"fake dwg bytes")
+    result = frc.resolve_regen_target(str(seed), "/some/fallback.dwg")
+    assert result == {"target": str(seed), "used_blank_seed": True}
+
+
+def test_resolve_regen_target_falls_back_when_seed_missing(tmp_path):
+    missing_seed = str(tmp_path / "does_not_exist.dwg")
+    result = frc.resolve_regen_target(missing_seed, "/some/fallback.dwg")
+    assert result["target"] == "/some/fallback.dwg"
+    assert result["used_blank_seed"] is False
+
+
+def test_resolve_regen_target_falls_back_when_seed_is_none():
+    result = frc.resolve_regen_target(None, "/some/fallback.dwg")
+    assert result["target"] == "/some/fallback.dwg"
+    assert result["used_blank_seed"] is False
+
+
+# --------------------------------------------------------------------------- #
+# isolate_regenerated_entities -- thin wrapper over op_roundtrip_probe.
+# added_entities_ir; verifies the glue (module resolution + kwarg passing),
+# not added_entities_ir's own internals (already covered by op_roundtrip_
+# probe's own test suite).
+# --------------------------------------------------------------------------- #
+
+def test_isolate_regenerated_entities_delegates_to_added_entities_ir():
+    calls = {}
+
+    class _FakeOrp:
+        @staticmethod
+        def added_entities_ir(pre_ir, post_ir, cad_diff_mod=None):
+            calls["pre_ir"] = pre_ir
+            calls["post_ir"] = post_ir
+            calls["cad_diff_mod"] = cad_diff_mod
+            return {"schema": "fake", "entities": ["sentinel"]}
+
+    pre_ir = {"entities": []}
+    post_ir = {"entities": [_entity("LINE", "line")]}
+    result = frc.isolate_regenerated_entities(pre_ir, post_ir, op_roundtrip_probe_mod=_FakeOrp())
+    assert result == {"schema": "fake", "entities": ["sentinel"]}
+    assert calls["pre_ir"] is pre_ir
+    assert calls["post_ir"] is post_ir
+
+
+def test_isolate_regenerated_entities_against_real_op_roundtrip_probe():
+    # Real module, real cad_diff -- a non-blank pre_ir (simulating regen
+    # directly onto the production drawing's own staged copy) with one
+    # extra handle in post_ir must isolate exactly that one new entity.
+    pre_ir = {"schema": "ariadne.dwg_graph_ir.v1", "entities": [
+        {"handle": "10", "dxf_name": "LINE", "layer": "0", "geometry": {"kind": "line"}},
+    ]}
+    post_ir = {"schema": "ariadne.dwg_graph_ir.v1", "entities": [
+        {"handle": "10", "dxf_name": "LINE", "layer": "0", "geometry": {"kind": "line"}},
+        {"handle": "20", "dxf_name": "CIRCLE", "layer": "0", "geometry": {"kind": "circle", "radius": 5}},
+    ]}
+    result = frc.isolate_regenerated_entities(pre_ir, post_ir)
+    handles = [e["handle"] for e in result["entities"]]
+    assert handles == ["20"]

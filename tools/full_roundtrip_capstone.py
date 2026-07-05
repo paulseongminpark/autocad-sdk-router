@@ -496,6 +496,13 @@ def run_regen_batch(filtered_ir: Dict[str, Any], blank_seed_path: str, run_dir: 
     }
 
 
+def pre_ir_path(run_dir: str) -> str:
+    """apply_staged's own stable output layout for the pre-mutation IR
+    (patch_engine.py apply_staged step 5: pre_dir = out_dir/pre,
+    pre_ir_path = pre_dir/dwg_graph_ir.json)."""
+    return os.path.join(run_dir, "pre", "dwg_graph_ir.json")
+
+
 def post_ir_path(run_dir: str) -> str:
     """apply_staged's own stable output layout for the post-mutation IR
     (patch_engine.py apply_staged step 7: post_dir = out_dir/post,
@@ -505,11 +512,33 @@ def post_ir_path(run_dir: str) -> str:
     return os.path.join(run_dir, "post", "dwg_graph_ir.json")
 
 
+def isolate_regenerated_entities(pre_ir: Dict[str, Any], post_ir: Dict[str, Any], *,
+                                 op_roundtrip_probe_mod=None, cad_diff_mod=None) -> Dict[str, Any]:
+    """The IR-shaped subset of ``post_ir`` whose handle is NEW relative to
+    ``pre_ir`` -- reuses op_roundtrip_probe.added_entities_ir (a handle-basis
+    diff, already exercised by every WAVE cert's own P-gate) so the regen
+    target does NOT need to be a blank seed: this isolates exactly what THIS
+    batch created even when regenerating directly onto a staged copy of the
+    full production drawing (pre_ir already has 21,747 entities; only the
+    NEW handles this batch's ops produced are returned). If the target
+    happens to be genuinely blank, pre_ir has 0 entities and every post_ir
+    entity is trivially "new" -- the same call is correct in both cases."""
+    op_roundtrip_probe_mod = op_roundtrip_probe_mod or importlib.import_module("op_roundtrip_probe")
+    return op_roundtrip_probe_mod.added_entities_ir(pre_ir, post_ir, cad_diff_mod=cad_diff_mod)
+
+
 def ensure_blank_seed(seed_path: str, run_dir: str, *, mint_blank_seed_mod=None) -> Dict[str, Any]:
     """Mint ``seed_path`` via tools/mint_blank_seed.py if it does not already
     exist locally (the .dwg is a generated/gitignored artifact -- a fresh
     ``git worktree add`` never checks it out, unlike the tracked
-    tools/mint_blank_seed.py script that produces it)."""
+    tools/mint_blank_seed.py script that produces it).
+
+    OPTIONAL: a truly-blank seed gives the cleanest regen target, but
+    isolate_regenerated_entities() (handle-basis added_entities_ir) makes a
+    non-blank target (e.g. the production drawing's own staged copy) an
+    equally valid regen target -- see resolve_regen_target(). This function
+    is only called when the caller explicitly asked for a blank seed and one
+    is not already present."""
     if os.path.isfile(seed_path):
         return {"minted": False, "seed_path": seed_path, "reason": "already present"}
     mint_blank_seed_mod = mint_blank_seed_mod or importlib.import_module("mint_blank_seed")
@@ -518,6 +547,21 @@ def ensure_blank_seed(seed_path: str, run_dir: str, *, mint_blank_seed_mod=None)
         template=None, output=__import__("pathlib").Path(seed_path),
         run_dir=__import__("pathlib").Path(mint_run_dir))
     return {"minted": True, "seed_path": seed_path, "mint_result": result}
+
+
+def resolve_regen_target(seed_path: Optional[str], fallback_dwg: str) -> Dict[str, Any]:
+    """Pick the DWG apply_staged should stage-and-mutate: ``seed_path`` if it
+    already exists on disk (a genuinely blank seed -- the cleanest target,
+    no isolation math needed since pre_ir is empty by construction), else
+    ``fallback_dwg`` (e.g. the production drawing itself -- safe because
+    isolate_regenerated_entities() isolates NEW handles regardless of how
+    much pre-existing content the target already has). Never mints; see
+    ensure_blank_seed for that (a separate, explicit opt-in)."""
+    if seed_path and os.path.isfile(seed_path):
+        return {"target": seed_path, "used_blank_seed": True}
+    return {"target": fallback_dwg, "used_blank_seed": False,
+           "reason": "no blank seed on disk; regenerating onto the source drawing's own "
+                    "staged copy and isolating new handles instead (isolate_regenerated_entities)"}
 
 
 # --------------------------------------------------------------------------- #
@@ -540,7 +584,13 @@ def main(argv=None) -> int:
     ap.add_argument("--compare-path", default=DEFAULT_COMPARE_PATH,
                    help="workitem production file to identity-check --dwg against")
     ap.add_argument("--skip-identity", action="store_true")
-    ap.add_argument("--seed", default=DEFAULT_SEED, help="blank-seed target DWG (auto-minted if missing)")
+    ap.add_argument("--seed", default=DEFAULT_SEED,
+                   help="blank-seed target DWG if present on disk (OPTIONAL -- falls back to "
+                        "regenerating onto --dwg's own staged copy + isolating new handles "
+                        "when absent; see resolve_regen_target/isolate_regenerated_entities)")
+    ap.add_argument("--mint-seed-if-missing", action="store_true",
+                   help="attempt tools/mint_blank_seed.py if --seed is absent, instead of "
+                        "falling back to --dwg as the regen target")
     ap.add_argument("--out-dir", required=True, help="run output directory")
     ap.add_argument("--census-only", action="store_true", help="stop after the census; no regen/diff")
     ap.add_argument("--kinds", default=None, help="comma-separated geometry.kind allowlist for regen")
@@ -601,17 +651,16 @@ def main(argv=None) -> int:
                                       per_kind_limit=args.per_kind_limit)
     summary["filtered_entity_count"] = len(filtered.get("entities") or [])
 
-    seed_status = ensure_blank_seed(args.seed, out_dir)
-    summary["seed_status"] = {k: v for k, v in seed_status.items() if k != "mint_result"}
-    if not os.path.isfile(args.seed):
-        summary["status"] = "blocked"
-        summary["reason"] = "blank seed not available and mint failed: %s" % seed_status
-        _write_json(os.path.join(out_dir, "summary.json"), summary)
-        print(json.dumps(summary, ensure_ascii=False, indent=2, default=str))
-        return 2
+    if args.mint_seed_if_missing and not os.path.isfile(args.seed):
+        seed_status = ensure_blank_seed(args.seed, out_dir)
+        summary["seed_status"] = {k: v for k, v in seed_status.items() if k != "mint_result"}
+        if not seed_status.get("minted") is False and not os.path.isfile(args.seed):
+            summary["mint_result"] = (seed_status.get("mint_result") or {})
+    regen_target = resolve_regen_target(args.seed, args.dwg)
+    summary["regen_target"] = regen_target
 
     regen_dir = os.path.join(out_dir, "regen")
-    batch = run_regen_batch(filtered, args.seed, regen_dir, "full_roundtrip_capstone/batch")
+    batch = run_regen_batch(filtered, regen_target["target"], regen_dir, "full_roundtrip_capstone/batch")
     summary["regen"] = {
         "op_count": batch["op_count"], "deferred_count": len(batch["deferred"]),
         "resolvable_ops": batch["resolvable_ops"],
@@ -622,11 +671,18 @@ def main(argv=None) -> int:
     _write_json(os.path.join(out_dir, "regen_summary.json"), summary["regen"])
     _write_json(os.path.join(out_dir, "deferred.json"), batch["deferred"])
 
-    post_path = post_ir_path(regen_dir)
-    if os.path.isfile(post_path):
+    pre_path, post_path = pre_ir_path(regen_dir), post_ir_path(regen_dir)
+    if os.path.isfile(pre_path) and os.path.isfile(post_path):
         cad_diff_mod = importlib.import_module("cad_diff")
+        pre_ir = json.load(open(pre_path, encoding="utf-8-sig"))
         post_ir = json.load(open(post_path, encoding="utf-8-sig"))
-        diff = cad_diff_mod.compute_diff(filtered, post_ir, comparison_basis="geometry",
+        # Isolate what THIS batch actually created (handle-basis) before the
+        # geometry-basis multiset compare -- required whenever regen_target
+        # is not a blank seed (its pre_ir already carries the full drawing),
+        # and harmless (a no-op re-listing) when it is.
+        regenerated_ir = isolate_regenerated_entities(pre_ir, post_ir, cad_diff_mod=cad_diff_mod)
+        _write_json(os.path.join(out_dir, "regenerated_only_ir.json"), regenerated_ir)
+        diff = cad_diff_mod.compute_diff(filtered, regenerated_ir, comparison_basis="geometry",
                                          diff_scope="modelspace_entities_only")
         _write_json(os.path.join(out_dir, "geometry_diff.json"), diff)
         verdict = per_kind_verdict(filtered, diff)
@@ -634,7 +690,9 @@ def main(argv=None) -> int:
         _write_json(os.path.join(out_dir, "verdict.json"), verdict)
     else:
         summary["verdict"] = None
-        summary["verdict_skipped_reason"] = "no post IR at %s (apply_staged did not reach post-inspect)" % post_path
+        summary["verdict_skipped_reason"] = (
+            "missing pre/post IR (pre=%s post=%s) -- apply_staged did not reach post-inspect"
+            % (os.path.isfile(pre_path), os.path.isfile(post_path)))
 
     if args.with_records:
         op_roundtrip_probe_mod = importlib.import_module("op_roundtrip_probe")
