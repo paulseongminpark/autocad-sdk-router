@@ -26,13 +26,15 @@ AutoCAD, this repo is everything around it.
 
 ## Status (current)
 
-- Registry: **517 catalogued** = **457 implemented** + **60 blocked** (headless-impossible:
-  need the ASM solid modeler).
-- Of the 457 implemented: **447 native** ops reachable via `cad.run_operation`
-  (exhaustively verified — 447/447 reach the native ObjectARX module, 0 fall-through,
-  golden DWG byte-unchanged), **7** python-layer ops via dedicated tools
-  (`cad.patch_*` / `cad.diff_before_after` / `cad.validate_ir` / `cad.query_entities`),
-  **2** managed, **1** live pump (`cad.live_status`).
+- Registry (2026-07-06, post wave-0/S/A): **525 catalogued** = **465 implemented** +
+  **60 blocked** (headless-impossible: need the ASM solid modeler).
+- Router lanes: **455** `ARIADNE_NATIVE_JOB` + 2 `ARIADNE_CAD_JOB` + 2 `full_autocad`
+  + 66 unrouted (60 = the blocked set). The earlier 447/447 generic-reachability sweep
+  predates the +8 wave-0 ops (dimstyle/linetype/textstyle/ucs/view/vport/xdata/
+  polyline2d.deep); a re-sweep on the current binary is the standing capstone item.
+- Python-layer ops via dedicated tools (`cad.patch_*` / `cad.diff_before_after` /
+  `cad.validate_ir` / `cad.query_entities`), **2** managed, **1** live pump
+  (`cad.live_status`).
 - Plus ~**16 native C++ handlers** (live-pump verbs + firing/probe diagnostics) that
   exist in the module but are **not yet entered in the registry** — so the real native
   surface is ≈ **473**. See the 2026-06-29 audit in
