@@ -2076,6 +2076,102 @@ def probe_linetype_mutation(name: str, baseline_args: Dict[str, Any], change_arg
 # runtime touched -- proves the driver's OWN wiring end to end.
 # --------------------------------------------------------------------------- #
 
+# --------------------------------------------------------------------------- #
+# P10: entity-HANDLE-targeted xdata write (set_entity_xdata_by_handle /
+# modify.entity.xdata) record-diff driver. Two-step, unlike probe_roundtrip's
+# single create_* op or probe_layer_roundtrip's name-joined record: step 1
+# creates a fresh line (an existing certified op) to obtain a target handle;
+# step 2 sets xdata on THAT handle. apply_staged's "operations" list applies
+# each step's native op in order on one staged chain, but has no inter-step
+# handle templating (an op's args are fixed at patch-authoring time) -- so a
+# single 2-op patch cannot express "target the entity step 1 just created".
+# Two chained apply_staged calls (step 2's dwg_path = step 1's staged_output)
+# gets the same real staged-write guarantees (schema/guards/journal/original-
+# unchanged proof) per call instead.
+# --------------------------------------------------------------------------- #
+
+def expected_xdata_items(values: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    """The AutoCAD-normalized expectation for a values=[{"code","value"},...]
+    xdata write: byte-identical to the input for every group code this probe
+    accepts (1000/1003/1005 string, 1040/1041/1042 real, 1070/1071 int16/32,
+    1010-1013 point). Unlike e.g. a 1005 handle reference INSIDE a block
+    definition (remapped on INSERT -- not exercised here, no block involved),
+    a plain entity xData()/setXData() round-trip on these codes is not known
+    to be AutoCAD-renormalized; a mismatch here is a genuine finding, not an
+    expected exclusion."""
+    return [{"code": item["code"], "value": item["value"]} for item in values]
+
+
+def probe_entity_xdata_roundtrip(app_name: str, values: List[Dict[str, Any]],
+                                 dwg_path: str, out_dir: str, *,
+                                 create_args: Optional[Dict[str, Any]] = None,
+                                 patch_engine_mod=None) -> Dict[str, Any]:
+    """create_line -> modify.entity.xdata(handle=<new line>) -> re-extract ->
+    item-list diff=0 against the WRITTEN values. Every non-OK outcome (not
+    wired / apply_staged degraded / original mutated / item-list mismatch)
+    returns a truthful status -- never a fake PASS."""
+    op_name = "set_entity_xdata_by_handle"
+    pe = patch_engine_mod if patch_engine_mod is not None else _import_optional("patch_engine")
+    if pe is None or not hasattr(pe, "apply_staged"):
+        return {"schema": SCHEMA_ID, "op_name": op_name, "status": "not_implemented",
+                "exit_code": 3, "reason": "patch_engine.apply_staged unavailable"}
+
+    line_args = create_args or {"start": [0.0, 0.0, 0.0], "end": [10.0, 0.0, 0.0], "layer": "0"}
+    step1_dir = os.path.join(out_dir, "step1_create_line")
+    patch1 = _build_patch("create_line", line_args, dwg_path, step1_dir)
+    env1 = pe.apply_staged(patch1, dwg_path, step1_dir)
+    if env1.get("status") != "ok":
+        return {"schema": SCHEMA_ID, "op_name": op_name, "status": env1.get("status"),
+                "exit_code": 2, "reason": "step1 create_line failed: %s" % env1.get("reason"),
+                "step1_envelope": env1}
+
+    pre_ir1 = _load_ir_maybe(env1.get("pre_ir"))
+    post_ir1 = _load_ir_maybe(env1.get("post_ir"))
+    added_entities = added_entities_ir(pre_ir1, post_ir1).get("entities") or []
+    if len(added_entities) != 1 or not added_entities[0].get("handle"):
+        return {"schema": SCHEMA_ID, "op_name": op_name, "status": "error", "exit_code": 2,
+                "reason": "step1 did not yield exactly one new handle-bearing entity: %r"
+                          % added_entities}
+    target_handle = added_entities[0]["handle"]
+    staged_output1 = os.path.join(step1_dir, "staged_output.dwg")
+
+    step2_dir = os.path.join(out_dir, "step2_set_xdata")
+    xdata_args = {"handle": target_handle, "app_name": app_name, "values": values}
+    patch2 = _build_patch(op_name, xdata_args, staged_output1, step2_dir,
+                          postconditions=[{"subject": "entity_count", "op": "delta_eq", "value": 0}])
+    env2 = pe.apply_staged(patch2, staged_output1, step2_dir)
+    if env2.get("status") != "ok":
+        return {"schema": SCHEMA_ID, "op_name": op_name, "status": env2.get("status"),
+                "exit_code": 2, "reason": "step2 %s failed: %s" % (op_name, env2.get("reason")),
+                "target_handle": target_handle, "step2_envelope": env2}
+
+    post_ir2 = _load_ir_maybe(env2.get("post_ir"))
+    by_handle2 = {e.get("handle"): e for e in (post_ir2.get("entities") or []) if isinstance(e, dict)}
+    final_entity = by_handle2.get(target_handle)
+    if final_entity is None:
+        return {"schema": SCHEMA_ID, "op_name": op_name, "status": "error", "exit_code": 2,
+                "reason": "target handle %r not found in post-step2 IR" % target_handle,
+                "target_handle": target_handle}
+
+    actual_blocks = final_entity.get("xdata") or []
+    actual_app_block = next((b for b in actual_blocks if b.get("app") == app_name), None)
+    actual_items = [{"code": it["code"], "value": it["value"]}
+                   for it in (actual_app_block or {}).get("items", [])]
+    expected_items = expected_xdata_items(values)
+    diff_ok = (actual_items == expected_items)
+
+    return {
+        "schema": SCHEMA_ID, "op_name": op_name, "native_op": "modify.entity.xdata",
+        "status": "ok" if diff_ok else "fail", "exit_code": 0 if diff_ok else 1,
+        "target_handle": target_handle, "app_name": app_name,
+        "expected_items": expected_items, "actual_items": actual_items,
+        "record_diff": [] if diff_ok else [{"expected": expected_items, "actual": actual_items}],
+        "original_unchanged_step1": env1.get("original_unchanged"),
+        "original_unchanged_step2": env2.get("original_unchanged"),
+        "run_dir": out_dir,
+    }
+
+
 def _fake_apply_staged_ok(op_name: str, entity: Dict[str, Any]):
     def _fn(patch, dwg_path, out_dir):
         pre_ir = {"schema": IR_SCHEMA_ID, "entities": []}

@@ -199,6 +199,60 @@ static AcDbEntity* m08gOpenEntityForWrite(AcDbDatabase* pDb, const std::string& 
     return pEnt;
 }
 
+// P10 (entity-handle-targeted xdata write): locate the [ ... ] span for a
+// top-level array-valued key. Bracket-depth + string-aware (unlike the plain
+// find(']', lb) m08gReadPointArray uses above), because a "values" item can
+// itself carry a nested "value":[x,y,z] array -- a naive first-']' scan
+// would truncate the outer array at that inner point payload's close bracket.
+// Returns false if the key/array is not found. lb/rb land on '[' / matching ']'.
+static bool m08gFindArraySpan(const std::string& job, const char* key,
+                               size_t& lb, size_t& rb)
+{
+    const std::string k = std::string("\"") + key + "\"";
+    size_t p = job.find(k);
+    if (p == std::string::npos) return false;
+    p = job.find(':', p + k.size());
+    if (p == std::string::npos) return false;
+    lb = job.find('[', p);
+    if (lb == std::string::npos) return false;
+    int depth = 0;
+    bool inString = false, escaped = false;
+    for (size_t i = lb; i < job.size(); ++i) {
+        const char c = job[i];
+        if (inString) {
+            if (escaped) escaped = false;
+            else if (c == '\\') escaped = true;
+            else if (c == '"') inString = false;
+            continue;
+        }
+        if (c == '"') { inString = true; continue; }
+        if (c == '[') { ++depth; }
+        else if (c == ']') { --depth; if (depth == 0) { rb = i; return true; } }
+    }
+    return false;
+}
+
+// P10: parse a "value":[n0,n1,n2] raw number triple (xdata point payload) out
+// of one item object's substring. Unlike m08gReadPointArray above (an array
+// of {x,y,z} objects), an xdata point item's "value" travels as a plain
+// 3-number JSON array, so it needs its own small scanner.
+static bool m08gReadValueTriple(const std::string& obj, double out[3])
+{
+    size_t p = obj.find("\"value\"");
+    if (p == std::string::npos) return false;
+    p = obj.find('[', p);
+    if (p == std::string::npos) return false;
+    const char* s = obj.c_str() + p + 1;
+    char* endp = nullptr;
+    for (int i = 0; i < 3; ++i) {
+        while (*s == ' ' || *s == ',') ++s;
+        out[i] = strtod(s, &endp);
+        if (endp == s) return false;
+        s = endp;
+    }
+    return true;
+}
+
 // Build a transform matrix from the job. Supports any combination, applied as
 // scale -> rotate(about Z @ pivot) -> translate (composed T*R*S). Reads:
 //   "translate":{x,y,z}, "scale":<num> (uniform), "rotate":<radians>, "pivot":{x,y,z}.
@@ -365,6 +419,7 @@ static bool m08gHasOp(const std::string& op)
         op == "modify.entity.transform" ||
         op == "modify.entity.copy_transformed" ||
         op == "modify.entity.common" ||
+        op == "modify.entity.xdata" ||
         op == "modify.entity.explode" ||
         op == "modify.entity.solid3d.boolean" ||
         op == "modify.curve.offset" ||
@@ -1295,6 +1350,161 @@ static bool m08gDispatch(const std::string& op, const AriadneJobCtx& ctx, std::o
           << ",\"linetype_set\":" << (didLinetype ? "true" : "false")
           << ",\"handle\":" << njsonStr(handle) << "},"
           << "\"status\":\"ok\"}";
+        return true;
+    }
+    if (op == "modify.entity.xdata") {
+        // P10: entity-handle-targeted xdata write. Distinct code path from the
+        // DATABASE-level write.xdata.set/inspect.xdata.get (Ariadne's own NOD
+        // dictionary, single app+value string via setDatabaseXdata/
+        // getDatabaseXdata) -- those and the set_entity_xdata patch op that
+        // aliases to write.entity.set_xdata are untouched by this ticket. This
+        // op sets a full multi-item xdata block on an arbitrary resolved
+        // entity via AcDbEntity::setXData, the write-side counterpart of the
+        // xData()/xdataBlocksJson() read already used by collectModelSpaceGraph.
+        std::string handle;
+        if (!m08gFindHandle(job, handle)) {
+            emitNativeError(r, "MISSING_ARG", "modify.entity.xdata requires 'handle'");
+            return true;
+        }
+        std::string appName;
+        if (!jsonFindString(job, "app_name", appName) || appName.empty()) {
+            emitNativeError(r, "MISSING_ARG", "modify.entity.xdata requires 'app_name'");
+            return true;
+        }
+        size_t lb = 0, rb = 0;
+        if (!m08gFindArraySpan(job, "values", lb, rb)) {
+            emitNativeError(r, "MISSING_ARG", "modify.entity.xdata requires a 'values' array");
+            return true;
+        }
+
+        // Pass 1: parse + validate every item BEFORE touching the entity --
+        // atomic all-or-nothing (fail-loud, no partial/silent-drop writes).
+        // Accepted codes are the DXF 1000-1071 xdata range only (the generic
+        // resbufCodeIs* families also match non-xdata codes below 1000, which
+        // are not valid xdata group codes at all). 1001 (appname) is
+        // synthesized by this handler, never caller-supplied; 1002 (control
+        // string) and 1004 (binary chunk) are excluded -- see build_log.md.
+        struct XdItem { short code; std::string str; double num; double pt[3]; };
+        std::vector<XdItem> items;
+        size_t scan = lb + 1;
+        int index = 0;
+        std::string badReason;
+        while (scan < rb) {
+            size_t ob = job.find('{', scan);
+            if (ob == std::string::npos || ob > rb) break;
+            size_t oe = job.find('}', ob);
+            if (oe == std::string::npos || oe > rb) break;
+            const std::string one = job.substr(ob, oe - ob + 1);
+            double codeD = 0.0;
+            if (!jsonFindNumber(one, "code", codeD)) {
+                badReason = "values[" + std::to_string(index) + "] missing 'code'";
+                break;
+            }
+            XdItem item;
+            item.code = static_cast<short>(codeD);
+            item.num = 0.0; item.pt[0] = item.pt[1] = item.pt[2] = 0.0;
+            const short code = item.code;
+            if (code == 1000 || code == 1003 || code == 1005) {
+                if (!jsonFindString(one, "value", item.str)) {
+                    badReason = "values[" + std::to_string(index) + "] code "
+                        + std::to_string(code) + " requires a string 'value'";
+                    break;
+                }
+            } else if (code == 1040 || code == 1041 || code == 1042 ||
+                       code == 1070 || code == 1071) {
+                if (!jsonFindNumber(one, "value", item.num)) {
+                    badReason = "values[" + std::to_string(index) + "] code "
+                        + std::to_string(code) + " requires a numeric 'value'";
+                    break;
+                }
+            } else if (code == 1010 || code == 1011 || code == 1012 || code == 1013) {
+                if (!m08gReadValueTriple(one, item.pt)) {
+                    badReason = "values[" + std::to_string(index) + "] code "
+                        + std::to_string(code) + " requires a 3-number 'value' array";
+                    break;
+                }
+            } else {
+                badReason = "values[" + std::to_string(index)
+                    + "] unsupported or reserved xdata group code " + std::to_string(code);
+                break;
+            }
+            items.push_back(item);
+            scan = oe + 1;
+            ++index;
+        }
+
+        if (!badReason.empty()) {
+            emitNativeError(r, "MALFORMED_XDATA_CODE", badReason);
+            return true;
+        }
+        if (items.empty()) {
+            emitNativeError(r, "MISSING_ARG", "modify.entity.xdata requires at least one item in 'values'");
+            return true;
+        }
+
+        AcDbEntity* pEnt = m08gOpenEntityForWrite(pDb, handle);
+        if (pEnt == nullptr) {
+            emitNativeError(r, "ENTITY_NOT_FOUND", "no writable entity for handle " + handle);
+            return true;
+        }
+
+        const Acad::ErrorStatus regEs = ensureRegApp(pDb, appName);
+        if (regEs != Acad::eOk) {
+            pEnt->close();
+            emitNativeError(r, "REGAPP_FAILED",
+                            "ensureRegApp errorstatus " + std::to_string(static_cast<int>(regEs)));
+            return true;
+        }
+
+        // Build the resbuf chain: 1001(app) then each item, via repeated
+        // single-pair acutBuildList calls manually linked (acutBuildList's
+        // fixed variadic shape can't take a runtime-variable item count in one
+        // call; setDatabaseXdata's 2-pair call above is the fixed-shape
+        // sibling this reuses the same primitive as). acutBuildList deep-
+        // copies its string/point payload, so the local wstrings/ads_point
+        // below only need to outlive their own call.
+        const std::wstring appW = asciiToWide(appName);
+        resbuf* head = acutBuildList(AcDb::kDxfRegAppName, appW.c_str(), 0);
+        resbuf* tail = head;
+        bool buildFailed = (head == nullptr);
+        for (size_t i = 0; i < items.size() && !buildFailed; ++i) {
+            const XdItem& it = items[i];
+            resbuf* node = nullptr;
+            if (it.code == 1000 || it.code == 1003 || it.code == 1005) {
+                const std::wstring w = asciiToWide(it.str);
+                node = acutBuildList(it.code, w.c_str(), 0);
+            } else if (it.code == 1070) {
+                node = acutBuildList(it.code, static_cast<int>(it.num), 0);
+            } else if (it.code == 1071) {
+                node = acutBuildList(it.code, static_cast<long>(it.num), 0);
+            } else if (it.code == 1040 || it.code == 1041 || it.code == 1042) {
+                node = acutBuildList(it.code, it.num, 0);
+            } else {
+                ads_point pt = { it.pt[0], it.pt[1], it.pt[2] };
+                node = acutBuildList(it.code, pt, 0);
+            }
+            if (node == nullptr) { buildFailed = true; break; }
+            tail->rbnext = node;
+            tail = node;
+        }
+
+        if (buildFailed) {
+            if (head != nullptr) acutRelRb(head);
+            pEnt->close();
+            emitNativeError(r, "OUT_OF_MEMORY", "failed building the xdata resbuf chain");
+            return true;
+        }
+
+        const Acad::ErrorStatus es = pEnt->setXData(head);
+        acutRelRb(head);
+        pEnt->close();
+
+        r << "\"result\":{\"set\":" << (es == Acad::eOk ? "true" : "false")
+          << ",\"errorstatus\":" << static_cast<int>(es)
+          << ",\"handle\":" << njsonStr(handle)
+          << ",\"app_name\":" << njsonStr(appName)
+          << ",\"item_count\":" << items.size() << "},"
+          << "\"status\":\"" << (es == Acad::eOk ? "ok" : "error") << "\"}";
         return true;
     }
     if (op == "modify.entity.explode") {

@@ -9,6 +9,11 @@ TIER-1 T1, via tools/promote_op.py F2 promotion) create_arc/create_ellipse/
 create_mpolygon/create_mtext/create_text/create_polyline/create_dimension/
 set_entity_xdata have a live native handler today; the rest degrade to
 not_implemented / deferred (no-fake-success) until a family ticket wires them.
+P10 adds set_entity_xdata_by_handle (modify.entity.xdata) -- a genuinely NEW,
+entity-HANDLE-targeted xdata write, distinct from set_entity_xdata above
+(write.entity.set_xdata aliases to the DATABASE-level write.xdata.set, no
+'handle' arg at all). See families/m08g_handlers.inc's "modify.entity.xdata"
+branch for the ground truth.
 
 CADOS F8 / H-5: set_layer is wired here (not patch_ops.tables) because its
 real native handler is modify.entity.common -- an ENTITY mutation
@@ -58,6 +63,12 @@ WRITE_OP_MAP: Dict[str, str] = {
     "create_face3d": "write.entity.face",
     "create_solid2d": "write.entity.solid2d",
     "create_trace": "write.entity.trace",
+    # P10: entity-HANDLE-targeted xdata write (modify.entity.xdata) -- a
+    # distinct op/handler from the pre-existing set_entity_xdata above
+    # (write.entity.set_xdata, which aliases to the DATABASE-level
+    # write.xdata.set and takes no 'handle'). See m08g_handlers.inc's
+    # "modify.entity.xdata" branch for the ground truth.
+    "set_entity_xdata_by_handle": "modify.entity.xdata",
 }
 
 
@@ -281,6 +292,12 @@ def build_job_args(native_op: str, args: Dict[str, Any]) -> Optional[Dict[str, A
         # the identical p0..p3 + layer job-arg shape.
         out: Dict[str, Any] = {}
         for k in ('p0', 'p1', 'p2', 'p3', 'layer'):
+            if k in args:
+                out[k] = args[k]
+        return out
+    if native_op == "modify.entity.xdata":
+        out: Dict[str, Any] = {}
+        for k in ('handle', 'app_name', 'values'):
             if k in args:
                 out[k] = args[k]
         return out

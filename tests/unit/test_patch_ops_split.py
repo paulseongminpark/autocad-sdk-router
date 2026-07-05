@@ -207,6 +207,7 @@ _ORIGINAL_NATIVE_WRITE_OP_MAP = {
     "create_face3d": "write.entity.face",
     "create_solid2d": "write.entity.solid2d",
     "create_trace": "write.entity.trace",
+    "set_entity_xdata_by_handle": "modify.entity.xdata",
 }
 
 

@@ -129,13 +129,15 @@ class TestM08ACatalogReopen(unittest.TestCase):
         # implemented or hard-blocked. w3-dimstyle adds one new synthetic
         # implemented op (write.dimstyle.create) on top of the wave3 baseline
         # -- 457 -> 458. w3-ltts adds one more (write.linetype.create) --
-        # 458 -> 459 (see tools/patch_ops/tables.py).
+        # 458 -> 459 (see tools/patch_ops/tables.py). P10 adds a third new
+        # synthetic implemented op (modify.entity.xdata) -- 459 -> 460 (see
+        # tools/patch_ops/entities.py).
         import collections
         by_status = collections.Counter(o.get("status") for o in self.ops)
         self.assertEqual(by_status.get("unknown", 0), 0)
         self.assertEqual(by_status.get("catalogued", 0), 0)
         self.assertEqual(by_status.get("stub", 0), 0)
-        self.assertEqual(by_status.get("implemented", 0), 459)
+        self.assertEqual(by_status.get("implemented", 0), 460)
         self.assertEqual(by_status.get("blocked", 0), 60)
         self.assertEqual(by_status.get("implemented", 0) + by_status.get("blocked", 0), len(self.ops))
 
