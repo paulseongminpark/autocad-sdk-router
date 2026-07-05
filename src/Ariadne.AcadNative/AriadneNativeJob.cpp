@@ -45,6 +45,12 @@
 #include "dbmleader.h" // w3-mleader: AcDbMLeader (collectModelSpaceGraph read branch --
                        // families/m08h_handlers.inc's own #include is textually AFTER
                        // collectModelSpaceGraph in this TU, so this needs its own copy)
+#include "dbray.h"     // w3-simple1: AcDbRay (collectModelSpaceGraph read branch --
+                       // families/m08g_handlers.inc's own #include is textually AFTER
+                       // collectModelSpaceGraph in this TU, so this needs its own copy)
+#include "dbxline.h"   // w3-simple1: AcDbXline (collectModelSpaceGraph read branch --
+                       // families/m08g_handlers.inc's own #include is textually AFTER
+                       // collectModelSpaceGraph in this TU, so this needs its own copy)
 #include "dbxrecrd.h"
 #include "dbsymtb.h"
 #include "dbcolor.h"
@@ -1767,6 +1773,41 @@ static bool collectEntitiesFromBlock(AcDbBlockTableRecord* pBTR, const char* spa
             }
             arr << "]";
             arr << ",\"closed\":" << (pMl->closedMline() ? "true" : "false");
+        }
+        // w3-simple1: AcDbPoint -- a single-point entity (dbents.h, already
+        // included above, no new #include needed). "position" is a direct,
+        // args-derivable echo of write.entity.point's own AcDbPoint(pos) ctor
+        // arg (m08g_handlers.inc). Derives directly from AcDbEntity (not
+        // AcDbCurve), so this branch's position in the chain is not
+        // load-bearing.
+        else if (AcDbPoint* pPt = AcDbPoint::cast(pEnt)) {
+            const AcGePoint3d p = pPt->position();
+            arr << ",\"position\":[" << p.x << "," << p.y << "," << p.z << "]";
+        }
+        // w3-simple1: AcDbRay -- a semi-infinite line (dbray.h, included
+        // above). base_point is a direct echo of write.entity.ray's
+        // setBasePoint(base) ctor arg; unit_dir is AutoCAD's OWN
+        // normalization of the input "direction" vector (setUnitDir always
+        // stores a UNIT vector, never the raw arg verbatim) -- ground truth
+        // in op_roundtrip_probe.py must assert the normalized vector, not
+        // args["direction"] as-is. Derives from AcDbCurve directly (not
+        // AcDbLine/Arc/Circle/Ellipse/Spline), so this branch's position in
+        // the chain is not load-bearing.
+        else if (AcDbRay* pRay = AcDbRay::cast(pEnt)) {
+            const AcGePoint3d b = pRay->basePoint();
+            const AcGeVector3d d = pRay->unitDir();
+            arr << ",\"base_point\":[" << b.x << "," << b.y << "," << b.z << "]"
+                << ",\"unit_dir\":[" << d.x << "," << d.y << "," << d.z << "]";
+        }
+        // w3-simple1: AcDbXline -- an infinite construction line (dbxline.h,
+        // included above). Same base_point/unit_dir shape and normalization
+        // caveat as AcDbRay directly above (setUnitDir always stores a unit
+        // vector).
+        else if (AcDbXline* pXl = AcDbXline::cast(pEnt)) {
+            const AcGePoint3d b = pXl->basePoint();
+            const AcGeVector3d d = pXl->unitDir();
+            arr << ",\"base_point\":[" << b.x << "," << b.y << "," << b.z << "]"
+                << ",\"unit_dir\":[" << d.x << "," << d.y << "," << d.z << "]";
         }
 
         arr << "}";

@@ -220,6 +220,46 @@ class TestNativeGraphGeometryLifting(unittest.TestCase):
             "start_angle": 0.0, "end_angle": 6.283185307179586,
         })
 
+    def test_point_lifts_position(self):
+        # w3-simple1: collectModelSpaceGraph's AcDbPoint branch emits
+        # "position" verbatim -- a direct pass-through, same treatment as
+        # AcDbLine's start/end above.
+        ent = self._one_entity_ir({
+            "handle": "1B0", "dxf_name": "AcDbPoint", "layer": "0",
+            "owner_handle": "1F", "space": "model",
+            "position": [5.0, 6.0, 0.0],
+        })
+        self.assertEqual(ent["dxf_name"], "POINT")
+        self.assertEqual(ent["geometry"], {"kind": "point", "position": [5.0, 6.0, 0.0]})
+
+    def test_ray_lifts_base_point_and_unit_dir(self):
+        # w3-simple1: collectModelSpaceGraph's AcDbRay branch emits
+        # base_point/unit_dir -- both plain point3 fields, lifted by the
+        # SAME generic point-field allowlist "center"/"position" etc. above
+        # already use (base_point/unit_dir were added to that allowlist).
+        ent = self._one_entity_ir({
+            "handle": "1B1", "dxf_name": "AcDbRay", "layer": "0",
+            "owner_handle": "1F", "space": "model",
+            "base_point": [1.0, 1.0, 0.0], "unit_dir": [1.0, 0.0, 0.0],
+        })
+        self.assertEqual(ent["dxf_name"], "RAY")
+        self.assertEqual(ent["geometry"], {
+            "kind": "ray", "base_point": [1.0, 1.0, 0.0], "unit_dir": [1.0, 0.0, 0.0],
+        })
+
+    def test_xline_lifts_base_point_and_unit_dir(self):
+        # w3-simple1: collectModelSpaceGraph's AcDbXline branch has the
+        # identical base_point/unit_dir shape AcDbRay's does above.
+        ent = self._one_entity_ir({
+            "handle": "1B2", "dxf_name": "AcDbXline", "layer": "0",
+            "owner_handle": "1F", "space": "model",
+            "base_point": [2.0, 3.0, 0.0], "unit_dir": [0.0, 1.0, 0.0],
+        })
+        self.assertEqual(ent["dxf_name"], "XLINE")
+        self.assertEqual(ent["geometry"], {
+            "kind": "xline", "base_point": [2.0, 3.0, 0.0], "unit_dir": [0.0, 1.0, 0.0],
+        })
+
     def test_dimension_lifts_points_measurement_and_top_level_block_fields(self):
         ent = self._one_entity_ir({
             "handle": "1A1", "dxf_name": "AcDbRotatedDimension", "layer": "0",

@@ -55,6 +55,9 @@ WRITE_OP_MAP: Dict[str, str] = {
     "create_polyfacemesh": "write.entity.polyfacemesh",
     "create_dimension_radiallarge": "write.entity.dim.radiallarge",
     "create_blockref": "write.entity.blockref",
+    "create_point": "write.entity.point",
+    "create_ray": "write.entity.ray",
+    "create_xline": "write.entity.xline",
 }
 
 
@@ -264,6 +267,22 @@ def build_job_args(native_op: str, args: Dict[str, Any]) -> Optional[Dict[str, A
             if k in args:
                 out[k] = args[k]
         return out
+    if native_op == "write.entity.point":
+        out: Dict[str, Any] = {}
+        for k in ('position', 'layer'):
+            if k in args:
+                out[k] = args[k]
+        return out
+    if native_op in ("write.entity.ray", "write.entity.xline"):
+        # w3-simple1: m08g_handlers.inc's write.entity.ray/write.entity.xline
+        # handlers read the identical ("base", "direction", "layer") job args
+        # (AcDbRay()/AcDbXline() default-ctor'd, then setBasePoint/setUnitDir)
+        # -- same shape, so one branch covers both native ops.
+        out: Dict[str, Any] = {}
+        for k in ('base', 'direction', 'layer'):
+            if k in args:
+                out[k] = args[k]
+        return out
     return None
 
 
@@ -329,4 +348,15 @@ def ir_op_for(ent: Dict[str, Any]) -> Optional[Dict[str, Any]]:
                              "xline1": _pt(g["xline1_point"]), "xline2": _pt(g["xline2_point"]),
                              "dim_line": _pt(g["dim_line_point"])}}
         return None  # extraction not landed yet -> deferred
+    if kind == "point":
+        return {"operation": "create_point",
+                "args": {"position": _pt(g.get("position")), "layer": layer}}
+    if kind == "ray":
+        return {"operation": "create_ray",
+                "args": {"base": _pt(g.get("base_point")), "direction": _pt(g.get("unit_dir")),
+                         "layer": layer}}
+    if kind == "xline":
+        return {"operation": "create_xline",
+                "args": {"base": _pt(g.get("base_point")), "direction": _pt(g.get("unit_dir")),
+                         "layer": layer}}
     return None
