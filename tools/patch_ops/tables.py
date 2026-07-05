@@ -4,10 +4,10 @@
 split).
 
 Symbol-table ops (layer/linetype/dimstyle/textstyle). create_layer (->
-write.layer.create), create_dimstyle (-> write.dimstyle.create), and
-create_linetype (-> write.linetype.create) have live native handlers here
-today; textstyle record writes await a family ticket (only the reference BY
-NAME from a layer record -- see "linetype" below -- is wired).
+write.layer.create), create_dimstyle (-> write.dimstyle.create),
+create_linetype (-> write.linetype.create), and create_textstyle (->
+write.textstyle.create) all have live native handlers here today -- every
+D-class TABLES-tier symbol table now has a record-level write path.
 
 CADOS F8 / H-5: set_layer used to live in this module, also mapped to
 write.layer.create. That was an active fake-success -- write.layer.create
@@ -48,6 +48,17 @@ field to the dash-pattern recompute trigger, so a description-only update on
 an EXISTING linetype silently reverted until the native handler was made to
 re-apply the record's own current dash pattern alongside it -- this is
 handled natively; callers do not need to work around it themselves.
+
+w3-ltts (TEXTSTYLE): write.textstyle.create is the same upsert shape for the
+TEXTSTYLE table -- font/bigfont file references (``font_file``/
+``big_font_file``, plain strings AutoCAD stores verbatim, unlike a LAYER's
+linetype which must resolve to an in-database object), ``height``/
+``width_factor``/``oblique_angle`` (textSize/xScale/obliquingAngle -- field
+names match schemas/dwg_graph_ir.v1.schema.json's pre-existing
+text_style_record $def, not the raw ObjectARX method names), and the two
+named boolean state flags AutoCAD exposes for a style (``is_shape_file``/
+``is_vertical``). setFont()'s Windows-typeface path and priorSize() are out
+of scope -- an honest gap, not a fake write.
 """
 from __future__ import annotations
 
@@ -59,6 +70,7 @@ WRITE_OP_MAP: Dict[str, str] = {
     "create_layer": "write.layer.create",
     "create_dimstyle": "write.dimstyle.create",
     "create_linetype": "write.linetype.create",
+    "create_textstyle": "write.textstyle.create",
 }
 
 # Passthrough fields whose native job encoding is identical to the patch-op
@@ -84,6 +96,15 @@ _DIMSTYLE_FLAG_FIELDS = ("dimse1",)
 # is a plain list of numbers -- no bool coercion needed, it travels as a JSON
 # array verbatim (see module docstring's "replaces the whole pattern" note).
 _LINETYPE_PASSTHROUGH_FIELDS = ("description", "dash_lengths")
+
+# The representative field subset write.textstyle.create's native handler
+# actually reads (TextStylePropertyArgs in AriadneNativeJob.cpp). Field names
+# match schemas/dwg_graph_ir.v1.schema.json's text_style_record $def
+# (font_file/big_font_file/height), not the raw ObjectARX method names.
+_TEXTSTYLE_PASSTHROUGH_FIELDS = (
+    "font_file", "big_font_file", "height", "width_factor", "oblique_angle",
+)
+_TEXTSTYLE_FLAG_FIELDS = ("is_shape_file", "is_vertical")
 
 
 def build_job_args(native_op: str, args: Dict[str, Any]) -> Optional[Dict[str, Any]]:
@@ -126,6 +147,20 @@ def build_job_args(native_op: str, args: Dict[str, Any]) -> Optional[Dict[str, A
         for key in _LINETYPE_PASSTHROUGH_FIELDS:
             if key in args:
                 out[key] = args[key]
+        return out
+    if native_op == "write.textstyle.create":
+        # create_textstyle -> create-or-update (upsert) the target textstyle
+        # record. Mirrors write.layer.create's arg-forwarding exactly.
+        out: Dict[str, Any] = {}
+        name = args.get("name")
+        if name is not None:
+            out["name"] = name
+        for key in _TEXTSTYLE_PASSTHROUGH_FIELDS:
+            if key in args:
+                out[key] = args[key]
+        for key in _TEXTSTYLE_FLAG_FIELDS:
+            if key in args:
+                out[key] = int(bool(args[key]))
         return out
     return None
 

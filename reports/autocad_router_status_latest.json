@@ -1,5 +1,5 @@
 ﻿{
-    "timestamp":  "2026-07-05T19:34:18.0246388+09:00",
+    "timestamp":  "2026-07-05T21:37:31.1495071+09:00",
     "schema":  "ariadne.autocad_router_status.v2",
     "status":  "ALL_AVAILABLE",
     "router_home":  "D:\\dev\\99_tools\\autocad-sdk-router__w3_ltts",
@@ -10,7 +10,7 @@
 
                     ],
     "native_modules":  {
-                           "status":  "SKIPPED",
+                           "status":  "PRESENT",
                            "modules":  [
                                            {
                                                "path":  "D:\\dev\\99_tools\\autocad-sdk-router__w3_ltts\\prebuilt\\2027\\Ariadne.AcadNativeDbx.dbx",
@@ -20,17 +20,17 @@
                                            {
                                                "path":  "D:\\dev\\99_tools\\autocad-sdk-router__w3_ltts\\prebuilt\\2027\\Ariadne.AcadNative.crx",
                                                "exists":  true,
-                                               "bytes":  799232
+                                               "bytes":  806912
                                            },
                                            {
                                                "path":  "D:\\dev\\99_tools\\autocad-sdk-router__w3_ltts\\prebuilt\\2027\\Ariadne.AcadNative.arx",
                                                "exists":  true,
-                                               "bytes":  807936
+                                               "bytes":  815616
                                            }
                                        ],
                            "coreconsole_load":  {
-                                                    "status":  "SKIPPED",
-                                                    "detail":  "accoreconsole, blank.dwg, DBX, or CRX missing."
+                                                    "status":  "NOT_RUN",
+                                                    "detail":  "Core Console native module load probe runs only for -Action status."
                                                 }
                        },
     "routes":  [

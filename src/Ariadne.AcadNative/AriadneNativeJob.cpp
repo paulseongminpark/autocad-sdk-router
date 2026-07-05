@@ -2099,6 +2099,73 @@ static std::string linetypesRichJson(AcDbDatabase* pDb, int& count)
     return arr.str();
 }
 
+// TEXTSTYLE table with the D-class TABLES tier's representative field subset
+// (w3-ltts): AcDbTextStyleTableRecord's SHX/TTF font reference pair
+// (fileName/bigFontFileName -- plain filename strings, not validated/
+// resolved against disk at set time, unlike a LAYER's linetype which must
+// resolve to an in-database object), textSize/xScale/obliquingAngle, and the
+// two named boolean state flags AutoCAD exposes for a style (isShapeFile/
+// isVertical -- there is no third; flagBits' other bits have no dedicated
+// accessor). Field names on the wire (font_file/big_font_file/height/
+// width_factor/oblique_angle) match schemas/dwg_graph_ir.v1.schema.json's
+// pre-existing text_style_record $def, not the raw ObjectARX method names --
+// height is the AutoCAD STYLE-dialog term for what the API calls textSize.
+// priorSize()/setFont()'s Windows-typeface path are out of scope, the same
+// "representative, not exhaustive" scoping dimStylesRichJson/
+// linetypesRichJson already established above.
+static std::string textStylesRichJson(AcDbDatabase* pDb, int& count)
+{
+    count = 0;
+    std::ostringstream arr; arr.precision(kJsonDoublePrecision);
+    arr << "[";
+    bool first = true;
+    AcDbTextStyleTable* pTST = nullptr;
+    if (pDb->getTextStyleTable(pTST, AcDb::kForRead) != Acad::eOk)
+        return "[]";
+    AcDbTextStyleTableIterator* pIt = nullptr;
+    if (pTST->newIterator(pIt) != Acad::eOk) {
+        pTST->close();
+        return "[]";
+    }
+    for (pIt->start(); !pIt->done(); pIt->step()) {
+        AcDbTextStyleTableRecord* pRec = nullptr;
+        if (pIt->getRecord(pRec, AcDb::kForRead) == Acad::eOk) {
+            const ACHAR* nameRaw = nullptr;
+            std::string name;
+            if (pRec->getName(nameRaw) == Acad::eOk)
+                name = acharToAscii(nameRaw);
+            const ACHAR* fontFileRaw = nullptr;
+            std::string fontFile;
+            if (pRec->fileName(fontFileRaw) == Acad::eOk)
+                fontFile = acharToAscii(fontFileRaw);
+            const ACHAR* bigFontRaw = nullptr;
+            std::string bigFont;
+            if (pRec->bigFontFileName(bigFontRaw) == Acad::eOk)
+                bigFont = acharToAscii(bigFontRaw);
+            const std::string handle = handleOf(pRec);
+            if (!first)
+                arr << ",";
+            first = false;
+            arr << "{\"handle\":\"" << jsonEscape(handle) << "\""
+                << ",\"name\":\"" << jsonEscape(name) << "\""
+                << ",\"font_file\":\"" << jsonEscape(fontFile) << "\""
+                << ",\"big_font_file\":\"" << jsonEscape(bigFont) << "\""
+                << ",\"height\":" << pRec->textSize()
+                << ",\"width_factor\":" << pRec->xScale()
+                << ",\"oblique_angle\":" << pRec->obliquingAngle()
+                << ",\"is_shape_file\":" << (pRec->isShapeFile() ? "true" : "false")
+                << ",\"is_vertical\":" << (pRec->isVertical() ? "true" : "false")
+                << "}";
+            ++count;
+            pRec->close();
+        }
+    }
+    delete pIt;
+    pTST->close();
+    arr << "]";
+    return arr.str();
+}
+
 // Block table records + the user-block-definition projection. w3-blockdef:
 // def geometry is now INLINED under block_definitions[].def_entities (the
 // docs/DWG_GRAPH_IR_SPEC.md Section 4.3 "inlined" strategy) via the SAME
@@ -2386,7 +2453,7 @@ static std::string collectDatabaseGraph(AcDbDatabase* pDb,
     int layerCount = 0, ltCount = 0, tsCount = 0, dsCount = 0, vpCount = 0, raCount = 0;
     const std::string layersJson = layersRichJson(pDb, layerCount);
     const std::string linetypesJson = linetypesRichJson(pDb, ltCount);
-    const std::string textStylesJson = symbolTableRecordsJson(pDb->textStyleTableId(), tsCount);
+    const std::string textStylesJson = textStylesRichJson(pDb, tsCount);
     const std::string dimStylesJson = dimStylesRichJson(pDb, dsCount);
     const std::string viewportsJson = symbolTableRecordsJson(pDb->viewportTableId(), vpCount);
     const std::string appIdsJson = symbolTableRecordsJson(pDb->regAppTableId(), raCount);
@@ -3235,6 +3302,100 @@ static Acad::ErrorStatus upsertLinetypeRecord(AcDbDatabase* pDb, const std::stri
     AcDbObjectId id;
     es = pLTT->add(id, pRec);
     pLTT->close();
+    if (es == Acad::eOk) {
+        created = true;
+        pRec->close();
+    }
+    else {
+        delete pRec;
+    }
+    return es;
+}
+
+// D-class TABLES tier (w3-ltts): optional per-field overrides for a
+// TEXTSTYLE table record write -- same hasX-flag upsert contract every
+// sibling struct above established (an absent field is left UNTOUCHED).
+// fontFile/bigFontFile are plain filename strings AutoCAD stores verbatim on
+// the record (unlike a LAYER's linetype reference, these are NOT resolved
+// against an in-database object or validated against disk at set time --
+// see AcDbTextStyleTableRecord::setFileName's own contract). Member names
+// here match the wire/JSON vocabulary (font_file/big_font_file/height, per
+// schemas/dwg_graph_ir.v1.schema.json's text_style_record $def), not the
+// raw ObjectARX method names (fileName/bigFontFileName/textSize) -- the
+// setter calls below still use the real API.
+struct TextStylePropertyArgs {
+    bool hasFontFile = false;    std::string fontFile;
+    bool hasBigFontFile = false; std::string bigFontFile;
+    bool hasHeight = false;      double height = 0.0;
+    bool hasWidthFactor = false; double widthFactor = 1.0;
+    bool hasObliqueAngle = false; double obliqueAngle = 0.0;
+    bool hasIsShapeFile = false;  bool isShapeFile = false;
+    bool hasIsVertical = false;   bool isVertical = false;
+};
+
+// Apply every PRESENT field in props onto pRec (open for write -- either a
+// not-yet-added new record or an existing one reopened kForWrite). Mirrors
+// applyLinetypeProperties'/applyDimStyleProperties' has-flag gating exactly.
+static void applyTextStyleProperties(AcDbTextStyleTableRecord* pRec, const TextStylePropertyArgs& props)
+{
+    if (props.hasFontFile) {
+        const std::wstring fontFileW = asciiToWide(props.fontFile);
+        pRec->setFileName(fontFileW.c_str());
+    }
+    if (props.hasBigFontFile) {
+        const std::wstring bigFontW = asciiToWide(props.bigFontFile);
+        pRec->setBigFontFileName(bigFontW.c_str());
+    }
+    if (props.hasHeight)
+        pRec->setTextSize(props.height);
+    if (props.hasWidthFactor)
+        pRec->setXScale(props.widthFactor);
+    if (props.hasObliqueAngle)
+        pRec->setObliquingAngle(props.obliqueAngle);
+    if (props.hasIsShapeFile)
+        pRec->setIsShapeFile(props.isShapeFile);
+    if (props.hasIsVertical)
+        pRec->setIsVertical(props.isVertical);
+}
+
+// D-class TABLES tier: create-or-update a named TEXTSTYLE record (write.
+// textstyle.create's handler) -- mirrors upsertLinetypeRecord's upsert
+// contract exactly (see its own comment above): a brand-new textstyle starts
+// from AcDbTextStyleTableRecord's own ctor defaults, and updating an
+// EXISTING textstyle applies ONLY the fields present in props; omitted
+// fields are left exactly as they were.
+static Acad::ErrorStatus upsertTextStyleRecord(AcDbDatabase* pDb, const std::string& name,
+                                               const TextStylePropertyArgs& props, bool& created)
+{
+    created = false;
+    if (name.empty())
+        return Acad::eInvalidInput;
+
+    AcDbTextStyleTable* pTST = nullptr;
+    Acad::ErrorStatus es = pDb->getTextStyleTable(pTST, AcDb::kForWrite);
+    if (es != Acad::eOk)
+        return es;
+
+    const std::wstring nameW = asciiToWide(name);
+    AcDbObjectId existingId;
+    if (pTST->getAt(nameW.c_str(), existingId) == Acad::eOk) {
+        pTST->close();
+        AcDbTextStyleTableRecord* pRec = nullptr;
+        es = acdbOpenObject(pRec, existingId, AcDb::kForWrite);
+        if (es != Acad::eOk)
+            return es;
+        applyTextStyleProperties(pRec, props);
+        pRec->close();
+        return Acad::eOk;
+    }
+
+    AcDbTextStyleTableRecord* pRec = new AcDbTextStyleTableRecord();
+    pRec->setName(nameW.c_str());
+    applyTextStyleProperties(pRec, props);
+
+    AcDbObjectId id;
+    es = pTST->add(id, pRec);
+    pTST->close();
     if (es == Acad::eOk) {
         created = true;
         pRec->close();
@@ -4247,6 +4408,7 @@ static const AriadneOperationSpec kAriadneNativeOperationTable[] = {
     { "write.layer.create", "symbol_tables_dictionaries" },
     { "write.dimstyle.create", "symbol_tables_dictionaries" },
     { "write.linetype.create", "symbol_tables_dictionaries" },
+    { "write.textstyle.create", "symbol_tables_dictionaries" },
     { "write.entity.line", "geometry_kernel" },
     { "write.entity.circle", "geometry_kernel" },
     { "inspect.entity.count", "inspect" },
@@ -4554,6 +4716,44 @@ static void ariadneNativeJob()
           << ",\"errorstatus\":" << static_cast<int>(es)
           << ",\"name\":\"" << jsonEscape(name) << "\""
           << ",\"linetypes_after\":" << linetypesAfter << "},"
+          << "\"status\":\"" << (es == Acad::eOk ? "ok" : "error") << "\"}";
+    }
+    else if (op == "write.textstyle.create") {
+        std::string name;
+        if (!jsonFindString(job, "name", name) || name.empty())
+            name = "ARIADNE_TEXTSTYLE";
+
+        // D-class TABLES tier (w3-ltts): every property below is OPTIONAL,
+        // same hasX upsert convention every prior TABLES-tier op uses above --
+        // an absent field leaves an existing textstyle's value untouched.
+        // Field names match schemas/dwg_graph_ir.v1.schema.json's
+        // text_style_record $def (font_file/big_font_file/height), not the
+        // raw ObjectARX method names. is_shape_file/is_vertical travel as
+        // 0/1 numbers (this file's existing jsonFindNumber convention -- see
+        // "closed"/"is_write"/write.layer.create's flags).
+        TextStylePropertyArgs props;
+        props.hasFontFile = jsonFindString(job, "font_file", props.fontFile);
+        props.hasBigFontFile = jsonFindString(job, "big_font_file", props.bigFontFile);
+        double numRaw = 0.0;
+        props.hasHeight = jsonFindNumber(job, "height", numRaw);
+        props.height = numRaw;
+        props.hasWidthFactor = jsonFindNumber(job, "width_factor", numRaw);
+        props.widthFactor = numRaw;
+        props.hasObliqueAngle = jsonFindNumber(job, "oblique_angle", numRaw);
+        props.obliqueAngle = numRaw;
+        props.hasIsShapeFile = jsonFindNumber(job, "is_shape_file", numRaw);
+        props.isShapeFile = (numRaw != 0.0);
+        props.hasIsVertical = jsonFindNumber(job, "is_vertical", numRaw);
+        props.isVertical = (numRaw != 0.0);
+
+        bool created = false;
+        const Acad::ErrorStatus es = upsertTextStyleRecord(pDb, name, props, created);
+        const int textstylesAfter = countSymbolTable(pDb->textStyleTableId());
+        r << "\"result\":{\"created\":" << (created ? "true" : "false")
+          << ",\"updated\":" << ((es == Acad::eOk && !created) ? "true" : "false")
+          << ",\"errorstatus\":" << static_cast<int>(es)
+          << ",\"name\":\"" << jsonEscape(name) << "\""
+          << ",\"textstyles_after\":" << textstylesAfter << "},"
           << "\"status\":\"" << (es == Acad::eOk ? "ok" : "error") << "\"}";
     }
     else if (op == "write.entity.line") {

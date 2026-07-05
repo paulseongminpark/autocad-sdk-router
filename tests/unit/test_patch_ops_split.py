@@ -147,6 +147,16 @@ upsert contract for the LINETYPE symbol table, writing name/description
 (comments) plus a simple dash-only pattern (dash_lengths); complex-linetype
 shape/text embedding is an unwritten gap (see tools/patch_ops/tables.py's
 module docstring). Oracle extended accordingly; same invariants unaffected.
+
+w3-ltts update (TEXTSTYLE): create_textstyle (write.textstyle.create,
+AcDbTextStyleTableRecord) gains its first-ever patch_ops wiring -- another
+brand-new op, same shape as create_linetype just above. Mirrors create_layer/
+create_dimstyle/create_linetype's upsert contract for the TEXTSTYLE symbol
+table, writing font/bigfont file references plus height/width_factor/
+oblique_angle and the is_shape_file/is_vertical state flags; setFont()'s
+Windows-typeface path and priorSize() are an unwritten gap (see
+tools/patch_ops/tables.py's module docstring). Oracle extended accordingly;
+same invariants unaffected.
 """
 from __future__ import annotations
 
@@ -195,6 +205,7 @@ _ORIGINAL_NATIVE_WRITE_OP_MAP = {
     "create_blockref": "write.entity.blockref",
     "create_dimstyle": "write.dimstyle.create",
     "create_linetype": "write.linetype.create",
+    "create_textstyle": "write.textstyle.create",
 }
 
 
