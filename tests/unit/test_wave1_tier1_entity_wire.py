@@ -41,6 +41,7 @@ for _p in (_REPO, os.path.join(_REPO, "tools")):
     if _p not in sys.path:
         sys.path.insert(0, _p)
 
+import ir_builder  # noqa: E402
 import patch_engine  # noqa: E402
 import patch_ops  # noqa: E402
 import probe_reachability as pr  # noqa: E402
@@ -256,8 +257,76 @@ class TestIrToPatchRoundTrip(unittest.TestCase):
         # 'mpolygon' is not an ir_builder._EXTRACT_KIND_TO_IR_KIND value -- no
         # real IR entity ever carries this geometry.kind, so ir_op_for
         # honestly returns None rather than fabricating a case (no-fake-success).
+        # This only proves the DISPATCHER has no mpolygon branch; see
+        # TestMpolygonNeverProducedByIrBuilder below for the upstream half of
+        # this claim (the REAL ir_builder mapping + a realistic extraction).
         ent = {"handle": "16", "layer": "0", "geometry": {"kind": "mpolygon"}}
         self.assertIsNone(entities.ir_op_for(ent))
+
+
+# A realistic dwg_geometry_extract.v1 payload (mirrors test_ir_builder.py's
+# _fake_extract shape -- the repo's established "real extraction fixture"
+# pattern) carrying one MPOLYGON entity, as a real accoreconsole extractor
+# would emit if/when it ever surfaces this DXF type.
+_MPOLYGON_EXTRACT = {
+    "schema": "ariadne.dwg_geometry_extract.v1",
+    "route": "dwg_truth_autocad",
+    "extractor": "test_synthetic",
+    "status": "ok",
+    "source": {"dwg_name": "fake_mpolygon.dwg", "format": "dwg"},
+    "summary": {"modelspace_count": 2, "entities_by_type": {"LINE": 1, "MPOLYGON": 1}},
+    "entities": [
+        {"handle": "200", "object_id": "o1", "type": "LINE", "layer": "0",
+         "geometry": {"kind": "line",
+                      "start": {"x": 0, "y": 0, "z": 0}, "end": {"x": 1, "y": 0, "z": 0}}},
+        {"handle": "201", "object_id": "o2", "type": "MPOLYGON", "layer": "HATCH",
+         "geometry": {"kind": "mpolygon",
+                      "loops": [[{"x": 0, "y": 0}, {"x": 1, "y": 0}, {"x": 1, "y": 1}]]}},
+    ],
+}
+
+_MPOLYGON_SOURCE_META = {
+    "extractor": "test_synthetic", "engine_tier": "accoreconsole_lisp",
+    "route": "dwg_truth_autocad", "dwg_path": "staging/golden/test/fake_mpolygon.dwg",
+    "original_path": "samples/fake_mpolygon.dwg", "byte_size": 0,
+}
+
+
+class TestMpolygonNeverProducedByIrBuilder(unittest.TestCase):
+    """The old test above only proves entities.ir_op_for's DISPATCHER has no
+    'mpolygon' branch -- that alone can't back its own comment's claim that
+    'no real IR entity ever carries this geometry.kind'. These two tests
+    close that gap against the REAL upstream module: ir_builder is what
+    actually assigns every IR entity's geometry.kind, so the claim has to be
+    proven there, against the real mapping and a realistic extraction."""
+
+    def test_mpolygon_is_not_a_reachable_ir_builder_output_kind(self):
+        # Structural proof against the REAL mapping dict (not just a comment):
+        # no raw extract kind can ever normalize to IR kind "mpolygon" --
+        # "mpolygon" is absent from _EXTRACT_KIND_TO_IR_KIND on both sides.
+        self.assertNotIn("mpolygon", ir_builder._EXTRACT_KIND_TO_IR_KIND)
+        self.assertNotIn("mpolygon", ir_builder._EXTRACT_KIND_TO_IR_KIND.values())
+
+    def test_a_real_extraction_with_an_mpolygon_entity_normalizes_to_unsupported(self):
+        # Run a realistic extract containing an MPOLYGON entity through the
+        # REAL build_ir_from_extract, then prove no resulting IR entity
+        # carries geometry.kind == "mpolygon" anywhere in the output.
+        ir = ir_builder.build_ir_from_extract(
+            _MPOLYGON_EXTRACT, summary=None, source_meta=_MPOLYGON_SOURCE_META)
+
+        kinds = [e["geometry"]["kind"] for e in ir["entities"]]
+        self.assertNotIn("mpolygon", kinds)
+
+        # The MPOLYGON entity specifically fell through to the honest
+        # "unsupported" bucket -- never silently dropped, never mislabeled,
+        # and correctly flagged as not decoded (no-fake-success).
+        mpolygon_entity = next(e for e in ir["entities"] if e["handle"] == "201")
+        self.assertEqual(mpolygon_entity["geometry"]["kind"], "unsupported")
+        self.assertFalse(mpolygon_entity["source"]["decoded"])
+
+        # And ir_op_for -- the entity write-op dispatcher -- correctly has no
+        # case for what this entity actually became either.
+        self.assertIsNone(entities.ir_op_for(mpolygon_entity))
 
 
 class TestPromotionStuckAgainstRealRepo(unittest.TestCase):
