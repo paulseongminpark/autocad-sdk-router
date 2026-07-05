@@ -536,6 +536,14 @@ _NATIVE_CLASS_TO_DXF_KIND = {
     # "FACE"); AcDbTrace's is "TRACE".
     "AcDbFace": ("3DFACE", "face3d"),
     "AcDbTrace": ("TRACE", "trace"),
+    # wA-cert: AcDbWipeout IS-A AcDbRasterImage (dbwipe.h) but the native
+    # collector cast-checks it FIRST (more-derived-first, same rule this
+    # class-map's own AcDbRotatedDimension-before-generic-dimension entries
+    # already follow) so its raw dxf_name is always the distinct string
+    # "AcDbWipeout", never "AcDbRasterImage" -- no ambiguity here.
+    "AcDbRasterImage": ("IMAGE", "rasterimage"),
+    "AcDbWipeout": ("WIPEOUT", "wipeout"),
+    "AcDbMPolygon": ("MPOLYGON", "mpolygon"),
 }
 
 
@@ -591,7 +599,25 @@ def _geometry_from_native_entity(raw: dict, kind: str) -> dict:
                 # p8-simple2: AcDbFace/AcDbSolid/AcDbTrace's 4 flat vertices,
                 # keyed exactly like the write.entity.face/solid2d/trace job
                 # args (m08g_handlers.inc) so the roundtrip diff is direct.
-                "p0", "p1", "p2", "p3"):
+                "p0", "p1", "p2", "p3",
+                # wA-cert: AcDbRasterImage/AcDbWipeout's plane orientation
+                # (getOrientation's origin/u/v triple) -- u_vector/v_vector
+                # are direction vectors, not points, but this lift is a bare
+                # [x,y,z] normalize with no positional semantics attached, so
+                # reusing it for vectors is exact (same idiom "normal"/
+                # "unit_dir" above already establish for other vector fields).
+                # NOTE: raw "origin" is also lifted top-level (NOT inside
+                # geometry) further below for AcDbOrdinateDimension, keyed
+                # on the same raw field name for an unrelated reason (that
+                # one is non-derivable-from-args and excluded from the
+                # P-gate fingerprint on purpose). For rasterimage/wipeout
+                # both lifts fire on the same true value -- harmless
+                # duplication, confirmed inert for cert purposes: cad_op_
+                # gate.check_roundtrip's fingerprint join is exactly
+                # (dxf_name, layer, geometry) [_local_fingerprint], so the
+                # top-level echo is never compared -- expect_rasterimage/
+                # expect_wipeout only need "origin" inside geometry.
+                "origin", "u_vector", "v_vector"):
         pt = _as_point3(raw.get(key))
         if pt is not None:
             geom[key] = pt
@@ -614,7 +640,13 @@ def _geometry_from_native_entity(raw: dict, kind: str) -> dict:
                    ("pattern_angle", "pattern_angle"),
                    ("pattern_scale", "pattern_scale"), ("pattern_type", "pattern_type"),
                    ("hatch_style", "hatch_style"), ("gradient_type", "gradient_type"),
-                   ("gradient_angle", "gradient_angle")):
+                   ("gradient_angle", "gradient_angle"),
+                   # wA-cert: AcDbRasterImage/AcDbWipeout's clip_boundary_type
+                   # (ClipBoundaryType enum ordinal, same plain-number-passthrough
+                   # convention as pattern_type/hatch_style above) and
+                   # AcDbMPolygon's loop_count (numMPolygonLoops()).
+                   ("clip_boundary_type", "clip_boundary_type"),
+                   ("loop_count", "loop_count")):
         num = _to_number(raw.get(nk))
         if num is not None:
             geom[ik] = num
@@ -626,6 +658,12 @@ def _geometry_from_native_entity(raw: dict, kind: str) -> dict:
         geom["pattern_name"] = str(raw.get("pattern_name"))
     if raw.get("gradient_name") is not None:
         geom["gradient_name"] = str(raw.get("gradient_name"))
+    # wA-cert: AcDbRasterImage/AcDbWipeout's backing AcDbRasterImageDef source
+    # file path (may be non-ASCII -- the native side already converts via
+    # wideToUtf8, this is a plain str passthrough, same idiom pattern_name/
+    # gradient_name above use).
+    if raw.get("source_file_name") is not None:
+        geom["source_file_name"] = str(raw.get("source_file_name"))
     # p3-insattr: ATTDEF/ATTRIB-specific fields (kind == "attribute", both
     # AcDbAttributeDefinition and AcDbAttribute per _NATIVE_CLASS_TO_DXF_KIND
     # above) -- tag/prompt are plain strings; the four ATTDEF/ATTRIB mode
@@ -699,6 +737,10 @@ def _geometry_from_native_entity(raw: dict, kind: str) -> dict:
         geom["is_associative"] = raw["is_associative"]
     if isinstance(raw.get("is_gradient"), bool):
         geom["is_gradient"] = raw["is_gradient"]
+    # wA-cert: AcDbRasterImage/AcDbWipeout's frame-display flag -- same
+    # present-only-when-known bool idiom as is_solid_fill/is_gradient above.
+    if isinstance(raw.get("frame_on"), bool):
+        geom["frame_on"] = raw["frame_on"]
     verts = raw.get("vertices")
     if isinstance(verts, list) and verts:
         norm = []
@@ -748,6 +790,24 @@ def _geometry_from_native_entity(raw: dict, kind: str) -> dict:
     faces = raw.get("faces")
     if isinstance(faces, list) and faces:
         geom["faces"] = faces
+    # wA-cert: AcDbRasterImage/AcDbWipeout's pixel [width, height] pair --
+    # a fixed 2-element number array, not a point (no z) and not an index
+    # list, so it gets its own small handler rather than joining an
+    # existing tuple/passthrough above.
+    img_size = raw.get("image_size")
+    if isinstance(img_size, list) and len(img_size) == 2:
+        w = _to_number(img_size[0])
+        h = _to_number(img_size[1])
+        if w is not None and h is not None:
+            geom["image_size"] = [w, h]
+    # wA-cert: AcDbRasterImage/AcDbWipeout's clip boundary vertices -- same
+    # bare zero-transform passthrough shape "loops" already uses above. The
+    # native side emits [x, y] pairs (AcGePoint2dArray -- the clip boundary
+    # is defined in the image's own local plane, no elevation component
+    # exists at the API level), unlike "loops"' [x, y, elevation] triples.
+    clip_boundary = raw.get("clip_boundary")
+    if isinstance(clip_boundary, list) and clip_boundary:
+        geom["clip_boundary"] = clip_boundary
     return geom
 
 

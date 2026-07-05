@@ -40,15 +40,17 @@ Design notes (read before extending):
   * Full P-gate roundtrip cert (attended_roundtrip, geometry-basis diff=0)
     needs the native reader (collectEntitiesFromBlock in
     AriadneNativeJob.cpp) to actually emit type-specific geometry fields for
-    the created entity. As of this wave that is true ONLY for HATCH
-    (AcDbHatch::cast branch: pattern_name/loop_count/loops, already lifted by
-    ir_builder.py's _geometry_from_native_entity). rasterimage/wipeout/
-    mpolygon have NO such branch, so a created entity extracts with only the
-    generic handle/dxf_name/layer/owner_handle/space record -- enough for
-    lane_proof()'s handle-basis "net added" check, NOT enough for a
-    geometry-basis fingerprint match. That gap is a genuine next-wave C++
-    change (blocked this wave -- see HARD CONSTRAINT in the task brief), not
-    a bug in this module. See build_log.md.
+    the created entity. Originally (early this wave) that was true ONLY for
+    HATCH (AcDbHatch::cast branch: pattern_name/loop_count/loops, already
+    lifted by ir_builder.py's _geometry_from_native_entity); rasterimage/
+    wipeout/mpolygon had no such branch, so a created entity extracted with
+    only the generic handle/dxf_name/layer/owner_handle/space record --
+    enough for lane_proof()'s handle-basis "net added" check, not enough for
+    a geometry-basis fingerprint match. wA-cert closed that gap: all three
+    now have AcDbRasterImage::cast/AcDbWipeout::cast/AcDbMPolygon::cast read
+    branches + matching ir_builder.py lifts (see expect_rasterimage/
+    expect_wipeout/expect_mpolygon below and build_log.md for the live
+    diff=0 evidence).
 
 Public API:
     build_job_doc(operation, args) -> dict                       # pure
@@ -205,8 +207,21 @@ def run_attended_native_job(staged_dwg: str, run_dir: str, operation: str,
     ]
     if acad_exe:
         cmd += ["-AcadExe", acad_exe]
-    if router_home:
-        cmd += ["-RouterHome", router_home]
+    # wA-cert BUGFIX: this was `if router_home: cmd += [...]`, silently falling
+    # through to run_attended_job.ps1's OWN hardcoded `-RouterHome` default
+    # (a specific sibling worktree name baked in at Wave-R authoring time) any
+    # time a caller did not pass router_home explicitly -- which every public
+    # entry point in this module (attended_apply_staged/lane_proof/
+    # attended_roundtrip) previously did NOT thread through at all. Live-caught
+    # this wave: a wA-cert rebuild + re-test against native_sample.dwg silently
+    # arxload'd a DIFFERENT worktree's prebuilt/2027 binaries (confirmed via the
+    # generated attended_job.scr's literal arxload paths), producing a stale
+    # pre-fix result. Always pass -RouterHome explicitly, defaulting to THIS
+    # module's own router root (_ROUTER_HOME, i.e. the worktree this exact
+    # attended_lane.py file lives in) -- correct regardless of which worktree
+    # imports/runs this module, and never silently drifts to a sibling
+    # worktree's (possibly stale, possibly since-deleted) binaries.
+    cmd += ["-RouterHome", router_home or _ROUTER_HOME]
 
     timed_out = False
     error = None
@@ -392,7 +407,8 @@ def run_attended_native_job(staged_dwg: str, run_dir: str, operation: str,
 def attended_apply_staged(operation: str, args: Dict[str, Any], dwg_path: str, out_dir: str, *,
                           timeout: int = DEFAULT_TIMEOUT_SEC,
                           patch_engine_mod=None, run_job_mod=None, ir_builder_mod=None,
-                          acad_exe: Optional[str] = None) -> Dict[str, Any]:
+                          acad_exe: Optional[str] = None,
+                          router_home: Optional[str] = None) -> Dict[str, Any]:
     """The attended-lane counterpart to ``patch_engine.apply_staged``: stage a
     copy, pre-inspect HEADLESS, apply the ONE native write op ATTENDED (the
     only step that needs full acad.exe), post-inspect HEADLESS again. Returns
@@ -433,7 +449,8 @@ def attended_apply_staged(operation: str, args: Dict[str, Any], dwg_path: str, o
     # apply: the ONE native write op, ATTENDED (full acad.exe) -----------------
     apply_dir = os.path.join(out_dir, "apply")
     apply_run = run_attended_native_job(staged_path, apply_dir, operation, args,
-                                        timeout=timeout, acad_exe=acad_exe)
+                                        timeout=timeout, acad_exe=acad_exe,
+                                        router_home=router_home)
     if apply_run.get("error") or not apply_run.get("staged_used"):
         return {"status": "unavailable" if apply_run.get("error") else "partial",
                 "reason": apply_run.get("error") or "attended job produced no staged_used",
@@ -484,7 +501,8 @@ def _added_entities(pre_ir: Dict[str, Any], post_ir: Dict[str, Any], *,
 
 def lane_proof(operation: str, args: Dict[str, Any], dwg_path: str, out_dir: str, *,
               expected_dxf_name: Optional[str] = None, expected_layer: Optional[str] = None,
-              timeout: int = DEFAULT_TIMEOUT_SEC, acad_exe: Optional[str] = None) -> Dict[str, Any]:
+              timeout: int = DEFAULT_TIMEOUT_SEC, acad_exe: Optional[str] = None,
+              router_home: Optional[str] = None) -> Dict[str, Any]:
     """LANE PROOF (not full P-gate cert): proves the attended lane creates a
     REAL, PERSISTED entity that survives a fresh headless re-extraction --
     handle-basis net "added" count, independent of whether the native reader
@@ -492,7 +510,8 @@ def lane_proof(operation: str, args: Dict[str, Any], dwg_path: str, out_dir: str
     do not; see build_log.md). Sufficient evidence the lane WORKS; not a claim
     of full roundtrip cert.
     """
-    envelope = attended_apply_staged(operation, args, dwg_path, out_dir, timeout=timeout, acad_exe=acad_exe)
+    envelope = attended_apply_staged(operation, args, dwg_path, out_dir, timeout=timeout,
+                                     acad_exe=acad_exe, router_home=router_home)
     if envelope.get("status") != "ok":
         return {"schema": SCHEMA_ID, "op": operation, "status": envelope.get("status"),
                 "reason": envelope.get("reason"), "envelope": envelope}
@@ -520,6 +539,7 @@ def attended_roundtrip(operation: str, args: Dict[str, Any], dwg_path: str, out_
                        expected_entity: Dict[str, Any], *,
                        geometry_tolerance: Optional[float] = None,
                        timeout: int = DEFAULT_TIMEOUT_SEC, acad_exe: Optional[str] = None,
+                       router_home: Optional[str] = None,
                        cad_diff_mod=None, cad_op_gate_mod=None) -> Dict[str, Any]:
     """FULL P-gate roundtrip cert via the attended lane: does the geometry we
     ASKED to be written (``expected_entity``) fingerprint-match what a fresh
@@ -531,7 +551,8 @@ def attended_roundtrip(operation: str, args: Dict[str, Any], dwg_path: str, out_
     if gate is None:
         return {"schema": SCHEMA_ID, "op": operation, "status": "error",
                 "reason": "cad_op_gate sibling module unavailable"}
-    envelope = attended_apply_staged(operation, args, dwg_path, out_dir, timeout=timeout, acad_exe=acad_exe)
+    envelope = attended_apply_staged(operation, args, dwg_path, out_dir, timeout=timeout,
+                                     acad_exe=acad_exe, router_home=router_home)
     if envelope.get("status") != "ok":
         return {"schema": SCHEMA_ID, "op": operation, "status": envelope.get("status"),
                 "reason": envelope.get("reason"), "envelope": envelope}
@@ -587,6 +608,113 @@ def expect_hatch(args: Dict[str, Any], *, loop_type: int = 3) -> Dict[str, Any]:
     }
 
 
+def expect_rasterimage(args: Dict[str, Any]) -> Dict[str, Any]:
+    """Ground truth for ``write.entity.rasterimage``: m08g_handlers.inc reads
+    ``position``/``width``/``height`` job args and calls
+    ``setOrientation(position, (width,0,0), (0,height,0))`` -- the U/V
+    vectors are PRE-SCALED by width/height, not unit vectors -- then
+    ``setClipBoundaryToWholeImage``, and stores ``image_path`` verbatim via
+    ``AcDbRasterImageDef::setSourceFileName``. Matches AriadneNativeJob.cpp's
+    AcDbRasterImage::cast read branch and ir_builder.py's
+    _geometry_from_native_entity lift.
+
+    clip_boundary_type=1 is ClipBoundaryType::kRect (imgent.h, the only type
+    setClipBoundaryToWholeImage can produce). clip_boundary for a kRect is a
+    CLOSED 5-point rectangle offset by -0.5 in both x and y from the nominal
+    (0,0)-(w,h) box -- a pixel-CENTER-vs-pixel-CORNER convention (pixel index
+    0's cell spans -0.5..+0.5) -- LIVE-VERIFIED this wave (see build_log.md;
+    an initial "opposite corners, no offset" hypothesis was wrong, corrected
+    from the actual diff, same empirical-correction pattern as expect_hatch's
+    loop_type). source_file_name round-trips through AutoCAD's own path
+    normalization to native Windows backslashes regardless of what separator
+    style the caller's image_path used -- os.path.normpath mirrors that.
+    """
+    origin = _point_to_list(args.get("position") or [0.0, 0.0, 0.0])
+    w = float(args.get("width", 1.0))
+    h = float(args.get("height", 1.0))
+    clip_rect = [[-0.5, -0.5], [-0.5, h - 0.5], [w - 0.5, h - 0.5], [w - 0.5, -0.5], [-0.5, -0.5]]
+    return {
+        "dxf_name": "IMAGE", "layer": args.get("layer") or "0",
+        "geometry": {
+            "kind": "rasterimage",
+            "origin": origin,
+            "u_vector": [w, 0.0, 0.0],
+            "v_vector": [0.0, h, 0.0],
+            "image_size": [w, h],
+            "clip_boundary_type": 1,
+            "clip_boundary": clip_rect,
+            "source_file_name": os.path.normpath(str(args.get("image_path", ""))),
+        },
+    }
+
+
+def expect_wipeout(args: Dict[str, Any]) -> Dict[str, Any]:
+    """Ground truth for ``write.entity.wipeout``: m08g_handlers.inc hardcodes
+    the plane orientation to identity (``origin=(0,0,0)``, ``u=(1,0,0)``,
+    ``v=(0,1,0)`` -- unlike write.entity.rasterimage, no position/width/
+    height job args are read here) and always uses
+    ``ClipBoundaryType::kPoly`` (2, per imgent.h) with the caller's
+    ``vertices``.
+
+    IMPORTANT: setClipBoundary live-probed (this wave, see build_log.md) to
+    require an EXPLICITLY CLOSED polygon -- an open loop fails
+    eInvalidInput(3). The caller's ``vertices`` arg MUST already repeat the
+    first vertex as the last, or the create itself fails before there is
+    anything to diff.
+
+    ``image_size`` and ``frame_on`` are NOT set explicitly by the handler (no
+    width/height args read, no setFrame call) -- their values are whatever
+    AcDbWipeout's placeholder, no-backing-file AcDbRasterImageDef/class
+    defaults resolve to. First-attempt hypotheses below (0x0, frame on);
+    correct from the live diff if wrong, same as clip_boundary above.
+    """
+    verts = args.get("vertices") or []
+    clip_pts = [_point_to_list(v)[:2] for v in verts]
+    return {
+        "dxf_name": "WIPEOUT", "layer": args.get("layer") or "0",
+        "geometry": {
+            "kind": "wipeout",
+            "origin": [0.0, 0.0, 0.0],
+            "u_vector": [1.0, 0.0, 0.0],
+            "v_vector": [0.0, 1.0, 0.0],
+            "image_size": [0.0, 0.0],
+            "clip_boundary_type": 2,
+            "clip_boundary": clip_pts,
+            "source_file_name": "",
+            "frame_on": True,
+        },
+    }
+
+
+def expect_mpolygon(args: Dict[str, Any]) -> Dict[str, Any]:
+    """Ground truth for ``write.entity.mpolygon``: m08g_handlers.inc always
+    creates a single-loop, SOLID-pattern (AcDbHatch::kPreDefined "SOLID")
+    mpolygon at elevation 0.0 with normal (0,0,1) from the caller's
+    ``vertices`` (zero bulges) -- matches AriadneNativeJob.cpp's
+    AcDbMPolygon::cast read branch (pattern_name/elevation/normal/loop_count/
+    loops) and ir_builder.py's _geometry_from_native_entity MPOLYGON lift.
+
+    ``appendMPolygonLoop``'s third arg is ``excludeCrossing`` (self-
+    intersection handling during hatch evaluation, per dbmpolygon.h) -- NOT
+    a close/normalize flag like AcDbWipeout's clip boundary needed, so the
+    stored loop vertex count is expected to echo the input verbatim (no
+    implicit closing-point duplication).
+    """
+    verts = args.get("vertices") or []
+    loop_verts = [{"point": _point_to_list(v)[:2] + [0.0], "bulge": 0.0} for v in verts]
+    return {
+        "dxf_name": "MPOLYGON", "layer": args.get("layer") or "0",
+        "geometry": {
+            "kind": "mpolygon",
+            "pattern_name": "SOLID",
+            "elevation": 0.0,
+            "normal": [0.0, 0.0, 1.0],
+            "loop_count": 1,
+            "loops": [{"index": 0, "vertices": loop_verts}],
+        },
+    }
+
+
 # --------------------------------------------------------------------------- #
 # 6. tiny PNG fixture (stdlib-only -- no Pillow dependency for rasterimage's
 #    required image_path arg; a real file must exist on disk).
@@ -631,6 +759,10 @@ if __name__ == "__main__":
     ap.add_argument("--timeout", type=int, default=DEFAULT_TIMEOUT_SEC)
     ap.add_argument("--mode", choices=["lane-proof", "full-cert"], default="lane-proof")
     ap.add_argument("--expected-dxf-name", default=None)
+    ap.add_argument("--router-home", default=None,
+                    help="router worktree root whose prebuilt/2027 binaries get arxload'd; "
+                         "defaults to the worktree THIS attended_lane.py file lives in "
+                         "(_ROUTER_HOME) -- pass explicitly only to target a different worktree")
     ns = ap.parse_args()
 
     extra_args = json.loads(ns.args_json)
@@ -638,13 +770,21 @@ if __name__ == "__main__":
 
     if ns.mode == "lane-proof":
         res = lane_proof(ns.op, extra_args, ns.dwg, ns.out_dir,
-                         expected_dxf_name=ns.expected_dxf_name, timeout=ns.timeout)
+                         expected_dxf_name=ns.expected_dxf_name, timeout=ns.timeout,
+                         router_home=ns.router_home)
     else:
         if ns.op == "write.entity.hatch":
             expected = expect_hatch(extra_args)
+        elif ns.op == "write.entity.rasterimage":
+            expected = expect_rasterimage(extra_args)
+        elif ns.op == "write.entity.wipeout":
+            expected = expect_wipeout(extra_args)
+        elif ns.op == "write.entity.mpolygon":
+            expected = expect_mpolygon(extra_args)
         else:
             raise SystemExit("no built-in expected-entity builder for --mode full-cert --op %r" % ns.op)
-        res = attended_roundtrip(ns.op, extra_args, ns.dwg, ns.out_dir, expected, timeout=ns.timeout)
+        res = attended_roundtrip(ns.op, extra_args, ns.dwg, ns.out_dir, expected, timeout=ns.timeout,
+                                 router_home=ns.router_home)
 
     print(json.dumps(res, ensure_ascii=False, indent=2, default=str))
     sys.exit(0 if res.get("status") == "ok" else 1)
