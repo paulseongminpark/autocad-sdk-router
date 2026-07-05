@@ -84,6 +84,32 @@ def build_job_args(native_op: str, args: Dict[str, Any]) -> Optional[Dict[str, A
     return None
 '''
 
+_MISMAPPED_FAMILY_MODULE = '''\
+"""synthetic family module with a BAD map write: WRITE_OP_MAP points
+create_widget at the WRONG native_op even though build_job_args has a fully
+coherent arg branch for the correct one. An arg-branch-only guard cannot
+see this defect at all -- it only shows up by cross-checking the map."""
+from __future__ import annotations
+
+from typing import Any, Dict, Optional
+
+WRITE_OP_MAP: Dict[str, str] = {
+    "create_widget": "write.entity.OTHER",
+}
+
+
+def build_job_args(native_op: str, args: Dict[str, Any]) -> Optional[Dict[str, Any]]:
+    """Coherent arg branch for write.entity.widget -- but WRITE_OP_MAP above
+    never actually routes create_widget to it."""
+    if native_op == "write.entity.widget":
+        out: Dict[str, Any] = {}
+        for k in ("size", "layer"):
+            if k in args:
+                out[k] = args[k]
+        return out
+    return None
+'''
+
 
 def _op_record(op_id: str, status_policy: str = "catalogued_not_runnable") -> dict:
     rec = {"id": op_id, "status": "implemented",
@@ -254,6 +280,32 @@ class TestPromoteSyntheticRunnableOp:
         assert rec["policy"]["status_policy"] == "implemented"
         assert "measure/reachable_matrix.jsonl#write.entity.gizmo" in rec["evidence_refs"]
         assert "runtime_behavior" not in rec["policy"]
+
+    def test_apply_promotion_reverts_if_map_write_resolves_to_the_wrong_native_op(self, env, monkeypatch):
+        """End-to-end regression for the map half of the H-R4 guard: simulate
+        a hypothetical _insert_map_entry defect that writes the WRONG
+        native_op into WRITE_OP_MAP. The arg branch inserted alongside it is
+        still perfectly coherent for the REAL native_op -- an arg-branch-only
+        guard (the pre-fix behavior) would have accepted this promotion.
+        apply_promotion must instead raise and revert BOTH files."""
+        row = _row("create_gizmo", "write.entity.gizmo", ["size", "layer"], "empty")
+        before_fam = env["empty_path"].read_text(encoding="utf-8")
+        before_ops = env["ops_v2_path"].read_text(encoding="utf-8")
+
+        real_insert = po._insert_map_entry
+
+        def _bad_insert(text, patch_op, native_op):
+            return real_insert(text, patch_op, native_op + "_WRONG")
+
+        monkeypatch.setattr(po, "_insert_map_entry", _bad_insert)
+
+        with pytest.raises(po.PromotionError, match="WRITE_OP_MAP"):
+            po.apply_promotion(row, matrix=env["matrix"], operations_v2_path=str(env["ops_v2_path"]),
+                                family_files=env["family_files"])
+
+        # All-or-nothing (RT-FOLD H-R4): both files reverted to pre-promotion bytes.
+        assert env["empty_path"].read_text(encoding="utf-8") == before_fam
+        assert env["ops_v2_path"].read_text(encoding="utf-8") == before_ops
 
     def test_apply_promotion_is_reversible(self, env):
         row = _row("create_gizmo", "write.entity.gizmo", ["size", "layer"], "empty")
@@ -432,6 +484,13 @@ class TestLoadF1Matrix:
 # H-R4 unknown-op guard, exercised directly
 # --------------------------------------------------------------------------- #
 class TestUnknownOpGuard:
+    """_verify_axis_b is a TWO-sided guard: the map half (WRITE_OP_MAP[patch_op]
+    == native_op) and the arg-branch half (build_job_args(native_op, ...) is
+    non-None and arg_keys-shaped). Either half failing alone must raise --
+    a coherent arg branch for the right native_op can never paper over a
+    WRITE_OP_MAP entry that resolves to the wrong (or no) native_op, and
+    vice versa."""
+
     def test_verify_axis_b_raises_if_arg_branch_is_missing(self, tmp_path):
         # A family module with a map entry but NO matching arg-branch --
         # the exact H-R4 defect this tool must never itself produce, but
@@ -441,12 +500,32 @@ class TestUnknownOpGuard:
             "WRITE_OP_MAP: Dict[str, str] = {}",
             'WRITE_OP_MAP: Dict[str, str] = {\n    "create_orphan": "write.entity.orphan",\n}'))
         with pytest.raises(po.PromotionError, match="unknown-op guard"):
-            po._verify_axis_b(str(broken), "write.entity.orphan", ["x"])
+            po._verify_axis_b(str(broken), "create_orphan", "write.entity.orphan", ["x"])
 
     def test_verify_axis_b_passes_for_a_coherent_branch(self, tmp_path):
         ok = tmp_path / "ok_family.py"
         _write(ok, _POPULATED_FAMILY_MODULE)
-        po._verify_axis_b(str(ok), "write.entity.widget", ["size", "layer"])  # no raise
+        po._verify_axis_b(str(ok), "create_widget", "write.entity.widget", ["size", "layer"])  # no raise
+
+    def test_verify_axis_b_raises_if_map_points_to_the_wrong_native_op(self, tmp_path):
+        # build_job_args("write.entity.widget", ...) is perfectly coherent in
+        # isolation -- an arg-branch-only guard (the pre-fix behavior) would
+        # pass this straight through. But WRITE_OP_MAP["create_widget"]
+        # resolves to "write.entity.OTHER", not "write.entity.widget": a bad
+        # map write that must fail regardless of how clean the arg branch is.
+        mismapped = tmp_path / "mismapped_family.py"
+        _write(mismapped, _MISMAPPED_FAMILY_MODULE)
+        with pytest.raises(po.PromotionError, match="WRITE_OP_MAP"):
+            po._verify_axis_b(str(mismapped), "create_widget", "write.entity.widget", ["size", "layer"])
+
+    def test_verify_axis_b_raises_if_map_entry_is_missing_entirely(self, tmp_path):
+        # patch_op isn't in WRITE_OP_MAP at all (mapped is None), even though
+        # native_op's own arg branch is coherent -- same defect class as
+        # above, the map key just never landed.
+        ok = tmp_path / "ok_family.py"
+        _write(ok, _POPULATED_FAMILY_MODULE)
+        with pytest.raises(po.PromotionError, match="WRITE_OP_MAP"):
+            po._verify_axis_b(str(ok), "create_nonexistent", "write.entity.widget", ["size", "layer"])
 
 
 if __name__ == "__main__":

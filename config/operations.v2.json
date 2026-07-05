@@ -34787,7 +34787,7 @@
         "router_lane": "ARIADNE_NATIVE_JOB",
         "dispatcher_symbol": "m08eDispatch",
         "execution_host_class": "dbx",
-        "native_api": "AcDbObject::setXData(const resbuf* xdata)",
+        "native_api": "setDatabaseXdata(AcDbDatabase*, app, value) -- DATABASE-level; this op does NOT call AcDbObject::setXData on a specific entity and takes no entity handle argument",
         "composed_of": []
       },
       "mapping_type": "exact",
@@ -34812,7 +34812,7 @@
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
         "tests/unit/test_m08e_handlers.py"
       ],
-      "summary": "Attach extended data (xdata, group codes 1000-1071) to any object; first resbuf must be",
+      "summary": "DATABASE-level xdata attach via setDatabaseXdata(app, value). Despite the patch_op name 'set_entity_xdata', this does NOT target a specific entity -- there is no entity handle argument; it writes xdata on the database object itself, not on any AcDbEntity.",
       "source_slice": "acdb-core.md",
       "citation": "ref AcDbObject__setXData@resbuf_.html",
       "evidence_refs": [
