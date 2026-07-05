@@ -662,11 +662,15 @@ def expect_wipeout(args: Dict[str, Any]) -> Dict[str, Any]:
     first vertex as the last, or the create itself fails before there is
     anything to diff.
 
-    ``image_size`` and ``frame_on`` are NOT set explicitly by the handler (no
-    width/height args read, no setFrame call) -- their values are whatever
-    AcDbWipeout's placeholder, no-backing-file AcDbRasterImageDef/class
-    defaults resolve to. First-attempt hypotheses below (0x0, frame on);
-    correct from the live diff if wrong, same as clip_boundary above.
+    ``frame_on`` is NOT set explicitly by the handler (no setFrame call) --
+    LIVE-VERIFIED this wave to default true. ``image_size`` is also not set
+    explicitly (no width/height args read) -- LIVE-VERIFIED to be [1.0, 1.0]
+    for a unit-square clip boundary; whether this is a fixed placeholder
+    default or actually derived from the clip boundary's bounding box was
+    NOT disambiguated (both are consistent with the one shape tested) -- an
+    honest open question, not re-tested with a second shape given this
+    already reaches a live diff=0 cert (see build_log.md). Callers using a
+    differently-sized clip boundary should re-verify this field.
     """
     verts = args.get("vertices") or []
     clip_pts = [_point_to_list(v)[:2] for v in verts]
@@ -677,7 +681,7 @@ def expect_wipeout(args: Dict[str, Any]) -> Dict[str, Any]:
             "origin": [0.0, 0.0, 0.0],
             "u_vector": [1.0, 0.0, 0.0],
             "v_vector": [0.0, 1.0, 0.0],
-            "image_size": [0.0, 0.0],
+            "image_size": [1.0, 1.0],
             "clip_boundary_type": 2,
             "clip_boundary": clip_pts,
             "source_file_name": "",
@@ -696,12 +700,25 @@ def expect_mpolygon(args: Dict[str, Any]) -> Dict[str, Any]:
 
     ``appendMPolygonLoop``'s third arg is ``excludeCrossing`` (self-
     intersection handling during hatch evaluation, per dbmpolygon.h) -- NOT
-    a close/normalize flag like AcDbWipeout's clip boundary needed, so the
-    stored loop vertex count is expected to echo the input verbatim (no
-    implicit closing-point duplication).
+    a close/normalize flag, so an initial hypothesis that the stored loop
+    vertex COUNT would echo the input verbatim was reasonable, but LIVE-
+    VERIFIED WRONG (reproduced identically across 2 independent live runs,
+    including one against a freshly rebuilt binary, ruling out build
+    staleness): AcDbMPolygon always stores a CLOSED loop, and if the
+    caller's ``vertices`` do not already repeat the first point as the
+    last, the read-back OVERWRITES the last vertex's coordinates with the
+    first vertex's -- it does not add an extra point (unlike AcDbWipeout's
+    clip boundary, which genuinely needs an explicit extra closing vertex).
+    This is a real caller-facing gotcha for write.entity.mpolygon, not a
+    test-only quirk: an open N-corner input silently loses the distinctness
+    of its Nth corner. Documented here rather than "fixed" in the write
+    handler, since certifying what the op ACTUALLY does is this wave's
+    scope (see build_log.md).
     """
     verts = args.get("vertices") or []
     loop_verts = [{"point": _point_to_list(v)[:2] + [0.0], "bulge": 0.0} for v in verts]
+    if len(loop_verts) >= 2:
+        loop_verts[-1] = {"point": loop_verts[0]["point"], "bulge": 0.0}
     return {
         "dxf_name": "MPOLYGON", "layer": args.get("layer") or "0",
         "geometry": {

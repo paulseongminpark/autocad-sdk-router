@@ -601,26 +601,34 @@ def _geometry_from_native_entity(raw: dict, kind: str) -> dict:
                 # args (m08g_handlers.inc) so the roundtrip diff is direct.
                 "p0", "p1", "p2", "p3",
                 # wA-cert: AcDbRasterImage/AcDbWipeout's plane orientation
-                # (getOrientation's origin/u/v triple) -- u_vector/v_vector
-                # are direction vectors, not points, but this lift is a bare
-                # [x,y,z] normalize with no positional semantics attached, so
-                # reusing it for vectors is exact (same idiom "normal"/
-                # "unit_dir" above already establish for other vector fields).
-                # NOTE: raw "origin" is also lifted top-level (NOT inside
-                # geometry) further below for AcDbOrdinateDimension, keyed
-                # on the same raw field name for an unrelated reason (that
-                # one is non-derivable-from-args and excluded from the
-                # P-gate fingerprint on purpose). For rasterimage/wipeout
-                # both lifts fire on the same true value -- harmless
-                # duplication, confirmed inert for cert purposes: cad_op_
-                # gate.check_roundtrip's fingerprint join is exactly
-                # (dxf_name, layer, geometry) [_local_fingerprint], so the
-                # top-level echo is never compared -- expect_rasterimage/
-                # expect_wipeout only need "origin" inside geometry.
-                "origin", "u_vector", "v_vector"):
+                # direction vectors (getOrientation's u/v) -- not points, but
+                # this lift is a bare [x,y,z] normalize with no positional
+                # semantics attached, so reusing it for vectors is exact
+                # (same idiom "normal"/"unit_dir" above already establish for
+                # other vector fields). "origin" is NOT in this shared tuple
+                # (see the kind-gated lift just below) -- a raw "origin" key
+                # is ALSO used, unrelated, by AcDbOrdinateDimension for a
+                # value that is deliberately top-level-only, never inside
+                # geometry (test_ir_builder.py::
+                # test_ordinate_dimension_lifts_points_and_top_level_origin
+                # asserts this for every kind, not just ordinate dimensions --
+                # an earlier attempt to add "origin" to this shared tuple
+                # broke that test; a blanket lift here would be wrong).
+                "u_vector", "v_vector"):
         pt = _as_point3(raw.get(key))
         if pt is not None:
             geom[key] = pt
+    # wA-cert: rasterimage/wipeout's own plane origin DOES belong inside
+    # geometry (needed for the P-gate fingerprint -- live-verified via
+    # attended_lane.py's expect_rasterimage/expect_wipeout, both certified
+    # diff=0). Kind-gated rather than added to the shared tuple above,
+    # specifically to NOT collide with AcDbOrdinateDimension's unrelated,
+    # deliberately-top-level-only "origin" (same raw field name, different
+    # entities, different P-gate treatment).
+    if kind in ("rasterimage", "wipeout"):
+        pt = _as_point3(raw.get("origin"))
+        if pt is not None:
+            geom["origin"] = pt
     radius = _to_number(raw.get("radius"))
     if radius is not None:
         geom["radius"] = radius
