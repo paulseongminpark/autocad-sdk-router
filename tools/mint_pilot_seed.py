@@ -28,8 +28,11 @@ Honest capability gap (verified 2026-07-01, this session -- see report.md):
 step 3 has NO implemented op anywhere in this codebase. config/operations.v2.json
 has zero erase/delete-entity operations in ANY family (entities, write,
 objectdbx_database, symbol_tables_dictionaries, blocks_xrefs_clone all checked);
-patch_engine.NATIVE_WRITE_OP_MAP has exactly 4 entries, all create-only
-(create_line, create_circle, set_layer, create_layer). ERASE_MODELSPACE_OP_ID
+patch_engine.NATIVE_WRITE_OP_MAP grows continuously as tools/promote_op.py F2
+promotions land (30 entries as of this ticket's re-check, up from the 4 this
+paragraph originally measured -- check ``len(patch_ops.NATIVE_WRITE_OP_MAP)``
+for the live count, never trust a frozen number here), but every entry is
+create/set-only -- none erase, delete, or remove an entity. ERASE_MODELSPACE_OP_ID
 below is a PROPOSED name for the missing native handler -- it is NOT registered
 in config/operations.v2.json (that file is out of scope for this node; RT-FOLD
 R2-A9 excludes it from all worker diffs) and calling it via
@@ -155,9 +158,12 @@ PINNED_CLEAR_PROCEDURE = [
                 "delete-entity ops exist in config/operations.v2.json across "
                 "families entities/write/objectdbx_database/"
                 "symbol_tables_dictionaries/blocks_xrefs_clone; "
-                "patch_engine.NATIVE_WRITE_OP_MAP has only create_line/"
-                "create_circle/set_layer/create_layer. Needs a new native ARX "
-                "handler: open the *MODEL_SPACE BTR (inspect.block.iterate "
+                "patch_engine.NATIVE_WRITE_OP_MAP grows continuously (30 "
+                "entries as of this ticket's re-check, up from the 4 "
+                "originally measured here) but every entry is create/set-"
+                "only -- none erase, delete, or remove an entity. Needs a "
+                "new native ARX handler: open the *MODEL_SPACE BTR "
+                "(inspect.block.iterate "
                 "gives the enumerator pattern), open each member for write, "
                 "call AcDbEntity::erase(true); then promote the op to "
                 "status='implemented' before this step is callable.",
