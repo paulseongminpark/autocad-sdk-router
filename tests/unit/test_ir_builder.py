@@ -570,6 +570,103 @@ class TestNativeGraphGeometryLifting(unittest.TestCase):
             "closed": False,
         })
 
+    def test_hatch_lifts_pattern_style_and_polyline_loop(self):
+        # a1-hatchread: pattern_name/loops already existed; this covers the
+        # newly-added pattern_type/pattern_angle/pattern_scale/pattern_double/
+        # hatch_style/is_solid_fill/is_associative/is_gradient/elevation +
+        # generic normal, plus the polyline-loop "closed" flag the C++ side
+        # now also emits. Shape verified byte-for-byte (all 669 real hatches,
+        # exact handle match) against an independent LibreDWG+ezdxf DXF
+        # re-parse -- see build_log.md. pattern_angle is radians here (every
+        # ObjectARX angle accessor this codebase surfaces is), 45 degrees.
+        ent = self._one_entity_ir({
+            "handle": "1220F", "dxf_name": "AcDbHatch", "layer": "0",
+            "owner_handle": "1F", "space": "model",
+            "pattern_name": "DASH", "pattern_type": 2, "pattern_angle": 0.7853981633974483,
+            "pattern_scale": 350.0, "pattern_double": False, "hatch_style": 0,
+            "is_solid_fill": False, "is_associative": False, "is_gradient": False,
+            "elevation": 0.0, "normal": [0.0, 0.0, 1.0],
+            "loops": [{
+                "index": 0, "loop_type": 2, "closed": True, "status": "ok",
+                "vertices": [
+                    {"point": [0.0, 0.0, 0.0], "bulge": 0.0},
+                    {"point": [10.0, 0.0, 0.0], "bulge": 0.0},
+                    {"point": [10.0, 10.0, 0.0], "bulge": 0.0},
+                    {"point": [0.0, 10.0, 0.0], "bulge": 0.0},
+                    {"point": [0.0, 0.0, 0.0], "bulge": 0.0},
+                ],
+            }],
+        })
+        self.assertEqual(ent["dxf_name"], "HATCH")
+        self.assertEqual(ent["geometry"]["kind"], "hatch")
+        self.assertEqual(ent["geometry"]["pattern_name"], "DASH")
+        self.assertEqual(ent["geometry"]["pattern_type"], 2)
+        self.assertAlmostEqual(ent["geometry"]["pattern_angle"], 0.7853981633974483)
+        self.assertEqual(ent["geometry"]["pattern_scale"], 350.0)
+        self.assertEqual(ent["geometry"]["pattern_double"], False)
+        self.assertEqual(ent["geometry"]["hatch_style"], 0)
+        self.assertEqual(ent["geometry"]["is_solid_fill"], False)
+        self.assertEqual(ent["geometry"]["is_associative"], False)
+        self.assertEqual(ent["geometry"]["is_gradient"], False)
+        self.assertEqual(ent["geometry"]["elevation"], 0.0)
+        self.assertEqual(ent["geometry"]["normal"], [0.0, 0.0, 1.0])
+        self.assertEqual(len(ent["geometry"]["loops"]), 1)
+        loop = ent["geometry"]["loops"][0]
+        self.assertEqual(loop["closed"], True)
+        self.assertEqual(len(loop["vertices"]), 5)
+
+    def test_hatch_lifts_solid_fill_gradient_and_edge_type_loop(self):
+        # a1-hatchread: a solid-fill, gradient, associative hatch whose ONE
+        # loop is a non-polyline (edge-type) boundary -- the exact gap this
+        # wave closed in collectModelSpaceGraph/hatchLoopsJson (previously the
+        # polyline-only getLoopAt overload silently dropped 100% of any
+        # loop like this). "loops" is a raw passthrough in ir_builder.py (see
+        # _geometry_from_native_entity), so this test locks in the edge-loop
+        # JSON *shape* contract even though no real hatch in the only fixture
+        # available in this environment happens to use one (all 669 real
+        # loops are kPolyline -- see build_log.md); it is the Python half of
+        # a contract whose C++ half is verified by a clean compile against
+        # the real ObjectARX 2027 SDK headers, not by live entity data.
+        ent = self._one_entity_ir({
+            "handle": "1FED", "dxf_name": "AcDbHatch", "layer": "0",
+            "owner_handle": "1F", "space": "model",
+            "pattern_name": "SOLID", "pattern_type": 1, "pattern_angle": 0.0,
+            "pattern_scale": 1.0, "pattern_double": False, "hatch_style": 1,
+            "is_solid_fill": True, "is_associative": True, "is_gradient": True,
+            "gradient_name": "LINEAR", "gradient_type": 0, "gradient_angle": 1.5707963267948966,
+            "elevation": 0.0, "normal": [0.0, 0.0, 1.0],
+            "loops": [{
+                "index": 0, "loop_type": 1, "closed": True, "status": "ok",
+                "edges": [
+                    {"type": "line", "start": [0.0, 0.0], "end": [10.0, 0.0]},
+                    {"type": "circ_arc", "center": [10.0, 5.0], "radius": 5.0,
+                     "start_angle": -1.5707963267948966, "end_angle": 1.5707963267948966,
+                     "counterclockwise": True},
+                    {"type": "ellipse_arc", "center": [5.0, 10.0], "major_axis": [5.0, 0.0],
+                     "major_radius": 5.0, "minor_radius": 2.5,
+                     "start_angle": 0.0, "end_angle": 3.141592653589793, "counterclockwise": True},
+                    {"type": "spline", "degree": 3, "rational": False, "periodic": False,
+                     "control_points": [[0.0, 10.0], [-2.0, 5.0], [0.0, 0.0]],
+                     "knots": [0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0, 1.0]},
+                ],
+            }],
+        })
+        self.assertEqual(ent["geometry"]["is_solid_fill"], True)
+        self.assertEqual(ent["geometry"]["is_associative"], True)
+        self.assertEqual(ent["geometry"]["is_gradient"], True)
+        self.assertEqual(ent["geometry"]["gradient_name"], "LINEAR")
+        self.assertEqual(ent["geometry"]["gradient_type"], 0)
+        self.assertAlmostEqual(ent["geometry"]["gradient_angle"], 1.5707963267948966)
+        loop = ent["geometry"]["loops"][0]
+        self.assertNotIn("vertices", loop)
+        edges = loop["edges"]
+        self.assertEqual([e["type"] for e in edges], ["line", "circ_arc", "ellipse_arc", "spline"])
+        self.assertEqual(edges[0]["start"], [0.0, 0.0])
+        self.assertEqual(edges[1]["radius"], 5.0)
+        self.assertEqual(edges[2]["minor_radius"], 2.5)
+        self.assertEqual(edges[3]["degree"], 3)
+        self.assertEqual(len(edges[3]["control_points"]), 3)
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -195,7 +195,15 @@ _KNOWN_GEOMETRY_LEAF_FIELDS = frozenset({
     # default_start_width+default_end_width/setDefaultStartWidth+
     # setDefaultEndWidth); per-vertex start_width/end_width live inside
     # vertices[].items, not here (schemas/dwg_graph_ir.v1.schema.json).
+    # "elevation" is shared with a1-hatchread's AcDbHatch plane elevation
+    # (one schema key, two producers).
     "elevation", "default_start_width", "default_end_width",
+    # a1-hatchread: the rest of AcDbHatch's own state (dwg_graph_ir.v1.
+    # schema.json geometry properties, kept in lockstep with that schema --
+    # see test_cross_oracle.py's own schema<->registry drift check).
+    "pattern_type", "pattern_angle", "pattern_scale", "pattern_double",
+    "hatch_style", "is_solid_fill", "is_associative", "is_gradient",
+    "gradient_name", "gradient_type", "gradient_angle",
 })
 
 # Entity keys that are IDENTITY / PROVENANCE, not oracle-asserted DATA: they

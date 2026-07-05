@@ -604,7 +604,17 @@ def _geometry_from_native_entity(raw: dict, kind: str) -> dict:
                    ("degree", "degree"), ("m_size", "m_size"), ("n_size", "n_size"),
                    ("jog_angle", "jog_angle"), ("elevation", "elevation"),
                    ("default_start_width", "default_start_width"),
-                   ("default_end_width", "default_end_width")):
+                   ("default_end_width", "default_end_width"),
+                   # a1-hatchread: AcDbHatch's own plane/pattern/gradient
+                   # numbers. pattern_type/hatch_style/gradient_type are
+                   # AutoCAD enum ordinals (AcDbHatch::HatchPatternType/
+                   # HatchStyle/GradientPatternType), passed through as
+                   # plain numbers like radius_ratio etc. above -- no
+                   # string translation table maintained on this side.
+                   ("pattern_angle", "pattern_angle"),
+                   ("pattern_scale", "pattern_scale"), ("pattern_type", "pattern_type"),
+                   ("hatch_style", "hatch_style"), ("gradient_type", "gradient_type"),
+                   ("gradient_angle", "gradient_angle")):
         num = _to_number(raw.get(nk))
         if num is not None:
             geom[ik] = num
@@ -614,6 +624,8 @@ def _geometry_from_native_entity(raw: dict, kind: str) -> dict:
         geom["block_name"] = str(raw.get("block_name"))
     if raw.get("pattern_name") is not None:
         geom["pattern_name"] = str(raw.get("pattern_name"))
+    if raw.get("gradient_name") is not None:
+        geom["gradient_name"] = str(raw.get("gradient_name"))
     if isinstance(raw.get("closed"), bool):
         geom["closed"] = raw["closed"]
     if isinstance(raw.get("use_x_axis"), bool):
@@ -632,6 +644,19 @@ def _geometry_from_native_entity(raw: dict, kind: str) -> dict:
     edge_vis = raw.get("edge_visibility")
     if isinstance(edge_vis, list) and edge_vis:
         geom["edge_visibility"] = [bool(v) for v in edge_vis]
+    # a1-hatchread: AcDbHatch booleans (pattern_double/is_solid_fill/
+    # is_associative/is_gradient) -- read-only surface, no roundtrip-create
+    # equivalent (write.entity.hatch is attended-gated on this build; see
+    # build_log.md), so this is verified via cross-oracle DXF comparison
+    # instead of a create->re-extract P-gate diff like closed/m_closed above.
+    if isinstance(raw.get("pattern_double"), bool):
+        geom["pattern_double"] = raw["pattern_double"]
+    if isinstance(raw.get("is_solid_fill"), bool):
+        geom["is_solid_fill"] = raw["is_solid_fill"]
+    if isinstance(raw.get("is_associative"), bool):
+        geom["is_associative"] = raw["is_associative"]
+    if isinstance(raw.get("is_gradient"), bool):
+        geom["is_gradient"] = raw["is_gradient"]
     verts = raw.get("vertices")
     if isinstance(verts, list) and verts:
         norm = []
