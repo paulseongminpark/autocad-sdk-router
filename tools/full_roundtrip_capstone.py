@@ -1,0 +1,718 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""full_roundtrip_capstone.py -- CAD OS Layer north-star capstone (PLAN Sec.
+0.6 A1): full-drawing extract -> regen (certified classes only) -> re-extract
+-> handle-independent multiset diff, driven on the real lane-A production
+drawing.
+
+This module is a DRIVER, not a new engine. It reuses, unmodified:
+  * tools/patch_engine.py       -- create_staged_copy / apply_staged (the
+                                    real staged-write lifecycle: staging,
+                                    per-op native writes, post-extraction,
+                                    original-unchanged proof).
+  * tools/run_job.py            -- run_router_cad_job (the native inspect/
+                                    write host invocation + capture).
+  * tools/ir_builder.py         -- build_ir_from_database_graph (native
+                                    result -> dwg_graph_ir.v1), via patch_
+                                    engine._native_full_ir (the SAME helper
+                                    apply_staged's own pre/post-inspect steps
+                                    use, so census IRs are shaped identically
+                                    to regen's pre/post IRs).
+  * tools/ir_to_patch.py + tools/patch_ops/*  -- IR entity -> cad_patch op,
+                                    per-family dispatch. NOT edited here:
+                                    whatever ir_op_for cannot map today is
+                                    honestly reported as deferred, never
+                                    guessed at in this file.
+  * tools/cad_diff.py's comparison_basis="geometry" -- the ALREADY-EXISTING
+                                    handle-independent, tolerance-aware
+                                    (dxf_name, layer, geometry) multiset join
+                                    (PLAN 0.6 A1's own required mechanism).
+                                    This module does not reimplement that
+                                    join; it only derives a per-(dxf_name)
+                                    rollup ("regen_attempted / diff0 /
+                                    modified / removed / added") from its
+                                    output.
+  * tools/op_roundtrip_probe.py's LAYER_RECORD_FIELDS / layer_record_diff
+                                    (and its documented DIMSTYLE sibling) --
+                                    reused for the record-table (layer/
+                                    dimstyle) comparison, never reimplemented.
+
+No C++, no registry, no edits to patch_ops/ir_builder/op_roundtrip_probe:
+this is a NEW file per the capstone-prep packet.
+
+Public API (pure -- no I/O, no CAD engine; independently unit-testable):
+    sha256_file(path) -> str | None
+    check_identity(path_a, path_b) -> dict
+    classify_entity_bucket(dxf_name, kind) -> str
+    census_report(ir) -> dict
+    filter_ir_to_certified(ir, kinds=None, limit=None, per_kind_limit=None) -> dict
+    layer_op_args_from_record(record, op_roundtrip_probe_mod) -> dict
+    dimstyle_op_args_from_record(record, op_roundtrip_probe_mod) -> dict
+    record_diff_report(kind_label, records, actual_ir, *, name_field, fields, diff_fn, lookup_fn) -> dict
+    per_kind_verdict(pre_ir, diff) -> dict
+    resolvable_ops_report(patch, patch_ops_mod=None) -> dict
+
+Public API (live -- needs a real AutoCAD runtime via patch_engine/run_job):
+    run_census(staged_path, original_path, run_dir, ...) -> dict
+    run_regen_batch(filtered_ir, blank_seed_path, run_dir, patch_id, ...) -> dict
+    run_capstone(...) -> dict  (top-level orchestrator; see main() / CLI)
+
+CLI:
+    python tools/full_roundtrip_capstone.py --census-only \\
+        --dwg tests/fixtures/native_sample.dwg --out-dir runs/capstone/<ts>
+
+    python tools/full_roundtrip_capstone.py \\
+        --dwg tests/fixtures/native_sample.dwg --seed tests/fixtures/blank_seed.dwg \\
+        --out-dir runs/capstone/<ts> --kinds line,circle,arc --per-kind-limit 20
+"""
+from __future__ import annotations
+
+import argparse
+import hashlib
+import importlib
+import json
+import os
+import shutil
+import sys
+import time
+from collections import Counter, defaultdict
+from typing import Any, Callable, Dict, List, Optional, Set, Tuple
+
+_THIS_DIR = os.path.dirname(os.path.abspath(__file__))
+_ROUTER_HOME = os.path.dirname(_THIS_DIR)
+if _THIS_DIR not in sys.path:
+    sys.path.insert(0, _THIS_DIR)
+
+# Mission-cited path (D:\dev\_ariadne\alm\build\input.dwg) does not exist on
+# disk as of this build -- the live file at that location is input0616.dwg.
+# check_identity() is run explicitly (see main()) against native_sample.dwg
+# so this drift is recorded as data, never silently assumed.
+DEFAULT_DWG = os.path.join(_ROUTER_HOME, "tests", "fixtures", "native_sample.dwg")
+DEFAULT_COMPARE_PATH = r"D:\dev\_ariadne\alm\build\input0616.dwg"
+DEFAULT_SEED = os.path.join(_ROUTER_HOME, "tests", "fixtures", "blank_seed.dwg")
+
+
+# --------------------------------------------------------------------------- #
+# 0. sha256 / identity (pure, read-only)
+# --------------------------------------------------------------------------- #
+
+def sha256_file(path: Optional[str]) -> Optional[str]:
+    if not path or not os.path.isfile(path):
+        return None
+    h = hashlib.sha256()
+    with open(path, "rb") as fh:
+        for chunk in iter(lambda: fh.read(1 << 20), b""):
+            h.update(chunk)
+    return h.hexdigest()
+
+
+def check_identity(path_a: str, path_b: str) -> Dict[str, Any]:
+    """Byte-identity check between two DWG paths (e.g. the tracked test
+    fixture vs the workitem's production file) -- pure file hashing, no CAD
+    engine, no mutation of either path."""
+    sha_a = sha256_file(path_a)
+    sha_b = sha256_file(path_b)
+    return {
+        "path_a": path_a, "path_b": path_b,
+        "exists_a": bool(path_a and os.path.isfile(path_a)),
+        "exists_b": bool(path_b and os.path.isfile(path_b)),
+        "sha256_a": sha_a, "sha256_b": sha_b,
+        "identical": bool(sha_a) and bool(sha_b) and sha_a == sha_b,
+    }
+
+
+# --------------------------------------------------------------------------- #
+# 1. certified-class classification, re-derived live against
+#    ir_builder._NATIVE_CLASS_TO_DXF_KIND (as of ced3ee8) -- see build_log.md
+#    for the full derivation. (dxf_name, geometry.kind) is the real join key:
+#    dxf_name alone is not unique (POLYLINE covers legacy-2D/3D-polyline,
+#    polygon_mesh AND poly_face_mesh, only separated by "kind"; LEADER vs
+#    MULTILEADER share kind=="leader" but differ by dxf_name) -- this mirrors
+#    cad_diff._geometry_fingerprint's own (dxf_name, layer, geometry) tuple.
+# --------------------------------------------------------------------------- #
+
+CERTIFIED_BUCKETS: Dict[Tuple[str, str], str] = {
+    ("LINE", "line"): "line",
+    ("CIRCLE", "circle"): "circle",
+    ("ARC", "arc"): "arc",
+    ("ELLIPSE", "ellipse"): "ellipse",
+    ("SPLINE", "spline"): "spline",
+    ("LWPOLYLINE", "lwpolyline"): "lwpolyline",
+    # AcDb2dPolyline AND AcDb3dPolyline both normalize to dxf_name=POLYLINE,
+    # kind=polyline in ir_builder._NATIVE_CLASS_TO_DXF_KIND -- the IR itself
+    # cannot separate "polyline2d" from "polyline3d" (both wave certs land in
+    # this one census bucket; documented gap, not a miscount).
+    ("POLYLINE", "polyline"): "polyline2d_or_polyline3d",
+    ("POLYLINE", "polygon_mesh"): "polygonmesh",
+    ("POLYLINE", "poly_face_mesh"): "polyfacemesh",
+    ("TEXT", "text"): "text",
+    ("MTEXT", "mtext"): "mtext",
+    ("MLINE", "mline"): "mline",
+    ("LEADER", "leader"): "leader",
+    ("MULTILEADER", "leader"): "mleader",
+    # All 9 DIMENSION subtypes (rotated/aligned/radial/diametric/ordinate/
+    # arc/angular2line/angular3pt/radiallarge) normalize to ONE
+    # (dxf_name, kind) = (DIMENSION, dimension) pair -- not separable from
+    # geometry.kind alone (same caveat as polyline2d/3d above).
+    ("DIMENSION", "dimension"): "dimension_all_subtypes",
+    ("INSERT", "block_reference"): "insert",
+}
+
+CERTIFIED_KINDS: Set[str] = {kind for (_dxf, kind) in CERTIFIED_BUCKETS}
+
+# Known-but-not-certified native classes -> why, for the census's out-of-class
+# reason column. Anything ir_builder itself cannot decode (kind=="unsupported")
+# is "unmapped_native_class" instead -- a distinct, more severe gap.
+_OUT_OF_CLASS_REASON_BY_DXF: Dict[str, str] = {
+    "HATCH": "attended_or_read_pending (a1-hatchread wave in progress)",
+    "ATTDEF": "in_progress (p3-insattr wave: block def_entities ATTDEF)",
+    "ATTRIB": "in_progress (p3-insattr wave: INSERT-attached ATTRIB)",
+    "3DSOLID": "asm_solids_pending (Wave-S / s0-asmprobe)",
+    "REGION": "asm_solids_pending (Wave-S / s0-asmprobe)",
+    "VIEWPORT": "no_wave_assignment_as_of_ced3ee8",
+    "POINT": "no_wave_assignment_as_of_ced3ee8",
+    "SOLID": "no_wave_assignment_as_of_ced3ee8",
+}
+
+
+def classify_entity_bucket(dxf_name: str, kind: str) -> str:
+    """CERTIFIED_BUCKETS label, or an out-of-class reason string. Never
+    raises. An unrecognized pair is "recognized_not_certified" (kind !=
+    "unsupported", i.e. ir_builder DID decode it, just not into a certified
+    bucket) or "unmapped_native_class" (ir_builder's own
+    _NATIVE_CLASS_TO_DXF_KIND has no entry for this native class at all)."""
+    label = CERTIFIED_BUCKETS.get((dxf_name, kind))
+    if label is not None:
+        return label
+    if kind == "unsupported":
+        return "unmapped_native_class"
+    return _OUT_OF_CLASS_REASON_BY_DXF.get(dxf_name, "recognized_not_certified")
+
+
+# --------------------------------------------------------------------------- #
+# 2. census (pure -- operates on an already-loaded dwg_graph_ir.v1 dict)
+# --------------------------------------------------------------------------- #
+
+def census_report(ir: Dict[str, Any]) -> Dict[str, Any]:
+    """Full per-(dxf_name, kind) breakdown of an IR's top-level modelspace
+    entities, cross-tabulated into certified vs out-of-class (with reasons),
+    plus a block-definitions census and a symbol-tables record census."""
+    entities = [e for e in (ir.get("entities") or []) if isinstance(e, dict)]
+    by_bucket: Counter = Counter()
+    for e in entities:
+        dxf = e.get("dxf_name", "") or ""
+        kind = (e.get("geometry") or {}).get("kind", "") or ""
+        by_bucket[(dxf, kind)] += 1
+
+    rows = []
+    certified_total = 0
+    out_of_class_total = 0
+    for (dxf, kind), count in sorted(by_bucket.items(), key=lambda kv: (-kv[1], kv[0])):
+        is_certified = (dxf, kind) in CERTIFIED_BUCKETS
+        rows.append({
+            "dxf_name": dxf, "kind": kind, "count": count,
+            "certified": is_certified,
+            "label": classify_entity_bucket(dxf, kind),
+        })
+        if is_certified:
+            certified_total += count
+        else:
+            out_of_class_total += count
+
+    # Block-def contents census: nested (block_definitions[].entities), NOT
+    # part of the modelspace multiset the regen/diff steps operate over.
+    block_defs = ir.get("block_definitions") or []
+    block_def_entity_total = 0
+    block_def_by_bucket: Counter = Counter()
+    for bd in block_defs:
+        if not isinstance(bd, dict):
+            continue
+        bd_entities = bd.get("entities")
+        if bd_entities is None:
+            bd_entities = bd.get("def_entities") or []
+        for e in bd_entities:
+            if not isinstance(e, dict):
+                continue
+            block_def_entity_total += 1
+            dxf = e.get("dxf_name", "") or ""
+            kind = (e.get("geometry") or {}).get("kind", "") or ""
+            block_def_by_bucket[(dxf, kind)] += 1
+
+    symbol_tables = ir.get("symbol_tables") or {}
+    symbol_table_counts = {
+        k: (len(v) if isinstance(v, list) else None) for k, v in symbol_tables.items()
+    }
+
+    return {
+        "modelspace_entity_total": len(entities),
+        "certified_total": certified_total,
+        "out_of_class_total": out_of_class_total,
+        "by_bucket": rows,
+        "block_definitions_count": len(block_defs),
+        "block_definitions_entity_total": block_def_entity_total,
+        "block_definitions_by_bucket": [
+            {"dxf_name": d, "kind": k, "count": c}
+            for (d, k), c in sorted(block_def_by_bucket.items(), key=lambda kv: (-kv[1], kv[0]))
+        ],
+        "symbol_tables_present": sorted(symbol_tables.keys()),
+        "symbol_table_record_counts": symbol_table_counts,
+        "diagnostics_entities_by_type": (ir.get("diagnostics") or {}).get("entities_by_type"),
+    }
+
+
+def filter_ir_to_certified(ir: Dict[str, Any], *, kinds: Optional[Set[str]] = None,
+                           limit: Optional[int] = None,
+                           per_kind_limit: Optional[int] = None) -> Dict[str, Any]:
+    """A shallow copy of ``ir`` whose entities[] is restricted to certified
+    (dxf_name, kind) buckets (optionally narrowed further by ``kinds``), with
+    an optional global ``limit`` and/or ``per_kind_limit`` -- the capstone's
+    "per-kind batches" / "largest feasible assembled subset" knobs. Never
+    mutates the input IR; iteration order (and therefore which entities get
+    dropped once a limit is hit) follows the input entities[] order."""
+    allowed_kinds = CERTIFIED_KINDS if kinds is None else (CERTIFIED_KINDS & set(kinds))
+    out_entities: List[Dict[str, Any]] = []
+    per_kind_seen: Dict[str, int] = defaultdict(int)
+    for e in (ir.get("entities") or []):
+        if not isinstance(e, dict):
+            continue
+        dxf = e.get("dxf_name", "") or ""
+        kind = (e.get("geometry") or {}).get("kind", "") or ""
+        if (dxf, kind) not in CERTIFIED_BUCKETS or kind not in allowed_kinds:
+            continue
+        if per_kind_limit is not None and per_kind_seen[kind] >= per_kind_limit:
+            continue
+        out_entities.append(e)
+        per_kind_seen[kind] += 1
+        if limit is not None and len(out_entities) >= limit:
+            break
+    filtered = dict(ir)
+    filtered["entities"] = out_entities
+    return filtered
+
+
+# --------------------------------------------------------------------------- #
+# 3. layer / dimstyle record regen + record-diff (reuses op_roundtrip_probe's
+#    EXISTING LAYER_RECORD_FIELDS/layer_record_diff and its documented
+#    DIMSTYLE_RECORD_FIELDS/dimstyle_record_diff sibling -- never
+#    reimplemented here; this module only builds op ARGS from a census
+#    record and drives the diff function the wave already certified with).
+# --------------------------------------------------------------------------- #
+
+# Fallback field lists used only if op_roundtrip_probe's own DIMSTYLE
+# constant isn't present under this exact name in a given checkout --
+# mirrors patch_ops.tables._DIMSTYLE_PASSTHROUGH_FIELDS/_DIMSTYLE_FLAG_FIELDS
+# so this module degrades gracefully instead of raising AttributeError.
+_DIMSTYLE_FIELDS_FALLBACK = ("dimtxt", "dimasz", "dimexe", "dimexo", "dimdec",
+                            "dimscale", "dimclrd", "dimclre", "dimclrt", "dimse1")
+
+
+def layer_op_args_from_record(record: Dict[str, Any], op_roundtrip_probe_mod) -> Dict[str, Any]:
+    """create_layer op args that replicate one census-extracted
+    symbol_tables.layers[] record (name + every LAYER_RECORD_FIELDS key
+    present on the record)."""
+    args: Dict[str, Any] = {"name": record.get("name")}
+    for k in op_roundtrip_probe_mod.LAYER_RECORD_FIELDS:
+        if k in record:
+            args[k] = record[k]
+    return args
+
+
+def dimstyle_op_args_from_record(record: Dict[str, Any], op_roundtrip_probe_mod) -> Dict[str, Any]:
+    """create_dimstyle op args that replicate one census-extracted dimstyle
+    record (name + every DIMSTYLE_RECORD_FIELDS key present on the record)."""
+    fields = getattr(op_roundtrip_probe_mod, "DIMSTYLE_RECORD_FIELDS", _DIMSTYLE_FIELDS_FALLBACK)
+    args: Dict[str, Any] = {"name": record.get("name")}
+    for k in fields:
+        if k in record:
+            args[k] = record[k]
+    return args
+
+
+def record_diff_report(label: str, records: List[Dict[str, Any]], actual_ir: Dict[str, Any], *,
+                       table_key: str, fields: Tuple[str, ...],
+                       diff_fn: Callable[[Dict[str, Any], Optional[Dict[str, Any]]], List[str]]
+                       ) -> Dict[str, Any]:
+    """Per-record diff of ``records`` (the census's OWN extracted rows, taken
+    as ground truth -- what regen was asked to reproduce) against
+    ``actual_ir.symbol_tables[table_key]`` (re-extracted after regen),
+    joined by name (the table's own unique key, never a handle). Mirrors
+    op_roundtrip_probe.probe_layer_roundtrip's record-diff shape, generalized
+    over the join field set."""
+    actual_by_name = {
+        r.get("name"): r for r in ((actual_ir.get("symbol_tables") or {}).get(table_key) or [])
+        if isinstance(r, dict)
+    }
+    rows = []
+    zero_diff_count = 0
+    for rec in records:
+        name = rec.get("name")
+        expected = {k: rec[k] for k in fields if k in rec}
+        actual = actual_by_name.get(name)
+        diff = diff_fn(expected, actual)
+        if not diff:
+            zero_diff_count += 1
+        rows.append({"name": name, "expected": expected, "actual": actual, "record_diff": diff})
+    return {
+        "label": label, "table_key": table_key,
+        "record_count": len(records), "zero_diff_count": zero_diff_count,
+        "rows": rows,
+    }
+
+
+# --------------------------------------------------------------------------- #
+# 4. handle-independent per-kind verdict -- rolls up cad_diff.compute_diff's
+#    OWN comparison_basis="geometry" output; does not reimplement its
+#    (dxf_name, layer, geometry) fingerprint/tolerance matching.
+# --------------------------------------------------------------------------- #
+
+def per_kind_verdict(pre_ir: Dict[str, Any], diff: Dict[str, Any]) -> Dict[str, Any]:
+    """Per-dxf_name regen verdict from a comparison_basis="geometry" diff
+    between ``pre_ir`` (the filtered ORIGINAL production drawing's subset
+    regen was asked to reproduce) and the regenerated-then-re-extracted
+    ``post_ir`` that diff was computed against.
+
+    diff0_count ("unchanged" -- matched byte-exact or within tolerance, see
+    cad_diff._compute_diff_geometry_basis tiers 1/1.5) is derived as
+    pre_count[dxf] - modified[dxf] - removed[dxf]: compute_diff's own
+    summary.by_type tracks only added/removed/modified per type (not
+    unchanged), so this is arithmetic on ITS OWN counts, not a re-derivation
+    of the match itself.
+    """
+    pre_counts: Counter = Counter(
+        e.get("dxf_name", "") or "" for e in (pre_ir.get("entities") or []) if isinstance(e, dict))
+    by_type = (diff.get("summary") or {}).get("by_type") or {}
+    changed = diff.get("changed_handles") or []
+
+    examples: Dict[str, Dict[str, List[Dict[str, Any]]]] = defaultdict(lambda: defaultdict(list))
+    for rec in changed:
+        dxf = rec.get("dxf_name", "") or ""
+        bucket = examples[dxf][rec.get("change", "")]
+        if len(bucket) < 3:
+            bucket.append(rec)
+
+    rows = []
+    for dxf in sorted(set(pre_counts) | set(by_type)):
+        pre_count = pre_counts.get(dxf, 0)
+        t = by_type.get(dxf, {})
+        added, removed, modified = t.get("added", 0), t.get("removed", 0), t.get("modified", 0)
+        rows.append({
+            "dxf_name": dxf,
+            "regen_attempted_count": pre_count,
+            "diff0_count": pre_count - modified - removed,
+            "modified_count": modified,
+            "removed_count": removed,  # in pre (original), no post (regen) match -> real miss
+            "added_count": added,      # in post (regen), no pre (original) match -> unexpected extra
+            "examples": {ch: examples[dxf][ch] for ch in ("removed", "modified", "added")
+                        if examples[dxf].get(ch)},
+        })
+    totals = {
+        k: sum(r[k] for r in rows)
+        for k in ("regen_attempted_count", "diff0_count", "modified_count", "removed_count", "added_count")
+    }
+    return {
+        "comparison_basis": (diff.get("diagnostics") or {}).get("comparison_basis"),
+        "rows": rows,
+        "totals": totals,
+    }
+
+
+def resolvable_ops_report(patch: Dict[str, Any], patch_ops_mod=None) -> Dict[str, Any]:
+    """For a built cad_patch.v1, split its operations into those whose
+    "operation" id has a live entry in patch_ops.NATIVE_WRITE_OP_MAP
+    (patch_engine would actually apply them) vs those that do not.
+
+    patch_engine.apply_staged's own _resolve_native_write_ops silently
+    buckets an unresolvable op into ITS OWN deferred_ops -- catching that
+    HERE, before spending an accoreconsole launch, is free and prevents
+    miscounting "ops ir_to_patch built" as "ops that can possibly apply"
+    (e.g. blocks.py's ir_op_for emits an "insert_block" operation id that no
+    family's WRITE_OP_MAP maps to any native handler -- entities.py's own
+    wired path is "create_blockref" -> "write.entity.blockref", which
+    ir_to_patch never emits -- so every block_reference entity ir_to_patch
+    "builds an op for" is unresolvable today; see build_log.md)."""
+    patch_ops_mod = patch_ops_mod or importlib.import_module("patch_ops")
+    live_map = patch_ops_mod.NATIVE_WRITE_OP_MAP
+    resolvable, unresolvable = [], []
+    for op in patch.get("operations") or []:
+        (resolvable if op.get("operation") in live_map else unresolvable).append(op)
+    return {
+        "resolvable_count": len(resolvable),
+        "unresolvable_count": len(unresolvable),
+        "unresolvable_op_ids": sorted({op.get("operation") for op in unresolvable}),
+    }
+
+
+# --------------------------------------------------------------------------- #
+# 5. live orchestration -- needs a real AutoCAD runtime. Every function above
+#    this line is pure and independently unit-testable without one.
+# --------------------------------------------------------------------------- #
+
+def run_census(staged_path: str, original_path: str, run_dir: str, *,
+               run_job_mod=None, ir_builder_mod=None, patch_engine_mod=None) -> Dict[str, Any]:
+    """inspect.database.graph on ``staged_path`` -> a native_full IR, reusing
+    patch_engine._native_full_ir (the SAME helper apply_staged's own pre/
+    post-inspect steps use), so census IRs are shaped identically to regen's
+    pre/post IRs (same source_meta/diagnostics conventions)."""
+    run_job_mod = run_job_mod or importlib.import_module("run_job")
+    ir_builder_mod = ir_builder_mod or importlib.import_module("ir_builder")
+    patch_engine_mod = patch_engine_mod or importlib.import_module("patch_engine")
+    run_res = run_job_mod.run_router_cad_job(
+        staged_path, run_dir, "inspect.database.graph", write_mode="read")
+    ir_path = os.path.join(run_dir, "dwg_graph_ir.json")
+    return patch_engine_mod._native_full_ir(
+        ir_builder_mod, run_res, staged_path, original_path, ir_path, "census")
+
+
+def run_regen_batch(filtered_ir: Dict[str, Any], blank_seed_path: str, run_dir: str,
+                    patch_id: str, *, ir_to_patch_mod=None, patch_engine_mod=None
+                    ) -> Dict[str, Any]:
+    """Build ONE cad_patch.v1 from ``filtered_ir`` (via the existing, unedited
+    ir_to_patch.build_patch_from_ir) and apply it in ONE patch_engine.
+    apply_staged call against a copy of ``blank_seed_path``.
+
+    "Batch the ops" means one staged-write session carrying every op in this
+    filtered_ir, not one apply_staged call per entity -- patch_engine still
+    launches one accoreconsole invocation PER OP internally (chaining each
+    op's mutated staged copy into the next), so op_count is the real
+    throughput unit; see the elapsed/seconds_per_op fields and build_log.md's
+    throughput section for the measured floor and full-scale extrapolation.
+    """
+    ir_to_patch_mod = ir_to_patch_mod or importlib.import_module("ir_to_patch")
+    patch_engine_mod = patch_engine_mod or importlib.import_module("patch_engine")
+    target_dwg = {
+        "original_path": os.path.abspath(blank_seed_path),
+        "staged_path": os.path.join(run_dir, "staged_input.dwg"),
+    }
+    patch, deferred = ir_to_patch_mod.build_patch_from_ir(filtered_ir, target_dwg, patch_id)
+    ops_report = resolvable_ops_report(patch)
+    t0 = time.time()
+    result = patch_engine_mod.apply_staged(patch, blank_seed_path, run_dir)
+    elapsed = time.time() - t0
+    op_count = len(patch.get("operations") or [])
+    return {
+        "patch": patch, "deferred": deferred, "resolvable_ops": ops_report,
+        "apply_result": result, "op_count": op_count, "elapsed_seconds": elapsed,
+        "seconds_per_op": (elapsed / op_count) if op_count else None,
+    }
+
+
+def pre_ir_path(run_dir: str) -> str:
+    """apply_staged's own stable output layout for the pre-mutation IR
+    (patch_engine.py apply_staged step 5: pre_dir = out_dir/pre,
+    pre_ir_path = pre_dir/dwg_graph_ir.json)."""
+    return os.path.join(run_dir, "pre", "dwg_graph_ir.json")
+
+
+def post_ir_path(run_dir: str) -> str:
+    """apply_staged's own stable output layout for the post-mutation IR
+    (patch_engine.py apply_staged step 7: post_dir = out_dir/post,
+    post_ir_path = post_dir/dwg_graph_ir.json) -- kept as one named
+    function so this convention is declared once, not re-typed at each
+    call site."""
+    return os.path.join(run_dir, "post", "dwg_graph_ir.json")
+
+
+def isolate_regenerated_entities(pre_ir: Dict[str, Any], post_ir: Dict[str, Any], *,
+                                 op_roundtrip_probe_mod=None, cad_diff_mod=None) -> Dict[str, Any]:
+    """The IR-shaped subset of ``post_ir`` whose handle is NEW relative to
+    ``pre_ir`` -- reuses op_roundtrip_probe.added_entities_ir (a handle-basis
+    diff, already exercised by every WAVE cert's own P-gate) so the regen
+    target does NOT need to be a blank seed: this isolates exactly what THIS
+    batch created even when regenerating directly onto a staged copy of the
+    full production drawing (pre_ir already has 21,747 entities; only the
+    NEW handles this batch's ops produced are returned). If the target
+    happens to be genuinely blank, pre_ir has 0 entities and every post_ir
+    entity is trivially "new" -- the same call is correct in both cases."""
+    op_roundtrip_probe_mod = op_roundtrip_probe_mod or importlib.import_module("op_roundtrip_probe")
+    return op_roundtrip_probe_mod.added_entities_ir(pre_ir, post_ir, cad_diff_mod=cad_diff_mod)
+
+
+def ensure_blank_seed(seed_path: str, run_dir: str, *, mint_blank_seed_mod=None) -> Dict[str, Any]:
+    """Mint ``seed_path`` via tools/mint_blank_seed.py if it does not already
+    exist locally (the .dwg is a generated/gitignored artifact -- a fresh
+    ``git worktree add`` never checks it out, unlike the tracked
+    tools/mint_blank_seed.py script that produces it).
+
+    OPTIONAL: a truly-blank seed gives the cleanest regen target, but
+    isolate_regenerated_entities() (handle-basis added_entities_ir) makes a
+    non-blank target (e.g. the production drawing's own staged copy) an
+    equally valid regen target -- see resolve_regen_target(). This function
+    is only called when the caller explicitly asked for a blank seed and one
+    is not already present."""
+    if os.path.isfile(seed_path):
+        return {"minted": False, "seed_path": seed_path, "reason": "already present"}
+    mint_blank_seed_mod = mint_blank_seed_mod or importlib.import_module("mint_blank_seed")
+    mint_run_dir = os.path.join(run_dir, "mint_blank_seed")
+    result = mint_blank_seed_mod.mint_blank_seed(
+        template=None, output=__import__("pathlib").Path(seed_path),
+        run_dir=__import__("pathlib").Path(mint_run_dir))
+    return {"minted": True, "seed_path": seed_path, "mint_result": result}
+
+
+def resolve_regen_target(seed_path: Optional[str], fallback_dwg: str) -> Dict[str, Any]:
+    """Pick the DWG apply_staged should stage-and-mutate: ``seed_path`` if it
+    already exists on disk (a genuinely blank seed -- the cleanest target,
+    no isolation math needed since pre_ir is empty by construction), else
+    ``fallback_dwg`` (e.g. the production drawing itself -- safe because
+    isolate_regenerated_entities() isolates NEW handles regardless of how
+    much pre-existing content the target already has). Never mints; see
+    ensure_blank_seed for that (a separate, explicit opt-in)."""
+    if seed_path and os.path.isfile(seed_path):
+        return {"target": seed_path, "used_blank_seed": True}
+    return {"target": fallback_dwg, "used_blank_seed": False,
+           "reason": "no blank seed on disk; regenerating onto the source drawing's own "
+                    "staged copy and isolating new handles instead (isolate_regenerated_entities)"}
+
+
+# --------------------------------------------------------------------------- #
+# 6. CLI
+# --------------------------------------------------------------------------- #
+
+def _write_json(path: str, obj: Any) -> str:
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+    with open(path, "w", encoding="utf-8") as fh:
+        json.dump(obj, fh, ensure_ascii=False, indent=2, default=str)
+    return path
+
+
+def main(argv=None) -> int:
+    ap = argparse.ArgumentParser(
+        description="full_roundtrip_capstone: full-drawing extract -> regen "
+                    "(certified classes) -> re-extract -> handle-independent "
+                    "multiset diff, on the real lane-A production drawing.")
+    ap.add_argument("--dwg", default=DEFAULT_DWG, help="source DWG (read-only; staged internally)")
+    ap.add_argument("--compare-path", default=DEFAULT_COMPARE_PATH,
+                   help="workitem production file to identity-check --dwg against")
+    ap.add_argument("--skip-identity", action="store_true")
+    ap.add_argument("--seed", default=DEFAULT_SEED,
+                   help="blank-seed target DWG if present on disk (OPTIONAL -- falls back to "
+                        "regenerating onto --dwg's own staged copy + isolating new handles "
+                        "when absent; see resolve_regen_target/isolate_regenerated_entities)")
+    ap.add_argument("--mint-seed-if-missing", action="store_true",
+                   help="attempt tools/mint_blank_seed.py if --seed is absent, instead of "
+                        "falling back to --dwg as the regen target")
+    ap.add_argument("--out-dir", required=True, help="run output directory")
+    ap.add_argument("--census-only", action="store_true", help="stop after the census; no regen/diff")
+    ap.add_argument("--kinds", default=None, help="comma-separated geometry.kind allowlist for regen")
+    ap.add_argument("--limit", type=int, default=None, help="global op cap for this batch")
+    ap.add_argument("--per-kind-limit", type=int, default=None, help="per-kind op cap for this batch")
+    ap.add_argument("--with-records", action="store_true",
+                   help="also regen+record-diff layer/dimstyle tables (stretch)")
+    args = ap.parse_args(argv)
+
+    out_dir = os.path.abspath(args.out_dir)
+    os.makedirs(out_dir, exist_ok=True)
+    summary: Dict[str, Any] = {"out_dir": out_dir}
+
+    if not args.skip_identity:
+        identity = check_identity(args.dwg, args.compare_path)
+        summary["identity"] = identity
+        _write_json(os.path.join(out_dir, "identity.json"), identity)
+
+    patch_engine_mod = importlib.import_module("patch_engine")
+    staged = patch_engine_mod.create_staged_copy(args.dwg, os.path.join(out_dir, "census_stage"))
+    summary["staged"] = staged
+    if not staged.get("ok"):
+        summary["status"] = "blocked"
+        summary["reason"] = staged.get("reason")
+        _write_json(os.path.join(out_dir, "summary.json"), summary)
+        print(json.dumps(summary, ensure_ascii=False, indent=2, default=str))
+        return 2
+
+    census = run_census(staged["staged_path"], staged["original_path"],
+                        os.path.join(out_dir, "census"))
+    summary["census_ok"] = census.get("ok")
+    if not census.get("ok"):
+        summary["status"] = "partial"
+        summary["reason"] = census.get("reason")
+        _write_json(os.path.join(out_dir, "summary.json"), summary)
+        print(json.dumps(summary, ensure_ascii=False, indent=2, default=str))
+        return 2
+
+    census_ir = json.load(open(census["ir_path"], encoding="utf-8-sig"))
+    report = census_report(census_ir)
+    summary["census_report"] = report
+    _write_json(os.path.join(out_dir, "census_report.json"), report)
+
+    original_sha_after_census = sha256_file(args.dwg)
+    summary["original_unchanged_after_census"] = (
+        original_sha_after_census == (summary.get("identity") or {}).get("sha256_a")
+        if not args.skip_identity else None)
+
+    if args.census_only:
+        summary["status"] = "ok"
+        _write_json(os.path.join(out_dir, "summary.json"), summary)
+        print(json.dumps({k: v for k, v in summary.items() if k != "census_report"},
+                         ensure_ascii=False, indent=2, default=str))
+        return 0
+
+    kinds = set(args.kinds.split(",")) if args.kinds else None
+    filtered = filter_ir_to_certified(census_ir, kinds=kinds, limit=args.limit,
+                                      per_kind_limit=args.per_kind_limit)
+    summary["filtered_entity_count"] = len(filtered.get("entities") or [])
+
+    if args.mint_seed_if_missing and not os.path.isfile(args.seed):
+        seed_status = ensure_blank_seed(args.seed, out_dir)
+        summary["seed_status"] = {k: v for k, v in seed_status.items() if k != "mint_result"}
+        summary["mint_result"] = seed_status.get("mint_result")
+    regen_target = resolve_regen_target(args.seed, args.dwg)
+    summary["regen_target"] = regen_target
+
+    regen_dir = os.path.join(out_dir, "regen")
+    batch = run_regen_batch(filtered, regen_target["target"], regen_dir, "full_roundtrip_capstone/batch")
+    summary["regen"] = {
+        "op_count": batch["op_count"], "deferred_count": len(batch["deferred"]),
+        "resolvable_ops": batch["resolvable_ops"],
+        "elapsed_seconds": batch["elapsed_seconds"], "seconds_per_op": batch["seconds_per_op"],
+        "apply_status": (batch["apply_result"] or {}).get("status"),
+        "apply_reason": (batch["apply_result"] or {}).get("reason"),
+    }
+    _write_json(os.path.join(out_dir, "regen_summary.json"), summary["regen"])
+    _write_json(os.path.join(out_dir, "deferred.json"), batch["deferred"])
+
+    pre_path, post_path = pre_ir_path(regen_dir), post_ir_path(regen_dir)
+    if os.path.isfile(pre_path) and os.path.isfile(post_path):
+        cad_diff_mod = importlib.import_module("cad_diff")
+        pre_ir = json.load(open(pre_path, encoding="utf-8-sig"))
+        post_ir = json.load(open(post_path, encoding="utf-8-sig"))
+        # Isolate what THIS batch actually created (handle-basis) before the
+        # geometry-basis multiset compare -- required whenever regen_target
+        # is not a blank seed (its pre_ir already carries the full drawing),
+        # and harmless (a no-op re-listing) when it is.
+        regenerated_ir = isolate_regenerated_entities(pre_ir, post_ir, cad_diff_mod=cad_diff_mod)
+        _write_json(os.path.join(out_dir, "regenerated_only_ir.json"), regenerated_ir)
+        diff = cad_diff_mod.compute_diff(filtered, regenerated_ir, comparison_basis="geometry",
+                                         diff_scope="modelspace_entities_only")
+        _write_json(os.path.join(out_dir, "geometry_diff.json"), diff)
+        verdict = per_kind_verdict(filtered, diff)
+        summary["verdict"] = verdict
+        _write_json(os.path.join(out_dir, "verdict.json"), verdict)
+    else:
+        summary["verdict"] = None
+        summary["verdict_skipped_reason"] = (
+            "missing pre/post IR (pre=%s post=%s) -- apply_staged did not reach post-inspect"
+            % (os.path.isfile(pre_path), os.path.isfile(post_path)))
+
+    if args.with_records:
+        op_roundtrip_probe_mod = importlib.import_module("op_roundtrip_probe")
+        layers = (census_ir.get("symbol_tables") or {}).get("layers") or []
+        layer_report = record_diff_report(
+            "layer", [r for r in layers if isinstance(r, dict)], census_ir,
+            table_key="layers", fields=op_roundtrip_probe_mod.LAYER_RECORD_FIELDS,
+            diff_fn=op_roundtrip_probe_mod.layer_record_diff)
+        summary["layer_record_report_note"] = (
+            "computed against census_ir itself as a self-check placeholder; "
+            "a true post-regen record-diff needs layer/dimstyle ops folded "
+            "into the SAME (or a follow-up) apply_staged batch -- see "
+            "build_log.md for why this stayed a stretch item this run.")
+        _write_json(os.path.join(out_dir, "layer_record_report.json"), layer_report)
+
+    summary["status"] = "ok"
+    _write_json(os.path.join(out_dir, "summary.json"), summary)
+    print(json.dumps({k: v for k, v in summary.items()
+                      if k not in ("census_report",)}, ensure_ascii=False, indent=2, default=str))
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())
