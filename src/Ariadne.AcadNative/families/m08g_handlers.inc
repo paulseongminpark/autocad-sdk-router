@@ -1117,17 +1117,42 @@ static bool m08gDispatch(const std::string& op, const AriadneJobCtx& ctx, std::o
             verts.append(AcGePoint2d(0.0, 0.0)); verts.append(AcGePoint2d(1.0, 0.0)); verts.append(AcGePoint2d(1.0, 1.0)); verts.append(AcGePoint2d(0.0, 1.0));
         }
         AcGeDoubleArray bulges; for (int i = 0; i < verts.length(); ++i) bulges.append(0.0);
+        // BUGFIX (a0-engineprep): the original code built the WHOLE mpolygon
+        // (setPattern/appendMPolygonLoop/evaluateHatch/balanceDisplay) on a
+        // bare, ownerless new()'d AcDbMPolygon* and only appended it to model
+        // space (m08gAppendEntity) at the very end -- appendMPolygonLoop
+        // live-probed to eNoClassId (409, C:\ObjectARX 2027\inc\acadstrc.h):
+        // AcDbMPolygon's boundary/loop-management engine (AcMPolygonObj)
+        // needs the entity to already be database-resident before it can
+        // register loop geometry against it. AcDb3dPolyline and
+        // AcDbPolyFaceMesh (this same file, above) already establish the
+        // correct convention for this class of entity -- append the empty
+        // shell FIRST, THEN populate it -- mirrored here verbatim.
+        if (!layer.empty()) { bool c = false; ensureLayer(pDb, layer, 7, c); }
+        AcDbBlockTable* pBT = nullptr;
+        Acad::ErrorStatus es = pDb->getBlockTable(pBT, AcDb::kForRead);
+        if (es != Acad::eOk) { emitNativeError(r, "DB_ERROR", "getBlockTable"); return true; }
+        AcDbBlockTableRecord* pMS = nullptr;
+        es = pBT->getAt(ACDB_MODEL_SPACE, pMS, AcDb::kForWrite);
+        pBT->close();
+        if (es != Acad::eOk) { emitNativeError(r, "DB_ERROR", "getAt modelspace"); return true; }
         AcDbMPolygon* pE = new AcDbMPolygon();
         pE->setDatabaseDefaults(pDb);
-        pE->setNormal(AcGeVector3d(0.0, 0.0, 1.0));
-        pE->setElevation(0.0);
-        Acad::ErrorStatus es = pE->setPattern(AcDbHatch::kPreDefined, L"SOLID");
+        if (!layer.empty()) pE->setLayer(asciiToWide(layer).c_str());
+        AcDbObjectId id;
+        es = pMS->appendAcDbEntity(id, pE);
+        pMS->close();
+        if (es != Acad::eOk) { delete pE; emitNativeError(r, "APPEND_FAILED", "appendAcDbEntity mpolygon errorstatus " + std::to_string(static_cast<int>(es))); return true; }
+        es = pE->setNormal(AcGeVector3d(0.0, 0.0, 1.0));
+        if (es == Acad::eOk) es = pE->setElevation(0.0);
+        if (es == Acad::eOk) es = pE->setPattern(AcDbHatch::kPreDefined, L"SOLID");
         if (es == Acad::eOk) es = pE->appendMPolygonLoop(verts, bulges, true);
         if (es == Acad::eOk) es = pE->evaluateHatch();
         if (es == Acad::eOk) es = pE->balanceDisplay();
-        if (es != Acad::eOk) { delete pE; emitNativeError(r, "MPOLYGON_BUILD_FAILED", "AcDbMPolygon build errorstatus " + std::to_string(static_cast<int>(es))); return true; }
-        AcDbObjectId id; int ms = 0; es = m08gAppendEntity(pDb, layer, pE, id, ms);
-        m08gEmitModelerCreate(r, "AcDbMPolygon", es, id, layer, ms);
+        pE->close();
+        int probes = 0, ms = 0; countModelSpace(pDb, ms, probes);
+        if (es != Acad::eOk) { emitNativeError(r, "MPOLYGON_BUILD_FAILED", "AcDbMPolygon build errorstatus " + std::to_string(static_cast<int>(es))); return true; }
+        m08gEmitModelerCreate(r, "AcDbMPolygon", Acad::eOk, id, layer, ms);
         return true;
     }
     if (op == "write.entity.rasterimage") {
