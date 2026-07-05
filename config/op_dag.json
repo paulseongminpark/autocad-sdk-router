@@ -12,11 +12,11 @@
     "acceptance_test_id": "registry tests[0] (current best-evidence test ref; F3's future per-op W+D roundtrip gate is not built in this tree yet)"
   },
   "totals": {
-    "catalogue_count": 522,
-    "node_count": 522,
-    "edge_count": 1175,
+    "catalogue_count": 525,
+    "node_count": 525,
+    "edge_count": 1202,
     "by_persistence_class": {
-      "D": 51,
+      "D": 54,
       "L": 35,
       "NON_GOAL": 60,
       "P": 57,
@@ -8637,6 +8637,72 @@
         "tools/patch_ops/tables.py"
       ],
       "acceptance_test_id": "tools/op_roundtrip_probe.py::probe_textstyle_roundtrip",
+      "persistence_class": "D"
+    },
+    {
+      "op_id": "write.ucs.create",
+      "predecessors": [
+        "acdb.database.create",
+        "inspect.dictionary.get",
+        "inspect.dictionary.named_objects",
+        "inspect.entity.get_xdata",
+        "inspect.object.ext_dict",
+        "inspect.symboltable.block",
+        "inspect.symboltable.layers",
+        "inspect.xrecord.get",
+        "transform.database.wblock"
+      ],
+      "arg_keys": [],
+      "target_files": [
+        "tools/op_roundtrip_probe.py",
+        "tools/patch_engine.py",
+        "tools/patch_ops/tables.py"
+      ],
+      "acceptance_test_id": "tools/op_roundtrip_probe.py::probe_ucs_roundtrip",
+      "persistence_class": "D"
+    },
+    {
+      "op_id": "write.view.create",
+      "predecessors": [
+        "acdb.database.create",
+        "inspect.dictionary.get",
+        "inspect.dictionary.named_objects",
+        "inspect.entity.get_xdata",
+        "inspect.object.ext_dict",
+        "inspect.symboltable.block",
+        "inspect.symboltable.layers",
+        "inspect.xrecord.get",
+        "transform.database.wblock"
+      ],
+      "arg_keys": [],
+      "target_files": [
+        "tools/op_roundtrip_probe.py",
+        "tools/patch_engine.py",
+        "tools/patch_ops/tables.py"
+      ],
+      "acceptance_test_id": "tools/op_roundtrip_probe.py::probe_view_roundtrip",
+      "persistence_class": "D"
+    },
+    {
+      "op_id": "write.vport.create",
+      "predecessors": [
+        "acdb.database.create",
+        "inspect.dictionary.get",
+        "inspect.dictionary.named_objects",
+        "inspect.entity.get_xdata",
+        "inspect.object.ext_dict",
+        "inspect.symboltable.block",
+        "inspect.symboltable.layers",
+        "inspect.xrecord.get",
+        "transform.database.wblock"
+      ],
+      "arg_keys": [],
+      "target_files": [
+        "tools/op_roundtrip_probe.py",
+        "tools/patch_engine.py",
+        "tools/patch_ops/tables.py"
+      ],
+      "acceptance_test_id": "tools/op_roundtrip_probe.py::probe_vport_roundtrip",
       "persistence_class": "D"
     },
     {

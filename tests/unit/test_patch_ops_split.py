@@ -149,6 +149,29 @@ tools/patch_ops/tables.py's module docstring for the exact set and the
 unwritten-DIMVAR gap). Oracle extended accordingly; same invariants
 unaffected.
 
+p9-tables2 update: create_ucs (write.ucs.create, AcDbUCSTableRecord) gains
+its first-ever patch_ops wiring -- another brand-new op, same shape as
+w3-dimstyle's addition above. Mirrors create_layer/create_dimstyle's upsert
+contract for the UCS symbol table (origin/x_axis/y_axis -- AcDbUCSTable
+Record's FULL settable surface, a small complete class unlike DIMSTYLE's
+partial DIMVAR subset). Oracle extended accordingly; same invariants
+unaffected.
+
+p9-tables2 update (VIEW): create_view (write.view.create, AcDbViewTable
+Record) gains its first-ever patch_ops wiring -- a third brand-new op.
+Mirrors the upsert contract for the VIEW symbol table's representative
+"camera" property subset (center/height/width/target/view_direction/twist/
+lens_length/perspective/front-back clip). Oracle extended accordingly; same
+invariants unaffected.
+
+p9-tables2 update (VPORT): create_vport (write.vport.create,
+AcDbViewportTableRecord) gains its first-ever patch_ops wiring -- a fourth
+brand-new op, completing the tables tier-2 wave (UCS/VIEW/VPORT). Mirrors
+the upsert contract for the VPORT symbol table's viewport-specific subset
+(lower_left/upper_right/center/height/width/target/view_direction/twist/
+ucs_follow_mode/circle_sides/grid_enabled/snap_enabled/snap_angle/
+ucs_per_viewport). Oracle extended accordingly; same invariants unaffected.
+
 w3-ltts update: create_linetype (write.linetype.create, AcDbLinetypeTable
 Record) gains its first-ever patch_ops wiring -- another brand-new op, same
 shape as w3-dimstyle just above. Mirrors create_layer/create_dimstyle's
@@ -237,6 +260,9 @@ _ORIGINAL_NATIVE_WRITE_OP_MAP = {
     "create_dimension_radiallarge": "write.entity.dim.radiallarge",
     "create_blockref": "write.entity.blockref",
     "create_dimstyle": "write.dimstyle.create",
+    "create_ucs": "write.ucs.create",
+    "create_view": "write.view.create",
+    "create_vport": "write.vport.create",
     "create_linetype": "write.linetype.create",
     "create_textstyle": "write.textstyle.create",
     "create_face3d": "write.entity.face",

@@ -54,10 +54,10 @@
     }
   },
   "totals": {
-    "operations": 522,
+    "operations": 525,
     "by_status": {
       "blocked": 60,
-      "implemented": 462
+      "implemented": 465
     },
     "by_family": {
       "active_document_write_original": 8,
@@ -69,7 +69,7 @@
       "custom_objects_protocols": 63,
       "diff": 1,
       "editor_input": 27,
-      "entities": 57,
+      "entities": 58,
       "extend": 2,
       "geometry_kernel": 25,
       "graphics_system": 9,
@@ -82,7 +82,7 @@
       "reactors_events": 22,
       "render": 1,
       "runtime_commands": 26,
-      "symbol_tables_dictionaries": 19,
+      "symbol_tables_dictionaries": 22,
       "ui_customization": 39,
       "validate": 2,
       "write": 4
@@ -38100,6 +38100,210 @@
       ],
       "notes": "Create-or-update a named TEXTSTYLE table record, writing font/bigfont file references plus height/width_factor/oblique_angle and the is_shape_file/is_vertical state flags; setFont()'s Windows-typeface path and priorSize() are an unwired gap (see tools/patch_ops/tables.py's module docstring).",
       "owner_ticket": "M08C-T02",
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs"
+    },
+    {
+      "id": "write.ucs.create",
+      "family": "symbol_tables_dictionaries",
+      "status": "implemented",
+      "engine_tier": "objectdbx_capable",
+      "host_eligibility": [
+        "dbx",
+        "coreconsole",
+        "arx_adapter",
+        "full_autocad"
+      ],
+      "execution_context": "hostless_dbx_in_accoreconsole",
+      "write_level": {
+        "default_write_mode": "write_copy",
+        "allowed_write_modes": [
+          "write_copy",
+          "write_original"
+        ],
+        "dwg_persisted": true,
+        "original_write_default": false
+      },
+      "handler": {
+        "router_lane": "ARIADNE_NATIVE_JOB",
+        "dispatcher_symbol": "upsertUcsRecord",
+        "execution_host_class": "dbx",
+        "composed_of": [],
+        "native_api": "AcDbUCSTable::add(AcDbObjectId&, AcDbUCSTableRecord*) + AcDbUCSTableRecord::setOrigin/setXAxis/setYAxis"
+      },
+      "mapping_type": "synthetic",
+      "catalog_op_id": null,
+      "input_schema": "schemas/cad_job.v2.schema.json#/allOf",
+      "output_schema": "schemas/cad_result.v2.schema.json",
+      "summary": "Create-or-update a named UCS table record, writing AcDbUCSTableRecord's full settable surface (origin/x_axis/y_axis).",
+      "evidence_refs": [
+        "tools/op_roundtrip_probe.py::probe_ucs_roundtrip",
+        "tools/patch_ops/tables.py#write.ucs.create"
+      ],
+      "phase_batch": "TABLES tier-2 D-class (p9-tables2)",
+      "target_family_first_class": false,
+      "wired_v1": false,
+      "operation": "write.ucs.create",
+      "hosts": [
+        "dbx",
+        "coreconsole",
+        "arx_adapter",
+        "full_autocad"
+      ],
+      "engines": [
+        "objectdbx_capable"
+      ],
+      "schema_refs": {
+        "input": "schemas/cad_job.v2.schema.json#/allOf",
+        "output": "schemas/cad_result.v2.schema.json"
+      },
+      "policy": {
+        "source": "config/policy.v2.json",
+        "status_policy": "implemented",
+        "default_write_mode": "write_copy",
+        "no_original_write_default": true
+      },
+      "tests": [
+        "tools/op_roundtrip_probe.py::probe_ucs_roundtrip"
+      ],
+      "notes": "Create-or-update a named UCS table record, writing AcDbUCSTableRecord's full settable surface (origin/x_axis/y_axis) -- a small, COMPLETE class, unlike DIMSTYLE's partial DIMVAR subset.",
+      "owner_ticket": "M08C-T03",
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs"
+    },
+    {
+      "id": "write.view.create",
+      "family": "symbol_tables_dictionaries",
+      "status": "implemented",
+      "engine_tier": "objectdbx_capable",
+      "host_eligibility": [
+        "dbx",
+        "coreconsole",
+        "arx_adapter",
+        "full_autocad"
+      ],
+      "execution_context": "hostless_dbx_in_accoreconsole",
+      "write_level": {
+        "default_write_mode": "write_copy",
+        "allowed_write_modes": [
+          "write_copy",
+          "write_original"
+        ],
+        "dwg_persisted": true,
+        "original_write_default": false
+      },
+      "handler": {
+        "router_lane": "ARIADNE_NATIVE_JOB",
+        "dispatcher_symbol": "upsertViewRecord",
+        "execution_host_class": "dbx",
+        "composed_of": [],
+        "native_api": "AcDbViewTable::add(AcDbObjectId&, AcDbViewTableRecord*) + AcDbAbstractViewTableRecord::setCenterPoint/setHeight/setWidth/setTarget/setViewDirection/setViewTwist/setLensLength/setPerspectiveEnabled/setFrontClipDistance/setFrontClipEnabled/setBackClipDistance/setBackClipEnabled"
+      },
+      "mapping_type": "synthetic",
+      "catalog_op_id": null,
+      "input_schema": "schemas/cad_job.v2.schema.json#/allOf",
+      "output_schema": "schemas/cad_result.v2.schema.json",
+      "summary": "Create-or-update a named VIEW table record, writing a representative subset of AcDbAbstractViewTableRecord's camera properties (center/height/width/target/view_direction/twist/lens_length/perspective/front-back clip).",
+      "evidence_refs": [
+        "tools/op_roundtrip_probe.py::probe_view_roundtrip",
+        "tools/patch_ops/tables.py#write.view.create"
+      ],
+      "phase_batch": "TABLES tier-2 D-class (p9-tables2)",
+      "target_family_first_class": false,
+      "wired_v1": false,
+      "operation": "write.view.create",
+      "hosts": [
+        "dbx",
+        "coreconsole",
+        "arx_adapter",
+        "full_autocad"
+      ],
+      "engines": [
+        "objectdbx_capable"
+      ],
+      "schema_refs": {
+        "input": "schemas/cad_job.v2.schema.json#/allOf",
+        "output": "schemas/cad_result.v2.schema.json"
+      },
+      "policy": {
+        "source": "config/policy.v2.json",
+        "status_policy": "implemented",
+        "default_write_mode": "write_copy",
+        "no_original_write_default": true
+      },
+      "tests": [
+        "tools/op_roundtrip_probe.py::probe_view_roundtrip"
+      ],
+      "notes": "Create-or-update a named VIEW table record, writing a representative camera-property subset; isPaperspaceView/category_name/layer_state/layout/camera/sun/visual_style/background/thumbnail/annotation_scale/UCS-association are an honest gap (see tools/patch_ops/tables.py's module docstring).",
+      "owner_ticket": "M08C-T03",
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs"
+    },
+    {
+      "id": "write.vport.create",
+      "family": "symbol_tables_dictionaries",
+      "status": "implemented",
+      "engine_tier": "objectdbx_capable",
+      "host_eligibility": [
+        "dbx",
+        "coreconsole",
+        "arx_adapter",
+        "full_autocad"
+      ],
+      "execution_context": "hostless_dbx_in_accoreconsole",
+      "write_level": {
+        "default_write_mode": "write_copy",
+        "allowed_write_modes": [
+          "write_copy",
+          "write_original"
+        ],
+        "dwg_persisted": true,
+        "original_write_default": false
+      },
+      "handler": {
+        "router_lane": "ARIADNE_NATIVE_JOB",
+        "dispatcher_symbol": "upsertVportRecord",
+        "execution_host_class": "dbx",
+        "composed_of": [],
+        "native_api": "AcDbViewportTable::add(AcDbObjectId&, AcDbViewportTableRecord*) + AcDbViewportTableRecord::setLowerLeftCorner/setUpperRightCorner/setUcsFollowMode/setCircleSides/setGridEnabled/setSnapEnabled/setSnapAngle/setUcsPerViewport + AcDbAbstractViewTableRecord::setCenterPoint/setHeight/setWidth/setTarget/setViewDirection/setViewTwist"
+      },
+      "mapping_type": "synthetic",
+      "catalog_op_id": null,
+      "input_schema": "schemas/cad_job.v2.schema.json#/allOf",
+      "output_schema": "schemas/cad_result.v2.schema.json",
+      "summary": "Create-or-update a named VPORT table record, writing the viewport-specific rectangle/interactive-toggle subset (lower_left/upper_right/ucs_follow_mode/circle_sides/grid_enabled/snap_enabled/snap_angle/ucs_per_viewport) plus the shared AcDbAbstractViewTableRecord center/height/width/target/view_direction/twist properties VIEW already certifies.",
+      "evidence_refs": [
+        "tools/op_roundtrip_probe.py::probe_vport_roundtrip",
+        "tools/patch_ops/tables.py#write.vport.create"
+      ],
+      "phase_batch": "TABLES tier-2 D-class (p9-tables2)",
+      "target_family_first_class": false,
+      "wired_v1": false,
+      "operation": "write.vport.create",
+      "hosts": [
+        "dbx",
+        "coreconsole",
+        "arx_adapter",
+        "full_autocad"
+      ],
+      "engines": [
+        "objectdbx_capable"
+      ],
+      "schema_refs": {
+        "input": "schemas/cad_job.v2.schema.json#/allOf",
+        "output": "schemas/cad_result.v2.schema.json"
+      },
+      "policy": {
+        "source": "config/policy.v2.json",
+        "status_policy": "implemented",
+        "default_write_mode": "write_copy",
+        "no_original_write_default": true
+      },
+      "tests": [
+        "tools/op_roundtrip_probe.py::probe_vport_roundtrip"
+      ],
+      "notes": "Create-or-update a named VPORT table record, writing the viewport-specific subset plus the shared VIEW-proven base-class camera fields; lens_length/perspective/clip-plane fields are deliberately NOT re-certified here (already proven on this shared base class via VIEW). number()/fastZoomsEnabled/icon toggles/extra snap-grid sub-parameters/GridDisplay sub-group/background-visualStyle-sun-lighting refs/the richer UCS query-set API are an honest gap (see tools/patch_ops/tables.py's module docstring). AutoCAD may legitimately store multiple VPORT records named \"*Active\" (one per active tiled viewport pane); callers must never pass that literal name.",
+      "owner_ticket": "M08C-T03",
       "implementation_strategy": "implemented_v1",
       "evidence_required": "existing_tests_and_evidence_refs"
     }

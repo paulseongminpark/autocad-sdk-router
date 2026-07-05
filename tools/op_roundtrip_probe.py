@@ -2017,6 +2017,686 @@ def probe_dimstyle_mutation(name: str, baseline_args: Dict[str, Any], change_arg
 
 
 # --------------------------------------------------------------------------- #
+# TABLES tier-2 (p9-tables2, D-class): UCS table RECORD-diff driver.
+#
+# symbol_tables.ucs[] is, like layers/dim_styles, not an entity: no handle
+# join through cad_diff, no geometry/bbox, joined by NAME instead. This is
+# the UCS sibling of the LAYER/DIMSTYLE record-diff drivers above -- same
+# apply_staged plumbing, same cad_op_gate status/exit-code vocabulary, same
+# flat per-field compare. The one new wrinkle: every UCS_RECORD_FIELDS value
+# is a nested {"x","y","z"} dict (a point/vector), not a scalar -- Python's
+# dict `!=` already does the deep compare layer_record_diff needs, so the
+# comparator itself is reused unchanged (see ucs_record_diff alias below).
+# --------------------------------------------------------------------------- #
+
+#: fields write.ucs.create can set (AriadneNativeJob.cpp's UcsPropertyArgs/
+#: applyUcsProperties) AND ucsRichJson extracts back -- AcDbUCSTableRecord's
+#: FULL settable surface (unlike DIMSTYLE's partial DIMVAR subset), each a
+#: nested {"x","y","z"} point/vector object.
+UCS_RECORD_FIELDS = ("origin", "x_axis", "y_axis")
+
+
+def _ucs_by_name(ir: Dict[str, Any], name: str) -> Optional[Dict[str, Any]]:
+    """Find a symbol_tables.ucs[] record by name -- the UCS table's own join
+    key (unique within a database), mirroring _layer_by_name/_dimstyle_by_name."""
+    for rec in ((ir.get("symbol_tables") or {}).get("ucs") or []):
+        if isinstance(rec, dict) and rec.get("name") == name:
+            return rec
+    return None
+
+
+def expected_ucs_record(args: Dict[str, Any]) -> Dict[str, Any]:
+    """Ground truth = the op's OWN args (never a live read): every
+    UCS_RECORD_FIELDS key present in ``args`` is asserted verbatim (each a
+    {"x","y","z"} dict). Mirrors expected_layer_record/expected_dimstyle_record."""
+    return {k: args[k] for k in UCS_RECORD_FIELDS if k in args}
+
+
+#: ucs_record_diff is IDENTICAL in shape to layer_record_diff (same "sorted
+#: mismatching keys, or every expected key if actual is None" contract, and
+#: Python dict `!=` already deep-compares the {"x","y","z"} values) -- reused
+#: directly rather than redefined.
+ucs_record_diff = layer_record_diff
+
+
+def probe_ucs_roundtrip(args: Dict[str, Any], dwg_path: str, out_dir: str, *,
+                        apply_staged: Optional[Callable[[Dict[str, Any], str, str], Dict[str, Any]]] = None,
+                        patch_ops_mod=None, cad_op_gate_mod=None) -> Dict[str, Any]:
+    """create_ucs -> re-extract -> record-diff against the op's own args.
+    Mirrors probe_layer_roundtrip/probe_dimstyle_roundtrip's pipeline and
+    result shape exactly, joining/comparing a symbol_tables.ucs[] record by
+    NAME."""
+    gate = cad_op_gate_mod if cad_op_gate_mod is not None else _import_optional("cad_op_gate")
+    if gate is None:
+        return {"schema": SCHEMA_ID, "op_name": "create_ucs", "status": "error",
+                "exit_code": 2, "reason": "cad_op_gate sibling module unavailable"}
+
+    native_op = resolve_native_op("create_ucs", patch_ops_mod=patch_ops_mod)
+    if native_op is None:
+        return {
+            "schema": SCHEMA_ID, "op_name": "create_ucs", "status": gate.STATUS_NOT_IMPLEMENTED,
+            "exit_code": gate.EXIT_NOT_IMPLEMENTED,
+            "reason": "create_ucs has no live native write handler wired "
+                      "(patch_ops.NATIVE_WRITE_OP_MAP)",
+        }
+
+    name = args.get("name")
+    if not name:
+        return {"schema": SCHEMA_ID, "op_name": "create_ucs", "native_op": native_op,
+                "status": gate.STATUS_ERROR, "exit_code": gate.EXIT_ERROR,
+                "reason": "args['name'] is required"}
+
+    apply_fn = apply_staged
+    if apply_fn is None:
+        patch_engine = _import_optional("patch_engine")
+        apply_fn = getattr(patch_engine, "apply_staged", None) if patch_engine else None
+    if apply_fn is None:
+        return {
+            "schema": SCHEMA_ID, "op_name": "create_ucs", "native_op": native_op,
+            "status": gate.STATUS_NOT_IMPLEMENTED, "exit_code": gate.EXIT_NOT_IMPLEMENTED,
+            "reason": "patch_engine.apply_staged unavailable",
+        }
+
+    patch = _build_patch("create_ucs", args, dwg_path, out_dir,
+                         postconditions=[{"subject": "ucs_exists", "op": "exists", "value": name}])
+    envelope = apply_fn(patch, dwg_path, out_dir)
+    env_status = envelope.get("status")
+    if env_status != "ok":
+        deferred_reasons = {"not_implemented", "unavailable"}
+        exit_code = gate.EXIT_NOT_IMPLEMENTED if env_status in deferred_reasons else gate.EXIT_ERROR
+        status = gate.STATUS_NOT_IMPLEMENTED if env_status in deferred_reasons else gate.STATUS_ERROR
+        return {
+            "schema": SCHEMA_ID, "op_name": "create_ucs", "native_op": native_op,
+            "status": status, "exit_code": exit_code,
+            "reason": envelope.get("reason"), "envelope_status": env_status,
+        }
+
+    orig = envelope.get("original_unchanged") or {}
+    if orig and orig.get("unchanged") is False:
+        return {
+            "schema": SCHEMA_ID, "op_name": "create_ucs", "native_op": native_op,
+            "status": gate.STATUS_ORIGINAL_MUTATED, "exit_code": gate.EXIT_ORIGINAL_MUTATED,
+            "reason": "original DWG changed during the live apply -- READ-ONLY invariant violated",
+            "original_unchanged": orig,
+        }
+
+    post_ir_ref = envelope.get("post_ir")
+    if not post_ir_ref:
+        return {
+            "schema": SCHEMA_ID, "op_name": "create_ucs", "native_op": native_op,
+            "status": gate.STATUS_ERROR, "exit_code": gate.EXIT_ERROR,
+            "reason": "apply_staged envelope reported ok but is missing post_ir",
+        }
+    post_ir = _load_ir_maybe(post_ir_ref)
+    actual = _ucs_by_name(post_ir, name)
+    expected = expected_ucs_record(args)
+    diff = ucs_record_diff(expected, actual)
+
+    result: Dict[str, Any] = {
+        "schema": SCHEMA_ID, "op_name": "create_ucs", "native_op": native_op,
+        "ucs_name": name, "expected": expected, "actual": actual, "record_diff": diff,
+        "original_unchanged": orig, "run_dir": out_dir,
+        "staged_output": envelope.get("staged_output"),
+    }
+    if actual is None:
+        result.update(status=gate.STATUS_HOLLOW, exit_code=gate.EXIT_HOLLOW,
+                      reason="ucs %r not found in symbol_tables.ucs[] after the write" % name)
+    elif diff:
+        result.update(status=gate.STATUS_FAIL, exit_code=gate.EXIT_FAIL,
+                      reason="record-diff is non-zero: field(s) %s do not match what was written"
+                             % diff)
+    else:
+        result.update(status=gate.STATUS_OK, exit_code=gate.EXIT_OK)
+    return result
+
+
+def probe_ucs_mutation(name: str, baseline_args: Dict[str, Any], change_args: Dict[str, Any],
+                       dwg_path: str, out_dir: str, *,
+                       apply_staged: Optional[Callable[[Dict[str, Any], str, str], Dict[str, Any]]] = None,
+                       patch_ops_mod=None, cad_op_gate_mod=None) -> Dict[str, Any]:
+    """The D-gate's 'changing one field -> 1 modified' contract, at the
+    UCS-record level. Mirrors probe_layer_mutation/probe_dimstyle_mutation's
+    two-step chained-staged-copy pipeline exactly (see their docstrings for
+    the full rationale) -- step 1 creates ``name`` with baseline_args, step 2
+    re-applies create_ucs with ONLY change_args onto step 1's own
+    staged_output."""
+    gate = cad_op_gate_mod if cad_op_gate_mod is not None else _import_optional("cad_op_gate")
+    if gate is None:
+        return {"schema": SCHEMA_ID, "op_name": "create_ucs", "status": "error",
+                "exit_code": 2, "reason": "cad_op_gate sibling module unavailable"}
+
+    out_dir1 = os.path.join(out_dir, "step1_baseline")
+    step1 = probe_ucs_roundtrip(dict(baseline_args, name=name), dwg_path, out_dir1,
+                               apply_staged=apply_staged, patch_ops_mod=patch_ops_mod,
+                               cad_op_gate_mod=gate)
+    if step1["status"] != gate.STATUS_OK:
+        step1["reason"] = "baseline step failed: %s" % step1.get("reason")
+        return step1
+    staged_after_1 = step1.get("staged_output")
+    if not staged_after_1:
+        return {"schema": SCHEMA_ID, "op_name": "create_ucs", "status": gate.STATUS_ERROR,
+                "exit_code": gate.EXIT_ERROR, "reason": "baseline step produced no staged_output"}
+
+    apply_fn = apply_staged
+    if apply_fn is None:
+        patch_engine = _import_optional("patch_engine")
+        apply_fn = getattr(patch_engine, "apply_staged", None) if patch_engine else None
+    if apply_fn is None:
+        return {"schema": SCHEMA_ID, "op_name": "create_ucs", "status": gate.STATUS_NOT_IMPLEMENTED,
+                "exit_code": gate.EXIT_NOT_IMPLEMENTED, "reason": "patch_engine.apply_staged unavailable"}
+    native_op = resolve_native_op("create_ucs", patch_ops_mod=patch_ops_mod)
+
+    out_dir2 = os.path.join(out_dir, "step2_change")
+    change_full_args = dict(change_args, name=name)
+    patch2 = _build_patch("create_ucs", change_full_args, staged_after_1, out_dir2,
+                          postconditions=[{"subject": "ucs_exists", "op": "exists", "value": name}])
+    envelope2 = apply_fn(patch2, staged_after_1, out_dir2)
+    if envelope2.get("status") != "ok":
+        return {
+            "schema": SCHEMA_ID, "op_name": "create_ucs", "native_op": native_op,
+            "status": gate.STATUS_ERROR, "exit_code": gate.EXIT_ERROR,
+            "reason": "mutation step failed: %s" % envelope2.get("reason"),
+            "envelope_status": envelope2.get("status"),
+        }
+    orig2 = envelope2.get("original_unchanged") or {}
+    if orig2 and orig2.get("unchanged") is False:
+        return {
+            "schema": SCHEMA_ID, "op_name": "create_ucs", "native_op": native_op,
+            "status": gate.STATUS_ORIGINAL_MUTATED, "exit_code": gate.EXIT_ORIGINAL_MUTATED,
+            "reason": "step 1's staged_output changed during step 2's apply -- "
+                      "READ-ONLY invariant violated at the chain link",
+            "original_unchanged": orig2,
+        }
+
+    pre_ir_ref = envelope2.get("pre_ir")
+    post_ir_ref = envelope2.get("post_ir")
+    if not pre_ir_ref or not post_ir_ref:
+        return {
+            "schema": SCHEMA_ID, "op_name": "create_ucs", "native_op": native_op,
+            "status": gate.STATUS_ERROR, "exit_code": gate.EXIT_ERROR,
+            "reason": "mutation step envelope missing pre_ir/post_ir",
+        }
+    pre_ir = _load_ir_maybe(pre_ir_ref)
+    post_ir = _load_ir_maybe(post_ir_ref)
+    pre_rec = _ucs_by_name(pre_ir, name)
+    post_rec = _ucs_by_name(post_ir, name)
+
+    result: Dict[str, Any] = {
+        "schema": SCHEMA_ID, "op_name": "create_ucs", "native_op": native_op,
+        "ucs_name": name, "pre_record": pre_rec, "post_record": post_rec, "run_dir": out_dir,
+    }
+    if pre_rec is None or post_rec is None:
+        result.update(status=gate.STATUS_HOLLOW, exit_code=gate.EXIT_HOLLOW,
+                      reason="ucs %r missing from pre_ir and/or post_ir" % name)
+        return result
+
+    requested = ucs_record_diff(
+        {k: change_args[k] for k in UCS_RECORD_FIELDS if k in change_args}, post_rec)
+    all_changed = sorted(k for k in UCS_RECORD_FIELDS if pre_rec.get(k) != post_rec.get(k))
+    expected_changed = sorted(change_args.keys())
+    result["changed_fields"] = all_changed
+    if requested:
+        result.update(status=gate.STATUS_HOLLOW, exit_code=gate.EXIT_HOLLOW,
+                      reason="the requested change to %s was not detected on re-extraction "
+                             "(invisible data)" % requested)
+    elif all_changed != expected_changed:
+        result.update(status=gate.STATUS_IRRECONSTRUCTIBLE, exit_code=gate.EXIT_IRRECONSTRUCTIBLE,
+                      reason="expected exactly the changed field set %s, observed %s"
+                             % (expected_changed, all_changed))
+    else:
+        result.update(status=gate.STATUS_OK, exit_code=gate.EXIT_OK)
+    return result
+
+
+# --------------------------------------------------------------------------- #
+# TABLES tier-2 (p9-tables2, D-class): VIEW table RECORD-diff driver.
+#
+# symbol_tables.views[] is, like ucs/layers/dim_styles, not an entity: joined
+# by NAME, no handle/geometry compare. VIEW sibling of the LAYER/DIMSTYLE/UCS
+# record-diff drivers above -- same apply_staged plumbing, same cad_op_gate
+# status/exit-code vocabulary, same flat per-field compare (point-valued
+# fields diff correctly via Python dict `!=`, same as UCS above).
+# --------------------------------------------------------------------------- #
+
+#: fields write.view.create can set (AriadneNativeJob.cpp's ViewPropertyArgs/
+#: applyViewProperties) AND viewsRichJson extracts back -- a REPRESENTATIVE
+#: subset of AcDbAbstractViewTableRecord's "camera" properties (see
+#: tools/patch_ops/tables.py's module docstring for the excluded fields).
+VIEW_RECORD_FIELDS = ("center", "height", "width", "target", "view_direction",
+                      "twist", "lens_length", "perspective_enabled",
+                      "front_clip_distance", "front_clip_enabled",
+                      "back_clip_distance", "back_clip_enabled")
+
+
+def _view_by_name(ir: Dict[str, Any], name: str) -> Optional[Dict[str, Any]]:
+    """Find a symbol_tables.views[] record by name -- the VIEW table's own
+    join key (unique within a database), mirroring _layer_by_name/_ucs_by_name."""
+    for rec in ((ir.get("symbol_tables") or {}).get("views") or []):
+        if isinstance(rec, dict) and rec.get("name") == name:
+            return rec
+    return None
+
+
+def expected_view_record(args: Dict[str, Any]) -> Dict[str, Any]:
+    """Ground truth = the op's OWN args (never a live read): every
+    VIEW_RECORD_FIELDS key present in ``args`` is asserted verbatim. Mirrors
+    expected_layer_record/expected_ucs_record."""
+    return {k: args[k] for k in VIEW_RECORD_FIELDS if k in args}
+
+
+#: view_record_diff is IDENTICAL in shape to layer_record_diff/ucs_record_diff
+#: -- reused directly rather than redefined.
+view_record_diff = layer_record_diff
+
+
+def probe_view_roundtrip(args: Dict[str, Any], dwg_path: str, out_dir: str, *,
+                         apply_staged: Optional[Callable[[Dict[str, Any], str, str], Dict[str, Any]]] = None,
+                         patch_ops_mod=None, cad_op_gate_mod=None) -> Dict[str, Any]:
+    """create_view -> re-extract -> record-diff against the op's own args.
+    Mirrors probe_layer_roundtrip/probe_ucs_roundtrip's pipeline and result
+    shape exactly, joining/comparing a symbol_tables.views[] record by NAME."""
+    gate = cad_op_gate_mod if cad_op_gate_mod is not None else _import_optional("cad_op_gate")
+    if gate is None:
+        return {"schema": SCHEMA_ID, "op_name": "create_view", "status": "error",
+                "exit_code": 2, "reason": "cad_op_gate sibling module unavailable"}
+
+    native_op = resolve_native_op("create_view", patch_ops_mod=patch_ops_mod)
+    if native_op is None:
+        return {
+            "schema": SCHEMA_ID, "op_name": "create_view", "status": gate.STATUS_NOT_IMPLEMENTED,
+            "exit_code": gate.EXIT_NOT_IMPLEMENTED,
+            "reason": "create_view has no live native write handler wired "
+                      "(patch_ops.NATIVE_WRITE_OP_MAP)",
+        }
+
+    name = args.get("name")
+    if not name:
+        return {"schema": SCHEMA_ID, "op_name": "create_view", "native_op": native_op,
+                "status": gate.STATUS_ERROR, "exit_code": gate.EXIT_ERROR,
+                "reason": "args['name'] is required"}
+
+    apply_fn = apply_staged
+    if apply_fn is None:
+        patch_engine = _import_optional("patch_engine")
+        apply_fn = getattr(patch_engine, "apply_staged", None) if patch_engine else None
+    if apply_fn is None:
+        return {
+            "schema": SCHEMA_ID, "op_name": "create_view", "native_op": native_op,
+            "status": gate.STATUS_NOT_IMPLEMENTED, "exit_code": gate.EXIT_NOT_IMPLEMENTED,
+            "reason": "patch_engine.apply_staged unavailable",
+        }
+
+    patch = _build_patch("create_view", args, dwg_path, out_dir,
+                         postconditions=[{"subject": "view_exists", "op": "exists", "value": name}])
+    envelope = apply_fn(patch, dwg_path, out_dir)
+    env_status = envelope.get("status")
+    if env_status != "ok":
+        deferred_reasons = {"not_implemented", "unavailable"}
+        exit_code = gate.EXIT_NOT_IMPLEMENTED if env_status in deferred_reasons else gate.EXIT_ERROR
+        status = gate.STATUS_NOT_IMPLEMENTED if env_status in deferred_reasons else gate.STATUS_ERROR
+        return {
+            "schema": SCHEMA_ID, "op_name": "create_view", "native_op": native_op,
+            "status": status, "exit_code": exit_code,
+            "reason": envelope.get("reason"), "envelope_status": env_status,
+        }
+
+    orig = envelope.get("original_unchanged") or {}
+    if orig and orig.get("unchanged") is False:
+        return {
+            "schema": SCHEMA_ID, "op_name": "create_view", "native_op": native_op,
+            "status": gate.STATUS_ORIGINAL_MUTATED, "exit_code": gate.EXIT_ORIGINAL_MUTATED,
+            "reason": "original DWG changed during the live apply -- READ-ONLY invariant violated",
+            "original_unchanged": orig,
+        }
+
+    post_ir_ref = envelope.get("post_ir")
+    if not post_ir_ref:
+        return {
+            "schema": SCHEMA_ID, "op_name": "create_view", "native_op": native_op,
+            "status": gate.STATUS_ERROR, "exit_code": gate.EXIT_ERROR,
+            "reason": "apply_staged envelope reported ok but is missing post_ir",
+        }
+    post_ir = _load_ir_maybe(post_ir_ref)
+    actual = _view_by_name(post_ir, name)
+    expected = expected_view_record(args)
+    diff = view_record_diff(expected, actual)
+
+    result: Dict[str, Any] = {
+        "schema": SCHEMA_ID, "op_name": "create_view", "native_op": native_op,
+        "view_name": name, "expected": expected, "actual": actual, "record_diff": diff,
+        "original_unchanged": orig, "run_dir": out_dir,
+        "staged_output": envelope.get("staged_output"),
+    }
+    if actual is None:
+        result.update(status=gate.STATUS_HOLLOW, exit_code=gate.EXIT_HOLLOW,
+                      reason="view %r not found in symbol_tables.views[] after the write" % name)
+    elif diff:
+        result.update(status=gate.STATUS_FAIL, exit_code=gate.EXIT_FAIL,
+                      reason="record-diff is non-zero: field(s) %s do not match what was written"
+                             % diff)
+    else:
+        result.update(status=gate.STATUS_OK, exit_code=gate.EXIT_OK)
+    return result
+
+
+def probe_view_mutation(name: str, baseline_args: Dict[str, Any], change_args: Dict[str, Any],
+                        dwg_path: str, out_dir: str, *,
+                        apply_staged: Optional[Callable[[Dict[str, Any], str, str], Dict[str, Any]]] = None,
+                        patch_ops_mod=None, cad_op_gate_mod=None) -> Dict[str, Any]:
+    """The D-gate's 'changing one field -> 1 modified' contract, at the
+    VIEW-record level. Mirrors probe_layer_mutation/probe_ucs_mutation's
+    two-step chained-staged-copy pipeline exactly -- step 1 creates ``name``
+    with baseline_args, step 2 re-applies create_view with ONLY change_args
+    onto step 1's own staged_output."""
+    gate = cad_op_gate_mod if cad_op_gate_mod is not None else _import_optional("cad_op_gate")
+    if gate is None:
+        return {"schema": SCHEMA_ID, "op_name": "create_view", "status": "error",
+                "exit_code": 2, "reason": "cad_op_gate sibling module unavailable"}
+
+    out_dir1 = os.path.join(out_dir, "step1_baseline")
+    step1 = probe_view_roundtrip(dict(baseline_args, name=name), dwg_path, out_dir1,
+                                 apply_staged=apply_staged, patch_ops_mod=patch_ops_mod,
+                                 cad_op_gate_mod=gate)
+    if step1["status"] != gate.STATUS_OK:
+        step1["reason"] = "baseline step failed: %s" % step1.get("reason")
+        return step1
+    staged_after_1 = step1.get("staged_output")
+    if not staged_after_1:
+        return {"schema": SCHEMA_ID, "op_name": "create_view", "status": gate.STATUS_ERROR,
+                "exit_code": gate.EXIT_ERROR, "reason": "baseline step produced no staged_output"}
+
+    apply_fn = apply_staged
+    if apply_fn is None:
+        patch_engine = _import_optional("patch_engine")
+        apply_fn = getattr(patch_engine, "apply_staged", None) if patch_engine else None
+    if apply_fn is None:
+        return {"schema": SCHEMA_ID, "op_name": "create_view", "status": gate.STATUS_NOT_IMPLEMENTED,
+                "exit_code": gate.EXIT_NOT_IMPLEMENTED, "reason": "patch_engine.apply_staged unavailable"}
+    native_op = resolve_native_op("create_view", patch_ops_mod=patch_ops_mod)
+
+    out_dir2 = os.path.join(out_dir, "step2_change")
+    change_full_args = dict(change_args, name=name)
+    patch2 = _build_patch("create_view", change_full_args, staged_after_1, out_dir2,
+                          postconditions=[{"subject": "view_exists", "op": "exists", "value": name}])
+    envelope2 = apply_fn(patch2, staged_after_1, out_dir2)
+    if envelope2.get("status") != "ok":
+        return {
+            "schema": SCHEMA_ID, "op_name": "create_view", "native_op": native_op,
+            "status": gate.STATUS_ERROR, "exit_code": gate.EXIT_ERROR,
+            "reason": "mutation step failed: %s" % envelope2.get("reason"),
+            "envelope_status": envelope2.get("status"),
+        }
+    orig2 = envelope2.get("original_unchanged") or {}
+    if orig2 and orig2.get("unchanged") is False:
+        return {
+            "schema": SCHEMA_ID, "op_name": "create_view", "native_op": native_op,
+            "status": gate.STATUS_ORIGINAL_MUTATED, "exit_code": gate.EXIT_ORIGINAL_MUTATED,
+            "reason": "step 1's staged_output changed during step 2's apply -- "
+                      "READ-ONLY invariant violated at the chain link",
+            "original_unchanged": orig2,
+        }
+
+    pre_ir_ref = envelope2.get("pre_ir")
+    post_ir_ref = envelope2.get("post_ir")
+    if not pre_ir_ref or not post_ir_ref:
+        return {
+            "schema": SCHEMA_ID, "op_name": "create_view", "native_op": native_op,
+            "status": gate.STATUS_ERROR, "exit_code": gate.EXIT_ERROR,
+            "reason": "mutation step envelope missing pre_ir/post_ir",
+        }
+    pre_ir = _load_ir_maybe(pre_ir_ref)
+    post_ir = _load_ir_maybe(post_ir_ref)
+    pre_rec = _view_by_name(pre_ir, name)
+    post_rec = _view_by_name(post_ir, name)
+
+    result: Dict[str, Any] = {
+        "schema": SCHEMA_ID, "op_name": "create_view", "native_op": native_op,
+        "view_name": name, "pre_record": pre_rec, "post_record": post_rec, "run_dir": out_dir,
+    }
+    if pre_rec is None or post_rec is None:
+        result.update(status=gate.STATUS_HOLLOW, exit_code=gate.EXIT_HOLLOW,
+                      reason="view %r missing from pre_ir and/or post_ir" % name)
+        return result
+
+    requested = view_record_diff(
+        {k: change_args[k] for k in VIEW_RECORD_FIELDS if k in change_args}, post_rec)
+    all_changed = sorted(k for k in VIEW_RECORD_FIELDS if pre_rec.get(k) != post_rec.get(k))
+    expected_changed = sorted(change_args.keys())
+    result["changed_fields"] = all_changed
+    if requested:
+        result.update(status=gate.STATUS_HOLLOW, exit_code=gate.EXIT_HOLLOW,
+                      reason="the requested change to %s was not detected on re-extraction "
+                             "(invisible data)" % requested)
+    elif all_changed != expected_changed:
+        result.update(status=gate.STATUS_IRRECONSTRUCTIBLE, exit_code=gate.EXIT_IRRECONSTRUCTIBLE,
+                      reason="expected exactly the changed field set %s, observed %s"
+                             % (expected_changed, all_changed))
+    else:
+        result.update(status=gate.STATUS_OK, exit_code=gate.EXIT_OK)
+    return result
+
+
+VPORT_RECORD_FIELDS = ("lower_left", "upper_right", "center", "height", "width",
+                       "target", "view_direction", "twist", "ucs_follow_mode",
+                       "circle_sides", "grid_enabled", "snap_enabled",
+                       "snap_angle", "ucs_per_viewport")
+
+
+def _vport_by_name(ir: Dict[str, Any], name: str) -> Optional[Dict[str, Any]]:
+    """Find a symbol_tables.viewports[] record by name -- mirrors
+    _view_by_name/_ucs_by_name. QUIRK: AutoCAD may legitimately store
+    MULTIPLE records named "*Active" (one per active tiled viewport pane);
+    this returns the FIRST match, same as every other _X_by_name helper --
+    callers of the roundtrip/mutation probes below must pass a unique,
+    caller-chosen name (never "*Active") to avoid that ambiguity entirely."""
+    for rec in ((ir.get("symbol_tables") or {}).get("viewports") or []):
+        if isinstance(rec, dict) and rec.get("name") == name:
+            return rec
+    return None
+
+
+def expected_vport_record(args: Dict[str, Any]) -> Dict[str, Any]:
+    """Ground truth = the op's OWN args (never a live read): every
+    VPORT_RECORD_FIELDS key present in ``args`` is asserted verbatim. Mirrors
+    expected_view_record/expected_ucs_record."""
+    return {k: args[k] for k in VPORT_RECORD_FIELDS if k in args}
+
+
+#: vport_record_diff is IDENTICAL in shape to layer_record_diff/view_record_diff
+#: -- reused directly rather than redefined.
+vport_record_diff = layer_record_diff
+
+
+def probe_vport_roundtrip(args: Dict[str, Any], dwg_path: str, out_dir: str, *,
+                          apply_staged: Optional[Callable[[Dict[str, Any], str, str], Dict[str, Any]]] = None,
+                          patch_ops_mod=None, cad_op_gate_mod=None) -> Dict[str, Any]:
+    """create_vport -> re-extract -> record-diff against the op's own args.
+    Mirrors probe_view_roundtrip/probe_ucs_roundtrip's pipeline and result
+    shape exactly, joining/comparing a symbol_tables.viewports[] record by
+    NAME (caller must pass a unique name, never "*Active" -- see
+    _vport_by_name)."""
+    gate = cad_op_gate_mod if cad_op_gate_mod is not None else _import_optional("cad_op_gate")
+    if gate is None:
+        return {"schema": SCHEMA_ID, "op_name": "create_vport", "status": "error",
+                "exit_code": 2, "reason": "cad_op_gate sibling module unavailable"}
+
+    native_op = resolve_native_op("create_vport", patch_ops_mod=patch_ops_mod)
+    if native_op is None:
+        return {
+            "schema": SCHEMA_ID, "op_name": "create_vport", "status": gate.STATUS_NOT_IMPLEMENTED,
+            "exit_code": gate.EXIT_NOT_IMPLEMENTED,
+            "reason": "create_vport has no live native write handler wired "
+                      "(patch_ops.NATIVE_WRITE_OP_MAP)",
+        }
+
+    name = args.get("name")
+    if not name:
+        return {"schema": SCHEMA_ID, "op_name": "create_vport", "native_op": native_op,
+                "status": gate.STATUS_ERROR, "exit_code": gate.EXIT_ERROR,
+                "reason": "args['name'] is required"}
+
+    apply_fn = apply_staged
+    if apply_fn is None:
+        patch_engine = _import_optional("patch_engine")
+        apply_fn = getattr(patch_engine, "apply_staged", None) if patch_engine else None
+    if apply_fn is None:
+        return {
+            "schema": SCHEMA_ID, "op_name": "create_vport", "native_op": native_op,
+            "status": gate.STATUS_NOT_IMPLEMENTED, "exit_code": gate.EXIT_NOT_IMPLEMENTED,
+            "reason": "patch_engine.apply_staged unavailable",
+        }
+
+    patch = _build_patch("create_vport", args, dwg_path, out_dir,
+                         postconditions=[{"subject": "vport_exists", "op": "exists", "value": name}])
+    envelope = apply_fn(patch, dwg_path, out_dir)
+    env_status = envelope.get("status")
+    if env_status != "ok":
+        deferred_reasons = {"not_implemented", "unavailable"}
+        exit_code = gate.EXIT_NOT_IMPLEMENTED if env_status in deferred_reasons else gate.EXIT_ERROR
+        status = gate.STATUS_NOT_IMPLEMENTED if env_status in deferred_reasons else gate.STATUS_ERROR
+        return {
+            "schema": SCHEMA_ID, "op_name": "create_vport", "native_op": native_op,
+            "status": status, "exit_code": exit_code,
+            "reason": envelope.get("reason"), "envelope_status": env_status,
+        }
+
+    orig = envelope.get("original_unchanged") or {}
+    if orig and orig.get("unchanged") is False:
+        return {
+            "schema": SCHEMA_ID, "op_name": "create_vport", "native_op": native_op,
+            "status": gate.STATUS_ORIGINAL_MUTATED, "exit_code": gate.EXIT_ORIGINAL_MUTATED,
+            "reason": "original DWG changed during the live apply -- READ-ONLY invariant violated",
+            "original_unchanged": orig,
+        }
+
+    post_ir_ref = envelope.get("post_ir")
+    if not post_ir_ref:
+        return {
+            "schema": SCHEMA_ID, "op_name": "create_vport", "native_op": native_op,
+            "status": gate.STATUS_ERROR, "exit_code": gate.EXIT_ERROR,
+            "reason": "apply_staged envelope reported ok but is missing post_ir",
+        }
+    post_ir = _load_ir_maybe(post_ir_ref)
+    actual = _vport_by_name(post_ir, name)
+    expected = expected_vport_record(args)
+    diff = vport_record_diff(expected, actual)
+
+    result: Dict[str, Any] = {
+        "schema": SCHEMA_ID, "op_name": "create_vport", "native_op": native_op,
+        "vport_name": name, "expected": expected, "actual": actual, "record_diff": diff,
+        "original_unchanged": orig, "run_dir": out_dir,
+        "staged_output": envelope.get("staged_output"),
+    }
+    if actual is None:
+        result.update(status=gate.STATUS_HOLLOW, exit_code=gate.EXIT_HOLLOW,
+                      reason="vport %r not found in symbol_tables.viewports[] after the write" % name)
+    elif diff:
+        result.update(status=gate.STATUS_FAIL, exit_code=gate.EXIT_FAIL,
+                      reason="record-diff is non-zero: field(s) %s do not match what was written"
+                             % diff)
+    else:
+        result.update(status=gate.STATUS_OK, exit_code=gate.EXIT_OK)
+    return result
+
+
+def probe_vport_mutation(name: str, baseline_args: Dict[str, Any], change_args: Dict[str, Any],
+                         dwg_path: str, out_dir: str, *,
+                         apply_staged: Optional[Callable[[Dict[str, Any], str, str], Dict[str, Any]]] = None,
+                         patch_ops_mod=None, cad_op_gate_mod=None) -> Dict[str, Any]:
+    """The D-gate's 'changing one field -> 1 modified' contract, at the
+    VPORT-record level. Mirrors probe_view_mutation/probe_ucs_mutation's
+    two-step chained-staged-copy pipeline exactly -- step 1 creates ``name``
+    with baseline_args, step 2 re-applies create_vport with ONLY change_args
+    onto step 1's own staged_output."""
+    gate = cad_op_gate_mod if cad_op_gate_mod is not None else _import_optional("cad_op_gate")
+    if gate is None:
+        return {"schema": SCHEMA_ID, "op_name": "create_vport", "status": "error",
+                "exit_code": 2, "reason": "cad_op_gate sibling module unavailable"}
+
+    out_dir1 = os.path.join(out_dir, "step1_baseline")
+    step1 = probe_vport_roundtrip(dict(baseline_args, name=name), dwg_path, out_dir1,
+                                  apply_staged=apply_staged, patch_ops_mod=patch_ops_mod,
+                                  cad_op_gate_mod=gate)
+    if step1["status"] != gate.STATUS_OK:
+        step1["reason"] = "baseline step failed: %s" % step1.get("reason")
+        return step1
+    staged_after_1 = step1.get("staged_output")
+    if not staged_after_1:
+        return {"schema": SCHEMA_ID, "op_name": "create_vport", "status": gate.STATUS_ERROR,
+                "exit_code": gate.EXIT_ERROR, "reason": "baseline step produced no staged_output"}
+
+    apply_fn = apply_staged
+    if apply_fn is None:
+        patch_engine = _import_optional("patch_engine")
+        apply_fn = getattr(patch_engine, "apply_staged", None) if patch_engine else None
+    if apply_fn is None:
+        return {"schema": SCHEMA_ID, "op_name": "create_vport", "status": gate.STATUS_NOT_IMPLEMENTED,
+                "exit_code": gate.EXIT_NOT_IMPLEMENTED, "reason": "patch_engine.apply_staged unavailable"}
+    native_op = resolve_native_op("create_vport", patch_ops_mod=patch_ops_mod)
+
+    out_dir2 = os.path.join(out_dir, "step2_change")
+    change_full_args = dict(change_args, name=name)
+    patch2 = _build_patch("create_vport", change_full_args, staged_after_1, out_dir2,
+                          postconditions=[{"subject": "vport_exists", "op": "exists", "value": name}])
+    envelope2 = apply_fn(patch2, staged_after_1, out_dir2)
+    if envelope2.get("status") != "ok":
+        return {
+            "schema": SCHEMA_ID, "op_name": "create_vport", "native_op": native_op,
+            "status": gate.STATUS_ERROR, "exit_code": gate.EXIT_ERROR,
+            "reason": "mutation step failed: %s" % envelope2.get("reason"),
+            "envelope_status": envelope2.get("status"),
+        }
+    orig2 = envelope2.get("original_unchanged") or {}
+    if orig2 and orig2.get("unchanged") is False:
+        return {
+            "schema": SCHEMA_ID, "op_name": "create_vport", "native_op": native_op,
+            "status": gate.STATUS_ORIGINAL_MUTATED, "exit_code": gate.EXIT_ORIGINAL_MUTATED,
+            "reason": "step 1's staged_output changed during step 2's apply -- "
+                      "READ-ONLY invariant violated at the chain link",
+            "original_unchanged": orig2,
+        }
+
+    pre_ir_ref = envelope2.get("pre_ir")
+    post_ir_ref = envelope2.get("post_ir")
+    if not pre_ir_ref or not post_ir_ref:
+        return {
+            "schema": SCHEMA_ID, "op_name": "create_vport", "native_op": native_op,
+            "status": gate.STATUS_ERROR, "exit_code": gate.EXIT_ERROR,
+            "reason": "mutation step envelope missing pre_ir/post_ir",
+        }
+    pre_ir = _load_ir_maybe(pre_ir_ref)
+    post_ir = _load_ir_maybe(post_ir_ref)
+    pre_rec = _vport_by_name(pre_ir, name)
+    post_rec = _vport_by_name(post_ir, name)
+
+    result: Dict[str, Any] = {
+        "schema": SCHEMA_ID, "op_name": "create_vport", "native_op": native_op,
+        "vport_name": name, "pre_record": pre_rec, "post_record": post_rec, "run_dir": out_dir,
+    }
+    if pre_rec is None or post_rec is None:
+        result.update(status=gate.STATUS_HOLLOW, exit_code=gate.EXIT_HOLLOW,
+                      reason="vport %r missing from pre_ir and/or post_ir" % name)
+        return result
+
+    requested = vport_record_diff(
+        {k: change_args[k] for k in VPORT_RECORD_FIELDS if k in change_args}, post_rec)
+    all_changed = sorted(k for k in VPORT_RECORD_FIELDS if pre_rec.get(k) != post_rec.get(k))
+    expected_changed = sorted(change_args.keys())
+    result["changed_fields"] = all_changed
+    if requested:
+        result.update(status=gate.STATUS_HOLLOW, exit_code=gate.EXIT_HOLLOW,
+                      reason="the requested change to %s was not detected on re-extraction "
+                             "(invisible data)" % requested)
+    elif all_changed != expected_changed:
+        result.update(status=gate.STATUS_IRRECONSTRUCTIBLE, exit_code=gate.EXIT_IRRECONSTRUCTIBLE,
+                      reason="expected exactly the changed field set %s, observed %s"
+                             % (expected_changed, all_changed))
+    else:
+        result.update(status=gate.STATUS_OK, exit_code=gate.EXIT_OK)
+    return result
+
+
+# --------------------------------------------------------------------------- #
 # TABLES tier (w3-ltts, D-class): linetype table RECORD-diff driver.
 #
 # symbol_tables.linetypes[] is, like symbol_tables.layers[]/dim_styles[], not
