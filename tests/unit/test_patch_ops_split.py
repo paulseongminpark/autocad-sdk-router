@@ -156,6 +156,16 @@ patch_ops.WRITE_OP_MAP entry and no collectModelSpaceGraph read branch, the
 same two-part gap every w3-* single-kind batch above closed. All 3 share the
 identical p0..p3 + layer job-arg shape (entities.py's build_job_args treats
 them as one branch). Oracle extended accordingly; same invariants unaffected.
+
+w3-ltts update (TEXTSTYLE): create_textstyle (write.textstyle.create,
+AcDbTextStyleTableRecord) gains its first-ever patch_ops wiring -- another
+brand-new op, same shape as create_linetype just above. Mirrors create_layer/
+create_dimstyle/create_linetype's upsert contract for the TEXTSTYLE symbol
+table, writing font/bigfont file references plus height/width_factor/
+oblique_angle and the is_shape_file/is_vertical state flags; setFont()'s
+Windows-typeface path and priorSize() are an unwritten gap (see
+tools/patch_ops/tables.py's module docstring). Oracle extended accordingly;
+same invariants unaffected.
 """
 from __future__ import annotations
 
@@ -204,6 +214,7 @@ _ORIGINAL_NATIVE_WRITE_OP_MAP = {
     "create_blockref": "write.entity.blockref",
     "create_dimstyle": "write.dimstyle.create",
     "create_linetype": "write.linetype.create",
+    "create_textstyle": "write.textstyle.create",
     "create_face3d": "write.entity.face",
     "create_solid2d": "write.entity.solid2d",
     "create_trace": "write.entity.trace",

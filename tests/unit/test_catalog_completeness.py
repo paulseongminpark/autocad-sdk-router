@@ -138,14 +138,15 @@ class TestCatalogDenominatorLiveSmoke(unittest.TestCase):
     def test_live_registry_is_517_ops(self):
         # w3-dimstyle adds one new synthetic op (write.dimstyle.create,
         # DIMSTYLE table D-class TABLES tier) on top of the F0 517-op
-        # anchor -- 517 -> 518. w3-ltts adds one more (write.linetype.create,
-        # LINETYPE table D-class TABLES tier) -- 518 -> 519. P10 adds a third
-        # (modify.entity.xdata, entity-handle-targeted xdata write) --
-        # 519 -> 520. See tools/patch_ops/tables.py + entities.py.
+        # anchor -- 517 -> 518. w3-ltts adds two more (write.linetype.create,
+        # write.textstyle.create -- LINETYPE/TEXTSTYLE table D-class TABLES
+        # tier) -- 518 -> 519 -> 520. P10 adds a fourth (modify.entity.xdata,
+        # entity-handle-targeted xdata write) -- 520 -> 521. See
+        # tools/patch_ops/tables.py + entities.py.
         ops = cc.load_operations_catalog()
-        self.assertEqual(len(ops), 520,
-                         "the F0 task's own '517-op catalogue' anchor (+3, "
-                         "w3-dimstyle/w3-ltts/P10); if this moves again, the whole "
+        self.assertEqual(len(ops), 521,
+                         "the F0 task's own '517-op catalogue' anchor (+4, "
+                         "w3-dimstyle/w3-ltts x2/P10); if this moves again, the whole "
                          "WAVE-0 accounting must be recomputed")
 
     def test_live_denominator_lands_near_plan_446_estimate(self):
