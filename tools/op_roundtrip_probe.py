@@ -1200,6 +1200,52 @@ def _expect_create_blockref(args: Dict[str, Any]) -> Dict[str, Any]:
 #     write.entity.blockref, where it previously could not;
 #   - the ASCII cert below (and create_line/create_circle) are unchanged,
 #     diff=0.
+def _expect_create_point(args: Dict[str, Any]) -> Dict[str, Any]:
+    # w3-simple1: collectModelSpaceGraph's AcDbPoint branch emits "position"
+    # -- the exact ctor arg write.entity.point passes to AcDbPoint(pos)
+    # (m08g_handlers.inc), so ground truth is a direct pass-through, same
+    # pattern as create_arc/create_ellipse's center.
+    return {
+        "dxf_name": "POINT", "layer": args.get("layer") or "0",
+        "geometry": {"kind": "point", "position": _point_to_list(args["position"])},
+    }
+
+
+def _unit_vector(v: list) -> list:
+    """Normalize a 3-vector -- AcDbRay/AcDbXline's setUnitDir() always stores
+    a UNIT vector (live ObjectARX behavior, not a raw ctor-arg echo), so
+    create_ray/create_xline's ground truth must assert the NORMALIZED
+    direction, never args["direction"] verbatim (mirrors the re-anchoring
+    caveats T3a/w3-dimarc/w3-ang2/w3-ang3 documented for their own dimension
+    classes' non-echoed fields)."""
+    length = math.sqrt(v[0] ** 2 + v[1] ** 2 + v[2] ** 2)
+    if length == 0:
+        return [0.0, 0.0, 0.0]
+    return [v[0] / length, v[1] / length, v[2] / length]
+
+
+def _expect_create_ray(args: Dict[str, Any]) -> Dict[str, Any]:
+    # w3-simple1: collectModelSpaceGraph's AcDbRay branch emits base_point
+    # (a direct echo of setBasePoint's "base" ctor arg) and unit_dir (the
+    # NORMALIZED "direction" arg -- see _unit_vector).
+    return {
+        "dxf_name": "RAY", "layer": args.get("layer") or "0",
+        "geometry": {"kind": "ray", "base_point": _point_to_list(args["base"]),
+                    "unit_dir": _unit_vector(_point_to_list(args["direction"]))},
+    }
+
+
+def _expect_create_xline(args: Dict[str, Any]) -> Dict[str, Any]:
+    # w3-simple1: collectModelSpaceGraph's AcDbXline branch has the identical
+    # base_point/unit_dir shape create_ray's does above (same handler
+    # pattern, same setUnitDir normalization caveat).
+    return {
+        "dxf_name": "XLINE", "layer": args.get("layer") or "0",
+        "geometry": {"kind": "xline", "base_point": _point_to_list(args["base"]),
+                    "unit_dir": _unit_vector(_point_to_list(args["direction"]))},
+    }
+
+
 _EXPECTED_ENTITY_BUILDERS: Dict[str, Callable[[Dict[str, Any]], Dict[str, Any]]] = {
     "create_line": _expect_create_line,
     "create_circle": _expect_create_circle,
@@ -1230,6 +1276,9 @@ _EXPECTED_ENTITY_BUILDERS: Dict[str, Callable[[Dict[str, Any]], Dict[str, Any]]]
     "create_face3d": _expect_create_face3d,
     "create_solid2d": _expect_create_solid2d,
     "create_trace": _expect_create_trace,
+    "create_point": _expect_create_point,
+    "create_ray": _expect_create_ray,
+    "create_xline": _expect_create_xline,
 }
 
 

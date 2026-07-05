@@ -157,6 +157,40 @@ class TestExpectedIrForOp(unittest.TestCase):
                           "major_axis": [3, 0, 0], "radius_ratio": 0.5,
                           "start_angle": 0.0, "end_angle": 6.283185307179586})
 
+    def test_create_point_builds_point_geometry(self):
+        # w3-simple1: collectModelSpaceGraph grew an AcDbPoint branch, so
+        # create_point is now certifiable -- ground truth is a direct
+        # pass-through of the "position" ctor arg, same pattern as
+        # create_arc/create_ellipse's center.
+        ir = probe.expected_ir_for_op(
+            "create_point", {"position": [5, 6, 0], "layer": "PNT"})
+        ent = ir["entities"][0]
+        self.assertEqual(ent["dxf_name"], "POINT")
+        self.assertEqual(ent["layer"], "PNT")
+        self.assertEqual(ent["geometry"], {"kind": "point", "position": [5, 6, 0]})
+
+    def test_create_ray_builds_normalized_unit_dir(self):
+        # w3-simple1: base_point is a direct echo of the "base" ctor arg;
+        # unit_dir must be the NORMALIZED "direction" arg (AcDbRay::
+        # setUnitDir always stores a unit vector) -- (3, 4, 0) has magnitude
+        # 5, so the expected unit_dir is (0.6, 0.8, 0.0).
+        ir = probe.expected_ir_for_op(
+            "create_ray", {"base": [1, 1, 0], "direction": [3, 4, 0], "layer": "0"})
+        ent = ir["entities"][0]
+        self.assertEqual(ent["dxf_name"], "RAY")
+        self.assertEqual(ent["geometry"]["base_point"], [1, 1, 0])
+        self.assertEqual(ent["geometry"]["unit_dir"], [0.6, 0.8, 0.0])
+
+    def test_create_xline_builds_normalized_unit_dir(self):
+        # w3-simple1: same shape/normalization as create_ray above (AcDbXline
+        # ::setUnitDir also always stores a unit vector).
+        ir = probe.expected_ir_for_op(
+            "create_xline", {"base": [2, 3, 0], "direction": [0, 5, 0], "layer": "0"})
+        ent = ir["entities"][0]
+        self.assertEqual(ent["dxf_name"], "XLINE")
+        self.assertEqual(ent["geometry"]["base_point"], [2, 3, 0])
+        self.assertEqual(ent["geometry"]["unit_dir"], [0.0, 1.0, 0.0])
+
     def test_create_dimension_builds_dimension_geometry(self):
         # T3a: collectModelSpaceGraph grew an AcDbRotatedDimension branch, so
         # create_dimension is now certifiable. "measurement" is independently
@@ -831,6 +865,44 @@ class TestProbeRoundtrip(unittest.TestCase):
         self.assertEqual(result["status"], cad_op_gate.STATUS_OK)
         self.assertEqual(result["exit_code"], cad_op_gate.EXIT_OK)
         self.assertEqual(result["native_op"], "write.entity.ellipse")
+
+    def test_matching_point_roundtrip_is_exit_0(self):
+        # end-to-end wiring for the w3-simple1 point ground-truth builder,
+        # mirroring test_matching_ellipse_roundtrip_is_exit_0.
+        entity = {"handle": "9F4", "dxf_name": "POINT", "layer": "0",
+                  "geometry": {"kind": "point", "position": [5.0, 6.0, 0.0]}}
+        result = probe.probe_roundtrip(
+            "create_point", {"position": [5, 6, 0], "layer": "0"},
+            "fake.dwg", "fake_out", apply_staged=_fake_apply_staged(entity))
+        self.assertEqual(result["status"], cad_op_gate.STATUS_OK)
+        self.assertEqual(result["exit_code"], cad_op_gate.EXIT_OK)
+        self.assertEqual(result["native_op"], "write.entity.point")
+
+    def test_matching_ray_roundtrip_is_exit_0(self):
+        # end-to-end wiring for the w3-simple1 ray ground-truth builder --
+        # the fake actual_ir's unit_dir is ALREADY normalized (as the real
+        # native reader would report), matching expected_ir's normalization.
+        entity = {"handle": "9F5", "dxf_name": "RAY", "layer": "0",
+                  "geometry": {"kind": "ray", "base_point": [1.0, 1.0, 0.0],
+                              "unit_dir": [0.6, 0.8, 0.0]}}
+        result = probe.probe_roundtrip(
+            "create_ray", {"base": [1, 1, 0], "direction": [3, 4, 0], "layer": "0"},
+            "fake.dwg", "fake_out", apply_staged=_fake_apply_staged(entity))
+        self.assertEqual(result["status"], cad_op_gate.STATUS_OK)
+        self.assertEqual(result["exit_code"], cad_op_gate.EXIT_OK)
+        self.assertEqual(result["native_op"], "write.entity.ray")
+
+    def test_matching_xline_roundtrip_is_exit_0(self):
+        # end-to-end wiring for the w3-simple1 xline ground-truth builder.
+        entity = {"handle": "9F6", "dxf_name": "XLINE", "layer": "0",
+                  "geometry": {"kind": "xline", "base_point": [2.0, 3.0, 0.0],
+                              "unit_dir": [0.0, 1.0, 0.0]}}
+        result = probe.probe_roundtrip(
+            "create_xline", {"base": [2, 3, 0], "direction": [0, 5, 0], "layer": "0"},
+            "fake.dwg", "fake_out", apply_staged=_fake_apply_staged(entity))
+        self.assertEqual(result["status"], cad_op_gate.STATUS_OK)
+        self.assertEqual(result["exit_code"], cad_op_gate.EXIT_OK)
+        self.assertEqual(result["native_op"], "write.entity.xline")
 
     def test_matching_dimension_roundtrip_is_exit_0(self):
         # end-to-end wiring for the T3a dimension ground-truth builder. The

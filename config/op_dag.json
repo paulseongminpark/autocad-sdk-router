@@ -7738,7 +7738,8 @@
         "reports/merge/MERGE-M08-READ.json",
         "src/Ariadne.AcadNative/families/m08g_handlers.inc",
         "tests/unit/test_m08g_handlers.py",
-        "tests/unit/test_operation_registry_v2.py"
+        "tests/unit/test_operation_registry_v2.py",
+        "tools/patch_engine.py"
       ],
       "acceptance_test_id": "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
       "persistence_class": "P"
@@ -7945,7 +7946,8 @@
         "reports/merge/MERGE-M08-READ.json",
         "src/Ariadne.AcadNative/families/m08g_handlers.inc",
         "tests/unit/test_m08g_handlers.py",
-        "tests/unit/test_operation_registry_v2.py"
+        "tests/unit/test_operation_registry_v2.py",
+        "tools/patch_engine.py"
       ],
       "acceptance_test_id": "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
       "persistence_class": "P"
@@ -8390,7 +8392,8 @@
         "reports/merge/MERGE-M08-READ.json",
         "src/Ariadne.AcadNative/families/m08g_handlers.inc",
         "tests/unit/test_m08g_handlers.py",
-        "tests/unit/test_operation_registry_v2.py"
+        "tests/unit/test_operation_registry_v2.py",
+        "tools/patch_engine.py"
       ],
       "acceptance_test_id": "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
       "persistence_class": "P"

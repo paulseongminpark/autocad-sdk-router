@@ -509,6 +509,12 @@ _NATIVE_CLASS_TO_DXF_KIND = {
     # existing generic handling (same shapes AcDbLeader/AcDb2dPolyline already
     # use) -- this class-map entry is the only change needed here.
     "AcDbMline": ("MLINE", "mline"),
+    # w3-simple1: AcDbRay/AcDbXline's "base_point"/"unit_dir" (both plain
+    # point3 fields) are already lifted by _geometry_from_native_entity's
+    # generic point-field allowlist below -- this class-map entry is the
+    # only change needed here for each.
+    "AcDbRay": ("RAY", "ray"),
+    "AcDbXline": ("XLINE", "xline"),
     # w3-pmesh: AcDbPolygonMesh serializes to DXF as a POLYLINE record too
     # (like AcDb2dPolyline/AcDb3dPolyline above -- distinguished on disk only
     # by its group-70 flags), but its geometry shape (m_size/n_size/m_closed/
@@ -581,7 +587,7 @@ def _geometry_from_native_entity(raw: dict, kind: str) -> dict:
                 "major_axis", "xline1_point", "xline2_point", "dim_line_point",
                 "chord_point", "far_chord_point", "defining_point", "leader_end_point",
                 "arc_point", "xline1_start", "xline1_end", "xline2_start", "xline2_end",
-                "override_center", "jog_point",
+                "override_center", "jog_point", "base_point", "unit_dir",
                 # p8-simple2: AcDbFace/AcDbSolid/AcDbTrace's 4 flat vertices,
                 # keyed exactly like the write.entity.face/solid2d/trace job
                 # args (m08g_handlers.inc) so the roundtrip diff is direct.
