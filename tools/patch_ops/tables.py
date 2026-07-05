@@ -42,6 +42,19 @@ valued fields: each travels as a nested {"x","y","z"} object (see
 AriadneNativeJob.cpp's jsonFindPoint3/UcsPropertyArgs), passed through
 verbatim -- no bool->int coercion needed since none of the 3 fields are
 flag-shaped.
+
+p9-tables2 (VIEW): write.view.create is the SAME upsert shape for the VIEW
+table -- a REPRESENTATIVE subset of AcDbAbstractViewTableRecord's "camera"
+properties (center/height/width/target/view_direction/twist/lens_length/
+perspective_enabled/front_clip_distance/front_clip_enabled/
+back_clip_distance/back_clip_enabled -- see AriadneNativeJob.cpp's
+ViewPropertyArgs). center is a nested {"x","y"} 2D point; target/
+view_direction are {"x","y","z"}. perspective_enabled/front_clip_enabled/
+back_clip_enabled are flag-shaped (bool->int coercion, same as LAYER's
+plottable/frozen/off/locked). Excluded (honest gap): isPaperspaceView,
+category_name/layer_state (strings), layout/camera/sun/visual_style/
+background (object-id refs), thumbnail/preview image, annotation scale,
+UCS-per-view association.
 """
 from __future__ import annotations
 
@@ -53,6 +66,7 @@ WRITE_OP_MAP: Dict[str, str] = {
     "create_layer": "write.layer.create",
     "create_dimstyle": "write.dimstyle.create",
     "create_ucs": "write.ucs.create",
+    "create_view": "write.view.create",
 }
 
 # Passthrough fields whose native job encoding is identical to the patch-op
@@ -78,6 +92,13 @@ _DIMSTYLE_FLAG_FIELDS = ("dimse1",)
 # point/vector objects, passed through as-is (no bool->int coercion, no
 # passthrough/flag split needed since none are scalar or flag-shaped).
 _UCS_POINT_FIELDS = ("origin", "x_axis", "y_axis")
+
+# The representative "camera" subset write.view.create's native handler
+# reads (ViewPropertyArgs in AriadneNativeJob.cpp).
+_VIEW_POINT_FIELDS = ("center", "target", "view_direction")
+_VIEW_PASSTHROUGH_FIELDS = ("height", "width", "twist", "lens_length",
+                            "front_clip_distance", "back_clip_distance")
+_VIEW_FLAG_FIELDS = ("perspective_enabled", "front_clip_enabled", "back_clip_enabled")
 
 
 def build_job_args(native_op: str, args: Dict[str, Any]) -> Optional[Dict[str, Any]]:
@@ -121,6 +142,25 @@ def build_job_args(native_op: str, args: Dict[str, Any]) -> Optional[Dict[str, A
         for key in _UCS_POINT_FIELDS:
             if key in args:
                 out[key] = args[key]
+        return out
+    if native_op == "write.view.create":
+        # create_view -> create-or-update (upsert) the target VIEW record.
+        # Mirrors write.layer.create/write.ucs.create's arg-forwarding, with
+        # a mix of point fields (verbatim) and flag fields (bool->int, same
+        # convention as LAYER's plottable/frozen/off/locked).
+        out = {}
+        name = args.get("name")
+        if name is not None:
+            out["name"] = name
+        for key in _VIEW_POINT_FIELDS:
+            if key in args:
+                out[key] = args[key]
+        for key in _VIEW_PASSTHROUGH_FIELDS:
+            if key in args:
+                out[key] = args[key]
+        for key in _VIEW_FLAG_FIELDS:
+            if key in args:
+                out[key] = int(bool(args[key]))
         return out
     return None
 

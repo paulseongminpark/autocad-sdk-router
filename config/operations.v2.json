@@ -54,10 +54,10 @@
     }
   },
   "totals": {
-    "operations": 519,
+    "operations": 520,
     "by_status": {
       "blocked": 60,
-      "implemented": 459
+      "implemented": 460
     },
     "by_family": {
       "active_document_write_original": 8,
@@ -82,7 +82,7 @@
       "reactors_events": 22,
       "render": 1,
       "runtime_commands": 26,
-      "symbol_tables_dictionaries": 18,
+      "symbol_tables_dictionaries": 19,
       "ui_customization": 39,
       "validate": 2,
       "write": 4
@@ -91,9 +91,9 @@
       "accoreconsole_lisp_also": 20,
       "managed_also": 46,
       "native_arx_only": 233,
-      "objectdbx_capable": 220
+      "objectdbx_capable": 221
     },
-    "total": 519
+    "total": 520
   },
   "coverage": {
     "wired_ops": 33,
@@ -127,8 +127,8 @@
       "symbol_tables_dictionaries": 16,
       "ui_customization": 39
     },
-    "operation_records": 519,
-    "implemented": 459,
+    "operation_records": 520,
+    "implemented": 460,
     "wired": 0,
     "stub": 0,
     "catalogued": 0,
@@ -37885,6 +37885,74 @@
         "tools/op_roundtrip_probe.py::probe_ucs_roundtrip"
       ],
       "notes": "Create-or-update a named UCS table record, writing AcDbUCSTableRecord's full settable surface (origin/x_axis/y_axis) -- a small, COMPLETE class, unlike DIMSTYLE's partial DIMVAR subset.",
+      "owner_ticket": "M08C-T03",
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs"
+    },
+    {
+      "id": "write.view.create",
+      "family": "symbol_tables_dictionaries",
+      "status": "implemented",
+      "engine_tier": "objectdbx_capable",
+      "host_eligibility": [
+        "dbx",
+        "coreconsole",
+        "arx_adapter",
+        "full_autocad"
+      ],
+      "execution_context": "hostless_dbx_in_accoreconsole",
+      "write_level": {
+        "default_write_mode": "write_copy",
+        "allowed_write_modes": [
+          "write_copy",
+          "write_original"
+        ],
+        "dwg_persisted": true,
+        "original_write_default": false
+      },
+      "handler": {
+        "router_lane": "ARIADNE_NATIVE_JOB",
+        "dispatcher_symbol": "upsertViewRecord",
+        "execution_host_class": "dbx",
+        "composed_of": [],
+        "native_api": "AcDbViewTable::add(AcDbObjectId&, AcDbViewTableRecord*) + AcDbAbstractViewTableRecord::setCenterPoint/setHeight/setWidth/setTarget/setViewDirection/setViewTwist/setLensLength/setPerspectiveEnabled/setFrontClipDistance/setFrontClipEnabled/setBackClipDistance/setBackClipEnabled"
+      },
+      "mapping_type": "synthetic",
+      "catalog_op_id": null,
+      "input_schema": "schemas/cad_job.v2.schema.json#/allOf",
+      "output_schema": "schemas/cad_result.v2.schema.json",
+      "summary": "Create-or-update a named VIEW table record, writing a representative subset of AcDbAbstractViewTableRecord's camera properties (center/height/width/target/view_direction/twist/lens_length/perspective/front-back clip).",
+      "evidence_refs": [
+        "tools/op_roundtrip_probe.py::probe_view_roundtrip",
+        "tools/patch_ops/tables.py#write.view.create"
+      ],
+      "phase_batch": "TABLES tier-2 D-class (p9-tables2)",
+      "target_family_first_class": false,
+      "wired_v1": false,
+      "operation": "write.view.create",
+      "hosts": [
+        "dbx",
+        "coreconsole",
+        "arx_adapter",
+        "full_autocad"
+      ],
+      "engines": [
+        "objectdbx_capable"
+      ],
+      "schema_refs": {
+        "input": "schemas/cad_job.v2.schema.json#/allOf",
+        "output": "schemas/cad_result.v2.schema.json"
+      },
+      "policy": {
+        "source": "config/policy.v2.json",
+        "status_policy": "implemented",
+        "default_write_mode": "write_copy",
+        "no_original_write_default": true
+      },
+      "tests": [
+        "tools/op_roundtrip_probe.py::probe_view_roundtrip"
+      ],
+      "notes": "Create-or-update a named VIEW table record, writing a representative camera-property subset; isPaperspaceView/category_name/layer_state/layout/camera/sun/visual_style/background/thumbnail/annotation_scale/UCS-association are an honest gap (see tools/patch_ops/tables.py's module docstring).",
       "owner_ticket": "M08C-T03",
       "implementation_strategy": "implemented_v1",
       "evidence_required": "existing_tests_and_evidence_refs"

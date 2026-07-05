@@ -147,6 +147,13 @@ contract for the UCS symbol table (origin/x_axis/y_axis -- AcDbUCSTable
 Record's FULL settable surface, a small complete class unlike DIMSTYLE's
 partial DIMVAR subset). Oracle extended accordingly; same invariants
 unaffected.
+
+p9-tables2 update (VIEW): create_view (write.view.create, AcDbViewTable
+Record) gains its first-ever patch_ops wiring -- a third brand-new op.
+Mirrors the upsert contract for the VIEW symbol table's representative
+"camera" property subset (center/height/width/target/view_direction/twist/
+lens_length/perspective/front-back clip). Oracle extended accordingly; same
+invariants unaffected.
 """
 from __future__ import annotations
 
@@ -195,6 +202,7 @@ _ORIGINAL_NATIVE_WRITE_OP_MAP = {
     "create_blockref": "write.entity.blockref",
     "create_dimstyle": "write.dimstyle.create",
     "create_ucs": "write.ucs.create",
+    "create_view": "write.view.create",
 }
 
 
