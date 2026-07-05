@@ -23577,13 +23577,9 @@
       },
       "policy": {
         "source": "config/policy.v2.json",
-        "status_policy": "catalogued_not_runnable",
+        "status_policy": "implemented",
         "default_write_mode": "write_copy",
-        "allowed_write_modes": [
-          "write_copy"
-        ],
-        "no_original_write_default": true,
-        "runtime_behavior": "not_runnable_until_promoted_to_implemented_or_wired"
+        "no_original_write_default": true
       },
       "tests": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
@@ -23600,7 +23596,7 @@
         "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
         "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)"
       ],
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "Create an empty AcDbBody (ASM/ACIS wrapper). WaveS0/wS-solids live-probed (accoreconsole): handler builds a content-less AcDbBody (no setter called) -- AcBr cannot bind it (BREP_BIND_FAILED). CREATED_DEGENERATE by construction; not certifiable non-degenerate until a content-setting C++ path exists (owner_ticket note below).",
       "owner_ticket": "M08G-T02",
       "implementation_strategy": "implemented_v1",
       "evidence_required": "existing_tests_and_evidence_refs"
@@ -25002,13 +24998,9 @@
       },
       "policy": {
         "source": "config/policy.v2.json",
-        "status_policy": "catalogued_not_runnable",
+        "status_policy": "implemented",
         "default_write_mode": "write_copy",
-        "allowed_write_modes": [
-          "write_copy"
-        ],
-        "no_original_write_default": true,
-        "runtime_behavior": "not_runnable_until_promoted_to_implemented_or_wired"
+        "no_original_write_default": true
       },
       "tests": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
@@ -25025,7 +25017,7 @@
         "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
         "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)"
       ],
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "Create a NURBS surface (AcDbNurbSurface::set). WaveS0/wS-solids live-verified headless (accoreconsole) with real caller-controlled control-point/degree args -- bounds/area match the requested patch exactly.",
       "owner_ticket": "M08G-T02",
       "implementation_strategy": "implemented_v1",
       "evidence_required": "existing_tests_and_evidence_refs"
@@ -25601,13 +25593,9 @@
       },
       "policy": {
         "source": "config/policy.v2.json",
-        "status_policy": "catalogued_not_runnable",
+        "status_policy": "implemented",
         "default_write_mode": "write_copy",
-        "allowed_write_modes": [
-          "write_copy"
-        ],
-        "no_original_write_default": true,
-        "runtime_behavior": "not_runnable_until_promoted_to_implemented_or_wired"
+        "no_original_write_default": true
       },
       "tests": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
@@ -25624,7 +25612,7 @@
         "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
         "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)"
       ],
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "Create region(s) from existing closed coplanar curves (AcDbRegion::createFromCurves). WaveS0/wS-solids live-verified headless (accoreconsole): area/bounds match the source curve exactly; requested layer is honored.",
       "owner_ticket": "M08G-T02",
       "implementation_strategy": "implemented_v1",
       "evidence_required": "existing_tests_and_evidence_refs"
@@ -25826,13 +25814,9 @@
       },
       "policy": {
         "source": "config/policy.v2.json",
-        "status_policy": "catalogued_not_runnable",
+        "status_policy": "implemented",
         "default_write_mode": "write_copy",
-        "allowed_write_modes": [
-          "write_copy"
-        ],
-        "no_original_write_default": true,
-        "runtime_behavior": "not_runnable_until_promoted_to_implemented_or_wired"
+        "no_original_write_default": true
       },
       "tests": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
@@ -25849,7 +25833,7 @@
         "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
         "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)"
       ],
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "Create a 3D solid by extruding a profile (AcDb3dSolid::createExtrudedSolid). WaveS0/wS-solids live-verified headless (accoreconsole): volume/surface_area match the box-extrusion closed form exactly.",
       "owner_ticket": "M08G-T02",
       "implementation_strategy": "implemented_v1",
       "evidence_required": "existing_tests_and_evidence_refs"
@@ -25901,13 +25885,9 @@
       },
       "policy": {
         "source": "config/policy.v2.json",
-        "status_policy": "catalogued_not_runnable",
+        "status_policy": "implemented",
         "default_write_mode": "write_copy",
-        "allowed_write_modes": [
-          "write_copy"
-        ],
-        "no_original_write_default": true,
-        "runtime_behavior": "not_runnable_until_promoted_to_implemented_or_wired"
+        "no_original_write_default": true
       },
       "tests": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
@@ -25924,7 +25904,7 @@
         "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
         "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)"
       ],
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "Create a 3D solid by lofting between section profiles (AcDb3dSolid::createLoftedSolid). WaveS0/wS-solids live-verified headless (accoreconsole): volume matches the general prismatoid formula exactly for two distinct offset closed profiles.",
       "owner_ticket": "M08G-T02",
       "implementation_strategy": "implemented_v1",
       "evidence_required": "existing_tests_and_evidence_refs"
@@ -25976,13 +25956,9 @@
       },
       "policy": {
         "source": "config/policy.v2.json",
-        "status_policy": "catalogued_not_runnable",
+        "status_policy": "implemented",
         "default_write_mode": "write_copy",
-        "allowed_write_modes": [
-          "write_copy"
-        ],
-        "no_original_write_default": true,
-        "runtime_behavior": "not_runnable_until_promoted_to_implemented_or_wired"
+        "no_original_write_default": true
       },
       "tests": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
@@ -25999,7 +25975,7 @@
         "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
         "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)"
       ],
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "Create a 3D solid primitive (box/sphere/torus/wedge/pyramid/frustum). WaveS0/wS-solids live-verified headless (accoreconsole): volume/surface_area match the closed-form solid-geometry formula for each requested primitive exactly.",
       "owner_ticket": "M08G-T02",
       "implementation_strategy": "implemented_v1",
       "evidence_required": "existing_tests_and_evidence_refs"
@@ -26051,13 +26027,9 @@
       },
       "policy": {
         "source": "config/policy.v2.json",
-        "status_policy": "catalogued_not_runnable",
+        "status_policy": "implemented",
         "default_write_mode": "write_copy",
-        "allowed_write_modes": [
-          "write_copy"
-        ],
-        "no_original_write_default": true,
-        "runtime_behavior": "not_runnable_until_promoted_to_implemented_or_wired"
+        "no_original_write_default": true
       },
       "tests": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
@@ -26074,7 +26046,7 @@
         "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
         "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)"
       ],
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "Create a 3D solid by revolving a profile about an axis (AcDb3dSolid::createRevolvedSolid). WaveS0/wS-solids live-verified headless (accoreconsole): volume matches the sector-of-cylinder closed form exactly.",
       "owner_ticket": "M08G-T02",
       "implementation_strategy": "implemented_v1",
       "evidence_required": "existing_tests_and_evidence_refs"
@@ -26126,13 +26098,9 @@
       },
       "policy": {
         "source": "config/policy.v2.json",
-        "status_policy": "catalogued_not_runnable",
+        "status_policy": "implemented",
         "default_write_mode": "write_copy",
-        "allowed_write_modes": [
-          "write_copy"
-        ],
-        "no_original_write_default": true,
-        "runtime_behavior": "not_runnable_until_promoted_to_implemented_or_wired"
+        "no_original_write_default": true
       },
       "tests": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
@@ -26149,7 +26117,7 @@
         "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
         "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)"
       ],
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "Create a 3D solid by sweeping a profile along a path (AcDb3dSolid::createSweptSolid). WaveS0/wS-solids live-verified headless (accoreconsole): volume/surface_area match the swept cross-section closed form exactly.",
       "owner_ticket": "M08G-T02",
       "implementation_strategy": "implemented_v1",
       "evidence_required": "existing_tests_and_evidence_refs"
@@ -26351,13 +26319,9 @@
       },
       "policy": {
         "source": "config/policy.v2.json",
-        "status_policy": "catalogued_not_runnable",
+        "status_policy": "implemented",
         "default_write_mode": "write_copy",
-        "allowed_write_modes": [
-          "write_copy"
-        ],
-        "no_original_write_default": true,
-        "runtime_behavior": "not_runnable_until_promoted_to_implemented_or_wired"
+        "no_original_write_default": true
       },
       "tests": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
@@ -26374,7 +26338,7 @@
         "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
         "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)"
       ],
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "Create a surface from a planar profile (AcDbSurface::createFrom). WaveS0/wS-solids live-verified headless (accoreconsole): surface_area/bounds match the source profile exactly.",
       "owner_ticket": "M08G-T02",
       "implementation_strategy": "implemented_v1",
       "evidence_required": "existing_tests_and_evidence_refs"

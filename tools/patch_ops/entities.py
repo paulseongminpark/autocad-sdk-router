@@ -74,6 +74,20 @@ WRITE_OP_MAP: Dict[str, str] = {
     "create_ray": "write.entity.ray",
     "create_xline": "write.entity.xline",
     "create_attribdef": "write.entity.attribdef",
+    # wS-solids: ASM/solids family (m08g_handlers.inc) -- live-verified headless
+    # (accoreconsole) via WaveS0's probe + this wave's B6 non-degeneracy gate
+    # (tools/asm_probe_driver.py). registry policy.status_policy reconciled
+    # from the stale M04 catalogued_not_runnable to implemented in the same
+    # wave (config/operations.v2.json).
+    "create_solid3d_primitive": "write.entity.solid3d.primitive",
+    "create_solid3d_extrude": "write.entity.solid3d.extrude",
+    "create_solid3d_revolve": "write.entity.solid3d.revolve",
+    "create_solid3d_sweep": "write.entity.solid3d.sweep",
+    "create_solid3d_loft": "write.entity.solid3d.loft",
+    "create_region": "write.entity.region",
+    "create_surface": "write.entity.surface",
+    "create_nurbsurface": "write.entity.nurbsurface",
+    "create_body": "write.entity.body",
 }
 
 
@@ -361,6 +375,84 @@ def build_job_args(native_op: str, args: Dict[str, Any]) -> Optional[Dict[str, A
         for k in ('base', 'direction', 'layer'):
             if k in args:
                 out[k] = args[k]
+        return out
+    if native_op == "write.entity.solid3d.primitive":
+        # wS-solids: m08g_handlers.inc reads "primitive" (box/sphere/torus/
+        # wedge/pyramid/frustum) + a union of dimension fields; only the
+        # subset each sub-kind actually uses is read (createBox ignores
+        # radius/height, createSphere ignores x/y/z, etc. -- see the C++
+        # createXxx dispatch in write.entity.solid3d.primitive). Passing the
+        # full union through is harmless: unread fields are simply ignored.
+        out: Dict[str, Any] = {}
+        for k in ('primitive', 'x', 'y', 'z', 'radius', 'height', 'top_radius',
+                  'minor_radius', 'layer'):
+            if k in args:
+                out[k] = args[k]
+        return out
+    if native_op == "write.entity.solid3d.extrude":
+        out: Dict[str, Any] = {}
+        for k in ('width', 'depth', 'height', 'layer'):
+            if k in args:
+                out[k] = args[k]
+        return out
+    if native_op == "write.entity.solid3d.revolve":
+        out: Dict[str, Any] = {}
+        for k in ('width', 'height', 'angle', 'layer'):
+            if k in args:
+                out[k] = args[k]
+        return out
+    if native_op == "write.entity.solid3d.sweep":
+        out: Dict[str, Any] = {}
+        for k in ('width', 'height', 'length', 'layer'):
+            if k in args:
+                out[k] = args[k]
+        return out
+    if native_op == "write.entity.solid3d.loft":
+        out: Dict[str, Any] = {}
+        for k in ('width', 'depth', 'top_width', 'top_depth', 'height', 'layer'):
+            if k in args:
+                out[k] = args[k]
+        return out
+    if native_op == "write.entity.region":
+        # wS-solids: requires a caller-supplied "curves":[<handle>,...] of
+        # PRE-EXISTING coplanar closed curves (e.g. a prior create_polyline
+        # step in the same multi-op patch) -- AcDbRegion::createFromCurves
+        # consumes clones of those, never args used to construct new geometry
+        # of its own. See m08g_handlers.inc's write.entity.region branch and
+        # tools/asm_probe_driver.py's precreate_curve chaining for the
+        # live-verified 2-step pattern this passthrough assumes the caller follows.
+        out: Dict[str, Any] = {}
+        for k in ('curves', 'layer'):
+            if k in args:
+                out[k] = args[k]
+        return out
+    if native_op == "write.entity.surface":
+        out: Dict[str, Any] = {}
+        for k in ('width', 'height', 'layer'):
+            if k in args:
+                out[k] = args[k]
+        return out
+    if native_op == "write.entity.nurbsurface":
+        # wS-solids/S6: width/height define a rectangular bilinear patch (see
+        # m08g_handlers.inc's write.entity.nurbsurface branch, S6 fix) --
+        # before S6 the handler read no args at all and always built the
+        # same hardcoded 1x1 patch (WaveS0 finding G4).
+        out: Dict[str, Any] = {}
+        for k in ('width', 'height', 'layer'):
+            if k in args:
+                out[k] = args[k]
+        return out
+    if native_op == "write.entity.body":
+        # wS-solids: the handler builds an empty AcDbBody with no content
+        # setter (WaveS0 finding G5) -- 'layer' is the only arg it reads.
+        # CREATED_DEGENERATE by construction; not certifiable non-degenerate
+        # until a content-setting C++ path exists. Wired here for registry
+        # completeness (status_policy=implemented is now honest about the
+        # HANDLER existing and dispatching, not about the result being
+        # non-degenerate -- see B6 gate / final report).
+        out: Dict[str, Any] = {}
+        if 'layer' in args:
+            out['layer'] = args['layer']
         return out
     return None
 

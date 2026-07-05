@@ -45,6 +45,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import math
 import os
 import shutil
 import sys
@@ -346,10 +347,226 @@ CASES = [
     ("write.entity.surface", "surface_from_profile",
      {"width": 25.0, "height": 18.0, "layer": "ARIADNE_ASM_PROBE"}, False),
     ("write.entity.nurbsurface", "nurbsurface_hardcoded",
-     {"layer": "ARIADNE_ASM_PROBE"}, False),  # handler reads NO args -- always the same 1x1 patch
+     {"layer": "ARIADNE_ASM_PROBE"}, False),  # wS-solids/S6: no width/height -> default 1x1 (regression case)
+    ("write.entity.nurbsurface", "nurbsurface_custom",
+     {"width": 7.0, "height": 4.0, "layer": "ARIADNE_ASM_PROBE"}, False),  # wS-solids/S6: caller-controlled patch
     ("write.entity.body", "body_empty",
      {"layer": "ARIADNE_ASM_PROBE"}, False),  # handler builds an empty AcDbBody -- no content setter called
 ]
+
+
+# --------------------------------------------------------------------------- #
+# B6 non-degeneracy gate (WaveS0 build_log.md section 5.2 design, wS-solids
+# implementation). Tiered RELATIVE tolerance for derived mass-property
+# invariants (AcBr's own numerical integration, not an echoed arg) -- a
+# SIBLING constant to cad_op_gate.DEFAULT_GEOMETRY_TOLERANCE (1e-6, an
+# ABSOLUTE tolerance for exact-echo coordinate comparisons; not the right
+# shape for a volume/area invariant).
+# --------------------------------------------------------------------------- #
+TIER1_RELATIVE_TOLERANCE = 1e-6   # closed-form primitives/extrude/revolve/sweep/region/surface/nurbsurface
+TIER2_RELATIVE_TOLERANCE = 1e-4   # loft (ASM ruled-surface numerical integration)
+NONDEGENERATE_ABS_FLOOR = 1e-9    # catches a genuinely-zero-size result
+
+
+def _expected_solid3d_primitive(args: Dict[str, Any]) -> Dict[str, Any]:
+    primitive = args.get("primitive", "box")
+    if primitive == "sphere":
+        r = args["radius"]
+        return {"volume": (4.0 / 3.0) * math.pi * r ** 3, "surface_area": 4.0 * math.pi * r ** 2}
+    if primitive == "torus":
+        big_r, small_r = args["radius"], args["minor_radius"]
+        return {"volume": 2.0 * math.pi ** 2 * big_r * small_r ** 2,
+                "surface_area": 4.0 * math.pi ** 2 * big_r * small_r}
+    if primitive == "wedge":
+        x, y, z = args["x"], args["y"], args["z"]
+        return {"volume": 0.5 * x * y * z}
+    if primitive == "pyramid":
+        h, r = args["height"], args["radius"]
+        return {"volume": (1.0 / 3.0) * (2.0 * r ** 2) * h}
+    if primitive == "frustum":
+        h, big_r, small_r = args["height"], args["radius"], args["top_radius"]
+        return {"volume": (math.pi * h / 3.0) * (big_r ** 2 + big_r * small_r + small_r ** 2)}
+    # box (default)
+    x, y, z = args["x"], args["y"], args["z"]
+    return {"volume": x * y * z, "surface_area": 2.0 * (x * y + y * z + z * x)}
+
+
+def _expected_solid3d_extrude(args: Dict[str, Any]) -> Dict[str, Any]:
+    w, d, h = args["width"], args["depth"], args["height"]
+    return {"volume": w * d * h, "surface_area": 2.0 * (w * d) + 2.0 * (w + d) * h}
+
+
+def _expected_solid3d_revolve(args: Dict[str, Any]) -> Dict[str, Any]:
+    # m08gMakeRectProfile(w,h) draws [0,w]x[0,h] in the profile's local XY;
+    # createRevolvedSolid's axis is (point=origin, dir=+Y) -- i.e. the profile's
+    # own w-edge sweeps out a sector-of-cylinder of radius w: V=(theta/2)*w^2*h.
+    w, h, angle = args["width"], args["height"], args["angle"]
+    return {"volume": (angle / 2.0) * w ** 2 * h}
+
+
+def _expected_solid3d_sweep(args: Dict[str, Any]) -> Dict[str, Any]:
+    w, h, length = args["width"], args["height"], args["length"]
+    perimeter = 2.0 * (w + h)
+    area = w * h
+    return {"volume": area * length, "surface_area": perimeter * length + 2.0 * area}
+
+
+def _expected_solid3d_loft(args: Dict[str, Any]) -> Dict[str, Any]:
+    # General prismatoid formula V=(h/6)(A_bottom+4*A_mid+A_top). The two
+    # profiles share one XY corner (m08gMakeRectProfile always starts at
+    # local origin) rather than a common center axis, so A_mid is the area of
+    # the LINEARLY-INTERPOLATED mid cross-section (avg width * avg depth) --
+    # NEVER a similar-shapes frustum formula (WaveS0 build_log.md section 0
+    # measured that off by ~15 units on this fixture).
+    w1, d1 = args["width"], args["depth"]
+    w2, d2 = args["top_width"], args["top_depth"]
+    h = args["height"]
+    a_bottom = w1 * d1
+    a_top = w2 * d2
+    a_mid = ((w1 + w2) / 2.0) * ((d1 + d2) / 2.0)
+    return {"volume": (h / 6.0) * (a_bottom + 4.0 * a_mid + a_top)}
+
+
+def _expected_region(args: Dict[str, Any]) -> Dict[str, Any]:
+    # Matches this driver's own hardcoded precreate rectangle (see
+    # _probe_one_inner's precreate_curve branch: 30x20, corners at origin).
+    return {"surface_area": 30.0 * 20.0}
+
+
+def _expected_surface(args: Dict[str, Any]) -> Dict[str, Any]:
+    w, h = args["width"], args["height"]
+    return {"surface_area": w * h}
+
+
+def _expected_nurbsurface(args: Dict[str, Any]) -> Dict[str, Any]:
+    # wS-solids/S6 fix: planar bilinear patch, area == width*height exactly.
+    # Missing/non-positive width or height default to 1.0, mirroring the C++
+    # handler's own default (m08g_handlers.inc's write.entity.nurbsurface).
+    w = args.get("width") or 1.0
+    h = args.get("height") or 1.0
+    if w <= 0.0:
+        w = 1.0
+    if h <= 0.0:
+        h = 1.0
+    return {"surface_area": w * h}
+
+
+# op_id -> (expected-invariant builder, tolerance tier). solid3d.primitive's
+# builder branches internally on args["primitive"] (one op_id, 6 shapes).
+# write.entity.body deliberately has NO entry -- see b6_gate's dedicated
+# EXPECTED_DEGENERATE branch (G5: no content setter exists, AcBr cannot bind).
+_EXPECTED_BUILDERS = {
+    "write.entity.solid3d.primitive": (_expected_solid3d_primitive, TIER1_RELATIVE_TOLERANCE),
+    "write.entity.solid3d.extrude": (_expected_solid3d_extrude, TIER1_RELATIVE_TOLERANCE),
+    "write.entity.solid3d.revolve": (_expected_solid3d_revolve, TIER1_RELATIVE_TOLERANCE),
+    "write.entity.solid3d.sweep": (_expected_solid3d_sweep, TIER1_RELATIVE_TOLERANCE),
+    "write.entity.solid3d.loft": (_expected_solid3d_loft, TIER2_RELATIVE_TOLERANCE),
+    "write.entity.region": (_expected_region, TIER1_RELATIVE_TOLERANCE),
+    "write.entity.surface": (_expected_surface, TIER1_RELATIVE_TOLERANCE),
+    "write.entity.nurbsurface": (_expected_nurbsurface, TIER1_RELATIVE_TOLERANCE),
+}
+
+
+def _rel_error(measured: Any, expected: Any) -> Optional[float]:
+    if not isinstance(measured, (int, float)) or not isinstance(expected, (int, float)):
+        return None
+    if expected == 0.0:
+        return None if measured == 0.0 else float("inf")
+    return abs(measured - expected) / abs(expected)
+
+
+def b6_gate(case: Dict[str, Any]) -> Dict[str, Any]:
+    """B6 non-degeneracy gate (WaveS0 design 5.2): bind_ok AND status_code==0
+    for whichever invariant is asserted AND measured-vs-expected within the
+    op-kind's tolerance tier AND the measured value clears an absolute
+    non-degeneracy floor. write.entity.body has no builder (structurally
+    degenerate per G5) -- its gate explicitly REQUIRES bind failure; a bind
+    success there would be the regression, not a bind failure."""
+    op = case.get("op")
+    # wS-solids: probe_one()'s own DRIVER_EXCEPTION fallback (main()'s per-case
+    # try/except, "never let one op's crash kill the sweep") has no "args" or
+    # "brep_bind_ok" keys -- calling build_fn on it would KeyError and defeat
+    # that very same isolation guarantee by crashing the WHOLE sweep from a
+    # single recoverable per-case failure (live-caught this wave: a
+    # self-inflicted concurrent-process race produced a transient
+    # FileNotFoundError on solid3d_loft, main() correctly caught it as
+    # DRIVER_EXCEPTION, then this function crashed on it uncaught with an
+    # unrelated-looking KeyError, losing every case after it). Fail loud but
+    # contained: report this one case's gate as failed, not the whole run.
+    if case.get("classification") == "DRIVER_EXCEPTION":
+        return {"op": op, "tag": case.get("tag"), "gate": "DRIVER_EXCEPTION", "pass": False,
+                "reason": case.get("reason") or "probe_one raised before producing a result"}
+    if op == "write.entity.body":
+        bind_ok = bool(case.get("brep_bind_ok"))
+        return {
+            "op": op, "tag": case.get("tag"), "gate": "EXPECTED_DEGENERATE",
+            "pass": (not bind_ok),
+            "reason": "AcDbBody has no content-setting C++ path (G5) -- AcBr bind "
+                      "MUST fail; a bind success here would be an undocumented "
+                      "regression/capability change, not a pass.",
+        }
+    builder = _EXPECTED_BUILDERS.get(op)
+    if builder is None:
+        return {"op": op, "tag": case.get("tag"), "gate": "NO_BUILDER", "pass": False,
+                "reason": "no expected-invariant builder wired for op_id %r" % op}
+    build_fn, tolerance = builder
+    expected = build_fn(case.get("args") or {})
+
+    bind_ok = bool(case.get("brep_bind_ok"))
+    if not bind_ok:
+        return {"op": op, "tag": case.get("tag"), "gate": "BIND_FAILED", "pass": False,
+                "expected": expected, "reason": "AcBr could not bind the created entity"}
+
+    brep = case.get("brep_results") or {}
+    vol_result = (brep.get("compute.brep.volume") or {}).get("result") or {}
+    area_result = (brep.get("compute.brep.surface_area") or {}).get("result") or {}
+
+    checks = []
+    for field, result_obj in (("volume", vol_result), ("surface_area", area_result)):
+        if field not in expected:
+            continue
+        status_code = result_obj.get("status_code")
+        measured = result_obj.get(field)
+        exp_val = expected[field]
+        if status_code != 0:
+            checks.append({"field": field, "ok": False,
+                           "reason": "status_code=%r (expected 0)" % status_code,
+                           "measured": measured, "expected": exp_val})
+            continue
+        if not (isinstance(measured, (int, float)) and measured > NONDEGENERATE_ABS_FLOOR):
+            checks.append({"field": field, "ok": False,
+                           "reason": "measured %r <= non-degeneracy floor %r" % (measured, NONDEGENERATE_ABS_FLOOR),
+                           "measured": measured, "expected": exp_val})
+            continue
+        rel_err = _rel_error(measured, exp_val)
+        ok = rel_err is not None and rel_err <= tolerance
+        checks.append({"field": field, "ok": ok, "measured": measured, "expected": exp_val,
+                       "rel_error": rel_err, "tolerance": tolerance})
+
+    all_ok = bool(checks) and all(c["ok"] for c in checks)
+    return {
+        "op": op, "tag": case.get("tag"), "gate": "B6", "pass": all_ok,
+        "tolerance_tier": tolerance, "expected": expected, "checks": checks,
+    }
+
+
+def extra_checks(case: Dict[str, Any]) -> Dict[str, Any]:
+    """Non-gate verification for this wave's other fixes (G2 layer, S8 kind/
+    bbox extraction) -- read directly off the new entity's post-IR record."""
+    record = case.get("new_entity_record") or {}
+    args = case.get("args") or {}
+    out: Dict[str, Any] = {}
+    requested_layer = args.get("layer")
+    if requested_layer:
+        out["g2_layer_check"] = {
+            "requested": requested_layer, "actual": record.get("layer"),
+            "pass": record.get("layer") == requested_layer,
+        }
+    geometry = record.get("geometry") or {}
+    out["s8_kind"] = geometry.get("kind")
+    out["s8_bbox"] = record.get("bbox")
+    out["s8_bbox_populated"] = bool(record.get("bbox"))
+    return out
 
 
 def main(argv=None) -> int:
@@ -369,6 +586,7 @@ def main(argv=None) -> int:
         cases = [c for c in CASES if any(s in c[1] for s in substrs)]
 
     results: List[Dict[str, Any]] = []
+    gates: List[Dict[str, Any]] = []
     for op_id, tag, args, precreate in cases:
         print("=== %s (%s) ===" % (tag, op_id))
         try:
@@ -383,6 +601,19 @@ def main(argv=None) -> int:
         if res.get("volume") is not None or res.get("area") is not None:
             print("  volume=%r area=%r" % (res.get("volume"), res.get("area")))
 
+        gate = b6_gate(res)
+        extra = extra_checks(res)
+        gate["extra_checks"] = extra
+        gates.append(gate)
+        print("  B6_gate=%s pass=%s" % (gate.get("gate"), gate.get("pass")))
+        for chk in gate.get("checks") or []:
+            print("    %s: measured=%r expected=%r rel_error=%r ok=%s" % (
+                chk.get("field"), chk.get("measured"), chk.get("expected"),
+                chk.get("rel_error"), chk.get("ok")))
+        if "g2_layer_check" in extra:
+            print("    g2_layer_check: %s" % extra["g2_layer_check"])
+        print("    s8_kind=%r s8_bbox_populated=%s" % (extra.get("s8_kind"), extra.get("s8_bbox_populated")))
+
     fixture_sha_end = sha256_file(FIXTURE)
     summary = {
         "schema": "s0_asmprobe.summary.v1",
@@ -392,6 +623,8 @@ def main(argv=None) -> int:
         "fixture_sha256_end": fixture_sha_end,
         "fixture_unchanged_overall": fixture_sha_start == fixture_sha_end,
         "results": results,
+        "gates": gates,
+        "all_gates_pass": all(g.get("pass") for g in gates) if gates else False,
     }
     os.makedirs(RUNS_ROOT, exist_ok=True)
     summary_path = os.path.join(RUNS_ROOT, "summary.json")
@@ -399,6 +632,7 @@ def main(argv=None) -> int:
         json.dump(summary, fh, ensure_ascii=False, indent=2)
     print("\nSummary written to %s" % summary_path)
     print("fixture_unchanged_overall=%s" % summary["fixture_unchanged_overall"])
+    print("all_gates_pass=%s" % summary["all_gates_pass"])
     return 0
 
 

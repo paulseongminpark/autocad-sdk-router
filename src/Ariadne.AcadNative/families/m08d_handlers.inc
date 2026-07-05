@@ -1014,16 +1014,28 @@ static bool m08dDispatch(const std::string& op, const AriadneJobCtx& ctx, std::o
                 return true;
             }
             if (op == "compute.brep.volume") {
+                // wS-solids/G3 fix: AcBr::getVolume() writes denormalized
+                // float noise (e.g. 2.62e-312) into 'vol' even on failure,
+                // despite the 0.0 initializer here -- observed live for
+                // surface/nurbsurface/region (status_code==2, "not
+                // applicable" for non-solid brep kinds). massprops' sibling
+                // branch below already gates its fields behind es==eOk; do
+                // the same here so a B6-gate consumer can never be fooled by
+                // a garbage non-zero value on a failed read (WaveS0 finding G3).
                 double vol = 0.0;
                 const AcBr::ErrorStatus es = brep.getVolume(vol);
-                r << "\"result\":{\"volume\":" << vol << ",\"status_code\":" << static_cast<int>(es)
+                r << "\"result\":{\"volume\":" << (es == AcBr::eOk ? vol : 0.0)
+                  << ",\"status_code\":" << static_cast<int>(es)
                   << "},\"status\":\"ok\"}";
                 return true;
             }
             if (op == "compute.brep.surface_area") {
+                // wS-solids/G3 fix: same getSurfaceArea() garbage-on-failure
+                // leak as compute.brep.volume above -- identical gate.
                 double area = 0.0;
                 const AcBr::ErrorStatus es = brep.getSurfaceArea(area);
-                r << "\"result\":{\"surface_area\":" << area << ",\"status_code\":" << static_cast<int>(es)
+                r << "\"result\":{\"surface_area\":" << (es == AcBr::eOk ? area : 0.0)
+                  << ",\"status_code\":" << static_cast<int>(es)
                   << "},\"status\":\"ok\"}";
                 return true;
             }

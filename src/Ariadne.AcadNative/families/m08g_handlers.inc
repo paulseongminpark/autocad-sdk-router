@@ -312,11 +312,22 @@ static AcGeMatrix3d m08gReadTransform(const std::string& job)
 // append; appended elements are closed. Returns count appended; statusOut is the
 // first non-eOk (or eOk).
 static int m08gAppendPieces(AcDbDatabase* pDb, AcDbVoidPtrArray& pieces,
-                            std::ostringstream& handlesJson, Acad::ErrorStatus& statusOut)
+                            std::ostringstream& handlesJson, Acad::ErrorStatus& statusOut,
+                            const std::string& layer = std::string())
 {
+    // wS-solids/G2 fix: an optional target layer, applied the same way every
+    // other m08g create-branch already does (ensureLayer at the database
+    // level once, then AcDbEntity::setLayer on each not-yet-resident piece
+    // BEFORE appendAcDbEntity -- mirrors write.entity.polyfacemesh's proven
+    // ensureLayer+setLayer-before-append ordering just above in this file).
+    // Default-empty preserves EXACT prior behavior for this function's other
+    // 3 call sites (explode/getOffsetCurves/getSplitCurves pieces, which have
+    // no "layer" job-arg concept and should keep inheriting the source
+    // entity's own layer) -- only write.entity.region passes a real layer.
     statusOut = Acad::eOk;
     handlesJson << "[";
     int appended = 0;
+    if (!layer.empty()) { bool c = false; ensureLayer(pDb, layer, 7, c); }
     AcDbBlockTable* pBT = nullptr;
     if (pDb->getBlockTable(pBT, AcDb::kForRead) != Acad::eOk) {
         // free everything; nothing appended
@@ -340,6 +351,8 @@ static int m08gAppendPieces(AcDbDatabase* pDb, AcDbVoidPtrArray& pieces,
         AcDbEntity* pPiece = static_cast<AcDbEntity*>(pieces[i]);
         if (pPiece == nullptr)
             continue;
+        if (!layer.empty())
+            pPiece->setLayer(asciiToWide(layer).c_str());
         AcDbObjectId pid;
         const Acad::ErrorStatus pe = pMS->appendAcDbEntity(pid, pPiece);
         if (pe == Acad::eOk) {
@@ -1097,7 +1110,10 @@ static bool m08gDispatch(const std::string& op, const AriadneJobCtx& ctx, std::o
         }
         std::ostringstream handlesJson; handlesJson.precision(kJsonDoublePrecision);
         Acad::ErrorStatus appendEs = Acad::eOk;
-        const int appended = m08gAppendPieces(pDb, regions, handlesJson, appendEs);
+        // wS-solids/G2 fix: pass 'layer' through so the created region(s)
+        // actually land on the requested layer instead of always "0" (was
+        // echoed in the reply below but silently dropped -- WaveS0 finding G2).
+        const int appended = m08gAppendPieces(pDb, regions, handlesJson, appendEs, layer);
         int probes = 0, ms = 0; countModelSpace(pDb, ms, probes);
         r << "\"result\":{\"created\":" << (appended > 0 ? "true" : "false")
           << ",\"region_count\":" << appended
@@ -1370,9 +1386,19 @@ static bool m08gDispatch(const std::string& op, const AriadneJobCtx& ctx, std::o
         return true;
     }
     if (op == "write.entity.nurbsurface") {
+        // wS-solids/S6 fix (closes WaveS0 finding G4): read real width/height
+        // job args instead of the previous hardcoded 1x1 unit patch, which
+        // produced the IDENTICAL bounds/area on every call regardless of what
+        // was requested. Degree-1, non-rational, 2x2 control grid is an exact
+        // planar bilinear patch, so surface_area == width*height exactly --
+        // the same closed-form-cert shape every other S-wave op gets.
+        double w = 1.0, h = 1.0;
+        jsonFindNumber(job, "width", w); jsonFindNumber(job, "height", h);
+        if (w <= 0.0) w = 1.0;
+        if (h <= 0.0) h = 1.0;
         AcGePoint3dArray cps;
-        cps.append(AcGePoint3d(0.0, 0.0, 0.0)); cps.append(AcGePoint3d(1.0, 0.0, 0.0));
-        cps.append(AcGePoint3d(0.0, 1.0, 0.0)); cps.append(AcGePoint3d(1.0, 1.0, 0.0));
+        cps.append(AcGePoint3d(0.0, 0.0, 0.0)); cps.append(AcGePoint3d(w, 0.0, 0.0));
+        cps.append(AcGePoint3d(0.0, h, 0.0)); cps.append(AcGePoint3d(w, h, 0.0));
         AcGeDoubleArray weights; weights.append(1.0); weights.append(1.0); weights.append(1.0); weights.append(1.0);
         AcGeKnotVector uKnots; uKnots.append(0.0); uKnots.append(0.0); uKnots.append(1.0); uKnots.append(1.0);
         AcGeKnotVector vKnots; vKnots.append(0.0); vKnots.append(0.0); vKnots.append(1.0); vKnots.append(1.0);
