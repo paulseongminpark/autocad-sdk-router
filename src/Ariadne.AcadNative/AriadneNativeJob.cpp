@@ -2047,15 +2047,38 @@ static std::string layersRichJson(AcDbDatabase* pDb, int& count)
     return arr.str();
 }
 
-// DIMSTYLE table with the D-class TABLES tier's representative DIMVAR subset
-// (w3-dimstyle): AcDbDimStyleTableRecord exposes ~70 dimension variables as
-// individual get/set pairs (dbdimvar.h) -- this surfaces the 10 write.
-// dimstyle.create actually writes today (see DimStylePropertyArgs below),
-// the same "extend as writers land" contract layersRichJson already set for
-// the LAYER table. dimclrd/dimclre/dimclrt are surfaced as a plain
-// colorIndex() int, matching the layer record's own "color_index"
+// DIMSTYLE table (w3-dimstyle + p1-dimvars): AcDbDimStyleTableRecord exposes
+// ~78 dimension variables as individual get/set pairs (dbdimvar.h) -- p1-
+// dimvars extended this from the original representative 10-field subset
+// (dimtxt/dimasz/dimexe/dimexo/dimdec/dimscale/dimclrd/dimclre/dimclrt/
+// dimse1) to the full honestly-settable surface (see DimStylePropertyArgs
+// below); every remaining DIMVAR dbdimvar.h declares a get/set pair for is
+// now wired here too. dimclrd/dimclre/dimclrt/dimtfillclr are surfaced as a
+// plain colorIndex() int, matching the layer record's own "color_index"
 // convention (AcCmColor's full RGB/book-color shape is out of scope for
 // both tables today).
+// p1-dimvars: resolve an ObjectId-typed DIMVAR (dimblk*/dimldrblk/dimltype/
+// dimltex1/dimltex2/dimtxsty) back to its symbol name for JSON output.
+// AcDbSymbolTableRecord::getName is shared by every symbol-table record
+// kind (block/linetype/textstyle/...), so one generic open-as-base-class
+// helper covers all 8 fields. A null id (never set -- the common case on a
+// freshly-created dimstyle) is not an error; it emits an empty string,
+// matching the DIMSTYLE dialog's own "none selected" UI.
+static std::string dimStyleObjectIdName(const AcDbObjectId& id)
+{
+    if (id.isNull())
+        return std::string();
+    AcDbSymbolTableRecord* pRec = nullptr;
+    if (acdbOpenObject(pRec, id, AcDb::kForRead) != Acad::eOk)
+        return std::string();
+    const ACHAR* nameRaw = nullptr;
+    std::string name;
+    if (pRec->getName(nameRaw) == Acad::eOk)
+        name = acharToAscii(nameRaw);
+    pRec->close();
+    return name;
+}
+
 static std::string dimStylesRichJson(AcDbDatabase* pDb, int& count)
 {
     count = 0;
@@ -2093,6 +2116,77 @@ static std::string dimStylesRichJson(AcDbDatabase* pDb, int& count)
                 << ",\"dimclre\":" << pRec->dimclre().colorIndex()
                 << ",\"dimclrt\":" << pRec->dimclrt().colorIndex()
                 << ",\"dimse1\":" << (pRec->dimse1() ? "true" : "false")
+                // p1-dimvars: full DIMVAR surface (dbdimvar.h) below,
+                // matching applyDimStyleProperties/the job-args parse block
+                // field-for-field.
+                << ",\"dimaltf\":" << pRec->dimaltf()
+                << ",\"dimaltrnd\":" << pRec->dimaltrnd()
+                << ",\"dimcen\":" << pRec->dimcen()
+                << ",\"dimdle\":" << pRec->dimdle()
+                << ",\"dimdli\":" << pRec->dimdli()
+                << ",\"dimgap\":" << pRec->dimgap()
+                << ",\"dimjogang\":" << pRec->dimjogang()
+                << ",\"dimlfac\":" << pRec->dimlfac()
+                << ",\"dimrnd\":" << pRec->dimrnd()
+                << ",\"dimtfac\":" << pRec->dimtfac()
+                << ",\"dimtm\":" << pRec->dimtm()
+                << ",\"dimtp\":" << pRec->dimtp()
+                << ",\"dimtsz\":" << pRec->dimtsz()
+                << ",\"dimtvp\":" << pRec->dimtvp()
+                << ",\"dimfxlen\":" << pRec->dimfxlen()
+                << ",\"dimmzf\":" << pRec->dimmzf()
+                << ",\"dimaltmzf\":" << pRec->dimaltmzf()
+                << ",\"dimadec\":" << pRec->dimadec()
+                << ",\"dimaltd\":" << pRec->dimaltd()
+                << ",\"dimalttd\":" << pRec->dimalttd()
+                << ",\"dimalttz\":" << pRec->dimalttz()
+                << ",\"dimaltu\":" << pRec->dimaltu()
+                << ",\"dimaltz\":" << pRec->dimaltz()
+                << ",\"dimarcsym\":" << pRec->dimarcsym()
+                << ",\"dimatfit\":" << pRec->dimatfit()
+                << ",\"dimaunit\":" << pRec->dimaunit()
+                << ",\"dimazin\":" << pRec->dimazin()
+                << ",\"dimfrac\":" << pRec->dimfrac()
+                << ",\"dimjust\":" << pRec->dimjust()
+                << ",\"dimlunit\":" << pRec->dimlunit()
+                << ",\"dimtad\":" << pRec->dimtad()
+                << ",\"dimtdec\":" << pRec->dimtdec()
+                << ",\"dimtfill\":" << pRec->dimtfill()
+                << ",\"dimtmove\":" << pRec->dimtmove()
+                << ",\"dimtolj\":" << pRec->dimtolj()
+                << ",\"dimtzin\":" << pRec->dimtzin()
+                << ",\"dimzin\":" << pRec->dimzin()
+                << ",\"dimalt\":" << (pRec->dimalt() ? "true" : "false")
+                << ",\"dimlim\":" << (pRec->dimlim() ? "true" : "false")
+                << ",\"dimsah\":" << (pRec->dimsah() ? "true" : "false")
+                << ",\"dimsd1\":" << (pRec->dimsd1() ? "true" : "false")
+                << ",\"dimsd2\":" << (pRec->dimsd2() ? "true" : "false")
+                << ",\"dimse2\":" << (pRec->dimse2() ? "true" : "false")
+                << ",\"dimsoxd\":" << (pRec->dimsoxd() ? "true" : "false")
+                << ",\"dimtih\":" << (pRec->dimtih() ? "true" : "false")
+                << ",\"dimtix\":" << (pRec->dimtix() ? "true" : "false")
+                << ",\"dimtofl\":" << (pRec->dimtofl() ? "true" : "false")
+                << ",\"dimtoh\":" << (pRec->dimtoh() ? "true" : "false")
+                << ",\"dimtol\":" << (pRec->dimtol() ? "true" : "false")
+                << ",\"dimupt\":" << (pRec->dimupt() ? "true" : "false")
+                << ",\"dimfxlenon\":" << (pRec->dimfxlenOn() ? "true" : "false")
+                << ",\"dimtxtdirection\":" << (pRec->dimtxtdirection() ? "true" : "false")
+                << ",\"dimapost\":\"" << jsonEscape(acharToAscii(pRec->dimapost())) << "\""
+                << ",\"dimpost\":\"" << jsonEscape(acharToAscii(pRec->dimpost())) << "\""
+                << ",\"dimmzs\":\"" << jsonEscape(acharToAscii(pRec->dimmzs())) << "\""
+                << ",\"dimaltmzs\":\"" << jsonEscape(acharToAscii(pRec->dimaltmzs())) << "\""
+                << ",\"dimdsep\":\"" << jsonEscape(wideToUtf8(std::wstring(1, pRec->dimdsep()))) << "\""
+                << ",\"dimtfillclr\":" << pRec->dimtfillclr().colorIndex()
+                << ",\"dimlwd\":" << static_cast<int>(pRec->dimlwd())
+                << ",\"dimlwe\":" << static_cast<int>(pRec->dimlwe())
+                << ",\"dimblk\":\"" << jsonEscape(dimStyleObjectIdName(pRec->dimblk())) << "\""
+                << ",\"dimblk1\":\"" << jsonEscape(dimStyleObjectIdName(pRec->dimblk1())) << "\""
+                << ",\"dimblk2\":\"" << jsonEscape(dimStyleObjectIdName(pRec->dimblk2())) << "\""
+                << ",\"dimldrblk\":\"" << jsonEscape(dimStyleObjectIdName(pRec->dimldrblk())) << "\""
+                << ",\"dimltype\":\"" << jsonEscape(dimStyleObjectIdName(pRec->dimltype())) << "\""
+                << ",\"dimltex1\":\"" << jsonEscape(dimStyleObjectIdName(pRec->dimltex1())) << "\""
+                << ",\"dimltex2\":\"" << jsonEscape(dimStyleObjectIdName(pRec->dimltex2())) << "\""
+                << ",\"dimtxsty\":\"" << jsonEscape(dimStyleObjectIdName(pRec->dimtxsty())) << "\""
                 << "}";
             ++count;
             pRec->close();
@@ -3170,13 +3264,15 @@ static Acad::ErrorStatus upsertLayerRecord(AcDbDatabase* pDb, const std::string&
     return es;
 }
 
-// D-class TABLES tier (w3-dimstyle): optional per-field overrides for a
-// DIMSTYLE table record write -- same hasX-flag upsert contract
-// LayerPropertyArgs/applyLayerProperties established above (an absent field
-// is left UNTOUCHED). Covers the representative DIMVAR subset write.
-// dimstyle.create actually supports today out of AcDbDimStyleTableRecord's
-// ~70 dimension variables (dbdimvar.h) -- the rest are an honest gap, not a
-// silent fake (Rule 12).
+// D-class TABLES tier (w3-dimstyle + p1-dimvars): optional per-field
+// overrides for a DIMSTYLE table record write -- same hasX-flag upsert
+// contract LayerPropertyArgs/applyLayerProperties established above (an
+// absent field is left UNTOUCHED). p1-dimvars extended this from the
+// original representative 10-DIMVAR subset to the full honestly-settable
+// surface out of AcDbDimStyleTableRecord's ~78 dimension variables
+// (dbdimvar.h) -- any field dbdimvar.h declares a get/set pair for and this
+// struct does NOT carry is a measured, documented exclusion (build_log.md),
+// not a silent gap (Rule 12).
 struct DimStylePropertyArgs {
     bool hasDimtxt = false;   double dimtxt = 2.5;
     bool hasDimasz = false;   double dimasz = 2.5;
@@ -3188,13 +3284,156 @@ struct DimStylePropertyArgs {
     bool hasDimclre = false;  int dimclre = 0;
     bool hasDimclrt = false;  int dimclrt = 0;
     bool hasDimse1 = false;   bool dimse1 = false;
+
+    // p1-dimvars: the remaining ~68 DIMVARs (dbdimvar.h) -- same hasX-flag
+    // upsert contract as the 10 fields above (an absent field is left
+    // UNTOUCHED). Grouped by C++ type, same relative order as the header.
+
+    // doubles
+    bool hasDimaltf = false;   double dimaltf = 25.4;
+    bool hasDimaltrnd = false; double dimaltrnd = 0.0;
+    bool hasDimcen = false;    double dimcen = 0.09;
+    bool hasDimdle = false;    double dimdle = 0.0;
+    bool hasDimdli = false;    double dimdli = 0.38;
+    bool hasDimgap = false;    double dimgap = 0.09;
+    bool hasDimjogang = false; double dimjogang = 0.7853981633974483;
+    bool hasDimlfac = false;   double dimlfac = 1.0;
+    bool hasDimrnd = false;    double dimrnd = 0.0;
+    bool hasDimtfac = false;   double dimtfac = 1.0;
+    bool hasDimtm = false;     double dimtm = 0.0;
+    bool hasDimtp = false;     double dimtp = 0.0;
+    bool hasDimtsz = false;    double dimtsz = 0.0;
+    bool hasDimtvp = false;    double dimtvp = 0.0;
+    bool hasDimfxlen = false;  double dimfxlen = 1.0;
+    bool hasDimmzf = false;    double dimmzf = 1.0;
+    bool hasDimaltmzf = false; double dimaltmzf = 1.0;
+
+    // ints
+    bool hasDimadec = false;   int dimadec = 0;
+    bool hasDimaltd = false;   int dimaltd = 2;
+    bool hasDimalttd = false;  int dimalttd = 2;
+    bool hasDimalttz = false;  int dimalttz = 0;
+    bool hasDimaltu = false;   int dimaltu = 2;
+    bool hasDimaltz = false;   int dimaltz = 0;
+    bool hasDimarcsym = false; int dimarcsym = 0;
+    bool hasDimatfit = false;  int dimatfit = 3;
+    bool hasDimaunit = false;  int dimaunit = 0;
+    bool hasDimazin = false;   int dimazin = 0;
+    bool hasDimfrac = false;   int dimfrac = 0;
+    bool hasDimjust = false;   int dimjust = 0;
+    bool hasDimlunit = false;  int dimlunit = 2;
+    bool hasDimtad = false;    int dimtad = 0;
+    bool hasDimtdec = false;   int dimtdec = 4;
+    bool hasDimtfill = false;  int dimtfill = 0;
+    bool hasDimtmove = false;  int dimtmove = 0;
+    bool hasDimtolj = false;   int dimtolj = 0;
+    bool hasDimtzin = false;   int dimtzin = 0;
+    bool hasDimzin = false;    int dimzin = 0;
+
+    // bools
+    bool hasDimalt = false;          bool dimalt = false;
+    bool hasDimlim = false;          bool dimlim = false;
+    bool hasDimsah = false;          bool dimsah = false;
+    bool hasDimsd1 = false;          bool dimsd1 = false;
+    bool hasDimsd2 = false;          bool dimsd2 = false;
+    bool hasDimse2 = false;          bool dimse2 = false;
+    bool hasDimsoxd = false;         bool dimsoxd = false;
+    bool hasDimtih = false;          bool dimtih = false;
+    bool hasDimtix = false;          bool dimtix = false;
+    bool hasDimtofl = false;         bool dimtofl = false;
+    bool hasDimtoh = false;          bool dimtoh = false;
+    bool hasDimtol = false;          bool dimtol = false;
+    bool hasDimupt = false;          bool dimupt = false;
+    bool hasDimfxlenOn = false;      bool dimfxlenOn = false;
+    bool hasDimtxtdirection = false; bool dimtxtdirection = false;
+
+    // content strings -- empty is a legitimate "clear" value, unlike the
+    // ObjectId-name fields below (mirrors AutoCAD's own dimapost/dimpost
+    // semantics: an empty prefix/suffix is meaningful, not "unset")
+    bool hasDimapost = false;  std::string dimapost;
+    bool hasDimpost = false;   std::string dimpost;
+    bool hasDimmzs = false;    std::string dimmzs;
+    bool hasDimaltmzs = false; std::string dimaltmzs;
+
+    // single-character decimal separator, carried as a 1-char UTF-8 string
+    // on the wire (widened + truncated to its first ACHAR at apply time)
+    bool hasDimdsep = false;   std::string dimdsep = ".";
+
+    // AcCmColor (colorIndex()-only, same convention as dimclrd/e/t above)
+    bool hasDimtfillclr = false; int dimtfillclr = 0;
+
+    // AcDb::LineWeight (int on the wire, same convention as write.layer.
+    // create's "lineweight")
+    bool hasDimlwd = false; int dimlwd = 0;
+    bool hasDimlwe = false; int dimlwe = 0;
+
+    // ObjectId-typed: resolved by NAME (never a raw handle), empty/absent
+    // leaves the field untouched -- mirrors LayerPropertyArgs.linetype's
+    // "hasX && !empty()" gate exactly.
+    bool hasDimblk = false;    std::string dimblk;
+    bool hasDimblk1 = false;   std::string dimblk1;
+    bool hasDimblk2 = false;   std::string dimblk2;
+    bool hasDimldrblk = false; std::string dimldrblk;
+    bool hasDimltype = false;  std::string dimltype;
+    bool hasDimltex1 = false;  std::string dimltex1;
+    bool hasDimltex2 = false;  std::string dimltex2;
+    bool hasDimtxsty = false;  std::string dimtxsty;
 };
+
+// p1-dimvars: DIMLTYPE/DIMLTEX1/DIMLTEX2 name resolution -- a dimstyle's
+// linetype fields need the SAME "not loaded yet -> try acad.lin once"
+// fallback applyLayerProperties already established for a layer's linetype
+// (see its own comment above). Duplicated here as a small dimstyle-local
+// helper rather than reworking applyLayerProperties into a shared utility,
+// to keep this wave's diff additive-only while other agents concurrently
+// edit this same file.
+static bool resolveDimStyleLinetype(AcDbDatabase* pDb, const std::string& name, AcDbObjectId& outId)
+{
+    const std::wstring nameW = asciiToWide(name);
+    AcDbLinetypeTable* pLTT = nullptr;
+    bool resolved = false;
+    if (pDb->getLinetypeTable(pLTT, AcDb::kForRead) == Acad::eOk) {
+        resolved = (pLTT->getAt(nameW.c_str(), outId) == Acad::eOk);
+        pLTT->close();
+    }
+    if (!resolved) {
+        pDb->loadLineTypeFile(nameW.c_str(), L"acad.lin");
+        if (pDb->getLinetypeTable(pLTT, AcDb::kForRead) == Acad::eOk) {
+            resolved = (pLTT->getAt(nameW.c_str(), outId) == Acad::eOk);
+            pLTT->close();
+        }
+    }
+    return resolved;
+}
+
+// p1-dimvars: DIMTXSTY name resolution. Unlike a linetype, there is no
+// standard "load this text style from a support file" mechanism, so a name
+// not already in the TEXTSTYLE table is a real failure, not a
+// resolve-or-load-once retry ("Standard" always exists in every DWG, same
+// as layer "0" and linetype "Continuous").
+static bool resolveTextStyleByName(AcDbDatabase* pDb, const std::string& name, AcDbObjectId& outId)
+{
+    const std::wstring nameW = asciiToWide(name);
+    AcDbTextStyleTable* pTST = nullptr;
+    if (pDb->getTextStyleTable(pTST, AcDb::kForRead) != Acad::eOk)
+        return false;
+    const bool resolved = (pTST->getAt(nameW.c_str(), outId) == Acad::eOk);
+    pTST->close();
+    return resolved;
+}
 
 // Apply every PRESENT field in props onto pRec (open for write -- either a
 // not-yet-added new record or an existing one reopened kForWrite). Mirrors
-// applyLayerProperties' has-flag gating exactly.
-static void applyDimStyleProperties(AcDbDimStyleTableRecord* pRec, const DimStylePropertyArgs& props)
+// applyLayerProperties' has-flag gating exactly. p1-dimvars: pDb (for the
+// ObjectId-typed fields' table lookups) and resolutionError (accumulates
+// every failed name resolution, semicolon-separated, mirroring
+// applyLayerProperties' own linetypeError out-param -- no-fake-success: a
+// name that can't be resolved is reported, never silently dropped) are new;
+// the original 10 fields are untouched.
+static void applyDimStyleProperties(AcDbDimStyleTableRecord* pRec, AcDbDatabase* pDb,
+                                    const DimStylePropertyArgs& props, std::string& resolutionError)
 {
+    resolutionError.clear();
     if (props.hasDimtxt)
         pRec->setDimtxt(props.dimtxt);
     if (props.hasDimasz)
@@ -3221,6 +3460,142 @@ static void applyDimStyleProperties(AcDbDimStyleTableRecord* pRec, const DimStyl
     }
     if (props.hasDimse1)
         pRec->setDimse1(props.dimse1);
+
+    // p1-dimvars: doubles
+    if (props.hasDimaltf)    pRec->setDimaltf(props.dimaltf);
+    if (props.hasDimaltrnd)  pRec->setDimaltrnd(props.dimaltrnd);
+    if (props.hasDimcen)     pRec->setDimcen(props.dimcen);
+    if (props.hasDimdle)     pRec->setDimdle(props.dimdle);
+    if (props.hasDimdli)     pRec->setDimdli(props.dimdli);
+    if (props.hasDimgap)     pRec->setDimgap(props.dimgap);
+    if (props.hasDimjogang)  pRec->setDimjogang(props.dimjogang);
+    if (props.hasDimlfac)    pRec->setDimlfac(props.dimlfac);
+    if (props.hasDimrnd)     pRec->setDimrnd(props.dimrnd);
+    if (props.hasDimtfac)    pRec->setDimtfac(props.dimtfac);
+    if (props.hasDimtm)      pRec->setDimtm(props.dimtm);
+    if (props.hasDimtp)      pRec->setDimtp(props.dimtp);
+    if (props.hasDimtsz)     pRec->setDimtsz(props.dimtsz);
+    if (props.hasDimtvp)     pRec->setDimtvp(props.dimtvp);
+    if (props.hasDimfxlen)   pRec->setDimfxlen(props.dimfxlen);
+    if (props.hasDimmzf)     pRec->setDimmzf(props.dimmzf);
+    if (props.hasDimaltmzf)  pRec->setDimaltmzf(props.dimaltmzf);
+
+    // p1-dimvars: ints
+    if (props.hasDimadec)   pRec->setDimadec(props.dimadec);
+    if (props.hasDimaltd)   pRec->setDimaltd(props.dimaltd);
+    if (props.hasDimalttd)  pRec->setDimalttd(props.dimalttd);
+    if (props.hasDimalttz)  pRec->setDimalttz(props.dimalttz);
+    if (props.hasDimaltu)   pRec->setDimaltu(props.dimaltu);
+    if (props.hasDimaltz)   pRec->setDimaltz(props.dimaltz);
+    if (props.hasDimarcsym) pRec->setDimarcsym(props.dimarcsym);
+    if (props.hasDimatfit)  pRec->setDimatfit(props.dimatfit);
+    if (props.hasDimaunit)  pRec->setDimaunit(props.dimaunit);
+    if (props.hasDimazin)   pRec->setDimazin(props.dimazin);
+    if (props.hasDimfrac)   pRec->setDimfrac(props.dimfrac);
+    if (props.hasDimjust)   pRec->setDimjust(props.dimjust);
+    if (props.hasDimlunit)  pRec->setDimlunit(props.dimlunit);
+    if (props.hasDimtad)    pRec->setDimtad(props.dimtad);
+    if (props.hasDimtdec)   pRec->setDimtdec(props.dimtdec);
+    if (props.hasDimtfill)  pRec->setDimtfill(props.dimtfill);
+    if (props.hasDimtmove)  pRec->setDimtmove(props.dimtmove);
+    if (props.hasDimtolj)   pRec->setDimtolj(props.dimtolj);
+    if (props.hasDimtzin)   pRec->setDimtzin(props.dimtzin);
+    if (props.hasDimzin)    pRec->setDimzin(props.dimzin);
+
+    // p1-dimvars: bools
+    if (props.hasDimalt)          pRec->setDimalt(props.dimalt);
+    if (props.hasDimlim)          pRec->setDimlim(props.dimlim);
+    if (props.hasDimsah)          pRec->setDimsah(props.dimsah);
+    if (props.hasDimsd1)          pRec->setDimsd1(props.dimsd1);
+    if (props.hasDimsd2)          pRec->setDimsd2(props.dimsd2);
+    if (props.hasDimse2)          pRec->setDimse2(props.dimse2);
+    if (props.hasDimsoxd)         pRec->setDimsoxd(props.dimsoxd);
+    if (props.hasDimtih)          pRec->setDimtih(props.dimtih);
+    if (props.hasDimtix)          pRec->setDimtix(props.dimtix);
+    if (props.hasDimtofl)         pRec->setDimtofl(props.dimtofl);
+    if (props.hasDimtoh)          pRec->setDimtoh(props.dimtoh);
+    if (props.hasDimtol)          pRec->setDimtol(props.dimtol);
+    if (props.hasDimupt)          pRec->setDimupt(props.dimupt);
+    if (props.hasDimfxlenOn)      pRec->setDimfxlenOn(props.dimfxlenOn);
+    if (props.hasDimtxtdirection) pRec->setDimtxtdirection(props.dimtxtdirection);
+
+    // p1-dimvars: content strings (empty is a legitimate "clear" value)
+    if (props.hasDimapost)  pRec->setDimapost(asciiToWide(props.dimapost).c_str());
+    if (props.hasDimpost)   pRec->setDimpost(asciiToWide(props.dimpost).c_str());
+    if (props.hasDimmzs)    pRec->setDimmzs(asciiToWide(props.dimmzs).c_str());
+    if (props.hasDimaltmzs) pRec->setDimaltmzs(asciiToWide(props.dimaltmzs).c_str());
+
+    // p1-dimvars: single-character decimal separator
+    if (props.hasDimdsep && !props.dimdsep.empty()) {
+        const std::wstring w = asciiToWide(props.dimdsep);
+        if (!w.empty())
+            pRec->setDimdsep(w[0]);
+    }
+
+    // p1-dimvars: fill color (AcCmColor, same colorIndex()-only convention
+    // as dimclrd/e/t above)
+    if (props.hasDimtfillclr) {
+        AcCmColor c; c.setColorIndex(static_cast<Adesk::UInt16>(props.dimtfillclr));
+        pRec->setDimtfillclr(c);
+    }
+
+    // p1-dimvars: lineweight enum (int on the wire, same convention as
+    // write.layer.create's "lineweight")
+    if (props.hasDimlwd)
+        pRec->setDimlwd(static_cast<AcDb::LineWeight>(props.dimlwd));
+    if (props.hasDimlwe)
+        pRec->setDimlwe(static_cast<AcDb::LineWeight>(props.dimlwe));
+
+    // p1-dimvars: ObjectId-typed fields resolved by NAME. Arrow-block fields
+    // go through AcDbDimStyleTableRecord's own const-ACHAR*-name setter
+    // overload (it resolves/auto-creates AutoCAD's reserved pseudo-names --
+    // "_DOT", "_OPEN", etc -- the same mechanism the DIMSTYLE dialog's arrow
+    // dropdown uses; a real user block name works the same way). Linetype
+    // and text-style fields go through the two resolver helpers above.
+    if (props.hasDimblk && !props.dimblk.empty()) {
+        if (pRec->setDimblk(asciiToWide(props.dimblk).c_str()) != Acad::eOk)
+            resolutionError += "dimblk '" + props.dimblk + "' could not be resolved; ";
+    }
+    if (props.hasDimblk1 && !props.dimblk1.empty()) {
+        if (pRec->setDimblk1(asciiToWide(props.dimblk1).c_str()) != Acad::eOk)
+            resolutionError += "dimblk1 '" + props.dimblk1 + "' could not be resolved; ";
+    }
+    if (props.hasDimblk2 && !props.dimblk2.empty()) {
+        if (pRec->setDimblk2(asciiToWide(props.dimblk2).c_str()) != Acad::eOk)
+            resolutionError += "dimblk2 '" + props.dimblk2 + "' could not be resolved; ";
+    }
+    if (props.hasDimldrblk && !props.dimldrblk.empty()) {
+        if (pRec->setDimldrblk(asciiToWide(props.dimldrblk).c_str()) != Acad::eOk)
+            resolutionError += "dimldrblk '" + props.dimldrblk + "' could not be resolved; ";
+    }
+    if (props.hasDimltype && !props.dimltype.empty()) {
+        AcDbObjectId ltId;
+        if (resolveDimStyleLinetype(pDb, props.dimltype, ltId))
+            pRec->setDimltype(ltId);
+        else
+            resolutionError += "dimltype '" + props.dimltype + "' not found and could not be loaded from acad.lin; ";
+    }
+    if (props.hasDimltex1 && !props.dimltex1.empty()) {
+        AcDbObjectId ltId;
+        if (resolveDimStyleLinetype(pDb, props.dimltex1, ltId))
+            pRec->setDimltex1(ltId);
+        else
+            resolutionError += "dimltex1 '" + props.dimltex1 + "' not found and could not be loaded from acad.lin; ";
+    }
+    if (props.hasDimltex2 && !props.dimltex2.empty()) {
+        AcDbObjectId ltId;
+        if (resolveDimStyleLinetype(pDb, props.dimltex2, ltId))
+            pRec->setDimltex2(ltId);
+        else
+            resolutionError += "dimltex2 '" + props.dimltex2 + "' not found and could not be loaded from acad.lin; ";
+    }
+    if (props.hasDimtxsty && !props.dimtxsty.empty()) {
+        AcDbObjectId tsId;
+        if (resolveTextStyleByName(pDb, props.dimtxsty, tsId))
+            pRec->setDimtxsty(tsId);
+        else
+            resolutionError += "dimtxsty '" + props.dimtxsty + "' not found in TEXTSTYLE table; ";
+    }
 }
 
 // D-class TABLES tier: create-or-update a named DIMSTYLE record (write.
@@ -3231,9 +3606,11 @@ static void applyDimStyleProperties(AcDbDimStyleTableRecord* pRec, const DimStyl
 // applies ONLY the fields present in props; omitted fields are left exactly
 // as they were.
 static Acad::ErrorStatus upsertDimStyleRecord(AcDbDatabase* pDb, const std::string& name,
-                                              const DimStylePropertyArgs& props, bool& created)
+                                              const DimStylePropertyArgs& props, bool& created,
+                                              std::string& resolutionError)
 {
     created = false;
+    resolutionError.clear();
     if (name.empty())
         return Acad::eInvalidInput;
 
@@ -3250,14 +3627,14 @@ static Acad::ErrorStatus upsertDimStyleRecord(AcDbDatabase* pDb, const std::stri
         es = acdbOpenObject(pRec, existingId, AcDb::kForWrite);
         if (es != Acad::eOk)
             return es;
-        applyDimStyleProperties(pRec, props);
+        applyDimStyleProperties(pRec, pDb, props, resolutionError);
         pRec->close();
         return Acad::eOk;
     }
 
     AcDbDimStyleTableRecord* pRec = new AcDbDimStyleTableRecord();
     pRec->setName(nameW.c_str());
-    applyDimStyleProperties(pRec, props);
+    applyDimStyleProperties(pRec, pDb, props, resolutionError);
 
     AcDbObjectId id;
     es = pDST->add(id, pRec);
@@ -4745,13 +5122,157 @@ static void ariadneNativeJob()
         props.hasDimse1 = jsonFindNumber(job, "dimse1", numRaw);
         props.dimse1 = (numRaw != 0.0);
 
+        // p1-dimvars: doubles
+        props.hasDimaltf = jsonFindNumber(job, "dimaltf", numRaw);
+        props.dimaltf = numRaw;
+        props.hasDimaltrnd = jsonFindNumber(job, "dimaltrnd", numRaw);
+        props.dimaltrnd = numRaw;
+        props.hasDimcen = jsonFindNumber(job, "dimcen", numRaw);
+        props.dimcen = numRaw;
+        props.hasDimdle = jsonFindNumber(job, "dimdle", numRaw);
+        props.dimdle = numRaw;
+        props.hasDimdli = jsonFindNumber(job, "dimdli", numRaw);
+        props.dimdli = numRaw;
+        props.hasDimgap = jsonFindNumber(job, "dimgap", numRaw);
+        props.dimgap = numRaw;
+        props.hasDimjogang = jsonFindNumber(job, "dimjogang", numRaw);
+        props.dimjogang = numRaw;
+        props.hasDimlfac = jsonFindNumber(job, "dimlfac", numRaw);
+        props.dimlfac = numRaw;
+        props.hasDimrnd = jsonFindNumber(job, "dimrnd", numRaw);
+        props.dimrnd = numRaw;
+        props.hasDimtfac = jsonFindNumber(job, "dimtfac", numRaw);
+        props.dimtfac = numRaw;
+        props.hasDimtm = jsonFindNumber(job, "dimtm", numRaw);
+        props.dimtm = numRaw;
+        props.hasDimtp = jsonFindNumber(job, "dimtp", numRaw);
+        props.dimtp = numRaw;
+        props.hasDimtsz = jsonFindNumber(job, "dimtsz", numRaw);
+        props.dimtsz = numRaw;
+        props.hasDimtvp = jsonFindNumber(job, "dimtvp", numRaw);
+        props.dimtvp = numRaw;
+        props.hasDimfxlen = jsonFindNumber(job, "dimfxlen", numRaw);
+        props.dimfxlen = numRaw;
+        props.hasDimmzf = jsonFindNumber(job, "dimmzf", numRaw);
+        props.dimmzf = numRaw;
+        props.hasDimaltmzf = jsonFindNumber(job, "dimaltmzf", numRaw);
+        props.dimaltmzf = numRaw;
+
+        // p1-dimvars: ints
+        props.hasDimadec = jsonFindNumber(job, "dimadec", numRaw);
+        props.dimadec = static_cast<int>(numRaw);
+        props.hasDimaltd = jsonFindNumber(job, "dimaltd", numRaw);
+        props.dimaltd = static_cast<int>(numRaw);
+        props.hasDimalttd = jsonFindNumber(job, "dimalttd", numRaw);
+        props.dimalttd = static_cast<int>(numRaw);
+        props.hasDimalttz = jsonFindNumber(job, "dimalttz", numRaw);
+        props.dimalttz = static_cast<int>(numRaw);
+        props.hasDimaltu = jsonFindNumber(job, "dimaltu", numRaw);
+        props.dimaltu = static_cast<int>(numRaw);
+        props.hasDimaltz = jsonFindNumber(job, "dimaltz", numRaw);
+        props.dimaltz = static_cast<int>(numRaw);
+        props.hasDimarcsym = jsonFindNumber(job, "dimarcsym", numRaw);
+        props.dimarcsym = static_cast<int>(numRaw);
+        props.hasDimatfit = jsonFindNumber(job, "dimatfit", numRaw);
+        props.dimatfit = static_cast<int>(numRaw);
+        props.hasDimaunit = jsonFindNumber(job, "dimaunit", numRaw);
+        props.dimaunit = static_cast<int>(numRaw);
+        props.hasDimazin = jsonFindNumber(job, "dimazin", numRaw);
+        props.dimazin = static_cast<int>(numRaw);
+        props.hasDimfrac = jsonFindNumber(job, "dimfrac", numRaw);
+        props.dimfrac = static_cast<int>(numRaw);
+        props.hasDimjust = jsonFindNumber(job, "dimjust", numRaw);
+        props.dimjust = static_cast<int>(numRaw);
+        props.hasDimlunit = jsonFindNumber(job, "dimlunit", numRaw);
+        props.dimlunit = static_cast<int>(numRaw);
+        props.hasDimtad = jsonFindNumber(job, "dimtad", numRaw);
+        props.dimtad = static_cast<int>(numRaw);
+        props.hasDimtdec = jsonFindNumber(job, "dimtdec", numRaw);
+        props.dimtdec = static_cast<int>(numRaw);
+        props.hasDimtfill = jsonFindNumber(job, "dimtfill", numRaw);
+        props.dimtfill = static_cast<int>(numRaw);
+        props.hasDimtmove = jsonFindNumber(job, "dimtmove", numRaw);
+        props.dimtmove = static_cast<int>(numRaw);
+        props.hasDimtolj = jsonFindNumber(job, "dimtolj", numRaw);
+        props.dimtolj = static_cast<int>(numRaw);
+        props.hasDimtzin = jsonFindNumber(job, "dimtzin", numRaw);
+        props.dimtzin = static_cast<int>(numRaw);
+        props.hasDimzin = jsonFindNumber(job, "dimzin", numRaw);
+        props.dimzin = static_cast<int>(numRaw);
+
+        // p1-dimvars: bools (0/1 number convention, matches dimse1 above)
+        props.hasDimalt = jsonFindNumber(job, "dimalt", numRaw);
+        props.dimalt = (numRaw != 0.0);
+        props.hasDimlim = jsonFindNumber(job, "dimlim", numRaw);
+        props.dimlim = (numRaw != 0.0);
+        props.hasDimsah = jsonFindNumber(job, "dimsah", numRaw);
+        props.dimsah = (numRaw != 0.0);
+        props.hasDimsd1 = jsonFindNumber(job, "dimsd1", numRaw);
+        props.dimsd1 = (numRaw != 0.0);
+        props.hasDimsd2 = jsonFindNumber(job, "dimsd2", numRaw);
+        props.dimsd2 = (numRaw != 0.0);
+        props.hasDimse2 = jsonFindNumber(job, "dimse2", numRaw);
+        props.dimse2 = (numRaw != 0.0);
+        props.hasDimsoxd = jsonFindNumber(job, "dimsoxd", numRaw);
+        props.dimsoxd = (numRaw != 0.0);
+        props.hasDimtih = jsonFindNumber(job, "dimtih", numRaw);
+        props.dimtih = (numRaw != 0.0);
+        props.hasDimtix = jsonFindNumber(job, "dimtix", numRaw);
+        props.dimtix = (numRaw != 0.0);
+        props.hasDimtofl = jsonFindNumber(job, "dimtofl", numRaw);
+        props.dimtofl = (numRaw != 0.0);
+        props.hasDimtoh = jsonFindNumber(job, "dimtoh", numRaw);
+        props.dimtoh = (numRaw != 0.0);
+        props.hasDimtol = jsonFindNumber(job, "dimtol", numRaw);
+        props.dimtol = (numRaw != 0.0);
+        props.hasDimupt = jsonFindNumber(job, "dimupt", numRaw);
+        props.dimupt = (numRaw != 0.0);
+        props.hasDimfxlenOn = jsonFindNumber(job, "dimfxlenon", numRaw);
+        props.dimfxlenOn = (numRaw != 0.0);
+        props.hasDimtxtdirection = jsonFindNumber(job, "dimtxtdirection", numRaw);
+        props.dimtxtdirection = (numRaw != 0.0);
+
+        // p1-dimvars: content strings -- empty is a legitimate "clear"
+        // value, so the has-flag is presence alone (unlike the
+        // name-resolved fields below).
+        props.hasDimapost = jsonFindString(job, "dimapost", props.dimapost);
+        props.hasDimpost = jsonFindString(job, "dimpost", props.dimpost);
+        props.hasDimmzs = jsonFindString(job, "dimmzs", props.dimmzs);
+        props.hasDimaltmzs = jsonFindString(job, "dimaltmzs", props.dimaltmzs);
+
+        // p1-dimvars: single-character decimal separator, travels as a
+        // 1-character JSON string
+        props.hasDimdsep = jsonFindString(job, "dimdsep", props.dimdsep);
+
+        // p1-dimvars: fill color + lineweight
+        props.hasDimtfillclr = jsonFindNumber(job, "dimtfillclr", numRaw);
+        props.dimtfillclr = static_cast<int>(numRaw);
+        props.hasDimlwd = jsonFindNumber(job, "dimlwd", numRaw);
+        props.dimlwd = static_cast<int>(numRaw);
+        props.hasDimlwe = jsonFindNumber(job, "dimlwe", numRaw);
+        props.dimlwe = static_cast<int>(numRaw);
+
+        // p1-dimvars: ObjectId-typed fields, resolved by NAME -- empty is
+        // NOT a meaningful value here (mirrors write.layer.create's
+        // "linetype" field exactly).
+        props.hasDimblk = jsonFindString(job, "dimblk", props.dimblk) && !props.dimblk.empty();
+        props.hasDimblk1 = jsonFindString(job, "dimblk1", props.dimblk1) && !props.dimblk1.empty();
+        props.hasDimblk2 = jsonFindString(job, "dimblk2", props.dimblk2) && !props.dimblk2.empty();
+        props.hasDimldrblk = jsonFindString(job, "dimldrblk", props.dimldrblk) && !props.dimldrblk.empty();
+        props.hasDimltype = jsonFindString(job, "dimltype", props.dimltype) && !props.dimltype.empty();
+        props.hasDimltex1 = jsonFindString(job, "dimltex1", props.dimltex1) && !props.dimltex1.empty();
+        props.hasDimltex2 = jsonFindString(job, "dimltex2", props.dimltex2) && !props.dimltex2.empty();
+        props.hasDimtxsty = jsonFindString(job, "dimtxsty", props.dimtxsty) && !props.dimtxsty.empty();
+
         bool created = false;
-        const Acad::ErrorStatus es = upsertDimStyleRecord(pDb, name, props, created);
+        std::string resolutionError;
+        const Acad::ErrorStatus es = upsertDimStyleRecord(pDb, name, props, created, resolutionError);
         const int dimstylesAfter = countSymbolTable(pDb->dimStyleTableId());
         r << "\"result\":{\"created\":" << (created ? "true" : "false")
           << ",\"updated\":" << ((es == Acad::eOk && !created) ? "true" : "false")
           << ",\"errorstatus\":" << static_cast<int>(es)
           << ",\"name\":\"" << jsonEscape(name) << "\""
+          << ",\"resolution_error\":\"" << jsonEscape(resolutionError) << "\""
           << ",\"dimstyles_after\":" << dimstylesAfter << "},"
           << "\"status\":\"" << (es == Acad::eOk ? "ok" : "error") << "\"}";
     }

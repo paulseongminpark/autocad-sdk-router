@@ -26,13 +26,14 @@ through re-extraction (symbol_tables.layers[], see AriadneNativeJob.cpp's
 upsertLayerRecord). Only fields present in ``args`` are forwarded; an absent
 field is left untouched on the native side, never defaulted/injected here.
 
-w3-dimstyle (D-class TABLES tier): write.dimstyle.create is the SAME upsert
-shape for the DIMSTYLE table -- AcDbDimStyleTableRecord exposes ~70
-dimension variables (dbdimvar.h); only a representative subset is wired on
-the native side today (dimtxt/dimasz/dimexe/dimexo/dimdec/dimscale/dimclrd/
-dimclre/dimclrt/dimse1 -- see AriadneNativeJob.cpp's DimStylePropertyArgs).
-The other ~60 DIMVARs are an honest gap: passing them in ``args`` is a
-silent no-op on the wire (never forwarded), not a fake write.
+w3-dimstyle + p1-dimvars (D-class TABLES tier): write.dimstyle.create is the
+SAME upsert shape for the DIMSTYLE table -- AcDbDimStyleTableRecord exposes
+~78 dimension variables (dbdimvar.h). p1-dimvars extended the native side
+(AriadneNativeJob.cpp's DimStylePropertyArgs) from the original
+representative 10-field subset to the full honestly-settable surface, and
+the passthrough allow-lists below now cover every wired field -- any DIMVAR
+NOT in one of these tuples is a measured, documented exclusion (see
+D:/dev/.build/cados_plan/runs/waveP/dimvars/build_log.md), not a silent gap.
 
 w3-ltts (D-class TABLES tier): write.linetype.create is the SAME upsert
 shape for the LINETYPE table -- name + description (comments) + a simple
@@ -82,14 +83,42 @@ _LAYER_PASSTHROUGH_FIELDS = ("color_index", "linetype", "lineweight")
 # idiomatic Python bool without silently becoming "false" on the wire.
 _LAYER_FLAG_FIELDS = ("plottable", "frozen", "off", "locked")
 
-# The representative DIMVAR subset write.dimstyle.create's native handler
-# actually reads (DimStylePropertyArgs in AriadneNativeJob.cpp) -- every
-# other DIMVAR name is NOT forwarded (see module docstring's gap note).
+# Every DIMVAR write.dimstyle.create's native handler reads (DimStyle
+# PropertyArgs in AriadneNativeJob.cpp) -- p1-dimvars extended both tuples
+# from the original representative 10-field subset to the full
+# honestly-settable ~78-DIMVAR surface (dbdimvar.h); any name still not
+# forwarded here is a measured, documented exclusion (build_log.md).
 _DIMSTYLE_PASSTHROUGH_FIELDS = (
     "dimtxt", "dimasz", "dimexe", "dimexo", "dimdec", "dimscale",
     "dimclrd", "dimclre", "dimclrt",
+    # p1-dimvars: doubles
+    "dimaltf", "dimaltrnd", "dimcen", "dimdle", "dimdli", "dimgap",
+    "dimjogang", "dimlfac", "dimrnd", "dimtfac", "dimtm", "dimtp",
+    "dimtsz", "dimtvp", "dimfxlen", "dimmzf", "dimaltmzf",
+    # p1-dimvars: ints
+    "dimadec", "dimaltd", "dimalttd", "dimalttz", "dimaltu", "dimaltz",
+    "dimarcsym", "dimatfit", "dimaunit", "dimazin", "dimfrac", "dimjust",
+    "dimlunit", "dimtad", "dimtdec", "dimtfill", "dimtmove", "dimtolj",
+    "dimtzin", "dimzin",
+    # p1-dimvars: AcCmColor index + AcDb::LineWeight (plain ints, same
+    # convention as dimclrd/e/t and LAYER's "lineweight" above)
+    "dimtfillclr", "dimlwd", "dimlwe",
+    # p1-dimvars: content strings (empty is a legitimate "clear" value) +
+    # the 1-character decimal separator
+    "dimapost", "dimpost", "dimmzs", "dimaltmzs", "dimdsep",
+    # p1-dimvars: ObjectId-typed fields resolved by NAME on the native side
+    # (block/linetype/textstyle lookup) -- plain string passthrough here,
+    # same as LAYER's "linetype" above.
+    "dimblk", "dimblk1", "dimblk2", "dimldrblk",
+    "dimltype", "dimltex1", "dimltex2", "dimtxsty",
 )
-_DIMSTYLE_FLAG_FIELDS = ("dimse1",)
+_DIMSTYLE_FLAG_FIELDS = (
+    "dimse1",
+    # p1-dimvars: bools
+    "dimalt", "dimlim", "dimsah", "dimsd1", "dimsd2", "dimse2", "dimsoxd",
+    "dimtih", "dimtix", "dimtofl", "dimtoh", "dimtol", "dimupt",
+    "dimfxlenon", "dimtxtdirection",
+)
 
 # The representative field subset write.linetype.create's native handler
 # actually reads (LinetypePropertyArgs in AriadneNativeJob.cpp). dash_lengths

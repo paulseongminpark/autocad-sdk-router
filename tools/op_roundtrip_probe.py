@@ -1651,14 +1651,40 @@ def probe_layer_mutation(name: str, baseline_args: Dict[str, Any], change_args: 
 # op_name / symbol-table section / field set.
 # --------------------------------------------------------------------------- #
 
-#: the representative DIMVAR subset write.dimstyle.create actually writes
-#: (AriadneNativeJob.cpp's DimStylePropertyArgs/applyDimStyleProperties) AND
-#: dimStylesRichJson extracts back -- the record-diff's comparable field set.
-#: AcDbDimStyleTableRecord exposes ~70 DIMVARs total (dbdimvar.h); the other
-#: ~60 are an honest gap (see tools/patch_ops/tables.py's module docstring),
-#: not yet write-wired, so they're out of scope here.
-DIMSTYLE_RECORD_FIELDS = ("dimtxt", "dimasz", "dimexe", "dimexo", "dimdec",
-                          "dimscale", "dimclrd", "dimclre", "dimclrt", "dimse1")
+#: every DIMVAR write.dimstyle.create writes (AriadneNativeJob.cpp's
+#: DimStylePropertyArgs/applyDimStyleProperties) AND dimStylesRichJson
+#: extracts back -- the record-diff's comparable field set. p1-dimvars
+#: extended this from the original representative 10-field subset to the
+#: full honestly-settable ~78-DIMVAR surface (dbdimvar.h); any DIMVAR name
+#: NOT listed here is a measured, documented exclusion (see
+#: D:\dev\.build\cados_plan\runs\waveP\dimvars\build_log.md), not an
+#: oversight.
+DIMSTYLE_RECORD_FIELDS = (
+    "dimtxt", "dimasz", "dimexe", "dimexo", "dimdec",
+    "dimscale", "dimclrd", "dimclre", "dimclrt", "dimse1",
+    # p1-dimvars: doubles
+    "dimaltf", "dimaltrnd", "dimcen", "dimdle", "dimdli", "dimgap",
+    "dimjogang", "dimlfac", "dimrnd", "dimtfac", "dimtm", "dimtp",
+    "dimtsz", "dimtvp", "dimfxlen", "dimmzf", "dimaltmzf",
+    # p1-dimvars: ints
+    "dimadec", "dimaltd", "dimalttd", "dimalttz", "dimaltu", "dimaltz",
+    "dimarcsym", "dimatfit", "dimaunit", "dimazin", "dimfrac", "dimjust",
+    "dimlunit", "dimtad", "dimtdec", "dimtfill", "dimtmove", "dimtolj",
+    "dimtzin", "dimzin",
+    # p1-dimvars: bools
+    "dimalt", "dimlim", "dimsah", "dimsd1", "dimsd2", "dimse2", "dimsoxd",
+    "dimtih", "dimtix", "dimtofl", "dimtoh", "dimtol", "dimupt",
+    "dimfxlenon", "dimtxtdirection",
+    # p1-dimvars: content strings + 1-char decimal separator
+    "dimapost", "dimpost", "dimmzs", "dimaltmzs", "dimdsep",
+    # p1-dimvars: AcCmColor index + AcDb::LineWeight
+    "dimtfillclr", "dimlwd", "dimlwe",
+    # p1-dimvars: ObjectId-typed fields, compared by resolved NAME (never a
+    # raw handle -- dimStylesRichJson resolves these back to their
+    # referenced record's name, see dimStyleObjectIdName)
+    "dimblk", "dimblk1", "dimblk2", "dimldrblk",
+    "dimltype", "dimltex1", "dimltex2", "dimtxsty",
+)
 
 
 def _dimstyle_by_name(ir: Dict[str, Any], name: str) -> Optional[Dict[str, Any]]:
