@@ -188,6 +188,9 @@ _KNOWN_GEOMETRY_LEAF_FIELDS = frozenset({
     "minor_ratio", "start_angle", "end_angle", "normal", "closed", "vertices",
     "text", "height", "rotation", "block_name", "scale", "dimension_type",
     "measurement", "control_points", "degree", "loops", "pattern_name",
+    # p8-simple2: 3DFACE/SOLID/TRACE's 4 flat vertices + 3DFACE's per-edge
+    # visibility flags (schemas/dwg_graph_ir.v1.schema.json geometry $defs).
+    "p0", "p1", "p2", "p3", "edge_visibility",
 })
 
 # Entity keys that are IDENTITY / PROVENANCE, not oracle-asserted DATA: they

@@ -55,6 +55,9 @@ WRITE_OP_MAP: Dict[str, str] = {
     "create_polyfacemesh": "write.entity.polyfacemesh",
     "create_dimension_radiallarge": "write.entity.dim.radiallarge",
     "create_blockref": "write.entity.blockref",
+    "create_face3d": "write.entity.face",
+    "create_solid2d": "write.entity.solid2d",
+    "create_trace": "write.entity.trace",
 }
 
 
@@ -270,6 +273,14 @@ def build_job_args(native_op: str, args: Dict[str, Any]) -> Optional[Dict[str, A
         # TestSetEntityXdataIsDatabaseLevelNotEntityLevel.
         out: Dict[str, Any] = {}
         for k in ('app', 'value'):
+            if k in args:
+                out[k] = args[k]
+        return out
+    if native_op in ("write.entity.face", "write.entity.solid2d", "write.entity.trace"):
+        # p8-simple2: all 3 flat 4-point entities (m08g_handlers.inc) share
+        # the identical p0..p3 + layer job-arg shape.
+        out: Dict[str, Any] = {}
+        for k in ('p0', 'p1', 'p2', 'p3', 'layer'):
             if k in args:
                 out[k] = args[k]
         return out

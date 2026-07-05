@@ -523,6 +523,13 @@ _NATIVE_CLASS_TO_DXF_KIND = {
     # "poly_face_mesh" kind.
     "AcDbPolyFaceMesh": ("POLYLINE", "poly_face_mesh"),
     "AcDbRadialDimensionLarge": ("DIMENSION", "dimension"),
+    # p8-simple2: AcDbFace/AcDbTrace, the other two flat 4-point entities
+    # alongside AcDbSolid above (already mapped to dxf_name "SOLID"/kind
+    # "solid" from an earlier batch -- unchanged here, its own geometry lift
+    # just gained p0..p3 below). AcDbFace's DXF record is "3DFACE" (not
+    # "FACE"); AcDbTrace's is "TRACE".
+    "AcDbFace": ("3DFACE", "face3d"),
+    "AcDbTrace": ("TRACE", "trace"),
 }
 
 
@@ -565,7 +572,11 @@ def _geometry_from_native_entity(raw: dict, kind: str) -> dict:
                 "major_axis", "xline1_point", "xline2_point", "dim_line_point",
                 "chord_point", "far_chord_point", "defining_point", "leader_end_point",
                 "arc_point", "xline1_start", "xline1_end", "xline2_start", "xline2_end",
-                "override_center", "jog_point"):
+                "override_center", "jog_point",
+                # p8-simple2: AcDbFace/AcDbSolid/AcDbTrace's 4 flat vertices,
+                # keyed exactly like the write.entity.face/solid2d/trace job
+                # args (m08g_handlers.inc) so the roundtrip diff is direct.
+                "p0", "p1", "p2", "p3"):
         pt = _as_point3(raw.get(key))
         if pt is not None:
             geom[key] = pt
@@ -598,6 +609,12 @@ def _geometry_from_native_entity(raw: dict, kind: str) -> dict:
         geom["m_closed"] = raw["m_closed"]
     if isinstance(raw.get("n_closed"), bool):
         geom["n_closed"] = raw["n_closed"]
+    # p8-simple2: AcDbFace's 4 edge-visibility flags (isEdgeVisibleAt) --
+    # a fixed-length bool array, same bare passthrough shape "faces" below
+    # uses for AcDbPolyFaceMesh's per-face index arrays.
+    edge_vis = raw.get("edge_visibility")
+    if isinstance(edge_vis, list) and edge_vis:
+        geom["edge_visibility"] = [bool(v) for v in edge_vis]
     verts = raw.get("vertices")
     if isinstance(verts, list) and verts:
         norm = []

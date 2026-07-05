@@ -147,6 +147,15 @@ upsert contract for the LINETYPE symbol table, writing name/description
 (comments) plus a simple dash-only pattern (dash_lengths); complex-linetype
 shape/text embedding is an unwritten gap (see tools/patch_ops/tables.py's
 module docstring). Oracle extended accordingly; same invariants unaffected.
+
+p8-simple2 update: create_face3d/create_solid2d/create_trace (write.entity.
+face/solid2d/trace, AcDbFace/AcDbSolid/AcDbTrace) gain their first-ever
+patch_ops wiring -- all 3 were already native-REACHABLE (m08g_handlers.inc's
+m08gHasOp/m08gDispatch already built the real entities) but had no
+patch_ops.WRITE_OP_MAP entry and no collectModelSpaceGraph read branch, the
+same two-part gap every w3-* single-kind batch above closed. All 3 share the
+identical p0..p3 + layer job-arg shape (entities.py's build_job_args treats
+them as one branch). Oracle extended accordingly; same invariants unaffected.
 """
 from __future__ import annotations
 
@@ -195,6 +204,9 @@ _ORIGINAL_NATIVE_WRITE_OP_MAP = {
     "create_blockref": "write.entity.blockref",
     "create_dimstyle": "write.dimstyle.create",
     "create_linetype": "write.linetype.create",
+    "create_face3d": "write.entity.face",
+    "create_solid2d": "write.entity.solid2d",
+    "create_trace": "write.entity.trace",
 }
 
 

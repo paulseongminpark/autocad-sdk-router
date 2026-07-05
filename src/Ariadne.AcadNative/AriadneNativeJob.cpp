@@ -1800,6 +1800,59 @@ static bool collectEntitiesFromBlock(AcDbBlockTableRecord* pBTR, const char* spa
             arr << "]";
             arr << ",\"closed\":" << (pMl->closedMline() ? "true" : "false");
         }
+        // p8-simple2: AcDbFace/AcDbSolid/AcDbTrace (write.entity.face/
+        // solid2d/trace, m08g_handlers.inc) are all flat 4-point entities
+        // built from the same p0..p3 job keys -- grouped together here.
+        // Neither derives from the other or from anything cast above (all
+        // three: public AcDbEntity directly, dbents.h), so cast ordering is
+        // not load-bearing, same as AcDbEllipse's note above. AcDbFace uses
+        // its own getVertexAt()/isEdgeVisibleAt() accessors; AcDbSolid/
+        // AcDbTrace share the identical getPointAt() signature. Points are
+        // emitted verbatim from whatever the API returns post-persist (no
+        // reordering here) -- ir_builder.py/op_roundtrip_probe.py assert the
+        // MEASURED vertex convention (AutoCAD's own SOLID/TRACE "bow-tie"
+        // 3rd/4th-vertex storage is a live question, not an assumption).
+        else if (AcDbFace* pFace = AcDbFace::cast(pEnt)) {
+            AcGePoint3d v0, v1, v2, v3;
+            pFace->getVertexAt(0, v0);
+            pFace->getVertexAt(1, v1);
+            pFace->getVertexAt(2, v2);
+            pFace->getVertexAt(3, v3);
+            arr << ",\"p0\":[" << v0.x << "," << v0.y << "," << v0.z << "]"
+                << ",\"p1\":[" << v1.x << "," << v1.y << "," << v1.z << "]"
+                << ",\"p2\":[" << v2.x << "," << v2.y << "," << v2.z << "]"
+                << ",\"p3\":[" << v3.x << "," << v3.y << "," << v3.z << "]";
+            arr << ",\"edge_visibility\":[";
+            for (int ei = 0; ei < 4; ++ei) {
+                Adesk::Boolean vis = Adesk::kTrue;
+                pFace->isEdgeVisibleAt(static_cast<Adesk::UInt16>(ei), vis);
+                if (ei != 0) arr << ",";
+                arr << (vis ? "true" : "false");
+            }
+            arr << "]";
+        }
+        else if (AcDbSolid* pSolid = AcDbSolid::cast(pEnt)) {
+            AcGePoint3d v0, v1, v2, v3;
+            pSolid->getPointAt(0, v0);
+            pSolid->getPointAt(1, v1);
+            pSolid->getPointAt(2, v2);
+            pSolid->getPointAt(3, v3);
+            arr << ",\"p0\":[" << v0.x << "," << v0.y << "," << v0.z << "]"
+                << ",\"p1\":[" << v1.x << "," << v1.y << "," << v1.z << "]"
+                << ",\"p2\":[" << v2.x << "," << v2.y << "," << v2.z << "]"
+                << ",\"p3\":[" << v3.x << "," << v3.y << "," << v3.z << "]";
+        }
+        else if (AcDbTrace* pTrace = AcDbTrace::cast(pEnt)) {
+            AcGePoint3d v0, v1, v2, v3;
+            pTrace->getPointAt(0, v0);
+            pTrace->getPointAt(1, v1);
+            pTrace->getPointAt(2, v2);
+            pTrace->getPointAt(3, v3);
+            arr << ",\"p0\":[" << v0.x << "," << v0.y << "," << v0.z << "]"
+                << ",\"p1\":[" << v1.x << "," << v1.y << "," << v1.z << "]"
+                << ",\"p2\":[" << v2.x << "," << v2.y << "," << v2.z << "]"
+                << ",\"p3\":[" << v3.x << "," << v3.y << "," << v3.z << "]";
+        }
 
         arr << "}";
         pEnt->close();
