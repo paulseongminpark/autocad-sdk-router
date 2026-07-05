@@ -1117,17 +1117,42 @@ static bool m08gDispatch(const std::string& op, const AriadneJobCtx& ctx, std::o
             verts.append(AcGePoint2d(0.0, 0.0)); verts.append(AcGePoint2d(1.0, 0.0)); verts.append(AcGePoint2d(1.0, 1.0)); verts.append(AcGePoint2d(0.0, 1.0));
         }
         AcGeDoubleArray bulges; for (int i = 0; i < verts.length(); ++i) bulges.append(0.0);
+        // BUGFIX (a0-engineprep): the original code built the WHOLE mpolygon
+        // (setPattern/appendMPolygonLoop/evaluateHatch/balanceDisplay) on a
+        // bare, ownerless new()'d AcDbMPolygon* and only appended it to model
+        // space (m08gAppendEntity) at the very end -- appendMPolygonLoop
+        // live-probed to eNoClassId (409, C:\ObjectARX 2027\inc\acadstrc.h):
+        // AcDbMPolygon's boundary/loop-management engine (AcMPolygonObj)
+        // needs the entity to already be database-resident before it can
+        // register loop geometry against it. AcDb3dPolyline and
+        // AcDbPolyFaceMesh (this same file, above) already establish the
+        // correct convention for this class of entity -- append the empty
+        // shell FIRST, THEN populate it -- mirrored here verbatim.
+        if (!layer.empty()) { bool c = false; ensureLayer(pDb, layer, 7, c); }
+        AcDbBlockTable* pBT = nullptr;
+        Acad::ErrorStatus es = pDb->getBlockTable(pBT, AcDb::kForRead);
+        if (es != Acad::eOk) { emitNativeError(r, "DB_ERROR", "getBlockTable"); return true; }
+        AcDbBlockTableRecord* pMS = nullptr;
+        es = pBT->getAt(ACDB_MODEL_SPACE, pMS, AcDb::kForWrite);
+        pBT->close();
+        if (es != Acad::eOk) { emitNativeError(r, "DB_ERROR", "getAt modelspace"); return true; }
         AcDbMPolygon* pE = new AcDbMPolygon();
         pE->setDatabaseDefaults(pDb);
-        pE->setNormal(AcGeVector3d(0.0, 0.0, 1.0));
-        pE->setElevation(0.0);
-        Acad::ErrorStatus es = pE->setPattern(AcDbHatch::kPreDefined, L"SOLID");
+        if (!layer.empty()) pE->setLayer(asciiToWide(layer).c_str());
+        AcDbObjectId id;
+        es = pMS->appendAcDbEntity(id, pE);
+        pMS->close();
+        if (es != Acad::eOk) { delete pE; emitNativeError(r, "APPEND_FAILED", "appendAcDbEntity mpolygon errorstatus " + std::to_string(static_cast<int>(es))); return true; }
+        es = pE->setNormal(AcGeVector3d(0.0, 0.0, 1.0));
+        if (es == Acad::eOk) es = pE->setElevation(0.0);
+        if (es == Acad::eOk) es = pE->setPattern(AcDbHatch::kPreDefined, L"SOLID");
         if (es == Acad::eOk) es = pE->appendMPolygonLoop(verts, bulges, true);
         if (es == Acad::eOk) es = pE->evaluateHatch();
         if (es == Acad::eOk) es = pE->balanceDisplay();
-        if (es != Acad::eOk) { delete pE; emitNativeError(r, "MPOLYGON_BUILD_FAILED", "AcDbMPolygon build errorstatus " + std::to_string(static_cast<int>(es))); return true; }
-        AcDbObjectId id; int ms = 0; es = m08gAppendEntity(pDb, layer, pE, id, ms);
-        m08gEmitModelerCreate(r, "AcDbMPolygon", es, id, layer, ms);
+        pE->close();
+        int probes = 0, ms = 0; countModelSpace(pDb, ms, probes);
+        if (es != Acad::eOk) { emitNativeError(r, "MPOLYGON_BUILD_FAILED", "AcDbMPolygon build errorstatus " + std::to_string(static_cast<int>(es))); return true; }
+        m08gEmitModelerCreate(r, "AcDbMPolygon", Acad::eOk, id, layer, ms);
         return true;
     }
     if (op == "write.entity.rasterimage") {
@@ -1161,10 +1186,36 @@ static bool m08gDispatch(const std::string& op, const AriadneJobCtx& ctx, std::o
     if (op == "write.entity.wipeout") {
         AcGePoint2dArray verts;
         if (!m08gRead2dVertices(job, verts)) { verts.append(AcGePoint2d(0.0, 0.0)); verts.append(AcGePoint2d(1.0, 0.0)); verts.append(AcGePoint2d(1.0, 1.0)); verts.append(AcGePoint2d(0.0, 1.0)); }
-        Acad::ErrorStatus es = AcDbWipeout::createImageDefinition();
-        if (es != Acad::eOk && es != Acad::eAlreadyInDb) { emitNativeError(r, "WIPEOUT_DEF_FAILED", "AcDbWipeout::createImageDefinition errorstatus " + std::to_string(static_cast<int>(es))); return true; }
+        // BUGFIX (a0-engineprep): the original code called the static, no-arg
+        // AcDbWipeout::createImageDefinition() and then NEVER retrieved or
+        // attached any image-definition id at all -- setImageDefId() was never
+        // called. AcDbWipeout IS-A AcDbRasterImage (dbwipe.h) and, like every
+        // other raster-image entity, is invalid until wired to a database-
+        // resident AcDbRasterImageDef via setImageDefId() (see the working
+        // write.entity.rasterimage branch above, which this now mirrors).
+        // A wipeout has no real backing file, so a placeholder def is minted in
+        // ctx.pDb's own ACAD_IMAGE_DICT the same way rasterimage does
+        // (AcDbRasterImageDef::imageDictionary/createImageDictionary +
+        // AcDbDictionary::setAt) instead of depending on the legacy
+        // createImageDefinition() static helper, which live-probed to
+        // eKeyNotFound (22) against this handler's staged db.
+        AcDbObjectId dictId = AcDbRasterImageDef::imageDictionary(pDb);
+        Acad::ErrorStatus es = Acad::eOk;
+        if (dictId.isNull()) es = AcDbRasterImageDef::createImageDictionary(pDb, dictId);
+        if (es != Acad::eOk || dictId.isNull()) { emitNativeError(r, "WIPEOUT_DICT_FAILED", "image dictionary errorstatus " + std::to_string(static_cast<int>(es))); return true; }
+        AcDbDictionary* pDict = nullptr;
+        if (acdbOpenObject(pDict, dictId, AcDb::kForWrite) != Acad::eOk || pDict == nullptr) { emitNativeError(r, "WIPEOUT_DICT_OPEN_FAILED", "could not open image dictionary"); return true; }
+        AcDbRasterImageDef* pDef = new AcDbRasterImageDef();
+        std::string defName = "ARIADNE_WIPEOUT_IMAGEDEF";
+        jsonFindString(job, "name", defName);
+        AcDbObjectId defId;
+        es = pDict->setAt(utf8ToWide(defName).c_str(), pDef, defId);
+        pDict->close();
+        if (es == Acad::eOk) pDef->close(); else { delete pDef; emitNativeError(r, "WIPEOUT_DEF_FAILED", "image def setAt errorstatus " + std::to_string(static_cast<int>(es))); return true; }
         AcDbWipeout* pE = new AcDbWipeout();
         pE->setDatabaseDefaults(pDb);
+        es = pE->setImageDefId(defId);
+        if (es != Acad::eOk) { delete pE; emitNativeError(r, "WIPEOUT_IMAGEDEFID_FAILED", "setImageDefId errorstatus " + std::to_string(static_cast<int>(es))); return true; }
         pE->setOrientation(AcGePoint3d(0.0, 0.0, 0.0), AcGeVector3d(1.0, 0.0, 0.0), AcGeVector3d(0.0, 1.0, 0.0));
         es = pE->setClipBoundary(AcDbRasterImage::kPoly, verts);
         if (es != Acad::eOk) { delete pE; emitNativeError(r, "WIPEOUT_CLIP_FAILED", "setClipBoundary errorstatus " + std::to_string(static_cast<int>(es))); return true; }
