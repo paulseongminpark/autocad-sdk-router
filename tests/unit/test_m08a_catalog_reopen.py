@@ -132,13 +132,14 @@ class TestM08ACatalogReopen(unittest.TestCase):
         # write.textstyle.create) -- 458 -> 459 -> 460 (see
         # tools/patch_ops/tables.py). P10 adds a fourth new synthetic
         # implemented op (modify.entity.xdata) -- 460 -> 461 (see
-        # tools/patch_ops/entities.py).
+        # tools/patch_ops/entities.py). p4-poly2d adds a fifth
+        # (write.entity.polyline2d.deep) -- 461 -> 462.
         import collections
         by_status = collections.Counter(o.get("status") for o in self.ops)
         self.assertEqual(by_status.get("unknown", 0), 0)
         self.assertEqual(by_status.get("catalogued", 0), 0)
         self.assertEqual(by_status.get("stub", 0), 0)
-        self.assertEqual(by_status.get("implemented", 0), 461)
+        self.assertEqual(by_status.get("implemented", 0), 462)
         self.assertEqual(by_status.get("blocked", 0), 60)
         self.assertEqual(by_status.get("implemented", 0) + by_status.get("blocked", 0), len(self.ops))
 

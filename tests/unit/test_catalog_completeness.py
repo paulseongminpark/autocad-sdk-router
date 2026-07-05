@@ -141,13 +141,14 @@ class TestCatalogDenominatorLiveSmoke(unittest.TestCase):
         # anchor -- 517 -> 518. w3-ltts adds two more (write.linetype.create,
         # write.textstyle.create -- LINETYPE/TEXTSTYLE table D-class TABLES
         # tier) -- 518 -> 519 -> 520. P10 adds a fourth (modify.entity.xdata,
-        # entity-handle-targeted xdata write) -- 520 -> 521. See
-        # tools/patch_ops/tables.py + entities.py.
+        # entity-handle-targeted xdata write) -- 520 -> 521. p4-poly2d adds a
+        # fifth (write.entity.polyline2d.deep, the true legacy AcDb2dPolyline
+        # write path) -- 521 -> 522. See tools/patch_ops/tables.py + entities.py.
         ops = cc.load_operations_catalog()
-        self.assertEqual(len(ops), 521,
-                         "the F0 task's own '517-op catalogue' anchor (+4, "
-                         "w3-dimstyle/w3-ltts x2/P10); if this moves again, the whole "
-                         "WAVE-0 accounting must be recomputed")
+        self.assertEqual(len(ops), 522,
+                         "the F0 task's own '517-op catalogue' anchor (+5, "
+                         "w3-dimstyle/w3-ltts x2/P10/p4-poly2d); if this moves again, "
+                         "the whole WAVE-0 accounting must be recomputed")
 
     def test_live_denominator_lands_near_plan_446_estimate(self):
         ops = cc.load_operations_catalog()

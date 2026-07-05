@@ -1216,8 +1216,17 @@ static bool collectEntitiesFromBlock(AcDbBlockTableRecord* pBTR, const char* spa
         // (AcDb2dVertex / AcDb3dPolylineVertex) walked via vertexIterator(), not
         // getPointAt(). Without this branch these (1874 POLYLINE in the golden)
         // carried no coordinate geometry. position() is OCS for 2D; emitted as-is.
+        // p4-poly2d: extended with elevation/default_start_width/default_end_width
+        // (entity-level) and per-vertex bulge/start_width/end_width (was bare
+        // [x,y,z]) so the deep write.entity.polyline2d.deep write path (AcDb2dPolyline
+        // + AcDb2dVertex append) has a schema to roundtrip against. Harmless for
+        // any pre-existing AcDb2dPolyline this branch already read (M02 comment
+        // above) -- these are additional fields, not a removed one.
         else if (AcDb2dPolyline* p2d = AcDb2dPolyline::cast(pEnt)) {
             arr << ",\"closed\":" << (p2d->isClosed() ? "true" : "false")
+                << ",\"elevation\":" << p2d->elevation()
+                << ",\"default_start_width\":" << p2d->defaultStartWidth()
+                << ",\"default_end_width\":" << p2d->defaultEndWidth()
                 << ",\"vertices\":[";
             AcDbObjectIterator* pVi = p2d->vertexIterator();
             bool vfirst = true;
@@ -1227,7 +1236,10 @@ static bool collectEntitiesFromBlock(AcDbBlockTableRecord* pBTR, const char* spa
                     const AcGePoint3d vp = pV->position();
                     if (!vfirst) arr << ",";
                     vfirst = false;
-                    arr << "[" << vp.x << "," << vp.y << "," << vp.z << "]";
+                    arr << "{\"point\":[" << vp.x << "," << vp.y << "," << vp.z << "]"
+                        << ",\"bulge\":" << pV->bulge()
+                        << ",\"start_width\":" << pV->startWidth()
+                        << ",\"end_width\":" << pV->endWidth() << "}";
                     pV->close();
                 }
             }

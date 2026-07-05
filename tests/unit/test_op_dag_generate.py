@@ -73,8 +73,9 @@ class TestOpDagBuild(unittest.TestCase):
         # w3-dimstyle adds one new op (write.dimstyle.create) -- 517 -> 518.
         # w3-ltts adds two more (write.linetype.create, write.textstyle.create)
         # -- 518 -> 519 -> 520. P10 adds a fourth (modify.entity.xdata) --
-        # 520 -> 521.
-        self.assertEqual(len(self.nodes), 521, "operations.v2.json is currently 521 ops; a "
+        # 520 -> 521. p4-poly2d adds a fifth (write.entity.polyline2d.deep) --
+        # 521 -> 522.
+        self.assertEqual(len(self.nodes), 522, "operations.v2.json is currently 522 ops; a "
                                                 "count drift here means the catalogue changed "
                                                 "underneath this test, not a generator bug")
 

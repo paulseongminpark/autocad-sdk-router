@@ -91,6 +91,15 @@ collectModelSpaceGraph read branch (AcDb3dPolyline's read branch pre-dates
 any wired create op for it, T3a). Oracle extended accordingly; same
 invariants unaffected.
 
+p4-poly2d update: create_polyline2d_deep (write.entity.polyline2d.deep,
+AcDb2dPolyline) is a NEW op id, not previously in the catalog or registry --
+it is the true legacy 2D polyline (per-vertex bulge/start_width/end_width,
+elevation, closed, default widths), distinct from create_polyline2d (an
+ALIAS building AcDbPolyline/LWPOLYLINE). Needed a NEW collectModelSpaceGraph
+read-branch extension (AcDb2dPolyline's pre-existing branch only emitted bare
+[x,y,z] vertices) as well as the write handler itself. Oracle extended
+accordingly; same invariants unaffected.
+
 w3-pmesh update: create_polygonmesh (write.entity.polygonmesh, AcDbPolygon
 Mesh) was already native-REACHABLE (measure/reachable_matrix.jsonl) but had
 NEITHER a patch_ops.WRITE_OP_MAP entry NOR a collectModelSpaceGraph read
@@ -207,6 +216,7 @@ _ORIGINAL_NATIVE_WRITE_OP_MAP = {
     "create_dimension_angular3pt": "write.entity.dim.angular3pt",
     "create_mleader": "write.entity.mleader",
     "create_polyline2d": "write.entity.polyline2d",
+    "create_polyline2d_deep": "write.entity.polyline2d.deep",
     "create_polyline3d": "write.entity.polyline3d",
     "create_polygonmesh": "write.entity.polygonmesh",
     "create_polyfacemesh": "write.entity.polyfacemesh",

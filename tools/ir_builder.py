@@ -563,6 +563,15 @@ def _geometry_from_native_entity(raw: dict, kind: str) -> dict:
     new point keys, override_center/jog_point, plus a new number key,
     jog_angle -- all three are this class's own jog-symbol placement args,
     with no prior-batch equivalent.
+    p4-poly2d: AcDb2dPolyline (the TRUE legacy 2D polyline, "kind": "polyline",
+    distinct from LWPOLYLINE's "kind": "lwpolyline") adds three entity-level
+    number keys -- elevation/default_start_width/default_end_width -- direct
+    setElevation/setDefaultStartWidth/setDefaultEndWidth echoes, and extends
+    the existing generic "vertices" lift below with two new per-vertex number
+    keys, start_width/end_width, alongside the "bulge" it already carried;
+    harmless for every other vertex-bearing kind (AcDb3dPolyline/
+    AcDbPolygonMesh/AcDbPolyFaceMesh's plain [x,y,z] vertices never carry
+    these keys, so they normalize exactly as before).
     Returns an IR geometry dict with a valid ``kind``; unrepresented kinds get
     a geometry that carries only ``kind`` (decoded=False is decided by the
     caller).
@@ -587,7 +596,9 @@ def _geometry_from_native_entity(raw: dict, kind: str) -> dict:
                    ("rotation", "rotation"), ("radius_ratio", "radius_ratio"),
                    ("height", "height"), ("measurement", "measurement"),
                    ("degree", "degree"), ("m_size", "m_size"), ("n_size", "n_size"),
-                   ("jog_angle", "jog_angle")):
+                   ("jog_angle", "jog_angle"), ("elevation", "elevation"),
+                   ("default_start_width", "default_start_width"),
+                   ("default_end_width", "default_end_width")):
         num = _to_number(raw.get(nk))
         if num is not None:
             geom[ik] = num
@@ -629,6 +640,15 @@ def _geometry_from_native_entity(raw: dict, kind: str) -> dict:
                     bulge = _to_number(v.get("bulge"))
                     if bulge is not None:
                         item["bulge"] = bulge
+                    # p4-poly2d: AcDb2dPolyline's per-vertex start_width/end_width
+                    # (see _geometry_from_native_entity's docstring); absent for
+                    # every other vertex-bearing kind's plain vertex dict.
+                    start_w = _to_number(v.get("start_width"))
+                    if start_w is not None:
+                        item["start_width"] = start_w
+                    end_w = _to_number(v.get("end_width"))
+                    if end_w is not None:
+                        item["end_width"] = end_w
                     norm.append(item)
         if norm:
             geom["vertices"] = norm

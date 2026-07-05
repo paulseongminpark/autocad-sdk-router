@@ -191,6 +191,11 @@ _KNOWN_GEOMETRY_LEAF_FIELDS = frozenset({
     # p8-simple2: 3DFACE/SOLID/TRACE's 4 flat vertices + 3DFACE's per-edge
     # visibility flags (schemas/dwg_graph_ir.v1.schema.json geometry $defs).
     "p0", "p1", "p2", "p3", "edge_visibility",
+    # p4-poly2d: AcDb2dPolyline entity-level fields (elevation/setElevation,
+    # default_start_width+default_end_width/setDefaultStartWidth+
+    # setDefaultEndWidth); per-vertex start_width/end_width live inside
+    # vertices[].items, not here (schemas/dwg_graph_ir.v1.schema.json).
+    "elevation", "default_start_width", "default_end_width",
 })
 
 # Entity keys that are IDENTITY / PROVENANCE, not oracle-asserted DATA: they

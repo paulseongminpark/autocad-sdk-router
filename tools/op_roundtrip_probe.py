@@ -223,6 +223,37 @@ def _expect_create_polyline2d(args: Dict[str, Any]) -> Dict[str, Any]:
     }
 
 
+def _expect_create_polyline2d_deep(args: Dict[str, Any]) -> Dict[str, Any]:
+    # p4-poly2d: write.entity.polyline2d.deep (m08g_handlers.inc) builds a
+    # genuine legacy AcDb2dPolyline: appendAcDbEntity then, per "points"
+    # entry, appendVertex(new AcDb2dVertex(point, bulge, start_width,
+    # end_width)) -- NOT the write.entity.polyline2d alias above (which
+    # builds AcDbPolyline/LWPOLYLINE). elevation/closed/default_start_width/
+    # default_end_width are direct setElevation/setClosed/
+    # setDefaultStartWidth/setDefaultEndWidth echoes; per-vertex z is set to
+    # the same elevation value the entity-level setElevation call uses (both
+    # read back consistently -- live-verified 2026-07-05 p4-poly2d cert).
+    # dxf_name reads back "POLYLINE" (the same legacy runtime class name
+    # AcDb3dPolyline uses, see _expect_create_polyline3d below), not
+    # "LWPOLYLINE".
+    elevation = args.get("elevation", 0.0)
+    vertices = [{"point": [pt.get("x", 0.0), pt.get("y", 0.0), elevation],
+                "bulge": pt.get("bulge", 0.0),
+                "start_width": pt.get("start_width", 0.0),
+                "end_width": pt.get("end_width", 0.0)}
+                for pt in (args.get("points") or [])]
+    closed = bool(args.get("closed", 0))
+    return {
+        "dxf_name": "POLYLINE", "layer": args.get("layer") or "0",
+        "geometry": {
+            "kind": "polyline", "vertices": vertices, "closed": closed,
+            "elevation": elevation,
+            "default_start_width": args.get("default_start_width", 0.0),
+            "default_end_width": args.get("default_end_width", 0.0),
+        },
+    }
+
+
 def _expect_create_polyline3d(args: Dict[str, Any]) -> Dict[str, Any]:
     # w3-poly3d: write.entity.polyline3d (m08g_handlers.inc) builds a
     # genuine AcDb3dPolyline: appendAcDbEntity then appendVertex(new
@@ -1178,6 +1209,7 @@ _EXPECTED_ENTITY_BUILDERS: Dict[str, Callable[[Dict[str, Any]], Dict[str, Any]]]
     "create_mtext": _expect_create_mtext,
     "create_polyline": _expect_create_polyline,
     "create_polyline2d": _expect_create_polyline2d,
+    "create_polyline2d_deep": _expect_create_polyline2d_deep,
     "create_polyline3d": _expect_create_polyline3d,
     "create_polygonmesh": _expect_create_polygonmesh,
     "create_polyfacemesh": _expect_create_polyfacemesh,
