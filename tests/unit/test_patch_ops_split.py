@@ -139,6 +139,20 @@ DIMVAR subset of AcDbDimStyleTableRecord's ~70 dimension variables (see
 tools/patch_ops/tables.py's module docstring for the exact set and the
 unwritten-DIMVAR gap). Oracle extended accordingly; same invariants
 unaffected.
+
+p2-blockapp update: patch_ops.blocks gains its first-ever wiring (previously
+WRITE_OP_MAP was empty). Two ops: create_block (write.block.simple_create,
+createSimpleBlock -- already real/certified, just never exposed to
+patch_ops) and append_block_entity (write.block.append_entity,
+m08eHandleBlockAppend -- graduated THIS wave from an always-rollback M08E
+probe into a REAL, persisting write; see families/m08e_handlers.inc's header
+comment and tests/unit/test_m08e_handlers.py's docstring for the before/
+after). append_block_entity's native args include a nested "entity"
+{kind,...} object passed through UNFLATTENED (the native handler does its own
+nested JSON parsing of it) -- the one shape in this oracle where a
+build_job_args branch's flat per-key passthrough legitimately carries a
+dict-valued arg, not just scalars/points. Oracle extended accordingly; same
+invariants (aggregate == per-family union, families disjoint) unaffected.
 """
 from __future__ import annotations
 
@@ -186,6 +200,8 @@ _ORIGINAL_NATIVE_WRITE_OP_MAP = {
     "create_dimension_radiallarge": "write.entity.dim.radiallarge",
     "create_blockref": "write.entity.blockref",
     "create_dimstyle": "write.dimstyle.create",
+    "create_block": "write.block.simple_create",
+    "append_block_entity": "write.block.append_entity",
 }
 
 

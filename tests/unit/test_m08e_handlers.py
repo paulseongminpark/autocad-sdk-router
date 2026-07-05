@@ -12,12 +12,17 @@ Intent (WHY):
        If HasOp claims an op the dispatcher doesn't route, the runtime surfaces
        OPERATION_DISPATCH_MISMATCH -- this test fails first, at source level.
 
-    2. The WRITE/create/clone ops in the M08E brief are NOT claimed. M08E is a READ
-       family; write.block.append_entity / write.dictionary.set / write.entity.set_xdata
-       / transform.database.deep_clone / transform.database.insert_block /
-       acdb.database.create / infra.hostapp.provide_services mutate or create state and
-       belong to the write lane (M08G). They must stay OUT of m08eHasOp so they keep
-       returning the honest OPERATION_NOT_IMPLEMENTED -- never a fabricated read result.
+    2. M08E is nominally a READ family, but claims 7 write-shaped ops as smoke PROBES
+       (write.block.append_entity / write.dictionary.set / write.entity.set_xdata /
+       transform.database.deep_clone / transform.database.insert_block /
+       acdb.database.create / infra.hostapp.provide_services) -- each wraps its mutation in
+       AriadneStagedWriteTransaction and never commits, so nothing survives the call. This
+       is the honest opposite of a fabricated read result: the op runs for real and then
+       is undone, on purpose.
+       p2-blockapp wave: write.block.append_entity was graduated OUT of that probe shape
+       into a REAL, persisting primitive (drops the transaction wrapper; appends into a
+       named block-table record, matching the no-wrapper shape every other real write
+       handler in the codebase uses). The other 6 stay probe-only, unaffected.
 
     3. Read-only proof: the .inc must contain none of the original-DWG-write / host-bootstrap
        tokens (save/saveAs/_QSAVE, acedCommand/acedCmd, appendAcDbEntity, setXData(,
@@ -42,8 +47,11 @@ _THIS = os.path.dirname(os.path.abspath(__file__))
 _REPO = os.path.dirname(os.path.dirname(_THIS))
 _INC = os.path.join(_REPO, "src", "Ariadne.AcadNative", "families", "m08e_handlers.inc")
 
-# Ops M08E implements as real handlers. Read ops are pure; write-shaped ops run only
-# inside staged transactions that roll back and never persist the original DWG.
+# Ops M08E implements as real handlers. Read ops are pure; 6 of the 7 write-shaped ops run
+# only inside staged transactions that roll back and never persist the original DWG --
+# write.block.append_entity is the exception (p2-blockapp wave): a REAL, persisting write
+# to the staged-copy DWG (never the original either way -- see test_write_opens_are_inside_
+# staged_transactions, which still holds for the other 6).
 _IMPLEMENTED = {
     "inspect.entity.get_xdata",
     "inspect.dictionary.named_objects",

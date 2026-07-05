@@ -4051,18 +4051,18 @@
       },
       "policy": {
         "source": "config/policy.v2.json",
-        "status_policy": "catalogued_not_runnable",
+        "status_policy": "implemented",
         "default_write_mode": "write_copy",
         "allowed_write_modes": [
           "write_copy"
         ],
-        "no_original_write_default": true,
-        "runtime_behavior": "not_runnable_until_promoted_to_implemented_or_wired"
+        "no_original_write_default": true
       },
       "tests": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
-        "tests/unit/test_m08e_handlers.py"
+        "tests/unit/test_m08e_handlers.py",
+        "tests/unit/test_patch_ops_split.py"
       ],
       "summary": "Add an entity to the db + this BTR (e.g. model space); returns its",
       "source_slice": "acdb-core.md",
@@ -4072,9 +4072,10 @@
         "src/Ariadne.AcadNative/families/m08e_handlers.inc:m08eDispatch",
         "reports/merge/MERGE-M08-READ.json",
         "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
-        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)"
+        "tools/patch_ops/blocks.py:append_block_entity",
+        "D:/dev/.build/cados_plan/runs/waveP/blockapp/build_log.md"
       ],
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "p2-blockapp wave: graduated from an always-rollback M08E probe (hardcoded model-space line, ignored every arg) to a REAL, persisting primitive -- resolves a NAMED block-table record by 'block_name' and appends one of {line,circle,arc,text} into it, via patch_ops.blocks.append_block_entity. Never touches the ORIGINAL DWG (write_copy policy, same as every other write op). Prior 'catalogued_not_runnable'/'has no CAD OS router handler yet' text was already stale before this wave -- the C++ dispatch branch existed all along, just as a fake-success probe (see m08e_handlers.inc's header comment).",
       "owner_ticket": "M08E-T01",
       "implementation_strategy": "implemented_v1",
       "evidence_required": "existing_tests_and_evidence_refs"

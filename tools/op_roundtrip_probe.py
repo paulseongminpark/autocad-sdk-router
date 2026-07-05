@@ -970,6 +970,42 @@ def _expect_create_blockref(args: Dict[str, Any]) -> Dict[str, Any]:
     }
 
 
+def _expect_append_block_entity(args: Dict[str, Any]) -> Dict[str, Any]:
+    # p2-blockapp: write.block.append_entity's ground truth is the appended
+    # entity itself. collectEntitiesFromBlock (AriadneNativeJob.cpp) is the
+    # SAME shared per-entity-kind geometry serializer collectModelSpaceGraph
+    # uses for model space, called with spaceLabel="block" instead of
+    # "model" -- so a line/circle/arc/text appended into a block gets the
+    # byte-identical dxf_name/geometry shape as the top-level create_*
+    # builders below; delegating to them directly is correct, not a guess.
+    #
+    # UNLIKE every other builder in this map, this op's result is never found
+    # in top-level post_ir["entities"] -- it lands in
+    # post_ir["block_definitions"][i]["def_entities"] instead, a part of the
+    # IR added_entities_ir()'s cad_diff (top-level-entities-only) does not
+    # scan. probe_roundtrip()/cad_op_gate against this builder would report a
+    # false "not added" for a real block_name (only a block_name that
+    # resolves to ACDB_MODEL_SPACE would show up top-level). The live
+    # p2-blockapp cert therefore verifies block_definitions[block_name].
+    # def_entities directly instead of routing through probe_roundtrip (see
+    # D:/dev/.build/cados_plan/runs/waveP/blockapp/build_log.md); this
+    # builder is registered so a future block-aware diff extension has a
+    # ready, honest ground-truth source rather than having to invent one.
+    entity = args.get("entity") or {}
+    kind = entity.get("kind")
+    if kind == "line":
+        return _expect_create_line(entity)
+    if kind == "circle":
+        return _expect_create_circle(entity)
+    if kind == "arc":
+        return _expect_create_arc(entity)
+    if kind == "text":
+        return _expect_create_text(entity)
+    raise NotImplementedError(
+        "append_block_entity: no expected-entity builder for entity.kind %r "
+        "(wired: line, circle, arc, text)" % kind)
+
+
 # op_name -> args -> a single IR entity (dxf_name/layer/geometry only -- no
 # handle; the P-gate's geometry-basis compare is handle-independent by
 # design). Only ops this module can honestly build ground truth for; an
@@ -1138,6 +1174,7 @@ _EXPECTED_ENTITY_BUILDERS: Dict[str, Callable[[Dict[str, Any]], Dict[str, Any]]]
     "create_dimension_angular3pt": _expect_create_dimension_angular3pt,
     "create_mleader": _expect_create_mleader,
     "create_blockref": _expect_create_blockref,
+    "append_block_entity": _expect_append_block_entity,
 }
 
 
