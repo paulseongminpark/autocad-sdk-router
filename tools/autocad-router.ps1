@@ -195,18 +195,38 @@ function Get-CadJobJigPointLine {
 }
 
 $script:_NativeJobOpSet = $null
+$script:_NativeJobOpSetCacheKey = $null
 
 function Get-NativeJobOpSet {
-  # Build (once per process) the set of op ids whose registry handler routes to the
-  # native ObjectARX job lane (handler.router_lane == 'ARIADNE_NATIVE_JOB'), i.e. the
-  # headless .crx/.dbx dispatch. The registry (operations.v2.json) is the SoT, so this
-  # stays in sync as native handlers are added -- no hand-maintained allow-list drift.
-  if ($null -ne $script:_NativeJobOpSet) { return $script:_NativeJobOpSet }
-  $set = @{}
-  try {
-    $regPath = Join-Path $RouterHome 'config\operations.v2.json'
-    if (Test-Path -LiteralPath $regPath) {
+  # Build the set of op ids whose registry handler routes to the native ObjectARX job
+  # lane (handler.router_lane == 'ARIADNE_NATIVE_JOB'), i.e. the headless .crx/.dbx
+  # dispatch. The registry (operations.v2.json) is the SoT, so this stays in sync as
+  # native handlers are added -- no hand-maintained allow-list drift.
+  #
+  # Cached per-process; the cache is invalidated whenever the registry file's mtime or
+  # size changes, so a registry update landing mid-session (e.g. a new native write op)
+  # is picked up without restarting the process.
+  #
+  # A read/parse failure is retried briefly (covers the window where another process is
+  # mid-write to the file) and then FAILS LOUD. There is no silent fallback: routing a
+  # native op through a stale/guessed op list is worse than refusing to route at all.
+  $regPath = Join-Path $RouterHome 'config\operations.v2.json'
+
+  $fi = Get-Item -LiteralPath $regPath -ErrorAction SilentlyContinue
+  $cacheKey = if ($fi) { '{0}:{1}' -f $fi.LastWriteTimeUtc.Ticks, $fi.Length } else { $null }
+  if ($null -ne $script:_NativeJobOpSet -and $null -ne $cacheKey -and $cacheKey -eq $script:_NativeJobOpSetCacheKey) {
+    return $script:_NativeJobOpSet
+  }
+
+  $maxAttempts = 3
+  $lastError = $null
+  for ($attempt = 1; $attempt -le $maxAttempts; $attempt++) {
+    try {
+      if (-not (Test-Path -LiteralPath $regPath)) {
+        throw "registry file not found: $regPath"
+      }
       $reg = Get-Content -LiteralPath $regPath -Raw -Encoding UTF8 | ConvertFrom-Json
+      $set = @{}
       foreach ($op in $reg.operations) {
         $lane = if ($op.handler) { $op.handler.router_lane } else { $null }
         if ($lane -eq 'ARIADNE_NATIVE_JOB') {
@@ -214,31 +234,30 @@ function Get-NativeJobOpSet {
           if ($oid) { $set[[string]$oid] = $true }
         }
       }
+      $fiAfter = Get-Item -LiteralPath $regPath -ErrorAction SilentlyContinue
+      $script:_NativeJobOpSetCacheKey = if ($fiAfter) { '{0}:{1}' -f $fiAfter.LastWriteTimeUtc.Ticks, $fiAfter.Length } else { $cacheKey }
+      $script:_NativeJobOpSet = $set
+      return $set
+    }
+    catch {
+      $lastError = $_
+      if ($attempt -lt $maxAttempts) { Start-Sleep -Milliseconds 200 }
     }
   }
-  catch { }
-  $script:_NativeJobOpSet = $set
-  return $set
+
+  throw "Get-NativeJobOpSet: cannot read/parse native-job operation registry at '$regPath' after $maxAttempts attempts -- $($lastError.Exception.Message). Refusing to silently fall back to a stale hardcoded operation list; native-op routing requires the live registry."
 }
 
 function Test-NativeP1CadJobOperation {
   param([string]$OperationName)
   if ([string]::IsNullOrWhiteSpace($OperationName)) { return $false }
-  $set = Get-NativeJobOpSet
-  if ($set.Count -gt 0) { return [bool]$set.ContainsKey($OperationName) }
-  # Legacy explicit fallback -- used ONLY if the registry could not be read.
-  return @(
-    'inspect.database.summary', 'inspect.database.graph', 'write.layer.create',
-    'write.entity.line', 'write.entity.circle', 'inspect.entity.count',
-    'write.xrecord.set', 'inspect.xrecord.get', 'write.xdata.set', 'inspect.xdata.get',
-    'write.block.simple_create', 'write.block.insert', 'inspect.block.count',
-    'write.layout.create', 'inspect.layout.list', 'inspect.xref.list',
-    'inspect.runtime.capabilities', 'live.reactor.enable', 'inspect.reactor.registry',
-    'live.reactor.disable', 'inspect.overrule.registry', 'live.overrule.enable',
-    'live.overrule.disable', 'inspect.jig.host_support', 'live.jig.point_probe',
-    'extend.customclass.create', 'inspect.customclass.count', 'extend.customobject.create',
-    'inspect.customobject.count', 'inspect.protocol.queryx'
-  ) -contains $OperationName
+  try {
+    $set = Get-NativeJobOpSet
+  }
+  catch {
+    throw "Test-NativeP1CadJobOperation: cannot resolve native-job routing for operation '$OperationName' -- $($_.Exception.Message)"
+  }
+  return [bool]$set.ContainsKey($OperationName)
 }
 
 function Test-NativeAcadModules {
