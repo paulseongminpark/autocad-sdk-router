@@ -127,6 +127,16 @@ class TestIrToPatchRoundTrip(unittest.TestCase):
     kinds; the 2 non-extractable ops (mpolygon/set_entity_xdata) honestly
     have none."""
 
+    @classmethod
+    def setUpClass(cls):
+        # arg_keys sourced from the REAL config/promotion_manifest.json row
+        # (not re-typed as a second literal) so the "which keys must appear"
+        # half of each full-args assertion below can never silently drift
+        # from the manifest that is the actual promotion source of truth.
+        manifest_path = os.path.join(_REPO, "config", "promotion_manifest.json")
+        rows = po.load_manifest(manifest_path)
+        cls.arg_keys_by_patch_op = {r["patch_op"]: set(r["arg_keys"]) for r in rows}
+
     def test_arc_round_trips(self):
         ent = {"handle": "10", "layer": "0",
                "geometry": {"kind": "arc", "center": [1.0, 2.0, 0.0], "radius": 5.0,
@@ -167,27 +177,80 @@ class TestIrToPatchRoundTrip(unittest.TestCase):
         # "Tier 2" comment); T1 only completed its Axis A/B, so the operation
         # it always emitted is finally backed by a live native handler.
         ent = {"handle": "13", "layer": "0",
-               "geometry": {"kind": "text", "position": [0.0, 0.0, 0.0], "text": "hi"}}
+               "geometry": {"kind": "text", "position": [1.0, 2.0, 0.0], "text": "hi", "height": 4.0}}
         op = entities.ir_op_for(ent)
         self.assertEqual(op["operation"], "create_text")
         self.assertIn(op["operation"], entities.WRITE_OP_MAP)
+        self.assertEqual(set(op["args"]), self.arg_keys_by_patch_op["create_text"])
+        self.assertEqual(op["args"], {"position": {"x": 1.0, "y": 2.0, "z": 0.0},
+                                       "text": "hi", "height": 4.0, "layer": "0"})
+
+    def test_text_case_defaults_height_when_ir_omits_it(self):
+        # The manifest's arg_keys prove "height" must be present; it can't
+        # prove WHAT ir_op_for defaults it to (g.get("height", 2.5)) -- pin
+        # that default explicitly since it is real conversion logic.
+        ent = {"handle": "13b", "layer": "0",
+               "geometry": {"kind": "text", "position": [0.0, 0.0, 0.0], "text": "hi"}}
+        op = entities.ir_op_for(ent)
+        self.assertEqual(op["args"]["height"], 2.5)
 
     def test_lwpolyline_case_predates_t1_but_is_only_now_wired(self):
+        # vertices -> points conversion: one vertex with an explicit bulge,
+        # one relying on the implicit 0.0 default -- and note points carry
+        # only x/y/bulge (2D), unlike _pt()'s x/y/z used by line/circle/arc.
         ent = {"handle": "14", "layer": "0",
                "geometry": {"kind": "lwpolyline", "closed": True,
-                            "vertices": [{"point": [0, 0], "bulge": 0.0}, {"point": [1, 1]}]}}
+                            "vertices": [{"point": [0, 0], "bulge": 0.5}, {"point": [1, 1]}]}}
         op = entities.ir_op_for(ent)
         self.assertEqual(op["operation"], "create_polyline")
         self.assertIn(op["operation"], entities.WRITE_OP_MAP)
+        self.assertEqual(set(op["args"]), self.arg_keys_by_patch_op["create_polyline"])
+        self.assertEqual(op["args"], {
+            "points": [{"x": 0, "y": 0, "bulge": 0.5}, {"x": 1, "y": 1, "bulge": 0.0}],
+            "closed": 1, "layer": "0"})
+
+    def test_lwpolyline_closed_flag_is_coerced_to_int_not_bool(self):
+        # int(bool(...)) in ir_op_for -- closed must be 0/1, never True/False
+        # (the native job arg is a C int, not a Python bool).
+        ent = {"handle": "14b", "layer": "0",
+               "geometry": {"kind": "lwpolyline", "closed": False,
+                            "vertices": [{"point": [0, 0]}]}}
+        op = entities.ir_op_for(ent)
+        self.assertEqual(op["args"]["closed"], 0)
+        self.assertNotIsInstance(op["args"]["closed"], bool)
+
+    def test_lwpolyline_vertex_without_a_point_is_skipped_not_fabricated(self):
+        # "if not p: continue" -- a malformed vertex is dropped, never turned
+        # into a fabricated (0, 0) point.
+        ent = {"handle": "14c", "layer": "0",
+               "geometry": {"kind": "lwpolyline", "closed": False,
+                            "vertices": [{"bulge": 0.2}, {"point": [3, 4]}]}}
+        op = entities.ir_op_for(ent)
+        self.assertEqual(op["args"]["points"], [{"x": 3, "y": 4, "bulge": 0.0}])
 
     def test_dimension_case_predates_t1_but_is_only_now_wired(self):
+        # xline1_point/xline2_point/dim_line_point (IR) -> xline1/xline2/
+        # dim_line (native arg names) via _pt(), plus dim_text/rotation.
         ent = {"handle": "15", "layer": "DIM",
-               "geometry": {"kind": "dimension", "dim_text": "100",
+               "geometry": {"kind": "dimension", "dim_text": "100", "rotation": 0.0,
                             "xline1_point": [0, 0, 0], "xline2_point": [10, 0, 0],
                             "dim_line_point": [5, 1, 0]}}
         op = entities.ir_op_for(ent)
         self.assertEqual(op["operation"], "create_dimension")
         self.assertIn(op["operation"], entities.WRITE_OP_MAP)
+        self.assertEqual(set(op["args"]), self.arg_keys_by_patch_op["create_dimension"])
+        self.assertEqual(op["args"], {
+            "layer": "DIM", "dim_text": "100", "rotation": 0.0,
+            "xline1": {"x": 0, "y": 0, "z": 0}, "xline2": {"x": 10, "y": 0, "z": 0},
+            "dim_line": {"x": 5, "y": 1, "z": 0}})
+
+    def test_dimension_case_defers_when_extraction_incomplete(self):
+        # Tier-3 honest deferral: if ANY of the three required points is
+        # missing, ir_op_for must return None, never fabricate a partial op.
+        ent = {"handle": "15b", "layer": "DIM",
+               "geometry": {"kind": "dimension", "dim_text": "100",
+                            "xline1_point": [0, 0, 0], "xline2_point": [10, 0, 0]}}
+        self.assertIsNone(entities.ir_op_for(ent))
 
     def test_mpolygon_has_no_ir_to_patch_case(self):
         # 'mpolygon' is not an ir_builder._EXTRACT_KIND_TO_IR_KIND value -- no
