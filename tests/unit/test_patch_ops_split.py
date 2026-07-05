@@ -186,6 +186,7 @@ _ORIGINAL_NATIVE_WRITE_OP_MAP = {
     "create_dimension_radiallarge": "write.entity.dim.radiallarge",
     "create_blockref": "write.entity.blockref",
     "create_dimstyle": "write.dimstyle.create",
+    "set_entity_xdata_by_handle": "modify.entity.xdata",
 }
 
 

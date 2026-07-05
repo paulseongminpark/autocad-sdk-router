@@ -83,11 +83,14 @@ _CREATE = [
     "write.entity.minsert",
     "write.entity.tolerance",
 ]
-# Modify / geometry-edit ops implemented. (7)
+# Modify / geometry-edit ops implemented. (9, +1 P10: modify.entity.xdata --
+# entity-HANDLE-targeted xdata write, added after the original 45-op brief;
+# see build_log.md and patch_ops.entities's set_entity_xdata_by_handle.)
 _MODIFY = [
     "modify.entity.transform",
     "modify.entity.copy_transformed",
     "modify.entity.common",
+    "modify.entity.xdata",
     "modify.entity.explode",
     "modify.entity.solid3d.boolean",
     "modify.curve.offset",
@@ -168,16 +171,19 @@ class TestM08GHandlers(unittest.TestCase):
         )
 
     def test_implemented_count(self):
-        # 34 entity-create + 8 modify = 42 real staged-write handlers after Wave3 Pane2.
-        # The remaining 3 ops of the 45-op brief are editor-bound subentity edits, left OUT
-        # of HasOp on purpose (no fake pass).
+        # 34 entity-create + 9 modify = 43 real staged-write handlers: 42 after
+        # Wave3 Pane2 (the original 45-op brief) + 1 (P10's modify.entity.xdata,
+        # a new capability outside that brief -- see the _MODIFY comment above).
+        # The remaining 3 ops of the original 45-op brief are editor-bound
+        # subentity edits, left OUT of HasOp on purpose (no fake pass).
         self.assertEqual(len(_CREATE), 34)
-        self.assertEqual(len(_MODIFY), 8)
-        self.assertEqual(len(_IMPLEMENTED), 42)
-        self.assertEqual(len(set(_IMPLEMENTED)), 42, "duplicate op id in the implemented list")
-        self.assertEqual(len(self.hasop), 42)
-        # the brief is 45 ops total: 42 implemented + 3 deferred.
-        self.assertEqual(len(_IMPLEMENTED) + len(_DEFERRED), 45)
+        self.assertEqual(len(_MODIFY), 9)
+        self.assertEqual(len(_IMPLEMENTED), 43)
+        self.assertEqual(len(set(_IMPLEMENTED)), 43, "duplicate op id in the implemented list")
+        self.assertEqual(len(self.hasop), 43)
+        # original brief was 45 ops (42 implemented + 3 deferred); P10 adds 1
+        # implemented op outside that brief, so the live total is 46.
+        self.assertEqual(len(_IMPLEMENTED) + len(_DEFERRED), 46)
         self.assertEqual(len(set(_DEFERRED)), 3, "duplicate op id in the deferred list")
 
     def test_minimum_implemented_floor(self):

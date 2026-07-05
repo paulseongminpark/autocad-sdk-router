@@ -138,12 +138,14 @@ class TestCatalogDenominatorLiveSmoke(unittest.TestCase):
     def test_live_registry_is_517_ops(self):
         # w3-dimstyle adds one new synthetic op (write.dimstyle.create,
         # DIMSTYLE table D-class TABLES tier) on top of the F0 517-op
-        # anchor -- 517 -> 518. See tools/patch_ops/tables.py.
+        # anchor -- 517 -> 518. See tools/patch_ops/tables.py. P10 adds a
+        # second new synthetic op (modify.entity.xdata, entity-handle-
+        # targeted xdata write) -- 518 -> 519. See tools/patch_ops/entities.py.
         ops = cc.load_operations_catalog()
-        self.assertEqual(len(ops), 518,
-                         "the F0 task's own '517-op catalogue' anchor (+1, "
-                         "w3-dimstyle); if this moves again, the whole WAVE-0 "
-                         "accounting must be recomputed")
+        self.assertEqual(len(ops), 519,
+                         "the F0 task's own '517-op catalogue' anchor (+2, "
+                         "w3-dimstyle and P10); if this moves again, the whole "
+                         "WAVE-0 accounting must be recomputed")
 
     def test_live_denominator_lands_near_plan_446_estimate(self):
         ops = cc.load_operations_catalog()

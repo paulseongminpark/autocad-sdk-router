@@ -71,7 +71,8 @@ class TestOpDagBuild(unittest.TestCase):
                           "exactly (missing=%r invented=%r)" % (missing, invented))
         self.assertEqual(len(self.nodes), len(self.catalogue), "no duplicate op_id nodes")
         # w3-dimstyle adds one new op (write.dimstyle.create) -- 517 -> 518.
-        self.assertEqual(len(self.nodes), 518, "operations.v2.json is currently 518 ops; a "
+        # P10 adds a second new op (modify.entity.xdata) -- 518 -> 519.
+        self.assertEqual(len(self.nodes), 519, "operations.v2.json is currently 519 ops; a "
                                                 "count drift here means the catalogue changed "
                                                 "underneath this test, not a generator bug")
 

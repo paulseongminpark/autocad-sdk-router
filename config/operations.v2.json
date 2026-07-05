@@ -54,10 +54,10 @@
     }
   },
   "totals": {
-    "operations": 518,
+    "operations": 519,
     "by_status": {
       "blocked": 60,
-      "implemented": 458
+      "implemented": 459
     },
     "by_family": {
       "active_document_write_original": 8,
@@ -69,7 +69,7 @@
       "custom_objects_protocols": 63,
       "diff": 1,
       "editor_input": 27,
-      "entities": 56,
+      "entities": 57,
       "extend": 2,
       "geometry_kernel": 25,
       "graphics_system": 9,
@@ -91,9 +91,9 @@
       "accoreconsole_lisp_also": 20,
       "managed_also": 46,
       "native_arx_only": 233,
-      "objectdbx_capable": 219
+      "objectdbx_capable": 220
     },
-    "total": 518
+    "total": 519
   },
   "coverage": {
     "wired_ops": 33,
@@ -127,8 +127,8 @@
       "symbol_tables_dictionaries": 16,
       "ui_customization": 39
     },
-    "operation_records": 518,
-    "implemented": 458,
+    "operation_records": 519,
+    "implemented": 459,
     "wired": 0,
     "stub": 0,
     "catalogued": 0,
@@ -23004,6 +23004,77 @@
         "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)"
       ],
       "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "owner_ticket": "M08G-T03",
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs"
+    },
+    {
+      "id": "modify.entity.xdata",
+      "operation": "modify.entity.xdata",
+      "family": "entities",
+      "status": "implemented",
+      "engine_tier": "objectdbx_capable",
+      "engines": [
+        "objectdbx_capable"
+      ],
+      "host_eligibility": [
+        "dbx",
+        "coreconsole",
+        "arx_adapter",
+        "full_autocad"
+      ],
+      "hosts": [
+        "dbx",
+        "coreconsole",
+        "arx_adapter",
+        "full_autocad"
+      ],
+      "execution_context": "host",
+      "write_level": {
+        "default_write_mode": "write_copy",
+        "allowed_write_modes": [
+          "write_copy"
+        ],
+        "dwg_persisted": true,
+        "original_write_default": false
+      },
+      "handler": {
+        "router_lane": "ARIADNE_NATIVE_JOB",
+        "dispatcher_symbol": "m08gDispatch",
+        "execution_host_class": "dbx",
+        "native_api": "AcDbEntity::setXData(resbuf*) on a resolved 'handle', with AcDbRegAppTable upsert (ensureRegApp)",
+        "composed_of": []
+      },
+      "mapping_type": "exact",
+      "catalog_op_id": null,
+      "input_schema": "schemas/cad_job.v2.schema.json#/allOf",
+      "output_schema": "schemas/cad_result.v2.schema.json",
+      "schema_refs": {
+        "input": "schemas/cad_job.v2.schema.json#/allOf",
+        "output": "schemas/cad_result.v2.schema.json"
+      },
+      "policy": {
+        "source": "config/policy.v2.json",
+        "status_policy": "implemented_v1",
+        "default_write_mode": "write_copy",
+        "allowed_write_modes": [
+          "write_copy"
+        ],
+        "no_original_write_default": true,
+        "runtime_behavior": "wired_and_live_certified"
+      },
+      "tests": [
+        "tests/unit/test_m08g_handlers.py",
+        "tests/unit/test_patch_ops_split.py"
+      ],
+      "summary": "Set entity-handle-targeted extended data (xdata): a full multi-item, per-regapp resbuf block on an arbitrary resolved entity -- distinct from the DATABASE-level write.xdata.set (Ariadne's own NOD dictionary, single app+value string, no handle).",
+      "source_slice": "entities-geometry-graphics.md",
+      "citation": "hdr dbmain.h AcDbObject::setXData/xData; dbsymtb.h AcDbRegAppTable",
+      "evidence_refs": [
+        "src/Ariadne.AcadNative/families/m08g_handlers.inc:m08gDispatch",
+        "tools/patch_ops/entities.py:set_entity_xdata_by_handle"
+      ],
+      "notes": "P10: a genuinely NEW capability layered on the M08G entity family, not part of the original ObjectARX 457-op catalog scan (catalog_op_id is null -- no pre-existing catalog entry to alias or exact-map to). Distinct code path from write.xdata.set/inspect.xdata.get and the set_entity_xdata patch op (both DATABASE-scoped, untouched by this ticket).",
       "owner_ticket": "M08G-T03",
       "implementation_strategy": "implemented_v1",
       "evidence_required": "existing_tests_and_evidence_refs"
