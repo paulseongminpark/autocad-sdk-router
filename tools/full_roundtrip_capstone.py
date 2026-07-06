@@ -51,10 +51,16 @@ Public API (pure -- no I/O, no CAD engine; independently unit-testable):
     record_diff_report(kind_label, records, actual_ir, *, name_field, fields, diff_fn, lookup_fn) -> dict
     per_kind_verdict(pre_ir, diff) -> dict
     resolvable_ops_report(patch, patch_ops_mod=None) -> dict
+    record_op_args_from_record(record, fields) -> dict
+    build_records_patch(census_ir, target_dwg, patch_id, ...) -> (patch, meta)
+    table_record_diff_reports(census_ir, post_ir, ...) -> dict  (Closeout #130)
+    regen_gate_report(op_count, apply_result) -> dict  (Closeout #129a)
+    combine_gate_statuses(statuses) -> str
 
 Public API (live -- needs a real AutoCAD runtime via patch_engine/run_job):
     run_census(staged_path, original_path, run_dir, ...) -> dict
     run_regen_batch(filtered_ir, blank_seed_path, run_dir, patch_id, ...) -> dict
+    run_records_batch(census_ir, blank_seed_path, run_dir, patch_id, ...) -> dict
     run_capstone(...) -> dict  (top-level orchestrator; see main() / CLI)
 
 CLI:
@@ -745,6 +751,37 @@ def run_census(staged_path: str, original_path: str, run_dir: str, *,
         ir_builder_mod, run_res, staged_path, original_path, ir_path, "census")
 
 
+def run_records_batch(census_ir: Dict[str, Any], blank_seed_path: str, run_dir: str,
+                      patch_id: str, *, per_table_limit: Optional[int] = None,
+                      op_roundtrip_probe_mod=None, patch_engine_mod=None) -> Dict[str, Any]:
+    """Table-tier sibling of run_regen_batch: build ONE cad_patch.v1 via
+    build_records_patch (7 record classes: layer/dimstyle/linetype/
+    textstyle/ucs/view/vport) and apply it in ONE patch_engine.apply_staged
+    call against a copy of ``blank_seed_path`` -- independent of, and run
+    into its own ``run_dir`` alongside, the entity batch (run_regen_batch),
+    so a --with-records run always has its own separate pre/post IR pair
+    for table_record_diff_reports to compare against (Closeout #130)."""
+    op_roundtrip_probe_mod = op_roundtrip_probe_mod or importlib.import_module("op_roundtrip_probe")
+    patch_engine_mod = patch_engine_mod or importlib.import_module("patch_engine")
+    target_dwg = {
+        "original_path": os.path.abspath(blank_seed_path),
+        "staged_path": os.path.join(run_dir, "staged_input.dwg"),
+    }
+    patch, build_meta = build_records_patch(
+        census_ir, target_dwg, patch_id,
+        op_roundtrip_probe_mod=op_roundtrip_probe_mod, per_table_limit=per_table_limit)
+    ops_report = resolvable_ops_report(patch)
+    t0 = time.time()
+    result = patch_engine_mod.apply_staged(patch, blank_seed_path, run_dir)
+    elapsed = time.time() - t0
+    op_count = len(patch.get("operations") or [])
+    return {
+        "patch": patch, "build_meta": build_meta, "resolvable_ops": ops_report,
+        "apply_result": result, "op_count": op_count, "elapsed_seconds": elapsed,
+        "seconds_per_op": (elapsed / op_count) if op_count else None,
+    }
+
+
 def run_regen_batch(filtered_ir: Dict[str, Any], blank_seed_path: str, run_dir: str,
                     patch_id: str, *, ir_to_patch_mod=None, patch_engine_mod=None
                     ) -> Dict[str, Any]:
@@ -942,15 +979,18 @@ def main(argv=None) -> int:
 
     regen_dir = os.path.join(out_dir, "regen")
     batch = run_regen_batch(filtered, regen_target["target"], regen_dir, "full_roundtrip_capstone/batch")
+    entity_gate = regen_gate_report(batch["op_count"], batch["apply_result"])
     summary["regen"] = {
         "op_count": batch["op_count"], "deferred_count": len(batch["deferred"]),
         "resolvable_ops": batch["resolvable_ops"],
         "elapsed_seconds": batch["elapsed_seconds"], "seconds_per_op": batch["seconds_per_op"],
         "apply_status": (batch["apply_result"] or {}).get("status"),
         "apply_reason": (batch["apply_result"] or {}).get("reason"),
+        "gate": entity_gate,
     }
     _write_json(os.path.join(out_dir, "regen_summary.json"), summary["regen"])
     _write_json(os.path.join(out_dir, "deferred.json"), batch["deferred"])
+    gate_statuses = [entity_gate["gate_status"]]
 
     pre_path, post_path = pre_ir_path(regen_dir), post_ir_path(regen_dir)
     if os.path.isfile(pre_path) and os.path.isfile(post_path):
@@ -976,24 +1016,66 @@ def main(argv=None) -> int:
             % (os.path.isfile(pre_path), os.path.isfile(post_path)))
 
     if args.with_records:
-        op_roundtrip_probe_mod = importlib.import_module("op_roundtrip_probe")
-        layers = (census_ir.get("symbol_tables") or {}).get("layers") or []
-        layer_report = record_diff_report(
-            "layer", [r for r in layers if isinstance(r, dict)], census_ir,
-            table_key="layers", fields=op_roundtrip_probe_mod.LAYER_RECORD_FIELDS,
-            diff_fn=op_roundtrip_probe_mod.layer_record_diff)
-        summary["layer_record_report_note"] = (
-            "computed against census_ir itself as a self-check placeholder; "
-            "a true post-regen record-diff needs layer/dimstyle ops folded "
-            "into the SAME (or a follow-up) apply_staged batch -- see "
-            "build_log.md for why this stayed a stretch item this run.")
-        _write_json(os.path.join(out_dir, "layer_record_report.json"), layer_report)
+        # Closeout #130: a REAL post-regen table-record diff, not the old
+        # layer_record_report self-check (which compared census_ir's own
+        # layer records to the census IR they came from -- zero-diff by
+        # construction, proves nothing). run_records_batch actually applies
+        # a create_layer/create_dimstyle/.../create_vport patch (7 table
+        # classes) to its own staged copy of regen_target["target"]; the
+        # diff below is against THAT batch's re-extracted post_ir.
+        records_dir = os.path.join(out_dir, "regen_records")
+        records_batch = run_records_batch(
+            census_ir, regen_target["target"], records_dir,
+            "full_roundtrip_capstone/records_batch", per_table_limit=args.per_kind_limit)
+        records_gate = regen_gate_report(records_batch["op_count"], records_batch["apply_result"])
+        summary["records_regen"] = {
+            "op_count": records_batch["op_count"],
+            "skipped_unnamed": records_batch["build_meta"]["skipped_unnamed"],
+            "per_table_requested": records_batch["build_meta"]["per_table_requested"],
+            "resolvable_ops": records_batch["resolvable_ops"],
+            "elapsed_seconds": records_batch["elapsed_seconds"],
+            "seconds_per_op": records_batch["seconds_per_op"],
+            "apply_status": (records_batch["apply_result"] or {}).get("status"),
+            "apply_reason": (records_batch["apply_result"] or {}).get("reason"),
+            "gate": records_gate,
+        }
+        _write_json(os.path.join(out_dir, "records_regen_summary.json"), summary["records_regen"])
+        gate_statuses.append(records_gate["gate_status"])
 
-    summary["status"] = "ok"
+        records_post_path = post_ir_path(records_dir)
+        records_post_ir = (
+            json.load(open(records_post_path, encoding="utf-8-sig"))
+            if os.path.isfile(records_post_path) else None
+        )
+        table_diffs = table_record_diff_reports(
+            census_ir, records_post_ir, per_table_limit=args.per_kind_limit,
+            unavailable_reason=(
+                None if records_post_ir is not None else
+                "records regen batch apply_status=%r (reason=%r) -- never reached post-inspect"
+                % (summary["records_regen"]["apply_status"], summary["records_regen"]["apply_reason"])
+            ))
+        summary["table_record_diffs"] = table_diffs
+        _write_json(os.path.join(out_dir, "table_record_diffs.json"), table_diffs)
+
+    overall_gate = combine_gate_statuses(gate_statuses)
+    summary["status"] = overall_gate
+    summary["dropped_ops"] = (
+        [dict(d, batch="entity") for d in entity_gate["dropped_ops"]] +
+        ([dict(d, batch="records") for d in records_gate["dropped_ops"]] if args.with_records else [])
+    )
     _write_json(os.path.join(out_dir, "summary.json"), summary)
     print(json.dumps({k: v for k, v in summary.items()
                       if k not in ("census_report",)}, ensure_ascii=False, indent=2, default=str))
-    return 0
+    # "ok" -> success; "ok_with_drops" -> ran to completion but requested !=
+    # applied somewhere (Closeout #129a's own case -- visible in
+    # summary["status"]/summary["dropped_ops"], never silently "ok"); anything
+    # else (blocked/partial/unavailable/...) is a harder failure, same
+    # severity as the earlier staged/census "blocked" exits above.
+    if overall_gate == "ok":
+        return 0
+    if overall_gate == "ok_with_drops":
+        return 1
+    return 2
 
 
 if __name__ == "__main__":
