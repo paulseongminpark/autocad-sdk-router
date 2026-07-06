@@ -142,9 +142,9 @@ class TestM08ACatalogReopen(unittest.TestCase):
         self.assertEqual(by_status.get("catalogued", 0), 0)
         self.assertEqual(by_status.get("stub", 0), 0)
         self.assertEqual(by_status.get("implemented", 0), 465)
-        self.assertEqual(by_status.get("blocked", 0), 60)
-        # ^ unchanged: p9-tables2 (like w3-dimstyle before it) only added a
-        # new IMPLEMENTED synthetic op, never touched the blocked count.
+        self.assertEqual(by_status.get("blocked", 0), 62)
+        # W6-SHEETSET added two new blocked synthetic COM read records for the
+        # measured Sheet Set Manager gap; implemented count is unchanged.
         self.assertEqual(by_status.get("implemented", 0) + by_status.get("blocked", 0), len(self.ops))
 
 

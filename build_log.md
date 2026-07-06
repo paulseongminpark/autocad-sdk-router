@@ -108,6 +108,69 @@ volatile live-probe snapshot, regenerated as a side effect of any
 `git checkout --` to keep the diff surgical.
 
 ---
+## Lane W6-SHEETSET
+
+Scope: governed Sheet Set Manager COM read surface only, in worktree branch
+`cados/w6-sheetset`. No `src/` changes, no `tools/autocad-router.ps1` changes,
+no `config/op_dag.json` regeneration, no existing registry records edited
+beyond additive Wave 6 top-level count reconciliation + the two new sheet-set
+records.
+
+Measured local surface:
+- `AcSmComponents.AcSmSheetSetMgr` is **not** registered on this machine.
+- `AcSmComponents.AcSmSheetSetMgr.26` **is** registered, CLSID
+  `{C8797DCA-3108-4297-AA85-3E66757CE5E2}`, with
+  `C:\Program Files\Autodesk\AutoCAD 2027\AcSmComponents.dll` present.
+- Sample DSTs exist under
+  `C:\Program Files\Autodesk\AutoCAD 2027\Sample\Sheet Sets\...`
+  (live probe used `Architectural\IRD Addition.dst`).
+- Standalone COM activation is real but fragile: plain Python dispatch against
+  `.26` failed until the AutoCAD 2027 install directory was prepended to
+  `PATH`; then PowerShell `New-Object -ComObject 'AcSmComponents.AcSmSheetSetMgr.26'`
+  succeeded headlessly.
+- Governed headless READ remains blocked: `win32com.client.Dispatch(...)`
+  cannot drive the manager because it is non-IDispatch, `comtypes` is absent,
+  and the Autodesk interop path
+  `AcSmComponents.Interop.dll -> OpenDatabase(...)` fails on missing
+  `AXDBLib, Version=1.0.0.0`.
+
+Delivered:
+- `tools/sheetset_read.py`: honest probe/read wrapper that emits a JSON
+  envelope, records registry/import/dispatch evidence, attempts the managed
+  interop read, and returns `blocked` with measured reason when the read path
+  is not actually reachable.
+- `tests/unit/test_sheetset_read.py`: envelope shape, COM-absent graceful
+  behavior, blocked backend behavior, json-out write, and live-probe status
+  coverage.
+- `config/operations.v2.json`: additive blocked records
+  `sheetset.read.summary` and `sheetset.read.sheets` (`family=com_activex`,
+  `engine_tier=managed_also`, `owner_ticket=M08O-T01`,
+  `implementation_strategy=hard_blocked`,
+  `evidence_required=blocker_ref_and_evidence`), plus top-level totals/coverage
+  reconciliation to 527 ops / 62 blocked / 51 `com_activex` / 48
+  `managed_also`.
+- `tests/unit/test_op_dag_generate.py`: narrow frozen-artifact allowance for
+  the exact two W6-SHEETSET additive ops because this lane was explicitly told
+  not to edit `config/op_dag.json`.
+
+Evidence:
+- Live probe artifact:
+  `measure/w6_sheetset_probe_latest.json`
+- Probe command:
+  `cmd /d /c set PYTHONUTF8=1&& python -X utf8 tools/sheetset_read.py --json-out measure/w6_sheetset_probe_latest.json`
+- Probe result: `status=blocked`; standalone COM creation `ok`; read path
+  blocked on missing `AXDBLib` after non-IDispatch late-binding failure.
+- Verification:
+  `python -X utf8 -m pytest tests/unit -q` with worktree-local `TMP/TEMP` ->
+  `1148 passed, 23 skipped`.
+
+Git/commit:
+- Attempted git write operations remain blocked by the sandbox/worktree
+  metadata permissions:
+  `fatal: Unable to create 'D:/dev/99_tools/autocad-sdk-router/.git/worktrees/w6_sheetset/index.lock': Permission denied`
+- Reporting this honestly; no commit was possible from this environment.
+
+---
 ## Lane cb2-irmap (#129b + #119)
 
 # build_log.md — lane cb2-irmap (tickets #129b + #119: IR->patch mapping truth)

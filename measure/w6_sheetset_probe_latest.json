@@ -1,0 +1,58 @@
+{
+  "schema": "ariadne.sheetset.read.v1",
+  "status": "blocked",
+  "dst_path": "C:\\Program Files\\Autodesk\\AutoCAD 2027\\Sample\\Sheet Sets\\Architectural\\IRD Addition.dst",
+  "summary": {},
+  "sheets": [],
+  "subsets": [],
+  "custom_properties": {},
+  "probe": {
+    "imports": {
+      "win32com": {
+        "available": true,
+        "detail": "win32com.client + pythoncom importable"
+      },
+      "comtypes": {
+        "available": false,
+        "detail": "Module not probed here; the local wave measurement found it absent."
+      }
+    },
+    "registry": {
+      "progids": [
+        "AcSmComponents.AcSmSheetSetMgr.26"
+      ]
+    },
+    "dispatch": [
+      {
+        "ok": false,
+        "progid": "AcSmComponents.AcSmSheetSetMgr",
+        "error": "com_error: (-2147221005, '잘못된 클래스 문자열입니다.', None, None)"
+      },
+      {
+        "ok": false,
+        "progid": "AcSmComponents.AcSmSheetSetMgr.26",
+        "error": "com_error: (-2147024770, '지정된 모듈을 찾을 수 없습니다.', None, None)"
+      }
+    ],
+    "autocad_dir": "C:\\Program Files\\Autodesk\\AutoCAD 2027",
+    "powershell_com_object": {
+      "returncode": 0,
+      "stdout": "{\"status\":\"ok\",\"dotnet_type\":\"System.__ComObject\"}\n",
+      "stderr": "#< CLIXML\n<Objs Version=\"1.1.0.1\" xmlns=\"http://schemas.microsoft.com/powershell/2004/04\"><Obj S=\"progress\" RefId=\"0\"><TN RefId=\"0\"><T>System.Management.Automation.PSCustomObject</T><T>System.Object</T></TN><MS><I64 N=\"SourceId\">1</I64><PR N=\"Record\"><AV>ó�� ����ϱ� ���� ����� �غ��ϴ� ���Դϴ�.</AV><AI>0</AI><Nil /><PI>-1</PI><PC>-1</PC><T>Completed</T><SR>-1</SR><SD> </SD></PR></MS></Obj></Objs>",
+      "payload": {
+        "status": "ok",
+        "dotnet_type": "System.__ComObject"
+      }
+    },
+    "powershell_read": {
+      "status": "blocked",
+      "error": "\"OpenDatabase\" ����� �˻��ϴ� ���� ���� ���ܰ� �߻��߽��ϴ�. \"�����̳� ������� 'AXDBLib, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null' �Ǵ� ���⿡ ���ӵǾ� �ִ� �����̳� ������� �� �ϳ��� �ε��� �� �����ϴ�. ������ ������ ã�� �� �����ϴ�.\"",
+      "exception_type": "System.Management.Automation.ExtendedTypeSystemException",
+      "returncode": 0
+    }
+  },
+  "blockers": [
+    "Autodesk sheet-set read backend is blocked on this machine: \"OpenDatabase\" ����� �˻��ϴ� ���� ���� ���ܰ� �߻��߽��ϴ�. \"�����̳� ������� 'AXDBLib, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null' �Ǵ� ���⿡ ���ӵǾ� �ִ� �����̳� ������� �� �ϳ��� �ε��� �� �����ϴ�. ������ ������ ã�� �� �����ϴ�.\"",
+    "Standalone COM activation succeeded after prepending the AutoCAD 2027 install directory to PATH, but the typed interop read path did not."
+  ]
+}
