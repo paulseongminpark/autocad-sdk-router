@@ -23,11 +23,40 @@ This module never fakes success: a count mismatch is recorded as a warning and
 """
 from __future__ import annotations
 
+import hashlib
 import json
 from pathlib import Path
 
+try:
+    from full_roundtrip_capstone import VPORT_MANAGED_FIELDS
+except Exception:  # pragma: no cover - local fallback keeps the builder standalone
+    VPORT_MANAGED_FIELDS = ("center", "height", "width")
+
 IR_SCHEMA_ID = "ariadne.dwg_graph_ir.v1"
-IR_PRODUCER_VERSION = "1.0.0"
+IR_PRODUCER_VERSION = "1.1.0"
+STABLE_ID_FLOAT_EPSILON = 1e-6
+
+_STABLE_ID_EXCLUDED_ENTITY_FIELDS = frozenset((
+    "bbox",
+    "block_record_handle",
+    "dim_block_handle",
+    "dim_block_name",
+    "extension_dictionary_handle",
+    "handle",
+    "leader_length",
+    "object_id",
+    "origin",
+    "owner_handle",
+    "reactors",
+    "source",
+    "spline_control_points",
+    "spline_knots",
+    "stable_id",
+    "stable_id_ordinal",
+    "xdata",
+))
+_STABLE_ID_VIEWPORT_GEOMETRY_EXCLUDES = frozenset(VPORT_MANAGED_FIELDS)
+_STABLE_ID_NESTED_HANDLE_KEYS = frozenset(("handle",))
 
 # dwg_geometry_extract geometry.kind -> IR geometry.kind. The extract contract
 # uses a narrower kind set; map straight through and fall back to "unsupported"
@@ -280,6 +309,114 @@ def _normalize_geometry(raw_geom):
     return geom
 
 
+# --- stable entity identity -------------------------------------------------
+
+def _stable_number_token(value):
+    """Return a canonical text token for numeric identity hashing."""
+    rounded = round(float(value), 6)
+    if abs(rounded) < STABLE_ID_FLOAT_EPSILON:
+        rounded = 0.0
+    token = f"{rounded:.6f}".rstrip("0").rstrip(".")
+    if token in ("", "-0"):
+        return "0"
+    return token
+
+
+def _normalize_for_stable_hash(value, *, geometry_kind=None, parent_key=""):
+    """Normalize nested payloads into a deterministic structure for hashing."""
+    if value is None or isinstance(value, bool):
+        return value
+    if isinstance(value, (int, float)):
+        return _stable_number_token(value)
+    if isinstance(value, str):
+        return value
+    if isinstance(value, list):
+        out = []
+        for item in value:
+            norm = _normalize_for_stable_hash(
+                item, geometry_kind=geometry_kind, parent_key=parent_key)
+            if norm in ({}, []):
+                continue
+            out.append(norm)
+        return out
+    if isinstance(value, dict):
+        out = {}
+        for key in sorted(value):
+            if parent_key == "attributes" and key in _STABLE_ID_NESTED_HANDLE_KEYS:
+                continue
+            if geometry_kind == "viewport" and key in _STABLE_ID_VIEWPORT_GEOMETRY_EXCLUDES:
+                continue
+            norm = _normalize_for_stable_hash(
+                value[key], geometry_kind=geometry_kind, parent_key=key)
+            if norm in ({}, []):
+                continue
+            out[key] = norm
+        return out
+    return str(value)
+
+
+def stable_identity_payload(entity: dict) -> dict:
+    """Return the canonical content payload that defines an entity's stable identity."""
+    geometry = entity.get("geometry") or {}
+    geometry_kind = str(geometry.get("kind", "unsupported") or "unsupported")
+    attrs = {"space": str(entity.get("space", "model") or "model")}
+    if entity.get("layout"):
+        attrs["layout"] = str(entity["layout"])
+    for key in ("class", "linetype", "color_index", "lineweight", "visible"):
+        if key in entity:
+            attrs[key] = entity[key]
+    payload = {
+        "kind": {
+            "dxf_name": str(entity.get("dxf_name", "") or ""),
+            "geometry_kind": geometry_kind,
+        },
+        "layer": str(entity.get("layer", "") or ""),
+        "geometry": _normalize_for_stable_hash(
+            geometry, geometry_kind=geometry_kind, parent_key="geometry"),
+        "attributes": _normalize_for_stable_hash(attrs),
+    }
+    extras = {}
+    for key in sorted(entity):
+        if key in _STABLE_ID_EXCLUDED_ENTITY_FIELDS:
+            continue
+        if key in ("class", "dxf_name", "geometry", "layer", "layout", "space",
+                   "linetype", "color_index", "lineweight", "visible"):
+            continue
+        extras[key] = _normalize_for_stable_hash(entity[key])
+    if extras:
+        payload["extras"] = extras
+    return payload
+
+
+def compute_stable_id(entity: dict) -> str:
+    """Compute a content-based stable id from normalized non-volatile entity data."""
+    payload = stable_identity_payload(entity)
+    blob = json.dumps(payload, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
+    return "sha256:" + hashlib.sha256(blob.encode("utf-8")).hexdigest()
+
+
+def assign_stable_entity_identity(entities):
+    """Attach stable_id + stable_id_ordinal to a normalized entity list in-place."""
+    buckets = {}
+    for entity in entities or []:
+        stable_id = compute_stable_id(entity)
+        entity["stable_id"] = stable_id
+        buckets.setdefault(stable_id, []).append(entity)
+    for stable_id, members in buckets.items():
+        for ordinal, entity in enumerate(sorted(members, key=lambda e: str(e.get("handle", "")))):
+            entity["stable_id"] = stable_id
+            entity["stable_id_ordinal"] = ordinal
+    return entities
+
+
+def apply_stable_entity_identity(ir: dict) -> dict:
+    """Ensure every emitted entity node carries the additive identity fields."""
+    assign_stable_entity_identity(ir.get("entities") or [])
+    for block_def in ir.get("block_definitions") or []:
+        assign_stable_entity_identity(block_def.get("def_entities") or [])
+    return ir
+
+
 # --- entity normalization ------------------------------------------------------
 
 def _normalize_entity(raw, source_block):
@@ -368,6 +505,7 @@ def build_ir_from_extract(extract: dict, summary: dict | None, source_meta: dict
     source_block = {"extractor": extractor, "engine_tier": engine_tier, "route": route}
 
     entities = [_normalize_entity(e, source_block) for e in entities_raw]
+    assign_stable_entity_identity(entities)
 
     # symbol_tables.layers from distinct entity layers (geometry_only fidelity).
     layer_names: list[str] = []
@@ -439,7 +577,7 @@ def build_ir_from_extract(extract: dict, summary: dict | None, source_meta: dict
         "entities": entities,
         "diagnostics": diagnostics,
     }
-    return ir
+    return apply_stable_entity_identity(ir)
 
 
 def _build_source(source_meta, extract_source, extractor, engine_tier):
@@ -948,6 +1086,7 @@ def _normalize_block_definitions(raw_block_defs, source_block: dict) -> list:
         raw_def_entities = bd.get("def_entities")
         if isinstance(raw_def_entities, list) and raw_def_entities:
             bd["def_entities"] = [_entity_from_native(e, source_block) for e in raw_def_entities]
+            assign_stable_entity_identity(bd["def_entities"])
         out.append(bd)
     return out
 
@@ -976,6 +1115,7 @@ def build_ir_from_database_graph(graph_result: dict, source_meta: dict) -> dict:
 
     raw_entities = graph_result.get("entities") or []
     entities = [_entity_from_native(e, source_block) for e in raw_entities]
+    assign_stable_entity_identity(entities)
 
     entity_count = len(entities)
     asserted = graph_result.get("modelspace_entities")
@@ -1084,7 +1224,7 @@ def build_ir_from_database_graph(graph_result: dict, source_meta: dict) -> dict:
     btr = graph_result.get("block_table_records")
     if btr is not None:
         ir["symbol_tables"]["block_table_records"] = btr
-    return ir
+    return apply_stable_entity_identity(ir)
 
 
 def load_native_graph_result(path) -> dict:

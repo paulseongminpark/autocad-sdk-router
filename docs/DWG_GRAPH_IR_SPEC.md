@@ -4,6 +4,7 @@
 JSON Schema: `schemas/dwg_graph_ir.v1.schema.json` (draft-07)
 Status: v1 (CAD OS Layer, Lane A / SCHEMAS). Authored alongside the frozen v1 working surface; does not modify it.
 Producer: `tools/ir_builder.py` — `build_ir_from_extract(...)` (geometry_only) and `build_ir_from_database_graph(...)` (native_full).
+Current producer version: `1.1.0`
 
 > **M02 state (this doc is implementation-true, not aspirational).** The IR is produced at **two**
 > coverage levels today. A live **`native_full`** IR exists at
@@ -12,6 +13,15 @@ Producer: `tools/ir_builder.py` — `build_ir_from_extract(...)` (geometry_only)
 > `geometry_only` builder is unchanged from M01. Sections 1–9 describe the *full v1 schema surface*;
 > Section 10 states *what an M02 native_full IR actually carries*. Where they differ, Section 10 is
 > the live truth.
+
+---
+
+## Version history
+
+| version | change | compatibility |
+|---|---|---|
+| `1.1.0` | Add additive entity identity fields `stable_id` and `stable_id_ordinal`; document float normalization (`1e-6`) and viewport-managed exclusions (`center/height/width`). | Backward-compatible minor bump; existing consumers still read the v1 schema/id unchanged. |
+| `1.0.0` | Initial producer version for the documented v1 graph IR surface. | Baseline. |
 
 ---
 
@@ -217,6 +227,8 @@ Required per entity: `handle`, `class`, `dxf_name`, `owner_handle`, `space`, `la
 | field | meaning |
 |---|---|
 | `handle` | DWG handle (uppercase hex). Portable join key. |
+| `stable_id` | Additive content hash over entity kind, layer, normalized geometry payload, and normalized non-volatile attributes. Volatile fields such as `handle`, owner/auxiliary handles, per-entity provenance, XDATA, and AutoCAD-managed viewport display fields are excluded. Floats are normalized at `1e-6` before hashing. |
+| `stable_id_ordinal` | Deterministic duplicate disambiguator within one emitted entity list: entities that share the same `stable_id` are ordered by `handle` and assigned ordinals `0..n-1`. The ordinal is only stable while that duplicate set is unchanged. |
 | `object_id` | Optional engine-local pointer/id (non-portable; `handle` is the portable key). Carries the v1 extract `object_id`. |
 | `class` | Runtime class name (`AcDbLine`, `AcDbBlockReference`, …). |
 | `dxf_name` | DXF entity name (`LINE`, `LWPOLYLINE`, `INSERT`, `DIMENSION`, …). |
@@ -244,6 +256,28 @@ Common geometry fields: `start`, `end`, `center`, `position`, `radius`, `major_a
 `vertices[]` (each `{point, bulge, start_width, end_width}` for polyline family),
 `text`, `height`, `rotation`, `block_name`, `scale`, `dimension_type`, `measurement`,
 `control_points[]`, `degree`, `loops[]` (hatch boundaries), `pattern_name`.
+
+#### Stable entity identity
+
+`stable_id` is intentionally **not** a handle alias. It is a canonical SHA-256 hash of:
+
+- entity kind (`dxf_name` + `geometry.kind`)
+- `layer`
+- normalized `geometry`
+- normalized non-volatile attributes (`space`, `layout`, common display attributes when present)
+
+Normalization rules:
+
+- Floats are rounded to `1e-6` before hashing so save/reopen noise does not churn identity.
+- `bbox` is excluded because it is derived from geometry.
+- Handle-bearing fields are excluded: `handle`, `owner_handle`, `object_id`, `block_record_handle`,
+  `dim_block_handle`, `extension_dictionary_handle`, reactor handles, nested attribute handles, and
+  similar auxiliary handles.
+- Per-entity provenance (`source`) and XDATA are excluded because they are not stable identity inputs.
+- The viewport-managed trio discovered in the capstone regen evidence —
+  `center`, `height`, `width` (the same fields named by
+  `tools/full_roundtrip_capstone.py::VPORT_MANAGED_FIELDS`) — is excluded from `viewport`
+  geometry hashing because AutoCAD rewrites that display state on its own.
 
 `kind == "unsupported"` (or `proxy`) means the extractor **recognized the entity but did not
 emit coordinate geometry**. This is a first-class, honest state — paired with
@@ -396,7 +430,7 @@ This section pins the *realized* native_full IR shape against the live artifact,
 knows exactly which sections to trust and which are still partial/deferred. It is not a wish list.
 
 **Reference artifact** (read-only): `runs/m02_cadctl_rich/dwg_graph_ir.json`
-(`schema = ariadne.dwg_graph_ir.v1`, `ir_version = 1.0.0`, `coverage_level = native_full`).
+(`schema = ariadne.dwg_graph_ir.v1`, `ir_version = 1.1.0`, `coverage_level = native_full`).
 Produced by `cadctl.Cad().inspect(dwg, out_dir, mode="graph", include_rich=True)` →
 `run_job.run_router_cad_job(staged, run_dir, "inspect.database.graph", write_mode="read")` →
 `ir_builder.build_ir_from_database_graph(result, source_meta)`. The native job result it consumes

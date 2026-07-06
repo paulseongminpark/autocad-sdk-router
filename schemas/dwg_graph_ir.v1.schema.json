@@ -756,6 +756,15 @@
       "required": ["handle", "class", "dxf_name", "owner_handle", "space", "layer", "bbox", "geometry", "source"],
       "properties": {
         "handle": { "$ref": "#/$defs/handle" },
+        "stable_id": {
+          "type": "string",
+          "description": "Additive content-based identity hash over normalized non-volatile entity content. Volatile fields such as handles, provenance, and managed viewport display state are excluded."
+        },
+        "stable_id_ordinal": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Deterministic duplicate disambiguator for entities that share the same stable_id. Assigned by sorting the duplicate set by handle at emission time."
+        },
         "object_id": { "type": "string", "description": "Optional engine-local object id/pointer (non-portable; handle is the portable key)." },
         "class": { "type": "string", "description": "Runtime class name (e.g. AcDbLine, AcDbBlockReference)." },
         "dxf_name": { "type": "string", "description": "DXF entity name (e.g. LINE, LWPOLYLINE, INSERT, DIMENSION)." },

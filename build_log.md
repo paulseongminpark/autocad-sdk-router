@@ -1470,4 +1470,45 @@ run across all 4 missions above -- unchanged throughout. No original file was ev
 opened directly; every attended/COM operation ran against a fresh staged copy, and every
 document this lane opened in the live session was closed by this lane.
 
+## Lane W5-ID
+
+- Added additive entity identity emission in `tools/ir_builder.py`: every emitted entity now carries
+  `stable_id` plus `stable_id_ordinal` without removing or renaming any existing IR fields.
+- Stable identity contract:
+  - hash basis = `dxf_name` + `geometry.kind`, `layer`, normalized geometry, normalized non-volatile
+    attributes (`space`, `layout`, common display attrs when present)
+  - excluded as volatile = `handle`, `object_id`, `owner_handle`, `bbox`, auxiliary handle fields,
+    per-entity `source`, XDATA, and viewport-managed `center`/`height`/`width`
+  - float normalization = `1e-6`
+  - duplicate entities intentionally share `stable_id`; `stable_id_ordinal` is assigned by sorting
+    the duplicate set by `handle` and is only stable while that duplicate set is unchanged
+- Added `tools/ir_identity.py` (`python tools/ir_identity.py --pre <ir> --post <ir> --out <report>`).
+  The matcher backfills stable identity in-memory when older IR artifacts do not already carry the
+  additive fields.
+- Real artifact proof:
+  - `reports/w5_mcp_verdict_identity_report.json` against
+    `runs/mcp_verdict_20260706/pre|post/dwg_graph_ir.json`:
+    matched `21747`, added `2`, removed `0`, moved `0`, unchanged_handle `21747`
+    (the patch pair kept existing handles stable; the two new entities are the only additions)
+  - `reports/w5_capstone_regen_identity_report.json` against
+    `runs/capstone_composed_20260706/census/dwg_graph_ir.json` vs
+    `runs/capstone_composed_20260706/regen/post/dwg_graph_ir.json`:
+    matched `7`, added `0`, removed `21740`, moved `7`, unchanged_handle `0`
+    (the regen case is the demonstrated handle-churn scenario)
+- Schema/spec discipline:
+  - bumped emitted `ir_version` from `1.0.0` to `1.1.0` (backward-compatible minor bump)
+  - updated `schemas/dwg_graph_ir.v1.schema.json` with `stable_id` and `stable_id_ordinal`
+  - updated `docs/DWG_GRAPH_IR_SPEC.md` with current producer version, version-history table, and
+    the stable-identity contract section
+- Tests:
+  - new unit coverage in `tests/unit/test_ir_identity.py` for float normalization, viewport-managed
+    exclusion, duplicate ordinals, matcher logic, CLI output, and real-artifact smoke
+  - native-full shape assertion extended in `tests/unit/test_dwg_graph_ir_schema.py`
+  - targeted regression fix in `tools/cross_oracle.py` so the additive identity keys are treated as
+    schema-known identity/provenance fields, not uncertified payload data
+  - full verifier: `python -X utf8 -m pytest tests/unit -q --basetemp .pytest_tmp`
+    -> `1151 passed, 23 skipped, 0 failed` in `39.00s`
+- Git commit note: commit/write to the worktree git metadata was blocked by the sandbox because
+  `.git/worktrees/w5_identity` is outside the writable roots; no commit was faked.
+
 
