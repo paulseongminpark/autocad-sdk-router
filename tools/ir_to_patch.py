@@ -42,11 +42,41 @@ def build_patch_from_ir(ir: Dict[str, Any], target_dwg: Dict[str, Any], patch_id
     """
     ops: List[Dict[str, Any]] = []
     deferred: List[Dict[str, Any]] = []
+    # #129b block-def dependency: a fresh/seed regen target starts with none
+    # of the source DWG's custom blocks, so a create_blockref for a name the
+    # target can't resolve fails (native BLOCK_NOT_FOUND). Synthesize each
+    # referenced block's definition (patch_ops.blocks.block_def_ops), once
+    # per name, from this IR's own block_definitions[] -- ahead of the first
+    # create_blockref that names it.
+    block_defs_by_name = {
+        bd.get("name"): bd for bd in (ir.get("block_definitions") or []) if bd.get("name")
+    }
+    emitted_block_defs: set = set()
     for i, ent in enumerate(ir.get("entities") or []):
         g = ent.get("geometry") or {}
         kind = g.get("kind")
         if kinds is not None and kind not in kinds:
             continue
+        if kind == "block_reference":
+            block_name = g.get("block_name")
+            block_def = block_defs_by_name.get(block_name)
+            if block_def is None:
+                # No block_definitions source for this name -- emitting
+                # create_blockref anyway would target a name the fresh seed
+                # cannot resolve. Honest deferral, never the undeclared
+                # 'insert_block' fallback this replaces.
+                deferred.append({
+                    "index": i, "handle": ent.get("handle"), "kind": kind,
+                    "reason": "no block_definitions entry for block_name %r" % (block_name,),
+                })
+                continue
+            if block_name not in emitted_block_defs:
+                bd_ops, bd_deferred = patch_ops.blocks.block_def_ops(block_def)
+                for j, bd_op in enumerate(bd_ops):
+                    bd_op["step_id"] = "bd%d_%d" % (i, j)
+                    ops.append(bd_op)
+                deferred.extend(bd_deferred)
+                emitted_block_defs.add(block_name)
         op = _op_for(ent)
         if op is None:
             deferred.append({"index": i, "handle": ent.get("handle"), "kind": kind})

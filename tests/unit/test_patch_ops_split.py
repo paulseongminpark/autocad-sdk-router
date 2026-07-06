@@ -443,7 +443,22 @@ class TestNativeJobDocByteIdentical(unittest.TestCase):
 
 class TestIrOpForByteIdentical(unittest.TestCase):
     """ir_to_patch._op_for must still produce exactly what the pre-split
-    if-chain produced, for every kind it ever handled."""
+    if-chain produced, for every kind it ever handled.
+
+    cb2-irmap/#129b update: kind=="block_reference" is REMOVED from the
+    fixture below (was handle "3", asserting _op_for produced the pre-split
+    oracle's "insert_block"). That was pinning a real bug, not a refactor
+    invariant: "insert_block" is not a declared op anywhere in the registry
+    (regen/journal.json's "insert_block is not declared" warning), so every
+    INSERT silently no-op'd on apply. entities.py now maps kind==
+    "block_reference" to create_blockref (write.entity.blockref, wired since
+    w3-insert but never given an IR-op-case) -- see
+    test_ir_to_patch_mappings.py for the corrected oracle. _original_op_for
+    below is left untouched as the historical pre-split snapshot; only the
+    fixture that fed it a block_reference case is removed, since the
+    "byte-identical to the old if-chain" invariant no longer applies to this
+    one kind by design.
+    """
 
     def setUp(self):
         import ir_to_patch
@@ -455,8 +470,6 @@ class TestIrOpForByteIdentical(unittest.TestCase):
              "geometry": {"kind": "line", "start": [0, 0, 0], "end": [1, 1, 0]}},
             {"handle": "2", "layer": "DIM",
              "geometry": {"kind": "circle", "center": [0, 0, 0], "radius": 2.5}},
-            {"handle": "3", "layer": "0",
-             "geometry": {"kind": "block_reference", "block_name": "DOOR", "position": [5, 5, 0]}},
             {"handle": "4", "layer": "TXT",
              "geometry": {"kind": "text", "position": [1, 1, 0], "text": "hi", "height": 3.0}},
             {"handle": "5", "layer": "0",
