@@ -61,6 +61,25 @@ VALID_ACTIONS = (ACTION_NONE, ACTION_ANNOTATED, ACTION_OPEN)
 # documented caveat, not inferring one.
 _CORE_CONSOLE_CAVEAT = "core console can only"
 
+# Second caveat, added by the 2026-07-06 Lane G triage of extend.customclass.
+# create / extend.customobject.create: both were flagged anomalous_crash by
+# this tool's own prior run (a wired dispatcher claimed, no caveat text, yet
+# CRASH on both empty-arg and valid-arg probes). Lane G reproduced the SAME
+# CRASH live on the canonical binary (ruling out a stale/flaky sweep row),
+# then re-ran the identical op+args through tools/attended_lane.py's dedicated
+# full-acad.exe lane and got created:true/errorstatus:0 on both -- proving the
+# native handler (createCustomEntity/createCustomObject, AriadneNativeJob.cpp)
+# is correct. Root cause: both ops' write_level.default_write_mode=="live_edit",
+# and autocad-router.ps1's Action=='run' dispatch (see the
+# "$effectiveWriteMode -eq 'live_edit'" branch) routes ANY op in that write
+# mode to Invoke-FullAutoCadCadJob, which requires an ALREADY-OPEN AutoCAD COM
+# session (GetActiveObject) -- never available to cadctl.run_operation's
+# headless/isolated-subprocess callers (the reachability sweep included) --
+# BEFORE it ever reaches Invoke-CadJobRoute's Core-Console dbx+crx path. This
+# is a router write-mode dispatch gap, not a native code defect; see
+# build_log.md's "Lane G" section for the full evidence trail.
+_ATTENDED_ONLY_CAVEAT = "requires an already-open autocad session"
+
 
 def load_jsonl(path: str) -> List[Dict[str, Any]]:
     with open(path, encoding="utf-8-sig") as f:
@@ -143,6 +162,22 @@ def classify_one(row: Dict[str, Any], op: Dict[str, Any]) -> Dict[str, Any]:
             "reason": ("registry summary/notes already states Core Console cannot "
                        "execute this op (quoted in evidence.registry_summary) -- "
                        "already documented, nothing to annotate."),
+        }
+
+    if _ATTENDED_ONLY_CAVEAT in registry_text.lower():
+        return {
+            "op_id": op_id, "bucket": crash_bucket(op_id, family),
+            "verdict": VERDICT_EXPECTED, "registry_action": ACTION_NONE,
+            "evidence": evidence,
+            "reason": ("registry summary/notes already documents that this op's "
+                       "live_edit default write_mode routes cadctl's headless "
+                       "surface to the attended full_autocad COM branch, which "
+                       "an isolated/headless probe never satisfies (2026-07-06 "
+                       "Lane G triage: reproduced the CRASH live, then proved "
+                       "the same op+args createCustomEntity/createCustomObject "
+                       "via the attended lane, created:true) -- harness "
+                       "difference, not a native code defect; already "
+                       "documented, nothing further to annotate."),
         }
 
     # policy.status_policy == "implemented" (a live, wired dispatcher is

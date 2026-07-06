@@ -978,3 +978,149 @@ reopen-crash.
 failed** (exit code 0) -- unchanged from the canonical rebuild baseline; no
 production code was touched by this lane.
 
+## Lane G
+
+**Task:** root-cause `extend.customclass.create` / `extend.customobject.create`
+CRASH regression flagged by F-b's `crash34_host_crosscheck.py` as
+`anomalous_crash` (`policy.status_policy=="implemented"`, a working fixture on
+file, yet CRASH on both empty-arg and valid-arg probes -- see build_log.md's
+F-b entry above).
+
+**Verdict: harness difference, not a real regression. Both native handlers
+are correct and unmodified; no C++ fix, no rebuild.**
+
+**Step 1 -- reproduce the CRASH live (sweep-style):** ran
+`tools/probe_reachability.py --live --ops extend.customclass.create,extend.
+customobject.create --dwg tests/fixtures/native_sample.dwg` against this
+worktree's own `prebuilt/2027/` (canonical, unmodified since 688155d) --
+mirrors the 2026-07-06 sweep's own isolated-subprocess invocation exactly.
+Result: **both CRASH again**, confirming this is a real, deterministic,
+reproducible outcome, not sweep flakiness. Root artifact:
+`runs/laneG_repro/sweep_style_matrix.jsonl`; per-op detail under
+`runs/laneG_repro/sweep_style_work/`. The actual failure signature, read from
+the `valid/stdout.txt` of the underlying router invocation, is **not** a
+native-module crash at all:
+```
+"status": "NO_ACTIVE_AUTOCAD",
+"detail": "No running AutoCAD COM application was found for full_autocad native job mode."
+```
+`cadctl.run_operation` maps that router-level `NO_ACTIVE_AUTOCAD` envelope
+(no `result`/`result_json` present) to `status:"partial"`, which
+`probe_reachability.classify_probe_response` in turn buckets as `CRASH` --
+the sweep's CRASH class conflates "native module crashed" with "router
+couldn't even reach the native module." The .crx/.dbx dispatcher
+(`createCustomEntity`/`createCustomObject`, `AriadneNativeJob.cpp`) was never
+invoked.
+
+**Root cause (traced in `tools/autocad-router.ps1`):** both ops' registry
+record (`config/operations.v2.json`) has `write_level.default_write_mode ==
+"live_edit"` (no `"read"` option). The `Action=='run'` dispatcher
+(`autocad-router.ps1` around the `dwg_truth_autocad` branch) checks
+`($HostMode -eq 'full_autocad' -or $effectiveWriteMode -eq 'live_edit')`
+**before** it ever considers `Invoke-CadJobRoute` (the headless Core Console
+`arxload` dbx+crx path that `Test-NativeP1CadJobOperation` would otherwise
+select for these two ops). Because `effectiveWriteMode` resolves to
+`live_edit` from the registry default, every call unconditionally takes the
+`Invoke-FullAutoCadCadJob` branch, which does `[Runtime.InteropServices.
+Marshal]::GetActiveObject('AutoCAD.Application')` -- i.e. it requires an
+**already-open, interactive AutoCAD session reachable via COM**. Neither
+`cadctl.run_operation` nor `probe_reachability.py`'s isolated subprocess ever
+opens or attaches to one, so this branch always fails with
+`NO_ACTIVE_AUTOCAD`, regardless of whether the native handler works.
+
+This is not specific to these two ops. Cross-checked every `engine_tier==
+"native_arx_only"` row in the real, already-committed
+`measure/reachable_matrix.jsonl` (191 ops total) against its own
+`write_level.default_write_mode`: **all 34 CRASH rows have
+`default_write_mode=="live_edit"`; all 157 non-CRASH rows (RUNNABLE/
+REACHABLE/RUNNABLE_BUT_DEGENERATE) have `default_write_mode=="read"`** -- a
+100% clean split. The other 4 `anomalous_crash` rows from F-b's crosscheck
+(`live.overrule.enable/disable`, `live.reactor.enable/disable`) show the
+same `default_write_mode=="live_edit"` shape and almost certainly hit the
+identical router branch -- flagged here as a strong lead for whoever owns
+that triage, left untouched (out of this lane's assigned scope; no
+registry/tool edit made for those 4).
+
+`git log -S Invoke-FullAutoCadCadJob -- tools/autocad-router.ps1` shows this
+branch has existed since `33b2932` (repo's very first tracked commit) -- this
+is a standing dispatch gap, not something a later build wave broke.
+
+**Step 2 -- bisect against the historically-proven invocation style:** the
+"working fixture" evidence cited by the registry
+(`test_native/job_create_args.json`, `job_record_create.json`) is not
+exercised live by any current pytest test -- `tests/test_native_arx_dbx_
+contract.py` / `tests/test_cad_job_control_plane.py` only assert the op_id
+strings/schema shapes appear as text (static contract checks, no live
+AutoCAD call). The actual historical proof mechanism is named directly in
+`AriadneNativeJob.cpp`'s `ariadneNativeJobArgs()` comment: "this is what the
+M07B attended harness uses to run custom ops (e.g. ... extend.customclass.
+create) ... host_mode defaults to full_autocad (this command path is
+attended)" -- i.e. a **dedicated, disposable full acad.exe** driven through
+the `ARIADNE_NATIVE_JOB_ARGS` env-file channel
+(`tools/attended_lane.py` + `tools/attended/run_attended_job.ps1`), not
+`cadctl.run_operation`'s headless `-Intent dwg` surface at all.
+
+Ran the exact same op_ids + exact same fixture args
+(`{"center":{"x":10,"y":20,"z":0},"size":5}` / `{"key":"recordA",
+"value":42}`, matching `test_native/job_create_args.json` /
+`job_record_create.json` byte-for-byte) through `attended_lane.
+run_attended_native_job()` against this worktree's own `router_home`
+(dedicated acad.exe launch, never attaches to a pre-existing session --
+distinct from `Invoke-FullAutoCadCadJob`'s COM-attach requirement). Both
+**PASS**:
+```
+extend.customclass.create  -> result: {"created": true, "errorstatus": 0, "center": [10,20,0], "size": 5, "ariadne_probes_after": 1}
+extend.customobject.create -> result: {"created": true, "errorstatus": 0, "key": "recordA", "value": 42, "ariadne_records_after": 1}
+```
+Evidence: `runs/laneG_repro/attended/customclass_run/attended_job_result.json`,
+`runs/laneG_repro/attended/customobject_run/attended_job_result.json`.
+Security scoping (`SECURELOAD`/`TRUSTEDPATHS`) was set then restored
+(`"restored": true` in both envelopes). Driver script used:
+`laneg_attended_repro.py` (scratchpad, not committed -- a thin, evidence-
+inlined caller of the repo's own `attended_lane.run_attended_native_job`,
+no ad-hoc CAD parsing).
+
+**Bisect result: (a) sweep-style (headless, `-Intent dwg`) CRASHES; (b)
+attended-lane style (dedicated full acad.exe, `ARIADNE_NATIVE_JOB_ARGS`)
+PASSES**, with byte-identical op+args and this worktree's own unmodified
+`prebuilt/2027` binaries in both cases -- textbook harness difference. The
+differing condition is exactly the router-dispatch gap above: `live_edit`
+write mode is being used by `autocad-router.ps1` as an "attended-COM-only"
+signal, when the registry actually means it as a *persistence* signal
+(`dwg_persisted:true`, no `read` mode exists for these ops) that
+`Invoke-CadJobRoute`'s own headless Core-Console path already knows how to
+honor (it appends `_QSAVE` for `write_copy`/`write_original`/`live_edit`
+alike) -- had the dispatcher reached that branch instead, this likely would
+have passed headlessly too, but that is a broader router-dispatch fix
+outside this lane's 2-op scope and is called out here, not silently patched.
+
+**Step 3 -- truth surfaces updated (measured facts only, no guessing):**
+- `config/operations.v2.json`: appended a caveat sentence to both ops'
+  `summary` and `notes` (the field `crash34_host_crosscheck.py` already
+  reads) documenting the exact mechanism above, plus an `evidence_refs` entry
+  pointing at the two `attended_job_result.json` proof artifacts.
+- `tools/crash34_host_crosscheck.py`: added a second, generic, verbatim
+  substring caveat check (`_ATTENDED_ONLY_CAVEAT = "requires an already-open
+  autocad session"`, mirrors the existing `_CORE_CONSOLE_CAVEAT` pattern
+  exactly) so `classify_one()` now recognizes this documented case as
+  `expected_crash`/`registry_action:"none"` instead of `anomalous_crash`/
+  `"open"`. Additive only -- every existing branch/test is untouched; the 4
+  `live.overrule`/`live.reactor` rows are deliberately left `anomalous_crash`/
+  `"open"` (no caveat text added to their registry entries -- not this
+  lane's scope to assert on their behalf).
+- Regenerated `reports/crash34_host_eligibility_crosscheck.{json,md}`:
+  `verdict_counts` moved from `{"expected_crash":28,"anomalous_crash":6}` to
+  `{"expected_crash":30,"anomalous_crash":4}`; `bucket_counts` unchanged
+  (`16/5/6/7`, as expected -- bucketing is presentational, independent of
+  verdict).
+
+**Verification:** `python -m pytest tests/unit -q` -- **1136 passed, 0
+failed** (includes the pre-existing `tests/unit/test_crash34_crosscheck.py`,
+all 17 still green; its synthetic
+`test_classify_one_implemented_with_working_fixture_still_anomalous` test
+constructs its own op dict with no caveat text, so it is unaffected by the
+real registry's new caveat sentence). No C++ touched; no rebuild performed
+(this worktree's `prebuilt/2027` binaries are the same canonical build from
+688155d used by every other lane this wave).
+
+

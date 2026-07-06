@@ -6,8 +6,8 @@
   "joined_count": 34,
   "unjoined_op_ids": [],
   "verdict_counts": {
-    "expected_crash": 28,
-    "anomalous_crash": 6
+    "expected_crash": 30,
+    "anomalous_crash": 4
   },
   "bucket_counts": {
     "misc": 7,
@@ -16,8 +16,8 @@
     "live": 5
   },
   "registry_action_counts": {
-    "none": 28,
-    "open": 6
+    "none": 30,
+    "open": 4
   },
   "rows": [
     {
@@ -375,8 +375,8 @@
     {
       "op_id": "extend.customclass.create",
       "bucket": "custom-class",
-      "verdict": "anomalous_crash",
-      "registry_action": "open",
+      "verdict": "expected_crash",
+      "registry_action": "none",
       "evidence": {
         "family": "extend",
         "engine_tier": "native_arx_only",
@@ -387,12 +387,12 @@
         "router_lane": "ARIADNE_NATIVE_JOB",
         "native_api": "",
         "policy_status_policy": "implemented",
-        "registry_summary": "Router job creates an Ariadne custom entity instance; catalog entries describe class definition and registration primitives.",
+        "registry_summary": "Router job creates an Ariadne custom entity instance; catalog entries describe class definition and registration primitives. Its live_edit default write_mode always makes cadctl.run_operation's headless surface route to the full_autocad COM-attach branch, which requires an already-open autocad session that a headless/isolated probe never has -- verified working under the attended lane with identical fixture args (2026-07-06, Lane G triage; see build_log.md).",
         "fixture_available": true,
         "fixture_evidence": "test_native/job_create_args.json (existing working fixture)",
         "empty_arg_reason": "native job produced no parseable result JSON"
       },
-      "reason": "policy.status_policy==\"implemented\" (registry claims a wired, runnable dispatcher) and no host-capability caveat exists in the registry text -- nothing here predicts a crash; needs owner triage, not a bot-authored registry edit."
+      "reason": "registry summary/notes already documents that this op's live_edit default write_mode routes cadctl's headless surface to the attended full_autocad COM branch, which an isolated/headless probe never satisfies (2026-07-06 Lane G triage: reproduced the CRASH live, then proved the same op+args createCustomEntity/createCustomObject via the attended lane, created:true) -- harness difference, not a native code defect; already documented, nothing further to annotate."
     },
     {
       "op_id": "extend.customentity.define",
@@ -419,8 +419,8 @@
     {
       "op_id": "extend.customobject.create",
       "bucket": "custom-class",
-      "verdict": "anomalous_crash",
-      "registry_action": "open",
+      "verdict": "expected_crash",
+      "registry_action": "none",
       "evidence": {
         "family": "extend",
         "engine_tier": "native_arx_only",
@@ -431,12 +431,12 @@
         "router_lane": "ARIADNE_NATIVE_JOB",
         "native_api": "",
         "policy_status_policy": "implemented",
-        "registry_summary": "Router job creates an Ariadne custom DBObject record; catalog separates custom object definition, filing, and storage primitives.",
+        "registry_summary": "Router job creates an Ariadne custom DBObject record; catalog separates custom object definition, filing, and storage primitives. Its live_edit default write_mode always makes cadctl.run_operation's headless surface route to the full_autocad COM-attach branch, which requires an already-open autocad session that a headless/isolated probe never has -- verified working under the attended lane with identical fixture args (2026-07-06, Lane G triage; see build_log.md).",
         "fixture_available": true,
         "fixture_evidence": "test_native/job_record_create.json (existing working fixture)",
         "empty_arg_reason": "native job produced no parseable result JSON"
       },
-      "reason": "policy.status_policy==\"implemented\" (registry claims a wired, runnable dispatcher) and no host-capability caveat exists in the registry text -- nothing here predicts a crash; needs owner triage, not a bot-authored registry edit."
+      "reason": "registry summary/notes already documents that this op's live_edit default write_mode routes cadctl's headless surface to the attended full_autocad COM branch, which an isolated/headless probe never satisfies (2026-07-06 Lane G triage: reproduced the CRASH live, then proved the same op+args createCustomEntity/createCustomObject via the attended lane, created:true) -- harness difference, not a native code defect; already documented, nothing further to annotate."
     },
     {
       "op_id": "extend.customobject.define",
