@@ -819,34 +819,6 @@ static std::string bytesToHexLower(const char* buf, int len)
     return out;
 }
 
-// E-a: inverse of bytesToHexLower() -- WRITE-side hex decode for xdata group
-// code 1004 (binary chunk), consumed by modify.entity.xdata
-// (m08g_handlers.inc). Rejects (returns false, leaves out unspecified) on
-// odd-length input or any non-hex-digit character -- never silently
-// truncates or skips bad input (fail-loud).
-static bool hexToBytes(const std::string& hex, std::vector<unsigned char>& out)
-{
-    if (hex.size() % 2 != 0)
-        return false;
-    out.clear();
-    out.reserve(hex.size() / 2);
-    for (size_t i = 0; i < hex.size(); i += 2) {
-        int hi = -1, lo = -1;
-        const char ch = hex[i];
-        const char cl = hex[i + 1];
-        if (ch >= '0' && ch <= '9') hi = ch - '0';
-        else if (ch >= 'a' && ch <= 'f') hi = ch - 'a' + 10;
-        else if (ch >= 'A' && ch <= 'F') hi = ch - 'A' + 10;
-        if (cl >= '0' && cl <= '9') lo = cl - '0';
-        else if (cl >= 'a' && cl <= 'f') lo = cl - 'a' + 10;
-        else if (cl >= 'A' && cl <= 'F') lo = cl - 'A' + 10;
-        if (hi < 0 || lo < 0)
-            return false;
-        out.push_back(static_cast<unsigned char>((hi << 4) | lo));
-    }
-    return true;
-}
-
 static std::string resbufItemJson(const resbuf* rb)
 {
     std::ostringstream o; o.precision(kJsonDoublePrecision);

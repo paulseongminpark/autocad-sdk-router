@@ -296,25 +296,6 @@ static bool m08gReadValueTriple(const std::string& obj, double out[3])
     return true;
 }
 
-// E-a: frees the xdata group-code-1004 (binary chunk) buffers WE allocated
-// ourselves for modify.entity.xdata, and neutralizes each node's
-// resval.rbinary fields to buf=nullptr/clen=0 first. MUST run after
-// AcDbEntity::setXData() (which deep-copies via a const resbuf* and so has
-// already read whatever it needs) but BEFORE acutRelRb(head) walks and frees
-// the chain -- acutRelRb's own handling of resval.rbinary.buf on a node it
-// did not allocate is undocumented upstream (see build_log.md, Lane E), so
-// this never lets it see a live pointer to free/mismatch-free.
-static void m08gReleaseOwnedXdataBinBuffers(std::vector<resbuf*>& binNodes)
-{
-    for (resbuf* bn : binNodes) {
-        char* ownBuf = bn->resval.rbinary.buf;
-        bn->resval.rbinary.buf = nullptr;
-        bn->resval.rbinary.clen = 0;
-        delete[] ownBuf;
-    }
-    binNodes.clear();
-}
-
 // Build a transform matrix from the job. Supports any combination, applied as
 // scale -> rotate(about Z @ pivot) -> translate (composed T*R*S). Reads:
 //   "translate":{x,y,z}, "scale":<num> (uniform), "rotate":<radians>, "pivot":{x,y,z}.
@@ -1717,20 +1698,28 @@ static bool m08gDispatch(const std::string& op, const AriadneJobCtx& ctx, std::o
         // resbufCodeIs* families also match non-xdata codes below 1000, which
         // are not valid xdata group codes at all). 1001 (appname) is
         // synthesized by this handler, never caller-supplied; 1002 (control
-        // string) stays excluded (no clear use case here) -- see build_log.md.
-        // 1004 (binary chunk): E-a re-adds this, hex-string 'value', via a
-        // DIFFERENT construction path than the one that was reverted (see
-        // below) -- earlier attempt used a by-value ads_binary through
-        // acutBuildList's variadic 1004 slot, which produced a resbuf that
-        // crashed AutoCAD's own DWG reader on the very next re-open (Access
-        // Violation, reproduced live, fully reverted -- commit 2916541,
-        // build_log.md "Lane E"). Each 1004 item is capped at <=127 bytes
-        // (ObjectARX's own documented per-chunk binary xdata limit,
-        // dbObject.h:270-276) -- larger payloads are rejected outright, not
-        // silently split across multiple chained 1004 nodes (that would need
-        // matching read-side concatenation in resbufItemJson/xdataBlocksJson
-        // this ticket does not touch; a named, out-of-scope gap).
-        struct XdItem { short code; std::string str; double num; double pt[3]; std::vector<unsigned char> bin; };
+        // string) and 1004 (binary chunk) are excluded -- see build_log.md.
+        // 1004 history: attempted TWICE now, both times the write itself
+        // reported success but the VERY NEXT accoreconsole reopen of the
+        // saved file crashed with an Access Violation inside AutoCAD's own
+        // internals (never inside this module). Attempt 1 (cc2, commit
+        // 2916541) used a by-value ads_binary through acutBuildList's
+        // variadic slot -- blamed on that ABI hazard at the time. Attempt 2
+        // (Lane E, E-a) used the "correct" fix -- manual acutNewRb(1004) with
+        // an explicitly-owned byte buffer, no acutBuildList involved at all --
+        // and STILL crashed identically on reopen with a non-empty payload
+        // (5-byte "Hello", crash addr 6A798473h reading 0x0005). An
+        // independent LibreDWG (sidecar, read-only) parse of that exact
+        // crashing file succeeded and returned the correct 5 bytes back
+        // (`48656C6C6F`) -- proof the SAVED FILE IS NOT CORRUPT; the crash is
+        // inside AutoCAD/ObjectARX 2027's OWN xData()/EED-reconstruction path
+        // when a REAL non-empty 1004 chunk is read back, not in anything this
+        // resbuf-construction discipline controls. A 0-byte 1004 chunk
+        // (clen=0, buf=nullptr) round-trips and rereads fine -- the trigger
+        // is specifically non-empty binary content. Conclusion: this is not
+        // fixable from the write side; 1004 stays excluded by design.
+        // Full evidence: build_log.md "Lane E".
+        struct XdItem { short code; std::string str; double num; double pt[3]; };
         std::vector<XdItem> items;
         size_t scan = lb + 1;
         int index = 0;
@@ -1767,25 +1756,6 @@ static bool m08gDispatch(const std::string& op, const AriadneJobCtx& ctx, std::o
                 if (!m08gReadValueTriple(one, item.pt)) {
                     badReason = "values[" + std::to_string(index) + "] code "
                         + std::to_string(code) + " requires a 3-number 'value' array";
-                    break;
-                }
-            } else if (code == 1004) {
-                std::string hex;
-                if (!jsonFindString(one, "value", hex)) {
-                    badReason = "values[" + std::to_string(index)
-                        + "] code 1004 requires a string 'value' (lowercase or uppercase hex)";
-                    break;
-                }
-                if (!hexToBytes(hex, item.bin)) {
-                    badReason = "values[" + std::to_string(index)
-                        + "] code 1004 'value' must be an even-length hex string";
-                    break;
-                }
-                if (item.bin.size() > 127) {
-                    badReason = "values[" + std::to_string(index) + "] code 1004 payload is "
-                        + std::to_string(item.bin.size())
-                        + " bytes, exceeding the 127-byte-per-item DXF binary-chunk limit "
-                          "(split into multiple 1004 items yourself -- not done automatically)";
                     break;
                 }
             } else {
@@ -1827,19 +1797,11 @@ static bool m08gDispatch(const std::string& op, const AriadneJobCtx& ctx, std::o
         // call; setDatabaseXdata's 2-pair call above is the fixed-shape
         // sibling this reuses the same primitive as). acutBuildList deep-
         // copies its string/point payload, so the local wstrings/ads_point
-        // below only need to outlive their own call. 1004 (binary chunk) is
-        // the one exception: it is built via manual acutNewRb(1004), NEVER
-        // acutBuildList -- passing struct ads_binary by value through
-        // acutBuildList's variadic slot is exactly what corrupted the DWG in
-        // the reverted attempt (build_log.md, Lane E). binNodes tracks every
-        // 1004 node so its WE-allocated buffer can be freed explicitly
-        // (m08gReleaseOwnedXdataBinBuffers), never trusting acutRelRb's
-        // undocumented-for-this-case handling of resval.rbinary.buf.
+        // below only need to outlive their own call.
         const std::wstring appW = asciiToWide(appName);
         resbuf* head = acutBuildList(AcDb::kDxfRegAppName, appW.c_str(), 0);
         resbuf* tail = head;
         bool buildFailed = (head == nullptr);
-        std::vector<resbuf*> binNodes;
         for (size_t i = 0; i < items.size() && !buildFailed; ++i) {
             const XdItem& it = items[i];
             resbuf* node = nullptr;
@@ -1852,46 +1814,16 @@ static bool m08gDispatch(const std::string& op, const AriadneJobCtx& ctx, std::o
                 node = acutBuildList(it.code, static_cast<long>(it.num), 0);
             } else if (it.code == 1040 || it.code == 1041 || it.code == 1042) {
                 node = acutBuildList(it.code, it.num, 0);
-            } else if (it.code == 1004) {
-                node = acutNewRb(1004);
-                if (node != nullptr) {
-                    // Defensive: don't rely on acutNewRb having zeroed rbnext
-                    // -- this node is not linked into the chain yet, so if we
-                    // must acutRelRb() it alone below (OOM path), it must not
-                    // walk into whatever garbage rbnext might otherwise hold.
-                    // restype is set explicitly too, even though acutNewRb(v)
-                    // is documented to already set it to v -- cheap insurance.
-                    node->rbnext = nullptr;
-                    node->restype = 1004;
-                    const size_t n = it.bin.size();
-                    char* ownBuf = nullptr;
-                    if (n > 0) {
-                        ownBuf = new (std::nothrow) char[n];
-                        if (ownBuf == nullptr) {
-                            acutRelRb(node);
-                            node = nullptr;
-                        } else {
-                            for (size_t bi = 0; bi < n; ++bi)
-                                ownBuf[bi] = static_cast<char>(it.bin[bi]);
-                        }
-                    }
-                    if (node != nullptr) {
-                        node->resval.rbinary.clen = static_cast<short>(n);
-                        node->resval.rbinary.buf = ownBuf;
-                    }
-                }
             } else {
                 ads_point pt = { it.pt[0], it.pt[1], it.pt[2] };
                 node = acutBuildList(it.code, pt, 0);
             }
             if (node == nullptr) { buildFailed = true; break; }
-            if (it.code == 1004) binNodes.push_back(node);
             tail->rbnext = node;
             tail = node;
         }
 
         if (buildFailed) {
-            m08gReleaseOwnedXdataBinBuffers(binNodes);
             if (head != nullptr) acutRelRb(head);
             pEnt->close();
             emitNativeError(r, "OUT_OF_MEMORY", "failed building the xdata resbuf chain");
@@ -1899,7 +1831,6 @@ static bool m08gDispatch(const std::string& op, const AriadneJobCtx& ctx, std::o
         }
 
         const Acad::ErrorStatus es = pEnt->setXData(head);
-        m08gReleaseOwnedXdataBinBuffers(binNodes);
         acutRelRb(head);
         pEnt->close();
 
