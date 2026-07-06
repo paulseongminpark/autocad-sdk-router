@@ -484,6 +484,7 @@ def build_records_patch(census_ir: Dict[str, Any], target_dwg: Dict[str, Any], p
     """
     op_roundtrip_probe_mod = op_roundtrip_probe_mod or importlib.import_module("op_roundtrip_probe")
     operations: List[Dict[str, Any]] = []
+    postconditions: List[Dict[str, Any]] = []
     skipped_unnamed: Dict[str, int] = {}
     per_table_requested: Dict[str, int] = {}
     for cls in table_classes:
@@ -500,6 +501,22 @@ def build_records_patch(census_ir: Dict[str, Any], target_dwg: Dict[str, Any], p
             args = record_op_args_from_record(rec, fields)
             operations.append({"step_id": "%s_%d" % (cls["label"], count),
                               "operation": cls["op_name"], "args": args})
+            # Same "<table>_exists" subject op_roundtrip_probe._build_patch's
+            # single-record P-gate patches already declare (see e.g.
+            # create_layer's postconditions=[{"subject": "layer_exists", ...}]
+            # a few lines up in that module) -- one entry per op here, not a
+            # NEW convention. An earlier version of this function shipped
+            # postconditions=[] unconditionally, reasoning (correctly) that
+            # classify_patch_risk's missing-postconditions bump only applies
+            # to mutation-of-existing ops (delete_entity/move_entity/
+            # set_layer), which these 7 create_* ops are not -- but missed
+            # patch_engine.require_validation, a SEPARATE, unconditional guard
+            # ("ops and not postconds" -> blocked) that fired on every
+            # non-empty batch regardless of op type. Caught live: a bounded
+            # --with-records E2E run came back apply_status="blocked"
+            # ("guards failed: require_validation") on this exact patch; see
+            # build_log.md.
+            postconditions.append({"subject": "%s_exists" % cls["label"], "op": "exists", "value": args["name"]})
             count += 1
         per_table_requested[cls["label"]] = count
     patch = {
@@ -509,13 +526,7 @@ def build_records_patch(census_ir: Dict[str, Any], target_dwg: Dict[str, Any], p
         "source_agent": "full_roundtrip_capstone",
         "target_dwg": target_dwg,
         "operations": operations,
-        # Unlike ir_to_patch.build_patch_from_ir's entity_count postcondition,
-        # none of these ops add a modelspace entity -- an empty list is the
-        # honest postcondition here (mirrors op_roundtrip_probe._build_patch's
-        # own override-don't-inherit comment), and none of these 7 ops are in
-        # patch_engine._OP_RISK's mutation set, so classify_patch_risk's
-        # missing-postconditions risk bump never triggers either.
-        "postconditions": [],
+        "postconditions": postconditions,
         "policy": {"staged_copy": True, "write_mode": "write_copy"},
     }
     return patch, {"skipped_unnamed": skipped_unnamed, "per_table_requested": per_table_requested}

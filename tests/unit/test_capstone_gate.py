@@ -166,8 +166,30 @@ def test_build_records_patch_builds_one_op_per_named_record_and_counts_unnamed()
     assert op_names == {"create_widget", "create_gadget"}
     assert meta["skipped_unnamed"] == {"widget": 1}
     assert meta["per_table_requested"] == {"widget": 1, "gadget": 1}
-    assert patch["postconditions"] == []
     assert patch["policy"]["staged_copy"] is True
+
+
+def test_build_records_patch_declares_one_postcondition_per_op_not_empty():
+    # Regression: patch_engine.require_validation blocks any patch whose
+    # operations[] is non-empty but postconditions[] is empty (a SEPARATE
+    # guard from classify_patch_risk's missing-postconditions risk bump --
+    # caught live by a bounded --with-records E2E run, see build_log.md).
+    census_ir = {"symbol_tables": {"widgets": [{"name": "W1", "color": "red"}], "gadgets": []}}
+    patch, _meta = frc.build_records_patch(
+        census_ir, {"original_path": "a.dwg", "staged_path": "b.dwg"}, "pid",
+        op_roundtrip_probe_mod=_FakeOrp(), table_classes=_FAKE_TABLE_CLASSES)
+    assert len(patch["postconditions"]) == len(patch["operations"]) == 1
+    assert patch["postconditions"][0] == {"subject": "widget_exists", "op": "exists", "value": "W1"}
+
+
+def test_build_records_patch_no_named_records_is_a_true_no_op():
+    census_ir = {"symbol_tables": {"widgets": [{"color": "no name"}], "gadgets": []}}
+    patch, meta = frc.build_records_patch(
+        census_ir, {"original_path": "a.dwg", "staged_path": "b.dwg"}, "pid",
+        op_roundtrip_probe_mod=_FakeOrp(), table_classes=_FAKE_TABLE_CLASSES)
+    assert patch["operations"] == []
+    assert patch["postconditions"] == []
+    assert meta["skipped_unnamed"] == {"widget": 1}
 
 
 def test_build_records_patch_per_table_limit_truncates_each_table_independently():
