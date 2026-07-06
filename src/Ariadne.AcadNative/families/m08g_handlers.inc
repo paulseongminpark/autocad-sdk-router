@@ -1699,15 +1699,26 @@ static bool m08gDispatch(const std::string& op, const AriadneJobCtx& ctx, std::o
         // are not valid xdata group codes at all). 1001 (appname) is
         // synthesized by this handler, never caller-supplied; 1002 (control
         // string) and 1004 (binary chunk) are excluded -- see build_log.md.
-        // #118 investigation (live-probed): a by-value ads_binary through
-        // acutBuildList's variadic 1004 slot produced a resbuf that crashed
-        // AutoCAD's own DWG reader on the very next re-open (Access Violation
-        // in inspect.database.graph's post-inspect, reproduced live, reverted
-        // -- see build_log.md). Writing 1004 stays out of scope here; #118's
-        // actual fix is read-side only (resbufItemJson / bytesToHexLower in
-        // AriadneNativeJob.cpp), verified by regression (plain string xdata
-        // and the full database graph walk both still work) rather than a
-        // live round-trip through this now-reverted write path.
+        // 1004 history: attempted TWICE now, both times the write itself
+        // reported success but the VERY NEXT accoreconsole reopen of the
+        // saved file crashed with an Access Violation inside AutoCAD's own
+        // internals (never inside this module). Attempt 1 (cc2, commit
+        // 2916541) used a by-value ads_binary through acutBuildList's
+        // variadic slot -- blamed on that ABI hazard at the time. Attempt 2
+        // (Lane E, E-a) used the "correct" fix -- manual acutNewRb(1004) with
+        // an explicitly-owned byte buffer, no acutBuildList involved at all --
+        // and STILL crashed identically on reopen with a non-empty payload
+        // (5-byte "Hello", crash addr 6A798473h reading 0x0005). An
+        // independent LibreDWG (sidecar, read-only) parse of that exact
+        // crashing file succeeded and returned the correct 5 bytes back
+        // (`48656C6C6F`) -- proof the SAVED FILE IS NOT CORRUPT; the crash is
+        // inside AutoCAD/ObjectARX 2027's OWN xData()/EED-reconstruction path
+        // when a REAL non-empty 1004 chunk is read back, not in anything this
+        // resbuf-construction discipline controls. A 0-byte 1004 chunk
+        // (clen=0, buf=nullptr) round-trips and rereads fine -- the trigger
+        // is specifically non-empty binary content. Conclusion: this is not
+        // fixable from the write side; 1004 stays excluded by design.
+        // Full evidence: build_log.md "Lane E".
         struct XdItem { short code; std::string str; double num; double pt[3]; };
         std::vector<XdItem> items;
         size_t scan = lb + 1;

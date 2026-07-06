@@ -485,13 +485,42 @@ static bool parsePointPayload(const std::string& job, double& x, double& y, doub
     return false;
 }
 
+// E-b: the canonical JSON string-escape used by every njsonStr() call in
+// this file. Was `"` / `\` only -- any control character (< 0x20, e.g. a
+// literal '\n' inside an M08N prompt string, AriadneNativeJob.cpp line
+// ~505's writeResult()/acutPrintf-adjacent native UI text) fell through
+// unescaped, producing JSON that `json.load()` rejects with "Invalid
+// control character" (see tools/cert_artifact_index.py findings --
+// 55 malformed result JSONs, e.g.
+// runs/native_batch_20260629_135844/results/245_input.get.point.json,
+// confirmed live: a raw 0x0A landed at byte offset 127 inside the
+// "prompt" string). Fix: \b \f \n \r \t get their short escapes (matches
+// every JSON encoder); every other control byte gets \u00XX. Non-ASCII
+// UTF-8 continuation/lead bytes are always >= 0x80 (> 0x20), so this is
+// unchanged for them -- Korean/non-ASCII fidelity is untouched.
 static std::string jsonEscape(const std::string& value)
 {
+    static const char kHexDigits[] = "0123456789abcdef";
     std::string out;
-    for (char c : value) {
-        if (c == '"' || c == '\\')
-            out.push_back('\\');
-        out.push_back(c);
+    out.reserve(value.size());
+    for (unsigned char c : value) {
+        switch (c) {
+            case '"':  out += "\\\""; break;
+            case '\\': out += "\\\\"; break;
+            case '\b': out += "\\b";  break;
+            case '\f': out += "\\f";  break;
+            case '\n': out += "\\n";  break;
+            case '\r': out += "\\r";  break;
+            case '\t': out += "\\t";  break;
+            default:
+                if (c < 0x20) {
+                    out += "\\u00";
+                    out.push_back(kHexDigits[(c >> 4) & 0x0F]);
+                    out.push_back(kHexDigits[c & 0x0F]);
+                } else {
+                    out.push_back(static_cast<char>(c));
+                }
+        }
     }
     return out;
 }

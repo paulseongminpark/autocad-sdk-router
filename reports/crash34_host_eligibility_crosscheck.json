@@ -1,0 +1,771 @@
+{
+  "schema": "ariadne.cados.crash34_host_eligibility_crosscheck.v1",
+  "source_matrix": "measure/reachable_matrix.jsonl",
+  "source_registry": "config/operations.v2.json",
+  "crash_total": 34,
+  "joined_count": 34,
+  "unjoined_op_ids": [],
+  "verdict_counts": {
+    "expected_crash": 28,
+    "anomalous_crash": 6
+  },
+  "bucket_counts": {
+    "misc": 7,
+    "custom-class": 6,
+    "com_activex": 16,
+    "live": 5
+  },
+  "registry_action_counts": {
+    "none": 28,
+    "open": 6
+  },
+  "rows": [
+    {
+      "op_id": "extend.property.category",
+      "bucket": "com_activex",
+      "verdict": "expected_crash",
+      "registry_action": "none",
+      "evidence": {
+        "family": "com_activex",
+        "engine_tier": "native_arx_only",
+        "host_eligibility": [
+          "arx_adapter",
+          "full_autocad"
+        ],
+        "router_lane": "ARIADNE_NATIVE_JOB",
+        "native_api": "AcRxUiPlacementAttribute(const ACHAR* category, unsigned int weight); lookup getCategory/getWeight; tree via AcRxCategory",
+        "policy_status_policy": "catalogued_not_runnable",
+        "registry_summary": "Place a property under a named UI category with a sort weight (drives palette",
+        "fixture_available": false,
+        "fixture_evidence": null,
+        "empty_arg_reason": "native job produced no parseable result JSON"
+      },
+      "reason": "registry policy.status_policy=\"catalogued_not_runnable\" -- the registry's own record already says no live dispatcher is wired for this op yet; a CRASH here is not a surprise."
+    },
+    {
+      "op_id": "extend.property.com_name",
+      "bucket": "com_activex",
+      "verdict": "expected_crash",
+      "registry_action": "none",
+      "evidence": {
+        "family": "com_activex",
+        "engine_tier": "native_arx_only",
+        "host_eligibility": [
+          "arx_adapter",
+          "full_autocad"
+        ],
+        "router_lane": "ARIADNE_NATIVE_JOB",
+        "native_api": "AcRxCOMAttribute(const ACHAR* name)",
+        "policy_status_policy": "catalogued_not_runnable",
+        "registry_summary": "Give a member a distinct COM property name (bridges the AcRxProperty member to its",
+        "fixture_available": false,
+        "fixture_evidence": null,
+        "empty_arg_reason": "native job produced no parseable result JSON"
+      },
+      "reason": "registry policy.status_policy=\"catalogued_not_runnable\" -- the registry's own record already says no live dispatcher is wired for this op yet; a CRASH here is not a surprise."
+    },
+    {
+      "op_id": "extend.property.default_value",
+      "bucket": "com_activex",
+      "verdict": "expected_crash",
+      "registry_action": "none",
+      "evidence": {
+        "family": "com_activex",
+        "engine_tier": "native_arx_only",
+        "host_eligibility": [
+          "arx_adapter",
+          "full_autocad"
+        ],
+        "router_lane": "ARIADNE_NATIVE_JOB",
+        "native_api": "AcRxDefaultValueAttribute(const AcRxValue&)",
+        "policy_status_policy": "catalogued_not_runnable",
+        "registry_summary": "Declare a default value for a property.",
+        "fixture_available": false,
+        "fixture_evidence": null,
+        "empty_arg_reason": "native job produced no parseable result JSON"
+      },
+      "reason": "registry policy.status_policy=\"catalogued_not_runnable\" -- the registry's own record already says no live dispatcher is wired for this op yet; a CRASH here is not a surprise."
+    },
+    {
+      "op_id": "extend.property.define",
+      "bucket": "com_activex",
+      "verdict": "expected_crash",
+      "registry_action": "none",
+      "evidence": {
+        "family": "com_activex",
+        "engine_tier": "native_arx_only",
+        "host_eligibility": [
+          "arx_adapter",
+          "full_autocad"
+        ],
+        "router_lane": "ARIADNE_NATIVE_JOB",
+        "native_api": "AcRxProperty (subclass; override subGetValue/subSetValue); ctor AcRxProperty(const ACHAR* name, const AcRxValueType& type, const AcRxObject* owner=NULL)",
+        "policy_status_policy": "catalogued_not_runnable",
+        "registry_summary": "Declare a single reflected get/set property on a custom AcRxClass. Code, registered at class-registration",
+        "fixture_available": false,
+        "fixture_evidence": null,
+        "empty_arg_reason": "native job produced no parseable result JSON"
+      },
+      "reason": "registry policy.status_policy=\"catalogued_not_runnable\" -- the registry's own record already says no live dispatcher is wired for this op yet; a CRASH here is not a surprise."
+    },
+    {
+      "op_id": "extend.property.define_collection",
+      "bucket": "com_activex",
+      "verdict": "expected_crash",
+      "registry_action": "none",
+      "evidence": {
+        "family": "com_activex",
+        "engine_tier": "native_arx_only",
+        "host_eligibility": [
+          "arx_adapter",
+          "full_autocad"
+        ],
+        "router_lane": "ARIADNE_NATIVE_JOB",
+        "native_api": "AcRxCollectionProperty::newValueIterator / tryGetCount (subclass subNewValueIterator/subTryGetCount)",
+        "policy_status_policy": "catalogued_not_runnable",
+        "registry_summary": "Declare a property whose value is an *enumerable collection* (palette shows it as expandable).",
+        "fixture_available": false,
+        "fixture_evidence": null,
+        "empty_arg_reason": "native job produced no parseable result JSON"
+      },
+      "reason": "registry policy.status_policy=\"catalogued_not_runnable\" -- the registry's own record already says no live dispatcher is wired for this op yet; a CRASH here is not a surprise."
+    },
+    {
+      "op_id": "extend.property.define_dictionary",
+      "bucket": "com_activex",
+      "verdict": "expected_crash",
+      "registry_action": "none",
+      "evidence": {
+        "family": "com_activex",
+        "engine_tier": "native_arx_only",
+        "host_eligibility": [
+          "arx_adapter",
+          "full_autocad"
+        ],
+        "router_lane": "ARIADNE_NATIVE_JOB",
+        "native_api": "AcRxDictionaryProperty::getValue/setValue(pO,const ACHAR* key,…)",
+        "policy_status_policy": "catalogued_not_runnable",
+        "registry_summary": "Declare a key-addressable (string-keyed) collection property.",
+        "fixture_available": false,
+        "fixture_evidence": null,
+        "empty_arg_reason": "native job produced no parseable result JSON"
+      },
+      "reason": "registry policy.status_policy=\"catalogued_not_runnable\" -- the registry's own record already says no live dispatcher is wired for this op yet; a CRASH here is not a surprise."
+    },
+    {
+      "op_id": "extend.property.define_indexed",
+      "bucket": "com_activex",
+      "verdict": "expected_crash",
+      "registry_action": "none",
+      "evidence": {
+        "family": "com_activex",
+        "engine_tier": "native_arx_only",
+        "host_eligibility": [
+          "arx_adapter",
+          "full_autocad"
+        ],
+        "router_lane": "ARIADNE_NATIVE_JOB",
+        "native_api": "AcRxIndexedProperty::getValue/setValue/insertValue/removeValue(pO,int index,…)",
+        "policy_status_policy": "catalogued_not_runnable",
+        "registry_summary": "Declare an index-addressable collection property (get/set/insert/remove by ordinal).",
+        "fixture_available": false,
+        "fixture_evidence": null,
+        "empty_arg_reason": "native job produced no parseable result JSON"
+      },
+      "reason": "registry policy.status_policy=\"catalogued_not_runnable\" -- the registry's own record already says no live dispatcher is wired for this op yet; a CRASH here is not a surprise."
+    },
+    {
+      "op_id": "extend.property.describe",
+      "bucket": "com_activex",
+      "verdict": "expected_crash",
+      "registry_action": "none",
+      "evidence": {
+        "family": "com_activex",
+        "engine_tier": "native_arx_only",
+        "host_eligibility": [
+          "arx_adapter",
+          "full_autocad"
+        ],
+        "router_lane": "ARIADNE_NATIVE_JOB",
+        "native_api": "AcRxDescriptionAttribute(const ACHAR* or unsigned int id[,hint]); getDescription(pO)",
+        "policy_status_policy": "catalogued_not_runnable",
+        "registry_summary": "Attach a description string (literal or resource-id) shown in the palette.",
+        "fixture_available": false,
+        "fixture_evidence": null,
+        "empty_arg_reason": "native job produced no parseable result JSON"
+      },
+      "reason": "registry policy.status_policy=\"catalogued_not_runnable\" -- the registry's own record already says no live dispatcher is wired for this op yet; a CRASH here is not a surprise."
+    },
+    {
+      "op_id": "extend.property.display_as",
+      "bucket": "com_activex",
+      "verdict": "expected_crash",
+      "registry_action": "none",
+      "evidence": {
+        "family": "com_activex",
+        "engine_tier": "native_arx_only",
+        "host_eligibility": [
+          "arx_adapter",
+          "full_autocad"
+        ],
+        "router_lane": "ARIADNE_NATIVE_JOB",
+        "native_api": "AcRxDisplayAsAttribute(const ACHAR* name); getDisplayValue(pAttr, AcDbObjectId)",
+        "policy_status_policy": "catalogued_not_runnable",
+        "registry_summary": "Substitute a friendlier display value (e.g. show a referenced object's *name* instead of its",
+        "fixture_available": false,
+        "fixture_evidence": null,
+        "empty_arg_reason": "native job produced no parseable result JSON"
+      },
+      "reason": "registry policy.status_policy=\"catalogued_not_runnable\" -- the registry's own record already says no live dispatcher is wired for this op yet; a CRASH here is not a surprise."
+    },
+    {
+      "op_id": "extend.property.enum_tag",
+      "bucket": "com_activex",
+      "verdict": "expected_crash",
+      "registry_action": "none",
+      "evidence": {
+        "family": "com_activex",
+        "engine_tier": "native_arx_only",
+        "host_eligibility": [
+          "arx_adapter",
+          "full_autocad"
+        ],
+        "router_lane": "ARIADNE_NATIVE_JOB",
+        "native_api": "AcRxEnumTag(const ACHAR* name, const AcRxValue& value); value()/alternateLocalName()",
+        "policy_status_policy": "catalogued_not_runnable",
+        "registry_summary": "Define an enumeration constant (name↔value) used to render a property as a dropdown.",
+        "fixture_available": false,
+        "fixture_evidence": null,
+        "empty_arg_reason": "native job produced no parseable result JSON"
+      },
+      "reason": "registry policy.status_policy=\"catalogued_not_runnable\" -- the registry's own record already says no live dispatcher is wired for this op yet; a CRASH here is not a surprise."
+    },
+    {
+      "op_id": "extend.property.expose_to_com",
+      "bucket": "com_activex",
+      "verdict": "expected_crash",
+      "registry_action": "none",
+      "evidence": {
+        "family": "com_activex",
+        "engine_tier": "native_arx_only",
+        "host_eligibility": [
+          "arx_adapter",
+          "full_autocad"
+        ],
+        "router_lane": "ARIADNE_NATIVE_JOB",
+        "native_api": "AcRxGenerateDynamicPropertiesAttribute()",
+        "policy_status_policy": "catalogued_not_runnable",
+        "registry_summary": "Bridge AcRxProperty → COM: tells AutoCAD to auto-generate IDynamicProperty2 wrappers for this class/property whenever",
+        "fixture_available": false,
+        "fixture_evidence": null,
+        "empty_arg_reason": "native job produced no parseable result JSON"
+      },
+      "reason": "registry policy.status_policy=\"catalogued_not_runnable\" -- the registry's own record already says no live dispatcher is wired for this op yet; a CRASH here is not a surprise."
+    },
+    {
+      "op_id": "extend.property.filepath",
+      "bucket": "com_activex",
+      "verdict": "expected_crash",
+      "registry_action": "none",
+      "evidence": {
+        "family": "com_activex",
+        "engine_tier": "native_arx_only",
+        "host_eligibility": [
+          "arx_adapter",
+          "full_autocad"
+        ],
+        "router_lane": "ARIADNE_NATIVE_JOB",
+        "native_api": "AcRxFilePathAttribute()",
+        "policy_status_policy": "catalogued_not_runnable",
+        "registry_summary": "Mark a string property as a file path (palette offers a file picker).",
+        "fixture_available": false,
+        "fixture_evidence": null,
+        "empty_arg_reason": "native job produced no parseable result JSON"
+      },
+      "reason": "registry policy.status_policy=\"catalogued_not_runnable\" -- the registry's own record already says no live dispatcher is wired for this op yet; a CRASH here is not a surprise."
+    },
+    {
+      "op_id": "extend.property.flags",
+      "bucket": "com_activex",
+      "verdict": "expected_crash",
+      "registry_action": "none",
+      "evidence": {
+        "family": "com_activex",
+        "engine_tier": "native_arx_only",
+        "host_eligibility": [
+          "arx_adapter",
+          "full_autocad"
+        ],
+        "router_lane": "ARIADNE_NATIVE_JOB",
+        "native_api": "AcRxFlagsAttribute()",
+        "policy_status_policy": "catalogued_not_runnable",
+        "registry_summary": "Mark a property value as a bitwise flag set (palette renders as checkable flags).",
+        "fixture_available": false,
+        "fixture_evidence": null,
+        "empty_arg_reason": "native job produced no parseable result JSON"
+      },
+      "reason": "registry policy.status_policy=\"catalogued_not_runnable\" -- the registry's own record already says no live dispatcher is wired for this op yet; a CRASH here is not a surprise."
+    },
+    {
+      "op_id": "extend.property.localize_name",
+      "bucket": "com_activex",
+      "verdict": "expected_crash",
+      "registry_action": "none",
+      "evidence": {
+        "family": "com_activex",
+        "engine_tier": "native_arx_only",
+        "host_eligibility": [
+          "arx_adapter",
+          "full_autocad"
+        ],
+        "router_lane": "ARIADNE_NATIVE_JOB",
+        "native_api": "AcRxLocalizedNameAttribute(id[,sourceHint]) / AcRxAlternateLocalizedNameAttribute; getLocalizedName(pO) via AcRxResourceLoader",
+        "policy_status_policy": "catalogued_not_runnable",
+        "registry_summary": "Provide a resource-backed localized member name.",
+        "fixture_available": false,
+        "fixture_evidence": null,
+        "empty_arg_reason": "native job produced no parseable result JSON"
+      },
+      "reason": "registry policy.status_policy=\"catalogued_not_runnable\" -- the registry's own record already says no live dispatcher is wired for this op yet; a CRASH here is not a surprise."
+    },
+    {
+      "op_id": "extend.property.refers_to",
+      "bucket": "com_activex",
+      "verdict": "expected_crash",
+      "registry_action": "none",
+      "evidence": {
+        "family": "com_activex",
+        "engine_tier": "native_arx_only",
+        "host_eligibility": [
+          "arx_adapter",
+          "full_autocad"
+        ],
+        "router_lane": "ARIADNE_NATIVE_JOB",
+        "native_api": "AcRxRefersToAttribute(const ACHAR* path); parseReference(path,pObject,…)",
+        "policy_status_policy": "catalogued_not_runnable",
+        "registry_summary": "Declare that a property points into a container (e.g. /LayerTableId/Items) so the UI can",
+        "fixture_available": false,
+        "fixture_evidence": null,
+        "empty_arg_reason": "native job produced no parseable result JSON"
+      },
+      "reason": "registry policy.status_policy=\"catalogued_not_runnable\" -- the registry's own record already says no live dispatcher is wired for this op yet; a CRASH here is not a surprise."
+    },
+    {
+      "op_id": "extend.property.units",
+      "bucket": "com_activex",
+      "verdict": "expected_crash",
+      "registry_action": "none",
+      "evidence": {
+        "family": "com_activex",
+        "engine_tier": "native_arx_only",
+        "host_eligibility": [
+          "arx_adapter",
+          "full_autocad"
+        ],
+        "router_lane": "ARIADNE_NATIVE_JOB",
+        "native_api": "AcRxUnitTypeAttribute(UnitType) (kDistance/kAngle/kArea/kVolume/kCurrency/kPercentage/…)",
+        "policy_status_policy": "catalogued_not_runnable",
+        "registry_summary": "Tag a numeric property's unit so the palette formats it correctly.",
+        "fixture_available": false,
+        "fixture_evidence": null,
+        "empty_arg_reason": "native job produced no parseable result JSON"
+      },
+      "reason": "registry policy.status_policy=\"catalogued_not_runnable\" -- the registry's own record already says no live dispatcher is wired for this op yet; a CRASH here is not a surprise."
+    },
+    {
+      "op_id": "extend.customclass.create",
+      "bucket": "custom-class",
+      "verdict": "anomalous_crash",
+      "registry_action": "open",
+      "evidence": {
+        "family": "extend",
+        "engine_tier": "native_arx_only",
+        "host_eligibility": [
+          "arx_adapter",
+          "full_autocad"
+        ],
+        "router_lane": "ARIADNE_NATIVE_JOB",
+        "native_api": "",
+        "policy_status_policy": "implemented",
+        "registry_summary": "Router job creates an Ariadne custom entity instance; catalog entries describe class definition and registration primitives.",
+        "fixture_available": true,
+        "fixture_evidence": "test_native/job_create_args.json (existing working fixture)",
+        "empty_arg_reason": "native job produced no parseable result JSON"
+      },
+      "reason": "policy.status_policy==\"implemented\" (registry claims a wired, runnable dispatcher) and no host-capability caveat exists in the registry text -- nothing here predicts a crash; needs owner triage, not a bot-authored registry edit."
+    },
+    {
+      "op_id": "extend.customentity.define",
+      "bucket": "custom-class",
+      "verdict": "expected_crash",
+      "registry_action": "none",
+      "evidence": {
+        "family": "custom_objects_protocols",
+        "engine_tier": "native_arx_only",
+        "host_eligibility": [
+          "arx_adapter",
+          "full_autocad"
+        ],
+        "router_lane": "ARIADNE_NATIVE_JOB",
+        "native_api": "subclass AcDbEntity + override subWorldDraw, subGetGeomExtents, subTransformBy, the 4 filing fns (+ others)",
+        "policy_status_policy": "catalogued_not_runnable",
+        "registry_summary": "Defines a graphical custom entity that draws via AcGi, lives in a block table",
+        "fixture_available": false,
+        "fixture_evidence": null,
+        "empty_arg_reason": "native job produced no parseable result JSON"
+      },
+      "reason": "registry policy.status_policy=\"catalogued_not_runnable\" -- the registry's own record already says no live dispatcher is wired for this op yet; a CRASH here is not a surprise."
+    },
+    {
+      "op_id": "extend.customobject.create",
+      "bucket": "custom-class",
+      "verdict": "anomalous_crash",
+      "registry_action": "open",
+      "evidence": {
+        "family": "extend",
+        "engine_tier": "native_arx_only",
+        "host_eligibility": [
+          "arx_adapter",
+          "full_autocad"
+        ],
+        "router_lane": "ARIADNE_NATIVE_JOB",
+        "native_api": "",
+        "policy_status_policy": "implemented",
+        "registry_summary": "Router job creates an Ariadne custom DBObject record; catalog separates custom object definition, filing, and storage primitives.",
+        "fixture_available": true,
+        "fixture_evidence": "test_native/job_record_create.json (existing working fixture)",
+        "empty_arg_reason": "native job produced no parseable result JSON"
+      },
+      "reason": "policy.status_policy==\"implemented\" (registry claims a wired, runnable dispatcher) and no host-capability caveat exists in the registry text -- nothing here predicts a crash; needs owner triage, not a bot-authored registry edit."
+    },
+    {
+      "op_id": "extend.customobject.define",
+      "bucket": "custom-class",
+      "verdict": "expected_crash",
+      "registry_action": "none",
+      "evidence": {
+        "family": "custom_objects_protocols",
+        "engine_tier": "native_arx_only",
+        "host_eligibility": [
+          "arx_adapter",
+          "full_autocad"
+        ],
+        "router_lane": "ARIADNE_NATIVE_JOB",
+        "native_api": "subclass AcDbObject + override dwgInFields/dwgOutFields/dxfInFields/dxfOutFields (+ subDeepClone/subWblockClone as needed)",
+        "policy_status_policy": "catalogued_not_runnable",
+        "registry_summary": "Defines a non-graphical persistent custom object (lives in a dictionary / extension dictionary, not",
+        "fixture_available": false,
+        "fixture_evidence": null,
+        "empty_arg_reason": "native job produced no parseable result JSON"
+      },
+      "reason": "registry policy.status_policy=\"catalogued_not_runnable\" -- the registry's own record already says no live dispatcher is wired for this op yet; a CRASH here is not a surprise."
+    },
+    {
+      "op_id": "extend.customobject.embedded",
+      "bucket": "custom-class",
+      "verdict": "expected_crash",
+      "registry_action": "none",
+      "evidence": {
+        "family": "custom_objects_protocols",
+        "engine_tier": "native_arx_only",
+        "host_eligibility": [
+          "arx_adapter",
+          "full_autocad"
+        ],
+        "router_lane": "ARIADNE_NATIVE_JOB",
+        "native_api": "encapsulate another AcDb* entity; forward worldDraw/grip/filing; DXF separator AcDb::kDxfEmbeddedObjectStart (101) via writeEmbeddedObjectStart() / atEmbeddedObjectStart()",
+        "policy_status_policy": "catalogued_not_runnable",
+        "registry_summary": "Compose a custom entity from a real AcDb entity (e.g. embedded AcDbCircle): forward subWorldDraw→worldDraw,",
+        "fixture_available": false,
+        "fixture_evidence": null,
+        "empty_arg_reason": "native job produced no parseable result JSON"
+      },
+      "reason": "registry policy.status_policy=\"catalogued_not_runnable\" -- the registry's own record already says no live dispatcher is wired for this op yet; a CRASH here is not a surprise."
+    },
+    {
+      "op_id": "extend.customobject.version",
+      "bucket": "custom-class",
+      "verdict": "expected_crash",
+      "registry_action": "none",
+      "evidence": {
+        "family": "custom_objects_protocols",
+        "engine_tier": "native_arx_only",
+        "host_eligibility": [
+          "arx_adapter",
+          "full_autocad"
+        ],
+        "router_lane": "ARIADNE_NATIVE_JOB",
+        "native_api": "data-member version Adesk::Int16 + eMakeMeProxy protocol; setHasSaveVersionOverride(true) + override AcDbObject::getObjectSaveVersion()",
+        "policy_status_policy": "catalogued_not_runnable",
+        "registry_summary": "Forward/back compatibility: write version as first filed item; old app reading newer object →",
+        "fixture_available": false,
+        "fixture_evidence": null,
+        "empty_arg_reason": "native job produced no parseable result JSON"
+      },
+      "reason": "registry policy.status_policy=\"catalogued_not_runnable\" -- the registry's own record already says no live dispatcher is wired for this op yet; a CRASH here is not a surprise."
+    },
+    {
+      "op_id": "live.jig.point_probe",
+      "bucket": "live",
+      "verdict": "expected_crash",
+      "registry_action": "none",
+      "evidence": {
+        "family": "live",
+        "engine_tier": "native_arx_only",
+        "host_eligibility": [
+          "full_autocad"
+        ],
+        "router_lane": "ARIADNE_NATIVE_JOB",
+        "native_api": "",
+        "policy_status_policy": "implemented",
+        "registry_summary": "Router job drives a point probe through the live jig path; Core Console can only report support status.",
+        "fixture_available": false,
+        "fixture_evidence": null,
+        "empty_arg_reason": "native job produced no parseable result JSON"
+      },
+      "reason": "registry summary/notes already states Core Console cannot execute this op (quoted in evidence.registry_summary) -- already documented, nothing to annotate."
+    },
+    {
+      "op_id": "live.overrule.disable",
+      "bucket": "live",
+      "verdict": "anomalous_crash",
+      "registry_action": "open",
+      "evidence": {
+        "family": "live",
+        "engine_tier": "native_arx_only",
+        "host_eligibility": [
+          "arx_adapter",
+          "full_autocad"
+        ],
+        "router_lane": "ARIADNE_NATIVE_JOB",
+        "native_api": "",
+        "policy_status_policy": "implemented",
+        "registry_summary": "Router job removes the Ariadne object overrule through the lower-level removal primitive.",
+        "fixture_available": false,
+        "fixture_evidence": null,
+        "empty_arg_reason": "native job produced no parseable result JSON"
+      },
+      "reason": "policy.status_policy==\"implemented\" (registry claims a wired, runnable dispatcher) and no host-capability caveat exists in the registry text -- nothing here predicts a crash; needs owner triage, not a bot-authored registry edit."
+    },
+    {
+      "op_id": "live.overrule.enable",
+      "bucket": "live",
+      "verdict": "anomalous_crash",
+      "registry_action": "open",
+      "evidence": {
+        "family": "live",
+        "engine_tier": "native_arx_only",
+        "host_eligibility": [
+          "arx_adapter",
+          "full_autocad"
+        ],
+        "router_lane": "ARIADNE_NATIVE_JOB",
+        "native_api": "",
+        "policy_status_policy": "implemented",
+        "registry_summary": "Router job installs the Ariadne object overrule and enables the runtime overrule path.",
+        "fixture_available": false,
+        "fixture_evidence": null,
+        "empty_arg_reason": "native job produced no parseable result JSON"
+      },
+      "reason": "policy.status_policy==\"implemented\" (registry claims a wired, runnable dispatcher) and no host-capability caveat exists in the registry text -- nothing here predicts a crash; needs owner triage, not a bot-authored registry edit."
+    },
+    {
+      "op_id": "live.reactor.disable",
+      "bucket": "live",
+      "verdict": "anomalous_crash",
+      "registry_action": "open",
+      "evidence": {
+        "family": "live",
+        "engine_tier": "native_arx_only",
+        "host_eligibility": [
+          "arx_adapter",
+          "full_autocad"
+        ],
+        "router_lane": "ARIADNE_NATIVE_JOB",
+        "native_api": "",
+        "policy_status_policy": "implemented",
+        "registry_summary": "Router job removes the current Ariadne editor reactor; catalog uses lower-level detach primitives.",
+        "fixture_available": false,
+        "fixture_evidence": null,
+        "empty_arg_reason": "native job produced no parseable result JSON"
+      },
+      "reason": "policy.status_policy==\"implemented\" (registry claims a wired, runnable dispatcher) and no host-capability caveat exists in the registry text -- nothing here predicts a crash; needs owner triage, not a bot-authored registry edit."
+    },
+    {
+      "op_id": "live.reactor.enable",
+      "bucket": "live",
+      "verdict": "anomalous_crash",
+      "registry_action": "open",
+      "evidence": {
+        "family": "live",
+        "engine_tier": "native_arx_only",
+        "host_eligibility": [
+          "arx_adapter",
+          "full_autocad"
+        ],
+        "router_lane": "ARIADNE_NATIVE_JOB",
+        "native_api": "",
+        "policy_status_policy": "implemented",
+        "registry_summary": "Router job installs the current Ariadne editor reactor; catalog separates reactor attach and monitor primitives.",
+        "fixture_available": false,
+        "fixture_evidence": null,
+        "empty_arg_reason": "native job produced no parseable result JSON"
+      },
+      "reason": "policy.status_policy==\"implemented\" (registry claims a wired, runnable dispatcher) and no host-capability caveat exists in the registry text -- nothing here predicts a crash; needs owner triage, not a bot-authored registry edit."
+    },
+    {
+      "op_id": "define.constraint.autoConstrain",
+      "bucket": "misc",
+      "verdict": "expected_crash",
+      "registry_action": "none",
+      "evidence": {
+        "family": "constraints_associativity",
+        "engine_tier": "native_arx_only",
+        "host_eligibility": [
+          "arx_adapter",
+          "full_autocad"
+        ],
+        "router_lane": "ARIADNE_NATIVE_JOB",
+        "native_api": "AcDbAssoc2dConstraintGroup::autoConstrain(AcDbFullSubentPathArray, AcGeTol, AcAutoConstrainEvaluationCallback*)",
+        "policy_status_policy": "catalogued_not_runnable",
+        "registry_summary": "Auto-infer constraints across a set of subentities within tolerance; callback sets per-type priority/order (the",
+        "fixture_available": false,
+        "fixture_evidence": null,
+        "empty_arg_reason": "native job produced no parseable result JSON"
+      },
+      "reason": "registry policy.status_policy=\"catalogued_not_runnable\" -- the registry's own record already says no live dispatcher is wired for this op yet; a CRASH here is not a surprise."
+    },
+    {
+      "op_id": "define.dimassoc.geometryDriven",
+      "bucket": "misc",
+      "verdict": "expected_crash",
+      "registry_action": "none",
+      "evidence": {
+        "family": "constraints_associativity",
+        "engine_tier": "native_arx_only",
+        "host_eligibility": [
+          "arx_adapter",
+          "full_autocad"
+        ],
+        "router_lane": "ARIADNE_NATIVE_JOB",
+        "native_api": "AcDbDimAssoc (object) + AcDbAssocDimDependencyBody / AcDbAssocDimDependencyBodyBase",
+        "policy_status_policy": "catalogued_not_runnable",
+        "registry_summary": "Distinct from dim-constraints: the *associative dimension* object that makes a normal AcDbDimension follow geometry",
+        "fixture_available": false,
+        "fixture_evidence": null,
+        "empty_arg_reason": "native job produced no parseable result JSON"
+      },
+      "reason": "registry policy.status_policy=\"catalogued_not_runnable\" -- the registry's own record already says no live dispatcher is wired for this op yet; a CRASH here is not a surprise."
+    },
+    {
+      "op_id": "interact.jig.run",
+      "bucket": "misc",
+      "verdict": "expected_crash",
+      "registry_action": "none",
+      "evidence": {
+        "family": "editor_input",
+        "engine_tier": "native_arx_only",
+        "host_eligibility": [
+          "arx_adapter",
+          "full_autocad"
+        ],
+        "router_lane": "ARIADNE_NATIVE_JOB",
+        "native_api": "AcEdJig (public AcRxObject): drag(), virtual sampler(), virtual update(), virtual entity(), append()",
+        "policy_status_policy": "catalogued_not_runnable",
+        "registry_summary": "Interactive \"jig\": drag loop that re-samples user input, updates a temp entity's geometry each",
+        "fixture_available": false,
+        "fixture_evidence": null,
+        "empty_arg_reason": "native job produced no parseable result JSON"
+      },
+      "reason": "registry policy.status_policy=\"catalogued_not_runnable\" -- the registry's own record already says no live dispatcher is wired for this op yet; a CRASH here is not a surprise."
+    },
+    {
+      "op_id": "react.persistent.attach",
+      "bucket": "misc",
+      "verdict": "expected_crash",
+      "registry_action": "none",
+      "evidence": {
+        "family": "reactors_events",
+        "engine_tier": "native_arx_only",
+        "host_eligibility": [
+          "arx_adapter",
+          "full_autocad"
+        ],
+        "router_lane": "ARIADNE_NATIVE_JOB",
+        "native_api": "AcDbObject::addPersistentReactor(AcDbObjectId objId)",
+        "policy_status_policy": "catalogued_not_runnable",
+        "registry_summary": "Register a persistent reactor: stores the *ObjectId* of the reacting object into the subject's",
+        "fixture_available": false,
+        "fixture_evidence": null,
+        "empty_arg_reason": "native job produced no parseable result JSON"
+      },
+      "reason": "registry policy.status_policy=\"catalogued_not_runnable\" -- the registry's own record already says no live dispatcher is wired for this op yet; a CRASH here is not a surprise."
+    },
+    {
+      "op_id": "react.persistent.detach",
+      "bucket": "misc",
+      "verdict": "expected_crash",
+      "registry_action": "none",
+      "evidence": {
+        "family": "reactors_events",
+        "engine_tier": "native_arx_only",
+        "host_eligibility": [
+          "arx_adapter",
+          "full_autocad"
+        ],
+        "router_lane": "ARIADNE_NATIVE_JOB",
+        "native_api": "AcDbObject::removePersistentReactor(AcDbObjectId objId)",
+        "policy_status_policy": "catalogued_not_runnable",
+        "registry_summary": "Remove a persistent reactor link from the subject (updates the DWG).",
+        "fixture_available": false,
+        "fixture_evidence": null,
+        "empty_arg_reason": "native job produced no parseable result JSON"
+      },
+      "reason": "registry policy.status_policy=\"catalogued_not_runnable\" -- the registry's own record already says no live dispatcher is wired for this op yet; a CRASH here is not a surprise."
+    },
+    {
+      "op_id": "transform.database.deep_clone",
+      "bucket": "misc",
+      "verdict": "expected_crash",
+      "registry_action": "none",
+      "evidence": {
+        "family": "blocks_xrefs_clone",
+        "engine_tier": "native_arx_only",
+        "host_eligibility": [
+          "arx_adapter",
+          "full_autocad"
+        ],
+        "router_lane": "ARIADNE_NATIVE_JOB",
+        "native_api": "AcDbDatabase::deepCloneObjects(const AcDbObjectIdArray&, const AcDbObjectId& owner, AcDbIdMapping&, bool deferXlation=false)",
+        "policy_status_policy": "catalogued_not_runnable",
+        "registry_summary": "Clone objects within/into the db, append under owner; idMap maps original→clone ids for post-processing.",
+        "fixture_available": false,
+        "fixture_evidence": null,
+        "empty_arg_reason": "native job produced no parseable result JSON"
+      },
+      "reason": "registry policy.status_policy=\"catalogued_not_runnable\" -- the registry's own record already says no live dispatcher is wired for this op yet; a CRASH here is not a surprise."
+    },
+    {
+      "op_id": "transform.database.wblock_clone",
+      "bucket": "misc",
+      "verdict": "expected_crash",
+      "registry_action": "none",
+      "evidence": {
+        "family": "symbol_tables_dictionaries",
+        "engine_tier": "native_arx_only",
+        "host_eligibility": [
+          "arx_adapter",
+          "full_autocad"
+        ],
+        "router_lane": "ARIADNE_NATIVE_JOB",
+        "native_api": "AcDbDatabase::wblockCloneObjects(const AcDbObjectIdArray&, const AcDbObjectId& owner, AcDbIdMapping&, AcDb::DuplicateRecordCloning, bool deferXlation=false)",
+        "policy_status_policy": "catalogued_not_runnable",
+        "registry_summary": "Clone objects across databases into a destination owner (BTR/Dictionary/SymbolTable). DuplicateRecordCloning controls duplicate handling: kDrcIgnore",
+        "fixture_available": false,
+        "fixture_evidence": null,
+        "empty_arg_reason": "native job produced no parseable result JSON"
+      },
+      "reason": "registry policy.status_policy=\"catalogued_not_runnable\" -- the registry's own record already says no live dispatcher is wired for this op yet; a CRASH here is not a surprise."
+    }
+  ]
+}
