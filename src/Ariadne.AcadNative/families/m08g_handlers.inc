@@ -1699,6 +1699,15 @@ static bool m08gDispatch(const std::string& op, const AriadneJobCtx& ctx, std::o
         // are not valid xdata group codes at all). 1001 (appname) is
         // synthesized by this handler, never caller-supplied; 1002 (control
         // string) and 1004 (binary chunk) are excluded -- see build_log.md.
+        // #118 investigation (live-probed): a by-value ads_binary through
+        // acutBuildList's variadic 1004 slot produced a resbuf that crashed
+        // AutoCAD's own DWG reader on the very next re-open (Access Violation
+        // in inspect.database.graph's post-inspect, reproduced live, reverted
+        // -- see build_log.md). Writing 1004 stays out of scope here; #118's
+        // actual fix is read-side only (resbufItemJson / bytesToHexLower in
+        // AriadneNativeJob.cpp), verified by regression (plain string xdata
+        // and the full database graph walk both still work) rather than a
+        // live round-trip through this now-reverted write path.
         struct XdItem { short code; std::string str; double num; double pt[3]; };
         std::vector<XdItem> items;
         size_t scan = lb + 1;
