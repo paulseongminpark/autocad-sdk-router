@@ -560,7 +560,16 @@ def table_record_diff_reports(census_ir: Dict[str, Any], post_ir: Optional[Dict[
             }
             continue
         fields = getattr(op_roundtrip_probe_mod, cls["fields_attr"], ())
-        diff_fn = getattr(op_roundtrip_probe_mod, cls["diff_attr"], op_roundtrip_probe_mod.layer_record_diff)
+        # `or`, not getattr(..., default=) -- a getattr default expression is
+        # evaluated eagerly (before the call), so a hardcoded
+        # op_roundtrip_probe_mod.layer_record_diff default would raise
+        # AttributeError on any module that lacks THAT name, even when
+        # cls["diff_attr"] itself resolves fine (caught by this module's own
+        # unit tests against a non-layer/dimstyle fake table class). `or`
+        # short-circuits: the fallback is only touched if the primary lookup
+        # is falsy/missing.
+        diff_fn = (getattr(op_roundtrip_probe_mod, cls["diff_attr"], None)
+                  or getattr(op_roundtrip_probe_mod, "layer_record_diff", None))
         base = record_diff_report(cls["label"], records, post_ir, table_key=cls["table_key"],
                                   fields=fields, diff_fn=diff_fn)
         reports[cls["label"]] = {
@@ -753,6 +762,7 @@ def run_census(staged_path: str, original_path: str, run_dir: str, *,
 
 def run_records_batch(census_ir: Dict[str, Any], blank_seed_path: str, run_dir: str,
                       patch_id: str, *, per_table_limit: Optional[int] = None,
+                      table_classes: Tuple[Dict[str, str], ...] = RECORD_TABLE_CLASSES,
                       op_roundtrip_probe_mod=None, patch_engine_mod=None) -> Dict[str, Any]:
     """Table-tier sibling of run_regen_batch: build ONE cad_patch.v1 via
     build_records_patch (7 record classes: layer/dimstyle/linetype/
@@ -768,8 +778,8 @@ def run_records_batch(census_ir: Dict[str, Any], blank_seed_path: str, run_dir: 
         "staged_path": os.path.join(run_dir, "staged_input.dwg"),
     }
     patch, build_meta = build_records_patch(
-        census_ir, target_dwg, patch_id,
-        op_roundtrip_probe_mod=op_roundtrip_probe_mod, per_table_limit=per_table_limit)
+        census_ir, target_dwg, patch_id, op_roundtrip_probe_mod=op_roundtrip_probe_mod,
+        table_classes=table_classes, per_table_limit=per_table_limit)
     ops_report = resolvable_ops_report(patch)
     t0 = time.time()
     result = patch_engine_mod.apply_staged(patch, blank_seed_path, run_dir)
