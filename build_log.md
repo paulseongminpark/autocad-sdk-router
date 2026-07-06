@@ -651,3 +651,223 @@ validity, and the 16/5/6/7 bucket totals.
 
 `pytest tests/unit -q`: 1136 passed, 23 skipped, 0 failed (both F-a and
 F-b changes included).
+
+## Lane E (closeout follow-up wave) -- worktree `wt/laneE`, branch `cados/closeout-e`
+
+### Research phase (before any code change)
+
+**Fixture path correction:** the assigned fixture path in the task brief
+(`fixtures/native_sample.dwg`) does not exist in the canonical repo -- only
+`fixtures/blank_seed.dwg` lives there. The actual `native_sample.dwg` (sha256
+`eac5d4b13d67d89106e503321412539df7b39b8a7f4e44c033448e9295fe3f76`, matches
+the brief) lives at `tests/fixtures/native_sample.dwg` (see
+`tools/fixture_foundry.py:82`, `DEFAULT_SEED_DWG`). Copied into this worktree
+at that corrected path; sha256 verified identical to the canonical copy
+before any use.
+
+**Locating the cc2 1004-write revert:** the exact commit hash named in the
+task brief (`2916541`) does not resolve in this repo's `git log --all`. The
+revert appears to have been squashed/folded rather than preserved as a
+standalone commit. However, the FULL mechanism and evidence survive as an
+already-committed code comment (not lost): `AriadneNativeJob.cpp:767-777`
+(the `bytesToHexLower` doc comment, #118) and
+`m08g_handlers.inc:1696-1710` (the `modify.entity.xdata` Pass-1 comment)
+both describe it verbatim: a by-value `ads_binary` through `acutBuildList`'s
+variadic 1004 slot built a resbuf that made `setXData` report success, but
+the VERY NEXT accoreconsole process to reopen the saved staged file crashed
+with an Access Violation (`engine_exit_code: -3`) inside AutoCAD's own DWG
+reader, reproduced live via `op_roundtrip_probe.probe_entity_xdata_roundtrip`
+and fully reverted. `modify.entity.xdata` currently rejects 1004 explicitly
+(`"unsupported or reserved xdata group code 1004"`) -- confirmed by reading
+the live code, not just the comment.
+
+**Root-cause hypothesis (two independent candidates, both addressed):**
+1. **ABI hazard.** `struct ads_binary { short clen; char* buf; }`
+   (`C:\ObjectARX 2027\inc\adsdef.h:125-131`) is 16 bytes (2-byte `short` +
+   6-byte pad + 8-byte pointer) on x64 -- too large for the MSVC x64 ABI to
+   pass inline through a variadic slot; the calling convention silently
+   passes a pointer-to-a-temporary-copy instead of the struct itself.
+   `acutBuildList`'s internal `va_arg` consumption for a 1004 slot has no
+   documented contract for this, unlike the fixed-size scalar codes
+   (1000/1040/1070/point codes) already proven safe by the existing working
+   code. This is consistent with the crash appearing only on REOPEN (a
+   corrupted length/pointer serialized into the file) rather than
+   immediately in the writer process.
+2. **127-byte chunk limit.** `dbObject.h:270-276`
+   (`AcDbObject::setBinaryData` doc comment) states ObjectARX's OWN
+   convention: "The binary data is broken into 127-byte chunks for storage
+   in the resbuf chain" -- i.e. a single DXF group-code-1004 resbuf node is
+   only valid up to 127 bytes; this matches the well-known AutoLISP DXF
+   reference limit for XDATA binary chunks. If cc2's probe payload exceeded
+   127 bytes in one node, that alone would explain file corruption
+   independent of the ABI issue.
+
+**Design decision (scope-bounded, defensible):** implement 1004 WRITE via
+manual `acutNewRb(1004)` (never `acutBuildList` for this code -- sidesteps
+hazard #1 entirely) with an explicit-ownership byte buffer: WE allocate
+(`new[]`) and copy the decoded hex bytes into `resval.rbinary.buf`/`clen`
+ourselves. Since `AcDbEntity::setXData` takes `const resbuf*` (deep-copies
+internally, does not take ownership -- confirmed from
+`dbObject.h:267`), our buffer is definitely still ours to free after the
+call. What is NOT documented anywhere in the SDK headers is whether
+`acutRelRb` (which frees the whole chain, `dbeval.h:96`) also tries to free
+`resval.rbinary.buf` on a 1004 node -- since that buffer was never allocated
+by `acutBuildList`/`acutNewRb` in the first place (unlike its handling of
+`rstring`), that is genuinely unverifiable from headers alone. Defensive
+fix: neutralize every 1004 node (`buf=nullptr,clen=0`) AFTER `setXData()`
+copies what it needs but BEFORE `acutRelRb(head)` walks the chain, then free
+our own buffers explicitly ourselves. This makes the design correct
+regardless of what `acutRelRb`'s internal 1004 handling actually is.
+Payloads are capped at <=127 bytes per item (hazard #2) with a structured
+rejection above that -- multi-chunk (>127B) concatenation is a NAMED,
+OUT-OF-SCOPE gap (would require matching read-side changes to
+`resbufItemJson`/`xdataBlocksJson` that this ticket does not touch, to avoid
+regressing the already-shipped #118 read fix under this ticket's time/risk
+budget).
+
+**Correction:** the exact commit `2916541` DOES exist (my earlier
+`git log --all | grep -i "916541"` search was a false negative, cause
+unknown) -- it is the merge commit `merge(cc-cpp): #118 xdata 1004 payload
+emission + #128 vport circle_sides persistence` (parent of `007713c`, this
+lane's base). Its message independently confirms the mechanism above
+verbatim (by-value `ads_binary` through `acutBuildList`, 0xC0000005 on
+reopen, "HONEST REVERT", "Follow-up: manual acutNewRb explicit-ownership
+construction (recorded in build_log)" -- i.e. this is that exact follow-up).
+
+### E-a implementation, live test, and the actual result
+
+Implemented exactly as designed above: `modify.entity.xdata` accepts code
+1004 (hex-string `value`, <=127 bytes), built via manual `acutNewRb(1004)` +
+an explicitly-allocated (`new[]`) byte buffer, with every 1004 node
+neutralized (`buf=nullptr,clen=0`) after `setXData()` but before
+`acutRelRb(head)`, and the real buffers freed ourselves via a new
+`m08gReleaseOwnedXdataBinBuffers()` helper. Rebuilt clean (isolated
+`build_iso`, 0 build errors), deployed to `prebuilt/2027/` (previous
+baseline rotated into `_bak/`).
+
+**Live test 1 (the mandatory acceptance test):** `op_roundtrip_probe.
+probe_entity_xdata_roundtrip("ARIADNE_E_A_TEST", [{"code":1004,
+"value":"48656c6c6f"}], "tests/fixtures/native_sample.dwg", ...)` (payload =
+hex for ASCII "Hello", 5 bytes, well under the 127-byte cap):
+
+- Step 2 (the write): `apply/op_00/stdout.txt` shows
+  `"set":true,"errorstatus":0,"item_count":1` -- the write itself reports
+  success, exactly like cc2's attempt did.
+- Step 2's own post-inspect (a **SEPARATE accoreconsole process** re-opening
+  the just-saved `staged_output.dwg` to run `inspect.database.graph`) --
+  `post/stdout.txt`: **`Unhandled Access Violation Reading 0x0005 Exception
+  at 6A798473h`**, `engine_output.status:"native_cad_job_failed"`,
+  `result:null`. Probe result: `status:"partial", exit_code:2, reason:
+  "post-inspect failed: native graph (post) produced no result object"`.
+  **The crash reproduces identically with the "correct" manual-acutNewRb
+  construction.** The ABI-hazard hypothesis (hazard #1 above) is therefore
+  NOT the (sole) cause -- a construction path that entirely avoids
+  `acutBuildList`'s variadic slot still crashes the same way.
+
+**Control test (rule out a generic regression in this rebuild):** same
+rebuilt binary, same fixture, code 1000 plain string instead of 1004 --
+`probe_entity_xdata_roundtrip` returns `status:"ok", exit_code:0,
+record_diff:[]`, both `original_unchanged_step{1,2}` true. The rebuild
+itself is not broken; the crash is specific to 1004.
+
+**Independent cross-check (LibreDWG sidecar, read-only diagnostic --
+never used for production per the GPL-sidecar-only rule):** ran
+`dwgread.exe -v2 -O JSON` (a completely independent, non-Autodesk DWG
+parser) against the EXACT `staged_output.dwg` that crashed AutoCAD's own
+reopen. **It succeeded** (`SUCCESS 0x0`) and its JSON shows the LINE
+entity (handle `0x19190`) with `"eed":[{"size":7,"handle":[5,3,102820],
+"code":4,"value":"48656C6C6F"}]` -- the exact 5 bytes we wrote, byte-for-
+byte correct. **This proves the SAVED FILE IS NOT CORRUPT.** The crash is
+not in what we wrote to disk; it is inside AutoCAD/ObjectARX 2027's OWN
+`xData()`/EED-reconstruction code when it re-parses a real, non-empty 1004
+chunk back into memory -- outside anything this resbuf-construction
+discipline controls. (Also consistent with the crash address pattern:
+`6A798473h` falls in a system-DLL load-address range, not inside our own
+`.crx` module.)
+
+**Precision test (isolate the exact trigger):** same everything, but
+`{"code":1004,"value":""}` -- a **0-byte** binary chunk (`clen=0,
+buf=nullptr`). This round-trips and re-reads **cleanly**: `status:"ok",
+exit_code:0, record_diff:[]`, no crash on reopen. This precisely isolates
+the trigger: it is not "any 1004 group code" that is fatal to AutoCAD's
+own reopen -- it is specifically **non-empty binary content**. An empty
+chunk is fine; real bytes are not.
+
+**Verdict: E-a is BLOCKED**, not by any flaw in this ticket's
+resbuf-construction/ownership design (which is demonstrably correct -- byte-
+perfect per an independent reader) but by a crash inside AutoCAD 2027's own
+internals when it reads back a real 1004 payload, regardless of how it was
+written. This is a STRONGER, more precise finding than cc2's original
+(which blamed the ABI hazard specifically) -- it now looks unfixable from
+the write side entirely. Per the task's own stated acceptance criteria
+("If ... reopen still crashes ... REVERT your write path to blocked ...
+that is acceptable"), the write-enabling code was fully reverted: the 1004
+parse branch, the `acutNewRb`/manual-buffer build branch, the now-orphaned
+`hexToBytes()` (`AriadneNativeJob.cpp`) and `m08gReleaseOwnedXdataBinBuffers()`
+(`m08g_handlers.inc`) helpers were all removed (no dead code left in the
+tree), and `modify.entity.xdata`'s original "1004 excluded" behavior and
+error message are restored, with an updated comment recording this entire
+two-attempt history for whoever looks at this next.
+
+**Post-revert verification:** rebuilt clean again, redeployed,
+re-ran the SAME 1004 write probe: `status:"fail", exit_code:1,
+actual_items:[]` (correctly rejected again, matching pre-E-a behavior),
+`original_unchanged_step{1,2}` both true throughout every experiment in
+this investigation -- no origin file was ever at risk.
+
+### E-b: M08N-era native JSON writer control-char escaping fix
+
+**Root cause, found by reading, not guessing:** `jsonEscape()`
+(`AriadneNativeJob.cpp`) is the canonical UTF-8 JSON string-escape used by
+every `njsonStr()` call in the whole native module (per its own doc
+comment). It only escaped `"` and `\` -- any raw control byte (< 0x20) in a
+string value, e.g. a literal `\n`, fell through unescaped.
+
+**Confirmed against the actual failing evidence, not just in theory:**
+ran `tools/cert_artifact_index.py` (read-only, scans `runs/` +
+`attended_runs/`) against the canonical repo's run history (this worktree
+has no `runs/` of its own to scan; `--scan-root` pointed at the canonical
+repo's absolute path, `--out` written only into this worktree's own
+`reports/`, never touching the canonical repo): **5851 artifacts scanned,
+55 invalid** -- matches the ticket's claimed count exactly. Picked the named
+example, `runs/native_batch_20260629_135844/results/245_input.get.point.json`
+(369 bytes): `json.loads` fails with `Invalid control character at: line 1
+column 128 (char 127)`; the raw bytes at that offset are
+`":"input.get.point","result":{"prompt":"\nAriadne M08N input: ",...` -- a
+literal `0x0A` inside the `"prompt"` string. Traced the source string to
+`m08n_handlers.inc:498`: `m08nStringArg(job, "prompt", "\nAriadne M08N
+input: ")` -- the DEFAULT prompt for every `input.get.*`/
+`interact.jig.acquire` op.
+
+**Fix:** `jsonEscape()` now emits `\b \f \n \r \t` as their standard short
+escapes and every other byte < 0x20 as `\u00XX`; bytes >= 0x80 (all
+UTF-8 continuation/lead bytes -- Korean/non-ASCII content) are untouched,
+preserving the "lossless UTF-8" guarantee `njsonStr()`'s own doc comment
+already promises.
+
+**Live verification (real op, real crash-prone input, not a synthetic
+unit test):** ran `input.get.point` headlessly via `cadctl.run_operation`
+against `tests/fixtures/native_sample.dwg` on the rebuilt binary. Loaded the
+raw result file
+(`runs\dwg_truth_autocad_cad_job_20260706_140610\native_cad_job_result.json`,
+370 bytes) as raw bytes: **zero literal `0x0A` bytes anywhere in the file**;
+the on-disk bytes read `{"prompt":"\\nAriadne M08N input: ",...` (backslash-
+n, two ASCII chars, properly escaped); `json.loads(raw.decode("utf-8"))`
+(Python's strict default -- no `utf-8-sig` tolerance) parses without error;
+the round-tripped value is `'\nAriadne M08N input: '`, byte-for-byte the
+original semantic string. This is the exact op/input that produced one of
+the 55 malformed artifacts pre-fix.
+
+**Regression:** `write.entity.line` roundtrip probe (a previously-certified
+op) on the same rebuilt binary: `status:"ok"`, diff `added:0, removed:0,
+modified:0, unchanged:1` -- diff=0, no regression.
+
+**Historical malformed artifacts:** the 55 pre-existing malformed result
+JSONs under `runs/`/`attended_runs/` were left untouched (explicitly
+optional per the task -- "evidence records"). Only the emitter was fixed.
+
+## Regression gate (both E-a revert + E-b fix together)
+
+`python -m pytest tests/unit -q`: **1114 passed, 23 skipped, 0 failed**
+(exit code 0).
+
