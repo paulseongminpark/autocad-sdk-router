@@ -1537,6 +1537,83 @@ document this lane opened in the live session was closed by this lane.
 ## Lane W5-TMPL
 ---
 ## Lane W5-ANCHOR
+## Lane W6-DYNBLK (worktree `wt/w6_dynblk`, branch `cados/w6-dynblk`) -- dynamic block
+reference property read/write
+
+**Mission:** census gap #1 P1 (`sdk_census_reaudit_20260706.md`) -- zero coverage of
+`AcDbDynBlockReference`/`AcDbDynBlockReferenceProperty` (dbdynblk.h), i.e. reading/setting the
+visibility state, distance, flip, or lookup value actually configured on an INSERTED dynamic
+block reference (door/window/furniture families). Distinct from dynamic block AUTHORING,
+which the same census confirms (live Autodesk docs/forums) is impossible via any public API
+including Autodesk's own .NET/COM SDKs -- correctly out of scope, not attempted.
+
+**Shipped:** one new family, `src/Ariadne.AcadNative/families/w6_dynblk_handlers.inc`
+(`w6dynblkHasOp`/`w6dynblkDispatch`), registered into `AriadneNativeJob.cpp` inside a
+`// w6-dynblk` ... `// end w6-dynblk` delimited block (concurrent-lane merge-safe: one new
+`#include` line + two `||` clauses, no existing family line touched). Three new ops:
+- `inspect.dynblock.references` -- enumerate block-reference entities in a BTR (model space
+  default, or `block_handle`/`block_name`), each tagged `is_dynamic_block` plus (when dynamic)
+  its full property array. Resolves the `AcDbBlockReference::blockTableRecord()`
+  anonymous-`*U###`-block naming nuance: reports both `insert_block_name` (raw instance BTR
+  name) and `block_name` (canonical name via `AcDbDynBlockReference::dynamicBlockTableRecord()`).
+- `inspect.dynblock.properties` -- the same full property array for ONE block reference by
+  handle.
+- `write.dynblock.property` -- set ONE named property's value on ONE block reference by
+  handle. REAL, PERSISTING write (no `AriadneStagedWriteTransaction`, matches
+  `write.block.append_entity`'s no-wrapper shape). Honesty guards beyond the raw SDK: rejects
+  a read-only property (`PROPERTY_READ_ONLY`), a property-type/value-kind mismatch
+  (`UNSUPPORTED_PROPERTY_TYPE`), and a value outside a list-restricted property's
+  `getAllowedValues()` (`VALUE_NOT_ALLOWED`) -- the SDK's own `setValue()` would otherwise
+  silently no-op on an invalid value without an error. Reports `value_before`/`value_after`
+  and `bbox_before`/`bbox_after` (`AcDbExtents`) plus the post-set `anonymous_block_handle`.
+
+**Test-DWG sourcing:** `tests/fixtures/native_sample.dwg` (sha `eac5d4b1...`, the workitem
+fixture) was checked FIRST via the new `inspect.dynblock.references` op itself -- confirmed
+2027 block references in model space, **0 dynamic**. Per the mission's own fallback
+instruction, used a STAGED COPY of an official Autodesk-shipped sample instead: `C:\Program
+Files\Autodesk\AutoCAD 2027\Sample\ko-KR\Dynamic Blocks\Architectural - Metric.dwg` (real
+Korean door/window dynamic blocks -- exactly the ALM/Sunapse-relevant case). Original sample
+never opened directly; the router always stages a copy, and its sha256/mtime were re-verified
+unchanged after every run (mtime `2026-05-12T08:10:31Z`, pre-dating this session).
+
+**Live proof (manual + `tests/integration/test_w6_dynblk_live.py`, `CADOS_LIVE=1`, 5 passed):**
+read found 9 block references, all 9 dynamic, e.g. `출입구 - 미터법` (Entrance - Metric) with 7
+properties incl. `문 크기` (door size, real, allowed `[600,700,750,800,900,1000]`), `경첩`/`진동`
+(hinge/swing, int16 flip), `열림각` (opening angle, text enum incl. `열기 30º`/`닫기`), and a
+read-only `point3d` `Origin` -- Korean UTF-8 and all 5 supported `AcDb::DwgDataType`s
+(real/int16/int32/text/point3d) round-trip correctly via `njsonStr`/`w6dEvalVariantValueJson`.
+Write: `문 크기` 750 -> 900, `value_before/value_after` correct, `bbox_before`
+`[...,750,750,0]` -> `bbox_after` `[...,900,900,0]` (evaluation graph genuinely re-ran, not
+just `setValue()` returning `eOk`). **Fresh-process reopen** (separate `accoreconsole.exe`
+invocation reading the staged, saved DWG from disk): re-read `문 크기` = 900 -- confirms the
+write persisted to disk, not just an in-memory success claim. Negative paths verified live:
+setting read-only `Origin` -> `PROPERTY_READ_ONLY`; setting `문 크기`=999 (not in the allowed
+list) -> `VALUE_NOT_ALLOWED`.
+
+**Registry (`config/operations.v2.json`):** 3 new records added (family `blocks_xrefs_clone`,
+`status: implemented`, `handler.router_lane: ARIADNE_NATIVE_JOB`, `mapping_type: synthetic`
++ `catalog_op_id: null` since these ops predate any catalog entry, `owner_ticket: M08E-T01`
+per `operation_coverage_matrix.assign_owner_ticket`'s deterministic family rule). 525 -> 528
+ops; `totals`/`coverage` blocks and `config/op_dag.json` (regenerated via
+`tools/op_dag_generate.py`, persistence_class `R`/`R`/`D` per its own derivation rule)
+updated to match. 4 pre-existing hardcoded-anchor tests bumped in the same commit
+(`test_catalog_completeness.py`, `test_m08a_catalog_reopen.py` x2, `test_op_dag_generate.py`)
+-- same pattern those tests' own comments already used for every prior wave's op-count delta.
+
+**Build:** `tools/build_native_acad.ps1` (isolated `-RouterHome`/`-OutputRoot` under this
+worktree) -- dbx/crx/arx all relinked, exit 0, first try. Deployed to this worktree's own
+`prebuilt/2027/` for live testing (canonical repo never touched).
+
+**Regression gate:** `python -m pytest tests/unit -q` -> **1156 passed, 0 failed, 23
+skipped**. `tests/test_native_arx_dbx_contract.py::test_router_exposes_native_p1_job_lane`
+fails identically on a clean `git stash` of the base branch (pre-existing, unrelated to this
+lane -- confirmed via stash/pop before attributing).
+
+**New tests:** `tests/unit/test_w6_dynblk_handlers.py` (13, source-level HasOp/Dispatch
+parity + honesty-guard + no-original-write-token + UTF-8 + public-API-only checks, no
+AutoCAD needed) and `tests/integration/test_w6_dynblk_live.py` (5, `CADOS_LIVE=1`-gated, all
+passing -- read/single-handle/write+fresh-process-readback/both negative paths).
+
 
 Mission: legislate + implement a semantic-anchor op family (`anchor.set`/`anchor.get`/
 `anchor.list`/`anchor.clear`) so an agent can stamp its interpretation of an entity onto
