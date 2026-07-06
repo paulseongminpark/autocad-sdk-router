@@ -764,6 +764,32 @@ static bool resbufCodeIsInt32(short code)
     return (code >= 90 && code <= 99) || code == 1071;
 }
 
+// #118: lowercase hex encoding for resbuf binary-chunk group codes (310,
+// 1004 xdata) -- READ side only. Was byte_count-only (the actual payload was
+// dropped, unlike every other supported code, which always round-trips a
+// "value"). Write-side support for 1004 was investigated and reverted: a
+// by-value ads_binary through acutBuildList's variadic 1004 slot produced a
+// resbuf that crashed AutoCAD's own DWG reader on next re-open (Access
+// Violation, reproduced live via op_roundtrip_probe -- see build_log.md), so
+// this fix stays read-only; verified by regression (plain string xdata and
+// the full database graph walk both still work with this change present)
+// rather than a live round-trip, since no safe write path for 1004 exists
+// yet to construct one.
+static std::string bytesToHexLower(const char* buf, int len)
+{
+    static const char kHexDigits[] = "0123456789abcdef";
+    std::string out;
+    if (buf == nullptr || len <= 0)
+        return out;
+    out.reserve(static_cast<size_t>(len) * 2);
+    for (int i = 0; i < len; ++i) {
+        const unsigned char b = static_cast<unsigned char>(buf[i]);
+        out.push_back(kHexDigits[(b >> 4) & 0x0F]);
+        out.push_back(kHexDigits[b & 0x0F]);
+    }
+    return out;
+}
+
 static std::string resbufItemJson(const resbuf* rb)
 {
     std::ostringstream o; o.precision(kJsonDoublePrecision);
@@ -791,7 +817,11 @@ static std::string resbufItemJson(const resbuf* rb)
         o << ",\"value\":" << (rb->resval.rint != 0 ? "true" : "false");
     }
     else if (code == 310 || code == 1004) {
-        o << ",\"value_kind\":\"binary\",\"byte_count\":" << rb->resval.rbinary.clen;
+        // #118: was byte_count-only (the actual payload was dropped, unlike
+        // every other supported code, which always round-trips a "value").
+        // Now also emits the raw bytes as a lowercase hex string.
+        o << ",\"value_kind\":\"binary\",\"byte_count\":" << rb->resval.rbinary.clen
+          << ",\"value\":" << njsonStr(bytesToHexLower(rb->resval.rbinary.buf, rb->resval.rbinary.clen));
     }
     else {
         o << ",\"value_kind\":\"unhandled\"";
@@ -4641,6 +4671,19 @@ static Acad::ErrorStatus upsertVportRecord(AcDbDatabase* pDb, const std::string&
         if (es != Acad::eOk)
             return es;
         applyVportProperties(pRec, props);
+        // #128 WORKAROUND (measured via live op_roundtrip_probe run, see
+        // build_log.md): setCircleSides() DOES take effect in-memory on an
+        // existing record -- a same-process readback right after this call
+        // confirms the new value -- but when circle_sides is the ONLY field
+        // an update call touches, AutoCAD's own save pipeline does not treat
+        // the record as modified and the change never reaches the saved DWG
+        // (reproduced: circle_sides-only update round-trips back to the OLD
+        // value; bundling it with any other AcDbAbstractViewTableRecord
+        // field change, e.g. height, makes it stick). Re-asserting height to
+        // its OWN current value is a true no-op that reliably forces that
+        // recognition, without altering any caller-visible field.
+        if (props.hasCircleSides)
+            pRec->setHeight(pRec->height());
         pRec->close();
         return Acad::eOk;
     }
