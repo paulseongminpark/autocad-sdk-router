@@ -1,0 +1,233 @@
+{
+  "schema": "ariadne.cados.lane_i_router_fix_resolution.v1",
+  "generated_at": "2026-07-06T06:26:43.932620+00:00",
+  "context": "Lane I fixed the router 'run' dispatcher (tools/autocad-router.ps1) so a job-based operation is routed to the headless Invoke-CadJobRoute path unless the registry (handler.execution_host_class) says it genuinely requires an attended, already-open AutoCAD session (execution_host_class=='full_autocad'). Root cause traced by Lane G (see build_log.md Lane G section); fix + re-probe by Lane I (see build_log.md Lane I section).",
+  "fix_commit": "b3f456d",
+  "fix_file": "tools/autocad-router.ps1",
+  "source_original_matrix": "measure/reachable_matrix.jsonl",
+  "source_registry": "config/operations.v2.json",
+  "reprobe_method": "tools/probe_reachability.py --live --ops <34 CRASH op_ids> --dwg tests/fixtures/native_sample.dwg (sweep-style, isolated subprocess, same style as the original 465-op sweep and Lane G repro)",
+  "reprobe_fixture_sha256": "eac5d4b13d67d89106e503321412539df7b39b8a7f4e44c033448e9295fe3f76",
+  "reprobe_ops_total": 34,
+  "reprobe_resolved_count": 33,
+  "reprobe_still_crash_count": 1,
+  "regression_subset_checked": [
+    "acdb.database.create",
+    "automate.com.bridge_objectid",
+    "automate.com.entity_helpers",
+    "automate.com.hold_objectref",
+    "automate.com.lock_document",
+    "apply.patch",
+    "automate.property.set",
+    "compute.solid3d.interference",
+    "define.assocaction.addDependency",
+    "define.assocaction.valueParam"
+  ],
+  "regression_subset_result": "all 10 classify identically before/after the fix (no regressions)",
+  "rows": [
+    {
+      "op_id": "define.constraint.autoConstrain",
+      "old_class": "CRASH",
+      "new_class": "REACHABLE",
+      "resolved": true
+    },
+    {
+      "op_id": "define.dimassoc.geometryDriven",
+      "old_class": "CRASH",
+      "new_class": "REACHABLE",
+      "resolved": true
+    },
+    {
+      "op_id": "extend.customclass.create",
+      "old_class": "CRASH",
+      "new_class": "RUNNABLE",
+      "resolved": true
+    },
+    {
+      "op_id": "extend.customentity.define",
+      "old_class": "CRASH",
+      "new_class": "RUNNABLE",
+      "resolved": true
+    },
+    {
+      "op_id": "extend.customobject.create",
+      "old_class": "CRASH",
+      "new_class": "RUNNABLE",
+      "resolved": true
+    },
+    {
+      "op_id": "extend.customobject.define",
+      "old_class": "CRASH",
+      "new_class": "RUNNABLE",
+      "resolved": true
+    },
+    {
+      "op_id": "extend.customobject.embedded",
+      "old_class": "CRASH",
+      "new_class": "RUNNABLE",
+      "resolved": true
+    },
+    {
+      "op_id": "extend.customobject.version",
+      "old_class": "CRASH",
+      "new_class": "RUNNABLE",
+      "resolved": true
+    },
+    {
+      "op_id": "extend.property.category",
+      "old_class": "CRASH",
+      "new_class": "RUNNABLE",
+      "resolved": true
+    },
+    {
+      "op_id": "extend.property.com_name",
+      "old_class": "CRASH",
+      "new_class": "RUNNABLE",
+      "resolved": true
+    },
+    {
+      "op_id": "extend.property.default_value",
+      "old_class": "CRASH",
+      "new_class": "RUNNABLE",
+      "resolved": true
+    },
+    {
+      "op_id": "extend.property.define",
+      "old_class": "CRASH",
+      "new_class": "RUNNABLE",
+      "resolved": true
+    },
+    {
+      "op_id": "extend.property.define_collection",
+      "old_class": "CRASH",
+      "new_class": "RUNNABLE",
+      "resolved": true
+    },
+    {
+      "op_id": "extend.property.define_dictionary",
+      "old_class": "CRASH",
+      "new_class": "RUNNABLE",
+      "resolved": true
+    },
+    {
+      "op_id": "extend.property.define_indexed",
+      "old_class": "CRASH",
+      "new_class": "RUNNABLE",
+      "resolved": true
+    },
+    {
+      "op_id": "extend.property.describe",
+      "old_class": "CRASH",
+      "new_class": "RUNNABLE",
+      "resolved": true
+    },
+    {
+      "op_id": "extend.property.display_as",
+      "old_class": "CRASH",
+      "new_class": "RUNNABLE",
+      "resolved": true
+    },
+    {
+      "op_id": "extend.property.enum_tag",
+      "old_class": "CRASH",
+      "new_class": "RUNNABLE",
+      "resolved": true
+    },
+    {
+      "op_id": "extend.property.expose_to_com",
+      "old_class": "CRASH",
+      "new_class": "RUNNABLE",
+      "resolved": true
+    },
+    {
+      "op_id": "extend.property.filepath",
+      "old_class": "CRASH",
+      "new_class": "RUNNABLE",
+      "resolved": true
+    },
+    {
+      "op_id": "extend.property.flags",
+      "old_class": "CRASH",
+      "new_class": "RUNNABLE",
+      "resolved": true
+    },
+    {
+      "op_id": "extend.property.localize_name",
+      "old_class": "CRASH",
+      "new_class": "RUNNABLE",
+      "resolved": true
+    },
+    {
+      "op_id": "extend.property.refers_to",
+      "old_class": "CRASH",
+      "new_class": "RUNNABLE",
+      "resolved": true
+    },
+    {
+      "op_id": "extend.property.units",
+      "old_class": "CRASH",
+      "new_class": "RUNNABLE",
+      "resolved": true
+    },
+    {
+      "op_id": "interact.jig.run",
+      "old_class": "CRASH",
+      "new_class": "RUNNABLE",
+      "resolved": true
+    },
+    {
+      "op_id": "live.jig.point_probe",
+      "old_class": "CRASH",
+      "new_class": "CRASH",
+      "resolved": false
+    },
+    {
+      "op_id": "live.overrule.disable",
+      "old_class": "CRASH",
+      "new_class": "RUNNABLE",
+      "resolved": true
+    },
+    {
+      "op_id": "live.overrule.enable",
+      "old_class": "CRASH",
+      "new_class": "RUNNABLE_BUT_DEGENERATE",
+      "resolved": true
+    },
+    {
+      "op_id": "live.reactor.disable",
+      "old_class": "CRASH",
+      "new_class": "RUNNABLE",
+      "resolved": true
+    },
+    {
+      "op_id": "live.reactor.enable",
+      "old_class": "CRASH",
+      "new_class": "RUNNABLE_BUT_DEGENERATE",
+      "resolved": true
+    },
+    {
+      "op_id": "react.persistent.attach",
+      "old_class": "CRASH",
+      "new_class": "RUNNABLE",
+      "resolved": true
+    },
+    {
+      "op_id": "react.persistent.detach",
+      "old_class": "CRASH",
+      "new_class": "RUNNABLE",
+      "resolved": true
+    },
+    {
+      "op_id": "transform.database.deep_clone",
+      "old_class": "CRASH",
+      "new_class": "RUNNABLE",
+      "resolved": true
+    },
+    {
+      "op_id": "transform.database.wblock_clone",
+      "old_class": "CRASH",
+      "new_class": "REACHABLE",
+      "resolved": true
+    }
+  ]
+}

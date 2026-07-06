@@ -1123,4 +1123,149 @@ real registry's new caveat sentence). No C++ touched; no rebuild performed
 (this worktree's `prebuilt/2027` binaries are the same canonical build from
 688155d used by every other lane this wave).
 
+## Lane I
+
+**Task:** fix the router `live_edit` dispatch defect that Lane G root-caused
+(the `Action=='run'` `dwg_truth_autocad` branch treated
+`effectiveWriteMode -eq 'live_edit'` as an attended-COM-only signal, routing
+every `live_edit`-default job-based op to `Invoke-FullAutoCadCadJob` ->
+`GetActiveObject("AutoCAD.Application")` -> `NO_ACTIVE_AUTOCAD` under any
+headless probe, before `Invoke-CadJobRoute`'s own headless Core Console path
+was ever considered), then re-probe the 34 CRASH rows against the fix.
+
+**Fix (`tools/autocad-router.ps1`):** added `Get-CadOperationExecutionHostClassMap`
+(cached, mtime/size-invalidated read of `config/operations.v2.json`, same
+pattern as the pre-existing `Get-NativeJobOpSet`) and
+`Test-CadJobRequiresAttendedHost`, which resolves the job's operation id
+(from `-Operation`, or `Get-CadJobOperation` on `-JobPath` when `-Operation`
+is absent) and returns true ONLY when the registry's
+`handler.execution_host_class == "full_autocad"` -- i.e. the op has no
+`arx_adapter`/`coreconsole`/`dbx` alternative and can only run inside an
+already-open, interactive AutoCAD session. The `Action=='run'`
+`dwg_truth_autocad` job-based dispatch now reads:
+
+```
+if (($HostMode -eq 'full_autocad' -or $jobRequiresAttendedHost) -and $hasJob) {
+  $exec = Invoke-FullAutoCadCadJob -RunOut $runOut
+}
+elseif ($hasJob) {
+  $exec = Invoke-CadJobRoute -Capabilities $capabilities
+}
+elseif (...) { ... }  # unchanged: non-job raw -Script branch (Invoke-FullAutoCadScript)
+```
+
+Unknown/unregistered op ids default to headless (`Test-CadJobRequiresAttendedHost`
+returns false when the op is absent from the registry map) --
+`Invoke-CadJobRoute`'s own NETLOAD fallback already handled arbitrary op ids,
+so this is no worse off than before the fix. The non-job raw `-Script`
+branch (`Invoke-FullAutoCadScript`, arbitrary AutoLISP against the live
+active document) is untouched: there is no registry-backed op id to check
+eligibility against for an arbitrary script, so it correctly stays gated on
+`-HostMode full_autocad` / `write_mode=='live_edit'` as before. Safety
+invariants preserved: `Invoke-CadJobRoute` stages its own copy and only that
+copy is `_QSAVE`d (never the original); `write_original` still refused from
+the agent surface; no fake availability.
+
+`python -m pytest tests/unit -q`: 1136 passed, 0 failed (no regression from
+the dispatch change alone).
+
+**Cross-registry landmine found while wiring the fix (flagged, not
+independently investigated further -- out of this lane's assigned scope):**
+many of these 34 ops have a TOP-LEVEL `"status": "implemented"` (the field
+`cadctl.Cad.run_operation`'s allow-list gate actually reads) but a STALE
+nested `policy.status_policy == "catalogued_not_runnable"` (a legacy
+sub-field `tools/crash34_host_crosscheck.py`'s old heuristic keyed off
+instead). The two fields had drifted out of sync; this is why 27 of the 33
+ops resolved below had been mis-classified `expected_crash` by the old
+crosscheck logic for the wrong reason (it believed no dispatcher was wired,
+when one was -- see `reports/lane_i_router_fix_resolution.json` and the
+crosscheck's new resolution-first check, which reads the measured live
+re-probe result instead of trusting the stale sub-field).
+
+**Re-probe (Task 2), sweep-style, this worktree's own fixed router + own
+`prebuilt/2027` (unmodified since 688155d):**
+
+1. All 34 previously-CRASH ops (`tools/probe_reachability.py --live --ops
+   <34 ids> --dwg tests/fixtures/native_sample.dwg`, artifacts under
+   `runs/laneI_reprobe/` -- gitignored, not committed; the measured result is
+   captured in the committed `reports/lane_i_router_fix_resolution.json`):
+   **33 of 34 flipped away from CRASH** -- 28 RUNNABLE (`status:"ok"`, real
+   native results, e.g. `extend.customclass.create` ->
+   `{"created":true,"errorstatus":0,...}`, `live.overrule.enable` ->
+   `{"registered":true,"created":true,"name":"AriadneObjectOverrule",...}`),
+   3 REACHABLE (native module reached, clean `MISSING_ARG`/`MISSING_HANDLE`
+   validation errors on the empty-arg fixture -- e.g.
+   `define.constraint.autoConstrain`, `transform.database.wblock_clone`), 2
+   RUNNABLE_BUT_DEGENERATE (`live.overrule.enable`, `live.reactor.enable` --
+   genuine `status:"ok"` successes; "degenerate" here is
+   `probe_reachability.py`'s own presentational bucket for "no valid-arg
+   fixture provided," unrelated to the router fix). **1 of 34 stayed CRASH**:
+   `live.jig.point_probe` -- its registry `handler.execution_host_class` is
+   genuinely `"full_autocad"` (no headless alternative; it drives an
+   `AcEdJig` prompt via `SendCommand` on a live document), and it still
+   fails with the same honest `NO_ACTIVE_AUTOCAD` / "No running AutoCAD COM
+   application was found for full_autocad native job mode" envelope as
+   before -- correctly routed to the attended branch, correctly refusing to
+   fake success under an isolated probe with no open AutoCAD session.
+2. Regression subset -- 10 previously-RUNNABLE/REACHABLE ops spanning `read`
+   (`acdb.database.create`, `automate.com.bridge_objectid`,
+   `automate.com.entity_helpers`, `automate.com.hold_objectref`,
+   `automate.com.lock_document`) and `write_copy`-allowed (`apply.patch`,
+   `automate.property.set`, `compute.solid3d.interference`,
+   `define.assocaction.addDependency`, `define.assocaction.valueParam`):
+   **all 10 classify identically before vs after the fix** -- no regression.
+3. Fixture integrity: `tests/fixtures/native_sample.dwg` sha256
+   `eac5d4b13d67d89106e503321412539df7b39b8a7f4e44c033448e9295fe3f76`
+   verified before the fix commit and after both probe batches (crash34
+   re-probe + regression subset) -- unchanged throughout.
+
+**Truth surfaces (Task 3):**
+- New committed artifact `reports/lane_i_router_fix_resolution.json`: the
+  measured before/after (`old_class`/`new_class`/`resolved`) for all 34
+  op_ids, plus fix commit/file and reprobe method/fixture sha -- the
+  evidentiary record for everything below (raw per-op probe artifacts live
+  under gitignored `runs/laneI_reprobe/` and are not committed).
+- `tools/crash34_host_crosscheck.py`: added `load_resolution_map()` +
+  `VERDICT_RESOLVED = "resolved_by_router_fix"` /
+  `ACTION_RESOLVED = "resolved_by_fix"`. `classify_one()` now takes an
+  optional `resolution` map argument (default `None`, so the existing
+  synthetic unit tests that call it directly with 2 positional args are
+  byte-for-byte unaffected -- same pattern Lane G's own caveat-text change
+  used) and checks it FIRST, ahead of the `catalogued_not_runnable`/caveat-
+  text/anomalous heuristics: a resolved op_id short-circuits straight to
+  `resolved_by_router_fix` with the fix commit/file and new_class inlined
+  into `evidence`. `build_report()` / `main()` gained a third
+  `resolution_path` parameter / `--resolution` flag (default
+  `reports/lane_i_router_fix_resolution.json`; a missing file soft-fails to
+  `{}`, reproducing pre-Lane-I behavior exactly).
+- Regenerated `reports/crash34_host_eligibility_crosscheck.{json,md}`:
+  `verdict_counts` moved from `{"expected_crash":30,"anomalous_crash":4}` to
+  `{"resolved_by_router_fix":33,"expected_crash":1}` -- zero `anomalous_crash`
+  remaining; `bucket_counts` unchanged (`16/5/6/7`, presentational,
+  independent of verdict); `live.jig.point_probe` is the sole
+  `expected_crash` row.
+- `config/operations.v2.json`: revised the stale caveat sentence Lane G
+  added to `extend.customclass.create` / `extend.customobject.create`
+  (`summary` + `notes`, both fields, both ops -- it previously asserted these
+  ops "always" route to the attended COM branch, which is no longer true)
+  to state the router bug is fixed and the op is now live-re-probed
+  RUNNABLE headlessly; appended an `evidence_refs` entry pointing at
+  `reports/lane_i_router_fix_resolution.json` for both ops. Regenerating
+  `config/op_dag.json` afterward (`python tools/op_dag_generate.py`) picked
+  up the new evidence_refs path token as an additional `target_files` entry
+  for both ops (2-line diff, `tools/op_dag_generate.py`'s own deterministic
+  parse of registry evidence_refs -- not a manual edit).
+- Added 7 new unit tests to `tests/unit/test_crash34_crosscheck.py`
+  (resolution-first classify_one behavior, resolution-map-present-but-not-
+  resolved fallthrough, `load_resolution_map` missing-file + metadata-inline
+  behavior, and a new `TestRealCrash34SweepAfterLaneIFix` class asserting the
+  real artifact's new verdict counts / the single remaining expected_crash /
+  fix-commit-in-evidence for all 33 resolved rows).
+
+**Verification:** `python -m pytest tests/unit -q` -- **1143 passed, 0
+failed** (1136 baseline + 7 new; includes the full, now-24-test
+`test_crash34_crosscheck.py`, all green). No C++ touched; no rebuild
+performed (same canonical `prebuilt/2027` from 688155d as every other lane
+this wave, confirmed unchanged by this lane).
+
 

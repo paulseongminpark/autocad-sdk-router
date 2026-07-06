@@ -88,6 +88,8 @@ def test_classify_one_implemented_with_no_caveat_is_anomalous_open():
 def test_classify_one_implemented_with_working_fixture_still_anomalous():
     # extend.customclass.create's real shape: implemented + a working
     # fixture on file -- still anomalous, since neither predicts a crash.
+    # No resolution map passed (defaults to None) -- reproduces pre-Lane-I
+    # behavior exactly, unaffected by the real registry's new Lane I text.
     row = _row("extend.customclass.create", fixture_available=True,
                fixture_evidence="test_native/job_create_args.json (existing working fixture)")
     op = {"family": "extend", "engine_tier": "native_arx_only",
@@ -99,6 +101,52 @@ def test_classify_one_implemented_with_working_fixture_still_anomalous():
     assert result["verdict"] == c34.VERDICT_ANOMALOUS
     assert result["registry_action"] == c34.ACTION_OPEN
     assert result["evidence"]["fixture_available"] is True
+
+
+def test_classify_one_resolved_by_resolution_map_overrides_catalogued_not_runnable():
+    # Lane I: a row the legacy heuristic would call "expected_crash" (stale
+    # catalogued_not_runnable) must be re-verdicted resolved_by_router_fix
+    # when the resolution map says Lane I proved it runs now.
+    row = _row("fake.op.b")
+    op = {"family": "misc_family", "engine_tier": "native_arx_only",
+          "host_eligibility": ["arx_adapter", "full_autocad"],
+          "policy": {"status_policy": "catalogued_not_runnable"},
+          "handler": {"router_lane": "ARIADNE_NATIVE_JOB", "native_api": ""},
+          "summary": "does a thing"}
+    resolution = {
+        "fake.op.b": {
+            "op_id": "fake.op.b", "old_class": "CRASH", "new_class": "RUNNABLE",
+            "resolved": True,
+            "_manifest": {"fix_commit": "deadbee", "fix_file": "tools/autocad-router.ps1"},
+        }
+    }
+    result = c34.classify_one(row, op, resolution)
+    assert result["verdict"] == c34.VERDICT_RESOLVED
+    assert result["registry_action"] == c34.ACTION_RESOLVED
+    assert result["evidence"]["resolved_new_class"] == "RUNNABLE"
+    assert result["evidence"]["resolved_fix_commit"] == "deadbee"
+
+
+def test_classify_one_resolution_map_present_but_op_not_resolved_falls_through():
+    # live.jig.point_probe's real shape: present in the resolution map (it
+    # was part of the 34 re-probed) but resolved=False (still genuinely
+    # attended-only) -- must fall through to the pre-existing Core Console
+    # caveat heuristic unchanged, not silently marked resolved.
+    row = _row("live.jig.point_probe")
+    op = {"family": "live", "engine_tier": "native_arx_only",
+          "host_eligibility": ["full_autocad"],
+          "policy": {"status_policy": "implemented"},
+          "handler": {"router_lane": "ARIADNE_NATIVE_JOB", "native_api": ""},
+          "summary": "Router job drives a point probe; Core Console can only report support status."}
+    resolution = {
+        "live.jig.point_probe": {
+            "op_id": "live.jig.point_probe", "old_class": "CRASH", "new_class": "CRASH",
+            "resolved": False,
+        }
+    }
+    result = c34.classify_one(row, op, resolution)
+    assert result["verdict"] == c34.VERDICT_EXPECTED
+    assert result["registry_action"] == c34.ACTION_NONE
 
 
 @pytest.mark.parametrize("op_id,family,expected_bucket", [
@@ -186,10 +234,32 @@ def test_main_nonzero_exit_when_unjoined(tmp_path):
     assert rc == 2
 
 
+def test_load_resolution_map_missing_file_returns_empty_dict(tmp_path):
+    missing = tmp_path / "does_not_exist.json"
+    assert c34.load_resolution_map(str(missing)) == {}
+
+
+def test_load_resolution_map_inlines_manifest_metadata_per_row(tmp_path):
+    resolution_path = tmp_path / "resolution.json"
+    resolution_path.write_text(json.dumps({
+        "fix_commit": "abc1234",
+        "fix_file": "tools/autocad-router.ps1",
+        "rows": [
+            {"op_id": "foo.bar", "old_class": "CRASH", "new_class": "RUNNABLE", "resolved": True},
+        ],
+    }), encoding="utf-8")
+    result = c34.load_resolution_map(str(resolution_path))
+    assert result["foo.bar"]["resolved"] is True
+    assert result["foo.bar"]["_manifest"]["fix_commit"] == "abc1234"
+
+
 # --------------------------------------------------------------------------- #
 # Real-artifact checks (read-only -- never writes measure/ or config/):
 # join completeness, verdict enum validity, report schema, bucket totals.
 # --------------------------------------------------------------------------- #
+
+_REAL_RESOLUTION = os.path.join(_ROUTER_HOME, "reports", "lane_i_router_fix_resolution.json")
+
 
 @pytest.mark.skipif(not (os.path.isfile(_REAL_MATRIX) and os.path.isfile(_REAL_REGISTRY)),
                     reason="real sweep artifacts not present in this checkout")
@@ -220,3 +290,38 @@ class TestRealCrash34Sweep:
         for row in report["rows"]:
             for key in ("op_id", "bucket", "verdict", "registry_action", "evidence", "reason"):
                 assert key in row
+
+
+@pytest.mark.skipif(not (os.path.isfile(_REAL_MATRIX) and os.path.isfile(_REAL_REGISTRY)
+                          and os.path.isfile(_REAL_RESOLUTION)),
+                    reason="Lane I resolution artifact not present in this checkout")
+class TestRealCrash34SweepAfterLaneIFix:
+    """Lane I fixed the router's live_edit dispatch bug (root-caused by Lane
+    G) and live-re-probed all 34 CRASH ops against the fix. These assertions
+    guard that measured result: 33 of the 34 rows must now read as
+    resolved_by_router_fix (not the pre-fix expected_crash/anomalous_crash
+    verdicts), and the one genuinely attended-only op must NOT be silently
+    swept into "resolved" just because it happens to sit in the resolution
+    file.
+    """
+
+    def test_verdict_counts_reflect_the_router_fix(self):
+        report = c34.build_report(_REAL_MATRIX, _REAL_REGISTRY, _REAL_RESOLUTION)
+        assert report["verdict_counts"] == {
+            "resolved_by_router_fix": 33,
+            "expected_crash": 1,
+        }
+        assert "anomalous_crash" not in report["verdict_counts"]
+
+    def test_live_jig_point_probe_is_the_one_still_expected_crash(self):
+        report = c34.build_report(_REAL_MATRIX, _REAL_REGISTRY, _REAL_RESOLUTION)
+        still_crash = [r for r in report["rows"] if r["verdict"] == c34.VERDICT_EXPECTED]
+        assert [r["op_id"] for r in still_crash] == ["live.jig.point_probe"]
+
+    def test_resolved_rows_carry_the_fix_commit_in_evidence(self):
+        report = c34.build_report(_REAL_MATRIX, _REAL_REGISTRY, _REAL_RESOLUTION)
+        resolved = [r for r in report["rows"] if r["verdict"] == c34.VERDICT_RESOLVED]
+        assert len(resolved) == 33
+        for r in resolved:
+            assert r["evidence"]["resolved_fix_commit"]
+            assert r["evidence"]["resolved_new_class"] != "CRASH"
