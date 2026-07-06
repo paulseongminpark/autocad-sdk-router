@@ -260,6 +260,77 @@ function Test-NativeP1CadJobOperation {
   return [bool]$set.ContainsKey($OperationName)
 }
 
+$script:_ExecutionHostClassMap = $null
+$script:_ExecutionHostClassMapCacheKey = $null
+
+function Get-CadOperationExecutionHostClassMap {
+  # Build op id -> handler.execution_host_class map from the registry
+  # (operations.v2.json is the SoT). Used by the 'run' dispatcher to decide whether a
+  # job-based operation is headless-eligible (dbx/coreconsole/arx_adapter -- routes
+  # through Invoke-CadJobRoute) or genuinely requires an attended, already-open AutoCAD
+  # session (full_autocad -- routes through Invoke-FullAutoCadCadJob). write_mode is a
+  # persistence signal (dwg_persisted / _QSAVE), not a host-eligibility signal -- see
+  # build_log.md Lane G / Lane I.
+  #
+  # Cached per-process; invalidated on registry mtime/size change, same pattern as
+  # Get-NativeJobOpSet. A read/parse failure is retried briefly then FAILS LOUD -- no
+  # silent fallback to a hardcoded eligibility list.
+  $regPath = Join-Path $RouterHome 'config\operations.v2.json'
+
+  $fi = Get-Item -LiteralPath $regPath -ErrorAction SilentlyContinue
+  $cacheKey = if ($fi) { '{0}:{1}' -f $fi.LastWriteTimeUtc.Ticks, $fi.Length } else { $null }
+  if ($null -ne $script:_ExecutionHostClassMap -and $null -ne $cacheKey -and $cacheKey -eq $script:_ExecutionHostClassMapCacheKey) {
+    return $script:_ExecutionHostClassMap
+  }
+
+  $maxAttempts = 3
+  $lastError = $null
+  for ($attempt = 1; $attempt -le $maxAttempts; $attempt++) {
+    try {
+      if (-not (Test-Path -LiteralPath $regPath)) {
+        throw "registry file not found: $regPath"
+      }
+      $reg = Get-Content -LiteralPath $regPath -Raw -Encoding UTF8 | ConvertFrom-Json
+      $map = @{}
+      foreach ($op in $reg.operations) {
+        $oid = if ($op.id) { $op.id } else { $op.operation }
+        $ehc = if ($op.handler) { $op.handler.execution_host_class } else { $null }
+        if ($oid -and $ehc) { $map[[string]$oid] = [string]$ehc }
+      }
+      $fiAfter = Get-Item -LiteralPath $regPath -ErrorAction SilentlyContinue
+      $script:_ExecutionHostClassMapCacheKey = if ($fiAfter) { '{0}:{1}' -f $fiAfter.LastWriteTimeUtc.Ticks, $fiAfter.Length } else { $cacheKey }
+      $script:_ExecutionHostClassMap = $map
+      return $map
+    }
+    catch {
+      $lastError = $_
+      if ($attempt -lt $maxAttempts) { Start-Sleep -Milliseconds 200 }
+    }
+  }
+
+  throw "Get-CadOperationExecutionHostClassMap: cannot read/parse operation registry at '$regPath' after $maxAttempts attempts -- $($lastError.Exception.Message). Refusing to silently fall back to a stale hardcoded eligibility list; attended-vs-headless dispatch requires the live registry."
+}
+
+function Test-CadJobRequiresAttendedHost {
+  # True only when the registry says this operation's execution host class is
+  # 'full_autocad' -- i.e. it has no dbx/coreconsole/arx_adapter alternative and can only
+  # run inside an already-open, interactive AutoCAD session (e.g. live.jig.point_probe,
+  # which drives AcEdJig prompts on a live document). Everything else is headless-eligible
+  # via Invoke-CadJobRoute regardless of write_mode. Unknown/unregistered operations default
+  # to headless (false): Invoke-CadJobRoute has always been the general-purpose fallback
+  # for arbitrary job ids (its own NETLOAD path handles ops outside the native-job set), so
+  # an unresolvable op id is no worse off after this change than before it.
+  param([string]$OperationName)
+  if ([string]::IsNullOrWhiteSpace($OperationName)) { return $false }
+  try {
+    $map = Get-CadOperationExecutionHostClassMap
+  }
+  catch {
+    throw "Test-CadJobRequiresAttendedHost: cannot resolve host eligibility for operation '$OperationName' -- $($_.Exception.Message)"
+  }
+  return ($map.ContainsKey($OperationName) -and $map[$OperationName] -eq 'full_autocad')
+}
+
 function Test-NativeAcadModules {
   param([object]$Capabilities, [bool]$ProbeCoreConsoleLoad = $false)
   $cap = @($Capabilities.routes | Where-Object { $_.id -eq 'dwg_truth_autocad' }) | Select-Object -First 1
@@ -1476,16 +1547,35 @@ switch ($Action) {
     $sel = $selection.selected_route
   if ($sel -eq 'dwg_truth_autocad') {
     $effectiveWriteMode = Get-EffectiveDwgWriteMode
+    $hasJob = (-not [string]::IsNullOrWhiteSpace($JobPath) -or -not [string]::IsNullOrWhiteSpace($Operation))
+    # Host-eligibility comes from the registry (handler.execution_host_class), not from
+    # write_mode: 'live_edit' is a persistence signal (dwg_persisted / _QSAVE) that
+    # Invoke-CadJobRoute's own headless Core Console path already honors. Only an
+    # operation the registry marks 'full_autocad'-only (or an explicit -HostMode
+    # full_autocad override) is routed to the attended COM-attach branch. See build_log.md
+    # Lane G (root cause) / Lane I (fix).
+    $jobRequiresAttendedHost = $false
+    if ($hasJob) {
+      $jobOpId = if (-not [string]::IsNullOrWhiteSpace($Operation)) {
+        $Operation
+      }
+      elseif (Test-Path -LiteralPath $JobPath) {
+        Get-CadJobOperation -Path $JobPath
+      }
+      else {
+        $null
+      }
+      $jobRequiresAttendedHost = Test-CadJobRequiresAttendedHost -OperationName $jobOpId
+    }
     if (
-      ($HostMode -eq 'full_autocad' -or $effectiveWriteMode -eq 'live_edit') -and
-      (-not [string]::IsNullOrWhiteSpace($JobPath) -or -not [string]::IsNullOrWhiteSpace($Operation))
+      ($HostMode -eq 'full_autocad' -or $jobRequiresAttendedHost) -and $hasJob
     ) {
       $stamp = Get-Date -Format 'yyyyMMdd_HHmmss'
       $runOut = Join-Path $RunsDir "dwg_truth_autocad_full_job_$stamp"
       New-Item -ItemType Directory -Force -Path $runOut | Out-Null
       $exec = Invoke-FullAutoCadCadJob -RunOut $runOut
     }
-    elseif (-not [string]::IsNullOrWhiteSpace($JobPath) -or -not [string]::IsNullOrWhiteSpace($Operation)) {
+    elseif ($hasJob) {
       $exec = Invoke-CadJobRoute -Capabilities $capabilities
     }
       elseif ($HostMode -eq 'full_autocad' -or $effectiveWriteMode -eq 'live_edit') {
