@@ -353,6 +353,11 @@ def evaluate_postconditions(postconditions: list[dict], stdout_text: str,
                 entry["unchanged"] = (before_count is not None and before_count == after_count)
                 if not entry["unchanged"]:
                     ok = False
+            if pc.get("expect_increase"):
+                entry["increased"] = (before_count is not None and after_count is not None
+                                       and after_count > before_count)
+                if not entry["increased"]:
+                    ok = False
             if "expect_baseline" in pc:
                 tolerance = pc.get("tolerance", 0)
                 baseline = pc["expect_baseline"]
@@ -476,8 +481,18 @@ def run_template(template_id: str, args: dict, dwg_path: str, *,
     scr_lines += tokens
     if has_entity_probe:
         scr_lines += _entity_count_lisp_lines(str(after_count_path).replace("\\", "/"), "After")
-    if write_mode == "write_copy":
-        scr_lines.append("_QSAVE")
+    # Always QSAVE the STAGED (disposable) copy before QUIT, regardless of the
+    # caller's write_mode. Live-measured (Lane W5-TMPL): accoreconsole hangs on
+    # QUIT whenever the in-memory database has any unsaved modification
+    # relative to its last save point -- reproduced with a bare LINE command,
+    # AUDIT with fix_answer="N", and ARRAYRECT, all fixed by this QSAVE. This
+    # does NOT change the write_mode CONTRACT: "read" still means the ORIGINAL
+    # is never touched and no persistence is guaranteed/reported to the
+    # caller -- only the throwaway staged copy (already gitignored, already
+    # discarded after the run) gets flushed to disk so accoreconsole's exit
+    # path has nothing pending to hang on. See docs/GOVERNED_COMMAND_TEMPLATES.md
+    # section 5 for the root-cause narrative.
+    scr_lines.append("_QSAVE")
     scr_lines += ["QUIT", ""]
 
     scr_path = run_dir_p / f"{template_id.replace('.', '_')}.scr"

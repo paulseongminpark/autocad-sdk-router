@@ -41,6 +41,7 @@ _EXPECTED_TOOLS = {
     "cad.patch_dry_run", "cad.patch_apply_staged", "cad.anchor_set",
     "cad.anchor_get", "cad.anchor_list", "cad.anchor_clear", "cad.diff_before_after",
     "cad.visual_report", "cad.live_status", "cad.run_operation",
+    "cad.run_command_template",
 }
 
 # Trivial args per tool: deliberately minimal/invalid so handlers report a
@@ -64,6 +65,8 @@ _TRIVIAL_ARGS = {
     "cad.live_status": {},
     # op_id only (no dwg) -> run_operation returns a refusal dict; no accoreconsole.
     "cad.run_operation": {"op_id": "inspect.database.graph"},
+    # nonexistent dwg -> run_command_template returns a refusal dict; no accoreconsole.
+    "cad.run_command_template": {"template_id": "maintenance.drawing.audit", "dwg": "/nonexistent/source.dwg", "slots": {}},
 }
 
 

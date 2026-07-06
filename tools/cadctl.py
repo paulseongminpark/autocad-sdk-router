@@ -840,6 +840,121 @@ class Cad:
         env["result"] = result_obj
         return env
 
+    # ----------------------------------------------------- run_command_template
+    def run_command_template(self, template_id: str, slots: dict,
+                             dwg: str | None = None) -> dict:
+        """Run a governed built-in-command template through W5-TMPL.
+
+        The command_template_engine owns the closed template registry, hostile
+        slot gate, typed validation, accoreconsole resolution, staged-copy run,
+        and original-sha verification. This surface only refuses unknown
+        template ids up front and normalizes the engine result for agents.
+        """
+        env = {
+            "schema": "ariadne.cadctl.run_command_template.v1",
+            "template_id": template_id,
+            "executed": False,
+            "staged_copy": None,
+            "original_unchanged": None,
+        }
+        command_template_engine, imp_err = _import_optional("command_template_engine")
+        if command_template_engine is None:
+            env.update({
+                "status": "not_implemented",
+                "reason": f"command_template_engine unavailable: {imp_err}",
+            })
+            return env
+        if slots is None:
+            slot_values = {}
+        elif isinstance(slots, dict):
+            slot_values = slots
+        else:
+            env.update({
+                "status": "blocked",
+                "reason": "slots must be a dict of typed template slot values",
+            })
+            return env
+
+        templates_path = self.config_dir / "command_templates.json"
+        try:
+            templates = command_template_engine.load_templates(templates_path)
+        except Exception as exc:  # registry/parsing errors are refusals, not crashes
+            code = getattr(exc, "code", type(exc).__name__)
+            env.update({
+                "status": "error",
+                "reason": f"failed to load command templates: {type(exc).__name__}: {exc}",
+                "error": {
+                    "code": code,
+                    "message": str(exc),
+                    "retryable": False,
+                },
+            })
+            return env
+
+        template = templates.get(template_id)
+        if template is None:
+            env.update({
+                "status": "not_found",
+                "reason": f"template '{template_id}' is not in command_templates.json",
+            })
+            return env
+        if not dwg:
+            env.update({
+                "status": "blocked",
+                "reason": "run_command_template requires a dwg path (a copy is staged)",
+            })
+            return env
+
+        write_mode = (template.get("write_mode") or {}).get("default") or "read"
+        try:
+            result = command_template_engine.run_template(
+                template_id,
+                slot_values,
+                dwg,
+                write_mode=write_mode,
+                templates_path=templates_path,
+            )
+        except Exception as exc:
+            env.update({
+                "status": "error",
+                "reason": f"command_template_engine.run_template failed: {type(exc).__name__}: {exc}",
+                "error": {
+                    "code": type(exc).__name__,
+                    "message": str(exc),
+                    "retryable": False,
+                },
+            })
+            return env
+
+        diagnostics = result.get("diagnostics") if isinstance(result, dict) else {}
+        diagnostics = diagnostics if isinstance(diagnostics, dict) else {}
+        details = result.get("details") if isinstance(result, dict) else {}
+        if not isinstance(details, dict):
+            details = {}
+        if not details:
+            err = result.get("error") if isinstance(result, dict) else {}
+            err_details = err.get("details") if isinstance(err, dict) else {}
+            if isinstance(err_details, dict):
+                details = err_details
+
+        staged_copy = details.get("staged_input")
+        original_unchanged = details.get("original_unchanged")
+        env.update({
+            "status": result.get("status", "error") if isinstance(result, dict) else "error",
+            "executed": bool(staged_copy),
+            "write_mode": result.get("write_mode", write_mode) if isinstance(result, dict) else write_mode,
+            "staged_copy": staged_copy,
+            "original_unchanged": original_unchanged,
+            "stdout": diagnostics.get("stdout_ref"),
+            "stderr": diagnostics.get("stderr_ref"),
+            "result": result,
+        })
+        err = result.get("error") if isinstance(result, dict) else None
+        if isinstance(err, dict):
+            env["reason"] = err.get("message")
+            env["error"] = err
+        return env
+
     # ------------------------------------------------------------- shell tools
     def patch_dry_run(self, patch: dict) -> dict:
         patch_engine, imp_err = _import_optional("patch_engine")
@@ -1192,6 +1307,11 @@ def registry_explain(op_id: str) -> dict:
 def run_operation(op_id: str, args: dict | None = None, write_mode: str | None = None,
                   dwg_path: str | None = None, out_dir: str | None = None) -> dict:
     return Cad().run_operation(op_id, args, write_mode, dwg_path, out_dir)
+
+
+def run_command_template(template_id: str, slots: dict,
+                         dwg: str | None = None) -> dict:
+    return Cad().run_command_template(template_id, slots, dwg)
 
 
 def patch_dry_run(patch: dict) -> dict:

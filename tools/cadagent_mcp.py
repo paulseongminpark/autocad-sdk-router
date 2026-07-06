@@ -21,6 +21,7 @@ Exposes the CAD OS Layer as a small set of agent-callable tools:
     cad.diff_before_after  -> cad_diff.compute_diff(pre_ir, post_ir)  [two IR paths]
     cad.visual_report      -> visual_report.build_visual_report(source_ref, kind)
     cad.live_status        -> truthful liveness probe (live ARX pump not attached)
+    cad.run_command_template -> cadctl.Cad().run_command_template(template_id, slots, dwg)
 
 Each tool delegates to the cadctl / validator / patch_engine / cad_diff /
 visual_report SHELLS -- never to a raw SDK and never to ad-hoc DWG parsing. That
@@ -481,6 +482,32 @@ def _tool_run_operation(args: Dict[str, Any]) -> Dict[str, Any]:
         return _err("cadctl.run_operation failed: %r" % exc)
 
 
+def _tool_run_command_template(args: Dict[str, Any]) -> Dict[str, Any]:
+    """Run a governed command template through command_template_engine.
+
+    This is the safe built-in-command surface: agents supply a closed
+    template_id plus typed slot values, never a raw command string. Delegates to
+    cadctl.Cad.run_command_template.
+    """
+    template_id = args.get("template_id")
+    if not template_id:
+        return _err("missing required arg: template_id")
+    dwg = args.get("dwg") or args.get("dwg_path")
+    if not dwg:
+        return _err("missing required arg: dwg")
+    cad, e = _cad()
+    if cad is None:
+        return _err(e, delegate="cadctl.Cad.run_command_template")
+    try:
+        return {"ok": True, "result": cad.run_command_template(
+            template_id,
+            args.get("slots") or {},
+            dwg=dwg,
+        )}
+    except Exception as exc:  # noqa: BLE001
+        return _err("cadctl.run_command_template failed: %r" % exc)
+
+
 # --------------------------------------------------------------------------- #
 # Tools manifest (self-describing) and dispatch table
 # --------------------------------------------------------------------------- #
@@ -752,6 +779,29 @@ _TOOLS: List[Dict[str, Any]] = [
             "additionalProperties": False,
         },
     },
+    {
+        "name": "cad.run_command_template",
+        "description": "Run a governed built-in AutoCAD command template (for example AUDIT "
+                       "or -PURGE) through command_template_engine. Agents supply only a "
+                       "closed template_id and typed slot values; raw command strings are "
+                       "never accepted. The engine hostile-char/type gates every slot, "
+                       "stages a copy, runs accoreconsole on that copy, and verifies the "
+                       "original DWG sha unchanged. Delegates to cadctl.Cad.run_command_template.",
+        "delegates_to": "cadctl.Cad.run_command_template",
+        "inputSchema": {
+            "type": "object",
+            "properties": {
+                "template_id": {"type": "string",
+                                "description": "Governed template id, e.g. 'maintenance.drawing.audit'."},
+                "slots": {"type": "object",
+                          "description": "Typed slot values declared by the template registry."},
+                "dwg": {"type": "string",
+                        "description": "Source DWG path (read-only original; a copy is staged)."},
+            },
+            "required": ["template_id", "dwg"],
+            "additionalProperties": False,
+        },
+    },
 ]
 
 _DISPATCH: Dict[str, Callable[[Dict[str, Any]], Dict[str, Any]]] = {
@@ -772,6 +822,7 @@ _DISPATCH: Dict[str, Callable[[Dict[str, Any]], Dict[str, Any]]] = {
     "cad.visual_report": _tool_visual_report,
     "cad.live_status": _tool_live_status,
     "cad.run_operation": _tool_run_operation,
+    "cad.run_command_template": _tool_run_command_template,
 }
 
 
@@ -797,6 +848,8 @@ def tools_manifest() -> Dict[str, Any]:
             "cad.visual_report and cad.live_status are no-fake-success: they return "
             "not_implemented/blocked (never a fabricated PASS) when no producer/live "
             "pump is wired.",
+            "cad.run_command_template is the only agent-facing path for governed "
+            "built-in command templates; it never accepts a raw command string.",
         ],
     }
 
@@ -902,6 +955,7 @@ _EXPECTED_TOOLS = {
     "cad.patch_dry_run", "cad.patch_apply_staged", "cad.anchor_set",
     "cad.anchor_get", "cad.anchor_list", "cad.anchor_clear", "cad.diff_before_after",
     "cad.visual_report", "cad.live_status", "cad.run_operation",
+    "cad.run_command_template",
 }
 
 # Trivial (often invalid/missing) args per tool. The contract: EVERY handler must
@@ -926,6 +980,11 @@ _SELFTEST_ARGS: Dict[str, Dict[str, Any]] = {
     "cad.visual_report": {"source_ref": "/nonexistent/source.dwg", "kind": "png"},
     "cad.live_status": {},
     "cad.run_operation": {"op_id": "inspect.database.graph"},  # no dwg -> refusal dict (no accoreconsole)
+    "cad.run_command_template": {
+        "template_id": "maintenance.drawing.audit",
+        "dwg": "/nonexistent/source.dwg",
+        "slots": {},
+    },
 }
 
 
@@ -968,7 +1027,7 @@ def _selftest() -> int:
 
     ok = (
         manifest["transport"] == "mock"
-        and len(manifest["tools"]) == 17
+        and len(manifest["tools"]) == 18
         and manifest_names == _EXPECTED_TOOLS
         # manifest and dispatch table must agree exactly (no orphan tools).
         and set(_DISPATCH.keys()) == manifest_names

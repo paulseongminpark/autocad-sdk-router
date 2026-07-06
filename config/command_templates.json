@@ -14,7 +14,7 @@
       "write_mode": {
         "default": "write_copy",
         "allowed": ["read", "write_copy"],
-        "note": "write_mode=read maps to fix_answer='N' being the only safe choice is NOT enforced here (fix vs write_mode are independent); read still stages a copy and never QSAVEs, so a 'fix=Y' AUDIT under write_mode=read fixes the STAGED copy in memory but the fix is discarded (never persisted). write_copy persists the fix via QSAVE."
+        "note": "The engine ALWAYS issues _QSAVE against the STAGED (disposable) copy before QUIT, regardless of write_mode -- a root-caused fix for an accoreconsole exit hang (see the fix_answer slot note + design doc section 5). This does not change the write_mode CONTRACT: 'read' still means the ORIGINAL is never touched and no persistence is reported/guaranteed to the caller; only the throwaway staged copy gets flushed so accoreconsole's exit path has nothing pending to hang on."
       },
       "command_sequence": [
         { "literal": "AUDIT" },
@@ -23,8 +23,8 @@
       "slots": {
         "fix_answer": {
           "type": "enum",
-          "values": ["Y"],
-          "description": "Answer to AUDIT's 'Fix any errors detected? [Yes/No]' prompt. Restricted to 'Y' only: live measurement (Lane W5-TMPL, 4/4 trials each) found 'N' makes accoreconsole hang on process exit -- deterministically, in this environment -- even though the AUDIT command itself and the postcondition entity-count probe both complete correctly (their output/files are fully written) BEFORE the hang; only the accoreconsole process's own shutdown never returns, and the engine's timeout+kill fires (status='error', code=ACCORECONSOLE_TIMEOUT, retryable=true; original DWG confirmed unchanged every time). 'Y' exits cleanly 4/4. Root cause not established (not this template's script logic -- identical command sequence otherwise); 'N' stays out of the shipped enum until it is. See docs/GOVERNED_COMMAND_TEMPLATES.md section 5.",
+          "values": ["Y", "N"],
+          "description": "Answer to AUDIT's 'Fix any errors detected? [Yes/No]' prompt. Both values live-verified (Lane W5-TMPL). 'N' was ORIGINALLY found to hang accoreconsole on process exit (4/4 trials) even though the AUDIT command itself and the postcondition entity-count probe both completed correctly before the hang -- root-caused: accoreconsole hangs on QUIT whenever the in-memory database has ANY unsaved modification relative to its last save point (reproduced independently with a bare LINE command and with ARRAYRECT, both fixed the same way). Fix: the engine now unconditionally QSAVEs the staged copy before QUIT (see write_mode.note above); 'N' now exits cleanly. See docs/GOVERNED_COMMAND_TEMPLATES.md section 5 for the full root-cause narrative.",
           "default": "Y"
         }
       },
@@ -44,6 +44,7 @@
           "expect_unchanged": true
         }
       ],
+      "notes": "Handle-stability caveat (per the 2026-07-06 SDK census re-audit, D:\\dev\\.build\\cados_plan\\sdk_census_reaudit_20260706.md): AUDIT is one of a small class of operations (alongside RECOVER and BIND) flagged as a silent handle-churn trap -- AutoCAD does not guarantee that entity handles are preserved across an AUDIT pass, even a fix=Y pass that reports 0 errors fixed. This template's postcondition checks entity COUNT stability only, not per-handle identity; a caller that depends on a specific entity's handle surviving an AUDIT call should verify that separately via the identity-contract lane (W5-ID) rather than assume it here.",
       "evidence_refs": [
         "docs/GOVERNED_COMMAND_TEMPLATES.md#5-live-verification",
         "tests/unit/test_command_template_engine.py::TestAuditTemplateLive"
@@ -86,6 +87,79 @@
       "evidence_refs": [
         "docs/GOVERNED_COMMAND_TEMPLATES.md#5-live-verification",
         "tests/unit/test_command_template_engine.py::TestPurgeTemplateLive"
+      ]
+    },
+    {
+      "template_id": "define.assocarray.rectangular",
+      "op_id": "define.assocarray.rectangular",
+      "status": "implemented",
+      "summary": "Create an associative rectangular array (ARRAYRECT) from the drawing's last-created entity, via the explicit Count/Spacing/eXit command sub-options (never the dynamic corner-point default, which is ambiguous headless).",
+      "headless_safe": true,
+      "write_mode": {
+        "default": "write_copy",
+        "allowed": ["read", "write_copy"]
+      },
+      "command_sequence": [
+        { "literal": "ARRAYRECT" },
+        { "literal": "L" },
+        { "literal": "" },
+        { "literal": "C" },
+        { "slot": "rows" },
+        { "slot": "cols" },
+        { "literal": "S" },
+        { "slot": "row_spacing" },
+        { "slot": "col_spacing" },
+        { "literal": "X" }
+      ],
+      "slots": {
+        "rows": { "type": "int_range", "min": 1, "max": 1000, "description": "Number of rows (ARRAYRECT's Count sub-option)." },
+        "cols": { "type": "int_range", "min": 1, "max": 1000, "description": "Number of columns (ARRAYRECT's Count sub-option)." },
+        "row_spacing": { "type": "float_range", "min": -1000000, "max": 1000000, "description": "Distance between rows (drawing units; ARRAYRECT's Spacing sub-option)." },
+        "col_spacing": { "type": "float_range", "min": -1000000, "max": 1000000, "description": "Distance between columns (drawing units; ARRAYRECT's Spacing sub-option)." }
+      },
+      "postconditions": [
+        {
+          "kind": "entity_count_probe",
+          "description": "Live-measured (Lane W5-TMPL): an associative array wraps its source entity as a SINGLE selectable object (visually rows*cols copies, but ssget/sslength counts it as 1 -- the array does not net-add entities to the database). Entity count must be unchanged.",
+          "capture_before": true,
+          "expect_unchanged": true
+        }
+      ],
+      "notes": "v1 scope limitation (documented, not hidden): selects via AutoCAD's 'L' (Last) option -- the drawing's most-recently-created entity in database order, NOT an agent-addressable handle. A handle-based selection slot (LISP (handent \"...\") + (sssetfirst ...) pre-selection) is a natural follow-up, not built by this lane. Mapped from the census's DCM/associativity command-coverage estimate (D:\\dev\\.build\\cados_plan\\sdk_census_reaudit_20260706.md section 5): AcDbAssocArrayActionBody::createInstance's real command-line equivalent. The census scoped its 16-17/23 estimate to 'attended full_autocad'; this lane found the ACTUAL blocker was a general accoreconsole exit-hang (see maintenance.drawing.audit's fix_answer note + design doc section 5), root-caused and fixed at the engine level (unconditional _QSAVE before QUIT) -- ARRAYRECT itself runs headless cleanly once that fix is applied, contradicting the implicit 'needs attended' assumption for at least this one op.",
+      "evidence_refs": [
+        "D:\\dev\\.build\\cados_plan\\sdk_census_reaudit_20260706.md#5-dcm--associativity-partial-coverage-path",
+        "docs/GOVERNED_COMMAND_TEMPLATES.md#5-live-verification",
+        "tests/unit/test_command_template_engine.py::TestArrayRectTemplateLive"
+      ]
+    },
+    {
+      "template_id": "edit.assocarray.explode",
+      "op_id": "edit.assocarray.explode",
+      "status": "implemented",
+      "summary": "Release associativity on the drawing's last associative array (EXPLODE), converting it back into independent entities.",
+      "headless_safe": true,
+      "write_mode": {
+        "default": "write_copy",
+        "allowed": ["read", "write_copy"]
+      },
+      "command_sequence": [
+        { "literal": "EXPLODE" },
+        { "literal": "L" }
+      ],
+      "slots": {},
+      "postconditions": [
+        {
+          "kind": "entity_count_probe",
+          "description": "Live-measured (Lane W5-TMPL): exploding an associative array converts its single wrapping entity into rows*cols independent entities -- entity count must increase (measured exact case: a 3x2 array, 21747 -> 21752, +5 = rows*cols-1). The exact delta is array-size-dependent and not asserted here; only the direction (increase) is a safe, general invariant.",
+          "capture_before": true,
+          "expect_increase": true
+        }
+      ],
+      "notes": "v1 scope limitation (documented, not hidden): 'L' (Last) selection only, same as define.assocarray.rectangular -- see that template's notes. EXPLODE's own 'Select objects:' sub-loop auto-terminates on a single 'L' answer (measured: does NOT need a trailing blank line the way ARRAYRECT/COPY's selection loops do; an extra blank line here fires EXPLODE a second time on garbage input -- see docs/GOVERNED_COMMAND_TEMPLATES.md section 5 for the exact failure trace this avoids).",
+      "evidence_refs": [
+        "D:\\dev\\.build\\cados_plan\\sdk_census_reaudit_20260706.md#5-dcm--associativity-partial-coverage-path",
+        "docs/GOVERNED_COMMAND_TEMPLATES.md#5-live-verification",
+        "tests/unit/test_command_template_engine.py::TestExplodeTemplateLive"
       ]
     }
   ]

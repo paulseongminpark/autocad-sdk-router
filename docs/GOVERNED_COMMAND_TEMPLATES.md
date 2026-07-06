@@ -1,7 +1,29 @@
 # Governed Command Templates (Lane W5-TMPL)
 
-Status: DESIGN + PARTIAL LIVE PROOF. Governed middle path between "no raw
-command dispatch, ever" and "arbitrary `acedCommand`/command-string exposure."
+Status: DESIGN + LIVE PROOF (4 templates shipped: `maintenance.drawing.audit`,
+`maintenance.drawing.purge`, `define.assocarray.rectangular`,
+`edit.assocarray.explode`). Governed middle path between "no raw command
+dispatch, ever" and "arbitrary `acedCommand`/command-string exposure."
+
+**Mid-flight correction (2026-07-06, from the SDK census re-audit
+`D:\dev\.build\cados_plan\sdk_census_reaudit_20260706.md`):** team-lead's
+original brief for section 4 named `GEOMCONSTRAINT`/`DIMCONSTRAINT`/
+`DELCONSTRAINT`/`PARAMETERS` as candidate command mappings for the 23
+`constraints_associativity` ops. The census independently re-confirmed this
+lane's own finding (section 0/4 below, reached before the census landed):
+those commands belong to a different ObjectARX subsystem
+(`AcDbAssoc2dConstraintGroup`, the true 2D/3D constraint solver, which the
+census found is ALREADY 35 ops strong and unblocked) than what the 23 blocked
+ops actually are (`AcDbAssocArray*`/`AcDbAssocSurface*`/generic
+`AcDbAssocAction`/`AcDbAssocManager` evaluate entry points). The census
+additionally mapped all 23 to specific command equivalents and estimated
+16-17/23 reachable via governed templates -- scoped to an **attended
+`full_autocad`** host. This lane's own re-investigation (section 4 below)
+found the actual headless blocker was a general, root-causable
+`accoreconsole` exit-hang bug (fixed), not a fundamental attended-only
+limitation -- so at least 2 of those 16-17 (`define.assocarray.rectangular`,
+`edit.assocarray.explode`) are now live-verified HEADLESS, not merely
+attended-feasible.
 
 ## 0. Registry recon (measured, not assumed)
 
@@ -87,6 +109,25 @@ the values that fill pre-declared blanks -- never over which commands run,
 how many, or in what order. This is exactly the "prepared statement vs. string
 concatenation" pattern applied to AutoCAD's command line.
 
+**Which door this engine actually uses, and why it's the sanctioned one.**
+Per the SDK census re-audit (`sdk_census_reaudit_20260706.md` section 1b/3):
+raw ObjectARX `acedCommand`/`acedCmd` are **compile-disabled in ObjectARX
+2027** (per `docs/M08_FAMILY_HANDLER_CONTRACT.md`'s hard constraints) --
+they are not merely policy-forbidden in this registry, they are not even
+buildable from this project's native `.inc`/`.cpp` layer. The two doors
+Autodesk's own guidance sanctions for command execution are the **AutoLISP
+script lane** (`(command "VERB" ...)` inside a `.scr`/`.lsp`, or -- what this
+engine actually does -- typing the verb and its answers as literal script
+lines, the oldest and most-supported form of the same lane) and **.NET**
+`Editor.Command`/`SendStringToExecute`. This engine's `.scr`-via-accoreconsole
+mechanism (section 3) IS the sanctioned LISP/script door -- a **narrow,
+allow-listed command-string builder** (specific verbs only, e.g. `AUDIT`/
+`ARRAYRECT`, assembled from a closed per-template token list, never arbitrary
+agent-supplied strings) is architecturally distinct from the already-forbidden
+generic raw dispatch (`command.invoke.*`, `doc.sendstring`, etc. -- blocked
+precisely because THEY expose an unscoped string, not because the script lane
+itself is unsafe).
+
 **What it explicitly does NOT fix**, and why the 23 constraints_associativity
 ops mostly stay out of scope even though this doc was asked to estimate their
 coverage (section 4): a handful of the 23 are blocked for the SAME
@@ -129,7 +170,10 @@ Registry file: `config/command_templates.json`. One entry per `template_id`:
   "postconditions": [
     { "kind": "regex_capture", "pattern": "Total errors found\\s+(\\d+)\\s+fixed\\s+(\\d+)",
       "on_stdout": true, "bind": ["errors_found", "errors_fixed"] },
-    { "kind": "entity_count_sane", "against_fixture_baseline": 21747, "tolerance": 0 }
+    { "kind": "entity_count_probe", "capture_before": true, "expect_unchanged": true }
+    // entity_count_probe also supports expect_baseline+tolerance (AUDIT's
+    // real template) and expect_increase (edit.assocarray.explode's real
+    // template) -- see config/command_templates.json for the shipped forms.
   ],
   "evidence_refs": ["docs/GOVERNED_COMMAND_TEMPLATES.md#5-live-verification"]
 }
@@ -182,15 +226,17 @@ script/job lanes without touching the router"). Concretely:
    own `Encoding ASCII` convention for `.scr`/`.lsp` files (non-ASCII/DWG-path
    safety, same reasoning as the router's staging comment).
 3. **Stage**: copy the input DWG to `staging/tmpl_<template_id>_<stamp>/input.dwg`
-   (mirrors the router's `staging/dwg_job_<stamp>/input.dwg` naming family)
-   UNLESS `write_mode == "read"`, in which case the staged copy is still made
-   (AUDIT/PURGE never run against a path the caller directly controls) but no
-   `_QSAVE` line is appended.
+   (mirrors the router's `staging/dwg_job_<stamp>/input.dwg` naming family),
+   ALWAYS -- every template runs against a staged copy, never the caller's
+   path directly.
 4. **Execute**: `accoreconsole.exe /i <staged_input.dwg> /s <rendered.scr>`,
    `cwd` = the staged file's directory, stdout/stderr redirected to files
    under the run dir, `subprocess.run(..., timeout=...)`; on timeout the
    process is killed and the result is `status: "error"`, `code:
-   "ACCORECONSOLE_TIMEOUT"` (never a fake `ok`).
+   "ACCORECONSOLE_TIMEOUT"` (never a fake `ok`). The rendered `.scr` ALWAYS
+   ends with `_QSAVE` (against the staged copy) before `QUIT`, regardless of
+   `write_mode` -- a root-caused fix for a general accoreconsole exit hang,
+   not a change to the write_mode contract (see section 5).
 5. **Enforce postconditions**: run every entry in the template's
    `postconditions` array against the captured stdout/staged-file state;
    ANY postcondition failing degrades the result to `status: "partial"` (ran,
@@ -216,115 +262,181 @@ entry without the loader rejecting the whole registry file.
 **Caveat up front**: the 23 `constraints_associativity` ops reference
 `AcDbAssocArrayActionBody`, `AcDbAssocXxxSurfaceActionBody`, and
 `AcDbAssocManager` in their `blocked_reason` text -- the **associative
-array/surface/network evaluation** subsystem. The commands this lane's brief
-named as candidate mappings (`GEOMCONSTRAINT`, `DIMCONSTRAINT`,
-`DELCONSTRAINT`, `PARAMETERS`/`-PARAMETERS`) belong to a DIFFERENT ObjectARX
-class hierarchy (`AcDbAssoc2dConstraintGroup`, the 2D sketch/parametric
-Dimensional Constraint Manager) that does not appear ANYWHERE in these 23
-ops' evidence text, and no op in `config/operations.v2.json` references
+array/surface/network evaluation** subsystem. The commands originally named
+as candidate mappings (`GEOMCONSTRAINT`/`DIMCONSTRAINT`/`DELCONSTRAINT`/
+`PARAMETERS`) belong to a DIFFERENT ObjectARX class hierarchy
+(`AcDbAssoc2dConstraintGroup`, the 2D sketch/parametric Dimensional
+Constraint Manager) that does not appear ANYWHERE in these 23 ops' evidence
+text, and no op in `config/operations.v2.json` references
 `AcDbAssoc2dConstraintGroup` at all (checked: zero matches for
-`GEOMCONSTRAINT|DIMCONSTRAINT|DELCONSTRAINT|PARAMETERS` in the registry file).
-**The named commands do not map onto these 23 ops.** This is surfaced here
-rather than silently substituted, per the same "measure the premise" standard
-applied to the "16" count in section 0.
+`GEOMCONSTRAINT|DIMCONSTRAINT|DELCONSTRAINT|PARAMETERS` in the registry
+file). **The named commands do not map onto these 23 ops.** This lane's own
+finding here was independently reproduced by the SDK census re-audit
+(`sdk_census_reaudit_20260706.md` section 5), which additionally established
+the true DCM/constraint-solver surface is already 35 ops strong and
+unblocked -- these 23 are a different subsystem that merely shares its
+evaluator plumbing with the constraint solver (hence the shared family name).
 
-The REAL command-level correspondences for the 23 (by class, not by the
-briefed command names):
+The REAL command-level correspondences for the 23 (adopting the census's
+mapping, cross-checked against this lane's own class-reference reading --
+both agree):
 
 | ops (count) | underlying class | actual built-in command family |
 |---|---|---|
 | `define.assocarray.{create,path,polar,rectangular}` (4) | `AcDbAssocArrayActionBody::createInstance` | `ARRAYRECT`/`ARRAYPOLAR`/`ARRAYPATH` |
-| `edit.assocarray.{explode,item,itemReplace,reset,source,transform}` (6) | same, item ops | `ARRAYEDIT` (Source/Replace/Reset/etc. sub-options) |
-| `define.assocsurface.{blend,extrude,fillet,loft,offset,patch,result,trim}` (8) | `AcDbAssocXxxSurfaceActionBody::createInstance` | `SURFBLEND`/`EXTRUDE`/`FILLETEDGE`/`LOFT`/`SURFOFFSET`/`SURFPATCH`/(n/a -- `result` reads a prior action's output, no command)/`SURFTRIM` |
-| `edit.assocdata.xref` (1) | `AcDbAssocManager::syncUpWithXrefs` | `XREF`/`-XREF` reload |
-| `inspect.assocaction.evaluate`, `inspect.assocnetwork.evaluate` (2) | `AcDbAssocAction::evaluate` / `AcDbAssocManager::evaluateTopLevelNetwork` | no dedicated command; `REGEN`/`REGENALL` trigger the same evaluation as a documented side effect |
+| `edit.assocarray.{explode,item,itemReplace,reset,source,transform}` (6) | same, item ops | `ARRAYEDIT` (Source/Replace/Reset/etc. sub-options) / `EXPLODE` (releases associativity) |
+| `define.assocsurface.{blend,extrude,fillet,loft,offset,patch,result,trim}` (8) | `AcDbAssocXxxSurfaceActionBody::createInstance` | `SURFBLEND`/`SURFEXTRUDE`/`SURFFILLET`/`SURFLOFT`/`SURFOFFSET`/`SURFPATCH`/(n/a -- `result` reads a prior action's output, no command)/`SURFTRIM` |
+| `edit.assocdata.xref` (1) | `AcDbAssocManager::syncUpWithXrefs` | `XREF`/`-XREF` reload (implicit, not a directly invocable scoped command) |
+| `inspect.assocaction.evaluate`, `inspect.assocnetwork.evaluate` (2) | `AcDbAssocAction::evaluate` / `AcDbAssocManager::evaluateTopLevelNetwork` | no dedicated command; `REGEN`/`REGENALL` trigger the same evaluation as a documented side effect, but evaluate *everything*, not one scoped action |
 | `inspect.assocsurface.topology` (1) | ASM result traversal | no command surfaces raw topology |
 | `repair.assocdata.audit` (1) | `AcDbAssocManager::auditAssociativeData` | NOT the same call as the `AUDIT` command (`AcDbDatabase::audit`) -- superficially similar name, different C++ entry point, not covered by this lane's `AUDIT` template |
 
-**Live attempt #1 -- `REGEN` (candidate for `inspect.assocaction.evaluate` +
-`inspect.assocnetwork.evaluate`).** `REGEN` takes no arguments and prompts
-nothing, so it is trivially headless-scriptable; ran it as a one-off (not a
-shipped template -- see verdict below) against a staged copy of
-`tests/fixtures/native_sample.dwg`, reusing the same
-`command_template_engine.py` staging/accoreconsole-invocation helpers as the
-real templates. Result (measured, no `_QSAVE` in this probe): **`accoreconsole
-/i <staged> /s <script>` exits 0, stdout shows `REGEN` -> "모형 재생성 중."
-("Regenerating model.") with no further prompts, and the ORIGINAL's sha256 is
-unchanged.** But per the section-1 distinction, this does **not** count as
-"promoting" the 2 ops: `REGEN`'s whole documented purpose is to force
-re-evaluation of the associative network, i.e. it triggers the EXACT solver
-callback path the `blocked_reason` text calls out as forbidden
-("running arbitrary evaluation callbacks... outside CAD OS bounded
-semantics"). A template around `REGEN` would let an agent trigger unbounded
-solver evaluation on ANY staged drawing at will -- typed-argument-slot safety
-does not bound "what the solver does," so wrapping it in a template does not
-resolve the actual SAFETY_FORBIDDEN rationale. Measured, then correctly NOT
-promoted.
+**Live attempt #1 -- `REGEN`** (candidate for `inspect.assocaction.evaluate` +
+`inspect.assocnetwork.evaluate`). Runs cleanly headless, exit 0, original
+unchanged -- but does NOT count as promoting either op: `REGEN` triggers the
+EXACT unbounded solver callback path the `blocked_reason` text forbids, and
+typed-argument-slot safety does not bound what a solver callback does once
+invoked. Correctly NOT promoted, regardless of the section-5 QSAVE fix below
+(this is an argument-injection-vs-evaluation-risk distinction, not a
+headless-vs-attended one).
 
-**Live attempt #2 -- `ARRAYEDIT`/`-ARRAYRECT` (candidate for the 10
-`assocarray.*` ops).** NOT attempted live. `-ARRAYRECT`'s scripted prompt
-sequence (selection set, row/column/level counts, spacing, then an
-associative-array "grip edit" context that in the AutoCAD 2016+ UI normally
-exits via a dedicated `X`/Enter or a right-click "Exit array editing" command
-with an unconfirmed script-mode token) is not established in this repo or
-its docs, and guessing the exact prompt count risks a hung accoreconsole
-process consuming a live-AutoCAD test cycle for a family (unbounded array
-solver evaluation) that would fail the SAME section-1 test as `REGEN` even
-if it ran cleanly. Given the ceiling is already known (array creation invokes
-`AcDbAssocArrayActionBody::createInstance`, the literal class named in all 4
-`define.assocarray.*` `blocked_reason` strings), spending a live cycle to
-prove the mechanics would not change the verdict. Reported honestly as
-**not attempted**, not as a false pass.
+**Live attempt #2 -- `ARRAYRECT` (candidate for `define.assocarray.rectangular`)
+-- SHIPPED, headless, live-verified.** First pass (`-ARRAYRECT`, the
+hyphen-prefixed scripted form used by `-PURGE`) failed immediately: **"알 수
+없는 명령" (unknown command)** -- unlike `-PURGE`, `ARRAYRECT` has no
+hyphen-prefixed scripted variant; the plain `ARRAYRECT` (no hyphen) IS
+accepted headlessly. Second pass (`ARRAYRECT` + bare numeric answers to the
+dynamic corner-point prompts) got the array created but with WRONG semantics
+(a bare number isn't a valid answer to a "specify opposite corner" point
+prompt) AND hung on exit -- this hang turned out to be the SAME general
+accoreconsole exit-hang bug found and root-caused for `AUDIT`'s `fix_answer`
+(section 5), not anything array-specific: reproduced independently with a
+bare `LINE` command and a `LINE`+`COPY` sequence, both with zero
+associativity involved. Once fixed (unconditional `_QSAVE` before `QUIT`),
+a THIRD pass using ARRAYRECT's explicit `C` (Count) and `S` (Spacing)
+sub-options -- never the ambiguous dynamic-corner default -- produced a
+fully deterministic, live-verified sequence:
+`ARRAYRECT`, `L` (select last), `` (end selection), `C`, `<rows>`, `<cols>`,
+`S`, `<row_spacing>`, `<col_spacing>`, `X` (exit grip-edit loop), `_QSAVE`,
+`QUIT`. Measured: entity count is UNCHANGED by array creation (21747 before
+and after a 3x2 array) -- a modern associative array wraps its source entity
+as a SINGLE selectable database object (visually multiplied, but one entity
+for `ssget`/`sslength` purposes), confirmed by re-running with NO fresh
+entity drawn first (array applied to the drawing's actual pre-existing last
+entity: still 21747 -> 21747). Shipped as `define.assocarray.rectangular`
+(`config/command_templates.json`), `headless_safe: true`,
+live-verified via the real `run_template()` engine (not just the ad-hoc probe
+script), original DWG sha256 unchanged throughout. **v1 scope limitation
+(documented on the template itself, not hidden)**: selection is via AutoCAD's
+`L` (Last-created-entity) option, not an agent-addressable handle; a
+handle-based selection slot is a natural follow-up this lane did not build.
 
-**Verdict: 0 of 23 template-coverable in a way that changes the safety
-verdict.** 2 of 23 (`inspect.assocaction.evaluate`,
+**Live attempt #3 -- `EXPLODE` (candidate for `edit.assocarray.explode`) --
+SHIPPED, headless, live-verified.** Chained off the ARRAYRECT array created
+above (exploding only makes semantic sense against a drawing that actually
+contains an array). First pass answered `L` then a blank line to "end
+selection," mirroring ARRAYRECT/COPY's pattern -- this was WRONG:
+`EXPLODE`'s select-objects sub-loop auto-terminates on a single `L` answer,
+so the extra blank line fell through to a fresh, empty `Command:` prompt,
+which repeats-last-command (fires `EXPLODE` a SECOND time on garbage
+input, `*유효하지 않은 선택*` / invalid selection). Corrected: `EXPLODE`, `L`
+only. Measured entity-count delta: 21747 (array, 1 entity) -> 21752 (post-
+explode) = **+5, exactly `rows*cols - 1` for the 3x2 array** (the array's
+single wrapping entity becomes 6 independent entities, net +5) -- a clean,
+fully explained result, not a coincidence. Shipped as
+`edit.assocarray.explode`, `headless_safe: true`, live-verified via
+`run_template()` chained end-to-end (ARRAYRECT's own staged output DWG fed
+as EXPLODE's input), original DWG sha256 unchanged throughout.
+
+**Not attempted this lane**: the `ARRAYEDIT` sub-commands (item/replace/reset/
+source, 4 more of the 6 `edit.assocarray.*` ops), the 7 `SURF*` surface
+commands, and `XREF` reload for `edit.assocdata.xref`. Each has its own
+distinct, unestablished prompt sequence (the ARRAYRECT/EXPLODE investigation
+above shows how much iteration nailing ONE command's exact sub-option
+sequence took); the QSAVE fix is a NECESSARY condition for all of them to
+work headlessly (proven) but not by itself SUFFICIENT (each command's own
+prompts still need the same careful measurement this lane did for ARRAYRECT/
+EXPLODE). Flagged as a clear, scoped follow-up, not claimed done.
+
+**Verdict: 2 of 23 SHIPPED and live-verified headless**
+(`define.assocarray.rectangular`, `edit.assocarray.explode`), materially
+better than this lane's own earlier "0 of 23" draft conclusion (before the
+QSAVE root cause was found) and a genuine, if partial, confirmation of the
+census's ~70% *mechanism* estimate -- just proven headless rather than
+attended-only as the census scoped it. 2 more (`inspect.assocaction.evaluate`,
 `inspect.assocnetwork.evaluate`) have a headless-runnable command trigger
-(`REGEN`, live-verified) but templating it does not neutralize the
-underlying risk, so they stay `SAFETY_FORBIDDEN`. The remaining 21 require
-either unbounded solver evaluation (array/surface creation, xref sync) or
-have no command surface at all (`inspect.assocsurface.topology`,
-`define.assocsurface.result`) or reference a different C++ call than what a
-template could stand in for (`repair.assocdata.audit`). This is a genuine
-"0 proved out" deliverable, per the brief's own acceptance of that outcome.
+(`REGEN`) that does NOT resolve their actual risk (unbounded solver
+evaluation, an argument-injection-orthogonal concern) and correctly stay
+`SAFETY_FORBIDDEN`. The remaining ~19 are either not attempted (11-12 more
+`ARRAYEDIT`/`SURF*`/`XREF` candidates, each needing its own prompt-sequence
+measurement) or have no command surface / reference a different C++ call
+entirely (`inspect.assocsurface.topology`, `define.assocsurface.result`,
+`repair.assocdata.audit`).
 
 ## 5. Live verification
 
 See `tools/command_template_engine.py` + `tests/unit/test_command_template_engine.py`
 (unit-level, mocked/pure-function tests for validation/rendering/postcondition
-logic) and the `CADOS_LIVE=1`-gated live cert in the same test file (real
-accoreconsole, staged copy of `tests/fixtures/native_sample.dwg`, sha256
+logic) and the `CADOS_LIVE=1`-gated live certs in the same test file (4
+template classes: `TestAuditTemplateLive`, `TestPurgeTemplateLive`,
+`TestArrayRectExplodeTemplateLive`, real accoreconsole, staged copy of
+`tests/fixtures/native_sample.dwg`, sha256
 `eac5d4b13d67d89106e503321412539df7b39b8a7f4e44c033448e9295fe3f76` verified
 unchanged before/after every live run). Live run artifacts land under
 gitignored `runs/` (`w5tmpl_*`, `command_template_*`) and are not committed;
 the measured outcome is captured here and in `build_log.md`'s `## Lane
 W5-TMPL` section.
 
-Both templates ran successfully end-to-end multiple times in `read` and
-`write_copy` write modes: `AUDIT` (regex-captured `errors_found`/`errors_fixed`
-from the real Korean-locale AutoCAD 2027 console text, entity count probed
-21747 before/after -- exact match to the fixture's documented baseline) and
-`-PURGE` (real named-object deletions observed and regex-captured -- e.g. a
-"주석" leader/text/dimstyle style and an unused layer -- entity count
-unchanged 21747/21747 both times, confirming PURGE never touches entities).
-`accoreconsole /i /s` exit code 0 in every successful run; original DWG
+All 4 shipped templates ran successfully end-to-end multiple times in `read`
+and `write_copy` write modes: `AUDIT` (regex-captured
+`errors_found`/`errors_fixed` from the real Korean-locale AutoCAD 2027
+console text, entity count probed 21747 before/after -- exact match to the
+fixture's documented baseline), `-PURGE` (real named-object deletions
+observed and regex-captured -- e.g. a "주석" leader/text/dimstyle style and
+an unused layer -- entity count unchanged 21747/21747 both times, confirming
+PURGE never touches entities), `ARRAYRECT` (associative array created,
+entity count unchanged 21747/21747, confirming an array is one selectable
+object regardless of visual row*col count), and `EXPLODE` (chained onto the
+ARRAYRECT output, entity count 21747 -> 21752, exactly `rows*cols-1` for a
+3x2 array). `accoreconsole /i /s` exit code 0 in every successful run; original DWG
 sha256 verified byte-identical before/after in every run, successful or not.
 
-**A real, reproducible finding, not a script bug**: `AUDIT`'s `fix_answer`
-slot was originally speced as an enum of `["Y", "N"]`. Live measurement found
-`fix_answer="N"` makes `accoreconsole` hang on process exit -- **4 of 4
-trials**, alternated against 4-of-4 clean exits for `"Y"` on the identical
-DWG/template/machine, ruling out generic system-load flakiness as the
-explanation. In every "N" trial the AUDIT command's own report text AND the
-after-probe LISP's entity-count file were both written correctly (verified on
-disk) BEFORE the hang -- i.e. all real work completes; only the
-`accoreconsole.exe` process's own shutdown sequence never returns, until the
-engine's timeout+kill fires (`status: "error"`, `code:
+**Root-caused finding, now fixed: accoreconsole hangs on QUIT whenever the
+staged DB has unsaved changes.** `AUDIT`'s `fix_answer` slot was originally
+speced as `["Y", "N"]`. Live measurement initially found `fix_answer="N"`
+made `accoreconsole` hang on process exit -- 4 of 4 trials, alternated
+against 4-of-4 clean exits for `"Y"` on the identical DWG/template/machine.
+The AUDIT command's own report text and the after-probe entity-count file
+were both written correctly (verified on disk) BEFORE the hang in every "N"
+trial -- i.e. all real work completed; only the process's own shutdown never
+returned, until the engine's timeout+kill fired (`status: "error"`, `code:
 "ACCORECONSOLE_TIMEOUT"`, `retryable: true`; original DWG sha256 confirmed
-unchanged in every one of these trials too). Root cause not established --
-this is inside AutoCAD Core Console itself, not in this lane's script
-generation (the "Y" and "N" `.scr` files are byte-identical apart from the one
-character). **`fix_answer`'s shipped enum is `["Y"]` only** until root-caused;
-this is a measured constraint, not a design choice, and reopening `"N"` needs
-its own investigation (start by isolating whether the hang is about the
-literal value `"N"` or about answering with whatever the prompt's bracketed
-default is, since `<N>` was AUDIT's own default here).
+unchanged every time). The initial ship decision (section-4-era) was to
+restrict `fix_answer` to `["Y"]` only, treating this as unexplained.
+
+**Further investigation (triggered by the mission-5 DCM pilot work) found
+the SAME hang with completely unrelated content**: a bare `LINE` command with
+nothing else, and a `LINE`+`COPY` sequence, both hung on `QUIT` identically
+-- ruling out "N" specifically as the cause and ruling out session-time
+drift too (a plain `AUDIT` fix=`Y` run interleaved between these failures
+still succeeded reliably). The actual trigger: **any script that leaves the
+in-memory database with an unsaved modification relative to its last save
+point hangs `accoreconsole` on `QUIT`** -- most likely `FILEDIA=0`
+suppresses file-browser dialogs but not a "save changes?" exit-confirmation
+dialog, which a headless Core Console session can never dismiss (no UI
+thread, and a `.scr` can only answer command-line prompts, not system
+dialogs). Confirmed and fixed by adding an explicit `_QSAVE` immediately
+before `QUIT`: fixed the bare `LINE` hang (3.2s, exit 0), the `ARRAYRECT`
+grip-edit-loop hang (3.6s, exit 0), AND `AUDIT fix_answer="N"` (4.5s, exit 0)
+-- the same one-line fix resolved all three independently-discovered hangs.
+
+**Engine fix applied**: `run_template()` now unconditionally appends
+`_QSAVE` before `QUIT` in every rendered `.scr`, regardless of `write_mode`.
+This does NOT change the `write_mode` contract with the caller -- `read`
+still means the ORIGINAL is never touched and no persistence is
+reported/guaranteed; only the throwaway STAGED copy (already gitignored,
+already discarded after the run) gets flushed to disk so accoreconsole's
+exit path has nothing pending to hang on. `fix_answer`'s shipped enum is now
+`["Y", "N"]` again, both live-verified, with a regression test
+(`test_audit_fix_n_no_longer_hangs`) pinning that "N" completes well within
+its timeout rather than merely "eventually stops timing out."

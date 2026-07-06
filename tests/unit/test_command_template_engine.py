@@ -296,14 +296,31 @@ class TestRunTemplateGates(unittest.TestCase):
         self.assertEqual(env["status"], "blocked")
         self.assertEqual(env["error"]["code"], "INJECTION_REJECTED")
 
-    def test_now_restricted_fix_answer_n_is_rejected_by_validation(self):
-        """Regression guard for the live-measured accoreconsole exit hang
-        (fix_answer='N', 4/4 trials -- docs/GOVERNED_COMMAND_TEMPLATES.md
-        section 5). The registry's enum must stay ['Y'] until root-caused;
-        this test fails loudly if someone reopens 'N' without re-verifying."""
-        env = cte.run_template("maintenance.drawing.audit", {"fix_answer": "N"}, str(_FIXTURE))
-        self.assertEqual(env["status"], "blocked")
-        self.assertEqual(env["error"]["code"], "VALIDATION_ERROR")
+    def test_fix_answer_n_is_a_valid_enum_value(self):
+        """fix_answer='N' was ORIGINALLY found to hang accoreconsole on exit
+        (4/4 trials); root-caused to a general accoreconsole exit hang
+        whenever the staged DB has unsaved changes, and fixed by an
+        unconditional _QSAVE before QUIT (docs/GOVERNED_COMMAND_TEMPLATES.md
+        section 5). This just asserts 'N' passes validation (no accoreconsole
+        needed) -- the actual hang-is-fixed claim is the CADOS_LIVE-gated
+        TestAuditTemplateLive.test_audit_fix_n_no_longer_hangs below."""
+        templates = cte.load_templates()
+        audit = templates["maintenance.drawing.audit"]
+        self.assertIn("N", audit["slots"]["fix_answer"]["values"])
+        tokens = cte.render_script(audit, {"fix_answer": "N"})
+        self.assertEqual(tokens, ["AUDIT", "N"])
+
+    def test_scr_always_qsaves_staged_copy_regardless_of_write_mode(self):
+        """The .scr must always contain _QSAVE before QUIT, even for
+        write_mode='read' -- this is what fixes the accoreconsole exit hang
+        (the staged copy is disposable either way; write_mode's CONTRACT with
+        the caller -- original untouched, no persistence guaranteed -- is
+        unaffected). Regression guard: if a future edit reintroduces the old
+        'only QSAVE for write_copy' conditional, this test fails loudly."""
+        import inspect
+        src = inspect.getsource(cte.run_template)
+        self.assertIn('scr_lines.append("_QSAVE")', src)
+        self.assertNotIn('if write_mode == "write_copy":\n        scr_lines.append("_QSAVE")', src)
 
 
 # --------------------------------------------------------------------------- #
@@ -322,6 +339,16 @@ class TestAuditTemplateLive(unittest.TestCase):
         self.assertTrue(pcs["regex_capture"]["matched"])
         self.assertEqual(pcs["entity_count_probe"]["before"], pcs["entity_count_probe"]["after"])
 
+    def test_audit_fix_n_no_longer_hangs(self):
+        """The actual hang-is-fixed claim: fix_answer='N' originally hung
+        accoreconsole 4/4 times; the unconditional _QSAVE-before-QUIT fix
+        (docs/GOVERNED_COMMAND_TEMPLATES.md section 5) resolved it. This must
+        complete well within the timeout, not merely 'not time out eventually'."""
+        env = cte.run_template("maintenance.drawing.audit", {"fix_answer": "N"}, str(_FIXTURE),
+                                write_mode="read", timeout_sec=60)
+        self.assertEqual(env["status"], "ok", msg=json.dumps(env, ensure_ascii=False)[:2000])
+        self.assertNotEqual(env.get("error", {}).get("code"), "ACCORECONSOLE_TIMEOUT")
+
 
 @unittest.skipUnless(_live_enabled(), "CADOS_LIVE!=1 or accoreconsole/fixture missing")
 class TestPurgeTemplateLive(unittest.TestCase):
@@ -333,6 +360,40 @@ class TestPurgeTemplateLive(unittest.TestCase):
         self.assertEqual(env["status"], "ok", msg=json.dumps(env, ensure_ascii=False)[:2000])
         pcs = {p["kind"]: p for p in env["result"]["postconditions"]}
         self.assertTrue(pcs["entity_count_probe"]["unchanged"])
+
+
+@unittest.skipUnless(_live_enabled(), "CADOS_LIVE!=1 or accoreconsole/fixture missing")
+class TestArrayRectExplodeTemplateLive(unittest.TestCase):
+    """DCM/constraints_associativity pilot templates (Lane W5-TMPL mission 5,
+    per the 2026-07-06 SDK census re-audit's command-coverage estimate).
+    Chained: ARRAYRECT's own staged output feeds EXPLODE's input, since
+    exploding only makes semantic sense against a drawing that actually
+    contains an associative array (EXPLODE against the pristine fixture,
+    which has none, is not a meaningful test of this template)."""
+
+    def test_arrayrect_then_explode_entity_count_roundtrips(self):
+        sha_before = cte.sha256_file(_FIXTURE)
+        array_env = cte.run_template(
+            "define.assocarray.rectangular",
+            {"rows": 3, "cols": 2, "row_spacing": 5, "col_spacing": 5},
+            str(_FIXTURE), write_mode="write_copy", timeout_sec=60,
+        )
+        self.assertEqual(cte.sha256_file(_FIXTURE), sha_before, "original mutated by ARRAYRECT")
+        self.assertEqual(array_env["status"], "ok", msg=json.dumps(array_env, ensure_ascii=False)[:2000])
+        array_pc = array_env["result"]["postconditions"][0]
+        self.assertTrue(array_pc["unchanged"], "associative array must not net-add entities")
+
+        staged_with_array = array_env["details"]["staged_input"]
+        explode_env = cte.run_template(
+            "edit.assocarray.explode", {}, staged_with_array,
+            write_mode="write_copy", timeout_sec=60,
+        )
+        self.assertEqual(cte.sha256_file(_FIXTURE), sha_before, "original mutated by EXPLODE")
+        self.assertEqual(explode_env["status"], "ok", msg=json.dumps(explode_env, ensure_ascii=False)[:2000])
+        explode_pc = explode_env["result"]["postconditions"][0]
+        self.assertTrue(explode_pc["increased"], "exploding an array must increase entity count")
+        self.assertEqual(explode_pc["after"] - explode_pc["before"], 5,
+                         "3x2 array explode should add exactly rows*cols-1 = 5 entities")
 
 
 if __name__ == "__main__":
