@@ -135,16 +135,19 @@ class TestM08ACatalogReopen(unittest.TestCase):
         # tools/patch_ops/entities.py). p4-poly2d adds a fifth
         # (write.entity.polyline2d.deep) -- 461 -> 462. p9-tables2 adds three
         # more (write.ucs.create / write.view.create / write.vport.create) --
-        # 462 -> 463 -> 464 -> 465.
+        # 462 -> 463 -> 464 -> 465. W6-DYNBLK adds three more new synthetic
+        # implemented ops (dynamic block REFERENCE property read/write:
+        # inspect.dynblock.references, inspect.dynblock.properties,
+        # write.dynblock.property -- dbdynblk.h) -- 465 -> 466 -> 467 -> 468.
         import collections
         by_status = collections.Counter(o.get("status") for o in self.ops)
         self.assertEqual(by_status.get("unknown", 0), 0)
         self.assertEqual(by_status.get("catalogued", 0), 0)
         self.assertEqual(by_status.get("stub", 0), 0)
-        self.assertEqual(by_status.get("implemented", 0), 465)
+        self.assertEqual(by_status.get("implemented", 0), 468)
         self.assertEqual(by_status.get("blocked", 0), 60)
-        # ^ unchanged: p9-tables2 (like w3-dimstyle before it) only added a
-        # new IMPLEMENTED synthetic op, never touched the blocked count.
+        # ^ unchanged: W6-DYNBLK (like p9-tables2/w3-dimstyle before it) only
+        # added new IMPLEMENTED synthetic ops, never touched the blocked count.
         self.assertEqual(by_status.get("implemented", 0) + by_status.get("blocked", 0), len(self.ops))
 
 

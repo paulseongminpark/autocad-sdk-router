@@ -54,15 +54,15 @@
     }
   },
   "totals": {
-    "operations": 525,
+    "operations": 528,
     "by_status": {
       "blocked": 60,
-      "implemented": 465
+      "implemented": 468
     },
     "by_family": {
       "active_document_write_original": 8,
       "apply": 1,
-      "blocks_xrefs_clone": 5,
+      "blocks_xrefs_clone": 8,
       "brep_solids": 54,
       "com_activex": 49,
       "constraints_associativity": 58,
@@ -91,9 +91,9 @@
       "accoreconsole_lisp_also": 20,
       "managed_also": 46,
       "native_arx_only": 232,
-      "objectdbx_capable": 227
+      "objectdbx_capable": 230
     },
-    "total": 525
+    "total": 528
   },
   "coverage": {
     "wired_ops": 29,
@@ -127,8 +127,8 @@
       "symbol_tables_dictionaries": 16,
       "ui_customization": 39
     },
-    "operation_records": 525,
-    "implemented": 465,
+    "operation_records": 528,
+    "implemented": 468,
     "wired": 0,
     "stub": 0,
     "catalogued": 0,
@@ -38272,6 +38272,225 @@
       ],
       "notes": "Create-or-update a named VPORT table record, writing the viewport-specific subset plus the shared VIEW-proven base-class camera fields; lens_length/perspective/clip-plane fields are deliberately NOT re-certified here (already proven on this shared base class via VIEW). number()/fastZoomsEnabled/icon toggles/extra snap-grid sub-parameters/GridDisplay sub-group/background-visualStyle-sun-lighting refs/the richer UCS query-set API are an honest gap (see tools/patch_ops/tables.py's module docstring). AutoCAD may legitimately store multiple VPORT records named \"*Active\" (one per active tiled viewport pane); callers must never pass that literal name.",
       "owner_ticket": "M08C-T03",
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs"
+    },
+    {
+      "id": "inspect.dynblock.references",
+      "operation": "inspect.dynblock.references",
+      "family": "blocks_xrefs_clone",
+      "status": "implemented",
+      "engine_tier": "objectdbx_capable",
+      "engines": [
+        "objectdbx_capable"
+      ],
+      "host_eligibility": [
+        "dbx",
+        "coreconsole",
+        "arx_adapter",
+        "full_autocad"
+      ],
+      "hosts": [
+        "dbx",
+        "coreconsole",
+        "arx_adapter",
+        "full_autocad"
+      ],
+      "execution_context": "hostless_dbx_in_accoreconsole",
+      "write_level": {
+        "default_write_mode": "read",
+        "allowed_write_modes": [
+          "read"
+        ],
+        "dwg_persisted": false,
+        "original_write_default": false
+      },
+      "handler": {
+        "router_lane": "ARIADNE_NATIVE_JOB",
+        "dispatcher_symbol": "w6dynblkDispatch",
+        "execution_host_class": "dbx",
+        "native_api": "AcDbDynBlockReference::isDynamicBlock/getBlockProperties over an AcDbBlockTableRecordIterator enumeration (dbdynblk.h)",
+        "composed_of": []
+      },
+      "mapping_type": "synthetic",
+      "catalog_op_id": null,
+      "input_schema": "schemas/cad_job.v2.schema.json#/allOf",
+      "output_schema": "schemas/cad_result.v2.schema.json",
+      "schema_refs": {
+        "input": "schemas/cad_job.v2.schema.json#/allOf",
+        "output": "schemas/cad_result.v2.schema.json"
+      },
+      "policy": {
+        "source": "config/policy.v2.json",
+        "status_policy": "implemented",
+        "default_write_mode": "read",
+        "allowed_write_modes": [
+          "read"
+        ],
+        "no_original_write_default": true
+      },
+      "tests": [
+        "tests/unit/test_w6_dynblk_handlers.py"
+      ],
+      "summary": "Enumerate block-reference entities in a BTR (model space by default, or block_handle/block_name), each tagged is_dynamic_block plus (when dynamic) its full dynamic-property array.",
+      "source_slice": "dbdynblk.h",
+      "citation": "AcDbDynBlockReference::isDynamicBlock() / getBlockProperties() (dbdynblk.h, ObjectARX 2027 SDK)",
+      "evidence_refs": [
+        "src/Ariadne.AcadNative/families/w6_dynblk_handlers.inc:w6dynblkDispatch",
+        "tests/unit/test_w6_dynblk_handlers.py",
+        "build:native_acad exit 0 (.crx/.arx/.dbx, VS2026 MSBuild x64, worktree wt/w6_dynblk)"
+      ],
+      "phase_batch": "W6-DYNBLK dynamic block reference property wave",
+      "target_family_first_class": true,
+      "wired_v1": false,
+      "notes": "W6-DYNBLK wave: census sdk_census_reaudit_20260706.md #1 P1 excellence candidate -- dynamic block REFERENCE property read/write was zero-coverage (only static block ops existed: write.block.simple_create/insert, inspect.block(s)/.iterate, write.entity.blockref). Uses the public, documented AcDbDynBlockReference / AcDbDynBlockReferenceProperty utility classes (dbdynblk.h) that read/set properties on an ALREADY-AUTHORED dynamic block reference -- distinct from dynamic block AUTHORING, which the same census confirms (live Autodesk docs/forums) is impossible via any public API, including Autodesk's own .NET/COM SDKs; authoring is correctly out of scope and not attempted. Resolves the AcDbBlockReference::blockTableRecord() anonymous-*U###-block naming nuance: block_name is the canonical dynamic definition name (dynamicBlockTableRecord()) when is_dynamic_block, distinct from insert_block_name (the raw, possibly-anonymous, instance BTR name).",
+      "owner_ticket": "M08E-T01",
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs"
+    },
+    {
+      "id": "inspect.dynblock.properties",
+      "operation": "inspect.dynblock.properties",
+      "family": "blocks_xrefs_clone",
+      "status": "implemented",
+      "engine_tier": "objectdbx_capable",
+      "engines": [
+        "objectdbx_capable"
+      ],
+      "host_eligibility": [
+        "dbx",
+        "coreconsole",
+        "arx_adapter",
+        "full_autocad"
+      ],
+      "hosts": [
+        "dbx",
+        "coreconsole",
+        "arx_adapter",
+        "full_autocad"
+      ],
+      "execution_context": "hostless_dbx_in_accoreconsole",
+      "write_level": {
+        "default_write_mode": "read",
+        "allowed_write_modes": [
+          "read"
+        ],
+        "dwg_persisted": false,
+        "original_write_default": false
+      },
+      "handler": {
+        "router_lane": "ARIADNE_NATIVE_JOB",
+        "dispatcher_symbol": "w6dynblkDispatch",
+        "execution_host_class": "dbx",
+        "native_api": "AcDbDynBlockReference::getBlockProperties + AcDbDynBlockReferenceProperty accessors, for ONE block reference by handle (dbdynblk.h)",
+        "composed_of": []
+      },
+      "mapping_type": "synthetic",
+      "catalog_op_id": null,
+      "input_schema": "schemas/cad_job.v2.schema.json#/allOf",
+      "output_schema": "schemas/cad_result.v2.schema.json",
+      "schema_refs": {
+        "input": "schemas/cad_job.v2.schema.json#/allOf",
+        "output": "schemas/cad_result.v2.schema.json"
+      },
+      "policy": {
+        "source": "config/policy.v2.json",
+        "status_policy": "implemented",
+        "default_write_mode": "read",
+        "allowed_write_modes": [
+          "read"
+        ],
+        "no_original_write_default": true
+      },
+      "tests": [
+        "tests/unit/test_w6_dynblk_handlers.py"
+      ],
+      "summary": "Full dynamic-property array (name/type/current value/allowed values/read-only flag/units/description) for ONE block-reference entity by handle.",
+      "source_slice": "dbdynblk.h",
+      "citation": "AcDbDynBlockReferenceProperty::propertyName/propertyType/value/getAllowedValues/readOnly (dbdynblk.h, ObjectARX 2027 SDK)",
+      "evidence_refs": [
+        "src/Ariadne.AcadNative/families/w6_dynblk_handlers.inc:w6dynblkDispatch",
+        "tests/unit/test_w6_dynblk_handlers.py",
+        "build:native_acad exit 0 (.crx/.arx/.dbx, VS2026 MSBuild x64, worktree wt/w6_dynblk)"
+      ],
+      "phase_batch": "W6-DYNBLK dynamic block reference property wave",
+      "target_family_first_class": true,
+      "wired_v1": false,
+      "notes": "W6-DYNBLK wave: census sdk_census_reaudit_20260706.md #1 P1 excellence candidate -- dynamic block REFERENCE property read/write was zero-coverage (only static block ops existed: write.block.simple_create/insert, inspect.block(s)/.iterate, write.entity.blockref). Uses the public, documented AcDbDynBlockReference / AcDbDynBlockReferenceProperty utility classes (dbdynblk.h) that read/set properties on an ALREADY-AUTHORED dynamic block reference -- distinct from dynamic block AUTHORING, which the same census confirms (live Autodesk docs/forums) is impossible via any public API, including Autodesk's own .NET/COM SDKs; authoring is correctly out of scope and not attempted. Resolves the AcDbBlockReference::blockTableRecord() anonymous-*U###-block naming nuance: block_name is the canonical dynamic definition name (dynamicBlockTableRecord()) when is_dynamic_block, distinct from insert_block_name (the raw, possibly-anonymous, instance BTR name).",
+      "owner_ticket": "M08E-T01",
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs"
+    },
+    {
+      "id": "write.dynblock.property",
+      "operation": "write.dynblock.property",
+      "family": "blocks_xrefs_clone",
+      "status": "implemented",
+      "engine_tier": "objectdbx_capable",
+      "engines": [
+        "objectdbx_capable"
+      ],
+      "host_eligibility": [
+        "dbx",
+        "coreconsole",
+        "arx_adapter",
+        "full_autocad"
+      ],
+      "hosts": [
+        "dbx",
+        "coreconsole",
+        "arx_adapter",
+        "full_autocad"
+      ],
+      "execution_context": "hostless_dbx_in_accoreconsole",
+      "write_level": {
+        "default_write_mode": "write_copy",
+        "allowed_write_modes": [
+          "write_copy"
+        ],
+        "dwg_persisted": true,
+        "original_write_default": false
+      },
+      "handler": {
+        "router_lane": "ARIADNE_NATIVE_JOB",
+        "dispatcher_symbol": "w6dynblkDispatch",
+        "execution_host_class": "dbx",
+        "native_api": "AcDbDynBlockReferenceProperty::setValue(const AcDbEvalVariant&) on the named property of ONE block reference by handle (dbdynblk.h)",
+        "composed_of": []
+      },
+      "mapping_type": "synthetic",
+      "catalog_op_id": null,
+      "input_schema": "schemas/cad_job.v2.schema.json#/allOf",
+      "output_schema": "schemas/cad_result.v2.schema.json",
+      "schema_refs": {
+        "input": "schemas/cad_job.v2.schema.json#/allOf",
+        "output": "schemas/cad_result.v2.schema.json"
+      },
+      "policy": {
+        "source": "config/policy.v2.json",
+        "status_policy": "implemented",
+        "default_write_mode": "write_copy",
+        "allowed_write_modes": [
+          "write_copy"
+        ],
+        "no_original_write_default": true
+      },
+      "tests": [
+        "tests/unit/test_w6_dynblk_handlers.py"
+      ],
+      "summary": "Set ONE named dynamic-block property's value on ONE block-reference entity by handle. REAL, PERSISTING write (no staged-transaction rollback) -- never touches the ORIGINAL DWG (write_copy policy, same as every other write op).",
+      "source_slice": "dbdynblk.h",
+      "citation": "AcDbDynBlockReferenceProperty::setValue (dbdynblk.h, ObjectARX 2027 SDK)",
+      "evidence_refs": [
+        "src/Ariadne.AcadNative/families/w6_dynblk_handlers.inc:w6dynblkDispatch",
+        "tests/unit/test_w6_dynblk_handlers.py",
+        "build:native_acad exit 0 (.crx/.arx/.dbx, VS2026 MSBuild x64, worktree wt/w6_dynblk)"
+      ],
+      "phase_batch": "W6-DYNBLK dynamic block reference property wave",
+      "target_family_first_class": true,
+      "wired_v1": false,
+      "notes": "W6-DYNBLK wave: census sdk_census_reaudit_20260706.md #1 P1 excellence candidate -- dynamic block REFERENCE property read/write was zero-coverage (only static block ops existed: write.block.simple_create/insert, inspect.block(s)/.iterate, write.entity.blockref). Uses the public, documented AcDbDynBlockReference / AcDbDynBlockReferenceProperty utility classes (dbdynblk.h) that read/set properties on an ALREADY-AUTHORED dynamic block reference -- distinct from dynamic block AUTHORING, which the same census confirms (live Autodesk docs/forums) is impossible via any public API, including Autodesk's own .NET/COM SDKs; authoring is correctly out of scope and not attempted. Resolves the AcDbBlockReference::blockTableRecord() anonymous-*U###-block naming nuance: block_name is the canonical dynamic definition name (dynamicBlockTableRecord()) when is_dynamic_block, distinct from insert_block_name (the raw, possibly-anonymous, instance BTR name). Honesty guards beyond the raw SDK: refuses read-only properties (PROPERTY_READ_ONLY), a property-type/value-kind mismatch (UNSUPPORTED_PROPERTY_TYPE), and a value outside a list-restricted property's getAllowedValues() (VALUE_NOT_ALLOWED) -- the SDK's own setValue() would otherwise silently no-op on an invalid value without returning an error. Reports value_before/value_after and bbox_before/bbox_after (AcDbExtents) so a caller can verify the dynamic block's evaluation graph actually re-ran, not just that the API call returned eOk.",
+      "owner_ticket": "M08E-T01",
       "implementation_strategy": "implemented_v1",
       "evidence_required": "existing_tests_and_evidence_refs"
     }

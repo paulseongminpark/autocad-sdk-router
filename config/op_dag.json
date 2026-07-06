@@ -12,15 +12,15 @@
     "acceptance_test_id": "registry tests[0] (current best-evidence test ref; F3's future per-op W+D roundtrip gate is not built in this tree yet)"
   },
   "totals": {
-    "catalogue_count": 525,
-    "node_count": 525,
-    "edge_count": 1202,
+    "catalogue_count": 528,
+    "node_count": 528,
+    "edge_count": 1210,
     "by_persistence_class": {
-      "D": 54,
+      "D": 55,
       "L": 35,
       "NON_GOAL": 60,
       "P": 57,
-      "R": 319
+      "R": 321
     }
   },
   "audit": {
@@ -4081,6 +4081,28 @@
       "persistence_class": "R"
     },
     {
+      "op_id": "inspect.dynblock.properties",
+      "predecessors": [],
+      "arg_keys": [],
+      "target_files": [
+        "src/Ariadne.AcadNative/families/w6_dynblk_handlers.inc",
+        "tests/unit/test_w6_dynblk_handlers.py"
+      ],
+      "acceptance_test_id": "tests/unit/test_w6_dynblk_handlers.py",
+      "persistence_class": "R"
+    },
+    {
+      "op_id": "inspect.dynblock.references",
+      "predecessors": [],
+      "arg_keys": [],
+      "target_files": [
+        "src/Ariadne.AcadNative/families/w6_dynblk_handlers.inc",
+        "tests/unit/test_w6_dynblk_handlers.py"
+      ],
+      "acceptance_test_id": "tests/unit/test_w6_dynblk_handlers.py",
+      "persistence_class": "R"
+    },
+    {
       "op_id": "inspect.edge.curve",
       "predecessors": [],
       "arg_keys": [],
@@ -6628,7 +6650,9 @@
       "op_id": "transform.database.insert_block",
       "predecessors": [
         "infra.hostapp.provide_services",
-        "inspect.block.iterate"
+        "inspect.block.iterate",
+        "inspect.dynblock.properties",
+        "inspect.dynblock.references"
       ],
       "arg_keys": [],
       "target_files": [
@@ -6957,7 +6981,9 @@
       "op_id": "write.block.append_entity",
       "predecessors": [
         "infra.hostapp.provide_services",
-        "inspect.block.iterate"
+        "inspect.block.iterate",
+        "inspect.dynblock.properties",
+        "inspect.dynblock.references"
       ],
       "arg_keys": [
         "block_name",
@@ -7056,6 +7082,22 @@
         "tools/patch_ops/tables.py"
       ],
       "acceptance_test_id": "tools/op_roundtrip_probe.py::probe_dimstyle_roundtrip",
+      "persistence_class": "D"
+    },
+    {
+      "op_id": "write.dynblock.property",
+      "predecessors": [
+        "infra.hostapp.provide_services",
+        "inspect.block.iterate",
+        "inspect.dynblock.properties",
+        "inspect.dynblock.references"
+      ],
+      "arg_keys": [],
+      "target_files": [
+        "src/Ariadne.AcadNative/families/w6_dynblk_handlers.inc",
+        "tests/unit/test_w6_dynblk_handlers.py"
+      ],
+      "acceptance_test_id": "tests/unit/test_w6_dynblk_handlers.py",
       "persistence_class": "D"
     },
     {

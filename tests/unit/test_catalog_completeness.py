@@ -146,12 +146,15 @@ class TestCatalogDenominatorLiveSmoke(unittest.TestCase):
         # write path) -- 521 -> 522. p9-tables2 adds three more
         # (write.ucs.create / write.view.create / write.vport.create, TABLES
         # tier-2) -- 522 -> 523 -> 524 -> 525. See tools/patch_ops/tables.py
-        # + entities.py.
+        # + entities.py. W6-DYNBLK adds three more (inspect.dynblock.references,
+        # inspect.dynblock.properties, write.dynblock.property -- dynamic block
+        # REFERENCE property read/write, dbdynblk.h) -- 525 -> 526 -> 527 -> 528.
+        # See src/Ariadne.AcadNative/families/w6_dynblk_handlers.inc.
         ops = cc.load_operations_catalog()
-        self.assertEqual(len(ops), 525,
-                         "the F0 task's own '517-op catalogue' anchor (+8, "
-                         "w3-dimstyle/w3-ltts x2/P10/p4-poly2d/p9-tables2 x3); "
-                         "if this moves again, "
+        self.assertEqual(len(ops), 528,
+                         "the F0 task's own '517-op catalogue' anchor (+11, "
+                         "w3-dimstyle/w3-ltts x2/P10/p4-poly2d/p9-tables2 x3/"
+                         "W6-DYNBLK x3); if this moves again, "
                          "the whole WAVE-0 accounting must be recomputed")
 
     def test_live_denominator_lands_near_plan_446_estimate(self):

@@ -6033,6 +6033,9 @@ struct AriadneJobCtx
 #include "families/m08kc_handlers.inc"  // M08K-T03 — constraints / associativity (native)
 #include "families/m08m_handlers.inc"   // M08M — OPM properties + reactors (native)
 #include "families/m08n_handlers.inc"   // M08N — editor/jig/selection/UI/command lifecycle (native)
+// w6-dynblk
+#include "families/w6_dynblk_handlers.inc"  // W6-DYNBLK — dynamic block reference property read/write (native)
+// end w6-dynblk
 
 // op admitted by any family module? (gate admission for not-yet-legacy family ops)
 static bool familyHasOp(const std::string& op)
@@ -6040,7 +6043,10 @@ static bool familyHasOp(const std::string& op)
     return m08cHasOp(op) || m08dHasOp(op) || m08eHasOp(op) || m08fHasOp(op)
         || m08gHasOp(op) || m08hHasOp(op)
         || m08kHasOp(op) || m08kcHasOp(op) || m08lHasOp(op) || m08mHasOp(op)
-        || m08nHasOp(op);
+        || m08nHasOp(op)
+        // w6-dynblk
+        || w6dynblkHasOp(op);
+        // end w6-dynblk
 }
 
 // route op to its owning family module; true if handled (result appended to r)
@@ -6051,7 +6057,10 @@ static bool tryFamilyDispatch(const std::string& op, const AriadneJobCtx& ctx, s
         || m08gDispatch(op, ctx, r) || m08hDispatch(op, ctx, r)
         || m08kDispatch(op, ctx, r) || m08kcDispatch(op, ctx, r)
         || m08lDispatch(op, ctx, r) || m08mDispatch(op, ctx, r)
-        || m08nDispatch(op, ctx, r);
+        || m08nDispatch(op, ctx, r)
+        // w6-dynblk
+        || w6dynblkDispatch(op, ctx, r);
+        // end w6-dynblk
 }
 
 static void ariadneNativeJob()
