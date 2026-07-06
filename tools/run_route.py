@@ -428,29 +428,43 @@ def r_pdf_svg_vector_route(args):
 def r_raster_compare_route(args):
     route = "raster_compare_route"
     need_input(args.input, route)
+    out = compare_raster_images(args.input, args.input2)
+    out["route"] = route
+    if out.get("status") == "ok":
+        emit(out)
+    emit(out, 5)
+
+
+def compare_raster_images(input_path, input2_path=None):
     try:
         import cv2
-        import numpy as np  # noqa: F401
     except Exception as e:
-        unavailable(route, "opencv-headless", type(e).__name__)
-    img = cv2.imread(args.input, cv2.IMREAD_GRAYSCALE)
+        return {"status": "unavailable", "error": "opencv_unavailable", "detail": type(e).__name__}
+    img = cv2.imread(input_path, cv2.IMREAD_GRAYSCALE)
     if img is None:
-        emit({"route": route, "status": "error", "error": "image_unreadable",
-              "detail": args.input}, 5)
-    out = {"route": route, "status": "ok", "input": args.input,
-           "reader": "opencv", "shape": list(img.shape),
-           "mean_intensity": round(float(img.mean()), 4)}
-    if args.input2 and os.path.exists(args.input2):
-        img2 = cv2.imread(args.input2, cv2.IMREAD_GRAYSCALE)
-        if img2 is not None and img2.shape == img.shape:
+        return {"status": "error", "error": "image_unreadable", "detail": input_path}
+    out = {
+        "status": "ok",
+        "input": input_path,
+        "reader": "opencv",
+        "shape": list(img.shape),
+        "mean_intensity": round(float(img.mean()), 4),
+    }
+    if input2_path and os.path.exists(input2_path):
+        img2 = cv2.imread(input2_path, cv2.IMREAD_GRAYSCALE)
+        if img2 is None:
+            out["compare_status"] = "image_unreadable"
+        elif img2.shape != img.shape:
+            out["compare_status"] = "shape_mismatch"
+            out["compare_shape"] = list(img2.shape)
+        else:
             try:
                 from skimage.metrics import structural_similarity as ssim
-                score = ssim(img, img2)
-                out["compare_to"] = args.input2
-                out["ssim"] = round(float(score), 6)
-            except Exception:
-                out["compare_note"] = "skimage ssim unavailable"
-    emit(out)
+                out["compare_to"] = input2_path
+                out["ssim"] = round(float(ssim(img, img2)), 6)
+            except Exception as e:
+                out["compare_note"] = f"skimage ssim unavailable: {type(e).__name__}"
+    return out
 
 
 def r_dwg_libredwg_sidecar(args):

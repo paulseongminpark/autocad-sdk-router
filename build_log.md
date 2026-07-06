@@ -1573,3 +1573,26 @@ document this lane opened in the live session was closed by this lane.
 
 
 
+## Lane W5-GATE
+
+- Added `tools/cross_verify.py`: LibreDWG sidecar (`dwgread`) runs in a separate GPL-isolated subprocess only, decodes LibreDWG JSON with explicit fallback handling, resolves modelspace entities from `*Model_Space`, maps only documented kind pairs (`LINE/ARC/CIRCLE/INSERT/TEXT/MTEXT/POLYLINE_2D/HATCH` -> CADOS IR kinds), and surfaces every unmapped LibreDWG type in an `unmapped` bucket instead of dropping it. Verdict shape: `agree`, `deltas`, `unmapped`, plus the saved `cross_verify_verdict.json`.
+- Added `tools/visual_gate.py`: reuses the existing `tools/visual_report.py` path to emit SVG views, rasterizes those views, then reuses the existing raster SSIM machinery through `run_route.compare_raster_images(...)`. The threshold is measured from a same-file baseline render, not invented. The tool records both the measured baseline SSIM and the gate SSIM, and states the limit clearly: SSIM proves rendered pixel similarity, not semantic CAD equivalence.
+- Integrated both gates into `tools/full_roundtrip_capstone.py` with additive CLI flags `--cross-verify/--no-cross-verify` and `--visual-gate/--no-visual-gate`, default-on in capstone only. Gate results are appended into the existing gate-status summary. I did not wire the cadctl patch-apply path in this lane because that routing would cascade through `patch_engine.apply_staged`; capstone integration plus standalone tools ship now, cadctl wiring remains an honest follow-up.
+- Reused existing machinery instead of cloning logic:
+  - `tools/run_route.py`: extracted `compare_raster_images(...)` from the existing raster compare route so `visual_gate.py` and the existing route share one SSIM implementation.
+  - `tools/visual_report.py`: unchanged render path; the new visual gate consumes its SVG output.
+- Live proof artifacts were written under `runs/w5_gate_live_20260706/`.
+  - Fixture integrity: `tests/fixtures/native_sample.dwg` sha256 re-verified as `eac5d4b13d67d89106e503321412539df7b39b8a7f4e44c033448e9295fe3f76`.
+  - Cross-engine proof: `python tools/cross_verify.py tests/fixtures/native_sample.dwg --ir D:\dev\.build\cados_plan\runs\t1_cert\pre_shared\dwg_graph_ir.json --out-dir runs/w5_gate_live_20260706/cross_verify_fixture --libredwg-bin D:\dev\99_tools\libredwg\bin`
+    -> `status: ok`, `agree: true`, `entity_total: 21747`, `layer_count: 70`, mapped counts matched exactly (`line 16276`, `block_reference 2027`, `polyline 1874`, `arc 753`, `hatch 669`, `mtext 106`, `circle 33`, `text 9`), `unmapped: []`.
+  - Visual same-file baseline: `python tools/visual_gate.py --pre-ir D:\dev\.build\cados_plan\runs\t1_cert\pre_shared\dwg_graph_ir.json --post-ir D:\dev\.build\cados_plan\runs\t1_cert\pre_shared\dwg_graph_ir.json --out-dir runs/w5_gate_live_20260706/visual_gate_same_file`
+    -> `status: ok`, `ssim: 1.0`, measured baseline `threshold: 1.0`.
+  - Visual mismatch proof: `python tools/visual_gate.py --pre-ir D:\dev\.build\cados_plan\runs\t1_cert\pre_shared\dwg_graph_ir.json --post-ir D:\dev\.build\cados_plan\runs\t1_cert\text\post\dwg_graph_ir.json --out-dir runs/w5_gate_live_20260706/visual_gate_real_pair`
+    -> `status: mismatch`, `pass: false`, `ssim: 0.999574`, `threshold: 1.0`.
+- Verification:
+  - `python -m pytest tests/unit -q --basetemp .tmp_pytest_unit` -> `1153 passed, 23 skipped`.
+  - New unit coverage added for kind mapping / verdict logic, SSIM thresholding, live-smoke gating, and capstone flag defaults.
+- Honest limitation:
+  - In this worktree, direct `cadctl.Cad().inspect(...)` calls are currently partial/blocked (`router produced no parseable JSON envelope` / `native graph job produced no result JSON`), so the live proof used the existing real ARX IR artifacts at `D:\dev\.build\cados_plan\runs\t1_cert\...` exactly as inputs to the new standalone tools.
+- Git/commit limitation:
+  - Commiting from this lane is blocked by worktree metadata permissions outside the writable root. `git add --intent-to-add w5_report.md` fails with `fatal: Unable to create 'D:/dev/99_tools/autocad-sdk-router/.git/worktrees/w5_gates/index.lock': Permission denied`. No fake commit was created.
