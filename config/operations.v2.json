@@ -1823,10 +1823,12 @@
       "catalog_op_id": null,
       "input_schema": "schemas/cad_job.v2.schema.json#/allOf",
       "output_schema": "schemas/cad_result.v2.schema.json",
-      "summary": "Router job creates an Ariadne custom entity instance; catalog entries describe class definition and registration primitives.",
+      "summary": "Router job creates an Ariadne custom entity instance; catalog entries describe class definition and registration primitives. Its live_edit default write_mode used to always route cadctl.run_operation's headless surface to the attended full_autocad COM branch -- a router dispatch bug (2026-07-06, Lane G triage), not a native code defect. Lane I (2026-07-06) fixed tools/autocad-router.ps1's dispatch to honor the registry's own handler.execution_host_class instead of write_mode; this op is now live-re-probed RUNNABLE through the headless Invoke-CadJobRoute path -- see reports/lane_i_router_fix_resolution.json and build_log.md Lane I.",
       "evidence_refs": [
         "config/cad_job_operation_aliases.json#extend.customclass.create",
-        "tests/test_native_arx_dbx_contract.py::createCustomEntity"
+        "tests/test_native_arx_dbx_contract.py::createCustomEntity",
+        "runs/laneG_repro/attended/customclass_run/attended_job_result.json (2026-07-06 Lane G attended-lane repro, created:true)",
+        "reports/lane_i_router_fix_resolution.json (2026-07-06 Lane I router-fix re-probe, CRASH->RUNNABLE headless)"
       ],
       "phase_batch": "P1 Custom objects/protocols",
       "target_family_first_class": false,
@@ -1852,7 +1854,7 @@
       "tests": [
         "tests/test_native_arx_dbx_contract.py::createCustomEntity"
       ],
-      "notes": "Router job creates an Ariadne custom entity instance; catalog entries describe class definition and registration primitives.",
+      "notes": "Router job creates an Ariadne custom entity instance; catalog entries describe class definition and registration primitives. Its live_edit default write_mode used to always route cadctl.run_operation's headless surface to the attended full_autocad COM branch -- a router dispatch bug (2026-07-06, Lane G triage), not a native code defect. Lane I (2026-07-06) fixed tools/autocad-router.ps1's dispatch to honor the registry's own handler.execution_host_class instead of write_mode; this op is now live-re-probed RUNNABLE through the headless Invoke-CadJobRoute path -- see reports/lane_i_router_fix_resolution.json and build_log.md Lane I.",
       "owner_ticket": "M08K-T01",
       "implementation_strategy": "implemented_v1",
       "evidence_required": "existing_tests_and_evidence_refs"
@@ -1955,10 +1957,12 @@
       "catalog_op_id": null,
       "input_schema": "schemas/cad_job.v2.schema.json#/allOf",
       "output_schema": "schemas/cad_result.v2.schema.json",
-      "summary": "Router job creates an Ariadne custom DBObject record; catalog separates custom object definition, filing, and storage primitives.",
+      "summary": "Router job creates an Ariadne custom DBObject record; catalog separates custom object definition, filing, and storage primitives. Its live_edit default write_mode used to always route cadctl.run_operation's headless surface to the attended full_autocad COM branch -- a router dispatch bug (2026-07-06, Lane G triage), not a native code defect. Lane I (2026-07-06) fixed tools/autocad-router.ps1's dispatch to honor the registry's own handler.execution_host_class instead of write_mode; this op is now live-re-probed RUNNABLE through the headless Invoke-CadJobRoute path -- see reports/lane_i_router_fix_resolution.json and build_log.md Lane I.",
       "evidence_refs": [
         "config/cad_job_operation_aliases.json#extend.customobject.create",
-        "tests/test_native_arx_dbx_contract.py::createCustomObject"
+        "tests/test_native_arx_dbx_contract.py::createCustomObject",
+        "runs/laneG_repro/attended/customobject_run/attended_job_result.json (2026-07-06 Lane G attended-lane repro, created:true)",
+        "reports/lane_i_router_fix_resolution.json (2026-07-06 Lane I router-fix re-probe, CRASH->RUNNABLE headless)"
       ],
       "phase_batch": "P1 Custom objects/protocols",
       "target_family_first_class": false,
@@ -1984,7 +1988,7 @@
       "tests": [
         "tests/test_native_arx_dbx_contract.py::createCustomObject"
       ],
-      "notes": "Router job creates an Ariadne custom DBObject record; catalog separates custom object definition, filing, and storage primitives.",
+      "notes": "Router job creates an Ariadne custom DBObject record; catalog separates custom object definition, filing, and storage primitives. Its live_edit default write_mode used to always route cadctl.run_operation's headless surface to the attended full_autocad COM branch -- a router dispatch bug (2026-07-06, Lane G triage), not a native code defect. Lane I (2026-07-06) fixed tools/autocad-router.ps1's dispatch to honor the registry's own handler.execution_host_class instead of write_mode; this op is now live-re-probed RUNNABLE through the headless Invoke-CadJobRoute path -- see reports/lane_i_router_fix_resolution.json and build_log.md Lane I.",
       "owner_ticket": "M08K-T01",
       "implementation_strategy": "implemented_v1",
       "evidence_required": "existing_tests_and_evidence_refs"

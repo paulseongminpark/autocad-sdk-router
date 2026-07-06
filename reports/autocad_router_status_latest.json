@@ -1,8 +1,8 @@
 ﻿{
-    "timestamp":  "2026-07-06T14:07:25.4113841+09:00",
+    "timestamp":  "2026-07-06T15:21:06.2247351+09:00",
     "schema":  "ariadne.autocad_router_status.v2",
     "status":  "ALL_AVAILABLE",
-    "router_home":  "D:\\dev\\.build\\cados_plan\\wt\\laneE",
+    "router_home":  "D:\\dev\\.build\\cados_plan\\wt\\laneI",
     "python_exe":  "C:\\Users\\PAUL\\AppData\\Local\\Programs\\Python\\Python312\\python.exe",
     "route_count":  11,
     "available_count":  11,
@@ -13,17 +13,17 @@
                            "status":  "PRESENT",
                            "modules":  [
                                            {
-                                               "path":  "D:\\dev\\.build\\cados_plan\\wt\\laneE\\prebuilt\\2027\\Ariadne.AcadNativeDbx.dbx",
+                                               "path":  "D:\\dev\\.build\\cados_plan\\wt\\laneI\\prebuilt\\2027\\Ariadne.AcadNativeDbx.dbx",
                                                "exists":  true,
                                                "bytes":  54272
                                            },
                                            {
-                                               "path":  "D:\\dev\\.build\\cados_plan\\wt\\laneE\\prebuilt\\2027\\Ariadne.AcadNative.crx",
+                                               "path":  "D:\\dev\\.build\\cados_plan\\wt\\laneI\\prebuilt\\2027\\Ariadne.AcadNative.crx",
                                                "exists":  true,
                                                "bytes":  911872
                                            },
                                            {
-                                               "path":  "D:\\dev\\.build\\cados_plan\\wt\\laneE\\prebuilt\\2027\\Ariadne.AcadNative.arx",
+                                               "path":  "D:\\dev\\.build\\cados_plan\\wt\\laneI\\prebuilt\\2027\\Ariadne.AcadNative.arx",
                                                "exists":  true,
                                                "bytes":  920576
                                            }
