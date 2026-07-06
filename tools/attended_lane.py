@@ -597,13 +597,30 @@ def expect_hatch(args: Dict[str, Any], *, loop_type: int = 3) -> Dict[str, Any]:
     run (see build_log.md for the exact run_dir). Pass an explicit value if a
     future AutoCAD version classifies it differently -- this is an observed
     runtime fact, not a documented guarantee.
+
+    Attended-wave (Lane AT) fix: the geometry dict now also carries
+    ``normal``/``elevation``/``pattern_angle``/``pattern_scale``/
+    ``hatch_style``/``loop_count``/``pattern_type``/``pattern_double``/
+    ``is_solid_fill``/``is_associative``/``is_gradient`` -- AcDbHatch's own
+    default/derived values for a SOLID, non-associative, non-gradient hatch
+    (LIVE-VERIFIED this wave: ``cad_op_gate.check_roundtrip`` against a real
+    attended write.entity.hatch run reported these as spurious "modified"
+    fields with the prior minimal ground truth, even though the write itself
+    was correct -- an incomplete expected-value builder, not a write defect;
+    see build_log.md's Attended Wave entry for the exact run_dir + before/after
+    diff that exposed this).
     """
     verts = args.get("vertices") or []
     loop_verts = [{"point": _point_to_list(v)[:2] + [0.0], "bulge": 0.0} for v in verts]
     return {
         "dxf_name": "HATCH", "layer": args.get("layer") or "0",
         "geometry": {"kind": "hatch", "pattern_name": "SOLID",
-                    "loops": [{"index": 0, "loop_type": loop_type, "status": "ok",
+                    "normal": [0.0, 0.0, 1.0], "elevation": 0.0,
+                    "pattern_angle": 0.0, "pattern_scale": 1.0, "hatch_style": 0.0,
+                    "loop_count": (1.0 if loop_verts else 0.0), "pattern_type": 1.0,
+                    "pattern_double": False, "is_solid_fill": True,
+                    "is_associative": False, "is_gradient": False,
+                    "loops": [{"index": 0, "loop_type": loop_type, "closed": True, "status": "ok",
                               "vertices": loop_verts}]},
     }
 
