@@ -146,12 +146,15 @@ class TestCatalogDenominatorLiveSmoke(unittest.TestCase):
         # write path) -- 521 -> 522. p9-tables2 adds three more
         # (write.ucs.create / write.view.create / write.vport.create, TABLES
         # tier-2) -- 522 -> 523 -> 524 -> 525. See tools/patch_ops/tables.py
-        # + entities.py.
+        # + entities.py. CADOS wave 6 W6-SECTION adds three more
+        # (inspect.section.objects / write.entity.section /
+        # write.section.generate2d, closing the AcDbSection R3 G0 gap this
+        # test's own module docstring names) -- 525 -> 526 -> 527 -> 528.
         ops = cc.load_operations_catalog()
-        self.assertEqual(len(ops), 525,
-                         "the F0 task's own '517-op catalogue' anchor (+8, "
-                         "w3-dimstyle/w3-ltts x2/P10/p4-poly2d/p9-tables2 x3); "
-                         "if this moves again, "
+        self.assertEqual(len(ops), 528,
+                         "the F0 task's own '517-op catalogue' anchor (+11, "
+                         "w3-dimstyle/w3-ltts x2/P10/p4-poly2d/p9-tables2 x3/"
+                         "W6-SECTION x3); if this moves again, "
                          "the whole WAVE-0 accounting must be recomputed")
 
     def test_live_denominator_lands_near_plan_446_estimate(self):
@@ -232,10 +235,33 @@ class TestCataloguedMatching(unittest.TestCase):
         # had 0 matching catalog ops. A regression here means either the
         # catalog gained real coverage (update the seed table) or the match
         # rule broke (false catalogued).
+        #
+        # AcDbSection REMOVED from this tuple (CADOS wave 6 census P2,
+        # W6-SECTION lane): operations.v2.json now carries real
+        # inspect.section.objects / write.entity.section records with a live
+        # families/w6_section_handlers.inc:w6sectionDispatch handler -- this
+        # is the "catalog gained real coverage" branch the comment above
+        # anticipates, not a match-rule regression. See
+        # test_catalog_completeness.py's own docstring and
+        # tools/catalog_completeness.py's KNOWN_UNCATALOGUED_DISPOSITIONS
+        # "section" entry (now stale/unreachable for AcDbSection specifically,
+        # since disposition_for only consults that seed when the live check
+        # already finds zero matches).
         for cls_name in ("AcDbViewport", "AcDbGroup", "AcDbField", "AcDbHelix",
-                         "AcDbPointCloud", "AcDbSection"):
+                         "AcDbPointCloud"):
             hits = cc.catalogued_by(cls_name, self.text_index)
             self.assertEqual(hits, [], "{0} expected uncatalogued per R3 G0".format(cls_name))
+
+    def test_acdbsection_is_now_catalogued(self):
+        # Counterpart to test_r3_g0_classes_are_uncatalogued above: proves the
+        # W6-SECTION registry additions are real (findable via the same
+        # exact-class-name-substring rule other classes are asserted BY), not
+        # just a removed assertion. If this ever regresses to [], either the
+        # w6-section operation records were reverted or the match rule broke.
+        hits = cc.catalogued_by("AcDbSection", self.text_index)
+        self.assertGreater(len(hits), 0,
+                           "AcDbSection expected catalogued after CADOS wave 6 "
+                           "W6-SECTION (inspect.section.objects / write.entity.section)")
 
     def test_empty_class_name_never_vacuously_matches(self):
         self.assertEqual(cc.catalogued_by("", self.text_index), [])
