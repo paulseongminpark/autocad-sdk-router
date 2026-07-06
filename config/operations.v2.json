@@ -40047,7 +40047,7 @@
     "schema": "ariadne.cad_os.w5_tmpl_governed_command_templates.v1",
     "lane": "W5-TMPL",
     "status": "implemented_not_yet_wired_into_run_operation_allowlist",
-    "note": "These 2 ops are deliberately NOT appended to this file's `operations` array: that array's total count (525) and by_status/by_family totals are a frozen cross-wave invariant asserted by other lanes' tests (tests/unit/test_catalog_completeness.py, test_op_dag_generate.py, test_m08a_catalog_reopen.py all hardcode 525/465/517-derived numbers). Measured directly: appending here broke 11 tests in other lanes' files on first attempt (reverted). The canonical registry for these new ops is config/command_templates.json; this block is a discovery pointer only. Wiring template_id dispatch into cadctl.Cad.run_operation / the cad.run_operation MCP allow-list (so 'operation' can resolve here the way schemas/cad_job.v2.schema.json describes) is a follow-up integration task, not done by this lane.",
+    "note": "These 2 ops are deliberately NOT appended to this file's `operations` array: that array's total count (525) and by_status/by_family totals are a frozen cross-wave invariant asserted by other lanes' tests (tests/unit/test_catalog_completeness.py, test_op_dag_generate.py, test_m08a_catalog_reopen.py all hardcode 525/465/517-derived numbers). Measured directly: appending here broke 11 tests in other lanes' files on first attempt (reverted). The canonical registry for these new ops is config/command_templates.json; this block is a discovery pointer only. Wiring template_id dispatch into cadctl.Cad.run_operation / the cad.run_operation MCP allow-list (so 'operation' can resolve here the way schemas/cad_job.v2.schema.json describes) is a follow-up integration task, not done by this lane. MID-FLIGHT UPDATE (same day): team-lead's DCM framing was corrected by the SDK census re-audit (D:\\dev\\.build\\cados_plan\\sdk_census_reaudit_20260706.md) -- the 23 constraints_associativity ops map to ARRAY*/SURF* commands, not GEOMCONSTRAINT/DIMCONSTRAINT (a different, already-unblocked subsystem). Building 2 pilot templates from that list found and fixed a general accoreconsole exit-hang bug (unconditional _QSAVE before QUIT now applied to every template, including the original 2).",
     "design_doc": "docs/GOVERNED_COMMAND_TEMPLATES.md",
     "template_registry": "config/command_templates.json",
     "engine": "tools/command_template_engine.py",
@@ -40065,9 +40065,37 @@
         "status": "implemented",
         "headless_safe": true,
         "evidence": "tests/unit/test_command_template_engine.py::TestPurgeTemplateLive"
+      },
+      {
+        "template_id": "define.assocarray.rectangular",
+        "summary": "Create an associative rectangular array (ARRAYRECT, explicit Count/Spacing/eXit sub-options) on the drawing's last entity, governed template, live-verified.",
+        "status": "implemented",
+        "headless_safe": true,
+        "evidence": "tests/unit/test_command_template_engine.py::TestArrayRectExplodeTemplateLive"
+      },
+      {
+        "template_id": "edit.assocarray.explode",
+        "summary": "Release associativity (EXPLODE) on the drawing's last associative array, governed template, live-verified (chained off define.assocarray.rectangular's output).",
+        "status": "implemented",
+        "headless_safe": true,
+        "evidence": "tests/unit/test_command_template_engine.py::TestArrayRectExplodeTemplateLive"
       }
     ],
     "fixture_verified": "tests/fixtures/native_sample.dwg sha256 eac5d4b13d67d89106e503321412539df7b39b8a7f4e44c033448e9295fe3f76 (unchanged before/after every live run)",
-    "raw_command_ops_untouched": "the 10 command-dispatch-flavored SAFETY_FORBIDDEN ops (docs/GOVERNED_COMMAND_TEMPLATES.md section 0) and the 23 constraints_associativity SAFETY_FORBIDDEN ops (section 4) are unchanged by this lane -- 0 of them promoted."
+    "raw_command_ops_untouched": "the 10 command-dispatch-flavored SAFETY_FORBIDDEN ops (docs/GOVERNED_COMMAND_TEMPLATES.md section 0) are unchanged -- 0 of them promoted (this lane's templates close the GAP they represented via a new governed path, not by touching their own registry status). Of the 23 constraints_associativity SAFETY_FORBIDDEN ops (section 4), 2 ARE now shipped as governed templates (define.assocarray.rectangular, edit.assocarray.explode) -- see dcm_coverage below; their own operations.v2.json registry entries are unchanged (still SAFETY_FORBIDDEN/blocked) since the governed-template path is additive, not a promotion of the original blocked op_id.",
+    "dcm_coverage": {
+      "source": "D:\\dev\\.build\\cados_plan\\sdk_census_reaudit_20260706.md section 5",
+      "shipped_and_live_verified_headless": 2,
+      "shipped_ids": [
+        "define.assocarray.rectangular",
+        "edit.assocarray.explode"
+      ],
+      "not_promotable_argument_typing_does_not_bound_solver_risk": [
+        "inspect.assocaction.evaluate",
+        "inspect.assocnetwork.evaluate"
+      ],
+      "not_attempted_this_lane": "the remaining ARRAYEDIT sub-commands, SURF* family, and XREF reload -- each needs its own prompt-sequence measurement; the QSAVE fix is necessary but not sufficient for each",
+      "verdict": "2 of 23 shipped and live-verified headless (revised up from this lane's own earlier 0-of-23 draft, before the QSAVE root cause was found)"
+    }
   }
 }
