@@ -1539,6 +1539,123 @@ document this lane opened in the live session was closed by this lane.
 ## Lane W5-ANCHOR
 ## Lane W6-DYNBLK (worktree `wt/w6_dynblk`, branch `cados/w6-dynblk`) -- dynamic block
 reference property read/write
+## Lane W6-SECTION
+
+**Task:** CADOS wave 6 census P2 -- AcDbSection had ZERO catalog/registry
+coverage despite `brep_solids` being the strongest catalogued family
+(R3_coverage.md finding G0 / `tools/catalog_completeness.py`'s
+`KNOWN_UNCATALOGUED_DISPOSITIONS` seeding `("section", "author", ...)`). Close
+the gap with a new parallel-owned family file, per the wave-6 C++
+parallel-ownership rules (one new `.inc` + a minimal contiguous registration
+block, no edits to existing `families/*.inc`, `tools/autocad-router.ps1`,
+`config/op_dag.json`, or existing registry records).
+
+**New family (`src/Ariadne.AcadNative/families/w6_section_handlers.inc`,
+`w6sectionHasOp`/`w6sectionDispatch`):**
+- `inspect.section.objects` -- enumerate `AcDbSection` entities in model space
+  (name, state, vertices, elevation/top/bottom plane, normal/vertical/viewing
+  direction, live-section flag, linked `AcDbSectionSettings` presence).
+- `write.entity.section` -- create an `AcDbSection` plane/boundary/volume via
+  the `(pts, verticalDir[, viewingDir])` ctor, optional name/state/layer,
+  appended into the staged model space (write_copy only).
+- `write.section.generate2d` -- **originally assumed full_autocad-only**
+  (ASM + AutoCAD's generate-section UI machinery); **measured this wave to be
+  false**. Builds a transient (non-database-resident) `AcDb3dSolid::createBox`
+  probe + a transient bisecting `AcDbSection`, calls
+  `generateSectionGeometry()`, reports the 5 output array counts, deletes
+  every transient object (never touches `ctx.pDb`). Runs correctly headless
+  under accoreconsole -- corrected from a speculative blocked/full_autocad
+  classification once actually tested live (see the near-miss note below).
+  All 3 ops registered `dispatcher_symbol: "w6sectionDispatch"`,
+  `router_lane: "ARIADNE_NATIVE_JOB"`, family `entities`; `owner_ticket`
+  aligned to `tools/operation_coverage_matrix.py::assign_owner_ticket()`'s
+  deterministic (family, id-prefix/keyword) scheme (`M08D-T01` /
+  `M08G-T02` / `M08G-T02`) -- the real wave/lane attribution lives in
+  `phase_batch: "CADOS wave 6 census P2 (W6-SECTION)"`, matching the
+  `write.dimstyle.create`-style precedent (owner_ticket is a classification
+  axis, not literal authorship).
+
+**Build:** `tools/build_native_acad.ps1 -RouterHome ...\wt\w6_section
+-OutputRoot ...\wt\w6_section\build_iso` -> exit 0 for all 3 projects
+(`.dbx`/`.crx`/`.arx`, VS2026 MSBuild x64, only benign `LNK4099` PDB warnings),
+twice (once before, once after adding the dispatch-mismatch guard). Deployed
+into this worktree's own `prebuilt/2027/` (original binaries backed up to
+`prebuilt/2027/_bak/` first) -- worktree-local only, no canonical/other-lane
+impact; the orchestrator's final rebuild supersedes this.
+
+**Live evidence (`runs/w6_section_live_smoke/`):** staged copy of
+`tests/fixtures/native_sample.dwg`, real accoreconsole via
+`tools/run_job.run_router_cad_job`:
+1. `inspect.section.objects` baseline -> `count:0` (fresh fixture, no sections yet).
+2. `write.entity.section` (points along Y, `vertical_dir` Z, `state:"boundary"`,
+   `name:"W6SectionSmoke"`, `write_mode:"write_copy"`) -> `created:true,
+   class:AcDbSection, handle:19190, modelspace_entities_after:21748`
+   (21747+1, matches this repo's known baseline entity count).
+3. Reopened in a **fresh, separate** accoreconsole process ->
+   `inspect.section.objects` finds `count:1`; the 2-point input expanded to a
+   real 4-vertex boundary polygon (front+back lines -- genuine
+   `AcDbSection::setState(kBoundary)` behavior, not a bug), matching
+   `top_plane`/`bottom_plane`/`height_above/below` = 5 and
+   `indicator_transparency` = 70 (AutoCAD's real defaults), an auto-created
+   linked `AcDbSectionSettings` (`getSettings()` non-null with no explicit
+   settings call) -- all genuine SDK-computed values, not stubbed.
+4. `write.section.generate2d` against a 100x100x100 probe box ->
+   `generated:true, intersection_boundary_count:4, intersection_fill_count:1,
+   background_count:4, foreground_count:0, curve_tangency_count:0`.
+5. `tests/fixtures/native_sample.dwg` sha256 re-verified unchanged after
+   every step (`eac5d4b13d67d89106e503321412539df7b39b8a7f4e44c033448e9295fe3f76`).
+
+**Near-miss (documented, no harm done):** an early `write.section.generate2d`
+registry patch left `handler.execution_host_class: "full_autocad"` (copied
+from the initial blocked-record template) while `router_lane` was already
+`ARIADNE_NATIVE_JOB` -- Lane I's `Test-CadJobRequiresAttendedHost` correctly
+read that as "needs an attended session" and routed to
+`Invoke-FullAutoCadCadJob`, which did a read-only `app.ActiveDocument` COM
+property check against the **real, pre-existing, user-owned** `acad.exe`
+(PID 8180, the same session named in this file's Mission 3 above) and got
+`NO_ACTIVE_DOCUMENT` (that window had no open document) -- a harmless failed
+property read, not a mutation; no document was opened, closed, or touched in
+that session. Root cause: `execution_host_class` (WHERE, per Lane I's own
+finding) must independently match `host_eligibility`/router_lane, not just be
+copied from a template. Fixed by setting `execution_host_class: "dbx"` (same
+as the other two ops), after which the op correctly ran headless.
+
+**Registry (`config/operations.v2.json`, additive-only):** 3 new records
+(`inspect.section.objects`, `write.entity.section`, `write.section.generate2d`),
+all `status:"implemented"` with the live evidence above. `totals`/`coverage`
+roll-ups recomputed in place (528 ops total, 468 implemented / 60 blocked;
+original key order preserved to keep the diff a clean append, not a
+reorder-noise diff). `config/op_dag.json` deliberately NOT regenerated (wave-6
+rule: parallel lanes would each produce a conflicting regen; the orchestrator
+runs `tools/op_dag_generate.py` once after merging all lanes) -- its own 2
+tests (`TestOpDagBuild::test_node_set_equals_catalogue_set`,
+`TestOpDagArtifactFresh::test_artifact_matches_fresh_build`) fail in this
+worktree as a KNOWN, EXPECTED, orchestrator-owned consequence, same class as
+every other count-drift this file's own `w3-*`/`p*-*` waves left for the next
+regen. Two other hardcoded running-tally test pins that legitimately drift
+with real registry growth (`test_catalog_completeness.py::
+test_live_registry_is_517_ops` 525->528,
+`test_m08a_catalog_reopen.py::test_status_counts_reflect_wave3_closure`
+465->468 implemented) were bumped with the same comment-chain convention
+those tests already used for `w3-dimstyle`/`p9-tables2`/etc.
+`test_catalog_completeness.py::TestCataloguedMatching::
+test_r3_g0_classes_are_uncatalogued` had `AcDbSection` removed from its tuple
+(the "catalog gained real coverage" branch its own comment anticipates) with
+a new counterpart `test_acdbsection_is_now_catalogued` added.
+
+**Tests (`tests/unit/test_w6_section_handlers.py`, new, 17 tests):**
+source-level HasOp<->Dispatch parity, no-silent-fallthrough
+(`OPERATION_DISPATCH_MISMATCH`), staged-write-only token ban, UTF-8 string
+fidelity, arg validation, State enum round-trip names, registry-record shape
+-- plus a `CADOS_LIVE=1`-gated `TestW6SectionLiveRoundTrip` that re-derives
+the manual live smoke above as an automated pytest (ran live this session,
+passed, 49.96s). `python -m unittest tests.unit.test_w6_section_handlers -v`
+-> **17 passed**.
+
+**Regression gate:** `CADOS_LIVE=1 python -m pytest tests/unit -q` ->
+**1160 passed, 2 failed (both `test_op_dag_generate.py`, expected/
+orchestrator-owned per above), 22 skipped**.
+
 
 **Mission:** census gap #1 P1 (`sdk_census_reaudit_20260706.md`) -- zero coverage of
 `AcDbDynBlockReference`/`AcDbDynBlockReferenceProperty` (dbdynblk.h), i.e. reading/setting the
