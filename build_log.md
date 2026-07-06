@@ -2125,3 +2125,115 @@ Verification:
 - `tools/corpus_batch.py --manifest .tmp/w6_real_corpus_manifest_bg.json --out-dir runs/corpus_batch_w6_real_bg --force` -> real five-file external corpus run above
 
 Git note: this worktree can read git state, but commit attempts in this session fail at `.git/worktrees/w6_corpus/index.lock` with `Permission denied`, so the requested checkpoint commits could not be created from inside the sandbox.
+## Lane W6-LAYERSTATE (CADOS wave 6, worktree `wt/w6_layerstate`, branch `cados/w6-layerstate`)
+
+Mission: AcDbLayerStateManager ops (saved layer states / filters) -- P2 census zero
+coverage, high value for the real Korean-layered workitem drawings.
+
+### Implementation
+
+- New family file `src/Ariadne.AcadNative/families/w6_layerstate_handlers.inc` (own
+  file, disjoint from every M08 `.inc` -- same parallel-ownership contract as the
+  M08 family tickets). 4 ops, all built on the real `AcDbLayerStateManager` API
+  (`dblstate.h`, a core acdb26 class -- no extra `#pragma comment(lib)` needed):
+  - `inspect.layerstates.list` -- `getLayerStateNames` + per-state
+    `getLayerStateDescription`/`getLayerStateMask`/`getLayerStateLayers`/
+    `layerStateHasViewportData`/`isDependentLayerState`. Read-only.
+  - `write.layerstate.save` -- `saveLayerState(name, mask)` on the staged db;
+    optional `description` via `setLayerStateDescription`; `mask:[...]` (default
+    `kAll`); `overwrite` (default 1, `hasLayerState` pre-check + `LAYERSTATE_EXISTS`
+    refusal when 0).
+  - `write.layerstate.restore` -- plain `restoreLayerState(name)` by default;
+    optional `restore_flags:[turn_off|freeze|restore_as_overrides]` routes to the
+    viewport-aware overload with `AcDbObjectId::kNull` (no viewport-scoped restore
+    in this lane's scope -- `kCurrentViewport`/`kNewViewport` are an explicit
+    non-goal, called out in the handler's own comment).
+  - `write.layerstate.delete` -- `deleteLayerState(name)`, `hasLayerState` gated
+    (`LAYERSTATE_NOT_FOUND` instead of a silent no-op).
+  - All string output via `njsonStr` (never the lossy `wideToAscii` funnel) --
+    load-bearing for the fixture's Korean layer names.
+- Registration block in `AriadneNativeJob.cpp` (the ONLY edit to that shared file,
+  per the parallel-ownership rule): one `#include "families/w6_layerstate_handlers.inc"`
+  line + `w6LayerStateHasOp(op)` in `familyHasOp` + `w6LayerStateDispatch(op, ctx, r)`
+  in `tryFamilyDispatch`, each tagged `// w6-layerstate`.
+- Registry: 4 new `config/operations.v2.json` records (family
+  `symbol_tables_dictionaries`, `status:"implemented"`, `write_level.allowed_write_modes`
+  restricted to `["read"]`/`["write_copy"]` only -- staged-copy discipline, no
+  `write_original` ever offered). `owner_ticket` set to the value
+  `operation_coverage_matrix.assign_owner_ticket()` derives for this family/id shape
+  (`M08C-T02`, matching `write.layer.create`'s own record) rather than an invented
+  lane ticket, so the deterministic-taxonomy test stays green. `totals`
+  (`operations`/`total`/`by_status`/`by_family`/`by_engine_tier`) and `coverage`
+  (`operation_records`/`implemented`) recomputed from the array, not hand-edited.
+
+### Build (isolated worktree)
+
+`tools/build_native_acad.ps1 -RouterHome D:\dev\.build\cados_plan\wt\w6_layerstate
+-OutputRoot D:\dev\.build\cados_plan\wt\w6_layerstateuild_iso` -> exit 0, all three
+targets built clean (`Ariadne.AcadNativeDbx.dbx` 54,272B, `Ariadne.AcadNative.crx`
+926,720B, `Ariadne.AcadNative.arx` 934,400B, `arx_relink_mode:"canonical"` -- no AutoCAD
+process holding the canonical `.arx` during this build). Deployed to this worktree's
+own `prebuilt/2027/` (pre-existing binaries backed up under `prebuilt/2027/_bak/
+*.pre_w6ls`).
+
+### Live cert (real fixture, `tests/fixtures/native_sample.dwg`, 70 layers / 68 Korean-named)
+
+sha256 verified `eac5d4b13d67d89106e503321412539df7b39b8a7f4e44c033448e9295fe3f76`
+before the run and again after all 9 chained `cadctl.Cad().run_operation` calls --
+unchanged (`original_unchanged:true` on every single call). Chain (each call staging
+FROM the previous call's `staged_result`, per `cadctl.run_operation`'s own documented
+chained-staged-copy contract):
+
+1. baseline `inspect.layers` on the untouched fixture -- 70 layers, 68 non-ASCII
+   (Korean) names; target picked: `X-평면도(기본형)$0$TEXT` (frozen=false, color=3).
+2. `write.layerstate.save` (`name=ARIADNE_TEST`, `mask=["all"]`, a description) --
+   `saved:true`, `layer_count:70`.
+3. `inspect.layerstates.list` on the post-save copy -- `ARIADNE_TEST` present,
+   `layer_count:70`, description round-trips, `masked_properties` carries all 11
+   mask names.
+4. `write.layer.create` (the EXISTING upsert op) mutates the target layer:
+   `frozen=1, color_index=5` -- `updated:true`.
+5. `inspect.layers` re-verify -- target layer now `frozen:true, color:5` (mutation
+   real, not a no-op).
+6. `write.layerstate.restore` (`name=ARIADNE_TEST`) -- `restored:true`.
+7. REOPEN-FRESH `inspect.layers` (independent accoreconsole process reading the
+   post-restore staged file off disk) -- 70 layers; the full
+   `{off,frozen,locked,color}` tuple for ALL 70 layers matches the step-1 baseline
+   EXACTLY (`mismatches={}`); the Korean layer NAME SET matches exactly at the
+   code-point level (`diff=set()`, not a console/mojibake check); the specific
+   mutated target is back to `(off=false, frozen=false, locked=false, color=3)`.
+8. `write.layerstate.delete` (`name=ARIADNE_TEST`) -- `deleted:true`.
+9. REOPEN-FRESH `inspect.layerstates.list` -- `ARIADNE_TEST` absent.
+
+Script: not committed (ad-hoc cert driver in the session scratchpad, cadctl-only,
+no direct accoreconsole/AutoLISP calls) -- every check above is reproducible via the
+same 9 `cadctl.Cad().run_operation` calls listed.
+
+### Tests
+
+- New `tests/unit/test_w6_layerstate_handlers.py` (source-level, no build/AutoCAD
+  needed): HasOp<->Dispatch parity, exactly-4-ops floor, no original-write/command-
+  stack tokens, real `AcDbLayerStateManager` API usage (not a stub), `njsonStr`-only
+  output discipline, structured no-fake-success error codes, and the
+  `AriadneNativeJob.cpp` registration-seam wiring -- **14 passed**.
+- `python -m pytest tests/unit -q` (full suite, after the registry add): **1153
+  passed, 4 failed, 23 skipped**. All 4 failures are pre-existing hardcoded-count /
+  generated-artifact-freshness assertions that ANY additive `operations.v2.json`
+  change trips, not a w6-layerstate regression -- see Blockers.
+
+### Blockers (orchestrator-owned, not fixed by this lane per its explicit scope)
+
+- `config/op_dag.json` is now stale (4 new op_ids absent) -- this lane was told not
+  to edit it (parallel-ownership rule: every wave-6 lane touching
+  `operations.v2.json` would otherwise fight over the same regenerated file).
+  `tests/unit/test_op_dag_generate.py::TestOpDagArtifactFresh::test_artifact_matches_fresh_build`
+  fails until a single centralized `tools/op_dag_generate.py` run happens after all
+  wave-6 lanes merge.
+- Three hardcoded op-count literals (525/465/517) in shared test files
+  (`test_op_dag_generate.py::test_node_set_equals_catalogue_set`,
+  `test_m08a_catalog_reopen.py::test_status_counts_reflect_wave3_closure`,
+  `test_catalog_completeness.py::TestCatalogDenominatorLiveSmoke::test_live_registry_is_517_ops`)
+  now read 529/469/521 post-merge; same "every additive lane trips this" shape as
+  the op_dag staleness above -- left for the orchestrator's single reconciliation
+  pass rather than hand-edited per-lane (editing a shared test file from N parallel
+  worktrees is the exact conflict this wave's file-ownership rules exist to avoid).
