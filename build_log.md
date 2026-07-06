@@ -534,3 +534,54 @@ than silently dropped (Rule 12 / no fake success).
 
 `pytest tests/unit`: **1073 passed, 14 skipped** (1087 total) -- 0 failed,
 both before and after these changes.
+
+---
+## Lane F (branch `cados/closeout-f`)
+
+### F-a -- vport "*Active" managed-field policy
+
+**Task**: `tools/full_roundtrip_capstone.py`'s table-record diff (Closeout
+#130) reported the reserved `*Active` viewport's `center/height/width` as a
+plain "modified" real diff, blanket-informational (never gate-wired either
+way). Paul wanted a real, evidence-bounded policy instead of a guess.
+
+**Evidence gathered first** (no field excluded without proof): read
+`runs/capstone_composed_20260706/table_record_diffs.json` -- the vport row
+for `*Active` shows `record_diff: ["center", "height", "width"]`, nothing
+else. Confirmed that run's own `regen_records/patch.json` (221 applied ops,
+`records_regen_summary.json`) contains zero vport-touching operations (no
+"vport"/"viewport" substring anywhere in the patch) -- so nothing this run
+issued could have written those fields; the drift is AutoCAD's own
+open/regen/save rewrite of the reserved active-viewport record, matching
+build_log.md's own #130 note ("plausibly *Active is a reserved,
+AutoCAD-managed record...").
+
+**Implementation** (`tools/full_roundtrip_capstone.py`):
+- `VPORT_MANAGED_FIELDS = ("center", "height", "width")` -- exactly the 3
+  fields the evidence run supports, nothing broader.
+- `classify_vport_managed_drift(row)`: for the `name == "*Active"` vport
+  row ONLY, splits `record_diff` into managed (moved to a new
+  `managed_field_drift` list, `{field, expected, actual}`, annotated not
+  swallowed) vs real (stays in `record_diff`). Any other vport record, or a
+  non-managed field on `*Active`, is returned untouched -- still a real
+  diff, still fails.
+- `table_record_diff_reports` invokes this only for `cls["label"] ==
+  "vport"`, then recomputes `zero_diff_count`/`diffs` from the
+  (possibly-reclassified) rows -- mathematically identical to the old
+  computation for all 6 other table classes (layer/dimstyle/linetype/
+  textstyle/ucs/view), touched only to source `rows` uniformly.
+
+**Verification**:
+- New unit tests in `tests/unit/test_capstone_gate.py` (fake vport-labeled
+  table class, no live CAD): managed-only drift on `*Active` -> 0 real
+  diffs, drift annotated; non-managed field on `*Active` -> still fails;
+  managed-named field (`center`) on a non-`*Active` record -> still fails.
+  Plus 2 direct unit tests on `classify_vport_managed_drift` itself.
+- Re-ran the record-diff stage against `runs/capstone_composed_20260706`'s
+  own real `expected`/`actual` vport values (evidence run, not a live
+  accoreconsole re-run -- see task note on acceptable scope): now
+  `diffs=0`, `zero_diff_count=1`, `managed_field_drift` lists all 3 fields
+  with their real old/new values, `record_diff` (post-policy) `== []`.
+- `pytest tests/unit -q`: 1119 passed, 0 failed (was 1073 passed / 14
+  skipped pre-lane baseline noted above in this same file -- delta is this
+  lane's added tests plus whatever accrued on `cados/wave0-build` since).
