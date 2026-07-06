@@ -533,6 +533,8 @@ def assign_owner_ticket(op):
         return "M08G-T01"
     if fam == "query":
         return "M08F-T02"
+    if fam == "anchor":
+        return "W5-ANCHOR"
     return "M08B-T01"  # never leave an op unowned
 
 

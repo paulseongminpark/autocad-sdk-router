@@ -14,6 +14,10 @@ Exposes the CAD OS Layer as a small set of agent-callable tools:
     cad.registry_explain   -> cadctl.Cad().registry_explain(op_id)
     cad.patch_dry_run      -> patch_engine.dry_run_plan(patch)
     cad.patch_apply_staged -> patch_engine.apply_staged(patch, dwg_path, out_dir)
+    cad.anchor_set         -> cadctl.Cad().anchor_set(dwg, handle, body, out, author_agent, tags?)
+    cad.anchor_get         -> cadctl.Cad().anchor_get(ir_path, handle)
+    cad.anchor_list        -> cadctl.Cad().anchor_list(ir_path)
+    cad.anchor_clear       -> cadctl.Cad().anchor_clear(dwg, handle, out, author_agent)
     cad.diff_before_after  -> cad_diff.compute_diff(pre_ir, post_ir)  [two IR paths]
     cad.visual_report      -> visual_report.build_visual_report(source_ref, kind)
     cad.live_status        -> truthful liveness probe (live ARX pump not attached)
@@ -291,6 +295,103 @@ def _tool_patch_apply_staged(args: Dict[str, Any]) -> Dict[str, Any]:
         return _err("patch_engine.apply_staged failed: %r" % exc)
 
 
+def _tool_anchor_set(args: Dict[str, Any]) -> Dict[str, Any]:
+    """Write (upsert) a semantic anchor on a STAGED copy of a DWG.
+
+    Reuses the existing set_entity_xdata_by_handle patch op (native
+    modify.entity.xdata) -- no new native op. Delegates to cadctl.Cad.anchor_set.
+    """
+    dwg_path = args.get("dwg") or args.get("dwg_path")
+    handle = args.get("handle")
+    body = args.get("body")
+    out_dir = args.get("out") or args.get("out_dir")
+    author_agent = args.get("author_agent")
+    if not dwg_path:
+        return _err("missing required arg: dwg")
+    if not handle:
+        return _err("missing required arg: handle")
+    if not isinstance(body, dict):
+        return _err("missing or invalid required arg: body (must be an object)")
+    if not out_dir:
+        return _err("missing required arg: out")
+    if not author_agent:
+        return _err("missing required arg: author_agent")
+    cad, e = _cad()
+    if cad is None:
+        return _err(e, delegate="cadctl.Cad.anchor_set")
+    try:
+        return {"ok": True, "result": cad.anchor_set(
+            dwg_path, handle, body, out_dir,
+            author_agent=author_agent, tags=args.get("tags"))}
+    except Exception as exc:  # noqa: BLE001
+        return _err("cadctl.anchor_set failed: %r" % exc)
+
+
+def _tool_anchor_get(args: Dict[str, Any]) -> Dict[str, Any]:
+    """Read a semantic anchor back from an already-extracted IR.
+
+    Delegates to cadctl.Cad.anchor_get.
+    """
+    ir = args.get("ir") or args.get("ir_path")
+    handle = args.get("handle")
+    if not ir or not handle:
+        return _err("missing required args: ir, handle")
+    cad, e = _cad()
+    if cad is None:
+        return _err(e, delegate="cadctl.Cad.anchor_get")
+    try:
+        return {"ok": True, "result": cad.anchor_get(ir, handle)}
+    except Exception as exc:  # noqa: BLE001
+        return _err("cadctl.anchor_get failed: %r" % exc)
+
+
+def _tool_anchor_list(args: Dict[str, Any]) -> Dict[str, Any]:
+    """List every live (non-tombstoned) semantic anchor in an already-extracted IR.
+
+    Delegates to cadctl.Cad.anchor_list.
+    """
+    ir = args.get("ir") or args.get("ir_path")
+    if not ir:
+        return _err("missing required arg: ir")
+    cad, e = _cad()
+    if cad is None:
+        return _err(e, delegate="cadctl.Cad.anchor_list")
+    try:
+        return {"ok": True, "result": cad.anchor_list(ir)}
+    except Exception as exc:  # noqa: BLE001
+        return _err("cadctl.anchor_list failed: %r" % exc)
+
+
+def _tool_anchor_clear(args: Dict[str, Any]) -> Dict[str, Any]:
+    """Logically clear (tombstone) a semantic anchor on a STAGED copy of a DWG.
+
+    KNOWN LIMITATION: this cannot truly remove the RegApp xdata (the native
+    handler rejects an empty 'values' array); it overwrites with a tombstone
+    envelope instead. See docs/SEMANTIC_ANCHOR_SPEC.md. Delegates to
+    cadctl.Cad.anchor_clear.
+    """
+    dwg_path = args.get("dwg") or args.get("dwg_path")
+    handle = args.get("handle")
+    out_dir = args.get("out") or args.get("out_dir")
+    author_agent = args.get("author_agent")
+    if not dwg_path:
+        return _err("missing required arg: dwg")
+    if not handle:
+        return _err("missing required arg: handle")
+    if not out_dir:
+        return _err("missing required arg: out")
+    if not author_agent:
+        return _err("missing required arg: author_agent")
+    cad, e = _cad()
+    if cad is None:
+        return _err(e, delegate="cadctl.Cad.anchor_clear")
+    try:
+        return {"ok": True, "result": cad.anchor_clear(
+            dwg_path, handle, out_dir, author_agent=author_agent)}
+    except Exception as exc:  # noqa: BLE001
+        return _err("cadctl.anchor_clear failed: %r" % exc)
+
+
 def _tool_diff_before_after(args: Dict[str, Any]) -> Dict[str, Any]:
     """Compute a structural IR diff (cad_diff.v1) between two IR documents.
 
@@ -512,6 +613,77 @@ _TOOLS: List[Dict[str, Any]] = [
         },
     },
     {
+        "name": "cad.anchor_set",
+        "description": "Write (upsert) a semantic anchor -- an agent's interpretation of an "
+                       "entity, as JSON -- onto a STAGED copy of a DWG. Reuses the existing "
+                       "set_entity_xdata_by_handle write (native modify.entity.xdata) under "
+                       "the ARIADNE_ANCHOR app; no new native op. Delegates to cadctl.Cad.anchor_set.",
+        "delegates_to": "cadctl.Cad.anchor_set",
+        "inputSchema": {
+            "type": "object",
+            "properties": {
+                "dwg": {"type": "string", "description": "DWG to copy+mutate (original stays read-only)."},
+                "handle": {"type": "string", "description": "Target entity handle (hex)."},
+                "body": {"type": "object", "description": "Arbitrary JSON anchor payload (the interpretation)."},
+                "author_agent": {"type": "string", "description": "Identifier of the writing agent."},
+                "tags": {"type": "array", "items": {"type": "string"}, "description": "Optional free-form tags."},
+                "out": {"type": "string", "description": "Output run directory."},
+            },
+            "required": ["dwg", "handle", "body", "author_agent", "out"],
+            "additionalProperties": False,
+        },
+    },
+    {
+        "name": "cad.anchor_get",
+        "description": "Read a semantic anchor back from an already-extracted dwg_graph_ir.json "
+                       "by entity handle. No native call (xdata is already carried through by "
+                       "extraction). Delegates to cadctl.Cad.anchor_get.",
+        "delegates_to": "cadctl.Cad.anchor_get",
+        "inputSchema": {
+            "type": "object",
+            "properties": {
+                "ir": {"type": "string", "description": "Path to dwg_graph_ir.json."},
+                "handle": {"type": "string", "description": "Target entity handle (hex)."},
+            },
+            "required": ["ir", "handle"],
+            "additionalProperties": False,
+        },
+    },
+    {
+        "name": "cad.anchor_list",
+        "description": "List every live (non-tombstoned) semantic anchor in an "
+                       "already-extracted dwg_graph_ir.json. Delegates to cadctl.Cad.anchor_list.",
+        "delegates_to": "cadctl.Cad.anchor_list",
+        "inputSchema": {
+            "type": "object",
+            "properties": {
+                "ir": {"type": "string", "description": "Path to dwg_graph_ir.json."},
+            },
+            "required": ["ir"],
+            "additionalProperties": False,
+        },
+    },
+    {
+        "name": "cad.anchor_clear",
+        "description": "Logically clear (tombstone) a semantic anchor on a STAGED copy of a "
+                       "DWG. KNOWN LIMITATION: cannot truly remove the RegApp xdata (the native "
+                       "handler rejects an empty values array) -- overwrites with a tombstone "
+                       "envelope instead; anchor.get/anchor.list treat it as absent. Delegates "
+                       "to cadctl.Cad.anchor_clear.",
+        "delegates_to": "cadctl.Cad.anchor_clear",
+        "inputSchema": {
+            "type": "object",
+            "properties": {
+                "dwg": {"type": "string", "description": "DWG to copy+mutate (original stays read-only)."},
+                "handle": {"type": "string", "description": "Target entity handle (hex)."},
+                "author_agent": {"type": "string", "description": "Identifier of the clearing agent."},
+                "out": {"type": "string", "description": "Output run directory."},
+            },
+            "required": ["dwg", "handle", "author_agent", "out"],
+            "additionalProperties": False,
+        },
+    },
+    {
         "name": "cad.diff_before_after",
         "description": "Compute a structural IR diff (cad_diff.v1) between two "
                        "dwg_graph_ir.json documents. Delegates to cad_diff.compute_diff; "
@@ -592,6 +764,10 @@ _DISPATCH: Dict[str, Callable[[Dict[str, Any]], Dict[str, Any]]] = {
     "cad.registry_explain": _tool_registry_explain,
     "cad.patch_dry_run": _tool_patch_dry_run,
     "cad.patch_apply_staged": _tool_patch_apply_staged,
+    "cad.anchor_set": _tool_anchor_set,
+    "cad.anchor_get": _tool_anchor_get,
+    "cad.anchor_list": _tool_anchor_list,
+    "cad.anchor_clear": _tool_anchor_clear,
     "cad.diff_before_after": _tool_diff_before_after,
     "cad.visual_report": _tool_visual_report,
     "cad.live_status": _tool_live_status,
@@ -723,7 +899,8 @@ def serve_stdio(stdin=None, stdout=None) -> int:
 _EXPECTED_TOOLS = {
     "cad.status", "cad.inspect_drawing", "cad.query_entities", "cad.get_entity",
     "cad.validate_ir", "cad.registry_status", "cad.registry_explain",
-    "cad.patch_dry_run", "cad.patch_apply_staged", "cad.diff_before_after",
+    "cad.patch_dry_run", "cad.patch_apply_staged", "cad.anchor_set",
+    "cad.anchor_get", "cad.anchor_list", "cad.anchor_clear", "cad.diff_before_after",
     "cad.visual_report", "cad.live_status", "cad.run_operation",
 }
 
@@ -741,6 +918,10 @@ _SELFTEST_ARGS: Dict[str, Dict[str, Any]] = {
     "cad.registry_explain": {"op_id": "inspect.database.graph"},
     "cad.patch_dry_run": {"patch": {"schema": "ariadne.cad_patch.v1"}},
     "cad.patch_apply_staged": {},  # missing args / degraded -> dict
+    "cad.anchor_set": {},          # missing args -> _err dict
+    "cad.anchor_get": {},          # missing args -> _err dict
+    "cad.anchor_list": {},         # missing args -> _err dict
+    "cad.anchor_clear": {},        # missing args -> _err dict
     "cad.diff_before_after": {},   # missing args / degraded -> dict
     "cad.visual_report": {"source_ref": "/nonexistent/source.dwg", "kind": "png"},
     "cad.live_status": {},
@@ -787,7 +968,7 @@ def _selftest() -> int:
 
     ok = (
         manifest["transport"] == "mock"
-        and len(manifest["tools"]) == 13
+        and len(manifest["tools"]) == 17
         and manifest_names == _EXPECTED_TOOLS
         # manifest and dispatch table must agree exactly (no orphan tools).
         and set(_DISPATCH.keys()) == manifest_names

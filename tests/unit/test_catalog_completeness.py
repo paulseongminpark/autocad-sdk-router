@@ -146,12 +146,16 @@ class TestCatalogDenominatorLiveSmoke(unittest.TestCase):
         # write path) -- 521 -> 522. p9-tables2 adds three more
         # (write.ucs.create / write.view.create / write.vport.create, TABLES
         # tier-2) -- 522 -> 523 -> 524 -> 525. See tools/patch_ops/tables.py
-        # + entities.py.
+        # + entities.py. Lane W5-ANCHOR adds a new "anchor" family (anchor.set/
+        # anchor.get/anchor.list/anchor.clear -- semantic anchors, all synthetic
+        # Python-layer ops composed over the existing modify.entity.xdata /
+        # inspect.database.graph ops, no new native op) -- 525 -> 526 -> 527 ->
+        # 528 -> 529. See tools/anchor_ops.py + docs/SEMANTIC_ANCHOR_SPEC.md.
         ops = cc.load_operations_catalog()
-        self.assertEqual(len(ops), 525,
-                         "the F0 task's own '517-op catalogue' anchor (+8, "
-                         "w3-dimstyle/w3-ltts x2/P10/p4-poly2d/p9-tables2 x3); "
-                         "if this moves again, "
+        self.assertEqual(len(ops), 529,
+                         "the F0 task's own '517-op catalogue' anchor (+12, "
+                         "w3-dimstyle/w3-ltts x2/P10/p4-poly2d/p9-tables2 x3/"
+                         "W5-ANCHOR x4); if this moves again, "
                          "the whole WAVE-0 accounting must be recomputed")
 
     def test_live_denominator_lands_near_plan_446_estimate(self):
