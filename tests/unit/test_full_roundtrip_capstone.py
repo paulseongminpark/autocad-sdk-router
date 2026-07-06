@@ -379,6 +379,20 @@ def test_resolve_regen_target_falls_back_when_seed_is_none():
     assert result["used_blank_seed"] is False
 
 
+def test_build_arg_parser_verification_flags_default_on():
+    args = frc.build_arg_parser().parse_args(["--out-dir", "/tmp/capstone"])
+    assert args.cross_verify is True
+    assert args.visual_gate is True
+
+
+def test_build_arg_parser_verification_flags_can_be_disabled():
+    args = frc.build_arg_parser().parse_args(
+        ["--out-dir", "/tmp/capstone", "--no-cross-verify", "--no-visual-gate"]
+    )
+    assert args.cross_verify is False
+    assert args.visual_gate is False
+
+
 # --------------------------------------------------------------------------- #
 # isolate_regenerated_entities -- thin wrapper over op_roundtrip_probe.
 # added_entities_ir; verifies the glue (module resolution + kwarg passing),
