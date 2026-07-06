@@ -488,6 +488,18 @@ def ir_op_for(ent: Dict[str, Any]) -> Optional[Dict[str, Any]]:
                          "major_axis": _pt(g.get("major_axis")), "radius_ratio": g.get("radius_ratio"),
                          "start_angle": g.get("start_angle"), "end_angle": g.get("end_angle"),
                          "layer": layer}}
+    if kind == "block_reference":
+        # cb2-irmap/#129b: INSERT's real op is create_blockref (write.entity.
+        # blockref, wired since w3-insert -- WRITE_OP_MAP/build_job_args
+        # above already handle it) but this IR-kind case was never added, so
+        # every INSERT fell through to patch_ops.blocks' now-removed
+        # "insert_block" stand-in, an op id no registry entry declares
+        # (regen/journal.json's "insert_block is not declared" warning).
+        # block_name -> "name" is build_job_args' job, not this one's -- see
+        # its write.entity.blockref branch above.
+        return {"operation": "create_blockref",
+                "args": {"block_name": g.get("block_name"), "position": _pt(g.get("position")),
+                         "scale": _pt(g.get("scale")), "rotation": g.get("rotation"), "layer": layer}}
     # --- Tier 2 (WAVE-1 TIER-1 T1 promoted create_text/create_polyline to a
     # live native handler; the gate below is now just "is this IR kind ever
     # produced", not "is the op runnable") ---
@@ -499,7 +511,7 @@ def ir_op_for(ent: Dict[str, Any]) -> Optional[Dict[str, Any]]:
         return {"operation": "create_mtext",
                 "args": {"position": _pt(g.get("position")), "text": g.get("text"),
                          "height": g.get("height", 2.5), "layer": layer}}
-    if kind in ("lwpolyline", "polyline"):
+    if kind == "lwpolyline":
         points: List[Dict[str, float]] = []
         for v in (g.get("vertices") or []):
             p = v.get("point") if isinstance(v, dict) else v
@@ -509,6 +521,43 @@ def ir_op_for(ent: Dict[str, Any]) -> Optional[Dict[str, Any]]:
                            "bulge": (v.get("bulge", 0.0) if isinstance(v, dict) else 0.0)})
         return {"operation": "create_polyline",
                 "args": {"points": points, "closed": int(bool(g.get("closed"))), "layer": layer}}
+    if kind == "polyline":
+        # #119: AcDb2dPolyline (true legacy 2D) and AcDb3dPolyline both
+        # normalize to IR kind "polyline"/dxf_name POLYLINE (ir_builder.py's
+        # _NATIVE_CLASS_TO_DXF_KIND) -- lifting either one through the
+        # "lwpolyline" branch above regenerates a real LWPOLYLINE instead,
+        # a silent legacy-type downgrade (capstone evidence: POLYLINE
+        # attempted=2 removed=2 + LWPOLYLINE added=2). The two are
+        # distinguished only by the entity's own "class"; each gets its own
+        # real write op instead of being folded into create_polyline.
+        native_class = ent.get("class")
+        if native_class == "AcDb2dPolyline":
+            deep_points: List[Dict[str, float]] = []
+            for v in (g.get("vertices") or []):
+                if not isinstance(v, dict):
+                    continue
+                p = v.get("point")
+                if not p:
+                    continue
+                deep_points.append({"x": p[0], "y": p[1], "bulge": v.get("bulge", 0.0),
+                                    "start_width": v.get("start_width", 0.0),
+                                    "end_width": v.get("end_width", 0.0)})
+            return {"operation": "create_polyline2d_deep",
+                    "args": {"points": deep_points, "closed": int(bool(g.get("closed"))),
+                             "elevation": g.get("elevation", 0.0),
+                             "default_start_width": g.get("default_start_width", 0.0),
+                             "default_end_width": g.get("default_end_width", 0.0),
+                             "layer": layer}}
+        if native_class == "AcDb3dPolyline":
+            poly3d_points = []
+            for v in (g.get("vertices") or []):
+                p = v.get("point") if isinstance(v, dict) else v
+                pt = _pt(p)
+                if pt is not None:
+                    poly3d_points.append(pt)
+            return {"operation": "create_polyline3d",
+                    "args": {"points": poly3d_points, "layer": layer}}
+        return None  # unrecognized class for a "polyline"-kind entity -> honest deferral
     # --- Tier 3 (requires dimension extraction to populate geometry) ---
     if kind == "dimension":
         need = ("xline1_point", "xline2_point", "dim_line_point")
