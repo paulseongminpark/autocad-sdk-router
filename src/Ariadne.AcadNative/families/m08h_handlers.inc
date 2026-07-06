@@ -11,15 +11,17 @@
 //   Never call save()/saveAs() on the original. No acedCommand/acedCmd (compile-disabled in 2027).
 //   Original DWG bytes must stay unchanged. We only appendAcDbEntity into the staged model space.
 //
-// IMPLEMENTED (12): write.entity.text (AcDbText), write.entity.mtext (AcDbMText),
-//   write.entity.dim.aligned (AcDbAlignedDimension), write.entity.dim.rotated (AcDbRotatedDimension),
+// IMPLEMENTED (15): write.entity.text (AcDbText), write.entity.mtext (AcDbMText),
+//   write.entity.leader (AcDbLeader, optional AcDbMText annotation), write.entity.mleader
+//   (AcDbMLeader, AcDbMText content via addLeader/addLeaderLine/add{First,Last}Vertex),
+//   write.entity.table (AcDbTable, pDb->tablestyle() default + setSize/setTextString per cell
+//   + generateLayout), write.entity.dim.aligned (AcDbAlignedDimension),
+//   write.entity.dim.rotated (AcDbRotatedDimension),
 //   write.entity.dim.radial (AcDbRadialDimension), write.entity.dim.diametric (AcDbDiametricDimension),
 //   write.entity.dim.angular2line (AcDb2LineAngularDimension),
 //   write.entity.dim.angular3pt (AcDb3PointAngularDimension),
 //   write.entity.dim.ordinate (AcDbOrdinateDimension), write.entity.dim.arc (AcDbArcDimension),
 //   write.entity.dim.radiallarge (AcDbRadialDimensionLarge), write.entity.hatch (AcDbHatch, solid fill).
-// DEFERRED (3, NOT in HasOp — see reports/tickets/M08H.md for the concrete blocker):
-//   write.entity.leader, write.entity.mleader, write.entity.table.
 //
 // Strings: entity content -> utf8ToWide() (lossless UTF-8 -> UTF-16; ASCII is a strict subset, so the
 //   ASCII path is unchanged) for setTextString/setContents/dim text; JSON output -> njsonStr (UTF-8).
