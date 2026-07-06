@@ -1268,4 +1268,206 @@ failed** (1136 baseline + 7 new; includes the full, now-24-test
 performed (same canonical `prebuilt/2027` from 688155d as every other lane
 this wave, confirmed unchanged by this lane).
 
+## Attended Wave (worktree `wt/laneAT`, branch `cados/attended-wave`)
+
+Assigned 5 priority-ordered missions against a claimed already-open attended AutoCAD
+session. **Session-existence check FIRST** (before touching anything): `Get-Process acad`
++ `tasklist` both showed **zero** acad.exe running -- the brief's premise was false at
+task start. Flagged to team-lead, did registry-only analysis while waiting, and a real
+session (PID 8180, empty, `Documents.Count=0`, "시작"/Start-tab title) appeared mid-task,
+presumably Paul opening it in response. All live work below used that real session (COM
+attach, opening ONLY our own staged copies as additional documents, never touching/
+closing anything else) or a genuinely separate dedicated `acad.exe` launch (verified safe
+to coexist -- see Mission 3).
+
+### Mission 1 (com_activex, 7 blocked) + Mission 4 (brep_solids, 4 blocked) + Mission 5
+### (best-effort remnants, 6 ops): registry-only verdict, 0/17 promotable, by design
+
+Pulled every one of the 17 named blocked/gated ops (`config/operations.v2.json`) before
+touching anything live, to avoid burning session time on dead ends. All 17 fall into
+exactly 3 buckets, none of which "attended access" can close:
+
+- **`SAFETY_FORBIDDEN` (14 ops)** -- deliberate design decisions, not capability gaps:
+  6 `automate.com.*` (raw COM/IDispatch handle exposure), 3 `edit.subentity.*`
+  (subentity-path mutation, no validated staged-authoring schema), `plot.config.settings`,
+  `command.menu.invoke`, `editor.toolpalette.tool_execute`, `command.queue.post`
+  (raw command-string dispatch). Attempting to "prove and promote" any of these would
+  defeat an intentional guardrail, not close a real gap -- refused on principle, not
+  attempted even with live access.
+- **`HOST_UNAVAILABLE` + `dispatcher_symbol: null` (3 ops)** -- `embed.ole.frame`,
+  `ui.subentity.highlight`, `plot.engine.run`. No ARX handler code exists for any of
+  these at all (would need new C++ authored + built + relinked -- out of scope for
+  "drive the documented COM call", which is an execution task, not a build ticket).
+- **`live.apply_patch` (1 op)** -- blocked pending "explicit write_original approval",
+  an owner-level gate (`dev-change-control`) a lane cannot grant itself.
+
+**Net: 0/17 promoted, all correctly stay blocked.** No registry edit made for any of
+these 17 (nothing to promote, nothing incorrectly blocked).
+
+### Bonus find in the com_activex family: `automate.property.set` (M08M-T01) --
+### real handler, write path broken, NOT promoted
+
+Not one of the 7 blocked ops (`status: implemented`, real `m08mDispatch` handler,
+`src/Ariadne.AcadNative/families/m08m_handlers.inc:1193`) but stuck at
+`policy.status_policy: catalogued_not_runnable` pending a live native-job smoke test.
+`host_eligibility` includes `coreconsole`/`dbx` (no attended session actually required) --
+ran it headless against a staged copy of `tests/fixtures/native_sample.dwg` (sha256
+verified `eac5d4b13d67d89106e503321412539df7b39b8a7f4e44c033448e9295fe3f76` before and
+after every experiment in this wave).
+
+- **Read path: real and correct.** `found`/`read_only`/`before` all verified against 3
+  distinct properties across 2 entity classes, including real Korean MTEXT content
+  (`Contents` on handle `1199B`: `before:"전실"`, matches the golden fixture verbatim).
+- **Lookup gap (own-class only):** `m08mFindClassProperty(pObj->isA(), ...)` walks only
+  the concrete instance's OWN class member collection, never inherited base-class members
+  -- `Layer`/`LayerId` (declared on `AcDbEntity`) are unreachable from any concrete entity
+  subtype instance (`AcDbLine`, `AcDbMText`, ...) via this op, confirmed via
+  `inspect.property.metadata` (`class=AcDbLine` -> 5 own members only: Normal/Thickness/
+  Angle/Length/Delta; `class=AcDbEntity` -> 17 members including LayerId, but that class
+  is never the runtime type of any real entity).
+- **Write path: broken for every type tried.** `Thickness` (double, found, not read-only)
+  -> `set_status:3` (`eInvalidInput`), value unchanged. `Contents` (AcString, found, not
+  read-only) -> same `eInvalidInput`, value unchanged. `Text` (read-only) correctly
+  refused with `set_status:2` (`eNotApplicable`) -- the read-only guard itself works. The
+  handler always boxes the new value as a generic `AcRxValue(const ACHAR*)`
+  (`m08m_handlers.inc:1233-1234`) regardless of the property's actual declared type; this
+  looks like a real marshalling defect (plain string boxing doesn't satisfy
+  `AcRxProperty::setValue`'s type check for non-string properties, and apparently not even
+  for the AcString-typed ones tried), not an attended-vs-headless issue.
+- **Verdict: NOT promoted.** `found:true` is not a working set (this wave's own
+  `dev-validation-and-qa` convention: "a catalogued_not_runnable op looks green" is
+  exactly this trap). `policy.status_policy` left at `catalogued_not_runnable`,
+  `operations.v2.json` untouched for this op. This is diagnostic evidence for whoever
+  owns M08M next, not a fix -- fixing the C++ marshalling is out of this lane's scope.
+- Evidence: `runs/attended_wave_aps_smoke/` (staging + pre-inspect) and 4 ad-hoc
+  `apply*`/`meta_*` subdirs under the same tree (headless native-job runs, each with its
+  own `native_cad_job_result.json`).
+
+### Mission 2: 1004 binary xdata via COM `SetXData` -- the 4th and last avenue, EXHAUSTED
+
+Per Lane E (ARX `setXData`: byte-perfect write, AutoCAD 2027's own reader crashes
+0xC0000005 on reopen) and Lane H (AutoLISP `entmod`: categorically REJECTS constructing
+group 1004 outright, both string and list-of-ints representations, before any write),
+COM `SetXData` was the one remaining untested avenue. Drove it live via `pywin32`
+(`win32com.client`) attached to the real attended session (`GetActiveObject`), opening
+ONLY our own staged copy of the fixture as an additional document (`Documents.Open`,
+never touching the pre-existing empty document state), resolving the target entity by
+handle (`Document.HandleToObject`).
+
+- **Marshalling, empirically resolved:** a plain Python `bytes` object for the 1004 slot
+  fails immediately (`SetXData` COM error `잘못된 인수 type` -- "invalid argument type").
+  The construction that actually works is an explicit nested `VARIANT` per the mission's
+  own hint ("vbBinary-typed 1004 element"): `DataType` as `VT_ARRAY|VT_I2` (`[1001,
+  1004]`), `Data` as `VT_ARRAY|VT_VARIANT` whose 1004 slot is itself a
+  `VT_ARRAY|VT_UI1` byte-array `VARIANT` (`win32com.client.VARIANT(pythoncom.VT_ARRAY |
+  pythoncom.VT_UI1, list(payload_bytes))`), payload = `bytes([72,101,108,108,111])`
+  (ASCII "Hello", same payload Lane E/H used, for direct comparability).
+- **In-session: SUCCEEDS.** `SetXData` raised no exception; immediate `GetXData("APPNAME")`
+  readback in the SAME session showed `types:[1001,1004]` and the byte payload present.
+  `doc.Save()` (staged copy only) succeeded. `RegisteredApplications.Add` confirmed the
+  APPID registered. Original fixture sha256 unchanged throughout
+  (`eac5d4b13d67d89106e503321412539df7b39b8a7f4e44c033448e9295fe3f76`, before==after).
+- **Independent cross-check (LibreDWG sidecar, read-only diagnostic, GPL-sidecar-only
+  per repo rule):** `dwgread.exe -v2 -O JSON` on the just-saved staged file succeeded
+  (`SUCCESS 0x0`) and shows, on the target LINE (`"handle":[0,3,71989]` = hex `0x11935`,
+  our exact target), `"eed":[{"size":7,"handle":[5,3,102800],"code":4,
+  "value":"48656C6C6F"}]` -- byte-perfect "Hello", the RegApp entry
+  (`"name":"ARIADNE_COM_1004_TEST"`) present and correctly wired. **The saved file is not
+  corrupt; COM wrote exactly what was asked, same as the ARX path did.**
+- **Reopen in a SEPARATE, fresh `accoreconsole` process (headless
+  `inspect.entity.get_xdata`, via `run_job.run_router_cad_job` -- never the same process
+  that wrote it): CRASHES.** `engine_output.status:"native_cad_job_failed"`,
+  `exit_code:-3`, `"Unhandled Access Violation Reading 0x0005 Exception at 41D2835h"` --
+  the SAME class of fault (0xC0000005-family AV, "Reading 0x0005") Lane E found via ARX,
+  at a different address but the same signature (system-DLL load-address range, not our
+  own module).
+- **Verdict: outcome is the mission's own named "write-succeeds-but-reopen-crashes" =
+  final confirmation of an AutoCAD-2027-internal fault**, now triple-independently
+  confirmed across all 3 possible write avenues (AutoLISP entmod: rejected outright; ARX
+  setXData: writes clean, crashes reopen; COM SetXData: writes clean, crashes reopen).
+  1004 binary xdata WRITE stays permanently blocked/read-only in this CAD OS -- not an
+  implementation gap on any of the 3 avenues, a genuine AutoCAD-internal reader defect.
+  No further avenue exists to test. No registry change (nothing was ever "implemented"
+  to begin with for 1004 write; `modify.entity.xdata` already correctly rejects it).
+- Evidence: `runs/attended_wave_m2_com_1004/` (`staged_m2.dwg`, `mission2_setxdata_result.json`,
+  `staged_m2_libredwg.json` cross-check) + the reopen-crash's own
+  `runs/dwg_truth_autocad_cad_job_20260706_154527/` router run dir.
+
+### Mission 3: hatch write attended cert -- PROMOTED, diff=0
+
+`write.entity.hatch` (owner_ticket M08H-T02) had a real handler (`m08hDispatch`,
+`AcDbHatch::setPattern/appendLoop/setAssociative/setGradient/setHatchStyle +
+evaluateHatch()`) but `policy.status_policy: catalogued_not_runnable` pending an
+attended smoke test (the hatch AREA ENGINE is demand-loaded and not available in
+headless accoreconsole even though `host_eligibility` optimistically lists it --
+`tools/attended_lane.py`'s own docstring documents this exact gap).
+
+- **Environment note (real, worth recording):** launching a SECOND, genuinely separate
+  dedicated `acad.exe` while the real session (PID 8180) was open works completely fine
+  -- verified with a throwaway diagnostic launch (new PID, opened its own doc, fully
+  responsive, no license/single-instance conflict, screenshot confirms a clean working
+  session). The two first attempts at running `attended_lane.py --mode full-cert` via
+  its CLI (240s then 480s timeout, `job_out_present:false`, no `security_before.txt`
+  ever written) were **not** an AutoCAD problem: I had passed a *relative* `--out-dir`
+  to the CLI, which flows through unchanged into `run_attended_job.ps1`'s `-RunDir` and
+  into the generated `.scr`'s `(open "runs/.../security_before.txt" "w")` call -- a
+  relative path that resolves against the LAUNCHED acad.exe's own working directory, not
+  the caller's, and fails silently in AutoLISP (`open` returns nil, the very next
+  `write-line` on a nil file handle halts the rest of the script) before ever reaching
+  `arxload`. Confirmed by reproducing the exact same script content with all-absolute
+  paths in a standalone diagnostic (wrote `security_before.txt` within 10s, no hang) and
+  then re-running the real CLI with an absolute `--out-dir` (worked end-to-end). The
+  canonical entry point (`tests/unit/test_attended_lane.py::test_attended_hatch_full_cert_live`,
+  which uses pytest's `tmp_path` -- always absolute) was never at risk; this was a
+  mistake in my own ad-hoc CLI invocation, not a latent bug in the shipped harness or its
+  own test, but worth noting for the next person who invokes the CLI by hand with a
+  relative path.
+- **Live run (`runs/attended_wave_m3_hatch_v2/`):** real dedicated `acad.exe`, staged
+  copy of the golden fixture, `write.entity.hatch` with a 4-vertex square
+  (0,0)-(100,0)-(100,100)-(0,100). Result: `created:true, class:AcDbHatch,
+  pattern:SOLID, loop_vertices:4, handle:19190, modelspace_entities_after:21748`
+  (21747+1, a genuinely new persisted entity). Security scoping restored
+  (`secureload`/`trustedpaths` before==after). `original_unchanged:true`.
+- **Ground-truth builder fix (`tools/attended_lane.py::expect_hatch`):** the FIRST
+  roundtrip attempt reported `status:fail` (`modified:1`) even though the write was
+  visibly correct -- `cad_op_gate.check_roundtrip`'s geometry-basis diff flagged
+  `normal/elevation/pattern_angle/pattern_scale/hatch_style/loop_count/pattern_type/
+  pattern_double/is_solid_fill/is_associative/is_gradient` and the loop's `closed` key as
+  "changed", because `expect_hatch()`'s prior minimal ground truth simply didn't declare
+  them -- an incomplete expected-value builder, not a write defect (every one of those
+  fields' actual values exactly matches what a correctly-created SOLID/non-associative/
+  non-gradient hatch should have). Added the missing fields (all constants, matching
+  `AcDbHatch`'s own defaults for this handler's fixed SOLID/non-associative/non-gradient
+  construction) plus `"closed": true` on the loop. Re-verified offline against the SAME
+  live run's `pre_ir`/`post_ir` first (`cad_op_gate.check_roundtrip` -> `status:ok,
+  exit_code:0, diff added:0 removed:0 modified:0 unchanged:1`), then via the real,
+  tracked, `CADOS_LIVE=1`-gated pytest entry point itself:
+  `pytest tests/unit/test_attended_lane.py -k hatch` -> **4 passed** including
+  `test_attended_hatch_full_cert_live` (85s, fresh live attended run, independent of the
+  CLI run above). Existing `expect_hatch`-consuming unit tests (`test_expect_hatch_*`,
+  `test_attended_roundtrip_geometry_{match,mismatch}_*`) all still pass unmodified --
+  additive-only fields, and the roundtrip tests derive `actual` FROM `expected` or from a
+  deliberately-wrong fixture, so they were never coupled to the old minimal shape.
+- **Registry promotion (`config/operations.v2.json`):** `write.entity.hatch`'s
+  `policy.status_policy` flipped `catalogued_not_runnable` -> `implemented`,
+  `runtime_behavior` removed (stale once promoted, mirrors `promote_op.py::_flip_axis_a`'s
+  convention even though that tool's own scope is patch_op/WRITE_OP_MAP wiring and
+  doesn't cover this M08M/M08H-style op family), evidence_refs' `deferred_attended`
+  tag replaced with the real `attended_live_verified` run + pytest reference, stale
+  `notes` (which claimed "has no CAD OS router handler yet" -- false, has since M08H)
+  replaced with an accurate one, `tests` list extended with the live pytest test.
+  `config/op_dag.json` regenerated (`tools/op_dag_generate.py`) to stay in sync (a
+  derived artifact `test_op_dag_generate.py` asserts freshness against the registry).
+- **Regression gate:** `python -m pytest tests/unit -q` -> **1136 passed, 0 failed, 23
+  skipped** (unchanged from the canonical baseline; the op_dag regen was required and
+  applied in the same commit).
+
+### Fixture integrity (all missions)
+
+`tests/fixtures/native_sample.dwg` sha256 `eac5d4b13d67d89106e503321412539df7b39b8a7f4e44c033448e9295fe3f76`
+verified before this wave's first use and re-verified after every single live/attended
+run across all 4 missions above -- unchanged throughout. No original file was ever
+opened directly; every attended/COM operation ran against a fresh staged copy, and every
+document this lane opened in the live session was closed by this lane.
+
 

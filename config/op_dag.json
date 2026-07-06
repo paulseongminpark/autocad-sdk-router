@@ -7510,6 +7510,7 @@
         "config/autocad_native_arx_operation_catalog.json",
         "reports/merge/MERGE-M08-READ.json",
         "src/Ariadne.AcadNative/families/m08h_handlers.inc",
+        "tests/unit/test_attended_lane.py",
         "tests/unit/test_m08h_handlers.py",
         "tests/unit/test_operation_registry_v2.py"
       ],
