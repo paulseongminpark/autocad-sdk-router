@@ -56,3 +56,48 @@ Baseline before any of my own edits: `pytest tests/unit -q` -> 1076 passed,
 - Full `pytest tests/unit` once more after the E2E run (tmp-file churn
   under `staging/` should not affect collected test count).
 - Commit the E2E evidence note; report back to team-lead.
+
+## Live E2E result (DONE)
+
+Ran `cad.run_operation("write.entity.line", args={layer:"0",
+start:{0,0,0}, end:{10,0,0}}, write_mode="write_copy",
+dwg_path=tests/fixtures/native_sample.dwg)` for real, headless, through
+the actual router (`accoreconsole`, native ARX/DBX lane) -- no mocks.
+
+```
+staged_copy_sha256   (pre)  = eac5d4b13d67d89106e503321412539df7b39b8a7f4e44c033448e9295fe3f76
+staged_result_sha256 (post) = 070471ddcf13535f6e4fe3b9594127dc470ae85c9b4527b5d798993d4229b32c
+fixture sha before == after = eac5d4b13d67d89106e503321412539df7b39b8a7f4e44c033448e9295fe3f76 (unchanged)
+result.modelspace_entities_after = 21748 (a new entity really landed)
+exit_code = 0, status = ok
+```
+
+Independent recomputation of both shas from the files on disk matched the
+record's values exactly. Pre != post, proving a real write happened; the
+original fixture's sha is bit-identical before and after; the run record
+alone (no re-derivation) proves the before/after story, which was exactly
+the gap item 5b called out.
+
+**Correction to the p6-hardening root-cause note, made with live evidence,
+not assumption**: that note said `cadctl.run_operation` reports
+`env["staged_copy"] = str(staged)` and that "by return time [this] holds
+POST-write bytes if a write op ran." This run disproves that specific
+claim: `staged_copy_sha256` above equals the ORIGINAL fixture's sha
+byte-for-byte -- `staged` (cadctl's own copy) was never touched, exactly
+as the inherited docstring/tests assert and as reading
+`autocad-router.ps1` lines 1054-1063 predicts (the router always makes
+its OWN second-level copy before any `_QSAVE`, because `write_original`
+is unreachable from this surface). The REAL pre-existing bug was narrower
+than that phrasing suggests: no hash of any kind was ever recorded for
+either the pre- or post-write state, so a caller had nothing to verify
+from the record alone -- not that the wrong file was being hashed. The
+fix (both shas, both labeled and present in the record) closes the actual
+gap either way.
+
+Full suite after the E2E run: `pytest tests/unit -q` -> 1076 passed, 14
+skipped (1090 = canonical 1087 + 3 new tests), unchanged from the
+pre-E2E baseline. `git status` after the run showed only
+`reports/autocad_router_status_latest.json` touched (the router's own
+volatile live-probe snapshot, regenerated as a side effect of any
+`-Action run` invocation, out of this ticket's scope) -- reverted with
+`git checkout --` to keep the diff surgical.
