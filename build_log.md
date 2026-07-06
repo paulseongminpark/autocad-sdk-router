@@ -585,3 +585,69 @@ AutoCAD-managed record...").
 - `pytest tests/unit -q`: 1119 passed, 0 failed (was 1073 passed / 14
   skipped pre-lane baseline noted above in this same file -- delta is this
   lane's added tests plus whatever accrued on `cados/wave0-build` since).
+
+### F-b -- CRASH-34 host_eligibility cross-check
+
+**Task**: cross-check the 465-op live reachability sweep's 34 CRASH-classified
+ops (`measure/reachable_matrix.jsonl`, `sweep_watchdog.ps1` -> live_probe,
+totals reproduced exactly: RUNNABLE 242 / REACHABLE 161 /
+RUNNABLE_BUT_DEGENERATE 28 / CRASH 34) against their own registry record
+(`config/operations.v2.json`) to see whether the manual triage split
+(com_activex 16 / live 5 / custom-class 6 / misc 7, "believed to be honestly
+headless-impossible") holds up as an evidence-backed verdict, not just a
+belief.
+
+**Tool**: `tools/crash34_host_crosscheck.py` -- joins all 34 CRASH rows to
+`config/operations.v2.json` by `id`, classifies each via
+`classify_one()`:
+- `expected_crash` if `policy.status_policy == "catalogued_not_runnable"`
+  (the registry's own words: no live dispatcher wired yet) -- 27 of 34.
+- `expected_crash` if the op's own `summary`/`notes` text already states
+  Core Console cannot execute it -- exactly 1 (`live.jig.point_probe`:
+  "Core Console can only report support status", quoted verbatim from the
+  registry, already documented before this lane touched anything).
+- `anomalous_crash` (registry_action=`open`) otherwise: `policy.
+  status_policy == "implemented"` (a wired, runnable dispatcher claimed)
+  with no textual host caveat -- 6 of 34.
+
+**Key finding that changed the plan**: `engine_tier == "native_arx_only"`
+alone does NOT predict CRASH -- 157 of 191 native_arx_only ops in this same
+sweep came back RUNNABLE/REACHABLE (only 34/191 crashed), so
+"host_eligibility excludes coreconsole" is not, by itself, a reliable
+per-op signal; the real discriminator is each op's OWN
+`policy.status_policy`.
+
+Anomalous 6 (registry_action=`open`, NOT registry-edited):
+- `extend.customclass.create`, `extend.customobject.create` -- registry
+  says `implemented` with a WORKING fixture on file (`test_native/
+  job_create_args.json`, `job_record_create.json`, referenced by 3+
+  existing test files) yet crashed on BOTH the empty-arg AND valid-arg
+  probe. No registry field predicts this; could be a live regression or an
+  isolated-subprocess-harness difference from whatever harness those
+  fixtures were last proven against -- flagged for owner triage, not
+  guessed at.
+- `live.overrule.enable/disable`, `live.reactor.enable/disable` -- registry
+  says `implemented`, `execution_host_class: "arx_adapter"` (in-process,
+  not textually attended-only like `live.jig.point_probe`). Plausible that
+  overrule/reactor installation needs a persistent editor command-loop a
+  one-shot native job doesn't have, but nothing in the registry says so --
+  left OPEN rather than silently annotated.
+
+No registry edit was made this lane (`registry_action_counts: {"none": 28,
+"open": 6}`, `"annotated": 0`) -- none of the 6 anomalies met the
+"unambiguous" bar the task set for a bot-authored annotation.
+
+**Outputs**: `reports/crash34_host_eligibility_crosscheck.json` +
+`.md` (34/34 joined, bucket counts reproduce 16/5/6/7 exactly, verdict
+split 28 expected / 6 anomalous).
+
+**Verification**: `tests/unit/test_crash34_crosscheck.py` -- synthetic
+fixture tests for each `classify_one` branch + `build_report`/`main` glue
+(tmp_path, no dependency on the real sweep ever changing shape), plus a
+`TestRealCrash34Sweep` class run against the real, already-committed
+`measure/reachable_matrix.jsonl` + `config/operations.v2.json`
+(read-only) asserting join completeness (34/34), verdict/action enum
+validity, and the 16/5/6/7 bucket totals.
+
+`pytest tests/unit -q`: 1136 passed, 23 skipped, 0 failed (both F-a and
+F-b changes included).
