@@ -1470,6 +1470,121 @@ run across all 4 missions above -- unchanged throughout. No original file was ev
 opened directly; every attended/COM operation ran against a fresh staged copy, and every
 document this lane opened in the live session was closed by this lane.
 
+## Lane W5-CPP
+
+Sole C++ owner of wave 5 (worktree `wt/w5_cpp`, branch `cados/w5-cpp`, base @5decde1).
+Mission: fix the `automate.property.set` WRITE marshalling defect the Attended Wave lane
+found (read path correct; write path failed `eInvalidInput` for every property type
+tried, string-typed included), then promote it.
+
+**Root cause, precisely.** `m08m_handlers.inc:1233-1234` (pre-fix) always boxed the
+incoming string arg as `AcRxValue(static_cast<const ACHAR*>(wval.c_str()))`, regardless of
+the target property's declared `AcRxValueType` (`prop->type()`). `AcRxProperty::setValue`'s
+internal type check requires the box's type to match the property's declared type by
+identity (`Desc<const ACHAR*>` is a different singleton than `Desc<AcString>`,
+`Desc<double>`, etc.), so the boxing itself failed the type check before the real setter
+ever ran -- for `Thickness` (double) AND `Contents` (AcString), not just numeric
+properties as the "string boxing should at least satisfy string properties" intuition
+would suggest.
+
+**Fix.** New file-scope helper `m08mBoxPropertyValue(propType, newValStr, outVal,
+parseError)` (`m08m_handlers.inc`, right after `m08mValueTypeName`) compares `prop->type()`
+by identity against `AcRxValueType::Desc<T>::value()` for `AcString` / `double` / `int`
+(covers `Adesk::Int32`, same underlying type on this platform) / `bool` (== `Adesk::Boolean`)
+/ `AcGePoint3d`, parses `newValStr` accordingly, and constructs the correctly-typed
+`AcRxValue`. Returns `false` (never touching `outVal`) for anything else so the caller
+treats it as an honest capability gap (`Acad::eNotImplemented` if the type itself is
+unsupported, `Acad::eInvalidInput` if the type is supported but the string didn't parse)
+-- never a silent wrong-type `setValue` attempt. **First attempt nested this helper directly
+inside the `automate.property.set` `if` block inside `m08mDispatch`'s body** -- caught before
+building: `m08mDispatch` is one large function with every op as a top-level `if` inside it, so
+a `static` free-function definition at that nesting level is an illegal local function
+definition in C++. Moved to file scope (all `m08mDispatch` helpers, including this one, must
+live before the dispatcher, alongside `m08mFindClassProperty`/`m08mValueTypeName`). Also
+extended the result envelope additively: `value_type` (from the existing
+`m08mValueTypeName`), `marshalled` (bool), and `marshal_note` (only emitted for a non-empty
+parse/support error) -- every pre-existing field (`found`/`read_only`/`before`/`requested`/
+`after`/`set_status`/`staged_rolled_back`/`status`) is unchanged in name and meaning.
+
+**Build.** `build_native_acad.ps1 -RouterHome wt\w5_cpp -OutputRoot wt\w5_cpp\build_iso` --
+0 errors, all 3 targets (`.dbx`/`.crx`/`.arx`) linked clean on the first attempt after the
+nesting fix, confirming all 5 `Desc<T>` specializations (`AcString`, `double`, `int`,
+`bool`, `AcGePoint3d`) resolve in this SDK even though only `double` had a prior
+in-repo call site (`AriadneProbe.cpp`). Deployed to `prebuilt/2027/` (previous baseline
+rotated into `prebuilt/2027/_bak/`, same convention as every prior lane).
+
+**Live verification** (staged copies of `tests/fixtures/native_sample.dwg`, sha256
+`eac5d4b13d67d89106e503321412539df7b39b8a7f4e44c033448e9295fe3f76` verified unchanged
+before AND after every single experiment below -- this op is a staged-transaction-rollback
+protocol proof by design (`AriadneStagedWriteTransaction`, dtor-abort, never commits), so
+"fresh-process readback" for THIS op is the sha256-invariance itself: nothing persists,
+by design, so a second open of the same staged file necessarily shows the pre-set value
+again; the real proof of the marshalling fix is the in-transaction before/after each run
+reports, captured via `tools/run_job.run_router_cad_job` against this worktree's own
+`tools/autocad-router.ps1` + freshly deployed `prebuilt/2027`, run dir
+`runs/w5_cpp_property_set_fix_20260706_172241/`):
+
+- **`Thickness` (double, `AcDbLine` handle `11935`):** `before:"0.000000"`,
+  `requested:"12.5"`, `after:"12.500000"`, `set_status:0`, `marshalled:true`. FIXED.
+- **`Contents` (AcString, `AcDbMText` handle `1199B`, Korean text):** `before:"전실"`
+  (matches the golden fixture verbatim, same handle the Attended Wave lane read),
+  `requested:"복도A-1"`, `after:"복도A-1"`, `set_status:0`, `marshalled:true`. FIXED,
+  and a genuinely different Korean string round-trips byte-correct (not just re-writing
+  the same value) -- encoding-safe.
+- **Read-only guard, re-verified against a genuine read-only property** (own independent
+  discovery via `inspect.entity.properties`, since the Attended Wave lane's "Text" property
+  name doesn't exist on `AcDbText`'s own member list -- the real member is `TextString`,
+  writable; the two real read-only ones are `IsDefaultAlignment` and `AlignmentPoint`):
+  `IsDefaultAlignment` (bool, `AcDbText` handle `19166`): `read_only:true`, `before:"1"`,
+  `requested:"false"`, `after:"1"` (unchanged), `set_status:2` (`eNotApplicable`). Guard
+  still correct; note `marshalled`/`marshal_note` are correctly omitted for the read-only
+  path (boxing is never attempted when read-only).
+- **Bonus type coverage** (not required by the mission, cheap given the harness was
+  already live): `IsMirroredInY` (bool, same handle) `0`->`1`, `set_status:0`. `Position`
+  (AcGePoint3d, same handle) `16910.387984 419483.601285 0.000000` ->
+  `111.500000 222.250000 0.000000`, `set_status:0`. Both FIXED end to end.
+- **`int` -- marshals correctly, one live case hits an unrelated native gap.** Only
+  reachable int-typed writable property found across `AcDbLine`/`AcDbText`/`AcDbHatch`/
+  `AcDbBlockReference`/`AcDb2dPolyline`: `DrawOrder` on `AcDbHatch` handle `119F4`.
+  `marshalled:true` (the box is correctly typed `int`, proving the type-match logic
+  itself works), but `prop->setValue()` itself then returns `set_status:-5001` (not
+  `eOk`, value unchanged) -- a native-side rejection distinct from the marshalling defect
+  this lane was scoped to fix (no exception, no crash, an honest non-ok status reported).
+  Root cause not chased further (out of scope: this is a `DrawOrder`/`AcDbHatch`/headless-host
+  question, not a boxing question) -- flagged for whoever next touches int-typed property
+  writes. Per the mission's own fallback guidance ("ship the types that work + honest
+  per-type errors ... partial promotion beats fake full support"), `int` support ships
+  as correctly-marshalling code with this one open native-side gap documented, not
+  papered over.
+- **Regression, previously-certified write op:** `write.entity.line`
+  (`tests/test_native/job_line_create.json`) on the same rebuilt binary: `created:true`,
+  `errorstatus:0`, `modelspace_entities_after:21748` (was 21747), exact start/end match.
+  No regression.
+- **`python -m pytest tests/unit -q`:** 1143 passed, 23 skipped, 0 failed.
+
+**Promoted.** `config/operations.v2.json` `automate.property.set` record: `policy.status_policy`
+`catalogued_not_runnable` -> `implemented`; removed the stale `runtime_behavior:
+"not_runnable_until_promoted..."` key; `evidence_refs` appended with the run dir and the
+concrete before/after values above; `notes` rewritten (the old note claimed "no CAD OS
+router handler yet", which was already false before this lane -- a real handler has existed
+since M08M-T01; now accurately describes the marshalling fix and its scope). Surgical
+per-record edit verified: `python -m json.load` succeeds, `len(operations) == 525` unchanged,
+`git diff --stat` shows exactly one record's lines touched. `config/op_dag.json` untouched
+(orchestrator regenerates it at merge, per instructions).
+
+**Known pre-existing gap, NOT this lane's scope, left for whoever owns it next:**
+`m08mFindClassProperty(pObj->isA(), ...)` (unchanged by this fix) walks only an object's
+OWN class member collection, never inherited base-class members -- so `Layer`/`LayerId`
+(declared on `AcDbEntity`) stay unreachable from any concrete entity subtype instance via
+this op. Same finding the Attended Wave lane already recorded; still true after this fix,
+because this fix only touched the write-side value boxing, not property lookup.
+
+Evidence: `runs/w5_cpp_property_set_fix_20260706_172241/` (staged copies + job JSONs +
+per-experiment outcome JSONs + the `inspect.database.graph`/`inspect.entity.properties`
+discovery dumps used to find real handles/properties independently rather than trusting
+the prior lane's evidence blindly).
+
+
 ## Lane W5-HYG
 
 - Started registry-hygiene reconciliation in worktree `wt/w5_hygiene` on branch

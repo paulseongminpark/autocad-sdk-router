@@ -8931,13 +8931,12 @@
       },
       "policy": {
         "source": "config/policy.v2.json",
-        "status_policy": "catalogued_not_runnable",
+        "status_policy": "implemented",
         "default_write_mode": "write_copy",
         "allowed_write_modes": [
           "write_copy"
         ],
-        "no_original_write_default": true,
-        "runtime_behavior": "not_runnable_until_promoted_to_implemented_or_wired"
+        "no_original_write_default": true
       },
       "tests": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
@@ -8949,12 +8948,12 @@
       "citation": "rxprop.h:112; readonly check rxprop.h:62",
       "evidence_refs": [
         "config/autocad_native_arx_operation_catalog.json#automate.property.set",
-        "src/Ariadne.AcadNative/families/m08m_handlers.inc:m08mDispatch",
+        "src/Ariadne.AcadNative/families/m08m_handlers.inc:m08mDispatch,m08mBoxPropertyValue",
         "reports/merge/MERGE-M08-READ.json",
-        "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
-        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)"
+        "build:native_acad exit 0 (.crx/.arx/.dbx, VS2026 MSBuild x64, worktree wt/w5_cpp)",
+        "runtime_native_job_smoke:live_verified(W5-CPP lane, run_dir runs/w5_cpp_property_set_fix_20260706_172241, fixture tests/fixtures/native_sample.dwg sha256 eac5d4b13d67d89106e503321412539df7b39b8a7f4e44c033448e9295fe3f76 unchanged before/after every run: double Thickness handle 11935 0->12.5 set_status:0; AcString Contents handle 1199B Korean 전실->복도A-1 set_status:0; bool IsMirroredInY handle 19166 0->1 set_status:0; AcGePoint3d Position handle 19166 set_status:0; read-only guard IsDefaultAlignment handle 19166 correctly refused set_status:2 unchanged; int DrawOrder handle 119F4 marshals correctly (type-matched box) but native setValue returns non-ok status -5001 on this headless host -- documented gap, not a marshalling defect; regression write.entity.line created:true errorstatus:0; python -m pytest tests/unit -q: 1143 passed, 23 skipped, 0 failed)"
       ],
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "W5-CPP (2026-07-06): fixed the WRITE marshalling defect -- the handler used to box every incoming value as a generic AcRxValue(const ACHAR*) regardless of the property's declared AcRxValueType, which failed AcRxProperty::setValue's type check for every real property (eInvalidInput), string-typed included. m08mBoxPropertyValue now boxes per the property's actual type (double/AcString/bool/AcGePoint3d live-verified end to end; int marshals correctly but the one reachable int-typed live property, AcDbHatch.DrawOrder, hits an unrelated headless-host native error -5001, not a boxing failure). Unsupported/unparseable types return an honest eNotImplemented/eInvalidInput status, never a fake attempt. Known pre-existing gap (not this fix's scope): m08mFindClassProperty only walks an object's OWN class member collection, so base-class-declared properties (e.g. Layer/LayerId on AcDbEntity) are unreachable from any concrete entity subtype instance.",
       "owner_ticket": "M08M-T01",
       "implementation_strategy": "implemented_v1",
       "evidence_required": "existing_tests_and_evidence_refs"
