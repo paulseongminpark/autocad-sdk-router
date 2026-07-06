@@ -464,6 +464,66 @@ RECORD_TABLE_CLASSES: Tuple[Dict[str, str], ...] = (
 )
 
 
+# --------------------------------------------------------------------------- #
+# 3.6 vport "*Active" managed-field policy (closeout follow-up F-a): AutoCAD
+#     reserves the "*Active" viewport record and recomputes several of its
+#     fields on its own open/regen/save cycle, independent of anything a
+#     create_vport op asked for -- build_log.md's #130 note already flagged
+#     this ("plausibly *Active is a reserved, AutoCAD-managed record that
+#     create_vport cannot fully override, not a bug in this batch's own diff
+#     machinery"), but left it as an unannotated, informational mismatch.
+#
+#     Evidence for EXACTLY these 3 fields (not a superset guess): in
+#     runs/capstone_composed_20260706 (the reference run that note was
+#     written against), records_regen_summary.json's applied batch is 221
+#     ops and regen/patch.json contains ZERO vport-touching operations (no
+#     "vport"/"viewport" substring anywhere in that patch's op list) -- so
+#     nothing THIS run issued could have written to the vport table at all.
+#     Its table_record_diffs.json "vport" row for name="*Active" still
+#     reports record_diff=["center", "height", "width"] against the
+#     census's captured values. Since no vport op ran, those 3 fields can
+#     only have moved via AutoCAD's own regen/save of the reserved active
+#     viewport -- not evidence for any OTHER field, and not evidence for
+#     any OTHER (non-"*Active") viewport record.
+# --------------------------------------------------------------------------- #
+
+VPORT_ACTIVE_RECORD_NAME = "*Active"
+VPORT_MANAGED_FIELDS: Tuple[str, ...] = ("center", "height", "width")
+
+
+def classify_vport_managed_drift(row: Dict[str, Any]) -> Dict[str, Any]:
+    """Split a vport record_diff_report() row into real diff vs
+    VPORT_MANAGED_FIELDS drift, for the reserved "*Active" record ONLY.
+
+    Returns a NEW row dict:
+      - "record_diff": the input row's record_diff with any
+        VPORT_MANAGED_FIELDS names removed -- so an "*Active" row whose
+        ONLY differences are managed fields ends up record_diff=[] (a real
+        pass, counted in zero_diff_count, never landing in the "diffs"
+        list), while any OTHER differing field still fails as before.
+      - "managed_field_drift": always present (empty list if nothing
+        managed drifted) -- {field, expected, actual} for every managed
+        field that differed, so the drift is annotated in the report JSON
+        rather than silently dropped.
+
+    A row for any name other than "*Active" is returned with
+    managed_field_drift=[] and record_diff UNCHANGED -- this policy never
+    excludes a non-"*Active" vport record, even if it happens to differ on
+    a field that shares a name with VPORT_MANAGED_FIELDS. No blanket vport
+    exclusion.
+    """
+    record_diff = list(row.get("record_diff") or [])
+    if row.get("name") != VPORT_ACTIVE_RECORD_NAME:
+        return dict(row, managed_field_drift=[])
+    managed = [f for f in record_diff if f in VPORT_MANAGED_FIELDS]
+    real = [f for f in record_diff if f not in VPORT_MANAGED_FIELDS]
+    expected = row.get("expected") or {}
+    actual = row.get("actual") or {}
+    drift = [{"field": f, "expected": expected.get(f), "actual": (actual or {}).get(f)}
+             for f in managed]
+    return dict(row, record_diff=real, managed_field_drift=drift)
+
+
 def build_records_patch(census_ir: Dict[str, Any], target_dwg: Dict[str, Any], patch_id: str, *,
                         op_roundtrip_probe_mod=None, table_classes: Tuple[Dict[str, str], ...] = RECORD_TABLE_CLASSES,
                         per_table_limit: Optional[int] = None
@@ -583,11 +643,19 @@ def table_record_diff_reports(census_ir: Dict[str, Any], post_ir: Optional[Dict[
                   or getattr(op_roundtrip_probe_mod, "layer_record_diff", None))
         base = record_diff_report(cls["label"], records, post_ir, table_key=cls["table_key"],
                                   fields=fields, diff_fn=diff_fn)
+        rows = base["rows"]
+        if cls["label"] == "vport":
+            # See "3.6 vport *Active managed-field policy" above -- reclassify
+            # AutoCAD-managed drift on the reserved "*Active" record before
+            # this table's zero_diff_count/diffs are derived, so a
+            # managed-only mismatch counts as a pass instead of a failure.
+            rows = [classify_vport_managed_drift(row) for row in rows]
+        zero_diff_count = sum(1 for row in rows if not row["record_diff"])
         reports[cls["label"]] = {
             "label": base["label"], "table_key": base["table_key"],
-            "records_compared": base["record_count"], "zero_diff_count": base["zero_diff_count"],
-            "rows": base["rows"],
-            "diffs": [row for row in base["rows"] if row["record_diff"]],
+            "records_compared": base["record_count"], "zero_diff_count": zero_diff_count,
+            "rows": rows,
+            "diffs": [row for row in rows if row["record_diff"]],
             "structural_note": (None if records else
                 "0 named records in census for this table -- vacuously 0 compared, "
                 "not evidence of a passing roundtrip"),

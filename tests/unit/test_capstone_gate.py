@@ -245,6 +245,100 @@ def test_table_record_diff_reports_zero_named_records_is_flagged_vacuous():
 
 
 # --------------------------------------------------------------------------- #
+# vport "*Active" managed-field policy (closeout follow-up F-a) -- exercised
+# against a FAKE vport-labeled table class (own small field set), so this
+# does not depend on the real op_roundtrip_probe.VPORT_RECORD_FIELDS list.
+# --------------------------------------------------------------------------- #
+
+class _FakeOrpVport:
+    VPORT_FIELDS = ("center", "height", "width", "circle_sides")
+
+    @staticmethod
+    def vport_diff(expected, actual):
+        if actual is None:
+            return sorted(expected)
+        return sorted(k for k, v in expected.items() if actual.get(k) != v)
+
+
+_FAKE_VPORT_TABLE_CLASSES = (
+    {"label": "vport", "op_name": "create_vport", "table_key": "viewports",
+     "fields_attr": "VPORT_FIELDS", "diff_attr": "vport_diff"},
+)
+
+
+def test_classify_vport_managed_drift_active_record_moves_managed_fields():
+    row = {
+        "name": "*Active", "record_diff": ["center", "height", "width", "circle_sides"],
+        "expected": {"center": [1, 1], "height": 10, "width": 20, "circle_sides": 1000},
+        "actual": {"center": [9, 9], "height": 99, "width": 88, "circle_sides": 16},
+    }
+    out = frc.classify_vport_managed_drift(row)
+    assert out["record_diff"] == ["circle_sides"]
+    assert {d["field"] for d in out["managed_field_drift"]} == {"center", "height", "width"}
+    drift_by_field = {d["field"]: d for d in out["managed_field_drift"]}
+    assert drift_by_field["center"] == {"field": "center", "expected": [1, 1], "actual": [9, 9]}
+
+
+def test_classify_vport_managed_drift_non_active_record_untouched():
+    row = {"name": "Viewport2", "record_diff": ["center"],
+           "expected": {"center": [1, 1]}, "actual": {"center": [9, 9]}}
+    out = frc.classify_vport_managed_drift(row)
+    assert out["record_diff"] == ["center"]  # unchanged -- policy only applies to "*Active"
+    assert out["managed_field_drift"] == []
+
+
+def test_vport_managed_field_drift_on_active_is_annotated_not_a_diff():
+    # Mirrors runs/capstone_composed_20260706's own vport row: center/height/
+    # width differ, no other field does -- gate passes, drift is annotated.
+    census_ir = {"symbol_tables": {"viewports": [
+        {"name": "*Active", "center": [1, 1], "height": 10, "width": 20, "circle_sides": 1000},
+    ]}}
+    post_ir = {"symbol_tables": {"viewports": [
+        {"name": "*Active", "center": [9, 9], "height": 99, "width": 88, "circle_sides": 1000},
+    ]}}
+    reports = frc.table_record_diff_reports(
+        census_ir, post_ir, op_roundtrip_probe_mod=_FakeOrpVport(), table_classes=_FAKE_VPORT_TABLE_CLASSES)
+    vport = reports["vport"]
+    assert vport["diffs"] == []
+    assert vport["zero_diff_count"] == 1
+    row = vport["rows"][0]
+    assert row["record_diff"] == []
+    assert {d["field"] for d in row["managed_field_drift"]} == {"center", "height", "width"}
+
+
+def test_vport_non_managed_field_on_active_still_fails_gate():
+    census_ir = {"symbol_tables": {"viewports": [
+        {"name": "*Active", "center": [1, 1], "height": 10, "width": 20, "circle_sides": 1000},
+    ]}}
+    post_ir = {"symbol_tables": {"viewports": [
+        {"name": "*Active", "center": [1, 1], "height": 10, "width": 20, "circle_sides": 16},
+    ]}}
+    reports = frc.table_record_diff_reports(
+        census_ir, post_ir, op_roundtrip_probe_mod=_FakeOrpVport(), table_classes=_FAKE_VPORT_TABLE_CLASSES)
+    vport = reports["vport"]
+    assert vport["zero_diff_count"] == 0
+    assert len(vport["diffs"]) == 1
+    assert vport["diffs"][0]["record_diff"] == ["circle_sides"]
+    assert vport["diffs"][0]["managed_field_drift"] == []
+
+
+def test_vport_managed_named_field_on_non_active_record_still_fails_gate():
+    census_ir = {"symbol_tables": {"viewports": [
+        {"name": "Viewport2", "center": [1, 1], "height": 10, "width": 20, "circle_sides": 1000},
+    ]}}
+    post_ir = {"symbol_tables": {"viewports": [
+        {"name": "Viewport2", "center": [9, 9], "height": 10, "width": 20, "circle_sides": 1000},
+    ]}}
+    reports = frc.table_record_diff_reports(
+        census_ir, post_ir, op_roundtrip_probe_mod=_FakeOrpVport(), table_classes=_FAKE_VPORT_TABLE_CLASSES)
+    vport = reports["vport"]
+    assert vport["zero_diff_count"] == 0
+    assert len(vport["diffs"]) == 1
+    assert vport["diffs"][0]["record_diff"] == ["center"]
+    assert vport["diffs"][0]["managed_field_drift"] == []
+
+
+# --------------------------------------------------------------------------- #
 # run_records_batch -- fake patch_engine_mod (no real accoreconsole call);
 # verifies the glue (build_records_patch -> apply_staged -> shape), same
 # split as test_isolate_regenerated_entities_delegates_to_added_entities_ir.
