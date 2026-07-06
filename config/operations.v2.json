@@ -61,6 +61,7 @@
     },
     "by_family": {
       "active_document_write_original": 8,
+      "anchor": 4,
       "apply": 1,
       "blocks_xrefs_clone": 5,
       "brep_solids": 54,
@@ -91,7 +92,7 @@
       "accoreconsole_lisp_also": 20,
       "managed_also": 48,
       "native_arx_only": 232,
-      "objectdbx_capable": 227
+      "objectdbx_capable": 231
     },
     "total": 527
   },
@@ -2781,6 +2782,301 @@
       },
       "notes": "IMPLEMENTED (M02). Handler = tools/validator.py validate_target, wired through tools/cadctl.py Cad.validate. Verified live this session against runs/m02_cadctl_rich/dwg_graph_ir.json: rollup status 'pass', 6/6 gates pass (ir_schema_present, entity_count_consistency, required_artifacts_exist, no_original_write_evidence, registry_status_consistency, run_folder_completeness). The registry_status_consistency gate reads THIS file and asserts the required wired-baseline ops (inspect.database.summary, inspect.entity.count) are status=implemented. Truthful degradation: cadctl.validate returns not_implemented if validator (Lane E) is absent, blocked if the IR file is missing.",
       "owner_ticket": "M08G-T01",
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs"
+    },
+    {
+      "id": "anchor.set",
+      "family": "anchor",
+      "status": "implemented",
+      "engine_tier": "objectdbx_capable",
+      "host_eligibility": [
+        "dbx",
+        "coreconsole",
+        "arx_adapter",
+        "full_autocad"
+      ],
+      "hosts": [
+        "dbx",
+        "coreconsole",
+        "arx_adapter",
+        "full_autocad"
+      ],
+      "execution_context": "python_pre_process_then_native_write",
+      "write_level": {
+        "default_write_mode": "write_copy",
+        "allowed_write_modes": [
+          "write_copy"
+        ],
+        "dwg_persisted": true,
+        "original_write_default": false
+      },
+      "handler": {
+        "router_lane": null,
+        "dispatcher_symbol": "anchor_ops.build_anchor_set_patch",
+        "execution_host_class": "dbx",
+        "python_handler": "tools/anchor_ops.py::build_anchor_set_patch + encode_anchor_envelope/encode_anchor_values",
+        "wired_via": "tools/cadctl.py::Cad.anchor_set -> patch_engine.apply_staged",
+        "composed_of": [
+          "modify.entity.xdata"
+        ]
+      },
+      "mapping_type": "synthetic",
+      "catalog_op_id": null,
+      "input_schema": "schemas/cad_patch.v1.schema.json",
+      "output_schema": "schemas/cad_patch.result.v1.schema.json",
+      "policy": {
+        "write_mode_default": "write_copy",
+        "staged_copy_required": true,
+        "write_original_requires_approval": true,
+        "raw_command_dispatch": "forbidden",
+        "secrets": "never_read_or_printed",
+        "note": "No new native op: builds a set_entity_xdata_by_handle patch (native modify.entity.xdata) whose 'values' encode a JSON envelope {schema_version,author_agent,timestamp,tags,body,tombstone} chunked across 1000-code xdata strings under app ARIADNE_ANCHOR. Rejects (blocked) oversized payloads before touching any DWG -- see tools/anchor_ops.py MAX_ANCHOR_BYTES/MAX_CHUNK_BYTES and docs/SEMANTIC_ANCHOR_SPEC.md."
+      },
+      "tests": [
+        "tests/unit/test_anchor_ops.py",
+        "Lane W5-ANCHOR live cert: set on tests/fixtures/native_sample.dwg, fresh-process reopen, byte-identical reassembly (see build_log.md)"
+      ],
+      "summary": "Write (upsert) a semantic anchor -- an agent's JSON interpretation of an entity -- onto a STAGED copy of a DWG. Reuses the existing set_entity_xdata_by_handle write; adds no new native op.",
+      "evidence_refs": [
+        "tools/anchor_ops.py::build_anchor_set_patch",
+        "tools/cadctl.py::Cad.anchor_set",
+        "tools/cadagent_mcp.py::_tool_anchor_set (cad.anchor_set)",
+        "docs/SEMANTIC_ANCHOR_SPEC.md"
+      ],
+      "target_family_first_class": true,
+      "wired_v1": false,
+      "operation": "anchor.set",
+      "engines": [
+        "objectdbx_capable"
+      ],
+      "schema_refs": {
+        "input": "schemas/cad_patch.v1.schema.json",
+        "output": "schemas/cad_patch.result.v1.schema.json"
+      },
+      "notes": "IMPLEMENTED (Wave 5, Lane W5-ANCHOR). setXData replaces only the calling app's own xdata block, so a second anchor.set on the same handle is a natural upsert (does not stack with the previous anchor). Truthful degradation: blocked if the envelope fails the size guard or anchor_ops is absent (not_implemented), not_implemented if patch_engine.apply_staged is absent.",
+      "owner_ticket": "W5-ANCHOR",
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs"
+    },
+    {
+      "id": "anchor.get",
+      "family": "anchor",
+      "status": "implemented",
+      "engine_tier": "objectdbx_capable",
+      "host_eligibility": [
+        "dbx",
+        "coreconsole",
+        "arx_adapter",
+        "full_autocad"
+      ],
+      "hosts": [
+        "dbx",
+        "coreconsole",
+        "arx_adapter",
+        "full_autocad"
+      ],
+      "execution_context": "python_post_process",
+      "write_level": {
+        "default_write_mode": "read",
+        "allowed_write_modes": [
+          "read"
+        ],
+        "dwg_persisted": false,
+        "original_write_default": false
+      },
+      "handler": {
+        "router_lane": null,
+        "dispatcher_symbol": "anchor_ops.get_anchor_from_ir",
+        "execution_host_class": "dbx",
+        "python_handler": "tools/anchor_ops.py::get_anchor_from_ir + decode_anchor_values",
+        "wired_via": "tools/cadctl.py::Cad.anchor_get",
+        "composed_of": [
+          "inspect.database.graph"
+        ]
+      },
+      "mapping_type": "synthetic",
+      "catalog_op_id": null,
+      "input_schema": "schemas/dwg_graph_ir.v1.schema.json",
+      "output_schema": "schemas/semantic_anchor.v1.schema.json",
+      "policy": {
+        "write_mode_default": "read",
+        "staged_copy_required": false,
+        "write_original_requires_approval": true,
+        "raw_command_dispatch": "forbidden",
+        "secrets": "never_read_or_printed",
+        "note": "Read-only. Operates on an already-extracted dwg_graph_ir.v1 document (same ir_path convention as query.entities/get_entity) -- no new native read op; reassembles the chunked JSON envelope and verifies length + sha256 before returning it."
+      },
+      "tests": [
+        "tests/unit/test_anchor_ops.py"
+      ],
+      "summary": "Read a semantic anchor back from an already-extracted IR by entity handle. Reassembles the chunked xdata payload, verifies its checksum, and returns the decoded envelope (or a truthful not_found/malformed status).",
+      "evidence_refs": [
+        "tools/anchor_ops.py::get_anchor_from_ir",
+        "tools/cadctl.py::Cad.anchor_get",
+        "tools/cadagent_mcp.py::_tool_anchor_get (cad.anchor_get)",
+        "docs/SEMANTIC_ANCHOR_SPEC.md"
+      ],
+      "target_family_first_class": true,
+      "wired_v1": false,
+      "operation": "anchor.get",
+      "engines": [
+        "objectdbx_capable"
+      ],
+      "schema_refs": {
+        "input": "schemas/dwg_graph_ir.v1.schema.json",
+        "output": "schemas/semantic_anchor.v1.schema.json"
+      },
+      "notes": "IMPLEMENTED (Wave 5, Lane W5-ANCHOR). Truthful statuses: not_found (no entity / no anchor block / tombstoned), malformed (xdata present but fails checksum/schema validation -- a real finding, never swallowed), ok (envelope returned).",
+      "owner_ticket": "W5-ANCHOR",
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs"
+    },
+    {
+      "id": "anchor.list",
+      "family": "anchor",
+      "status": "implemented",
+      "engine_tier": "objectdbx_capable",
+      "host_eligibility": [
+        "dbx",
+        "coreconsole",
+        "arx_adapter",
+        "full_autocad"
+      ],
+      "hosts": [
+        "dbx",
+        "coreconsole",
+        "arx_adapter",
+        "full_autocad"
+      ],
+      "execution_context": "python_post_process",
+      "write_level": {
+        "default_write_mode": "read",
+        "allowed_write_modes": [
+          "read"
+        ],
+        "dwg_persisted": false,
+        "original_write_default": false
+      },
+      "handler": {
+        "router_lane": null,
+        "dispatcher_symbol": "anchor_ops.list_anchors_from_ir",
+        "execution_host_class": "dbx",
+        "python_handler": "tools/anchor_ops.py::list_anchors_from_ir",
+        "wired_via": "tools/cadctl.py::Cad.anchor_list",
+        "composed_of": [
+          "inspect.database.graph"
+        ]
+      },
+      "mapping_type": "synthetic",
+      "catalog_op_id": null,
+      "input_schema": "schemas/dwg_graph_ir.v1.schema.json",
+      "output_schema": "schemas/semantic_anchor_list.v1.schema.json",
+      "policy": {
+        "write_mode_default": "read",
+        "staged_copy_required": false,
+        "write_original_requires_approval": true,
+        "raw_command_dispatch": "forbidden",
+        "secrets": "never_read_or_printed",
+        "note": "Read-only. Scans every entity in an already-extracted IR for an ARIADNE_ANCHOR xdata block; tombstoned anchors are excluded from the live list but malformed ones are reported (not silently dropped)."
+      },
+      "tests": [
+        "tests/unit/test_anchor_ops.py"
+      ],
+      "summary": "List every live (non-tombstoned) semantic anchor in an already-extracted IR.",
+      "evidence_refs": [
+        "tools/anchor_ops.py::list_anchors_from_ir",
+        "tools/cadctl.py::Cad.anchor_list",
+        "tools/cadagent_mcp.py::_tool_anchor_list (cad.anchor_list)",
+        "docs/SEMANTIC_ANCHOR_SPEC.md"
+      ],
+      "target_family_first_class": true,
+      "wired_v1": false,
+      "operation": "anchor.list",
+      "engines": [
+        "objectdbx_capable"
+      ],
+      "schema_refs": {
+        "input": "schemas/dwg_graph_ir.v1.schema.json",
+        "output": "schemas/semantic_anchor_list.v1.schema.json"
+      },
+      "notes": "IMPLEMENTED (Wave 5, Lane W5-ANCHOR).",
+      "owner_ticket": "W5-ANCHOR",
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs"
+    },
+    {
+      "id": "anchor.clear",
+      "family": "anchor",
+      "status": "implemented",
+      "engine_tier": "objectdbx_capable",
+      "host_eligibility": [
+        "dbx",
+        "coreconsole",
+        "arx_adapter",
+        "full_autocad"
+      ],
+      "hosts": [
+        "dbx",
+        "coreconsole",
+        "arx_adapter",
+        "full_autocad"
+      ],
+      "execution_context": "python_pre_process_then_native_write",
+      "write_level": {
+        "default_write_mode": "write_copy",
+        "allowed_write_modes": [
+          "write_copy"
+        ],
+        "dwg_persisted": true,
+        "original_write_default": false
+      },
+      "handler": {
+        "router_lane": null,
+        "dispatcher_symbol": "anchor_ops.build_anchor_clear_patch",
+        "execution_host_class": "dbx",
+        "python_handler": "tools/anchor_ops.py::build_anchor_clear_patch",
+        "wired_via": "tools/cadctl.py::Cad.anchor_clear -> patch_engine.apply_staged",
+        "composed_of": [
+          "modify.entity.xdata"
+        ]
+      },
+      "mapping_type": "synthetic",
+      "catalog_op_id": null,
+      "input_schema": "schemas/cad_patch.v1.schema.json",
+      "output_schema": "schemas/cad_patch.result.v1.schema.json",
+      "policy": {
+        "write_mode_default": "write_copy",
+        "staged_copy_required": true,
+        "write_original_requires_approval": true,
+        "raw_command_dispatch": "forbidden",
+        "secrets": "never_read_or_printed",
+        "note": "KNOWN LIMITATION -- LOGICAL CLEAR ONLY, not true XDATA removal. The native modify.entity.xdata handler unconditionally rejects an empty 'values' array (m08g_handlers.inc), which is the only ObjectARX-documented way to delete an app's xdata (setXData with a resbuf containing only the {1001,appName} record); relaxing that guard requires a C++ change out of this Python-only lane's scope. anchor.clear instead overwrites the entity's ARIADNE_ANCHOR xdata with a minimal tombstone envelope (tombstone=true); anchor.get/anchor.list both treat tombstone=true as absent. See docs/SEMANTIC_ANCHOR_SPEC.md 'Clear semantics (known limitation)'."
+      },
+      "tests": [
+        "tests/unit/test_anchor_ops.py",
+        "Lane W5-ANCHOR live cert: clear on tests/fixtures/native_sample.dwg, fresh-process reopen confirms anchor.get reports not_found (see build_log.md)"
+      ],
+      "summary": "Logically clear (tombstone) a semantic anchor on a STAGED copy of a DWG. Does not truly remove the underlying xdata (native handler limitation, honestly documented); anchor.get/anchor.list treat a tombstoned anchor as absent.",
+      "evidence_refs": [
+        "tools/anchor_ops.py::build_anchor_clear_patch",
+        "tools/cadctl.py::Cad.anchor_clear",
+        "tools/cadagent_mcp.py::_tool_anchor_clear (cad.anchor_clear)",
+        "docs/SEMANTIC_ANCHOR_SPEC.md",
+        "src/Ariadne.AcadNative/families/m08g_handlers.inc (modify.entity.xdata items.empty() guard)"
+      ],
+      "target_family_first_class": true,
+      "wired_v1": false,
+      "operation": "anchor.clear",
+      "engines": [
+        "objectdbx_capable"
+      ],
+      "schema_refs": {
+        "input": "schemas/cad_patch.v1.schema.json",
+        "output": "schemas/cad_patch.result.v1.schema.json"
+      },
+      "notes": "IMPLEMENTED (Wave 5, Lane W5-ANCHOR). See policy.note for the honest tombstone-vs-true-removal limitation.",
+      "owner_ticket": "W5-ANCHOR",
       "implementation_strategy": "implemented_v1",
       "evidence_required": "existing_tests_and_evidence_refs"
     },

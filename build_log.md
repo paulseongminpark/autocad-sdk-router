@@ -1535,6 +1535,159 @@ document this lane opened in the live session was closed by this lane.
 
 ## Lane W5-CPP
 ## Lane W5-TMPL
+---
+## Lane W5-ANCHOR
+
+Mission: legislate + implement a semantic-anchor op family (`anchor.set`/`anchor.get`/
+`anchor.list`/`anchor.clear`) so an agent can stamp its interpretation of an entity onto
+that entity (staged copies only) and read it back later, using the ALREADY live-certified
+`set_entity_xdata_by_handle` write (native `modify.entity.xdata`) -- no new native op,
+Python layer only.
+
+### Read-first (Rule 8)
+
+Read `tools/patch_ops/entities.py`'s `modify.entity.xdata` branch (`build_job_args`),
+`src/Ariadne.AcadNative/families/m08g_handlers.inc`'s `modify.entity.xdata` handler (the
+accepted xdata group codes 1000/1003/1005/1040-1042/1070-1071/1010-1013; 1002/1004
+excluded; the `items.empty()` guard that unconditionally rejects an empty `values` array
+BEFORE building any resbuf chain), `AriadneNativeJob.cpp`'s `utf8ToWide`/`acharToUtf8`
+(confirmed real UTF-8<->UTF-16 conversion, not the historically-named-but-actually-ASCII
+funnel -- Korean survives), `tools/op_roundtrip_probe.py`'s `probe_entity_xdata_roundtrip`
+(the P10 two-step create-then-set-xdata pattern this lane's live cert reuses), and
+`tools/cadctl.py`'s `Cad.query`/`Cad.validate`/`Cad.patch_apply_staged` (the thin-delegate,
+truthful-degradation convention every new `Cad.anchor_*` method mirrors).
+
+### Design (docs/SEMANTIC_ANCHOR_SPEC.md)
+
+Envelope schema (schema_version 1): `{schema_version, author_agent, timestamp, tags[],
+body{}, tombstone}`. `tombstone` is an addition beyond the originally specified 5 fields
+(see Clear semantics below). Stored under registered app `ARIADNE_ANCHOR`.
+
+### Wire-safety discovery (load-bearing finding, not assumed away)
+
+First implementation encoded the header as JSON (`{"v":1,"n":..,"len":..,"sha256":".."}`)
+and chunked the JSON-serialized envelope directly. The LIVE cert caught a real bug: the
+native `modify.entity.xdata` handler's `values` array item-boundary scanner does naive,
+non-nesting-aware `job.find('{', scan)` / `job.find('}', ob)` matching. A `"value"` string
+that itself contains a literal `{` or `}` -- which any JSON text does, since JSON syntax
+never needs to escape braces inside a string -- makes the scanner latch onto the wrong
+closing brace (the one embedded in the string's own content), truncating the item and
+corrupting the subsequent `jsonFindString()` read. Live-reproduced: a JSON header written
+via `anchor.set` came back through a fresh accoreconsole reopen as the 2-byte garbage
+string `{\` -- a silent wrong-read, not a crash. Since this lane is Python-layer only (no
+C++ touched; `src/` is a concurrent lane's), the fix is on the wire-format side: the JSON
+envelope is now **base64-encoded** (alphabet `[A-Za-z0-9+/=]` -- no braces/quotes/
+backslashes) before chunking, and the header is a plain pipe-delimited string
+(`ANCHOR1|n=<count>|len=<bytes>|sha256=<hex>`), never JSON. Re-ran the live cert after the
+fix: passed clean. Full writeup: `docs/SEMANTIC_ANCHOR_SPEC.md`, "Wire-safety discovery".
+
+### Clear semantics (known limitation, honestly documented)
+
+`anchor.clear` is a LOGICAL (tombstone) clear, not true XDATA removal. The native
+`modify.entity.xdata` handler rejects an empty `values` array unconditionally (the only
+ObjectARX-documented way to truly delete an app's xdata is `setXData()` with a resbuf
+containing ONLY the `{1001,appName}` record) -- relaxing that guard is a C++ change, out
+of this Python-only lane's scope. `anchor.clear` instead overwrites the entity's
+`ARIADNE_ANCHOR` xdata with a minimal `tombstone:true` envelope; `anchor.get`/
+`anchor.list` both treat it as absent.
+
+### Implementation
+
+- `tools/anchor_ops.py` (new): chunking primitives (`_utf8_chunks`, UTF-8-boundary-safe),
+  `encode_anchor_envelope`/`encode_anchor_values`/`decode_anchor_values`, IR-side read
+  helpers (`find_anchor_xdata_items`/`get_anchor_from_ir`/`list_anchors_from_ir`), and
+  patch builders (`build_anchor_set_patch`/`build_anchor_clear_patch`) that emit a plain
+  `set_entity_xdata_by_handle` cad_patch.v1 operation -- reusing the existing native op
+  verbatim, adding no new one.
+- `tools/cadctl.py`: 4 new `Cad` methods (`anchor_set`/`anchor_get`/`anchor_list`/
+  `anchor_clear`), mirroring `Cad.query`/`Cad.validate`/`Cad.patch_apply_staged`'s
+  thin-delegate + truthful-degradation shape exactly.
+- `tools/cadagent_mcp.py`: 4 new MCP tools (`cad.anchor_set`/`cad.anchor_get`/
+  `cad.anchor_list`/`cad.anchor_clear`), added to `_TOOLS`/`_DISPATCH`/`_EXPECTED_TOOLS`/
+  `_SELFTEST_ARGS`; tool surface grows from 13 to **17**.
+- `config/operations.v2.json`: 4 new records under a new family `anchor` (family shape
+  mirrors `query.entities`/`validate.ir`'s synthetic/python-layer convention exactly --
+  `mapping_type:"synthetic"`, `catalog_op_id:null`, `wired_v1:false`, `composed_of`
+  pointing at the EXACT existing registry ids `modify.entity.xdata` / `inspect.database.
+  graph`, never a descriptive string with extra text -- learned the hard way from
+  `test_operations_v2_registry.py`'s unresolved-ref gate, which requires an exact id
+  match). `totals`/`coverage` roll-ups updated (525->529 ops, implemented 465->469,
+  `by_family.anchor:4`, `objectdbx_capable` 227->231). `tools/operation_coverage_matrix.py`
+  gained an `anchor` branch in `assign_owner_ticket` (-> `W5-ANCHOR`) so the deterministic
+  owner-ticket gate (`test_m08a_catalog_reopen.py`) stays green.
+- `docs/SEMANTIC_ANCHOR_SPEC.md` (new): full design doc.
+- `tests/unit/test_anchor_ops.py` (new): 45 tests -- chunking (255-byte boundary, Korean
+  multi-byte split safety, empty text, single-codepoint-too-small), envelope validation,
+  encode/decode round trip (ASCII, Korean+nested JSON, 255-byte boundary end-to-end),
+  size guard (oversized rejected, exact-cap accepted, propagates through
+  `build_anchor_set_patch`), malformed-anchor tolerance (empty items, unrecognized
+  header, wrong version prefix, missing header field, truncated chunk set, tampered
+  chunk/sha256 mismatch, wrong chunk count, inner schema_version mismatch), IR-side
+  lookup helpers (not_found/malformed/tombstone/ok paths), patch builders (op shape,
+  missing handle, native-op-map cross-check), and a `CADOS_LIVE=1`-gated live cert class
+  (skipped by default with an explicit reason, same convention as
+  `test_attended_lane.py`'s live leg).
+
+### Live cert (real run, not injected)
+
+Ran `TestAnchorLiveCert.test_full_lifecycle` with `CADOS_LIVE=1` against
+`tests/fixtures/native_sample.dwg` (sha256
+`eac5d4b13d67d89106e503321412539df7b39b8a7f4e44c033448e9295fe3f76`, verified before AND
+after -- unchanged). Real entity handle discovered from the fixture: `11935`. Body written
+(Korean text + nested JSON):
+```json
+{"note": "한국어 텍스트 확인 완전체 -- Lane W5-ANCHOR live cert",
+ "nested": {"층": "1층", "list": [1, 2, {"ok": true}], "layer_ref": "<discovered layer>"}}
+```
+- `anchor.set` (`patch_engine.apply_staged`): `status:ok`, `original_unchanged:true`
+  (sha256 before==after==`eac5d4...`). xdata written as 3 items (1 header + 2 base64
+  chunks): header `ANCHOR1|n=2|len=310|sha256=4b7377c7bcb578fcdf2504b093369daa707984aab5
+  d6233c0f1e508d4dbf517c`.
+- **Independent fresh-process reopen #1**: a SEPARATE `run_job.run_router_cad_job`
+  invocation (new accoreconsole process, decoupled from `apply_staged`'s own internal
+  pre/post inspect) against the `set` step's `staged_output.dwg`. `entity_count:21747`
+  (unchanged from the golden baseline). `anchor.get(handle=11935)` -> `status:ok`,
+  reassembled body byte-identical (`assertEqual` against the exact dict written,
+  including the Korean text and nested structure) -- proves the base64 chunk/header
+  fix round-trips correctly, not just that it doesn't crash. `anchor.list` finds handle
+  `11935` among the live anchors.
+- `anchor.clear` on that same staged output: `status:ok`, its own `original_unchanged`
+  proof also `true` (sha256 before==after of the SET step's staged output, which is the
+  input this clear step further staged a copy of).
+- **Independent fresh-process reopen #2**: another separate accoreconsole invocation
+  against the `clear` step's `staged_output.dwg`. `entity_count:21747` (still unchanged
+  -- xdata writes never touch entity count). `anchor.get(handle=11935)` ->
+  `status:not_found` (reason mentions tombstone). `anchor.list` no longer lists the
+  handle.
+- Pristine `tests/fixtures/native_sample.dwg` sha256 re-verified identical at the very
+  end of the test, independent of `patch_engine`'s own proofs.
+
+### Regression gate
+
+`python -m pytest tests/unit -q`: **1184 passed, 24 skipped** (unchanged pre-existing
+skip set; matches the canonical baseline), **2 pre-existing failures** --
+`test_op_dag_generate.py::TestOpDagBuild::test_node_set_equals_catalogue_set` and
+`::TestOpDagArtifactFresh::test_artifact_matches_fresh_build`. Both fail because
+`config/op_dag.json` (explicitly PROTECTED for this lane -- owned by a concurrent lane
+this wave) is a derived artifact of `operations.v2.json` and is now stale (525 nodes vs.
+the registry's live 529). This is the same "regenerate `config/op_dag.json` after growing
+the registry" step earlier lanes in this same log performed via `tools/op_dag_generate.py`
+(see the cd2-cadctl/attended-wave entries above) -- but doing so here is out of THIS
+lane's scope per its explicit brief (`config/op_dag.json` untouched by design, concurrent
+lane owns it). **Known, expected, cross-lane blocker: `config/op_dag.json` needs a
+regen pass against the merged registry once this lane's 4 new ops land** -- not a defect
+in the anchor implementation itself. Every other test file touched by this lane's
+registry/owner-ticket/pinned-count changes (`test_mcp_tool_contract.py`,
+`test_cadctl.py`, `test_patch_ops_split.py`, `test_operations_v2_registry.py`,
+`test_operation_registry_v2.py`, `test_catalog_completeness.py`,
+`test_m08a_catalog_reopen.py`) is green.
+
+### Fixture integrity (this lane)
+
+`tests/fixtures/native_sample.dwg` sha256 `eac5d4b13d67d89106e503321412539df7b39b8a7f4e44c033448e9295fe3f76`
+unchanged before/after every write in this lane's live cert (verified independently by
+this lane, not just trusted from `patch_engine`'s own proof).
+
 
 **Task:** design + build a GOVERNED middle path for the raw-command-dispatch
 family blocked ops (`command.invoke.*`, `doc.sendstring`, `command.queue.post`,

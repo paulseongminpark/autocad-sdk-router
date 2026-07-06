@@ -38,7 +38,8 @@ for _p in (_REPO, os.path.join(_REPO, "tools")):
 _EXPECTED_TOOLS = {
     "cad.status", "cad.inspect_drawing", "cad.query_entities", "cad.get_entity",
     "cad.validate_ir", "cad.registry_status", "cad.registry_explain",
-    "cad.patch_dry_run", "cad.patch_apply_staged", "cad.diff_before_after",
+    "cad.patch_dry_run", "cad.patch_apply_staged", "cad.anchor_set",
+    "cad.anchor_get", "cad.anchor_list", "cad.anchor_clear", "cad.diff_before_after",
     "cad.visual_report", "cad.live_status", "cad.run_operation",
 }
 
@@ -54,6 +55,10 @@ _TRIVIAL_ARGS = {
     "cad.registry_explain": {"op_id": "inspect.database.graph"},
     "cad.patch_dry_run": {"patch": {"schema": "ariadne.cad_patch.v1"}},
     "cad.patch_apply_staged": {},
+    "cad.anchor_set": {},
+    "cad.anchor_get": {},
+    "cad.anchor_list": {},
+    "cad.anchor_clear": {},
     "cad.diff_before_after": {},
     "cad.visual_report": {"source_ref": "/nonexistent/source.dwg", "kind": "png"},
     "cad.live_status": {},
