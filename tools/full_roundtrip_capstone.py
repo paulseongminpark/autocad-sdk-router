@@ -51,10 +51,16 @@ Public API (pure -- no I/O, no CAD engine; independently unit-testable):
     record_diff_report(kind_label, records, actual_ir, *, name_field, fields, diff_fn, lookup_fn) -> dict
     per_kind_verdict(pre_ir, diff) -> dict
     resolvable_ops_report(patch, patch_ops_mod=None) -> dict
+    record_op_args_from_record(record, fields) -> dict
+    build_records_patch(census_ir, target_dwg, patch_id, ...) -> (patch, meta)
+    table_record_diff_reports(census_ir, post_ir, ...) -> dict  (Closeout #130)
+    regen_gate_report(op_count, apply_result) -> dict  (Closeout #129a)
+    combine_gate_statuses(statuses) -> str
 
 Public API (live -- needs a real AutoCAD runtime via patch_engine/run_job):
     run_census(staged_path, original_path, run_dir, ...) -> dict
     run_regen_batch(filtered_ir, blank_seed_path, run_dir, patch_id, ...) -> dict
+    run_records_batch(census_ir, blank_seed_path, run_dir, patch_id, ...) -> dict
     run_capstone(...) -> dict  (top-level orchestrator; see main() / CLI)
 
 CLI:
@@ -416,6 +422,308 @@ def per_kind_verdict(pre_ir: Dict[str, Any], diff: Dict[str, Any]) -> Dict[str, 
     }
 
 
+def record_op_args_from_record(record: Dict[str, Any], fields: Tuple[str, ...]) -> Dict[str, Any]:
+    """Generic form of layer_op_args_from_record/dimstyle_op_args_from_record:
+    create_<table> op args replicating one census-extracted symbol_tables
+    record (name + every key in ``fields`` present on the record). Used by
+    build_records_patch/RECORD_TABLE_CLASSES to cover all 7 record-table
+    classes (layer/dimstyle/linetype/textstyle/ucs/view/vport) through ONE
+    code path instead of a hand-written per-table function each; the two
+    named wrappers above are unchanged (existing call sites/tests) and are
+    now equivalent special cases of this one."""
+    args: Dict[str, Any] = {"name": record.get("name")}
+    for k in fields:
+        if k in record:
+            args[k] = record[k]
+    return args
+
+
+# Every symbol-table record class with a live create_* native write handler
+# (patch_ops.NATIVE_WRITE_OP_MAP) AND a record-diff driver in
+# op_roundtrip_probe.py -- the table-tier D-class certs' own field lists /
+# diff functions, reused verbatim (never reimplemented; see module
+# docstring). fields_attr/diff_attr are attribute NAMES (not the values
+# themselves), resolved via getattr with a fallback, so a checkout missing
+# one constant degrades gracefully (see table_record_diff_reports) instead
+# of raising AttributeError at import time.
+RECORD_TABLE_CLASSES: Tuple[Dict[str, str], ...] = (
+    {"label": "layer", "op_name": "create_layer", "table_key": "layers",
+     "fields_attr": "LAYER_RECORD_FIELDS", "diff_attr": "layer_record_diff"},
+    {"label": "dimstyle", "op_name": "create_dimstyle", "table_key": "dim_styles",
+     "fields_attr": "DIMSTYLE_RECORD_FIELDS", "diff_attr": "dimstyle_record_diff"},
+    {"label": "linetype", "op_name": "create_linetype", "table_key": "linetypes",
+     "fields_attr": "LINETYPE_RECORD_FIELDS", "diff_attr": "linetype_record_diff"},
+    {"label": "textstyle", "op_name": "create_textstyle", "table_key": "text_styles",
+     "fields_attr": "TEXTSTYLE_RECORD_FIELDS", "diff_attr": "textstyle_record_diff"},
+    {"label": "ucs", "op_name": "create_ucs", "table_key": "ucs",
+     "fields_attr": "UCS_RECORD_FIELDS", "diff_attr": "ucs_record_diff"},
+    {"label": "view", "op_name": "create_view", "table_key": "views",
+     "fields_attr": "VIEW_RECORD_FIELDS", "diff_attr": "view_record_diff"},
+    {"label": "vport", "op_name": "create_vport", "table_key": "viewports",
+     "fields_attr": "VPORT_RECORD_FIELDS", "diff_attr": "vport_record_diff"},
+)
+
+
+def build_records_patch(census_ir: Dict[str, Any], target_dwg: Dict[str, Any], patch_id: str, *,
+                        op_roundtrip_probe_mod=None, table_classes: Tuple[Dict[str, str], ...] = RECORD_TABLE_CLASSES,
+                        per_table_limit: Optional[int] = None
+                        ) -> Tuple[Dict[str, Any], Dict[str, Any]]:
+    """A SINGLE cad_patch.v1 whose operations[] replicate every requested
+    symbol_tables record across every RECORD_TABLE_CLASSES entry (one
+    create_* op per named record, via record_op_args_from_record) -- the
+    table-tier sibling of ir_to_patch.build_patch_from_ir's entity batching
+    (one patch, one apply_staged call; patch_engine chains each op's
+    mutated staged copy into the next, same as run_regen_batch).
+
+    Records with no "name" (dwg_graph_ir.v1's table join key; every create_*
+    op here requires one) are counted in meta["skipped_unnamed"][label]
+    rather than silently shrinking the op count. meta["per_table_requested"]
+    [label] is the op count actually built for that table -- the
+    "requested" side of this batch's own gate arithmetic (see
+    regen_gate_report).
+    """
+    op_roundtrip_probe_mod = op_roundtrip_probe_mod or importlib.import_module("op_roundtrip_probe")
+    operations: List[Dict[str, Any]] = []
+    postconditions: List[Dict[str, Any]] = []
+    skipped_unnamed: Dict[str, int] = {}
+    per_table_requested: Dict[str, int] = {}
+    for cls in table_classes:
+        records = [r for r in ((census_ir.get("symbol_tables") or {}).get(cls["table_key"]) or [])
+                  if isinstance(r, dict)]
+        fields = getattr(op_roundtrip_probe_mod, cls["fields_attr"], ())
+        count = 0
+        for rec in records:
+            if per_table_limit is not None and count >= per_table_limit:
+                break
+            if not rec.get("name"):
+                skipped_unnamed[cls["label"]] = skipped_unnamed.get(cls["label"], 0) + 1
+                continue
+            args = record_op_args_from_record(rec, fields)
+            operations.append({"step_id": "%s_%d" % (cls["label"], count),
+                              "operation": cls["op_name"], "args": args})
+            # Same "<table>_exists" subject op_roundtrip_probe._build_patch's
+            # single-record P-gate patches already declare (see e.g.
+            # create_layer's postconditions=[{"subject": "layer_exists", ...}]
+            # a few lines up in that module) -- one entry per op here, not a
+            # NEW convention. An earlier version of this function shipped
+            # postconditions=[] unconditionally, reasoning (correctly) that
+            # classify_patch_risk's missing-postconditions bump only applies
+            # to mutation-of-existing ops (delete_entity/move_entity/
+            # set_layer), which these 7 create_* ops are not -- but missed
+            # patch_engine.require_validation, a SEPARATE, unconditional guard
+            # ("ops and not postconds" -> blocked) that fired on every
+            # non-empty batch regardless of op type. Caught live: a bounded
+            # --with-records E2E run came back apply_status="blocked"
+            # ("guards failed: require_validation") on this exact patch; see
+            # build_log.md.
+            postconditions.append({"subject": "%s_exists" % cls["label"], "op": "exists", "value": args["name"]})
+            count += 1
+        per_table_requested[cls["label"]] = count
+    patch = {
+        "schema": "ariadne.cad_patch.v1",
+        "patch_id": patch_id,
+        "title": "table-record regen from census IR (%d ops)" % len(operations),
+        "source_agent": "full_roundtrip_capstone",
+        "target_dwg": target_dwg,
+        "operations": operations,
+        "postconditions": postconditions,
+        "policy": {"staged_copy": True, "write_mode": "write_copy"},
+    }
+    return patch, {"skipped_unnamed": skipped_unnamed, "per_table_requested": per_table_requested}
+
+
+def table_record_diff_reports(census_ir: Dict[str, Any], post_ir: Optional[Dict[str, Any]], *,
+                              op_roundtrip_probe_mod=None,
+                              table_classes: Tuple[Dict[str, str], ...] = RECORD_TABLE_CLASSES,
+                              per_table_limit: Optional[int] = None,
+                              unavailable_reason: Optional[str] = None) -> Dict[str, Any]:
+    """TRUE post-regen record-diff for every RECORD_TABLE_CLASSES entry:
+    reuses record_diff_report() (already generic over table_key/fields/
+    diff_fn -- never reimplemented) against ``post_ir``, the re-extracted
+    IR from AFTER build_records_patch's ops actually ran -- instead of
+    diffing census_ir against itself (Closeout #130: the old
+    layer_record_report compared the census's OWN layer records to the
+    census IR they came from, which is zero-diff by construction and
+    proves nothing about whether create_layer actually reproduces a
+    record; see build_log.md).
+
+    If ``post_ir`` is None (the records regen batch never reached
+    post-inspect -- apply_staged returned a non-"ok" status before writing
+    post/dwg_graph_ir.json), every table's report says so explicitly via
+    "structural_note" instead of silently emitting a zero-record report
+    that LOOKS like a real all-matched diff.
+    """
+    op_roundtrip_probe_mod = op_roundtrip_probe_mod or importlib.import_module("op_roundtrip_probe")
+    reports: Dict[str, Any] = {}
+    for cls in table_classes:
+        records = [r for r in ((census_ir.get("symbol_tables") or {}).get(cls["table_key"]) or [])
+                  if isinstance(r, dict) and r.get("name")]
+        if per_table_limit is not None:
+            records = records[:per_table_limit]
+        if post_ir is None:
+            reports[cls["label"]] = {
+                "label": cls["label"], "table_key": cls["table_key"],
+                "records_compared": 0, "zero_diff_count": 0, "rows": [], "diffs": [],
+                "structural_note": (unavailable_reason or
+                    "post-regen IR unavailable -- the records regen batch did not reach "
+                    "post-inspect, so no post-regen record-diff could be computed for this "
+                    "table (this is NOT a zero-diff pass; see records_regen.apply_status)"),
+            }
+            continue
+        fields = getattr(op_roundtrip_probe_mod, cls["fields_attr"], ())
+        # `or`, not getattr(..., default=) -- a getattr default expression is
+        # evaluated eagerly (before the call), so a hardcoded
+        # op_roundtrip_probe_mod.layer_record_diff default would raise
+        # AttributeError on any module that lacks THAT name, even when
+        # cls["diff_attr"] itself resolves fine (caught by this module's own
+        # unit tests against a non-layer/dimstyle fake table class). `or`
+        # short-circuits: the fallback is only touched if the primary lookup
+        # is falsy/missing.
+        diff_fn = (getattr(op_roundtrip_probe_mod, cls["diff_attr"], None)
+                  or getattr(op_roundtrip_probe_mod, "layer_record_diff", None))
+        base = record_diff_report(cls["label"], records, post_ir, table_key=cls["table_key"],
+                                  fields=fields, diff_fn=diff_fn)
+        reports[cls["label"]] = {
+            "label": base["label"], "table_key": base["table_key"],
+            "records_compared": base["record_count"], "zero_diff_count": base["zero_diff_count"],
+            "rows": base["rows"],
+            "diffs": [row for row in base["rows"] if row["record_diff"]],
+            "structural_note": (None if records else
+                "0 named records in census for this table -- vacuously 0 compared, "
+                "not evidence of a passing roundtrip"),
+        }
+    return reports
+
+
+# --------------------------------------------------------------------------- #
+# 4.5 fail-loud regen gate (Closeout #129a): apply_staged's own status=="ok"
+#     means every RESOLVABLE op in a batch applied cleanly -- it does NOT
+#     mean every op ir_to_patch/build_records_patch BUILT for the batch ran.
+#     Ops with no NATIVE_WRITE_OP_MAP entry (e.g. ir_to_patch's
+#     "insert_block", which no family's write handler accepts -- see
+#     resolvable_ops_report's own docstring) are silently bucketed into
+#     apply_result["deferred_ops"] and never move apply_status off "ok".
+#     Before this fix, main() printed status="ok" whenever the entity/
+#     records batch reached this far, REGARDLESS of dropped ops -- a real
+#     reference run (runs/capstone_final_20260706_062040) requested 14 ops,
+#     applied 12, and reported apply_status="ok" with no top-level signal
+#     that 2 were silently skipped. These two functions make that
+#     requested-vs-applied arithmetic explicit and un-skippable.
+# --------------------------------------------------------------------------- #
+
+def regen_gate_report(op_count: int, apply_result: Optional[Dict[str, Any]]) -> Dict[str, Any]:
+    """Reconcile ``op_count`` (ops REQUESTED this batch -- e.g.
+    len(patch["operations"])) against ``apply_result`` (patch_engine.
+    apply_staged's own return envelope) and report whether every requested
+    op actually applied.
+
+    applied_count is read from apply_result["op_count_applied"] when present
+    (only populated on the FINAL status=="ok" envelope -- see patch_engine.
+    apply_staged's last _finish(_result_envelope("ok", ..., extra={...
+    "op_count_applied": len(applied_ok) ...}))); apply_result["applied_ops"]
+    length is the fallback (present on that same "ok" envelope, and absent
+    -- so applied_count falls to 0 -- on every earlier blocked/partial/
+    not_implemented/unavailable return, which is the conservative, honest
+    reading: no evidence any op ran).
+
+    dropped_ops is built primarily from apply_result["deferred_ops"] (the
+    SAME NATIVE_WRITE_OP_MAP check patch_engine._resolve_native_write_ops
+    already performs internally -- reused, not re-derived). If applied_count
+    + len(deferred_ops) still falls short of op_count (e.g. a mid-batch
+    apply[n] step failed and stopped the loop early -- a case deferred_ops
+    alone does not cover), one synthetic entry accounts for the remainder,
+    so the arithmetic always reconciles to op_count; never silently smaller.
+
+    gate_status:
+      "ok"            -- apply_result status=="ok" and applied_count==op_count.
+      "ok_with_drops" -- apply_result status=="ok" but applied_count<op_count
+                         (patch_engine itself is satisfied; this batch's own
+                         requested-vs-applied count is not 1:1 -- exactly the
+                         permissiveness this gate exists to catch).
+      <status>        -- any apply_result status other than "ok" passes
+                         through unchanged (blocked/partial/not_implemented/
+                         unavailable are already fail-loud on their own; this
+                         function only refuses to launder them back into "ok"
+                         the way main() used to with its unconditional
+                         summary["status"] = "ok").
+
+    NOTE (deliberately NOT a gate signal): patch_engine's journal.json
+    carries "operations[i].operation '<op>' is not a declared op [...]"
+    schema warnings from validate_patch_schema against patch_engine.
+    DECLARED_OPS -- a small legacy op-name allowlist wholly disconnected
+    from NATIVE_WRITE_OP_MAP. In the reference capstone run
+    (runs/capstone_final_20260706_062040/regen/journal.json) this warning
+    fires for create_mtext/create_arc/create_circle too, all of which
+    applied successfully (they're in applied_ops) -- wiring that warning
+    into this gate would flag successful ops as drops (false positives on
+    every run), so it is intentionally excluded. Flagged here for a
+    separate schema/DECLARED_OPS cleanup, not blended into this gate.
+    """
+    apply_result = apply_result or {}
+    applied_ops = apply_result.get("applied_ops")
+    op_count_applied = apply_result.get("op_count_applied")
+    if op_count_applied is not None:
+        applied_count = op_count_applied
+    elif isinstance(applied_ops, list):
+        applied_count = len(applied_ops)
+    else:
+        applied_count = 0
+
+    deferred_ops = [d for d in (apply_result.get("deferred_ops") or []) if isinstance(d, dict)]
+    dropped_ops: List[Dict[str, Any]] = [
+        {"index": d.get("index"), "operation": d.get("operation"), "reason": d.get("reason")}
+        for d in deferred_ops
+    ]
+    unexplained = op_count - (applied_count + len(dropped_ops))
+    if unexplained > 0:
+        dropped_ops.append({
+            "index": None, "operation": None,
+            "reason": ("%d op(s) unaccounted for by applied_count + deferred_ops "
+                      "(apply_result status=%r, reason=%r)"
+                      % (unexplained, apply_result.get("status"), apply_result.get("reason"))),
+        })
+
+    apply_status = apply_result.get("status")
+    has_drops = bool(dropped_ops)
+    if apply_status == "ok":
+        gate_status = "ok_with_drops" if has_drops else "ok"
+    else:
+        gate_status = apply_status or "unknown"
+
+    return {
+        "requested_count": op_count,
+        "applied_count": applied_count,
+        "dropped_count": len(dropped_ops),
+        "dropped_ops": dropped_ops,
+        "apply_status": apply_status,
+        "gate_status": gate_status,
+        "ok": gate_status == "ok",
+    }
+
+
+_GATE_OK_STATUSES = ("ok", "ok_with_drops")
+
+
+def combine_gate_statuses(statuses: List[str]) -> str:
+    """Roll up multiple regen_gate_report()["gate_status"] values (the
+    entity batch + any --with-records table batch) into ONE overall
+    verdict: "ok" iff every component is "ok"; "ok_with_drops" iff every
+    component is "ok" or "ok_with_drops" (at least one drop, nothing
+    worse); otherwise the first status that is neither -- e.g. a batch
+    that came back "blocked" outranks a sibling "ok_with_drops" (blocked
+    can mean the original-unchanged invariant failed; patch_engine.
+    apply_staged step 10 -- strictly more severe than a merely-deferred
+    op). Empty input is vacuously "ok" (nothing ran, nothing dropped)."""
+    if not statuses:
+        return "ok"
+    if all(s in _GATE_OK_STATUSES for s in statuses):
+        return "ok_with_drops" if any(s == "ok_with_drops" for s in statuses) else "ok"
+    for s in statuses:
+        if s not in _GATE_OK_STATUSES:
+            return s
+    return "ok_with_drops"  # unreachable, defensive
+
+
 def resolvable_ops_report(patch: Dict[str, Any], patch_ops_mod=None) -> Dict[str, Any]:
     """For a built cad_patch.v1, split its operations into those whose
     "operation" id has a live entry in patch_ops.NATIVE_WRITE_OP_MAP
@@ -461,6 +769,38 @@ def run_census(staged_path: str, original_path: str, run_dir: str, *,
     ir_path = os.path.join(run_dir, "dwg_graph_ir.json")
     return patch_engine_mod._native_full_ir(
         ir_builder_mod, run_res, staged_path, original_path, ir_path, "census")
+
+
+def run_records_batch(census_ir: Dict[str, Any], blank_seed_path: str, run_dir: str,
+                      patch_id: str, *, per_table_limit: Optional[int] = None,
+                      table_classes: Tuple[Dict[str, str], ...] = RECORD_TABLE_CLASSES,
+                      op_roundtrip_probe_mod=None, patch_engine_mod=None) -> Dict[str, Any]:
+    """Table-tier sibling of run_regen_batch: build ONE cad_patch.v1 via
+    build_records_patch (7 record classes: layer/dimstyle/linetype/
+    textstyle/ucs/view/vport) and apply it in ONE patch_engine.apply_staged
+    call against a copy of ``blank_seed_path`` -- independent of, and run
+    into its own ``run_dir`` alongside, the entity batch (run_regen_batch),
+    so a --with-records run always has its own separate pre/post IR pair
+    for table_record_diff_reports to compare against (Closeout #130)."""
+    op_roundtrip_probe_mod = op_roundtrip_probe_mod or importlib.import_module("op_roundtrip_probe")
+    patch_engine_mod = patch_engine_mod or importlib.import_module("patch_engine")
+    target_dwg = {
+        "original_path": os.path.abspath(blank_seed_path),
+        "staged_path": os.path.join(run_dir, "staged_input.dwg"),
+    }
+    patch, build_meta = build_records_patch(
+        census_ir, target_dwg, patch_id, op_roundtrip_probe_mod=op_roundtrip_probe_mod,
+        table_classes=table_classes, per_table_limit=per_table_limit)
+    ops_report = resolvable_ops_report(patch)
+    t0 = time.time()
+    result = patch_engine_mod.apply_staged(patch, blank_seed_path, run_dir)
+    elapsed = time.time() - t0
+    op_count = len(patch.get("operations") or [])
+    return {
+        "patch": patch, "build_meta": build_meta, "resolvable_ops": ops_report,
+        "apply_result": result, "op_count": op_count, "elapsed_seconds": elapsed,
+        "seconds_per_op": (elapsed / op_count) if op_count else None,
+    }
 
 
 def run_regen_batch(filtered_ir: Dict[str, Any], blank_seed_path: str, run_dir: str,
@@ -660,15 +1000,18 @@ def main(argv=None) -> int:
 
     regen_dir = os.path.join(out_dir, "regen")
     batch = run_regen_batch(filtered, regen_target["target"], regen_dir, "full_roundtrip_capstone/batch")
+    entity_gate = regen_gate_report(batch["op_count"], batch["apply_result"])
     summary["regen"] = {
         "op_count": batch["op_count"], "deferred_count": len(batch["deferred"]),
         "resolvable_ops": batch["resolvable_ops"],
         "elapsed_seconds": batch["elapsed_seconds"], "seconds_per_op": batch["seconds_per_op"],
         "apply_status": (batch["apply_result"] or {}).get("status"),
         "apply_reason": (batch["apply_result"] or {}).get("reason"),
+        "gate": entity_gate,
     }
     _write_json(os.path.join(out_dir, "regen_summary.json"), summary["regen"])
     _write_json(os.path.join(out_dir, "deferred.json"), batch["deferred"])
+    gate_statuses = [entity_gate["gate_status"]]
 
     pre_path, post_path = pre_ir_path(regen_dir), post_ir_path(regen_dir)
     if os.path.isfile(pre_path) and os.path.isfile(post_path):
@@ -694,24 +1037,66 @@ def main(argv=None) -> int:
             % (os.path.isfile(pre_path), os.path.isfile(post_path)))
 
     if args.with_records:
-        op_roundtrip_probe_mod = importlib.import_module("op_roundtrip_probe")
-        layers = (census_ir.get("symbol_tables") or {}).get("layers") or []
-        layer_report = record_diff_report(
-            "layer", [r for r in layers if isinstance(r, dict)], census_ir,
-            table_key="layers", fields=op_roundtrip_probe_mod.LAYER_RECORD_FIELDS,
-            diff_fn=op_roundtrip_probe_mod.layer_record_diff)
-        summary["layer_record_report_note"] = (
-            "computed against census_ir itself as a self-check placeholder; "
-            "a true post-regen record-diff needs layer/dimstyle ops folded "
-            "into the SAME (or a follow-up) apply_staged batch -- see "
-            "build_log.md for why this stayed a stretch item this run.")
-        _write_json(os.path.join(out_dir, "layer_record_report.json"), layer_report)
+        # Closeout #130: a REAL post-regen table-record diff, not the old
+        # layer_record_report self-check (which compared census_ir's own
+        # layer records to the census IR they came from -- zero-diff by
+        # construction, proves nothing). run_records_batch actually applies
+        # a create_layer/create_dimstyle/.../create_vport patch (7 table
+        # classes) to its own staged copy of regen_target["target"]; the
+        # diff below is against THAT batch's re-extracted post_ir.
+        records_dir = os.path.join(out_dir, "regen_records")
+        records_batch = run_records_batch(
+            census_ir, regen_target["target"], records_dir,
+            "full_roundtrip_capstone/records_batch", per_table_limit=args.per_kind_limit)
+        records_gate = regen_gate_report(records_batch["op_count"], records_batch["apply_result"])
+        summary["records_regen"] = {
+            "op_count": records_batch["op_count"],
+            "skipped_unnamed": records_batch["build_meta"]["skipped_unnamed"],
+            "per_table_requested": records_batch["build_meta"]["per_table_requested"],
+            "resolvable_ops": records_batch["resolvable_ops"],
+            "elapsed_seconds": records_batch["elapsed_seconds"],
+            "seconds_per_op": records_batch["seconds_per_op"],
+            "apply_status": (records_batch["apply_result"] or {}).get("status"),
+            "apply_reason": (records_batch["apply_result"] or {}).get("reason"),
+            "gate": records_gate,
+        }
+        _write_json(os.path.join(out_dir, "records_regen_summary.json"), summary["records_regen"])
+        gate_statuses.append(records_gate["gate_status"])
 
-    summary["status"] = "ok"
+        records_post_path = post_ir_path(records_dir)
+        records_post_ir = (
+            json.load(open(records_post_path, encoding="utf-8-sig"))
+            if os.path.isfile(records_post_path) else None
+        )
+        table_diffs = table_record_diff_reports(
+            census_ir, records_post_ir, per_table_limit=args.per_kind_limit,
+            unavailable_reason=(
+                None if records_post_ir is not None else
+                "records regen batch apply_status=%r (reason=%r) -- never reached post-inspect"
+                % (summary["records_regen"]["apply_status"], summary["records_regen"]["apply_reason"])
+            ))
+        summary["table_record_diffs"] = table_diffs
+        _write_json(os.path.join(out_dir, "table_record_diffs.json"), table_diffs)
+
+    overall_gate = combine_gate_statuses(gate_statuses)
+    summary["status"] = overall_gate
+    summary["dropped_ops"] = (
+        [dict(d, batch="entity") for d in entity_gate["dropped_ops"]] +
+        ([dict(d, batch="records") for d in records_gate["dropped_ops"]] if args.with_records else [])
+    )
     _write_json(os.path.join(out_dir, "summary.json"), summary)
     print(json.dumps({k: v for k, v in summary.items()
                       if k not in ("census_report",)}, ensure_ascii=False, indent=2, default=str))
-    return 0
+    # "ok" -> success; "ok_with_drops" -> ran to completion but requested !=
+    # applied somewhere (Closeout #129a's own case -- visible in
+    # summary["status"]/summary["dropped_ops"], never silently "ok"); anything
+    # else (blocked/partial/unavailable/...) is a harder failure, same
+    # severity as the earlier staged/census "blocked" exits above.
+    if overall_gate == "ok":
+        return 0
+    if overall_gate == "ok_with_drops":
+        return 1
+    return 2
 
 
 if __name__ == "__main__":
