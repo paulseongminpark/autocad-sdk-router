@@ -1,0 +1,73 @@
+{
+  "id": "verify.cross_engine.dwg",
+  "family": "verify",
+  "status": "implemented",
+  "engine_tier": "objectdbx_capable",
+  "host_eligibility": [
+    "dbx",
+    "coreconsole",
+    "arx_adapter",
+    "full_autocad"
+  ],
+  "hosts": [
+    "dbx",
+    "coreconsole",
+    "arx_adapter",
+    "full_autocad"
+  ],
+  "execution_context": "python_post_process",
+  "write_level": {
+    "default_write_mode": "read",
+    "allowed_write_modes": [
+      "read"
+    ],
+    "dwg_persisted": false,
+    "original_write_default": false
+  },
+  "handler": {
+    "router_lane": null,
+    "dispatcher_symbol": "verify_cross_engine",
+    "execution_host_class": "dbx",
+    "python_handler": "tools/cross_engine_verify.py::verify_cross_engine",
+    "wired_via": "tools/cadctl.py::Cad.validate",
+    "composed_of": []
+  },
+  "mapping_type": "synthetic",
+  "catalog_op_id": null,
+  "input_schema": "schemas/dwg_graph_ir.v1.schema.json",
+  "output_schema": "application/json",
+  "policy": {
+    "write_mode_default": "read",
+    "staged_copy_required": false,
+    "write_original_requires_approval": true,
+    "raw_command_dispatch": "forbidden",
+    "secrets": "never_read_or_printed"
+  },
+  "tests": [
+    "tests/unit/test_cross_engine_verify.py::test_match_reports_concordant",
+    "tests/unit/test_cross_engine_verify.py::test_mismatch_reports_deltas",
+    "tests/unit/test_cross_engine_verify.py::test_missing_libredwg_bin_returns_not_available"
+  ],
+  "summary": "Cross-engine, read-only DWG verification that stages a copy, runs LibreDWG dwgread as a sidecar, and compares entity_count + layer-set against an AutoCAD IR for deterministic concordance.",
+  "evidence_refs": [
+    "tools/validator.py::validate_target",
+    "tools/cadctl.py::Cad.validate",
+    "runs/m02_cadctl_rich/dwg_graph_ir.json (21747 entities)",
+    "docs/OPERATION_REGISTRY_SPEC.md"
+  ],
+  "implementation_notes": "Stage a READ-ONLY DWG copy under staging/cross_engine_verify, invoke dwgread as a separate sidecar through subprocess, compute AutoCAD-vs-LibreDWG entity_count/layer deltas, and include original_unchanged via SHA-256 pre/post verification. Missing dwgread is truthful 'not_available'.",
+  "target_family_first_class": true,
+  "wired_v1": false,
+  "operation": "verify.cross_engine.dwg",
+  "engines": [
+    "objectdbx_capable"
+  ],
+  "schema_refs": {
+    "input": "schemas/dwg_graph_ir.v1.schema.json",
+    "output": "application/json"
+  },
+  "notes": "Stage a READ-ONLY DWG copy under staging/cross_engine_verify, invoke dwgread as a separate sidecar through subprocess, compute AutoCAD-vs-LibreDWG entity_count/layer deltas, and include original_unchanged via SHA-256 pre/post verification. Missing dwgread is truthful 'not_available'.",
+  "owner_ticket": "M08G-T01",
+  "implementation_strategy": "implemented_v1",
+  "evidence_required": "existing_tests_and_evidence_refs"
+}

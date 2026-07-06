@@ -1,0 +1,5 @@
+{
+  "schema": "ariadne.governed_command_templates.v1",
+  "notice": "edit.assocarray.explode is already governed directly in the base registry (config/command_templates.json), landed by the wave-7 W5-TMPL harvest (commit 66cce00) with live accoreconsole verification (tests/unit/test_command_template_engine.py::TestArrayRectExplodeTemplateLive). This fragment intentionally declares zero templates: command_template_engine._ingest_templates treats a duplicate template_id as a hard DUPLICATE_TEMPLATE_ID collision by design -- a .d/ drop-in fragment must never silently re-declare or override a governed base template. Re-declaring the real definition here would break cte.load_templates() for every caller (including the shared test suite). See tests/unit/test_template_explode.py for the offline invariant checks (presence, write_mode excludes write_original, universal injection guard) run against the already-merged registry.",
+  "templates": []
+}

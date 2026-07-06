@@ -1,0 +1,44 @@
+{
+  "templates": [
+    {
+      "template_id": "define.surffillet",
+      "op_id": "define.assocsurface.fillet",
+      "command": "SURFFILLET",
+      "status": "implemented",
+      "summary": "Associative fillet surface between two surfaces with typed radius and trim-mode slots.",
+      "headless_safe": false,
+      "write_mode": {
+        "default": "write_copy",
+        "allowed": ["read", "write_copy"]
+      },
+      "command_sequence": [
+        { "literal": "SURFFILLET" },
+        { "literal": "L" },
+        { "literal": "" },
+        { "literal": "L" },
+        { "literal": "" },
+        { "slot": "radius" },
+        { "slot": "trim_mode" }
+      ],
+      "slots": {
+        "radius": {
+          "type": "float_range",
+          "min": 0.0,
+          "max": 1000000.0,
+          "description": "Fillet radius in drawing units."
+        },
+        "trim_mode": {
+          "type": "enum",
+          "values": ["TRIM", "NOTRIM"],
+          "default": "TRIM",
+          "description": "Whether the input surfaces are trimmed back to the fillet surface."
+        }
+      },
+      "notes": "DCM/associativity census coverage entry for SURFFILLET. Real operation parameters from AcDbAssocFilletSurfaceActionBody include two input surfaces, two pick points, radius, and trim mode; this governed template only exposes the scalar command-line parameters as typed slots. Marked headless_safe=false because this surface workflow is attended full_autocad, not certified for accoreconsole.",
+      "evidence_refs": [
+        "research/native_arx/constraints-associativity.md",
+        "docs/GOVERNED_COMMAND_TEMPLATES.md"
+      ]
+    }
+  ]
+}

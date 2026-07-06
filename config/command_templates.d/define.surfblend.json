@@ -1,0 +1,53 @@
+{
+  "templates": [
+    {
+      "template_id": "define.surfblend",
+      "command": "SURFBLEND",
+      "op_id": "define.assocsurface.blend",
+      "status": "implemented",
+      "summary": "Create an associative blend surface between two selected surface edges.",
+      "headless_safe": false,
+      "write_mode": {
+        "default": "read",
+        "allowed": [
+          "read",
+          "write_copy"
+        ]
+      },
+      "command_sequence": [
+        { "literal": "SURFBLEND" },
+        { "literal": "L" },
+        { "literal": "L" },
+        { "slot": "continuity" },
+        { "slot": "start_bulge" },
+        { "slot": "end_bulge" }
+      ],
+      "slots": {
+        "continuity": {
+          "type": "enum",
+          "values": [
+            "G0",
+            "G1",
+            "G2"
+          ],
+          "default": "G0",
+          "description": "Surface continuity between the source edges."
+        },
+        "start_bulge": {
+          "type": "float_range",
+          "min": 0,
+          "max": 1,
+          "default": 0.5,
+          "description": "Start-edge bulge magnitude for the blend (0.0 to 1.0)."
+        },
+        "end_bulge": {
+          "type": "float_range",
+          "min": 0,
+          "max": 1,
+          "default": 0.5,
+          "description": "End-edge bulge magnitude for the blend (0.0 to 1.0)."
+        }
+      }
+    }
+  ]
+}

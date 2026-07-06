@@ -1,0 +1,33 @@
+{
+  "templates": [
+    {
+      "template_id": "define.arrayedit",
+      "op_id": "edit.assocarray.reset_source",
+      "status": "implemented",
+      "summary": "Open ARRAYEDIT on the drawing's last associative array and select the Reset or Source subcommand.",
+      "headless_safe": false,
+      "write_mode": {
+        "default": "write_copy",
+        "allowed": ["read", "write_copy"]
+      },
+      "command_sequence": [
+        { "literal": "ARRAYEDIT" },
+        { "literal": "L" },
+        { "literal": "" },
+        { "slot": "subcommand" }
+      ],
+      "slots": {
+        "subcommand": {
+          "type": "enum",
+          "values": ["Reset", "Source"],
+          "description": "ARRAYEDIT subcommand to enter after selecting the last associative array."
+        }
+      },
+      "notes": "Attended full_autocad only: this template covers the measured ARRAYEDIT entry path plus the Reset/Source branch choice, but is not certified headless-safe.",
+      "evidence_refs": [
+        "docs/GOVERNED_COMMAND_TEMPLATES.md#7-future-candidates",
+        "research/native_arx/constraints-associativity.md"
+      ]
+    }
+  ]
+}

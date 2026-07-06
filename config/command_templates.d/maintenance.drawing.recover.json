@@ -1,0 +1,40 @@
+{
+  "schema": "ariadne.governed_command_templates.v1",
+  "templates": [
+    {
+      "template_id": "maintenance.drawing.recover",
+      "op_id": "maintenance.drawing.recover",
+      "status": "catalogued",
+      "summary": "Run the built-in RECOVER command to audit and repair a possibly-damaged staged DWG copy: RECOVER discards the in-memory document and reopens the named file from disk, running the same audit-and-repair pass AUDIT does but unconditionally (no fix y/n prompt).",
+      "headless_safe": false,
+      "write_mode": {
+        "default": "write_copy",
+        "allowed": ["read", "write_copy"],
+        "note": "Same contract as maintenance.drawing.audit: the engine unconditionally _QSAVEs the STAGED (disposable) copy before QUIT regardless of write_mode (accoreconsole exit-hang fix, see docs/GOVERNED_COMMAND_TEMPLATES.md section 5). 'read' still means the ORIGINAL is never touched and no persistence is reported/guaranteed to the caller; only the throwaway staged copy gets flushed so accoreconsole's exit path has nothing pending to hang on."
+      },
+      "command_sequence": [
+        { "literal": "RECOVER" },
+        { "slot": "recover_target_path" }
+      ],
+      "slots": {
+        "recover_target_path": {
+          "type": "staged_path",
+          "description": "Answer to RECOVER's 'Enter name of drawing to recover:' prompt -- the drawing file RECOVER will discard the current in-memory document for and reopen+repair from disk. Must resolve inside this run's own staging/ tree (same invariant as every other staged-only path in this engine); typically the same staged copy already opened via accoreconsole's /i flag, so RECOVER ends up repairing the file it was launched against."
+        }
+      },
+      "postconditions": [
+        {
+          "kind": "entity_count_probe",
+          "description": "NOT YET LIVE-VERIFIED for RECOVER specifically (unlike AUDIT/PURGE's live-measured probes). Modeled on AUDIT's same assumption -- a repair pass fixes symbol-table/dictionary/header issues, not modelspace entity content -- but carries the SAME handle-churn caveat AUDIT's own notes already flag for RECOVER (see maintenance.drawing.audit.notes in config/command_templates.json): entity COUNT stability is checked here, not per-handle identity.",
+          "capture_before": true,
+          "expect_unchanged": true
+        }
+      ],
+      "notes": "v1 scope limitation (documented, not hidden): headless_safe is false because this template has NOT been live-measured against real accoreconsole (unlike the 4 templates in the base config/command_templates.json, all live-verified per docs/GOVERNED_COMMAND_TEMPLATES.md section 5) -- per that doc's own rule, headless_safe is trusted only after live measurement, never assumed. A second, separate gap: run_template() (tools/command_template_engine.py) does not currently pass its internally-generated staged-copy path into render_script()'s args, so recover_target_path has no way to be auto-supplied end-to-end through run_template() yet -- a caller would have to already know the staged path, which is only generated (with a fresh timestamp) inside stage_copy() at run time. Both gaps are flagged as follow-up work for the live-verification lane, not silently papered over. The staged_path validator itself (hostile-value rejection + staging/-root escape rejection) is exercised and passes fully offline in tests/unit/test_template_recover.py.",
+      "evidence_refs": [
+        "docs/GOVERNED_COMMAND_TEMPLATES.md#5-live-verification",
+        "tests/unit/test_template_recover.py"
+      ]
+    }
+  ]
+}

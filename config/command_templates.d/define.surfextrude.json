@@ -1,0 +1,43 @@
+{
+  "templates": [
+    {
+      "template_id": "define.surfextrude",
+      "command": "SURFEXTRUDE",
+      "status": "implemented",
+      "summary": "Create an associative surface by extruding a profile with typed height and taper.",
+      "headless_safe": false,
+      "write_mode": {
+        "default": "read",
+        "allowed": ["read", "write_copy"]
+      },
+      "command_sequence": [
+        { "literal": "SURFEXTRUDE" },
+        { "slot": "selection" },
+        { "slot": "height" },
+        { "literal": "T" },
+        { "slot": "taper_angle" },
+        { "literal": "" }
+      ],
+      "slots": {
+        "selection": {
+          "type": "enum",
+          "values": ["L"],
+          "default": "L",
+          "description": "Selection mode for input profile; only last-object mode is pre-authorized."
+        },
+        "height": {
+          "type": "float_range",
+          "min": -1000000,
+          "max": 1000000,
+          "description": "Extrusion height (can be positive or negative)."
+        },
+        "taper_angle": {
+          "type": "float_range",
+          "min": -90,
+          "max": 90,
+          "description": "Taper angle in degrees; sign defines taper direction."
+        }
+      }
+    }
+  ]
+}

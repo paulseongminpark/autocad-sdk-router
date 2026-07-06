@@ -1,0 +1,37 @@
+[
+  {
+    "template_id": "define.surftrim",
+    "op_id": "define.assocsurface.trim",
+    "status": "implemented",
+    "summary": "Trim a surface with SURFTRIM using governed option slots.",
+    "headless_safe": false,
+    "write_mode": {
+      "default": "write_copy",
+      "allowed": ["read", "write_copy"]
+    },
+    "command_sequence": [
+      { "literal": "SURFTRIM" },
+      { "slot": "extend" },
+      { "slot": "projection_direction" }
+    ],
+    "slots": {
+      "extend": {
+        "type": "enum",
+        "values": ["Y", "N"],
+        "default": "N",
+        "description": "Extend prompt response."
+      },
+      "projection_direction": {
+        "type": "enum",
+        "values": ["A", "V", "U", "N"],
+        "default": "A",
+        "description": "Projection Direction prompt response."
+      }
+    },
+    "notes": "Attended-only census coverage for associative surface trim. The selection prompts remain operator-driven; only the safe keyword answers are governed here.",
+    "evidence_refs": [
+      "docs/GOVERNED_COMMAND_TEMPLATES.md#5-live-verification",
+      "research/native_arx/constraints-associativity.md#define.assocsurface.trim"
+    ]
+  }
+]

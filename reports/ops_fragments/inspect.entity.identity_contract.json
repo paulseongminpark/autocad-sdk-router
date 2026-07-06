@@ -1,0 +1,62 @@
+{
+  "id": "inspect.entity.identity_contract",
+  "family": "inspect",
+  "status": "implemented",
+  "operation": "inspect.entity.identity_contract",
+  "engine_tier": "objectdbx_capable",
+  "host_eligibility": [
+    "dbx",
+    "coreconsole",
+    "arx_adapter",
+    "full_autocad"
+  ],
+  "hosts": [
+    "dbx",
+    "coreconsole",
+    "arx_adapter",
+    "full_autocad"
+  ],
+  "execution_context": "python_post_process",
+  "write_level": {
+    "default_write_mode": "read",
+    "allowed_write_modes": [
+      "read"
+    ],
+    "dwg_persisted": false,
+    "original_write_default": false
+  },
+  "handler": {
+    "router_lane": null,
+    "dispatcher_symbol": "entity_identity.verify_identity_stability",
+    "execution_host_class": "dbx",
+    "python_handler": "tools/entity_identity.py::verify_identity_stability",
+    "wired_via": "tools/cadctl.py::Cad.inspect",
+    "composed_of": []
+  },
+  "mapping_type": "synthetic",
+  "catalog_op_id": null,
+  "input_schema": "schemas/dwg_graph_ir.v1.schema.json",
+  "output_schema": "schemas/validation_report.v1.schema.json",
+  "policy": {
+    "write_mode_default": "read",
+    "staged_copy_required": false,
+    "write_original_requires_approval": true,
+    "raw_command_dispatch": "forbidden",
+    "secrets": "never_read_or_printed"
+  },
+  "tests": [
+    "tests/unit/test_entity_identity.py::TestVerifyIdentityStability"
+  ],
+  "summary": "Compare two entity IR snapshots by deterministic identity keys (handle-primary, with xdata/xdictionary and coarse geometry fallback) and report stable/drifted/added/removed counts.",
+  "evidence_refs": [
+    "tools/entity_identity.py::verify_identity_stability",
+    "tools/entity_identity.py::entity_identity_key"
+  ],
+  "target_family_first_class": true,
+  "wired_v1": false,
+  "implementation_notes": "Pure-Python IR comparator for entity continuity checks in roundtrip/diff workflows.",
+  "notes": "Pure-Python identity contract comparator: handle-primary matching with xdata/dictionary anchor fallback + coarse geometry drift detection.",
+  "owner_ticket": "M08G-T01",
+  "implementation_strategy": "implemented_v1",
+  "evidence_required": "existing_tests_and_evidence_refs"
+}

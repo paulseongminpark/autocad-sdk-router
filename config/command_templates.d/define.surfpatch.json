@@ -1,0 +1,40 @@
+[
+  {
+    "template_id": "define.surfpatch",
+    "op_id": "define.assocsurface.patch",
+    "command": "SURFPATCH",
+    "status": "implemented",
+    "summary": "Create an associative patch surface from an attended preselection/interactive loop, with governed continuity and bulge inputs.",
+    "headless_safe": false,
+    "write_mode": {
+      "default": "write_copy",
+      "allowed": ["read", "write_copy"]
+    },
+    "command_sequence": [
+      { "literal": "SURFPATCH" },
+      { "literal": "P" },
+      { "literal": "" },
+      { "literal": "C" },
+      { "slot": "continuity" },
+      { "literal": "B" },
+      { "slot": "bulge_magnitude" },
+      { "literal": "" }
+    ],
+    "slots": {
+      "continuity": {
+        "type": "enum",
+        "values": ["G0", "G1", "G2"],
+        "default": "G0",
+        "description": "Patch edge continuity: position (G0), tangency (G1), or curvature (G2)."
+      },
+      "bulge_magnitude": {
+        "type": "float_range",
+        "min": 0.0,
+        "max": 1.0,
+        "default": 0.5,
+        "description": "Patch bulge magnitude. Autodesk documents 0..1 as the practical range, with 0 flat and 1 most curved."
+      }
+    },
+    "notes": "Attended-only census coverage for SURFPATCH. The native associative API exposes continuity and bulge as scalar parameters; edge/curve/point references come from the user's attended selection context. The governed template therefore fixes the command path and exposes only the bounded scalar inputs."
+  }
+]

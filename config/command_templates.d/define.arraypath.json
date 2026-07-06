@@ -1,0 +1,39 @@
+{
+  "templates": [
+    {
+      "template_id": "define.arraypath",
+      "command": "ARRAYPATH",
+      "summary": "Create an associative path array with typed count/align slots.",
+      "headless_safe": true,
+      "write_mode": {
+        "default": "write_copy",
+        "allowed": ["read", "write_copy"]
+      },
+      "command_sequence": [
+        { "literal": "ARRAYPATH" },
+        { "literal": "L" },
+        { "literal": "" },
+        { "literal": "Y" },
+        { "literal": "D" },
+        { "slot": "item_count" },
+        { "slot": "align_items" },
+        { "literal": "X" }
+      ],
+      "slots": {
+        "item_count": {
+          "type": "int_range",
+          "min": 1,
+          "max": 1000,
+          "description": "Number of items along the path when Method is Divide."
+        },
+        "align_items": {
+          "type": "enum",
+          "values": ["Y", "N"],
+          "default": "Y",
+          "description": "Whether to align items to the path direction."
+        }
+      },
+      "notes": "v1 command-line projection for the path-array parameter object: the command path is governed, and only the count/align knobs are agent-supplied."
+    }
+  ]
+}

@@ -1,0 +1,30 @@
+[
+  {
+    "template_id": "define.surfloft",
+    "op_id": "define.assocsurface.loft",
+    "status": "implemented",
+    "summary": "Create an associative lofted surface by cross-sections via the SURFLOFT command.",
+    "headless_safe": false,
+    "write_mode": {
+      "default": "write_copy",
+      "allowed": ["read", "write_copy"]
+    },
+    "command_sequence": [
+      {
+        "literal": "SURFLOFT"
+      },
+      {
+        "slot": "surf_option"
+      }
+    ],
+    "slots": {
+      "surf_option": {
+        "type": "enum",
+        "values": ["Cross sections only", "Guides", "Path", "Settings"],
+        "default": "Cross sections only",
+        "description": "SURFLOFT option selected when prompts are displayed."
+      }
+    },
+    "notes": "Attended-only, associative surface-lifecycle lane command: SURFLOFT remains headless-blocked by current evidence."
+  }
+]

@@ -1,0 +1,26 @@
+{
+  "templates": [
+    {
+      "template_id": "define.assocaudit",
+      "command": "AUDIT",
+      "headless_safe": false,
+      "summary": "Run AUDIT across the current drawing database to census associativity-related repair findings, with an explicit fix/no-fix answer slot.",
+      "write_mode": {
+        "default": "read",
+        "allowed": ["read", "write_copy"]
+      },
+      "command_sequence": [
+        { "literal": "AUDIT" },
+        { "slot": "fix_answer" }
+      ],
+      "slots": {
+        "fix_answer": {
+          "type": "enum",
+          "values": ["Y", "N"],
+          "default": "N",
+          "description": "AUDIT prompt answer for whether detected database errors should be fixed."
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,39 @@
+{
+  "templates": [
+    {
+      "template_id": "maintenance.drawing.overkill",
+      "op_id": "maintenance.drawing.overkill",
+      "status": "catalogued",
+      "summary": "Run the built-in -OVERKILL command (dialog-free command-line form) against the staged drawing to remove duplicate/overlapping geometry, using an explicit Numeric-fuzz tolerance sub-option.",
+      "headless_safe": false,
+      "write_mode": {
+        "default": "write_copy",
+        "allowed": ["read", "write_copy"]
+      },
+      "command_sequence": [
+        { "literal": "-OVERKILL" },
+        { "literal": "ALL" },
+        { "literal": "" },
+        { "literal": "N" },
+        { "slot": "tolerance" },
+        { "literal": "" }
+      ],
+      "slots": {
+        "tolerance": {
+          "type": "float_range",
+          "min": 0,
+          "max": 1000000,
+          "description": "Numeric fuzz distance for -OVERKILL's 'Numeric fuzz' sub-option: two objects whose comparable properties (e.g. endpoints) fall within this distance of each other are treated as duplicates and one copy is deleted. No default -- a caller must decide this value explicitly rather than silently inherit AutoCAD's own near-zero exact-match default."
+        }
+      },
+      "postconditions": [
+        {
+          "kind": "entity_count_probe",
+          "description": "Capture-only: OVERKILL deletes zero or more duplicate entities depending on what the staged drawing actually contains, so neither 'unchanged' nor 'increase' is a safe invariant to assert here (unlike AUDIT/PURGE/ARRAYRECT, which have a fixed structural relationship to entity count). before/after counts are recorded for evidence only -- no expect_unchanged/expect_increase is declared.",
+          "capture_before": true
+        }
+      ],
+      "notes": "Not live-verified (status: catalogued, headless_safe: false pending measurement) -- unlike maintenance.drawing.audit/purge and the two DCM templates already in config/command_templates.json, this entry has not yet been run against real accoreconsole on this machine; the engine refuses it with ATTENDED_ONLY_TEMPLATE until a future lane clears the same live-measurement bar those four templates document in their evidence_refs. The command_sequence follows Autodesk's documented dialog-free '-OVERKILL' command-line form (select objects, end selection, choose the 'Numeric fuzz' [N] sub-option, supply the fuzz distance, accept the remaining option defaults with a blank confirmation to run), but the exact number of trailing blank confirmations needed to fall through to execution on this machine's locale/AutoCAD build is unmeasured. v1 scope limitation (documented, not hidden): only the 'Numeric fuzz' tolerance is exposed as a slot -- -OVERKILL also has an independent 'Gap tolerance' sub-option and several boolean Ignore-* toggles (color/layer/linetype/lineweight/etc.) that are out of scope for this drop-in. No paired config/operations.v2.json entry yet (out of scope for this disjoint drop-in file)."
+    }
+  ]
+}

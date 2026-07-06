@@ -1,0 +1,32 @@
+{
+  "schema": "ariadne.governed_command_templates.v1",
+  "templates": [
+    {
+      "template_id": "define.surfoffset",
+      "op_id": "define.assocsurface.offset",
+      "status": "implemented",
+      "summary": "Create an associative offset surface with an explicit typed distance after selecting the last surface in the drawing.",
+      "headless_safe": false,
+      "write_mode": {
+        "default": "write_copy",
+        "allowed": ["read", "write_copy"]
+      },
+      "command_sequence": [
+        { "literal": "SURFOFFSET" },
+        { "literal": "" },
+        { "literal": "L" },
+        { "literal": "" },
+        { "slot": "distance" }
+      ],
+      "slots": {
+        "distance": {
+          "type": "float_range",
+          "min": -1000000,
+          "max": 1000000,
+          "description": "Offset distance from the source surface."
+        }
+      },
+      "notes": "Attended full AutoCAD coverage for the associative offset-surface path. The command is modeled with a single typed distance slot; the surface selection is fixed to the last-created surface via the literal 'L' prompt answer."
+    }
+  ]
+}

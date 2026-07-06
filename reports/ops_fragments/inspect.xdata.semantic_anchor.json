@@ -1,0 +1,69 @@
+{
+  "id": "inspect.xdata.semantic_anchor",
+  "family": "inspect",
+  "status": "implemented",
+  "engine_tier": "objectdbx_capable",
+  "host_eligibility": [
+    "dbx",
+    "coreconsole",
+    "arx_adapter",
+    "full_autocad"
+  ],
+  "hosts": [
+    "dbx",
+    "coreconsole",
+    "arx_adapter",
+    "full_autocad"
+  ],
+  "execution_context": "python_post_process",
+  "write_level": {
+    "default_write_mode": "read",
+    "allowed_write_modes": [
+      "read"
+    ],
+    "dwg_persisted": false,
+    "original_write_default": false
+  },
+  "handler": {
+    "router_lane": null,
+    "dispatcher_symbol": "semantic_anchor.read_semantic_anchors",
+    "execution_host_class": "dbx",
+    "python_handler": "tools/semantic_anchor.py::read_semantic_anchors",
+    "wired_via": "tools/semantic_anchor.py::read_semantic_anchors",
+    "composed_of": []
+  },
+  "mapping_type": "synthetic",
+  "catalog_op_id": null,
+  "input_schema": "schemas/dwg_graph_ir.v1.schema.json",
+  "output_schema": null,
+  "policy": {
+    "write_mode_default": "read",
+    "staged_copy_required": false,
+    "write_original_requires_approval": true,
+    "raw_command_dispatch": "forbidden",
+    "secrets": "never_read_or_printed"
+  },
+  "tests": [
+    "tests/unit/test_semantic_anchor.py"
+  ],
+  "summary": "Read-only semantic census over an already-extracted dwg_graph_ir.v1 or single entity dict. Normalizes per-app XDATA and extension-dictionary-backed xrecords into a per-entity anchor map, using key/value maps when the typed item sequence is pair-shaped and ordered value lists otherwise.",
+  "evidence_refs": [
+    "tools/semantic_anchor.py::read_semantic_anchors",
+    "tests/unit/test_semantic_anchor.py"
+  ],
+  "implementation_notes": "IMPLEMENTED. Pure Python, stdlib-only, no DWG access. Accepts either a whole IR or one entity dict. XDATA blocks are read from entity.xdata[{app,items}], extension-dictionary anchors are resolved through top-level extension_dictionaries + xrecords by owner_handle/value_handle.",
+  "target_family_first_class": true,
+  "wired_v1": false,
+  "operation": "inspect.xdata.semantic_anchor",
+  "engines": [
+    "objectdbx_capable"
+  ],
+  "schema_refs": {
+    "input": "schemas/dwg_graph_ir.v1.schema.json",
+    "output": null
+  },
+  "notes": "IMPLEMENTED. Pure Python, stdlib-only, no DWG access. Returns an empty-but-ok result when no xdata or extension-dictionary anchors are present.",
+  "owner_ticket": "M08G-T01",
+  "implementation_strategy": "implemented_v1",
+  "evidence_required": "existing_tests_and_evidence_refs"
+}

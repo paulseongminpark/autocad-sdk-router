@@ -1,0 +1,65 @@
+{
+  "templates": [
+    {
+      "template_id": "define.arraypolar",
+      "op_id": "define.assocarray.polar",
+      "status": "implemented",
+      "summary": "Create an associative polar array (ARRAYPOLAR) from the drawing's last-created entity, using explicit center, item count, angle, and rotate prompts.",
+      "headless_safe": false,
+      "write_mode": {
+        "default": "write_copy",
+        "allowed": ["read", "write_copy"]
+      },
+      "command_sequence": [
+        { "literal": "ARRAYPOLAR" },
+        { "literal": "L" },
+        { "literal": "" },
+        { "slot": "center_x" },
+        { "slot": "center_y" },
+        { "slot": "center_z" },
+        { "literal": "I" },
+        { "slot": "item_count" },
+        { "literal": "A" },
+        { "slot": "angle_to_fill" },
+        { "slot": "rotate_items" }
+      ],
+      "slots": {
+        "center_x": {
+          "type": "float_range",
+          "min": -1000000,
+          "max": 1000000,
+          "description": "Center point X coordinate for the polar array."
+        },
+        "center_y": {
+          "type": "float_range",
+          "min": -1000000,
+          "max": 1000000,
+          "description": "Center point Y coordinate for the polar array."
+        },
+        "center_z": {
+          "type": "float_range",
+          "min": -1000000,
+          "max": 1000000,
+          "description": "Center point Z coordinate for the polar array."
+        },
+        "item_count": {
+          "type": "int_range",
+          "min": 2,
+          "max": 1000,
+          "description": "Total number of items in the polar array, including the source object."
+        },
+        "angle_to_fill": {
+          "type": "float_range",
+          "min": -360,
+          "max": 360,
+          "description": "Angle to fill for the polar array, in degrees."
+        },
+        "rotate_items": {
+          "type": "enum",
+          "values": ["Y", "N"],
+          "description": "Whether copied items rotate as they are created."
+        }
+      }
+    }
+  ]
+}

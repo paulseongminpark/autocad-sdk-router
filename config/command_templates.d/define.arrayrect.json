@@ -1,0 +1,66 @@
+{
+  "templates": [
+    {
+      "template_id": "define.arrayrect",
+      "op_id": "define.arrayrect",
+      "status": "implemented",
+      "summary": "Create an associative rectangular array (ARRAYRECT) from the drawing's last-created entity, via explicit Count/Spacing/eXit command sub-options.",
+      "headless_safe": false,
+      "write_mode": {
+        "default": "write_copy",
+        "allowed": ["read", "write_copy"]
+      },
+      "command_sequence": [
+        { "literal": "ARRAYRECT" },
+        { "literal": "L" },
+        { "literal": "" },
+        { "literal": "C" },
+        { "slot": "rows" },
+        { "slot": "cols" },
+        { "literal": "S" },
+        { "slot": "row_spacing" },
+        { "slot": "col_spacing" },
+        { "literal": "X" }
+      ],
+      "slots": {
+        "rows": {
+          "type": "int_range",
+          "min": 1,
+          "max": 1000,
+          "description": "Number of rows (ARRAYRECT's Count sub-option)."
+        },
+        "cols": {
+          "type": "int_range",
+          "min": 1,
+          "max": 1000,
+          "description": "Number of columns (ARRAYRECT's Count sub-option)."
+        },
+        "row_spacing": {
+          "type": "float_range",
+          "min": -1000000,
+          "max": 1000000,
+          "description": "Distance between rows (drawing units; ARRAYRECT's Spacing sub-option)."
+        },
+        "col_spacing": {
+          "type": "float_range",
+          "min": -1000000,
+          "max": 1000000,
+          "description": "Distance between columns (drawing units; ARRAYRECT's Spacing sub-option)."
+        }
+      },
+      "postconditions": [
+        {
+          "kind": "entity_count_probe",
+          "description": "Associative ARRAYRECT wraps its source entity as a single selectable object, so modelspace entity count must be unchanged.",
+          "capture_before": true,
+          "expect_unchanged": true
+        }
+      ],
+      "notes": "v1 scope limitation: selects via AutoCAD's 'L' (Last) option, not an agent-addressable handle. This template exists for the DCM/associativity coverage census and reuses the governed ARRAYRECT command sequence with typed numeric slots only.",
+      "evidence_refs": [
+        "D:\\dev\\.build\\cados_plan\\sdk_census_reaudit_20260706.md#5-dcm--associativity-partial-coverage-path",
+        "docs/GOVERNED_COMMAND_TEMPLATES.md#5-live-verification"
+      ]
+    }
+  ]
+}
