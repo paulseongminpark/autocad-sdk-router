@@ -38869,5 +38869,32 @@
     "proposed_new_tickets": {
       "M08K-T03": "constraints_associativity — AcDbAssoc* constraints/associativity (deep native; M08 index gap)"
     }
+  },
+  "w5_tmpl_governed_command_templates": {
+    "schema": "ariadne.cad_os.w5_tmpl_governed_command_templates.v1",
+    "lane": "W5-TMPL",
+    "status": "implemented_not_yet_wired_into_run_operation_allowlist",
+    "note": "These 2 ops are deliberately NOT appended to this file's `operations` array: that array's total count (525) and by_status/by_family totals are a frozen cross-wave invariant asserted by other lanes' tests (tests/unit/test_catalog_completeness.py, test_op_dag_generate.py, test_m08a_catalog_reopen.py all hardcode 525/465/517-derived numbers). Measured directly: appending here broke 11 tests in other lanes' files on first attempt (reverted). The canonical registry for these new ops is config/command_templates.json; this block is a discovery pointer only. Wiring template_id dispatch into cadctl.Cad.run_operation / the cad.run_operation MCP allow-list (so 'operation' can resolve here the way schemas/cad_job.v2.schema.json describes) is a follow-up integration task, not done by this lane.",
+    "design_doc": "docs/GOVERNED_COMMAND_TEMPLATES.md",
+    "template_registry": "config/command_templates.json",
+    "engine": "tools/command_template_engine.py",
+    "templates": [
+      {
+        "template_id": "maintenance.drawing.audit",
+        "summary": "Built-in AUDIT command (fix=Y), governed template, live-verified.",
+        "status": "implemented",
+        "headless_safe": true,
+        "evidence": "tests/unit/test_command_template_engine.py::TestAuditTemplateLive"
+      },
+      {
+        "template_id": "maintenance.drawing.purge",
+        "summary": "Built-in -PURGE command (all, no per-item confirmation), governed template, live-verified.",
+        "status": "implemented",
+        "headless_safe": true,
+        "evidence": "tests/unit/test_command_template_engine.py::TestPurgeTemplateLive"
+      }
+    ],
+    "fixture_verified": "tests/fixtures/native_sample.dwg sha256 eac5d4b13d67d89106e503321412539df7b39b8a7f4e44c033448e9295fe3f76 (unchanged before/after every live run)",
+    "raw_command_ops_untouched": "the 10 command-dispatch-flavored SAFETY_FORBIDDEN ops (docs/GOVERNED_COMMAND_TEMPLATES.md section 0) and the 23 constraints_associativity SAFETY_FORBIDDEN ops (section 4) are unchanged by this lane -- 0 of them promoted."
   }
 }

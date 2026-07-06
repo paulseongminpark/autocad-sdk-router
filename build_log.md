@@ -1471,6 +1471,163 @@ opened directly; every attended/COM operation ran against a fresh staged copy, a
 document this lane opened in the live session was closed by this lane.
 
 ## Lane W5-CPP
+## Lane W5-TMPL
+
+**Task:** design + build a GOVERNED middle path for the raw-command-dispatch
+family blocked ops (`command.invoke.*`, `doc.sendstring`, `command.queue.post`,
+`command.menu.invoke`, `editor.toolpalette.tool_execute`,
+`automate.com.{get_for_command,send_command}`, `module.command.lookup`): typed
+per-command templates so a small set of high-value built-in commands
+(maintenance class: `AUDIT`, `-PURGE`) become agent-usable WITHOUT ever
+exposing a raw command string, plus an honest headless-coverage estimate for
+the 23 `constraints_associativity` ops. Full design rationale, threat model,
+and the section-by-section measured findings live in
+`docs/GOVERNED_COMMAND_TEMPLATES.md` (design doc committed first, per the
+mission's own instruction) -- this entry is the compressed run log.
+
+**Registry recon (measured, not trusted from the brief):** the brief cited
+"16 runtime_commands ops blocked." Re-derived directly from
+`config/operations.v2.json` (525 ops): every `blocked_reason` starting
+`SAFETY_FORBIDDEN` that names raw command-string dispatch
+(`acedCommand`/`sendStringToExecute`/`acedMenuCmd`/`AcTcTool::Execute`/
+`SendCommand`) totals **10**, spread across 4 families (not 1) --
+`active_document_write_original` (4), `com_activex` (2), `editor_input` (1),
+`runtime_commands` (1), `ui_customization` (2). The `runtime_commands` family
+itself has 7 more `SAFETY_FORBIDDEN` ops but they're ARX module load/unload
+hazards (loading arbitrary code into the host process), a different threat
+this lane's templates do not address. The briefed "23 constraints/DCM-blocked"
+figure DID reproduce exactly (`family == "constraints_associativity"`, all 23
+`SAFETY_FORBIDDEN`). Flagged the "16" discrepancy rather than silently
+substituting it; full evidence table in the design doc section 0.
+
+**Built:** `config/command_templates.json` (template registry: `template_id`,
+fixed `command_sequence` of `{"literal"}`/`{"slot"}` steps, typed `slots`
+(enum/int_range/float_range/name_token/staged_path), `postconditions`,
+`headless_safe` flag) + `tools/command_template_engine.py` (validate args ->
+render `.scr` -> stage a copy (never the original) -> run
+`accoreconsole.exe /i <staged> /s <script>` (mirrors
+`autocad-router.ps1`'s `Invoke-CadJobRoute`/`Invoke-AccoreScr` staging/
+accoreconsole-invocation pattern, reimplemented in Python rather than adding a
+new router `-Action`, per the brief's preference not to touch the router) ->
+enforce postconditions -> emit an `ariadne.autocad_sdk_result.v2`-shaped
+envelope). A universal hostile-character gate (control chars, quotes,
+semicolon, LISP parens) runs on every slot value before its type-specific
+validator, regardless of declared type -- the literal implementation of "no
+free-text slot ever reaches the command line." `write_original` is impossible
+by construction: the registry loader hard-rejects any template whose
+`write_mode.allowed` contains anything but `read`/`write_copy`.
+
+**Live-verified, both templates, real accoreconsole (AutoCAD 2027, this
+machine's Korean-locale build), staged copies of
+`tests/fixtures/native_sample.dwg`:**
+- `maintenance.drawing.audit` (`AUDIT`, `fix_answer` slot): regex-captured the
+  real Korean console text (`전체 (\d+)건의 오류를 찾아서 (\d+)건이 수정됨`)
+  -> `errors_found=0, errors_fixed=0`; entity-count probe (AutoLISP
+  `(sslength (ssget "_X" ...))` written to a run-dir file before+after)
+  `21747 == 21747` -- exact match to the fixture's documented baseline. `ok`
+  in both `read` and `write_copy` write modes, `accoreconsole` exit 0.
+- `maintenance.drawing.purge` (`-PURGE A * N`, no agent-controllable slots --
+  the "verify each name" prompt is a hardcoded literal `N`, never exposed,
+  specifically to close the unbounded per-item-confirmation hazard): real
+  named-object deletions observed and regex-captured (a layer, a text style, 3
+  dimstyles, a leader style across two separate runs), entity count
+  `21747 == 21747` both times (PURGE never touches entities, confirmed).
+  `ok` in `write_copy` mode, exit 0.
+- Original DWG sha256 `eac5d4b13d67d89106e503321412539df7b39b8a7f4e44c033448e9295fe3f76`
+  verified unchanged before/after every one of ~12 live runs (successful,
+  postcondition-failed, and timed-out alike) via an `ORIGINAL_MUTATED`
+  hard-check that overrides every other status.
+
+**Real bugs found + fixed during live verification (not assumed away):**
+1. `accoreconsole`'s stdout is UTF-16LE with no BOM (measured) -- decoding as
+   UTF-8 produced null-byte-interleaved mojibake and silently broke every
+   regex postcondition. Added `_read_accoreconsole_stdout()`'s NUL-density
+   heuristic.
+2. First staging implementation passed a `run_dir`-relative `.scr` path into
+   the `/s` argument while `cwd` was set to the STAGED DWG's own directory (a
+   different absolute path) -- accoreconsole correctly reported "file not
+   found" for the script. Fixed by resolving `run_dir` to absolute before
+   deriving any path from it.
+3. **`AUDIT`'s `fix_answer="N"` deterministically hangs `accoreconsole` on
+   process exit** -- 4/4 trials, alternated against 4/4 clean exits for
+   `"Y"` on the byte-identical `.scr` apart from one character, ruling out
+   generic system-load flakiness as the explanation. In every "N" trial the
+   AUDIT report text and the after-probe entity-count file were both written
+   correctly to disk BEFORE the hang (verified) -- all real work completes;
+   only the process's own shutdown never returns, until the engine's
+   timeout+kill fires (`status: "error"`, `code: "ACCORECONSOLE_TIMEOUT"`,
+   `retryable: true`; original confirmed unchanged in these trials too). Root
+   cause not established (native accoreconsole behavior, not this lane's
+   script generation). Response: shipped `fix_answer` enum is `["Y"]` only;
+   `"N"` is now rejected by validation before ever reaching accoreconsole (a
+   dedicated regression test asserts this). Full narrative in design doc
+   section 5.
+
+**DCM / `constraints_associativity` coverage estimate (23 ops):** the
+command names the brief suggested mapping against (`GEOMCONSTRAINT`/
+`DIMCONSTRAINT`/`DELCONSTRAINT`/`PARAMETERS`) belong to a DIFFERENT ObjectARX
+class hierarchy (`AcDbAssoc2dConstraintGroup`, the 2D sketch/parametric
+constraint manager) than what these 23 ops' `blocked_reason` text actually
+references (`AcDbAssocArrayActionBody`/`AcDbAssocXxxSurfaceActionBody`/
+`AcDbAssocManager` -- the associative array/surface/network-evaluation
+subsystem); confirmed zero registry matches for those 4 command names.
+Flagged rather than silently substituted (design doc section 4 has the real
+class-to-command correspondence table). Live-attempted `REGEN` (candidate
+trigger for `inspect.assocaction.evaluate` +`inspect.assocnetwork.evaluate`,
+one-off, not a shipped template): runs headless cleanly, exit 0, original
+unchanged -- but does NOT count as promoting either op, because `REGEN`'s
+whole purpose is to force the exact solver-evaluation callback path their
+`blocked_reason` forbids; typed-argument-slot safety (what a template
+provides) does not bound what a solver callback does once invoked, so
+templating a working command here does not resolve the actual safety
+rationale. Second candidate (`-ARRAYRECT`/`ARRAYEDIT` for the 10
+`assocarray.*` ops) was NOT live-attempted: its multi-prompt "grip edit"
+script sequence is unestablished in this repo, and the ceiling was already
+known (unbounded array-solver evaluation, same class of risk as `REGEN`) --
+spending a live cycle to prove the mechanics would not change the verdict.
+**Verdict: 0 of 23 promoted.** Reported honestly as the brief's own accepted
+possible outcome, not padded.
+
+**Registry update -- deliberately NOT the pattern first tried.** First
+attempt appended 2 new op records (`maintenance.drawing.audit`,
+`maintenance.drawing.purge`) directly to `config/operations.v2.json`'s
+`operations` array and bumped `totals`. Measured consequence:
+**11 test failures** in OTHER lanes' files (`test_catalog_completeness.py`,
+`test_op_dag_generate.py`, `test_m08a_catalog_reopen.py`) -- the array's total
+count (525) and `by_status`/`by_family` totals are a frozen cross-wave
+invariant several other lanes' tests hardcode, and
+`operation_coverage_matrix.is_raw_command()`'s substring heuristic
+(`"acedCommand" in native_api`) false-positived on this lane's OWN defensive
+phrasing ("never a raw acedCommand... surface") in the new records' text.
+Reverted both `config/operations.v2.json` and the regenerated
+`config/op_dag.json` back to HEAD. Re-did it the way this file's OWN
+established convention actually works (`m02_extend`, `m04_operation_registry_
+completion`, `m05_patch_diff_validation_transaction`, `m08a_catalog_reopen` are
+all top-level namespaced keys, none of them touch the `operations` array): added
+`w5_tmpl_governed_command_templates` as a new additive top-level key (27-line
+diff) with template_ids/evidence/status, explicitly noting these ops are not
+yet wired into `cadctl.Cad.run_operation`'s allow-list dispatch (a follow-up
+integration task, not claimed done here).
+
+**Tests:** `tests/unit/test_command_template_engine.py` (30 new tests --
+registry load/write-mode guard, injection-gate coverage across every slot
+type with literal hostile strings, `render_script` determinism +
+undeclared/unknown-arg rejection, `evaluate_postconditions` as a pure
+function against synthetic evidence including the REAL registry's regex
+pattern, `run_template` gate short-circuits, a dedicated regression test
+pinning `fix_answer="N"` to VALIDATION_ERROR, and 2 `CADOS_LIVE`-gated live
+certs). `python -m pytest tests/unit -q` -> **1173 passed, 0 failed** (1143
+baseline + 30 new); `CADOS_LIVE=1 python -m pytest tests/unit -q` -> **1176
+passed, 0 failed** (both live certs run and pass).
+
+**Fixture integrity:** `tests/fixtures/native_sample.dwg` sha256
+`eac5d4b13d67d89106e503321412539df7b39b8a7f4e44c033448e9295fe3f76` unchanged
+throughout every experiment above (script-logic bugs, the fix_answer hang, and
+clean successes alike). `config/operations.v2.json`/`config/op_dag.json` are
+byte-identical to HEAD apart from the intentional additive
+`w5_tmpl_governed_command_templates` key (op_dag regen from the first, wrong
+attempt was reverted, not left as drift).
+
 
 Sole C++ owner of wave 5 (worktree `wt/w5_cpp`, branch `cados/w5-cpp`, base @5decde1).
 Mission: fix the `automate.property.set` WRITE marshalling defect the Attended Wave lane
