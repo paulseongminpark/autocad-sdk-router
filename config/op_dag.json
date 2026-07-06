@@ -2171,6 +2171,7 @@
       ],
       "target_files": [
         "config/cad_job_operation_aliases.json",
+        "reports/lane_i_router_fix_resolution.json",
         "tests/test_native_arx_dbx_contract.py"
       ],
       "acceptance_test_id": "tests/test_native_arx_dbx_contract.py::createCustomEntity",
@@ -2487,6 +2488,7 @@
       ],
       "target_files": [
         "config/cad_job_operation_aliases.json",
+        "reports/lane_i_router_fix_resolution.json",
         "tests/test_native_arx_dbx_contract.py"
       ],
       "acceptance_test_id": "tests/test_native_arx_dbx_contract.py::createCustomObject",
