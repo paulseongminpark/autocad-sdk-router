@@ -24,25 +24,25 @@
     "host_support": "host_eligibility (cheapest-first), '|'-joined"
   },
   "totals": {
-    "total": 517,
+    "total": 541,
     "by_status": {
-      "implemented": 457,
-      "blocked": 60
+      "implemented": 479,
+      "blocked": 62
     },
-    "implemented": 457,
+    "implemented": 479,
     "wired": 0,
     "stub": 0,
     "catalogued": 0,
-    "blocked": 60,
+    "blocked": 62,
     "deprecated": 0,
     "unknown": 0,
-    "v1_target_total": 517,
-    "v1_target_implemented": 457,
-    "v1_target_blocked": 60,
+    "v1_target_total": 541,
+    "v1_target_implemented": 479,
+    "v1_target_blocked": 62,
     "v1_target_deferred": 0,
     "by_family": {
       "objectdbx_database": 21,
-      "symbol_tables_dictionaries": 16,
+      "symbol_tables_dictionaries": 26,
       "geometry_kernel": 25,
       "inspect": 16,
       "write": 4,
@@ -52,16 +52,17 @@
       "render": 1,
       "apply": 1,
       "validate": 2,
+      "anchor": 4,
       "patch": 2,
       "diff": 1,
       "active_document_write_original": 8,
-      "blocks_xrefs_clone": 5,
+      "blocks_xrefs_clone": 8,
       "brep_solids": 54,
-      "com_activex": 49,
+      "com_activex": 51,
       "constraints_associativity": 58,
       "custom_objects_protocols": 63,
       "editor_input": 27,
-      "entities": 56,
+      "entities": 61,
       "graphics_system": 9,
       "layouts_plot_publish": 2,
       "reactors_events": 22,
@@ -69,21 +70,21 @@
       "ui_customization": 39
     },
     "by_family_group": {
-      "read": 53,
-      "native_only": 421,
-      "write_patch": 20,
+      "read": 63,
+      "native_only": 432,
+      "write_patch": 23,
       "live": 7,
       "query": 1,
       "render_visual": 12,
       "validate_diff": 3
     },
     "by_risk_class": {
-      "read_safe": 349,
-      "staged_write": 112,
+      "read_safe": 357,
+      "staged_write": 128,
       "live_edit": 50,
       "raw_command": 6
     },
-    "agent_exposed_count": 457
+    "agent_exposed_count": 479
   },
   "gate": {
     "all_classified": true,
@@ -645,13 +646,15 @@
       ],
       "evidence_ref": [
         "config/cad_job_operation_aliases.json#extend.customclass.create",
-        "tests/test_native_arx_dbx_contract.py::createCustomEntity"
+        "tests/test_native_arx_dbx_contract.py::createCustomEntity",
+        "runs/laneG_repro/attended/customclass_run/attended_job_result.json (2026-07-06 Lane G attended-lane repro, created:true)",
+        "reports/lane_i_router_fix_resolution.json (2026-07-06 Lane I router-fix re-probe, CRASH->RUNNABLE headless)"
       ],
       "blocker_ref": "",
       "risk_class": "live_edit",
       "write_level": "live_edit",
       "agent_exposed": true,
-      "notes": "Router job creates an Ariadne custom entity instance; catalog entries describe class definition and registration primitives.",
+      "notes": "Router job creates an Ariadne custom entity instance; catalog entries describe class definition and registration primitives. Its live_edit default write_mode used to always route cadctl.run_operation's headless surface to the attended full_",
       "engine_tier": "native_arx_only",
       "mapping_type": "synthetic"
     },
@@ -689,13 +692,15 @@
       ],
       "evidence_ref": [
         "config/cad_job_operation_aliases.json#extend.customobject.create",
-        "tests/test_native_arx_dbx_contract.py::createCustomObject"
+        "tests/test_native_arx_dbx_contract.py::createCustomObject",
+        "runs/laneG_repro/attended/customobject_run/attended_job_result.json (2026-07-06 Lane G attended-lane repro, created:true)",
+        "reports/lane_i_router_fix_resolution.json (2026-07-06 Lane I router-fix re-probe, CRASH->RUNNABLE headless)"
       ],
       "blocker_ref": "",
       "risk_class": "live_edit",
       "write_level": "live_edit",
       "agent_exposed": true,
-      "notes": "Router job creates an Ariadne custom DBObject record; catalog separates custom object definition, filing, and storage primitives.",
+      "notes": "Router job creates an Ariadne custom DBObject record; catalog separates custom object definition, filing, and storage primitives. Its live_edit default write_mode used to always route cadctl.run_operation's headless surface to the attended ",
       "engine_tier": "native_arx_only",
       "mapping_type": "synthetic"
     },
@@ -989,6 +994,105 @@
       "write_level": "read",
       "agent_exposed": true,
       "notes": "IMPLEMENTED (M02). Handler = tools/validator.py validate_target, wired through tools/cadctl.py Cad.validate. Verified live this session against runs/m02_cadctl_rich/dwg_graph_ir.json: rollup status 'pass', 6/6 gates pass (ir_schema_present,",
+      "engine_tier": "objectdbx_capable",
+      "mapping_type": "synthetic"
+    },
+    {
+      "operation": "anchor.set",
+      "family": "anchor",
+      "v1_target": true,
+      "status": "implemented",
+      "host_support": "dbx|coreconsole|arx_adapter|full_autocad",
+      "handler": "anchor_ops.build_anchor_set_patch",
+      "test_ref": [
+        "tests/unit/test_anchor_ops.py",
+        "Lane W5-ANCHOR live cert: set on tests/fixtures/native_sample.dwg, fresh-process reopen, byte-identical reassembly (see build_log.md)"
+      ],
+      "evidence_ref": [
+        "tools/anchor_ops.py::build_anchor_set_patch",
+        "tools/cadctl.py::Cad.anchor_set",
+        "tools/cadagent_mcp.py::_tool_anchor_set (cad.anchor_set)",
+        "docs/SEMANTIC_ANCHOR_SPEC.md"
+      ],
+      "blocker_ref": "",
+      "risk_class": "staged_write",
+      "write_level": "write_copy",
+      "agent_exposed": true,
+      "notes": "IMPLEMENTED (Wave 5, Lane W5-ANCHOR). setXData replaces only the calling app's own xdata block, so a second anchor.set on the same handle is a natural upsert (does not stack with the previous anchor). Truthful degradation: blocked if the en",
+      "engine_tier": "objectdbx_capable",
+      "mapping_type": "synthetic"
+    },
+    {
+      "operation": "anchor.get",
+      "family": "anchor",
+      "v1_target": true,
+      "status": "implemented",
+      "host_support": "dbx|coreconsole|arx_adapter|full_autocad",
+      "handler": "anchor_ops.get_anchor_from_ir",
+      "test_ref": [
+        "tests/unit/test_anchor_ops.py"
+      ],
+      "evidence_ref": [
+        "tools/anchor_ops.py::get_anchor_from_ir",
+        "tools/cadctl.py::Cad.anchor_get",
+        "tools/cadagent_mcp.py::_tool_anchor_get (cad.anchor_get)",
+        "docs/SEMANTIC_ANCHOR_SPEC.md"
+      ],
+      "blocker_ref": "",
+      "risk_class": "read_safe",
+      "write_level": "read",
+      "agent_exposed": true,
+      "notes": "IMPLEMENTED (Wave 5, Lane W5-ANCHOR). Truthful statuses: not_found (no entity / no anchor block / tombstoned), malformed (xdata present but fails checksum/schema validation -- a real finding, never swallowed), ok (envelope returned).",
+      "engine_tier": "objectdbx_capable",
+      "mapping_type": "synthetic"
+    },
+    {
+      "operation": "anchor.list",
+      "family": "anchor",
+      "v1_target": true,
+      "status": "implemented",
+      "host_support": "dbx|coreconsole|arx_adapter|full_autocad",
+      "handler": "anchor_ops.list_anchors_from_ir",
+      "test_ref": [
+        "tests/unit/test_anchor_ops.py"
+      ],
+      "evidence_ref": [
+        "tools/anchor_ops.py::list_anchors_from_ir",
+        "tools/cadctl.py::Cad.anchor_list",
+        "tools/cadagent_mcp.py::_tool_anchor_list (cad.anchor_list)",
+        "docs/SEMANTIC_ANCHOR_SPEC.md"
+      ],
+      "blocker_ref": "",
+      "risk_class": "read_safe",
+      "write_level": "read",
+      "agent_exposed": true,
+      "notes": "IMPLEMENTED (Wave 5, Lane W5-ANCHOR).",
+      "engine_tier": "objectdbx_capable",
+      "mapping_type": "synthetic"
+    },
+    {
+      "operation": "anchor.clear",
+      "family": "anchor",
+      "v1_target": true,
+      "status": "implemented",
+      "host_support": "dbx|coreconsole|arx_adapter|full_autocad",
+      "handler": "anchor_ops.build_anchor_clear_patch",
+      "test_ref": [
+        "tests/unit/test_anchor_ops.py",
+        "Lane W5-ANCHOR live cert: clear on tests/fixtures/native_sample.dwg, fresh-process reopen confirms anchor.get reports not_found (see build_log.md)"
+      ],
+      "evidence_ref": [
+        "tools/anchor_ops.py::build_anchor_clear_patch",
+        "tools/cadctl.py::Cad.anchor_clear",
+        "tools/cadagent_mcp.py::_tool_anchor_clear (cad.anchor_clear)",
+        "docs/SEMANTIC_ANCHOR_SPEC.md",
+        "src/Ariadne.AcadNative/families/m08g_handlers.inc (modify.entity.xdata items.empty() guard)"
+      ],
+      "blocker_ref": "",
+      "risk_class": "staged_write",
+      "write_level": "write_copy",
+      "agent_exposed": true,
+      "notes": "IMPLEMENTED (Wave 5, Lane W5-ANCHOR). See policy.note for the honest tombstone-vs-true-removal limitation.",
       "engine_tier": "objectdbx_capable",
       "mapping_type": "synthetic"
     },
@@ -1400,13 +1504,14 @@
         "src/Ariadne.AcadNative/families/m08e_handlers.inc:m08eDispatch",
         "reports/merge/MERGE-M08-READ.json",
         "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
-        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)"
+        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)",
+        "reports/lane_i_router_fix_resolution.json (2026-07-06 Lane I router-fix re-probe, CRASH->RUNNABLE headless)"
       ],
       "blocker_ref": "",
       "risk_class": "live_edit",
       "write_level": "live_edit",
       "agent_exposed": true,
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "M04 catalog-only classification was stale after the 2026-07-06 router fix. Lane I fixed tools/autocad-router.ps1 to route job-based ops by handler.execution_host_class instead of the old write_mode-based attended branch; the fixed-router re",
       "engine_tier": "native_arx_only",
       "mapping_type": "exact"
     },
@@ -1447,20 +1552,22 @@
       "test_ref": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
-        "tests/unit/test_m08e_handlers.py"
+        "tests/unit/test_m08e_handlers.py",
+        "tests/unit/test_patch_ops_split.py"
       ],
       "evidence_ref": [
         "config/autocad_native_arx_operation_catalog.json#write.block.append_entity",
         "src/Ariadne.AcadNative/families/m08e_handlers.inc:m08eDispatch",
         "reports/merge/MERGE-M08-READ.json",
         "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
-        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)"
+        "tools/patch_ops/blocks.py:append_block_entity",
+        "D:/dev/.build/cados_plan/runs/waveP/blockapp/build_log.md"
       ],
       "blocker_ref": "",
       "risk_class": "staged_write",
       "write_level": "write_copy",
       "agent_exposed": true,
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "p2-blockapp wave: graduated from an always-rollback M08E probe (hardcoded model-space line, ignored every arg) to a REAL, persisting primitive -- resolves a NAMED block-table record by 'block_name' and appends one of {line,circle,arc,text} ",
       "engine_tier": "objectdbx_capable",
       "mapping_type": "exact"
     },
@@ -2910,7 +3017,7 @@
       "risk_class": "read_safe",
       "write_level": "read",
       "agent_exposed": false,
-      "notes": "Wave3 post-merge re-audit accepted hard block. HOST_UNAVAILABLE: subentity highlight requires a live graphics/editor selection context and GS refresh; no controlled attended AutoCAD editor host is available in this integration route.",
+      "notes": "Wave3 post-merge re-audit accepted hard block. HOST_UNAVAILABLE: subentity highlight requires a live graphics/editor selection context and GS refresh; no controlled attended AutoCAD editor host is available in this integration route. No nat",
       "engine_tier": "native_arx_only",
       "mapping_type": "exact"
     },
@@ -3207,16 +3314,16 @@
       ],
       "evidence_ref": [
         "config/autocad_native_arx_operation_catalog.json#automate.property.set",
-        "src/Ariadne.AcadNative/families/m08m_handlers.inc:m08mDispatch",
+        "src/Ariadne.AcadNative/families/m08m_handlers.inc:m08mDispatch,m08mBoxPropertyValue",
         "reports/merge/MERGE-M08-READ.json",
-        "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
-        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)"
+        "build:native_acad exit 0 (.crx/.arx/.dbx, VS2026 MSBuild x64, worktree wt/w5_cpp)",
+        "runtime_native_job_smoke:live_verified(W5-CPP lane, run_dir runs/w5_cpp_property_set_fix_20260706_172241, fixture tests/fixtures/native_sample.dwg sha256 eac5d4b13d67d89106e503321412539df7b39b8a7f4e44c033448e9295fe3f76 unchanged before/after every run: double Thickness handle 11935 0->12.5 set_status:0; AcString Contents handle 1199B Korean 전실->복도A-1 set_status:0; bool IsMirroredInY handle 19166 0->1 set_status:0; AcGePoint3d Position handle 19166 set_status:0; read-only guard IsDefaultAlignment handle 19166 correctly refused set_status:2 unchanged; int DrawOrder handle 119F4 marshals correctly (type-matched box) but native setValue returns non-ok status -5001 on this headless host -- documented gap, not a marshalling defect; regression write.entity.line created:true errorstatus:0; python -m pytest tests/unit -q: 1143 passed, 23 skipped, 0 failed)"
       ],
       "blocker_ref": "",
       "risk_class": "staged_write",
       "write_level": "write_copy",
       "agent_exposed": true,
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "W5-CPP (2026-07-06): fixed the WRITE marshalling defect -- the handler used to box every incoming value as a generic AcRxValue(const ACHAR*) regardless of the property's declared AcRxValueType, which failed AcRxProperty::setValue's type che",
       "engine_tier": "objectdbx_capable",
       "mapping_type": "exact"
     },
@@ -3240,7 +3347,7 @@
       "risk_class": "live_edit",
       "write_level": "live_edit",
       "agent_exposed": false,
-      "notes": "Wave3 post-merge re-audit accepted hard block. HOST_UNAVAILABLE: AcDbOle2Frame embedding/linking requires a live OLE client item and attended host context; no controlled OLE route or staged payload contract is available.",
+      "notes": "Wave3 post-merge re-audit accepted hard block. HOST_UNAVAILABLE: AcDbOle2Frame embedding/linking requires a live OLE client item and attended host context; no controlled OLE route or staged payload contract is available. No native dispatche",
       "engine_tier": "native_arx_only",
       "mapping_type": "exact"
     },
@@ -3612,13 +3719,14 @@
         "src/Ariadne.AcadNative/families/m08m_handlers.inc:m08mDispatch",
         "reports/merge/MERGE-M08-READ.json",
         "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
-        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)"
+        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)",
+        "reports/lane_i_router_fix_resolution.json (2026-07-06 Lane I router-fix re-probe, CRASH->RUNNABLE headless)"
       ],
       "blocker_ref": "",
       "risk_class": "live_edit",
       "write_level": "live_edit",
       "agent_exposed": true,
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "M04 catalog-only classification was stale after the 2026-07-06 router fix. Lane I fixed tools/autocad-router.ps1 to route job-based ops by handler.execution_host_class instead of the old write_mode-based attended branch; the fixed-router re",
       "engine_tier": "native_arx_only",
       "mapping_type": "exact"
     },
@@ -3639,13 +3747,14 @@
         "src/Ariadne.AcadNative/families/m08m_handlers.inc:m08mDispatch",
         "reports/merge/MERGE-M08-READ.json",
         "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
-        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)"
+        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)",
+        "reports/lane_i_router_fix_resolution.json (2026-07-06 Lane I router-fix re-probe, CRASH->RUNNABLE headless)"
       ],
       "blocker_ref": "",
       "risk_class": "live_edit",
       "write_level": "live_edit",
       "agent_exposed": true,
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "M04 catalog-only classification was stale after the 2026-07-06 router fix. Lane I fixed tools/autocad-router.ps1 to route job-based ops by handler.execution_host_class instead of the old write_mode-based attended branch; the fixed-router re",
       "engine_tier": "native_arx_only",
       "mapping_type": "exact"
     },
@@ -3666,13 +3775,14 @@
         "src/Ariadne.AcadNative/families/m08m_handlers.inc:m08mDispatch",
         "reports/merge/MERGE-M08-READ.json",
         "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
-        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)"
+        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)",
+        "reports/lane_i_router_fix_resolution.json (2026-07-06 Lane I router-fix re-probe, CRASH->RUNNABLE headless)"
       ],
       "blocker_ref": "",
       "risk_class": "live_edit",
       "write_level": "live_edit",
       "agent_exposed": true,
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "M04 catalog-only classification was stale after the 2026-07-06 router fix. Lane I fixed tools/autocad-router.ps1 to route job-based ops by handler.execution_host_class instead of the old write_mode-based attended branch; the fixed-router re",
       "engine_tier": "native_arx_only",
       "mapping_type": "exact"
     },
@@ -3693,13 +3803,14 @@
         "src/Ariadne.AcadNative/families/m08m_handlers.inc:m08mDispatch",
         "reports/merge/MERGE-M08-READ.json",
         "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
-        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)"
+        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)",
+        "reports/lane_i_router_fix_resolution.json (2026-07-06 Lane I router-fix re-probe, CRASH->RUNNABLE headless)"
       ],
       "blocker_ref": "",
       "risk_class": "live_edit",
       "write_level": "live_edit",
       "agent_exposed": true,
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "M04 catalog-only classification was stale after the 2026-07-06 router fix. Lane I fixed tools/autocad-router.ps1 to route job-based ops by handler.execution_host_class instead of the old write_mode-based attended branch; the fixed-router re",
       "engine_tier": "native_arx_only",
       "mapping_type": "exact"
     },
@@ -3720,13 +3831,14 @@
         "src/Ariadne.AcadNative/families/m08m_handlers.inc:m08mDispatch",
         "reports/merge/MERGE-M08-READ.json",
         "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
-        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)"
+        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)",
+        "reports/lane_i_router_fix_resolution.json (2026-07-06 Lane I router-fix re-probe, CRASH->RUNNABLE headless)"
       ],
       "blocker_ref": "",
       "risk_class": "live_edit",
       "write_level": "live_edit",
       "agent_exposed": true,
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "M04 catalog-only classification was stale after the 2026-07-06 router fix. Lane I fixed tools/autocad-router.ps1 to route job-based ops by handler.execution_host_class instead of the old write_mode-based attended branch; the fixed-router re",
       "engine_tier": "native_arx_only",
       "mapping_type": "exact"
     },
@@ -3747,13 +3859,14 @@
         "src/Ariadne.AcadNative/families/m08m_handlers.inc:m08mDispatch",
         "reports/merge/MERGE-M08-READ.json",
         "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
-        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)"
+        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)",
+        "reports/lane_i_router_fix_resolution.json (2026-07-06 Lane I router-fix re-probe, CRASH->RUNNABLE headless)"
       ],
       "blocker_ref": "",
       "risk_class": "live_edit",
       "write_level": "live_edit",
       "agent_exposed": true,
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "M04 catalog-only classification was stale after the 2026-07-06 router fix. Lane I fixed tools/autocad-router.ps1 to route job-based ops by handler.execution_host_class instead of the old write_mode-based attended branch; the fixed-router re",
       "engine_tier": "native_arx_only",
       "mapping_type": "exact"
     },
@@ -3774,13 +3887,14 @@
         "src/Ariadne.AcadNative/families/m08m_handlers.inc:m08mDispatch",
         "reports/merge/MERGE-M08-READ.json",
         "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
-        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)"
+        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)",
+        "reports/lane_i_router_fix_resolution.json (2026-07-06 Lane I router-fix re-probe, CRASH->RUNNABLE headless)"
       ],
       "blocker_ref": "",
       "risk_class": "live_edit",
       "write_level": "live_edit",
       "agent_exposed": true,
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "M04 catalog-only classification was stale after the 2026-07-06 router fix. Lane I fixed tools/autocad-router.ps1 to route job-based ops by handler.execution_host_class instead of the old write_mode-based attended branch; the fixed-router re",
       "engine_tier": "native_arx_only",
       "mapping_type": "exact"
     },
@@ -3801,13 +3915,14 @@
         "src/Ariadne.AcadNative/families/m08m_handlers.inc:m08mDispatch",
         "reports/merge/MERGE-M08-READ.json",
         "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
-        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)"
+        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)",
+        "reports/lane_i_router_fix_resolution.json (2026-07-06 Lane I router-fix re-probe, CRASH->RUNNABLE headless)"
       ],
       "blocker_ref": "",
       "risk_class": "live_edit",
       "write_level": "live_edit",
       "agent_exposed": true,
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "M04 catalog-only classification was stale after the 2026-07-06 router fix. Lane I fixed tools/autocad-router.ps1 to route job-based ops by handler.execution_host_class instead of the old write_mode-based attended branch; the fixed-router re",
       "engine_tier": "native_arx_only",
       "mapping_type": "exact"
     },
@@ -3828,13 +3943,14 @@
         "src/Ariadne.AcadNative/families/m08m_handlers.inc:m08mDispatch",
         "reports/merge/MERGE-M08-READ.json",
         "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
-        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)"
+        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)",
+        "reports/lane_i_router_fix_resolution.json (2026-07-06 Lane I router-fix re-probe, CRASH->RUNNABLE headless)"
       ],
       "blocker_ref": "",
       "risk_class": "live_edit",
       "write_level": "live_edit",
       "agent_exposed": true,
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "M04 catalog-only classification was stale after the 2026-07-06 router fix. Lane I fixed tools/autocad-router.ps1 to route job-based ops by handler.execution_host_class instead of the old write_mode-based attended branch; the fixed-router re",
       "engine_tier": "native_arx_only",
       "mapping_type": "exact"
     },
@@ -3855,13 +3971,14 @@
         "src/Ariadne.AcadNative/families/m08m_handlers.inc:m08mDispatch",
         "reports/merge/MERGE-M08-READ.json",
         "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
-        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)"
+        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)",
+        "reports/lane_i_router_fix_resolution.json (2026-07-06 Lane I router-fix re-probe, CRASH->RUNNABLE headless)"
       ],
       "blocker_ref": "",
       "risk_class": "live_edit",
       "write_level": "live_edit",
       "agent_exposed": true,
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "M04 catalog-only classification was stale after the 2026-07-06 router fix. Lane I fixed tools/autocad-router.ps1 to route job-based ops by handler.execution_host_class instead of the old write_mode-based attended branch; the fixed-router re",
       "engine_tier": "native_arx_only",
       "mapping_type": "exact"
     },
@@ -3882,13 +3999,14 @@
         "src/Ariadne.AcadNative/families/m08m_handlers.inc:m08mDispatch",
         "reports/merge/MERGE-M08-READ.json",
         "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
-        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)"
+        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)",
+        "reports/lane_i_router_fix_resolution.json (2026-07-06 Lane I router-fix re-probe, CRASH->RUNNABLE headless)"
       ],
       "blocker_ref": "",
       "risk_class": "live_edit",
       "write_level": "live_edit",
       "agent_exposed": true,
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "M04 catalog-only classification was stale after the 2026-07-06 router fix. Lane I fixed tools/autocad-router.ps1 to route job-based ops by handler.execution_host_class instead of the old write_mode-based attended branch; the fixed-router re",
       "engine_tier": "native_arx_only",
       "mapping_type": "exact"
     },
@@ -3909,13 +4027,14 @@
         "src/Ariadne.AcadNative/families/m08m_handlers.inc:m08mDispatch",
         "reports/merge/MERGE-M08-READ.json",
         "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
-        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)"
+        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)",
+        "reports/lane_i_router_fix_resolution.json (2026-07-06 Lane I router-fix re-probe, CRASH->RUNNABLE headless)"
       ],
       "blocker_ref": "",
       "risk_class": "live_edit",
       "write_level": "live_edit",
       "agent_exposed": true,
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "M04 catalog-only classification was stale after the 2026-07-06 router fix. Lane I fixed tools/autocad-router.ps1 to route job-based ops by handler.execution_host_class instead of the old write_mode-based attended branch; the fixed-router re",
       "engine_tier": "native_arx_only",
       "mapping_type": "exact"
     },
@@ -3936,13 +4055,14 @@
         "src/Ariadne.AcadNative/families/m08m_handlers.inc:m08mDispatch",
         "reports/merge/MERGE-M08-READ.json",
         "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
-        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)"
+        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)",
+        "reports/lane_i_router_fix_resolution.json (2026-07-06 Lane I router-fix re-probe, CRASH->RUNNABLE headless)"
       ],
       "blocker_ref": "",
       "risk_class": "live_edit",
       "write_level": "live_edit",
       "agent_exposed": true,
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "M04 catalog-only classification was stale after the 2026-07-06 router fix. Lane I fixed tools/autocad-router.ps1 to route job-based ops by handler.execution_host_class instead of the old write_mode-based attended branch; the fixed-router re",
       "engine_tier": "native_arx_only",
       "mapping_type": "exact"
     },
@@ -3963,13 +4083,14 @@
         "src/Ariadne.AcadNative/families/m08m_handlers.inc:m08mDispatch",
         "reports/merge/MERGE-M08-READ.json",
         "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
-        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)"
+        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)",
+        "reports/lane_i_router_fix_resolution.json (2026-07-06 Lane I router-fix re-probe, CRASH->RUNNABLE headless)"
       ],
       "blocker_ref": "",
       "risk_class": "live_edit",
       "write_level": "live_edit",
       "agent_exposed": true,
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "M04 catalog-only classification was stale after the 2026-07-06 router fix. Lane I fixed tools/autocad-router.ps1 to route job-based ops by handler.execution_host_class instead of the old write_mode-based attended branch; the fixed-router re",
       "engine_tier": "native_arx_only",
       "mapping_type": "exact"
     },
@@ -4017,13 +4138,14 @@
         "src/Ariadne.AcadNative/families/m08m_handlers.inc:m08mDispatch",
         "reports/merge/MERGE-M08-READ.json",
         "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
-        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)"
+        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)",
+        "reports/lane_i_router_fix_resolution.json (2026-07-06 Lane I router-fix re-probe, CRASH->RUNNABLE headless)"
       ],
       "blocker_ref": "",
       "risk_class": "live_edit",
       "write_level": "live_edit",
       "agent_exposed": true,
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "M04 catalog-only classification was stale after the 2026-07-06 router fix. Lane I fixed tools/autocad-router.ps1 to route job-based ops by handler.execution_host_class instead of the old write_mode-based attended branch; the fixed-router re",
       "engine_tier": "native_arx_only",
       "mapping_type": "exact"
     },
@@ -4044,13 +4166,14 @@
         "src/Ariadne.AcadNative/families/m08m_handlers.inc:m08mDispatch",
         "reports/merge/MERGE-M08-READ.json",
         "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
-        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)"
+        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)",
+        "reports/lane_i_router_fix_resolution.json (2026-07-06 Lane I router-fix re-probe, CRASH->RUNNABLE headless)"
       ],
       "blocker_ref": "",
       "risk_class": "live_edit",
       "write_level": "live_edit",
       "agent_exposed": true,
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "M04 catalog-only classification was stale after the 2026-07-06 router fix. Lane I fixed tools/autocad-router.ps1 to route job-based ops by handler.execution_host_class instead of the old write_mode-based attended branch; the fixed-router re",
       "engine_tier": "native_arx_only",
       "mapping_type": "exact"
     },
@@ -4836,13 +4959,14 @@
         "src/Ariadne.AcadNative/families/m08kc_handlers.inc:m08kcDispatch",
         "reports/merge/MERGE-M08-READ.json",
         "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
-        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)"
+        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)",
+        "reports/lane_i_router_fix_resolution.json (2026-07-06 Lane I router-fix re-probe, CRASH->REACHABLE headless)"
       ],
       "blocker_ref": "",
       "risk_class": "live_edit",
       "write_level": "live_edit",
       "agent_exposed": true,
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "M04 catalog-only classification was stale after the 2026-07-06 router fix. Lane I fixed tools/autocad-router.ps1 to route job-based ops by handler.execution_host_class instead of the old write_mode-based attended branch; the fixed-router re",
       "engine_tier": "native_arx_only",
       "mapping_type": "exact"
     },
@@ -4998,13 +5122,14 @@
         "src/Ariadne.AcadNative/families/m08kc_handlers.inc:m08kcDispatch",
         "reports/merge/MERGE-M08-READ.json",
         "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
-        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)"
+        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)",
+        "reports/lane_i_router_fix_resolution.json (2026-07-06 Lane I router-fix re-probe, CRASH->REACHABLE headless)"
       ],
       "blocker_ref": "",
       "risk_class": "live_edit",
       "write_level": "live_edit",
       "agent_exposed": true,
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "M04 catalog-only classification was stale after the 2026-07-06 router fix. Lane I fixed tools/autocad-router.ps1 to route job-based ops by handler.execution_host_class instead of the old write_mode-based attended branch; the fixed-router re",
       "engine_tier": "native_arx_only",
       "mapping_type": "exact"
     },
@@ -5978,13 +6103,14 @@
         "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)",
         "reports/tickets/WAVE3_PANE6_NATIVE_CUSTOM.md",
         "reports/tickets/WAVE3_PANE6_NATIVE_CUSTOM_OPS.json",
-        "reports/tickets/WAVE3_PANE6_native_build.json"
+        "reports/tickets/WAVE3_PANE6_native_build.json",
+        "reports/lane_i_router_fix_resolution.json (2026-07-06 Lane I router-fix re-probe, CRASH->RUNNABLE headless)"
       ],
       "blocker_ref": "",
       "risk_class": "live_edit",
       "write_level": "live_edit",
       "agent_exposed": true,
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "M04 catalog-only classification was stale after the 2026-07-06 router fix. Lane I fixed tools/autocad-router.ps1 to route job-based ops by handler.execution_host_class instead of the old write_mode-based attended branch; the fixed-router re",
       "engine_tier": "native_arx_only",
       "mapping_type": "exact"
     },
@@ -6347,13 +6473,14 @@
         "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)",
         "reports/tickets/WAVE3_PANE6_NATIVE_CUSTOM.md",
         "reports/tickets/WAVE3_PANE6_NATIVE_CUSTOM_OPS.json",
-        "reports/tickets/WAVE3_PANE6_native_build.json"
+        "reports/tickets/WAVE3_PANE6_native_build.json",
+        "reports/lane_i_router_fix_resolution.json (2026-07-06 Lane I router-fix re-probe, CRASH->RUNNABLE headless)"
       ],
       "blocker_ref": "",
       "risk_class": "live_edit",
       "write_level": "live_edit",
       "agent_exposed": true,
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "M04 catalog-only classification was stale after the 2026-07-06 router fix. Lane I fixed tools/autocad-router.ps1 to route job-based ops by handler.execution_host_class instead of the old write_mode-based attended branch; the fixed-router re",
       "engine_tier": "native_arx_only",
       "mapping_type": "exact"
     },
@@ -6377,13 +6504,14 @@
         "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)",
         "reports/tickets/WAVE3_PANE6_NATIVE_CUSTOM.md",
         "reports/tickets/WAVE3_PANE6_NATIVE_CUSTOM_OPS.json",
-        "reports/tickets/WAVE3_PANE6_native_build.json"
+        "reports/tickets/WAVE3_PANE6_native_build.json",
+        "reports/lane_i_router_fix_resolution.json (2026-07-06 Lane I router-fix re-probe, CRASH->RUNNABLE headless)"
       ],
       "blocker_ref": "",
       "risk_class": "live_edit",
       "write_level": "live_edit",
       "agent_exposed": true,
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "M04 catalog-only classification was stale after the 2026-07-06 router fix. Lane I fixed tools/autocad-router.ps1 to route job-based ops by handler.execution_host_class instead of the old write_mode-based attended branch; the fixed-router re",
       "engine_tier": "native_arx_only",
       "mapping_type": "exact"
     },
@@ -6548,13 +6676,14 @@
         "src/Ariadne.AcadNative/families/m08k_handlers.inc:m08kDispatch",
         "reports/merge/MERGE-M08-READ.json",
         "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
-        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)"
+        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)",
+        "reports/lane_i_router_fix_resolution.json (2026-07-06 Lane I router-fix re-probe, CRASH->RUNNABLE headless)"
       ],
       "blocker_ref": "",
       "risk_class": "live_edit",
       "write_level": "live_edit",
       "agent_exposed": true,
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "M04 catalog-only classification was stale after the 2026-07-06 router fix. Lane I fixed tools/autocad-router.ps1 to route job-based ops by handler.execution_host_class instead of the old write_mode-based attended branch; the fixed-router re",
       "engine_tier": "native_arx_only",
       "mapping_type": "exact"
     },
@@ -7904,13 +8033,14 @@
         "src/Ariadne.AcadNative/families/m08n_handlers.inc:m08nDispatch",
         "reports/merge/MERGE-M08-READ.json",
         "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
-        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)"
+        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)",
+        "reports/lane_i_router_fix_resolution.json (2026-07-06 Lane I router-fix re-probe, CRASH->RUNNABLE headless)"
       ],
       "blocker_ref": "",
       "risk_class": "live_edit",
       "write_level": "live_edit",
       "agent_exposed": true,
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "M04 catalog-only classification was stale after the 2026-07-06 router fix. Lane I fixed tools/autocad-router.ps1 to route job-based ops by handler.execution_host_class instead of the old write_mode-based attended branch; the fixed-router re",
       "engine_tier": "native_arx_only",
       "mapping_type": "exact"
     },
@@ -8428,6 +8558,29 @@
       "mapping_type": "exact"
     },
     {
+      "operation": "modify.entity.xdata",
+      "family": "entities",
+      "v1_target": true,
+      "status": "implemented",
+      "host_support": "dbx|coreconsole|arx_adapter|full_autocad",
+      "handler": "m08gDispatch",
+      "test_ref": [
+        "tests/unit/test_m08g_handlers.py",
+        "tests/unit/test_patch_ops_split.py"
+      ],
+      "evidence_ref": [
+        "src/Ariadne.AcadNative/families/m08g_handlers.inc:m08gDispatch",
+        "tools/patch_ops/entities.py:set_entity_xdata_by_handle"
+      ],
+      "blocker_ref": "",
+      "risk_class": "staged_write",
+      "write_level": "write_copy",
+      "agent_exposed": true,
+      "notes": "P10: a genuinely NEW capability layered on the M08G entity family, not part of the original ObjectARX 457-op catalog scan (catalog_op_id is null -- no pre-existing catalog entry to alias or exact-map to). Distinct code path from write.xdata",
+      "engine_tier": "objectdbx_capable",
+      "mapping_type": "exact"
+    },
+    {
       "operation": "modify.entity.copy_transformed",
       "family": "entities",
       "v1_target": true,
@@ -8498,7 +8651,8 @@
         "src/Ariadne.AcadNative/families/m08g_handlers.inc:m08gDispatch",
         "reports/merge/MERGE-M08-READ.json",
         "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
-        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)"
+        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)",
+        "measure/reachable_matrix.jsonl#write.entity.arc"
       ],
       "blocker_ref": "",
       "risk_class": "staged_write",
@@ -8612,7 +8766,7 @@
       "risk_class": "staged_write",
       "write_level": "write_copy",
       "agent_exposed": true,
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "Create an empty AcDbBody (ASM/ACIS wrapper). WaveS0/wS-solids live-probed (accoreconsole): handler builds a content-less AcDbBody (no setter called) -- AcBr cannot bind it (BREP_BIND_FAILED). CREATED_DEGENERATE by construction; not certifia",
       "engine_tier": "objectdbx_capable",
       "mapping_type": "exact"
     },
@@ -8849,7 +9003,8 @@
         "src/Ariadne.AcadNative/families/m08h_handlers.inc:m08hDispatch",
         "reports/merge/MERGE-M08-READ.json",
         "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
-        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)"
+        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)",
+        "measure/reachable_matrix.jsonl#write.entity.dim.rotated"
       ],
       "blocker_ref": "",
       "risk_class": "staged_write",
@@ -8876,7 +9031,8 @@
         "src/Ariadne.AcadNative/families/m08g_handlers.inc:m08gDispatch",
         "reports/merge/MERGE-M08-READ.json",
         "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
-        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)"
+        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)",
+        "measure/reachable_matrix.jsonl#write.entity.ellipse"
       ],
       "blocker_ref": "",
       "risk_class": "staged_write",
@@ -8923,20 +9079,21 @@
       "test_ref": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
-        "tests/unit/test_m08h_handlers.py"
+        "tests/unit/test_m08h_handlers.py",
+        "tests/unit/test_attended_lane.py::test_attended_hatch_full_cert_live"
       ],
       "evidence_ref": [
         "config/autocad_native_arx_operation_catalog.json#write.entity.hatch",
         "src/Ariadne.AcadNative/families/m08h_handlers.inc:m08hDispatch",
         "reports/merge/MERGE-M08-READ.json",
         "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
-        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)"
+        "runtime_native_job_smoke:attended_live_verified(Attended Wave, tests/unit/test_attended_lane.py::test_attended_hatch_full_cert_live PASSED, run_dir runs/attended_wave_m3_hatch_v2, cad_op_gate diff=0)"
       ],
       "blocker_ref": "",
       "risk_class": "staged_write",
       "write_level": "write_copy",
       "agent_exposed": true,
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "Attended-wave promotion (Lane AT): live attended run (CADOS_LIVE=1 pytest + a standalone repro under runs/attended_wave_m3_hatch_v2) created a real SOLID hatch via m08hDispatch inside a dedicated full acad.exe, headless re-extracted, cad_op",
       "engine_tier": "objectdbx_capable",
       "mapping_type": "exact"
     },
@@ -9065,7 +9222,8 @@
         "src/Ariadne.AcadNative/families/m08g_handlers.inc:m08gDispatch",
         "reports/merge/MERGE-M08-READ.json",
         "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
-        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)"
+        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)",
+        "measure/reachable_matrix.jsonl#write.entity.mpolygon"
       ],
       "blocker_ref": "",
       "risk_class": "staged_write",
@@ -9092,7 +9250,8 @@
         "src/Ariadne.AcadNative/families/m08h_handlers.inc:m08hDispatch",
         "reports/merge/MERGE-M08-READ.json",
         "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
-        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)"
+        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)",
+        "measure/reachable_matrix.jsonl#write.entity.mtext"
       ],
       "blocker_ref": "",
       "risk_class": "staged_write",
@@ -9125,7 +9284,7 @@
       "risk_class": "staged_write",
       "write_level": "write_copy",
       "agent_exposed": true,
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "Create a NURBS surface (AcDbNurbSurface::set). WaveS0/wS-solids live-verified headless (accoreconsole) with real caller-controlled control-point/degree args -- bounds/area match the requested patch exactly.",
       "engine_tier": "objectdbx_capable",
       "mapping_type": "exact"
     },
@@ -9209,6 +9368,33 @@
       "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
       "engine_tier": "objectdbx_capable",
       "mapping_type": "exact"
+    },
+    {
+      "operation": "write.entity.polyline2d.deep",
+      "family": "entities",
+      "v1_target": true,
+      "status": "implemented",
+      "host_support": "dbx|coreconsole|arx_adapter|full_autocad",
+      "handler": "m08gDispatch",
+      "test_ref": [
+        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
+        "tests/unit/test_m08g_handlers.py",
+        "tests/unit/test_patch_ops_split.py",
+        "tests/unit/test_op_roundtrip_probe.py"
+      ],
+      "evidence_ref": [
+        "src/Ariadne.AcadNative/families/m08g_handlers.inc:m08gDispatch",
+        "src/Ariadne.AcadNative/AriadneNativeJob.cpp:collectModelSpaceGraph (AcDb2dPolyline branch, extended)",
+        "build:native_acad exit 0 (.crx/.arx, VS2027 MSBuild x64)",
+        "runtime_native_job_smoke:p4-poly2d live re-cert (tests/fixtures/native_sample.dwg staged copy, geometry-diff=0)"
+      ],
+      "blocker_ref": "",
+      "risk_class": "staged_write",
+      "write_level": "write_copy",
+      "agent_exposed": true,
+      "notes": "p4-poly2d: NEW synthetic (router-only, not in the raw 480-op ObjectARX catalog) op id, kept distinct from write.entity.polyline2d so the pre-existing LWPOLYLINE alias is not disturbed. Scope is k2dSimplePoly only; curve-fit/spline-fit poly ",
+      "engine_tier": "objectdbx_capable",
+      "mapping_type": "synthetic"
     },
     {
       "operation": "write.entity.polyline3d",
@@ -9314,7 +9500,7 @@
       "risk_class": "staged_write",
       "write_level": "write_copy",
       "agent_exposed": true,
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "Create region(s) from existing closed coplanar curves (AcDbRegion::createFromCurves). WaveS0/wS-solids live-verified headless (accoreconsole): area/bounds match the source curve exactly; requested layer is honored.",
       "engine_tier": "objectdbx_capable",
       "mapping_type": "exact"
     },
@@ -9395,7 +9581,7 @@
       "risk_class": "staged_write",
       "write_level": "write_copy",
       "agent_exposed": true,
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "Create a 3D solid by extruding a profile (AcDb3dSolid::createExtrudedSolid). WaveS0/wS-solids live-verified headless (accoreconsole): volume/surface_area match the box-extrusion closed form exactly.",
       "engine_tier": "objectdbx_capable",
       "mapping_type": "exact"
     },
@@ -9422,7 +9608,7 @@
       "risk_class": "staged_write",
       "write_level": "write_copy",
       "agent_exposed": true,
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "Create a 3D solid by lofting between section profiles (AcDb3dSolid::createLoftedSolid). WaveS0/wS-solids live-verified headless (accoreconsole): volume matches the general prismatoid formula exactly for two distinct offset closed profiles.",
       "engine_tier": "objectdbx_capable",
       "mapping_type": "exact"
     },
@@ -9449,7 +9635,7 @@
       "risk_class": "staged_write",
       "write_level": "write_copy",
       "agent_exposed": true,
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "Create a 3D solid primitive (box/sphere/torus/wedge/pyramid/frustum). WaveS0/wS-solids live-verified headless (accoreconsole): volume/surface_area match the closed-form solid-geometry formula for each requested primitive exactly.",
       "engine_tier": "objectdbx_capable",
       "mapping_type": "exact"
     },
@@ -9476,7 +9662,7 @@
       "risk_class": "staged_write",
       "write_level": "write_copy",
       "agent_exposed": true,
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "Create a 3D solid by revolving a profile about an axis (AcDb3dSolid::createRevolvedSolid). WaveS0/wS-solids live-verified headless (accoreconsole): volume matches the sector-of-cylinder closed form exactly.",
       "engine_tier": "objectdbx_capable",
       "mapping_type": "exact"
     },
@@ -9503,7 +9689,7 @@
       "risk_class": "staged_write",
       "write_level": "write_copy",
       "agent_exposed": true,
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "Create a 3D solid by sweeping a profile along a path (AcDb3dSolid::createSweptSolid). WaveS0/wS-solids live-verified headless (accoreconsole): volume/surface_area match the swept cross-section closed form exactly.",
       "engine_tier": "objectdbx_capable",
       "mapping_type": "exact"
     },
@@ -9584,7 +9770,7 @@
       "risk_class": "staged_write",
       "write_level": "write_copy",
       "agent_exposed": true,
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "Create a surface from a planar profile (AcDbSurface::createFrom). WaveS0/wS-solids live-verified headless (accoreconsole): surface_area/bounds match the source profile exactly.",
       "engine_tier": "objectdbx_capable",
       "mapping_type": "exact"
     },
@@ -9632,7 +9818,8 @@
         "src/Ariadne.AcadNative/families/m08h_handlers.inc:m08hDispatch",
         "reports/merge/MERGE-M08-READ.json",
         "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
-        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)"
+        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)",
+        "measure/reachable_matrix.jsonl#write.entity.text"
       ],
       "blocker_ref": "",
       "risk_class": "staged_write",
@@ -10307,7 +10494,8 @@
         "src/Ariadne.AcadNative/families/m08g_handlers.inc:m08gDispatch",
         "reports/merge/MERGE-M08-READ.json",
         "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
-        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)"
+        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)",
+        "measure/reachable_matrix.jsonl#write.entity.polyline"
       ],
       "blocker_ref": "",
       "risk_class": "staged_write",
@@ -10631,7 +10819,7 @@
       "risk_class": "read_safe",
       "write_level": "read",
       "agent_exposed": false,
-      "notes": "Wave3 final no-fake-PASS audit accepted hard block. HOST_UNAVAILABLE: AcPlPlotEngine execution requires a controlled attended/full AutoCAD plot host; no controlled attended plot route is available in this integration validation.",
+      "notes": "Wave3 final no-fake-PASS audit accepted hard block. HOST_UNAVAILABLE: AcPlPlotEngine execution requires a controlled attended/full AutoCAD plot host; no controlled attended plot route is available in this integration validation. No native d",
       "engine_tier": "managed_also",
       "mapping_type": "exact"
     },
@@ -11723,13 +11911,14 @@
         "src/Ariadne.AcadNative/families/m08m_handlers.inc:m08mDispatch",
         "reports/merge/MERGE-M08-READ.json",
         "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
-        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)"
+        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)",
+        "reports/lane_i_router_fix_resolution.json (2026-07-06 Lane I router-fix re-probe, CRASH->RUNNABLE headless)"
       ],
       "blocker_ref": "",
       "risk_class": "live_edit",
       "write_level": "live_edit",
       "agent_exposed": true,
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "M04 catalog-only classification was stale after the 2026-07-06 router fix. Lane I fixed tools/autocad-router.ps1 to route job-based ops by handler.execution_host_class instead of the old write_mode-based attended branch; the fixed-router re",
       "engine_tier": "native_arx_only",
       "mapping_type": "exact"
     },
@@ -11750,13 +11939,14 @@
         "src/Ariadne.AcadNative/families/m08m_handlers.inc:m08mDispatch",
         "reports/merge/MERGE-M08-READ.json",
         "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
-        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)"
+        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)",
+        "reports/lane_i_router_fix_resolution.json (2026-07-06 Lane I router-fix re-probe, CRASH->RUNNABLE headless)"
       ],
       "blocker_ref": "",
       "risk_class": "live_edit",
       "write_level": "live_edit",
       "agent_exposed": true,
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "M04 catalog-only classification was stale after the 2026-07-06 router fix. Lane I fixed tools/autocad-router.ps1 to route job-based ops by handler.execution_host_class instead of the old write_mode-based attended branch; the fixed-router re",
       "engine_tier": "native_arx_only",
       "mapping_type": "exact"
     },
@@ -12708,13 +12898,14 @@
         "src/Ariadne.AcadNative/families/m08c_handlers.inc:m08cDispatch",
         "reports/merge/MERGE-M08-READ.json",
         "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
-        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)"
+        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)",
+        "reports/lane_i_router_fix_resolution.json (2026-07-06 Lane I router-fix re-probe, CRASH->REACHABLE headless)"
       ],
       "blocker_ref": "",
       "risk_class": "live_edit",
       "write_level": "live_edit",
       "agent_exposed": true,
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "M04 catalog-only classification was stale after the 2026-07-06 router fix. Lane I fixed tools/autocad-router.ps1 to route job-based ops by handler.execution_host_class instead of the old write_mode-based attended branch; the fixed-router re",
       "engine_tier": "native_arx_only",
       "mapping_type": "exact"
     },
@@ -12762,7 +12953,8 @@
         "src/Ariadne.AcadNative/families/m08e_handlers.inc:m08eDispatch",
         "reports/merge/MERGE-M08-READ.json",
         "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
-        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)"
+        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)",
+        "measure/reachable_matrix.jsonl#write.entity.set_xdata"
       ],
       "blocker_ref": "",
       "risk_class": "staged_write",
@@ -13882,14 +14074,443 @@
       "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
       "engine_tier": "native_arx_only",
       "mapping_type": "exact"
+    },
+    {
+      "operation": "write.dimstyle.create",
+      "family": "symbol_tables_dictionaries",
+      "v1_target": true,
+      "status": "implemented",
+      "host_support": "dbx|coreconsole|arx_adapter|full_autocad",
+      "handler": "upsertDimStyleRecord",
+      "test_ref": [
+        "tools/op_roundtrip_probe.py::probe_dimstyle_roundtrip"
+      ],
+      "evidence_ref": [
+        "tools/op_roundtrip_probe.py::probe_dimstyle_roundtrip",
+        "tools/patch_ops/tables.py#write.dimstyle.create"
+      ],
+      "blocker_ref": "",
+      "risk_class": "staged_write",
+      "write_level": "write_copy",
+      "agent_exposed": true,
+      "notes": "Create-or-update a named DIMSTYLE table record, writing a representative 10-DIMVAR subset of AcDbDimStyleTableRecord's ~70 dimension variables; the rest are an unwired gap (see tools/patch_ops/tables.py's module docstring).",
+      "engine_tier": "objectdbx_capable",
+      "mapping_type": "synthetic"
+    },
+    {
+      "operation": "write.linetype.create",
+      "family": "symbol_tables_dictionaries",
+      "v1_target": true,
+      "status": "implemented",
+      "host_support": "dbx|coreconsole|arx_adapter|full_autocad",
+      "handler": "upsertLinetypeRecord",
+      "test_ref": [
+        "tools/op_roundtrip_probe.py::probe_linetype_roundtrip"
+      ],
+      "evidence_ref": [
+        "tools/op_roundtrip_probe.py::probe_linetype_roundtrip",
+        "tools/patch_ops/tables.py#write.linetype.create"
+      ],
+      "blocker_ref": "",
+      "risk_class": "staged_write",
+      "write_level": "write_copy",
+      "agent_exposed": true,
+      "notes": "Create-or-update a named LINETYPE table record, writing name/description plus a simple dash-only pattern; complex-linetype shape/text embedding is an unwired gap (see tools/patch_ops/tables.py's module docstring).",
+      "engine_tier": "objectdbx_capable",
+      "mapping_type": "synthetic"
+    },
+    {
+      "operation": "write.textstyle.create",
+      "family": "symbol_tables_dictionaries",
+      "v1_target": true,
+      "status": "implemented",
+      "host_support": "dbx|coreconsole|arx_adapter|full_autocad",
+      "handler": "upsertTextStyleRecord",
+      "test_ref": [
+        "tools/op_roundtrip_probe.py::probe_textstyle_roundtrip"
+      ],
+      "evidence_ref": [
+        "tools/op_roundtrip_probe.py::probe_textstyle_roundtrip",
+        "tools/patch_ops/tables.py#write.textstyle.create"
+      ],
+      "blocker_ref": "",
+      "risk_class": "staged_write",
+      "write_level": "write_copy",
+      "agent_exposed": true,
+      "notes": "Create-or-update a named TEXTSTYLE table record, writing font/bigfont file references plus height/width_factor/oblique_angle and the is_shape_file/is_vertical state flags; setFont()'s Windows-typeface path and priorSize() are an unwired gap",
+      "engine_tier": "objectdbx_capable",
+      "mapping_type": "synthetic"
+    },
+    {
+      "operation": "write.ucs.create",
+      "family": "symbol_tables_dictionaries",
+      "v1_target": true,
+      "status": "implemented",
+      "host_support": "dbx|coreconsole|arx_adapter|full_autocad",
+      "handler": "upsertUcsRecord",
+      "test_ref": [
+        "tools/op_roundtrip_probe.py::probe_ucs_roundtrip"
+      ],
+      "evidence_ref": [
+        "tools/op_roundtrip_probe.py::probe_ucs_roundtrip",
+        "tools/patch_ops/tables.py#write.ucs.create"
+      ],
+      "blocker_ref": "",
+      "risk_class": "staged_write",
+      "write_level": "write_copy",
+      "agent_exposed": true,
+      "notes": "Create-or-update a named UCS table record, writing AcDbUCSTableRecord's full settable surface (origin/x_axis/y_axis) -- a small, COMPLETE class, unlike DIMSTYLE's partial DIMVAR subset.",
+      "engine_tier": "objectdbx_capable",
+      "mapping_type": "synthetic"
+    },
+    {
+      "operation": "write.view.create",
+      "family": "symbol_tables_dictionaries",
+      "v1_target": true,
+      "status": "implemented",
+      "host_support": "dbx|coreconsole|arx_adapter|full_autocad",
+      "handler": "upsertViewRecord",
+      "test_ref": [
+        "tools/op_roundtrip_probe.py::probe_view_roundtrip"
+      ],
+      "evidence_ref": [
+        "tools/op_roundtrip_probe.py::probe_view_roundtrip",
+        "tools/patch_ops/tables.py#write.view.create"
+      ],
+      "blocker_ref": "",
+      "risk_class": "staged_write",
+      "write_level": "write_copy",
+      "agent_exposed": true,
+      "notes": "Create-or-update a named VIEW table record, writing a representative camera-property subset; isPaperspaceView/category_name/layer_state/layout/camera/sun/visual_style/background/thumbnail/annotation_scale/UCS-association are an honest gap (",
+      "engine_tier": "objectdbx_capable",
+      "mapping_type": "synthetic"
+    },
+    {
+      "operation": "write.vport.create",
+      "family": "symbol_tables_dictionaries",
+      "v1_target": true,
+      "status": "implemented",
+      "host_support": "dbx|coreconsole|arx_adapter|full_autocad",
+      "handler": "upsertVportRecord",
+      "test_ref": [
+        "tools/op_roundtrip_probe.py::probe_vport_roundtrip"
+      ],
+      "evidence_ref": [
+        "tools/op_roundtrip_probe.py::probe_vport_roundtrip",
+        "tools/patch_ops/tables.py#write.vport.create"
+      ],
+      "blocker_ref": "",
+      "risk_class": "staged_write",
+      "write_level": "write_copy",
+      "agent_exposed": true,
+      "notes": "Create-or-update a named VPORT table record, writing the viewport-specific subset plus the shared VIEW-proven base-class camera fields; lens_length/perspective/clip-plane fields are deliberately NOT re-certified here (already proven on this",
+      "engine_tier": "objectdbx_capable",
+      "mapping_type": "synthetic"
+    },
+    {
+      "operation": "sheetset.read.summary",
+      "family": "com_activex",
+      "v1_target": true,
+      "status": "blocked",
+      "host_support": "full_autocad",
+      "handler": "tools.sheetset_read.read_sheetset",
+      "test_ref": [
+        "tests/unit/test_sheetset_read.py",
+        "tests/unit/test_wave3_remaining_registry_closure.py::test_remaining_wave3_blocks_have_accepted_codes_and_evidence",
+        "measure/w6_sheetset_probe_latest.json"
+      ],
+      "evidence_ref": [
+        "tools/sheetset_read.py",
+        "measure/w6_sheetset_probe_latest.json",
+        "w6_report.md"
+      ],
+      "blocker_ref": "HOST_UNAVAILABLE: standalone COM activation is reachable only after injecting the AutoCAD 2027 install directory into PATH, but governed headless read remains unavailable because the registered manager is non-IDispatch and the Autodesk OpenDatabase interop path fails on missing AXDBLib.",
+      "risk_class": "read_safe",
+      "write_level": "read",
+      "agent_exposed": false,
+      "notes": "Wave 6 measured a real standalone COM object after prepending the AutoCAD 2027 install directory to PATH, but the governed read path stays blocked because win32com late binding cannot drive the non-IDispatch manager and Autodesk's OpenDatab",
+      "engine_tier": "managed_also",
+      "mapping_type": "synthetic"
+    },
+    {
+      "operation": "sheetset.read.sheets",
+      "family": "com_activex",
+      "v1_target": true,
+      "status": "blocked",
+      "host_support": "full_autocad",
+      "handler": "tools.sheetset_read.read_sheetset",
+      "test_ref": [
+        "tests/unit/test_sheetset_read.py",
+        "tests/unit/test_wave3_remaining_registry_closure.py::test_remaining_wave3_blocks_have_accepted_codes_and_evidence",
+        "measure/w6_sheetset_probe_latest.json"
+      ],
+      "evidence_ref": [
+        "tools/sheetset_read.py",
+        "measure/w6_sheetset_probe_latest.json",
+        "w6_report.md"
+      ],
+      "blocker_ref": "HOST_UNAVAILABLE: installed sample .dst inputs exist and the versioned manager ProgID is registered, but governed headless sheet enumeration remains unavailable because the registered manager is non-IDispatch and Autodesk's OpenDatabase interop path fails on missing AXDBLib.",
+      "risk_class": "read_safe",
+      "write_level": "read",
+      "agent_exposed": false,
+      "notes": "Wave 6 found installed sample .dst files and a versioned Sheet Set manager ProgID, but the only headless read attempt currently fails before enumeration because Autodesk's typed OpenDatabase path cannot resolve AXDBLib on this machine.",
+      "engine_tier": "managed_also",
+      "mapping_type": "synthetic"
+    },
+    {
+      "operation": "inspect.layerstates.list",
+      "family": "symbol_tables_dictionaries",
+      "v1_target": true,
+      "status": "implemented",
+      "host_support": "dbx|coreconsole|arx_adapter|full_autocad",
+      "handler": "w6LayerStateDispatch",
+      "test_ref": [
+        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
+        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
+        "tests/unit/test_w6_layerstate_handlers.py"
+      ],
+      "evidence_ref": [
+        "src/Ariadne.AcadNative/families/w6_layerstate_handlers.inc:w6LayerStateDispatch",
+        "tests/unit/test_w6_layerstate_handlers.py",
+        "D:/dev/.build/cados_plan/wt/w6_layerstate/build_log.md"
+      ],
+      "blocker_ref": "",
+      "risk_class": "read_safe",
+      "write_level": "read",
+      "agent_exposed": true,
+      "notes": "W6-LAYERSTATE: enumerates AcDbLayerStateManager::getLayerStateNames, decorating each name with description (getLayerStateDescription), layer_count (getLayerStateLayers length), masked_properties (getLayerStateMask decoded to a string array)",
+      "engine_tier": "objectdbx_capable",
+      "mapping_type": "synthetic"
+    },
+    {
+      "operation": "write.layerstate.save",
+      "family": "symbol_tables_dictionaries",
+      "v1_target": true,
+      "status": "implemented",
+      "host_support": "dbx|coreconsole|arx_adapter|full_autocad",
+      "handler": "w6LayerStateDispatch",
+      "test_ref": [
+        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
+        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
+        "tests/unit/test_w6_layerstate_handlers.py"
+      ],
+      "evidence_ref": [
+        "src/Ariadne.AcadNative/families/w6_layerstate_handlers.inc:w6LayerStateDispatch",
+        "tests/unit/test_w6_layerstate_handlers.py",
+        "D:/dev/.build/cados_plan/wt/w6_layerstate/build_log.md"
+      ],
+      "blocker_ref": "",
+      "risk_class": "staged_write",
+      "write_level": "write_copy",
+      "agent_exposed": true,
+      "notes": "W6-LAYERSTATE: AcDbLayerStateManager::saveLayerState on the staged db; optional description via setLayerStateDescription, optional mask[] (default kAll). overwrite=1 (default) re-saves an existing name. Staged-copy only, never touches the o",
+      "engine_tier": "objectdbx_capable",
+      "mapping_type": "synthetic"
+    },
+    {
+      "operation": "write.layerstate.restore",
+      "family": "symbol_tables_dictionaries",
+      "v1_target": true,
+      "status": "implemented",
+      "host_support": "dbx|coreconsole|arx_adapter|full_autocad",
+      "handler": "w6LayerStateDispatch",
+      "test_ref": [
+        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
+        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
+        "tests/unit/test_w6_layerstate_handlers.py"
+      ],
+      "evidence_ref": [
+        "src/Ariadne.AcadNative/families/w6_layerstate_handlers.inc:w6LayerStateDispatch",
+        "tests/unit/test_w6_layerstate_handlers.py",
+        "D:/dev/.build/cados_plan/wt/w6_layerstate/build_log.md"
+      ],
+      "blocker_ref": "",
+      "risk_class": "staged_write",
+      "write_level": "write_copy",
+      "agent_exposed": true,
+      "notes": "W6-LAYERSTATE: AcDbLayerStateManager::restoreLayerState on the staged db (plain named-state overload by default; optional restore_flags[] uses the viewport-aware overload with AcDbObjectId::kNull). Staged-copy only.",
+      "engine_tier": "objectdbx_capable",
+      "mapping_type": "synthetic"
+    },
+    {
+      "operation": "write.layerstate.delete",
+      "family": "symbol_tables_dictionaries",
+      "v1_target": true,
+      "status": "implemented",
+      "host_support": "dbx|coreconsole|arx_adapter|full_autocad",
+      "handler": "w6LayerStateDispatch",
+      "test_ref": [
+        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
+        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
+        "tests/unit/test_w6_layerstate_handlers.py"
+      ],
+      "evidence_ref": [
+        "src/Ariadne.AcadNative/families/w6_layerstate_handlers.inc:w6LayerStateDispatch",
+        "tests/unit/test_w6_layerstate_handlers.py",
+        "D:/dev/.build/cados_plan/wt/w6_layerstate/build_log.md"
+      ],
+      "blocker_ref": "",
+      "risk_class": "staged_write",
+      "write_level": "write_copy",
+      "agent_exposed": true,
+      "notes": "W6-LAYERSTATE: AcDbLayerStateManager::deleteLayerState on the staged db. Staged-copy only.",
+      "engine_tier": "objectdbx_capable",
+      "mapping_type": "synthetic"
+    },
+    {
+      "operation": "inspect.dynblock.references",
+      "family": "blocks_xrefs_clone",
+      "v1_target": true,
+      "status": "implemented",
+      "host_support": "dbx|coreconsole|arx_adapter|full_autocad",
+      "handler": "w6dynblkDispatch",
+      "test_ref": [
+        "tests/unit/test_w6_dynblk_handlers.py"
+      ],
+      "evidence_ref": [
+        "src/Ariadne.AcadNative/families/w6_dynblk_handlers.inc:w6dynblkDispatch",
+        "tests/unit/test_w6_dynblk_handlers.py",
+        "build:native_acad exit 0 (.crx/.arx/.dbx, VS2026 MSBuild x64, worktree wt/w6_dynblk)"
+      ],
+      "blocker_ref": "",
+      "risk_class": "read_safe",
+      "write_level": "read",
+      "agent_exposed": true,
+      "notes": "W6-DYNBLK wave: census sdk_census_reaudit_20260706.md #1 P1 excellence candidate -- dynamic block REFERENCE property read/write was zero-coverage (only static block ops existed: write.block.simple_create/insert, inspect.block(s)/.iterate, w",
+      "engine_tier": "objectdbx_capable",
+      "mapping_type": "synthetic"
+    },
+    {
+      "operation": "inspect.dynblock.properties",
+      "family": "blocks_xrefs_clone",
+      "v1_target": true,
+      "status": "implemented",
+      "host_support": "dbx|coreconsole|arx_adapter|full_autocad",
+      "handler": "w6dynblkDispatch",
+      "test_ref": [
+        "tests/unit/test_w6_dynblk_handlers.py"
+      ],
+      "evidence_ref": [
+        "src/Ariadne.AcadNative/families/w6_dynblk_handlers.inc:w6dynblkDispatch",
+        "tests/unit/test_w6_dynblk_handlers.py",
+        "build:native_acad exit 0 (.crx/.arx/.dbx, VS2026 MSBuild x64, worktree wt/w6_dynblk)"
+      ],
+      "blocker_ref": "",
+      "risk_class": "read_safe",
+      "write_level": "read",
+      "agent_exposed": true,
+      "notes": "W6-DYNBLK wave: census sdk_census_reaudit_20260706.md #1 P1 excellence candidate -- dynamic block REFERENCE property read/write was zero-coverage (only static block ops existed: write.block.simple_create/insert, inspect.block(s)/.iterate, w",
+      "engine_tier": "objectdbx_capable",
+      "mapping_type": "synthetic"
+    },
+    {
+      "operation": "write.dynblock.property",
+      "family": "blocks_xrefs_clone",
+      "v1_target": true,
+      "status": "implemented",
+      "host_support": "dbx|coreconsole|arx_adapter|full_autocad",
+      "handler": "w6dynblkDispatch",
+      "test_ref": [
+        "tests/unit/test_w6_dynblk_handlers.py"
+      ],
+      "evidence_ref": [
+        "src/Ariadne.AcadNative/families/w6_dynblk_handlers.inc:w6dynblkDispatch",
+        "tests/unit/test_w6_dynblk_handlers.py",
+        "build:native_acad exit 0 (.crx/.arx/.dbx, VS2026 MSBuild x64, worktree wt/w6_dynblk)"
+      ],
+      "blocker_ref": "",
+      "risk_class": "staged_write",
+      "write_level": "write_copy",
+      "agent_exposed": true,
+      "notes": "W6-DYNBLK wave: census sdk_census_reaudit_20260706.md #1 P1 excellence candidate -- dynamic block REFERENCE property read/write was zero-coverage (only static block ops existed: write.block.simple_create/insert, inspect.block(s)/.iterate, w",
+      "engine_tier": "objectdbx_capable",
+      "mapping_type": "synthetic"
+    },
+    {
+      "operation": "inspect.section.objects",
+      "family": "entities",
+      "v1_target": true,
+      "status": "implemented",
+      "host_support": "dbx|coreconsole|arx_adapter|full_autocad",
+      "handler": "w6sectionDispatch",
+      "test_ref": [
+        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
+        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
+        "tests/unit/test_w6_section_handlers.py"
+      ],
+      "evidence_ref": [
+        "src/Ariadne.AcadNative/families/w6_section_handlers.inc:w6sectionDispatch",
+        "tests/unit/test_w6_section_handlers.py",
+        "build:native_acad exit 0 (.crx/.arx/.dbx, worktree-isolated build_iso, VS2026 MSBuild x64)",
+        "runtime_native_job_smoke:runs/w6_section_live_smoke (live accoreconsole create->reopen->inspect roundtrip against a staged copy of tests/fixtures/native_sample.dwg)"
+      ],
+      "blocker_ref": "",
+      "risk_class": "read_safe",
+      "write_level": "read",
+      "agent_exposed": true,
+      "notes": "New op, no catalog precedent -- AcDbSection/AcDbSectionSettings measured 0 catalog ops (R3_coverage.md finding G0 / tools/catalog_completeness.py KNOWN_UNCATALOGUED_DISPOSITIONS 'section' -> author). Scope: model space only (paperspace layo",
+      "engine_tier": "objectdbx_capable",
+      "mapping_type": "synthetic"
+    },
+    {
+      "operation": "write.entity.section",
+      "family": "entities",
+      "v1_target": true,
+      "status": "implemented",
+      "host_support": "dbx|coreconsole|arx_adapter|full_autocad",
+      "handler": "w6sectionDispatch",
+      "test_ref": [
+        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
+        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
+        "tests/unit/test_w6_section_handlers.py"
+      ],
+      "evidence_ref": [
+        "src/Ariadne.AcadNative/families/w6_section_handlers.inc:w6sectionDispatch",
+        "tests/unit/test_w6_section_handlers.py",
+        "build:native_acad exit 0 (.crx/.arx/.dbx, worktree-isolated build_iso, VS2026 MSBuild x64)",
+        "runtime_native_job_smoke:runs/w6_section_live_smoke (live accoreconsole create->reopen->inspect roundtrip against a staged copy of tests/fixtures/native_sample.dwg, original sha256 unchanged)"
+      ],
+      "blocker_ref": "",
+      "risk_class": "staged_write",
+      "write_level": "write_copy",
+      "agent_exposed": true,
+      "notes": "New op, no catalog precedent -- AcDbSection/AcDbSectionSettings measured 0 catalog ops (R3_coverage.md finding G0 / tools/catalog_completeness.py KNOWN_UNCATALOGUED_DISPOSITIONS 'section' -> author). Live-verified this wave: staged create +",
+      "engine_tier": "objectdbx_capable",
+      "mapping_type": "synthetic"
+    },
+    {
+      "operation": "write.section.generate2d",
+      "family": "entities",
+      "v1_target": true,
+      "status": "implemented",
+      "host_support": "dbx|coreconsole|arx_adapter|full_autocad",
+      "handler": "w6sectionDispatch",
+      "test_ref": [
+        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
+        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
+        "tests/unit/test_w6_section_handlers.py"
+      ],
+      "evidence_ref": [
+        "src/Ariadne.AcadNative/families/w6_section_handlers.inc:w6sectionDispatch",
+        "tests/unit/test_w6_section_handlers.py",
+        "build:native_acad exit 0 (.crx/.arx/.dbx, worktree-isolated build_iso, VS2026 MSBuild x64)",
+        "runtime_native_job_smoke:runs/w6_section_live_smoke/step5_generate2d (live accoreconsole, headless, against a staged copy of tests/fixtures/native_sample.dwg -- result intersection_boundary_count=4 intersection_fill_count=1 background_count=4 foreground_count=0 curve_tangency_count=0, original fixture sha256 unchanged)"
+      ],
+      "blocker_ref": "",
+      "risk_class": "staged_write",
+      "write_level": "write_copy",
+      "agent_exposed": true,
+      "notes": "New op, no catalog precedent (same R3_coverage.md G0 / catalog_completeness.py disposition as its sibling section ops). INITIALLY ASSUMED full_autocad-only (ASM + AutoCAD generate-section UI machinery); MEASURED THIS WAVE to be false -- gen",
+      "engine_tier": "objectdbx_capable",
+      "mapping_type": "synthetic"
     }
   ],
   "closure_gate": {
     "schema": "ariadne.cad_os.closure_gate.v1",
     "ticket_basis": "M08A-T01",
     "totals_by_status": {
-      "implemented": 457,
-      "blocked": 60
+      "implemented": 479,
+      "blocked": 62
     },
     "catalogued": 0,
     "stub": 0,

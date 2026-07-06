@@ -26,13 +26,13 @@ AutoCAD, this repo is everything around it.
 
 ## Status (current)
 
-- Registry (2026-07-06, post wave-0/S/A): **525 catalogued** = **465 implemented** +
-  **60 blocked**. The blocked set is a mixed hard-block class, not one cause:
+- Registry (2026-07-06, post wave-0/S/A): **541 catalogued** = **479 implemented** +
+  **62 blocked**. The blocked set is a mixed hard-block class, not one cause:
   constraints/associativity 23 (DCM solver), runtime commands 16 (acedCommand
-  policy-forbidden), COM/ActiveX 7, active-document write_original 4 (policy),
+  policy-forbidden), COM/ActiveX 9, active-document write_original 4 (policy),
   BRep/solids 4, layouts/plot 2, UI 2, live 1, editor input 1.
-- Router lanes: **455** `ARIADNE_NATIVE_JOB` + 2 `ARIADNE_CAD_JOB` + 2 `full_autocad`
-  + 66 unrouted (60 = the blocked set). The earlier 447/447 generic-reachability sweep
+- Router lanes: **469** `ARIADNE_NATIVE_JOB` + 2 `ARIADNE_CAD_JOB` + 2 `full_autocad`
+  + 68 unrouted (62 = the blocked set). The earlier 447/447 generic-reachability sweep
   predates the +8 wave-0 ops (dimstyle/linetype/textstyle/ucs/view/vport/xdata/
   polyline2d.deep); a re-sweep on the current binary is the standing capstone item.
 - Python-layer ops via dedicated tools (`cad.patch_*` / `cad.diff_before_after` /
@@ -42,7 +42,7 @@ AutoCAD, this repo is everything around it.
   exist in the module but are **not yet entered in the registry** — so the real native
   surface is ≈ **473**. See the 2026-06-29 audit in
   [`docs/CADOS_M10_FULL_AGENT_CONTROL_PLAN.md`](docs/CADOS_M10_FULL_AGENT_CONTROL_PLAN.md).
-- Tests: `pytest -q` → **510 passed / 3 skipped**.
+- Tests: `pytest -q` → **1316 passed / 6 skipped**.
 - Safety invariants: original DWG **read-only** (staged copy only, sha-verified);
   `write_original` is **always refused** from the agent surface; blocked/unknown ops are
   refused, never faked.
@@ -72,7 +72,7 @@ python   tools\cadctl_cli.py run --op inspect.layers --dwg <your.dwg>
 
 | tool | purpose |
 |---|---|
-| `cad.run_operation(op_id, args, write_mode)` | run any of the 447 native ops (allow-listed; `write_original` refused) |
+| `cad.run_operation(op_id, args, write_mode)` | run any of the 479 implemented native ops (allow-listed; `write_original` refused) |
 | `cad.inspect_drawing` / `cad.query_entities` / `cad.get_entity` | read / query the rich DWG graph IR |
 | `cad.patch_dry_run` → `cad.patch_apply_staged` → `cad.diff_before_after` | change a **staged copy** (original untouched) and diff it |
 | `cad.validate_ir` / `cad.visual_report` | deterministic validation / IR→SVG visual report |
@@ -116,7 +116,7 @@ autocad-sdk-router/
   src/          Ariadne.AcadNative (.crx/.arx C++) · Ariadne.AcadNativeDbx (.dbx) · managed extractor
   prebuilt/     <version>/ compiled native modules (shipped; clone-and-run)
   schemas/      cad_job / cad_result / dwg_graph_ir / operation_registry (v2)
-  tests/        pytest suite (510 passed / 3 skipped)
+  tests/        pytest suite (1316 passed / 6 skipped)
 ```
 
 - Install & per-agent MCP registration: **[`INSTALL.md`](INSTALL.md)**

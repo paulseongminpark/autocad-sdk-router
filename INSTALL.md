@@ -1,7 +1,7 @@
 # CAD OS — Install & Use (team)
 
 Let an AI agent (Claude / Codex / Pi / Hermes / Gemini) **drive the AutoCAD SDK
-directly** — 457 native ObjectARX operations + inspect / patch / diff / validate /
+directly** — 479 native ObjectARX operations + inspect / patch / diff / validate /
 query — through one MCP server (`cadagent`), safely (original DWGs stay read-only).
 
 > **What this is:** a control plane *on top of* AutoCAD. You still run your own
@@ -97,7 +97,7 @@ After registering, start a new session and confirm the tools load (Claude:
 **Via the agent (natural language):** "extract this drawing's layers and blocks",
 "draw the wall centerlines on a copy". The agent calls:
 - read: `cad.inspect_drawing`, `cad.query_entities`, `cad.get_entity`
-- execute (457 ops): `cad.run_operation(op_id, args, write_mode)` — `write_mode`
+- execute (479 ops): `cad.run_operation(op_id, args, write_mode)` — `write_mode`
   must be in the op's `allowed_write_modes`; `write_original` is always refused.
 - change: `cad.patch_dry_run` → `cad.patch_apply_staged` (staged copy only) →
   `cad.diff_before_after`

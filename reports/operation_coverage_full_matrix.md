@@ -2,9 +2,9 @@
 
 - packet: `CADOS_M08_FULL_OPERATION_COVERAGE_CLOSURE`
 - generated_from: `config/operations.v2.json`
-- total operations: **517** · implemented 457 · stub 0 · blocked 60 · catalogued 0 · deprecated 0 · **unknown 0**
-- v1-target: **517** (implemented 457 · blocked 60 · **deferred 0**)
-- agent-exposed ops: 457
+- total operations: **541** · implemented 479 · stub 0 · blocked 62 · catalogued 0 · deprecated 0 · **unknown 0**
+- v1-target: **541** (implemented 479 · blocked 62 · **deferred 0**)
+- agent-exposed ops: 479
 
 ## Gate
 
@@ -26,20 +26,20 @@
 
 | group | implemented | stub | blocked | catalogued | v1_target |
 |---|---|---|---|---|---|
-| read | 53 | 0 | 0 | 0 | 53 |
+| read | 63 | 0 | 0 | 0 | 63 |
 | query | 1 | 0 | 0 | 0 | 1 |
-| write_patch | 16 | 0 | 4 | 0 | 20 |
+| write_patch | 19 | 0 | 4 | 0 | 23 |
 | validate_diff | 3 | 0 | 0 | 0 | 3 |
 | render_visual | 10 | 0 | 2 | 0 | 12 |
 | live | 6 | 0 | 1 | 0 | 7 |
-| native_only | 368 | 0 | 53 | 0 | 421 |
+| native_only | 377 | 0 | 55 | 0 | 432 |
 
 ## Risk class distribution
 
 | risk_class | count |
 |---|---|
-| read_safe | 349 |
-| staged_write | 112 |
+| read_safe | 357 |
+| staged_write | 128 |
 | live_edit | 50 |
 | raw_command | 6 |
 
@@ -62,6 +62,8 @@
 | automate.com.send_command | com_activex | blocked | read_safe | read | False | (no native export found this session) — via COM: | SAFETY_FORBIDDEN: COM SendCommand is raw command-string disp |
 | automate.com.wrapper_for_object | com_activex | blocked | read_safe | read | False | AcAxGetOleLinkManager() → AcAxOleLinkManager::Ge | SAFETY_FORBIDDEN: wrapping AcDb objects into automation inte |
 | embed.ole.frame | com_activex | blocked | live_edit | live_edit | False | AcDbOle2Frame (setOleClientItem(COleClientItem*) | HOST_UNAVAILABLE: AcDbOle2Frame embedding/linking requires a |
+| sheetset.read.sheets | com_activex | blocked | read_safe | read | False | tools.sheetset_read.read_sheetset | HOST_UNAVAILABLE: installed sample .dst inputs exist and the |
+| sheetset.read.summary | com_activex | blocked | read_safe | read | False | tools.sheetset_read.read_sheetset | HOST_UNAVAILABLE: standalone COM activation is reachable onl |
 | define.assocarray.create | constraints_associativity | blocked | staged_write | write_copy | False | AcDbAssocArrayActionBody::createInstance(AcDbObj | SAFETY_FORBIDDEN: AcDbAssocArrayActionBody::createInstance p |
 | define.assocarray.path | constraints_associativity | blocked | staged_write | write_copy | False | AcDbAssocArrayPathParameters: itemCount, itemSpa | SAFETY_FORBIDDEN: path associative array creation relies on  |
 | define.assocarray.polar | constraints_associativity | blocked | staged_write | write_copy | False | AcDbAssocArrayPolarParameters: itemCount, angleB | SAFETY_FORBIDDEN: polar associative array creation relies on |
@@ -111,12 +113,19 @@
 | doc.lock | active_document_write_original | implemented | read_safe | read | True | m08nDispatch |  |
 | doc.new | active_document_write_original | implemented | staged_write | write_copy | True | m08nDispatch |  |
 | doc.syncopen | active_document_write_original | implemented | read_safe | read | True | m08nDispatch |  |
+| anchor.clear | anchor | implemented | staged_write | write_copy | True | anchor_ops.build_anchor_clear_patch |  |
+| anchor.get | anchor | implemented | read_safe | read | True | anchor_ops.get_anchor_from_ir |  |
+| anchor.list | anchor | implemented | read_safe | read | True | anchor_ops.list_anchors_from_ir |  |
+| anchor.set | anchor | implemented | staged_write | write_copy | True | anchor_ops.build_anchor_set_patch |  |
 | apply.patch | apply | implemented | staged_write | write_copy | True | patch_engine.apply_staged |  |
 | infra.hostapp.provide_services | blocks_xrefs_clone | implemented | read_safe | read | True | m08eDispatch |  |
 | inspect.block.iterate | blocks_xrefs_clone | implemented | read_safe | read | True | m08eDispatch |  |
+| inspect.dynblock.properties | blocks_xrefs_clone | implemented | read_safe | read | True | w6dynblkDispatch |  |
+| inspect.dynblock.references | blocks_xrefs_clone | implemented | read_safe | read | True | w6dynblkDispatch |  |
 | transform.database.deep_clone | blocks_xrefs_clone | implemented | live_edit | live_edit | True | m08eDispatch |  |
 | transform.database.insert_block | blocks_xrefs_clone | implemented | staged_write | write_copy | True | m08eDispatch |  |
 | write.block.append_entity | blocks_xrefs_clone | implemented | staged_write | write_copy | True | m08eDispatch |  |
+| write.dynblock.property | blocks_xrefs_clone | implemented | staged_write | write_copy | True | w6dynblkDispatch |  |
 | compute.brep.line_containment | brep_solids | implemented | read_safe | read | True | m08dDispatch |  |
 | compute.brep.massprops | brep_solids | implemented | read_safe | read | True | m08dDispatch |  |
 | compute.brep.perimeter | brep_solids | implemented | read_safe | read | True | m08dDispatch |  |
@@ -338,12 +347,14 @@
 | inspect.entity.common | entities | implemented | read_safe | read | True | m08dDispatch |  |
 | inspect.entity.geomextents | entities | implemented | read_safe | read | True | m08dDispatch |  |
 | inspect.entity.osnap | entities | implemented | read_safe | read | True | m08dDispatch |  |
+| inspect.section.objects | entities | implemented | read_safe | read | True | w6sectionDispatch |  |
 | modify.curve.offset | entities | implemented | read_safe | read | True | m08gDispatch |  |
 | modify.curve.split | entities | implemented | read_safe | read | True | m08gDispatch |  |
 | modify.curve.to_spline | entities | implemented | read_safe | read | True | m08gDispatch |  |
 | modify.entity.common | entities | implemented | staged_write | write_copy | True | m08gDispatch |  |
 | modify.entity.copy_transformed | entities | implemented | read_safe | read | True | m08gDispatch |  |
 | modify.entity.explode | entities | implemented | read_safe | read | True | m08gDispatch |  |
+| modify.entity.xdata | entities | implemented | staged_write | write_copy | True | m08gDispatch |  |
 | write.entity.arc | entities | implemented | staged_write | write_copy | True | m08gDispatch |  |
 | write.entity.attribdef | entities | implemented | staged_write | write_copy | True | m08gDispatch |  |
 | write.entity.attribute | entities | implemented | staged_write | write_copy | True | m08gDispatch |  |
@@ -371,10 +382,12 @@
 | write.entity.polyfacemesh | entities | implemented | staged_write | write_copy | True | m08gDispatch |  |
 | write.entity.polygonmesh | entities | implemented | staged_write | write_copy | True | m08gDispatch |  |
 | write.entity.polyline2d | entities | implemented | staged_write | write_copy | True | m08gDispatch |  |
+| write.entity.polyline2d.deep | entities | implemented | staged_write | write_copy | True | m08gDispatch |  |
 | write.entity.polyline3d | entities | implemented | staged_write | write_copy | True | m08gDispatch |  |
 | write.entity.rasterimage | entities | implemented | staged_write | write_copy | True | m08gDispatch |  |
 | write.entity.ray | entities | implemented | staged_write | write_copy | True | m08gDispatch |  |
 | write.entity.region | entities | implemented | staged_write | write_copy | True | m08gDispatch |  |
+| write.entity.section | entities | implemented | staged_write | write_copy | True | w6sectionDispatch |  |
 | write.entity.shape | entities | implemented | staged_write | write_copy | True | m08gDispatch |  |
 | write.entity.solid2d | entities | implemented | staged_write | write_copy | True | m08gDispatch |  |
 | write.entity.solid3d.extrude | entities | implemented | staged_write | write_copy | True | m08gDispatch |  |
@@ -390,6 +403,7 @@
 | write.entity.trace | entities | implemented | staged_write | write_copy | True | m08gDispatch |  |
 | write.entity.wipeout | entities | implemented | staged_write | write_copy | True | m08gDispatch |  |
 | write.entity.xline | entities | implemented | staged_write | write_copy | True | m08gDispatch |  |
+| write.section.generate2d | entities | implemented | staged_write | write_copy | True | w6sectionDispatch |  |
 | extend.customclass.create | extend | implemented | live_edit | live_edit | True | createCustomEntity |  |
 | extend.customobject.create | extend | implemented | live_edit | live_edit | True | createCustomObject |  |
 | compute.entity.intersect | geometry_kernel | implemented | read_safe | read | True | m08dDispatch |  |
@@ -509,6 +523,7 @@
 | inspect.dictionary.get | symbol_tables_dictionaries | implemented | read_safe | read | True | m08eDispatch |  |
 | inspect.dictionary.named_objects | symbol_tables_dictionaries | implemented | read_safe | read | True | m08eDispatch |  |
 | inspect.entity.get_xdata | symbol_tables_dictionaries | implemented | read_safe | read | True | m08eDispatch |  |
+| inspect.layerstates.list | symbol_tables_dictionaries | implemented | read_safe | read | True | w6LayerStateDispatch |  |
 | inspect.object.ext_dict | symbol_tables_dictionaries | implemented | read_safe | read | True | m08cDispatch |  |
 | inspect.symboltable.block | symbol_tables_dictionaries | implemented | read_safe | read | True | m08cDispatch |  |
 | inspect.symboltable.layers | symbol_tables_dictionaries | implemented | read_safe | read | True | m08cDispatch |  |
@@ -516,10 +531,19 @@
 | transform.database.wblock | symbol_tables_dictionaries | implemented | read_safe | read | True | m08cDispatch |  |
 | transform.database.wblock_clone | symbol_tables_dictionaries | implemented | live_edit | live_edit | True | m08cDispatch |  |
 | write.dictionary.set | symbol_tables_dictionaries | implemented | staged_write | write_copy | True | m08eDispatch |  |
+| write.dimstyle.create | symbol_tables_dictionaries | implemented | staged_write | write_copy | True | upsertDimStyleRecord |  |
 | write.entity.set_xdata | symbol_tables_dictionaries | implemented | staged_write | write_copy | True | m08eDispatch |  |
 | write.layer.create | symbol_tables_dictionaries | implemented | staged_write | write_copy | True | createLayer |  |
+| write.layerstate.delete | symbol_tables_dictionaries | implemented | staged_write | write_copy | True | w6LayerStateDispatch |  |
+| write.layerstate.restore | symbol_tables_dictionaries | implemented | staged_write | write_copy | True | w6LayerStateDispatch |  |
+| write.layerstate.save | symbol_tables_dictionaries | implemented | staged_write | write_copy | True | w6LayerStateDispatch |  |
+| write.linetype.create | symbol_tables_dictionaries | implemented | staged_write | write_copy | True | upsertLinetypeRecord |  |
 | write.object.create_ext_dict | symbol_tables_dictionaries | implemented | staged_write | write_copy | True | m08eDispatch |  |
 | write.regapp.register | symbol_tables_dictionaries | implemented | staged_write | write_copy | True | m08eDispatch |  |
+| write.textstyle.create | symbol_tables_dictionaries | implemented | staged_write | write_copy | True | upsertTextStyleRecord |  |
+| write.ucs.create | symbol_tables_dictionaries | implemented | staged_write | write_copy | True | upsertUcsRecord |  |
+| write.view.create | symbol_tables_dictionaries | implemented | staged_write | write_copy | True | upsertViewRecord |  |
+| write.vport.create | symbol_tables_dictionaries | implemented | staged_write | write_copy | True | upsertVportRecord |  |
 | write.xrecord.set | symbol_tables_dictionaries | implemented | staged_write | write_copy | True | setXrecord |  |
 | editor.command.register | ui_customization | implemented | read_safe | read | True | m08nDispatch |  |
 | editor.command.unregister | ui_customization | implemented | read_safe | read | True | m08nDispatch |  |
@@ -565,4 +589,4 @@
 | write.layout.create | write | implemented | staged_write | write_copy | True | createLayout |  |
 | write.xdata.set | write | implemented | staged_write | write_copy | True | setDatabaseXdata |  |
 
-> Full 517-operation detail (all 13 fields per op) is in `reports/operation_coverage_full_matrix.json` — this table lists only the 517 v1-target ops. The 0 catalogued ops are classified future-version native capability (v1_target=false), not omitted.
+> Full 517-operation detail (all 13 fields per op) is in `reports/operation_coverage_full_matrix.json` — this table lists only the 541 v1-target ops. The 0 catalogued ops are classified future-version native capability (v1_target=false), not omitted.
