@@ -1868,3 +1868,44 @@ the prior lane's evidence blindly).
   - In this worktree, direct `cadctl.Cad().inspect(...)` calls are currently partial/blocked (`router produced no parseable JSON envelope` / `native graph job produced no result JSON`), so the live proof used the existing real ARX IR artifacts at `D:\dev\.build\cados_plan\runs\t1_cert\...` exactly as inputs to the new standalone tools.
 - Git/commit limitation:
   - Commiting from this lane is blocked by worktree metadata permissions outside the writable root. `git add --intent-to-add w5_report.md` fails with `fatal: Unable to create 'D:/dev/99_tools/autocad-sdk-router/.git/worktrees/w5_gates/index.lock': Permission denied`. No fake commit was created.
+## Lane W6-CORPUS
+
+Built `tools/corpus_batch.py` as a Python-only multi-DWG batch runner on top of the existing `cadctl` surface. The parent process owns ordering, resume, per-file timeout enforcement, process-tree kill, and final summaries; each DWG runs inside its own worker Python process with file-backed `worker_stdout.txt` / `worker_stderr.txt` so a hung native child cannot deadlock the batch on inherited pipes. The worker writes `result_envelope.json` incrementally after staging and after each completed op, so already-finished op records survive a later timeout or crash.
+
+Default op set is:
+
+- `inspect.database.summary`
+- `inspect.layers`
+- `inspect.entities`
+
+Interface / evidence outputs:
+
+- `docs/CORPUS_BATCH.md` documents the CLI, manifest rules, run layout, per-file result envelope schema (`ariadne.corpus_batch.result.v1`), summary schema (`ariadne.corpus_batch.summary.v1`), taxonomy, and resume semantics for the sibling Daedalus lane.
+- `tests/unit/test_corpus_batch.py` covers manifest parsing, glob ordering, resume skip logic, taxonomy mapping, summary math, and a `CADOS_LIVE=1`-gated smoke.
+- `runs/corpus_batch_w6_real_bg/` is the real external-DWG proof run.
+
+Real external mini-corpus used (all OUTSIDE this repo; originals read-only, staged copies only):
+
+- `D:\dev\_ariadne\alm\build\아웃풋레이어.dwg` sha256 `13ac7e5803545f984807fd4ee1aca061428ab666fd36e9ba91a0cf1de2c84ac0`
+- `D:\dev\_ariadne\alm\build\output0616.dwg` sha256 `9e1e0ec56cbee984d9b6553e47ddf57f39bb915b718a2a8180bbce63e7654342`
+- `D:\dev\_ariadne\alm\drawings\output_v001.dwg` sha256 `d4fd529f2212399b058a7e86f84354ab6b2c7a5fb428e39dc0dd00417fbddb29`
+- `D:\dev\_ariadne\alm\build\input0616.dwg` sha256 `eac5d4b13d67d89106e503321412539df7b39b8a7f4e44c033448e9295fe3f76`
+- `D:\dev\_ariadne\alm\drawings\input_v001.dwg` sha256 `a8b94992f324b7f9d79ea0b4864a1dee106dafbdf6249cf9656a285276fa7a30`
+
+Real run summary (`runs/corpus_batch_w6_real_bg/summary.json`):
+
+- `total_inputs: 5`
+- `counts_by_status: failed=5`
+- `counts_by_error_class: extraction-crash=5`
+- `total_elapsed_sec: 787.063`
+- Per-file elapsed seconds:
+  `아웃풋레이어=137.031`, `output0616=169.282`, `output_v001=163.782`, `input0616=170.656`, `input_v001=146.312`
+
+Observed live failure shape was consistent across the five real files: every default op recorded `status=partial`, the file-level reason was `native job produced no parseable result JSON`, and the captured router stdout for sampled ops shows `status=ROUTE_NONZERO`, `executed_route=dwg_truth_autocad`, `engine_exit_code=-3`, and `engine_output.status=native_cad_job_failed`. The runner preserved those failures honestly instead of dropping files or fabricating success.
+
+Verification:
+
+- `python -X utf8 -c "import os,sys,subprocess; os.environ['PYTHONUTF8']='1'; p=subprocess.run([sys.executable,'-m','pytest','tests/unit','-q','--basetemp','.tmp/pytest-all-exact'], text=True, cwd=r'D:/dev/.build/cados_plan/wt/w6_corpus'); raise SystemExit(p.returncode)"` -> `1154 passed, 24 skipped, 0 failed` in `18.08s`
+- `tools/corpus_batch.py --manifest .tmp/w6_real_corpus_manifest_bg.json --out-dir runs/corpus_batch_w6_real_bg --force` -> real five-file external corpus run above
+
+Git note: this worktree can read git state, but commit attempts in this session fail at `.git/worktrees/w6_corpus/index.lock` with `Permission denied`, so the requested checkpoint commits could not be created from inside the sandbox.
