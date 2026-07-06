@@ -145,12 +145,14 @@ class TestCatalogDenominatorLiveSmoke(unittest.TestCase):
         # fifth (write.entity.polyline2d.deep, the true legacy AcDb2dPolyline
         # write path) -- 521 -> 522. p9-tables2 adds three more
         # (write.ucs.create / write.view.create / write.vport.create, TABLES
-        # tier-2) -- 522 -> 523 -> 524 -> 525. See tools/patch_ops/tables.py
-        # + entities.py.
+        # tier-2) -- 522 -> 523 -> 524 -> 525. W6-SHEETSET adds two blocked
+        # sheet-set COM read records -- 525 -> 526 -> 527. See
+        # tools/patch_ops/tables.py + entities.py + tools/sheetset_read.py.
         ops = cc.load_operations_catalog()
-        self.assertEqual(len(ops), 525,
+        self.assertEqual(len(ops), 527,
                          "the F0 task's own '517-op catalogue' anchor (+8, "
-                         "w3-dimstyle/w3-ltts x2/P10/p4-poly2d/p9-tables2 x3); "
+                         "w3-dimstyle/w3-ltts x2/P10/p4-poly2d/p9-tables2 x3/"
+                         "W6-SHEETSET x2); "
                          "if this moves again, "
                          "the whole WAVE-0 accounting must be recomputed")
 

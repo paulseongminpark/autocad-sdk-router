@@ -54,9 +54,9 @@
     }
   },
   "totals": {
-    "operations": 525,
+    "operations": 527,
     "by_status": {
-      "blocked": 60,
+      "blocked": 62,
       "implemented": 465
     },
     "by_family": {
@@ -64,7 +64,7 @@
       "apply": 1,
       "blocks_xrefs_clone": 5,
       "brep_solids": 54,
-      "com_activex": 49,
+      "com_activex": 51,
       "constraints_associativity": 58,
       "custom_objects_protocols": 63,
       "diff": 1,
@@ -89,11 +89,11 @@
     },
     "by_engine_tier": {
       "accoreconsole_lisp_also": 20,
-      "managed_also": 46,
+      "managed_also": 48,
       "native_arx_only": 232,
       "objectdbx_capable": 227
     },
-    "total": 525
+    "total": 527
   },
   "coverage": {
     "wired_ops": 29,
@@ -113,7 +113,7 @@
       "active_document_write_original": 8,
       "blocks_xrefs_clone": 5,
       "brep_solids": 54,
-      "com_activex": 49,
+      "com_activex": 51,
       "constraints_associativity": 58,
       "custom_objects_protocols": 63,
       "editor_input": 27,
@@ -127,12 +127,12 @@
       "symbol_tables_dictionaries": 16,
       "ui_customization": 39
     },
-    "operation_records": 525,
+    "operation_records": 527,
     "implemented": 465,
     "wired": 0,
     "stub": 0,
     "catalogued": 0,
-    "blocked": 60,
+    "blocked": 62,
     "deprecated": 0,
     "unknown": 0,
     "catalog_classified_ops": 62,
@@ -38274,6 +38274,146 @@
       "owner_ticket": "M08C-T03",
       "implementation_strategy": "implemented_v1",
       "evidence_required": "existing_tests_and_evidence_refs"
+    },
+    {
+      "id": "sheetset.read.summary",
+      "operation": "sheetset.read.summary",
+      "family": "com_activex",
+      "status": "blocked",
+      "engine_tier": "managed_also",
+      "engines": [
+        "managed_also"
+      ],
+      "host_eligibility": [
+        "full_autocad"
+      ],
+      "hosts": [
+        "full_autocad"
+      ],
+      "execution_context": "external_com_install_bound",
+      "write_level": {
+        "default_write_mode": "read",
+        "allowed_write_modes": [
+          "read"
+        ],
+        "dwg_persisted": false,
+        "original_write_default": false
+      },
+      "handler": {
+        "router_lane": null,
+        "dispatcher_symbol": "tools.sheetset_read.read_sheetset",
+        "execution_host_class": "full_autocad",
+        "native_api": "AcSmComponents.AcSmSheetSetMgr.26 via AcSmComponents.Interop.dll (OpenDatabase -> GetSheetSet -> GetName/GetDesc/GetCustomPropertyBag)",
+        "composed_of": []
+      },
+      "mapping_type": "synthetic",
+      "catalog_op_id": null,
+      "input_schema": "schemas/cad_job.v2.schema.json#/allOf",
+      "output_schema": "schemas/cad_result.v2.schema.json",
+      "schema_refs": {
+        "input": "schemas/cad_job.v2.schema.json#/allOf",
+        "output": "schemas/cad_result.v2.schema.json"
+      },
+      "policy": {
+        "source": "config/policy.v2.json",
+        "status_policy": "blocked",
+        "default_write_mode": "read",
+        "allowed_write_modes": [
+          "read"
+        ],
+        "no_original_write_default": true,
+        "runtime_behavior": "hard_blocked_after_wave6_sheetset_probe",
+        "agent_exposed": false
+      },
+      "tests": [
+        "tests/unit/test_sheetset_read.py",
+        "tests/unit/test_wave3_remaining_registry_closure.py::test_remaining_wave3_blocks_have_accepted_codes_and_evidence",
+        "measure/w6_sheetset_probe_latest.json"
+      ],
+      "summary": "Read the top-level Sheet Set summary (name, description, custom properties) from a .dst via the AutoCAD Sheet Set Manager COM surface.",
+      "source_slice": "sdk_census_reaudit_20260706.md",
+      "citation": "Sheet Set Manager is COM-first: AcSmComponents / IAcSmSheetSetMgr.",
+      "evidence_refs": [
+        "tools/sheetset_read.py",
+        "measure/w6_sheetset_probe_latest.json",
+        "w6_report.md"
+      ],
+      "notes": "Wave 6 measured a real standalone COM object after prepending the AutoCAD 2027 install directory to PATH, but the governed read path stays blocked because win32com late binding cannot drive the non-IDispatch manager and Autodesk's OpenDatabase interop path fails on missing AXDBLib.",
+      "owner_ticket": "M08O-T01",
+      "implementation_strategy": "hard_blocked",
+      "evidence_required": "blocker_ref_and_evidence",
+      "blocked_reason": "HOST_UNAVAILABLE: standalone COM activation is reachable only after injecting the AutoCAD 2027 install directory into PATH, but governed headless read remains unavailable because the registered manager is non-IDispatch and the Autodesk OpenDatabase interop path fails on missing AXDBLib.",
+      "blocker_ref": "w6_report.md#blockers"
+    },
+    {
+      "id": "sheetset.read.sheets",
+      "operation": "sheetset.read.sheets",
+      "family": "com_activex",
+      "status": "blocked",
+      "engine_tier": "managed_also",
+      "engines": [
+        "managed_also"
+      ],
+      "host_eligibility": [
+        "full_autocad"
+      ],
+      "hosts": [
+        "full_autocad"
+      ],
+      "execution_context": "external_com_install_bound",
+      "write_level": {
+        "default_write_mode": "read",
+        "allowed_write_modes": [
+          "read"
+        ],
+        "dwg_persisted": false,
+        "original_write_default": false
+      },
+      "handler": {
+        "router_lane": null,
+        "dispatcher_symbol": "tools.sheetset_read.read_sheetset",
+        "execution_host_class": "full_autocad",
+        "native_api": "AcSmComponents.AcSmSheetSetMgr.26 via AcSmComponents.Interop.dll (OpenDatabase -> GetSheetSet -> GetDirectlyOwnedObjects / sheet GetNumber/GetTitle/GetLayout)",
+        "composed_of": []
+      },
+      "mapping_type": "synthetic",
+      "catalog_op_id": null,
+      "input_schema": "schemas/cad_job.v2.schema.json#/allOf",
+      "output_schema": "schemas/cad_result.v2.schema.json",
+      "schema_refs": {
+        "input": "schemas/cad_job.v2.schema.json#/allOf",
+        "output": "schemas/cad_result.v2.schema.json"
+      },
+      "policy": {
+        "source": "config/policy.v2.json",
+        "status_policy": "blocked",
+        "default_write_mode": "read",
+        "allowed_write_modes": [
+          "read"
+        ],
+        "no_original_write_default": true,
+        "runtime_behavior": "hard_blocked_after_wave6_sheetset_probe",
+        "agent_exposed": false
+      },
+      "tests": [
+        "tests/unit/test_sheetset_read.py",
+        "tests/unit/test_wave3_remaining_registry_closure.py::test_remaining_wave3_blocks_have_accepted_codes_and_evidence",
+        "measure/w6_sheetset_probe_latest.json"
+      ],
+      "summary": "Enumerate Sheet Set sheets and subsets (sheet number, title, layout reference, nested subset structure) from a .dst via the AutoCAD Sheet Set Manager COM surface.",
+      "source_slice": "sdk_census_reaudit_20260706.md",
+      "citation": "Sheet Set Manager is COM-first: AcSmComponents / IAcSmSheetSetMgr.",
+      "evidence_refs": [
+        "tools/sheetset_read.py",
+        "measure/w6_sheetset_probe_latest.json",
+        "w6_report.md"
+      ],
+      "notes": "Wave 6 found installed sample .dst files and a versioned Sheet Set manager ProgID, but the only headless read attempt currently fails before enumeration because Autodesk's typed OpenDatabase path cannot resolve AXDBLib on this machine.",
+      "owner_ticket": "M08O-T01",
+      "implementation_strategy": "hard_blocked",
+      "evidence_required": "blocker_ref_and_evidence",
+      "blocked_reason": "HOST_UNAVAILABLE: installed sample .dst inputs exist and the versioned manager ProgID is registered, but governed headless sheet enumeration remains unavailable because the registered manager is non-IDispatch and Autodesk's OpenDatabase interop path fails on missing AXDBLib.",
+      "blocker_ref": "w6_report.md#blockers"
     }
   ],
   "catalog_families": [
