@@ -213,6 +213,51 @@ class TestSyntheticNativeMapping(unittest.TestCase):
         self.assertEqual(len(self.ir["block_references"]), 1)
         self.assertEqual(self.ir["block_references"][0]["block_name"], "DOOR")
 
+    def test_block_definitions_def_entities_normalized(self):
+        # w3-blockdef: block_definitions[].def_entities[] carries RAW native
+        # entity records (same shape as graph_result['entities']) from the
+        # native collectEntitiesFromBlock side -- the builder must lift them
+        # through the SAME _entity_from_native normalizer top-level entities[]
+        # uses (dxf_name/geometry/bbox/source), not pass them through raw.
+        result = _synthetic_native_result()
+        result["block_definitions"][0]["def_entities"] = [
+            {"handle": "B01", "dxf_name": "AcDbLine", "owner_handle": "A0",
+             "space": "block", "layer": "0",
+             "start": {"x": 0.0, "y": 0.0, "z": 0.0},
+             "end": {"x": 5.0, "y": 0.0, "z": 0.0}},
+        ]
+        ir = self.ir_builder.build_ir_from_database_graph(result, _source_meta())
+
+        bd = ir["block_definitions"][0]
+        self.assertEqual(bd["name"], "DOOR")
+        self.assertEqual(len(bd["def_entities"]), 1)
+        def_ent = bd["def_entities"][0]
+        # normalized like a top-level entity: DXF type (not native class),
+        # nested geometry, required IR fields all present.
+        self.assertEqual(def_ent["class"], "AcDbLine")
+        self.assertEqual(def_ent["dxf_name"], "LINE")
+        self.assertEqual(def_ent["geometry"]["kind"], "line")
+        self.assertEqual(def_ent["owner_handle"], "A0")
+        self.assertEqual(def_ent["space"], "block")
+        self.assertIn("source", def_ent)
+        self.assertTrue(def_ent["source"]["decoded"])
+
+        # def_entities must NEVER leak into the flat top-level entities[] --
+        # that array (and diagnostics.entity_count) stays modelspace-only,
+        # the golden-pinned truth-gate numerator (tests/golden/expected_counts.json).
+        self.assertEqual(len(ir["entities"]), 4)
+        self.assertEqual(ir["diagnostics"]["entity_count"], 4)
+        self.assertTrue(all(e["handle"] != "B01" for e in ir["entities"]))
+
+    def test_block_definitions_without_def_entities_unchanged(self):
+        # Backward compat: a block_definitions entry with no def_entities key
+        # (the pre-w3-blockdef shallow shape) passes through unchanged.
+        result = _synthetic_native_result()
+        ir = self.ir_builder.build_ir_from_database_graph(result, _source_meta())
+        bd = ir["block_definitions"][0]
+        self.assertEqual(bd["name"], "DOOR")
+        self.assertNotIn("def_entities", bd)
+
     def test_m03_depth_sections_are_carried_through(self):
         # M03 rich-IR depth: native graph records may carry entity XDATA,
         # extension-dictionary handles, hatch loops, decoded xrecords, and a

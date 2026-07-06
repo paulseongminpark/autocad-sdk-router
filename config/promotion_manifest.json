@@ -1,0 +1,174 @@
+{
+  "schema": "ariadne.cados.promotion_manifest.v1",
+  "version": "1.0.0",
+  "generated_at": "2026-07-01",
+  "generated_by": "CADOS Wave-0 F2 (promotion harness, tools/promote_op.py)",
+  "purpose": "One row per candidate patch_op->native_op promotion (PLAN.md PART 2 sec 2.0 'three promotion axes'). tools/promote_op.py reads this file and atomically applies Axis A (config/operations.v2.json operations[].policy.status_policy flip) + Axis B (the owning tools/patch_ops/<family>.py module's WRITE_OP_MAP entry + build_job_args arg-branch) for a row -- REFUSING the whole promotion unless F1 (measure/reachable_matrix.jsonl) marks native_op RUNNABLE, never RUNNABLE_BUT_DEGENERATE or unprobed. Axis C (C++ reachability) needs no file edit from this tool: F1's live probe already exercises the same AriadneNativeJob.cpp dispatch chain a RUNNABLE verdict implies is already reachable (PLAN.md PART 2 sec 2.0 Axis-C note: 'already ON for the simple entity/annotation/solid create families').",
+  "row_schema": {
+    "patch_op": "cad_patch.v1 operation id (ir_to_patch / patch_engine surface).",
+    "native_op": "config/operations.v2.json operations[].id this patch_op dispatches to.",
+    "arg_keys": "ordered list of args[] keys build_job_args copies through verbatim (matches tools/patch_ops/entities.py's existing branches: 'if k in args: out[k] = args[k]').",
+    "ir_kind": "the IR entity geometry.kind this patch_op regenerates from (ir_to_patch.build_patch_from_ir / patch_ops.ir_op_for), or null for a record-level (non-entity) op with no ir_to_patch builder case yet -- tools/promote_op.py does not generate ir_op_for wiring, only WRITE_OP_MAP + build_job_args (PLAN.md F2 node text).",
+    "persistence_class": "PLAN.md PART 1 sec 1.4 class: P (geometry, diff target = geometry-diff=0) | D (persistent-non-geometry record, diff target = record-diff=0) | R (read/compute) | L (live/non-persistent).",
+    "risk": "low | medium | high -- H2/H4 risk-sequencing tier, informational only; tools/promote_op.py does not gate on this field (tools/reconcile_native_registry.py's F8 coverage gate does).",
+    "family": "optional override for which tools/patch_ops/<family>.py module owns this promotion (entities|blocks|tables|db). Omit to let promote_op.infer_family() derive it from native_op's prefix.",
+    "state": "informational only (not read by tools/promote_op.py): already_promoted | pending_f1.",
+    "notes": "free-text rationale / PLAN.md cross-reference for this row."
+  },
+  "rows": [
+    {
+      "patch_op": "create_line",
+      "native_op": "write.entity.line",
+      "arg_keys": ["start", "end", "layer"],
+      "ir_kind": "line",
+      "persistence_class": "P",
+      "risk": "low",
+      "family": "entities",
+      "state": "already_promoted",
+      "notes": "F9-merged control row -- tools/patch_ops/entities.py already carries this exact map-entry + arg-branch and config/operations.v2.json#write.entity.line is already policy.status_policy=implemented; promote_op reports ALREADY_PROMOTED (idempotent no-op), never re-edits the file. Exercised by F2's own tests against the REAL repo files (read-only; compute_promotion never writes)."
+    },
+    {
+      "patch_op": "create_circle",
+      "native_op": "write.entity.circle",
+      "arg_keys": ["center", "radius", "layer"],
+      "ir_kind": "circle",
+      "persistence_class": "P",
+      "risk": "low",
+      "family": "entities",
+      "state": "already_promoted",
+      "notes": "F9-merged control row -- see create_line."
+    },
+    {
+      "patch_op": "create_block_def",
+      "native_op": "write.block.simple_create",
+      "arg_keys": ["name"],
+      "ir_kind": null,
+      "persistence_class": "D",
+      "risk": "low",
+      "family": "blocks",
+      "state": "pending_f1",
+      "notes": "PLAN.md Tier 1 T1.1 (WAVE-0 exit gate M-A / TIER 1 table). config/operations.v2.json#write.block.simple_create is already policy.status_policy=implemented (Axis A pre-satisfied) but measure/reachable_matrix.jsonl carries no row for it yet -- F1 has not live-probed it, so the Axis-A gate REJECTS until a live F1 sweep classifies it RUNNABLE. tools/patch_ops/blocks.py's WRITE_OP_MAP is still empty for this op_id (Axis B not yet wired)."
+    },
+    {
+      "patch_op": "create_layout",
+      "native_op": "write.layout.create",
+      "arg_keys": ["name"],
+      "ir_kind": null,
+      "persistence_class": "D",
+      "risk": "low",
+      "family": "db",
+      "state": "pending_f1",
+      "notes": "PLAN.md Tier 1 T1.3. Same F1-unprobed gate closure as create_block_def; family=db per tools/patch_ops/db.py's own docstring (catch-all for a database/transform op with no entities/blocks/tables home)."
+    },
+    {
+      "patch_op": "set_xdata",
+      "native_op": "write.xdata.set",
+      "arg_keys": ["app", "value"],
+      "ir_kind": null,
+      "persistence_class": "D",
+      "risk": "low",
+      "family": "db",
+      "state": "pending_f1",
+      "notes": "PLAN.md Tier 1 T1.4 (H-9: proves the write path only, not xdata SOURCE fidelity -- source resbuf_json is NULL until a T5 cross-cutting extraction node)."
+    },
+    {
+      "patch_op": "set_xrecord",
+      "native_op": "write.xrecord.set",
+      "arg_keys": ["key", "value"],
+      "ir_kind": null,
+      "persistence_class": "D",
+      "risk": "low",
+      "family": "db",
+      "state": "pending_f1",
+      "notes": "PLAN.md Tier 1 T1.5."
+    },
+    {
+      "patch_op": "create_arc",
+      "native_op": "write.entity.arc",
+      "arg_keys": ["center", "radius", "start_angle", "end_angle", "layer"],
+      "ir_kind": "arc",
+      "persistence_class": "P",
+      "risk": "medium",
+      "family": "entities",
+      "state": "already_promoted",
+      "notes": "WAVE-1 TIER-1 T1. F1 (measure/reachable_matrix.jsonl) classifies write.entity.arc RUNNABLE (valid_arg_probe; native handler src/Ariadne.AcadNative/families/m08g_handlers.inc m08gDispatch, AcDbArc(center,radius,startAng,endAng)). risk=medium: input_validated=false (empty_arg_probe silently builds a default-radius/full-sweep arc instead of erroring) -- not a promotion blocker, but callers must supply real args to avoid a degenerate create."
+    },
+    {
+      "patch_op": "create_ellipse",
+      "native_op": "write.entity.ellipse",
+      "arg_keys": ["center", "normal", "major_axis", "radius_ratio", "start_angle", "end_angle", "layer"],
+      "ir_kind": "ellipse",
+      "persistence_class": "P",
+      "risk": "medium",
+      "family": "entities",
+      "state": "already_promoted",
+      "notes": "WAVE-1 TIER-1 T1. F1 classifies write.entity.ellipse RUNNABLE (valid_arg_probe; m08g_handlers.inc AcDbEllipse(center,normal,major,ratio,sa,ea)). risk=medium: input_validated=false (same silent-default-on-empty-args shape as create_arc)."
+    },
+    {
+      "patch_op": "create_mpolygon",
+      "native_op": "write.entity.mpolygon",
+      "arg_keys": ["points", "layer"],
+      "ir_kind": null,
+      "persistence_class": "P",
+      "risk": "low",
+      "family": "entities",
+      "state": "already_promoted",
+      "notes": "WAVE-1 TIER-1 T1. F1 classifies write.entity.mpolygon RUNNABLE (m08g_handlers.inc AcDbMPolygon, hatch-backed closed polygon; m08gRead2dVertices reads 'vertices' then falls back to 'points', matching tools/fixture_foundry.py's mpolygon fixture args shape). ir_kind=null: 'mpolygon' is not in ir_builder._EXTRACT_KIND_TO_IR_KIND (no IR entity ever carries geometry.kind=='mpolygon' today), so no ir_to_patch case is wired -- Axis A/B only, honestly deferred on the read/IR side until an extraction ticket lands it."
+    },
+    {
+      "patch_op": "create_mtext",
+      "native_op": "write.entity.mtext",
+      "arg_keys": ["position", "text", "height", "layer"],
+      "ir_kind": "mtext",
+      "persistence_class": "P",
+      "risk": "medium",
+      "family": "entities",
+      "state": "already_promoted",
+      "notes": "WAVE-1 TIER-1 T1. F1 classifies write.entity.mtext RUNNABLE (valid_arg_probe; m08h_handlers.inc m08hDispatch, AcDbMText::setContents/setLocation/setTextHeight). risk=medium: input_validated=false (empty_arg_probe still creates an empty-content MText)."
+    },
+    {
+      "patch_op": "create_text",
+      "native_op": "write.entity.text",
+      "arg_keys": ["position", "text", "height", "layer"],
+      "ir_kind": "text",
+      "persistence_class": "P",
+      "risk": "medium",
+      "family": "entities",
+      "state": "already_promoted",
+      "notes": "WAVE-1 TIER-1 T1. F1 classifies write.entity.text RUNNABLE (valid_arg_probe; m08h_handlers.inc AcDbText + setTextString/setPosition/setHeight). risk=medium: input_validated=false (same silent-default-on-empty shape as create_mtext). ir_to_patch case (kind=='text' -> 'create_text') already forward-declared in patch_ops.entities.ir_op_for pre-F2; this row only completes Axis A/B."
+    },
+    {
+      "patch_op": "create_polyline",
+      "native_op": "write.entity.polyline",
+      "arg_keys": ["points", "closed", "layer"],
+      "ir_kind": "lwpolyline",
+      "persistence_class": "P",
+      "risk": "low",
+      "family": "entities",
+      "state": "already_promoted",
+      "notes": "WAVE-1 TIER-1 T1. F1 classifies write.entity.polyline RUNNABLE (valid_arg_probe; input_validated=true -- empty_arg_probe correctly MISSING_ARGs on <2 points, m08g_handlers.inc AcDbPolyline::addVertexAt). native op also accepts 'write.entity.polyline2d' as an alias (same handler); ir_kind='lwpolyline' is the IR-side name (ir_builder._EXTRACT_KIND_TO_IR_KIND) -- ir_to_patch case (kind in ('lwpolyline','polyline') -> 'create_polyline') already forward-declared in patch_ops.entities.ir_op_for pre-F2; this row only completes Axis A/B."
+    },
+    {
+      "patch_op": "create_dimension",
+      "native_op": "write.entity.dim.rotated",
+      "arg_keys": ["xline1", "xline2", "dim_line", "dim_text", "rotation", "layer"],
+      "ir_kind": "dimension",
+      "persistence_class": "P",
+      "risk": "low",
+      "family": "entities",
+      "state": "already_promoted",
+      "notes": "WAVE-1 TIER-1 T1. F1 classifies write.entity.dim.rotated RUNNABLE (valid_arg_probe; input_validated=true -- empty_arg_probe correctly MISSING_ARGs without xline1/xline2/dim_line, m08h_handlers.inc AcDbRotatedDimension). ir_to_patch case (kind=='dimension', gated on xline1_point/xline2_point/dim_line_point all present -> 'create_dimension') already forward-declared in patch_ops.entities.ir_op_for (Tier 3) pre-F2; this row only completes Axis A/B."
+    },
+    {
+      "patch_op": "set_entity_xdata",
+      "native_op": "write.entity.set_xdata",
+      "arg_keys": ["app", "value"],
+      "ir_kind": null,
+      "persistence_class": "D",
+      "risk": "low",
+      "family": "entities",
+      "state": "already_promoted",
+      "notes": "WAVE-1 TIER-1 T1. F1 classifies write.entity.set_xdata RUNNABLE. Distinct native_op from the pre-existing 'set_xdata' patch_op (which targets write.xdata.set) -- named set_entity_xdata to avoid a patch_op collision; same (app,value) arg shape. Current m08e_handlers.inc handler (m08eHandleEntitySetXdata) calls setDatabaseXdata(pDb,...) inside an AriadneStagedWriteTransaction that is always rolled back (result.staged_rolled_back=true) -- proves the write path only, matching the existing set_xdata row's H-9 caveat, not per-entity handle-scoped xdata yet. ir_kind=null: record-level, no ir_to_patch case (same pattern as set_xdata/set_xrecord)."
+    }
+  ]
+}

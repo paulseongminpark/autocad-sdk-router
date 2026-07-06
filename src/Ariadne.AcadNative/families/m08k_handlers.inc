@@ -229,7 +229,7 @@ static bool m08kFindStr(const std::string& job, const char* key, std::string& ou
 // real registered metadata the class system carries for the descriptor.
 static std::string m08kRxClassJson(AcRxClass* cls)
 {
-    std::ostringstream o;
+    std::ostringstream o; o.precision(kJsonDoublePrecision);
     if (cls == nullptr) {
         o << "\"resolved\":false";
         return o.str();
@@ -298,7 +298,7 @@ static Acad::ErrorStatus m08kAppendRecordToNod(AcDbDatabase* pDb, int value,
     }
     // Unique key from the tick count so repeat invocations never collide.
     static unsigned long s_seq = 0;
-    std::ostringstream k;
+    std::ostringstream k; k.precision(kJsonDoublePrecision);
     k << "ARIADNE_M08K_REC_" << (++s_seq) << "_" << static_cast<unsigned long>(GetTickCount());
     keyOut = k.str();
     es = pNod->setAt(asciiToWide(keyOut).c_str(), pObj, idOut);
@@ -462,7 +462,7 @@ static bool m08kDispatch(const std::string& op, const AriadneJobCtx& ctx, std::o
         }
         AcRxClass* isa = pObj->isA();
         AcRxClass* parent = (isa != nullptr) ? isa->myParent() : nullptr;
-        std::ostringstream o;
+        std::ostringstream o; o.precision(kJsonDoublePrecision);
         o << "\"handle\":" << njsonStr(handle)
           << ",\"isa\":" << njsonStr(isa != nullptr ? isa->name() : ACRX_T(""))
           << ",\"dxf_name\":" << njsonStr(isa != nullptr ? isa->dxfName() : ACRX_T(""))
@@ -568,7 +568,7 @@ static bool m08kDispatch(const std::string& op, const AriadneJobCtx& ctx, std::o
         }
         AcDbProxyEntity* pPE = AcDbProxyEntity::cast(pObj);
         AcDbProxyObject* pPO = AcDbProxyObject::cast(pObj);
-        std::ostringstream o;
+        std::ostringstream o; o.precision(kJsonDoublePrecision);
         o << "\"handle\":" << njsonStr(handle)
           << ",\"is_proxy\":" << ((pPE != nullptr || pPO != nullptr) ? "true" : "false")
           << ",\"is_proxy_entity\":" << (pPE != nullptr ? "true" : "false")
@@ -631,7 +631,7 @@ static bool m08kDispatch(const std::string& op, const AriadneJobCtx& ctx, std::o
         acrxBuildClassHierarchy();
         AcRxClass* lookedUp = AcRxClass::cast(acrxClassDictionary->at(wpname.c_str()));
         const bool derived = cls->isDerivedFrom(AcRxObject::desc());
-        std::ostringstream o;
+        std::ostringstream o; o.precision(kJsonDoublePrecision);
         o << "\"declared\":true,\"name\":" << njsonStr(pname)
           << ",\"registered_in_dict\":" << (lookedUp == cls ? "true" : "false")
           << ",\"derived_from_acrxobject\":" << (derived ? "true" : "false");
@@ -674,7 +674,7 @@ static bool m08kDispatch(const std::string& op, const AriadneJobCtx& ctx, std::o
         AcRxObject* prevX = host->addX(protoCls, peObj);   // attach
         AcRxObject* afterAttach = host->queryX(protoCls);
         const bool attached = (afterAttach == peObj);
-        std::ostringstream o;
+        std::ostringstream o; o.precision(kJsonDoublePrecision);
         o << "\"name\":" << njsonStr(pname)
           << ",\"host_class\":\"AriadneRecord\""
           << ",\"prev_x_present\":" << (prevX != nullptr ? "true" : "false")
@@ -751,7 +751,7 @@ static bool m08kDispatch(const std::string& op, const AriadneJobCtx& ctx, std::o
             AcRxObject* inst = cls->create();
             if (inst != nullptr) { created = true; delete inst; }
         }
-        std::ostringstream o;
+        std::ostringstream o; o.precision(kJsonDoublePrecision);
         o << "\"defined\":true,\"variant\":" << njsonStr(op)
           << ",\"name\":" << njsonStr(cname)
           << ",\"with_constructor\":" << (withCons ? "true" : "false")
@@ -823,7 +823,7 @@ static bool m08kDispatch(const std::string& op, const AriadneJobCtx& ctx, std::o
     if (op == "extend.service.register") {
         std::string svc;
         m08kFindStr(job, "name", svc);
-        std::ostringstream nm;
+        std::ostringstream nm; nm.precision(kJsonDoublePrecision);
         nm << (svc.empty() ? "AriadneM08KService" : svc) << "_" << static_cast<unsigned long>(GetTickCount());
         const std::wstring wsvc = asciiToWide(nm.str());
         const bool before = acrxServiceIsRegistered(wsvc.c_str());
@@ -1284,7 +1284,7 @@ static bool m08kDispatch(const std::string& op, const AriadneJobCtx& ctx, std::o
             }
         }
         const bool roundtrip = opened && cloneIsRecord;
-        std::ostringstream o;
+        std::ostringstream o; o.precision(kJsonDoublePrecision);
         o << "\"source_value\":" << value
           << ",\"clone_status\":" << static_cast<int>(cloneEs)
           << ",\"clone_produced\":" << (!cloneId.isNull() ? "true" : "false")
@@ -1384,7 +1384,7 @@ static bool m08kDispatch(const std::string& op, const AriadneJobCtx& ctx, std::o
                 pEnt->close();
             }
         }
-        std::ostringstream o;
+        std::ostringstream o; o.precision(kJsonDoublePrecision);
         o << "\"appended\":" << (es == Acad::eOk ? "true" : "false")
           << ",\"size\":" << sz
           << ",\"has_extents\":" << (got ? "true" : "false");
@@ -1481,7 +1481,7 @@ static bool m08kDispatch(const std::string& op, const AriadneJobCtx& ctx, std::o
             if (pProbe) pProbe->close();
             if (pLn) pLn->close();
         }
-        std::ostringstream o;
+        std::ostringstream o; o.precision(kJsonDoublePrecision);
         o << "\"probe_appended\":" << (es == Acad::eOk ? "true" : "false")
           << ",\"line_appended\":" << (lineEs == Acad::eOk ? "true" : "false")
           << ",\"intersect_status\":" << static_cast<int>(ixEs)
@@ -1508,7 +1508,7 @@ static bool m08kDispatch(const std::string& op, const AriadneJobCtx& ctx, std::o
         AriadneStagedWriteTransaction wt(pDb);
         AcDbObjectId id;
         Acad::ErrorStatus es = m08kAppendProbeEntity(pDb, AcGePoint3d(cx, cy, cz), sz, id);
-        std::ostringstream o;
+        std::ostringstream o; o.precision(kJsonDoublePrecision);
         bool ok = false;
         if (es == Acad::eOk && !id.isNull()) {
             AcDbEntity* pEnt = nullptr;

@@ -581,7 +581,7 @@ static AcDbEntity* m08lOpenEntity(AcDbDatabase* pDb, const std::string& handleHe
 
 static std::string m08lPointJson(const AcGePoint3d& p)
 {
-    std::ostringstream o;
+    std::ostringstream o; o.precision(kJsonDoublePrecision);
     o << "[" << p.x << "," << p.y << "," << p.z << "]";
     return o.str();
 }
@@ -680,7 +680,7 @@ static bool m08lDispatch(const std::string& op, const AriadneJobCtx& ctx, std::o
         const std::string entClass = (pEnt->isA() != nullptr) ? acharToAscii(pEnt->isA()->name()) : std::string();
         pEnt->close();
 
-        std::ostringstream o;
+        std::ostringstream o; o.precision(kJsonDoublePrecision);
         o << "\"handle\":" << njsonStr(handle)
           << ",\"entity_class\":" << njsonStr(entClass)
           << ",\"world_draw_returned\":" << (drew == Adesk::kTrue ? "true" : "false")
@@ -743,7 +743,7 @@ static bool m08lDispatch(const std::string& op, const AriadneJobCtx& ctx, std::o
         const std::string entClass = (pEnt->isA() != nullptr) ? acharToAscii(pEnt->isA()->name()) : std::string();
         pEnt->close();
 
-        std::ostringstream o;
+        std::ostringstream o; o.precision(kJsonDoublePrecision);
         o << "\"handle\":" << njsonStr(handle)
           << ",\"entity_class\":" << njsonStr(entClass)
           << ",\"world_draw_returned\":" << (drewWorld == Adesk::kTrue ? "true" : "false")
@@ -1035,7 +1035,7 @@ static bool m08lDispatch(const std::string& op, const AriadneJobCtx& ctx, std::o
         const Acad::ErrorStatus es = pEnt->getGripPoints(grips, osnapModes, geomIds);
         const std::string entClass = (pEnt->isA() != nullptr) ? acharToAscii(pEnt->isA()->name()) : std::string();
         pEnt->close();
-        std::ostringstream o;
+        std::ostringstream o; o.precision(kJsonDoublePrecision);
         o << "\"handle\":" << njsonStr(handle)
           << ",\"entity_class\":" << njsonStr(entClass)
           << ",\"grip_status\":" << static_cast<int>(es)

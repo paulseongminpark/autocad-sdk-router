@@ -89,7 +89,7 @@ static std::wstring m08nWide(const std::string& s)
 
 static std::string m08nPointJson(double x, double y, double z)
 {
-    std::ostringstream o;
+    std::ostringstream o; o.precision(kJsonDoublePrecision);
     o << "[" << x << "," << y << "," << z << "]";
     return o.str();
 }
@@ -146,7 +146,7 @@ static std::string m08nSelectionSetJson(const ads_name ss, int& emitted)
     emitted = 0;
     Adesk::Int32 len = 0;
     const int lenRc = acedSSLength(ss, &len);
-    std::ostringstream o;
+    std::ostringstream o; o.precision(kJsonDoublePrecision);
     o << "{\"length_status\":" << lenRc
       << ",\"length_status_name\":" << njsonStr(m08nRtStatus(lenRc))
       << ",\"count\":" << (lenRc == RTNORM ? static_cast<int>(len) : 0)

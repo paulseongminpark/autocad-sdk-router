@@ -194,8 +194,11 @@ class TestApplyStagedNoHandlerDegrades(unittest.TestCase):
         self.pe = patch_engine
 
     def test_resolve_native_write_op_rejects_unsupported(self):
-        # delete_entity / create_polyline / move_entity have NO native handler.
-        for op_name in ("delete_entity", "create_polyline", "move_entity"):
+        # delete_entity / create_hatch / move_entity have NO native handler.
+        # (create_polyline was the third fixture here pre-WAVE-1 TIER-1 T1;
+        # tools/promote_op.py has since wired it for real -- write.entity.hatch
+        # remains genuinely unwired at the patch_ops layer today.)
+        for op_name in ("delete_entity", "create_hatch", "move_entity"):
             patch = _good_patch("a/s.dwg", "b/o.dwg")
             patch["operations"] = [{"operation": op_name, "args": {}}]
             rec, err = self.pe._resolve_native_write_op(patch)
@@ -378,6 +381,42 @@ class TestApplyStagedLifecycleMocked(unittest.TestCase):
                 real_irb.build_ir_from_database_graph = saved
             self.assertEqual(res["status"], "not_implemented")
             self.assertEqual(_sha256(original), sha_before)
+
+
+class TestModuleDocstringDoesNotStaleSnapshotNativeWriteOpMap(unittest.TestCase):
+    """patch_engine.py's own module docstring says NATIVE_WRITE_OP_MAP's
+    paragraph 'is a pointer, not a second copy, so it cannot drift again' --
+    yet an earlier version immediately broke that promise with a literal
+    '12 ops: create_line, create_circle, ...' snapshot from WAVE-1 TIER-1 T1's
+    initial promotion. Real promotions kept landing (T1 T2 T3... this file's
+    own history) and grew NATIVE_WRITE_OP_MAP well past 12 without the
+    docstring ever being touched -- a stale "apply_staged allowlist" doc claim
+    (codex FIX-BEFORE-RELY finding). The fix removed the hardcoded count; this
+    tripwire guards against the SAME anti-pattern being reintroduced: if the
+    docstring ever again claims a specific op count, that count must match
+    NATIVE_WRITE_OP_MAP's real, live size -- never a frozen snapshot."""
+
+    def test_docstring_op_count_claim_if_present_must_match_reality(self):
+        import re as _re
+        import patch_engine
+        doc = patch_engine.__doc__ or ""
+        m = _re.search(r"covers (\d+) ops", doc)
+        if m is None:
+            return  # current state: no hardcoded count claim at all -- the fix.
+        claimed = int(m.group(1))
+        self.assertEqual(
+            claimed, len(patch_engine.NATIVE_WRITE_OP_MAP),
+            "patch_engine.py's module docstring claims a specific NATIVE_WRITE_OP_MAP "
+            "op count that no longer matches the live map -- either remove the hardcoded "
+            "count (the prior fix's approach: NATIVE_WRITE_OP_MAP is the sole source of "
+            "truth) or update the number; do not let it drift silently again.")
+
+    def test_native_write_op_map_is_the_real_live_source_not_a_frozen_dict(self):
+        # Belt + suspenders for the same claim: NATIVE_WRITE_OP_MAP today
+        # already exceeds the stale "12" the docstring used to claim, proving
+        # the map itself grows independently of any doc snapshot.
+        import patch_engine
+        self.assertGreater(len(patch_engine.NATIVE_WRITE_OP_MAP), 12)
 
 
 if __name__ == "__main__":

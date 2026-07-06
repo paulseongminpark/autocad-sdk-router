@@ -187,5 +187,486 @@ class TestRoundTripThroughDisk(unittest.TestCase):
             self.assertEqual(reloaded, ir, "IR did not round-trip through disk")
 
 
+class TestNativeGraphGeometryLifting(unittest.TestCase):
+    """T3a: build_ir_from_database_graph's field lifting for the new
+    collectModelSpaceGraph fields (ellipse/dimension/text/mtext/polyline).
+
+    build_ir_from_database_graph (the ``inspect.database.graph`` -> IR path
+    op_roundtrip_probe's pre/post-inspect actually uses) is otherwise only
+    exercised by live/integration/smoke tests gated on a real AutoCAD run --
+    this feeds it synthetic raw entity dicts shaped exactly like
+    collectModelSpaceGraph's JSON, so the lifting itself is covered without
+    any live runtime.
+    """
+
+    def _one_entity_ir(self, raw_entity):
+        import ir_builder
+        graph_result = {"entities": [raw_entity], "modelspace_entities": 1}
+        ir = ir_builder.build_ir_from_database_graph(graph_result, {"dwg_path": "fake.dwg"})
+        return ir["entities"][0]
+
+    def test_ellipse_lifts_major_axis_and_radius_ratio(self):
+        ent = self._one_entity_ir({
+            "handle": "1A0", "dxf_name": "AcDbEllipse", "layer": "0",
+            "owner_handle": "1F", "space": "model",
+            "center": [1.0, 2.0, 0.0], "major_axis": [3.0, 0.0, 0.0],
+            "radius_ratio": 0.5, "start_angle": 0.0, "end_angle": 6.283185307179586,
+            "normal": [0.0, 0.0, 1.0],
+        })
+        self.assertEqual(ent["dxf_name"], "ELLIPSE")
+        self.assertEqual(ent["geometry"], {
+            "kind": "ellipse", "center": [1.0, 2.0, 0.0], "normal": [0.0, 0.0, 1.0],
+            "major_axis": [3.0, 0.0, 0.0], "radius_ratio": 0.5,
+            "start_angle": 0.0, "end_angle": 6.283185307179586,
+        })
+
+    def test_point_lifts_position(self):
+        # w3-simple1: collectModelSpaceGraph's AcDbPoint branch emits
+        # "position" verbatim -- a direct pass-through, same treatment as
+        # AcDbLine's start/end above.
+        ent = self._one_entity_ir({
+            "handle": "1B0", "dxf_name": "AcDbPoint", "layer": "0",
+            "owner_handle": "1F", "space": "model",
+            "position": [5.0, 6.0, 0.0],
+        })
+        self.assertEqual(ent["dxf_name"], "POINT")
+        self.assertEqual(ent["geometry"], {"kind": "point", "position": [5.0, 6.0, 0.0]})
+
+    def test_ray_lifts_base_point_and_unit_dir(self):
+        # w3-simple1: collectModelSpaceGraph's AcDbRay branch emits
+        # base_point/unit_dir -- both plain point3 fields, lifted by the
+        # SAME generic point-field allowlist "center"/"position" etc. above
+        # already use (base_point/unit_dir were added to that allowlist).
+        ent = self._one_entity_ir({
+            "handle": "1B1", "dxf_name": "AcDbRay", "layer": "0",
+            "owner_handle": "1F", "space": "model",
+            "base_point": [1.0, 1.0, 0.0], "unit_dir": [1.0, 0.0, 0.0],
+        })
+        self.assertEqual(ent["dxf_name"], "RAY")
+        self.assertEqual(ent["geometry"], {
+            "kind": "ray", "base_point": [1.0, 1.0, 0.0], "unit_dir": [1.0, 0.0, 0.0],
+        })
+
+    def test_xline_lifts_base_point_and_unit_dir(self):
+        # w3-simple1: collectModelSpaceGraph's AcDbXline branch has the
+        # identical base_point/unit_dir shape AcDbRay's does above.
+        ent = self._one_entity_ir({
+            "handle": "1B2", "dxf_name": "AcDbXline", "layer": "0",
+            "owner_handle": "1F", "space": "model",
+            "base_point": [2.0, 3.0, 0.0], "unit_dir": [0.0, 1.0, 0.0],
+        })
+        self.assertEqual(ent["dxf_name"], "XLINE")
+        self.assertEqual(ent["geometry"], {
+            "kind": "xline", "base_point": [2.0, 3.0, 0.0], "unit_dir": [0.0, 1.0, 0.0],
+        })
+
+    def test_dimension_lifts_points_measurement_and_top_level_block_fields(self):
+        ent = self._one_entity_ir({
+            "handle": "1A1", "dxf_name": "AcDbRotatedDimension", "layer": "0",
+            "owner_handle": "1F", "space": "model",
+            "xline1_point": [0.0, 0.0, 0.0], "xline2_point": [100.0, 0.0, 0.0],
+            "dim_line_point": [100.0, 20.0, 0.0], "rotation": 0.0, "measurement": 100.0,
+            "dim_block_handle": "1A2", "dim_block_name": "*D1",
+        })
+        self.assertEqual(ent["dxf_name"], "DIMENSION")
+        self.assertEqual(ent["geometry"], {
+            "kind": "dimension", "xline1_point": [0.0, 0.0, 0.0],
+            "xline2_point": [100.0, 0.0, 0.0], "dim_line_point": [100.0, 20.0, 0.0],
+            "rotation": 0.0, "measurement": 100.0,
+        })
+        # dim_block_handle/dim_block_name are TOP-LEVEL entity fields, never
+        # inside "geometry" -- see op_roundtrip_probe.py's
+        # _expect_create_dimension for why this must hold.
+        self.assertEqual(ent["dim_block_handle"], "1A2")
+        self.assertEqual(ent["dim_block_name"], "*D1")
+        self.assertNotIn("dim_block_handle", ent["geometry"])
+        self.assertNotIn("dim_block_name", ent["geometry"])
+
+    def test_text_and_mtext_lift_height(self):
+        text_ent = self._one_entity_ir({
+            "handle": "1A3", "dxf_name": "AcDbText", "layer": "0",
+            "owner_handle": "1F", "space": "model",
+            "position": [1.0, 1.0, 0.0], "text": "hi", "height": 3.5,
+        })
+        self.assertEqual(text_ent["geometry"],
+                         {"kind": "text", "position": [1.0, 1.0, 0.0], "text": "hi", "height": 3.5})
+
+        mtext_ent = self._one_entity_ir({
+            "handle": "1A4", "dxf_name": "AcDbMText", "layer": "0",
+            "owner_handle": "1F", "space": "model",
+            "position": [2.0, 2.0, 0.0], "text": "note", "height": 4.25,
+        })
+        self.assertEqual(mtext_ent["geometry"],
+                         {"kind": "mtext", "position": [2.0, 2.0, 0.0], "text": "note", "height": 4.25})
+
+    def test_polyline_lifts_bulge_and_closed(self):
+        ent = self._one_entity_ir({
+            "handle": "1A5", "dxf_name": "AcDbPolyline", "layer": "0",
+            "owner_handle": "1F", "space": "model", "vertex_count": 2,
+            "closed": True,
+            "vertices": [{"point": [0.0, 0.0, 0.0], "bulge": 0.5},
+                        {"point": [10.0, 0.0, 0.0], "bulge": 0.0}],
+        })
+        self.assertEqual(ent["geometry"], {
+            "kind": "lwpolyline", "closed": True,
+            "vertices": [{"point": [0.0, 0.0, 0.0], "bulge": 0.5},
+                        {"point": [10.0, 0.0, 0.0], "bulge": 0.0}],
+        })
+
+    def test_spline_lifts_degree_closed_fit_points_and_top_level_nurbs_fields(self):
+        ent = self._one_entity_ir({
+            "handle": "1A6", "dxf_name": "AcDbSpline", "layer": "0",
+            "owner_handle": "1F", "space": "model",
+            "degree": 3, "closed": False,
+            "fit_points": [[0.0, 0.0, 0.0], [10.0, 5.0, 0.0], [20.0, 0.0, 0.0]],
+            "spline_control_points": [[0.0, 0.0, 0.0], [6.0, 8.0, 0.0], [20.0, 0.0, 0.0]],
+            "spline_knots": [0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0, 1.0],
+        })
+        self.assertEqual(ent["dxf_name"], "SPLINE")
+        self.assertEqual(ent["geometry"], {
+            "kind": "spline", "degree": 3, "closed": False,
+            "fit_points": [[0.0, 0.0, 0.0], [10.0, 5.0, 0.0], [20.0, 0.0, 0.0]],
+        })
+        # spline_control_points/spline_knots are TOP-LEVEL entity fields, never
+        # inside "geometry" -- see op_roundtrip_probe.py's _expect_create_spline
+        # for why this must hold (AutoCAD's own fit-to-NURBS conversion result,
+        # not derivable from write.entity.spline's args alone).
+        self.assertEqual(ent["spline_control_points"],
+                         [[0.0, 0.0, 0.0], [6.0, 8.0, 0.0], [20.0, 0.0, 0.0]])
+        self.assertEqual(ent["spline_knots"], [0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0, 1.0])
+        self.assertNotIn("spline_control_points", ent["geometry"])
+        self.assertNotIn("spline_knots", ent["geometry"])
+
+    def test_aligned_dimension_lifts_points_and_measurement(self):
+        ent = self._one_entity_ir({
+            "handle": "1A7", "dxf_name": "AcDbAlignedDimension", "layer": "0",
+            "owner_handle": "1F", "space": "model",
+            "xline1_point": [0.0, 0.0, 0.0], "xline2_point": [100.0, 0.0, 0.0],
+            "dim_line_point": [100.0, 20.0, 0.0], "measurement": 100.0,
+            "dim_block_handle": "1A8", "dim_block_name": "*D2",
+        })
+        self.assertEqual(ent["dxf_name"], "DIMENSION")
+        self.assertEqual(ent["geometry"], {
+            "kind": "dimension", "xline1_point": [0.0, 0.0, 0.0],
+            "xline2_point": [100.0, 0.0, 0.0], "dim_line_point": [100.0, 20.0, 0.0],
+            "measurement": 100.0,
+        })
+        self.assertEqual(ent["dim_block_handle"], "1A8")
+        self.assertEqual(ent["dim_block_name"], "*D2")
+
+    def test_radial_dimension_lifts_center_chord_and_top_level_leader_length(self):
+        ent = self._one_entity_ir({
+            "handle": "1A9", "dxf_name": "AcDbRadialDimension", "layer": "0",
+            "owner_handle": "1F", "space": "model",
+            "center": [0.0, 0.0, 0.0], "chord_point": [10.0, 0.0, 0.0],
+            "leader_length": 5.0, "measurement": 10.0,
+        })
+        self.assertEqual(ent["dxf_name"], "DIMENSION")
+        self.assertEqual(ent["geometry"], {
+            "kind": "dimension", "center": [0.0, 0.0, 0.0], "chord_point": [10.0, 0.0, 0.0],
+            "measurement": 10.0,
+        })
+        # leader_length is a TOP-LEVEL entity field, never inside "geometry" --
+        # live-discovered (2026-07-02 T3a-batch2 re-cert) to be AutoCAD's own
+        # recomputed value, not a ctor-arg echo (see op_roundtrip_probe.py's
+        # _expect_create_dimension_radial).
+        self.assertEqual(ent["leader_length"], 5.0)
+        self.assertNotIn("leader_length", ent["geometry"])
+
+    def test_diametric_dimension_lifts_chord_points_and_top_level_leader_length(self):
+        ent = self._one_entity_ir({
+            "handle": "1AA", "dxf_name": "AcDbDiametricDimension", "layer": "0",
+            "owner_handle": "1F", "space": "model",
+            "chord_point": [-10.0, 0.0, 0.0], "far_chord_point": [10.0, 0.0, 0.0],
+            "leader_length": 5.0, "measurement": 20.0,
+        })
+        self.assertEqual(ent["dxf_name"], "DIMENSION")
+        self.assertEqual(ent["geometry"], {
+            "kind": "dimension", "chord_point": [-10.0, 0.0, 0.0],
+            "far_chord_point": [10.0, 0.0, 0.0], "measurement": 20.0,
+        })
+        self.assertEqual(ent["leader_length"], 5.0)
+        self.assertNotIn("leader_length", ent["geometry"])
+
+    def test_radiallarge_dimension_lifts_jog_fields(self):
+        # w3-radl: center/chord_point carry the SAME semantic AcDbRadialDimension
+        # already uses (measurement = the center<->chord_point distance).
+        # override_center/jog_point/jog_angle are this class's own 3 extra
+        # jog-symbol placement fields -- UNLIKE leader_length (radial/
+        # diametric) or origin (ordinate), all 3 are live-verified (2026-07-02
+        # w3-radl re-cert) to be direct ctor-arg echoes, so they stay INSIDE
+        # "geometry" (asserted by the P-gate), not top-level.
+        ent = self._one_entity_ir({
+            "handle": "1AC5", "dxf_name": "AcDbRadialDimensionLarge", "layer": "0",
+            "owner_handle": "1F", "space": "model",
+            "center": [0.0, 0.0, 0.0], "chord_point": [50.0, 0.0, 0.0],
+            "override_center": [0.0, -80.0, 0.0], "jog_point": [25.0, -40.0, 0.0],
+            "jog_angle": 0.785398163397448, "measurement": 50.0,
+        })
+        self.assertEqual(ent["dxf_name"], "DIMENSION")
+        self.assertEqual(ent["geometry"], {
+            "kind": "dimension", "center": [0.0, 0.0, 0.0], "chord_point": [50.0, 0.0, 0.0],
+            "override_center": [0.0, -80.0, 0.0], "jog_point": [25.0, -40.0, 0.0],
+            "jog_angle": 0.785398163397448, "measurement": 50.0,
+        })
+
+    def test_ordinate_dimension_lifts_points_and_top_level_origin(self):
+        ent = self._one_entity_ir({
+            "handle": "1AB", "dxf_name": "AcDbOrdinateDimension", "layer": "0",
+            "owner_handle": "1F", "space": "model",
+            "defining_point": [10.0, 5.0, 0.0], "leader_end_point": [10.0, 15.0, 0.0],
+            "use_x_axis": True, "origin": [0.0, 0.0, 0.0], "measurement": 10.0,
+        })
+        self.assertEqual(ent["dxf_name"], "DIMENSION")
+        self.assertEqual(ent["geometry"], {
+            "kind": "dimension", "defining_point": [10.0, 5.0, 0.0],
+            "leader_end_point": [10.0, 15.0, 0.0], "use_x_axis": True, "measurement": 10.0,
+        })
+        # origin is a TOP-LEVEL entity field, never inside "geometry" -- it is
+        # not a write.entity.dim.ordinate ctor arg at all (see op_roundtrip_
+        # probe.py's _expect_create_dimension_ordinate).
+        self.assertEqual(ent["origin"], [0.0, 0.0, 0.0])
+        self.assertNotIn("origin", ent["geometry"])
+
+    def test_arc_dimension_lifts_center_and_arc_point(self):
+        # arc_point here is AutoCAD's own live-verified re-placement (1/3 of
+        # the xline1->xline2 angular span, NOT the raw ctor-arg the op was
+        # given -- see op_roundtrip_probe.py's _arc_dimension_arc_point),
+        # exactly as a real collectModelSpaceGraph read-back reports it.
+        ent = self._one_entity_ir({
+            "handle": "1AD", "dxf_name": "AcDbArcDimension", "layer": "0",
+            "owner_handle": "1F", "space": "model",
+            "center": [0.0, 0.0, 0.0], "xline1_point": [50.0, 0.0, 0.0],
+            "xline2_point": [0.0, 50.0, 0.0],
+            "arc_point": [43.301270189221924, 25.000000000000004, 0.0],
+            "measurement": 78.5398163397448,
+            "dim_block_handle": "1AE", "dim_block_name": "*D3",
+        })
+        self.assertEqual(ent["dxf_name"], "DIMENSION")
+        self.assertEqual(ent["geometry"], {
+            "kind": "dimension", "center": [0.0, 0.0, 0.0],
+            "xline1_point": [50.0, 0.0, 0.0], "xline2_point": [0.0, 50.0, 0.0],
+            "arc_point": [43.301270189221924, 25.000000000000004, 0.0],
+            "measurement": 78.5398163397448,
+        })
+        self.assertEqual(ent["dim_block_handle"], "1AE")
+        self.assertEqual(ent["dim_block_name"], "*D3")
+
+    def test_angular2line_dimension_lifts_line_endpoints_and_arc_point(self):
+        # arc_point here is AutoCAD's own live-verified re-placement (1/3 of
+        # whichever of the 2 lines' 4 apex-sectors the raw ctor-arg's angle
+        # selected, NOT the raw ctor-arg itself -- see op_roundtrip_probe.py's
+        # _angular2line_arc_point), exactly as a real collectModelSpaceGraph
+        # read-back reports it. xline1=(10,0,0)->(30,0,0) (angle 0 from the
+        # apex at (0,0,0)), xline2=(0,10,0)->(0,30,0) (angle 90 deg) -- the
+        # [0,90] sector's 1/3 point sits at 30 deg, radius 40.
+        ent = self._one_entity_ir({
+            "handle": "1B1", "dxf_name": "AcDb2LineAngularDimension", "layer": "0",
+            "owner_handle": "1F", "space": "model",
+            "xline1_start": [10.0, 0.0, 0.0], "xline1_end": [30.0, 0.0, 0.0],
+            "xline2_start": [0.0, 10.0, 0.0], "xline2_end": [0.0, 30.0, 0.0],
+            "arc_point": [34.64101615137755, 20.0, 0.0],
+            "measurement": 1.5707963267948966,
+            "dim_block_handle": "1B2", "dim_block_name": "*D4",
+        })
+        self.assertEqual(ent["dxf_name"], "DIMENSION")
+        self.assertEqual(ent["geometry"], {
+            "kind": "dimension",
+            "xline1_start": [10.0, 0.0, 0.0], "xline1_end": [30.0, 0.0, 0.0],
+            "xline2_start": [0.0, 10.0, 0.0], "xline2_end": [0.0, 30.0, 0.0],
+            "arc_point": [34.64101615137755, 20.0, 0.0],
+            "measurement": 1.5707963267948966,
+        })
+        self.assertEqual(ent["dim_block_handle"], "1B2")
+        self.assertEqual(ent["dim_block_name"], "*D4")
+
+    def test_3pt_angular_dimension_lifts_center_and_arc_point(self):
+        # w3-ang3: collectModelSpaceGraph grew an AcDb3PointAngularDimension
+        # branch, reusing the SAME field names (center/xline1_point/
+        # xline2_point/arc_point/measurement) the arc-dimension branch above
+        # already uses -- no _geometry_from_native_entity allowlist change
+        # needed, only the class-map entry. arc_point here is AutoCAD's own
+        # live-verified re-placement (1/3 of the xline1->xline2 angular span,
+        # at the INPUT arc_point's own radius from center, NOT xline1's
+        # radius like AcDbArcDimension -- see op_roundtrip_probe.py's
+        # _angular3pt_arc_point), exactly as a real collectModelSpaceGraph
+        # read-back reports it: center=(0,0,0), xline1=(50,0,0) (angle 0),
+        # xline2=(0,50,0) (angle 90 deg) -> stored arc_point at 30 deg,
+        # radius 50 (this fixture's input arc_point happened to sit at the
+        # same radius as xline1 -- see op_roundtrip_probe.py's own test for
+        # the case that distinguishes the two radius rules). measurement is
+        # the plain angle (pi/2), not an arc length.
+        ent = self._one_entity_ir({
+            "handle": "1C1", "dxf_name": "AcDb3PointAngularDimension", "layer": "0",
+            "owner_handle": "1F", "space": "model",
+            "center": [0.0, 0.0, 0.0], "xline1_point": [50.0, 0.0, 0.0],
+            "xline2_point": [0.0, 50.0, 0.0],
+            "arc_point": [43.301270189221924, 25.000000000000004, 0.0],
+            "measurement": 1.5707963267948963,
+            "dim_block_handle": "1C2", "dim_block_name": "*D5",
+        })
+        self.assertEqual(ent["dxf_name"], "DIMENSION")
+        self.assertEqual(ent["geometry"], {
+            "kind": "dimension", "center": [0.0, 0.0, 0.0],
+            "xline1_point": [50.0, 0.0, 0.0], "xline2_point": [0.0, 50.0, 0.0],
+            "arc_point": [43.301270189221924, 25.000000000000004, 0.0],
+            "measurement": 1.5707963267948963,
+        })
+        self.assertEqual(ent["dim_block_handle"], "1C2")
+        self.assertEqual(ent["dim_block_name"], "*D5")
+
+    def test_leader_lifts_vertices_and_arrowhead_splined(self):
+        ent = self._one_entity_ir({
+            "handle": "1AC", "dxf_name": "AcDbLeader", "layer": "0",
+            "owner_handle": "1F", "space": "model",
+            "vertices": [[0.0, 0.0, 0.0], [10.0, 10.0, 0.0], [20.0, 10.0, 0.0]],
+            "has_arrow_head": True, "splined": False,
+        })
+        self.assertEqual(ent["dxf_name"], "LEADER")
+        self.assertEqual(ent["geometry"], {
+            "kind": "leader",
+            "vertices": [{"point": [0.0, 0.0, 0.0]}, {"point": [10.0, 10.0, 0.0]},
+                        {"point": [20.0, 10.0, 0.0]}],
+            "has_arrow_head": True, "splined": False,
+        })
+
+    def test_mleader_lifts_vertices_and_text(self):
+        # w3-mleader: AcDbMLeader's "vertices" (plain [x,y,z] array, no bulge)
+        # reuses the exact same generic lift AcDbLeader/AcDbMline already
+        # exercise above; "text"/"height" reuse the same generic lifts
+        # AcDbMText/AcDbText already exercise -- ir_builder.py itself needed
+        # ZERO changes for this kind (its _NATIVE_CLASS_TO_DXF_KIND already
+        # had an AcDbMLeader entry from an earlier batch).
+        ent = self._one_entity_ir({
+            "handle": "1C3", "dxf_name": "AcDbMLeader", "layer": "0",
+            "owner_handle": "1F", "space": "model",
+            "vertices": [[0.0, 0.0, 0.0], [15.0, 10.0, 0.0], [30.0, 0.0, 0.0]],
+            "text": "Multi Vertex", "height": 3.0,
+        })
+        self.assertEqual(ent["dxf_name"], "MULTILEADER")
+        self.assertEqual(ent["geometry"], {
+            "kind": "leader",
+            "vertices": [{"point": [0.0, 0.0, 0.0]}, {"point": [15.0, 10.0, 0.0]},
+                        {"point": [30.0, 0.0, 0.0]}],
+            "text": "Multi Vertex", "height": 3.0,
+        })
+
+    def test_mline_lifts_vertices_and_closed(self):
+        # w3-wbug: AcDbMline's "vertices" (plain [x,y,z] array) and "closed"
+        # both reuse the exact same generic lifts AcDbLeader/AcDb2dPolyline
+        # already exercise above -- only the _NATIVE_CLASS_TO_DXF_KIND entry is
+        # new (ir_builder.py itself is unchanged for this kind).
+        ent = self._one_entity_ir({
+            "handle": "1AD", "dxf_name": "AcDbMline", "layer": "0",
+            "owner_handle": "1F", "space": "model",
+            "vertices": [[0.0, 0.0, 0.0], [10.0, 0.0, 0.0], [10.0, 10.0, 0.0]],
+            "closed": False,
+        })
+        self.assertEqual(ent["dxf_name"], "MLINE")
+        self.assertEqual(ent["geometry"], {
+            "kind": "mline",
+            "vertices": [{"point": [0.0, 0.0, 0.0]}, {"point": [10.0, 0.0, 0.0]},
+                        {"point": [10.0, 10.0, 0.0]}],
+            "closed": False,
+        })
+
+    def test_hatch_lifts_pattern_style_and_polyline_loop(self):
+        # a1-hatchread: pattern_name/loops already existed; this covers the
+        # newly-added pattern_type/pattern_angle/pattern_scale/pattern_double/
+        # hatch_style/is_solid_fill/is_associative/is_gradient/elevation +
+        # generic normal, plus the polyline-loop "closed" flag the C++ side
+        # now also emits. Shape verified byte-for-byte (all 669 real hatches,
+        # exact handle match) against an independent LibreDWG+ezdxf DXF
+        # re-parse -- see build_log.md. pattern_angle is radians here (every
+        # ObjectARX angle accessor this codebase surfaces is), 45 degrees.
+        ent = self._one_entity_ir({
+            "handle": "1220F", "dxf_name": "AcDbHatch", "layer": "0",
+            "owner_handle": "1F", "space": "model",
+            "pattern_name": "DASH", "pattern_type": 2, "pattern_angle": 0.7853981633974483,
+            "pattern_scale": 350.0, "pattern_double": False, "hatch_style": 0,
+            "is_solid_fill": False, "is_associative": False, "is_gradient": False,
+            "elevation": 0.0, "normal": [0.0, 0.0, 1.0],
+            "loops": [{
+                "index": 0, "loop_type": 2, "closed": True, "status": "ok",
+                "vertices": [
+                    {"point": [0.0, 0.0, 0.0], "bulge": 0.0},
+                    {"point": [10.0, 0.0, 0.0], "bulge": 0.0},
+                    {"point": [10.0, 10.0, 0.0], "bulge": 0.0},
+                    {"point": [0.0, 10.0, 0.0], "bulge": 0.0},
+                    {"point": [0.0, 0.0, 0.0], "bulge": 0.0},
+                ],
+            }],
+        })
+        self.assertEqual(ent["dxf_name"], "HATCH")
+        self.assertEqual(ent["geometry"]["kind"], "hatch")
+        self.assertEqual(ent["geometry"]["pattern_name"], "DASH")
+        self.assertEqual(ent["geometry"]["pattern_type"], 2)
+        self.assertAlmostEqual(ent["geometry"]["pattern_angle"], 0.7853981633974483)
+        self.assertEqual(ent["geometry"]["pattern_scale"], 350.0)
+        self.assertEqual(ent["geometry"]["pattern_double"], False)
+        self.assertEqual(ent["geometry"]["hatch_style"], 0)
+        self.assertEqual(ent["geometry"]["is_solid_fill"], False)
+        self.assertEqual(ent["geometry"]["is_associative"], False)
+        self.assertEqual(ent["geometry"]["is_gradient"], False)
+        self.assertEqual(ent["geometry"]["elevation"], 0.0)
+        self.assertEqual(ent["geometry"]["normal"], [0.0, 0.0, 1.0])
+        self.assertEqual(len(ent["geometry"]["loops"]), 1)
+        loop = ent["geometry"]["loops"][0]
+        self.assertEqual(loop["closed"], True)
+        self.assertEqual(len(loop["vertices"]), 5)
+
+    def test_hatch_lifts_solid_fill_gradient_and_edge_type_loop(self):
+        # a1-hatchread: a solid-fill, gradient, associative hatch whose ONE
+        # loop is a non-polyline (edge-type) boundary -- the exact gap this
+        # wave closed in collectModelSpaceGraph/hatchLoopsJson (previously the
+        # polyline-only getLoopAt overload silently dropped 100% of any
+        # loop like this). "loops" is a raw passthrough in ir_builder.py (see
+        # _geometry_from_native_entity), so this test locks in the edge-loop
+        # JSON *shape* contract even though no real hatch in the only fixture
+        # available in this environment happens to use one (all 669 real
+        # loops are kPolyline -- see build_log.md); it is the Python half of
+        # a contract whose C++ half is verified by a clean compile against
+        # the real ObjectARX 2027 SDK headers, not by live entity data.
+        ent = self._one_entity_ir({
+            "handle": "1FED", "dxf_name": "AcDbHatch", "layer": "0",
+            "owner_handle": "1F", "space": "model",
+            "pattern_name": "SOLID", "pattern_type": 1, "pattern_angle": 0.0,
+            "pattern_scale": 1.0, "pattern_double": False, "hatch_style": 1,
+            "is_solid_fill": True, "is_associative": True, "is_gradient": True,
+            "gradient_name": "LINEAR", "gradient_type": 0, "gradient_angle": 1.5707963267948966,
+            "elevation": 0.0, "normal": [0.0, 0.0, 1.0],
+            "loops": [{
+                "index": 0, "loop_type": 1, "closed": True, "status": "ok",
+                "edges": [
+                    {"type": "line", "start": [0.0, 0.0], "end": [10.0, 0.0]},
+                    {"type": "circ_arc", "center": [10.0, 5.0], "radius": 5.0,
+                     "start_angle": -1.5707963267948966, "end_angle": 1.5707963267948966,
+                     "counterclockwise": True},
+                    {"type": "ellipse_arc", "center": [5.0, 10.0], "major_axis": [5.0, 0.0],
+                     "major_radius": 5.0, "minor_radius": 2.5,
+                     "start_angle": 0.0, "end_angle": 3.141592653589793, "counterclockwise": True},
+                    {"type": "spline", "degree": 3, "rational": False, "periodic": False,
+                     "control_points": [[0.0, 10.0], [-2.0, 5.0], [0.0, 0.0]],
+                     "knots": [0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0, 1.0]},
+                ],
+            }],
+        })
+        self.assertEqual(ent["geometry"]["is_solid_fill"], True)
+        self.assertEqual(ent["geometry"]["is_associative"], True)
+        self.assertEqual(ent["geometry"]["is_gradient"], True)
+        self.assertEqual(ent["geometry"]["gradient_name"], "LINEAR")
+        self.assertEqual(ent["geometry"]["gradient_type"], 0)
+        self.assertAlmostEqual(ent["geometry"]["gradient_angle"], 1.5707963267948966)
+        loop = ent["geometry"]["loops"][0]
+        self.assertNotIn("vertices", loop)
+        edges = loop["edges"]
+        self.assertEqual([e["type"] for e in edges], ["line", "circ_arc", "ellipse_arc", "spline"])
+        self.assertEqual(edges[0]["start"], [0.0, 0.0])
+        self.assertEqual(edges[1]["radius"], 5.0)
+        self.assertEqual(edges[2]["minor_radius"], 2.5)
+        self.assertEqual(edges[3]["degree"], 3)
+        self.assertEqual(len(edges[3]["control_points"]), 3)
+
+
 if __name__ == "__main__":
     unittest.main()

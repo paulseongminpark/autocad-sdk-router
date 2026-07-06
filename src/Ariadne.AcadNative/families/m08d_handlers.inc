@@ -129,19 +129,19 @@ static bool m08dFindNamedPoint(const std::string& job, const char* key,
 
 static std::string m08dPointJson(const AcGePoint3d& p)
 {
-    std::ostringstream o;
+    std::ostringstream o; o.precision(kJsonDoublePrecision);
     o << "[" << p.x << "," << p.y << "," << p.z << "]";
     return o.str();
 }
 static std::string m08dVectorJson(const AcGeVector3d& v)
 {
-    std::ostringstream o;
+    std::ostringstream o; o.precision(kJsonDoublePrecision);
     o << "[" << v.x << "," << v.y << "," << v.z << "]";
     return o.str();
 }
 static std::string m08dMatrixJson(const AcGeMatrix3d& m)
 {
-    std::ostringstream o;
+    std::ostringstream o; o.precision(kJsonDoublePrecision);
     o << "[";
     for (int row = 0; row < 4; ++row) {
         if (row) o << ",";
@@ -321,7 +321,7 @@ static bool m08dDispatch(const std::string& op, const AriadneJobCtx& ctx, std::o
             return true;
         }
         AriadneReadTransaction rt(pDb);
-        std::ostringstream o;
+        std::ostringstream o; o.precision(kJsonDoublePrecision);
         o << serializeEntityCommon(pEnt);
         o << ",\"lineweight\":" << static_cast<int>(pEnt->lineWeight());
         pEnt->close();
@@ -341,7 +341,7 @@ static bool m08dDispatch(const std::string& op, const AriadneJobCtx& ctx, std::o
         }
         AcDbExtents ext;
         const Acad::ErrorStatus es = pEnt->getGeomExtents(ext);
-        std::ostringstream o;
+        std::ostringstream o; o.precision(kJsonDoublePrecision);
         o << serializeEntityCommon(pEnt);
         if (es == Acad::eOk) {
             o << ",\"min\":" << m08dPointJson(ext.minPoint())
@@ -374,7 +374,7 @@ static bool m08dDispatch(const std::string& op, const AriadneJobCtx& ctx, std::o
         AcGeMatrix3d viewXform;   // identity
         const Acad::ErrorStatus es = pEnt->getOsnapPoints(
             AcDb::kOsModeEnd, 0, origin, origin, viewXform, snapPts, geomIds);
-        std::ostringstream o;
+        std::ostringstream o; o.precision(kJsonDoublePrecision);
         o << "\"snap_mode\":\"end\",\"point_count\":" << snapPts.length()
           << ",\"points\":[";
         for (int i = 0; i < snapPts.length(); ++i) {
@@ -398,7 +398,7 @@ static bool m08dDispatch(const std::string& op, const AriadneJobCtx& ctx, std::o
             return true;
         }
         AcDbCurve* pCurve = AcDbCurve::cast(pEnt);
-        std::ostringstream o;
+        std::ostringstream o; o.precision(kJsonDoublePrecision);
         o << "\"is_curve\":" << (pCurve != nullptr ? "true" : "false");
         if (pCurve != nullptr) {
             AcGePoint3d sp, ep;
@@ -801,7 +801,7 @@ static bool m08dDispatch(const std::string& op, const AriadneJobCtx& ctx, std::o
         if (op == "inspect.subentity.geom_extents") {
             AcDbExtents ext;
             const Acad::ErrorStatus es = pEnt->getSubentPathGeomExtents(path, ext);
-            std::ostringstream o;
+            std::ostringstream o; o.precision(kJsonDoublePrecision);
             o << "\"subent_type\":\"" << subTypeStr << "\",\"marker\":" << static_cast<long>(marker)
               << ",\"extents_status\":" << static_cast<int>(es);
             if (es == Acad::eOk)
@@ -815,7 +815,7 @@ static bool m08dDispatch(const std::string& op, const AriadneJobCtx& ctx, std::o
         if (op == "inspect.subentity.class_id") {
             CLSID clsid;
             const Acad::ErrorStatus es = pEnt->getSubentClassId(path, &clsid);
-            std::ostringstream o;
+            std::ostringstream o; o.precision(kJsonDoublePrecision);
             o << "\"subent_type\":\"" << subTypeStr << "\",\"marker\":" << static_cast<long>(marker)
               << ",\"class_id_status\":" << static_cast<int>(es)
               << ",\"resolved\":" << (es == Acad::eOk ? "true" : "false");
@@ -827,7 +827,7 @@ static bool m08dDispatch(const std::string& op, const AriadneJobCtx& ctx, std::o
         if (op == "inspect.subentity.markers_at_path") {
             AcArray<Adesk::GsMarker> markers;
             const Acad::ErrorStatus es = pEnt->getGsMarkersAtSubentPath(path, markers);
-            std::ostringstream o;
+            std::ostringstream o; o.precision(kJsonDoublePrecision);
             o << "\"subent_type\":\"" << subTypeStr << "\",\"marker\":" << static_cast<long>(marker)
               << ",\"markers_status\":" << static_cast<int>(es)
               << ",\"marker_count\":" << markers.length()
@@ -893,7 +893,7 @@ static bool m08dDispatch(const std::string& op, const AriadneJobCtx& ctx, std::o
             return true;
         }
         AcDbEntity* pSub = pEnt->subentPtr(path);
-        std::ostringstream o;
+        std::ostringstream o; o.precision(kJsonDoublePrecision);
         o << "\"subent_type\":\"" << subTypeStr << "\",\"marker\":" << static_cast<long>(marker)
           << ",\"materialized\":" << (pSub != nullptr ? "true" : "false");
         if (pSub != nullptr) {
@@ -933,7 +933,7 @@ static bool m08dDispatch(const std::string& op, const AriadneJobCtx& ctx, std::o
             std::string className;
             const AcBr::ErrorStatus bes = m08dBindBrep(pDb, handle, brep, className);
             if (bes != AcBr::eOk) {
-                std::ostringstream m;
+                std::ostringstream m; m.precision(kJsonDoublePrecision);
                 m << "AcBrBrep::set failed (AcBr status " << static_cast<int>(bes)
                   << ", class " << className << ")";
                 emitNativeError(r, "BREP_BIND_FAILED", m.str());
@@ -969,7 +969,7 @@ static bool m08dDispatch(const std::string& op, const AriadneJobCtx& ctx, std::o
             if (op == "inspect.brep.bounds") {
                 AcGeBoundBlock3d block;
                 const AcBr::ErrorStatus es = brep.getBoundBlock(block);
-                std::ostringstream o;
+                std::ostringstream o; o.precision(kJsonDoublePrecision);
                 o << "\"bounds_status\":" << static_cast<int>(es);
                 if (es == AcBr::eOk) {
                     AcGePoint3d lo, hi;
@@ -991,7 +991,7 @@ static bool m08dDispatch(const std::string& op, const AriadneJobCtx& ctx, std::o
             if (op == "inspect.brep.solid_roundtrip") {
                 AcDb3dSolid* pSolid = nullptr;
                 const AcBr::ErrorStatus es = brep.get(pSolid);
-                std::ostringstream o;
+                std::ostringstream o; o.precision(kJsonDoublePrecision);
                 o << "\"roundtrip_status\":" << static_cast<int>(es)
                   << ",\"got_solid\":" << (es == AcBr::eOk && pSolid != nullptr ? "true" : "false");
                 if (pSolid != nullptr) {
@@ -1014,16 +1014,28 @@ static bool m08dDispatch(const std::string& op, const AriadneJobCtx& ctx, std::o
                 return true;
             }
             if (op == "compute.brep.volume") {
+                // wS-solids/G3 fix: AcBr::getVolume() writes denormalized
+                // float noise (e.g. 2.62e-312) into 'vol' even on failure,
+                // despite the 0.0 initializer here -- observed live for
+                // surface/nurbsurface/region (status_code==2, "not
+                // applicable" for non-solid brep kinds). massprops' sibling
+                // branch below already gates its fields behind es==eOk; do
+                // the same here so a B6-gate consumer can never be fooled by
+                // a garbage non-zero value on a failed read (WaveS0 finding G3).
                 double vol = 0.0;
                 const AcBr::ErrorStatus es = brep.getVolume(vol);
-                r << "\"result\":{\"volume\":" << vol << ",\"status_code\":" << static_cast<int>(es)
+                r << "\"result\":{\"volume\":" << (es == AcBr::eOk ? vol : 0.0)
+                  << ",\"status_code\":" << static_cast<int>(es)
                   << "},\"status\":\"ok\"}";
                 return true;
             }
             if (op == "compute.brep.surface_area") {
+                // wS-solids/G3 fix: same getSurfaceArea() garbage-on-failure
+                // leak as compute.brep.volume above -- identical gate.
                 double area = 0.0;
                 const AcBr::ErrorStatus es = brep.getSurfaceArea(area);
-                r << "\"result\":{\"surface_area\":" << area << ",\"status_code\":" << static_cast<int>(es)
+                r << "\"result\":{\"surface_area\":" << (es == AcBr::eOk ? area : 0.0)
+                  << ",\"status_code\":" << static_cast<int>(es)
                   << "},\"status\":\"ok\"}";
                 return true;
             }
@@ -1037,7 +1049,7 @@ static bool m08dDispatch(const std::string& op, const AriadneJobCtx& ctx, std::o
             if (op == "compute.brep.massprops") {
                 AcBrMassProps mp;
                 const AcBr::ErrorStatus es = brep.getMassProps(mp);
-                std::ostringstream o;
+                std::ostringstream o; o.precision(kJsonDoublePrecision);
                 o << "\"massprops_status\":" << static_cast<int>(es);
                 if (es == AcBr::eOk) {
                     o << ",\"volume\":" << mp.mVolume << ",\"mass\":" << mp.mMass
@@ -1327,7 +1339,7 @@ static bool m08dDispatch(const std::string& op, const AriadneJobCtx& ctx, std::o
                 } else if (op == "inspect.face.surface") {
                     AcGeSurface* pSurf = nullptr;
                     const AcBr::ErrorStatus es = face.getSurface(pSurf);
-                    std::ostringstream o;
+                    std::ostringstream o; o.precision(kJsonDoublePrecision);
                     o << "\"index\":0,\"surface_status\":" << static_cast<int>(es)
                       << ",\"got_surface\":" << (es == AcBr::eOk && pSurf != nullptr ? "true" : "false");
                     if (pSurf != nullptr) {
@@ -1365,7 +1377,7 @@ static bool m08dDispatch(const std::string& op, const AriadneJobCtx& ctx, std::o
                 if (op == "inspect.edge.curve") {
                     AcGeCurve3d* pCurve = nullptr;
                     const AcBr::ErrorStatus es = edge.getCurve(pCurve);
-                    std::ostringstream o;
+                    std::ostringstream o; o.precision(kJsonDoublePrecision);
                     o << "\"index\":0,\"curve_status\":" << static_cast<int>(es)
                       << ",\"got_curve\":" << (es == AcBr::eOk && pCurve != nullptr ? "true" : "false");
                     if (pCurve != nullptr) {
@@ -1394,7 +1406,7 @@ static bool m08dDispatch(const std::string& op, const AriadneJobCtx& ctx, std::o
                     AcBrVertex v1, v2;
                     const AcBr::ErrorStatus es1 = edge.getVertex1(v1);
                     const AcBr::ErrorStatus es2 = edge.getVertex2(v2);
-                    std::ostringstream o;
+                    std::ostringstream o; o.precision(kJsonDoublePrecision);
                     o << "\"index\":0,\"vertex1_status\":" << static_cast<int>(es1)
                       << ",\"vertex2_status\":" << static_cast<int>(es2);
                     AcGePoint3d p1, p2;
@@ -1414,7 +1426,7 @@ static bool m08dDispatch(const std::string& op, const AriadneJobCtx& ctx, std::o
                 if (!got) { emitNativeError(r, "NO_SUBELEMENT", "brep has no vertex to inspect"); return true; }
                 AcGePoint3d p;
                 const AcBr::ErrorStatus es = vertex.getPoint(p);
-                std::ostringstream o;
+                std::ostringstream o; o.precision(kJsonDoublePrecision);
                 o << "\"index\":0,\"point_status\":" << static_cast<int>(es);
                 if (es == AcBr::eOk) o << ",\"point\":" << m08dPointJson(p);
                 r << "\"result\":{" << o.str() << "},\"status\":\"ok\"}";

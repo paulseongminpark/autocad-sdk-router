@@ -1,0 +1,32 @@
+{
+  "schema": "ariadne.cad_os.f0_catalog_completeness_summary.v1",
+  "packet": "CADOS_WAVE0_F0",
+  "generated_from": {
+    "catalog": "config/operations.v2.json",
+    "native_catalog": "config/autocad_native_arx_operation_catalog.json"
+  },
+  "corpus_files_scanned": [
+    "D:\\dev\\.build\\cados_plan\\measure\\m4_inspect\\dwg_graph_ir.json"
+  ],
+  "corpus_files_skipped": [],
+  "observed_class_count": 6,
+  "catalogued_class_count": 6,
+  "uncatalogued_class_count": 0,
+  "denominator": {
+    "total_catalogued_ops": 517,
+    "hard_blocked": 60,
+    "write_original_charter_forbidden": 4,
+    "com_activex_session_bound_estimate": 6,
+    "catalog_parity_targets": 447,
+    "formula": "total - hard_blocked - write_original_charter_forbidden - com_activex_session_bound_estimate",
+    "source": "PLAN.md PART 2 section 2.6: 517 - 60 blocked - 4 write_original - ~7 com_activex ~= 446 catalogued parity targets. Recomputed live from config/operations.v2.json every run; never hardcoded (PLAN.md: counts jitter +/-1 as the registry evolves).",
+    "uncatalogued_class_count_U": 0,
+    "catalog_parity_denominator_annotated": "447 catalogued parity targets + U(0) uncatalogued classes requiring disposition"
+  },
+  "gate": {
+    "every_observed_class_has_disposition": true,
+    "no_class_silently_omitted": true
+  },
+  "missing_disposition": [],
+  "classes_needing_review": []
+}

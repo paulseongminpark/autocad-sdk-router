@@ -1,4 +1,4 @@
-﻿{
+{
   "schema": "ariadne.operations_registry.v2",
   "version": "2.0.0",
   "generated_at": "2026-06-23T20:36:32+09:00",
@@ -54,10 +54,10 @@
     }
   },
   "totals": {
-    "operations": 517,
+    "operations": 525,
     "by_status": {
       "blocked": 60,
-      "implemented": 457
+      "implemented": 465
     },
     "by_family": {
       "active_document_write_original": 8,
@@ -69,7 +69,7 @@
       "custom_objects_protocols": 63,
       "diff": 1,
       "editor_input": 27,
-      "entities": 56,
+      "entities": 58,
       "extend": 2,
       "geometry_kernel": 25,
       "graphics_system": 9,
@@ -82,7 +82,7 @@
       "reactors_events": 22,
       "render": 1,
       "runtime_commands": 26,
-      "symbol_tables_dictionaries": 16,
+      "symbol_tables_dictionaries": 22,
       "ui_customization": 39,
       "validate": 2,
       "write": 4
@@ -90,13 +90,13 @@
     "by_engine_tier": {
       "accoreconsole_lisp_also": 20,
       "managed_also": 46,
-      "native_arx_only": 233,
-      "objectdbx_capable": 218
+      "native_arx_only": 232,
+      "objectdbx_capable": 227
     },
-    "total": 517
+    "total": 525
   },
   "coverage": {
-    "wired_ops": 33,
+    "wired_ops": 29,
     "wired_native": 28,
     "wired_managed": 1,
     "exact_mapped": 6,
@@ -127,8 +127,8 @@
       "symbol_tables_dictionaries": 16,
       "ui_customization": 39
     },
-    "operation_records": 517,
-    "implemented": 457,
+    "operation_records": 525,
+    "implemented": 465,
     "wired": 0,
     "stub": 0,
     "catalogued": 0,
@@ -4051,18 +4051,18 @@
       },
       "policy": {
         "source": "config/policy.v2.json",
-        "status_policy": "catalogued_not_runnable",
+        "status_policy": "implemented",
         "default_write_mode": "write_copy",
         "allowed_write_modes": [
           "write_copy"
         ],
-        "no_original_write_default": true,
-        "runtime_behavior": "not_runnable_until_promoted_to_implemented_or_wired"
+        "no_original_write_default": true
       },
       "tests": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
-        "tests/unit/test_m08e_handlers.py"
+        "tests/unit/test_m08e_handlers.py",
+        "tests/unit/test_patch_ops_split.py"
       ],
       "summary": "Add an entity to the db + this BTR (e.g. model space); returns its",
       "source_slice": "acdb-core.md",
@@ -4072,9 +4072,10 @@
         "src/Ariadne.AcadNative/families/m08e_handlers.inc:m08eDispatch",
         "reports/merge/MERGE-M08-READ.json",
         "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
-        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)"
+        "tools/patch_ops/blocks.py:append_block_entity",
+        "D:/dev/.build/cados_plan/runs/waveP/blockapp/build_log.md"
       ],
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "p2-blockapp wave: graduated from an always-rollback M08E probe (hardcoded model-space line, ignored every arg) to a REAL, persisting primitive -- resolves a NAMED block-table record by 'block_name' and appends one of {line,circle,arc,text} into it, via patch_ops.blocks.append_block_entity. Never touches the ORIGINAL DWG (write_copy policy, same as every other write op). Prior 'catalogued_not_runnable'/'has no CAD OS router handler yet' text was already stale before this wave -- the C++ dispatch branch existed all along, just as a fake-success probe (see m08e_handlers.inc's header comment).",
       "owner_ticket": "M08E-T01",
       "implementation_strategy": "implemented_v1",
       "evidence_required": "existing_tests_and_evidence_refs"
@@ -23009,6 +23010,77 @@
       "evidence_required": "existing_tests_and_evidence_refs"
     },
     {
+      "id": "modify.entity.xdata",
+      "operation": "modify.entity.xdata",
+      "family": "entities",
+      "status": "implemented",
+      "engine_tier": "objectdbx_capable",
+      "engines": [
+        "objectdbx_capable"
+      ],
+      "host_eligibility": [
+        "dbx",
+        "coreconsole",
+        "arx_adapter",
+        "full_autocad"
+      ],
+      "hosts": [
+        "dbx",
+        "coreconsole",
+        "arx_adapter",
+        "full_autocad"
+      ],
+      "execution_context": "host",
+      "write_level": {
+        "default_write_mode": "write_copy",
+        "allowed_write_modes": [
+          "write_copy"
+        ],
+        "dwg_persisted": true,
+        "original_write_default": false
+      },
+      "handler": {
+        "router_lane": "ARIADNE_NATIVE_JOB",
+        "dispatcher_symbol": "m08gDispatch",
+        "execution_host_class": "dbx",
+        "native_api": "AcDbEntity::setXData(resbuf*) on a resolved 'handle', with AcDbRegAppTable upsert (ensureRegApp)",
+        "composed_of": []
+      },
+      "mapping_type": "exact",
+      "catalog_op_id": null,
+      "input_schema": "schemas/cad_job.v2.schema.json#/allOf",
+      "output_schema": "schemas/cad_result.v2.schema.json",
+      "schema_refs": {
+        "input": "schemas/cad_job.v2.schema.json#/allOf",
+        "output": "schemas/cad_result.v2.schema.json"
+      },
+      "policy": {
+        "source": "config/policy.v2.json",
+        "status_policy": "implemented_v1",
+        "default_write_mode": "write_copy",
+        "allowed_write_modes": [
+          "write_copy"
+        ],
+        "no_original_write_default": true,
+        "runtime_behavior": "wired_and_live_certified"
+      },
+      "tests": [
+        "tests/unit/test_m08g_handlers.py",
+        "tests/unit/test_patch_ops_split.py"
+      ],
+      "summary": "Set entity-handle-targeted extended data (xdata): a full multi-item, per-regapp resbuf block on an arbitrary resolved entity -- distinct from the DATABASE-level write.xdata.set (Ariadne's own NOD dictionary, single app+value string, no handle).",
+      "source_slice": "entities-geometry-graphics.md",
+      "citation": "hdr dbmain.h AcDbObject::setXData/xData; dbsymtb.h AcDbRegAppTable",
+      "evidence_refs": [
+        "src/Ariadne.AcadNative/families/m08g_handlers.inc:m08gDispatch",
+        "tools/patch_ops/entities.py:set_entity_xdata_by_handle"
+      ],
+      "notes": "P10: a genuinely NEW capability layered on the M08G entity family, not part of the original ObjectARX 457-op catalog scan (catalog_op_id is null -- no pre-existing catalog entry to alias or exact-map to). Distinct code path from write.xdata.set/inspect.xdata.get and the set_entity_xdata patch op (both DATABASE-scoped, untouched by this ticket).",
+      "owner_ticket": "M08G-T03",
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs"
+    },
+    {
       "id": "modify.entity.copy_transformed",
       "operation": "modify.entity.copy_transformed",
       "family": "entities",
@@ -23205,13 +23277,12 @@
       },
       "policy": {
         "source": "config/policy.v2.json",
-        "status_policy": "catalogued_not_runnable",
+        "status_policy": "implemented",
         "default_write_mode": "write_copy",
         "allowed_write_modes": [
           "write_copy"
         ],
-        "no_original_write_default": true,
-        "runtime_behavior": "not_runnable_until_promoted_to_implemented_or_wired"
+        "no_original_write_default": true
       },
       "tests": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
@@ -23226,7 +23297,8 @@
         "src/Ariadne.AcadNative/families/m08g_handlers.inc:m08gDispatch",
         "reports/merge/MERGE-M08-READ.json",
         "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
-        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)"
+        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)",
+        "measure/reachable_matrix.jsonl#write.entity.arc"
       ],
       "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
       "owner_ticket": "M08G-T02",
@@ -23505,13 +23577,9 @@
       },
       "policy": {
         "source": "config/policy.v2.json",
-        "status_policy": "catalogued_not_runnable",
+        "status_policy": "implemented",
         "default_write_mode": "write_copy",
-        "allowed_write_modes": [
-          "write_copy"
-        ],
-        "no_original_write_default": true,
-        "runtime_behavior": "not_runnable_until_promoted_to_implemented_or_wired"
+        "no_original_write_default": true
       },
       "tests": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
@@ -23528,7 +23596,7 @@
         "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
         "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)"
       ],
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "Create an empty AcDbBody (ASM/ACIS wrapper). WaveS0/wS-solids live-probed (accoreconsole): handler builds a content-less AcDbBody (no setter called) -- AcBr cannot bind it (BREP_BIND_FAILED). CREATED_DEGENERATE by construction; not certifiable non-degenerate until a content-setting C++ path exists (owner_ticket note below).",
       "owner_ticket": "M08G-T02",
       "implementation_strategy": "implemented_v1",
       "evidence_required": "existing_tests_and_evidence_refs"
@@ -24180,13 +24248,12 @@
       },
       "policy": {
         "source": "config/policy.v2.json",
-        "status_policy": "catalogued_not_runnable",
+        "status_policy": "implemented",
         "default_write_mode": "write_copy",
         "allowed_write_modes": [
           "write_copy"
         ],
-        "no_original_write_default": true,
-        "runtime_behavior": "not_runnable_until_promoted_to_implemented_or_wired"
+        "no_original_write_default": true
       },
       "tests": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
@@ -24201,7 +24268,8 @@
         "src/Ariadne.AcadNative/families/m08h_handlers.inc:m08hDispatch",
         "reports/merge/MERGE-M08-READ.json",
         "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
-        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)"
+        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)",
+        "measure/reachable_matrix.jsonl#write.entity.dim.rotated"
       ],
       "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
       "owner_ticket": "M08H-T01",
@@ -24255,13 +24323,12 @@
       },
       "policy": {
         "source": "config/policy.v2.json",
-        "status_policy": "catalogued_not_runnable",
+        "status_policy": "implemented",
         "default_write_mode": "write_copy",
         "allowed_write_modes": [
           "write_copy"
         ],
-        "no_original_write_default": true,
-        "runtime_behavior": "not_runnable_until_promoted_to_implemented_or_wired"
+        "no_original_write_default": true
       },
       "tests": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
@@ -24276,7 +24343,8 @@
         "src/Ariadne.AcadNative/families/m08g_handlers.inc:m08gDispatch",
         "reports/merge/MERGE-M08-READ.json",
         "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
-        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)"
+        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)",
+        "measure/reachable_matrix.jsonl#write.entity.ellipse"
       ],
       "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
       "owner_ticket": "M08G-T02",
@@ -24780,13 +24848,12 @@
       },
       "policy": {
         "source": "config/policy.v2.json",
-        "status_policy": "catalogued_not_runnable",
+        "status_policy": "implemented",
         "default_write_mode": "write_copy",
         "allowed_write_modes": [
           "write_copy"
         ],
-        "no_original_write_default": true,
-        "runtime_behavior": "not_runnable_until_promoted_to_implemented_or_wired"
+        "no_original_write_default": true
       },
       "tests": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
@@ -24801,7 +24868,8 @@
         "src/Ariadne.AcadNative/families/m08g_handlers.inc:m08gDispatch",
         "reports/merge/MERGE-M08-READ.json",
         "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
-        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)"
+        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)",
+        "measure/reachable_matrix.jsonl#write.entity.mpolygon"
       ],
       "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
       "owner_ticket": "M08G-T02",
@@ -24855,13 +24923,12 @@
       },
       "policy": {
         "source": "config/policy.v2.json",
-        "status_policy": "catalogued_not_runnable",
+        "status_policy": "implemented",
         "default_write_mode": "write_copy",
         "allowed_write_modes": [
           "write_copy"
         ],
-        "no_original_write_default": true,
-        "runtime_behavior": "not_runnable_until_promoted_to_implemented_or_wired"
+        "no_original_write_default": true
       },
       "tests": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
@@ -24876,7 +24943,8 @@
         "src/Ariadne.AcadNative/families/m08h_handlers.inc:m08hDispatch",
         "reports/merge/MERGE-M08-READ.json",
         "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
-        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)"
+        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)",
+        "measure/reachable_matrix.jsonl#write.entity.mtext"
       ],
       "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
       "owner_ticket": "M08H-T01",
@@ -24930,13 +24998,9 @@
       },
       "policy": {
         "source": "config/policy.v2.json",
-        "status_policy": "catalogued_not_runnable",
+        "status_policy": "implemented",
         "default_write_mode": "write_copy",
-        "allowed_write_modes": [
-          "write_copy"
-        ],
-        "no_original_write_default": true,
-        "runtime_behavior": "not_runnable_until_promoted_to_implemented_or_wired"
+        "no_original_write_default": true
       },
       "tests": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
@@ -24953,7 +25017,7 @@
         "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
         "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)"
       ],
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "Create a NURBS surface (AcDbNurbSurface::set). WaveS0/wS-solids live-verified headless (accoreconsole) with real caller-controlled control-point/degree args -- bounds/area match the requested patch exactly.",
       "owner_ticket": "M08G-T02",
       "implementation_strategy": "implemented_v1",
       "evidence_required": "existing_tests_and_evidence_refs"
@@ -25179,6 +25243,80 @@
         "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)"
       ],
       "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "owner_ticket": "M08G-T02",
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs"
+    },
+    {
+      "id": "write.entity.polyline2d.deep",
+      "operation": "write.entity.polyline2d.deep",
+      "family": "entities",
+      "status": "implemented",
+      "engine_tier": "objectdbx_capable",
+      "engines": [
+        "objectdbx_capable"
+      ],
+      "host_eligibility": [
+        "dbx",
+        "coreconsole",
+        "arx_adapter",
+        "full_autocad"
+      ],
+      "hosts": [
+        "dbx",
+        "coreconsole",
+        "arx_adapter",
+        "full_autocad"
+      ],
+      "execution_context": "host",
+      "write_level": {
+        "default_write_mode": "write_copy",
+        "allowed_write_modes": [
+          "write_copy"
+        ],
+        "dwg_persisted": true,
+        "original_write_default": false
+      },
+      "handler": {
+        "router_lane": "ARIADNE_NATIVE_JOB",
+        "dispatcher_symbol": "m08gDispatch",
+        "execution_host_class": "dbx",
+        "native_api": "AcDb2dPolyline + AcDb2dVertex append (true legacy 2D polyline; distinct from write.entity.polyline2d, which aliases to AcDbPolyline/LWPOLYLINE)",
+        "composed_of": []
+      },
+      "mapping_type": "synthetic",
+      "catalog_op_id": null,
+      "input_schema": "schemas/cad_job.v2.schema.json#/allOf",
+      "output_schema": "schemas/cad_result.v2.schema.json",
+      "schema_refs": {
+        "input": "schemas/cad_job.v2.schema.json#/allOf",
+        "output": "schemas/cad_result.v2.schema.json"
+      },
+      "policy": {
+        "source": "config/policy.v2.json",
+        "status_policy": "implemented",
+        "default_write_mode": "write_copy",
+        "allowed_write_modes": [
+          "write_copy"
+        ],
+        "no_original_write_default": true
+      },
+      "tests": [
+        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
+        "tests/unit/test_m08g_handlers.py",
+        "tests/unit/test_patch_ops_split.py",
+        "tests/unit/test_op_roundtrip_probe.py"
+      ],
+      "summary": "Create true legacy 2D polyline (AcDb2dPolyline) with per-vertex bulge/start_width/end_width, elevation, closed, default widths",
+      "source_slice": "entities-geometry-graphics.md",
+      "citation": "hdr dbents.h AcDb2dPolyline::appendVertex / AcDb2dVertex ctor / setElevation / setClosed / setDefaultStartWidth / setDefaultEndWidth",
+      "evidence_refs": [
+        "src/Ariadne.AcadNative/families/m08g_handlers.inc:m08gDispatch",
+        "src/Ariadne.AcadNative/AriadneNativeJob.cpp:collectModelSpaceGraph (AcDb2dPolyline branch, extended)",
+        "build:native_acad exit 0 (.crx/.arx, VS2027 MSBuild x64)",
+        "runtime_native_job_smoke:p4-poly2d live re-cert (tests/fixtures/native_sample.dwg staged copy, geometry-diff=0)"
+      ],
+      "notes": "p4-poly2d: NEW synthetic (router-only, not in the raw 480-op ObjectARX catalog) op id, kept distinct from write.entity.polyline2d so the pre-existing LWPOLYLINE alias is not disturbed. Scope is k2dSimplePoly only; curve-fit/spline-fit poly types (k2dFitCurvePoly/k2dQuadSplinePoly/k2dCubicSplinePoly) are deliberately uncertified -- AutoCAD synthesizes extra fit/spline vertices for those that are not args-derivable from this op's own args alone.",
       "owner_ticket": "M08G-T02",
       "implementation_strategy": "implemented_v1",
       "evidence_required": "existing_tests_and_evidence_refs"
@@ -25455,13 +25593,9 @@
       },
       "policy": {
         "source": "config/policy.v2.json",
-        "status_policy": "catalogued_not_runnable",
+        "status_policy": "implemented",
         "default_write_mode": "write_copy",
-        "allowed_write_modes": [
-          "write_copy"
-        ],
-        "no_original_write_default": true,
-        "runtime_behavior": "not_runnable_until_promoted_to_implemented_or_wired"
+        "no_original_write_default": true
       },
       "tests": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
@@ -25478,7 +25612,7 @@
         "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
         "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)"
       ],
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "Create region(s) from existing closed coplanar curves (AcDbRegion::createFromCurves). WaveS0/wS-solids live-verified headless (accoreconsole): area/bounds match the source curve exactly; requested layer is honored.",
       "owner_ticket": "M08G-T02",
       "implementation_strategy": "implemented_v1",
       "evidence_required": "existing_tests_and_evidence_refs"
@@ -25680,13 +25814,9 @@
       },
       "policy": {
         "source": "config/policy.v2.json",
-        "status_policy": "catalogued_not_runnable",
+        "status_policy": "implemented",
         "default_write_mode": "write_copy",
-        "allowed_write_modes": [
-          "write_copy"
-        ],
-        "no_original_write_default": true,
-        "runtime_behavior": "not_runnable_until_promoted_to_implemented_or_wired"
+        "no_original_write_default": true
       },
       "tests": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
@@ -25703,7 +25833,7 @@
         "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
         "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)"
       ],
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "Create a 3D solid by extruding a profile (AcDb3dSolid::createExtrudedSolid). WaveS0/wS-solids live-verified headless (accoreconsole): volume/surface_area match the box-extrusion closed form exactly.",
       "owner_ticket": "M08G-T02",
       "implementation_strategy": "implemented_v1",
       "evidence_required": "existing_tests_and_evidence_refs"
@@ -25755,13 +25885,9 @@
       },
       "policy": {
         "source": "config/policy.v2.json",
-        "status_policy": "catalogued_not_runnable",
+        "status_policy": "implemented",
         "default_write_mode": "write_copy",
-        "allowed_write_modes": [
-          "write_copy"
-        ],
-        "no_original_write_default": true,
-        "runtime_behavior": "not_runnable_until_promoted_to_implemented_or_wired"
+        "no_original_write_default": true
       },
       "tests": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
@@ -25778,7 +25904,7 @@
         "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
         "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)"
       ],
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "Create a 3D solid by lofting between section profiles (AcDb3dSolid::createLoftedSolid). WaveS0/wS-solids live-verified headless (accoreconsole): volume matches the general prismatoid formula exactly for two distinct offset closed profiles.",
       "owner_ticket": "M08G-T02",
       "implementation_strategy": "implemented_v1",
       "evidence_required": "existing_tests_and_evidence_refs"
@@ -25830,13 +25956,9 @@
       },
       "policy": {
         "source": "config/policy.v2.json",
-        "status_policy": "catalogued_not_runnable",
+        "status_policy": "implemented",
         "default_write_mode": "write_copy",
-        "allowed_write_modes": [
-          "write_copy"
-        ],
-        "no_original_write_default": true,
-        "runtime_behavior": "not_runnable_until_promoted_to_implemented_or_wired"
+        "no_original_write_default": true
       },
       "tests": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
@@ -25853,7 +25975,7 @@
         "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
         "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)"
       ],
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "Create a 3D solid primitive (box/sphere/torus/wedge/pyramid/frustum). WaveS0/wS-solids live-verified headless (accoreconsole): volume/surface_area match the closed-form solid-geometry formula for each requested primitive exactly.",
       "owner_ticket": "M08G-T02",
       "implementation_strategy": "implemented_v1",
       "evidence_required": "existing_tests_and_evidence_refs"
@@ -25905,13 +26027,9 @@
       },
       "policy": {
         "source": "config/policy.v2.json",
-        "status_policy": "catalogued_not_runnable",
+        "status_policy": "implemented",
         "default_write_mode": "write_copy",
-        "allowed_write_modes": [
-          "write_copy"
-        ],
-        "no_original_write_default": true,
-        "runtime_behavior": "not_runnable_until_promoted_to_implemented_or_wired"
+        "no_original_write_default": true
       },
       "tests": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
@@ -25928,7 +26046,7 @@
         "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
         "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)"
       ],
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "Create a 3D solid by revolving a profile about an axis (AcDb3dSolid::createRevolvedSolid). WaveS0/wS-solids live-verified headless (accoreconsole): volume matches the sector-of-cylinder closed form exactly.",
       "owner_ticket": "M08G-T02",
       "implementation_strategy": "implemented_v1",
       "evidence_required": "existing_tests_and_evidence_refs"
@@ -25980,13 +26098,9 @@
       },
       "policy": {
         "source": "config/policy.v2.json",
-        "status_policy": "catalogued_not_runnable",
+        "status_policy": "implemented",
         "default_write_mode": "write_copy",
-        "allowed_write_modes": [
-          "write_copy"
-        ],
-        "no_original_write_default": true,
-        "runtime_behavior": "not_runnable_until_promoted_to_implemented_or_wired"
+        "no_original_write_default": true
       },
       "tests": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
@@ -26003,7 +26117,7 @@
         "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
         "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)"
       ],
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "Create a 3D solid by sweeping a profile along a path (AcDb3dSolid::createSweptSolid). WaveS0/wS-solids live-verified headless (accoreconsole): volume/surface_area match the swept cross-section closed form exactly.",
       "owner_ticket": "M08G-T02",
       "implementation_strategy": "implemented_v1",
       "evidence_required": "existing_tests_and_evidence_refs"
@@ -26205,13 +26319,9 @@
       },
       "policy": {
         "source": "config/policy.v2.json",
-        "status_policy": "catalogued_not_runnable",
+        "status_policy": "implemented",
         "default_write_mode": "write_copy",
-        "allowed_write_modes": [
-          "write_copy"
-        ],
-        "no_original_write_default": true,
-        "runtime_behavior": "not_runnable_until_promoted_to_implemented_or_wired"
+        "no_original_write_default": true
       },
       "tests": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
@@ -26228,7 +26338,7 @@
         "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
         "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)"
       ],
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "Create a surface from a planar profile (AcDbSurface::createFrom). WaveS0/wS-solids live-verified headless (accoreconsole): surface_area/bounds match the source profile exactly.",
       "owner_ticket": "M08G-T02",
       "implementation_strategy": "implemented_v1",
       "evidence_required": "existing_tests_and_evidence_refs"
@@ -26355,13 +26465,12 @@
       },
       "policy": {
         "source": "config/policy.v2.json",
-        "status_policy": "catalogued_not_runnable",
+        "status_policy": "implemented",
         "default_write_mode": "write_copy",
         "allowed_write_modes": [
           "write_copy"
         ],
-        "no_original_write_default": true,
-        "runtime_behavior": "not_runnable_until_promoted_to_implemented_or_wired"
+        "no_original_write_default": true
       },
       "tests": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
@@ -26376,7 +26485,8 @@
         "src/Ariadne.AcadNative/families/m08h_handlers.inc:m08hDispatch",
         "reports/merge/MERGE-M08-READ.json",
         "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
-        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)"
+        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)",
+        "measure/reachable_matrix.jsonl#write.entity.text"
       ],
       "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
       "owner_ticket": "M08H-T01",
@@ -28166,13 +28276,12 @@
       },
       "policy": {
         "source": "config/policy.v2.json",
-        "status_policy": "catalogued_not_runnable",
+        "status_policy": "implemented",
         "default_write_mode": "write_copy",
         "allowed_write_modes": [
           "write_copy"
         ],
-        "no_original_write_default": true,
-        "runtime_behavior": "not_runnable_until_promoted_to_implemented_or_wired"
+        "no_original_write_default": true
       },
       "tests": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
@@ -28187,7 +28296,8 @@
         "src/Ariadne.AcadNative/families/m08g_handlers.inc:m08gDispatch",
         "reports/merge/MERGE-M08-READ.json",
         "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
-        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)"
+        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)",
+        "measure/reachable_matrix.jsonl#write.entity.polyline"
       ],
       "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
       "owner_ticket": "M08G-T02",
@@ -34787,7 +34897,7 @@
         "router_lane": "ARIADNE_NATIVE_JOB",
         "dispatcher_symbol": "m08eDispatch",
         "execution_host_class": "dbx",
-        "native_api": "AcDbObject::setXData(const resbuf* xdata)",
+        "native_api": "setDatabaseXdata(AcDbDatabase*, app, value) -- DATABASE-level; this op does NOT call AcDbObject::setXData on a specific entity and takes no entity handle argument",
         "composed_of": []
       },
       "mapping_type": "exact",
@@ -34800,20 +34910,19 @@
       },
       "policy": {
         "source": "config/policy.v2.json",
-        "status_policy": "catalogued_not_runnable",
+        "status_policy": "implemented",
         "default_write_mode": "write_copy",
         "allowed_write_modes": [
           "write_copy"
         ],
-        "no_original_write_default": true,
-        "runtime_behavior": "not_runnable_until_promoted_to_implemented_or_wired"
+        "no_original_write_default": true
       },
       "tests": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
         "tests/unit/test_m08e_handlers.py"
       ],
-      "summary": "Attach extended data (xdata, group codes 1000-1071) to any object; first resbuf must be",
+      "summary": "DATABASE-level xdata attach via setDatabaseXdata(app, value). Despite the patch_op name 'set_entity_xdata', this does NOT target a specific entity -- there is no entity handle argument; it writes xdata on the database object itself, not on any AcDbEntity.",
       "source_slice": "acdb-core.md",
       "citation": "ref AcDbObject__setXData@resbuf_.html",
       "evidence_refs": [
@@ -34821,7 +34930,8 @@
         "src/Ariadne.AcadNative/families/m08e_handlers.inc:m08eDispatch",
         "reports/merge/MERGE-M08-READ.json",
         "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
-        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)"
+        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)",
+        "measure/reachable_matrix.jsonl#write.entity.set_xdata"
       ],
       "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
       "owner_ticket": "M08E-T03",
@@ -37750,6 +37860,414 @@
       ],
       "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
       "owner_ticket": "M08N-T02",
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs"
+    },
+    {
+      "id": "write.dimstyle.create",
+      "family": "symbol_tables_dictionaries",
+      "status": "implemented",
+      "engine_tier": "objectdbx_capable",
+      "host_eligibility": [
+        "dbx",
+        "coreconsole",
+        "arx_adapter",
+        "full_autocad"
+      ],
+      "execution_context": "hostless_dbx_in_accoreconsole",
+      "write_level": {
+        "default_write_mode": "write_copy",
+        "allowed_write_modes": [
+          "write_copy",
+          "write_original"
+        ],
+        "dwg_persisted": true,
+        "original_write_default": false
+      },
+      "handler": {
+        "router_lane": "ARIADNE_NATIVE_JOB",
+        "dispatcher_symbol": "upsertDimStyleRecord",
+        "execution_host_class": "dbx",
+        "composed_of": [],
+        "native_api": "AcDbDimStyleTable::add(AcDbObjectId&, AcDbDimStyleTableRecord*) + AcDbDimStyleTableRecord::setDimtxt/setDimasz/setDimexe/setDimexo/setDimdec/setDimscale/setDimclrd/setDimclre/setDimclrt/setDimse1"
+      },
+      "mapping_type": "synthetic",
+      "catalog_op_id": null,
+      "input_schema": "schemas/cad_job.v2.schema.json#/allOf",
+      "output_schema": "schemas/cad_result.v2.schema.json",
+      "summary": "Create-or-update a named DIMSTYLE table record, writing a representative 10-DIMVAR subset (dimtxt/dimasz/dimexe/dimexo/dimdec/dimscale/dimclrd/dimclre/dimclrt/dimse1) of AcDbDimStyleTableRecord's ~70 dimension variables.",
+      "evidence_refs": [
+        "tools/op_roundtrip_probe.py::probe_dimstyle_roundtrip",
+        "tools/patch_ops/tables.py#write.dimstyle.create"
+      ],
+      "phase_batch": "TABLES tier D-class (w3-dimstyle)",
+      "target_family_first_class": false,
+      "wired_v1": false,
+      "operation": "write.dimstyle.create",
+      "hosts": [
+        "dbx",
+        "coreconsole",
+        "arx_adapter",
+        "full_autocad"
+      ],
+      "engines": [
+        "objectdbx_capable"
+      ],
+      "schema_refs": {
+        "input": "schemas/cad_job.v2.schema.json#/allOf",
+        "output": "schemas/cad_result.v2.schema.json"
+      },
+      "policy": {
+        "source": "config/policy.v2.json",
+        "status_policy": "implemented",
+        "default_write_mode": "write_copy",
+        "no_original_write_default": true
+      },
+      "tests": [
+        "tools/op_roundtrip_probe.py::probe_dimstyle_roundtrip"
+      ],
+      "notes": "Create-or-update a named DIMSTYLE table record, writing a representative 10-DIMVAR subset of AcDbDimStyleTableRecord's ~70 dimension variables; the rest are an unwired gap (see tools/patch_ops/tables.py's module docstring).",
+      "owner_ticket": "M08C-T03",
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs"
+    },
+    {
+      "id": "write.linetype.create",
+      "family": "symbol_tables_dictionaries",
+      "status": "implemented",
+      "engine_tier": "objectdbx_capable",
+      "host_eligibility": [
+        "dbx",
+        "coreconsole",
+        "arx_adapter",
+        "full_autocad"
+      ],
+      "execution_context": "hostless_dbx_in_accoreconsole",
+      "write_level": {
+        "default_write_mode": "write_copy",
+        "allowed_write_modes": [
+          "write_copy",
+          "write_original"
+        ],
+        "dwg_persisted": true,
+        "original_write_default": false
+      },
+      "handler": {
+        "router_lane": "ARIADNE_NATIVE_JOB",
+        "dispatcher_symbol": "upsertLinetypeRecord",
+        "execution_host_class": "dbx",
+        "composed_of": [],
+        "native_api": "AcDbLinetypeTable::add(AcDbObjectId&, AcDbLinetypeTableRecord*) + AcDbLinetypeTableRecord::setComments/setNumDashes/setDashLengthAt"
+      },
+      "mapping_type": "synthetic",
+      "catalog_op_id": null,
+      "input_schema": "schemas/cad_job.v2.schema.json#/allOf",
+      "output_schema": "schemas/cad_result.v2.schema.json",
+      "summary": "Create-or-update a named LINETYPE table record, writing name/description (comments) plus a simple dash pattern (dash_lengths: positive=dash, negative=gap, 0=dot).",
+      "evidence_refs": [
+        "tools/op_roundtrip_probe.py::probe_linetype_roundtrip",
+        "tools/patch_ops/tables.py#write.linetype.create"
+      ],
+      "phase_batch": "TABLES tier D-class (w3-ltts)",
+      "target_family_first_class": false,
+      "wired_v1": false,
+      "operation": "write.linetype.create",
+      "hosts": [
+        "dbx",
+        "coreconsole",
+        "arx_adapter",
+        "full_autocad"
+      ],
+      "engines": [
+        "objectdbx_capable"
+      ],
+      "schema_refs": {
+        "input": "schemas/cad_job.v2.schema.json#/allOf",
+        "output": "schemas/cad_result.v2.schema.json"
+      },
+      "policy": {
+        "source": "config/policy.v2.json",
+        "status_policy": "implemented",
+        "default_write_mode": "write_copy",
+        "no_original_write_default": true
+      },
+      "tests": [
+        "tools/op_roundtrip_probe.py::probe_linetype_roundtrip"
+      ],
+      "notes": "Create-or-update a named LINETYPE table record, writing name/description plus a simple dash-only pattern; complex-linetype shape/text embedding is an unwired gap (see tools/patch_ops/tables.py's module docstring).",
+      "owner_ticket": "M08C-T02",
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs"
+    },
+    {
+      "id": "write.textstyle.create",
+      "family": "symbol_tables_dictionaries",
+      "status": "implemented",
+      "engine_tier": "objectdbx_capable",
+      "host_eligibility": [
+        "dbx",
+        "coreconsole",
+        "arx_adapter",
+        "full_autocad"
+      ],
+      "execution_context": "hostless_dbx_in_accoreconsole",
+      "write_level": {
+        "default_write_mode": "write_copy",
+        "allowed_write_modes": [
+          "write_copy",
+          "write_original"
+        ],
+        "dwg_persisted": true,
+        "original_write_default": false
+      },
+      "handler": {
+        "router_lane": "ARIADNE_NATIVE_JOB",
+        "dispatcher_symbol": "upsertTextStyleRecord",
+        "execution_host_class": "dbx",
+        "composed_of": [],
+        "native_api": "AcDbTextStyleTable::add(AcDbObjectId&, AcDbTextStyleTableRecord*) + AcDbTextStyleTableRecord::setFileName/setBigFontFileName/setTextSize/setXScale/setObliquingAngle/setIsShapeFile/setIsVertical"
+      },
+      "mapping_type": "synthetic",
+      "catalog_op_id": null,
+      "input_schema": "schemas/cad_job.v2.schema.json#/allOf",
+      "output_schema": "schemas/cad_result.v2.schema.json",
+      "summary": "Create-or-update a named TEXTSTYLE table record, writing font/bigfont file references plus height/width_factor/oblique_angle and the is_shape_file/is_vertical state flags.",
+      "evidence_refs": [
+        "tools/op_roundtrip_probe.py::probe_textstyle_roundtrip",
+        "tools/patch_ops/tables.py#write.textstyle.create"
+      ],
+      "phase_batch": "TABLES tier D-class (w3-ltts)",
+      "target_family_first_class": false,
+      "wired_v1": false,
+      "operation": "write.textstyle.create",
+      "hosts": [
+        "dbx",
+        "coreconsole",
+        "arx_adapter",
+        "full_autocad"
+      ],
+      "engines": [
+        "objectdbx_capable"
+      ],
+      "schema_refs": {
+        "input": "schemas/cad_job.v2.schema.json#/allOf",
+        "output": "schemas/cad_result.v2.schema.json"
+      },
+      "policy": {
+        "source": "config/policy.v2.json",
+        "status_policy": "implemented",
+        "default_write_mode": "write_copy",
+        "no_original_write_default": true
+      },
+      "tests": [
+        "tools/op_roundtrip_probe.py::probe_textstyle_roundtrip"
+      ],
+      "notes": "Create-or-update a named TEXTSTYLE table record, writing font/bigfont file references plus height/width_factor/oblique_angle and the is_shape_file/is_vertical state flags; setFont()'s Windows-typeface path and priorSize() are an unwired gap (see tools/patch_ops/tables.py's module docstring).",
+      "owner_ticket": "M08C-T02",
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs"
+    },
+    {
+      "id": "write.ucs.create",
+      "family": "symbol_tables_dictionaries",
+      "status": "implemented",
+      "engine_tier": "objectdbx_capable",
+      "host_eligibility": [
+        "dbx",
+        "coreconsole",
+        "arx_adapter",
+        "full_autocad"
+      ],
+      "execution_context": "hostless_dbx_in_accoreconsole",
+      "write_level": {
+        "default_write_mode": "write_copy",
+        "allowed_write_modes": [
+          "write_copy",
+          "write_original"
+        ],
+        "dwg_persisted": true,
+        "original_write_default": false
+      },
+      "handler": {
+        "router_lane": "ARIADNE_NATIVE_JOB",
+        "dispatcher_symbol": "upsertUcsRecord",
+        "execution_host_class": "dbx",
+        "composed_of": [],
+        "native_api": "AcDbUCSTable::add(AcDbObjectId&, AcDbUCSTableRecord*) + AcDbUCSTableRecord::setOrigin/setXAxis/setYAxis"
+      },
+      "mapping_type": "synthetic",
+      "catalog_op_id": null,
+      "input_schema": "schemas/cad_job.v2.schema.json#/allOf",
+      "output_schema": "schemas/cad_result.v2.schema.json",
+      "summary": "Create-or-update a named UCS table record, writing AcDbUCSTableRecord's full settable surface (origin/x_axis/y_axis).",
+      "evidence_refs": [
+        "tools/op_roundtrip_probe.py::probe_ucs_roundtrip",
+        "tools/patch_ops/tables.py#write.ucs.create"
+      ],
+      "phase_batch": "TABLES tier-2 D-class (p9-tables2)",
+      "target_family_first_class": false,
+      "wired_v1": false,
+      "operation": "write.ucs.create",
+      "hosts": [
+        "dbx",
+        "coreconsole",
+        "arx_adapter",
+        "full_autocad"
+      ],
+      "engines": [
+        "objectdbx_capable"
+      ],
+      "schema_refs": {
+        "input": "schemas/cad_job.v2.schema.json#/allOf",
+        "output": "schemas/cad_result.v2.schema.json"
+      },
+      "policy": {
+        "source": "config/policy.v2.json",
+        "status_policy": "implemented",
+        "default_write_mode": "write_copy",
+        "no_original_write_default": true
+      },
+      "tests": [
+        "tools/op_roundtrip_probe.py::probe_ucs_roundtrip"
+      ],
+      "notes": "Create-or-update a named UCS table record, writing AcDbUCSTableRecord's full settable surface (origin/x_axis/y_axis) -- a small, COMPLETE class, unlike DIMSTYLE's partial DIMVAR subset.",
+      "owner_ticket": "M08C-T03",
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs"
+    },
+    {
+      "id": "write.view.create",
+      "family": "symbol_tables_dictionaries",
+      "status": "implemented",
+      "engine_tier": "objectdbx_capable",
+      "host_eligibility": [
+        "dbx",
+        "coreconsole",
+        "arx_adapter",
+        "full_autocad"
+      ],
+      "execution_context": "hostless_dbx_in_accoreconsole",
+      "write_level": {
+        "default_write_mode": "write_copy",
+        "allowed_write_modes": [
+          "write_copy",
+          "write_original"
+        ],
+        "dwg_persisted": true,
+        "original_write_default": false
+      },
+      "handler": {
+        "router_lane": "ARIADNE_NATIVE_JOB",
+        "dispatcher_symbol": "upsertViewRecord",
+        "execution_host_class": "dbx",
+        "composed_of": [],
+        "native_api": "AcDbViewTable::add(AcDbObjectId&, AcDbViewTableRecord*) + AcDbAbstractViewTableRecord::setCenterPoint/setHeight/setWidth/setTarget/setViewDirection/setViewTwist/setLensLength/setPerspectiveEnabled/setFrontClipDistance/setFrontClipEnabled/setBackClipDistance/setBackClipEnabled"
+      },
+      "mapping_type": "synthetic",
+      "catalog_op_id": null,
+      "input_schema": "schemas/cad_job.v2.schema.json#/allOf",
+      "output_schema": "schemas/cad_result.v2.schema.json",
+      "summary": "Create-or-update a named VIEW table record, writing a representative subset of AcDbAbstractViewTableRecord's camera properties (center/height/width/target/view_direction/twist/lens_length/perspective/front-back clip).",
+      "evidence_refs": [
+        "tools/op_roundtrip_probe.py::probe_view_roundtrip",
+        "tools/patch_ops/tables.py#write.view.create"
+      ],
+      "phase_batch": "TABLES tier-2 D-class (p9-tables2)",
+      "target_family_first_class": false,
+      "wired_v1": false,
+      "operation": "write.view.create",
+      "hosts": [
+        "dbx",
+        "coreconsole",
+        "arx_adapter",
+        "full_autocad"
+      ],
+      "engines": [
+        "objectdbx_capable"
+      ],
+      "schema_refs": {
+        "input": "schemas/cad_job.v2.schema.json#/allOf",
+        "output": "schemas/cad_result.v2.schema.json"
+      },
+      "policy": {
+        "source": "config/policy.v2.json",
+        "status_policy": "implemented",
+        "default_write_mode": "write_copy",
+        "no_original_write_default": true
+      },
+      "tests": [
+        "tools/op_roundtrip_probe.py::probe_view_roundtrip"
+      ],
+      "notes": "Create-or-update a named VIEW table record, writing a representative camera-property subset; isPaperspaceView/category_name/layer_state/layout/camera/sun/visual_style/background/thumbnail/annotation_scale/UCS-association are an honest gap (see tools/patch_ops/tables.py's module docstring).",
+      "owner_ticket": "M08C-T03",
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs"
+    },
+    {
+      "id": "write.vport.create",
+      "family": "symbol_tables_dictionaries",
+      "status": "implemented",
+      "engine_tier": "objectdbx_capable",
+      "host_eligibility": [
+        "dbx",
+        "coreconsole",
+        "arx_adapter",
+        "full_autocad"
+      ],
+      "execution_context": "hostless_dbx_in_accoreconsole",
+      "write_level": {
+        "default_write_mode": "write_copy",
+        "allowed_write_modes": [
+          "write_copy",
+          "write_original"
+        ],
+        "dwg_persisted": true,
+        "original_write_default": false
+      },
+      "handler": {
+        "router_lane": "ARIADNE_NATIVE_JOB",
+        "dispatcher_symbol": "upsertVportRecord",
+        "execution_host_class": "dbx",
+        "composed_of": [],
+        "native_api": "AcDbViewportTable::add(AcDbObjectId&, AcDbViewportTableRecord*) + AcDbViewportTableRecord::setLowerLeftCorner/setUpperRightCorner/setUcsFollowMode/setCircleSides/setGridEnabled/setSnapEnabled/setSnapAngle/setUcsPerViewport + AcDbAbstractViewTableRecord::setCenterPoint/setHeight/setWidth/setTarget/setViewDirection/setViewTwist"
+      },
+      "mapping_type": "synthetic",
+      "catalog_op_id": null,
+      "input_schema": "schemas/cad_job.v2.schema.json#/allOf",
+      "output_schema": "schemas/cad_result.v2.schema.json",
+      "summary": "Create-or-update a named VPORT table record, writing the viewport-specific rectangle/interactive-toggle subset (lower_left/upper_right/ucs_follow_mode/circle_sides/grid_enabled/snap_enabled/snap_angle/ucs_per_viewport) plus the shared AcDbAbstractViewTableRecord center/height/width/target/view_direction/twist properties VIEW already certifies.",
+      "evidence_refs": [
+        "tools/op_roundtrip_probe.py::probe_vport_roundtrip",
+        "tools/patch_ops/tables.py#write.vport.create"
+      ],
+      "phase_batch": "TABLES tier-2 D-class (p9-tables2)",
+      "target_family_first_class": false,
+      "wired_v1": false,
+      "operation": "write.vport.create",
+      "hosts": [
+        "dbx",
+        "coreconsole",
+        "arx_adapter",
+        "full_autocad"
+      ],
+      "engines": [
+        "objectdbx_capable"
+      ],
+      "schema_refs": {
+        "input": "schemas/cad_job.v2.schema.json#/allOf",
+        "output": "schemas/cad_result.v2.schema.json"
+      },
+      "policy": {
+        "source": "config/policy.v2.json",
+        "status_policy": "implemented",
+        "default_write_mode": "write_copy",
+        "no_original_write_default": true
+      },
+      "tests": [
+        "tools/op_roundtrip_probe.py::probe_vport_roundtrip"
+      ],
+      "notes": "Create-or-update a named VPORT table record, writing the viewport-specific subset plus the shared VIEW-proven base-class camera fields; lens_length/perspective/clip-plane fields are deliberately NOT re-certified here (already proven on this shared base class via VIEW). number()/fastZoomsEnabled/icon toggles/extra snap-grid sub-parameters/GridDisplay sub-group/background-visualStyle-sun-lighting refs/the richer UCS query-set API are an honest gap (see tools/patch_ops/tables.py's module docstring). AutoCAD may legitimately store multiple VPORT records named \"*Active\" (one per active tiled viewport pane); callers must never pass that literal name.",
+      "owner_ticket": "M08C-T03",
       "implementation_strategy": "implemented_v1",
       "evidence_required": "existing_tests_and_evidence_refs"
     }

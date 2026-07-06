@@ -31,14 +31,22 @@ tools/autocad-router.ps1) entirely on staged copies:
     -> journal       (ordered steps + every command's stdout/stderr/exit ref +
                       original-unchanged proof)
 
-Patch op -> native write op mapping (the only ops with a live native handler):
-    create_line   -> write.entity.line
-    create_circle -> write.entity.circle
-    set_layer     -> write.layer.create
-    create_layer  -> write.layer.create
-Any other declared op (create_polyline / create_text / move_entity /
-delete_entity / unknown) has no native write handler today and is reported
-``not_implemented`` -- never a faked success.
+Patch op -> native write op mapping: NATIVE_WRITE_OP_MAP (below) is the SOLE
+live list -- this paragraph is a pointer, not a second copy, so it must never
+restate a count or member enumeration here again. (It used to: a prior
+version of this paragraph froze a "12 ops: create_line, create_circle, ..."
+snapshot from WAVE-1 TIER-1 T1's initial F2 promotion (tools/promote_op.py,
+commit 99ed266) -- later promotions grew the real map well past 12 without
+anyone touching this docstring, the exact stale-doc drift a "pointer, not a
+copy" was supposed to prevent. tests/unit/test_patch_engine_policy.py has a
+tripwire against this literal anti-pattern recurring.) NATIVE_WRITE_OP_MAP
+proves an op has a live *write* handler; it says nothing
+about whether the op can be *roundtrip-certified* (geometry read back and
+diffed) -- that is a stricter, separate gate: see
+tools/op_roundtrip_probe.py's _EXPECTED_ENTITY_BUILDERS, which independently
+tracks which ops this codebase can build ground-truth geometry for (creating
+an entity with no live native handler mapped here is reported
+``not_implemented`` -- never a faked success).
 
 Hard rules: standard library ONLY; no-fake-success (a route/host/sibling that is
 unavailable => not_implemented/unavailable/partial/blocked with a reason, never a
@@ -87,19 +95,39 @@ _JSON_ENCODING = "utf-8-sig"
 if _THIS_DIR not in sys.path:
     sys.path.insert(0, _THIS_DIR)
 
+import patch_ops  # native write-op map + arg-branches, split by family (PLAN F9)
+
 PATCH_SCHEMA_ID = "ariadne.cad_patch.v1"
 RESULT_SCHEMA_ID = "ariadne.cad_patch.result.v1"
 
 # The declared high-level mutation operations this shell understands, mapped to
 # the operation-registry id (config/operations.v2.json) that carries the native
 # operation evidence.
+#
+# CADOS F8/H-6: set_layer/move_entity/delete_entity used to point at
+# write.entity.modify / write.entity.delete -- ids that do not exist ANYWHERE
+# in config/operations.v2.json (let alone in a family's live HasOp gate), a
+# dangling target. Repointed at the real, live, implemented ids: set_layer and
+# move_entity are true entity-property/transform mutations
+# (modify.entity.common / modify.entity.transform); delete_entity is repointed
+# at modify.entity.explode -- the closest live, resolvable id (see
+# reconcile_native_registry.check_vocab_lockstep for the resolves-live proof).
+# Honest caveat: modify.entity.explode is NOT a real delete (it appends the
+# exploded pieces and preserves the source; its own write_level is
+# default_write_mode="read" / dwg_persisted=false, so nothing is even
+# persisted) -- no real erase/delete-entity op exists in this registry yet
+# (independently confirmed by tools/mint_pilot_seed.py's ERASE_MODELSPACE_OP_ID
+# gap analysis). delete_entity/move_entity stay OUT of NATIVE_WRITE_OP_MAP
+# below (no live write handler), so apply_staged still honestly reports them
+# not_implemented; this map only fixes the dry_run_plan/validate_patch_schema
+# informational surface so it never cites a non-existent registry id.
 OP_REGISTRY_MAP: Dict[str, str] = {
     "create_line": "write.entity.line",
     "create_polyline": "write.entity.polyline",
     "create_text": "write.entity.text",
-    "set_layer": "write.entity.modify",
-    "move_entity": "write.entity.modify",
-    "delete_entity": "write.entity.delete",
+    "set_layer": "modify.entity.common",
+    "move_entity": "modify.entity.transform",
+    "delete_entity": "modify.entity.explode",
 }
 DECLARED_OPS = tuple(OP_REGISTRY_MAP.keys())
 
@@ -447,13 +475,9 @@ def dry_run_plan(patch: Any) -> Dict[str, Any]:
 
 # Patch op id -> native ObjectARX write op (operations.v2.json, status
 # "implemented"). Only these four declared patch ops have a live native handler;
-# everything else is not_implemented (no-fake-success).
-NATIVE_WRITE_OP_MAP: Dict[str, str] = {
-    "create_line": "write.entity.line",
-    "create_circle": "write.entity.circle",
-    "set_layer": "write.layer.create",
-    "create_layer": "write.layer.create",
-}
+# everything else is not_implemented (no-fake-success). Split by family under
+# tools/patch_ops/ (PLAN F9); this is the aggregate, reproduced exactly.
+NATIVE_WRITE_OP_MAP: Dict[str, str] = patch_ops.NATIVE_WRITE_OP_MAP
 
 
 def _now_iso() -> str:
@@ -605,6 +629,8 @@ def _native_job_doc(native_op: str, args: Dict[str, Any]) -> Dict[str, Any]:
     The native ObjectARX job reads its args (start/end, center/radius, name/
     color_index, point) from this JobPath JSON. We pass through only the keys the
     op declares (per cad_job.v2 allOf rules); extra keys are harmless but omitted.
+    The per-op arg branch is owned by the op's family module under
+    tools/patch_ops/ (PLAN F9); this stays the single job-envelope builder.
     """
     job: Dict[str, Any] = {
         "schema": "ariadne.autocad_sdk_job.v2",
@@ -615,21 +641,7 @@ def _native_job_doc(native_op: str, args: Dict[str, Any]) -> Dict[str, Any]:
         "source_agent": "patch_engine",
         "args": {},
     }
-    if native_op == "write.entity.line":
-        for k in ("start", "end", "layer"):
-            if k in args:
-                job["args"][k] = args[k]
-    elif native_op == "write.entity.circle":
-        for k in ("center", "radius", "layer"):
-            if k in args:
-                job["args"][k] = args[k]
-    elif native_op == "write.layer.create":
-        # set_layer/create_layer -> ensure the target layer exists.
-        name = args.get("name") or args.get("layer")
-        if name is not None:
-            job["args"]["name"] = name
-        if "color_index" in args:
-            job["args"]["color_index"] = args["color_index"]
+    job["args"] = patch_ops.build_job_args(native_op, args)
     return job
 
 

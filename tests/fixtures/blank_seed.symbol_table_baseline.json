@@ -1,0 +1,534 @@
+{
+  "schema": "ariadne.blank_seed_symbol_table_baseline.v1",
+  "generated_at": "2026-07-05T21:21:25.408459+00:00",
+  "source_dwg": "tests/fixtures/blank_seed.dwg",
+  "source_dwg_sha256": "5724f4ce3ec9daf8ac6f35ec9fc7ed1f30781ff37db32648e505ebcce0df33b6",
+  "minted_from_template": "C:\\Users\\PAUL\\AppData\\Local\\Autodesk\\AutoCAD 2027\\R26.0\\kor\\Template\\acad.dwt",
+  "captured_via_operation": "inspect.database.graph",
+  "note": "Default symbol-table/graph content of a fresh drawing minted from the kor acad.dwt template. F5 (config/diff_scope.json, full_database scope) subtracts these {handle,name} records from a real drawing's symbol tables so template defaults are never reported as added content. modelspace_entities is expected to be 0.",
+  "baseline": {
+    "modelspace_entities": 0,
+    "entities": [],
+    "database": {
+      "insbase": [
+        0,
+        0,
+        0
+      ],
+      "extents": {
+        "extmin": [
+          1e+20,
+          1e+20,
+          1e+20
+        ],
+        "extmax": [
+          -1e+20,
+          -1e+20,
+          -1e+20
+        ]
+      },
+      "units": {
+        "insunits": 1,
+        "linear_units": 2,
+        "angular_units": 0,
+        "linear_precision": 4,
+        "angular_precision": 0
+      }
+    },
+    "symbol_tables": {
+      "layers": [
+        {
+          "handle": "10",
+          "name": "0",
+          "color_index": 7,
+          "linetype": "Continuous",
+          "lineweight": -3,
+          "frozen": false,
+          "off": false,
+          "locked": false,
+          "plottable": true,
+          "is_xref_dependent": false
+        }
+      ],
+      "linetypes": [
+        {
+          "handle": "14",
+          "name": "ByBlock",
+          "description": "",
+          "dash_lengths": []
+        },
+        {
+          "handle": "15",
+          "name": "ByLayer",
+          "description": "",
+          "dash_lengths": []
+        },
+        {
+          "handle": "16",
+          "name": "Continuous",
+          "description": "Solid line",
+          "dash_lengths": []
+        }
+      ],
+      "text_styles": [
+        {
+          "handle": "11",
+          "name": "Standard",
+          "font_file": "arial.ttf",
+          "big_font_file": "",
+          "height": 0,
+          "width_factor": 1,
+          "oblique_angle": 0,
+          "is_shape_file": false,
+          "is_vertical": false
+        },
+        {
+          "handle": "DC",
+          "name": "주석",
+          "font_file": "arial.ttf",
+          "big_font_file": "",
+          "height": 0,
+          "width_factor": 1,
+          "oblique_angle": 0,
+          "is_shape_file": false,
+          "is_vertical": false
+        }
+      ],
+      "dim_styles": [
+        {
+          "handle": "27",
+          "name": "Standard",
+          "dimtxt": 0.18,
+          "dimasz": 0.18,
+          "dimexe": 0.18,
+          "dimexo": 0.0625,
+          "dimdec": 4,
+          "dimscale": 1,
+          "dimclrd": 0,
+          "dimclre": 0,
+          "dimclrt": 0,
+          "dimse1": false,
+          "dimaltf": 25.4,
+          "dimaltrnd": 0,
+          "dimcen": 0.09,
+          "dimdle": 0,
+          "dimdli": 0.38,
+          "dimgap": 0.09,
+          "dimjogang": 0.7853981633974483,
+          "dimlfac": 1,
+          "dimrnd": 0,
+          "dimtfac": 1,
+          "dimtm": 0,
+          "dimtp": 0,
+          "dimtsz": 0,
+          "dimtvp": 0,
+          "dimfxlen": 1,
+          "dimmzf": 100,
+          "dimaltmzf": 100,
+          "dimadec": 0,
+          "dimaltd": 2,
+          "dimalttd": 2,
+          "dimalttz": 0,
+          "dimaltu": 2,
+          "dimaltz": 0,
+          "dimarcsym": 0,
+          "dimatfit": 3,
+          "dimaunit": 0,
+          "dimazin": 0,
+          "dimfrac": 0,
+          "dimjust": 0,
+          "dimlunit": 2,
+          "dimtad": 0,
+          "dimtdec": 4,
+          "dimtfill": 0,
+          "dimtmove": 0,
+          "dimtolj": 1,
+          "dimtzin": 0,
+          "dimzin": 0,
+          "dimalt": false,
+          "dimlim": false,
+          "dimsah": false,
+          "dimsd1": false,
+          "dimsd2": false,
+          "dimse2": false,
+          "dimsoxd": false,
+          "dimtih": true,
+          "dimtix": false,
+          "dimtofl": false,
+          "dimtoh": true,
+          "dimtol": false,
+          "dimupt": false,
+          "dimfxlenon": false,
+          "dimtxtdirection": false,
+          "dimapost": "",
+          "dimpost": "",
+          "dimmzs": "",
+          "dimaltmzs": "",
+          "dimdsep": ".",
+          "dimtfillclr": 0,
+          "dimlwd": -2,
+          "dimlwe": -2,
+          "dimblk": "",
+          "dimblk1": "",
+          "dimblk2": "",
+          "dimldrblk": "",
+          "dimltype": "",
+          "dimltex1": "",
+          "dimltex2": "",
+          "dimtxsty": "Standard"
+        },
+        {
+          "handle": "E1",
+          "name": "주석",
+          "dimtxt": 0.18,
+          "dimasz": 0.18,
+          "dimexe": 0.18,
+          "dimexo": 0.0625,
+          "dimdec": 4,
+          "dimscale": 0,
+          "dimclrd": 0,
+          "dimclre": 0,
+          "dimclrt": 0,
+          "dimse1": false,
+          "dimaltf": 25.4,
+          "dimaltrnd": 0,
+          "dimcen": 0.09,
+          "dimdle": 0,
+          "dimdli": 0.38,
+          "dimgap": 0.09,
+          "dimjogang": 0.7853981633974483,
+          "dimlfac": 1,
+          "dimrnd": 0,
+          "dimtfac": 1,
+          "dimtm": 0,
+          "dimtp": 0,
+          "dimtsz": 0,
+          "dimtvp": 0,
+          "dimfxlen": 1,
+          "dimmzf": 100,
+          "dimaltmzf": 100,
+          "dimadec": 0,
+          "dimaltd": 2,
+          "dimalttd": 2,
+          "dimalttz": 0,
+          "dimaltu": 2,
+          "dimaltz": 0,
+          "dimarcsym": 0,
+          "dimatfit": 3,
+          "dimaunit": 0,
+          "dimazin": 0,
+          "dimfrac": 0,
+          "dimjust": 0,
+          "dimlunit": 2,
+          "dimtad": 0,
+          "dimtdec": 4,
+          "dimtfill": 0,
+          "dimtmove": 0,
+          "dimtolj": 1,
+          "dimtzin": 0,
+          "dimzin": 0,
+          "dimalt": false,
+          "dimlim": false,
+          "dimsah": false,
+          "dimsd1": false,
+          "dimsd2": false,
+          "dimse2": false,
+          "dimsoxd": false,
+          "dimtih": true,
+          "dimtix": false,
+          "dimtofl": false,
+          "dimtoh": true,
+          "dimtol": false,
+          "dimupt": false,
+          "dimfxlenon": false,
+          "dimtxtdirection": false,
+          "dimapost": "",
+          "dimpost": "",
+          "dimmzs": "",
+          "dimaltmzs": "",
+          "dimdsep": ".",
+          "dimtfillclr": 0,
+          "dimlwd": -2,
+          "dimlwe": -2,
+          "dimblk": "",
+          "dimblk1": "",
+          "dimblk2": "",
+          "dimldrblk": "",
+          "dimltype": "",
+          "dimltex1": "",
+          "dimltex2": "",
+          "dimtxsty": "Standard"
+        }
+      ],
+      "viewports": [
+        {
+          "handle": "94",
+          "name": "*Active",
+          "lower_left": {
+            "x": 0,
+            "y": 0
+          },
+          "upper_right": {
+            "x": 1,
+            "y": 1
+          },
+          "center": {
+            "x": 21.320188017861092,
+            "y": 11.222682400458831
+          },
+          "height": 25.401645837425974,
+          "width": 44.846057660446235,
+          "target": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "view_direction": {
+            "x": 0,
+            "y": 0,
+            "z": 1
+          },
+          "twist": 0,
+          "ucs_follow_mode": false,
+          "circle_sides": 1000,
+          "grid_enabled": true,
+          "snap_enabled": false,
+          "snap_angle": 0,
+          "ucs_per_viewport": true
+        }
+      ],
+      "app_ids": [
+        {
+          "handle": "12",
+          "name": "ACAD"
+        },
+        {
+          "handle": "DD",
+          "name": "AcadAnnoPO"
+        },
+        {
+          "handle": "DE",
+          "name": "AcadAnnotative"
+        },
+        {
+          "handle": "DF",
+          "name": "ACAD_DSTYLE_DIMJAG"
+        },
+        {
+          "handle": "E0",
+          "name": "ACAD_DSTYLE_DIMTALN"
+        },
+        {
+          "handle": "107",
+          "name": "ACAD_MLEADERVER"
+        },
+        {
+          "handle": "1A6",
+          "name": "ACAD_NAV_VCDISPLAY"
+        }
+      ],
+      "ucs": [],
+      "views": []
+    },
+    "block_table_records": [
+      {
+        "handle": "1F",
+        "name": "*Model_Space",
+        "is_layout": true,
+        "is_anonymous": false,
+        "is_xref": false,
+        "entity_count": 0
+      },
+      {
+        "handle": "58",
+        "name": "*Paper_Space",
+        "is_layout": true,
+        "is_anonymous": false,
+        "is_xref": false,
+        "entity_count": 0
+      },
+      {
+        "handle": "5D",
+        "name": "*Paper_Space0",
+        "is_layout": true,
+        "is_anonymous": false,
+        "is_xref": false,
+        "entity_count": 0
+      }
+    ],
+    "block_definitions": [],
+    "layouts": [
+      {
+        "handle": "22",
+        "name": "Model",
+        "tab_order": 0,
+        "block_table_record_handle": "1F"
+      },
+      {
+        "handle": "59",
+        "name": "배치1",
+        "tab_order": 1,
+        "block_table_record_handle": "58"
+      },
+      {
+        "handle": "5E",
+        "name": "배치2",
+        "tab_order": 2,
+        "block_table_record_handle": "5D"
+      }
+    ],
+    "xrefs": [],
+    "dictionaries": [
+      {
+        "name": "ACAD_NAMED_OBJECTS",
+        "entries": [
+          {
+            "key": "ACAD_CIP_PREVIOUS_PRODUCT_INFO",
+            "value_handle": "1A5"
+          },
+          {
+            "key": "ACAD_COLOR",
+            "value_handle": "73"
+          },
+          {
+            "key": "ACAD_DETAILVIEWSTYLE",
+            "value_handle": "1AB"
+          },
+          {
+            "key": "ACAD_GROUP",
+            "value_handle": "D"
+          },
+          {
+            "key": "ACAD_LAYOUT",
+            "value_handle": "1A"
+          },
+          {
+            "key": "ACAD_MATERIAL",
+            "value_handle": "72"
+          },
+          {
+            "key": "ACAD_MLEADERSTYLE",
+            "value_handle": "D7"
+          },
+          {
+            "key": "ACAD_MLINESTYLE",
+            "value_handle": "17"
+          },
+          {
+            "key": "ACAD_PLOTSETTINGS",
+            "value_handle": "19"
+          },
+          {
+            "key": "ACAD_PLOTSTYLENAME",
+            "value_handle": "E"
+          },
+          {
+            "key": "ACAD_SCALELIST",
+            "value_handle": "B6"
+          },
+          {
+            "key": "ACAD_SECTIONVIEWSTYLE",
+            "value_handle": "1A8"
+          },
+          {
+            "key": "ACAD_TABLESTYLE",
+            "value_handle": "86"
+          },
+          {
+            "key": "ACAD_VISUALSTYLE",
+            "value_handle": "99"
+          },
+          {
+            "key": "AcDbVariableDictionary",
+            "value_handle": "66"
+          }
+        ]
+      }
+    ],
+    "extension_dictionaries": [],
+    "xrecords": [
+      {
+        "handle": "1A5",
+        "owner_handle": "C",
+        "key": "ACAD_CIP_PREVIOUS_PRODUCT_INFO",
+        "item_count": 3,
+        "items": [
+          {
+            "code": 300,
+            "value": ""
+          },
+          {
+            "code": 300,
+            "value": ""
+          },
+          {
+            "code": 300,
+            "value": ""
+          }
+        ]
+      }
+    ],
+    "coverage": {
+      "layers": "implemented",
+      "linetypes": "implemented",
+      "text_styles": "implemented",
+      "dim_styles": "implemented",
+      "ucs": "implemented",
+      "views": "implemented",
+      "viewports": "implemented",
+      "block_table_records": "implemented",
+      "block_definitions": "implemented",
+      "layouts": "implemented",
+      "xrefs": "implemented",
+      "dictionaries": "implemented",
+      "xrecords": "implemented",
+      "xdata": "implemented",
+      "extension_dictionaries": "implemented",
+      "hatch_loops": "implemented",
+      "proxy_objects": "partial",
+      "counts": {
+        "layers": 1,
+        "linetypes": 3,
+        "text_styles": 2,
+        "dim_styles": 2,
+        "viewports": 1,
+        "app_ids": 7,
+        "ucs": 0,
+        "views": 0,
+        "block_table_records": 3,
+        "block_definitions": 0,
+        "layouts": 3,
+        "xrefs": 0,
+        "dictionary_entries": 15,
+        "xrecords": 1,
+        "xrecord_items": 3,
+        "xdata_blocks": 0,
+        "xdata_items": 0,
+        "extension_dictionaries": 0,
+        "extension_dictionary_entries": 0,
+        "extension_xrecords": 0,
+        "extension_xrecord_items": 0,
+        "hatch_loops": 0,
+        "hatch_loop_vertices": 0
+      },
+      "sections_present": [
+        "database",
+        "symbol_tables",
+        "block_table_records",
+        "block_definitions",
+        "layouts",
+        "xrefs",
+        "dictionaries",
+        "extension_dictionaries",
+        "xrecords",
+        "xdata",
+        "hatch_loops"
+      ],
+      "sections_skipped": [
+        "groups",
+        "materials",
+        "plot_settings"
+      ]
+    }
+  }
+}

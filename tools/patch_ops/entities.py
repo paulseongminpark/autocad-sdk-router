@@ -1,0 +1,582 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""patch_ops.entities -- entity write ops (CAD OS Layer, Lane E family split).
+
+Owns the entity family's slice of patch_engine.NATIVE_WRITE_OP_MAP /
+_native_job_doc and ir_to_patch's entity IR-op-cases (line/circle/arc/text/
+polyline/dimension/...). create_line, create_circle, set_layer, and (WAVE-1
+TIER-1 T1, via tools/promote_op.py F2 promotion) create_arc/create_ellipse/
+create_mpolygon/create_mtext/create_text/create_polyline/create_dimension/
+set_entity_xdata have a live native handler today; the rest degrade to
+not_implemented / deferred (no-fake-success) until a family ticket wires them.
+P10 adds set_entity_xdata_by_handle (modify.entity.xdata) -- a genuinely NEW,
+entity-HANDLE-targeted xdata write, distinct from set_entity_xdata above
+(write.entity.set_xdata aliases to the DATABASE-level write.xdata.set, no
+'handle' arg at all). See families/m08g_handlers.inc's "modify.entity.xdata"
+branch for the ground truth.
+
+CADOS F8 / H-5: set_layer is wired here (not patch_ops.tables) because its
+real native handler is modify.entity.common -- an ENTITY mutation
+(AcDbEntity::setLayer on a resolved 'handle'), not a symbol-table op. The
+former mapping (write.layer.create) only ensured a layer existed and silently
+ignored 'handle', so it never actually reassigned anything -- an active
+fake-success. See src/Ariadne.AcadNative/families/m08g_handlers.inc's
+"modify.entity.common" branch and the live Lane-A probe
+tools/probe_modify.py::run_probe_common (R1) for the ground truth this
+mapping is repointed at.
+"""
+from __future__ import annotations
+
+from typing import Any, Dict, List, Optional
+
+# patch op id -> native ObjectARX write op (operations.v2.json, status
+# "implemented"). Only these have a live native handler today.
+WRITE_OP_MAP: Dict[str, str] = {
+    "create_line": "write.entity.line",
+    "create_circle": "write.entity.circle",
+    "set_layer": "modify.entity.common",
+    "create_arc": "write.entity.arc",
+    "create_ellipse": "write.entity.ellipse",
+    "create_mpolygon": "write.entity.mpolygon",
+    "create_mtext": "write.entity.mtext",
+    "create_text": "write.entity.text",
+    "create_polyline": "write.entity.polyline",
+    "create_dimension": "write.entity.dim.rotated",
+    "set_entity_xdata": "write.entity.set_xdata",
+    "create_spline": "write.entity.spline",
+    "create_dimension_aligned": "write.entity.dim.aligned",
+    "create_dimension_radial": "write.entity.dim.radial",
+    "create_dimension_diametric": "write.entity.dim.diametric",
+    "create_dimension_ordinate": "write.entity.dim.ordinate",
+    "create_leader": "write.entity.leader",
+    "create_mline": "write.entity.mline",
+    "create_dimension_arc": "write.entity.dim.arc",
+    "create_dimension_angular2line": "write.entity.dim.angular2line",
+    "create_dimension_angular3pt": "write.entity.dim.angular3pt",
+    "create_mleader": "write.entity.mleader",
+    "create_polyline2d": "write.entity.polyline2d",
+    "create_polyline2d_deep": "write.entity.polyline2d.deep",
+    "create_polyline3d": "write.entity.polyline3d",
+    "create_polygonmesh": "write.entity.polygonmesh",
+    "create_polyfacemesh": "write.entity.polyfacemesh",
+    "create_dimension_radiallarge": "write.entity.dim.radiallarge",
+    "create_blockref": "write.entity.blockref",
+    "create_face3d": "write.entity.face",
+    "create_solid2d": "write.entity.solid2d",
+    "create_trace": "write.entity.trace",
+    # P10: entity-HANDLE-targeted xdata write (modify.entity.xdata) -- a
+    # distinct op/handler from the pre-existing set_entity_xdata above
+    # (write.entity.set_xdata, which aliases to the DATABASE-level
+    # write.xdata.set and takes no 'handle'). See m08g_handlers.inc's
+    # "modify.entity.xdata" branch for the ground truth.
+    "set_entity_xdata_by_handle": "modify.entity.xdata",
+    "create_point": "write.entity.point",
+    "create_ray": "write.entity.ray",
+    "create_xline": "write.entity.xline",
+    "create_attribdef": "write.entity.attribdef",
+    # wS-solids: ASM/solids family (m08g_handlers.inc) -- live-verified headless
+    # (accoreconsole) via WaveS0's probe + this wave's B6 non-degeneracy gate
+    # (tools/asm_probe_driver.py). registry policy.status_policy reconciled
+    # from the stale M04 catalogued_not_runnable to implemented in the same
+    # wave (config/operations.v2.json).
+    "create_solid3d_primitive": "write.entity.solid3d.primitive",
+    "create_solid3d_extrude": "write.entity.solid3d.extrude",
+    "create_solid3d_revolve": "write.entity.solid3d.revolve",
+    "create_solid3d_sweep": "write.entity.solid3d.sweep",
+    "create_solid3d_loft": "write.entity.solid3d.loft",
+    "create_region": "write.entity.region",
+    "create_surface": "write.entity.surface",
+    "create_nurbsurface": "write.entity.nurbsurface",
+    "create_body": "write.entity.body",
+}
+
+
+def build_job_args(native_op: str, args: Dict[str, Any]) -> Optional[Dict[str, Any]]:
+    """Native job "args" for an entity write op, or None if native_op isn't ours."""
+    if native_op == "write.entity.line":
+        out: Dict[str, Any] = {}
+        for k in ("start", "end", "layer"):
+            if k in args:
+                out[k] = args[k]
+        return out
+    if native_op == "write.entity.circle":
+        out = {}
+        for k in ("center", "radius", "layer"):
+            if k in args:
+                out[k] = args[k]
+        return out
+    if native_op == "modify.entity.common":
+        # set_layer -> resolve 'handle' and REASSIGN its layer (the m08g
+        # native dispatcher reads 'handle' from the job root or job.args, and
+        # 'set_layer' as a plain string field anywhere in the job JSON -- see
+        # m08gFindHandle / the "modify.entity.common" branch in
+        # m08g_handlers.inc). Patch-op args use 'layer' (matching
+        # create_line/create_circle's key); the native field name is
+        # 'set_layer', so the two are NOT the same key here on purpose.
+        out = {}
+        if "handle" in args:
+            out["handle"] = args["handle"]
+        if "layer" in args:
+            out["set_layer"] = args["layer"]
+        return out
+    if native_op == "write.entity.arc":
+        out: Dict[str, Any] = {}
+        for k in ('center', 'radius', 'start_angle', 'end_angle', 'layer'):
+            if k in args:
+                out[k] = args[k]
+        return out
+    if native_op == "write.entity.ellipse":
+        out: Dict[str, Any] = {}
+        for k in ('center', 'normal', 'major_axis', 'radius_ratio', 'start_angle', 'end_angle', 'layer'):
+            if k in args:
+                out[k] = args[k]
+        return out
+    if native_op == "write.entity.mpolygon":
+        out: Dict[str, Any] = {}
+        for k in ('points', 'layer'):
+            if k in args:
+                out[k] = args[k]
+        return out
+    if native_op == "write.entity.mtext":
+        out: Dict[str, Any] = {}
+        for k in ('position', 'text', 'height', 'layer'):
+            if k in args:
+                out[k] = args[k]
+        return out
+    if native_op == "write.entity.text":
+        out: Dict[str, Any] = {}
+        for k in ('position', 'text', 'height', 'layer'):
+            if k in args:
+                out[k] = args[k]
+        return out
+    if native_op == "write.entity.polyline":
+        out: Dict[str, Any] = {}
+        for k in ('points', 'closed', 'layer'):
+            if k in args:
+                out[k] = args[k]
+        return out
+    if native_op == "write.entity.polyline2d":
+        # ALIAS of write.entity.polyline in m08g_handlers.inc (same handler,
+        # same args) -- see op_roundtrip_probe.py's _expect_create_polyline2d
+        # for why this is NOT a true legacy AcDb2dPolyline.
+        out: Dict[str, Any] = {}
+        for k in ('points', 'closed', 'layer'):
+            if k in args:
+                out[k] = args[k]
+        return out
+    if native_op == "write.entity.polyline3d":
+        # 'closed' deliberately excluded: the write.entity.polyline3d handler
+        # never reads it (no setClosed() call at all) -- see
+        # op_roundtrip_probe.py's _expect_create_polyline3d.
+        out: Dict[str, Any] = {}
+        for k in ('points', 'layer'):
+            if k in args:
+                out[k] = args[k]
+        return out
+    if native_op == "write.entity.polyline2d.deep":
+        # p4-poly2d: the TRUE legacy AcDb2dPolyline (NOT the write.entity.
+        # polyline2d alias above) -- per-vertex points carry bulge/
+        # start_width/end_width (unlike write.entity.polyline2d/polyline's
+        # {x,y,bulge}-only points), plus entity-level elevation/closed/
+        # default_start_width/default_end_width. See op_roundtrip_probe.py's
+        # _expect_create_polyline2d_deep.
+        out: Dict[str, Any] = {}
+        for k in ('points', 'closed', 'elevation', 'default_start_width',
+                  'default_end_width', 'layer'):
+            if k in args:
+                out[k] = args[k]
+        return out
+    if native_op == "write.entity.polygonmesh":
+        # m08g_handlers.inc's one-shot AcDbPolygonMesh(type, mSize, nSize,
+        # verts, mClosed, nClosed) ctor is called with mClosed/nClosed
+        # HARDCODED to Adesk::kFalse -- there is no "m_closed"/"n_closed" job
+        # field read anywhere in this branch, so only m_size/n_size/points/
+        # layer pass through (see w3-pmesh's op_roundtrip_probe.py
+        # _expect_create_polygonmesh for the live-verified consequence).
+        out: Dict[str, Any] = {}
+        for k in ('m_size', 'n_size', 'points', 'layer'):
+            if k in args:
+                out[k] = args[k]
+        return out
+    if native_op == "write.entity.polyfacemesh":
+        # m08g_handlers.inc's write.entity.polyfacemesh handler reads ONLY
+        # points/vertices (points first, vertices as fallback if points has
+        # <3 entries) + layer -- it NEVER reads a "faces" job field at all:
+        # appendFaceRecord is called exactly once, with vertex indices
+        # HARDCODED to {1,2,3, len>=4?4:3} (see op_roundtrip_probe.py's
+        # _expect_create_polyfacemesh for the live-verified consequence), the
+        # same "handler ignores an arg it never reads" shape create_polygon
+        # mesh's m_closed/n_closed already documented.
+        out: Dict[str, Any] = {}
+        for k in ('points', 'vertices', 'layer'):
+            if k in args:
+                out[k] = args[k]
+        return out
+    if native_op == "write.entity.dim.rotated":
+        out: Dict[str, Any] = {}
+        for k in ('xline1', 'xline2', 'dim_line', 'dim_text', 'rotation', 'layer'):
+            if k in args:
+                out[k] = args[k]
+        return out
+    if native_op == "write.entity.spline":
+        out: Dict[str, Any] = {}
+        for k in ('points', 'order', 'layer'):
+            if k in args:
+                out[k] = args[k]
+        return out
+    if native_op == "write.entity.dim.aligned":
+        out: Dict[str, Any] = {}
+        for k in ('xline1', 'xline2', 'dim_line', 'dim_text', 'layer'):
+            if k in args:
+                out[k] = args[k]
+        return out
+    if native_op == "write.entity.dim.radial":
+        out: Dict[str, Any] = {}
+        for k in ('center', 'chord_point', 'leader_length', 'dim_text', 'layer'):
+            if k in args:
+                out[k] = args[k]
+        return out
+    if native_op == "write.entity.dim.diametric":
+        out: Dict[str, Any] = {}
+        for k in ('chord_point', 'far_chord_point', 'leader_length', 'dim_text', 'layer'):
+            if k in args:
+                out[k] = args[k]
+        return out
+    if native_op == "write.entity.dim.ordinate":
+        out: Dict[str, Any] = {}
+        for k in ('defining_point', 'leader_end_point', 'use_x_axis', 'dim_text', 'layer'):
+            if k in args:
+                out[k] = args[k]
+        return out
+    if native_op == "write.entity.leader":
+        out: Dict[str, Any] = {}
+        for k in ('vertices', 'points', 'text', 'height', 'layer'):
+            if k in args:
+                out[k] = args[k]
+        return out
+    if native_op == "write.entity.mleader":
+        out: Dict[str, Any] = {}
+        for k in ('vertices', 'points', 'text', 'height', 'layer'):
+            if k in args:
+                out[k] = args[k]
+        return out
+    if native_op == "write.entity.mline":
+        out: Dict[str, Any] = {}
+        for k in ('points', 'vertices', 'closed', 'scale', 'layer'):
+            if k in args:
+                out[k] = args[k]
+        return out
+    if native_op == "write.entity.dim.arc":
+        out: Dict[str, Any] = {}
+        for k in ('center', 'xline1', 'xline2', 'arc_point', 'dim_text', 'layer'):
+            if k in args:
+                out[k] = args[k]
+        return out
+    if native_op == "write.entity.dim.angular2line":
+        out: Dict[str, Any] = {}
+        for k in ('xline1_start', 'xline1_end', 'xline2_start', 'xline2_end', 'arc_point', 'dim_text', 'layer'):
+            if k in args:
+                out[k] = args[k]
+        return out
+    if native_op == "write.entity.dim.angular3pt":
+        out: Dict[str, Any] = {}
+        for k in ('center', 'xline1', 'xline2', 'arc_point', 'dim_text', 'layer'):
+            if k in args:
+                out[k] = args[k]
+        return out
+    if native_op == "write.entity.dim.radiallarge":
+        out: Dict[str, Any] = {}
+        for k in ('center', 'chord_point', 'override_center', 'jog_point', 'jog_angle', 'dim_text', 'layer'):
+            if k in args:
+                out[k] = args[k]
+        return out
+    if native_op == "write.entity.blockref":
+        # w3-insert: op-level arg is "block_name" (matches DWG_GRAPH_IR_SPEC's
+        # block_reference.block_name / the IR geometry field this op's ground
+        # truth is compared against) -- the native job field is "name" (see
+        # m08g_handlers.inc's write.entity.blockref branch), so this is a
+        # rename, not a passthrough, the same shape modify.entity.common's
+        # layer -> set_layer rename above already uses.
+        out = {}
+        if "block_name" in args:
+            out["name"] = args["block_name"]
+        for k in ("position", "scale", "rotation", "layer"):
+            if k in args:
+                out[k] = args[k]
+        # p3-insattr: "attributes":[{tag,value,position?,height?}] -- a
+        # plain passthrough (native field name matches the patch-op arg name);
+        # only meaningful when "block_name" already resolves to a block
+        # definition containing matching-tag ATTDEFs (see m08g_handlers.inc's
+        # write.entity.blockref branch, same precondition create_blockref's
+        # "block_name" already documents above).
+        if "attributes" in args:
+            out["attributes"] = args["attributes"]
+        return out
+    if native_op == "write.entity.attribdef":
+        # p3-insattr: plain passthrough -- native field names match the
+        # patch-op arg names 1:1 (see m08g_handlers.inc's write.entity.
+        # attribdef branch). "block" targets a named block definition's own
+        # entity list instead of modelspace (the ATTDEF-as-template case this
+        # op exists for); omitting it preserves the pre-existing modelspace
+        # behavior.
+        out = {}
+        for k in ("position", "text", "tag", "prompt", "height", "block", "layer"):
+            if k in args:
+                out[k] = args[k]
+        # jsonFindNumber's strtod parse does not understand JSON true/false
+        # tokens (see AriadneNativeJob.cpp write.layer.create's comment) --
+        # coerce to 0/1 the same way tables.py's _LAYER_FLAG_FIELDS does, so
+        # an idiomatic Python bool doesn't silently become "false" on the wire.
+        for k in ("constant", "invisible", "verifiable", "preset"):
+            if k in args:
+                out[k] = int(bool(args[k]))
+        return out
+    if native_op == "write.entity.set_xdata":
+        # DATABASE-level, not entity-level, despite the patch_op name
+        # "set_entity_xdata": the native handler (m08eHandleEntitySetXdata in
+        # m08e_handlers.inc) calls setDatabaseXdata(ctx.pDb, app, value) --
+        # there is no entity handle argument anywhere in this op's shape, and
+        # none should be added here without also updating the registry
+        # summary/native_api text for "write.entity.set_xdata" in
+        # config/operations.v2.json. See the tripwire test in
+        # tests/unit/test_wave1_tier1_entity_wire.py::
+        # TestSetEntityXdataIsDatabaseLevelNotEntityLevel.
+        out: Dict[str, Any] = {}
+        for k in ('app', 'value'):
+            if k in args:
+                out[k] = args[k]
+        return out
+    if native_op in ("write.entity.face", "write.entity.solid2d", "write.entity.trace"):
+        # p8-simple2: all 3 flat 4-point entities (m08g_handlers.inc) share
+        # the identical p0..p3 + layer job-arg shape.
+        out: Dict[str, Any] = {}
+        for k in ('p0', 'p1', 'p2', 'p3', 'layer'):
+            if k in args:
+                out[k] = args[k]
+        return out
+    if native_op == "modify.entity.xdata":
+        out: Dict[str, Any] = {}
+        for k in ('handle', 'app_name', 'values'):
+            if k in args:
+                out[k] = args[k]
+        return out
+    if native_op == "write.entity.point":
+        out: Dict[str, Any] = {}
+        for k in ('position', 'layer'):
+            if k in args:
+                out[k] = args[k]
+        return out
+    if native_op in ("write.entity.ray", "write.entity.xline"):
+        # w3-simple1: m08g_handlers.inc's write.entity.ray/write.entity.xline
+        # handlers read the identical ("base", "direction", "layer") job args
+        # (AcDbRay()/AcDbXline() default-ctor'd, then setBasePoint/setUnitDir)
+        # -- same shape, so one branch covers both native ops.
+        out: Dict[str, Any] = {}
+        for k in ('base', 'direction', 'layer'):
+            if k in args:
+                out[k] = args[k]
+        return out
+    if native_op == "write.entity.solid3d.primitive":
+        # wS-solids: m08g_handlers.inc reads "primitive" (box/sphere/torus/
+        # wedge/pyramid/frustum) + a union of dimension fields; only the
+        # subset each sub-kind actually uses is read (createBox ignores
+        # radius/height, createSphere ignores x/y/z, etc. -- see the C++
+        # createXxx dispatch in write.entity.solid3d.primitive). Passing the
+        # full union through is harmless: unread fields are simply ignored.
+        out: Dict[str, Any] = {}
+        for k in ('primitive', 'x', 'y', 'z', 'radius', 'height', 'top_radius',
+                  'minor_radius', 'layer'):
+            if k in args:
+                out[k] = args[k]
+        return out
+    if native_op == "write.entity.solid3d.extrude":
+        out: Dict[str, Any] = {}
+        for k in ('width', 'depth', 'height', 'layer'):
+            if k in args:
+                out[k] = args[k]
+        return out
+    if native_op == "write.entity.solid3d.revolve":
+        out: Dict[str, Any] = {}
+        for k in ('width', 'height', 'angle', 'layer'):
+            if k in args:
+                out[k] = args[k]
+        return out
+    if native_op == "write.entity.solid3d.sweep":
+        out: Dict[str, Any] = {}
+        for k in ('width', 'height', 'length', 'layer'):
+            if k in args:
+                out[k] = args[k]
+        return out
+    if native_op == "write.entity.solid3d.loft":
+        out: Dict[str, Any] = {}
+        for k in ('width', 'depth', 'top_width', 'top_depth', 'height', 'layer'):
+            if k in args:
+                out[k] = args[k]
+        return out
+    if native_op == "write.entity.region":
+        # wS-solids: requires a caller-supplied "curves":[<handle>,...] of
+        # PRE-EXISTING coplanar closed curves (e.g. a prior create_polyline
+        # step in the same multi-op patch) -- AcDbRegion::createFromCurves
+        # consumes clones of those, never args used to construct new geometry
+        # of its own. See m08g_handlers.inc's write.entity.region branch and
+        # tools/asm_probe_driver.py's precreate_curve chaining for the
+        # live-verified 2-step pattern this passthrough assumes the caller follows.
+        out: Dict[str, Any] = {}
+        for k in ('curves', 'layer'):
+            if k in args:
+                out[k] = args[k]
+        return out
+    if native_op == "write.entity.surface":
+        out: Dict[str, Any] = {}
+        for k in ('width', 'height', 'layer'):
+            if k in args:
+                out[k] = args[k]
+        return out
+    if native_op == "write.entity.nurbsurface":
+        # wS-solids/S6: width/height define a rectangular bilinear patch (see
+        # m08g_handlers.inc's write.entity.nurbsurface branch, S6 fix) --
+        # before S6 the handler read no args at all and always built the
+        # same hardcoded 1x1 patch (WaveS0 finding G4).
+        out: Dict[str, Any] = {}
+        for k in ('width', 'height', 'layer'):
+            if k in args:
+                out[k] = args[k]
+        return out
+    if native_op == "write.entity.body":
+        # wS-solids: the handler builds an empty AcDbBody with no content
+        # setter (WaveS0 finding G5) -- 'layer' is the only arg it reads.
+        # CREATED_DEGENERATE by construction; not certifiable non-degenerate
+        # until a content-setting C++ path exists. Wired here for registry
+        # completeness (status_policy=implemented is now honest about the
+        # HANDLER existing and dispatching, not about the result being
+        # non-degenerate -- see B6 gate / final report).
+        out: Dict[str, Any] = {}
+        if 'layer' in args:
+            out['layer'] = args['layer']
+        return out
+    return None
+
+
+def _pt(arr: Any) -> Optional[Dict[str, float]]:
+    """IR coordinate array [x,y,z] -> native job object {x,y,z}."""
+    if not arr:
+        return None
+    return {"x": arr[0], "y": arr[1], "z": arr[2] if len(arr) > 2 else 0.0}
+
+
+def ir_op_for(ent: Dict[str, Any]) -> Optional[Dict[str, Any]]:
+    """Map one IR entity to a cad_patch operation, or None if not an entity
+    kind this family regenerates."""
+    g = ent.get("geometry") or {}
+    kind = g.get("kind")
+    layer = ent.get("layer")
+
+    if kind == "line":
+        return {"operation": "create_line",
+                "args": {"start": _pt(g.get("start")), "end": _pt(g.get("end")), "layer": layer}}
+    if kind == "circle":
+        return {"operation": "create_circle",
+                "args": {"center": _pt(g.get("center")), "radius": g.get("radius"), "layer": layer}}
+    if kind == "arc":
+        return {"operation": "create_arc",
+                "args": {"center": _pt(g.get("center")), "radius": g.get("radius"),
+                         "start_angle": g.get("start_angle"), "end_angle": g.get("end_angle"),
+                         "layer": layer}}
+    if kind == "ellipse":
+        return {"operation": "create_ellipse",
+                "args": {"center": _pt(g.get("center")), "normal": _pt(g.get("normal")),
+                         "major_axis": _pt(g.get("major_axis")), "radius_ratio": g.get("radius_ratio"),
+                         "start_angle": g.get("start_angle"), "end_angle": g.get("end_angle"),
+                         "layer": layer}}
+    if kind == "block_reference":
+        # cb2-irmap/#129b: INSERT's real op is create_blockref (write.entity.
+        # blockref, wired since w3-insert -- WRITE_OP_MAP/build_job_args
+        # above already handle it) but this IR-kind case was never added, so
+        # every INSERT fell through to patch_ops.blocks' now-removed
+        # "insert_block" stand-in, an op id no registry entry declares
+        # (regen/journal.json's "insert_block is not declared" warning).
+        # block_name -> "name" is build_job_args' job, not this one's -- see
+        # its write.entity.blockref branch above.
+        return {"operation": "create_blockref",
+                "args": {"block_name": g.get("block_name"), "position": _pt(g.get("position")),
+                         "scale": _pt(g.get("scale")), "rotation": g.get("rotation"), "layer": layer}}
+    # --- Tier 2 (WAVE-1 TIER-1 T1 promoted create_text/create_polyline to a
+    # live native handler; the gate below is now just "is this IR kind ever
+    # produced", not "is the op runnable") ---
+    if kind == "text":
+        return {"operation": "create_text",
+                "args": {"position": _pt(g.get("position")), "text": g.get("text"),
+                         "height": g.get("height", 2.5), "layer": layer}}
+    if kind == "mtext":
+        return {"operation": "create_mtext",
+                "args": {"position": _pt(g.get("position")), "text": g.get("text"),
+                         "height": g.get("height", 2.5), "layer": layer}}
+    if kind == "lwpolyline":
+        points: List[Dict[str, float]] = []
+        for v in (g.get("vertices") or []):
+            p = v.get("point") if isinstance(v, dict) else v
+            if not p:
+                continue
+            points.append({"x": p[0], "y": p[1],
+                           "bulge": (v.get("bulge", 0.0) if isinstance(v, dict) else 0.0)})
+        return {"operation": "create_polyline",
+                "args": {"points": points, "closed": int(bool(g.get("closed"))), "layer": layer}}
+    if kind == "polyline":
+        # #119: AcDb2dPolyline (true legacy 2D) and AcDb3dPolyline both
+        # normalize to IR kind "polyline"/dxf_name POLYLINE (ir_builder.py's
+        # _NATIVE_CLASS_TO_DXF_KIND) -- lifting either one through the
+        # "lwpolyline" branch above regenerates a real LWPOLYLINE instead,
+        # a silent legacy-type downgrade (capstone evidence: POLYLINE
+        # attempted=2 removed=2 + LWPOLYLINE added=2). The two are
+        # distinguished only by the entity's own "class"; each gets its own
+        # real write op instead of being folded into create_polyline.
+        native_class = ent.get("class")
+        if native_class == "AcDb2dPolyline":
+            deep_points: List[Dict[str, float]] = []
+            for v in (g.get("vertices") or []):
+                if not isinstance(v, dict):
+                    continue
+                p = v.get("point")
+                if not p:
+                    continue
+                deep_points.append({"x": p[0], "y": p[1], "bulge": v.get("bulge", 0.0),
+                                    "start_width": v.get("start_width", 0.0),
+                                    "end_width": v.get("end_width", 0.0)})
+            return {"operation": "create_polyline2d_deep",
+                    "args": {"points": deep_points, "closed": int(bool(g.get("closed"))),
+                             "elevation": g.get("elevation", 0.0),
+                             "default_start_width": g.get("default_start_width", 0.0),
+                             "default_end_width": g.get("default_end_width", 0.0),
+                             "layer": layer}}
+        if native_class == "AcDb3dPolyline":
+            poly3d_points = []
+            for v in (g.get("vertices") or []):
+                p = v.get("point") if isinstance(v, dict) else v
+                pt = _pt(p)
+                if pt is not None:
+                    poly3d_points.append(pt)
+            return {"operation": "create_polyline3d",
+                    "args": {"points": poly3d_points, "layer": layer}}
+        return None  # unrecognized class for a "polyline"-kind entity -> honest deferral
+    # --- Tier 3 (requires dimension extraction to populate geometry) ---
+    if kind == "dimension":
+        need = ("xline1_point", "xline2_point", "dim_line_point")
+        if all(g.get(x) for x in need):
+            return {"operation": "create_dimension",
+                    "args": {"layer": layer, "dim_text": g.get("dim_text", ""),
+                             "rotation": g.get("rotation", 0.0),
+                             "xline1": _pt(g["xline1_point"]), "xline2": _pt(g["xline2_point"]),
+                             "dim_line": _pt(g["dim_line_point"])}}
+        return None  # extraction not landed yet -> deferred
+    if kind == "point":
+        return {"operation": "create_point",
+                "args": {"position": _pt(g.get("position")), "layer": layer}}
+    if kind == "ray":
+        return {"operation": "create_ray",
+                "args": {"base": _pt(g.get("base_point")), "direction": _pt(g.get("unit_dir")),
+                         "layer": layer}}
+    if kind == "xline":
+        return {"operation": "create_xline",
+                "args": {"base": _pt(g.get("base_point")), "direction": _pt(g.get("unit_dir")),
+                         "layer": layer}}
+    return None

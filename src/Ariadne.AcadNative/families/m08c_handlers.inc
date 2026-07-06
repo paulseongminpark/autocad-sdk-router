@@ -443,7 +443,7 @@ static bool m08cDispatch(const std::string& op, const AriadneJobCtx& ctx, std::o
         pInfo->getHyperlinkBase(hyperlink);
 
         const int customCount = pInfo->numCustomInfo();
-        std::ostringstream custom;
+        std::ostringstream custom; custom.precision(kJsonDoublePrecision);
         custom << "[";
         for (int i = 0; i < customCount; ++i) {
             AcString k, v;

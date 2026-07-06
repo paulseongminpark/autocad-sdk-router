@@ -151,7 +151,13 @@
             "required": ["name"],
             "properties": {
               "name": { "type": "string", "minLength": 1 },
-              "color_index": { "type": "integer", "minimum": 1, "maximum": 255 }
+              "color_index": { "type": "integer", "minimum": 1, "maximum": 255 },
+              "linetype": { "type": "string", "minLength": 1, "description": "Existing/loadable linetype name; unresolvable names surface in the result's linetype_error, never silently dropped." },
+              "lineweight": { "type": "integer", "description": "AcDb::LineWeight raw value (hundredths of mm, e.g. 25 == 0.25mm; -1/-2/-3 == ByLayer/ByBlock/ByLwDefault)." },
+              "plottable": { "type": "integer", "enum": [0, 1], "description": "Boolean-as-number (0/1); see write.layer.create's job-args convention." },
+              "frozen": { "type": "integer", "enum": [0, 1] },
+              "off": { "type": "integer", "enum": [0, 1] },
+              "locked": { "type": "integer", "enum": [0, 1] }
             }
           }
         }
@@ -281,6 +287,28 @@
             "type": "object",
             "required": ["name"],
             "properties": { "name": { "type": "string", "minLength": 1 } }
+          }
+        }
+      }
+    },
+    {
+      "if": { "properties": { "operation": { "const": "write.block.append_entity" } } },
+      "then": {
+        "properties": {
+          "args": {
+            "type": "object",
+            "required": ["entity"],
+            "properties": {
+              "block_name": { "type": "string" },
+              "entity": {
+                "type": "object",
+                "required": ["kind"],
+                "properties": {
+                  "kind": { "type": "string", "enum": ["line", "circle", "arc", "text"] }
+                }
+              },
+              "layer": { "type": "string" }
+            }
           }
         }
       }

@@ -490,14 +490,89 @@ _NATIVE_CLASS_TO_DXF_KIND = {
     "AcDbSpline": ("SPLINE", "spline"),
     "AcDbPoint": ("POINT", "point"),
     "AcDbSolid": ("SOLID", "solid"),
-    "AcDb3dSolid": ("3DSOLID", "solid"),
+    # wS-solids/S8 fix (WaveS0 finding G1): AcDb3dSolid used to share the
+    # IDENTICAL "solid" kind with the unrelated flat-2D AcDbSolid entity right
+    # above -- a consumer filtering IR by geometry.kind could not tell a real
+    # 3D solid from a 2D filled quad without also checking class/dxf_name.
+    # Distinct "solid3d" kind; additive to schemas/dwg_graph_ir.v1.schema.json
+    # (geometry already declares additionalProperties:true).
+    "AcDb3dSolid": ("3DSOLID", "solid3d"),
     "AcDbRegion": ("REGION", "region"),
+    # wS-solids/S8: AcDbSurface/AcDbNurbSurface/AcDbBody previously had NO
+    # entry at all -- geometry.kind fell through to "unsupported" (WaveS0
+    # finding G1/G3). AcDbNurbSurface DERIVES from AcDbSurface but this dict
+    # is keyed on the native reader's own most-derived dxf_name string (see
+    # collectEntitiesFromBlock's cast-order comment in AriadneNativeJob.cpp),
+    # not a cast chain, so no ordering hazard here -- both keys are exact,
+    # disjoint string matches.
+    # LIVE-VERIFIED CORRECTION (same wave): AcDbSurface is an ABSTRACT
+    # ObjectARX base class -- no entity can ever report this exact class
+    # name, so this entry can never fire; kept only as documentation of
+    # intent. write.entity.surface's AcDbSurface::createFrom(profile, ...)
+    # actually returns a concrete AcDbPlaneSurface for the flat closed
+    # profile this handler builds (confirmed via a live case_result.json:
+    # "class":"AcDbPlaneSurface", geometry.kind was silently "unsupported"
+    # before this line was added) -- THAT is the key that must be mapped for
+    # write.entity.surface's real output. A future op that produces a
+    # different concrete AcDbSurface subclass (AcDbExtrudedSurface/
+    # AcDbLoftedSurface/AcDbRevolvedSurface/AcDbSweptSurface) needs its own
+    # entry, live-verified the same way -- do not assume this one covers them.
+    "AcDbSurface": ("SURFACE", "surface"),
+    "AcDbPlaneSurface": ("SURFACE", "surface"),
+    "AcDbNurbSurface": ("NURBSURFACE", "nurbsurface"),
+    "AcDbBody": ("BODY", "body"),
     "AcDbViewport": ("VIEWPORT", "viewport"),
     "AcDbRotatedDimension": ("DIMENSION", "dimension"),
     "AcDbAlignedDimension": ("DIMENSION", "dimension"),
+    "AcDbRadialDimension": ("DIMENSION", "dimension"),
+    "AcDbDiametricDimension": ("DIMENSION", "dimension"),
     "AcDbDimension": ("DIMENSION", "dimension"),
+    "AcDbOrdinateDimension": ("DIMENSION", "dimension"),
+    "AcDbArcDimension": ("DIMENSION", "dimension"),
+    "AcDb2LineAngularDimension": ("DIMENSION", "dimension"),
+    "AcDb3PointAngularDimension": ("DIMENSION", "dimension"),
     "AcDbLeader": ("LEADER", "leader"),
     "AcDbMLeader": ("MULTILEADER", "leader"),
+    # w3-wbug: AcDbMline's "vertices" (plain [x,y,z] array, no bulge) and
+    # "closed" are BOTH already lifted by _geometry_from_native_entity's
+    # existing generic handling (same shapes AcDbLeader/AcDb2dPolyline already
+    # use) -- this class-map entry is the only change needed here.
+    "AcDbMline": ("MLINE", "mline"),
+    # w3-simple1: AcDbRay/AcDbXline's "base_point"/"unit_dir" (both plain
+    # point3 fields) are already lifted by _geometry_from_native_entity's
+    # generic point-field allowlist below -- this class-map entry is the
+    # only change needed here for each.
+    "AcDbRay": ("RAY", "ray"),
+    "AcDbXline": ("XLINE", "xline"),
+    # w3-pmesh: AcDbPolygonMesh serializes to DXF as a POLYLINE record too
+    # (like AcDb2dPolyline/AcDb3dPolyline above -- distinguished on disk only
+    # by its group-70 flags), but its geometry shape (m_size/n_size/m_closed/
+    # n_closed grid, no per-vertex bulge) is unrelated to "polyline"'s, hence
+    # its own "polygon_mesh" kind.
+    "AcDbPolygonMesh": ("POLYLINE", "polygon_mesh"),
+    # w3-pfmesh: AcDbPolyFaceMesh serializes to DXF as a POLYLINE record too
+    # (same group-70-flag-distinguished convention as AcDb2dPolyline/AcDb3d
+    # Polyline/AcDbPolygonMesh above), but its geometry shape (a plain vertex
+    # list PLUS a "faces" array of per-face vertex-index tuples -- no m_size/
+    # n_size grid, no bulge) is unrelated to any of theirs, hence its own
+    # "poly_face_mesh" kind.
+    "AcDbPolyFaceMesh": ("POLYLINE", "poly_face_mesh"),
+    "AcDbRadialDimensionLarge": ("DIMENSION", "dimension"),
+    # p8-simple2: AcDbFace/AcDbTrace, the other two flat 4-point entities
+    # alongside AcDbSolid above (already mapped to dxf_name "SOLID"/kind
+    # "solid" from an earlier batch -- unchanged here, its own geometry lift
+    # just gained p0..p3 below). AcDbFace's DXF record is "3DFACE" (not
+    # "FACE"); AcDbTrace's is "TRACE".
+    "AcDbFace": ("3DFACE", "face3d"),
+    "AcDbTrace": ("TRACE", "trace"),
+    # wA-cert: AcDbWipeout IS-A AcDbRasterImage (dbwipe.h) but the native
+    # collector cast-checks it FIRST (more-derived-first, same rule this
+    # class-map's own AcDbRotatedDimension-before-generic-dimension entries
+    # already follow) so its raw dxf_name is always the distinct string
+    # "AcDbWipeout", never "AcDbRasterImage" -- no ambiguity here.
+    "AcDbRasterImage": ("IMAGE", "rasterimage"),
+    "AcDbWipeout": ("WIPEOUT", "wipeout"),
+    "AcDbMPolygon": ("MPOLYGON", "mpolygon"),
 }
 
 
@@ -505,20 +580,110 @@ def _geometry_from_native_entity(raw: dict, kind: str) -> dict:
     """Lift a native graph entity's inline geometry fields into an IR geometry dict.
 
     The native collector writes geometry inline on the entity record (start/end,
-    center/radius/angles, position/scale/rotation/block_name, text, vertices).
-    Returns an IR geometry dict with a valid ``kind``; unrepresented kinds get a
-    geometry that carries only ``kind`` (decoded=False is decided by the caller).
+    center/radius/angles, position/scale/rotation/block_name, text, vertices,
+    T3a: major_axis/radius_ratio, height, xline1_point/xline2_point/
+    dim_line_point/measurement. T3a-batch2: degree/fit_points (spline),
+    chord_point/far_chord_point (radial/diametric dims); NOT leader_length --
+    see _entity_from_native, it is lifted top-level instead. T3a-batch3:
+    defining_point/leader_end_point/use_x_axis (ordinate dim); NOT origin --
+    see _entity_from_native, it is lifted top-level instead. Also T3a-batch3:
+    has_arrow_head/splined (AcDbLeader) -- reuses the existing generic
+    "vertices" lift below, no change needed there). w3-dimarc: arc_point
+    (AcDbArcDimension, reuses center/xline1_point/xline2_point/measurement,
+    already lifted). w3-ang2: xline1_start/xline1_end/xline2_start/xline2_end
+    (AcDb2LineAngularDimension; arc_point/measurement reuse the existing
+    lifts). w3-ang3: AcDb3PointAngularDimension reuses center/xline1_point/
+    xline2_point/arc_point/measurement verbatim (identical ctor-arg shape to
+    AcDbArcDimension) -- no allowlist change needed, only the class-map entry
+    above. w3-pmesh: m_size/n_size (numbers) + m_closed/n_closed (booleans)
+    for AcDbPolygonMesh; its plain [x,y,z] "vertices" (no bulge) reuse the
+    existing generic vertices lift below, zero change needed there. w3-pfmesh:
+    AcDbPolyFaceMesh's "vertices" reuse that same generic lift too; its
+    "faces" (per-face vertex-index arrays, no point/bulge shape at all) get
+    their own passthrough below, the same shape "loops" already uses.
+    w3-radl: AcDbRadialDimensionLarge reuses center/chord_point/measurement
+    verbatim (identical semantic to AcDbRadialDimension above) and adds two
+    new point keys, override_center/jog_point, plus a new number key,
+    jog_angle -- all three are this class's own jog-symbol placement args,
+    with no prior-batch equivalent.
+    p4-poly2d: AcDb2dPolyline (the TRUE legacy 2D polyline, "kind": "polyline",
+    distinct from LWPOLYLINE's "kind": "lwpolyline") adds three entity-level
+    number keys -- elevation/default_start_width/default_end_width -- direct
+    setElevation/setDefaultStartWidth/setDefaultEndWidth echoes, and extends
+    the existing generic "vertices" lift below with two new per-vertex number
+    keys, start_width/end_width, alongside the "bulge" it already carried;
+    harmless for every other vertex-bearing kind (AcDb3dPolyline/
+    AcDbPolygonMesh/AcDbPolyFaceMesh's plain [x,y,z] vertices never carry
+    these keys, so they normalize exactly as before).
+    Returns an IR geometry dict with a valid ``kind``; unrepresented kinds get
+    a geometry that carries only ``kind`` (decoded=False is decided by the
+    caller).
     """
     geom: dict = {"kind": kind}
-    for key in ("start", "end", "center", "position", "scale", "normal"):
+    for key in ("start", "end", "center", "position", "scale", "normal",
+                "major_axis", "xline1_point", "xline2_point", "dim_line_point",
+                "chord_point", "far_chord_point", "defining_point", "leader_end_point",
+                "arc_point", "xline1_start", "xline1_end", "xline2_start", "xline2_end",
+                "override_center", "jog_point", "base_point", "unit_dir",
+                # p8-simple2: AcDbFace/AcDbSolid/AcDbTrace's 4 flat vertices,
+                # keyed exactly like the write.entity.face/solid2d/trace job
+                # args (m08g_handlers.inc) so the roundtrip diff is direct.
+                "p0", "p1", "p2", "p3",
+                # wA-cert: AcDbRasterImage/AcDbWipeout's plane orientation
+                # direction vectors (getOrientation's u/v) -- not points, but
+                # this lift is a bare [x,y,z] normalize with no positional
+                # semantics attached, so reusing it for vectors is exact
+                # (same idiom "normal"/"unit_dir" above already establish for
+                # other vector fields). "origin" is NOT in this shared tuple
+                # (see the kind-gated lift just below) -- a raw "origin" key
+                # is ALSO used, unrelated, by AcDbOrdinateDimension for a
+                # value that is deliberately top-level-only, never inside
+                # geometry (test_ir_builder.py::
+                # test_ordinate_dimension_lifts_points_and_top_level_origin
+                # asserts this for every kind, not just ordinate dimensions --
+                # an earlier attempt to add "origin" to this shared tuple
+                # broke that test; a blanket lift here would be wrong).
+                "u_vector", "v_vector"):
         pt = _as_point3(raw.get(key))
         if pt is not None:
             geom[key] = pt
+    # wA-cert: rasterimage/wipeout's own plane origin DOES belong inside
+    # geometry (needed for the P-gate fingerprint -- live-verified via
+    # attended_lane.py's expect_rasterimage/expect_wipeout, both certified
+    # diff=0). Kind-gated rather than added to the shared tuple above,
+    # specifically to NOT collide with AcDbOrdinateDimension's unrelated,
+    # deliberately-top-level-only "origin" (same raw field name, different
+    # entities, different P-gate treatment).
+    if kind in ("rasterimage", "wipeout"):
+        pt = _as_point3(raw.get("origin"))
+        if pt is not None:
+            geom["origin"] = pt
     radius = _to_number(raw.get("radius"))
     if radius is not None:
         geom["radius"] = radius
     for nk, ik in (("start_angle", "start_angle"), ("end_angle", "end_angle"),
-                   ("rotation", "rotation")):
+                   ("rotation", "rotation"), ("radius_ratio", "radius_ratio"),
+                   ("height", "height"), ("measurement", "measurement"),
+                   ("degree", "degree"), ("m_size", "m_size"), ("n_size", "n_size"),
+                   ("jog_angle", "jog_angle"), ("elevation", "elevation"),
+                   ("default_start_width", "default_start_width"),
+                   ("default_end_width", "default_end_width"),
+                   # a1-hatchread: AcDbHatch's own plane/pattern/gradient
+                   # numbers. pattern_type/hatch_style/gradient_type are
+                   # AutoCAD enum ordinals (AcDbHatch::HatchPatternType/
+                   # HatchStyle/GradientPatternType), passed through as
+                   # plain numbers like radius_ratio etc. above -- no
+                   # string translation table maintained on this side.
+                   ("pattern_angle", "pattern_angle"),
+                   ("pattern_scale", "pattern_scale"), ("pattern_type", "pattern_type"),
+                   ("hatch_style", "hatch_style"), ("gradient_type", "gradient_type"),
+                   ("gradient_angle", "gradient_angle"),
+                   # wA-cert: AcDbRasterImage/AcDbWipeout's clip_boundary_type
+                   # (ClipBoundaryType enum ordinal, same plain-number-passthrough
+                   # convention as pattern_type/hatch_style above) and
+                   # AcDbMPolygon's loop_count (numMPolygonLoops()).
+                   ("clip_boundary_type", "clip_boundary_type"),
+                   ("loop_count", "loop_count")):
         num = _to_number(raw.get(nk))
         if num is not None:
             geom[ik] = num
@@ -528,8 +693,91 @@ def _geometry_from_native_entity(raw: dict, kind: str) -> dict:
         geom["block_name"] = str(raw.get("block_name"))
     if raw.get("pattern_name") is not None:
         geom["pattern_name"] = str(raw.get("pattern_name"))
+    if raw.get("gradient_name") is not None:
+        geom["gradient_name"] = str(raw.get("gradient_name"))
+    # wA-cert: AcDbRasterImage/AcDbWipeout's backing AcDbRasterImageDef source
+    # file path (may be non-ASCII -- the native side already converts via
+    # wideToUtf8, this is a plain str passthrough, same idiom pattern_name/
+    # gradient_name above use).
+    if raw.get("source_file_name") is not None:
+        geom["source_file_name"] = str(raw.get("source_file_name"))
+    # p3-insattr: ATTDEF/ATTRIB-specific fields (kind == "attribute", both
+    # AcDbAttributeDefinition and AcDbAttribute per _NATIVE_CLASS_TO_DXF_KIND
+    # above) -- tag/prompt are plain strings; the four ATTDEF/ATTRIB mode
+    # flags are booleans the native side only emits when true/false is known
+    # (never guessed), so isinstance(bool) is the correct presence test here,
+    # same idiom "closed"/"has_arrow_head"/"splined" already use below.
+    if raw.get("tag") is not None:
+        geom["tag"] = str(raw.get("tag"))
+    if raw.get("prompt") is not None:
+        geom["prompt"] = str(raw.get("prompt"))
+    for flag_key in ("constant", "invisible", "verifiable", "preset"):
+        if isinstance(raw.get(flag_key), bool):
+            geom[flag_key] = raw[flag_key]
+    # p3-insattr: INSERT's own "attributes" convenience array (ATTRIB tag/
+    # value/position/height grouped on the owning block_reference geometry --
+    # mirrors schemas/dwg_graph_ir.v1.schema.json's $defs/block_reference.
+    # attributes[] shape). The same ATTRIB data also round-trips as its own
+    # top-level entity (kind=="attribute") via the class-map above; this is a
+    # convenience projection, not the only place it lives.
+    raw_attrs = raw.get("attributes")
+    if isinstance(raw_attrs, list) and raw_attrs:
+        norm_attrs = []
+        for one_attr in raw_attrs:
+            if not isinstance(one_attr, dict):
+                continue
+            item: dict = {}
+            if one_attr.get("tag") is not None:
+                item["tag"] = str(one_attr["tag"])
+            if one_attr.get("value") is not None:
+                item["value"] = str(one_attr["value"])
+            if one_attr.get("handle"):
+                item["handle"] = str(one_attr["handle"])
+            attr_pt = _as_point3(one_attr.get("position"))
+            if attr_pt is not None:
+                item["position"] = attr_pt
+            attr_height = _to_number(one_attr.get("height"))
+            if attr_height is not None:
+                item["height"] = attr_height
+            if item:
+                norm_attrs.append(item)
+        if norm_attrs:
+            geom["attributes"] = norm_attrs
     if isinstance(raw.get("closed"), bool):
         geom["closed"] = raw["closed"]
+    if isinstance(raw.get("use_x_axis"), bool):
+        geom["use_x_axis"] = raw["use_x_axis"]
+    if isinstance(raw.get("has_arrow_head"), bool):
+        geom["has_arrow_head"] = raw["has_arrow_head"]
+    if isinstance(raw.get("splined"), bool):
+        geom["splined"] = raw["splined"]
+    if isinstance(raw.get("m_closed"), bool):
+        geom["m_closed"] = raw["m_closed"]
+    if isinstance(raw.get("n_closed"), bool):
+        geom["n_closed"] = raw["n_closed"]
+    # p8-simple2: AcDbFace's 4 edge-visibility flags (isEdgeVisibleAt) --
+    # a fixed-length bool array, same bare passthrough shape "faces" below
+    # uses for AcDbPolyFaceMesh's per-face index arrays.
+    edge_vis = raw.get("edge_visibility")
+    if isinstance(edge_vis, list) and edge_vis:
+        geom["edge_visibility"] = [bool(v) for v in edge_vis]
+    # a1-hatchread: AcDbHatch booleans (pattern_double/is_solid_fill/
+    # is_associative/is_gradient) -- read-only surface, no roundtrip-create
+    # equivalent (write.entity.hatch is attended-gated on this build; see
+    # build_log.md), so this is verified via cross-oracle DXF comparison
+    # instead of a create->re-extract P-gate diff like closed/m_closed above.
+    if isinstance(raw.get("pattern_double"), bool):
+        geom["pattern_double"] = raw["pattern_double"]
+    if isinstance(raw.get("is_solid_fill"), bool):
+        geom["is_solid_fill"] = raw["is_solid_fill"]
+    if isinstance(raw.get("is_associative"), bool):
+        geom["is_associative"] = raw["is_associative"]
+    if isinstance(raw.get("is_gradient"), bool):
+        geom["is_gradient"] = raw["is_gradient"]
+    # wA-cert: AcDbRasterImage/AcDbWipeout's frame-display flag -- same
+    # present-only-when-known bool idiom as is_solid_fill/is_gradient above.
+    if isinstance(raw.get("frame_on"), bool):
+        geom["frame_on"] = raw["frame_on"]
     verts = raw.get("vertices")
     if isinstance(verts, list) and verts:
         norm = []
@@ -544,12 +792,59 @@ def _geometry_from_native_entity(raw: dict, kind: str) -> dict:
                     bulge = _to_number(v.get("bulge"))
                     if bulge is not None:
                         item["bulge"] = bulge
+                    # p4-poly2d: AcDb2dPolyline's per-vertex start_width/end_width
+                    # (see _geometry_from_native_entity's docstring); absent for
+                    # every other vertex-bearing kind's plain vertex dict.
+                    start_w = _to_number(v.get("start_width"))
+                    if start_w is not None:
+                        item["start_width"] = start_w
+                    end_w = _to_number(v.get("end_width"))
+                    if end_w is not None:
+                        item["end_width"] = end_w
                     norm.append(item)
         if norm:
             geom["vertices"] = norm
+    # T3a-batch2: a spline's fit points -- distinct from "vertices" (which
+    # always means an owning polyline/curve's own defining vertices, with an
+    # optional per-vertex bulge); fit points are the plain [x,y,z] points a
+    # fit-point AcDbSpline interpolates through, with no bulge concept.
+    fit_pts = raw.get("fit_points")
+    if isinstance(fit_pts, list) and fit_pts:
+        norm_fp = []
+        for v in fit_pts:
+            pt = _as_point3(v)
+            if pt is not None:
+                norm_fp.append(pt)
+        if norm_fp:
+            geom["fit_points"] = norm_fp
     loops = raw.get("loops")
     if isinstance(loops, list) and loops:
         geom["loops"] = loops
+    # w3-pfmesh: AcDbPolyFaceMesh's per-face vertex-index arrays (e.g.
+    # [1, 2, 3, 4]) -- unlike "vertices", these are indices, not points, so
+    # they get a bare passthrough with no _as_point3 normalization, the same
+    # zero-transform shape "loops" already uses above.
+    faces = raw.get("faces")
+    if isinstance(faces, list) and faces:
+        geom["faces"] = faces
+    # wA-cert: AcDbRasterImage/AcDbWipeout's pixel [width, height] pair --
+    # a fixed 2-element number array, not a point (no z) and not an index
+    # list, so it gets its own small handler rather than joining an
+    # existing tuple/passthrough above.
+    img_size = raw.get("image_size")
+    if isinstance(img_size, list) and len(img_size) == 2:
+        w = _to_number(img_size[0])
+        h = _to_number(img_size[1])
+        if w is not None and h is not None:
+            geom["image_size"] = [w, h]
+    # wA-cert: AcDbRasterImage/AcDbWipeout's clip boundary vertices -- same
+    # bare zero-transform passthrough shape "loops" already uses above. The
+    # native side emits [x, y] pairs (AcGePoint2dArray -- the clip boundary
+    # is defined in the image's own local plane, no elevation component
+    # exists at the API level), unlike "loops"' [x, y, elevation] triples.
+    clip_boundary = raw.get("clip_boundary")
+    if isinstance(clip_boundary, list) and clip_boundary:
+        geom["clip_boundary"] = clip_boundary
     return geom
 
 
@@ -561,7 +856,17 @@ def _entity_from_native(raw: dict, source_block: dict) -> dict:
         native_class, (native_class or "UNKNOWN", "unsupported"))
     layer = str(raw.get("layer", "") or "")
     geom = _geometry_from_native_entity(raw, kind)
-    bbox = _normalize_bbox(None, geom)
+    # wS-solids/S8 fix: this used to hardcode None, silently discarding
+    # whatever bbox the native side emitted and ALWAYS falling back to
+    # deriving one from geometry points. Harmless for every pre-existing
+    # entity kind (none of them ever emitted a native "bbox" key -- verified:
+    # AriadneNativeJob.cpp's bboxJsonField, added this wave for the 5 ASM/
+    # solids classes, is the ONLY "bbox" JSON emitter in the whole native
+    # codebase), but it silently zeroed out the S8 cast branches' bbox for
+    # solid3d/surface/nurbsurface/region/body -- those kinds have no start/
+    # end/center/vertices geometry fields for _normalize_bbox to fall back
+    # to, so raw.get("bbox") is their ONLY extents signal.
+    bbox = _normalize_bbox(raw.get("bbox"), geom)
     decoded = kind != "unsupported"
 
     entity: dict = {
@@ -586,7 +891,65 @@ def _entity_from_native(raw: dict, source_block: dict) -> dict:
         entity["xdata"] = raw["xdata"]
     if raw.get("extension_dictionary_handle"):
         entity["extension_dictionary_handle"] = str(raw["extension_dictionary_handle"])
+    # T3a: a dimension's defining anonymous block (*Dn) id/name -- deliberately
+    # a top-level field, NOT inside "geometry": *Dn increments with the live
+    # drawing's pre-existing anonymous-block count, so it is not derivable from
+    # an op's own args alone and must never enter the geometry P-gate's
+    # fingerprint (see op_roundtrip_probe.py's _expect_create_dimension).
+    if raw.get("dim_block_handle"):
+        entity["dim_block_handle"] = str(raw["dim_block_handle"])
+    if raw.get("dim_block_name"):
+        entity["dim_block_name"] = str(raw["dim_block_name"])
+    # T3a-batch2: a radial/diametric dimension's leader_length -- LIVE-
+    # DISCOVERED (2026-07-02 T3a-batch2 re-cert) to NOT survive as a ctor-arg
+    # echo: AutoCAD recomputes/resets it (observed 5.0 -> 0.0 for a
+    # chord_point 10 units from center, well within default text/arrow size,
+    # where no leader is actually needed) as part of its own internal
+    # leader-needed heuristic -- not derivable from this op's own args alone.
+    # Deliberately top-level, NOT inside "geometry", same treatment as
+    # dim_block_handle/name (see op_roundtrip_probe.py's
+    # _expect_create_dimension_radial/_diametric).
+    leader_length = _to_number(raw.get("leader_length"))
+    if leader_length is not None:
+        entity["leader_length"] = leader_length
+    # T3a-batch2: a fit-point spline's NURBS-basis representation (control
+    # points + knot vector) -- deliberately top-level, NOT inside "geometry",
+    # for the same reason dim_block_handle/name are: AutoCAD derives them via
+    # its own proprietary fit-to-NURBS conversion, not from write.entity.
+    # spline's own args alone, so they must never enter the geometry P-gate's
+    # fingerprint (see op_roundtrip_probe.py's _expect_create_spline).
+    if isinstance(raw.get("spline_control_points"), list) and raw["spline_control_points"]:
+        entity["spline_control_points"] = raw["spline_control_points"]
+    if isinstance(raw.get("spline_knots"), list) and raw["spline_knots"]:
+        entity["spline_knots"] = raw["spline_knots"]
+    # T3a-batch3: an ordinate dimension's origin() -- NOT a write.entity.dim.
+    # ordinate ctor arg (the handler never calls setOrigin), so it is not
+    # derivable from this op's own args alone. Deliberately top-level, NOT
+    # inside "geometry", same treatment as dim_block_handle/name (see
+    # op_roundtrip_probe.py's _expect_create_dimension_ordinate).
+    origin = _as_point3(raw.get("origin"))
+    if origin is not None:
+        entity["origin"] = origin
     return entity
+
+
+def _normalize_block_definitions(raw_block_defs, source_block: dict) -> list:
+    """Lift each block_definitions[] entry's raw def_entities[] (native
+    records, same shape as graph_result['entities']) through
+    _entity_from_native so they carry the same normalized IR entity shape
+    ($defs.entity, schemas/dwg_graph_ir.v1.schema.json) as top-level
+    entities[] -- dxf_name/geometry/bbox/source, not raw native fields.
+    def_entities already carries the right owner_handle (the block def's own
+    BTR handle) and space ("block") from the native side
+    (collectEntitiesFromBlock), so no extra plumbing is needed here."""
+    out = []
+    for bd in raw_block_defs or []:
+        bd = dict(bd)
+        raw_def_entities = bd.get("def_entities")
+        if isinstance(raw_def_entities, list) and raw_def_entities:
+            bd["def_entities"] = [_entity_from_native(e, source_block) for e in raw_def_entities]
+        out.append(bd)
+    return out
 
 
 def build_ir_from_database_graph(graph_result: dict, source_meta: dict) -> dict:
@@ -707,7 +1070,8 @@ def build_ir_from_database_graph(graph_result: dict, source_meta: dict) -> dict:
         "source": source,
         "database": graph_result.get("database") or {"header_vars": {}},
         "symbol_tables": symbol_tables,
-        "block_definitions": graph_result.get("block_definitions") or [],
+        "block_definitions": _normalize_block_definitions(
+            graph_result.get("block_definitions"), source_block),
         "block_references": block_references,
         "xrefs": graph_result.get("xrefs") or [],
         "dictionaries": graph_result.get("dictionaries") or [],

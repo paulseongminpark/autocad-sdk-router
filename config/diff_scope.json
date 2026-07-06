@@ -1,0 +1,28 @@
+{
+  "schema": "ariadne.diff_scope.v1",
+  "version": "1.0.0",
+  "generated_at": "2026-07-01",
+  "generated_by": "CADOS Wave-0 F5 (diff-scope legislation + diff_id basis-hash + handle-independence fix)",
+  "purpose": "Legislates which entities tools/cad_diff.py's compute_diff() is even eligible to diff -- H-R18 / D1_tier_dag F5 / PLAN.md F5. Consumed by cad_diff.load_diff_scope_config()/_resolve_diff_scope(); compute_diff(diff_scope=None) resolves default_scope from here. Not consumed for tolerance -- see cad_diff.default_tolerance_profile() (v2-A5), which is Python constants, not config.",
+  "default_scope": "modelspace_entities_only",
+  "freeze_scope": "full_database",
+  "valid_scopes": ["modelspace_entities_only", "full_database"],
+  "paul_decision": "Default critical-path scope = modelspace-only; freeze scope = full_database. Both supported, chosen by config (PLAN.md F5 Paul-decision node, SEED open Q#1/#2).",
+  "scopes": {
+    "modelspace_entities_only": {
+      "description": "Keep only entities whose IR entity.space is \"model\" (ir_builder's own default when a producer omits space). Paperspace/layout entities and any future symbol-table/block-definition-shaped record are out of scope. This is the default critical-path scope: fast, and structurally immune to blank-seed noise because seed default records (layers, linetypes, text styles, dimstyles, block defs) never live in modelspace.",
+      "entity_filter": { "space": ["model"] },
+      "seed_baseline_mask": { "enabled": false }
+    },
+    "full_database": {
+      "description": "Keep entities from every space (no space filter) -- the freeze scope. Additionally subtract any entity matching the seed_baseline_mask passed to compute_diff(): the blank-seed's default symbol-table/block-definition records (fixtures/blank_seed.dwg, node F4) that would otherwise show up as diff noise (H-R18 measured on the pilot seed: ~91 layers, 8 text styles, 6 dim styles, 18 linetypes, 140 block defs). T5 (symbol-table & dictionary record-diff) is a prerequisite for a genuinely complete full_database diff; until it lands this scope only widens cad_diff.py's existing entities[] population (no space filter) plus honest mask subtraction -- it does not yet diff symbol_tables/block_definitions/dictionaries themselves.",
+      "entity_filter": null,
+      "seed_baseline_mask": {
+        "enabled": true,
+        "match_on": ["dxf_name", "layer", "geometry"],
+        "match_semantics": "A mask entry WITHOUT a \"geometry\" key matches ANY geometry for its (dxf_name, layer) pair (a symbol-table-record-style wildcard -- most seed default records are not shaped like a graphical entity at all). A mask entry WITH a \"geometry\" key matches only entities whose geometry fingerprint is equal within the active tolerance profile (an exact graphical-entity match).",
+        "source": "Not yet minted -- node F4/F4b mint fixtures/blank_seed.dwg (+ its symbol-table baseline) separately. Until then callers pass seed_baseline_mask explicitly to compute_diff(); no mask means no subtraction (no-fake-success: this module never fabricates an exclusion it cannot justify)."
+      }
+    }
+  }
+}

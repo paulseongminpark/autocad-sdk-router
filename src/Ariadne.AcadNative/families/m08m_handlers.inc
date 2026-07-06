@@ -180,7 +180,7 @@ static std::string m08mValueTypeName(const AcRxValueType& vt)
 static AcRxClass* m08mNewTransientClass(const std::string& baseName, std::string& outName)
 {
     static unsigned long s_seq = 0;
-    std::ostringstream nm;
+    std::ostringstream nm; nm.precision(kJsonDoublePrecision);
     nm << "AriadneM08M_" << baseName << "_" << (++s_seq) << "_" << static_cast<unsigned long>(GetTickCount());
     outName = nm.str();
     const std::wstring wname = asciiToWide(outName);
@@ -991,7 +991,7 @@ static bool m08mDispatch(const std::string& op, const AriadneJobCtx& ctx, std::o
         }
         const std::wstring wprop = asciiToWide(propName);
         const AcRxProperty* prop = m08mFindClassProperty(cls, wprop.c_str());
-        std::ostringstream o;
+        std::ostringstream o; o.precision(kJsonDoublePrecision);
         o << "\"class\":" << njsonStr(clsName.empty() ? std::string("AcDbEntity") : clsName)
           << ",\"property\":" << njsonStr(propName)
           << ",\"found\":" << (prop != nullptr ? "true" : "false");
@@ -1052,7 +1052,7 @@ static bool m08mDispatch(const std::string& op, const AriadneJobCtx& ctx, std::o
         AcRxMemberCollection* members = cls->members();
         const int n = (members != nullptr) ? members->count() : 0;
         int emitted = 0;
-        std::ostringstream props;
+        std::ostringstream props; props.precision(kJsonDoublePrecision);
         for (int i = 0; i < n && emitted < 64; ++i) {
             AcRxMember* m = members->getAt(i);
             const AcRxProperty* prop = (m != nullptr) ? AcRxProperty::cast(m) : nullptr;
@@ -1096,7 +1096,7 @@ static bool m08mDispatch(const std::string& op, const AriadneJobCtx& ctx, std::o
         AcRxMemberCollection* members = (cls != nullptr) ? cls->members() : nullptr;
         const int n = (members != nullptr) ? members->count() : 0;
         int props = 0, promoted = 0;
-        std::ostringstream arr;
+        std::ostringstream arr; arr.precision(kJsonDoublePrecision);
         for (int i = 0; i < n && props < 96; ++i) {
             AcRxMember* m = members->getAt(i);
             const AcRxProperty* prop = (m != nullptr) ? AcRxProperty::cast(m) : nullptr;
