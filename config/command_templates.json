@@ -1,0 +1,92 @@
+{
+  "schema": "ariadne.governed_command_templates.v1",
+  "version": "1.0.0",
+  "generated_at": "2026-07-06",
+  "purpose": "Governed, typed-slot templates for a small allow-listed set of built-in AutoCAD commands that have no safe path today because the only way to invoke a built-in command is through the SAFETY_FORBIDDEN raw command-dispatch surface (see docs/GOVERNED_COMMAND_TEMPLATES.md). Never write_original. Every slot value is validated before it ever reaches a .scr file; no free-text slot ever reaches the command line.",
+  "design_doc": "docs/GOVERNED_COMMAND_TEMPLATES.md",
+  "templates": [
+    {
+      "template_id": "maintenance.drawing.audit",
+      "op_id": "maintenance.drawing.audit",
+      "status": "implemented",
+      "summary": "Run the built-in AUDIT command against the staged drawing; optionally fix detected errors.",
+      "headless_safe": true,
+      "write_mode": {
+        "default": "write_copy",
+        "allowed": ["read", "write_copy"],
+        "note": "write_mode=read maps to fix_answer='N' being the only safe choice is NOT enforced here (fix vs write_mode are independent); read still stages a copy and never QSAVEs, so a 'fix=Y' AUDIT under write_mode=read fixes the STAGED copy in memory but the fix is discarded (never persisted). write_copy persists the fix via QSAVE."
+      },
+      "command_sequence": [
+        { "literal": "AUDIT" },
+        { "slot": "fix_answer" }
+      ],
+      "slots": {
+        "fix_answer": {
+          "type": "enum",
+          "values": ["Y"],
+          "description": "Answer to AUDIT's 'Fix any errors detected? [Yes/No]' prompt. Restricted to 'Y' only: live measurement (Lane W5-TMPL, 4/4 trials each) found 'N' makes accoreconsole hang on process exit -- deterministically, in this environment -- even though the AUDIT command itself and the postcondition entity-count probe both complete correctly (their output/files are fully written) BEFORE the hang; only the accoreconsole process's own shutdown never returns, and the engine's timeout+kill fires (status='error', code=ACCORECONSOLE_TIMEOUT, retryable=true; original DWG confirmed unchanged every time). 'Y' exits cleanly 4/4. Root cause not established (not this template's script logic -- identical command sequence otherwise); 'N' stays out of the shipped enum until it is. See docs/GOVERNED_COMMAND_TEMPLATES.md section 5.",
+          "default": "Y"
+        }
+      },
+      "postconditions": [
+        {
+          "kind": "regex_capture",
+          "description": "AUDIT's own summary line. Live-measured on this machine's Korean-locale AutoCAD 2027 (accoreconsole stdout is Korean UI text, not English) -- pattern is locale-specific; an English-locale AutoCAD install would need the English form 'Total (\\d+) errors? found[.,]? (\\d+) (?:were |was )?fixed' added as an alternative.",
+          "pattern": "전체\\s*(\\d+)\\s*건의\\s*오류를\\s*찾아서\\s*(\\d+)\\s*건이\\s*수정됨",
+          "on_stdout": true,
+          "bind": ["errors_found", "errors_fixed"],
+          "required": true
+        },
+        {
+          "kind": "entity_count_probe",
+          "description": "Modelspace entity count must be unchanged by AUDIT (audit repairs symbol-table/dictionary issues; it does not add/remove entities on a clean fixture).",
+          "capture_before": true,
+          "expect_unchanged": true
+        }
+      ],
+      "evidence_refs": [
+        "docs/GOVERNED_COMMAND_TEMPLATES.md#5-live-verification",
+        "tests/unit/test_command_template_engine.py::TestAuditTemplateLive"
+      ]
+    },
+    {
+      "template_id": "maintenance.drawing.purge",
+      "op_id": "maintenance.drawing.purge",
+      "status": "implemented",
+      "summary": "Run the built-in -PURGE command (all unused named objects, no per-item confirmation) against the staged drawing.",
+      "headless_safe": true,
+      "write_mode": {
+        "default": "write_copy",
+        "allowed": ["read", "write_copy"]
+      },
+      "command_sequence": [
+        { "literal": "-PURGE" },
+        { "literal": "A" },
+        { "literal": "*" },
+        { "literal": "N" }
+      ],
+      "slots": {},
+      "postconditions": [
+        {
+          "kind": "regex_capture",
+          "description": "First purged-named-object deletion line, if any (purged-item report). Korean-locale text, live-measured; not required (a clean drawing with nothing to purge legitimately produces zero matches).",
+          "pattern": "(\\S+)\\s*\"([^\"]+)\"\\s*을\\(를\\)\\s*삭제\\s*중입니다",
+          "on_stdout": true,
+          "bind": ["purged_kind", "purged_name"],
+          "required": false
+        },
+        {
+          "kind": "entity_count_probe",
+          "description": "PURGE removes only unused named objects (layers/linetypes/styles/blocks not referenced by any entity); modelspace entity count must be unchanged.",
+          "capture_before": true,
+          "expect_unchanged": true
+        }
+      ],
+      "notes": "verify_each is hardcoded literal 'N', never an agent-controllable slot: answering 'Y' opens an unbounded per-item confirmation loop with no headless-safe way to answer an unknown number of further prompts -- exactly the kind of hazard this registry exists to close off, not merely make agent-configurable.",
+      "evidence_refs": [
+        "docs/GOVERNED_COMMAND_TEMPLATES.md#5-live-verification",
+        "tests/unit/test_command_template_engine.py::TestPurgeTemplateLive"
+      ]
+    }
+  ]
+}

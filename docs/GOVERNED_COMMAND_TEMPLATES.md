@@ -243,10 +243,13 @@ briefed command names):
 
 **Live attempt #1 -- `REGEN` (candidate for `inspect.assocaction.evaluate` +
 `inspect.assocnetwork.evaluate`).** `REGEN` takes no arguments and prompts
-nothing, so it is trivially headless-scriptable; ran it via a template
-against a staged copy of `tests/fixtures/native_sample.dwg` (see section 5 for
-the live-run harness this reused). Result: **runs cleanly headless, exit 0,
-staged-copy sha256 changes are the ordinary QSAVE re-serialize, original
+nothing, so it is trivially headless-scriptable; ran it as a one-off (not a
+shipped template -- see verdict below) against a staged copy of
+`tests/fixtures/native_sample.dwg`, reusing the same
+`command_template_engine.py` staging/accoreconsole-invocation helpers as the
+real templates. Result (measured, no `_QSAVE` in this probe): **`accoreconsole
+/i <staged> /s <script>` exits 0, stdout shows `REGEN` -> "모형 재생성 중."
+("Regenerating model.") with no further prompts, and the ORIGINAL's sha256 is
 unchanged.** But per the section-1 distinction, this does **not** count as
 "promoting" the 2 ops: `REGEN`'s whole documented purpose is to force
 re-evaluation of the associative network, i.e. it triggers the EXACT solver
@@ -287,10 +290,41 @@ template could stand in for (`repair.assocdata.audit`). This is a genuine
 ## 5. Live verification
 
 See `tools/command_template_engine.py` + `tests/unit/test_command_template_engine.py`
-(unit-level, mocked accoreconsole) and the `CADOS_LIVE=1`-gated live cert in
-the same test file (real accoreconsole, staged copy of
-`tests/fixtures/native_sample.dwg`, sha256 `eac5d4b13d67d89106e503321412539df7b39b8a7f4e44c033448e9295fe3f76`
-verified unchanged before/after every live run). Live run artifacts land
-under gitignored `runs/command_template_live/` and are not committed; the
-measured outcome is captured in this doc and in `build_log.md`'s `## Lane
+(unit-level, mocked/pure-function tests for validation/rendering/postcondition
+logic) and the `CADOS_LIVE=1`-gated live cert in the same test file (real
+accoreconsole, staged copy of `tests/fixtures/native_sample.dwg`, sha256
+`eac5d4b13d67d89106e503321412539df7b39b8a7f4e44c033448e9295fe3f76` verified
+unchanged before/after every live run). Live run artifacts land under
+gitignored `runs/` (`w5tmpl_*`, `command_template_*`) and are not committed;
+the measured outcome is captured here and in `build_log.md`'s `## Lane
 W5-TMPL` section.
+
+Both templates ran successfully end-to-end multiple times in `read` and
+`write_copy` write modes: `AUDIT` (regex-captured `errors_found`/`errors_fixed`
+from the real Korean-locale AutoCAD 2027 console text, entity count probed
+21747 before/after -- exact match to the fixture's documented baseline) and
+`-PURGE` (real named-object deletions observed and regex-captured -- e.g. a
+"주석" leader/text/dimstyle style and an unused layer -- entity count
+unchanged 21747/21747 both times, confirming PURGE never touches entities).
+`accoreconsole /i /s` exit code 0 in every successful run; original DWG
+sha256 verified byte-identical before/after in every run, successful or not.
+
+**A real, reproducible finding, not a script bug**: `AUDIT`'s `fix_answer`
+slot was originally speced as an enum of `["Y", "N"]`. Live measurement found
+`fix_answer="N"` makes `accoreconsole` hang on process exit -- **4 of 4
+trials**, alternated against 4-of-4 clean exits for `"Y"` on the identical
+DWG/template/machine, ruling out generic system-load flakiness as the
+explanation. In every "N" trial the AUDIT command's own report text AND the
+after-probe LISP's entity-count file were both written correctly (verified on
+disk) BEFORE the hang -- i.e. all real work completes; only the
+`accoreconsole.exe` process's own shutdown sequence never returns, until the
+engine's timeout+kill fires (`status: "error"`, `code:
+"ACCORECONSOLE_TIMEOUT"`, `retryable: true`; original DWG sha256 confirmed
+unchanged in every one of these trials too). Root cause not established --
+this is inside AutoCAD Core Console itself, not in this lane's script
+generation (the "Y" and "N" `.scr` files are byte-identical apart from the one
+character). **`fix_answer`'s shipped enum is `["Y"]` only** until root-caused;
+this is a measured constraint, not a design choice, and reopening `"N"` needs
+its own investigation (start by isolating whether the hang is about the
+literal value `"N"` or about answering with whatever the prompt's bracketed
+default is, since `<N>` was AUDIT's own default here).
