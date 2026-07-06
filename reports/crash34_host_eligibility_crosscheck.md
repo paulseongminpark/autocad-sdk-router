@@ -3,9 +3,9 @@
 Source: `measure/reachable_matrix.jsonl` (CRASH rows) joined against `config/operations.v2.json`.
 
 CRASH total: 34 | joined: 34 | unjoined: 0
-Verdict counts: {"expected_crash": 28, "anomalous_crash": 6}
+Verdict counts: {"expected_crash": 30, "anomalous_crash": 4}
 Bucket counts: {"misc": 7, "custom-class": 6, "com_activex": 16, "live": 5}
-Registry action counts: {"none": 28, "open": 6}
+Registry action counts: {"none": 30, "open": 4}
 
 | op_id | bucket | policy.status_policy | verdict | reason |
 |---|---|---|---|---|
@@ -25,9 +25,9 @@ Registry action counts: {"none": 28, "open": 6}
 | extend.property.localize_name | com_activex | catalogued_not_runnable | expected_crash | registry policy.status_policy="catalogued_not_runnable" -- the registry's own record already says no live dispatcher is wired for this op yet; a CRASH here is not a surprise. |
 | extend.property.refers_to | com_activex | catalogued_not_runnable | expected_crash | registry policy.status_policy="catalogued_not_runnable" -- the registry's own record already says no live dispatcher is wired for this op yet; a CRASH here is not a surprise. |
 | extend.property.units | com_activex | catalogued_not_runnable | expected_crash | registry policy.status_policy="catalogued_not_runnable" -- the registry's own record already says no live dispatcher is wired for this op yet; a CRASH here is not a surprise. |
-| extend.customclass.create | custom-class | implemented | anomalous_crash | policy.status_policy=="implemented" (registry claims a wired, runnable dispatcher) and no host-capability caveat exists in the registry text -- nothing here predicts a crash; needs owner triage, not a bot-authored registry edit. |
+| extend.customclass.create | custom-class | implemented | expected_crash | registry summary/notes already documents that this op's live_edit default write_mode routes cadctl's headless surface to the attended full_autocad COM branch, which an isolated/headless probe never satisfies (2026-07-06 Lane G triage: reproduced the CRASH live, then proved the same op+args createCustomEntity/createCustomObject via the attended lane, created:true) -- harness difference, not a native code defect; already documented, nothing further to annotate. |
 | extend.customentity.define | custom-class | catalogued_not_runnable | expected_crash | registry policy.status_policy="catalogued_not_runnable" -- the registry's own record already says no live dispatcher is wired for this op yet; a CRASH here is not a surprise. |
-| extend.customobject.create | custom-class | implemented | anomalous_crash | policy.status_policy=="implemented" (registry claims a wired, runnable dispatcher) and no host-capability caveat exists in the registry text -- nothing here predicts a crash; needs owner triage, not a bot-authored registry edit. |
+| extend.customobject.create | custom-class | implemented | expected_crash | registry summary/notes already documents that this op's live_edit default write_mode routes cadctl's headless surface to the attended full_autocad COM branch, which an isolated/headless probe never satisfies (2026-07-06 Lane G triage: reproduced the CRASH live, then proved the same op+args createCustomEntity/createCustomObject via the attended lane, created:true) -- harness difference, not a native code defect; already documented, nothing further to annotate. |
 | extend.customobject.define | custom-class | catalogued_not_runnable | expected_crash | registry policy.status_policy="catalogued_not_runnable" -- the registry's own record already says no live dispatcher is wired for this op yet; a CRASH here is not a surprise. |
 | extend.customobject.embedded | custom-class | catalogued_not_runnable | expected_crash | registry policy.status_policy="catalogued_not_runnable" -- the registry's own record already says no live dispatcher is wired for this op yet; a CRASH here is not a surprise. |
 | extend.customobject.version | custom-class | catalogued_not_runnable | expected_crash | registry policy.status_policy="catalogued_not_runnable" -- the registry's own record already says no live dispatcher is wired for this op yet; a CRASH here is not a surprise. |

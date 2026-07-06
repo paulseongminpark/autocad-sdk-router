@@ -1823,10 +1823,11 @@
       "catalog_op_id": null,
       "input_schema": "schemas/cad_job.v2.schema.json#/allOf",
       "output_schema": "schemas/cad_result.v2.schema.json",
-      "summary": "Router job creates an Ariadne custom entity instance; catalog entries describe class definition and registration primitives.",
+      "summary": "Router job creates an Ariadne custom entity instance; catalog entries describe class definition and registration primitives. Its live_edit default write_mode always makes cadctl.run_operation's headless surface route to the full_autocad COM-attach branch, which requires an already-open autocad session that a headless/isolated probe never has -- verified working under the attended lane with identical fixture args (2026-07-06, Lane G triage; see build_log.md).",
       "evidence_refs": [
         "config/cad_job_operation_aliases.json#extend.customclass.create",
-        "tests/test_native_arx_dbx_contract.py::createCustomEntity"
+        "tests/test_native_arx_dbx_contract.py::createCustomEntity",
+        "runs/laneG_repro/attended/customclass_run/attended_job_result.json (2026-07-06 Lane G attended-lane repro, created:true)"
       ],
       "phase_batch": "P1 Custom objects/protocols",
       "target_family_first_class": false,
@@ -1852,7 +1853,7 @@
       "tests": [
         "tests/test_native_arx_dbx_contract.py::createCustomEntity"
       ],
-      "notes": "Router job creates an Ariadne custom entity instance; catalog entries describe class definition and registration primitives.",
+      "notes": "Router job creates an Ariadne custom entity instance; catalog entries describe class definition and registration primitives. Its live_edit default write_mode always makes cadctl.run_operation's headless surface route to the full_autocad COM-attach branch, which requires an already-open autocad session that a headless/isolated probe never has -- verified working under the attended lane with identical fixture args (2026-07-06, Lane G triage; see build_log.md).",
       "owner_ticket": "M08K-T01",
       "implementation_strategy": "implemented_v1",
       "evidence_required": "existing_tests_and_evidence_refs"
@@ -1955,10 +1956,11 @@
       "catalog_op_id": null,
       "input_schema": "schemas/cad_job.v2.schema.json#/allOf",
       "output_schema": "schemas/cad_result.v2.schema.json",
-      "summary": "Router job creates an Ariadne custom DBObject record; catalog separates custom object definition, filing, and storage primitives.",
+      "summary": "Router job creates an Ariadne custom DBObject record; catalog separates custom object definition, filing, and storage primitives. Its live_edit default write_mode always makes cadctl.run_operation's headless surface route to the full_autocad COM-attach branch, which requires an already-open autocad session that a headless/isolated probe never has -- verified working under the attended lane with identical fixture args (2026-07-06, Lane G triage; see build_log.md).",
       "evidence_refs": [
         "config/cad_job_operation_aliases.json#extend.customobject.create",
-        "tests/test_native_arx_dbx_contract.py::createCustomObject"
+        "tests/test_native_arx_dbx_contract.py::createCustomObject",
+        "runs/laneG_repro/attended/customobject_run/attended_job_result.json (2026-07-06 Lane G attended-lane repro, created:true)"
       ],
       "phase_batch": "P1 Custom objects/protocols",
       "target_family_first_class": false,
@@ -1984,7 +1986,7 @@
       "tests": [
         "tests/test_native_arx_dbx_contract.py::createCustomObject"
       ],
-      "notes": "Router job creates an Ariadne custom DBObject record; catalog separates custom object definition, filing, and storage primitives.",
+      "notes": "Router job creates an Ariadne custom DBObject record; catalog separates custom object definition, filing, and storage primitives. Its live_edit default write_mode always makes cadctl.run_operation's headless surface route to the full_autocad COM-attach branch, which requires an already-open autocad session that a headless/isolated probe never has -- verified working under the attended lane with identical fixture args (2026-07-06, Lane G triage; see build_log.md).",
       "owner_ticket": "M08K-T01",
       "implementation_strategy": "implemented_v1",
       "evidence_required": "existing_tests_and_evidence_refs"
