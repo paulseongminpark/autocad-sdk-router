@@ -96,14 +96,24 @@ def _reject_if_hostile(value: str, slot_name: str) -> None:
 # --------------------------------------------------------------------------- #
 # Registry load + validation
 # --------------------------------------------------------------------------- #
-def load_templates(path: Path | str = TEMPLATES_JSON) -> dict:
-    """Load + validate config/command_templates.json. Raises TemplateError if
-    any template declares a write_mode outside {read, write_copy} -- a
-    template author cannot even author a write_original-permitting entry
-    without the whole registry load failing."""
-    raw = json.loads(Path(path).read_text(encoding="utf-8-sig"))
-    by_id: dict[str, dict] = {}
-    for t in raw.get("templates", []):
+# A registry document is `{"templates": [...]}` (the base file) or a bare
+# `[...]` list (a fragment may use either shape). One drop-in file = one
+# disjoint unit, so template additions never collide on the single base JSON.
+FRAGMENT_DIRNAME_SUFFIX = ".d"  # command_templates.json -> command_templates.d/
+
+
+def _templates_of(raw) -> list:
+    return raw if isinstance(raw, list) else raw.get("templates", [])
+
+
+def _ingest_templates(templates, by_id: dict, sources: dict, source: str) -> None:
+    """Fold one document's templates into by_id. Fails LOUD on (a) a write_mode
+    outside {read, write_copy} -- a template author cannot author a
+    write_original-permitting entry without failing the whole load -- and (b) a
+    template_id defined more than once (base vs fragment, or fragment vs
+    fragment): a silent override would let a drop-in weaken a governed base
+    template, so a collision is a hard error, never last-writer-wins."""
+    for t in templates:
         tid = t["template_id"]
         allowed = t.get("write_mode", {}).get("allowed", [])
         bad = [m for m in allowed if m not in _ALLOWED_WRITE_MODES]
@@ -112,9 +122,49 @@ def load_templates(path: Path | str = TEMPLATES_JSON) -> dict:
                 "INVALID_TEMPLATE_REGISTRY",
                 f"template {tid!r} declares disallowed write_mode(s) {bad!r} "
                 f"(only {_ALLOWED_WRITE_MODES} permitted)",
-                {"template_id": tid},
+                {"template_id": tid, "source": source},
+            )
+        if tid in by_id:
+            raise TemplateError(
+                "DUPLICATE_TEMPLATE_ID",
+                f"template {tid!r} defined more than once "
+                f"(collision between {sources[tid]!r} and {source!r})",
+                {"template_id": tid, "source": source},
             )
         by_id[tid] = t
+        sources[tid] = source
+
+
+def load_templates(path: Path | str = TEMPLATES_JSON) -> dict:
+    """Load + validate the governed command-template registry.
+
+    Folded in a deterministic order (base first, then fragments sorted by
+    filename):
+      1. the base file `path` (config/command_templates.json), then
+      2. every ``*.json`` under the sibling drop-in dir
+         ``config/command_templates.d/`` (derived from the base filename).
+
+    The drop-in dir lets a new template land as its OWN file -- a disjoint unit
+    that never conflicts with the single base JSON at merge time. Every source
+    is subject to the same guarantees (see _ingest_templates): a disallowed
+    write_mode fails the whole load, and a duplicate template_id is a hard
+    collision -- a fragment can never silently override a governed base
+    template. Back-compatible: with no ``.d`` dir present, behavior is
+    identical to the pre-drop-in single-file load."""
+    base = Path(path)
+    by_id: dict[str, dict] = {}
+    sources: dict[str, str] = {}
+    _ingest_templates(
+        _templates_of(json.loads(base.read_text(encoding="utf-8-sig"))),
+        by_id, sources, source=base.name,
+    )
+    frag_dir = base.parent / (base.stem + FRAGMENT_DIRNAME_SUFFIX)
+    if frag_dir.is_dir():
+        for frag in sorted(frag_dir.glob("*.json")):
+            _ingest_templates(
+                _templates_of(json.loads(frag.read_text(encoding="utf-8-sig"))),
+                by_id, sources, source=f"{frag_dir.name}/{frag.name}",
+            )
     return by_id
 
 
