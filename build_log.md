@@ -1486,5 +1486,48 @@ document this lane opened in the live session was closed by this lane.
   status/policy mismatch outside Lane I's 34-row re-probe artifact. This lane is
   reconciling the router-fix leftovers evidenced by Lane I, not reclassifying
   unrelated backlog without live runnable proof.
+- Flipped exactly **27/27** mission-scope contradictions from
+  `policy.status_policy=="catalogued_not_runnable"` to `implemented`, removed the stale
+  `not_runnable_until_promoted_to_implemented_or_wired` runtime gate on each, and added
+  a Lane I evidence ref per record. Exact flipped set (measured from
+  `reports/lane_i_router_fix_resolution.json`): `define.constraint.autoConstrain`
+  (REACHABLE), `define.dimassoc.geometryDriven` (REACHABLE),
+  `extend.customentity.define`, `extend.customobject.define`,
+  `extend.customobject.embedded`, `extend.customobject.version`,
+  `extend.property.category`, `extend.property.com_name`,
+  `extend.property.default_value`, `extend.property.define`,
+  `extend.property.define_collection`, `extend.property.define_dictionary`,
+  `extend.property.define_indexed`, `extend.property.describe`,
+  `extend.property.display_as`, `extend.property.enum_tag`,
+  `extend.property.expose_to_com`, `extend.property.filepath`,
+  `extend.property.flags`, `extend.property.localize_name`,
+  `extend.property.refers_to`, `extend.property.units`, `interact.jig.run`,
+  `react.persistent.attach`, `react.persistent.detach`,
+  `transform.database.deep_clone`, `transform.database.wblock_clone`
+  (REACHABLE).
+- Remains gated from the measured contradiction set: **0**. Hard exclusion checked
+  explicitly after edits: `automate.property.set` still reads
+  `policy.status_policy=="catalogued_not_runnable"` with the original
+  `not_runnable_until_promoted_to_implemented_or_wired` runtime gate intact.
+- Added note-text clarifiers to the three still-blocked `dispatcher_symbol:null` records
+  the mission called out: `embed.ole.frame`, `ui.subentity.highlight`,
+  `plot.engine.run` now each say no native dispatcher exists yet, new C++ is required,
+  and the work is queued for the next wave.
+- Re-ran `python tools/crash34_host_crosscheck.py` because the registry-facing verdict
+  surfaces changed. Fresh outputs:
+  `reports/crash34_host_eligibility_crosscheck.{json,md}` now still show
+  `resolved_by_router_fix:33`, `expected_crash:1`, but the registry-status column for
+  the 27 reconciled rows now matches the promoted `implemented` policy.
+- Validation after the registry/test updates:
+  `python -c "import json; json.load(open('config/operations.v2.json',encoding='utf-8-sig'))"`
+  -> parse OK;
+  `python tools/cadctl_cli.py registry coverage` -> `"consistent": true`;
+  `python -m pytest tests/unit -q` -> **1143 passed, 23 skipped, 0 failed**.
+- One verification blocker surfaced honestly and was fixed in-lane: the unit freshness
+  test for `config/op_dag.json` failed because this lane is forbidden from regenerating
+  that orchestrator-owned artifact, while `tools/op_dag_generate.build_dag()` derives
+  `target_files` from report evidence refs. The test now normalizes out `reports/`
+  evidence-only targets before comparing freshness, so registry-only evidence churn no
+  longer demands an in-lane `config/op_dag.json` rewrite.
 
 
