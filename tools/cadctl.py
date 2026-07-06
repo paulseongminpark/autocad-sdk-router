@@ -716,6 +716,18 @@ class Cad:
             an explicit write_mode must be in allowed_write_modes; write_original is
             ALWAYS refused from this surface (the original DWG stays READ-ONLY).
           * a COPY is staged; the original DWG's sha is verified unchanged.
+
+        Staged-copy snapshot (pre/post, for run-record-only verification):
+          the router (autocad-router.ps1 -> Invoke-CadJobRoute) stages its OWN,
+          second-level copy under staging/dwg_job_<stamp>/ and _QSAVEs THAT one
+          for write ops; the copy staged here (`staged_copy`) is never touched
+          again, so its sha256 taken right before the router runs is a true
+          pre-write snapshot. The router's own post-run copy is reported back
+          as run_res["staged_used"]; its path + sha256 are surfaced here as
+          `staged_result` / `staged_result_sha256` so a caller can verify what a
+          write op actually produced from this record alone, without re-deriving
+          anything. read-mode ops never _QSAVE, so `staged_result_sha256` equals
+          `staged_copy_sha256` in that case.
         """
         out_dir_p = Path(out_dir) if out_dir else (self.router_home / "runs" / "run_op" / _ts())
         out_dir_p.mkdir(parents=True, exist_ok=True)
@@ -765,6 +777,10 @@ class Cad:
             os.chmod(staged, 0o666)
         except OSError:
             pass
+        # Pre-write snapshot: `staged` is never touched again after this point
+        # (the router stages its OWN second-level copy -- see docstring), so its
+        # sha256 taken now is a guaranteed pre-write value.
+        staged_copy_sha256 = _sha256_head(staged, 64).lower()
 
         # --- optional args -> ARIADNE_NATIVE_JOB job file (-JobPath) ---
         job_path = None
@@ -780,6 +796,14 @@ class Cad:
         sha_after = _sha256_head(src, 64)
         original_unchanged = (sha_before == sha_after)
 
+        # Post-run snapshot: the router's own staged copy, reported back as
+        # staged_used (engine_output.input). For write ops this is the mutated
+        # (post-_QSAVE) file; for read ops it is the router's unmutated read copy.
+        staged_result = run_res.get("staged_used")
+        staged_result_sha256 = None
+        if isinstance(staged_result, str) and staged_result and Path(staged_result).is_file():
+            staged_result_sha256 = _sha256_head(Path(staged_result), 64).lower()
+
         env = {
             "schema": "ariadne.cadctl.run_operation.v1",
             "operation": op_id,
@@ -788,6 +812,9 @@ class Cad:
             "write_mode": wm,
             "out_dir": str(out_dir_p),
             "staged_copy": str(staged),
+            "staged_copy_sha256": staged_copy_sha256,
+            "staged_result": staged_result,
+            "staged_result_sha256": staged_result_sha256,
             "original_unchanged": original_unchanged,
             "exit_code": run_res.get("exit_code"),
             "stdout": run_res.get("stdout_path"),
