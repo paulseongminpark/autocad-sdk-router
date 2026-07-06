@@ -141,7 +141,9 @@ class TestM08ACatalogReopen(unittest.TestCase):
         self.assertEqual(by_status.get("unknown", 0), 0)
         self.assertEqual(by_status.get("catalogued", 0), 0)
         self.assertEqual(by_status.get("stub", 0), 0)
-        self.assertEqual(by_status.get("implemented", 0), 465)
+        # wave-5/6 merge adds 14 implemented (w5-anchor x4, w6-layerstate x4,
+        # w6-dynblk x3, w6-section x3) -- 465 -> 479; w6-sheetset x2 are blocked.
+        self.assertEqual(by_status.get("implemented", 0), 479)
         self.assertEqual(by_status.get("blocked", 0), 62)
         # W6-SHEETSET added two new blocked synthetic COM read records for the
         # measured Sheet Set Manager gap; implemented count is unchanged.

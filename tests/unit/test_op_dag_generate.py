@@ -76,10 +76,9 @@ class TestOpDagBuild(unittest.TestCase):
         # 520 -> 521. p4-poly2d adds a fifth (write.entity.polyline2d.deep) --
         # 521 -> 522. p9-tables2 adds three more (write.ucs.create,
         # write.view.create, write.vport.create) -- 522 -> 523 -> 524 -> 525.
-        # W6-DYNBLK adds three more (inspect.dynblock.references,
-        # inspect.dynblock.properties, write.dynblock.property) --
-        # 525 -> 526 -> 527 -> 528.
-        self.assertEqual(len(self.nodes), 528, "operations.v2.json is currently 528 ops; a "
+        # wave-5/6 coordinated merge adds sixteen (w5-anchor x4, w6-layerstate x4,
+        # w6-dynblk x3, w6-section x3, w6-sheetset x2 blocked) -- 525 -> 541.
+        self.assertEqual(len(self.nodes), 541, "operations.v2.json is currently 541 ops; a "
                                                 "count drift here means the catalogue changed "
                                                 "underneath this test, not a generator bug")
 

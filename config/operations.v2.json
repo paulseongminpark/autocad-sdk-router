@@ -54,26 +54,34 @@
     }
   },
   "totals": {
-    "operations": 527,
+    "operations": 541,
     "by_status": {
       "blocked": 62,
-      "implemented": 465
+      "implemented": 479
     },
     "by_family": {
-      "active_document_write_original": 8,
-      "anchor": 4,
+      "objectdbx_database": 21,
+      "symbol_tables_dictionaries": 26,
+      "geometry_kernel": 25,
+      "inspect": 16,
+      "write": 4,
+      "live": 7,
+      "extend": 2,
+      "query": 1,
+      "render": 1,
       "apply": 1,
       "validate": 2,
+      "anchor": 4,
       "patch": 2,
       "diff": 1,
       "active_document_write_original": 8,
-      "blocks_xrefs_clone": 5,
+      "blocks_xrefs_clone": 8,
       "brep_solids": 54,
       "com_activex": 51,
       "constraints_associativity": 58,
       "custom_objects_protocols": 63,
       "editor_input": 27,
-      "entities": 58,
+      "entities": 61,
       "graphics_system": 9,
       "layouts_plot_publish": 2,
       "reactors_events": 22,
@@ -81,12 +89,12 @@
       "ui_customization": 39
     },
     "by_engine_tier": {
-      "accoreconsole_lisp_also": 20,
       "managed_also": 48,
-      "native_arx_only": 232,
-      "objectdbx_capable": 231
+      "objectdbx_capable": 241,
+      "accoreconsole_lisp_also": 20,
+      "native_arx_only": 232
     },
-    "total": 527
+    "total": 541
   },
   "coverage": {
     "wired_ops": 29,
@@ -120,8 +128,8 @@
       "symbol_tables_dictionaries": 16,
       "ui_customization": 39
     },
-    "operation_records": 527,
-    "implemented": 465,
+    "operation_records": 541,
+    "implemented": 479,
     "wired": 0,
     "stub": 0,
     "catalogued": 0,
@@ -38701,6 +38709,743 @@
       "evidence_required": "blocker_ref_and_evidence",
       "blocked_reason": "HOST_UNAVAILABLE: installed sample .dst inputs exist and the versioned manager ProgID is registered, but governed headless sheet enumeration remains unavailable because the registered manager is non-IDispatch and Autodesk's OpenDatabase interop path fails on missing AXDBLib.",
       "blocker_ref": "w6_report.md#blockers"
+    },
+    {
+      "id": "inspect.layerstates.list",
+      "operation": "inspect.layerstates.list",
+      "family": "symbol_tables_dictionaries",
+      "status": "implemented",
+      "engine_tier": "objectdbx_capable",
+      "engines": [
+        "objectdbx_capable"
+      ],
+      "host_eligibility": [
+        "dbx",
+        "coreconsole",
+        "arx_adapter",
+        "full_autocad"
+      ],
+      "hosts": [
+        "dbx",
+        "coreconsole",
+        "arx_adapter",
+        "full_autocad"
+      ],
+      "execution_context": "hostless_dbx_in_accoreconsole",
+      "write_level": {
+        "default_write_mode": "read",
+        "allowed_write_modes": [
+          "read"
+        ],
+        "dwg_persisted": false,
+        "original_write_default": false
+      },
+      "handler": {
+        "router_lane": "ARIADNE_NATIVE_JOB",
+        "dispatcher_symbol": "w6LayerStateDispatch",
+        "execution_host_class": "dbx",
+        "native_api": "AcDbLayerStateManager::getLayerStateNames(AcStringArray&, bool, bool)",
+        "composed_of": []
+      },
+      "mapping_type": "synthetic",
+      "catalog_op_id": null,
+      "input_schema": "schemas/cad_job.v2.schema.json#/allOf",
+      "output_schema": "schemas/cad_result.v2.schema.json",
+      "schema_refs": {
+        "input": "schemas/cad_job.v2.schema.json#/allOf",
+        "output": "schemas/cad_result.v2.schema.json"
+      },
+      "summary": "List every saved layer state (name, description, layer count, masked properties)",
+      "source_slice": "acdb-core.md",
+      "citation": "hdr dblstate.h AcDbLayerStateManager",
+      "policy": {
+        "source": "config/policy.v2.json",
+        "status_policy": "implemented",
+        "default_write_mode": "read",
+        "allowed_write_modes": [
+          "read"
+        ],
+        "no_original_write_default": true
+      },
+      "tests": [
+        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
+        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
+        "tests/unit/test_w6_layerstate_handlers.py"
+      ],
+      "evidence_refs": [
+        "src/Ariadne.AcadNative/families/w6_layerstate_handlers.inc:w6LayerStateDispatch",
+        "tests/unit/test_w6_layerstate_handlers.py",
+        "D:/dev/.build/cados_plan/wt/w6_layerstate/build_log.md"
+      ],
+      "notes": "W6-LAYERSTATE: enumerates AcDbLayerStateManager::getLayerStateNames, decorating each name with description (getLayerStateDescription), layer_count (getLayerStateLayers length), masked_properties (getLayerStateMask decoded to a string array), has_viewport_data, and is_dependent. Read-only.",
+      "owner_ticket": "M08C-T02",
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs",
+      "wired_v1": false,
+      "target_family_first_class": false
+    },
+    {
+      "id": "write.layerstate.save",
+      "operation": "write.layerstate.save",
+      "family": "symbol_tables_dictionaries",
+      "status": "implemented",
+      "engine_tier": "objectdbx_capable",
+      "engines": [
+        "objectdbx_capable"
+      ],
+      "host_eligibility": [
+        "dbx",
+        "coreconsole",
+        "arx_adapter",
+        "full_autocad"
+      ],
+      "hosts": [
+        "dbx",
+        "coreconsole",
+        "arx_adapter",
+        "full_autocad"
+      ],
+      "execution_context": "hostless_dbx_in_accoreconsole",
+      "write_level": {
+        "default_write_mode": "write_copy",
+        "allowed_write_modes": [
+          "write_copy"
+        ],
+        "dwg_persisted": true,
+        "original_write_default": false
+      },
+      "handler": {
+        "router_lane": "ARIADNE_NATIVE_JOB",
+        "dispatcher_symbol": "w6LayerStateDispatch",
+        "execution_host_class": "dbx",
+        "native_api": "AcDbLayerStateManager::saveLayerState(const ACHAR*, LayerStateMask)",
+        "composed_of": []
+      },
+      "mapping_type": "synthetic",
+      "catalog_op_id": null,
+      "input_schema": "schemas/cad_job.v2.schema.json#/allOf",
+      "output_schema": "schemas/cad_result.v2.schema.json",
+      "schema_refs": {
+        "input": "schemas/cad_job.v2.schema.json#/allOf",
+        "output": "schemas/cad_result.v2.schema.json"
+      },
+      "summary": "Snapshot the current layer table into a named layer state (staged copy)",
+      "source_slice": "acdb-core.md",
+      "citation": "hdr dblstate.h AcDbLayerStateManager",
+      "policy": {
+        "source": "config/policy.v2.json",
+        "status_policy": "implemented",
+        "default_write_mode": "write_copy",
+        "allowed_write_modes": [
+          "write_copy"
+        ],
+        "no_original_write_default": true
+      },
+      "tests": [
+        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
+        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
+        "tests/unit/test_w6_layerstate_handlers.py"
+      ],
+      "evidence_refs": [
+        "src/Ariadne.AcadNative/families/w6_layerstate_handlers.inc:w6LayerStateDispatch",
+        "tests/unit/test_w6_layerstate_handlers.py",
+        "D:/dev/.build/cados_plan/wt/w6_layerstate/build_log.md"
+      ],
+      "notes": "W6-LAYERSTATE: AcDbLayerStateManager::saveLayerState on the staged db; optional description via setLayerStateDescription, optional mask[] (default kAll). overwrite=1 (default) re-saves an existing name. Staged-copy only, never touches the original DWG (the accoreconsole job driver QSAVEs the staged copy, same as every sibling write op).",
+      "owner_ticket": "M08C-T02",
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs",
+      "wired_v1": false,
+      "target_family_first_class": false
+    },
+    {
+      "id": "write.layerstate.restore",
+      "operation": "write.layerstate.restore",
+      "family": "symbol_tables_dictionaries",
+      "status": "implemented",
+      "engine_tier": "objectdbx_capable",
+      "engines": [
+        "objectdbx_capable"
+      ],
+      "host_eligibility": [
+        "dbx",
+        "coreconsole",
+        "arx_adapter",
+        "full_autocad"
+      ],
+      "hosts": [
+        "dbx",
+        "coreconsole",
+        "arx_adapter",
+        "full_autocad"
+      ],
+      "execution_context": "hostless_dbx_in_accoreconsole",
+      "write_level": {
+        "default_write_mode": "write_copy",
+        "allowed_write_modes": [
+          "write_copy"
+        ],
+        "dwg_persisted": true,
+        "original_write_default": false
+      },
+      "handler": {
+        "router_lane": "ARIADNE_NATIVE_JOB",
+        "dispatcher_symbol": "w6LayerStateDispatch",
+        "execution_host_class": "dbx",
+        "native_api": "AcDbLayerStateManager::restoreLayerState(const ACHAR*)",
+        "composed_of": []
+      },
+      "mapping_type": "synthetic",
+      "catalog_op_id": null,
+      "input_schema": "schemas/cad_job.v2.schema.json#/allOf",
+      "output_schema": "schemas/cad_result.v2.schema.json",
+      "schema_refs": {
+        "input": "schemas/cad_job.v2.schema.json#/allOf",
+        "output": "schemas/cad_result.v2.schema.json"
+      },
+      "summary": "Apply a named layer state to the current layer table (staged copy)",
+      "source_slice": "acdb-core.md",
+      "citation": "hdr dblstate.h AcDbLayerStateManager",
+      "policy": {
+        "source": "config/policy.v2.json",
+        "status_policy": "implemented",
+        "default_write_mode": "write_copy",
+        "allowed_write_modes": [
+          "write_copy"
+        ],
+        "no_original_write_default": true
+      },
+      "tests": [
+        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
+        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
+        "tests/unit/test_w6_layerstate_handlers.py"
+      ],
+      "evidence_refs": [
+        "src/Ariadne.AcadNative/families/w6_layerstate_handlers.inc:w6LayerStateDispatch",
+        "tests/unit/test_w6_layerstate_handlers.py",
+        "D:/dev/.build/cados_plan/wt/w6_layerstate/build_log.md"
+      ],
+      "notes": "W6-LAYERSTATE: AcDbLayerStateManager::restoreLayerState on the staged db (plain named-state overload by default; optional restore_flags[] uses the viewport-aware overload with AcDbObjectId::kNull). Staged-copy only.",
+      "owner_ticket": "M08C-T02",
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs",
+      "wired_v1": false,
+      "target_family_first_class": false
+    },
+    {
+      "id": "write.layerstate.delete",
+      "operation": "write.layerstate.delete",
+      "family": "symbol_tables_dictionaries",
+      "status": "implemented",
+      "engine_tier": "objectdbx_capable",
+      "engines": [
+        "objectdbx_capable"
+      ],
+      "host_eligibility": [
+        "dbx",
+        "coreconsole",
+        "arx_adapter",
+        "full_autocad"
+      ],
+      "hosts": [
+        "dbx",
+        "coreconsole",
+        "arx_adapter",
+        "full_autocad"
+      ],
+      "execution_context": "hostless_dbx_in_accoreconsole",
+      "write_level": {
+        "default_write_mode": "write_copy",
+        "allowed_write_modes": [
+          "write_copy"
+        ],
+        "dwg_persisted": true,
+        "original_write_default": false
+      },
+      "handler": {
+        "router_lane": "ARIADNE_NATIVE_JOB",
+        "dispatcher_symbol": "w6LayerStateDispatch",
+        "execution_host_class": "dbx",
+        "native_api": "AcDbLayerStateManager::deleteLayerState(const ACHAR*)",
+        "composed_of": []
+      },
+      "mapping_type": "synthetic",
+      "catalog_op_id": null,
+      "input_schema": "schemas/cad_job.v2.schema.json#/allOf",
+      "output_schema": "schemas/cad_result.v2.schema.json",
+      "schema_refs": {
+        "input": "schemas/cad_job.v2.schema.json#/allOf",
+        "output": "schemas/cad_result.v2.schema.json"
+      },
+      "summary": "Delete a named layer state (staged copy)",
+      "source_slice": "acdb-core.md",
+      "citation": "hdr dblstate.h AcDbLayerStateManager",
+      "policy": {
+        "source": "config/policy.v2.json",
+        "status_policy": "implemented",
+        "default_write_mode": "write_copy",
+        "allowed_write_modes": [
+          "write_copy"
+        ],
+        "no_original_write_default": true
+      },
+      "tests": [
+        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
+        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
+        "tests/unit/test_w6_layerstate_handlers.py"
+      ],
+      "evidence_refs": [
+        "src/Ariadne.AcadNative/families/w6_layerstate_handlers.inc:w6LayerStateDispatch",
+        "tests/unit/test_w6_layerstate_handlers.py",
+        "D:/dev/.build/cados_plan/wt/w6_layerstate/build_log.md"
+      ],
+      "notes": "W6-LAYERSTATE: AcDbLayerStateManager::deleteLayerState on the staged db. Staged-copy only.",
+      "owner_ticket": "M08C-T02",
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs",
+      "wired_v1": false,
+      "target_family_first_class": false
+    },
+    {
+      "id": "inspect.dynblock.references",
+      "operation": "inspect.dynblock.references",
+      "family": "blocks_xrefs_clone",
+      "status": "implemented",
+      "engine_tier": "objectdbx_capable",
+      "engines": [
+        "objectdbx_capable"
+      ],
+      "host_eligibility": [
+        "dbx",
+        "coreconsole",
+        "arx_adapter",
+        "full_autocad"
+      ],
+      "hosts": [
+        "dbx",
+        "coreconsole",
+        "arx_adapter",
+        "full_autocad"
+      ],
+      "execution_context": "hostless_dbx_in_accoreconsole",
+      "write_level": {
+        "default_write_mode": "read",
+        "allowed_write_modes": [
+          "read"
+        ],
+        "dwg_persisted": false,
+        "original_write_default": false
+      },
+      "handler": {
+        "router_lane": "ARIADNE_NATIVE_JOB",
+        "dispatcher_symbol": "w6dynblkDispatch",
+        "execution_host_class": "dbx",
+        "native_api": "AcDbDynBlockReference::isDynamicBlock/getBlockProperties over an AcDbBlockTableRecordIterator enumeration (dbdynblk.h)",
+        "composed_of": []
+      },
+      "mapping_type": "synthetic",
+      "catalog_op_id": null,
+      "input_schema": "schemas/cad_job.v2.schema.json#/allOf",
+      "output_schema": "schemas/cad_result.v2.schema.json",
+      "schema_refs": {
+        "input": "schemas/cad_job.v2.schema.json#/allOf",
+        "output": "schemas/cad_result.v2.schema.json"
+      },
+      "policy": {
+        "source": "config/policy.v2.json",
+        "status_policy": "implemented",
+        "default_write_mode": "read",
+        "allowed_write_modes": [
+          "read"
+        ],
+        "no_original_write_default": true
+      },
+      "tests": [
+        "tests/unit/test_w6_dynblk_handlers.py"
+      ],
+      "summary": "Enumerate block-reference entities in a BTR (model space by default, or block_handle/block_name), each tagged is_dynamic_block plus (when dynamic) its full dynamic-property array.",
+      "source_slice": "dbdynblk.h",
+      "citation": "AcDbDynBlockReference::isDynamicBlock() / getBlockProperties() (dbdynblk.h, ObjectARX 2027 SDK)",
+      "evidence_refs": [
+        "src/Ariadne.AcadNative/families/w6_dynblk_handlers.inc:w6dynblkDispatch",
+        "tests/unit/test_w6_dynblk_handlers.py",
+        "build:native_acad exit 0 (.crx/.arx/.dbx, VS2026 MSBuild x64, worktree wt/w6_dynblk)"
+      ],
+      "phase_batch": "W6-DYNBLK dynamic block reference property wave",
+      "target_family_first_class": true,
+      "wired_v1": false,
+      "notes": "W6-DYNBLK wave: census sdk_census_reaudit_20260706.md #1 P1 excellence candidate -- dynamic block REFERENCE property read/write was zero-coverage (only static block ops existed: write.block.simple_create/insert, inspect.block(s)/.iterate, write.entity.blockref). Uses the public, documented AcDbDynBlockReference / AcDbDynBlockReferenceProperty utility classes (dbdynblk.h) that read/set properties on an ALREADY-AUTHORED dynamic block reference -- distinct from dynamic block AUTHORING, which the same census confirms (live Autodesk docs/forums) is impossible via any public API, including Autodesk's own .NET/COM SDKs; authoring is correctly out of scope and not attempted. Resolves the AcDbBlockReference::blockTableRecord() anonymous-*U###-block naming nuance: block_name is the canonical dynamic definition name (dynamicBlockTableRecord()) when is_dynamic_block, distinct from insert_block_name (the raw, possibly-anonymous, instance BTR name).",
+      "owner_ticket": "M08E-T01",
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs"
+    },
+    {
+      "id": "inspect.dynblock.properties",
+      "operation": "inspect.dynblock.properties",
+      "family": "blocks_xrefs_clone",
+      "status": "implemented",
+      "engine_tier": "objectdbx_capable",
+      "engines": [
+        "objectdbx_capable"
+      ],
+      "host_eligibility": [
+        "dbx",
+        "coreconsole",
+        "arx_adapter",
+        "full_autocad"
+      ],
+      "hosts": [
+        "dbx",
+        "coreconsole",
+        "arx_adapter",
+        "full_autocad"
+      ],
+      "execution_context": "hostless_dbx_in_accoreconsole",
+      "write_level": {
+        "default_write_mode": "read",
+        "allowed_write_modes": [
+          "read"
+        ],
+        "dwg_persisted": false,
+        "original_write_default": false
+      },
+      "handler": {
+        "router_lane": "ARIADNE_NATIVE_JOB",
+        "dispatcher_symbol": "w6dynblkDispatch",
+        "execution_host_class": "dbx",
+        "native_api": "AcDbDynBlockReference::getBlockProperties + AcDbDynBlockReferenceProperty accessors, for ONE block reference by handle (dbdynblk.h)",
+        "composed_of": []
+      },
+      "mapping_type": "synthetic",
+      "catalog_op_id": null,
+      "input_schema": "schemas/cad_job.v2.schema.json#/allOf",
+      "output_schema": "schemas/cad_result.v2.schema.json",
+      "schema_refs": {
+        "input": "schemas/cad_job.v2.schema.json#/allOf",
+        "output": "schemas/cad_result.v2.schema.json"
+      },
+      "policy": {
+        "source": "config/policy.v2.json",
+        "status_policy": "implemented",
+        "default_write_mode": "read",
+        "allowed_write_modes": [
+          "read"
+        ],
+        "no_original_write_default": true
+      },
+      "tests": [
+        "tests/unit/test_w6_dynblk_handlers.py"
+      ],
+      "summary": "Full dynamic-property array (name/type/current value/allowed values/read-only flag/units/description) for ONE block-reference entity by handle.",
+      "source_slice": "dbdynblk.h",
+      "citation": "AcDbDynBlockReferenceProperty::propertyName/propertyType/value/getAllowedValues/readOnly (dbdynblk.h, ObjectARX 2027 SDK)",
+      "evidence_refs": [
+        "src/Ariadne.AcadNative/families/w6_dynblk_handlers.inc:w6dynblkDispatch",
+        "tests/unit/test_w6_dynblk_handlers.py",
+        "build:native_acad exit 0 (.crx/.arx/.dbx, VS2026 MSBuild x64, worktree wt/w6_dynblk)"
+      ],
+      "phase_batch": "W6-DYNBLK dynamic block reference property wave",
+      "target_family_first_class": true,
+      "wired_v1": false,
+      "notes": "W6-DYNBLK wave: census sdk_census_reaudit_20260706.md #1 P1 excellence candidate -- dynamic block REFERENCE property read/write was zero-coverage (only static block ops existed: write.block.simple_create/insert, inspect.block(s)/.iterate, write.entity.blockref). Uses the public, documented AcDbDynBlockReference / AcDbDynBlockReferenceProperty utility classes (dbdynblk.h) that read/set properties on an ALREADY-AUTHORED dynamic block reference -- distinct from dynamic block AUTHORING, which the same census confirms (live Autodesk docs/forums) is impossible via any public API, including Autodesk's own .NET/COM SDKs; authoring is correctly out of scope and not attempted. Resolves the AcDbBlockReference::blockTableRecord() anonymous-*U###-block naming nuance: block_name is the canonical dynamic definition name (dynamicBlockTableRecord()) when is_dynamic_block, distinct from insert_block_name (the raw, possibly-anonymous, instance BTR name).",
+      "owner_ticket": "M08E-T01",
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs"
+    },
+    {
+      "id": "write.dynblock.property",
+      "operation": "write.dynblock.property",
+      "family": "blocks_xrefs_clone",
+      "status": "implemented",
+      "engine_tier": "objectdbx_capable",
+      "engines": [
+        "objectdbx_capable"
+      ],
+      "host_eligibility": [
+        "dbx",
+        "coreconsole",
+        "arx_adapter",
+        "full_autocad"
+      ],
+      "hosts": [
+        "dbx",
+        "coreconsole",
+        "arx_adapter",
+        "full_autocad"
+      ],
+      "execution_context": "hostless_dbx_in_accoreconsole",
+      "write_level": {
+        "default_write_mode": "write_copy",
+        "allowed_write_modes": [
+          "write_copy"
+        ],
+        "dwg_persisted": true,
+        "original_write_default": false
+      },
+      "handler": {
+        "router_lane": "ARIADNE_NATIVE_JOB",
+        "dispatcher_symbol": "w6dynblkDispatch",
+        "execution_host_class": "dbx",
+        "native_api": "AcDbDynBlockReferenceProperty::setValue(const AcDbEvalVariant&) on the named property of ONE block reference by handle (dbdynblk.h)",
+        "composed_of": []
+      },
+      "mapping_type": "synthetic",
+      "catalog_op_id": null,
+      "input_schema": "schemas/cad_job.v2.schema.json#/allOf",
+      "output_schema": "schemas/cad_result.v2.schema.json",
+      "schema_refs": {
+        "input": "schemas/cad_job.v2.schema.json#/allOf",
+        "output": "schemas/cad_result.v2.schema.json"
+      },
+      "policy": {
+        "source": "config/policy.v2.json",
+        "status_policy": "implemented",
+        "default_write_mode": "write_copy",
+        "allowed_write_modes": [
+          "write_copy"
+        ],
+        "no_original_write_default": true
+      },
+      "tests": [
+        "tests/unit/test_w6_dynblk_handlers.py"
+      ],
+      "summary": "Set ONE named dynamic-block property's value on ONE block-reference entity by handle. REAL, PERSISTING write (no staged-transaction rollback) -- never touches the ORIGINAL DWG (write_copy policy, same as every other write op).",
+      "source_slice": "dbdynblk.h",
+      "citation": "AcDbDynBlockReferenceProperty::setValue (dbdynblk.h, ObjectARX 2027 SDK)",
+      "evidence_refs": [
+        "src/Ariadne.AcadNative/families/w6_dynblk_handlers.inc:w6dynblkDispatch",
+        "tests/unit/test_w6_dynblk_handlers.py",
+        "build:native_acad exit 0 (.crx/.arx/.dbx, VS2026 MSBuild x64, worktree wt/w6_dynblk)"
+      ],
+      "phase_batch": "W6-DYNBLK dynamic block reference property wave",
+      "target_family_first_class": true,
+      "wired_v1": false,
+      "notes": "W6-DYNBLK wave: census sdk_census_reaudit_20260706.md #1 P1 excellence candidate -- dynamic block REFERENCE property read/write was zero-coverage (only static block ops existed: write.block.simple_create/insert, inspect.block(s)/.iterate, write.entity.blockref). Uses the public, documented AcDbDynBlockReference / AcDbDynBlockReferenceProperty utility classes (dbdynblk.h) that read/set properties on an ALREADY-AUTHORED dynamic block reference -- distinct from dynamic block AUTHORING, which the same census confirms (live Autodesk docs/forums) is impossible via any public API, including Autodesk's own .NET/COM SDKs; authoring is correctly out of scope and not attempted. Resolves the AcDbBlockReference::blockTableRecord() anonymous-*U###-block naming nuance: block_name is the canonical dynamic definition name (dynamicBlockTableRecord()) when is_dynamic_block, distinct from insert_block_name (the raw, possibly-anonymous, instance BTR name). Honesty guards beyond the raw SDK: refuses read-only properties (PROPERTY_READ_ONLY), a property-type/value-kind mismatch (UNSUPPORTED_PROPERTY_TYPE), and a value outside a list-restricted property's getAllowedValues() (VALUE_NOT_ALLOWED) -- the SDK's own setValue() would otherwise silently no-op on an invalid value without returning an error. Reports value_before/value_after and bbox_before/bbox_after (AcDbExtents) so a caller can verify the dynamic block's evaluation graph actually re-ran, not just that the API call returned eOk.",
+      "owner_ticket": "M08E-T01",
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs"
+    },
+    {
+      "id": "inspect.section.objects",
+      "operation": "inspect.section.objects",
+      "family": "entities",
+      "status": "implemented",
+      "engine_tier": "objectdbx_capable",
+      "engines": [
+        "objectdbx_capable"
+      ],
+      "host_eligibility": [
+        "dbx",
+        "coreconsole",
+        "arx_adapter",
+        "full_autocad"
+      ],
+      "hosts": [
+        "dbx",
+        "coreconsole",
+        "arx_adapter",
+        "full_autocad"
+      ],
+      "execution_context": "host",
+      "write_level": {
+        "default_write_mode": "read",
+        "allowed_write_modes": [
+          "read"
+        ],
+        "dwg_persisted": false,
+        "original_write_default": false
+      },
+      "handler": {
+        "router_lane": "ARIADNE_NATIVE_JOB",
+        "dispatcher_symbol": "w6sectionDispatch",
+        "execution_host_class": "dbx",
+        "native_api": "AcDbSection::cast + getName/state/getVertices/elevation/topPlane/bottomPlane/height/normal/verticalDirection/viewingDirection/hasJogs/thicknessDepth/sectionPlaneOffset/indicatorTransparency/isLiveSectionEnabled/getSettings",
+        "composed_of": []
+      },
+      "mapping_type": "synthetic",
+      "catalog_op_id": null,
+      "input_schema": "schemas/cad_job.v2.schema.json#/allOf",
+      "output_schema": "schemas/cad_result.v2.schema.json",
+      "schema_refs": {
+        "input": "schemas/cad_job.v2.schema.json#/allOf",
+        "output": "schemas/cad_result.v2.schema.json"
+      },
+      "policy": {
+        "source": "config/policy.v2.json",
+        "status_policy": "implemented",
+        "default_write_mode": "read",
+        "allowed_write_modes": [
+          "read"
+        ],
+        "no_original_write_default": true
+      },
+      "tests": [
+        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
+        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
+        "tests/unit/test_w6_section_handlers.py"
+      ],
+      "summary": "Enumerate AcDbSection entities in model space: name, state (plane/boundary/volume), vertices, elevation/top/bottom plane, normal/vertical/viewing direction, live-section flag, linked AcDbSectionSettings presence.",
+      "citation": "hdr DbSection.h AcDbSection::state/getName/getVertices/elevation/topPlane/bottomPlane/height/normal/verticalDirection/viewingDirection/isLiveSectionEnabled/getSettings",
+      "evidence_refs": [
+        "src/Ariadne.AcadNative/families/w6_section_handlers.inc:w6sectionDispatch",
+        "tests/unit/test_w6_section_handlers.py",
+        "build:native_acad exit 0 (.crx/.arx/.dbx, worktree-isolated build_iso, VS2026 MSBuild x64)",
+        "runtime_native_job_smoke:runs/w6_section_live_smoke (live accoreconsole create->reopen->inspect roundtrip against a staged copy of tests/fixtures/native_sample.dwg)"
+      ],
+      "phase_batch": "CADOS wave 6 census P2 (W6-SECTION)",
+      "target_family_first_class": false,
+      "wired_v1": false,
+      "notes": "New op, no catalog precedent -- AcDbSection/AcDbSectionSettings measured 0 catalog ops (R3_coverage.md finding G0 / tools/catalog_completeness.py KNOWN_UNCATALOGUED_DISPOSITIONS 'section' -> author). Scope: model space only (paperspace layouts/block definitions not walked). Live-verified this wave: accoreconsole create (write.entity.section) -> reopen -> inspect.section.objects round trip against a staged copy, original fixture sha256 unchanged.",
+      "owner_ticket": "M08D-T01",
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs"
+    },
+    {
+      "id": "write.entity.section",
+      "operation": "write.entity.section",
+      "family": "entities",
+      "status": "implemented",
+      "engine_tier": "objectdbx_capable",
+      "engines": [
+        "objectdbx_capable"
+      ],
+      "host_eligibility": [
+        "dbx",
+        "coreconsole",
+        "arx_adapter",
+        "full_autocad"
+      ],
+      "hosts": [
+        "dbx",
+        "coreconsole",
+        "arx_adapter",
+        "full_autocad"
+      ],
+      "execution_context": "host",
+      "write_level": {
+        "default_write_mode": "write_copy",
+        "allowed_write_modes": [
+          "write_copy"
+        ],
+        "dwg_persisted": true,
+        "original_write_default": false
+      },
+      "handler": {
+        "router_lane": "ARIADNE_NATIVE_JOB",
+        "dispatcher_symbol": "w6sectionDispatch",
+        "execution_host_class": "dbx",
+        "native_api": "AcDbSection::AcDbSection(pts, verticalDir[, viewingDir]) + setName/setState + AcDbBlockTableRecord::appendAcDbEntity",
+        "composed_of": []
+      },
+      "mapping_type": "synthetic",
+      "catalog_op_id": null,
+      "input_schema": "schemas/cad_job.v2.schema.json#/allOf",
+      "output_schema": "schemas/cad_result.v2.schema.json",
+      "schema_refs": {
+        "input": "schemas/cad_job.v2.schema.json#/allOf",
+        "output": "schemas/cad_result.v2.schema.json"
+      },
+      "policy": {
+        "source": "config/policy.v2.json",
+        "status_policy": "implemented",
+        "default_write_mode": "write_copy",
+        "allowed_write_modes": [
+          "write_copy"
+        ],
+        "no_original_write_default": true
+      },
+      "tests": [
+        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
+        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
+        "tests/unit/test_w6_section_handlers.py"
+      ],
+      "summary": "Create an AcDbSection plane/boundary/volume through a points/vertices array + vertical_dir (optional viewing_dir), with optional name/state/layer; appended into staged model space (write_copy only, original DWG never touched).",
+      "citation": "hdr DbSection.h AcDbSection::AcDbSection(AcGePoint3dArray, AcGeVector3d[, AcGeVector3d])/setName/setState",
+      "evidence_refs": [
+        "src/Ariadne.AcadNative/families/w6_section_handlers.inc:w6sectionDispatch",
+        "tests/unit/test_w6_section_handlers.py",
+        "build:native_acad exit 0 (.crx/.arx/.dbx, worktree-isolated build_iso, VS2026 MSBuild x64)",
+        "runtime_native_job_smoke:runs/w6_section_live_smoke (live accoreconsole create->reopen->inspect roundtrip against a staged copy of tests/fixtures/native_sample.dwg, original sha256 unchanged)"
+      ],
+      "phase_batch": "CADOS wave 6 census P2 (W6-SECTION)",
+      "target_family_first_class": false,
+      "wired_v1": false,
+      "notes": "New op, no catalog precedent -- AcDbSection/AcDbSectionSettings measured 0 catalog ops (R3_coverage.md finding G0 / tools/catalog_completeness.py KNOWN_UNCATALOGUED_DISPOSITIONS 'section' -> author). Live-verified this wave: staged create + _QSAVE, reopened in a fresh accoreconsole process, inspect.section.objects re-extracted the entity with matching name/state/vertices; original fixture sha256 unchanged.",
+      "owner_ticket": "M08G-T02",
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs"
+    },
+    {
+      "id": "write.section.generate2d",
+      "operation": "write.section.generate2d",
+      "family": "entities",
+      "status": "implemented",
+      "engine_tier": "objectdbx_capable",
+      "engines": [
+        "objectdbx_capable"
+      ],
+      "host_eligibility": [
+        "dbx",
+        "coreconsole",
+        "arx_adapter",
+        "full_autocad"
+      ],
+      "hosts": [
+        "dbx",
+        "coreconsole",
+        "arx_adapter",
+        "full_autocad"
+      ],
+      "execution_context": "host",
+      "write_level": {
+        "default_write_mode": "write_copy",
+        "allowed_write_modes": [
+          "write_copy"
+        ],
+        "dwg_persisted": true,
+        "original_write_default": false
+      },
+      "handler": {
+        "router_lane": "ARIADNE_NATIVE_JOB",
+        "dispatcher_symbol": "w6sectionDispatch",
+        "execution_host_class": "dbx",
+        "native_api": "AcDbSection::generateSectionGeometry(AcDbEntity*, ...)",
+        "composed_of": []
+      },
+      "mapping_type": "synthetic",
+      "catalog_op_id": null,
+      "input_schema": "schemas/cad_job.v2.schema.json#/allOf",
+      "output_schema": "schemas/cad_result.v2.schema.json",
+      "schema_refs": {
+        "input": "schemas/cad_job.v2.schema.json#/allOf",
+        "output": "schemas/cad_result.v2.schema.json"
+      },
+      "policy": {
+        "source": "config/policy.v2.json",
+        "status_policy": "implemented",
+        "default_write_mode": "write_copy",
+        "no_original_write_default": true
+      },
+      "tests": [
+        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
+        "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
+        "tests/unit/test_w6_section_handlers.py"
+      ],
+      "summary": "Generate 2D/3D section boundary/fill/background/foreground/tangency geometry for a sectionable entity via AcDbSection::generateSectionGeometry(). This measurement-op variant builds its own transient AcDb3dSolid box probe entity (x_len/y_len/z_len args, default 100x100x100) and a transient bisecting AcDbSection -- neither is ever appended to the database.",
+      "citation": "hdr DbSection.h AcDbSection::generateSectionGeometry; dbsol3d.h AcDb3dSolid::createBox",
+      "evidence_refs": [
+        "src/Ariadne.AcadNative/families/w6_section_handlers.inc:w6sectionDispatch",
+        "tests/unit/test_w6_section_handlers.py",
+        "build:native_acad exit 0 (.crx/.arx/.dbx, worktree-isolated build_iso, VS2026 MSBuild x64)",
+        "runtime_native_job_smoke:runs/w6_section_live_smoke/step5_generate2d (live accoreconsole, headless, against a staged copy of tests/fixtures/native_sample.dwg -- result intersection_boundary_count=4 intersection_fill_count=1 background_count=4 foreground_count=0 curve_tangency_count=0, original fixture sha256 unchanged)"
+      ],
+      "phase_batch": "CADOS wave 6 census P2 (W6-SECTION)",
+      "target_family_first_class": false,
+      "wired_v1": false,
+      "notes": "New op, no catalog precedent (same R3_coverage.md G0 / catalog_completeness.py disposition as its sibling section ops). INITIALLY ASSUMED full_autocad-only (ASM + AutoCAD generate-section UI machinery); MEASURED THIS WAVE to be false -- generateSectionGeometry() runs correctly headless under accoreconsole against a transient (non-database-resident) AcDb3dSolid + AcDbSection probe pair, no demand-loaded engine module or attended host required. Corrected from the earlier speculative blocked/full_autocad classification once actually tested live.",
+      "owner_ticket": "M08G-T02",
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs"
     }
   ],
   "catalog_families": [
