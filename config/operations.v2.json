@@ -3905,13 +3905,12 @@
       },
       "policy": {
         "source": "config/policy.v2.json",
-        "status_policy": "catalogued_not_runnable",
+        "status_policy": "implemented",
         "default_write_mode": "live_edit",
         "allowed_write_modes": [
           "live_edit"
         ],
-        "no_original_write_default": true,
-        "runtime_behavior": "not_runnable_until_promoted_to_implemented_or_wired"
+        "no_original_write_default": true
       },
       "tests": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
@@ -3926,9 +3925,10 @@
         "src/Ariadne.AcadNative/families/m08e_handlers.inc:m08eDispatch",
         "reports/merge/MERGE-M08-READ.json",
         "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
-        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)"
+        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)",
+        "reports/lane_i_router_fix_resolution.json (2026-07-06 Lane I router-fix re-probe, CRASH->RUNNABLE headless)"
       ],
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "M04 catalog-only classification was stale after the 2026-07-06 router fix. Lane I fixed tools/autocad-router.ps1 to route job-based ops by handler.execution_host_class instead of the old write_mode-based attended branch; the fixed-router re-probe measured this op as RUNNABLE, so the policy is now promoted to implemented. See reports/lane_i_router_fix_resolution.json and build_log.md Lane I.",
       "owner_ticket": "M08E-T01",
       "implementation_strategy": "implemented_v1",
       "evidence_required": "existing_tests_and_evidence_refs"
@@ -8092,7 +8092,7 @@
         "config/autocad_native_arx_operation_catalog.json#ui.subentity.highlight",
         "reports/WAVE3_REMAINING_HARDBLOCK_REAUDIT.md#ui.subentity.highlight"
       ],
-      "notes": "Wave3 post-merge re-audit accepted hard block. HOST_UNAVAILABLE: subentity highlight requires a live graphics/editor selection context and GS refresh; no controlled attended AutoCAD editor host is available in this integration route.",
+      "notes": "Wave3 post-merge re-audit accepted hard block. HOST_UNAVAILABLE: subentity highlight requires a live graphics/editor selection context and GS refresh; no controlled attended AutoCAD editor host is available in this integration route. No native dispatcher exists yet (handler.dispatcher_symbol is null); requires new C++ graphics/editor handler work and stays queued for the next wave.",
       "owner_ticket": "M08D-T03",
       "implementation_strategy": "hard_blocked",
       "evidence_required": "blocker_ref_and_evidence",
@@ -9023,7 +9023,7 @@
         "config/autocad_native_arx_operation_catalog.json#embed.ole.frame",
         "reports/WAVE3_REMAINING_HARDBLOCK_REAUDIT.md#embed.ole.frame"
       ],
-      "notes": "Wave3 post-merge re-audit accepted hard block. HOST_UNAVAILABLE: AcDbOle2Frame embedding/linking requires a live OLE client item and attended host context; no controlled OLE route or staged payload contract is available.",
+      "notes": "Wave3 post-merge re-audit accepted hard block. HOST_UNAVAILABLE: AcDbOle2Frame embedding/linking requires a live OLE client item and attended host context; no controlled OLE route or staged payload contract is available. No native dispatcher exists yet (handler.dispatcher_symbol is null); requires new C++ OLE handler work and stays queued for the next wave.",
       "owner_ticket": "M08O-T01",
       "implementation_strategy": "hard_blocked",
       "evidence_required": "blocker_ref_and_evidence",
@@ -9996,13 +9996,12 @@
       },
       "policy": {
         "source": "config/policy.v2.json",
-        "status_policy": "catalogued_not_runnable",
+        "status_policy": "implemented",
         "default_write_mode": "live_edit",
         "allowed_write_modes": [
           "live_edit"
         ],
-        "no_original_write_default": true,
-        "runtime_behavior": "not_runnable_until_promoted_to_implemented_or_wired"
+        "no_original_write_default": true
       },
       "tests": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
@@ -10017,9 +10016,10 @@
         "src/Ariadne.AcadNative/families/m08m_handlers.inc:m08mDispatch",
         "reports/merge/MERGE-M08-READ.json",
         "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
-        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)"
+        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)",
+        "reports/lane_i_router_fix_resolution.json (2026-07-06 Lane I router-fix re-probe, CRASH->RUNNABLE headless)"
       ],
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "M04 catalog-only classification was stale after the 2026-07-06 router fix. Lane I fixed tools/autocad-router.ps1 to route job-based ops by handler.execution_host_class instead of the old write_mode-based attended branch; the fixed-router re-probe measured this op as RUNNABLE, so the policy is now promoted to implemented. See reports/lane_i_router_fix_resolution.json and build_log.md Lane I.",
       "owner_ticket": "M08M-T01",
       "implementation_strategy": "implemented_v1",
       "evidence_required": "existing_tests_and_evidence_refs"
@@ -10067,13 +10067,12 @@
       },
       "policy": {
         "source": "config/policy.v2.json",
-        "status_policy": "catalogued_not_runnable",
+        "status_policy": "implemented",
         "default_write_mode": "live_edit",
         "allowed_write_modes": [
           "live_edit"
         ],
-        "no_original_write_default": true,
-        "runtime_behavior": "not_runnable_until_promoted_to_implemented_or_wired"
+        "no_original_write_default": true
       },
       "tests": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
@@ -10088,9 +10087,10 @@
         "src/Ariadne.AcadNative/families/m08m_handlers.inc:m08mDispatch",
         "reports/merge/MERGE-M08-READ.json",
         "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
-        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)"
+        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)",
+        "reports/lane_i_router_fix_resolution.json (2026-07-06 Lane I router-fix re-probe, CRASH->RUNNABLE headless)"
       ],
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "M04 catalog-only classification was stale after the 2026-07-06 router fix. Lane I fixed tools/autocad-router.ps1 to route job-based ops by handler.execution_host_class instead of the old write_mode-based attended branch; the fixed-router re-probe measured this op as RUNNABLE, so the policy is now promoted to implemented. See reports/lane_i_router_fix_resolution.json and build_log.md Lane I.",
       "owner_ticket": "M08M-T01",
       "implementation_strategy": "implemented_v1",
       "evidence_required": "existing_tests_and_evidence_refs"
@@ -10138,13 +10138,12 @@
       },
       "policy": {
         "source": "config/policy.v2.json",
-        "status_policy": "catalogued_not_runnable",
+        "status_policy": "implemented",
         "default_write_mode": "live_edit",
         "allowed_write_modes": [
           "live_edit"
         ],
-        "no_original_write_default": true,
-        "runtime_behavior": "not_runnable_until_promoted_to_implemented_or_wired"
+        "no_original_write_default": true
       },
       "tests": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
@@ -10159,9 +10158,10 @@
         "src/Ariadne.AcadNative/families/m08m_handlers.inc:m08mDispatch",
         "reports/merge/MERGE-M08-READ.json",
         "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
-        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)"
+        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)",
+        "reports/lane_i_router_fix_resolution.json (2026-07-06 Lane I router-fix re-probe, CRASH->RUNNABLE headless)"
       ],
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "M04 catalog-only classification was stale after the 2026-07-06 router fix. Lane I fixed tools/autocad-router.ps1 to route job-based ops by handler.execution_host_class instead of the old write_mode-based attended branch; the fixed-router re-probe measured this op as RUNNABLE, so the policy is now promoted to implemented. See reports/lane_i_router_fix_resolution.json and build_log.md Lane I.",
       "owner_ticket": "M08M-T01",
       "implementation_strategy": "implemented_v1",
       "evidence_required": "existing_tests_and_evidence_refs"
@@ -10209,13 +10209,12 @@
       },
       "policy": {
         "source": "config/policy.v2.json",
-        "status_policy": "catalogued_not_runnable",
+        "status_policy": "implemented",
         "default_write_mode": "live_edit",
         "allowed_write_modes": [
           "live_edit"
         ],
-        "no_original_write_default": true,
-        "runtime_behavior": "not_runnable_until_promoted_to_implemented_or_wired"
+        "no_original_write_default": true
       },
       "tests": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
@@ -10230,9 +10229,10 @@
         "src/Ariadne.AcadNative/families/m08m_handlers.inc:m08mDispatch",
         "reports/merge/MERGE-M08-READ.json",
         "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
-        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)"
+        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)",
+        "reports/lane_i_router_fix_resolution.json (2026-07-06 Lane I router-fix re-probe, CRASH->RUNNABLE headless)"
       ],
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "M04 catalog-only classification was stale after the 2026-07-06 router fix. Lane I fixed tools/autocad-router.ps1 to route job-based ops by handler.execution_host_class instead of the old write_mode-based attended branch; the fixed-router re-probe measured this op as RUNNABLE, so the policy is now promoted to implemented. See reports/lane_i_router_fix_resolution.json and build_log.md Lane I.",
       "owner_ticket": "M08M-T01",
       "implementation_strategy": "implemented_v1",
       "evidence_required": "existing_tests_and_evidence_refs"
@@ -10280,13 +10280,12 @@
       },
       "policy": {
         "source": "config/policy.v2.json",
-        "status_policy": "catalogued_not_runnable",
+        "status_policy": "implemented",
         "default_write_mode": "live_edit",
         "allowed_write_modes": [
           "live_edit"
         ],
-        "no_original_write_default": true,
-        "runtime_behavior": "not_runnable_until_promoted_to_implemented_or_wired"
+        "no_original_write_default": true
       },
       "tests": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
@@ -10301,9 +10300,10 @@
         "src/Ariadne.AcadNative/families/m08m_handlers.inc:m08mDispatch",
         "reports/merge/MERGE-M08-READ.json",
         "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
-        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)"
+        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)",
+        "reports/lane_i_router_fix_resolution.json (2026-07-06 Lane I router-fix re-probe, CRASH->RUNNABLE headless)"
       ],
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "M04 catalog-only classification was stale after the 2026-07-06 router fix. Lane I fixed tools/autocad-router.ps1 to route job-based ops by handler.execution_host_class instead of the old write_mode-based attended branch; the fixed-router re-probe measured this op as RUNNABLE, so the policy is now promoted to implemented. See reports/lane_i_router_fix_resolution.json and build_log.md Lane I.",
       "owner_ticket": "M08M-T01",
       "implementation_strategy": "implemented_v1",
       "evidence_required": "existing_tests_and_evidence_refs"
@@ -10351,13 +10351,12 @@
       },
       "policy": {
         "source": "config/policy.v2.json",
-        "status_policy": "catalogued_not_runnable",
+        "status_policy": "implemented",
         "default_write_mode": "live_edit",
         "allowed_write_modes": [
           "live_edit"
         ],
-        "no_original_write_default": true,
-        "runtime_behavior": "not_runnable_until_promoted_to_implemented_or_wired"
+        "no_original_write_default": true
       },
       "tests": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
@@ -10372,9 +10371,10 @@
         "src/Ariadne.AcadNative/families/m08m_handlers.inc:m08mDispatch",
         "reports/merge/MERGE-M08-READ.json",
         "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
-        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)"
+        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)",
+        "reports/lane_i_router_fix_resolution.json (2026-07-06 Lane I router-fix re-probe, CRASH->RUNNABLE headless)"
       ],
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "M04 catalog-only classification was stale after the 2026-07-06 router fix. Lane I fixed tools/autocad-router.ps1 to route job-based ops by handler.execution_host_class instead of the old write_mode-based attended branch; the fixed-router re-probe measured this op as RUNNABLE, so the policy is now promoted to implemented. See reports/lane_i_router_fix_resolution.json and build_log.md Lane I.",
       "owner_ticket": "M08M-T01",
       "implementation_strategy": "implemented_v1",
       "evidence_required": "existing_tests_and_evidence_refs"
@@ -10422,13 +10422,12 @@
       },
       "policy": {
         "source": "config/policy.v2.json",
-        "status_policy": "catalogued_not_runnable",
+        "status_policy": "implemented",
         "default_write_mode": "live_edit",
         "allowed_write_modes": [
           "live_edit"
         ],
-        "no_original_write_default": true,
-        "runtime_behavior": "not_runnable_until_promoted_to_implemented_or_wired"
+        "no_original_write_default": true
       },
       "tests": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
@@ -10443,9 +10442,10 @@
         "src/Ariadne.AcadNative/families/m08m_handlers.inc:m08mDispatch",
         "reports/merge/MERGE-M08-READ.json",
         "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
-        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)"
+        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)",
+        "reports/lane_i_router_fix_resolution.json (2026-07-06 Lane I router-fix re-probe, CRASH->RUNNABLE headless)"
       ],
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "M04 catalog-only classification was stale after the 2026-07-06 router fix. Lane I fixed tools/autocad-router.ps1 to route job-based ops by handler.execution_host_class instead of the old write_mode-based attended branch; the fixed-router re-probe measured this op as RUNNABLE, so the policy is now promoted to implemented. See reports/lane_i_router_fix_resolution.json and build_log.md Lane I.",
       "owner_ticket": "M08M-T01",
       "implementation_strategy": "implemented_v1",
       "evidence_required": "existing_tests_and_evidence_refs"
@@ -10493,13 +10493,12 @@
       },
       "policy": {
         "source": "config/policy.v2.json",
-        "status_policy": "catalogued_not_runnable",
+        "status_policy": "implemented",
         "default_write_mode": "live_edit",
         "allowed_write_modes": [
           "live_edit"
         ],
-        "no_original_write_default": true,
-        "runtime_behavior": "not_runnable_until_promoted_to_implemented_or_wired"
+        "no_original_write_default": true
       },
       "tests": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
@@ -10514,9 +10513,10 @@
         "src/Ariadne.AcadNative/families/m08m_handlers.inc:m08mDispatch",
         "reports/merge/MERGE-M08-READ.json",
         "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
-        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)"
+        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)",
+        "reports/lane_i_router_fix_resolution.json (2026-07-06 Lane I router-fix re-probe, CRASH->RUNNABLE headless)"
       ],
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "M04 catalog-only classification was stale after the 2026-07-06 router fix. Lane I fixed tools/autocad-router.ps1 to route job-based ops by handler.execution_host_class instead of the old write_mode-based attended branch; the fixed-router re-probe measured this op as RUNNABLE, so the policy is now promoted to implemented. See reports/lane_i_router_fix_resolution.json and build_log.md Lane I.",
       "owner_ticket": "M08M-T01",
       "implementation_strategy": "implemented_v1",
       "evidence_required": "existing_tests_and_evidence_refs"
@@ -10564,13 +10564,12 @@
       },
       "policy": {
         "source": "config/policy.v2.json",
-        "status_policy": "catalogued_not_runnable",
+        "status_policy": "implemented",
         "default_write_mode": "live_edit",
         "allowed_write_modes": [
           "live_edit"
         ],
-        "no_original_write_default": true,
-        "runtime_behavior": "not_runnable_until_promoted_to_implemented_or_wired"
+        "no_original_write_default": true
       },
       "tests": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
@@ -10585,9 +10584,10 @@
         "src/Ariadne.AcadNative/families/m08m_handlers.inc:m08mDispatch",
         "reports/merge/MERGE-M08-READ.json",
         "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
-        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)"
+        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)",
+        "reports/lane_i_router_fix_resolution.json (2026-07-06 Lane I router-fix re-probe, CRASH->RUNNABLE headless)"
       ],
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "M04 catalog-only classification was stale after the 2026-07-06 router fix. Lane I fixed tools/autocad-router.ps1 to route job-based ops by handler.execution_host_class instead of the old write_mode-based attended branch; the fixed-router re-probe measured this op as RUNNABLE, so the policy is now promoted to implemented. See reports/lane_i_router_fix_resolution.json and build_log.md Lane I.",
       "owner_ticket": "M08M-T01",
       "implementation_strategy": "implemented_v1",
       "evidence_required": "existing_tests_and_evidence_refs"
@@ -10635,13 +10635,12 @@
       },
       "policy": {
         "source": "config/policy.v2.json",
-        "status_policy": "catalogued_not_runnable",
+        "status_policy": "implemented",
         "default_write_mode": "live_edit",
         "allowed_write_modes": [
           "live_edit"
         ],
-        "no_original_write_default": true,
-        "runtime_behavior": "not_runnable_until_promoted_to_implemented_or_wired"
+        "no_original_write_default": true
       },
       "tests": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
@@ -10656,9 +10655,10 @@
         "src/Ariadne.AcadNative/families/m08m_handlers.inc:m08mDispatch",
         "reports/merge/MERGE-M08-READ.json",
         "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
-        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)"
+        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)",
+        "reports/lane_i_router_fix_resolution.json (2026-07-06 Lane I router-fix re-probe, CRASH->RUNNABLE headless)"
       ],
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "M04 catalog-only classification was stale after the 2026-07-06 router fix. Lane I fixed tools/autocad-router.ps1 to route job-based ops by handler.execution_host_class instead of the old write_mode-based attended branch; the fixed-router re-probe measured this op as RUNNABLE, so the policy is now promoted to implemented. See reports/lane_i_router_fix_resolution.json and build_log.md Lane I.",
       "owner_ticket": "M08M-T01",
       "implementation_strategy": "implemented_v1",
       "evidence_required": "existing_tests_and_evidence_refs"
@@ -10706,13 +10706,12 @@
       },
       "policy": {
         "source": "config/policy.v2.json",
-        "status_policy": "catalogued_not_runnable",
+        "status_policy": "implemented",
         "default_write_mode": "live_edit",
         "allowed_write_modes": [
           "live_edit"
         ],
-        "no_original_write_default": true,
-        "runtime_behavior": "not_runnable_until_promoted_to_implemented_or_wired"
+        "no_original_write_default": true
       },
       "tests": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
@@ -10727,9 +10726,10 @@
         "src/Ariadne.AcadNative/families/m08m_handlers.inc:m08mDispatch",
         "reports/merge/MERGE-M08-READ.json",
         "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
-        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)"
+        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)",
+        "reports/lane_i_router_fix_resolution.json (2026-07-06 Lane I router-fix re-probe, CRASH->RUNNABLE headless)"
       ],
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "M04 catalog-only classification was stale after the 2026-07-06 router fix. Lane I fixed tools/autocad-router.ps1 to route job-based ops by handler.execution_host_class instead of the old write_mode-based attended branch; the fixed-router re-probe measured this op as RUNNABLE, so the policy is now promoted to implemented. See reports/lane_i_router_fix_resolution.json and build_log.md Lane I.",
       "owner_ticket": "M08M-T01",
       "implementation_strategy": "implemented_v1",
       "evidence_required": "existing_tests_and_evidence_refs"
@@ -10777,13 +10777,12 @@
       },
       "policy": {
         "source": "config/policy.v2.json",
-        "status_policy": "catalogued_not_runnable",
+        "status_policy": "implemented",
         "default_write_mode": "live_edit",
         "allowed_write_modes": [
           "live_edit"
         ],
-        "no_original_write_default": true,
-        "runtime_behavior": "not_runnable_until_promoted_to_implemented_or_wired"
+        "no_original_write_default": true
       },
       "tests": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
@@ -10798,9 +10797,10 @@
         "src/Ariadne.AcadNative/families/m08m_handlers.inc:m08mDispatch",
         "reports/merge/MERGE-M08-READ.json",
         "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
-        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)"
+        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)",
+        "reports/lane_i_router_fix_resolution.json (2026-07-06 Lane I router-fix re-probe, CRASH->RUNNABLE headless)"
       ],
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "M04 catalog-only classification was stale after the 2026-07-06 router fix. Lane I fixed tools/autocad-router.ps1 to route job-based ops by handler.execution_host_class instead of the old write_mode-based attended branch; the fixed-router re-probe measured this op as RUNNABLE, so the policy is now promoted to implemented. See reports/lane_i_router_fix_resolution.json and build_log.md Lane I.",
       "owner_ticket": "M08M-T01",
       "implementation_strategy": "implemented_v1",
       "evidence_required": "existing_tests_and_evidence_refs"
@@ -10848,13 +10848,12 @@
       },
       "policy": {
         "source": "config/policy.v2.json",
-        "status_policy": "catalogued_not_runnable",
+        "status_policy": "implemented",
         "default_write_mode": "live_edit",
         "allowed_write_modes": [
           "live_edit"
         ],
-        "no_original_write_default": true,
-        "runtime_behavior": "not_runnable_until_promoted_to_implemented_or_wired"
+        "no_original_write_default": true
       },
       "tests": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
@@ -10869,9 +10868,10 @@
         "src/Ariadne.AcadNative/families/m08m_handlers.inc:m08mDispatch",
         "reports/merge/MERGE-M08-READ.json",
         "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
-        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)"
+        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)",
+        "reports/lane_i_router_fix_resolution.json (2026-07-06 Lane I router-fix re-probe, CRASH->RUNNABLE headless)"
       ],
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "M04 catalog-only classification was stale after the 2026-07-06 router fix. Lane I fixed tools/autocad-router.ps1 to route job-based ops by handler.execution_host_class instead of the old write_mode-based attended branch; the fixed-router re-probe measured this op as RUNNABLE, so the policy is now promoted to implemented. See reports/lane_i_router_fix_resolution.json and build_log.md Lane I.",
       "owner_ticket": "M08M-T01",
       "implementation_strategy": "implemented_v1",
       "evidence_required": "existing_tests_and_evidence_refs"
@@ -10919,13 +10919,12 @@
       },
       "policy": {
         "source": "config/policy.v2.json",
-        "status_policy": "catalogued_not_runnable",
+        "status_policy": "implemented",
         "default_write_mode": "live_edit",
         "allowed_write_modes": [
           "live_edit"
         ],
-        "no_original_write_default": true,
-        "runtime_behavior": "not_runnable_until_promoted_to_implemented_or_wired"
+        "no_original_write_default": true
       },
       "tests": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
@@ -10940,9 +10939,10 @@
         "src/Ariadne.AcadNative/families/m08m_handlers.inc:m08mDispatch",
         "reports/merge/MERGE-M08-READ.json",
         "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
-        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)"
+        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)",
+        "reports/lane_i_router_fix_resolution.json (2026-07-06 Lane I router-fix re-probe, CRASH->RUNNABLE headless)"
       ],
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "M04 catalog-only classification was stale after the 2026-07-06 router fix. Lane I fixed tools/autocad-router.ps1 to route job-based ops by handler.execution_host_class instead of the old write_mode-based attended branch; the fixed-router re-probe measured this op as RUNNABLE, so the policy is now promoted to implemented. See reports/lane_i_router_fix_resolution.json and build_log.md Lane I.",
       "owner_ticket": "M08M-T01",
       "implementation_strategy": "implemented_v1",
       "evidence_required": "existing_tests_and_evidence_refs"
@@ -11061,13 +11061,12 @@
       },
       "policy": {
         "source": "config/policy.v2.json",
-        "status_policy": "catalogued_not_runnable",
+        "status_policy": "implemented",
         "default_write_mode": "live_edit",
         "allowed_write_modes": [
           "live_edit"
         ],
-        "no_original_write_default": true,
-        "runtime_behavior": "not_runnable_until_promoted_to_implemented_or_wired"
+        "no_original_write_default": true
       },
       "tests": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
@@ -11082,9 +11081,10 @@
         "src/Ariadne.AcadNative/families/m08m_handlers.inc:m08mDispatch",
         "reports/merge/MERGE-M08-READ.json",
         "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
-        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)"
+        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)",
+        "reports/lane_i_router_fix_resolution.json (2026-07-06 Lane I router-fix re-probe, CRASH->RUNNABLE headless)"
       ],
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "M04 catalog-only classification was stale after the 2026-07-06 router fix. Lane I fixed tools/autocad-router.ps1 to route job-based ops by handler.execution_host_class instead of the old write_mode-based attended branch; the fixed-router re-probe measured this op as RUNNABLE, so the policy is now promoted to implemented. See reports/lane_i_router_fix_resolution.json and build_log.md Lane I.",
       "owner_ticket": "M08M-T01",
       "implementation_strategy": "implemented_v1",
       "evidence_required": "existing_tests_and_evidence_refs"
@@ -11132,13 +11132,12 @@
       },
       "policy": {
         "source": "config/policy.v2.json",
-        "status_policy": "catalogued_not_runnable",
+        "status_policy": "implemented",
         "default_write_mode": "live_edit",
         "allowed_write_modes": [
           "live_edit"
         ],
-        "no_original_write_default": true,
-        "runtime_behavior": "not_runnable_until_promoted_to_implemented_or_wired"
+        "no_original_write_default": true
       },
       "tests": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
@@ -11153,9 +11152,10 @@
         "src/Ariadne.AcadNative/families/m08m_handlers.inc:m08mDispatch",
         "reports/merge/MERGE-M08-READ.json",
         "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
-        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)"
+        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)",
+        "reports/lane_i_router_fix_resolution.json (2026-07-06 Lane I router-fix re-probe, CRASH->RUNNABLE headless)"
       ],
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "M04 catalog-only classification was stale after the 2026-07-06 router fix. Lane I fixed tools/autocad-router.ps1 to route job-based ops by handler.execution_host_class instead of the old write_mode-based attended branch; the fixed-router re-probe measured this op as RUNNABLE, so the policy is now promoted to implemented. See reports/lane_i_router_fix_resolution.json and build_log.md Lane I.",
       "owner_ticket": "M08M-T01",
       "implementation_strategy": "implemented_v1",
       "evidence_required": "existing_tests_and_evidence_refs"
@@ -13360,13 +13360,12 @@
       },
       "policy": {
         "source": "config/policy.v2.json",
-        "status_policy": "catalogued_not_runnable",
+        "status_policy": "implemented",
         "default_write_mode": "live_edit",
         "allowed_write_modes": [
           "live_edit"
         ],
-        "no_original_write_default": true,
-        "runtime_behavior": "not_runnable_until_promoted_to_implemented_or_wired"
+        "no_original_write_default": true
       },
       "tests": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
@@ -13381,9 +13380,10 @@
         "src/Ariadne.AcadNative/families/m08kc_handlers.inc:m08kcDispatch",
         "reports/merge/MERGE-M08-READ.json",
         "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
-        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)"
+        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)",
+        "reports/lane_i_router_fix_resolution.json (2026-07-06 Lane I router-fix re-probe, CRASH->REACHABLE headless)"
       ],
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "M04 catalog-only classification was stale after the 2026-07-06 router fix. Lane I fixed tools/autocad-router.ps1 to route job-based ops by handler.execution_host_class instead of the old write_mode-based attended branch; the fixed-router re-probe measured this op as REACHABLE, so the policy is now promoted to implemented. See reports/lane_i_router_fix_resolution.json and build_log.md Lane I.",
       "owner_ticket": "M08K-T03",
       "implementation_strategy": "implemented_v1",
       "evidence_required": "existing_tests_and_evidence_refs"
@@ -13806,13 +13806,12 @@
       },
       "policy": {
         "source": "config/policy.v2.json",
-        "status_policy": "catalogued_not_runnable",
+        "status_policy": "implemented",
         "default_write_mode": "live_edit",
         "allowed_write_modes": [
           "live_edit"
         ],
-        "no_original_write_default": true,
-        "runtime_behavior": "not_runnable_until_promoted_to_implemented_or_wired"
+        "no_original_write_default": true
       },
       "tests": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
@@ -13827,9 +13826,10 @@
         "src/Ariadne.AcadNative/families/m08kc_handlers.inc:m08kcDispatch",
         "reports/merge/MERGE-M08-READ.json",
         "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
-        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)"
+        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)",
+        "reports/lane_i_router_fix_resolution.json (2026-07-06 Lane I router-fix re-probe, CRASH->REACHABLE headless)"
       ],
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "M04 catalog-only classification was stale after the 2026-07-06 router fix. Lane I fixed tools/autocad-router.ps1 to route job-based ops by handler.execution_host_class instead of the old write_mode-based attended branch; the fixed-router re-probe measured this op as REACHABLE, so the policy is now promoted to implemented. See reports/lane_i_router_fix_resolution.json and build_log.md Lane I.",
       "owner_ticket": "M08K-T03",
       "implementation_strategy": "implemented_v1",
       "evidence_required": "existing_tests_and_evidence_refs"
@@ -16528,13 +16528,12 @@
       },
       "policy": {
         "source": "config/policy.v2.json",
-        "status_policy": "catalogued_not_runnable",
+        "status_policy": "implemented",
         "default_write_mode": "live_edit",
         "allowed_write_modes": [
           "live_edit"
         ],
-        "no_original_write_default": true,
-        "runtime_behavior": "not_runnable_until_promoted_to_implemented_or_wired"
+        "no_original_write_default": true
       },
       "tests": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
@@ -16552,9 +16551,10 @@
         "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)",
         "reports/tickets/WAVE3_PANE6_NATIVE_CUSTOM.md",
         "reports/tickets/WAVE3_PANE6_NATIVE_CUSTOM_OPS.json",
-        "reports/tickets/WAVE3_PANE6_native_build.json"
+        "reports/tickets/WAVE3_PANE6_native_build.json",
+        "reports/lane_i_router_fix_resolution.json (2026-07-06 Lane I router-fix re-probe, CRASH->RUNNABLE headless)"
       ],
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "M04 catalog-only classification was stale after the 2026-07-06 router fix. Lane I fixed tools/autocad-router.ps1 to route job-based ops by handler.execution_host_class instead of the old write_mode-based attended branch; the fixed-router re-probe measured this op as RUNNABLE, so the policy is now promoted to implemented. See reports/lane_i_router_fix_resolution.json and build_log.md Lane I.",
       "owner_ticket": "M08K-T01",
       "implementation_strategy": "implemented_v1",
       "evidence_required": "existing_tests_and_evidence_refs"
@@ -17469,13 +17469,12 @@
       },
       "policy": {
         "source": "config/policy.v2.json",
-        "status_policy": "catalogued_not_runnable",
+        "status_policy": "implemented",
         "default_write_mode": "live_edit",
         "allowed_write_modes": [
           "live_edit"
         ],
-        "no_original_write_default": true,
-        "runtime_behavior": "not_runnable_until_promoted_to_implemented_or_wired"
+        "no_original_write_default": true
       },
       "tests": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
@@ -17493,9 +17492,10 @@
         "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)",
         "reports/tickets/WAVE3_PANE6_NATIVE_CUSTOM.md",
         "reports/tickets/WAVE3_PANE6_NATIVE_CUSTOM_OPS.json",
-        "reports/tickets/WAVE3_PANE6_native_build.json"
+        "reports/tickets/WAVE3_PANE6_native_build.json",
+        "reports/lane_i_router_fix_resolution.json (2026-07-06 Lane I router-fix re-probe, CRASH->RUNNABLE headless)"
       ],
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "M04 catalog-only classification was stale after the 2026-07-06 router fix. Lane I fixed tools/autocad-router.ps1 to route job-based ops by handler.execution_host_class instead of the old write_mode-based attended branch; the fixed-router re-probe measured this op as RUNNABLE, so the policy is now promoted to implemented. See reports/lane_i_router_fix_resolution.json and build_log.md Lane I.",
       "owner_ticket": "M08K-T01",
       "implementation_strategy": "implemented_v1",
       "evidence_required": "existing_tests_and_evidence_refs"
@@ -17543,13 +17543,12 @@
       },
       "policy": {
         "source": "config/policy.v2.json",
-        "status_policy": "catalogued_not_runnable",
+        "status_policy": "implemented",
         "default_write_mode": "live_edit",
         "allowed_write_modes": [
           "live_edit"
         ],
-        "no_original_write_default": true,
-        "runtime_behavior": "not_runnable_until_promoted_to_implemented_or_wired"
+        "no_original_write_default": true
       },
       "tests": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
@@ -17567,9 +17566,10 @@
         "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)",
         "reports/tickets/WAVE3_PANE6_NATIVE_CUSTOM.md",
         "reports/tickets/WAVE3_PANE6_NATIVE_CUSTOM_OPS.json",
-        "reports/tickets/WAVE3_PANE6_native_build.json"
+        "reports/tickets/WAVE3_PANE6_native_build.json",
+        "reports/lane_i_router_fix_resolution.json (2026-07-06 Lane I router-fix re-probe, CRASH->RUNNABLE headless)"
       ],
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "M04 catalog-only classification was stale after the 2026-07-06 router fix. Lane I fixed tools/autocad-router.ps1 to route job-based ops by handler.execution_host_class instead of the old write_mode-based attended branch; the fixed-router re-probe measured this op as RUNNABLE, so the policy is now promoted to implemented. See reports/lane_i_router_fix_resolution.json and build_log.md Lane I.",
       "owner_ticket": "M08K-T01",
       "implementation_strategy": "implemented_v1",
       "evidence_required": "existing_tests_and_evidence_refs"
@@ -17997,13 +17997,12 @@
       },
       "policy": {
         "source": "config/policy.v2.json",
-        "status_policy": "catalogued_not_runnable",
+        "status_policy": "implemented",
         "default_write_mode": "live_edit",
         "allowed_write_modes": [
           "live_edit"
         ],
-        "no_original_write_default": true,
-        "runtime_behavior": "not_runnable_until_promoted_to_implemented_or_wired"
+        "no_original_write_default": true
       },
       "tests": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
@@ -18018,9 +18017,10 @@
         "src/Ariadne.AcadNative/families/m08k_handlers.inc:m08kDispatch",
         "reports/merge/MERGE-M08-READ.json",
         "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
-        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)"
+        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)",
+        "reports/lane_i_router_fix_resolution.json (2026-07-06 Lane I router-fix re-probe, CRASH->RUNNABLE headless)"
       ],
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "M04 catalog-only classification was stale after the 2026-07-06 router fix. Lane I fixed tools/autocad-router.ps1 to route job-based ops by handler.execution_host_class instead of the old write_mode-based attended branch; the fixed-router re-probe measured this op as RUNNABLE, so the policy is now promoted to implemented. See reports/lane_i_router_fix_resolution.json and build_log.md Lane I.",
       "owner_ticket": "M08K-T01",
       "implementation_strategy": "implemented_v1",
       "evidence_required": "existing_tests_and_evidence_refs"
@@ -21584,13 +21584,12 @@
       },
       "policy": {
         "source": "config/policy.v2.json",
-        "status_policy": "catalogued_not_runnable",
+        "status_policy": "implemented",
         "default_write_mode": "live_edit",
         "allowed_write_modes": [
           "live_edit"
         ],
-        "no_original_write_default": true,
-        "runtime_behavior": "not_runnable_until_promoted_to_implemented_or_wired"
+        "no_original_write_default": true
       },
       "tests": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
@@ -21605,9 +21604,10 @@
         "src/Ariadne.AcadNative/families/m08n_handlers.inc:m08nDispatch",
         "reports/merge/MERGE-M08-READ.json",
         "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
-        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)"
+        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)",
+        "reports/lane_i_router_fix_resolution.json (2026-07-06 Lane I router-fix re-probe, CRASH->RUNNABLE headless)"
       ],
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "M04 catalog-only classification was stale after the 2026-07-06 router fix. Lane I fixed tools/autocad-router.ps1 to route job-based ops by handler.execution_host_class instead of the old write_mode-based attended branch; the fixed-router re-probe measured this op as RUNNABLE, so the policy is now promoted to implemented. See reports/lane_i_router_fix_resolution.json and build_log.md Lane I.",
       "owner_ticket": "M08N-T01",
       "implementation_strategy": "implemented_v1",
       "evidence_required": "existing_tests_and_evidence_refs"
@@ -29157,7 +29157,7 @@
         "config/autocad_native_arx_operation_catalog.json#plot.engine.run",
         "reports/WAVE3_RENDER_PLOT_REAUDIT.md#plot.engine.run"
       ],
-      "notes": "Wave3 final no-fake-PASS audit accepted hard block. HOST_UNAVAILABLE: AcPlPlotEngine execution requires a controlled attended/full AutoCAD plot host; no controlled attended plot route is available in this integration validation.",
+      "notes": "Wave3 final no-fake-PASS audit accepted hard block. HOST_UNAVAILABLE: AcPlPlotEngine execution requires a controlled attended/full AutoCAD plot host; no controlled attended plot route is available in this integration validation. No native dispatcher exists yet (handler.dispatcher_symbol is null); requires new C++ plot-engine handler work and stays queued for the next wave.",
       "owner_ticket": "M08I-T01",
       "implementation_strategy": "hard_blocked",
       "evidence_required": "blocker_ref_and_evidence",
@@ -32018,13 +32018,12 @@
       },
       "policy": {
         "source": "config/policy.v2.json",
-        "status_policy": "catalogued_not_runnable",
+        "status_policy": "implemented",
         "default_write_mode": "live_edit",
         "allowed_write_modes": [
           "live_edit"
         ],
-        "no_original_write_default": true,
-        "runtime_behavior": "not_runnable_until_promoted_to_implemented_or_wired"
+        "no_original_write_default": true
       },
       "tests": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
@@ -32039,9 +32038,10 @@
         "src/Ariadne.AcadNative/families/m08m_handlers.inc:m08mDispatch",
         "reports/merge/MERGE-M08-READ.json",
         "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
-        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)"
+        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)",
+        "reports/lane_i_router_fix_resolution.json (2026-07-06 Lane I router-fix re-probe, CRASH->RUNNABLE headless)"
       ],
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "M04 catalog-only classification was stale after the 2026-07-06 router fix. Lane I fixed tools/autocad-router.ps1 to route job-based ops by handler.execution_host_class instead of the old write_mode-based attended branch; the fixed-router re-probe measured this op as RUNNABLE, so the policy is now promoted to implemented. See reports/lane_i_router_fix_resolution.json and build_log.md Lane I.",
       "owner_ticket": "M08M-T02",
       "implementation_strategy": "implemented_v1",
       "evidence_required": "existing_tests_and_evidence_refs"
@@ -32089,13 +32089,12 @@
       },
       "policy": {
         "source": "config/policy.v2.json",
-        "status_policy": "catalogued_not_runnable",
+        "status_policy": "implemented",
         "default_write_mode": "live_edit",
         "allowed_write_modes": [
           "live_edit"
         ],
-        "no_original_write_default": true,
-        "runtime_behavior": "not_runnable_until_promoted_to_implemented_or_wired"
+        "no_original_write_default": true
       },
       "tests": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
@@ -32110,9 +32109,10 @@
         "src/Ariadne.AcadNative/families/m08m_handlers.inc:m08mDispatch",
         "reports/merge/MERGE-M08-READ.json",
         "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
-        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)"
+        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)",
+        "reports/lane_i_router_fix_resolution.json (2026-07-06 Lane I router-fix re-probe, CRASH->RUNNABLE headless)"
       ],
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "M04 catalog-only classification was stale after the 2026-07-06 router fix. Lane I fixed tools/autocad-router.ps1 to route job-based ops by handler.execution_host_class instead of the old write_mode-based attended branch; the fixed-router re-probe measured this op as RUNNABLE, so the policy is now promoted to implemented. See reports/lane_i_router_fix_resolution.json and build_log.md Lane I.",
       "owner_ticket": "M08M-T02",
       "implementation_strategy": "implemented_v1",
       "evidence_required": "existing_tests_and_evidence_refs"
@@ -34764,13 +34764,12 @@
       },
       "policy": {
         "source": "config/policy.v2.json",
-        "status_policy": "catalogued_not_runnable",
+        "status_policy": "implemented",
         "default_write_mode": "live_edit",
         "allowed_write_modes": [
           "live_edit"
         ],
-        "no_original_write_default": true,
-        "runtime_behavior": "not_runnable_until_promoted_to_implemented_or_wired"
+        "no_original_write_default": true
       },
       "tests": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
@@ -34785,9 +34784,10 @@
         "src/Ariadne.AcadNative/families/m08c_handlers.inc:m08cDispatch",
         "reports/merge/MERGE-M08-READ.json",
         "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
-        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)"
+        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)",
+        "reports/lane_i_router_fix_resolution.json (2026-07-06 Lane I router-fix re-probe, CRASH->REACHABLE headless)"
       ],
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "M04 catalog-only classification was stale after the 2026-07-06 router fix. Lane I fixed tools/autocad-router.ps1 to route job-based ops by handler.execution_host_class instead of the old write_mode-based attended branch; the fixed-router re-probe measured this op as REACHABLE, so the policy is now promoted to implemented. See reports/lane_i_router_fix_resolution.json and build_log.md Lane I.",
       "owner_ticket": "M08C-T02",
       "implementation_strategy": "implemented_v1",
       "evidence_required": "existing_tests_and_evidence_refs"
