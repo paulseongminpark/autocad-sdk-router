@@ -90,13 +90,13 @@
     "by_engine_tier": {
       "accoreconsole_lisp_also": 20,
       "managed_also": 46,
-      "native_arx_only": 233,
-      "objectdbx_capable": 222
+      "native_arx_only": 232,
+      "objectdbx_capable": 227
     },
-    "total": 521
+    "total": 525
   },
   "coverage": {
-    "wired_ops": 33,
+    "wired_ops": 29,
     "wired_native": 28,
     "wired_managed": 1,
     "exact_mapped": 6,
