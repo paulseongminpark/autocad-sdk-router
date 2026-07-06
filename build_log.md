@@ -1470,4 +1470,21 @@ run across all 4 missions above -- unchanged throughout. No original file was ev
 opened directly; every attended/COM operation ran against a fresh staged copy, and every
 document this lane opened in the live session was closed by this lane.
 
+## Lane W5-HYG
+
+- Started registry-hygiene reconciliation in worktree `wt/w5_hygiene` on branch
+  `cados/w5-hygiene`; scope constrained to mission surfaces only:
+  `config/operations.v2.json`, `reports/lane_i_router_fix_resolution.json`,
+  `build_log.md`, `w5_report.md`, and only tests/reports proven necessary by the
+  registry edits. No `src/`, no `tools/autocad-router.ps1`, no `config/op_dag.json`.
+- Measured the mission-relevant contradiction set instead of trusting the packet's
+  `~27` estimate: among Lane I's 34 fixed-router re-probe rows, exactly **27** ops
+  still claim top-level `status=="implemented"` while nested
+  `policy.status_policy=="catalogued_not_runnable"`. All 27 also still carry
+  `policy.runtime_behavior=="not_runnable_until_promoted_to_implemented_or_wired"`.
+- Important scope note: the registry contains a larger historical backlog of the same
+  status/policy mismatch outside Lane I's 34-row re-probe artifact. This lane is
+  reconciling the router-fix leftovers evidenced by Lane I, not reclassifying
+  unrelated backlog without live runnable proof.
+
 
