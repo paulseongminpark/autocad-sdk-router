@@ -197,6 +197,10 @@ class TestSyntheticNativeMapping(unittest.TestCase):
             self.assertIn("decoded", ent["source"])
             self.assertTrue(ent["source"]["decoded"],
                             "a recognized native class was marked undecoded")
+            self.assertIn("stable_id", ent)
+            self.assertIn("stable_id_ordinal", ent)
+            self.assertIsInstance(ent["stable_id"], str)
+            self.assertIsInstance(ent["stable_id_ordinal"], int)
 
     def test_entities_by_type_histogram(self):
         ebt = self.ir["diagnostics"]["entities_by_type"]

@@ -174,6 +174,66 @@ static std::string m08mValueTypeName(const AcRxValueType& vt)
     return njsonStr(vt.name());
 }
 
+// Box a string arg into an AcRxValue matching a property's ACTUAL declared AcRxValueType.
+// automate.property.set used to always box the new value as a generic AcRxValue(const ACHAR*);
+// AcRxProperty::setValue's internal type check requires the box's type to match the property's
+// declared type exactly (Desc<const ACHAR*> is a different singleton than e.g. Desc<AcString> or
+// Desc<double>), so that boxing failed eInvalidInput for every real property tried, string-typed
+// included. Supports double / int(Adesk::Int32) / bool / AcString / AcGePoint3d -- the common
+// AcDbEntity-family property value types. Returns false (never touching outVal) for anything
+// else so the caller can report an honest capability gap instead of attempting a mismatched box.
+static bool m08mBoxPropertyValue(const AcRxValueType& propType, const std::string& newValStr,
+                                  AcRxValue& outVal, std::string& parseError)
+{
+    if (propType == AcRxValueType::Desc<AcString>::value()) {
+        outVal = AcRxValue(AcString(asciiToWide(newValStr).c_str()));
+        return true;
+    }
+    if (propType == AcRxValueType::Desc<double>::value()) {
+        try {
+            outVal = AcRxValue(std::stod(newValStr));
+            return true;
+        } catch (...) {
+            parseError = "value '" + newValStr + "' is not a valid double";
+            return false;
+        }
+    }
+    if (propType == AcRxValueType::Desc<int>::value()) {
+        try {
+            outVal = AcRxValue(std::stoi(newValStr));
+            return true;
+        } catch (...) {
+            parseError = "value '" + newValStr + "' is not a valid int";
+            return false;
+        }
+    }
+    if (propType == AcRxValueType::Desc<bool>::value()) {
+        std::string low = newValStr;
+        for (char& c : low) { if (c >= 'A' && c <= 'Z') c = static_cast<char>(c - 'A' + 'a'); }
+        if (low == "true" || low == "1" || low == "yes") { outVal = AcRxValue(true); return true; }
+        if (low == "false" || low == "0" || low == "no") { outVal = AcRxValue(false); return true; }
+        parseError = "value '" + newValStr + "' is not a valid bool (use true/false/1/0)";
+        return false;
+    }
+    if (propType == AcRxValueType::Desc<AcGePoint3d>::value()) {
+        std::istringstream iss(newValStr);
+        std::string tok;
+        double comps[3] = { 0.0, 0.0, 0.0 };
+        int n = 0;
+        while (n < 3 && std::getline(iss, tok, ',')) {
+            try { comps[n] = std::stod(tok); } catch (...) { n = -1; break; }
+            ++n;
+        }
+        if (n != 3) {
+            parseError = "value '" + newValStr + "' is not a valid 'x,y,z' point";
+            return false;
+        }
+        outVal = AcRxValue(AcGePoint3d(comps[0], comps[1], comps[2]));
+        return true;
+    }
+    return false;   // unsupported property value type -- no parseError; caller distinguishes.
+}
+
 // Create a uniquely-named transient runtime AcRxClass derived from AcRxObject for attribute-
 // authoring proofs (so we never clobber a registered descriptor and always tear down cleanly).
 // Returns the class (caller MUST deleteAcRxClass it) + the resolved unique name. nullptr on failure.
@@ -1228,13 +1288,22 @@ static bool m08mDispatch(const std::string& op, const AriadneJobCtx& ctx, std::o
             beforeVal.toString(buf, 512);
             beforeStr = acharToAscii(buf);
         }
-        // Attempt the set via the property protocol with a string AcRxValue (many AcDbEntity props,
-        // e.g. Layer, accept a const ACHAR* value).
-        const std::wstring wval = asciiToWide(newValStr);
-        AcRxValue newVal(static_cast<const ACHAR*>(wval.c_str()));
-        Acad::ErrorStatus setEs = Acad::eNotApplicable;
-        if (!readOnly)
-            setEs = prop->setValue(pObj, newVal);
+        // Attempt the set via the property protocol, boxing the incoming string as the property's
+        // ACTUAL declared AcRxValueType (m08mBoxPropertyValue) -- never a generic ACHAR* guess.
+        AcRxValue newVal;
+        std::string marshalNote;
+        bool boxed = false;
+        Acad::ErrorStatus setEs = Acad::eNotApplicable;   // default: read-only guard result
+        if (!readOnly) {
+            boxed = m08mBoxPropertyValue(prop->type(), newValStr, newVal, marshalNote);
+            if (boxed)
+                setEs = prop->setValue(pObj, newVal);
+            else
+                // Never call setValue with a mismatched box: eNotImplemented = this handler doesn't
+                // marshal the property's type yet; eInvalidInput = the type is supported but the
+                // supplied string didn't parse for it. Either way, an honest gap, not a fake attempt.
+                setEs = marshalNote.empty() ? Acad::eNotImplemented : Acad::eInvalidInput;
+        }
         // Read back.
         AcRxValue afterVal;
         std::string afterStr;
@@ -1249,11 +1318,17 @@ static bool m08mDispatch(const std::string& op, const AriadneJobCtx& ctx, std::o
         r << "\"result\":{\"handle\":" << njsonStr(handle)
           << ",\"property\":" << njsonStr(propName)
           << ",\"found\":true,\"read_only\":" << (readOnly ? "true" : "false")
+          << ",\"value_type\":" << m08mValueTypeName(prop->type())
           << ",\"before\":" << njsonStr(beforeStr)
           << ",\"requested\":" << njsonStr(newValStr)
           << ",\"after\":" << njsonStr(afterStr)
-          << ",\"set_status\":" << static_cast<int>(setEs)
-          << ",\"staged_rolled_back\":true"
+          << ",\"set_status\":" << static_cast<int>(setEs);
+        if (!readOnly) {
+            r << ",\"marshalled\":" << (boxed ? "true" : "false");
+            if (!marshalNote.empty())
+                r << ",\"marshal_note\":" << njsonStr(marshalNote);
+        }
+        r << ",\"staged_rolled_back\":true"
           << "},\"status\":\"" << (ok ? "ok" : "error") << "\"}";
         return true;
     }

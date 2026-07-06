@@ -12,15 +12,15 @@
     "acceptance_test_id": "registry tests[0] (current best-evidence test ref; F3's future per-op W+D roundtrip gate is not built in this tree yet)"
   },
   "totals": {
-    "catalogue_count": 525,
-    "node_count": 525,
-    "edge_count": 1202,
+    "catalogue_count": 541,
+    "node_count": 541,
+    "edge_count": 1329,
     "by_persistence_class": {
-      "D": 54,
+      "D": 60,
       "L": 35,
-      "NON_GOAL": 60,
-      "P": 57,
-      "R": 319
+      "NON_GOAL": 62,
+      "P": 59,
+      "R": 325
     }
   },
   "audit": {
@@ -44,6 +44,77 @@
       ],
       "acceptance_test_id": "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
       "persistence_class": "R"
+    },
+    {
+      "op_id": "anchor.clear",
+      "predecessors": [
+        "anchor.get",
+        "anchor.list",
+        "modify.entity.xdata"
+      ],
+      "arg_keys": [],
+      "target_files": [
+        "build_log.md",
+        "docs/SEMANTIC_ANCHOR_SPEC.md",
+        "src/Ariadne.AcadNative/families/m08g_handlers.inc",
+        "tests/unit/test_anchor_ops.py",
+        "tools/anchor_ops.py",
+        "tools/cadagent_mcp.py",
+        "tools/cadctl.py"
+      ],
+      "acceptance_test_id": "tests/unit/test_anchor_ops.py",
+      "persistence_class": "D"
+    },
+    {
+      "op_id": "anchor.get",
+      "predecessors": [
+        "inspect.database.graph"
+      ],
+      "arg_keys": [],
+      "target_files": [
+        "docs/SEMANTIC_ANCHOR_SPEC.md",
+        "tests/unit/test_anchor_ops.py",
+        "tools/anchor_ops.py",
+        "tools/cadagent_mcp.py",
+        "tools/cadctl.py"
+      ],
+      "acceptance_test_id": "tests/unit/test_anchor_ops.py",
+      "persistence_class": "R"
+    },
+    {
+      "op_id": "anchor.list",
+      "predecessors": [
+        "inspect.database.graph"
+      ],
+      "arg_keys": [],
+      "target_files": [
+        "docs/SEMANTIC_ANCHOR_SPEC.md",
+        "tests/unit/test_anchor_ops.py",
+        "tools/anchor_ops.py",
+        "tools/cadagent_mcp.py",
+        "tools/cadctl.py"
+      ],
+      "acceptance_test_id": "tests/unit/test_anchor_ops.py",
+      "persistence_class": "R"
+    },
+    {
+      "op_id": "anchor.set",
+      "predecessors": [
+        "anchor.get",
+        "anchor.list",
+        "modify.entity.xdata"
+      ],
+      "arg_keys": [],
+      "target_files": [
+        "build_log.md",
+        "docs/SEMANTIC_ANCHOR_SPEC.md",
+        "tests/unit/test_anchor_ops.py",
+        "tools/anchor_ops.py",
+        "tools/cadagent_mcp.py",
+        "tools/cadctl.py"
+      ],
+      "acceptance_test_id": "tests/unit/test_anchor_ops.py",
+      "persistence_class": "D"
     },
     {
       "op_id": "apply.patch",
@@ -1089,6 +1160,7 @@
       "arg_keys": [],
       "target_files": [
         "config/autocad_native_arx_operation_catalog.json",
+        "reports/lane_i_router_fix_resolution.json",
         "reports/merge/MERGE-M08-READ.json",
         "src/Ariadne.AcadNative/families/m08kc_handlers.inc",
         "tests/unit/test_m08kc_handlers.py",
@@ -1223,6 +1295,7 @@
       "arg_keys": [],
       "target_files": [
         "config/autocad_native_arx_operation_catalog.json",
+        "reports/lane_i_router_fix_resolution.json",
         "reports/merge/MERGE-M08-READ.json",
         "src/Ariadne.AcadNative/families/m08kc_handlers.inc",
         "tests/unit/test_m08kc_handlers.py",
@@ -2295,6 +2368,7 @@
       "arg_keys": [],
       "target_files": [
         "config/autocad_native_arx_operation_catalog.json",
+        "reports/lane_i_router_fix_resolution.json",
         "reports/merge/MERGE-M08-READ.json",
         "reports/tickets/WAVE3_PANE6_NATIVE_CUSTOM.md",
         "reports/tickets/WAVE3_PANE6_NATIVE_CUSTOM_OPS.json",
@@ -2514,6 +2588,7 @@
       "arg_keys": [],
       "target_files": [
         "config/autocad_native_arx_operation_catalog.json",
+        "reports/lane_i_router_fix_resolution.json",
         "reports/merge/MERGE-M08-READ.json",
         "reports/tickets/WAVE3_PANE6_NATIVE_CUSTOM.md",
         "reports/tickets/WAVE3_PANE6_NATIVE_CUSTOM_OPS.json",
@@ -2531,6 +2606,7 @@
       "arg_keys": [],
       "target_files": [
         "config/autocad_native_arx_operation_catalog.json",
+        "reports/lane_i_router_fix_resolution.json",
         "reports/merge/MERGE-M08-READ.json",
         "reports/tickets/WAVE3_PANE6_NATIVE_CUSTOM.md",
         "reports/tickets/WAVE3_PANE6_NATIVE_CUSTOM_OPS.json",
@@ -2743,6 +2819,7 @@
       "arg_keys": [],
       "target_files": [
         "config/autocad_native_arx_operation_catalog.json",
+        "reports/lane_i_router_fix_resolution.json",
         "reports/merge/MERGE-M08-READ.json",
         "src/Ariadne.AcadNative/families/m08k_handlers.inc",
         "tests/unit/test_m08k_handlers.py",
@@ -3030,6 +3107,7 @@
       "arg_keys": [],
       "target_files": [
         "config/autocad_native_arx_operation_catalog.json",
+        "reports/lane_i_router_fix_resolution.json",
         "reports/merge/MERGE-M08-READ.json",
         "src/Ariadne.AcadNative/families/m08m_handlers.inc",
         "tests/unit/test_m08m_handlers.py",
@@ -3044,6 +3122,7 @@
       "arg_keys": [],
       "target_files": [
         "config/autocad_native_arx_operation_catalog.json",
+        "reports/lane_i_router_fix_resolution.json",
         "reports/merge/MERGE-M08-READ.json",
         "src/Ariadne.AcadNative/families/m08m_handlers.inc",
         "tests/unit/test_m08m_handlers.py",
@@ -3058,6 +3137,7 @@
       "arg_keys": [],
       "target_files": [
         "config/autocad_native_arx_operation_catalog.json",
+        "reports/lane_i_router_fix_resolution.json",
         "reports/merge/MERGE-M08-READ.json",
         "src/Ariadne.AcadNative/families/m08m_handlers.inc",
         "tests/unit/test_m08m_handlers.py",
@@ -3072,6 +3152,7 @@
       "arg_keys": [],
       "target_files": [
         "config/autocad_native_arx_operation_catalog.json",
+        "reports/lane_i_router_fix_resolution.json",
         "reports/merge/MERGE-M08-READ.json",
         "src/Ariadne.AcadNative/families/m08m_handlers.inc",
         "tests/unit/test_m08m_handlers.py",
@@ -3086,6 +3167,7 @@
       "arg_keys": [],
       "target_files": [
         "config/autocad_native_arx_operation_catalog.json",
+        "reports/lane_i_router_fix_resolution.json",
         "reports/merge/MERGE-M08-READ.json",
         "src/Ariadne.AcadNative/families/m08m_handlers.inc",
         "tests/unit/test_m08m_handlers.py",
@@ -3100,6 +3182,7 @@
       "arg_keys": [],
       "target_files": [
         "config/autocad_native_arx_operation_catalog.json",
+        "reports/lane_i_router_fix_resolution.json",
         "reports/merge/MERGE-M08-READ.json",
         "src/Ariadne.AcadNative/families/m08m_handlers.inc",
         "tests/unit/test_m08m_handlers.py",
@@ -3114,6 +3197,7 @@
       "arg_keys": [],
       "target_files": [
         "config/autocad_native_arx_operation_catalog.json",
+        "reports/lane_i_router_fix_resolution.json",
         "reports/merge/MERGE-M08-READ.json",
         "src/Ariadne.AcadNative/families/m08m_handlers.inc",
         "tests/unit/test_m08m_handlers.py",
@@ -3128,6 +3212,7 @@
       "arg_keys": [],
       "target_files": [
         "config/autocad_native_arx_operation_catalog.json",
+        "reports/lane_i_router_fix_resolution.json",
         "reports/merge/MERGE-M08-READ.json",
         "src/Ariadne.AcadNative/families/m08m_handlers.inc",
         "tests/unit/test_m08m_handlers.py",
@@ -3142,6 +3227,7 @@
       "arg_keys": [],
       "target_files": [
         "config/autocad_native_arx_operation_catalog.json",
+        "reports/lane_i_router_fix_resolution.json",
         "reports/merge/MERGE-M08-READ.json",
         "src/Ariadne.AcadNative/families/m08m_handlers.inc",
         "tests/unit/test_m08m_handlers.py",
@@ -3156,6 +3242,7 @@
       "arg_keys": [],
       "target_files": [
         "config/autocad_native_arx_operation_catalog.json",
+        "reports/lane_i_router_fix_resolution.json",
         "reports/merge/MERGE-M08-READ.json",
         "src/Ariadne.AcadNative/families/m08m_handlers.inc",
         "tests/unit/test_m08m_handlers.py",
@@ -3170,6 +3257,7 @@
       "arg_keys": [],
       "target_files": [
         "config/autocad_native_arx_operation_catalog.json",
+        "reports/lane_i_router_fix_resolution.json",
         "reports/merge/MERGE-M08-READ.json",
         "src/Ariadne.AcadNative/families/m08m_handlers.inc",
         "tests/unit/test_m08m_handlers.py",
@@ -3184,6 +3272,7 @@
       "arg_keys": [],
       "target_files": [
         "config/autocad_native_arx_operation_catalog.json",
+        "reports/lane_i_router_fix_resolution.json",
         "reports/merge/MERGE-M08-READ.json",
         "src/Ariadne.AcadNative/families/m08m_handlers.inc",
         "tests/unit/test_m08m_handlers.py",
@@ -3198,6 +3287,7 @@
       "arg_keys": [],
       "target_files": [
         "config/autocad_native_arx_operation_catalog.json",
+        "reports/lane_i_router_fix_resolution.json",
         "reports/merge/MERGE-M08-READ.json",
         "src/Ariadne.AcadNative/families/m08m_handlers.inc",
         "tests/unit/test_m08m_handlers.py",
@@ -3212,6 +3302,7 @@
       "arg_keys": [],
       "target_files": [
         "config/autocad_native_arx_operation_catalog.json",
+        "reports/lane_i_router_fix_resolution.json",
         "reports/merge/MERGE-M08-READ.json",
         "src/Ariadne.AcadNative/families/m08m_handlers.inc",
         "tests/unit/test_m08m_handlers.py",
@@ -3240,6 +3331,7 @@
       "arg_keys": [],
       "target_files": [
         "config/autocad_native_arx_operation_catalog.json",
+        "reports/lane_i_router_fix_resolution.json",
         "reports/merge/MERGE-M08-READ.json",
         "src/Ariadne.AcadNative/families/m08m_handlers.inc",
         "tests/unit/test_m08m_handlers.py",
@@ -3254,6 +3346,7 @@
       "arg_keys": [],
       "target_files": [
         "config/autocad_native_arx_operation_catalog.json",
+        "reports/lane_i_router_fix_resolution.json",
         "reports/merge/MERGE-M08-READ.json",
         "src/Ariadne.AcadNative/families/m08m_handlers.inc",
         "tests/unit/test_m08m_handlers.py",
@@ -4081,6 +4174,28 @@
       "persistence_class": "R"
     },
     {
+      "op_id": "inspect.dynblock.properties",
+      "predecessors": [],
+      "arg_keys": [],
+      "target_files": [
+        "src/Ariadne.AcadNative/families/w6_dynblk_handlers.inc",
+        "tests/unit/test_w6_dynblk_handlers.py"
+      ],
+      "acceptance_test_id": "tests/unit/test_w6_dynblk_handlers.py",
+      "persistence_class": "R"
+    },
+    {
+      "op_id": "inspect.dynblock.references",
+      "predecessors": [],
+      "arg_keys": [],
+      "target_files": [
+        "src/Ariadne.AcadNative/families/w6_dynblk_handlers.inc",
+        "tests/unit/test_w6_dynblk_handlers.py"
+      ],
+      "acceptance_test_id": "tests/unit/test_w6_dynblk_handlers.py",
+      "persistence_class": "R"
+    },
+    {
       "op_id": "inspect.edge.curve",
       "predecessors": [],
       "arg_keys": [],
@@ -4389,6 +4504,19 @@
       "persistence_class": "R"
     },
     {
+      "op_id": "inspect.layerstates.list",
+      "predecessors": [],
+      "arg_keys": [],
+      "target_files": [
+        "/dev/.build/cados_plan/wt/w6_layerstate/build_log.md",
+        "src/Ariadne.AcadNative/families/w6_layerstate_handlers.inc",
+        "tests/unit/test_operation_registry_v2.py",
+        "tests/unit/test_w6_layerstate_handlers.py"
+      ],
+      "acceptance_test_id": "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
+      "persistence_class": "R"
+    },
+    {
       "op_id": "inspect.layout.list",
       "predecessors": [
         "inspect.dictionary.named_objects"
@@ -4682,6 +4810,18 @@
       "persistence_class": "R"
     },
     {
+      "op_id": "inspect.section.objects",
+      "predecessors": [],
+      "arg_keys": [],
+      "target_files": [
+        "src/Ariadne.AcadNative/families/w6_section_handlers.inc",
+        "tests/unit/test_operation_registry_v2.py",
+        "tests/unit/test_w6_section_handlers.py"
+      ],
+      "acceptance_test_id": "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
+      "persistence_class": "R"
+    },
+    {
       "op_id": "inspect.shell.complex",
       "predecessors": [],
       "arg_keys": [],
@@ -4957,6 +5097,7 @@
       "arg_keys": [],
       "target_files": [
         "config/autocad_native_arx_operation_catalog.json",
+        "reports/lane_i_router_fix_resolution.json",
         "reports/merge/MERGE-M08-READ.json",
         "src/Ariadne.AcadNative/families/m08n_handlers.inc",
         "tests/unit/test_m08n_handlers.py",
@@ -5111,6 +5252,7 @@
         "inspect.entity.common",
         "inspect.entity.geomextents",
         "inspect.entity.osnap",
+        "inspect.section.objects",
         "modify.curve.offset",
         "modify.curve.split",
         "modify.curve.to_spline",
@@ -5228,6 +5370,7 @@
         "inspect.entity.common",
         "inspect.entity.geomextents",
         "inspect.entity.osnap",
+        "inspect.section.objects",
         "modify.curve.offset",
         "modify.curve.split",
         "modify.curve.to_spline",
@@ -6235,6 +6378,7 @@
       "arg_keys": [],
       "target_files": [
         "config/autocad_native_arx_operation_catalog.json",
+        "reports/lane_i_router_fix_resolution.json",
         "reports/merge/MERGE-M08-READ.json",
         "src/Ariadne.AcadNative/families/m08m_handlers.inc",
         "tests/unit/test_m08m_handlers.py",
@@ -6249,6 +6393,7 @@
       "arg_keys": [],
       "target_files": [
         "config/autocad_native_arx_operation_catalog.json",
+        "reports/lane_i_router_fix_resolution.json",
         "reports/merge/MERGE-M08-READ.json",
         "src/Ariadne.AcadNative/families/m08m_handlers.inc",
         "tests/unit/test_m08m_handlers.py",
@@ -6553,6 +6698,32 @@
       "persistence_class": "R"
     },
     {
+      "op_id": "sheetset.read.sheets",
+      "predecessors": [],
+      "arg_keys": [],
+      "target_files": [
+        "measure/w6_sheetset_probe_latest.json",
+        "tests/unit/test_sheetset_read.py",
+        "tests/unit/test_wave3_remaining_registry_closure.py",
+        "tools/sheetset_read.py"
+      ],
+      "acceptance_test_id": "tests/unit/test_sheetset_read.py",
+      "persistence_class": "NON_GOAL"
+    },
+    {
+      "op_id": "sheetset.read.summary",
+      "predecessors": [],
+      "arg_keys": [],
+      "target_files": [
+        "measure/w6_sheetset_probe_latest.json",
+        "tests/unit/test_sheetset_read.py",
+        "tests/unit/test_wave3_remaining_registry_closure.py",
+        "tools/sheetset_read.py"
+      ],
+      "acceptance_test_id": "tests/unit/test_sheetset_read.py",
+      "persistence_class": "NON_GOAL"
+    },
+    {
       "op_id": "transaction.manager.get_object",
       "predecessors": [],
       "arg_keys": [],
@@ -6586,6 +6757,7 @@
       "arg_keys": [],
       "target_files": [
         "config/autocad_native_arx_operation_catalog.json",
+        "reports/lane_i_router_fix_resolution.json",
         "reports/merge/MERGE-M08-READ.json",
         "src/Ariadne.AcadNative/families/m08e_handlers.inc",
         "tests/unit/test_m08e_handlers.py",
@@ -6628,7 +6800,9 @@
       "op_id": "transform.database.insert_block",
       "predecessors": [
         "infra.hostapp.provide_services",
-        "inspect.block.iterate"
+        "inspect.block.iterate",
+        "inspect.dynblock.properties",
+        "inspect.dynblock.references"
       ],
       "arg_keys": [],
       "target_files": [
@@ -6721,6 +6895,7 @@
       "arg_keys": [],
       "target_files": [
         "config/autocad_native_arx_operation_catalog.json",
+        "reports/lane_i_router_fix_resolution.json",
         "reports/merge/MERGE-M08-READ.json",
         "src/Ariadne.AcadNative/families/m08c_handlers.inc",
         "tests/unit/test_m08c_handlers.py",
@@ -6957,7 +7132,9 @@
       "op_id": "write.block.append_entity",
       "predecessors": [
         "infra.hostapp.provide_services",
-        "inspect.block.iterate"
+        "inspect.block.iterate",
+        "inspect.dynblock.properties",
+        "inspect.dynblock.references"
       ],
       "arg_keys": [
         "block_name",
@@ -7019,6 +7196,7 @@
         "inspect.dictionary.get",
         "inspect.dictionary.named_objects",
         "inspect.entity.get_xdata",
+        "inspect.layerstates.list",
         "inspect.object.ext_dict",
         "inspect.symboltable.block",
         "inspect.symboltable.layers",
@@ -7043,6 +7221,7 @@
         "inspect.dictionary.get",
         "inspect.dictionary.named_objects",
         "inspect.entity.get_xdata",
+        "inspect.layerstates.list",
         "inspect.object.ext_dict",
         "inspect.symboltable.block",
         "inspect.symboltable.layers",
@@ -7059,12 +7238,29 @@
       "persistence_class": "D"
     },
     {
+      "op_id": "write.dynblock.property",
+      "predecessors": [
+        "infra.hostapp.provide_services",
+        "inspect.block.iterate",
+        "inspect.dynblock.properties",
+        "inspect.dynblock.references"
+      ],
+      "arg_keys": [],
+      "target_files": [
+        "src/Ariadne.AcadNative/families/w6_dynblk_handlers.inc",
+        "tests/unit/test_w6_dynblk_handlers.py"
+      ],
+      "acceptance_test_id": "tests/unit/test_w6_dynblk_handlers.py",
+      "persistence_class": "D"
+    },
+    {
       "op_id": "write.entity.arc",
       "predecessors": [
         "inspect.curve.protocol",
         "inspect.entity.common",
         "inspect.entity.geomextents",
         "inspect.entity.osnap",
+        "inspect.section.objects",
         "modify.curve.offset",
         "modify.curve.split",
         "modify.curve.to_spline",
@@ -7090,6 +7286,7 @@
         "inspect.entity.common",
         "inspect.entity.geomextents",
         "inspect.entity.osnap",
+        "inspect.section.objects",
         "modify.curve.offset",
         "modify.curve.split",
         "modify.curve.to_spline",
@@ -7115,6 +7312,7 @@
         "inspect.entity.common",
         "inspect.entity.geomextents",
         "inspect.entity.osnap",
+        "inspect.section.objects",
         "modify.curve.offset",
         "modify.curve.split",
         "modify.curve.to_spline",
@@ -7139,6 +7337,7 @@
         "inspect.entity.common",
         "inspect.entity.geomextents",
         "inspect.entity.osnap",
+        "inspect.section.objects",
         "modify.curve.offset",
         "modify.curve.split",
         "modify.curve.to_spline",
@@ -7164,6 +7363,7 @@
         "inspect.entity.common",
         "inspect.entity.geomextents",
         "inspect.entity.osnap",
+        "inspect.section.objects",
         "modify.curve.offset",
         "modify.curve.split",
         "modify.curve.to_spline",
@@ -7224,6 +7424,7 @@
         "inspect.entity.common",
         "inspect.entity.geomextents",
         "inspect.entity.osnap",
+        "inspect.section.objects",
         "modify.curve.offset",
         "modify.curve.split",
         "modify.curve.to_spline",
@@ -7249,6 +7450,7 @@
         "inspect.entity.common",
         "inspect.entity.geomextents",
         "inspect.entity.osnap",
+        "inspect.section.objects",
         "modify.curve.offset",
         "modify.curve.split",
         "modify.curve.to_spline",
@@ -7274,6 +7476,7 @@
         "inspect.entity.common",
         "inspect.entity.geomextents",
         "inspect.entity.osnap",
+        "inspect.section.objects",
         "modify.curve.offset",
         "modify.curve.split",
         "modify.curve.to_spline",
@@ -7299,6 +7502,7 @@
         "inspect.entity.common",
         "inspect.entity.geomextents",
         "inspect.entity.osnap",
+        "inspect.section.objects",
         "modify.curve.offset",
         "modify.curve.split",
         "modify.curve.to_spline",
@@ -7324,6 +7528,7 @@
         "inspect.entity.common",
         "inspect.entity.geomextents",
         "inspect.entity.osnap",
+        "inspect.section.objects",
         "modify.curve.offset",
         "modify.curve.split",
         "modify.curve.to_spline",
@@ -7349,6 +7554,7 @@
         "inspect.entity.common",
         "inspect.entity.geomextents",
         "inspect.entity.osnap",
+        "inspect.section.objects",
         "modify.curve.offset",
         "modify.curve.split",
         "modify.curve.to_spline",
@@ -7374,6 +7580,7 @@
         "inspect.entity.common",
         "inspect.entity.geomextents",
         "inspect.entity.osnap",
+        "inspect.section.objects",
         "modify.curve.offset",
         "modify.curve.split",
         "modify.curve.to_spline",
@@ -7399,6 +7606,7 @@
         "inspect.entity.common",
         "inspect.entity.geomextents",
         "inspect.entity.osnap",
+        "inspect.section.objects",
         "modify.curve.offset",
         "modify.curve.split",
         "modify.curve.to_spline",
@@ -7424,6 +7632,7 @@
         "inspect.entity.common",
         "inspect.entity.geomextents",
         "inspect.entity.osnap",
+        "inspect.section.objects",
         "modify.curve.offset",
         "modify.curve.split",
         "modify.curve.to_spline",
@@ -7449,6 +7658,7 @@
         "inspect.entity.common",
         "inspect.entity.geomextents",
         "inspect.entity.osnap",
+        "inspect.section.objects",
         "modify.curve.offset",
         "modify.curve.split",
         "modify.curve.to_spline",
@@ -7474,6 +7684,7 @@
         "inspect.entity.common",
         "inspect.entity.geomextents",
         "inspect.entity.osnap",
+        "inspect.section.objects",
         "modify.curve.offset",
         "modify.curve.split",
         "modify.curve.to_spline",
@@ -7499,6 +7710,7 @@
         "inspect.entity.common",
         "inspect.entity.geomextents",
         "inspect.entity.osnap",
+        "inspect.section.objects",
         "modify.curve.offset",
         "modify.curve.split",
         "modify.curve.to_spline",
@@ -7524,6 +7736,7 @@
         "inspect.entity.common",
         "inspect.entity.geomextents",
         "inspect.entity.osnap",
+        "inspect.section.objects",
         "modify.curve.offset",
         "modify.curve.split",
         "modify.curve.to_spline",
@@ -7584,6 +7797,7 @@
         "inspect.entity.common",
         "inspect.entity.geomextents",
         "inspect.entity.osnap",
+        "inspect.section.objects",
         "modify.curve.offset",
         "modify.curve.split",
         "modify.curve.to_spline",
@@ -7608,6 +7822,7 @@
         "inspect.entity.common",
         "inspect.entity.geomextents",
         "inspect.entity.osnap",
+        "inspect.section.objects",
         "modify.curve.offset",
         "modify.curve.split",
         "modify.curve.to_spline",
@@ -7633,6 +7848,7 @@
         "inspect.entity.common",
         "inspect.entity.geomextents",
         "inspect.entity.osnap",
+        "inspect.section.objects",
         "modify.curve.offset",
         "modify.curve.split",
         "modify.curve.to_spline",
@@ -7658,6 +7874,7 @@
         "inspect.entity.common",
         "inspect.entity.geomextents",
         "inspect.entity.osnap",
+        "inspect.section.objects",
         "modify.curve.offset",
         "modify.curve.split",
         "modify.curve.to_spline",
@@ -7683,6 +7900,7 @@
         "inspect.entity.common",
         "inspect.entity.geomextents",
         "inspect.entity.osnap",
+        "inspect.section.objects",
         "modify.curve.offset",
         "modify.curve.split",
         "modify.curve.to_spline",
@@ -7708,6 +7926,7 @@
         "inspect.entity.common",
         "inspect.entity.geomextents",
         "inspect.entity.osnap",
+        "inspect.section.objects",
         "modify.curve.offset",
         "modify.curve.split",
         "modify.curve.to_spline",
@@ -7766,6 +7985,7 @@
         "inspect.entity.common",
         "inspect.entity.geomextents",
         "inspect.entity.osnap",
+        "inspect.section.objects",
         "modify.curve.offset",
         "modify.curve.split",
         "modify.curve.to_spline",
@@ -7791,6 +8011,7 @@
         "inspect.entity.common",
         "inspect.entity.geomextents",
         "inspect.entity.osnap",
+        "inspect.section.objects",
         "modify.curve.offset",
         "modify.curve.split",
         "modify.curve.to_spline",
@@ -7849,6 +8070,7 @@
         "inspect.entity.common",
         "inspect.entity.geomextents",
         "inspect.entity.osnap",
+        "inspect.section.objects",
         "modify.curve.offset",
         "modify.curve.split",
         "modify.curve.to_spline",
@@ -7874,6 +8096,7 @@
         "inspect.entity.common",
         "inspect.entity.geomextents",
         "inspect.entity.osnap",
+        "inspect.section.objects",
         "modify.curve.offset",
         "modify.curve.split",
         "modify.curve.to_spline",
@@ -7900,6 +8123,7 @@
         "inspect.entity.common",
         "inspect.entity.geomextents",
         "inspect.entity.osnap",
+        "inspect.section.objects",
         "modify.curve.offset",
         "modify.curve.split",
         "modify.curve.to_spline",
@@ -7925,6 +8149,7 @@
         "inspect.entity.common",
         "inspect.entity.geomextents",
         "inspect.entity.osnap",
+        "inspect.section.objects",
         "modify.curve.offset",
         "modify.curve.split",
         "modify.curve.to_spline",
@@ -7949,6 +8174,7 @@
         "inspect.entity.common",
         "inspect.entity.geomextents",
         "inspect.entity.osnap",
+        "inspect.section.objects",
         "modify.curve.offset",
         "modify.curve.split",
         "modify.curve.to_spline",
@@ -7974,6 +8200,7 @@
         "inspect.entity.common",
         "inspect.entity.geomextents",
         "inspect.entity.osnap",
+        "inspect.section.objects",
         "modify.curve.offset",
         "modify.curve.split",
         "modify.curve.to_spline",
@@ -7993,12 +8220,36 @@
       "persistence_class": "P"
     },
     {
+      "op_id": "write.entity.section",
+      "predecessors": [
+        "inspect.curve.protocol",
+        "inspect.entity.common",
+        "inspect.entity.geomextents",
+        "inspect.entity.osnap",
+        "inspect.section.objects",
+        "modify.curve.offset",
+        "modify.curve.split",
+        "modify.curve.to_spline",
+        "modify.entity.copy_transformed",
+        "modify.entity.explode"
+      ],
+      "arg_keys": [],
+      "target_files": [
+        "src/Ariadne.AcadNative/families/w6_section_handlers.inc",
+        "tests/unit/test_operation_registry_v2.py",
+        "tests/unit/test_w6_section_handlers.py"
+      ],
+      "acceptance_test_id": "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
+      "persistence_class": "P"
+    },
+    {
       "op_id": "write.entity.set_xdata",
       "predecessors": [
         "acdb.database.create",
         "inspect.dictionary.get",
         "inspect.dictionary.named_objects",
         "inspect.entity.get_xdata",
+        "inspect.layerstates.list",
         "inspect.object.ext_dict",
         "inspect.symboltable.block",
         "inspect.symboltable.layers",
@@ -8024,6 +8275,7 @@
         "inspect.entity.common",
         "inspect.entity.geomextents",
         "inspect.entity.osnap",
+        "inspect.section.objects",
         "modify.curve.offset",
         "modify.curve.split",
         "modify.curve.to_spline",
@@ -8048,6 +8300,7 @@
         "inspect.entity.common",
         "inspect.entity.geomextents",
         "inspect.entity.osnap",
+        "inspect.section.objects",
         "modify.curve.offset",
         "modify.curve.split",
         "modify.curve.to_spline",
@@ -8073,6 +8326,7 @@
         "inspect.entity.common",
         "inspect.entity.geomextents",
         "inspect.entity.osnap",
+        "inspect.section.objects",
         "modify.curve.offset",
         "modify.curve.split",
         "modify.curve.to_spline",
@@ -8098,6 +8352,7 @@
         "inspect.entity.common",
         "inspect.entity.geomextents",
         "inspect.entity.osnap",
+        "inspect.section.objects",
         "modify.curve.offset",
         "modify.curve.split",
         "modify.curve.to_spline",
@@ -8123,6 +8378,7 @@
         "inspect.entity.common",
         "inspect.entity.geomextents",
         "inspect.entity.osnap",
+        "inspect.section.objects",
         "modify.curve.offset",
         "modify.curve.split",
         "modify.curve.to_spline",
@@ -8148,6 +8404,7 @@
         "inspect.entity.common",
         "inspect.entity.geomextents",
         "inspect.entity.osnap",
+        "inspect.section.objects",
         "modify.curve.offset",
         "modify.curve.split",
         "modify.curve.to_spline",
@@ -8173,6 +8430,7 @@
         "inspect.entity.common",
         "inspect.entity.geomextents",
         "inspect.entity.osnap",
+        "inspect.section.objects",
         "modify.curve.offset",
         "modify.curve.split",
         "modify.curve.to_spline",
@@ -8198,6 +8456,7 @@
         "inspect.entity.common",
         "inspect.entity.geomextents",
         "inspect.entity.osnap",
+        "inspect.section.objects",
         "modify.curve.offset",
         "modify.curve.split",
         "modify.curve.to_spline",
@@ -8223,6 +8482,7 @@
         "inspect.entity.common",
         "inspect.entity.geomextents",
         "inspect.entity.osnap",
+        "inspect.section.objects",
         "modify.curve.offset",
         "modify.curve.split",
         "modify.curve.to_spline",
@@ -8247,6 +8507,7 @@
         "inspect.entity.common",
         "inspect.entity.geomextents",
         "inspect.entity.osnap",
+        "inspect.section.objects",
         "modify.curve.offset",
         "modify.curve.split",
         "modify.curve.to_spline",
@@ -8272,6 +8533,7 @@
         "inspect.entity.common",
         "inspect.entity.geomextents",
         "inspect.entity.osnap",
+        "inspect.section.objects",
         "modify.curve.offset",
         "modify.curve.split",
         "modify.curve.to_spline",
@@ -8296,6 +8558,7 @@
         "inspect.entity.common",
         "inspect.entity.geomextents",
         "inspect.entity.osnap",
+        "inspect.section.objects",
         "modify.curve.offset",
         "modify.curve.split",
         "modify.curve.to_spline",
@@ -8353,6 +8616,7 @@
         "inspect.entity.common",
         "inspect.entity.geomextents",
         "inspect.entity.osnap",
+        "inspect.section.objects",
         "modify.curve.offset",
         "modify.curve.split",
         "modify.curve.to_spline",
@@ -8378,6 +8642,7 @@
         "inspect.entity.common",
         "inspect.entity.geomextents",
         "inspect.entity.osnap",
+        "inspect.section.objects",
         "modify.curve.offset",
         "modify.curve.split",
         "modify.curve.to_spline",
@@ -8402,6 +8667,7 @@
         "inspect.entity.common",
         "inspect.entity.geomextents",
         "inspect.entity.osnap",
+        "inspect.section.objects",
         "modify.curve.offset",
         "modify.curve.split",
         "modify.curve.to_spline",
@@ -8427,6 +8693,7 @@
         "inspect.dictionary.get",
         "inspect.dictionary.named_objects",
         "inspect.entity.get_xdata",
+        "inspect.layerstates.list",
         "inspect.object.ext_dict",
         "inspect.symboltable.block",
         "inspect.symboltable.layers",
@@ -8453,6 +8720,78 @@
       "persistence_class": "D"
     },
     {
+      "op_id": "write.layerstate.delete",
+      "predecessors": [
+        "acdb.database.create",
+        "inspect.dictionary.get",
+        "inspect.dictionary.named_objects",
+        "inspect.entity.get_xdata",
+        "inspect.layerstates.list",
+        "inspect.object.ext_dict",
+        "inspect.symboltable.block",
+        "inspect.symboltable.layers",
+        "inspect.xrecord.get",
+        "transform.database.wblock"
+      ],
+      "arg_keys": [],
+      "target_files": [
+        "/dev/.build/cados_plan/wt/w6_layerstate/build_log.md",
+        "src/Ariadne.AcadNative/families/w6_layerstate_handlers.inc",
+        "tests/unit/test_operation_registry_v2.py",
+        "tests/unit/test_w6_layerstate_handlers.py"
+      ],
+      "acceptance_test_id": "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
+      "persistence_class": "D"
+    },
+    {
+      "op_id": "write.layerstate.restore",
+      "predecessors": [
+        "acdb.database.create",
+        "inspect.dictionary.get",
+        "inspect.dictionary.named_objects",
+        "inspect.entity.get_xdata",
+        "inspect.layerstates.list",
+        "inspect.object.ext_dict",
+        "inspect.symboltable.block",
+        "inspect.symboltable.layers",
+        "inspect.xrecord.get",
+        "transform.database.wblock"
+      ],
+      "arg_keys": [],
+      "target_files": [
+        "/dev/.build/cados_plan/wt/w6_layerstate/build_log.md",
+        "src/Ariadne.AcadNative/families/w6_layerstate_handlers.inc",
+        "tests/unit/test_operation_registry_v2.py",
+        "tests/unit/test_w6_layerstate_handlers.py"
+      ],
+      "acceptance_test_id": "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
+      "persistence_class": "D"
+    },
+    {
+      "op_id": "write.layerstate.save",
+      "predecessors": [
+        "acdb.database.create",
+        "inspect.dictionary.get",
+        "inspect.dictionary.named_objects",
+        "inspect.entity.get_xdata",
+        "inspect.layerstates.list",
+        "inspect.object.ext_dict",
+        "inspect.symboltable.block",
+        "inspect.symboltable.layers",
+        "inspect.xrecord.get",
+        "transform.database.wblock"
+      ],
+      "arg_keys": [],
+      "target_files": [
+        "/dev/.build/cados_plan/wt/w6_layerstate/build_log.md",
+        "src/Ariadne.AcadNative/families/w6_layerstate_handlers.inc",
+        "tests/unit/test_operation_registry_v2.py",
+        "tests/unit/test_w6_layerstate_handlers.py"
+      ],
+      "acceptance_test_id": "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
+      "persistence_class": "D"
+    },
+    {
       "op_id": "write.layout.create",
       "predecessors": [
         "inspect.dictionary.named_objects"
@@ -8474,6 +8813,7 @@
         "inspect.dictionary.get",
         "inspect.dictionary.named_objects",
         "inspect.entity.get_xdata",
+        "inspect.layerstates.list",
         "inspect.object.ext_dict",
         "inspect.symboltable.block",
         "inspect.symboltable.layers",
@@ -8540,6 +8880,7 @@
         "inspect.dictionary.get",
         "inspect.dictionary.named_objects",
         "inspect.entity.get_xdata",
+        "inspect.layerstates.list",
         "inspect.object.ext_dict",
         "inspect.symboltable.block",
         "inspect.symboltable.layers",
@@ -8610,6 +8951,7 @@
         "inspect.dictionary.get",
         "inspect.dictionary.named_objects",
         "inspect.entity.get_xdata",
+        "inspect.layerstates.list",
         "inspect.object.ext_dict",
         "inspect.symboltable.block",
         "inspect.symboltable.layers",
@@ -8630,12 +8972,36 @@
       "persistence_class": "D"
     },
     {
+      "op_id": "write.section.generate2d",
+      "predecessors": [
+        "inspect.curve.protocol",
+        "inspect.entity.common",
+        "inspect.entity.geomextents",
+        "inspect.entity.osnap",
+        "inspect.section.objects",
+        "modify.curve.offset",
+        "modify.curve.split",
+        "modify.curve.to_spline",
+        "modify.entity.copy_transformed",
+        "modify.entity.explode"
+      ],
+      "arg_keys": [],
+      "target_files": [
+        "src/Ariadne.AcadNative/families/w6_section_handlers.inc",
+        "tests/unit/test_operation_registry_v2.py",
+        "tests/unit/test_w6_section_handlers.py"
+      ],
+      "acceptance_test_id": "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
+      "persistence_class": "P"
+    },
+    {
       "op_id": "write.textstyle.create",
       "predecessors": [
         "acdb.database.create",
         "inspect.dictionary.get",
         "inspect.dictionary.named_objects",
         "inspect.entity.get_xdata",
+        "inspect.layerstates.list",
         "inspect.object.ext_dict",
         "inspect.symboltable.block",
         "inspect.symboltable.layers",
@@ -8658,6 +9024,7 @@
         "inspect.dictionary.get",
         "inspect.dictionary.named_objects",
         "inspect.entity.get_xdata",
+        "inspect.layerstates.list",
         "inspect.object.ext_dict",
         "inspect.symboltable.block",
         "inspect.symboltable.layers",
@@ -8680,6 +9047,7 @@
         "inspect.dictionary.get",
         "inspect.dictionary.named_objects",
         "inspect.entity.get_xdata",
+        "inspect.layerstates.list",
         "inspect.object.ext_dict",
         "inspect.symboltable.block",
         "inspect.symboltable.layers",
@@ -8702,6 +9070,7 @@
         "inspect.dictionary.get",
         "inspect.dictionary.named_objects",
         "inspect.entity.get_xdata",
+        "inspect.layerstates.list",
         "inspect.object.ext_dict",
         "inspect.symboltable.block",
         "inspect.symboltable.layers",
@@ -8741,6 +9110,7 @@
         "inspect.dictionary.get",
         "inspect.dictionary.named_objects",
         "inspect.entity.get_xdata",
+        "inspect.layerstates.list",
         "inspect.object.ext_dict",
         "inspect.symboltable.block",
         "inspect.symboltable.layers",

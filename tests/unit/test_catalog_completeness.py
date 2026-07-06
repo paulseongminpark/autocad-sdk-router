@@ -145,12 +145,14 @@ class TestCatalogDenominatorLiveSmoke(unittest.TestCase):
         # fifth (write.entity.polyline2d.deep, the true legacy AcDb2dPolyline
         # write path) -- 521 -> 522. p9-tables2 adds three more
         # (write.ucs.create / write.view.create / write.vport.create, TABLES
-        # tier-2) -- 522 -> 523 -> 524 -> 525. See tools/patch_ops/tables.py
-        # + entities.py.
+        # tier-2) -- 522 -> 523 -> 524 -> 525. W6-SHEETSET adds two blocked
+        # sheet-set COM read records -- 525 -> 526 -> 527. See
+        # tools/patch_ops/tables.py + entities.py + tools/sheetset_read.py.
         ops = cc.load_operations_catalog()
-        self.assertEqual(len(ops), 525,
-                         "the F0 task's own '517-op catalogue' anchor (+8, "
-                         "w3-dimstyle/w3-ltts x2/P10/p4-poly2d/p9-tables2 x3); "
+        self.assertEqual(len(ops), 541,
+                         "the F0 task's own '517-op catalogue' anchor (+8 wave0-3, "
+                         "+16 wave5/6: w5-anchor x4/w6-layerstate x4/w6-dynblk x3/"
+                         "w6-section x3/w6-sheetset x2); "
                          "if this moves again, "
                          "the whole WAVE-0 accounting must be recomputed")
 
@@ -158,9 +160,9 @@ class TestCatalogDenominatorLiveSmoke(unittest.TestCase):
         ops = cc.load_operations_catalog()
         denom = cc.compute_catalog_denominator(ops)
         self.assertEqual(denom["total_catalogued_ops"], len(ops))
-        self.assertTrue(430 <= denom["catalog_parity_targets"] <= 460,
-                        "parity_targets {0} far outside PLAN.md's ~446 neighborhood "
-                        "(+/-1 jitter is expected, not this)".format(
+        self.assertTrue(455 <= denom["catalog_parity_targets"] <= 485,
+                        "parity_targets {0} far outside the post-wave5/6 ~469 neighborhood "
+                        "(PLAN.md's ~446 + 16 wave5/6 catalogue ops)".format(
                             denom["catalog_parity_targets"]))
 
 
@@ -232,8 +234,11 @@ class TestCataloguedMatching(unittest.TestCase):
         # had 0 matching catalog ops. A regression here means either the
         # catalog gained real coverage (update the seed table) or the match
         # rule broke (false catalogued).
+        # AcDbSection removed from this seed: w6-section (wave-6 census P2) added
+        # real AcDbSection coverage (inspect.section.objects / write.entity.section /
+        # write.section.generate2d), legitimately closing that R3 G0 gap.
         for cls_name in ("AcDbViewport", "AcDbGroup", "AcDbField", "AcDbHelix",
-                         "AcDbPointCloud", "AcDbSection"):
+                         "AcDbPointCloud"):
             hits = cc.catalogued_by(cls_name, self.text_index)
             self.assertEqual(hits, [], "{0} expected uncatalogued per R3 G0".format(cls_name))
 

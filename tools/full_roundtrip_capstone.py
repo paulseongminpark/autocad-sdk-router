@@ -983,7 +983,7 @@ def _write_json(path: str, obj: Any) -> str:
     return path
 
 
-def main(argv=None) -> int:
+def build_arg_parser() -> argparse.ArgumentParser:
     ap = argparse.ArgumentParser(
         description="full_roundtrip_capstone: full-drawing extract -> regen "
                     "(certified classes) -> re-extract -> handle-independent "
@@ -1006,7 +1006,15 @@ def main(argv=None) -> int:
     ap.add_argument("--per-kind-limit", type=int, default=None, help="per-kind op cap for this batch")
     ap.add_argument("--with-records", action="store_true",
                    help="also regen+record-diff layer/dimstyle tables (stretch)")
-    args = ap.parse_args(argv)
+    ap.add_argument("--cross-verify", dest="cross_verify", action=argparse.BooleanOptionalAction, default=True,
+                   help="run LibreDWG sidecar verification as a post-write gate (default: on)")
+    ap.add_argument("--visual-gate", dest="visual_gate", action=argparse.BooleanOptionalAction, default=True,
+                   help="run SVG->raster SSIM visual verification as a post-write gate (default: on)")
+    return ap
+
+
+def main(argv=None) -> int:
+    args = build_arg_parser().parse_args(argv)
 
     out_dir = os.path.abspath(args.out_dir)
     os.makedirs(out_dir, exist_ok=True)
@@ -1082,6 +1090,7 @@ def main(argv=None) -> int:
     gate_statuses = [entity_gate["gate_status"]]
 
     pre_path, post_path = pre_ir_path(regen_dir), post_ir_path(regen_dir)
+    records_gate = {"dropped_ops": []}
     if os.path.isfile(pre_path) and os.path.isfile(post_path):
         cad_diff_mod = importlib.import_module("cad_diff")
         pre_ir = json.load(open(pre_path, encoding="utf-8-sig"))
@@ -1098,6 +1107,25 @@ def main(argv=None) -> int:
         verdict = per_kind_verdict(filtered, diff)
         summary["verdict"] = verdict
         _write_json(os.path.join(out_dir, "verdict.json"), verdict)
+        if args.cross_verify:
+            cross_verify_mod = importlib.import_module("cross_verify")
+            cross_verify_result = cross_verify_mod.cross_verify_dwg(
+                os.path.join(regen_dir, "staged_output.dwg"),
+                ir_path=post_path,
+                out_dir=os.path.join(out_dir, "cross_verify_regen"),
+            )
+            summary["regen"]["cross_verify"] = cross_verify_result
+            gate_statuses.append(cross_verify_result["status"])
+        if args.visual_gate:
+            visual_gate_mod = importlib.import_module("visual_gate")
+            visual_gate_result = visual_gate_mod.visual_gate_from_ir_docs(
+                filtered,
+                regenerated_ir,
+                diff_doc=diff,
+                out_dir=os.path.join(out_dir, "visual_gate_regen"),
+            )
+            summary["regen"]["visual_gate"] = visual_gate_result
+            gate_statuses.append(visual_gate_result["status"])
     else:
         summary["verdict"] = None
         summary["verdict_skipped_reason"] = (
@@ -1145,6 +1173,25 @@ def main(argv=None) -> int:
             ))
         summary["table_record_diffs"] = table_diffs
         _write_json(os.path.join(out_dir, "table_record_diffs.json"), table_diffs)
+        if args.cross_verify and records_post_ir is not None:
+            cross_verify_mod = importlib.import_module("cross_verify")
+            cross_verify_result = cross_verify_mod.cross_verify_dwg(
+                os.path.join(records_dir, "staged_output.dwg"),
+                ir_path=records_post_path,
+                out_dir=os.path.join(out_dir, "cross_verify_records"),
+            )
+            summary["records_regen"]["cross_verify"] = cross_verify_result
+            gate_statuses.append(cross_verify_result["status"])
+        if args.visual_gate and records_post_ir is not None:
+            visual_gate_mod = importlib.import_module("visual_gate")
+            visual_gate_result = visual_gate_mod.visual_gate_from_ir_paths(
+                pre_ir_path(records_dir),
+                records_post_path,
+                diff_path=None,
+                out_dir=os.path.join(out_dir, "visual_gate_records"),
+            )
+            summary["records_regen"]["visual_gate"] = visual_gate_result
+            gate_statuses.append(visual_gate_result["status"])
 
     overall_gate = combine_gate_statuses(gate_statuses)
     summary["status"] = overall_gate

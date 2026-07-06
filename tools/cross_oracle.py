@@ -177,7 +177,7 @@ _ENGINE_INTENT = {
 # itself so the two cannot silently drift apart.
 
 _KNOWN_ENTITY_FIELDS = frozenset({
-    "handle", "object_id", "class", "dxf_name", "owner_handle", "space",
+    "handle", "stable_id", "stable_id_ordinal", "object_id", "class", "dxf_name", "owner_handle", "space",
     "layout", "layer", "linetype", "color_index", "lineweight", "visible",
     "bbox", "geometry", "xdata", "extension_dictionary_handle", "reactors",
     "source",
@@ -222,7 +222,7 @@ _KNOWN_GEOMETRY_LEAF_FIELDS = frozenset({
 # set below, find_uncertified_oracle_fields flags it not_certified rather than
 # silently skipping it (recognized-by-schema != oracle-certified).
 _IDENTITY_PROVENANCE_FIELDS = frozenset({
-    "handle", "object_id", "class", "dxf_name", "owner_handle", "space", "source",
+    "handle", "stable_id", "stable_id_ordinal", "object_id", "class", "dxf_name", "owner_handle", "space", "source",
 })
 
 # Top-level fields ACTIVELY multiset-compared by default (a subset of the known

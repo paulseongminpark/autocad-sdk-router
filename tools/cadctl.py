@@ -881,6 +881,163 @@ class Cad:
                 "reason": f"patch_engine.apply_staged failed: {type(exc).__name__}: {exc}",
             }
 
+    # ------------------------------------------------------------- semantic anchors (W5-ANCHOR)
+
+    def anchor_set(self, dwg_path: str, handle: str, body: dict, out_dir: str, *,
+                  author_agent: str, tags: list | None = None) -> dict:
+        """Write (upsert) a semantic anchor onto ``handle`` on a STAGED copy of
+        ``dwg_path``, via the existing set_entity_xdata_by_handle patch op
+        (native modify.entity.xdata -- no new native op). See
+        docs/SEMANTIC_ANCHOR_SPEC.md and tools/anchor_ops.py.
+        """
+        anchor_ops, imp_err = _import_optional("anchor_ops")
+        if anchor_ops is None:
+            return {
+                "schema": "ariadne.cadctl.anchor_set.v1",
+                "status": "not_implemented",
+                "reason": f"anchor_ops (Lane W5-ANCHOR) unavailable: {imp_err}",
+            }
+        try:
+            patch = anchor_ops.build_anchor_set_patch(
+                handle, body, author_agent=author_agent, tags=tags)
+        except anchor_ops.AnchorError as exc:
+            return {
+                "schema": "ariadne.cadctl.anchor_set.v1",
+                "status": "blocked",
+                "handle": handle,
+                "reason": str(exc),
+            }
+        patch_engine, imp_err2 = _import_optional("patch_engine")
+        if patch_engine is None or not hasattr(patch_engine, "apply_staged"):
+            return {
+                "schema": "ariadne.cadctl.anchor_set.v1",
+                "status": "not_implemented",
+                "reason": f"patch_engine.apply_staged unavailable: {imp_err2}",
+            }
+        try:
+            patch_result = patch_engine.apply_staged(patch, dwg_path, out_dir)
+        except Exception as exc:
+            return {
+                "schema": "ariadne.cadctl.anchor_set.v1",
+                "status": "error",
+                "handle": handle,
+                "reason": f"patch_engine.apply_staged failed: {type(exc).__name__}: {exc}",
+            }
+        return {
+            "schema": "ariadne.cadctl.anchor_set.v1",
+            "status": patch_result.get("status"),
+            "handle": handle,
+            "patch_result": patch_result,
+        }
+
+    def anchor_clear(self, dwg_path: str, handle: str, out_dir: str, *,
+                     author_agent: str) -> dict:
+        """Logically clear (tombstone) the semantic anchor on ``handle`` on a
+        STAGED copy of ``dwg_path``. KNOWN LIMITATION: this cannot truly
+        remove the RegApp xdata (the native handler rejects an empty
+        'values' array) -- see anchor_ops.build_anchor_clear_patch and
+        docs/SEMANTIC_ANCHOR_SPEC.md "Clear semantics".
+        """
+        anchor_ops, imp_err = _import_optional("anchor_ops")
+        if anchor_ops is None:
+            return {
+                "schema": "ariadne.cadctl.anchor_clear.v1",
+                "status": "not_implemented",
+                "reason": f"anchor_ops (Lane W5-ANCHOR) unavailable: {imp_err}",
+            }
+        try:
+            patch = anchor_ops.build_anchor_clear_patch(handle, author_agent=author_agent)
+        except anchor_ops.AnchorError as exc:
+            return {
+                "schema": "ariadne.cadctl.anchor_clear.v1",
+                "status": "blocked",
+                "handle": handle,
+                "reason": str(exc),
+            }
+        patch_engine, imp_err2 = _import_optional("patch_engine")
+        if patch_engine is None or not hasattr(patch_engine, "apply_staged"):
+            return {
+                "schema": "ariadne.cadctl.anchor_clear.v1",
+                "status": "not_implemented",
+                "reason": f"patch_engine.apply_staged unavailable: {imp_err2}",
+            }
+        try:
+            patch_result = patch_engine.apply_staged(patch, dwg_path, out_dir)
+        except Exception as exc:
+            return {
+                "schema": "ariadne.cadctl.anchor_clear.v1",
+                "status": "error",
+                "handle": handle,
+                "reason": f"patch_engine.apply_staged failed: {type(exc).__name__}: {exc}",
+            }
+        return {
+            "schema": "ariadne.cadctl.anchor_clear.v1",
+            "status": patch_result.get("status"),
+            "handle": handle,
+            "patch_result": patch_result,
+        }
+
+    def anchor_get(self, ir_path: str, handle: str) -> dict:
+        """Read a semantic anchor back from an already-extracted IR (same
+        ir_path convention as query()/get_entity()). No native call: xdata is
+        already carried through by the existing extraction pipeline.
+        """
+        irp = Path(ir_path)
+        if not irp.exists():
+            return {
+                "schema": "ariadne.cadctl.anchor_get.v1",
+                "status": "blocked",
+                "reason": f"IR file not found: {ir_path}",
+            }
+        anchor_ops, imp_err = _import_optional("anchor_ops")
+        if anchor_ops is None:
+            return {
+                "schema": "ariadne.cadctl.anchor_get.v1",
+                "status": "not_implemented",
+                "reason": f"anchor_ops (Lane W5-ANCHOR) unavailable: {imp_err}",
+            }
+        try:
+            ir = _load_json_bom(irp)
+        except Exception as exc:
+            return {
+                "schema": "ariadne.cadctl.anchor_get.v1",
+                "status": "error",
+                "reason": f"failed to read IR: {type(exc).__name__}: {exc}",
+            }
+        result = dict(anchor_ops.get_anchor_from_ir(ir, handle))
+        result["schema"] = "ariadne.cadctl.anchor_get.v1"
+        return result
+
+    def anchor_list(self, ir_path: str) -> dict:
+        """List every live (non-tombstoned) semantic anchor in an
+        already-extracted IR (same ir_path convention as query()/anchor_get()).
+        """
+        irp = Path(ir_path)
+        if not irp.exists():
+            return {
+                "schema": "ariadne.cadctl.anchor_list.v1",
+                "status": "blocked",
+                "reason": f"IR file not found: {ir_path}",
+            }
+        anchor_ops, imp_err = _import_optional("anchor_ops")
+        if anchor_ops is None:
+            return {
+                "schema": "ariadne.cadctl.anchor_list.v1",
+                "status": "not_implemented",
+                "reason": f"anchor_ops (Lane W5-ANCHOR) unavailable: {imp_err}",
+            }
+        try:
+            ir = _load_json_bom(irp)
+        except Exception as exc:
+            return {
+                "schema": "ariadne.cadctl.anchor_list.v1",
+                "status": "error",
+                "reason": f"failed to read IR: {type(exc).__name__}: {exc}",
+            }
+        result = dict(anchor_ops.list_anchors_from_ir(ir))
+        result["schema"] = "ariadne.cadctl.anchor_list.v1"
+        return result
+
     def diff_before_after(self, pre_ir_path: str, post_ir_path: str) -> dict:
         pre = Path(pre_ir_path)
         post = Path(post_ir_path)
