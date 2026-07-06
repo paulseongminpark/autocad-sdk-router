@@ -534,3 +534,77 @@ than silently dropped (Rule 12 / no fake success).
 
 `pytest tests/unit`: **1073 passed, 14 skipped** (1087 total) -- 0 failed,
 both before and after these changes.
+
+---
+## Lane E (closeout follow-up wave) -- worktree `wt/laneE`, branch `cados/closeout-e`
+
+### Research phase (before any code change)
+
+**Fixture path correction:** the assigned fixture path in the task brief
+(`fixtures/native_sample.dwg`) does not exist in the canonical repo -- only
+`fixtures/blank_seed.dwg` lives there. The actual `native_sample.dwg` (sha256
+`eac5d4b13d67d89106e503321412539df7b39b8a7f4e44c033448e9295fe3f76`, matches
+the brief) lives at `tests/fixtures/native_sample.dwg` (see
+`tools/fixture_foundry.py:82`, `DEFAULT_SEED_DWG`). Copied into this worktree
+at that corrected path; sha256 verified identical to the canonical copy
+before any use.
+
+**Locating the cc2 1004-write revert:** the exact commit hash named in the
+task brief (`2916541`) does not resolve in this repo's `git log --all`. The
+revert appears to have been squashed/folded rather than preserved as a
+standalone commit. However, the FULL mechanism and evidence survive as an
+already-committed code comment (not lost): `AriadneNativeJob.cpp:767-777`
+(the `bytesToHexLower` doc comment, #118) and
+`m08g_handlers.inc:1696-1710` (the `modify.entity.xdata` Pass-1 comment)
+both describe it verbatim: a by-value `ads_binary` through `acutBuildList`'s
+variadic 1004 slot built a resbuf that made `setXData` report success, but
+the VERY NEXT accoreconsole process to reopen the saved staged file crashed
+with an Access Violation (`engine_exit_code: -3`) inside AutoCAD's own DWG
+reader, reproduced live via `op_roundtrip_probe.probe_entity_xdata_roundtrip`
+and fully reverted. `modify.entity.xdata` currently rejects 1004 explicitly
+(`"unsupported or reserved xdata group code 1004"`) -- confirmed by reading
+the live code, not just the comment.
+
+**Root-cause hypothesis (two independent candidates, both addressed):**
+1. **ABI hazard.** `struct ads_binary { short clen; char* buf; }`
+   (`C:\ObjectARX 2027\inc\adsdef.h:125-131`) is 16 bytes (2-byte `short` +
+   6-byte pad + 8-byte pointer) on x64 -- too large for the MSVC x64 ABI to
+   pass inline through a variadic slot; the calling convention silently
+   passes a pointer-to-a-temporary-copy instead of the struct itself.
+   `acutBuildList`'s internal `va_arg` consumption for a 1004 slot has no
+   documented contract for this, unlike the fixed-size scalar codes
+   (1000/1040/1070/point codes) already proven safe by the existing working
+   code. This is consistent with the crash appearing only on REOPEN (a
+   corrupted length/pointer serialized into the file) rather than
+   immediately in the writer process.
+2. **127-byte chunk limit.** `dbObject.h:270-276`
+   (`AcDbObject::setBinaryData` doc comment) states ObjectARX's OWN
+   convention: "The binary data is broken into 127-byte chunks for storage
+   in the resbuf chain" -- i.e. a single DXF group-code-1004 resbuf node is
+   only valid up to 127 bytes; this matches the well-known AutoLISP DXF
+   reference limit for XDATA binary chunks. If cc2's probe payload exceeded
+   127 bytes in one node, that alone would explain file corruption
+   independent of the ABI issue.
+
+**Design decision (scope-bounded, defensible):** implement 1004 WRITE via
+manual `acutNewRb(1004)` (never `acutBuildList` for this code -- sidesteps
+hazard #1 entirely) with an explicit-ownership byte buffer: WE allocate
+(`new[]`) and copy the decoded hex bytes into `resval.rbinary.buf`/`clen`
+ourselves. Since `AcDbEntity::setXData` takes `const resbuf*` (deep-copies
+internally, does not take ownership -- confirmed from
+`dbObject.h:267`), our buffer is definitely still ours to free after the
+call. What is NOT documented anywhere in the SDK headers is whether
+`acutRelRb` (which frees the whole chain, `dbeval.h:96`) also tries to free
+`resval.rbinary.buf` on a 1004 node -- since that buffer was never allocated
+by `acutBuildList`/`acutNewRb` in the first place (unlike its handling of
+`rstring`), that is genuinely unverifiable from headers alone. Defensive
+fix: neutralize every 1004 node (`buf=nullptr,clen=0`) AFTER `setXData()`
+copies what it needs but BEFORE `acutRelRb(head)` walks the chain, then free
+our own buffers explicitly ourselves. This makes the design correct
+regardless of what `acutRelRb`'s internal 1004 handling actually is.
+Payloads are capped at <=127 bytes per item (hazard #2) with a structured
+rejection above that -- multi-chunk (>127B) concatenation is a NAMED,
+OUT-OF-SCOPE gap (would require matching read-side changes to
+`resbufItemJson`/`xdataBlocksJson` that this ticket does not touch, to avoid
+regressing the already-shipped #118 read fix under this ticket's time/risk
+budget).
