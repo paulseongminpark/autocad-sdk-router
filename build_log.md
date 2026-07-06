@@ -871,3 +871,110 @@ optional per the task -- "evidence records"). Only the emitter was fixed.
 `python -m pytest tests/unit -q`: **1114 passed, 23 skipped, 0 failed**
 (exit code 0).
 
+## Lane H (closeout wave, worktree `wt/laneH`, branch `cados/closeout-h`) --
+## 1004 binary xdata WRITE, AutoLISP `entmod` alternate-path experiment
+
+Experiment lane, NO production `src/` changes (Lane G owns C++ this wave).
+Ordered to exhaust the remaining avenue on Lane E's `1004 xdata write` finding
+before accepting permanence: Lane E proved the ObjectARX `setXData` path
+(both `acutBuildList` and a manual `acutNewRb` construction) writes a
+byte-perfect non-empty 1004 chunk that then crashes AutoCAD 2027's OWN reader
+(0xC0000005) on the very next reopen. This lane asks the same question
+through a completely different write path -- raw AutoLISP `entmod`/`entget`,
+never touching ObjectARX's `setXData` at all -- via a new, isolated one-off
+script: `tools/experiments/lane_h_1004_lisp_probe.ps1` (not wired into the
+router, `cadctl`, or any production op).
+
+**Mechanism (mirrors the router's own staging discipline, duplicated in
+miniature rather than dot-sourcing the production router file, to keep this
+experiment fully isolated from Lane G's concurrent C++ wave):** ASCII
+staging dir under `staging/` per stage, forward-slash paths, `SECURELOAD 0`
+/ `FILEDIA 0` / `CMDECHO 0` / `(vl-load-com)`, `accoreconsole.exe /i
+<staged.dwg> /s <script.scr>` -- the exact same primitives as
+`Resolve-AcadEnginePath`/`Invoke-AccoreScr` in `tools/autocad-router.ps1`.
+Each of 3 stages uses its OWN staged copy of `tests/fixtures/native_sample.dwg`
+(sha256 `eac5d4b13d67d89106e503321412539df7b39b8a7f4e44c033448e9295fe3f76`,
+verified unchanged before AND after the entire run -- `fixture_unchanged:
+true` in every run's `summary.json`), so one stage's `entmod` attempt can
+never contaminate another stage's saved file. Per stage: WRITE (`entmake` a
+fresh LINE, `regapp`, build a `-3` xdata list via `entmod`, immediate
+in-session `entget` readback, `_QSAVE`) in ONE `accoreconsole` process, then
+REOPEN (a SEPARATE, fresh `accoreconsole` process, `handent`-by-handle +
+`entget` readback, no save) in a second process -- mirrors Lane E's
+write/reopen/crash-detection methodology exactly.
+
+**Key unknown resolved empirically (AutoLISP has no dedicated binary
+datatype -- docs disagree across releases on whether/how group 1004 is
+LISP-constructible):** tested BOTH candidate representations against
+AutoCAD 2027 directly, rather than trusting stale documentation.
+
+- **Stage A (`stageA_string1004`):** 1004 value given as a plain AutoLISP
+  STRING, `(cons 1004 "Hello")`. `entmod` (wrapped in `vl-catch-all-apply`,
+  so the failure is caught cleanly, not a process crash) returned an error
+  object; `vl-catch-all-error-message` (raw bytes decoded as `cp949` --
+  AutoCAD's own console/message locale on this machine -- since the message
+  is Korean): **`1004 그룹 내의 유효하지 않은 문자`** ("invalid character
+  within group 1004"). In-session `entget` readback confirms NOTHING was
+  attached to the entity (no `-3` block at all) -- the write never took
+  effect even transiently.
+- **Stage B (`stageB_listint1004`):** 1004 value given as a LIST OF
+  INTEGERS, `(cons 1004 (list 72 101 108 108 111))` (== ASCII "Hello",
+  byte-for-byte the same payload Lane E used) -- the AutoLISP Reference's
+  historically-documented binary-chunk shape. `entmod` STILL rejected it,
+  this time with a stronger, more categorical error:
+  **`잘못된 DXF 그룹: (-3 ("ARIADNELANEH" (1000 . "stageB_listint1004_marker")
+  (1004 72 101 108 108 111)))`** ("invalid DXF group: (-3 (...))") -- the
+  entire xdata sublist is rejected as malformed, not just the 1004 item.
+  Same as stage A: no `-3` block attached, nothing persisted even
+  transiently.
+- **Stage C (`stageC_control_1000`, no 1004 at all -- proves this script's
+  OWN write/reopen/readback plumbing is sound, mirroring Lane E's control-
+  test rigor):** `entmod` with only a `1000` string item:
+  `ENTMOD_RESULT=SUCCESS`; in-session readback AND the separate-process
+  REOPEN readback both show the correct
+  `(-3 ("ARIADNELANEH" (1000 . "stageC_control_1000_marker")))` block intact,
+  byte-for-byte. Both WRITE and REOPEN processes exited 0, no crash, no AV.
+  Confirms the crash/rejection behavior in stages A/B is specific to group
+  1004, not a bug in this experiment's write/save/reopen/readback mechanics.
+
+**Verdict: Outcome B -- CONFIRMED non-constructible from AutoLISP.** Unlike
+the ARX path (which "succeeds" at write time and only fails on reopen),
+`entmod` refuses to build DXF group 1004 at ALL on this AutoCAD 2027 build,
+in either candidate Lisp representation, rejecting the attempt immediately
+and cleanly (a caught Lisp error, zero crash risk, zero partial/invisible
+writes -- confirmed via immediate in-session readback showing no `-3` block
+after either failed attempt). This is a cleaner failure mode than the ARX
+path but the same practical conclusion: 1004 stays read-only. It also
+resolves a specific ambiguity in the task brief: the suggested
+`(1001 . "APPID")(1002 . "{")(1004 . <data>)(1002 . "}")` DXF-group-code
+shape is the raw **DXF FILE encoding** of xdata (used when hand-parsing a
+`.dxf` text stream); AutoLISP's own `entget`/`entmod` association-list
+convention abstracts that away entirely -- the registered app name string
+itself heads the `-3` sublist (no manual `1001`/`1002` brace markers needed
+or accepted) -- confirmed by this experiment's own control stage (C) working
+correctly without them.
+
+**Secondary avenue (documented, not attempted per the task's own scope
+note):** COM/ActiveX `SetXData` on the AutoCAD COM object model is
+attended-only per the registry's `com_activex` class (requires a live,
+user-owned AutoCAD session) -- not driven here. If a future session has
+explicit attended access, that remains the one theoretically untested
+avenue; given stage B's categorical "invalid DXF group" rejection surfaces
+from AutoCAD's own DXF-group validator (not something obviously specific to
+the LISP entry point), there is no strong reason to expect a different
+result from COM, but this has not been empirically verified.
+
+**Evidence:** `runs/lane_h_1004_lisp_probe_<stamp>/summary.json` (this
+lane's own worktree-local, gitignored `runs/`) plus per-stage
+`write_result.txt`/`reopen_result.txt`/`*_stdout.txt`/`*_stderr.txt` under
+each stage's subdirectory. `fixture_sha256_before` == `fixture_sha256_after`
+== `eac5d4b13d67d89106e503321412539df7b39b8a7f4e44c033448e9295fe3f76` in
+every run (original never touched, only ASCII-staged copies). All 6
+`accoreconsole` processes (3 stages x write+reopen) exited 0 -- zero crashes
+anywhere in this path, a materially different signature from Lane E's ARX
+reopen-crash.
+
+**Regression gate:** `python -m pytest tests/unit -q`: **1136 passed, 0
+failed** (exit code 0) -- unchanged from the canonical rebuild baseline; no
+production code was touched by this lane.
+
