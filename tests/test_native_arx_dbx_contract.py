@@ -1,3 +1,4 @@
+import json
 import re
 from pathlib import Path
 
@@ -105,40 +106,46 @@ def test_core_console_command_shell_builds_as_crx():
     assert "AriadneProbe.cpp" not in text
 
 
+# The historical P1 op surface. Commit 7d00a9f intentionally removed the
+# hardcoded ps1 op list (silent-legacy-fallback removal): the router now
+# resolves native-job routing from config/operations.v2.json via
+# Get-NativeJobOpSet (its own gate lives in
+# tests/unit/test_native_job_opset_no_silent_fallback.py). This contract
+# therefore asserts (a) the ps1 still exposes the lane and the registry-driven
+# resolver, and (b) every P1 op is still an implemented registry record --
+# the same surface, now checked against the SoT instead of a ps1 string copy.
+_P1_JOB_LANE_OPS = (
+    "extend.customclass.create", "inspect.customclass.count",
+    "write.layer.create", "write.entity.line", "write.entity.circle",
+    "inspect.entity.count", "write.xrecord.set", "inspect.xrecord.get",
+    "write.xdata.set", "inspect.xdata.get", "write.block.simple_create",
+    "write.block.insert", "inspect.block.count", "write.layout.create",
+    "inspect.layout.list", "inspect.xref.list", "inspect.runtime.capabilities",
+    "live.reactor.enable", "inspect.reactor.registry", "live.reactor.disable",
+    "inspect.overrule.registry", "live.overrule.enable", "live.overrule.disable",
+    "inspect.jig.host_support", "live.jig.point_probe",
+    "extend.customobject.create", "inspect.customobject.count",
+    "inspect.protocol.queryx",
+)
+
+
 def test_router_exposes_native_p1_job_lane():
     text = ROUTER.read_text(encoding="utf-8")
 
     assert "ARIADNE_NATIVE_JOB" in text
     assert "Ariadne.AcadNativeDbx.dbx" in text
     assert "Ariadne.AcadNative.crx" in text
-    assert "extend.customclass.create" in text
-    assert "inspect.customclass.count" in text
-    assert "write.layer.create" in text
-    assert "write.entity.line" in text
-    assert "write.entity.circle" in text
-    assert "inspect.entity.count" in text
-    assert "write.xrecord.set" in text
-    assert "inspect.xrecord.get" in text
-    assert "write.xdata.set" in text
-    assert "inspect.xdata.get" in text
-    assert "write.block.simple_create" in text
-    assert "write.block.insert" in text
-    assert "inspect.block.count" in text
-    assert "write.layout.create" in text
-    assert "inspect.layout.list" in text
-    assert "inspect.xref.list" in text
-    assert "inspect.runtime.capabilities" in text
-    assert "live.reactor.enable" in text
-    assert "inspect.reactor.registry" in text
-    assert "live.reactor.disable" in text
-    assert "inspect.overrule.registry" in text
-    assert "live.overrule.enable" in text
-    assert "live.overrule.disable" in text
-    assert "inspect.jig.host_support" in text
-    assert "live.jig.point_probe" in text
-    assert "extend.customobject.create" in text
-    assert "inspect.customobject.count" in text
-    assert "inspect.protocol.queryx" in text
+    # registry-driven op routing replaced the hardcoded ps1 list (7d00a9f)
+    assert "Get-NativeJobOpSet" in text
+    assert "operations.v2.json" in text
+
+    registry = json.loads(
+        (ROOT / "config" / "operations.v2.json").read_text(encoding="utf-8-sig"))
+    implemented = {o["id"] for o in registry["operations"]
+                   if o.get("status") == "implemented"}
+    missing = [op for op in _P1_JOB_LANE_OPS if op not in implemented]
+    assert missing == [], (
+        "P1 job-lane ops vanished from the implemented registry surface: %r" % missing)
 
 
 def test_native_job_dispatcher_exposes_p2_batch1_database_crud():
