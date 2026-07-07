@@ -400,7 +400,13 @@ def test_erase_op_truly_absent_and_save_as_truly_not_runnable_in_the_real_regist
 
     save_as = next(o for o in ops if o["id"] == "transform.database.save_as")
     assert save_as["status"] == "implemented"
-    assert save_as["policy"]["status_policy"] == "catalogued_not_runnable", (
-        "transform.database.save_as's policy.status_policy changed -- it may now be "
-        "genuinely runnable; re-check step 4's CAUTION note and F4b's blocked status."
+    # policy.status_policy now mirrors top-level status by legislation
+    # (tools/policy_hygiene.py, 2026-07-07), so it can no longer serve as the
+    # not-yet-proven-headless tripwire. The durable signal is the evidence ref
+    # marking the native job smoke as deferred/attended-only.
+    evidence = "\n".join(save_as.get("evidence_refs") or [])
+    assert "runtime_native_job_smoke:deferred_attended" in evidence, (
+        "transform.database.save_as no longer carries the deferred_attended smoke "
+        "marker -- it may now be genuinely runnable headless; re-check step 4's "
+        "CAUTION note and F4b's blocked status."
     )

@@ -38,11 +38,12 @@ in config/operations.v2.json (that file is out of scope for this node; RT-FOLD
 R2-A9 excludes it from all worker diffs) and calling it via
 cadctl.Cad.run_operation() today returns a truthful not_found refusal (never a
 fake pass). Separately, step 4's op (transform.database.save_as) IS registered
-as status=='implemented', but its own nested policy block says
-status_policy=='catalogued_not_runnable' and its evidence_refs mark the native
-job smoke test 'deferred_attended' (never proven outside attended/GUI AutoCAD)
--- so a green exit code there must not be trusted as PASS either, per that
-op's own registry notes.
+as status=='implemented', but its evidence_refs mark the native job smoke test
+'deferred_attended' (never proven outside attended/GUI AutoCAD) -- so a green
+exit code there must not be trusted as PASS either, per that op's own registry
+notes. (Its nested policy block used to say 'catalogued_not_runnable' too; the
+2026-07-07 policy hygiene pass made status_policy mirror top-level status, so
+the deferred_attended evidence ref is now the load-bearing caution signal.)
 
 mint() therefore runs everything real today (stage -> pre-baseline, both
 read-only against a staged copy) and stops at step 3 with a truthful
