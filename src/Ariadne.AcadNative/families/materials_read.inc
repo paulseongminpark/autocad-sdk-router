@@ -77,6 +77,22 @@ static bool materialsReadEnumerateDictionary(const AriadneJobCtx& ctx,
     return true;
 }
 
+// serialize one AcGiMaterialColor: inherit/override method, blend factor, and
+// the RGB triple when the color carries an explicit true-color value.
+static void materialsReadColorJson(const AcGiMaterialColor& c, std::ostringstream& out)
+{
+    out << "{\"method\":"
+        << (c.method() == AcGiMaterialColor::kOverride ? "\"override\"" : "\"inherit\"")
+        << ",\"factor\":" << c.factor();
+    const AcCmEntityColor& ec = c.color();
+    if (ec.colorMethod() == AcCmEntityColor::kByColor) {
+        out << ",\"rgb\":[" << static_cast<int>(ec.red())
+            << "," << static_cast<int>(ec.green())
+            << "," << static_cast<int>(ec.blue()) << "]";
+    }
+    out << "}";
+}
+
 static bool materialsReadHandleProperties(const AriadneJobCtx& ctx, std::ostringstream& r)
 {
     std::string handleHex;
@@ -118,8 +134,45 @@ static bool materialsReadHandleProperties(const AriadneJobCtx& ctx, std::ostring
         acutRelRb(xd);
     }
 
+    // material-specific rendering properties (the catalog-facing payload this
+    // op exists for); visual styles fall back to common object data + xdata.
+    std::ostringstream matProps;
+    if (cls == kMaterialsClassMaterial) {
+        const AcDbMaterial* pMat = AcDbMaterial::cast(pObj);
+        if (pMat != nullptr) {
+            AcGiMaterialColor ambientColor;
+            AcGiMaterialColor diffuseColor;
+            AcGiMaterialColor specularColor;
+            AcGiMaterialMap diffuseMap;
+            AcGiMaterialMap specularMap;
+            AcGiMaterialMap opacityMap;
+            double gloss = 0.0;
+            double opacityPct = 1.0;
+            pMat->ambient(ambientColor);
+            pMat->diffuse(diffuseColor, diffuseMap);
+            pMat->specular(specularColor, specularMap, gloss);
+            pMat->opacity(opacityPct, opacityMap);
+            const ACHAR* nameW = pMat->name();
+            const ACHAR* descW = pMat->description();
+            matProps << ",\"name\":" << njsonStr(nameW != nullptr ? acharToAscii(nameW) : std::string())
+                     << ",\"description\":" << njsonStr(descW != nullptr ? acharToAscii(descW) : std::string())
+                     << ",\"ambient\":";
+            materialsReadColorJson(ambientColor, matProps);
+            matProps << ",\"diffuse\":";
+            materialsReadColorJson(diffuseColor, matProps);
+            matProps << ",\"specular\":";
+            materialsReadColorJson(specularColor, matProps);
+            matProps << ",\"gloss\":" << gloss
+                     << ",\"opacity\":" << opacityPct
+                     << ",\"mode\":" << static_cast<int>(pMat->mode())
+                     << ",\"channel_flags\":" << static_cast<int>(pMat->channelFlags())
+                     << ",\"illumination_model\":" << static_cast<int>(pMat->illuminationModel());
+        }
+    }
+
     r << "\"result\":{" << serializeObjectCommon(pObj)
       << ",\"kind\":" << (cls == kMaterialsClassMaterial ? njsonStr("material") : njsonStr("visual_style"))
+      << matProps.str()
       << ",\"xdata_present\":" << (blockCount > 0 ? "true" : "false")
       << ",\"xdata_block_count\":" << blockCount
       << ",\"xdata_item_count\":" << itemCount
@@ -138,6 +191,9 @@ static bool materialsReadHasOp(const std::string& op)
 
 static bool materialsReadDispatch(const std::string& op, const AriadneJobCtx& ctx, std::ostringstream& r)
 {
+    if (!materialsReadHasOp(op))
+        return false;
+
     if (op == kMaterialsReadOpMaterialEnumerate) {
         return materialsReadEnumerateDictionary(ctx, kMaterialsReadDictMaterial, r);
     }

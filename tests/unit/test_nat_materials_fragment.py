@@ -61,6 +61,30 @@ class TestMaterialsFragment(unittest.TestCase):
         self.assertRegex(self.inc, r"bool\s+materialsReadHasOp\s*\(")
         self.assertRegex(self.inc, r"bool\s+materialsReadDispatch\s*\(")
 
+    # w7-hardening regression guards -----------------------------------------
+    # The first deployed build short-circuited tryFamilyDispatch: dispatch
+    # emitted OPERATION_DISPATCH_MISMATCH (and returned true) for ops it did
+    # NOT own, so later families in the || chain were unreachable (live-proof
+    # failure: annoscale ops died inside materialsReadDispatch). The family
+    # contract requires the m08d-style HasOp guard as the FIRST statement.
+    def test_dispatch_guards_unowned_ops_with_hasop_first(self):
+        self.assertRegex(
+            self.inc,
+            r"materialsReadDispatch\([^)]*\)\s*\{\s*if\s*\(!materialsReadHasOp\(op\)\)\s*return\s+false;",
+            "materialsReadDispatch must open with the HasOp guard returning false "
+            "for unowned ops (else the family chain is short-circuited)")
+
+    def test_properties_handler_reads_the_claimed_material_api(self):
+        # the fragment's native_api claims AcDbMaterial accessors; a handler
+        # that only dumps xdata is a fake implementation (adversarial review
+        # finding, wave-7). Pin the accessor calls at source level.
+        self.assertIn("AcDbMaterial::cast", self.inc)
+        for accessor in ("->ambient(", "->diffuse(", "->specular(", "->opacity(",
+                         "->mode(", "->channelFlags(", "->illuminationModel("):
+            self.assertIn(accessor, self.inc,
+                          f"materials properties handler must call {accessor} "
+                          "(fragment native_api claims it)")
+
 
 if __name__ == "__main__":
     unittest.main()

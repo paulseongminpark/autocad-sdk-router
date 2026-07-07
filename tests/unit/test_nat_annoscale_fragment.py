@@ -56,6 +56,31 @@ class TestAnnoscaleInc(unittest.TestCase):
         self.assertIn("AcDb::kForRead", self.src, "missing kForRead usage in read family")
         self.assertNotIn("AcDb::kForWrite", self.src, "read family must not use kForWrite")
 
+    # w7-hardening regression guards -----------------------------------------
+    def test_dispatch_guards_unowned_ops_with_hasop_first(self) -> None:
+        # without this m08d-style guard the family emits DISPATCH_MISMATCH for
+        # ops it does not own and short-circuits tryFamilyDispatch's || chain.
+        self.assertRegex(
+            self.src,
+            r"annoscaleReadDispatch\([^)]*\)\s*\{\s*if\s*\(!annoscaleReadHasOp\(op\)\)\s*return\s+false;",
+            "annoscaleReadDispatch must open with the HasOp guard")
+
+    def test_handlers_do_real_context_reads_not_scaffold(self) -> None:
+        # the original scaffold returned hardcoded empty results while the
+        # registry said 'implemented' -- the live gate rejected that as fake
+        # success. Pin the real ObjectARX context API usage at source level.
+        for marker in ("objectContextManager()",
+                       "ACDB_ANNOTATIONSCALES_COLLECTION",
+                       "AcDbObjectContextCollectionIterator",
+                       "AcDbObjectContextInterface",
+                       "resolveHandle"):
+            self.assertIn(marker, self.src,
+                          f"annoscale family must use {marker} (real read, not scaffold)")
+        for scaffold_marker in ("Scaffold result", "Placeholder contract"):
+            self.assertNotIn(scaffold_marker, self.src,
+                             "scaffold implementation must not return: the registry "
+                             "records these ops as implemented")
+
 
 class TestAnnoscaleFragment(unittest.TestCase):
     @classmethod

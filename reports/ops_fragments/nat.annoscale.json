@@ -52,11 +52,11 @@
     "handler": {
       "router_lane": "ARIADNE_NATIVE_JOB",
       "dispatcher_symbol": "annoscaleReadDispatch",
-      "execution_host_class": "arx",
-      "native_api": "AcDbObjectContextManager::contextCollection(ACDB_ANNOTATIONSCALES_COLLECTION) iterate",
+      "execution_host_class": "arx_adapter",
+      "native_api": "AcDbObjectContextManager::contextCollection(ACDB_ANNOTATIONSCALES_COLLECTION) iterate -> AcDbAnnotationScale",
       "composed_of": []
     },
-    "summary": "List every annotation scale in the database context collection (name, scale factor, unique id). Census P3-10 read half.",
+    "summary": "List every annotation scale in the database context collection: name, paper/drawing units + scale ratio, unique identifier, is_current flag. Census P3-10 read half.",
     "citation": "hdr dbObjContext.h AcDbAnnotationScale"
   },
   {
@@ -112,11 +112,11 @@
     "handler": {
       "router_lane": "ARIADNE_NATIVE_JOB",
       "dispatcher_symbol": "annoscaleReadDispatch",
-      "execution_host_class": "arx",
-      "native_api": "AcDbObjectContextInterface / entity context enumeration",
+      "execution_host_class": "arx_adapter",
+      "native_api": "AcDbObjectContextInterface::supportsCollection/hasContext per ACDB_ANNOTATIONSCALES scale",
       "composed_of": []
     },
-    "summary": "For ONE annotative entity by handle: list its per-scale context representations (scale name + participation).",
+    "summary": "For ONE object by handle (resolveHandle-validated; HANDLE_NOT_FOUND on stale handles): annotative support flag + names of the annotation-scale contexts it participates in.",
     "citation": "hdr dbObjContext.h AcDbObjectContextInterface"
   }
 ]

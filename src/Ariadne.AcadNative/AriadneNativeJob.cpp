@@ -85,6 +85,13 @@
 #include "adscodes.h"
 #include "acedads.h"   // M07B: acedSSGet/acedSSName/acedSSLength/acedSSFree (pickfirst selection)
 #include "acdbads.h"   // M07B: acdbGetObjectId (ads_name -> AcDbObjectId)
+#include "dbmaterial.h"    // w7-materials: AcDbMaterial property read (families/materials_read.inc
+                           // is textually AFTER the helpers, but the cast/accessors need full defs)
+#include "acgimaterial.h"  // w7-materials: AcGiMaterialColor/AcGiMaterialMap construction
+#include "dbAnnotationScale.h"       // w7-annoscale: AcDbAnnotationScale (pulls dbObjContext.h)
+#include "dbObjectContextManager.h"  // w7-annoscale: AcDbObjectContextManager
+#include "dbObjectContextCollection.h" // w7-annoscale: collection + iterator
+#include "dbObjectContextInterface.h"  // w7-annoscale: per-entity participation PE
 
 #include "..\Ariadne.AcadNativeDbx\AriadneDbxApi.h"
 

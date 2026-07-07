@@ -57,10 +57,10 @@
       "router_lane": "ARIADNE_NATIVE_JOB",
       "dispatcher_symbol": "materialsReadDispatch",
       "execution_host_class": "dbx",
-      "native_api": "AcDbDictionary(ACDB_MATERIAL_DICT) iterate -> AcDbMaterial",
+      "native_api": "NOD getAt(ACAD_MATERIAL) -> AcDbDictionary iterate (dictionaryEntriesJson)",
       "composed_of": []
     },
-    "summary": "Enumerate the material dictionary: per material name/handle (+ description where set). Census P2-6 DB-object half (rendering-callback half was already covered).",
+    "summary": "Enumerate the ACAD_MATERIAL dictionary: per entry key (material name), value handle, class name, xrecord flag. Census P2-6 DB-object half (rendering-callback half was already covered).",
     "citation": "hdr dbmaterial.h AcDbMaterial"
   },
   {
@@ -121,10 +121,10 @@
       "router_lane": "ARIADNE_NATIVE_JOB",
       "dispatcher_symbol": "materialsReadDispatch",
       "execution_host_class": "dbx",
-      "native_api": "AcDbMaterial::name/description/ambient/diffuse/specular/opacity",
+      "native_api": "AcDbMaterial::name/description/ambient/diffuse/specular/opacity/mode/channelFlags/illuminationModel",
       "composed_of": []
     },
-    "summary": "Full property read for ONE material by name or handle: ambient/diffuse/specular colors, opacity, mode/channel flags.",
+    "summary": "Full property read for ONE material by handle: name/description, ambient/diffuse/specular colors (+gloss), opacity, mode/channel/illumination flags, plus common object data + xdata. AcDbVisualStyle handles return common object data + xdata only.",
     "citation": "hdr dbmaterial.h AcDbMaterial"
   },
   {
@@ -185,10 +185,10 @@
       "router_lane": "ARIADNE_NATIVE_JOB",
       "dispatcher_symbol": "materialsReadDispatch",
       "execution_host_class": "dbx",
-      "native_api": "AcDbDictionary(ACDB_VISUALSTYLE_DICT) iterate -> AcDbVisualStyle",
+      "native_api": "NOD getAt(ACAD_VISUALSTYLE) -> AcDbDictionary iterate (dictionaryEntriesJson)",
       "composed_of": []
     },
-    "summary": "Enumerate the visual style dictionary: per style name/handle/type/internal-use flag.",
+    "summary": "Enumerate the ACAD_VISUALSTYLE dictionary: per entry key (style name), value handle, class name, xrecord flag.",
     "citation": "hdr dbvisualstyle.h AcDbVisualStyle"
   }
 ]
