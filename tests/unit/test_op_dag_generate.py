@@ -78,7 +78,10 @@ class TestOpDagBuild(unittest.TestCase):
         # write.view.create, write.vport.create) -- 522 -> 523 -> 524 -> 525.
         # wave-5/6 coordinated merge adds sixteen (w5-anchor x4, w6-layerstate x4,
         # w6-dynblk x3, w6-section x3, w6-sheetset x2 blocked) -- 525 -> 541.
-        self.assertEqual(len(self.nodes), 541, "operations.v2.json is currently 541 ops; a "
+        # wave-7 adds four headless python ops (inspect.entity.identity_contract,
+        # inspect.xdata.semantic_anchor, run.corpus.batch, verify.cross_engine.dwg)
+        # -- 541 -> 545.
+        self.assertEqual(len(self.nodes), 545, "operations.v2.json is currently 545 ops; a "
                                                 "count drift here means the catalogue changed "
                                                 "underneath this test, not a generator bug")
 

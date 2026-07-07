@@ -12,15 +12,15 @@
     "acceptance_test_id": "registry tests[0] (current best-evidence test ref; F3's future per-op W+D roundtrip gate is not built in this tree yet)"
   },
   "totals": {
-    "catalogue_count": 541,
-    "node_count": 541,
+    "catalogue_count": 545,
+    "node_count": 545,
     "edge_count": 1329,
     "by_persistence_class": {
       "D": 60,
       "L": 35,
       "NON_GOAL": 62,
       "P": 59,
-      "R": 325
+      "R": 329
     }
   },
   "audit": {
@@ -4351,6 +4351,17 @@
       "persistence_class": "R"
     },
     {
+      "op_id": "inspect.entity.identity_contract",
+      "predecessors": [],
+      "arg_keys": [],
+      "target_files": [
+        "tests/unit/test_entity_identity.py",
+        "tools/entity_identity.py"
+      ],
+      "acceptance_test_id": "tests/unit/test_entity_identity.py::TestVerifyIdentityStability",
+      "persistence_class": "R"
+    },
+    {
       "op_id": "inspect.entity.osnap",
       "predecessors": [],
       "arg_keys": [],
@@ -5004,6 +5015,17 @@
         "tests/test_native_arx_dbx_contract.py"
       ],
       "acceptance_test_id": "tests/test_native_arx_dbx_contract.py::getDatabaseXdata",
+      "persistence_class": "R"
+    },
+    {
+      "op_id": "inspect.xdata.semantic_anchor",
+      "predecessors": [],
+      "arg_keys": [],
+      "target_files": [
+        "tests/unit/test_semantic_anchor.py",
+        "tools/semantic_anchor.py"
+      ],
+      "acceptance_test_id": "tests/unit/test_semantic_anchor.py",
       "persistence_class": "R"
     },
     {
@@ -6572,6 +6594,17 @@
       "persistence_class": "NON_GOAL"
     },
     {
+      "op_id": "run.corpus.batch",
+      "predecessors": [],
+      "arg_keys": [],
+      "target_files": [
+        "tests/unit/test_corpus_batch.py",
+        "tools/corpus_batch.py"
+      ],
+      "acceptance_test_id": "tests/unit/test_corpus_batch.py",
+      "persistence_class": "R"
+    },
+    {
       "op_id": "select.entity.pick",
       "predecessors": [],
       "arg_keys": [],
@@ -7126,6 +7159,19 @@
         "tests/unit/test_validator_gates.py"
       ],
       "acceptance_test_id": "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
+      "persistence_class": "R"
+    },
+    {
+      "op_id": "verify.cross_engine.dwg",
+      "predecessors": [],
+      "arg_keys": [],
+      "target_files": [
+        "docs/OPERATION_REGISTRY_SPEC.md",
+        "tests/unit/test_cross_engine_verify.py",
+        "tools/cadctl.py",
+        "tools/validator.py"
+      ],
+      "acceptance_test_id": "tests/unit/test_cross_engine_verify.py::test_match_reports_concordant",
       "persistence_class": "R"
     },
     {

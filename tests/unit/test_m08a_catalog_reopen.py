@@ -143,7 +143,9 @@ class TestM08ACatalogReopen(unittest.TestCase):
         self.assertEqual(by_status.get("stub", 0), 0)
         # wave-5/6 merge adds 14 implemented (w5-anchor x4, w6-layerstate x4,
         # w6-dynblk x3, w6-section x3) -- 465 -> 479; w6-sheetset x2 are blocked.
-        self.assertEqual(by_status.get("implemented", 0), 479)
+        # wave-7 adds 4 implemented headless python ops (identity_contract,
+        # semantic_anchor, corpus.batch, cross_engine) -- 479 -> 483.
+        self.assertEqual(by_status.get("implemented", 0), 483)
         self.assertEqual(by_status.get("blocked", 0), 62)
         # W6-SHEETSET added two new blocked synthetic COM read records for the
         # measured Sheet Set Manager gap; implemented count is unchanged.

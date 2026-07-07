@@ -54,16 +54,16 @@
     }
   },
   "totals": {
-    "operations": 541,
+    "operations": 545,
     "by_status": {
       "blocked": 62,
-      "implemented": 479
+      "implemented": 483
     },
     "by_family": {
       "objectdbx_database": 21,
       "symbol_tables_dictionaries": 26,
       "geometry_kernel": 25,
-      "inspect": 16,
+      "inspect": 18,
       "write": 4,
       "live": 7,
       "extend": 2,
@@ -86,15 +86,17 @@
       "layouts_plot_publish": 2,
       "reactors_events": 22,
       "runtime_commands": 26,
-      "ui_customization": 39
+      "ui_customization": 39,
+      "corpus": 1,
+      "verify": 1
     },
     "by_engine_tier": {
       "managed_also": 48,
-      "objectdbx_capable": 241,
+      "objectdbx_capable": 245,
       "accoreconsole_lisp_also": 20,
       "native_arx_only": 232
     },
-    "total": 541
+    "total": 545
   },
   "coverage": {
     "wired_ops": 29,
@@ -128,8 +130,8 @@
       "symbol_tables_dictionaries": 16,
       "ui_customization": 39
     },
-    "operation_records": 541,
-    "implemented": 479,
+    "operation_records": 545,
+    "implemented": 483,
     "wired": 0,
     "stub": 0,
     "catalogued": 0,
@@ -39444,6 +39446,286 @@
       "wired_v1": false,
       "notes": "New op, no catalog precedent (same R3_coverage.md G0 / catalog_completeness.py disposition as its sibling section ops). INITIALLY ASSUMED full_autocad-only (ASM + AutoCAD generate-section UI machinery); MEASURED THIS WAVE to be false -- generateSectionGeometry() runs correctly headless under accoreconsole against a transient (non-database-resident) AcDb3dSolid + AcDbSection probe pair, no demand-loaded engine module or attended host required. Corrected from the earlier speculative blocked/full_autocad classification once actually tested live.",
       "owner_ticket": "M08G-T02",
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs"
+    },
+    {
+      "id": "inspect.entity.identity_contract",
+      "family": "inspect",
+      "status": "implemented",
+      "operation": "inspect.entity.identity_contract",
+      "engine_tier": "objectdbx_capable",
+      "host_eligibility": [
+        "dbx",
+        "coreconsole",
+        "arx_adapter",
+        "full_autocad"
+      ],
+      "hosts": [
+        "dbx",
+        "coreconsole",
+        "arx_adapter",
+        "full_autocad"
+      ],
+      "execution_context": "python_post_process",
+      "write_level": {
+        "default_write_mode": "read",
+        "allowed_write_modes": [
+          "read"
+        ],
+        "dwg_persisted": false,
+        "original_write_default": false
+      },
+      "handler": {
+        "router_lane": null,
+        "dispatcher_symbol": "entity_identity.verify_identity_stability",
+        "execution_host_class": "dbx",
+        "python_handler": "tools/entity_identity.py::verify_identity_stability",
+        "wired_via": "tools/cadctl.py::Cad.inspect",
+        "composed_of": []
+      },
+      "mapping_type": "synthetic",
+      "catalog_op_id": null,
+      "input_schema": "schemas/dwg_graph_ir.v1.schema.json",
+      "output_schema": "schemas/validation_report.v1.schema.json",
+      "policy": {
+        "write_mode_default": "read",
+        "staged_copy_required": false,
+        "write_original_requires_approval": true,
+        "raw_command_dispatch": "forbidden",
+        "secrets": "never_read_or_printed"
+      },
+      "tests": [
+        "tests/unit/test_entity_identity.py::TestVerifyIdentityStability"
+      ],
+      "summary": "Compare two entity IR snapshots by deterministic identity keys (handle-primary, with xdata/xdictionary and coarse geometry fallback) and report stable/drifted/added/removed counts.",
+      "evidence_refs": [
+        "tools/entity_identity.py::verify_identity_stability",
+        "tools/entity_identity.py::entity_identity_key"
+      ],
+      "target_family_first_class": true,
+      "wired_v1": false,
+      "implementation_notes": "Pure-Python IR comparator for entity continuity checks in roundtrip/diff workflows.",
+      "notes": "Pure-Python identity contract comparator: handle-primary matching with xdata/dictionary anchor fallback + coarse geometry drift detection.",
+      "owner_ticket": "M08C-T01",
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs",
+      "engines": [
+        "objectdbx_capable"
+      ],
+      "schema_refs": {
+        "input": "schemas/dwg_graph_ir.v1.schema.json",
+        "output": "schemas/validation_report.v1.schema.json"
+      }
+    },
+    {
+      "id": "inspect.xdata.semantic_anchor",
+      "family": "inspect",
+      "status": "implemented",
+      "engine_tier": "objectdbx_capable",
+      "host_eligibility": [
+        "dbx",
+        "coreconsole",
+        "arx_adapter",
+        "full_autocad"
+      ],
+      "hosts": [
+        "dbx",
+        "coreconsole",
+        "arx_adapter",
+        "full_autocad"
+      ],
+      "execution_context": "python_post_process",
+      "write_level": {
+        "default_write_mode": "read",
+        "allowed_write_modes": [
+          "read"
+        ],
+        "dwg_persisted": false,
+        "original_write_default": false
+      },
+      "handler": {
+        "router_lane": null,
+        "dispatcher_symbol": "semantic_anchor.read_semantic_anchors",
+        "execution_host_class": "dbx",
+        "python_handler": "tools/semantic_anchor.py::read_semantic_anchors",
+        "wired_via": "tools/semantic_anchor.py::read_semantic_anchors",
+        "composed_of": []
+      },
+      "mapping_type": "synthetic",
+      "catalog_op_id": null,
+      "input_schema": "schemas/dwg_graph_ir.v1.schema.json",
+      "output_schema": "(no schema authored - plain dict)",
+      "policy": {
+        "write_mode_default": "read",
+        "staged_copy_required": false,
+        "write_original_requires_approval": true,
+        "raw_command_dispatch": "forbidden",
+        "secrets": "never_read_or_printed"
+      },
+      "tests": [
+        "tests/unit/test_semantic_anchor.py"
+      ],
+      "summary": "Read-only semantic census over an already-extracted dwg_graph_ir.v1 or single entity dict. Normalizes per-app XDATA and extension-dictionary-backed xrecords into a per-entity anchor map, using key/value maps when the typed item sequence is pair-shaped and ordered value lists otherwise.",
+      "evidence_refs": [
+        "tools/semantic_anchor.py::read_semantic_anchors",
+        "tests/unit/test_semantic_anchor.py"
+      ],
+      "implementation_notes": "IMPLEMENTED. Pure Python, stdlib-only, no DWG access. Accepts either a whole IR or one entity dict. XDATA blocks are read from entity.xdata[{app,items}], extension-dictionary anchors are resolved through top-level extension_dictionaries + xrecords by owner_handle/value_handle.",
+      "target_family_first_class": true,
+      "wired_v1": false,
+      "operation": "inspect.xdata.semantic_anchor",
+      "engines": [
+        "objectdbx_capable"
+      ],
+      "schema_refs": {
+        "input": "schemas/dwg_graph_ir.v1.schema.json",
+        "output": "(no schema authored - plain dict)"
+      },
+      "notes": "IMPLEMENTED. Pure Python, stdlib-only, no DWG access. Returns an empty-but-ok result when no xdata or extension-dictionary anchors are present.",
+      "owner_ticket": "M08C-T01",
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs"
+    },
+    {
+      "id": "run.corpus.batch",
+      "family": "corpus",
+      "status": "implemented",
+      "engine_tier": "objectdbx_capable",
+      "host_eligibility": [
+        "dbx",
+        "coreconsole",
+        "arx_adapter",
+        "full_autocad"
+      ],
+      "hosts": [
+        "dbx",
+        "coreconsole",
+        "arx_adapter",
+        "full_autocad"
+      ],
+      "execution_context": "python_post_process",
+      "write_level": {
+        "default_write_mode": "read",
+        "allowed_write_modes": [
+          "read"
+        ],
+        "dwg_persisted": false,
+        "original_write_default": false
+      },
+      "handler": {
+        "router_lane": null,
+        "dispatcher_symbol": "corpus_batch.run_corpus_batch",
+        "execution_host_class": "dbx",
+        "python_handler": "tools/corpus_batch.py::run_corpus_batch",
+        "wired_via": "tools/corpus_batch.py (direct import; op-runner injected)",
+        "composed_of": []
+      },
+      "mapping_type": "synthetic",
+      "catalog_op_id": null,
+      "input_schema": "(no schema authored - plain dict)",
+      "output_schema": "(no schema authored - plain dict)",
+      "policy": {
+        "write_mode_default": "read",
+        "staged_copy_required": false,
+        "write_original_requires_approval": true,
+        "raw_command_dispatch": "forbidden",
+        "secrets": "never_read_or_printed"
+      },
+      "tests": [
+        "tests/unit/test_corpus_batch.py"
+      ],
+      "summary": "Resumable, bounded-concurrency corpus-scale batch runner: stages a READ-ONLY copy of each DWG, runs an injected read-op per file, appends one JSONL ledger line per file (skip-on-resume), never mutates originals.",
+      "evidence_refs": [
+        "tools/corpus_batch.py::run_corpus_batch",
+        "tests/unit/test_corpus_batch.py"
+      ],
+      "implementation_notes": "IMPLEMENTED. Handler = tools/corpus_batch.py run_corpus_batch (staged copy per file, resumable JSONL ledger, bounded concurrency, failure isolation). Offline tests cover resume-skip, failure counting, original immutability.",
+      "target_family_first_class": true,
+      "wired_v1": false,
+      "operation": "run.corpus.batch",
+      "engines": [
+        "objectdbx_capable"
+      ],
+      "schema_refs": {
+        "input": "(no schema authored - plain dict)",
+        "output": "(no schema authored - plain dict)"
+      },
+      "notes": "IMPLEMENTED. Handler = tools/corpus_batch.py run_corpus_batch (staged copy per file, resumable JSONL ledger, bounded concurrency, failure isolation). Offline tests cover resume-skip, failure counting, original immutability.",
+      "owner_ticket": "M08B-T01",
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs"
+    },
+    {
+      "id": "verify.cross_engine.dwg",
+      "family": "verify",
+      "status": "implemented",
+      "engine_tier": "objectdbx_capable",
+      "host_eligibility": [
+        "dbx",
+        "coreconsole",
+        "arx_adapter",
+        "full_autocad"
+      ],
+      "hosts": [
+        "dbx",
+        "coreconsole",
+        "arx_adapter",
+        "full_autocad"
+      ],
+      "execution_context": "python_post_process",
+      "write_level": {
+        "default_write_mode": "read",
+        "allowed_write_modes": [
+          "read"
+        ],
+        "dwg_persisted": false,
+        "original_write_default": false
+      },
+      "handler": {
+        "router_lane": null,
+        "dispatcher_symbol": "verify_cross_engine",
+        "execution_host_class": "dbx",
+        "python_handler": "tools/cross_engine_verify.py::verify_cross_engine",
+        "wired_via": "tools/cadctl.py::Cad.validate",
+        "composed_of": []
+      },
+      "mapping_type": "synthetic",
+      "catalog_op_id": null,
+      "input_schema": "schemas/dwg_graph_ir.v1.schema.json",
+      "output_schema": "application/json",
+      "policy": {
+        "write_mode_default": "read",
+        "staged_copy_required": false,
+        "write_original_requires_approval": true,
+        "raw_command_dispatch": "forbidden",
+        "secrets": "never_read_or_printed"
+      },
+      "tests": [
+        "tests/unit/test_cross_engine_verify.py::test_match_reports_concordant",
+        "tests/unit/test_cross_engine_verify.py::test_mismatch_reports_deltas",
+        "tests/unit/test_cross_engine_verify.py::test_missing_libredwg_bin_returns_not_available"
+      ],
+      "summary": "Cross-engine, read-only DWG verification that stages a copy, runs LibreDWG dwgread as a sidecar, and compares entity_count + layer-set against an AutoCAD IR for deterministic concordance.",
+      "evidence_refs": [
+        "tools/validator.py::validate_target",
+        "tools/cadctl.py::Cad.validate",
+        "runs/m02_cadctl_rich/dwg_graph_ir.json (21747 entities)",
+        "docs/OPERATION_REGISTRY_SPEC.md"
+      ],
+      "implementation_notes": "Stage a READ-ONLY DWG copy under staging/cross_engine_verify, invoke dwgread as a separate sidecar through subprocess, compute AutoCAD-vs-LibreDWG entity_count/layer deltas, and include original_unchanged via SHA-256 pre/post verification. Missing dwgread is truthful 'not_available'.",
+      "target_family_first_class": true,
+      "wired_v1": false,
+      "operation": "verify.cross_engine.dwg",
+      "engines": [
+        "objectdbx_capable"
+      ],
+      "schema_refs": {
+        "input": "schemas/dwg_graph_ir.v1.schema.json",
+        "output": "application/json"
+      },
+      "notes": "Stage a READ-ONLY DWG copy under staging/cross_engine_verify, invoke dwgread as a separate sidecar through subprocess, compute AutoCAD-vs-LibreDWG entity_count/layer deltas, and include original_unchanged via SHA-256 pre/post verification. Missing dwgread is truthful 'not_available'.",
+      "owner_ticket": "M08B-T01",
       "implementation_strategy": "implemented_v1",
       "evidence_required": "existing_tests_and_evidence_refs"
     }

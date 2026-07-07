@@ -58,5 +58,12 @@
   "notes": "Pure-Python identity contract comparator: handle-primary matching with xdata/dictionary anchor fallback + coarse geometry drift detection.",
   "owner_ticket": "M08G-T01",
   "implementation_strategy": "implemented_v1",
-  "evidence_required": "existing_tests_and_evidence_refs"
+  "evidence_required": "existing_tests_and_evidence_refs",
+  "engines": [
+    "objectdbx_capable"
+  ],
+  "schema_refs": {
+    "input": "schemas/dwg_graph_ir.v1.schema.json",
+    "output": "schemas/validation_report.v1.schema.json"
+  }
 }
