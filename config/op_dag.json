@@ -12,15 +12,15 @@
     "acceptance_test_id": "registry tests[0] (current best-evidence test ref; F3's future per-op W+D roundtrip gate is not built in this tree yet)"
   },
   "totals": {
-    "catalogue_count": 545,
-    "node_count": 545,
-    "edge_count": 1329,
+    "catalogue_count": 550,
+    "node_count": 550,
+    "edge_count": 1404,
     "by_persistence_class": {
       "D": 60,
       "L": 35,
       "NON_GOAL": 62,
       "P": 59,
-      "R": 329
+      "R": 334
     }
   },
   "audit": {
@@ -3594,6 +3594,17 @@
       "persistence_class": "R"
     },
     {
+      "op_id": "inspect.annoscale.list",
+      "predecessors": [],
+      "arg_keys": [],
+      "target_files": [
+        "src/Ariadne.AcadNative/families/annoscale_read.inc",
+        "tests/unit/test_nat_annoscale_fragment.py"
+      ],
+      "acceptance_test_id": "tests/unit/test_nat_annoscale_fragment.py",
+      "persistence_class": "R"
+    },
+    {
       "op_id": "inspect.assocaction.dependencies",
       "predecessors": [
         "config.assoceval.callback",
@@ -4279,6 +4290,17 @@
       "persistence_class": "R"
     },
     {
+      "op_id": "inspect.entity.annoscale.contexts",
+      "predecessors": [],
+      "arg_keys": [],
+      "target_files": [
+        "src/Ariadne.AcadNative/families/annoscale_read.inc",
+        "tests/unit/test_nat_annoscale_fragment.py"
+      ],
+      "acceptance_test_id": "tests/unit/test_nat_annoscale_fragment.py",
+      "persistence_class": "R"
+    },
+    {
       "op_id": "inspect.entity.common",
       "predecessors": [],
       "arg_keys": [],
@@ -4519,7 +4541,6 @@
       "predecessors": [],
       "arg_keys": [],
       "target_files": [
-        "/dev/.build/cados_plan/wt/w6_layerstate/build_log.md",
         "src/Ariadne.AcadNative/families/w6_layerstate_handlers.inc",
         "tests/unit/test_operation_registry_v2.py",
         "tests/unit/test_w6_layerstate_handlers.py"
@@ -4566,6 +4587,28 @@
         "tests/unit/test_operation_registry_v2.py"
       ],
       "acceptance_test_id": "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
+      "persistence_class": "R"
+    },
+    {
+      "op_id": "inspect.material.enumerate",
+      "predecessors": [],
+      "arg_keys": [],
+      "target_files": [
+        "src/Ariadne.AcadNative/families/materials_read.inc",
+        "tests/unit/test_nat_materials_fragment.py"
+      ],
+      "acceptance_test_id": "tests/unit/test_nat_materials_fragment.py",
+      "persistence_class": "R"
+    },
+    {
+      "op_id": "inspect.material.properties",
+      "predecessors": [],
+      "arg_keys": [],
+      "target_files": [
+        "src/Ariadne.AcadNative/families/materials_read.inc",
+        "tests/unit/test_nat_materials_fragment.py"
+      ],
+      "acceptance_test_id": "tests/unit/test_nat_materials_fragment.py",
       "persistence_class": "R"
     },
     {
@@ -5000,6 +5043,17 @@
         "tests/unit/test_operation_registry_v2.py"
       ],
       "acceptance_test_id": "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
+      "persistence_class": "R"
+    },
+    {
+      "op_id": "inspect.visualstyle.enumerate",
+      "predecessors": [],
+      "arg_keys": [],
+      "target_files": [
+        "src/Ariadne.AcadNative/families/materials_read.inc",
+        "tests/unit/test_nat_materials_fragment.py"
+      ],
+      "acceptance_test_id": "tests/unit/test_nat_materials_fragment.py",
       "persistence_class": "R"
     },
     {
@@ -7239,13 +7293,18 @@
       "op_id": "write.dictionary.set",
       "predecessors": [
         "acdb.database.create",
+        "inspect.annoscale.list",
         "inspect.dictionary.get",
         "inspect.dictionary.named_objects",
+        "inspect.entity.annoscale.contexts",
         "inspect.entity.get_xdata",
         "inspect.layerstates.list",
+        "inspect.material.enumerate",
+        "inspect.material.properties",
         "inspect.object.ext_dict",
         "inspect.symboltable.block",
         "inspect.symboltable.layers",
+        "inspect.visualstyle.enumerate",
         "inspect.xrecord.get",
         "transform.database.wblock"
       ],
@@ -7264,13 +7323,18 @@
       "op_id": "write.dimstyle.create",
       "predecessors": [
         "acdb.database.create",
+        "inspect.annoscale.list",
         "inspect.dictionary.get",
         "inspect.dictionary.named_objects",
+        "inspect.entity.annoscale.contexts",
         "inspect.entity.get_xdata",
         "inspect.layerstates.list",
+        "inspect.material.enumerate",
+        "inspect.material.properties",
         "inspect.object.ext_dict",
         "inspect.symboltable.block",
         "inspect.symboltable.layers",
+        "inspect.visualstyle.enumerate",
         "inspect.xrecord.get",
         "transform.database.wblock"
       ],
@@ -8292,13 +8356,18 @@
       "op_id": "write.entity.set_xdata",
       "predecessors": [
         "acdb.database.create",
+        "inspect.annoscale.list",
         "inspect.dictionary.get",
         "inspect.dictionary.named_objects",
+        "inspect.entity.annoscale.contexts",
         "inspect.entity.get_xdata",
         "inspect.layerstates.list",
+        "inspect.material.enumerate",
+        "inspect.material.properties",
         "inspect.object.ext_dict",
         "inspect.symboltable.block",
         "inspect.symboltable.layers",
+        "inspect.visualstyle.enumerate",
         "inspect.xrecord.get",
         "transform.database.wblock"
       ],
@@ -8736,13 +8805,18 @@
       "op_id": "write.layer.create",
       "predecessors": [
         "acdb.database.create",
+        "inspect.annoscale.list",
         "inspect.dictionary.get",
         "inspect.dictionary.named_objects",
+        "inspect.entity.annoscale.contexts",
         "inspect.entity.get_xdata",
         "inspect.layerstates.list",
+        "inspect.material.enumerate",
+        "inspect.material.properties",
         "inspect.object.ext_dict",
         "inspect.symboltable.block",
         "inspect.symboltable.layers",
+        "inspect.visualstyle.enumerate",
         "inspect.xrecord.get",
         "transform.database.wblock"
       ],
@@ -8769,19 +8843,23 @@
       "op_id": "write.layerstate.delete",
       "predecessors": [
         "acdb.database.create",
+        "inspect.annoscale.list",
         "inspect.dictionary.get",
         "inspect.dictionary.named_objects",
+        "inspect.entity.annoscale.contexts",
         "inspect.entity.get_xdata",
         "inspect.layerstates.list",
+        "inspect.material.enumerate",
+        "inspect.material.properties",
         "inspect.object.ext_dict",
         "inspect.symboltable.block",
         "inspect.symboltable.layers",
+        "inspect.visualstyle.enumerate",
         "inspect.xrecord.get",
         "transform.database.wblock"
       ],
       "arg_keys": [],
       "target_files": [
-        "/dev/.build/cados_plan/wt/w6_layerstate/build_log.md",
         "src/Ariadne.AcadNative/families/w6_layerstate_handlers.inc",
         "tests/unit/test_operation_registry_v2.py",
         "tests/unit/test_w6_layerstate_handlers.py"
@@ -8793,19 +8871,23 @@
       "op_id": "write.layerstate.restore",
       "predecessors": [
         "acdb.database.create",
+        "inspect.annoscale.list",
         "inspect.dictionary.get",
         "inspect.dictionary.named_objects",
+        "inspect.entity.annoscale.contexts",
         "inspect.entity.get_xdata",
         "inspect.layerstates.list",
+        "inspect.material.enumerate",
+        "inspect.material.properties",
         "inspect.object.ext_dict",
         "inspect.symboltable.block",
         "inspect.symboltable.layers",
+        "inspect.visualstyle.enumerate",
         "inspect.xrecord.get",
         "transform.database.wblock"
       ],
       "arg_keys": [],
       "target_files": [
-        "/dev/.build/cados_plan/wt/w6_layerstate/build_log.md",
         "src/Ariadne.AcadNative/families/w6_layerstate_handlers.inc",
         "tests/unit/test_operation_registry_v2.py",
         "tests/unit/test_w6_layerstate_handlers.py"
@@ -8817,19 +8899,23 @@
       "op_id": "write.layerstate.save",
       "predecessors": [
         "acdb.database.create",
+        "inspect.annoscale.list",
         "inspect.dictionary.get",
         "inspect.dictionary.named_objects",
+        "inspect.entity.annoscale.contexts",
         "inspect.entity.get_xdata",
         "inspect.layerstates.list",
+        "inspect.material.enumerate",
+        "inspect.material.properties",
         "inspect.object.ext_dict",
         "inspect.symboltable.block",
         "inspect.symboltable.layers",
+        "inspect.visualstyle.enumerate",
         "inspect.xrecord.get",
         "transform.database.wblock"
       ],
       "arg_keys": [],
       "target_files": [
-        "/dev/.build/cados_plan/wt/w6_layerstate/build_log.md",
         "src/Ariadne.AcadNative/families/w6_layerstate_handlers.inc",
         "tests/unit/test_operation_registry_v2.py",
         "tests/unit/test_w6_layerstate_handlers.py"
@@ -8856,13 +8942,18 @@
       "op_id": "write.linetype.create",
       "predecessors": [
         "acdb.database.create",
+        "inspect.annoscale.list",
         "inspect.dictionary.get",
         "inspect.dictionary.named_objects",
+        "inspect.entity.annoscale.contexts",
         "inspect.entity.get_xdata",
         "inspect.layerstates.list",
+        "inspect.material.enumerate",
+        "inspect.material.properties",
         "inspect.object.ext_dict",
         "inspect.symboltable.block",
         "inspect.symboltable.layers",
+        "inspect.visualstyle.enumerate",
         "inspect.xrecord.get",
         "transform.database.wblock"
       ],
@@ -8923,13 +9014,18 @@
       "op_id": "write.object.create_ext_dict",
       "predecessors": [
         "acdb.database.create",
+        "inspect.annoscale.list",
         "inspect.dictionary.get",
         "inspect.dictionary.named_objects",
+        "inspect.entity.annoscale.contexts",
         "inspect.entity.get_xdata",
         "inspect.layerstates.list",
+        "inspect.material.enumerate",
+        "inspect.material.properties",
         "inspect.object.ext_dict",
         "inspect.symboltable.block",
         "inspect.symboltable.layers",
+        "inspect.visualstyle.enumerate",
         "inspect.xrecord.get",
         "transform.database.wblock"
       ],
@@ -8994,13 +9090,18 @@
       "op_id": "write.regapp.register",
       "predecessors": [
         "acdb.database.create",
+        "inspect.annoscale.list",
         "inspect.dictionary.get",
         "inspect.dictionary.named_objects",
+        "inspect.entity.annoscale.contexts",
         "inspect.entity.get_xdata",
         "inspect.layerstates.list",
+        "inspect.material.enumerate",
+        "inspect.material.properties",
         "inspect.object.ext_dict",
         "inspect.symboltable.block",
         "inspect.symboltable.layers",
+        "inspect.visualstyle.enumerate",
         "inspect.xrecord.get",
         "transform.database.wblock"
       ],
@@ -9044,13 +9145,18 @@
       "op_id": "write.textstyle.create",
       "predecessors": [
         "acdb.database.create",
+        "inspect.annoscale.list",
         "inspect.dictionary.get",
         "inspect.dictionary.named_objects",
+        "inspect.entity.annoscale.contexts",
         "inspect.entity.get_xdata",
         "inspect.layerstates.list",
+        "inspect.material.enumerate",
+        "inspect.material.properties",
         "inspect.object.ext_dict",
         "inspect.symboltable.block",
         "inspect.symboltable.layers",
+        "inspect.visualstyle.enumerate",
         "inspect.xrecord.get",
         "transform.database.wblock"
       ],
@@ -9067,13 +9173,18 @@
       "op_id": "write.ucs.create",
       "predecessors": [
         "acdb.database.create",
+        "inspect.annoscale.list",
         "inspect.dictionary.get",
         "inspect.dictionary.named_objects",
+        "inspect.entity.annoscale.contexts",
         "inspect.entity.get_xdata",
         "inspect.layerstates.list",
+        "inspect.material.enumerate",
+        "inspect.material.properties",
         "inspect.object.ext_dict",
         "inspect.symboltable.block",
         "inspect.symboltable.layers",
+        "inspect.visualstyle.enumerate",
         "inspect.xrecord.get",
         "transform.database.wblock"
       ],
@@ -9090,13 +9201,18 @@
       "op_id": "write.view.create",
       "predecessors": [
         "acdb.database.create",
+        "inspect.annoscale.list",
         "inspect.dictionary.get",
         "inspect.dictionary.named_objects",
+        "inspect.entity.annoscale.contexts",
         "inspect.entity.get_xdata",
         "inspect.layerstates.list",
+        "inspect.material.enumerate",
+        "inspect.material.properties",
         "inspect.object.ext_dict",
         "inspect.symboltable.block",
         "inspect.symboltable.layers",
+        "inspect.visualstyle.enumerate",
         "inspect.xrecord.get",
         "transform.database.wblock"
       ],
@@ -9113,13 +9229,18 @@
       "op_id": "write.vport.create",
       "predecessors": [
         "acdb.database.create",
+        "inspect.annoscale.list",
         "inspect.dictionary.get",
         "inspect.dictionary.named_objects",
+        "inspect.entity.annoscale.contexts",
         "inspect.entity.get_xdata",
         "inspect.layerstates.list",
+        "inspect.material.enumerate",
+        "inspect.material.properties",
         "inspect.object.ext_dict",
         "inspect.symboltable.block",
         "inspect.symboltable.layers",
+        "inspect.visualstyle.enumerate",
         "inspect.xrecord.get",
         "transform.database.wblock"
       ],
@@ -9153,13 +9274,18 @@
       "op_id": "write.xrecord.set",
       "predecessors": [
         "acdb.database.create",
+        "inspect.annoscale.list",
         "inspect.dictionary.get",
         "inspect.dictionary.named_objects",
+        "inspect.entity.annoscale.contexts",
         "inspect.entity.get_xdata",
         "inspect.layerstates.list",
+        "inspect.material.enumerate",
+        "inspect.material.properties",
         "inspect.object.ext_dict",
         "inspect.symboltable.block",
         "inspect.symboltable.layers",
+        "inspect.visualstyle.enumerate",
         "inspect.xrecord.get",
         "transform.database.wblock"
       ],

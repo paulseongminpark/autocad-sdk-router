@@ -6036,6 +6036,8 @@ struct AriadneJobCtx
 #include "families/w6_layerstate_handlers.inc"  // w6-layerstate — AcDbLayerStateManager ops (native)
 #include "families/w6_dynblk_handlers.inc"  // w6-dynblk — dynamic block reference property read/write (native)
 #include "families/w6_section_handlers.inc"  // w6-section — AcDbSection read + create (wave 6 census P2)
+#include "families/materials_read.inc"  // w7-materials — AcDbMaterial/AcDbVisualStyle dictionary reads (census P2-6)
+#include "families/annoscale_read.inc"  // w7-annoscale — annotation scale context reads (census P3-10)
 
 // op admitted by any family module? (gate admission for not-yet-legacy family ops)
 static bool familyHasOp(const std::string& op)
@@ -6046,7 +6048,9 @@ static bool familyHasOp(const std::string& op)
         || m08nHasOp(op)
         || w6LayerStateHasOp(op)   // w6-layerstate
         || w6dynblkHasOp(op)   // w6-dynblk
-        || w6sectionHasOp(op);  // w6-section
+        || w6sectionHasOp(op)  // w6-section
+        || materialsReadHasOp(op)  // w7-materials
+        || annoscaleReadHasOp(op);  // w7-annoscale
 }
 
 // route op to its owning family module; true if handled (result appended to r)
@@ -6060,7 +6064,9 @@ static bool tryFamilyDispatch(const std::string& op, const AriadneJobCtx& ctx, s
         || m08nDispatch(op, ctx, r)
         || w6LayerStateDispatch(op, ctx, r)   // w6-layerstate
         || w6dynblkDispatch(op, ctx, r)   // w6-dynblk
-        || w6sectionDispatch(op, ctx, r);  // w6-section
+        || w6sectionDispatch(op, ctx, r)  // w6-section
+        || materialsReadDispatch(op, ctx, r)  // w7-materials
+        || annoscaleReadDispatch(op, ctx, r);  // w7-annoscale
 }
 
 static void ariadneNativeJob()

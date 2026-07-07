@@ -1,0 +1,122 @@
+[
+  {
+    "family": "symbol_tables_dictionaries",
+    "status": "implemented",
+    "engine_tier": "native_arx_only",
+    "engines": [
+      "native_arx_only"
+    ],
+    "host_eligibility": [
+      "arx_adapter",
+      "full_autocad"
+    ],
+    "hosts": [
+      "arx_adapter",
+      "full_autocad"
+    ],
+    "execution_context": "arx_in_accoreconsole",
+    "write_level": {
+      "default_write_mode": "read",
+      "allowed_write_modes": [
+        "read"
+      ],
+      "dwg_persisted": false,
+      "original_write_default": false
+    },
+    "mapping_type": "synthetic",
+    "catalog_op_id": null,
+    "input_schema": "schemas/cad_job.v2.schema.json#/allOf",
+    "output_schema": "schemas/cad_result.v2.schema.json",
+    "schema_refs": {
+      "input": "schemas/cad_job.v2.schema.json#/allOf",
+      "output": "schemas/cad_result.v2.schema.json"
+    },
+    "source_slice": "acdb-core.md",
+    "policy": {
+      "source": "config/policy.v2.json",
+      "status_policy": "implemented",
+      "default_write_mode": "read",
+      "allowed_write_modes": [
+        "read"
+      ],
+      "no_original_write_default": true
+    },
+    "tests": [
+      "tests/unit/test_nat_annoscale_fragment.py"
+    ],
+    "evidence_refs": [
+      "src/Ariadne.AcadNative/families/annoscale_read.inc"
+    ],
+    "id": "inspect.annoscale.list",
+    "operation": "inspect.annoscale.list",
+    "handler": {
+      "router_lane": "ARIADNE_NATIVE_JOB",
+      "dispatcher_symbol": "annoscaleReadDispatch",
+      "execution_host_class": "arx",
+      "native_api": "AcDbObjectContextManager::contextCollection(ACDB_ANNOTATIONSCALES_COLLECTION) iterate",
+      "composed_of": []
+    },
+    "summary": "List every annotation scale in the database context collection (name, scale factor, unique id). Census P3-10 read half.",
+    "citation": "hdr dbObjContext.h AcDbAnnotationScale"
+  },
+  {
+    "family": "symbol_tables_dictionaries",
+    "status": "implemented",
+    "engine_tier": "native_arx_only",
+    "engines": [
+      "native_arx_only"
+    ],
+    "host_eligibility": [
+      "arx_adapter",
+      "full_autocad"
+    ],
+    "hosts": [
+      "arx_adapter",
+      "full_autocad"
+    ],
+    "execution_context": "arx_in_accoreconsole",
+    "write_level": {
+      "default_write_mode": "read",
+      "allowed_write_modes": [
+        "read"
+      ],
+      "dwg_persisted": false,
+      "original_write_default": false
+    },
+    "mapping_type": "synthetic",
+    "catalog_op_id": null,
+    "input_schema": "schemas/cad_job.v2.schema.json#/allOf",
+    "output_schema": "schemas/cad_result.v2.schema.json",
+    "schema_refs": {
+      "input": "schemas/cad_job.v2.schema.json#/allOf",
+      "output": "schemas/cad_result.v2.schema.json"
+    },
+    "source_slice": "acdb-core.md",
+    "policy": {
+      "source": "config/policy.v2.json",
+      "status_policy": "implemented",
+      "default_write_mode": "read",
+      "allowed_write_modes": [
+        "read"
+      ],
+      "no_original_write_default": true
+    },
+    "tests": [
+      "tests/unit/test_nat_annoscale_fragment.py"
+    ],
+    "evidence_refs": [
+      "src/Ariadne.AcadNative/families/annoscale_read.inc"
+    ],
+    "id": "inspect.entity.annoscale.contexts",
+    "operation": "inspect.entity.annoscale.contexts",
+    "handler": {
+      "router_lane": "ARIADNE_NATIVE_JOB",
+      "dispatcher_symbol": "annoscaleReadDispatch",
+      "execution_host_class": "arx",
+      "native_api": "AcDbObjectContextInterface / entity context enumeration",
+      "composed_of": []
+    },
+    "summary": "For ONE annotative entity by handle: list its per-scale context representations (scale name + participation).",
+    "citation": "hdr dbObjContext.h AcDbObjectContextInterface"
+  }
+]

@@ -134,7 +134,13 @@ def test_build_verdict_reports_total_kind_and_layer_deltas():
     reason="LibreDWG sidecar unavailable on this machine",
 )
 def test_cross_verify_live_fixture_against_real_arx_ir():
-    fixture = Path(r"D:\dev\.build\cados_plan\wt\w5_gates\tests\fixtures\native_sample.dwg")
+    # the repo's OWN canonical fixture (sha eac5d4b1..., the frozen native_sample):
+    # an earlier revision pointed at a w5_gates WORKTREE copy of the same file,
+    # which vanished when that scratch worktree was cleaned -- machine-local
+    # scratch paths are not durable test inputs.
+    fixture = Path(__file__).resolve().parents[2] / "tests" / "fixtures" / "native_sample.dwg"
+    if not fixture.exists():
+        pytest.skip("canonical native_sample.dwg fixture not present")
     ir_path = Path(r"D:\dev\.build\cados_plan\runs\t1_cert\pre_shared\dwg_graph_ir.json")
     if not ir_path.exists():
         pytest.skip("real ARX IR artifact not present")

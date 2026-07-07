@@ -93,6 +93,27 @@ class MergeFragmentsTest(unittest.TestCase):
         with self.registry_path.open("r", encoding="utf-8-sig") as f:
             return json.load(f)
 
+    def test_array_fragment_adds_every_entry(self) -> None:
+        # a native FAMILY lands all its ops in ONE nat.<family>.json ARRAY;
+        # each entry must merge exactly like a single-op fragment (dup skipped).
+        with (self.fragments_dir / "nat_family.json").open("w", encoding="utf-8") as f:
+            json.dump(
+                [
+                    {"id": "fam.op_a", "family": "delta", "status": "implemented", "engine_tier": "tier_b"},
+                    {"id": "fam.op_b", "family": "delta", "status": "implemented", "engine_tier": "tier_b"},
+                    {"id": "existing.one", "family": "alpha", "status": "implemented", "engine_tier": "tier_a"},
+                ],
+                f,
+            )
+        result = merge_fragments(self.registry_path, self.fragments_dir, dry_run=False)
+        self.assertIn("fam.op_a", result["added"])
+        self.assertIn("fam.op_b", result["added"])
+        self.assertIn("existing.one", result["skipped"])
+        reg = self._load_registry()
+        ids = {o["id"] for o in reg["operations"]}
+        self.assertLessEqual({"fam.op_a", "fam.op_b"}, ids)
+        self.assertEqual(reg["totals"]["by_family"].get("delta"), 2)
+
     def test_dry_run_computes_without_writing(self) -> None:
         before_bytes = self.registry_path.read_bytes()
 

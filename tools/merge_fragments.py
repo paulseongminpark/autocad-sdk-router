@@ -36,13 +36,17 @@ def merge_fragments(registry_path, fragments_dir, dry_run: bool = False) -> Dict
     for fragment_path in fragment_paths:
         with fragment_path.open("r", encoding="utf-8-sig") as f:
             fragment = json.load(f)
-        op_id = fragment["id"]
-        if op_id in existing_ids:
-            skipped.append(op_id)
-            continue
-        operations.append(fragment)
-        existing_ids.add(op_id)
-        added.append(op_id)
+        # a fragment file is either ONE op-entry dict or an ARRAY of them
+        # (a native FAMILY lands all its ops in one nat.<family>.json).
+        entries = fragment if isinstance(fragment, list) else [fragment]
+        for entry in entries:
+            op_id = entry["id"]
+            if op_id in existing_ids:
+                skipped.append(op_id)
+                continue
+            operations.append(entry)
+            existing_ids.add(op_id)
+            added.append(op_id)
 
     by_status = Counter(op.get("status") for op in operations)
     by_family = Counter(op.get("family") for op in operations)
