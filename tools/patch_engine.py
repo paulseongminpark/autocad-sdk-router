@@ -83,8 +83,9 @@ import json
 import os
 import shutil
 import sys
+import time
 from datetime import datetime, timezone
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, FrozenSet, List, Optional, Set, Tuple
 
 _THIS_DIR = os.path.dirname(os.path.abspath(__file__))
 _ROUTER_HOME = os.path.dirname(_THIS_DIR)
@@ -145,14 +146,126 @@ _OP_RISK: Dict[str, str] = {
 _RISK_ORDER = {"low": 0, "medium": 1, "high": 2, "blocked": 3}
 
 
-def _load_registry() -> Optional[Dict[str, Any]]:
-    if not os.path.isfile(_OPERATIONS_V2):
-        return None
+class PatchEngineRegistryError(RuntimeError):
+    """Registry SoT read/parse/lockstep failure -- fail loud, no silent fallback."""
+
+
+_registry_doc_cache: Optional[Dict[str, Any]] = None
+_registry_doc_cache_key: Optional[Tuple[int, int]] = None
+_native_write_lockstep_cache_key: Optional[Tuple[int, int]] = None
+
+
+def _registry_file_stat_key() -> Optional[Tuple[int, int]]:
     try:
-        with open(_OPERATIONS_V2, "r", encoding=_JSON_ENCODING) as fh:
-            return json.load(fh)
-    except (OSError, ValueError):
+        st = os.stat(_OPERATIONS_V2)
+        return (st.st_mtime_ns, st.st_size)
+    except OSError:
         return None
+
+
+def _load_registry_doc_loud(*, retries: int = 3) -> Dict[str, Any]:
+    """Load config/operations.v2.json; raise PatchEngineRegistryError on failure.
+
+    Cached per-process; invalidated when the registry file's mtime/size changes
+    (same pattern as tools/autocad-router.ps1 Get-NativeJobOpSet). Retries
+    briefly on read/parse errors so a concurrent registry write does not leave
+    apply_staged trusting a stale hand-copied supported-op list.
+    """
+    global _registry_doc_cache, _registry_doc_cache_key
+    key = _registry_file_stat_key()
+    if _registry_doc_cache is not None and key == _registry_doc_cache_key:
+        return _registry_doc_cache
+    if not os.path.isfile(_OPERATIONS_V2):
+        raise PatchEngineRegistryError(
+            "cannot read operation registry at %r: file not found" % _OPERATIONS_V2)
+    last_err: Optional[BaseException] = None
+    doc: Optional[Dict[str, Any]] = None
+    for attempt in range(retries):
+        try:
+            with open(_OPERATIONS_V2, "r", encoding=_JSON_ENCODING) as fh:
+                doc = json.load(fh)
+            break
+        except (OSError, ValueError) as exc:
+            last_err = exc
+            if attempt + 1 < retries:
+                time.sleep(0.2)
+    if doc is None:
+        raise PatchEngineRegistryError(
+            "cannot read/parse operation registry at %r after %d attempts: %s: %s"
+            % (_OPERATIONS_V2, retries, type(last_err).__name__, last_err))
+    _registry_doc_cache = doc
+    _registry_doc_cache_key = _registry_file_stat_key()
+    return doc
+
+
+def _load_registry() -> Optional[Dict[str, Any]]:
+    try:
+        return _load_registry_doc_loud()
+    except PatchEngineRegistryError:
+        return None
+
+
+def registry_native_job_implemented_op_ids(
+        doc: Optional[Dict[str, Any]] = None) -> FrozenSet[str]:
+    """Registry-derived native write op ids apply_staged may route (SoT).
+
+    A row qualifies when status is ``implemented`` and
+    handler.router_lane is ``ARIADNE_NATIVE_JOB`` -- the same signals
+    tools/autocad-router.ps1 uses for native ObjectARX job routing, so the
+    supported-op set cannot drift from a hand-maintained allow-list.
+    """
+    reg = doc if doc is not None else _load_registry_doc_loud()
+    ids: Set[str] = set()
+    for op in reg.get("operations", []):
+        if not isinstance(op, dict):
+            continue
+        oid = op.get("id")
+        if not oid:
+            continue
+        handler = op.get("handler") or {}
+        if (handler.get("router_lane") == "ARIADNE_NATIVE_JOB"
+                and op.get("status") == "implemented"):
+            ids.add(oid)
+    return frozenset(ids)
+
+
+def assert_native_write_op_map_lockstep(
+        raw_map: Optional[Dict[str, str]] = None) -> None:
+    """Fail LOUDLY when ``patch_ops``'s map cites a non-live registry native op.
+
+    Every patch-op -> native-op target must exist in config/operations.v2.json
+    with status ``implemented`` on the ARIADNE_NATIVE_JOB lane. A stale
+    hand-copied supported-op list is worse than refusing to apply.
+    """
+    global _native_write_lockstep_cache_key
+    key = _registry_file_stat_key()
+    if raw_map is None and key == _native_write_lockstep_cache_key:
+        return
+    mapping = raw_map if raw_map is not None else patch_ops.NATIVE_WRITE_OP_MAP
+    reg = _load_registry_doc_loud()
+    by_id = {o.get("id"): o for o in reg.get("operations", [])
+             if isinstance(o, dict) and o.get("id")}
+    live_native = registry_native_job_implemented_op_ids(reg)
+    violations: List[str] = []
+    for patch_op in sorted(mapping):
+        native_op = mapping[patch_op]
+        rec = by_id.get(native_op)
+        if rec is None:
+            violations.append(
+                "%r -> %r (dangling: not in registry)" % (patch_op, native_op))
+            continue
+        if native_op not in live_native:
+            handler = rec.get("handler") or {}
+            violations.append(
+                "%r -> %r (registry status=%r router_lane=%r)"
+                % (patch_op, native_op, rec.get("status"),
+                   handler.get("router_lane")))
+    if violations:
+        raise PatchEngineRegistryError(
+            "patch_ops.NATIVE_WRITE_OP_MAP drifts from live config/operations.v2.json; "
+            "refusing stale supported-op list:\n  " + "\n  ".join(violations))
+    if raw_map is None:
+        _native_write_lockstep_cache_key = key
 
 
 def _registry_status(op_id: str) -> Optional[str]:
@@ -473,11 +586,13 @@ def dry_run_plan(patch: Any) -> Dict[str, Any]:
 # M02 -- staged-copy execution lifecycle (REAL writes, ALWAYS on a copy)
 # --------------------------------------------------------------------------- #
 
-# Patch op id -> native ObjectARX write op (operations.v2.json, status
-# "implemented"). Only these four declared patch ops have a live native handler;
-# everything else is not_implemented (no-fake-success). Split by family under
-# tools/patch_ops/ (PLAN F9); this is the aggregate, reproduced exactly.
+# Patch op id -> native ObjectARX write op. The patch_ops family aggregate owns
+# patch-op naming + arg branches; apply_staged's supported-op *truth* is the
+# live registry row set (registry_native_job_implemented_op_ids), verified on
+# every resolve via assert_native_write_op_map_lockstep -- never a frozen copy.
 NATIVE_WRITE_OP_MAP: Dict[str, str] = patch_ops.NATIVE_WRITE_OP_MAP
+
+assert_native_write_op_map_lockstep()
 
 
 def _now_iso() -> str:
@@ -571,6 +686,11 @@ def create_staged_copy(dwg_path: str, out_dir: str) -> Dict[str, Any]:
     return out
 
 
+def _unknown_patch_op_reason(patch_op: Any, live_map: Dict[str, str]) -> str:
+    return ("unknown patch operation %r (not in registry-backed supported set; "
+            "known patch ops: %s)" % (patch_op, sorted(live_map)))
+
+
 def _resolve_native_write_op(patch: Dict[str, Any]) -> Tuple[Optional[Dict[str, Any]], Optional[str]]:
     """Pick the single patch operation to apply and resolve its native write op.
 
@@ -580,6 +700,11 @@ def _resolve_native_write_op(patch: Dict[str, Any]) -> Tuple[Optional[Dict[str, 
     op_record is {index, patch_op, native_op, args}; error is set (op_record None)
     when the op has no live native handler (not_implemented, no fake).
     """
+    try:
+        assert_native_write_op_map_lockstep()
+    except PatchEngineRegistryError as exc:
+        return None, str(exc)
+    live_map = NATIVE_WRITE_OP_MAP
     ops = patch.get("operations") or []
     if not ops:
         return None, "patch has no operations"
@@ -587,22 +712,29 @@ def _resolve_native_write_op(patch: Dict[str, Any]) -> Tuple[Optional[Dict[str, 
     if not isinstance(op, dict):
         return None, "operations[0] is not an object"
     patch_op = op.get("operation")
-    native_op = NATIVE_WRITE_OP_MAP.get(patch_op)
+    native_op = live_map.get(patch_op)
     if native_op is None:
-        return None, ("patch op %r has no live native write handler (supported: %s)"
-                      % (patch_op, sorted(NATIVE_WRITE_OP_MAP)))
+        return None, _unknown_patch_op_reason(patch_op, live_map)
     return ({"index": 0, "step_id": op.get("step_id"), "patch_op": patch_op,
              "native_op": native_op, "args": op.get("args", {}) or {}}, None)
 
 
-def _resolve_native_write_ops(patch: Dict[str, Any]) -> Tuple[List[Dict[str, Any]], List[Dict[str, Any]]]:
+def _resolve_native_write_ops(
+        patch: Dict[str, Any]) -> Tuple[List[Dict[str, Any]], List[Dict[str, Any]], Optional[str]]:
     """Resolve EVERY patch operation to its native write op (multi-op apply).
 
-    Returns (applied, deferred): ``applied`` = the ops (in order) that have a live
-    native write handler; ``deferred`` = ops with no handler -- reported, never
-    applied, never faked. apply_staged applies every ``applied`` op in sequence,
-    chaining each op's mutated staged copy into the next op's input.
+    Returns (applied, deferred, registry_error): ``applied`` = the ops (in order)
+    that have a live native write handler; ``deferred`` = ops with no handler --
+    reported, never applied, never faked. ``registry_error`` is set when the
+    registry-backed supported-op lockstep check fails (fail loud). apply_staged
+    applies every ``applied`` op in sequence, chaining each op's mutated staged
+    copy into the next op's input.
     """
+    try:
+        assert_native_write_op_map_lockstep()
+    except PatchEngineRegistryError as exc:
+        return [], [], str(exc)
+    live_map = NATIVE_WRITE_OP_MAP
     ops = patch.get("operations") or []
     applied: List[Dict[str, Any]] = []
     deferred: List[Dict[str, Any]] = []
@@ -612,15 +744,14 @@ def _resolve_native_write_ops(patch: Dict[str, Any]) -> Tuple[List[Dict[str, Any
                              "reason": "operation is not an object"})
             continue
         patch_op = op.get("operation")
-        native_op = NATIVE_WRITE_OP_MAP.get(patch_op)
+        native_op = live_map.get(patch_op)
         if native_op is None:
             deferred.append({"index": i, "operation": patch_op, "status": "deferred",
-                             "reason": "no live native write handler (supported: %s)"
-                                       % sorted(NATIVE_WRITE_OP_MAP)})
+                             "reason": _unknown_patch_op_reason(patch_op, live_map)})
             continue
         applied.append({"index": i, "step_id": op.get("step_id"), "patch_op": patch_op,
                         "native_op": native_op, "args": op.get("args", {}) or {}})
-    return applied, deferred
+    return applied, deferred, None
 
 
 def _native_job_doc(native_op: str, args: Dict[str, Any]) -> Dict[str, Any]:
@@ -864,10 +995,25 @@ def apply_staged(patch: Dict[str, Any], dwg_path: str, out_dir: str) -> Dict[str
     # resolve the native write op(s) BEFORE touching the disk (no-fake-success).
     # apply_staged applies ALL ops with a live native handler, in order; ops with
     # no native handler are reported as deferred (never faked).
-    applied_records, deferred_ops = _resolve_native_write_ops(patch)
+    applied_records, deferred_ops, registry_err = _resolve_native_write_ops(patch)
+    if registry_err:
+        _step("resolve_native_write_ops", "blocked", reason=registry_err)
+        return _finish(_result_envelope(
+            "blocked", patch_id=patch_id, out_dir=out_dir,
+            journal_path=journal_path, artifacts=artifacts,
+            original_unchanged=None, reason=registry_err))
     if not applied_records:
-        reason = ("no patch operation has a live native write handler (supported: %s)"
-                  % sorted(NATIVE_WRITE_OP_MAP))
+        if deferred_ops:
+            deferred_reasons = [d["reason"] for d in deferred_ops
+                                if isinstance(d.get("reason"), str) and d["reason"]]
+            if deferred_reasons:
+                reason = "; ".join(deferred_reasons)
+            else:
+                reason = ("no patch operation has a live native write handler "
+                          "(supported: %s)" % sorted(NATIVE_WRITE_OP_MAP))
+        else:
+            reason = ("no patch operation has a live native write handler "
+                      "(supported: %s)" % sorted(NATIVE_WRITE_OP_MAP))
         _step("resolve_native_write_ops", "not_implemented", reason=reason,
               deferred=len(deferred_ops))
         return _finish(_result_envelope(

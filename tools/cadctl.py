@@ -768,7 +768,7 @@ class Cad:
         if not src.exists():
             return self._run_op_refusal(op_id, "blocked",
                 f"input DWG not found: {dwg_path}", out_dir_p, registry_status=op_status)
-        sha_before = _sha256_head(src, 64)
+        original_sha256_before = _sha256_head(src, 64).lower()
         stage_root = self.staging_golden / _ts()
         stage_root.mkdir(parents=True, exist_ok=True)
         staged = stage_root / "input.dwg"
@@ -777,10 +777,32 @@ class Cad:
             os.chmod(staged, 0o666)
         except OSError:
             pass
-        # Pre-write snapshot: `staged` is never touched again after this point
-        # (the router stages its OWN second-level copy -- see docstring), so its
-        # sha256 taken now is a guaranteed pre-write value.
+        # Staged-copy semantics (envelope truth contract):
+        #   staged_copy        = cadctl's pristine pre-op copy; sha MUST equal the
+        #                        original and MUST stay byte-identical through the run
+        #                        (the router re-stages into its own dwg_job_* file).
+        #   staged_copy_sha256 = full sha256 of staged_copy captured NOW (pre-router).
+        #   staged_result      = router-reported post-op file (run_res["staged_used"]);
+        #                        for write_copy this is the post-_QSAVE artifact; for
+        #                        read it is the router's unmutated second-level copy.
+        #   staged_result_sha256 = full sha256 of staged_result after the router returns.
         staged_copy_sha256 = _sha256_head(staged, 64).lower()
+        staged_copy_matches_original = (staged_copy_sha256 == original_sha256_before)
+        if not staged_copy_matches_original:
+            return {
+                "schema": "ariadne.cadctl.run_operation.v1",
+                "operation": op_id,
+                "status": "error",
+                "executed": False,
+                "registry_operation_status": op_status,
+                "write_mode": wm,
+                "out_dir": str(out_dir_p),
+                "staged_copy": str(staged),
+                "staged_copy_sha256": staged_copy_sha256,
+                "original_sha256_before": original_sha256_before,
+                "staged_copy_matches_original": False,
+                "reason": "SAFETY VIOLATION: staged copy sha does not match original at staging time",
+            }
 
         # --- optional args -> ARIADNE_NATIVE_JOB job file (-JobPath) ---
         job_path = None
@@ -793,8 +815,12 @@ class Cad:
         # --- drive the native job lane on the COPY ---
         run_res = run_job.run_router_cad_job(str(staged), str(out_dir_p), op_id,
                                              write_mode=wm, job_path=job_path)
-        sha_after = _sha256_head(src, 64)
-        original_unchanged = (sha_before == sha_after)
+        original_sha256_after = _sha256_head(src, 64).lower()
+        original_unchanged = (original_sha256_before == original_sha256_after)
+        # Re-read cadctl's staged_copy AFTER the router: if bytes drifted, the path
+        # alone would mislead consumers ("staged_copy=pre-write" ambiguity).
+        staged_copy_sha_after = _sha256_head(staged, 64).lower()
+        staged_copy_unchanged = (staged_copy_sha_after == staged_copy_sha256)
 
         # Post-run snapshot: the router's own staged copy, reported back as
         # staged_used (engine_output.input). For write ops this is the mutated
@@ -813,8 +839,12 @@ class Cad:
             "out_dir": str(out_dir_p),
             "staged_copy": str(staged),
             "staged_copy_sha256": staged_copy_sha256,
+            "staged_copy_matches_original": staged_copy_matches_original,
+            "staged_copy_unchanged": staged_copy_unchanged,
             "staged_result": staged_result,
             "staged_result_sha256": staged_result_sha256,
+            "original_sha256_before": original_sha256_before,
+            "original_sha256_after": original_sha256_after,
             "original_unchanged": original_unchanged,
             "exit_code": run_res.get("exit_code"),
             "stdout": run_res.get("stdout_path"),
@@ -824,6 +854,13 @@ class Cad:
         if not original_unchanged:
             env["status"] = "error"
             env["reason"] = "SAFETY VIOLATION: original DWG sha changed during run_operation"
+            return env
+        if not staged_copy_unchanged:
+            env["status"] = "error"
+            env["reason"] = (
+                "SAFETY VIOLATION: cadctl staged_copy bytes changed during run; "
+                "staged_copy_sha256 is the pre-write snapshot only"
+            )
             return env
         if run_res.get("error"):
             env["status"] = "unavailable"

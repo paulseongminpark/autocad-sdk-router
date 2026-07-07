@@ -1,0 +1,131 @@
+{
+  "generated_at_head_note": "Generated 2026-07-07 against config/operations.v2.json at repo HEAD (commit a32f5ad, this worktree): 550 ops = 488 implemented + 62 blocked. Supersedes the wave-7 judgment-call closure of 'census P1 expansion' (no artifact was produced at that time) with a code-verified mapping.",
+  "sources": [
+    {"path": "config/operations.v2.json", "role": "registry under audit (read with utf-8-sig; totals.operations=550, by_status.implemented=488, by_status.blocked=62)"},
+    {"path": "D:\\dev\\.build\\cados_plan\\sdk_census_reaudit_20260706.md", "role": "primary census document: 7 confirmed zero-coverage gaps (S1a), 4 partial-coverage areas (S1c), 1 confirmed SDK-wide wall excluded from scope (S1b: dynamic block authoring), P1-P3 prioritized excellence-addition list with proposed op ids (S4). Baseline snapshot at audit time: 525 ops = 465 implemented + 60 blocked."},
+    {"path": "D:\\dev\\.build\\cados_plan\\cados_capability_matrix_20260706.md", "role": "READ/WRITE/headless/attended capability rollup; cross-checked blocked-family totals against current registry"},
+    {"path": "D:\\dev\\.build\\cados_plan\\registry_honesty_reconcile_20260706.md", "role": "prior dispatcher-literal honesty check (implemented=479 snapshot, distinct from both the census's 465 and this artifact's 488 -- see limits); method (native/python dispatcher literal cross-check) reused independently in this artifact against a different symptom (stale 'catalogued not runnable' notes)"},
+    {"path": "D:\\dev\\.build\\cados_plan\\blocked_ops_audit_20260706.md", "role": "60-row blocked-ops audit table, dated same day as the census (60 blocked); reconciled against current registry's 62 blocked (+2, both newly added and both still blocked -- see counts_reconciliation)"},
+    {"path": "D:\\dev\\.build\\cados_plan\\wt\\w5_anchor\\config\\operations.v2.json", "role": "supplementary read-only artifact (under the allowed D:\\dev\\.build\\cados_plan root): an intermediate registry snapshot (529 ops = 469 implemented + 60 blocked) that made a precise id-level diff against current HEAD possible for the last leg of registry growth (see counts_reconciliation and untraced_ops_count)"}
+  ],
+  "counts": {
+    "total": 550,
+    "implemented": 488,
+    "blocked": 62
+  },
+  "counts_reconciliation": {
+    "method": "Two-stage evidence chain, not estimation: (1) sdk_census_reaudit_20260706.md recomputed the registry live on audit day at 525 ops (465 implemented + 60 blocked). (2) A separate read-only snapshot at D:\\dev\\.build\\cados_plan\\wt\\w5_anchor\\config\\operations.v2.json captured 529 ops (469 implemented + 60 blocked) -- 4 ops ahead of the audit-day count, all implemented, none blocked. (3) A direct set-diff of that 529-op snapshot against the current 550-op HEAD registry (by op id) found exactly 21 ops added (19 implemented + 2 blocked) and 0 removed.",
+    "525_to_529_gap": "4 ops (all implemented, by_status.blocked unchanged 60->60). Cannot be named at the op-id level -- no exact 525-op snapshot exists in the read-only sources -- so they are reported as untraced_ops_count, not guessed.",
+    "529_to_550_diff": "21 ops added, 0 removed (verified by direct id-set diff, not text matching): inspect.annoscale.list, inspect.entity.annoscale.contexts, inspect.dynblock.references, inspect.dynblock.properties, write.dynblock.property, inspect.material.enumerate, inspect.material.properties, inspect.visualstyle.enumerate, inspect.section.objects, write.entity.section, write.section.generate2d, inspect.layerstates.list, write.layerstate.save, write.layerstate.restore, write.layerstate.delete, verify.cross_engine.dwg, inspect.entity.identity_contract, inspect.xdata.semantic_anchor, run.corpus.batch, sheetset.read.summary (blocked), sheetset.read.sheets (blocked).",
+    "arithmetic_check": "525 + 4 (untraced) + 21 (traced diff) = 550. Implemented: 465 + 4 + 19 = 488. Blocked: 60 + 0 + 2 = 62. Both check out exactly against totals.by_status in operations.v2.json."
+  },
+  "covered": [
+    {
+      "census_item": "Dynamic block reference property read/write (census S1c row 1 / P1 item #1 -- proposed inspect.blockref.dynamic_properties, write.blockref.dynamic_property_set)",
+      "evidence_op_ids": ["inspect.dynblock.references", "inspect.dynblock.properties", "write.dynblock.property"]
+    },
+    {
+      "census_item": "Section objects, AcDbSection/AcDbSectionManager (census S1c row 4 / P2 item #7 -- proposed inspect.section.enumerate, write.section.create)",
+      "evidence_op_ids": ["inspect.section.objects", "write.entity.section", "write.section.generate2d"]
+    },
+    {
+      "census_item": "Layer states -- saved layer-state snapshots via AcDbLayerStateManager (half of census S1a row 6 'Layer states / layer filters')",
+      "evidence_op_ids": ["inspect.layerstates.list", "write.layerstate.save", "write.layerstate.restore", "write.layerstate.delete"]
+    },
+    {
+      "census_item": "Annotation scaling -- read half only (census S1a row 1 / P3 item #10 -- proposed inspect.entity.annoscale.list)",
+      "evidence_op_ids": ["inspect.annoscale.list", "inspect.entity.annoscale.contexts"]
+    },
+    {
+      "census_item": "Materials / visual styles as DB objects -- read/enumerate half only (census S1c row 2 / P2 item #6 -- proposed inspect.material.enumerate, inspect.visualstyle.enumerate)",
+      "evidence_op_ids": ["inspect.material.enumerate", "inspect.material.properties", "inspect.visualstyle.enumerate"]
+    },
+    {
+      "census_item": "Cross-engine verification as a first-class governed op (P1 item #2 -- proposed validate.crosscheck.libredwg / extend diff.before_after)",
+      "evidence_op_ids": ["verify.cross_engine.dwg"]
+    },
+    {
+      "census_item": "Stable entity identity across regen/roundtrip (P1 item #4 -- proposed inspect.entity.stability_contract)",
+      "evidence_op_ids": ["inspect.entity.identity_contract"]
+    },
+    {
+      "census_item": "Corpus/batch-scale operation runner (P2 item #5 -- generalize single-DWG batch to multi-DWG corpus batch)",
+      "evidence_op_ids": ["run.corpus.batch"]
+    },
+    {
+      "census_item": "XDATA/extension-dictionary semantic-anchor read/normalize half (P1 item #3 -- proposed inspect.entity.xdata.agent_anchor). PARTIAL MATCH, not exact: the implemented op is a generic multi-app XDATA/xrecord normalizer over an already-extracted IR, not the specifically-envisioned reserved 'agent'-namespace convention the census text describes. Judgment call: counted as covering the read/normalize intent; the governed write/stamp half is not covered -- see gaps.",
+      "evidence_op_ids": ["inspect.xdata.semantic_anchor"]
+    },
+    {
+      "census_item": "Baseline already-well-covered areas re-verified live against current registry (census S1d: selection sets/filters, associative-array/parameter structural presence, deep-clone/wblock semantics, proxy/object-enabler handling, external reference listing). Not new since the census -- re-checked here only to avoid silently dropping a named census item.",
+      "evidence_op_ids": ["select.pickfirst.get", "select.pickfirst.set", "select.ssget.interactive", "select.ssget.preview", "transform.database.deep_clone", "transform.database.wblock", "transform.database.wblock_clone", "extend.customobject.deepclone", "extend.customobject.wblockclone", "extend.object_enabler.demand_register", "inspect.proxy.detect", "inspect.xref.list"]
+    }
+  ],
+  "gaps": [
+    {
+      "census_item": "Sheet Set Manager (census S1a row 5 / P2 item #9)",
+      "why_gap": "No longer literally zero-coverage: 2 ops were added since the census (sheetset.read.summary, sheetset.read.sheets) but both carry status=blocked. Own registry notes: 'Wave 6 measured a real standalone COM object ... but the governed read path stays blocked because win32com late binding cannot drive the non-IDispatch manager and Autodesk's OpenDatabase interop path fails on missing AXDBLib.' This is an attempted-and-blocked engineering wall, not an unaddressed gap, but it still delivers zero usable agent surface today.",
+      "proposed_family_or_lane": "com_activex; requires an early-bound COM path (e.g. comtypes against the AcSmComponents type library) instead of win32com late binding, or resolving the missing AXDBLib dependency, before promotion off blocked."
+    },
+    {
+      "census_item": "Annotation scaling -- write half (census S1a row 1 / P3 item #10 -- proposed write.entity.annoscale.add)",
+      "why_gap": "Only the two read ops (inspect.annoscale.list, inspect.entity.annoscale.contexts) were built this wave. No write.*annoscale* op id exists in the registry (id-prefix scan for write.entity.annoscale / write.annoscale returned empty). Adding/removing a per-viewport annotation-scale context on an entity is unbuilt.",
+      "proposed_family_or_lane": "symbol_tables_dictionaries; ARX, extending the existing families/annoscale_read.inc pattern to a write counterpart."
+    },
+    {
+      "census_item": "Materials / visual styles -- apply-to-entity/viewport write half (census S1c row 2 / P2 item #6)",
+      "why_gap": "Only enumerate/read ops exist (inspect.material.enumerate, inspect.material.properties, inspect.visualstyle.enumerate). No write.material.apply or write.visualstyle.apply op id exists (id-prefix scan returned empty). write.vport.create's own notes explicitly list 'background-visualStyle-sun-lighting refs' as 'an honest gap' it deliberately does not certify -- confirming this is a known, self-documented gap rather than an oversight.",
+      "proposed_family_or_lane": "symbol_tables_dictionaries or entities; ARX, assigning an existing AcDbMaterial/AcDbVisualStyle dictionary entry's handle to an entity or viewport."
+    },
+    {
+      "census_item": "Layer filters -- AcDbFilteredLayerIndex / saved filter definitions (other half of census S1a row 6 'Layer states / layer filters')",
+      "why_gap": "Zero hits for layerfilter in id/family/summary/handler/notes across all 550 ops. Layer states (the sibling half of this census row) were fully built this wave; layer filters were not.",
+      "proposed_family_or_lane": "symbol_tables_dictionaries; ARX."
+    },
+    {
+      "census_item": "Point clouds -- AcDbPointCloudEx DB-object level (census S1a row 2)",
+      "why_gap": "Zero hits for pointcloud/rcs/rcp at the ObjectARX DB-object level. Note: the router's separate file-level pointcloud_route (open3d+laspy, route 8 of 11 in the AutoCAD SDK router) already exists, but that is a different layer (file-format ingestion, not a CADOS registry op on an open AutoCAD database) and does not close this specific census item.",
+      "proposed_family_or_lane": "objectdbx_database (or a new dedicated family); ARX, for attach/detach/region-filter operations on AcDbPointCloudEx."
+    },
+    {
+      "census_item": "Underlays -- PDF/DWF/DGN attach via AcDbPdfReference/AcDbDwfReference/AcDbDgnReference/AcDbUnderlayReference (census S1a row 3)",
+      "why_gap": "Zero hits for underlay/pdfreference/dwfreference/dgnreference across all 550 ops. Unchanged since the census.",
+      "proposed_family_or_lane": "blocks_xrefs_clone; ARX."
+    },
+    {
+      "census_item": "Data extraction (DXE / Data Extraction wizard object model) (census S1a row 4)",
+      "why_gap": "Zero hits. Census itself flags this as low priority: 'no public low-level ObjectARX class backs this cleanly -- it is largely a UI wizard over AcDbTable.' Unchanged since the census; correctly still deprioritized rather than silently forgotten.",
+      "proposed_family_or_lane": "Not recommended as a standalone ARX family per the census's own assessment; if pursued, layer on top of the existing AcDbTable write/inspect ops instead of a new SDK-level family."
+    },
+    {
+      "census_item": "Plot style tables -- CTB/STB read/apply via AcDbPlotSettingsValidator (census S1a row 7)",
+      "why_gap": "Zero hits for plotstyle/ctb/stb across all 550 ops. layouts_plot_publish remains a 2-op family (plot.config.settings, plot.engine.run) and both of those 2 are still status=blocked, unchanged since the census's own count of that family.",
+      "proposed_family_or_lane": "layouts_plot_publish; ARX, though note both existing family members are already hard-blocked (session-bound plot engine / page setup) -- a new CTB/STB read op would need to be scoped narrowly enough to avoid the same live-session blocker."
+    },
+    {
+      "census_item": "Multileader styles -- AcDbMLeaderStyle dictionary CRUD (census S1c row 5)",
+      "why_gap": "Zero hits for mleaderstyle/multileaderstyle. write.entity.mleader (the entity itself) is implemented, but the style-dictionary side remains untouched, exactly as the census described -- no change since the audit.",
+      "proposed_family_or_lane": "symbol_tables_dictionaries; ARX."
+    },
+    {
+      "census_item": "XDATA/extension-dictionary semantic-anchor -- governed write/stamp half (P1 item #3 -- proposed write.entity.xdata.agent_anchor)",
+      "why_gap": "The read/normalize half was added this wave (inspect.xdata.semantic_anchor, a generic multi-app XDATA/xrecord reader -- see covered). No corresponding write op exists to let an agent stamp its own namespaced provenance/derivation-rule/confidence metadata onto an entity's XDATA in a way that is guaranteed to survive a roundtrip. Id-prefix scans for write.entity.xdata and a reserved agent-namespace convention returned nothing.",
+      "proposed_family_or_lane": "inspect/write (router-internal verb families) or symbol_tables_dictionaries; ARX, reusing the existing raw XDATA read/write primitives already in the native TU (per the census: 'this is a governance/convention layer, not new C++ surface')."
+    },
+    {
+      "census_item": "Geo-location -- AcDbGeoData object itself (design point, north direction, coordinate system) (census S1c row 3, described there as 'thin, not absent')",
+      "why_gap": "Unchanged since the census: still exactly 1 op (define.georef.subent), and it only covers subentity-level geo-referencing helpers, not the AcDbGeoData object (design point / north direction / CRS). Separately worth flagging: this op's own notes field says 'has no CAD OS router handler yet; status catalogued is not runnable' even though status=implemented and it carries a real handler.dispatcher_symbol (m08kcDispatch) -- almost certainly a stale boilerplate note (see limits), not evidence the op is actually broken, but the thin AcDbGeoData coverage itself is real and unaddressed.",
+      "proposed_family_or_lane": "constraints_associativity (where the existing thin op lives) or geometry_kernel; ARX, for AcDbGeoData-level design-point/north-direction/CRS read+write."
+    }
+  ],
+  "untraced_ops_count": 4,
+  "limits": [
+    "untraced_ops_count=4 refers to a precisely-bounded but not individually-identifiable gap: the sdk_census_reaudit_20260706.md audit-day snapshot measured 525 ops (465 implemented + 60 blocked); a separate read-only intermediate snapshot (D:\\dev\\.build\\cados_plan\\wt\\w5_anchor\\config\\operations.v2.json) measured 529 ops (469 implemented + 60 blocked) -- 4 ops ahead, all implemented. No exact 525-op snapshot exists in the read-only sources available to this task, so those 4 specific op ids cannot be named. This is reported as an explicit UNKNOWN rather than guessed. Every other op added between that intermediate snapshot and the current 550-op HEAD (21 ops) WAS identified by a direct id-level set-diff, not by text guessing, and is fully accounted for in covered/gaps above.",
+    "Found and independently verified during this pass: 395 of the 550 ops (390 of the 488 implemented ops) carry a notes-field disclaimer reading 'M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.' Checking handler.dispatcher_symbol directly for all 395: 390 DO have a real, non-null dispatcher symbol (e.g. m08nDispatch, m08lDispatch, m08kcDispatch, m08eDispatch); only 5 do not, and those 5 are already status=blocked (command.invoke.coroutine, command.invoke.sync, command.invoke.sync.resbuf, command.queue.post, module.command.lookup), i.e. already correctly excluded. Conclusion: this disclaimer is stale leftover documentation from an early M04 catalog-import phase that predates those 390 ops being wired with real dispatchers -- the same stale-note pattern the census itself already caught once for reports/tickets/M08H.md. It is a documentation-hygiene debt across ~390 op records, not a functional 390-op honesty gap; registry_honesty_reconcile_20260706.md's dispatcher-literal method (which found near-zero real orphans) is corroborated by this independent, code-level dispatcher_symbol check, not contradicted by it. Flagging this so a future reader does not treat the notes field as ground truth over handler.dispatcher_symbol.",
+    "registry_honesty_reconcile_20260706.md reports 'implemented ops: 479' as its baseline -- a count that does not match any of the three op-count snapshots this artifact could directly verify (465 at the sdk_census_reaudit audit day, 469 in the w5_anchor intermediate snapshot, 488 at current HEAD). It almost certainly reflects yet another intermediate point in the same wave-5/6/7 growth sequence, but the exact snapshot file was not available under the read-only sources for this task, so that specific number is not reconciled here -- reported as UNKNOWN rather than assumed to line up with either of the two directly-verified intermediate counts.",
+    "blocked_ops_audit_20260706.md's 60-row table was verified still fully present and unchanged in the current 550-op registry (the id-set diff against the w5_anchor snapshot found 0 removed ops), so all 60 of its per-op blocked_reason entries remain accurate as documentation of those specific ops. The +2 delta to the current 62-blocked total (sheetset.read.summary, sheetset.read.sheets) is new since that audit and is documented directly in this artifact's own registry notes rather than in a stale copy of that table.",
+    "The DCM/associativity command-template reachability estimate from sdk_census_reaudit_20260706.md S5 (~70%, 16-17 of the 23 blocked constraints_associativity ops reachable via governed AutoCAD command templates) was not independently re-derived in this pass -- it concerns a different census question (command-template reachability of already-blocked ops) than the P1-domain-expansion gap this artifact focuses on. The underlying blocked-ops count for that family is unchanged (constraints_associativity blocked=23, confirmed present via the 0-removed diff), so the estimate's premise still holds, but the percentage itself is carried forward from the source doc, not recomputed here.",
+    "Method for gap/coverage detection was keyword and regex scanning of each op's id + family + summary + handler (JSON-serialized) + notes fields, followed by manual read-back of every match to reject false positives (examples caught and excluded: the substring 'rcp' inside 'arcpt' in write.entity.dim.arc's native_api field falsely matched a 'point cloud' rcp/rcs pattern; the word 'visualstyle' appearing inside an unrelated AcGiSubEntityTraits setter-method list in render.traits.set and inside write.vport.create's own gap-notes falsely suggested visual-style write coverage that does not actually exist). Residual risk: a genuinely covering op using materially different terminology than the keyword sets used here (annoscale, dynblock, material, visualstyle, section, sheetset, layerstate, layerfilter, plotstyle, pointcloud, underlay, dataextraction, mleaderstyle, georef, crosscheck/libredwg, agent_anchor, stability_contract, corpus/batch) could have been missed as a false negative. No such case was found during manual spot-checking of adjacent id prefixes, but this is a text-matching method, not a semantic one, and is reported as a limit rather than a guarantee.",
+    "Dynamic block AUTHORING (distinct from dynamic block REFERENCE properties, which is covered -- see covered list) is explicitly excluded from both covered and gaps by design, per the census's own S1b finding: verified via live 2026 Autodesk forum/docs that 'it is impossible to create dynamic blocks with the help of public ObjectARX SDK and other APIs' -- a confirmed SDK-wide wall affecting every vendor, not a CADOS-specific gap. Carrying it forward as a scored gap would misrepresent an unfixable SDK limitation as unfinished CADOS work."
+  ]
+}

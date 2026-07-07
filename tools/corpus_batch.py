@@ -34,6 +34,7 @@ DEFAULT_OPS = [
     {"id": "inspect.layers", "args": {}},
     {"id": "inspect.entities", "args": {}},
 ]
+DEFAULT_OP_IDS = [str(op["id"]) for op in DEFAULT_OPS]
 TERMINAL_STATUSES = {"ok", "failed", "timeout"}
 
 
@@ -163,7 +164,42 @@ def parse_ops(ops_text: str | None = None, ops_file: str | None = None) -> list[
     return [dict(op) for op in DEFAULT_OPS]
 
 
-def should_resume_skip(result_path: str | Path, *, force: bool) -> bool:
+def op_ids(ops: list[dict[str, Any]]) -> list[str]:
+    return [str(op["id"]) for op in ops]
+
+
+def recorded_op_ids_from_envelope(payload: dict[str, Any]) -> list[str]:
+    if "ops_requested" in payload:
+        raw = payload["ops_requested"]
+        if isinstance(raw, list):
+            return [str(item) for item in raw]
+    return list(DEFAULT_OP_IDS)
+
+
+def ops_set_covers(recorded: list[str], requested: list[str]) -> bool:
+    recorded_set = set(recorded)
+    return all(op in recorded_set for op in requested)
+
+
+def resume_rerun_reason(payload: dict[str, Any], requested_ops: list[dict[str, Any]]) -> str | None:
+    if payload.get("status") not in TERMINAL_STATUSES:
+        return None
+    requested_ids = op_ids(requested_ops)
+    recorded_ids = recorded_op_ids_from_envelope(payload)
+    if ops_set_covers(recorded_ids, requested_ids):
+        return None
+    return (
+        "ops_requested changed: "
+        f"recorded={recorded_ids!r} requested={requested_ids!r}"
+    )
+
+
+def should_resume_skip(
+    result_path: str | Path,
+    *,
+    force: bool,
+    requested_ops: list[dict[str, Any]] | None = None,
+) -> bool:
     if force:
         return False
     result_path = Path(result_path)
@@ -173,7 +209,10 @@ def should_resume_skip(result_path: str | Path, *, force: bool) -> bool:
         payload = json.loads(result_path.read_text(encoding="utf-8"))
     except (OSError, ValueError):
         return False
-    return payload.get("status") in TERMINAL_STATUSES
+    if payload.get("status") not in TERMINAL_STATUSES:
+        return False
+    requested = requested_ops if requested_ops is not None else [dict(op) for op in DEFAULT_OPS]
+    return ops_set_covers(recorded_op_ids_from_envelope(payload), op_ids(requested))
 
 
 def classify_error(*, source_path: str, status: str, reason: str | None) -> str:
@@ -228,6 +267,7 @@ def _result_envelope(
     error_class: str | None,
     source_sha256: str | None,
     staged_path: str | None,
+    ops_requested: list[str],
     ops_run: list[dict[str, Any]],
     started_at: str,
     finished_at: str,
@@ -236,6 +276,7 @@ def _result_envelope(
     worker_exit_code: int | None = None,
     source_sha256_expected: str | None = None,
     source_sha256_match: bool | None = None,
+    resume_rerun_reason: str | None = None,
 ) -> dict[str, Any]:
     payload = {
         "schema": RESULT_SCHEMA,
@@ -245,6 +286,7 @@ def _result_envelope(
         "source_sha256_expected": source_sha256_expected,
         "source_sha256_match": source_sha256_match,
         "staged_path": staged_path,
+        "ops_requested": list(ops_requested),
         "ops_run": ops_run,
         "status": status,
         "error_class": error_class,
@@ -257,6 +299,8 @@ def _result_envelope(
     }
     if reason:
         payload["reason"] = reason
+    if resume_rerun_reason:
+        payload["resume_rerun_reason"] = resume_rerun_reason
     if worker_exit_code is not None:
         payload["worker_exit_code"] = worker_exit_code
     return payload
@@ -322,6 +366,8 @@ def _worker_impl(request_path: Path) -> int:
     entry = CorpusEntry.from_json(request["entry"])
     run_dir = Path(request["run_dir"])
     ops = list(request["ops"])
+    ops_requested = op_ids(ops)
+    resume_rerun = request.get("resume_rerun_reason")
     started_at = _now_iso()
     started_monotonic = time.monotonic()
     result_path = run_dir / RESULT_FILE
@@ -338,6 +384,7 @@ def _worker_impl(request_path: Path) -> int:
             error_class=error_class,
             source_sha256=source_sha,
             staged_path=str(staged_path) if staged_path.exists() else None,
+            ops_requested=ops_requested,
             ops_run=ops_run,
             started_at=started_at,
             finished_at=_now_iso(),
@@ -345,6 +392,7 @@ def _worker_impl(request_path: Path) -> int:
             reason=reason,
             source_sha256_expected=entry.expected_sha256,
             source_sha256_match=sha_match,
+            resume_rerun_reason=resume_rerun,
         )
         _json_dump(payload, result_path)
     try:
@@ -356,6 +404,7 @@ def _worker_impl(request_path: Path) -> int:
                 error_class="non-dwg",
                 source_sha256=None,
                 staged_path=None,
+                ops_requested=ops_requested,
                 ops_run=[],
                 started_at=started_at,
                 finished_at=_now_iso(),
@@ -363,6 +412,7 @@ def _worker_impl(request_path: Path) -> int:
                 reason=f"input is not a .dwg file: {source}",
                 source_sha256_expected=entry.expected_sha256,
                 source_sha256_match=None,
+                resume_rerun_reason=resume_rerun,
             )
             _json_dump(payload, result_path)
             return 0
@@ -378,6 +428,7 @@ def _worker_impl(request_path: Path) -> int:
                     error_class="unreadable",
                     source_sha256=source_sha,
                     staged_path=None,
+                    ops_requested=ops_requested,
                     ops_run=[],
                     started_at=started_at,
                     finished_at=_now_iso(),
@@ -385,6 +436,7 @@ def _worker_impl(request_path: Path) -> int:
                     reason=f"sha256 mismatch for source drawing: expected {entry.expected_sha256}, got {source_sha}",
                     source_sha256_expected=entry.expected_sha256,
                     source_sha256_match=False,
+                    resume_rerun_reason=resume_rerun,
                 )
                 _json_dump(payload, result_path)
                 return 0
@@ -430,6 +482,7 @@ def _worker_impl(request_path: Path) -> int:
             error_class=overall_error_class,
             source_sha256=source_sha,
             staged_path=str(staged_path),
+            ops_requested=ops_requested,
             ops_run=ops_run,
             started_at=started_at,
             finished_at=_now_iso(),
@@ -437,6 +490,7 @@ def _worker_impl(request_path: Path) -> int:
             reason=overall_reason,
             source_sha256_expected=entry.expected_sha256,
             source_sha256_match=sha_match,
+            resume_rerun_reason=resume_rerun,
         )
         _json_dump(payload, result_path)
         return 0
@@ -448,6 +502,7 @@ def _worker_impl(request_path: Path) -> int:
             error_class=classify_error(source_path=entry.source_path, status="failed", reason=str(exc)),
             source_sha256=source_sha,
             staged_path=str(staged_path) if staged_path.exists() else None,
+            ops_requested=ops_requested,
             ops_run=ops_run,
             started_at=started_at,
             finished_at=_now_iso(),
@@ -455,25 +510,33 @@ def _worker_impl(request_path: Path) -> int:
             reason=f"{type(exc).__name__}: {exc}",
             source_sha256_expected=entry.expected_sha256,
             source_sha256_match=sha_match,
+            resume_rerun_reason=resume_rerun,
         )
         _json_dump(payload, result_path)
         return 1
 
 
-def _run_entry_parent(entry: CorpusEntry, *, ops: list[dict[str, Any]], run_dir: Path, timeout_sec: int) -> dict[str, Any]:
+def _run_entry_parent(
+    entry: CorpusEntry,
+    *,
+    ops: list[dict[str, Any]],
+    run_dir: Path,
+    timeout_sec: int,
+    resume_rerun_reason: str | None = None,
+) -> dict[str, Any]:
     request_path = run_dir / WORKER_REQUEST
     result_path = run_dir / RESULT_FILE
     stdout_path = run_dir / "worker_stdout.txt"
     stderr_path = run_dir / "worker_stderr.txt"
-    _json_dump(
-        {
-            "entry": entry.to_json(),
-            "run_dir": str(run_dir),
-            "ops": ops,
-            "timeout_sec": timeout_sec,
-        },
-        request_path,
-    )
+    request_payload: dict[str, Any] = {
+        "entry": entry.to_json(),
+        "run_dir": str(run_dir),
+        "ops": ops,
+        "timeout_sec": timeout_sec,
+    }
+    if resume_rerun_reason:
+        request_payload["resume_rerun_reason"] = resume_rerun_reason
+    _json_dump(request_payload, request_path)
     cmd = [sys.executable, "-X", "utf8", str(Path(__file__).resolve()), "--worker-request", str(request_path)]
     env = os.environ.copy()
     env["PYTHONUTF8"] = "1"
@@ -508,6 +571,7 @@ def _run_entry_parent(entry: CorpusEntry, *, ops: list[dict[str, Any]], run_dir:
         partial_staged_path = str(run_dir / "source_staged.dwg") if (run_dir / "source_staged.dwg").exists() else None
         partial_expected = entry.expected_sha256
         partial_match = None
+        partial_ops_requested = op_ids(ops)
         if result_path.is_file():
             try:
                 partial = _load_json(result_path)
@@ -516,6 +580,8 @@ def _run_entry_parent(entry: CorpusEntry, *, ops: list[dict[str, Any]], run_dir:
                 partial_staged_path = partial.get("staged_path") or partial_staged_path
                 partial_expected = partial.get("source_sha256_expected")
                 partial_match = partial.get("source_sha256_match")
+                if partial.get("ops_requested"):
+                    partial_ops_requested = list(partial["ops_requested"])
             except Exception:
                 pass
         return _result_envelope(
@@ -525,6 +591,7 @@ def _run_entry_parent(entry: CorpusEntry, *, ops: list[dict[str, Any]], run_dir:
             error_class="timeout",
             source_sha256=partial_source_sha,
             staged_path=partial_staged_path,
+            ops_requested=partial_ops_requested,
             ops_run=partial_ops,
             started_at=started_at,
             finished_at=_now_iso(),
@@ -533,6 +600,7 @@ def _run_entry_parent(entry: CorpusEntry, *, ops: list[dict[str, Any]], run_dir:
             worker_exit_code=proc.poll(),
             source_sha256_expected=partial_expected,
             source_sha256_match=partial_match,
+            resume_rerun_reason=resume_rerun_reason,
         )
     if result_path.is_file():
         payload = _load_json(result_path)
@@ -546,6 +614,7 @@ def _run_entry_parent(entry: CorpusEntry, *, ops: list[dict[str, Any]], run_dir:
         error_class="extraction-crash",
         source_sha256=None,
         staged_path=None,
+        ops_requested=op_ids(ops),
         ops_run=[],
         started_at=started_at,
         finished_at=_now_iso(),
@@ -554,6 +623,7 @@ def _run_entry_parent(entry: CorpusEntry, *, ops: list[dict[str, Any]], run_dir:
         worker_exit_code=exit_code,
         source_sha256_expected=entry.expected_sha256,
         source_sha256_match=None,
+        resume_rerun_reason=resume_rerun_reason,
     )
 
 
@@ -617,12 +687,26 @@ def run_batch(
             shutil.rmtree(case_dir)
         case_dir.mkdir(parents=True, exist_ok=True)
         result_path = case_dir / RESULT_FILE
-        if should_resume_skip(result_path, force=force):
+        rerun_reason: str | None = None
+        if result_path.is_file() and not force:
+            try:
+                existing = _load_json(result_path)
+                rerun_reason = resume_rerun_reason(existing, ops)
+            except Exception:
+                pass
+        if should_resume_skip(result_path, force=force, requested_ops=ops):
             payload = _load_json(result_path)
             payload["resumed"] = True
+            _json_dump(payload, result_path)
             results.append(payload)
             continue
-        payload = _run_entry_parent(entry, ops=ops, run_dir=case_dir, timeout_sec=timeout_sec)
+        payload = _run_entry_parent(
+            entry,
+            ops=ops,
+            run_dir=case_dir,
+            timeout_sec=timeout_sec,
+            resume_rerun_reason=rerun_reason,
+        )
         _json_dump(payload, result_path)
         results.append(payload)
     finished_at = _now_iso()
