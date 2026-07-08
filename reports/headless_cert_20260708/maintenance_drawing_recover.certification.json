@@ -1,0 +1,23 @@
+{
+  "schema": "ariadne.headless_safe_certification.v1",
+  "template_id": "maintenance.drawing.recover",
+  "verdict": "NOT_CERTIFIED",
+  "reason": "SAMPLE_ARGS_REQUIRED: recover_target_path: staged_path requires the runtime staging path; cannot derive offline from template defaults/examples",
+  "exit_code": null,
+  "original_sha256_before": null,
+  "original_sha256_after": null,
+  "original_unchanged": true,
+  "staged_input_sha256": null,
+  "staged_result_sha256": null,
+  "staged_whole_file_sha_changed": false,
+  "effect_took": false,
+  "effect_basis": "logical_ir_diff",
+  "effect_diff_summary": null,
+  "effect_note": "not run: sample args unavailable",
+  "attended_markers": [],
+  "elapsed_sec": 0.0,
+  "timeout_sec": 120.0,
+  "evidence_paths": {
+    "envelope": "D:\\dev\\99_tools\\autocad-sdk-router\\reports\\headless_cert_20260708\\maintenance_drawing_recover.certification.json"
+  }
+}

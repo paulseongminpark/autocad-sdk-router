@@ -79,6 +79,12 @@ reports/remaining_after_wave*
 reports/merge/MERGE_WAVE4*
 reports/merge/MAIN_DIRTY_STATE_*
 reports/tickets/WAVE4*
+# headless_safe certification: keep the small *.certification.json envelopes + the
+# report .md, but NOT the transient per-template IR artifacts (native inspect stdout
+# is ~169 MB each -> multi-GB) or the batch logs.
+reports/headless_cert_*/_ir/
+reports/headless_cert_*/_ir_baseline/
+reports/headless_cert_*/_batch_*
 
 # ── OS noise ──
 Thumbs.db

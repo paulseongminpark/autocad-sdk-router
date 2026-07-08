@@ -1,0 +1,33 @@
+{
+  "schema": "ariadne.headless_safe_certification.v1",
+  "template_id": "define.assocaudit",
+  "verdict": "NOT_CERTIFIED",
+  "reason": "NO_STAGED_EFFECT",
+  "exit_code": 0,
+  "original_sha256_before": "eac5d4b13d67d89106e503321412539df7b39b8a7f4e44c033448e9295fe3f76",
+  "original_sha256_after": "eac5d4b13d67d89106e503321412539df7b39b8a7f4e44c033448e9295fe3f76",
+  "original_unchanged": true,
+  "staged_input_sha256": "eac5d4b13d67d89106e503321412539df7b39b8a7f4e44c033448e9295fe3f76",
+  "staged_result_sha256": "3e077846b517fdc053e07fbd7ca39031ec29f5f286d8c6208b7892c6728f786f",
+  "staged_whole_file_sha_changed": true,
+  "effect_took": false,
+  "effect_basis": "logical_ir_diff",
+  "effect_diff_summary": {
+    "added": 0,
+    "removed": 0,
+    "modified": 0,
+    "entity_count_before": 21747,
+    "entity_count_after": 21747
+  },
+  "effect_note": "logical IR diff empty (no added/removed/modified entities)",
+  "attended_markers": [],
+  "elapsed_sec": 3.657,
+  "timeout_sec": 120.0,
+  "evidence_paths": {
+    "envelope": "D:\\dev\\99_tools\\autocad-sdk-router\\reports\\headless_cert_20260708\\define_assocaudit.certification.json",
+    "stdout": "D:\\dev\\99_tools\\autocad-sdk-router\\runs\\command_template_define_assocaudit_20260708_153548_681\\accoreconsole_stdout.txt",
+    "stderr": "D:\\dev\\99_tools\\autocad-sdk-router\\runs\\command_template_define_assocaudit_20260708_153548_681\\accoreconsole_stderr.txt",
+    "staged_copy": "D:\\dev\\99_tools\\autocad-sdk-router\\staging\\tmpl_define_assocaudit_20260708_153548_683\\input.dwg",
+    "staged_result": "D:\\dev\\99_tools\\autocad-sdk-router\\staging\\tmpl_define_assocaudit_20260708_153548_683\\input.dwg"
+  }
+}
