@@ -10,9 +10,11 @@ WHY this exists:
   impossible) without inventing a parallel schema.
 
 Two modes:
-  --plan (default): enumerate every *.json under command_templates.d/, validate
-      each declared template against the same contract cadctl uses, emit one
-      JSONL row per template. Zero AutoCAD interaction.
+  --plan (default): enumerate the full governed template surface cadctl can
+      dispatch (base registry + command_templates.d/ drop-ins), validate each
+      template against the same contract cadctl uses, and emit note rows for
+      fragment files that intentionally declare zero templates. Zero AutoCAD
+      interaction.
   --live --dwg <path> --out-dir <dir>: execute each template through
       cadctl.Cad().run_command_template (never shell out to accoreconsole
       directly) against a STAGED COPY of the supplied DWG; per-template envelope
@@ -85,6 +87,10 @@ def _fragment_rel_path(frag_path: Path, router_home: Path) -> str:
         return rel.as_posix()
     except ValueError:
         return frag_path.name
+
+
+def _load_json_doc(path: Path | str):
+    return json.loads(Path(path).read_text(encoding="utf-8-sig"))
 
 
 def derive_required_args(template: dict) -> list[str]:
@@ -272,23 +278,52 @@ def load_merged_registry(templates_json: Path | str) -> dict[str, dict]:
     return cte.load_templates(templates_json)
 
 
+def _build_note_row(
+    source_path: Path,
+    router_home: Path,
+    *,
+    provenance: str,
+    validation_status: str,
+    validation_reason: str,
+) -> dict:
+    return {
+        "schema": PLAN_SCHEMA,
+        "template_id": None,
+        "file": _fragment_rel_path(source_path, router_home),
+        "provenance": provenance,
+        "validation_status": validation_status,
+        "validation_reason": validation_reason,
+        "commands_or_action_summary": None,
+        "required_args": [],
+        "sample_args": None,
+        "sample_args_note": None,
+        "expected_assertions": [],
+    }
+
+
 def build_plan_row(
     template: dict,
-    frag_path: Path,
+    source_path: Path,
     router_home: Path,
     merged_registry: dict[str, dict],
+    *,
+    provenance: str = "fragment_declared",
+    validation_status: str | None = None,
+    validation_reason: str | None = None,
 ) -> dict:
     """One JSONL plan row for a single governed template."""
     tid = template["template_id"]
     merged = merged_registry.get(tid, template)
-    validation_status, validation_reason = validate_template_contract(
-        template, merged_registry,
-    )
+    if validation_status is None:
+        validation_status, validation_reason = validate_template_contract(
+            template, merged_registry,
+        )
     sample_args, sample_args_note = derive_sample_args(merged)
     return {
         "schema": PLAN_SCHEMA,
         "template_id": tid,
-        "file": _fragment_rel_path(frag_path, router_home),
+        "file": _fragment_rel_path(source_path, router_home),
+        "provenance": provenance,
         "validation_status": validation_status,
         "validation_reason": validation_reason,
         "commands_or_action_summary": commands_or_action_summary(merged),
@@ -305,7 +340,7 @@ def run_plan(
     frag_dir: Path | str | None = None,
     templates_json: Path | str | None = None,
 ) -> list[dict]:
-    """Enumerate fragment templates and emit plan rows (no AutoCAD)."""
+    """Enumerate the full governed template surface and emit plan rows."""
     router_home = Path(router_home)
     frag_dir = Path(frag_dir) if frag_dir else router_home / "config" / "command_templates.d"
     templates_json = Path(templates_json) if templates_json else router_home / "config" / "command_templates.json"
@@ -318,40 +353,48 @@ def run_plan(
         registry_error = f"{exc.code}: {exc.message}"
 
     rows: list[dict] = []
+    fragment_declared_ids: set[str] = set()
     for frag_path in enumerate_fragment_files(frag_dir):
         try:
-            raw = json.loads(frag_path.read_text(encoding="utf-8-sig"))
+            raw = _load_json_doc(frag_path)
         except (OSError, json.JSONDecodeError) as exc:
-            rows.append({
-                "schema": PLAN_SCHEMA,
-                "template_id": None,
-                "file": _fragment_rel_path(frag_path, router_home),
-                "validation_status": "refused",
-                "validation_reason": f"fragment parse error: {type(exc).__name__}: {exc}",
-                "commands_or_action_summary": None,
-                "required_args": [],
-                "sample_args": None,
-                "sample_args_note": None,
-                "expected_assertions": [],
-            })
+            rows.append(_build_note_row(
+                frag_path,
+                router_home,
+                provenance="fragment_parse_error",
+                validation_status="refused",
+                validation_reason=f"fragment parse error: {type(exc).__name__}: {exc}",
+            ))
             continue
 
-        for template in _templates_of(raw):
+        templates = _templates_of(raw)
+        if not templates:
+            notice = raw.get("notice") if isinstance(raw, dict) else None
+            rows.append(_build_note_row(
+                frag_path,
+                router_home,
+                provenance="fragment_duplicate_guard",
+                validation_status="skipped_with_reason",
+                validation_reason=(
+                    str(notice)
+                    if notice
+                    else "fragment declares zero templates; likely a duplicate-guard stub"
+                ),
+            ))
+            continue
+
+        for template in templates:
             if not template.get("template_id"):
-                rows.append({
-                    "schema": PLAN_SCHEMA,
-                    "template_id": None,
-                    "file": _fragment_rel_path(frag_path, router_home),
-                    "validation_status": "refused",
-                    "validation_reason": "template entry missing template_id",
-                    "commands_or_action_summary": None,
-                    "required_args": [],
-                    "sample_args": None,
-                    "sample_args_note": None,
-                    "expected_assertions": [],
-                })
+                rows.append(_build_note_row(
+                    frag_path,
+                    router_home,
+                    provenance="fragment_invalid_entry",
+                    validation_status="refused",
+                    validation_reason="template entry missing template_id",
+                ))
                 continue
             tid = template["template_id"]
+            fragment_declared_ids.add(tid)
             validation_status, validation_reason = validate_template_contract(
                 template,
                 merged_registry,
@@ -360,20 +403,28 @@ def run_plan(
             if validation_status == "ok" and registry_error:
                 validation_status = "refused"
                 validation_reason = f"registry load refused: {registry_error}"
-            merged = merged_registry.get(tid, template)
-            sample_args, sample_args_note = derive_sample_args(merged)
-            rows.append({
-                "schema": PLAN_SCHEMA,
-                "template_id": tid,
-                "file": _fragment_rel_path(frag_path, router_home),
-                "validation_status": validation_status,
-                "validation_reason": validation_reason,
-                "commands_or_action_summary": commands_or_action_summary(merged),
-                "required_args": derive_required_args(merged),
-                "sample_args": sample_args,
-                "sample_args_note": sample_args_note,
-                "expected_assertions": expected_assertions(merged),
-            })
+            rows.append(build_plan_row(
+                template,
+                frag_path,
+                router_home,
+                merged_registry,
+                provenance="fragment_declared",
+                validation_status=validation_status,
+                validation_reason=validation_reason,
+            ))
+
+    if registry_error is None:
+        for template in _templates_of(_load_json_doc(templates_json)):
+            tid = template.get("template_id")
+            if not tid or tid in fragment_declared_ids or tid not in merged_registry:
+                continue
+            rows.append(build_plan_row(
+                template,
+                templates_json,
+                router_home,
+                merged_registry,
+                provenance="base_registry",
+            ))
     return rows
 
 
@@ -426,18 +477,20 @@ def summarize_exit_codes(envelopes: list[dict]) -> int:
 def _collect_live_templates(
     frag_dir: Path,
     router_home: Path,
+    templates_json: Path,
     merged_registry: dict[str, dict],
 ) -> list[tuple[str, dict | None, str | None]]:
     """(template_id, sample_args, sample_args_note) in deterministic order."""
     items: list[tuple[str, dict | None, str | None]] = []
+    seen: set[str] = set()
     for frag_path in enumerate_fragment_files(frag_dir):
         try:
-            raw = json.loads(frag_path.read_text(encoding="utf-8-sig"))
+            raw = _load_json_doc(frag_path)
         except (OSError, json.JSONDecodeError):
             continue
         for template in _templates_of(raw):
             tid = template.get("template_id")
-            if not tid or tid not in merged_registry:
+            if not tid or tid in seen or tid not in merged_registry:
                 continue
             merged = merged_registry[tid]
             validation_status, _reason = validate_template_contract(
@@ -447,7 +500,50 @@ def _collect_live_templates(
                 continue
             sample_args, note = derive_sample_args(merged)
             items.append((tid, sample_args, note))
+            seen.add(tid)
+    for template in _templates_of(_load_json_doc(templates_json)):
+        tid = template.get("template_id")
+        if not tid or tid in seen or tid not in merged_registry:
+            continue
+        merged = merged_registry[tid]
+        validation_status, _reason = validate_template_contract(
+            template, merged_registry,
+        )
+        if validation_status != "ok":
+            continue
+        sample_args, note = derive_sample_args(merged)
+        items.append((tid, sample_args, note))
+        seen.add(tid)
     return items
+
+
+def build_plan_summary(
+    rows: list[dict],
+    *,
+    templates_json: Path | str = TEMPLATES_JSON,
+) -> dict:
+    total_governed = None
+    try:
+        total_governed = len(load_merged_registry(templates_json))
+    except Exception:  # pragma: no cover - keep summary honest, never crash main()
+        total_governed = None
+
+    refused = sum(1 for r in rows if r.get("validation_status") == "refused")
+    ok = sum(1 for r in rows if r.get("validation_status") == "ok")
+    planned = sum(1 for r in rows if r.get("template_id") is not None)
+    skipped_with_reason = sum(
+        1 for r in rows if r.get("validation_status") == "skipped_with_reason"
+    )
+    return {
+        "schema": SUMMARY_SCHEMA,
+        "mode": "plan",
+        "total_rows": len(rows),
+        "total_governed": total_governed,
+        "planned": planned,
+        "skipped_with_reason": skipped_with_reason,
+        "refused": refused,
+        "ok": ok,
+    }
 
 
 def run_live(
@@ -480,7 +576,7 @@ def run_live(
     envelopes: list[dict] = []
 
     for template_id, sample_args, sample_args_note in _collect_live_templates(
-        frag_dir, router_home, merged_registry,
+        frag_dir, router_home, templates_json, merged_registry,
     ):
         env_path = envelope_path(out_dir, template_id)
         if env_path.is_file():
@@ -586,16 +682,12 @@ def main(argv: list[str] | None = None) -> int:
     else:
         emit_jsonl(rows, sys.stdout)
 
-    refused = sum(1 for r in rows if r.get("validation_status") == "refused")
-    summary = {
-        "schema": SUMMARY_SCHEMA,
-        "mode": "plan",
-        "total_rows": len(rows),
-        "refused": refused,
-        "ok": len(rows) - refused,
-    }
+    summary = build_plan_summary(
+        rows,
+        templates_json=router_home / "config" / "command_templates.json",
+    )
     print(json.dumps(summary, ensure_ascii=False, indent=2), file=sys.stderr)
-    return 2 if refused else 0
+    return 2 if summary["refused"] else 0
 
 
 if __name__ == "__main__":

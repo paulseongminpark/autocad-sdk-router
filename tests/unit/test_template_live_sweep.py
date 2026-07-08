@@ -59,12 +59,17 @@ def _write_json(path: Path, doc) -> None:
     path.write_text(json.dumps(doc), encoding="utf-8")
 
 
-def _synthetic_registry(tmp_path: Path, fragments: dict[str, list]) -> Path:
+def _synthetic_registry(
+    tmp_path: Path,
+    fragments: dict[str, list],
+    *,
+    base_templates: list[dict] | None = None,
+) -> Path:
     """Build config/command_templates.json + command_templates.d/*.json."""
     config = tmp_path / "config"
     config.mkdir(parents=True)
     base = config / "command_templates.json"
-    _write_json(base, {"templates": [_minimal_template("base.audit")]})
+    _write_json(base, {"templates": list(base_templates or [])})
     frag_dir = config / "command_templates.d"
     frag_dir.mkdir()
     for name, templates in fragments.items():
@@ -91,6 +96,44 @@ def test_plan_generation_emits_one_row_per_fragment_template(tmp_path):
         assert row["required_args"] == []
         assert row["expected_assertions"]
         assert row["file"].startswith("command_templates.d/")
+        assert row["provenance"] == "fragment_declared"
+
+
+def test_plan_includes_base_registry_and_duplicate_guard_rows(capsys, tmp_path):
+    """Plan mode must surface base-only templates and zero-template guard files."""
+    router = _synthetic_registry(
+        tmp_path,
+        {
+            "alpha.json": [_minimal_template("define.alpha")],
+            "edit.assocarray.explode.json": [],
+        },
+        base_templates=[_minimal_template("base.audit")],
+    )
+
+    exit_code = tls.main(["--router-home", str(router)])
+    out, err = capsys.readouterr()
+
+    assert exit_code == 0
+    rows = [json.loads(line) for line in out.splitlines()]
+    assert len(rows) == 3
+
+    fragment_row = next(r for r in rows if r["template_id"] == "define.alpha")
+    assert fragment_row["provenance"] == "fragment_declared"
+    assert fragment_row["file"] == "command_templates.d/alpha.json"
+
+    base_row = next(r for r in rows if r["template_id"] == "base.audit")
+    assert base_row["provenance"] == "base_registry"
+    assert base_row["file"] == "command_templates.json"
+
+    guard_row = next(r for r in rows if r["provenance"] == "fragment_duplicate_guard")
+    assert guard_row["template_id"] is None
+    assert guard_row["file"] == "command_templates.d/edit.assocarray.explode.json"
+    assert guard_row["validation_status"] == "skipped_with_reason"
+
+    summary = json.loads(err)
+    assert summary["total_governed"] == 2
+    assert summary["planned"] == 2
+    assert summary["skipped_with_reason"] == 1
 
 
 def test_malformed_template_refused_in_plan(tmp_path):
