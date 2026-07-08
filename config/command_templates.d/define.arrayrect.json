@@ -60,7 +60,8 @@
       "evidence_refs": [
         "D:\\dev\\.build\\cados_plan\\sdk_census_reaudit_20260706.md#5-dcm--associativity-partial-coverage-path",
         "docs/GOVERNED_COMMAND_TEMPLATES.md#5-live-verification",
-        "reports/headless_cert_20260708/define_arrayrect.certification.json"
+        "reports/headless_cert_20260708/define_arrayrect.certification.json",
+        "reports/headless_cert_20260708_wave2b/define_arrayrect.certification.json"
       ]
     }
   ]
