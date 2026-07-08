@@ -1,0 +1,6 @@
+{
+  "schema": "ariadne.interior_gate_baseline.v1",
+  "baseline_fraction": 0.948,
+  "source": "runs/e2e_1dwg_R4e_interior_20260709 canonical measurement 0.9485 (reports/interior100/blockdef_diff_R4e.json)",
+  "note": "P8 ratchet floor (Paul approved 2026-07-09). Raising the floor is a deliberate commit after a verified better run - never automatic. A run whose interior_diff0_fraction falls below this blocks the capstone."
+}

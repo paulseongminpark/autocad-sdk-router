@@ -1125,11 +1125,65 @@ def build_arg_parser() -> argparse.ArgumentParser:
                    help="run LibreDWG sidecar verification as a post-write gate (default: on)")
     ap.add_argument("--visual-gate", dest="visual_gate", action=argparse.BooleanOptionalAction, default=True,
                    help="run SVG->raster SSIM visual verification as a post-write gate (default: on)")
+    ap.add_argument("--interior-gate", dest="interior_gate", action=argparse.BooleanOptionalAction, default=True,
+                   help="gate on block-interior fidelity (blockdef_diff census vs post, "
+                        "anon_remap-aware): fraction must not regress below the committed "
+                        "ratchet baseline (default: on; P8, approved 2026-07-09)")
+    ap.add_argument("--interior-baseline", type=float, default=None,
+                   help="override the interior-gate ratchet floor (default: read "
+                        "config/roundtrip_interior_baseline.json)")
     ap.add_argument("--allow-empty-census", action="store_true",
                    help="accept a 0-entity/0-blockdef extraction as census truth. Without "
                         "this flag a vacuous extraction is retried and then FAILS the run "
                         "(fail-closed guard for the accoreconsole blank-document race)")
     return ap
+
+
+def interior_gate_report(census_ir, post_ir, *, anon_remap=None,
+                         baseline=None, baseline_source=None):
+    """P8 (approved 2026-07-09): block-interior fidelity is a GATE, not a
+    report. Ratchet semantics: the canonical interior_diff0_fraction
+    (blockdef_diff, anon_remap-aware) must not regress below the committed
+    floor; raising the floor is a deliberate commit after a verified better
+    run, never automatic. Returns (interior_diff_doc, gate_doc)."""
+    blockdef_diff_mod = importlib.import_module("blockdef_diff")
+    interior = blockdef_diff_mod.diff_block_definitions(
+        census_ir, post_ir, name_map=anon_remap)
+    totals = interior.get("totals") or {}
+    fraction = totals.get("interior_diff0_fraction")
+    gate = {
+        "schema": "ariadne.interior_gate.v1",
+        "fraction": fraction,
+        "baseline": baseline,
+        "baseline_source": baseline_source,
+        "diff0_total": totals.get("diff0_total"),
+        "a_entity_total": totals.get("a_entity_total"),
+    }
+    if not totals.get("a_entity_total"):
+        gate["status"] = "ok"
+        gate["note"] = "no block interiors in source (vacuously ok)"
+    elif baseline is None:
+        gate["status"] = "blocked"
+        gate["reason"] = ("no ratchet baseline (config/roundtrip_interior_baseline.json "
+                          "missing and no --interior-baseline)")
+    elif fraction is not None and fraction + 1e-9 >= baseline:
+        gate["status"] = "ok"
+    else:
+        gate["status"] = "blocked"
+        gate["reason"] = ("interior fraction %.4f regressed below ratchet baseline %.4f"
+                          % (fraction or 0.0, baseline))
+    return interior, gate
+
+
+def _load_interior_baseline():
+    """(baseline_fraction, source_string) from the committed ratchet config,
+    or (None, None) when absent."""
+    path = os.path.join(os.path.dirname(os.path.abspath(__file__)), os.pardir,
+                        "config", "roundtrip_interior_baseline.json")
+    if not os.path.isfile(path):
+        return None, None
+    doc = json.load(open(path, encoding="utf-8-sig"))
+    return doc.get("baseline_fraction"), doc.get("source")
 
 
 def main(argv=None) -> int:
@@ -1253,6 +1307,21 @@ def main(argv=None) -> int:
             )
             summary["regen"]["visual_gate"] = visual_gate_result
             gate_statuses.append(visual_gate_result["status"])
+        if args.interior_gate:
+            baseline, baseline_source = (
+                (args.interior_baseline, "--interior-baseline CLI override")
+                if args.interior_baseline is not None else _load_interior_baseline())
+            patch_doc_path = os.path.join(regen_dir, "patch.json")
+            anon_remap = None
+            if os.path.isfile(patch_doc_path):
+                anon_remap = (json.load(open(patch_doc_path, encoding="utf-8-sig"))
+                              or {}).get("anon_remap")
+            interior_diff, interior_gate = interior_gate_report(
+                census_ir, post_ir, anon_remap=anon_remap,
+                baseline=baseline, baseline_source=baseline_source)
+            _write_json(os.path.join(out_dir, "interior_diff.json"), interior_diff)
+            summary["regen"]["interior_gate"] = interior_gate
+            gate_statuses.append(interior_gate["status"])
     else:
         summary["verdict"] = None
         summary["verdict_skipped_reason"] = (
