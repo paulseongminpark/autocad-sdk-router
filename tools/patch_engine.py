@@ -81,7 +81,9 @@ import importlib
 import inspect
 import json
 import os
+import re
 import shutil
+import subprocess
 import sys
 import time
 from datetime import datetime, timezone
@@ -97,6 +99,7 @@ if _THIS_DIR not in sys.path:
     sys.path.insert(0, _THIS_DIR)
 
 import patch_ops  # native write-op map + arg-branches, split by family (PLAN F9)
+import patch_batch_planner
 
 PATCH_SCHEMA_ID = "ariadne.cad_patch.v1"
 RESULT_SCHEMA_ID = "ariadne.cad_patch.result.v1"
@@ -776,6 +779,290 @@ def _native_job_doc(native_op: str, args: Dict[str, Any]) -> Dict[str, Any]:
     return job
 
 
+def _resolve_native_acad_bin_dir() -> str:
+    env_dir = os.environ.get("ARIADNE_NATIVE_ACAD_BIN_DIR")
+    if env_dir:
+        return env_dir
+    prebuilt_root = os.path.join(_ROUTER_HOME, "prebuilt")
+    if os.path.isdir(prebuilt_root):
+        for name in sorted(os.listdir(prebuilt_root), reverse=True):
+            candidate = os.path.join(prebuilt_root, name)
+            if os.path.isfile(os.path.join(candidate, "Ariadne.AcadNative.crx")):
+                return candidate
+    return os.path.join(_ROUTER_HOME, "src", "Ariadne.AcadNative", "bin",
+                        "x64", "Release")
+
+
+def _resolve_native_acad_module(leaf_name: str) -> str:
+    path = os.path.join(_resolve_native_acad_bin_dir(), leaf_name)
+    if not os.path.isfile(path):
+        raise OSError("native AutoCAD module missing: %s" % path)
+    return path
+
+
+def _escape_lisp_string(text: str) -> str:
+    return text.replace("\\", "\\\\").replace('"', '\\"')
+
+
+def _batch_marker_id(op_record: Dict[str, Any], seen: Dict[str, int]) -> str:
+    raw = op_record.get("step_id")
+    if not isinstance(raw, str) or not raw.strip():
+        raw = "op_%05d" % int(op_record.get("index", 0))
+    marker_id = raw.strip()
+    count = seen.get(marker_id, 0)
+    seen[marker_id] = count + 1
+    return marker_id if count == 0 else "%s__%05d" % (marker_id, int(op_record.get("index", 0)))
+
+
+def _prepare_batched_records(op_records: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    seen: Dict[str, int] = {}
+    prepared: List[Dict[str, Any]] = []
+    for op_record in op_records:
+        enriched = dict(op_record)
+        enriched["batch_marker_id"] = _batch_marker_id(op_record, seen)
+        prepared.append(enriched)
+    return prepared
+
+
+def _build_native_batch_script(
+        batch_dir: str, batch_id: str,
+        op_records: List[Dict[str, Any]]) -> Dict[str, Any]:
+    jobs_dir = os.path.join(batch_dir, "jobs")
+    results_dir = os.path.join(batch_dir, "results")
+    os.makedirs(jobs_dir, exist_ok=True)
+    os.makedirs(results_dir, exist_ok=True)
+
+    dbx = _resolve_native_acad_module("Ariadne.AcadNativeDbx.dbx")
+    crx = _resolve_native_acad_module("Ariadne.AcadNative.crx")
+    dbx_fwd = dbx.replace("\\", "/")
+    crx_fwd = crx.replace("\\", "/")
+    trusted = os.path.dirname(crx).replace("\\", "\\\\")
+
+    script_lines = [
+        '(setvar "SECURELOAD" 0)',
+        '(setvar "FILEDIA" 0)',
+        '(setvar "CMDECHO" 0)',
+        '(setvar "TRUSTEDPATHS" "%s")' % trusted,
+        '(arxload "%s")' % _escape_lisp_string(dbx_fwd),
+        '(arxload "%s")' % _escape_lisp_string(crx_fwd),
+        '(setenv "ARIADNE_CAD_JOB_HOST_MODE" "coreconsole")',
+        '(setenv "ARIADNE_CAD_JOB_WRITE_MODE" "write_copy")',
+    ]
+
+    for seq, op_record in enumerate(op_records):
+        safe_name = "%02d_%s" % (
+            seq,
+            str(op_record["native_op"]).replace(".", "_").replace("/", "_"),
+        )
+        job_path = os.path.join(jobs_dir, safe_name + ".json")
+        result_path = os.path.join(results_dir, safe_name + ".json")
+        _write_json(job_path, _native_job_doc(op_record["native_op"], op_record["args"]))
+        job_fwd = job_path.replace("\\", "/")
+        result_fwd = result_path.replace("\\", "/")
+        start_marker = "ARIADNE_OP_START %s" % op_record["batch_marker_id"]
+        end_marker = "ARIADNE_OP_END %s STATUS=OK" % op_record["batch_marker_id"]
+        script_lines.extend([
+            '(princ "\\n%s")' % _escape_lisp_string(start_marker),
+            '(setenv "ARIADNE_CAD_JOB_IN" "%s")' % _escape_lisp_string(job_fwd),
+            '(setenv "ARIADNE_CAD_JOB_OUT" "%s")' % _escape_lisp_string(result_fwd),
+            'ARIADNE_NATIVE_JOB',
+            '(princ "\\n%s")' % _escape_lisp_string(end_marker),
+        ])
+
+    # Legacy per-op routing stages/saves one DWG per operation; the batched path
+    # intentionally opens the staged DWG once, runs every op in-order against that
+    # in-memory document, then saves once at the end via _QSAVE.
+    script_lines.extend(['_QSAVE', 'QUIT', ''])
+    script_path = os.path.join(batch_dir, "%s.scr" % batch_id)
+    with open(script_path, "w", encoding="ascii", newline="\n") as fh:
+        fh.write("\n".join(script_lines))
+    return {"script_path": script_path}
+
+
+def _parse_first_json_object(text: str) -> Optional[Dict[str, Any]]:
+    text = (text or "").strip()
+    if not text:
+        return None
+    try:
+        doc = json.loads(text)
+        return doc if isinstance(doc, dict) else None
+    except (TypeError, ValueError):
+        pass
+    start = text.find("{")
+    end = text.rfind("}")
+    if start != -1 and end != -1 and end > start:
+        try:
+            doc = json.loads(text[start:end + 1])
+            return doc if isinstance(doc, dict) else None
+        except (TypeError, ValueError):
+            return None
+    return None
+
+
+def _read_console_text(path: Optional[str]) -> str:
+    if not path or not os.path.isfile(path):
+        return ""
+    try:
+        with open(path, "rb") as fh:
+            raw = fh.read()
+    except OSError:
+        return ""
+    if not raw:
+        return ""
+    sample = raw[:200]
+    nul_ratio = sample.count(b"\x00") / max(len(sample), 1)
+    if nul_ratio > 0.3:
+        try:
+            return raw.decode("utf-16-le", errors="replace")
+        except (LookupError, UnicodeError):
+            pass
+    return raw.decode("utf-8", errors="replace")
+
+
+def _router_custom_run_paths(staged_used: Optional[str]) -> Tuple[Optional[str], Optional[str]]:
+    if not staged_used:
+        return None, None
+    parent = os.path.basename(os.path.dirname(staged_used))
+    if not parent.startswith("dwg_"):
+        return None, None
+    stamp = parent[len("dwg_"):]
+    run_out = os.path.join(_ROUTER_HOME, "runs", "dwg_truth_autocad_%s" % stamp)
+    return (
+        os.path.join(run_out, "accoreconsole_custom_stdout.txt"),
+        os.path.join(run_out, "accoreconsole_custom_stderr.txt"),
+    )
+
+
+def _run_batched_native_ops(run_job, staged_dwg: str, batch_dir: str, batch_id: str,
+                            op_records: List[Dict[str, Any]], *,
+                            timeout: int = 600) -> Dict[str, Any]:
+    outer_stdout = os.path.join(batch_dir, "stdout.txt")
+    outer_stderr = os.path.join(batch_dir, "stderr.txt")
+    try:
+        script_info = _build_native_batch_script(batch_dir, batch_id, op_records)
+    except Exception as exc:
+        _write_json(os.path.join(batch_dir, "batch_error.json"),
+                    {"status": "error", "reason": "%s: %s" % (type(exc).__name__, exc)})
+        return {"command": None, "exit_code": None, "stdout_path": outer_stdout,
+                "stderr_path": outer_stderr, "staged_used": None, "error": str(exc)}
+
+    router_ps1 = getattr(run_job, "ROUTER_PS1", None)
+    router_home = getattr(run_job, "ROUTER_HOME", _ROUTER_HOME)
+    if router_ps1 is None or not os.path.isfile(str(router_ps1)):
+        msg = "router entrypoint missing: %s" % router_ps1
+        with open(outer_stderr, "w", encoding="utf-8") as fh:
+            fh.write(msg + "\n")
+        with open(outer_stdout, "w", encoding="utf-8") as fh:
+            fh.write("")
+        return {"command": None, "exit_code": None, "stdout_path": outer_stdout,
+                "stderr_path": outer_stderr, "staged_used": None, "error": msg}
+
+    powershell = (run_job._powershell_exe() if hasattr(run_job, "_powershell_exe")
+                  else "powershell.exe")
+    cmd = [
+        powershell,
+        "-NoProfile",
+        "-NonInteractive",
+        "-ExecutionPolicy", "Bypass",
+        "-File", str(router_ps1),
+        "-Action", "run",
+        "-Intent", "dwg",
+        "-InputPath", str(staged_dwg),
+        "-Script", str(script_info["script_path"]),
+    ]
+    timed_out = False
+    error = None
+    stdout_text = ""
+    stderr_text = ""
+    code = None
+    try:
+        proc = subprocess.run(
+            cmd,
+            cwd=str(router_home),
+            capture_output=True,
+            text=True,
+            encoding="utf-8",
+            errors="replace",
+            timeout=timeout,
+        )
+        stdout_text = proc.stdout or ""
+        stderr_text = proc.stderr or ""
+        code = proc.returncode
+    except subprocess.TimeoutExpired as exc:
+        timed_out = True
+        error = "router batch job timed out after %ss" % timeout
+        stdout_text = (exc.stdout or "") if isinstance(exc.stdout, str) else ""
+        stderr_text = (exc.stderr or "") if isinstance(exc.stderr, str) else ""
+    except OSError as exc:
+        error = "failed to launch router: %s" % exc
+
+    with open(outer_stdout, "w", encoding="utf-8") as fh:
+        fh.write(stdout_text)
+    with open(outer_stderr, "w", encoding="utf-8") as fh:
+        fh.write(stderr_text)
+
+    envelope = _parse_first_json_object(stdout_text)
+    staged_used = None
+    stdout_path = outer_stdout
+    stderr_path = outer_stderr
+    if envelope:
+        eng = (envelope.get("execution") or {}).get("engine_output") or {}
+        staged_used = eng.get("staged_input")
+        batch_stdout, batch_stderr = _router_custom_run_paths(staged_used)
+        if batch_stdout and os.path.isfile(batch_stdout):
+            stdout_path = batch_stdout
+        if batch_stderr and os.path.isfile(batch_stderr):
+            stderr_path = batch_stderr
+
+    return {
+        "command": cmd,
+        "exit_code": code,
+        "stdout_path": stdout_path,
+        "stderr_path": stderr_path,
+        "router_stdout_path": outer_stdout,
+        "router_stderr_path": outer_stderr,
+        "staged_used": staged_used,
+        "timed_out": timed_out,
+        "error": error,
+    }
+
+
+def _parse_batched_op_results(op_records: List[Dict[str, Any]], stdout_path: Optional[str],
+                              batch_id: str) -> List[Dict[str, Any]]:
+    stdout_text = _read_console_text(stdout_path)
+    results: List[Dict[str, Any]] = []
+    aborted = False
+    for op_record in op_records:
+        rec: Dict[str, Any] = {
+            "index": op_record["index"],
+            "native_op": op_record["native_op"],
+            "batch_id": batch_id,
+        }
+        if aborted:
+            rec["status"] = "failed"
+            rec["reason"] = "batch_aborted_upstream"
+            results.append(rec)
+            continue
+        marker_id = op_record["batch_marker_id"]
+        end_pat = re.compile(
+            r"ARIADNE_OP_END\s+%s\s+STATUS=([A-Z0-9_]+)" % re.escape(marker_id))
+        end_match = end_pat.search(stdout_text)
+        if end_match:
+            marker_status = end_match.group(1)
+            if marker_status == "OK":
+                rec["status"] = "ok"
+            else:
+                rec["status"] = "failed"
+                rec["reason"] = "marker_status_%s" % marker_status.lower()
+                aborted = True
+        else:
+            rec["status"] = "failed"
+            rec["reason"] = "batch_aborted_before_end_marker"
+            aborted = True
+        results.append(rec)
+    return results
+
+
 def _native_full_ir(ir_builder, run_res: Dict[str, Any], staged_path: str,
                     original_path: str, ir_out_path: str,
                     phase: str) -> Dict[str, Any]:
@@ -892,7 +1179,8 @@ def _result_envelope(status: str, *, patch_id, out_dir, journal_path,
     return env
 
 
-def apply_staged(patch: Dict[str, Any], dwg_path: str, out_dir: str) -> Dict[str, Any]:
+def apply_staged(patch: Dict[str, Any], dwg_path: str, out_dir: str,
+                 batch_size: Optional[int] = None) -> Dict[str, Any]:
     """Apply a patch to a STAGED COPY of ``dwg_path`` and return a result envelope.
 
     REAL staged-write lifecycle (the original is never touched):
@@ -919,6 +1207,10 @@ def apply_staged(patch: Dict[str, Any], dwg_path: str, out_dir: str) -> Dict[str
       partial          -- an inspect/apply ran but did not return a usable result
       ok               -- the mutation applied, both IRs built, diff computed,
                           validation ran, and the original is byte-identical
+
+    ``batch_size=None`` preserves the legacy per-op launch path exactly. Any
+    positive batch_size enables EXPERIMENTAL native batching: one accoreconsole
+    session per planned batch, still against staged copies only.
 
     Artifacts written under ``out_dir``: patch.json, staged_input.dwg,
     staged_output.dwg, pre/dwg_graph_ir.json, post/dwg_graph_ir.json,
@@ -991,6 +1283,21 @@ def apply_staged(patch: Dict[str, Any], dwg_path: str, out_dir: str) -> Dict[str
             journal_path=journal_path, artifacts=artifacts,
             original_unchanged=None,
             reason="guards failed: %s" % ", ".join(failed)))
+
+    batch_plan = None
+    if batch_size is not None:
+        batch_plan = patch_batch_planner.plan_batches(
+            patch.get("operations") or [],
+            max_ops_per_batch=batch_size,
+        )
+        violations = patch_batch_planner.validate_plan(
+            batch_plan, patch.get("operations") or [])
+        _step("plan_batches", "pass" if not violations else "fail",
+              batch_size=batch_size,
+              batch_count=len((batch_plan or {}).get("batches") or []),
+              violations=violations)
+        if violations:
+            raise RuntimeError("invalid native batch plan: %s" % "; ".join(violations))
 
     # resolve the native write op(s) BEFORE touching the disk (no-fake-success).
     # apply_staged applies ALL ops with a live native handler, in order; ops with
@@ -1090,54 +1397,158 @@ def apply_staged(patch: Dict[str, Any], dwg_path: str, out_dir: str) -> Dict[str
     # is never touched. staged_output = the final mutated copy after all ops.
     current_input = staged_path
     applied_ok: List[Dict[str, Any]] = []
-    for n, op_record in enumerate(applied_records):
-        apply_dir = os.path.join(out_dir, "apply", "op_%02d" % n)
-        os.makedirs(apply_dir, exist_ok=True)
-        job_doc = _native_job_doc(op_record["native_op"], op_record["args"])
-        job_path = os.path.join(apply_dir, "cad_job.json")
-        _write_json(job_path, job_doc)
-        apply_run = run_job.run_router_cad_job(
-            current_input, apply_dir, op_record["native_op"],
-            write_mode="write_copy", job_path=job_path)
-        mutated = apply_run.get("staged_used")  # router's mutated copy (post-_QSAVE)
-        step_out = os.path.join(apply_dir, "staged_step.dwg")
-        step_ok = False
-        if mutated and os.path.isfile(mutated):
-            try:
-                shutil.copy2(mutated, step_out)
-                step_ok = True
-            except OSError as exc:
-                _step("apply[%d]" % n, "partial",
-                      reason="failed to capture step output: %s" % exc,
-                      native_op=op_record["native_op"], staged_used=mutated)
-        if not step_ok:
-            reason = (apply_run.get("error")
-                      or "native write op returned no mutated staged copy "
-                         "(staged_used=%r)" % mutated)
-            _step("apply[%d]" % n, "unavailable" if apply_run.get("error") else "partial",
-                  native_op=op_record["native_op"], staged_used=mutated,
+    op_results_all: List[Dict[str, Any]] = []
+    batch_count_used: Optional[int] = None
+    if batch_size is None:
+        for n, op_record in enumerate(applied_records):
+            apply_dir = os.path.join(out_dir, "apply", "op_%02d" % n)
+            os.makedirs(apply_dir, exist_ok=True)
+            job_doc = _native_job_doc(op_record["native_op"], op_record["args"])
+            job_path = os.path.join(apply_dir, "cad_job.json")
+            _write_json(job_path, job_doc)
+            apply_run = run_job.run_router_cad_job(
+                current_input, apply_dir, op_record["native_op"],
+                write_mode="write_copy", job_path=job_path)
+            mutated = apply_run.get("staged_used")  # router's mutated copy (post-_QSAVE)
+            step_out = os.path.join(apply_dir, "staged_step.dwg")
+            step_ok = False
+            if mutated and os.path.isfile(mutated):
+                try:
+                    shutil.copy2(mutated, step_out)
+                    step_ok = True
+                except OSError as exc:
+                    _step("apply[%d]" % n, "partial",
+                          reason="failed to capture step output: %s" % exc,
+                          native_op=op_record["native_op"], staged_used=mutated)
+            if not step_ok:
+                reason = (apply_run.get("error")
+                          or "native write op returned no mutated staged copy "
+                             "(staged_used=%r)" % mutated)
+                _step("apply[%d]" % n, "unavailable" if apply_run.get("error") else "partial",
+                      native_op=op_record["native_op"], staged_used=mutated,
+                      exit_code=apply_run.get("exit_code"),
+                      stdout=apply_run.get("stdout_path"), stderr=apply_run.get("stderr_path"),
+                      reason=reason)
+                status = "unavailable" if apply_run.get("error") else "partial"
+                return _finish(_result_envelope(
+                    status, patch_id=patch_id, out_dir=out_dir,
+                    journal_path=journal_path, artifacts=artifacts,
+                    original_unchanged=_original_unchanged(),
+                    reason="apply[%d] (%s) failed: %s" % (n, op_record["native_op"], reason),
+                    deferred_ops=deferred_ops, extra={"applied_ops": applied_ok}))
+            _step("apply[%d]" % n, "pass", native_op=op_record["native_op"],
+                  step_output=step_out, staged_used=mutated,
                   exit_code=apply_run.get("exit_code"),
-                  stdout=apply_run.get("stdout_path"), stderr=apply_run.get("stderr_path"),
-                  reason=reason)
-            status = "unavailable" if apply_run.get("error") else "partial"
-            return _finish(_result_envelope(
-                status, patch_id=patch_id, out_dir=out_dir,
-                journal_path=journal_path, artifacts=artifacts,
-                original_unchanged=_original_unchanged(),
-                reason="apply[%d] (%s) failed: %s" % (n, op_record["native_op"], reason),
-                deferred_ops=deferred_ops, extra={"applied_ops": applied_ok}))
-        _step("apply[%d]" % n, "pass", native_op=op_record["native_op"],
-              step_output=step_out, staged_used=mutated,
-              exit_code=apply_run.get("exit_code"),
-              stdout=apply_run.get("stdout_path"), stderr=apply_run.get("stderr_path"))
-        applied_ok.append({"index": op_record["index"], "native_op": op_record["native_op"]})
-        current_input = step_out  # chain: the next op mutates this op's output
+                  stdout=apply_run.get("stdout_path"), stderr=apply_run.get("stderr_path"))
+            applied_ok.append({"index": op_record["index"], "native_op": op_record["native_op"]})
+            current_input = step_out  # chain: the next op mutates this op's output
+    else:
+        applied_by_index = {record["index"]: record for record in applied_records}
+        apply_index = 0
+        batch_count_used = 0
+        for batch in (batch_plan or {}).get("batches") or []:
+            batch_id = str(batch.get("batch_id") or ("b%03d" % batch_count_used))
+            batch_records = [
+                applied_by_index[op_index]
+                for op_index in (batch.get("op_indices") or [])
+                if op_index in applied_by_index
+            ]
+            if not batch_records:
+                continue
+            batch_count_used += 1
+            prepared_records = _prepare_batched_records(batch_records)
+            apply_dir = os.path.join(out_dir, "apply", batch_id)
+            os.makedirs(apply_dir, exist_ok=True)
+            batch_run = _run_batched_native_ops(
+                run_job, current_input, apply_dir, batch_id, prepared_records)
+            batch_results = _parse_batched_op_results(
+                prepared_records, batch_run.get("stdout_path"), batch_id)
+            op_results_all.extend(batch_results)
+            for op_result in batch_results:
+                step_status = "pass" if op_result["status"] == "ok" else "partial"
+                _step("apply[%d]" % apply_index, step_status,
+                      native_op=op_result["native_op"], batch_id=batch_id,
+                      exit_code=batch_run.get("exit_code"),
+                      stdout=batch_run.get("stdout_path"),
+                      stderr=batch_run.get("stderr_path"),
+                      reason=op_result.get("reason"))
+                if op_result["status"] == "ok":
+                    applied_ok.append({
+                        "index": op_result["index"],
+                        "native_op": op_result["native_op"],
+                        "batch_id": batch_id,
+                    })
+                apply_index += 1
+            mutated = batch_run.get("staged_used")
+            step_out = os.path.join(apply_dir, "staged_step.dwg")
+            step_ok = False
+            if mutated and os.path.isfile(mutated):
+                try:
+                    shutil.copy2(mutated, step_out)
+                    step_ok = True
+                except OSError as exc:
+                    _step("apply_batch[%s]" % batch_id, "partial",
+                          reason="failed to capture batch output: %s" % exc,
+                          stdout=batch_run.get("stdout_path"),
+                          stderr=batch_run.get("stderr_path"))
+            first_failed = next((r for r in batch_results if r.get("status") != "ok"), None)
+            if first_failed:
+                reason = first_failed.get("reason") or "native batch failed"
+                _step("apply_batch[%s]" % batch_id,
+                      "unavailable" if batch_run.get("error") else "partial",
+                      reason=reason, stdout=batch_run.get("stdout_path"),
+                      stderr=batch_run.get("stderr_path"),
+                      exit_code=batch_run.get("exit_code"))
+                status = "unavailable" if batch_run.get("error") else "partial"
+                return _finish(_result_envelope(
+                    status, patch_id=patch_id, out_dir=out_dir,
+                    journal_path=journal_path, artifacts=artifacts,
+                    original_unchanged=_original_unchanged(),
+                    reason="apply batch %s failed at op index %s (%s): %s"
+                    % (batch_id, first_failed["index"], first_failed["native_op"], reason),
+                    deferred_ops=deferred_ops,
+                    extra={"applied_ops": applied_ok,
+                           "op_results": op_results_all,
+                           "batch_count": batch_count_used,
+                           "batch_size": batch_size}))
+            if not step_ok:
+                reason = (batch_run.get("error")
+                          or "native batch returned no mutated staged copy "
+                             "(staged_used=%r)" % mutated)
+                _step("apply_batch[%s]" % batch_id,
+                      "unavailable" if batch_run.get("error") else "partial",
+                      reason=reason, stdout=batch_run.get("stdout_path"),
+                      stderr=batch_run.get("stderr_path"),
+                      exit_code=batch_run.get("exit_code"))
+                status = "unavailable" if batch_run.get("error") else "partial"
+                return _finish(_result_envelope(
+                    status, patch_id=patch_id, out_dir=out_dir,
+                    journal_path=journal_path, artifacts=artifacts,
+                    original_unchanged=_original_unchanged(),
+                    reason="apply batch %s failed: %s" % (batch_id, reason),
+                    deferred_ops=deferred_ops,
+                    extra={"applied_ops": applied_ok,
+                           "op_results": op_results_all,
+                           "batch_count": batch_count_used,
+                           "batch_size": batch_size}))
+            _step("apply_batch[%s]" % batch_id, "pass",
+                  op_count=len(prepared_records), step_output=step_out,
+                  staged_used=mutated, stdout=batch_run.get("stdout_path"),
+                  stderr=batch_run.get("stderr_path"),
+                  exit_code=batch_run.get("exit_code"))
+            current_input = step_out
     # final mutated copy after ALL ops
     staged_output = os.path.join(out_dir, "staged_output.dwg")
     shutil.copy2(current_input, staged_output)
     artifacts.append({"kind": "dwg_staged", "ref": staged_output})
     _step("apply", "pass", applied=[r["native_op"] for r in applied_records],
-          op_count=len(applied_records), staged_output=staged_output)
+          op_count=len(applied_records), staged_output=staged_output,
+          batch_count=batch_count_used)
+    apply_extra = ({
+        "op_results": op_results_all,
+        "batch_count": batch_count_used,
+        "batch_size": batch_size,
+    } if batch_size is not None else {})
 
     # 7. post-inspect: native_full IR of the mutated output --------------------
     post_dir = os.path.join(out_dir, "post")
@@ -1157,7 +1568,8 @@ def apply_staged(patch: Dict[str, Any], dwg_path: str, out_dir: str) -> Dict[str
             journal_path=journal_path, artifacts=artifacts,
             original_unchanged=_original_unchanged(),
             reason="post-inspect failed: %s" % post.get("reason"),
-            deferred_ops=deferred_ops))
+            deferred_ops=deferred_ops,
+            extra=apply_extra or None))
     artifacts.append({"kind": "ir", "ref": post["ir_path"]})
 
     # 8. compute the diff (cad_diff sibling lane) ------------------------------
@@ -1173,8 +1585,8 @@ def apply_staged(patch: Dict[str, Any], dwg_path: str, out_dir: str) -> Dict[str
             original_unchanged=_original_unchanged(),
             reason="cad_diff sibling unavailable: %s" % diff_err,
             deferred_ops=deferred_ops,
-            extra={"pre_ir": pre["ir_path"], "post_ir": post["ir_path"],
-                   "staged_output": staged_output}))
+            extra=dict(apply_extra, pre_ir=pre["ir_path"], post_ir=post["ir_path"],
+                       staged_output=staged_output)))
     try:
         pre_ir = _load_json_bom(pre["ir_path"])
         post_ir = _load_json_bom(post["ir_path"])
@@ -1191,7 +1603,8 @@ def apply_staged(patch: Dict[str, Any], dwg_path: str, out_dir: str) -> Dict[str
             journal_path=journal_path, artifacts=artifacts,
             original_unchanged=_original_unchanged(),
             reason="compute_diff failed: %s: %s" % (type(exc).__name__, exc),
-            deferred_ops=deferred_ops))
+            deferred_ops=deferred_ops,
+            extra=apply_extra or None))
 
     # Finalize the journal BEFORE validation so the validator's journal_present /
     # original_dwg_unchanged gates can read it (with the original-unchanged proof
@@ -1222,7 +1635,8 @@ def apply_staged(patch: Dict[str, Any], dwg_path: str, out_dir: str) -> Dict[str
             journal_path=journal_path, artifacts=artifacts,
             original_unchanged=_original_unchanged(),
             reason="validator sibling unavailable: %s" % val_err,
-            diff_summary=diff_summary, deferred_ops=deferred_ops))
+            diff_summary=diff_summary, deferred_ops=deferred_ops,
+            extra=apply_extra or None))
     val = _call_validator(validator_mod, diff_path, out_dir, patch_json_path,
                           ir_path=post["ir_path"])
     if val["ok"]:
@@ -1243,7 +1657,8 @@ def apply_staged(patch: Dict[str, Any], dwg_path: str, out_dir: str) -> Dict[str
             journal_path=journal_path, artifacts=artifacts,
             original_unchanged=_original_unchanged(),
             reason=val.get("reason"), diff_summary=diff_summary,
-            deferred_ops=deferred_ops))
+            deferred_ops=deferred_ops,
+            extra=apply_extra or None))
 
     # 10. finalize: success requires the original to be byte-identical ---------
     orig_proof = _original_unchanged()
@@ -1256,7 +1671,8 @@ def apply_staged(patch: Dict[str, Any], dwg_path: str, out_dir: str) -> Dict[str
             reason="original DWG changed during apply (sha256 before != after) -- "
                    "READ-ONLY invariant violated",
             diff_summary=diff_summary, validation_status=validation_status,
-            deferred_ops=deferred_ops))
+            deferred_ops=deferred_ops,
+            extra=apply_extra or None))
     _step("original_unchanged_proof", "pass", proof=orig_proof)
 
     return _finish(_result_envelope(
@@ -1265,13 +1681,13 @@ def apply_staged(patch: Dict[str, Any], dwg_path: str, out_dir: str) -> Dict[str
         original_unchanged=orig_proof,
         diff_summary=diff_summary, validation_status=validation_status,
         deferred_ops=deferred_ops,
-        extra={"pre_ir": pre["ir_path"], "post_ir": post["ir_path"],
-               "staged_output": staged_output,
-               "diff": diff_path,
-               "applied_ops": applied_ok,
-               "op_count_applied": len(applied_ok),
-               "entity_count_before": pre.get("entity_count"),
-               "entity_count_after": post.get("entity_count")}))
+        extra=dict(apply_extra, pre_ir=pre["ir_path"], post_ir=post["ir_path"],
+                   staged_output=staged_output,
+                   diff=diff_path,
+                   applied_ops=applied_ok,
+                   op_count_applied=len(applied_ok),
+                   entity_count_before=pre.get("entity_count"),
+                   entity_count_after=post.get("entity_count"))))
 
 
 # --------------------------------------------------------------------------- #
