@@ -859,6 +859,78 @@ static bool m08eReadHatchLoops(const std::string& json, std::vector<M08eHatchLoo
     return !out.empty();
 }
 
+static bool m08eFileExists(const std::wstring& path)
+{
+    const DWORD attrs = GetFileAttributesW(path.c_str());
+    return attrs != INVALID_FILE_ATTRIBUTES && !(attrs & FILE_ATTRIBUTE_DIRECTORY);
+}
+
+static bool m08eCurrentWorkingDirectory(std::wstring& outDir)
+{
+    outDir.clear();
+    const DWORD needed = GetCurrentDirectoryW(0, nullptr);
+    if (needed == 0)
+        return false;
+    std::wstring buf(static_cast<size_t>(needed), L'\0');
+    const DWORD got = GetCurrentDirectoryW(needed, &buf[0]);
+    if (got == 0 || got >= needed)
+        return false;
+    buf.resize(static_cast<size_t>(got));
+    outDir = buf;
+    return true;
+}
+
+static std::wstring m08eJoinPath(const std::wstring& dir, const std::wstring& leaf)
+{
+    if (dir.empty())
+        return leaf;
+    const wchar_t last = dir[dir.size() - 1];
+    if (last == L'\\' || last == L'/')
+        return dir + leaf;
+    return dir + L"\\" + leaf;
+}
+
+static bool m08eEnsureCustomPatDiscoverable(const std::string& patternName,
+                                            const std::string& patternPatPathUtf8,
+                                            std::string& errMsg)
+{
+    errMsg.clear();
+    const std::wstring sourcePath = utf8ToWide(patternPatPathUtf8);
+    if (sourcePath.empty()) {
+        errMsg = "entity.kind=hatch custom pattern '" + patternName + "' requires 'pattern_pat_path'";
+        return false;
+    }
+    if (!m08eFileExists(sourcePath)) {
+        errMsg = "entity.kind=hatch custom pattern '" + patternName + "' missing source pat '"
+               + patternPatPathUtf8 + "'";
+        return false;
+    }
+
+    std::wstring cwd;
+    if (!m08eCurrentWorkingDirectory(cwd)) {
+        errMsg = "entity.kind=hatch custom pattern '" + patternName
+               + "' could not resolve accoreconsole working directory";
+        return false;
+    }
+
+    const size_t slash = sourcePath.find_last_of(L"\\/");
+    const std::wstring leaf = (slash == std::wstring::npos)
+        ? sourcePath
+        : sourcePath.substr(slash + 1);
+    const std::wstring stagedPath = m08eJoinPath(cwd, leaf);
+    if (lstrcmpiW(sourcePath.c_str(), stagedPath.c_str()) == 0)
+        return true;
+
+    if (!CopyFileW(sourcePath.c_str(), stagedPath.c_str(), FALSE)) {
+        const DWORD copyErr = GetLastError();
+        errMsg = "entity.kind=hatch custom pattern '" + patternName + "' copy failed from '"
+               + patternPatPathUtf8 + "' to '" + wideToUtf8(stagedPath) + "' win32="
+               + std::to_string(static_cast<unsigned long>(copyErr));
+        return false;
+    }
+    return true;
+}
+
 static void m08eReadScaleFactors(const std::string& json, AcGeScale3d& out)
 {
     double sx = 1.0, sy = 1.0, sz = 1.0;
@@ -1073,6 +1145,9 @@ static AcDbEntity* m08eBuildExtendedEntityForAppend(AcDbDatabase* pDb,
             errMsg = "entity.kind=hatch requires 'pattern_name'";
             return nullptr;
         }
+        std::string patternPatPath;
+        const bool hasPatternPatPath =
+            jsonFindString(entityJson, "pattern_pat_path", patternPatPath) && !patternPatPath.empty();
         std::vector<M08eHatchLoop> loops;
         if (!m08eReadHatchLoops(entityJson, loops)) {
             errCode = "MISSING_ARG";
@@ -1098,13 +1173,32 @@ static AcDbEntity* m08eBuildExtendedEntityForAppend(AcDbDatabase* pDb,
         }
         if (isSolidFill) {
             es = pHatch->setPattern(AcDbHatch::kPreDefined, L"SOLID");
+        } else if (hasPatternPatPath) {
+            std::string customPatErr;
+            // The router copies the batch .scr into its staged DWG directory and
+            // launches accoreconsole with that directory as the working dir.
+            // setPattern(kCustomDefined, name) resolves <name>.pat through that cwd,
+            // so stage the synthesized batch artifact there before resolving.
+            if (!m08eEnsureCustomPatDiscoverable(patternName, patternPatPath, customPatErr)) {
+                delete pHatch;
+                errCode = "HATCH_CUSTOM_PAT_UNRESOLVED";
+                errMsg = customPatErr;
+                return nullptr;
+            }
+            es = pHatch->setPattern(AcDbHatch::kCustomDefined, utf8ToWide(patternName).c_str());
         } else {
             es = pHatch->setPattern(AcDbHatch::kPreDefined, utf8ToWide(patternName).c_str());
         }
         if (es != Acad::eOk) {
             delete pHatch;
-            errCode = "BUILD_FAILED";
-            errMsg = "entity.kind=hatch setPattern errorstatus " + std::to_string(static_cast<int>(es));
+            if (hasPatternPatPath) {
+                errCode = "HATCH_CUSTOM_PAT_UNRESOLVED";
+                errMsg = "entity.kind=hatch custom pattern '" + patternName + "' unresolved from '"
+                       + patternPatPath + "' errorstatus " + std::to_string(static_cast<int>(es));
+            } else {
+                errCode = "BUILD_FAILED";
+                errMsg = "entity.kind=hatch setPattern errorstatus " + std::to_string(static_cast<int>(es));
+            }
             return nullptr;
         }
         if (!isSolidFill) {

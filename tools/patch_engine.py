@@ -80,6 +80,7 @@ import hashlib
 import importlib
 import inspect
 import json
+import math
 import os
 import re
 import shutil
@@ -824,6 +825,48 @@ def _prepare_batched_records(op_records: List[Dict[str, Any]]) -> List[Dict[str,
     return prepared
 
 
+def _format_pat_number(value: Any) -> str:
+    return format(float(value), ".10g")
+
+
+def _pattern_definition_line(row: Dict[str, Any]) -> str:
+    base = row.get("base") or [0.0, 0.0]
+    offset = row.get("offset") or [0.0, 0.0]
+    values = [
+        math.degrees(float(row.get("angle", 0.0))),
+        float(base[0]),
+        float(base[1]),
+        float(offset[0]),
+        float(offset[1]),
+    ]
+    values.extend(float(dash) for dash in (row.get("dashes") or []))
+    return ", ".join(_format_pat_number(value) for value in values)
+
+
+def _synthesize_batch_pat_files(batch_dir: str, op_records: List[Dict[str, Any]]) -> Dict[str, str]:
+    synthesized: Dict[str, str] = {}
+    for op_record in op_records:
+        args = op_record.get("args") or {}
+        entity = args.get("entity") if isinstance(args, dict) else None
+        if not isinstance(entity, dict) or entity.get("kind") != "hatch":
+            continue
+        pattern_name = str(entity.get("pattern_name") or "").strip()
+        pattern_definitions = entity.get("pattern_definitions") or []
+        if not pattern_name or not pattern_definitions:
+            continue
+        upper_name = pattern_name.upper()
+        pat_path = synthesized.get(upper_name)
+        if pat_path is None:
+            pat_path = os.path.abspath(os.path.join(batch_dir, "%s.pat" % upper_name))
+            lines = ["*%s" % upper_name]
+            lines.extend(_pattern_definition_line(row) for row in pattern_definitions)
+            with open(pat_path, "w", encoding="utf-8", newline="\n") as fh:
+                fh.write("\n".join(lines) + "\n")
+            synthesized[upper_name] = pat_path
+        entity["pattern_pat_path"] = pat_path.replace("\\", "/")
+    return synthesized
+
+
 def _build_native_batch_script(
         batch_dir: str, batch_id: str,
         op_records: List[Dict[str, Any]]) -> Dict[str, Any]:
@@ -831,6 +874,7 @@ def _build_native_batch_script(
     results_dir = os.path.join(batch_dir, "results")
     os.makedirs(jobs_dir, exist_ok=True)
     os.makedirs(results_dir, exist_ok=True)
+    _synthesize_batch_pat_files(batch_dir, op_records)
 
     dbx = _resolve_native_acad_module("Ariadne.AcadNativeDbx.dbx")
     crx = _resolve_native_acad_module("Ariadne.AcadNative.crx")

@@ -161,14 +161,21 @@ def _has_hatch_polyline_loops(loops: Any) -> bool:
     return True
 
 
+def _is_custom_hatch_pattern(g: Dict[str, Any]) -> bool:
+    return (not bool(g.get("is_solid_fill"))
+            and str(g.get("pattern_name") or "").upper() not in _STANDARD_HATCH_PATTERNS)
+
+
+def _has_hatch_pattern_definitions(g: Dict[str, Any]) -> bool:
+    return bool(g.get("pattern_definitions"))
+
+
 def _def_entity_append_reason(def_ent: Dict[str, Any]) -> str:
     g = def_ent.get("geometry") or {}
     if g.get("kind") == "hatch":
         if bool(g.get("is_gradient")):
             return _GRADIENT_HATCH_DEFER_REASON
-        if (g.get("pattern_name")
-                and not bool(g.get("is_solid_fill"))
-                and str(g.get("pattern_name")).upper() not in _STANDARD_HATCH_PATTERNS):
+        if g.get("pattern_name") and _is_custom_hatch_pattern(g) and not _has_hatch_pattern_definitions(g):
             return _CUSTOM_HATCH_DEFER_REASON
     return _UNSUPPORTED_APPEND_REASON
 
@@ -252,8 +259,7 @@ def _def_entity_append_op(block_name: str, def_ent: Dict[str, Any]) -> Optional[
     elif kind == "hatch":
         if bool(g.get("is_gradient")):
             return None
-        if (not bool(g.get("is_solid_fill"))
-                and str(g.get("pattern_name") or "").upper() not in _STANDARD_HATCH_PATTERNS):
+        if _is_custom_hatch_pattern(g) and not _has_hatch_pattern_definitions(g):
             # Drawing-custom pattern names (measured: H3 x181, H1 x1 on 1.dwg)
             # are NOT in headless acad.pat - setPattern(kPreDefined, name)
             # fails errorstatus 3 and fail-closed aborts the whole batch
@@ -281,6 +287,8 @@ def _def_entity_append_op(block_name: str, def_ent: Dict[str, Any]) -> Optional[
                 "is_gradient": g.get("is_gradient"),
                 "loops": copy.deepcopy(loops),
             }
+            if _is_custom_hatch_pattern(g) and _has_hatch_pattern_definitions(g):
+                entity["pattern_definitions"] = copy.deepcopy(g.get("pattern_definitions"))
     elif kind == "face3d":
         edge_visibility = g.get("edge_visibility")
         if (_is_numeric_array(g.get("p0"), min_len=3)

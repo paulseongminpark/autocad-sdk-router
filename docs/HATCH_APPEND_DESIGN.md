@@ -30,3 +30,14 @@
 - `tools/ir_builder.py` is not a generic geometry passthrough for native graph entities; it lifts hatch fields explicitly, so `pattern_definitions` must be preserved there unchanged as a bare pass-through list.
 - REBUILD-side contract for the next packet: stage a temporary `.pat` entry as `*<NAME>\n<angle_deg>, <baseX>, <baseY>, <offsetX>, <offsetY>[, dashes...]`, then replay with `setPattern(kCustomDefined, <NAME>)` and apply `setPatternAngle(...)` / `setPatternScale(...)` separately.
 - Never bake the same transform twice: definition-line `angle_deg` comes only from the stored row radians, while hatch instance rotation/scale remain the existing `pattern_angle` and `pattern_scale` setters.
+
+## REBUILD Implementation Notes
+
+- `tools/patch_ops/blocks.py` now emits drawing-custom block-definition hatches only when `pattern_definitions` is present and non-empty; the emitted `entity` carries `pattern_definitions` verbatim for batch-side `.pat` synthesis. Custom names without definitions still defer with `custom hatch pattern replay pending .pat synthesis`.
+- `tools/patch_engine.py` synthesizes one `.pat` file per unique hatch pattern name per native batch before the per-op job JSON files are written. The exact file naming rule is `<NAME>.pat` with `<NAME>` uppercased, and every emitted hatch job receives `entity.pattern_pat_path` as an absolute forward-slash path to that synthesized file.
+- The only radians-to-degrees conversion site is the batch `.pat` writer (`%.10g` formatting via Python `.10g`), so extractor IR and job payloads stay in radians elsewhere.
+- Router/runtime assumption proven from the custom-script lane: the batch `.scr` is copied into the router's staged DWG directory and `accoreconsole` is launched with that staged DWG directory as its working directory. The native hatch builder therefore copies the synthesized `<NAME>.pat` from `pattern_pat_path` into the current working directory before calling `AcDbHatch::setPattern(AcDbHatch::kCustomDefined, name)`.
+
+## REBUILD Backtrack Trigger
+
+- If custom hatch replay starts failing with `HATCH_CUSTOM_PAT_UNRESOLVED` after the batch-side `.pat` file is present, back out the custom replay branch and re-verify the effective `accoreconsole` working directory / custom-pattern resolution behavior before widening the batch surface.
