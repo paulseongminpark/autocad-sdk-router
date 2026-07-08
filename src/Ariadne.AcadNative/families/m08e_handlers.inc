@@ -1039,6 +1039,29 @@ static Acad::ErrorStatus m08eAppendPolylineEntityForAppend(const std::string& en
 // dbents.h, already #included at the top of the TU before any family .inc. On success returns a
 // freshly new()'d AcDbEntity* (caller owns: appendAcDbEntity() or delete() consumes it). On
 // failure returns nullptr and fills errCode/errMsg for an emitNativeError envelope.
+// "text" is BOTH the kind VALUE and the content KEY in this payload
+// ({"kind": "text", "position": {...}, "text": "..."}). The global
+// jsonFindString takes the FIRST occurrence -- the kind value -- then reads
+// the next quoted token after a colon, which is position's "x" key: every
+// appended text became literal "x" (measured: 72/72 X-FORM_청주 texts on
+// R4c). Locate the KEY occurrence ('"text"' followed by ':') and delegate to
+// jsonFindString on the tail so its proven unescape logic parses the value.
+static bool m08eFindTextContent(const std::string& entityJson, std::string& out)
+{
+    const std::string needle = "\"text\"";
+    size_t pos = 0;
+    while ((pos = entityJson.find(needle, pos)) != std::string::npos) {
+        size_t after = pos + needle.size();
+        while (after < entityJson.size()
+               && std::isspace(static_cast<unsigned char>(entityJson[after])))
+            ++after;
+        if (after < entityJson.size() && entityJson[after] == ':')
+            return jsonFindString(entityJson.substr(pos), "text", out);
+        pos = after;
+    }
+    return false;
+}
+
 static AcDbEntity* m08eBuildEntityForAppend(const std::string& entityJson,
                                             std::string& kindOut,
                                             std::string& errCode,
@@ -1104,7 +1127,7 @@ static AcDbEntity* m08eBuildEntityForAppend(const std::string& entityJson,
             pos.set(x, y, z);
         }
         std::string content;
-        jsonFindString(entityJson, "text", content);
+        m08eFindTextContent(entityJson, content);
         double height = 2.5;
         jsonFindNumber(entityJson, "height", height);
 
