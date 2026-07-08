@@ -1407,11 +1407,53 @@ def make_fixture_ir() -> dict:
     )
 
 
+# --- structural-fallback point-shape defect detection (F-C1-1 hardening) ------
+#
+# The jsonschema branch above catches an un-normalized {x,y(,z)} point object
+# via the schema's point2/point3 array typing. The structural fallback has no
+# schema to consult, so it needs its own (bounded) detector for the exact two
+# F-C1-1 defect shapes an adversarial review PROVED it silently accepted:
+# a dict-form geometry point, and a dict-form rich-section point (viewport /
+# block-table-record / block-definition origin).
+
+_VIEWPORT_POINT_KEYS = (
+    "center", "view_direction", "view_target",
+    "lower_left", "upper_right", "target", "origin",
+)
+
+
+def _is_point_shape_dict(value) -> bool:
+    """True when ``value`` is an un-normalized {x,y(,z)} point object -- the
+    IR schema requires a point2/point3 ARRAY for every such field."""
+    if not isinstance(value, dict):
+        return False
+    keys = set(value.keys())
+    return keys <= {"x", "y", "z"} and "x" in keys and "y" in keys
+
+
+def _find_point_shape_defects(value, path: str = "") -> list[str]:
+    """Recursively walk ``value`` (a geometry payload) and return the dotted
+    key paths of any un-normalized point-shape dict found -- including one
+    nested inside a list (e.g. a list of un-normalized vertex points)."""
+    found: list[str] = []
+    if _is_point_shape_dict(value):
+        found.append(path or "<root>")
+        return found
+    if isinstance(value, dict):
+        for k, v in value.items():
+            found.extend(_find_point_shape_defects(v, f"{path}.{k}" if path else k))
+    elif isinstance(value, (list, tuple)):
+        for i, v in enumerate(value):
+            found.extend(_find_point_shape_defects(v, f"{path}[{i}]"))
+    return found
+
+
 def _validate_ir(ir: dict):
     """Validate an IR dict against the schema if jsonschema is importable.
 
     Returns (ok: bool, method: str, errors: list[str]). Falls back to structural
-    checks (required keys + truth gate) when jsonschema is unavailable.
+    checks (required keys + truth gate + point-shape defect scan) when
+    jsonschema is unavailable.
     """
     schema_path = Path(__file__).resolve().parent.parent / "schemas" / "dwg_graph_ir.v1.schema.json"
     errors: list[str] = []
@@ -1436,12 +1478,44 @@ def _validate_ir(ir: dict):
         diag = ir.get("diagnostics") or {}
         if diag.get("entity_count") != len(ir.get("entities") or []):
             errors.append("truth gate: diagnostics.entity_count != len(entities)")
-        for ent in ir.get("entities") or []:
+        for i, ent in enumerate(ir.get("entities") or []):
+            if not isinstance(ent, dict):
+                continue
             for rk in ("handle", "class", "dxf_name", "owner_handle", "space",
                        "layer", "bbox", "geometry", "source"):
                 if rk not in ent:
                     errors.append(f"entity {ent.get('handle')!r} missing required field {rk}")
                     break
+            # F-C1-1 defect A: an entity geometry point surviving as a dict
+            # (e.g. {"x":0,"y":0,"z":0}) instead of the schema's point3/point2
+            # array -- jsonschema catches this by typing; this is the fallback
+            # equivalent.
+            geom = ent.get("geometry")
+            if isinstance(geom, dict):
+                for key_path in _find_point_shape_defects(geom):
+                    errors.append(
+                        f"entity[{i}] geometry.{key_path} is an un-normalized "
+                        "point object (expected a point array)")
+        # F-C1-1 defect A, rich-section variants: symbol_tables.viewports[]
+        # center/view_direction/etc, block_table_records[].origin, and
+        # block_definitions[].origin surviving as dicts instead of arrays.
+        for vp in (ir.get("symbol_tables") or {}).get("viewports") or []:
+            if not isinstance(vp, dict):
+                continue
+            for key in _VIEWPORT_POINT_KEYS:
+                if isinstance(vp.get(key), dict):
+                    errors.append(
+                        f"symbol_tables.viewports[].{key} is an object, "
+                        "expected a point array")
+        for btr in (ir.get("symbol_tables") or {}).get("block_table_records") or []:
+            if isinstance(btr, dict) and isinstance(btr.get("origin"), dict):
+                errors.append(
+                    "symbol_tables.block_table_records[].origin is an "
+                    "object, expected a point array")
+        for bd in ir.get("block_definitions") or []:
+            if isinstance(bd, dict) and isinstance(bd.get("origin"), dict):
+                errors.append(
+                    "block_definitions[].origin is an object, expected a point array")
         return (len(errors) == 0, "structural", errors[:20])
 
 

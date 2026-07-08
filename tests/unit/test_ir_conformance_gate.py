@@ -20,11 +20,14 @@ Discoverable by pytest and ``python -m unittest discover -s tests``.
 """
 from __future__ import annotations
 
+import builtins
 import json
 import os
 import sys
 import tempfile
 import unittest
+from contextlib import contextmanager
+from unittest import mock
 
 _THIS = os.path.dirname(os.path.abspath(__file__))
 _REPO = os.path.dirname(os.path.dirname(_THIS))
@@ -39,6 +42,24 @@ _JSON_ENCODING = "utf-8-sig"
 def _load_json(path):
     with open(path, "r", encoding=_JSON_ENCODING) as fh:
         return json.load(fh)
+
+
+@contextmanager
+def _no_jsonschema():
+    """Simulate jsonschema being unavailable (ImportError), forcing
+    ir_builder._validate_ir / cad_diff.validate_diff onto their structural
+    fallback -- the same monkeypatch technique an adversarial review used to
+    PROVE that fallback silently accepts document shapes jsonschema rejects
+    (F-C1-1 point-shape defects, a changed_handles record missing "change")."""
+    real_import = builtins.__import__
+
+    def _fake_import(name, *args, **kwargs):
+        if name == "jsonschema" or name.startswith("jsonschema."):
+            raise ImportError("jsonschema blocked for structural-fallback test")
+        return real_import(name, *args, **kwargs)
+
+    with mock.patch.object(builtins, "__import__", side_effect=_fake_import):
+        yield
 
 
 class TestIRWriteGate(unittest.TestCase):
@@ -147,6 +168,98 @@ class TestKindCoverageGuard(unittest.TestCase):
             missing, set(),
             "geometry.kind(s) emitted by the builder but NOT in the schema enum "
             "(the F-C1-1 defect-B class): %s" % sorted(missing))
+
+
+class TestStructuralFallbackHardening(unittest.TestCase):
+    """Structural fallback (jsonschema unavailable) must reject the two
+    F-C1-1-class defects an adversarial review PROVED it silently accepted
+    (a dict-form geometry/viewport point; a changed_handles record missing
+    "change"), and must not false-reject a well-formed doc."""
+
+    def setUp(self):
+        import ir_builder
+        import cad_diff
+        self.ir_builder = ir_builder
+        self.cad_diff = cad_diff
+
+    def test_fallback_rejects_dict_form_geometry_point(self):
+        # PASS 3.2-style defect: a point OBJECT where the schema requires a
+        # point3 ARRAY -- the exact F-C1-1 failure class.
+        ir = self.ir_builder.make_fixture_ir()
+        ir["entities"][0]["geometry"]["start"] = {"x": 0, "y": 0, "z": 0}
+        with _no_jsonschema():
+            ok, method, errors = self.ir_builder.validate_ir(ir)
+        self.assertEqual(method, "structural")
+        self.assertFalse(ok)
+        self.assertTrue(errors)
+
+    def test_fallback_rejects_2d_dict_form_geometry_point(self):
+        ir = self.ir_builder.make_fixture_ir()
+        ir["entities"][1]["geometry"]["center"] = {"x": 5, "y": 5}
+        with _no_jsonschema():
+            ok, method, errors = self.ir_builder.validate_ir(ir)
+        self.assertEqual(method, "structural")
+        self.assertFalse(ok)
+
+    def test_fallback_rejects_dict_form_viewport_center(self):
+        ir = self.ir_builder.make_fixture_ir()
+        ir["symbol_tables"]["viewports"] = [
+            {"name": "vp", "center": {"x": 0, "y": 0}},
+        ]
+        with _no_jsonschema():
+            ok, method, errors = self.ir_builder.validate_ir(ir)
+        self.assertEqual(method, "structural")
+        self.assertFalse(ok)
+
+    def test_fallback_rejects_malformed_change_record(self):
+        pre = self.ir_builder.make_fixture_ir()
+        post = self.ir_builder.make_fixture_ir()
+        diff = self.cad_diff.compute_diff(pre, post)
+        diff["changed_handles"] = [{"handle": "X"}]  # missing required "change"
+        with _no_jsonschema():
+            ok, method, errors = self.cad_diff.validate_diff(diff)
+        self.assertEqual(method, "structural")
+        self.assertFalse(ok)
+
+    def test_fallback_accepts_well_formed_ir(self):
+        # No false rejection: a genuinely conformant IR must still pass under
+        # the structural fallback, not just under jsonschema.
+        ir = self.ir_builder.make_fixture_ir()
+        with _no_jsonschema():
+            ok, method, errors = self.ir_builder.validate_ir(ir)
+        self.assertEqual(method, "structural")
+        self.assertTrue(ok, errors)
+
+    def test_fallback_accepts_well_formed_diff(self):
+        pre = self.ir_builder.make_fixture_ir()
+        post = self.ir_builder.make_fixture_ir()
+        diff = self.cad_diff.compute_diff(pre, post)
+        with _no_jsonschema():
+            ok, method, errors = self.cad_diff.validate_diff(diff)
+        self.assertEqual(method, "structural")
+        self.assertTrue(ok, errors)
+
+    def test_fallback_write_ir_refuses_bad_doc_and_writes_nothing(self):
+        ir = self.ir_builder.make_fixture_ir()
+        ir["entities"][0]["geometry"]["start"] = {"x": 0, "y": 0, "z": 0}
+        with tempfile.TemporaryDirectory() as td:
+            out = os.path.join(td, "fallback_bad", "dwg_graph_ir.json")
+            with _no_jsonschema():
+                with self.assertRaises(self.ir_builder.IRConformanceError):
+                    self.ir_builder.write_ir(ir, out)
+            self.assertFalse(os.path.exists(out))
+
+    def test_fallback_write_diff_refuses_bad_doc_and_writes_nothing(self):
+        pre = self.ir_builder.make_fixture_ir()
+        post = self.ir_builder.make_fixture_ir()
+        diff = self.cad_diff.compute_diff(pre, post)
+        diff["changed_handles"] = [{"handle": "X"}]
+        with tempfile.TemporaryDirectory() as td:
+            out = os.path.join(td, "fallback_baddiff", "cad_diff.json")
+            with _no_jsonschema():
+                with self.assertRaises(self.cad_diff.DiffConformanceError):
+                    self.cad_diff.write_diff(diff, out)
+            self.assertFalse(os.path.exists(out))
 
 
 if __name__ == "__main__":

@@ -227,10 +227,30 @@ def validate_diff(diff: Dict[str, Any]) -> Tuple[bool, str, List[str]]:
                 errors.append("missing required key: %s" % key)
         if diff.get("schema") != DIFF_SCHEMA_ID:
             errors.append("schema const mismatch: %r" % diff.get("schema"))
+        # each changed_handles[] record must carry a usable handle AND a
+        # change kind in the schema's closed enum -- the measured adversarial
+        # defect was `{"handle": "X"}` (no "change") silently passing here.
+        for i, rec in enumerate(diff.get("changed_handles") or []):
+            if not isinstance(rec, dict):
+                errors.append("changed_handles[%d] is not an object" % i)
+                continue
+            handle = rec.get("handle")
+            if not isinstance(handle, str) or not handle.strip():
+                errors.append("changed_handles[%d] missing a usable handle" % i)
+            change = rec.get("change")
+            if change not in ("added", "removed", "modified"):
+                errors.append(
+                    "changed_handles[%d] change must be one of "
+                    "added/removed/modified, got %r" % (i, change))
         summ = diff.get("summary") or {}
         for key in ("added", "removed", "modified"):
             if key not in summ:
                 errors.append("summary missing required key: %s" % key)
+                continue
+            val = summ.get(key)
+            if isinstance(val, bool) or not isinstance(val, int) or val < 0:
+                errors.append(
+                    "summary.%s must be a non-negative int, got %r" % (key, val))
         return (len(errors) == 0, "structural", errors[:20])
 
 
