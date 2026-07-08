@@ -1,0 +1,148 @@
+{
+  "schema": "ariadne.ir_section_coverage.v1",
+  "sections_absent": [
+    "b.extension_dictionaries"
+  ],
+  "sections": {
+    "entities": {
+      "a": 375,
+      "b": 375,
+      "pct": 100.0
+    },
+    "block_definitions": {
+      "a_defs": 407,
+      "b_defs": 248,
+      "a_def_entities": 28183,
+      "b_def_entities": 21447,
+      "pct_defs": 60.93,
+      "pct_def_entities": 76.1,
+      "missing_def_names_sample": [
+        "DIMDOT",
+        "_ArchTick",
+        "X-평면도(기본형)$0$ins-l",
+        "*U45",
+        "*U47",
+        "*U48",
+        "*U49",
+        "*U50",
+        "*U51",
+        "*U52",
+        "*U53",
+        "*U54",
+        "*U55",
+        "*U56",
+        "*U57",
+        "*U58",
+        "*U59",
+        "*U60",
+        "*U61",
+        "*U62"
+      ]
+    },
+    "symbol_tables": {
+      "per_table": {
+        "app_ids": {
+          "a_records": 25,
+          "b_records": 7,
+          "pct": 28.0
+        },
+        "block_table_records": {
+          "a_records": 410,
+          "b_records": 251,
+          "pct": 61.22
+        },
+        "dim_styles": {
+          "a_records": 6,
+          "b_records": 2,
+          "pct": 33.33
+        },
+        "layers": {
+          "a_records": 91,
+          "b_records": 86,
+          "pct": 94.51
+        },
+        "linetypes": {
+          "a_records": 18,
+          "b_records": 3,
+          "pct": 16.67
+        },
+        "text_styles": {
+          "a_records": 8,
+          "b_records": 2,
+          "pct": 25.0
+        },
+        "ucs": {
+          "a_records": 0,
+          "b_records": 0,
+          "pct": 100.0
+        },
+        "viewports": {
+          "a_records": 1,
+          "b_records": 1,
+          "pct": 100.0
+        },
+        "views": {
+          "a_records": 0,
+          "b_records": 0,
+          "pct": 100.0
+        }
+      }
+    },
+    "layouts": {
+      "a": 3,
+      "b": 3,
+      "names_missing_in_b": []
+    },
+    "dictionaries": {
+      "a": 1,
+      "b": 1
+    },
+    "xrecords": {
+      "a": 2,
+      "b": 1
+    },
+    "extension_dictionaries": {
+      "a": 1,
+      "b": 0
+    },
+    "xdata": {
+      "entities_with_xdata_a": 64,
+      "entities_with_xdata_b": 0
+    }
+  },
+  "headline": {
+    "overall_weighted_pct": 75.78,
+    "worst_sections": [
+      {
+        "section": "block_definitions.def_entities",
+        "missing": 6736,
+        "a": 28183,
+        "b": 21447
+      },
+      {
+        "section": "block_definitions",
+        "missing": 159,
+        "a": 407,
+        "b": 248
+      },
+      {
+        "section": "symbol_tables.block_table_records",
+        "missing": 159,
+        "a": 410,
+        "b": 251
+      },
+      {
+        "section": "xdata",
+        "missing": 64,
+        "a": 64,
+        "b": 0
+      },
+      {
+        "section": "symbol_tables.app_ids",
+        "missing": 18,
+        "a": 25,
+        "b": 7
+      }
+    ]
+  }
+}
