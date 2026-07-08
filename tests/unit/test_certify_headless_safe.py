@@ -580,6 +580,54 @@ class TestCertifyHeadlessSafe(unittest.TestCase):
         # apply is idempotent (already-safe + already-ref -> no-op)
         self.assertFalse(chs.apply_certification("define.arrayrect", envelope, router_home=root))
 
+    def test_apply_refused_when_resumed_envelope_fixture_sha_mismatches(self):
+        """WHY (safety, no-fake-CERTIFIED): --apply must not flip the registry from a resumed
+        envelope whose recorded fixture sha does not match the current --dwg (stale / other-
+        fixture / hand-tampered verdict). The flip is refused; the bit stays false."""
+        tmp, router, frag_path, dwg, out_dir = self._router_and_dwg()
+        self.addCleanup(tmp.cleanup)
+        out_dir.mkdir(parents=True, exist_ok=True)
+        env = {
+            "schema": chs.ENVELOPE_SCHEMA,
+            "template_id": "tmpl.audit",
+            "verdict": chs.CERTIFIED,
+            "reason": chs.REASON_CERTIFIED,
+            "original_sha256_before": "0" * 64,  # does NOT match dwg -> untrusted
+            "evidence_paths": {"envelope": "prebuilt"},
+        }
+        chs.envelope_path(out_dir, "tmpl.audit").write_text(
+            json.dumps(env, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+
+        class FakeCad(_FakeCadBase):
+            def run_command_template(self, *a, **k):
+                raise AssertionError("resume path must not execute cadctl")
+
+        with mock.patch.object(chs.cadctl, "Cad", FakeCad):
+            envelopes, exit_code = chs.run_batch(
+                ["tmpl.audit"], dwg_path=dwg, out_dir=out_dir,
+                timeout_sec=30, apply=True, router_home=router)
+
+        self.assertGreaterEqual(exit_code, 1)
+        self.assertIn("apply_refused_reason", envelopes[0])
+        doc = json.loads(frag_path.read_text(encoding="utf-8-sig"))
+        self.assertFalse(doc["templates"][0]["headless_safe"])
+        self.assertNotIn("evidence_refs", doc["templates"][0])
+
+    def test_apply_trust_check_matches_and_rejects(self):
+        """Unit: _apply_trust_check passes only on schema + template_id + fixture-sha match."""
+        tmp, router, _frag, dwg, _out = self._router_and_dwg()
+        self.addCleanup(tmp.cleanup)
+        good = {
+            "schema": chs.ENVELOPE_SCHEMA,
+            "template_id": "tmpl.audit",
+            "original_sha256_before": chs.tls.sha256_file(dwg),
+        }
+        self.assertTrue(chs._apply_trust_check(good, "tmpl.audit", dwg)[0])
+        self.assertFalse(chs._apply_trust_check({**good, "schema": "x"}, "tmpl.audit", dwg)[0])
+        self.assertFalse(chs._apply_trust_check(good, "other.id", dwg)[0])
+        self.assertFalse(
+            chs._apply_trust_check({**good, "original_sha256_before": "0" * 64}, "tmpl.audit", dwg)[0])
+
     def test_resume_skip_reuses_existing_envelope_without_invoking_cad(self):
         """WHY: certification is resumable; an existing envelope is the source of truth unless --force reruns it."""
         tmp, router, _frag_path, dwg, out_dir = self._router_and_dwg()

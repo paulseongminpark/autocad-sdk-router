@@ -577,11 +577,45 @@ def _is_safety_envelope(envelope: dict) -> bool:
     )
 
 
+def _apply_trust_check(envelope: dict, template_id: str,
+                       dwg_path: str | Path) -> tuple[bool, str | None]:
+    """Guard the registry flip against an untrusted / stale / wrong-fixture envelope.
+
+    run_batch resumes a CERTIFIED envelope from disk WITHOUT re-running CAD (by design),
+    and --apply would otherwise flip headless_safe=true on nothing but that file's verdict
+    string -- so `--dwg <anything> --out-dir <dir-with-a-CERTIFIED-envelope> --apply` could
+    flip the registry with zero CAD in the invocation. Before honoring a CERTIFIED envelope
+    for apply, require that its identity + the fixture it was certified against match THIS
+    invocation: schema, template_id, and original_sha256_before == sha256 of the current
+    --dwg. Any mismatch refuses the flip."""
+    if envelope.get("schema") != ENVELOPE_SCHEMA:
+        return False, f"schema mismatch ({envelope.get('schema')!r})"
+    if envelope.get("template_id") != template_id:
+        return False, f"template_id mismatch ({envelope.get('template_id')!r} != {template_id!r})"
+    recorded = envelope.get("original_sha256_before")
+    try:
+        actual = tls.sha256_file(dwg_path)
+    except OSError as exc:
+        return False, f"cannot read --dwg to verify sha ({exc})"
+    if not recorded or recorded != actual:
+        return False, (f"fixture sha mismatch (envelope {str(recorded)[:16]}... "
+                       f"!= --dwg {actual[:16]}...)")
+    return True, None
+
+
 def run_batch(template_ids: list[str], *, dwg_path: str | Path, out_dir: str | Path,
               timeout_sec: float, apply: bool = False, force: bool = False,
               router_home: Path | str = ROUTER_HOME, cad_factory=None) -> tuple[list[dict], int]:
     out_dir = Path(out_dir)
     out_dir.mkdir(parents=True, exist_ok=True)
+
+    # angle-4 defense: the fixture must not drift mid-batch. A corruption during
+    # template A's run must not be silently adopted as template B's "pristine" baseline
+    # (certify recomputes original_sha_before per call, so a loud stop has to live here).
+    try:
+        batch_baseline_sha = tls.sha256_file(dwg_path)
+    except OSError:
+        batch_baseline_sha = None
 
     # Compute the ORIGINAL fixture's baseline IR once for the whole batch (same fixture,
     # immutable) so per-template certify only inspects its own staged_result + diffs.
@@ -602,6 +636,17 @@ def run_batch(template_ids: list[str], *, dwg_path: str | Path, out_dir: str | P
     overall_exit = 0
 
     for template_id in template_ids:
+        if batch_baseline_sha is not None:
+            try:
+                now_sha = tls.sha256_file(dwg_path)
+            except OSError:
+                now_sha = None
+            if now_sha is not None and now_sha != batch_baseline_sha:
+                print(f"[run_batch] HARD STOP: fixture {dwg_path} changed mid-batch "
+                      f"({batch_baseline_sha[:16]}... -> {now_sha[:16]}...); refusing further work",
+                      file=sys.stderr)
+                overall_exit = 2
+                break
         env_path = envelope_path(out_dir, template_id)
         if env_path.is_file() and not force:
             envelope = _load_json_doc(env_path)
@@ -625,7 +670,15 @@ def run_batch(template_ids: list[str], *, dwg_path: str | Path, out_dir: str | P
                 _write_json_style(env_path, envelope)
 
         if apply and envelope.get("verdict") == CERTIFIED:
-            apply_certification(template_id, envelope, router_home=router_home)
+            trust_ok, trust_reason = _apply_trust_check(envelope, template_id, dwg_path)
+            if trust_ok:
+                apply_certification(template_id, envelope, router_home=router_home)
+            else:
+                envelope["apply_refused_reason"] = trust_reason
+                print(f"[run_batch] REFUSED --apply of {template_id}: {trust_reason}",
+                      file=sys.stderr)
+                if overall_exit < 1:
+                    overall_exit = 1
 
         envelopes.append(envelope)
 
