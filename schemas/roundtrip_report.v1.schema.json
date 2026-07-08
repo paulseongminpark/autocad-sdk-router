@@ -1,0 +1,121 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "ariadne.roundtrip_report.v1",
+  "title": "Ariadne Roundtrip Report v1",
+  "description": "Machine contract for roundtrip fidelity reports produced by tools/roundtrip_report.py build_report. additionalProperties true at every object level for forward-compatible extension by sibling packets.",
+  "type": "object",
+  "additionalProperties": true,
+  "required": ["schema", "run_dir", "ceiling", "kind_buckets", "patterns", "naive_vs_smart", "totals"],
+  "properties": {
+    "schema": { "type": "string", "const": "ariadne.roundtrip_report.v1" },
+    "run_dir": { "type": "string" },
+    "source": { "$ref": "#/$defs/source" },
+    "ceiling": { "$ref": "#/$defs/ceiling" },
+    "kind_buckets": { "$ref": "#/$defs/kind_buckets" },
+    "patterns": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/pattern" }
+    },
+    "naive_vs_smart": { "$ref": "#/$defs/naive_vs_smart" },
+    "totals": { "$ref": "#/$defs/totals" }
+  },
+  "$defs": {
+    "source": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "original_path": { "type": "string" },
+        "original_sha256": { "type": "string" },
+        "staged_sha256": { "type": "string" }
+      }
+    },
+    "ceiling": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": ["modelspace_entity_total", "certified_total", "out_of_class_total", "deferred_count"],
+      "properties": {
+        "modelspace_entity_total": { "type": "integer", "minimum": 0 },
+        "certified_total": { "type": "integer", "minimum": 0 },
+        "out_of_class_total": { "type": "integer", "minimum": 0 },
+        "deferred_count": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "kind_buckets": {
+      "type": "object",
+      "additionalProperties": { "$ref": "#/$defs/kind_bucket" }
+    },
+    "kind_bucket": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": [
+        "status",
+        "certified",
+        "census_count",
+        "attempted_count",
+        "diff0_count",
+        "modified_count",
+        "removed_count",
+        "added_count"
+      ],
+      "properties": {
+        "status": { "type": "string", "enum": ["PASS", "FAIL", "VACUOUS"] },
+        "certified": { "type": "boolean" },
+        "label": { "type": ["string", "null"] },
+        "kind": { "type": ["string", "null"] },
+        "census_count": { "type": "integer", "minimum": 0 },
+        "attempted_count": { "type": "integer", "minimum": 0 },
+        "diff0_count": { "type": "integer", "minimum": 0 },
+        "modified_count": { "type": "integer", "minimum": 0 },
+        "removed_count": { "type": "integer", "minimum": 0 },
+        "added_count": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "pattern_signature": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": ["dxf_name", "change", "context"],
+      "properties": {
+        "dxf_name": { "type": "string" },
+        "change": { "type": "string" },
+        "context": { "type": "string" }
+      }
+    },
+    "pattern": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": ["signature", "count", "judgment"],
+      "properties": {
+        "signature": { "$ref": "#/$defs/pattern_signature" },
+        "count": { "type": "integer", "minimum": 0 },
+        "judgment": {
+          "type": "string",
+          "enum": ["harmless", "harmful", "unreviewed"]
+        },
+        "examples": {
+          "type": "array",
+          "maxItems": 3,
+          "items": {
+            "type": "object",
+            "additionalProperties": true
+          }
+        },
+        "rule_id": { "type": ["string", "null"] },
+        "note": { "type": "string" }
+      }
+    },
+    "naive_vs_smart": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": ["naive_pass", "smart_all_diff0", "contrast_note"],
+      "properties": {
+        "naive_pass": { "type": "boolean" },
+        "smart_all_diff0": { "type": "boolean" },
+        "contrast_note": { "type": "string" }
+      }
+    },
+    "totals": {
+      "type": "object",
+      "additionalProperties": true
+    }
+  }
+}
