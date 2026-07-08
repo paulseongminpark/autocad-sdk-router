@@ -31,7 +31,7 @@ Class definitions (verbatim from `tools\probe_reachability.py`, the classifier t
 - **RUNNABLE** — a deliberately-authored valid-arg fixture created a real, non-degenerate result.
 - **REACHABLE** — the native dispatcher responded with a structured arg/precondition error (`MISSING_ARG` et al.) — reachable, zero roundtrip value on its own.
 - **RUNNABLE_BUT_DEGENERATE** — the op "succeeds" (`created:true`) on empty/underspecified args — input-unvalidated; never trusted as RUNNABLE until it either arg-validates or passes a non-degeneracy assertion.
-- **ATTENDED_ONLY** — the probe timed out (60s outer budget). **Caveat (post-sweep triage, see `crash_triage_20260707.md`):** all 15 ATTENDED_ONLY rows are assessed as *possible false positives* — the 60s budget covers BOTH probe legs (empty-arg + valid-arg) while the accoreconsole cold-start floor on this machine is ~50s/leg, and structurally only 5 registry ops (`execution_host_class==full_autocad`) can even route to an attended session, none of which are among these 15. Treat ATTENDED_ONLY here as "timed out under a starved budget", not proven attendedness; a re-probe at `--timeout-sec 180` is the settling experiment.
+- **ATTENDED_ONLY** — the probe timed out (60s outer budget). **Caveat (post-sweep triage, see `crash_triage_20260707.md`):** all 15 ATTENDED_ONLY rows are assessed as *possible false positives* — the 60s budget covers BOTH probe legs (empty-arg + valid-arg) while the accoreconsole cold-start floor on this machine is ~50s/leg, and structurally only 5 registry ops (`execution_host_class==full_autocad`) can even route to an attended session, none of which are among these 15. Treat ATTENDED_ONLY here as "timed out under a starved budget", not proven attendedness; a re-probe at `--timeout-sec 180` is the settling experiment. **Update (2026-07-08):** upgraded from *possible false positives* to **confirmed false positives** — see §7, re-probe.
 - **CRASH** — the isolated probe subprocess died abnormally, or the native job produced no parseable result (the engine died mid-run).
 
 ---
@@ -145,3 +145,58 @@ print('classification_source:', collections.Counter(r.get('classification_source
 - `reports\crash34_host_eligibility_crosscheck.md` — wave-6 crash cross-check (§5 comparison)
 - commit `a1fedc61e55021e9c6e5d4938352cc77f446f8e6` — policy-annotation hygiene fix + staleness caveat (§5 comparison)
 - 16-shard verification results supplied by the overnight verification pass (§3, §4 — quoted verbatim where the shard included prose notes; shards without notes are reported as checked/clean counts only)
+
+---
+
+## 7. Re-probe validation (2026-07-08, per-leg timeout)
+
+After the overnight sweep above, two truthfulness fixes landed in commit `112d48f`:
+
+1. **Per-leg probe timeout** — each probe leg (empty-arg control + valid-arg fixture) now gets its own full `--timeout-sec` budget, instead of the two legs sharing one budget. This directly addresses the §1 ATTENDED_ONLY caveat's hypothesis (starved shared budget, not genuine attendedness).
+2. **`FIXTURES` entries for 23 promotable `RUNNABLE_BUT_DEGENERATE` ops** — valid-arg fixtures authored for ops that previously only had an empty-arg probe.
+
+A targeted live re-probe of **38 ops** (the 15 `ATTENDED_ONLY` + the 23 newly-fixtured `RUNNABLE_BUT_DEGENERATE`) was run with `--timeout-sec 90`, per-op isolated subprocess, staged copies only. The original fixture (`native_sample.dwg`, `sha256 eac5d4b13d67d89106e503321412539df7b39b8a7f4e44c033448e9295fe3f76`) was verified **unchanged** across all 63 probe envelopes produced by the re-probe (0 integrity violations).
+
+### 7.1 ATTENDED_ONLY caveat — confirmed
+
+The §1 caveat is now proven correct: all 15 `ATTENDED_ONLY` ops resolved under the per-leg timeout, and **zero** remained `ATTENDED_ONLY`.
+
+| Resolved to | Count |
+|---|---:|
+| RUNNABLE | 7 |
+| REACHABLE | 8 |
+| **Total resolved** | **15** |
+
+This confirms the class was entirely a shared-budget timeout artifact, not genuine attendedness. Notably, the regression pair `extend.customclass.create` and `extend.customobject.create` (the latter flagged as the §4 broken-artifact anomaly) both resolved to **RUNNABLE**.
+
+### 7.2 RUNNABLE_BUT_DEGENERATE fixture promotions
+
+All 23 fixture-promoted ops flipped `RUNNABLE_BUT_DEGENERATE` → `RUNNABLE` — **23/23**.
+
+### 7.3 Updated full 488-op distribution
+
+Applying the 38 live re-probe rows over the overnight (2026-07-07) baseline:
+
+| class | overnight (2026-07-07) | re-probed (2026-07-08) | delta |
+|---|---:|---:|---:|
+| RUNNABLE | 270 | 300 | +30 |
+| REACHABLE | 171 | 179 | +8 |
+| RUNNABLE_BUT_DEGENERATE | 30 | 7 | -23 |
+| ATTENDED_ONLY | 15 | 0 | -15 |
+| CRASH | 2 | 2 | 0 |
+| **Total** | **488** | **488** | |
+
+Every delta is fully accounted for:
+
+- RUNNABLE +30 = 23 promoted (§7.2) + 7 ATTENDED→RUNNABLE (§7.1).
+- REACHABLE +8 = 8 ATTENDED→REACHABLE (§7.1).
+- RUNNABLE_BUT_DEGENERATE -23 = the 23 promoted (§7.2).
+- ATTENDED_ONLY -15 = the 15 resolved (§7.1).
+- CRASH unchanged (2) — `live.jig.point_probe` and `live.status`, both genuine editor-session ops (per §5), not re-probed.
+
+The 7 remaining `RUNNABLE_BUT_DEGENERATE` ops are a deliberately-deferred set, not an unresolved gap: `write.entity.body` (degenerate by construction), the 5 zero-arg reactor/assoc ops, and `write.entity.solid3d.loft` (deferred as classifier-gaming).
+
+### 7.4 Evidence
+
+- `runs\reprobe_20260708\reachable_matrix_v2_20260708.jsonl` — 488-row updated matrix.
+- `runs\reprobe_20260708\work\` — per-op probe envelopes for the 38 re-probed ops.
