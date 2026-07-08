@@ -655,6 +655,10 @@
             "poly_face_mesh",
             "face3d",
             "trace",
+            "rasterimage",
+            "image",
+            "wipeout",
+            "mpolygon",
             "proxy",
             "unsupported"
           ]

@@ -89,6 +89,26 @@ def _synthetic_native_result():
             ],
             "linetypes": [{"name": "Continuous", "handle": "14"}],
             "text_styles": [{"name": "Standard", "handle": "15"}],
+            # F-C1-1 regression fixture (defect A): the native ObjectARX side
+            # emits viewport points as {x,y(,z)} OBJECTS. The schema types
+            # center as point2 and view_target/view_direction as point3 ARRAYS.
+            # Before the builder's _coerce_rich_section_points fix this made the
+            # native_full IR non-conformant -- and the pre-fix fixtures lacked a
+            # viewports section, which is exactly why the conformance tests below
+            # never caught the live regression. This entry restores the missing
+            # coverage so test_validates_against_schema is now a real guard.
+            "viewports": [
+                {
+                    "handle": "2D", "name": "*Active",
+                    "lower_left": {"x": 0, "y": 0},
+                    "upper_right": {"x": 1, "y": 1},
+                    "center": {"x": 117740.01, "y": 14597.02},
+                    "height": 114448.86, "width": 236290.03,
+                    "target": {"x": 0, "y": 0, "z": 0},
+                    "view_direction": {"x": 0, "y": 0, "z": 1},
+                    "circle_sides": 20000,
+                }
+            ],
         },
         "block_table_records": [
             {"name": "*Model_Space", "handle": "1F", "is_layout": True},
@@ -345,6 +365,55 @@ class TestSyntheticNativeMapping(unittest.TestCase):
         # and it still counts toward the truth gate.
         self.assertEqual(ir["diagnostics"]["entity_count"], len(ir["entities"]))
         self.assertEqual(ir["diagnostics"]["entity_count"], 5)
+
+    def test_viewport_points_coerced_to_arrays(self):
+        # F-C1-1 defect A: native viewport point OBJECTS ({x,y}/{x,y,z}) must be
+        # normalized to the schema's point2/point3 ARRAYS by the builder, not
+        # carried through verbatim. center=point2 (exactly 2 elems);
+        # view_direction/target=point3 (exactly 3). This is the exact shape that
+        # made the 10 production IRs INVALID before the fix.
+        vp = self.ir["symbol_tables"]["viewports"][0]
+        self.assertEqual(vp["center"], [117740.01, 14597.02])
+        self.assertEqual(vp["view_direction"], [0.0, 0.0, 1.0])
+        self.assertEqual(vp["target"], [0.0, 0.0, 0.0])
+        self.assertEqual(vp["lower_left"], [0.0, 0.0])
+        self.assertEqual(vp["upper_right"], [1.0, 1.0])
+        for key in ("center", "lower_left", "upper_right"):
+            self.assertIsInstance(vp[key], list)
+            self.assertEqual(len(vp[key]), 2)
+        for key in ("view_direction", "target"):
+            self.assertIsInstance(vp[key], list)
+            self.assertEqual(len(vp[key]), 3)
+
+    def test_wipeout_block_def_kind_is_valid_and_conforms(self):
+        # F-C1-1 defect B: AcDbWipeout is a live-certified DECODED kind
+        # ("wipeout") emitted by _NATIVE_CLASS_TO_DXF_KIND; the schema enum must
+        # ADMIT it (additive widening) rather than the builder faking it to
+        # "unsupported". Exercised through a block definition's def_entities --
+        # the exact shape that failed in the A1_D2/A1_D3 production IRs.
+        result = _synthetic_native_result()
+        result["block_definitions"][0]["def_entities"] = [
+            {"handle": "W01", "dxf_name": "AcDbWipeout", "owner_handle": "A0",
+             "space": "block", "layer": "0",
+             "origin": {"x": 0.0, "y": 0.0, "z": 0.0},
+             "image_size": [100, 50], "clip_boundary_type": 1},
+        ]
+        ir = self.ir_builder.build_ir_from_database_graph(result, _source_meta())
+        def_ent = ir["block_definitions"][0]["def_entities"][0]
+        self.assertEqual(def_ent["dxf_name"], "WIPEOUT")
+        self.assertEqual(def_ent["geometry"]["kind"], "wipeout")
+        self.assertTrue(def_ent["source"]["decoded"])
+        jsonschema = _try_import_jsonschema()
+        if jsonschema is None:
+            self.skipTest("SKIPPED_DEP: jsonschema not importable")
+        schema = _load_json(os.path.join(_SCHEMAS, "dwg_graph_ir.v1.schema.json"))
+        validator = jsonschema.Draft7Validator(schema)
+        errors = sorted(validator.iter_errors(ir), key=lambda e: list(e.path))
+        self.assertEqual(
+            errors, [],
+            "wipeout-bearing native_full IR does not conform: "
+            + "; ".join("%s: %s" % ("/".join(str(p) for p in e.path), e.message)
+                       for e in errors[:8]))
 
 
 class TestSyntheticIrSchemaConforms(unittest.TestCase):

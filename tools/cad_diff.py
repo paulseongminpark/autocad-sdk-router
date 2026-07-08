@@ -195,8 +195,67 @@ def load_diff(path) -> Dict[str, Any]:
         return json.load(fh)
 
 
-def write_diff(diff: Dict[str, Any], path) -> str:
-    """Write a cad_diff document (UTF-8, pretty). Returns the path written."""
+class DiffConformanceError(ValueError):
+    """Raised by the conformance gate when a cad_diff.v1-tagged diff does not
+    satisfy the schema of record."""
+
+
+_DIFF_SCHEMA_PATH = os.path.join(_ROUTER_HOME, "schemas", "cad_diff.v1.schema.json")
+
+
+def validate_diff(diff: Dict[str, Any]) -> Tuple[bool, str, List[str]]:
+    """Validate a diff against cad_diff.v1. Returns ``(ok, method, errors)``.
+
+    Uses jsonschema when importable (the machine has 4.26.0), else a structural
+    fallback over cad_diff.v1's required keys. Reusable core of the T1 gate.
+    """
+    errors: List[str] = []
+    try:
+        import jsonschema  # type: ignore
+        with open(_DIFF_SCHEMA_PATH, "r", encoding=_JSON_ENCODING) as fh:
+            schema = json.load(fh)
+        validator = jsonschema.Draft7Validator(schema)
+        errors = [
+            "%s: %s" % ("/".join(str(p) for p in e.path), e.message)
+            for e in sorted(validator.iter_errors(diff), key=lambda e: list(e.path))
+        ]
+        return (len(errors) == 0, "jsonschema", errors[:20])
+    except ImportError:
+        for key in ("schema", "diff_id", "before_ref", "after_ref",
+                    "changed_handles", "summary", "diagnostics"):
+            if key not in diff:
+                errors.append("missing required key: %s" % key)
+        if diff.get("schema") != DIFF_SCHEMA_ID:
+            errors.append("schema const mismatch: %r" % diff.get("schema"))
+        summ = diff.get("summary") or {}
+        for key in ("added", "removed", "modified"):
+            if key not in summ:
+                errors.append("summary missing required key: %s" % key)
+        return (len(errors) == 0, "structural", errors[:20])
+
+
+def assert_diff_conforms(diff: Dict[str, Any]) -> bool:
+    """Hard conformance gate: raise ``DiffConformanceError`` if ``diff`` does not
+    conform to cad_diff.v1. Returns True on success (it raises otherwise)."""
+    ok, method, errors = validate_diff(diff)
+    if not ok:
+        raise DiffConformanceError(
+            "cad_diff.v1 conformance FAILED (%s); %d error(s): %s"
+            % (method, len(errors), "; ".join(errors[:8])))
+    return True
+
+
+def write_diff(diff: Dict[str, Any], path, *, enforce_schema: bool = True) -> str:
+    """Write a cad_diff document (UTF-8, pretty). Returns the path written.
+
+    Conformance gate (T1): when ``enforce_schema`` is true and ``diff`` carries
+    the cad_diff.v1 schema tag, the diff is validated against the schema of
+    record and a non-conformant diff raises ``DiffConformanceError`` BEFORE any
+    bytes are written. Pass ``enforce_schema=False`` only for a deliberately
+    partial or non-tagged document.
+    """
+    if enforce_schema and isinstance(diff, dict) and diff.get("schema") == DIFF_SCHEMA_ID:
+        assert_diff_conforms(diff)
     parent = os.path.dirname(os.path.abspath(path))
     if parent and not os.path.isdir(parent):
         os.makedirs(parent, exist_ok=True)

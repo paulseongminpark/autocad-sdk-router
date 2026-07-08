@@ -13,7 +13,9 @@ so any JSON read here uses ``encoding="utf-8-sig"``.
 Public API (INTERFACE CONTRACT):
     build_ir_from_extract(extract: dict, summary: dict | None, source_meta: dict) -> dict
     load_ir(path) -> dict
-    write_ir(ir, path) -> str
+    write_ir(ir, path, *, enforce_schema=True) -> str   # hard conformance gate (F-C1-1)
+    validate_ir(ir) -> (ok, method, errors)             # reusable conformance battery
+    assert_ir_conforms(ir) -> True | raises IRConformanceError
     make_fixture_ir() -> dict          # small valid golden IR for skeleton/tests
 
 The truth gate is ``diagnostics.entity_count == len(ir["entities"])``; cross-checking
@@ -158,6 +160,29 @@ def _as_point3(p):
     return None
 
 
+def _as_point2(p):
+    """Normalize a point into IR [x, y] (point2). Accepts dict {x,y(,z)} /
+    {X,Y(,Z)} or list/tuple; a z component is dropped. Returns None when no
+    usable x/y is present. Used for the schema's point2 fields (viewport center,
+    layout limits) so a native {x,y} object becomes the required 2-element array
+    -- _as_point3 would wrongly pad it to 3 elements and still fail point2."""
+    if p is None:
+        return None
+    if isinstance(p, dict):
+        x = _to_number(p.get("x", p.get("X")))
+        y = _to_number(p.get("y", p.get("Y")))
+        if x is None and y is None:
+            return None
+        return [x or 0.0, y or 0.0]
+    if isinstance(p, (list, tuple)):
+        nums = [_to_number(c) for c in p]
+        nums = [n for n in nums if n is not None]
+        if len(nums) < 2:
+            return None
+        return [nums[0], nums[1]]
+    return None
+
+
 def _vertex_point(v):
     """Extract a point3 from one polyline vertex (dict, point-dict, or list)."""
     if isinstance(v, dict):
@@ -246,6 +271,66 @@ def _bbox_from_explicit(raw_bbox):
             return [x0, y0, z0 or 0.0, x1, y1, z1 or 0.0]
         return None
     return None
+
+
+# --- rich-section point coercion (F-C1-1 fix) ----------------------------------
+
+# Keys whose VALUES are schema-typed points inside the native rich sections
+# (database, symbol_tables.viewports, block_table_records, block_definition
+# headers) that build_ir_from_database_graph carries straight from the native
+# result. The native ObjectARX side may emit these as {x,y(,z)} objects; the
+# straight-through passthrough bypasses the per-entity _as_point3 normalization,
+# so a viewport/extents point object survives un-normalized and violates the
+# point2/point3 array shape dwg_graph_ir.v1 requires (F-C1-1 defect A: the
+# measured failures were symbol_tables.viewports[].center + .view_direction).
+_RICH_POINT3_KEYS = ("view_target", "view_direction", "target", "origin")
+_RICH_POINT2_KEYS = ("center", "lower_left", "upper_right")
+
+
+def _coerce_point3_key(d, key):
+    """If d[key] is an object-form point, replace it with an IR point3 array."""
+    if isinstance(d, dict) and isinstance(d.get(key), dict):
+        pt = _as_point3(d[key])
+        if pt is not None:
+            d[key] = pt
+
+
+def _coerce_point2_key(d, key):
+    """If d[key] is an object-form point, replace it with an IR point2 array."""
+    if isinstance(d, dict) and isinstance(d.get(key), dict):
+        pt = _as_point2(d[key])
+        if pt is not None:
+            d[key] = pt
+
+
+def _coerce_rich_section_points(ir):
+    """Normalize object-form points ({x,y(,z)}) to IR arrays in the rich IR
+    sections that build_ir_from_database_graph carries straight from the native
+    result. Surgical + idempotent: only object values under a known schema-point
+    key are converted; arrays, database.header_vars (raw sysvar passthrough), and
+    the entities[] list are left untouched. Fixes F-C1-1 defect A without
+    reshaping anything the schema does not type as a point."""
+    db = ir.get("database")
+    if isinstance(db, dict):
+        _coerce_point3_key(db, "insbase")
+        ext = db.get("extents")
+        if isinstance(ext, dict):
+            _coerce_point3_key(ext, "extmin")
+            _coerce_point3_key(ext, "extmax")
+            _coerce_point2_key(ext, "limmin")
+            _coerce_point2_key(ext, "limmax")
+    st = ir.get("symbol_tables")
+    if isinstance(st, dict):
+        for vp in st.get("viewports") or []:
+            for k in _RICH_POINT2_KEYS:
+                _coerce_point2_key(vp, k)
+            for k in _RICH_POINT3_KEYS:
+                _coerce_point3_key(vp, k)
+        for btr in st.get("block_table_records") or []:
+            _coerce_point3_key(btr, "origin")
+    for bd in ir.get("block_definitions") or []:
+        _coerce_point3_key(bd, "origin")
+    return ir
 
 
 # --- geometry normalization ----------------------------------------------------
@@ -1224,6 +1309,11 @@ def build_ir_from_database_graph(graph_result: dict, source_meta: dict) -> dict:
     btr = graph_result.get("block_table_records")
     if btr is not None:
         ir["symbol_tables"]["block_table_records"] = btr
+    # F-C1-1 fix: the native rich sections above (database, symbol_tables,
+    # block_definitions headers) are carried straight from graph_result and may
+    # hold object-form points; normalize them to point2/point3 arrays before the
+    # IR leaves the builder so the emitted IR conforms to dwg_graph_ir.v1.
+    _coerce_rich_section_points(ir)
     return apply_stable_entity_identity(ir)
 
 
@@ -1240,8 +1330,19 @@ def load_ir(path) -> dict:
     return json.loads(Path(path).read_text(encoding="utf-8-sig"))
 
 
-def write_ir(ir: dict, path) -> str:
-    """Write an IR JSON document (UTF-8, pretty). Returns the path written."""
+def write_ir(ir: dict, path, *, enforce_schema: bool = True) -> str:
+    """Write an IR JSON document (UTF-8, pretty). Returns the path written.
+
+    Conformance gate (F-C1-1 fix): when ``enforce_schema`` is true and ``ir``
+    carries the dwg_graph_ir.v1 schema tag, the IR is validated against the
+    schema of record and a non-conformant IR raises ``IRConformanceError``
+    BEFORE any bytes are written -- a document that CLAIMS the schema must
+    satisfy it, so a serialization regression can never again persist silently.
+    Pass ``enforce_schema=False`` only to write a deliberately partial or
+    non-tagged document.
+    """
+    if enforce_schema and isinstance(ir, dict) and ir.get("schema") == IR_SCHEMA_ID:
+        assert_ir_conforms(ir)
     p = Path(path)
     p.parent.mkdir(parents=True, exist_ok=True)
     p.write_text(json.dumps(ir, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
@@ -1342,6 +1443,34 @@ def _validate_ir(ir: dict):
                     errors.append(f"entity {ent.get('handle')!r} missing required field {rk}")
                     break
         return (len(errors) == 0, "structural", errors[:20])
+
+
+class IRConformanceError(ValueError):
+    """Raised by the conformance gate when a dwg_graph_ir.v1-tagged IR does not
+    satisfy the schema of record."""
+
+
+def validate_ir(ir: dict):
+    """Public wrapper over the schema/structural validator.
+
+    Returns ``(ok: bool, method: str, errors: list[str])`` -- ``method`` is
+    ``"jsonschema"`` when the library is importable (the machine has 4.26.0),
+    else ``"structural"``. This is the reusable core of the conformance gate
+    (the same battery the C1 machine-validation harness ran).
+    """
+    return _validate_ir(ir)
+
+
+def assert_ir_conforms(ir: dict) -> bool:
+    """Hard conformance gate: raise ``IRConformanceError`` if ``ir`` does not
+    conform to dwg_graph_ir.v1. Returns True on success (it never returns
+    False -- it raises), so it reads as an assertion at call sites (write_ir)."""
+    ok, method, errors = _validate_ir(ir)
+    if not ok:
+        raise IRConformanceError(
+            "dwg_graph_ir.v1 conformance FAILED (%s); %d error(s): %s"
+            % (method, len(errors), "; ".join(errors[:8])))
+    return True
 
 
 # --- self-demo -----------------------------------------------------------------
