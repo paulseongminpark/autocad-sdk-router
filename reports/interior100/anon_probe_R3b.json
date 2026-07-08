@@ -1,0 +1,1648 @@
+{
+  "schema": "ariadne.anon_block_probe.v1",
+  "referenced_names": {
+    "X-평면도(기본형)": 1,
+    "X-FORM_청주": 1,
+    "C": 18,
+    "LV": 14,
+    "LV2": 4,
+    "SC": 12,
+    "X-FORM_청주$0$dA로고": 1,
+    "X-평면도(기본형)$0$84c": 3,
+    "X-평면도(기본형)$0$84a1": 4,
+    "X-평면도(기본형)$0$111a": 4,
+    "X-평면도(기본형)$0$111b": 4,
+    "X-평면도(기본형)$0$130b": 6,
+    "X-평면도(기본형)$0$84a": 4,
+    "X-평면도(기본형)$0$130a1": 6,
+    "X-평면도(기본형)$0$84b": 3,
+    "X-평면도(기본형)$0$130a": 3,
+    "X-평면도(기본형)$0$84b1": 2,
+    "X-평면도(기본형)$0$84c1": 2,
+    "X-평면도(기본형)$0$sta-t": 15,
+    "X-평면도(기본형)$0$101co2": 5,
+    "X-평면도(기본형)$0$103co1": 1,
+    "X-평면도(기본형)$0$sta-t-5": 1,
+    "X-평면도(기본형)$0$111BRF2": 2,
+    "X-평면도(기본형)$0$sta-t-4": 1,
+    "X-평면도(기본형)$0$101co1": 3,
+    "X-평면도(기본형)$0$dffm": 9,
+    "X-평면도(기본형)$0$FSD1500-2": 15,
+    "X-평면도(기본형)$0$A$C651D2038": 2,
+    "X-평면도(기본형)$0$A$C12CA7994": 1,
+    "X-평면도(기본형)$0$A$C5C3D4CBD": 1,
+    "X-평면도(기본형)$0$A$C57620E0B": 2,
+    "X-평면도(기본형)$0$A$C590B6141": 1,
+    "X-평면도(기본형)$0$A$C6FEB5B01": 1,
+    "X-평면도(기본형)$0$130A-S1": 1,
+    "X-평면도(기본형)$0$111ARF": 1,
+    "X-평면도(기본형)$0$111BRF": 1,
+    "X-평면도(기본형)$0$101co1-RF": 1,
+    "X-평면도(기본형)$0$101co1-RF2": 1,
+    "X-평면도(기본형)$0$111ARF2": 2,
+    "X-평면도(기본형)$0$101co1-RF3": 1,
+    "X-평면도(기본형)$0$FSD1120": 19,
+    "X-평면도(기본형)$0$ev13k": 7,
+    "X-평면도(기본형)$0$ev16k": 1,
+    "X-평면도(기본형)$0$ev16x2k": 7,
+    "X-평면도(기본형)$0$104co1": 2,
+    "X-평면도(기본형)$0$105co2": 1,
+    "X-평면도(기본형)$0$104co2": 3,
+    "X-FORM_청주$0$Block_5": 1,
+    "*U172": 26,
+    "*U68": 6,
+    "X-평면도(기본형)$0$A$C38AD67D4": 4,
+    "*U124": 2,
+    "X-평면도(기본형)$0$pkdr750190": 8,
+    "*U83": 4,
+    "*U45": 2,
+    "*U115": 2,
+    "*U116": 2,
+    "*U290": 2,
+    "*U144": 18,
+    "*U117": 1,
+    "*U58": 2,
+    "*U61": 6,
+    "*U79": 7,
+    "*U81": 6,
+    "X-평면도(기본형)$0$is2": 9,
+    "X-평면도(기본형)$0$A$C0EF505D0": 4,
+    "X-평면도(기본형)$0$A$C48BA1CD6": 2,
+    "X-평면도(기본형)$0$esp": 11,
+    "X-평면도(기본형)$0$hd1050": 11,
+    "X-평면도(기본형)$0$wd160750": 11,
+    "X-평면도(기본형)$0$wd120900": 15,
+    "X-평면도(기본형)$0$dw1600": 8,
+    "X-평면도(기본형)$0$is": 26,
+    "X-평면도(기본형)$0$A$C66AC16F3": 8,
+    "X-평면도(기본형)$0$A$C5AA0109C": 8,
+    "X-평면도(기본형)$0$DW1500": 39,
+    "*U67": 6,
+    "X-평면도(기본형)$0$DW2700v": 11,
+    "*U128": 2,
+    "*U120": 4,
+    "*U122": 4,
+    "*U193": 4,
+    "*U192": 4,
+    "X-평면도(기본형)$0$pd900": 9,
+    "X-평면도(기본형)$0$ba15002200": 6,
+    "X-평면도(기본형)$0$ba17001400": 4,
+    "X-평면도(기본형)$0$수전-1": 38,
+    "X-평면도(기본형)$0$A$C66e6687a": 11,
+    "*U279": 4,
+    "*U278": 4,
+    "X-평면도(기본형)$0$1000": 7,
+    "*U64": 2,
+    "*U84": 2,
+    "*U47": 2,
+    "*U163": 2,
+    "*U48": 4,
+    "*U164": 2,
+    "*U105": 1,
+    "*U127": 2,
+    "X-평면도(기본형)$0$A$C0C1F5443": 2,
+    "*U82": 3,
+    "*U70": 2,
+    "*U202": 1,
+    "*U55": 3,
+    "*U53": 2,
+    "*U118": 2,
+    "*U125": 2,
+    "*U119": 2,
+    "*U50": 2,
+    "*U49": 1,
+    "*U51": 2,
+    "*U114": 2,
+    "*U126": 2,
+    "*U86": 2,
+    "*U85": 2,
+    "*U111": 2,
+    "*U130": 2,
+    "*U62": 2,
+    "*U104": 2,
+    "*U71": 2,
+    "*U131": 2,
+    "*U72": 2,
+    "X-평면도(기본형)$0$A$C072C115F": 2,
+    "X-평면도(기본형)$0$A$C7CF27C93": 2,
+    "X-평면도(기본형)$0$A$C4D747D6B": 2,
+    "X-평면도(기본형)$0$A$C01A306AE": 4,
+    "X-평면도(기본형)$0$A$C059766AB": 8,
+    "X-평면도(기본형)$0$HOBGAS19": 8,
+    "X-평면도(기본형)$0$FU1": 2,
+    "X-평면도(기본형)$0$WD850": 2,
+    "X-평면도(기본형)$0$ba15001400": 2,
+    "X-평면도(기본형)$0$ba18601500": 2,
+    "X-평면도(기본형)$0$wd170750": 2,
+    "*U280": 2,
+    "*U281": 2,
+    "*U162": 1,
+    "*U129": 1,
+    "*U123": 1,
+    "*U161": 1,
+    "*U109": 1,
+    "*U74": 1,
+    "*U166": 1,
+    "*U165": 1,
+    "*U121": 1,
+    "*U52": 1,
+    "*U171": 1,
+    "*U106": 1,
+    "*U107": 1,
+    "*U108": 1,
+    "*U133": 1,
+    "*U110": 1,
+    "*U103": 1,
+    "*U89": 2,
+    "*U135": 3,
+    "*U90": 1,
+    "*U134": 1,
+    "*U87": 1,
+    "*U88": 1,
+    "*U167": 1,
+    "*U136": 1,
+    "*U168": 1,
+    "*U199": 1,
+    "X-평면도(기본형)$0$A$C49112A41": 1,
+    "X-평면도(기본형)$0$WD200900": 7,
+    "X-평면도(기본형)$0$A$C57321CDF": 1,
+    "X-평면도(기본형)$0$A$C17C8346B": 1,
+    "*U197": 1,
+    "*U75": 5,
+    "*U132": 1,
+    "X-평면도(기본형)$0$dw1200": 2,
+    "X-평면도(기본형)$0$BA23502100": 2,
+    "X-평면도(기본형)$0$A$C4cfca2ef": 3,
+    "*U282": 3,
+    "*U141": 1,
+    "*U142": 1,
+    "*U137": 1,
+    "*U173": 1,
+    "*U92": 1,
+    "*U138": 1,
+    "*U93": 1,
+    "*U113": 1,
+    "*U54": 1,
+    "*U56": 1,
+    "*U57": 1,
+    "*U160": 1,
+    "*U169": 1,
+    "*U91": 1,
+    "*U232": 1,
+    "X-평면도(기본형)$0$wd250900": 5,
+    "X-평면도(기본형)$0$Ca2405caa": 1,
+    "X-평면도(기본형)$0$is1": 1,
+    "X-평면도(기본형)$0$is3": 1,
+    "X-평면도(기본형)$0$A$C04B05B29": 1,
+    "X-평면도(기본형)$0$A$C610442A9": 1,
+    "*U139": 4,
+    "*U140": 1,
+    "*U170": 2,
+    "*U283": 1,
+    "X-평면도(기본형)$0$A$C4B913E7C": 1,
+    "X-평면도(기본형)$0$씽크$0$59C$0$gasdfasdfs$0$COK3": 1,
+    "*U196": 1,
+    "*U184": 1,
+    "*U157": 1,
+    "*U156": 1,
+    "*U186": 1,
+    "*U188": 1,
+    "*U155": 2,
+    "*U77": 1,
+    "*U189": 1,
+    "*U191": 1,
+    "*U63": 1,
+    "*U185": 1,
+    "*U183": 1,
+    "*U187": 1,
+    "*U201": 1,
+    "X-평면도(기본형)$0$A$C24B0555E": 1,
+    "*U195": 1,
+    "*U194": 1,
+    "*U200": 1,
+    "*U181": 1,
+    "*U76": 1,
+    "*U73": 6,
+    "X-평면도(기본형)$0$dw1400": 1,
+    "X-평면도(기본형)$0$A$C60D55377": 1,
+    "X-평면도(기본형)$0$A$C200833B1": 1,
+    "X-평면도(기본형)$0$A$Cc2871f03": 1,
+    "X-평면도(기본형)$0$ba15002700": 3,
+    "X-평면도(기본형)$0$코너  선반": 10,
+    "X-평면도(기본형)$0$SB1703 1500": 3,
+    "X-평면도(기본형)$0$T1": 7,
+    "X-평면도(기본형)$0$KH-530S-1 TOP": 6,
+    "X-평면도(기본형)$0$A$C5C7666B6": 5,
+    "X-평면도(기본형)$0$IW990": 6,
+    "X-평면도(기본형)$0$A$C41D360DF": 1,
+    "X-평면도(기본형)$0$pkdr750190-1": 1,
+    "X-평면도(기본형)$0$1000m": 1,
+    "X-평면도(기본형)$0$국기계양대": 1,
+    "*U158": 2,
+    "*U112": 2,
+    "*U147": 2,
+    "*U149": 2,
+    "*U148": 2,
+    "*U59": 2,
+    "*U145": 2,
+    "X-평면도(기본형)$0$A$C745B7F2C": 2,
+    "X-평면도(기본형)$0$A$C0E9D10F9": 2,
+    "X-평면도(기본형)$0$A$C0A097A0C": 2,
+    "*U146": 1,
+    "*U180": 1,
+    "*U179": 2,
+    "*U60": 2,
+    "*U150": 2,
+    "*U151": 2,
+    "*U274": 2,
+    "*U275": 1,
+    "*U177": 2,
+    "*U152": 2,
+    "*U159": 2,
+    "*U174": 2,
+    "*U175": 2,
+    "*U176": 2,
+    "X-평면도(기본형)$0$dw2100": 2,
+    "X-평면도(기본형)$0$A$C7D8E4760": 1,
+    "X-평면도(기본형)$0$100012": 2,
+    "X-평면도(기본형)$0$BS-03 TOP": 2,
+    "X-평면도(기본형)$0$IC708": 3,
+    "X-평면도(기본형)$0$세면대_공통": 2,
+    "X-평면도(기본형)$0$A$C019C01BD": 3,
+    "X-평면도(기본형)$0$A$C71B42895": 2,
+    "X-평면도(기본형)$0$L933 TOP": 1,
+    "X-평면도(기본형)$0$A$C5FEA68FE": 1,
+    "X-평면도(기본형)$0$FSDFSDF321": 1,
+    "X-평면도(기본형)$0$수전": 2,
+    "*U238": 1,
+    "*U237": 1,
+    "*U273": 1,
+    "*U272": 1,
+    "*U236": 1,
+    "*U241": 1,
+    "*U240": 1,
+    "*U239": 1,
+    "X-평면도(기본형)$0$CW900": 8,
+    "X-평면도(기본형)$0$cw1200": 7,
+    "X-평면도(기본형)$0$evj": 27,
+    "X-평면도(기본형)$0$PSD700_2": 19,
+    "X-평면도(기본형)$0$jjbl": 2,
+    "X-평면도(기본형)$0$우수관_100A": 6,
+    "X-평면도(기본형)$0$무동력휀300": 4,
+    "X-평면도(기본형)$0$안전사다리": 4,
+    "X-평면도(기본형)$0$phg1200": 2
+  },
+  "defined_names": [
+    "DIMDOT",
+    "X-FORM_청주",
+    "X-평면도(기본형)",
+    "_ArchTick",
+    "C",
+    "LV",
+    "LV2",
+    "SC",
+    "X-FORM_청주$0$Block_5",
+    "X-FORM_청주$0$dA로고",
+    "X-평면도(기본형)$0$pd900",
+    "X-평면도(기본형)$0$hd1050",
+    "X-평면도(기본형)$0$wd120900",
+    "X-평면도(기본형)$0$wd160750",
+    "X-평면도(기본형)$0$dw1600",
+    "X-평면도(기본형)$0$esp",
+    "X-평면도(기본형)$0$BS-03 TOP",
+    "X-평면도(기본형)$0$씽크$0$59C$0$gasdfasdfs$0$COK3",
+    "X-평면도(기본형)$0$HOBGAS19",
+    "X-평면도(기본형)$0$A$C01A306AE",
+    "X-평면도(기본형)$0$A$C66AC16F3",
+    "X-평면도(기본형)$0$A$C5AA0109C",
+    "X-평면도(기본형)$0$A$C0EF505D0",
+    "X-평면도(기본형)$0$A$C48BA1CD6",
+    "X-평면도(기본형)$0$A$C4D747D6B",
+    "X-평면도(기본형)$0$84a",
+    "X-평면도(기본형)$0$84b",
+    "X-평면도(기본형)$0$84c",
+    "X-평면도(기본형)$0$84a1",
+    "X-평면도(기본형)$0$A$C0C1F5443",
+    "X-평면도(기본형)$0$111a",
+    "X-평면도(기본형)$0$111b",
+    "X-평면도(기본형)$0$A$C49112A41",
+    "X-평면도(기본형)$0$A$C0A097A0C",
+    "X-평면도(기본형)$0$A$C059766AB",
+    "X-평면도(기본형)$0$A$C0E9D10F9",
+    "X-평면도(기본형)$0$A$C745B7F2C",
+    "X-평면도(기본형)$0$is",
+    "X-평면도(기본형)$0$A$C200833B1",
+    "X-평면도(기본형)$0$130b",
+    "X-평면도(기본형)$0$is1",
+    "X-평면도(기본형)$0$is2",
+    "X-평면도(기본형)$0$wd250900",
+    "X-평면도(기본형)$0$ins-l",
+    "X-평면도(기본형)$0$Ca2405caa",
+    "X-평면도(기본형)$0$국기계양대",
+    "X-평면도(기본형)$0$ng",
+    "X-평면도(기본형)$0$A$C38AD67D4",
+    "X-평면도(기본형)$0$DW1500",
+    "X-평면도(기본형)$0$DW2700v",
+    "X-평면도(기본형)$0$WD200900",
+    "X-평면도(기본형)$0$pkdr750190",
+    "X-평면도(기본형)$0$A$C072C115F",
+    "X-평면도(기본형)$0$A$C7CF27C93",
+    "X-평면도(기본형)$0$A$C57321CDF",
+    "X-평면도(기본형)$0$A$C17C8346B",
+    "X-평면도(기본형)$0$is3",
+    "X-평면도(기본형)$0$A$C04B05B29",
+    "X-평면도(기본형)$0$A$C610442A9",
+    "X-평면도(기본형)$0$130a1",
+    "X-평면도(기본형)$0$A$Cc2871f03",
+    "X-평면도(기본형)$0$A$C24B0555E",
+    "X-평면도(기본형)$0$dw2100",
+    "X-평면도(기본형)$0$dw1400",
+    "X-평면도(기본형)$0$A$C60D55377",
+    "X-평면도(기본형)$0$dw1200",
+    "X-평면도(기본형)$0$WD850",
+    "X-평면도(기본형)$0$FU1",
+    "X-평면도(기본형)$0$ba15002200",
+    "X-평면도(기본형)$0$세면대_공통",
+    "X-평면도(기본형)$0$코너  선반",
+    "X-평면도(기본형)$0$KH-530S-1 TOP",
+    "X-평면도(기본형)$0$SB1703 1500",
+    "X-평면도(기본형)$0$IC708",
+    "X-평면도(기본형)$0$IW990",
+    "X-평면도(기본형)$0$A$C71B42895",
+    "X-평면도(기본형)$0$ba17001400",
+    "X-평면도(기본형)$0$A$C019C01BD",
+    "X-평면도(기본형)$0$T1",
+    "X-평면도(기본형)$0$L933 TOP",
+    "X-평면도(기본형)$0$ba15001400",
+    "X-평면도(기본형)$0$ba18601500",
+    "X-평면도(기본형)$0$BA23502100",
+    "X-평면도(기본형)$0$ba15002700",
+    "X-평면도(기본형)$0$A$C5C7666B6",
+    "X-평면도(기본형)$0$수전-1",
+    "X-평면도(기본형)$0$A$C66e6687a",
+    "X-평면도(기본형)$0$wd170750",
+    "X-평면도(기본형)$0$수전",
+    "X-평면도(기본형)$0$FSDFSDF321",
+    "X-평면도(기본형)$0$A$C4cfca2ef",
+    "X-평면도(기본형)$0$A$C5FEA68FE",
+    "X-평면도(기본형)$0$A$C7D8E4760",
+    "X-평면도(기본형)$0$A$C41D360DF",
+    "X-평면도(기본형)$0$pkdr750190-1",
+    "X-평면도(기본형)$0$84b1",
+    "X-평면도(기본형)$0$130a",
+    "X-평면도(기본형)$0$84c1",
+    "X-평면도(기본형)$0$dffm",
+    "X-평면도(기본형)$0$CW900",
+    "X-평면도(기본형)$0$sta-t",
+    "X-평면도(기본형)$0$FSD1500-2",
+    "X-평면도(기본형)$0$cw1200",
+    "X-평면도(기본형)$0$101co2",
+    "X-평면도(기본형)$0$101co1",
+    "X-평면도(기본형)$0$103co1",
+    "X-평면도(기본형)$0$jjbl",
+    "X-평면도(기본형)$0$evj",
+    "X-평면도(기본형)$0$A$C651D2038",
+    "X-평면도(기본형)$0$A$C12CA7994",
+    "X-평면도(기본형)$0$A$C5C3D4CBD",
+    "X-평면도(기본형)$0$A$C57620E0B",
+    "X-평면도(기본형)$0$A$C590B6141",
+    "X-평면도(기본형)$0$A$C6FEB5B01",
+    "X-평면도(기본형)$0$130A-S1",
+    "X-평면도(기본형)$0$우수관_100A",
+    "X-평면도(기본형)$0$무동력휀300",
+    "X-평면도(기본형)$0$111ARF",
+    "X-평면도(기본형)$0$111ARF2",
+    "X-평면도(기본형)$0$111BRF",
+    "X-평면도(기본형)$0$111BRF2",
+    "X-평면도(기본형)$0$101co1-RF",
+    "X-평면도(기본형)$0$sta-t-4",
+    "X-평면도(기본형)$0$안전사다리",
+    "X-평면도(기본형)$0$phg1200",
+    "X-평면도(기본형)$0$101co1-RF2",
+    "X-평면도(기본형)$0$sta-t-5",
+    "X-평면도(기본형)$0$101co1-RF3",
+    "X-평면도(기본형)$0$PSD700_2",
+    "X-평면도(기본형)$0$FSD1120",
+    "X-평면도(기본형)$0$ev13k",
+    "X-평면도(기본형)$0$ev16k",
+    "X-평면도(기본형)$0$ev16x2k",
+    "X-평면도(기본형)$0$104co1",
+    "X-평면도(기본형)$0$104co2",
+    "X-평면도(기본형)$0$105co2",
+    "X-평면도(기본형)$0$1000",
+    "X-평면도(기본형)$0$100012",
+    "X-평면도(기본형)$0$1000m",
+    "X-평면도(기본형)$0$A$C4B913E7C"
+  ],
+  "undefined": {
+    "*U172": {
+      "references": 26,
+      "referenced_from": [
+        "X-평면도(기본형)$0$84a",
+        "X-평면도(기본형)$0$84a",
+        "X-평면도(기본형)$0$84a",
+        "X-평면도(기본형)$0$84b",
+        "X-평면도(기본형)$0$84b"
+      ],
+      "anonymous": true
+    },
+    "*U68": {
+      "references": 6,
+      "referenced_from": [
+        "X-평면도(기본형)$0$84a",
+        "X-평면도(기본형)$0$84b",
+        "X-평면도(기본형)$0$84c",
+        "X-평면도(기본형)$0$84a1",
+        "X-평면도(기본형)$0$84b1"
+      ],
+      "anonymous": true
+    },
+    "*U124": {
+      "references": 2,
+      "referenced_from": [
+        "X-평면도(기본형)$0$84a",
+        "X-평면도(기본형)$0$84a1"
+      ],
+      "anonymous": true
+    },
+    "*U83": {
+      "references": 4,
+      "referenced_from": [
+        "X-평면도(기본형)$0$84a",
+        "X-평면도(기본형)$0$84b",
+        "X-평면도(기본형)$0$84a1",
+        "X-평면도(기본형)$0$84b1"
+      ],
+      "anonymous": true
+    },
+    "*U45": {
+      "references": 2,
+      "referenced_from": [
+        "X-평면도(기본형)$0$84a",
+        "X-평면도(기본형)$0$84a1"
+      ],
+      "anonymous": true
+    },
+    "*U115": {
+      "references": 2,
+      "referenced_from": [
+        "X-평면도(기본형)$0$84a",
+        "X-평면도(기본형)$0$84a1"
+      ],
+      "anonymous": true
+    },
+    "*U116": {
+      "references": 2,
+      "referenced_from": [
+        "X-평면도(기본형)$0$84a",
+        "X-평면도(기본형)$0$84a1"
+      ],
+      "anonymous": true
+    },
+    "*U290": {
+      "references": 2,
+      "referenced_from": [
+        "X-평면도(기본형)$0$84a",
+        "X-평면도(기본형)$0$84a1"
+      ],
+      "anonymous": true
+    },
+    "*U144": {
+      "references": 18,
+      "referenced_from": [
+        "X-평면도(기본형)$0$84a",
+        "X-평면도(기본형)$0$84a",
+        "X-평면도(기본형)$0$84c",
+        "X-평면도(기본형)$0$84c",
+        "X-평면도(기본형)$0$84a1"
+      ],
+      "anonymous": true
+    },
+    "*U117": {
+      "references": 1,
+      "referenced_from": [
+        "X-평면도(기본형)$0$84a"
+      ],
+      "anonymous": true
+    },
+    "*U58": {
+      "references": 2,
+      "referenced_from": [
+        "X-평면도(기본형)$0$84a",
+        "X-평면도(기본형)$0$84a1"
+      ],
+      "anonymous": true
+    },
+    "*U61": {
+      "references": 6,
+      "referenced_from": [
+        "X-평면도(기본형)$0$84a",
+        "X-평면도(기본형)$0$84b",
+        "X-평면도(기본형)$0$111b",
+        "X-평면도(기본형)$0$130a1",
+        "X-평면도(기본형)$0$84b1"
+      ],
+      "anonymous": true
+    },
+    "*U79": {
+      "references": 7,
+      "referenced_from": [
+        "X-평면도(기본형)$0$84a",
+        "X-평면도(기본형)$0$84b",
+        "X-평면도(기본형)$0$84c",
+        "X-평면도(기본형)$0$84a1",
+        "X-평면도(기본형)$0$130b"
+      ],
+      "anonymous": true
+    },
+    "*U81": {
+      "references": 6,
+      "referenced_from": [
+        "X-평면도(기본형)$0$84a",
+        "X-평면도(기본형)$0$84b",
+        "X-평면도(기본형)$0$84c",
+        "X-평면도(기본형)$0$84a1",
+        "X-평면도(기본형)$0$84b1"
+      ],
+      "anonymous": true
+    },
+    "*U67": {
+      "references": 6,
+      "referenced_from": [
+        "X-평면도(기본형)$0$84a",
+        "X-평면도(기본형)$0$84b",
+        "X-평면도(기본형)$0$84c",
+        "X-평면도(기본형)$0$84a1",
+        "X-평면도(기본형)$0$84b1"
+      ],
+      "anonymous": true
+    },
+    "*U128": {
+      "references": 2,
+      "referenced_from": [
+        "X-평면도(기본형)$0$84a",
+        "X-평면도(기본형)$0$84a1"
+      ],
+      "anonymous": true
+    },
+    "*U120": {
+      "references": 4,
+      "referenced_from": [
+        "X-평면도(기본형)$0$84a",
+        "X-평면도(기본형)$0$84b",
+        "X-평면도(기본형)$0$84a1",
+        "X-평면도(기본형)$0$84b1"
+      ],
+      "anonymous": true
+    },
+    "*U122": {
+      "references": 4,
+      "referenced_from": [
+        "X-평면도(기본형)$0$84a",
+        "X-평면도(기본형)$0$84b",
+        "X-평면도(기본형)$0$84a1",
+        "X-평면도(기본형)$0$84b1"
+      ],
+      "anonymous": true
+    },
+    "*U193": {
+      "references": 4,
+      "referenced_from": [
+        "X-평면도(기본형)$0$84a",
+        "X-평면도(기본형)$0$84b",
+        "X-평면도(기본형)$0$84a1",
+        "X-평면도(기본형)$0$84b1"
+      ],
+      "anonymous": true
+    },
+    "*U192": {
+      "references": 4,
+      "referenced_from": [
+        "X-평면도(기본형)$0$84a",
+        "X-평면도(기본형)$0$84b",
+        "X-평면도(기본형)$0$84a1",
+        "X-평면도(기본형)$0$84b1"
+      ],
+      "anonymous": true
+    },
+    "*U279": {
+      "references": 4,
+      "referenced_from": [
+        "X-평면도(기본형)$0$84a",
+        "X-평면도(기본형)$0$84b",
+        "X-평면도(기본형)$0$84a1",
+        "X-평면도(기본형)$0$84b1"
+      ],
+      "anonymous": true
+    },
+    "*U278": {
+      "references": 4,
+      "referenced_from": [
+        "X-평면도(기본형)$0$84a",
+        "X-평면도(기본형)$0$84b",
+        "X-평면도(기본형)$0$84a1",
+        "X-평면도(기본형)$0$84b1"
+      ],
+      "anonymous": true
+    },
+    "*U64": {
+      "references": 2,
+      "referenced_from": [
+        "X-평면도(기본형)$0$84b",
+        "X-평면도(기본형)$0$84b1"
+      ],
+      "anonymous": true
+    },
+    "*U84": {
+      "references": 2,
+      "referenced_from": [
+        "X-평면도(기본형)$0$84b",
+        "X-평면도(기본형)$0$84b1"
+      ],
+      "anonymous": true
+    },
+    "*U47": {
+      "references": 2,
+      "referenced_from": [
+        "X-평면도(기본형)$0$84b",
+        "X-평면도(기본형)$0$84b1"
+      ],
+      "anonymous": true
+    },
+    "*U163": {
+      "references": 2,
+      "referenced_from": [
+        "X-평면도(기본형)$0$84b",
+        "X-평면도(기본형)$0$84b1"
+      ],
+      "anonymous": true
+    },
+    "*U48": {
+      "references": 4,
+      "referenced_from": [
+        "X-평면도(기본형)$0$84b",
+        "X-평면도(기본형)$0$84b",
+        "X-평면도(기본형)$0$84b1",
+        "X-평면도(기본형)$0$84b1"
+      ],
+      "anonymous": true
+    },
+    "*U164": {
+      "references": 2,
+      "referenced_from": [
+        "X-평면도(기본형)$0$84b",
+        "X-평면도(기본형)$0$84b1"
+      ],
+      "anonymous": true
+    },
+    "*U105": {
+      "references": 1,
+      "referenced_from": [
+        "X-평면도(기본형)$0$84b"
+      ],
+      "anonymous": true
+    },
+    "*U127": {
+      "references": 2,
+      "referenced_from": [
+        "X-평면도(기본형)$0$84b",
+        "X-평면도(기본형)$0$84b1"
+      ],
+      "anonymous": true
+    },
+    "*U82": {
+      "references": 3,
+      "referenced_from": [
+        "X-평면도(기본형)$0$84b",
+        "X-평면도(기본형)$0$111a",
+        "X-평면도(기본형)$0$84b1"
+      ],
+      "anonymous": true
+    },
+    "*U70": {
+      "references": 2,
+      "referenced_from": [
+        "X-평면도(기본형)$0$84c",
+        "X-평면도(기본형)$0$84c1"
+      ],
+      "anonymous": true
+    },
+    "*U202": {
+      "references": 1,
+      "referenced_from": [
+        "X-평면도(기본형)$0$84c"
+      ],
+      "anonymous": true
+    },
+    "*U55": {
+      "references": 3,
+      "referenced_from": [
+        "X-평면도(기본형)$0$84c",
+        "X-평면도(기본형)$0$111b",
+        "X-평면도(기본형)$0$84c1"
+      ],
+      "anonymous": true
+    },
+    "*U53": {
+      "references": 2,
+      "referenced_from": [
+        "X-평면도(기본형)$0$84c",
+        "X-평면도(기본형)$0$84c1"
+      ],
+      "anonymous": true
+    },
+    "*U118": {
+      "references": 2,
+      "referenced_from": [
+        "X-평면도(기본형)$0$84c",
+        "X-평면도(기본형)$0$84c1"
+      ],
+      "anonymous": true
+    },
+    "*U125": {
+      "references": 2,
+      "referenced_from": [
+        "X-평면도(기본형)$0$84c",
+        "X-평면도(기본형)$0$84c1"
+      ],
+      "anonymous": true
+    },
+    "*U119": {
+      "references": 2,
+      "referenced_from": [
+        "X-평면도(기본형)$0$84c",
+        "X-평면도(기본형)$0$84c1"
+      ],
+      "anonymous": true
+    },
+    "*U50": {
+      "references": 2,
+      "referenced_from": [
+        "X-평면도(기본형)$0$84c",
+        "X-평면도(기본형)$0$84c1"
+      ],
+      "anonymous": true
+    },
+    "*U49": {
+      "references": 1,
+      "referenced_from": [
+        "X-평면도(기본형)$0$84c"
+      ],
+      "anonymous": true
+    },
+    "*U51": {
+      "references": 2,
+      "referenced_from": [
+        "X-평면도(기본형)$0$84c",
+        "X-평면도(기본형)$0$84c1"
+      ],
+      "anonymous": true
+    },
+    "*U114": {
+      "references": 2,
+      "referenced_from": [
+        "X-평면도(기본형)$0$84c",
+        "X-평면도(기본형)$0$84c1"
+      ],
+      "anonymous": true
+    },
+    "*U126": {
+      "references": 2,
+      "referenced_from": [
+        "X-평면도(기본형)$0$84c",
+        "X-평면도(기본형)$0$84c1"
+      ],
+      "anonymous": true
+    },
+    "*U86": {
+      "references": 2,
+      "referenced_from": [
+        "X-평면도(기본형)$0$84c",
+        "X-평면도(기본형)$0$111a"
+      ],
+      "anonymous": true
+    },
+    "*U85": {
+      "references": 2,
+      "referenced_from": [
+        "X-평면도(기본형)$0$84c",
+        "X-평면도(기본형)$0$84c1"
+      ],
+      "anonymous": true
+    },
+    "*U111": {
+      "references": 2,
+      "referenced_from": [
+        "X-평면도(기본형)$0$84c",
+        "X-평면도(기본형)$0$84c1"
+      ],
+      "anonymous": true
+    },
+    "*U130": {
+      "references": 2,
+      "referenced_from": [
+        "X-평면도(기본형)$0$84c",
+        "X-평면도(기본형)$0$84c1"
+      ],
+      "anonymous": true
+    },
+    "*U62": {
+      "references": 2,
+      "referenced_from": [
+        "X-평면도(기본형)$0$84c",
+        "X-평면도(기본형)$0$84c1"
+      ],
+      "anonymous": true
+    },
+    "*U104": {
+      "references": 2,
+      "referenced_from": [
+        "X-평면도(기본형)$0$84c",
+        "X-평면도(기본형)$0$84c1"
+      ],
+      "anonymous": true
+    },
+    "*U71": {
+      "references": 2,
+      "referenced_from": [
+        "X-평면도(기본형)$0$84c",
+        "X-평면도(기본형)$0$84c1"
+      ],
+      "anonymous": true
+    },
+    "*U131": {
+      "references": 2,
+      "referenced_from": [
+        "X-평면도(기본형)$0$84c",
+        "X-평면도(기본형)$0$84c1"
+      ],
+      "anonymous": true
+    },
+    "*U72": {
+      "references": 2,
+      "referenced_from": [
+        "X-평면도(기본형)$0$84c",
+        "X-평면도(기본형)$0$84c1"
+      ],
+      "anonymous": true
+    },
+    "*U280": {
+      "references": 2,
+      "referenced_from": [
+        "X-평면도(기본형)$0$84c",
+        "X-평면도(기본형)$0$84c1"
+      ],
+      "anonymous": true
+    },
+    "*U281": {
+      "references": 2,
+      "referenced_from": [
+        "X-평면도(기본형)$0$84c",
+        "X-평면도(기본형)$0$84c1"
+      ],
+      "anonymous": true
+    },
+    "*U162": {
+      "references": 1,
+      "referenced_from": [
+        "X-평면도(기본형)$0$84a1"
+      ],
+      "anonymous": true
+    },
+    "*U129": {
+      "references": 1,
+      "referenced_from": [
+        "X-평면도(기본형)$0$84a1"
+      ],
+      "anonymous": true
+    },
+    "*U123": {
+      "references": 1,
+      "referenced_from": [
+        "X-평면도(기본형)$0$84a1"
+      ],
+      "anonymous": true
+    },
+    "*U161": {
+      "references": 1,
+      "referenced_from": [
+        "X-평면도(기본형)$0$84a1"
+      ],
+      "anonymous": true
+    },
+    "*U109": {
+      "references": 1,
+      "referenced_from": [
+        "X-평면도(기본형)$0$111a"
+      ],
+      "anonymous": true
+    },
+    "*U74": {
+      "references": 1,
+      "referenced_from": [
+        "X-평면도(기본형)$0$111a"
+      ],
+      "anonymous": true
+    },
+    "*U166": {
+      "references": 1,
+      "referenced_from": [
+        "X-평면도(기본형)$0$111a"
+      ],
+      "anonymous": true
+    },
+    "*U165": {
+      "references": 1,
+      "referenced_from": [
+        "X-평면도(기본형)$0$111a"
+      ],
+      "anonymous": true
+    },
+    "*U121": {
+      "references": 1,
+      "referenced_from": [
+        "X-평면도(기본형)$0$111a"
+      ],
+      "anonymous": true
+    },
+    "*U52": {
+      "references": 1,
+      "referenced_from": [
+        "X-평면도(기본형)$0$111a"
+      ],
+      "anonymous": true
+    },
+    "*U171": {
+      "references": 1,
+      "referenced_from": [
+        "X-평면도(기본형)$0$111a"
+      ],
+      "anonymous": true
+    },
+    "*U106": {
+      "references": 1,
+      "referenced_from": [
+        "X-평면도(기본형)$0$111a"
+      ],
+      "anonymous": true
+    },
+    "*U107": {
+      "references": 1,
+      "referenced_from": [
+        "X-평면도(기본형)$0$111a"
+      ],
+      "anonymous": true
+    },
+    "*U108": {
+      "references": 1,
+      "referenced_from": [
+        "X-평면도(기본형)$0$111a"
+      ],
+      "anonymous": true
+    },
+    "*U133": {
+      "references": 1,
+      "referenced_from": [
+        "X-평면도(기본형)$0$111a"
+      ],
+      "anonymous": true
+    },
+    "*U110": {
+      "references": 1,
+      "referenced_from": [
+        "X-평면도(기본형)$0$111a"
+      ],
+      "anonymous": true
+    },
+    "*U103": {
+      "references": 1,
+      "referenced_from": [
+        "X-평면도(기본형)$0$111a"
+      ],
+      "anonymous": true
+    },
+    "*U89": {
+      "references": 2,
+      "referenced_from": [
+        "X-평면도(기본형)$0$111a",
+        "X-평면도(기본형)$0$111b"
+      ],
+      "anonymous": true
+    },
+    "*U135": {
+      "references": 3,
+      "referenced_from": [
+        "X-평면도(기본형)$0$111a",
+        "X-평면도(기본형)$0$130a1",
+        "X-평면도(기본형)$0$130a"
+      ],
+      "anonymous": true
+    },
+    "*U90": {
+      "references": 1,
+      "referenced_from": [
+        "X-평면도(기본형)$0$111a"
+      ],
+      "anonymous": true
+    },
+    "*U134": {
+      "references": 1,
+      "referenced_from": [
+        "X-평면도(기본형)$0$111a"
+      ],
+      "anonymous": true
+    },
+    "*U87": {
+      "references": 1,
+      "referenced_from": [
+        "X-평면도(기본형)$0$111a"
+      ],
+      "anonymous": true
+    },
+    "*U88": {
+      "references": 1,
+      "referenced_from": [
+        "X-평면도(기본형)$0$111a"
+      ],
+      "anonymous": true
+    },
+    "*U167": {
+      "references": 1,
+      "referenced_from": [
+        "X-평면도(기본형)$0$111a"
+      ],
+      "anonymous": true
+    },
+    "*U136": {
+      "references": 1,
+      "referenced_from": [
+        "X-평면도(기본형)$0$111a"
+      ],
+      "anonymous": true
+    },
+    "*U168": {
+      "references": 1,
+      "referenced_from": [
+        "X-평면도(기본형)$0$111a"
+      ],
+      "anonymous": true
+    },
+    "*U199": {
+      "references": 1,
+      "referenced_from": [
+        "X-평면도(기본형)$0$111a"
+      ],
+      "anonymous": true
+    },
+    "*U197": {
+      "references": 1,
+      "referenced_from": [
+        "X-평면도(기본형)$0$111a"
+      ],
+      "anonymous": true
+    },
+    "*U75": {
+      "references": 5,
+      "referenced_from": [
+        "X-평면도(기본형)$0$111a",
+        "X-평면도(기본형)$0$111b",
+        "X-평면도(기본형)$0$130b",
+        "X-평면도(기본형)$0$130a1",
+        "X-평면도(기본형)$0$130a"
+      ],
+      "anonymous": true
+    },
+    "*U132": {
+      "references": 1,
+      "referenced_from": [
+        "X-평면도(기본형)$0$111a"
+      ],
+      "anonymous": true
+    },
+    "*U282": {
+      "references": 3,
+      "referenced_from": [
+        "X-평면도(기본형)$0$111a",
+        "X-평면도(기본형)$0$130a1",
+        "X-평면도(기본형)$0$130a"
+      ],
+      "anonymous": true
+    },
+    "*U141": {
+      "references": 1,
+      "referenced_from": [
+        "X-평면도(기본형)$0$111b"
+      ],
+      "anonymous": true
+    },
+    "*U142": {
+      "references": 1,
+      "referenced_from": [
+        "X-평면도(기본형)$0$111b"
+      ],
+      "anonymous": true
+    },
+    "*U137": {
+      "references": 1,
+      "referenced_from": [
+        "X-평면도(기본형)$0$111b"
+      ],
+      "anonymous": true
+    },
+    "*U173": {
+      "references": 1,
+      "referenced_from": [
+        "X-평면도(기본형)$0$111b"
+      ],
+      "anonymous": true
+    },
+    "*U92": {
+      "references": 1,
+      "referenced_from": [
+        "X-평면도(기본형)$0$111b"
+      ],
+      "anonymous": true
+    },
+    "*U138": {
+      "references": 1,
+      "referenced_from": [
+        "X-평면도(기본형)$0$111b"
+      ],
+      "anonymous": true
+    },
+    "*U93": {
+      "references": 1,
+      "referenced_from": [
+        "X-평면도(기본형)$0$111b"
+      ],
+      "anonymous": true
+    },
+    "*U113": {
+      "references": 1,
+      "referenced_from": [
+        "X-평면도(기본형)$0$111b"
+      ],
+      "anonymous": true
+    },
+    "*U54": {
+      "references": 1,
+      "referenced_from": [
+        "X-평면도(기본형)$0$111b"
+      ],
+      "anonymous": true
+    },
+    "*U56": {
+      "references": 1,
+      "referenced_from": [
+        "X-평면도(기본형)$0$111b"
+      ],
+      "anonymous": true
+    },
+    "*U57": {
+      "references": 1,
+      "referenced_from": [
+        "X-평면도(기본형)$0$111b"
+      ],
+      "anonymous": true
+    },
+    "*U160": {
+      "references": 1,
+      "referenced_from": [
+        "X-평면도(기본형)$0$111b"
+      ],
+      "anonymous": true
+    },
+    "*U169": {
+      "references": 1,
+      "referenced_from": [
+        "X-평면도(기본형)$0$111b"
+      ],
+      "anonymous": true
+    },
+    "*U91": {
+      "references": 1,
+      "referenced_from": [
+        "X-평면도(기본형)$0$111b"
+      ],
+      "anonymous": true
+    },
+    "*U232": {
+      "references": 1,
+      "referenced_from": [
+        "X-평면도(기본형)$0$111b"
+      ],
+      "anonymous": true
+    },
+    "*U139": {
+      "references": 4,
+      "referenced_from": [
+        "X-평면도(기본형)$0$111b",
+        "X-평면도(기본형)$0$130b",
+        "X-평면도(기본형)$0$130a1",
+        "X-평면도(기본형)$0$130a"
+      ],
+      "anonymous": true
+    },
+    "*U140": {
+      "references": 1,
+      "referenced_from": [
+        "X-평면도(기본형)$0$111b"
+      ],
+      "anonymous": true
+    },
+    "*U170": {
+      "references": 2,
+      "referenced_from": [
+        "X-평면도(기본형)$0$111b",
+        "X-평면도(기본형)$0$130b"
+      ],
+      "anonymous": true
+    },
+    "*U283": {
+      "references": 1,
+      "referenced_from": [
+        "X-평면도(기본형)$0$111b"
+      ],
+      "anonymous": true
+    },
+    "*U196": {
+      "references": 1,
+      "referenced_from": [
+        "X-평면도(기본형)$0$130b"
+      ],
+      "anonymous": true
+    },
+    "*U184": {
+      "references": 1,
+      "referenced_from": [
+        "X-평면도(기본형)$0$130b"
+      ],
+      "anonymous": true
+    },
+    "*U157": {
+      "references": 1,
+      "referenced_from": [
+        "X-평면도(기본형)$0$130b"
+      ],
+      "anonymous": true
+    },
+    "*U156": {
+      "references": 1,
+      "referenced_from": [
+        "X-평면도(기본형)$0$130b"
+      ],
+      "anonymous": true
+    },
+    "*U186": {
+      "references": 1,
+      "referenced_from": [
+        "X-평면도(기본형)$0$130b"
+      ],
+      "anonymous": true
+    },
+    "*U188": {
+      "references": 1,
+      "referenced_from": [
+        "X-평면도(기본형)$0$130b"
+      ],
+      "anonymous": true
+    },
+    "*U155": {
+      "references": 2,
+      "referenced_from": [
+        "X-평면도(기본형)$0$130b",
+        "X-평면도(기본형)$0$130b"
+      ],
+      "anonymous": true
+    },
+    "*U77": {
+      "references": 1,
+      "referenced_from": [
+        "X-평면도(기본형)$0$130b"
+      ],
+      "anonymous": true
+    },
+    "*U189": {
+      "references": 1,
+      "referenced_from": [
+        "X-평면도(기본형)$0$130b"
+      ],
+      "anonymous": true
+    },
+    "*U191": {
+      "references": 1,
+      "referenced_from": [
+        "X-평면도(기본형)$0$130b"
+      ],
+      "anonymous": true
+    },
+    "*U63": {
+      "references": 1,
+      "referenced_from": [
+        "X-평면도(기본형)$0$130b"
+      ],
+      "anonymous": true
+    },
+    "*U185": {
+      "references": 1,
+      "referenced_from": [
+        "X-평면도(기본형)$0$130b"
+      ],
+      "anonymous": true
+    },
+    "*U183": {
+      "references": 1,
+      "referenced_from": [
+        "X-평면도(기본형)$0$130b"
+      ],
+      "anonymous": true
+    },
+    "*U187": {
+      "references": 1,
+      "referenced_from": [
+        "X-평면도(기본형)$0$130b"
+      ],
+      "anonymous": true
+    },
+    "*U201": {
+      "references": 1,
+      "referenced_from": [
+        "X-평면도(기본형)$0$130b"
+      ],
+      "anonymous": true
+    },
+    "*U195": {
+      "references": 1,
+      "referenced_from": [
+        "X-평면도(기본형)$0$130b"
+      ],
+      "anonymous": true
+    },
+    "*U194": {
+      "references": 1,
+      "referenced_from": [
+        "X-평면도(기본형)$0$130b"
+      ],
+      "anonymous": true
+    },
+    "*U200": {
+      "references": 1,
+      "referenced_from": [
+        "X-평면도(기본형)$0$130b"
+      ],
+      "anonymous": true
+    },
+    "*U181": {
+      "references": 1,
+      "referenced_from": [
+        "X-평면도(기본형)$0$130b"
+      ],
+      "anonymous": true
+    },
+    "*U76": {
+      "references": 1,
+      "referenced_from": [
+        "X-평면도(기본형)$0$130b"
+      ],
+      "anonymous": true
+    },
+    "*U73": {
+      "references": 6,
+      "referenced_from": [
+        "X-평면도(기본형)$0$130b",
+        "X-평면도(기본형)$0$130b",
+        "X-평면도(기본형)$0$130a1",
+        "X-평면도(기본형)$0$130a1",
+        "X-평면도(기본형)$0$130a"
+      ],
+      "anonymous": true
+    },
+    "*U158": {
+      "references": 2,
+      "referenced_from": [
+        "X-평면도(기본형)$0$130a1",
+        "X-평면도(기본형)$0$130a"
+      ],
+      "anonymous": true
+    },
+    "*U112": {
+      "references": 2,
+      "referenced_from": [
+        "X-평면도(기본형)$0$130a1",
+        "X-평면도(기본형)$0$130a"
+      ],
+      "anonymous": true
+    },
+    "*U147": {
+      "references": 2,
+      "referenced_from": [
+        "X-평면도(기본형)$0$130a1",
+        "X-평면도(기본형)$0$130a"
+      ],
+      "anonymous": true
+    },
+    "*U149": {
+      "references": 2,
+      "referenced_from": [
+        "X-평면도(기본형)$0$130a1",
+        "X-평면도(기본형)$0$130a"
+      ],
+      "anonymous": true
+    },
+    "*U148": {
+      "references": 2,
+      "referenced_from": [
+        "X-평면도(기본형)$0$130a1",
+        "X-평면도(기본형)$0$130a"
+      ],
+      "anonymous": true
+    },
+    "*U59": {
+      "references": 2,
+      "referenced_from": [
+        "X-평면도(기본형)$0$130a1",
+        "X-평면도(기본형)$0$130a"
+      ],
+      "anonymous": true
+    },
+    "*U145": {
+      "references": 2,
+      "referenced_from": [
+        "X-평면도(기본형)$0$130a1",
+        "X-평면도(기본형)$0$130a"
+      ],
+      "anonymous": true
+    },
+    "*U146": {
+      "references": 1,
+      "referenced_from": [
+        "X-평면도(기본형)$0$130a1"
+      ],
+      "anonymous": true
+    },
+    "*U180": {
+      "references": 1,
+      "referenced_from": [
+        "X-평면도(기본형)$0$130a1"
+      ],
+      "anonymous": true
+    },
+    "*U179": {
+      "references": 2,
+      "referenced_from": [
+        "X-평면도(기본형)$0$130a1",
+        "X-평면도(기본형)$0$130a"
+      ],
+      "anonymous": true
+    },
+    "*U60": {
+      "references": 2,
+      "referenced_from": [
+        "X-평면도(기본형)$0$130a1",
+        "X-평면도(기본형)$0$130a"
+      ],
+      "anonymous": true
+    },
+    "*U150": {
+      "references": 2,
+      "referenced_from": [
+        "X-평면도(기본형)$0$130a1",
+        "X-평면도(기본형)$0$130a"
+      ],
+      "anonymous": true
+    },
+    "*U151": {
+      "references": 2,
+      "referenced_from": [
+        "X-평면도(기본형)$0$130a1",
+        "X-평면도(기본형)$0$130a"
+      ],
+      "anonymous": true
+    },
+    "*U274": {
+      "references": 2,
+      "referenced_from": [
+        "X-평면도(기본형)$0$130a1",
+        "X-평면도(기본형)$0$130a"
+      ],
+      "anonymous": true
+    },
+    "*U275": {
+      "references": 1,
+      "referenced_from": [
+        "X-평면도(기본형)$0$130a1"
+      ],
+      "anonymous": true
+    },
+    "*U177": {
+      "references": 2,
+      "referenced_from": [
+        "X-평면도(기본형)$0$130a1",
+        "X-평면도(기본형)$0$130a"
+      ],
+      "anonymous": true
+    },
+    "*U152": {
+      "references": 2,
+      "referenced_from": [
+        "X-평면도(기본형)$0$130a1",
+        "X-평면도(기본형)$0$130a"
+      ],
+      "anonymous": true
+    },
+    "*U159": {
+      "references": 2,
+      "referenced_from": [
+        "X-평면도(기본형)$0$130a1",
+        "X-평면도(기본형)$0$130a"
+      ],
+      "anonymous": true
+    },
+    "*U174": {
+      "references": 2,
+      "referenced_from": [
+        "X-평면도(기본형)$0$130a1",
+        "X-평면도(기본형)$0$130a"
+      ],
+      "anonymous": true
+    },
+    "*U175": {
+      "references": 2,
+      "referenced_from": [
+        "X-평면도(기본형)$0$130a1",
+        "X-평면도(기본형)$0$130a"
+      ],
+      "anonymous": true
+    },
+    "*U176": {
+      "references": 2,
+      "referenced_from": [
+        "X-평면도(기본형)$0$130a1",
+        "X-평면도(기본형)$0$130a"
+      ],
+      "anonymous": true
+    },
+    "*U238": {
+      "references": 1,
+      "referenced_from": [
+        "X-평면도(기본형)$0$84b1"
+      ],
+      "anonymous": true
+    },
+    "*U237": {
+      "references": 1,
+      "referenced_from": [
+        "X-평면도(기본형)$0$130a"
+      ],
+      "anonymous": true
+    },
+    "*U273": {
+      "references": 1,
+      "referenced_from": [
+        "X-평면도(기본형)$0$130a"
+      ],
+      "anonymous": true
+    },
+    "*U272": {
+      "references": 1,
+      "referenced_from": [
+        "X-평면도(기본형)$0$130a"
+      ],
+      "anonymous": true
+    },
+    "*U236": {
+      "references": 1,
+      "referenced_from": [
+        "X-평면도(기본형)$0$130a"
+      ],
+      "anonymous": true
+    },
+    "*U241": {
+      "references": 1,
+      "referenced_from": [
+        "X-평면도(기본형)$0$84c1"
+      ],
+      "anonymous": true
+    },
+    "*U240": {
+      "references": 1,
+      "referenced_from": [
+        "X-평면도(기본형)$0$84c1"
+      ],
+      "anonymous": true
+    },
+    "*U239": {
+      "references": 1,
+      "referenced_from": [
+        "X-평면도(기본형)$0$84c1"
+      ],
+      "anonymous": true
+    }
+  },
+  "anonymous_defined_count": 0,
+  "summary": {
+    "undefined_total_refs": 320,
+    "undefined_unique": 154,
+    "all_undefined_anonymous": true
+  }
+}
