@@ -1,167 +1,43 @@
 # Session Handoff
 
-- **Saved**: 2026-06-22 14:51 KST (+09:00)
-- **By**: /save (skill v2)
+- **Saved**: 2026-07-07 08:30 KST (+09:00)
+- **By**: pi (manual handoff after M4 completion)
 - **From cwd**: D:\dev\99_tools\autocad-sdk-router
-- **Project**: autocad-sdk-router (CAD OS Layer)
-- **Agent**: Claude Code — Opus 4.8 (1M context)
-- **Roles touched this session**: [cad-os-layer]
+- **Project**: rhino-sdk-parity (Rhino/GH SDK parity vs AutoCAD SDK Router)
+- **Agent**: pi — DGX Ornith-1.0-35B
+- **Roles touched this session**: [rhino-sdk-parity]
 
 ---
 
 ## TL;DR (next session: read this first)
 
-- **What** — Executed CADOS_M08 (full operation coverage closure) → committed as PASS (router `1bb6f12`, daedalus `78dd04c`). Then Paul asked a sharp honesty question: "are all 400+ ops actually being built? are we on the original plan?"
-- **Why** — The honest answer is **NO**: only **3 new native ops** were built this session (+1 reclassification); **474 ops remain `catalogued` = classified-but-NOT-built**. M08 PASS holds only under the packet *body* acceptance (classify-all + v1-target-only), NOT under "build all 480."
-- **Where stuck / next action** — **SCOPE DECISION IS OPEN.** Do NOT proceed to M09. Paul rejected the structured scope question and wants to **clarify first**. I offered 4 clarify angles; awaiting his pick. Resolve scope → possibly reopen/redo M08.
+- **What** — M4 (governance wrapper) complete and pushed.
+- **M4 deliverable**: `rhinoagent_mcp.py` — proxy server with allow-list (27 tools) + write-mode validation + truthful degradation.
+- **Tests**: 11/11 passing.
+- **Registry**: 119 ops (34 impl_unverified + 85 catalogued).
+- **Parity axes**: 3/7 improved (registry PARTIAL, staged-write PARTIAL, test gate PARTIAL).
+- **Next**: M3B (live-canvas staging) is the hard design problem. M5 (probe matrix) and M6 (test gate) can run in parallel.
 
 ---
 
 ## §0 Resume Path
 
-> CAD OS Layer (`D:\dev\99_tools\autocad-sdk-router`, own git, main, no remote). **A SCOPE QUESTION IS LIVE — do not auto-proceed to M09.** M08 was committed as PASS (`1bb6f12`) but Paul is questioning whether the *original plan* was to actually BUILD all ~474 catalogued ops. Truth: this session built only 3 new native ops (`inspect.layers/blocks/entities`, real C++ + accoreconsole smoke 70/245/21747) + promoted `live.status`; cumulative implemented = 41; **474 ops are `catalogued` (classified, zero handlers, NOT built)**. M08 PASS is real ONLY under the packet *body* acceptance ("100% classified + v1-target implemented-or-blocked"); the bundle `index.md` says "implement OR hard-block, no unclassified" which my result does NOT satisfy literally. The packet sources CONTRADICT — surface that. Paul rejected the AskUserQuestion and said "clarify first"; I asked which of 4 angles to dig into (① exact spec wording index-vs-body, ② per-family breakdown of what's feasible-cheap vs bespoke-heavy, ③ what Paul's "태초의 계획" baseline was, ④ was my narrow v1_target scoping a reasonable cut or under-delivery). **Next concrete action: get Paul's clarification, then re-decide M08 scope.** Honesty first — no fake PASS. Golden `27dbf6b9…` READ-ONLY. Verify: `git -C D:\dev\99_tools\autocad-sdk-router log --oneline -3`; `python tools/operation_coverage_matrix.py`.
+Read `HANDOFF/roles/rhino-sdk-parity.md` for full role state, then `HANDOFF/sessions/SESSION_2026-07-07_0830.md` for session detail.
 
----
+## §1 Source paths (on disk)
 
-## §A Prompt Engineering Layer
+- `D:\dev\_agent_workspace\02_rhino-mcp\RhinoBridgePlugin.Core\`
+- `D:\dev\_agent_workspace\02_rhino-mcp\RhinoBridgePlugin.Rhp\`
+- `D:\dev\_agent_workspace\02_rhino-mcp\RhinoBridgePlugin\`
+- `D:\dev\_agent_workspace\02_rhino-mcp\rhino-grasshopper-mcp\`
+- `D:\dev\_agent_workspace\02_rhino-mcp\grasshopper-mcp\`
+- `D:\dev\99_tools\rhino-sdk-router\wt\rh_m1\`
+- `D:\dev\99_tools\rhino-sdk-router\wt\rh_m2\`
+- `D:\dev\99_tools\rhino-sdk-router\wt\rh_m3a\`
+- `D:\dev\99_tools\rhino-sdk-router\wt\rh_m4\`
+- `D:\dev\99_tools\rhino-sdk-router\wt\d_corpus\`
 
-### A.1 User profile (observed)
-- Paul. Korean-primary. **Demands deep honesty + checks claims hard.** This session's pivotal moment: he caught that "full operation coverage closure" did NOT mean "build 400+ ops" and asked directly. He values catching over-claims over smooth completion.
-- Decision-maker: rejected a premature structured question to clarify scope first (wants to understand before choosing).
+## §2 Audit references
 
-### A.2 Behavioral feedback received
-- When a milestone's headline ("full coverage closure") could be read as more than was delivered, **surface the gap proactively** — don't let the user discover it by asking. (apply-when: any PASS where scope was interpreted/narrowed.)
-- On scope-defining questions, Paul may want to **clarify before** answering a multiple-choice — offer angles, let him drive. (apply-when: he rejects an AskUserQuestion saying "clarify".)
-
-### A.3 Bootstrap continuation prompt
-- See §0. First action: answer whichever clarify-angle Paul picks (likely ① spec wording or ③ his baseline intent), then re-decide whether M08 stays PASS-as-v1-surface or reopens to build more/all of the 474.
-
----
-
-## §B Context Engineering Layer
-
-### B.1 Files modified (this session — all committed at `1bb6f12` / `78dd04c`)
-- `src/Ariadne.AcadNative/AriadneNativeJob.cpp` — added 3 inspect helpers + 3 dispatcher branches (inspect.layers/blocks/entities).
-- `config/operations.v2.json` — promoted 4 ops (inspect.layers/blocks/entities + live.status) stub→implemented; totals.by_status recomputed (41/0/2/474).
-- `tools/operation_coverage_matrix.py` (NEW) — deterministic 13-field taxonomy/matrix/gate generator.
-- `tests/unit/test_m08_operation_coverage.py` (NEW, 17 tests).
-- reports: operation_coverage_full_matrix.json/.md (NEW), v1_operation_gate_latest.json (NEW), operation_coverage_latest.json/.md, latest_status.json, validation_latest.json (refreshed), CADOS_M08 report (NEW), build_native_m08.log (NEW).
-- docs: CAD_OS_BUILD_STATUS.md, CAD_OS_FULL_STACK_HANDOFF.md, CAD_OS_V1_ACCEPTANCE.md.
-- handoff: TAKEOVER.md, NEXT_STEP.md, zip/index.md, zip/CADOS_M08…zip (28 entries, no DWG), packets/CADOS_M08….md, PACKET_INDEX.md.
-- Daedalus external: CADOS_LATEST_SUMMARY.md, cad_os_latest_status.json, CAD_OS_ADAPTER_IMPORT_NOTES.md, CAD_OS_V1_CAPABILITIES.json.
-- runs/m08_inspect_ops/ + runs/m08_baseline/ (gitignored evidence: introspect, smoke, promote, codepoint, family_rollup scripts + outputs).
-
-### B.2 Files referenced (decision-critical)
-- `D:\dev\_ariadne\alm\docs\CADOS_COMPLETION_PACKET_BUNDLE_M03_TO_FINAL\index.md` — line 39: "Full 480-op coverage closure: **implement or hard-block** with evidence, no unclassified ops" (the STRICT reading).
-- `…\packets\CADOS_M08_FULL_OPERATION_COVERAGE_CLOSURE.md` — body ACCEPTANCE: "100% classified + v1-target implemented-or-blocked, catalogued allowed for non-v1" (the reading I followed). **These two CONTRADICT — the crux of the open question.**
-
-### B.3 Decisions made (this session — SOME now under review)
-- **(UNDER REVIEW)** v1_target = status∈{implemented,blocked}; 474 catalogued = non-v1 future. → made M08 PASS. Paul questioning if this matches the original plan. Reversible: yes (re-scope).
-- Built 3 inspect ops natively + promoted live.status. Real, verified. Reversible: no (genuine progress).
-- Fixed risk_class bug (raw_command by native_api, not policy flag). Correct. Reversible: no.
-- Committed M08 router+daedalus, no push. Reversible: only by new commits.
-
-### B.4 Open questions
-- **Q (CENTRAL, BLOCKING): What is the CADOS op-build scope — the "태초의 계획"?** Options I framed: (A) build all feasible headless reads next (~30 more symbol-table enumerations: linetype/textstyle/dimstyle/viewport/UCS/material) [medium]; (B) implement-or-genuinely-block ALL 474 (literal index.md; native_only 417 = bespoke ARX, huge multi-session) [very large; reopens M08]; (C) keep current (classify + v1-surface), proceed M09. **Paul wants to clarify before choosing.** Proposed: present spec contradiction + per-family feasibility, let him set the baseline.
-- Sub-q: was my v1_target scoping too narrow? Honest self-flag: YES on the ~33 feasible catalogued reads (I could have built linetype/textstyle/dimstyle enumerations with the countSymbolTable pattern and didn't).
-
-### B.5 Constraints introduced (carry-forward, HARD)
-- H: No fake PASS. H: Golden DWG (`staging/dwg_20260617_191504/input.dwg`, sha `27dbf6b9…`) READ-ONLY (copy only). H: No remote push. H: No original-DWG write; no `write_original` default; no agent-exposed raw command; zero-COM; never mark unbuilt as PASS; never hide skips.
-- H (this session): "full coverage closure" ≠ "all 480 built" — keep that distinction explicit in all reporting.
-
-### B.6 Task state snapshot
-- M08 build tasks (#14–#23): all completed (the build/commit happened). BUT the **scope ratification** is a NEW open item not in that list.
-- M09: NOT started, and BLOCKED until scope resolved.
-
-### B.7 Code in progress
-- None mid-edit. All committed. The open item is a conversation/decision, not code.
-
-### B.8 External state changed (irreversible-ish)
-- Router commit `514289a → 1bb6f12` (main, NO push). Daedalus `7d13875 → 78dd04c` (NO push).
-- Native build canonical: `.dbx` 48128 / `.crx` 260096 / `.arx` 268288.
-- Memory `project_cad_os_layer.md` updated to M08 PASS (will be flagged with the open-scope caveat in this save).
-
----
-
-## §C Harness Engineering Layer
-
-### C.1 cwd
-- This session + next: `D:\dev\99_tools\autocad-sdk-router` (own git; build/tests/runs rooted here).
-
-### C.2 MCP servers required
-- None for the next step (it's a scope conversation). CAD ops go through `tools/autocad-router.ps1` / native build.
-
-### C.3 Hooks expected
-- PreToolUse(PowerShell): CAD router enforcement reminder (advisory). PostToolUse(Bash): Ariadne emit (detached) — use Write/PowerShell to avoid latency.
-
-### C.4 Environment / external services
-- AutoCAD 2027 (`accoreconsole.exe` headless / `acad.exe` attended) at `C:\Program Files\Autodesk\AutoCAD 2027\`. Native build via `tools/build_native_acad.ps1`. `CADOS_LIVE=1` enables 3 live pytest tests.
-
-### C.5 Skills / plugins assumed
-- `/save`, `/prime`. superpowers (verification-before-completion).
-
-### C.6 Permission notes
-- Default. No push without explicit ask.
-
-### C.7 Credentials needed
-- None. (Never read/print .env/token/key/.pem.)
-
----
-
-## §D Reasoning chain (rejected alternatives)
-
-| Decision | Chosen | Rejected alt | Why rejected |
-|---|---|---|---|
-| M08 scope | classify-all + build feasible v1 stubs (3) + 474 catalogued | build all 480 native handlers | followed packet *body* acceptance + feasibility; BUT this is exactly what Paul is now questioning — not a settled call |
-| answer Paul's check | blunt "NO, 474 not built" + surface spec contradiction | defend the PASS as-is | honesty first; the headline could mislead; let Paul ratify scope |
-| how to ask scope | offer clarify angles, let Paul drive | push AskUserQuestion immediately | Paul rejected the structured Q and asked to clarify first |
-
-### §E Live snapshots (volatile state, at save time)
-```yaml
-git_router:   {branch: main, HEAD: 1bb6f12, dirty: false}
-git_daedalus: {HEAD: 78dd04c}
-golden_dwg:   {path: staging/dwg_20260617_191504/input.dwg, sha256: 27dbf6b95ff72a89fd53b153891187365b9e8ebc4c05a97cfed307057bf49bc8, modified: false}
-native_build: {dbx: 48128, crx: 260096, arx: 268288}
-op_coverage:  {total: 517, implemented: 41, stub: 0, blocked: 2, catalogued: 474, unknown: 0}
-v1_target:    {total: 43, implemented: 41, blocked: 2, deferred: 0}
-tests:        {default: "313 passed / 3 skipped", cados_live_1: "316 passed / 0 skipped"}
-```
-
-### §F Tool output cache (re-fetch handles)
-| Operation | Source/handle | Re-fetch cost | Re-fetch via |
-|---|---|---|---|
-| 13-field matrix | `reports/operation_coverage_full_matrix.json` | cheap | `python tools/operation_coverage_matrix.py` |
-| per-family feasibility rollup | `runs/m08_inspect_ops/family_rollup.py` | cheap | `python runs/m08_inspect_ops/family_rollup.py` |
-| catalog introspection | `runs/m08_baseline/introspect2.py` | cheap | re-run |
-| native inspect smoke | `runs/m08_inspect_ops/inspect_smoke_result.json` | medium (native run) | `runs/m08_inspect_ops/run_inspect_smoke.ps1` |
-
-### §G Negative space (intentional non-actions)
-- NOT built: the 474 catalogued ops (incl. ~33 feasible headless reads I could have built — linetype/textstyle/dimstyle/viewport/UCS/material enumerations).
-- NOT done: M09 (blocked on scope). NOT done: Daedalus app logic (gated behind v1 freeze).
-- NOT pushed: both repos local-only.
-- Open, not answered: Paul's scope clarification (which angle to dig).
-
-### §H Skill runtime state (mid-skill resume)
-```yaml
-in_progress_skill: null
-step: n/a
-state: M08 committed; scope decision OPEN; Paul clarifying
-resume_command: n/a
-```
-
----
-
-## §Z Notes / gotchas
-- The 3 inspect ops ARE real (C++ in AriadneNativeJob.cpp, compiled .crx, accoreconsole smoke 70/245/21747 == M03 truth, UTF-8 Korean preserved by code-point). Don't let the scope debate cast doubt on THAT — it's solid.
-- cp949 console mojibake on Korean names = DISPLAY artifact; on-disk bytes are valid UTF-8 (verify by code-point).
-- `policy.raw_command_dispatch=forbidden` is a SAFETY guarantee on safe ops, NOT a raw-command marker (caught+fixed this session).
-- M08 PASS is defensible under packet body acceptance, but the bundle index.md's "implement or hard-block (no catalogued)" is a stricter standard the result does not meet — this contradiction is the heart of the open question.
-- "hard-block" requires a real blocker (host/license/safety per step 6) — feasible-but-unbuilt ops CANNOT be honestly hard-blocked, so the only honest states are implemented or catalogued.
-
----
-
-## How to Resume
-1. Open fresh session at: `D:\dev\99_tools\autocad-sdk-router`
-2. `/prime` — OR — read §0
-3. Verify §E snapshots (`git log --oneline -3`; golden sha)
-4. §H null — no mid-skill resume. **Pick up the OPEN scope conversation with Paul (§B.4) before any M09 work.**
+- Full audit: `D:\dev\99_tools\rhino-sdk-router\docs\RHINO_SDK_PARITY_AUDIT_20260706.md`
+- 7-axis summary: `D:\dev\.build\cados_plan\pi_out\pi_rhino_audit.md`
