@@ -62,6 +62,19 @@ WRITE_OP_MAP: Dict[str, str] = {
 
 _UNSUPPORTED_APPEND_REASON = "def_entity kind unsupported by write.block.append_entity"
 _GRADIENT_HATCH_DEFER_REASON = _UNSUPPORTED_APPEND_REASON + " (no gradient replay)"
+_CUSTOM_HATCH_DEFER_REASON = (_UNSUPPORTED_APPEND_REASON
+                              + " (custom hatch pattern replay pending .pat synthesis)")
+
+# acad.pat standard pattern names resolvable headless via kPreDefined.
+# Anything else is drawing-custom and must wait for definition-line replay.
+_STANDARD_HATCH_PATTERNS = frozenset({
+    "SOLID", "ANGLE", "ANSI31", "ANSI32", "ANSI33", "ANSI34", "ANSI35",
+    "ANSI36", "ANSI37", "ANSI38", "BOX", "BRASS", "BRICK", "BRSTONE", "CLAY",
+    "CORK", "CROSS", "DASH", "DOLMIT", "DOTS", "EARTH", "ESCHER", "FLEX",
+    "GRASS", "GRATE", "GRAVEL", "HEX", "HONEY", "HOUND", "INSUL", "LINE",
+    "MUDST", "NET", "NET3", "PLAST", "PLASTI", "SACNCR", "SQUARE", "STARS",
+    "STEEL", "SWAMP", "TRANS", "TRIANG", "ZIGZAG",
+})
 
 
 def build_job_args(native_op: str, args: Dict[str, Any]) -> Optional[Dict[str, Any]]:
@@ -150,8 +163,13 @@ def _has_hatch_polyline_loops(loops: Any) -> bool:
 
 def _def_entity_append_reason(def_ent: Dict[str, Any]) -> str:
     g = def_ent.get("geometry") or {}
-    if g.get("kind") == "hatch" and bool(g.get("is_gradient")):
-        return _GRADIENT_HATCH_DEFER_REASON
+    if g.get("kind") == "hatch":
+        if bool(g.get("is_gradient")):
+            return _GRADIENT_HATCH_DEFER_REASON
+        if (g.get("pattern_name")
+                and not bool(g.get("is_solid_fill"))
+                and str(g.get("pattern_name")).upper() not in _STANDARD_HATCH_PATTERNS):
+            return _CUSTOM_HATCH_DEFER_REASON
     return _UNSUPPORTED_APPEND_REASON
 
 
@@ -233,6 +251,15 @@ def _def_entity_append_op(block_name: str, def_ent: Dict[str, Any]) -> Optional[
                       "rotation": g.get("rotation")}
     elif kind == "hatch":
         if bool(g.get("is_gradient")):
+            return None
+        if (not bool(g.get("is_solid_fill"))
+                and str(g.get("pattern_name") or "").upper() not in _STANDARD_HATCH_PATTERNS):
+            # Drawing-custom pattern names (measured: H3 x181, H1 x1 on 1.dwg)
+            # are NOT in headless acad.pat - setPattern(kPreDefined, name)
+            # fails errorstatus 3 and fail-closed aborts the whole batch
+            # (R4f b157). Defer until the definition-line replay lands
+            # (extract getPatternDefinitionAt -> staging .pat -> kCustomDefined;
+            # advisory ledger in docs/HATCH_APPEND_DESIGN.md).
             return None
         loops = g.get("loops")
         if (_is_numeric_array(g.get("normal"), min_len=3)

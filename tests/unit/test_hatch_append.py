@@ -36,6 +36,11 @@ def _sample(kind: str, *, require_vertices: bool | None = None) -> dict:
 
 def test_hatch_serializer_emits_real_pattern_fields_and_loops_verbatim():
     ent = _sample("hatch", require_vertices=True)
+    # The real 1.dwg sample carries a DRAWING-CUSTOM pattern name (H1) which
+    # now defers until .pat synthesis lands - assert that first, then run the
+    # verbatim-emission check on a standard-pattern variant of the same data.
+    assert patch_ops_blocks._def_entity_append_op("BLK", ent) is None
+    ent["geometry"]["pattern_name"] = "DASH"
     geom = ent["geometry"]
 
     op = patch_ops_blocks._def_entity_append_op("BLK", ent)
@@ -132,3 +137,25 @@ def test_non_gradient_hatch_without_polyline_vertices_keeps_generic_reason():
         "kind": "hatch",
         "reason": _UNSUPPORTED,
     }]
+
+
+def test_custom_pattern_hatch_defers_until_pat_synthesis():
+    # H3 x181 on 1.dwg: not in headless acad.pat -> setPattern errorstatus 3
+    # aborted batch b157 on R4f. Custom names defer; standard names emit.
+    base = {
+        "kind": "hatch", "normal": [0.0, 0.0, 1.0], "elevation": 0.0,
+        "pattern_angle": 0.0, "pattern_scale": 1.0, "pattern_type": 1.0,
+        "hatch_style": 1.0, "loop_count": 1.0, "pattern_double": False,
+        "is_solid_fill": False, "is_associative": False, "is_gradient": False,
+        "loops": [{"index": 0, "loop_type": 7, "closed": True, "status": "ok",
+                   "vertices": [{"point": [0.0, 0.0]}, {"point": [1.0, 0.0]},
+                                 {"point": [1.0, 1.0]}]}],
+    }
+    custom = {"handle": "H", "layer": "0", "geometry": dict(base, pattern_name="H3")}
+    assert patch_ops_blocks._def_entity_append_op("B", custom) is None
+    assert "custom hatch pattern replay pending" in patch_ops_blocks._def_entity_append_reason(custom)
+    standard = {"handle": "H", "layer": "0", "geometry": dict(base, pattern_name="DASH")}
+    assert patch_ops_blocks._def_entity_append_op("B", standard) is not None
+    solid = {"handle": "H", "layer": "0",
+             "geometry": dict(base, pattern_name="SOLID", is_solid_fill=True)}
+    assert patch_ops_blocks._def_entity_append_op("B", solid) is not None
