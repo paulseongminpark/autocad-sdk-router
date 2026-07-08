@@ -40,5 +40,58 @@ Under the pre-fix whole-file-sha logic, the 5 NO_STAGED_EFFECT templates plus su
 
 ## Honesty / limitations
 
-- The NO_STAGED_EFFECT results are fixture-bound (`native_sample.dwg` may lack suitable source geometry for the surface ops); those templates are honestly "not certifiable from THIS evidence," not proven unsafe. Re-testing on a fixture with appropriate source surfaces could reclassify some.
-- Evidence artifacts: per-template envelopes under `reports/headless_cert_20260708/`, per-template IR diffs under `reports/headless_cert_20260708/_ir/<tag>/`.
+This run has **no false positives** (nothing was certified without a real logical
+effect), but `1 / 13 CERTIFIED` is an **undercount**, not proof that the other 12 are
+headless-unsafe. An adversarial false-negative audit of the 12 rejections (decoded
+UTF-16LE accoreconsole stdout, cross-checked against `config/operations.v2.json`
+`host_eligibility`) classifies them as:
+
+**Fixable false-negatives (4) — harness/fixture/template bugs, not headless-unsafety:**
+- `maintenance.drawing.overkill` — the 120s timeout is **not** an attended prompt; the
+  template sends option letter `N` but this Korean-locale build uses `O` for 공차
+  (tolerance), so the invalid option hangs. Single-char fix (`N`→`O`) very likely
+  certifies with a real dedup effect.
+- `define.assocaudit` — ran **perfectly** (audited 68800 objects, "0 errors found, 0
+  fixed", clean `_QSAVE`+`QUIT`). Zero diff is *correct* for a healthy drawing with
+  `fix_answer=N`; the gate's effect_took bar cannot distinguish "correct no-op" from
+  "silent no-op" for diagnostic-class ops. Needs a fixture with a deliberate repairable
+  defect + `fix_answer=Y`, or an audit-class methodology carve-out.
+- `define.arraypolar` — real `command_sequence` prompt-mapping bug (center x/y/z sent as
+  3 lines into a 1-line prompt; mismatched option letters). Structurally analogous to the
+  one template that certified (`arrayrect`); a corrected sequence would plausibly certify.
+- `define.arrayedit` — fixture-sequencing gap: `L` selected a non-array entity because the
+  staged copy has no pre-existing associative array. Needs to run chained after `arrayrect`
+  (or on a fixture that already has an array).
+
+**Registry-corroborated honest exclusions (7):** all `define.assocsurface.*` /
+`define.surf*` ops are independently marked `status: blocked`,
+`host_eligibility: [arx_adapter, full_autocad]` (coreconsole NOT listed) in
+`operations.v2.json` from an earlier re-audit. Two (`surfextrude`, `surfloft`) aren't
+even recognized command names in accoreconsole. Fixing their template/fixture gaps
+likely won't flip them via the headless lane — they belong on the attended/arx pump.
+
+**Unfinished wiring (1):** `maintenance.drawing.recover` needs the staged-copy path
+wired into `render_script()` args (a known engine gap, documented in the template notes)
+before it can be attempted at all.
+
+**Gate-scope caveat:** `headless_safe` is a **template-level** flag, and
+`derive_sample_args` exercises a single boundary value per slot (enum→first value, etc.).
+Certifying one argument branch (e.g. an enum's first option) authorizes headless use of
+the untested branches too. Argument-conditional certification is out of scope here.
+
+**Evidence artifacts:** per-template envelopes under `reports/headless_cert_20260708/`
+(committed); the multi-GB native IR artifacts (`_ir/`, ~169 MB stdout each) and batch
+logs are gitignored — the distilled envelope (verdict + effect diff summary) is the
+durable record.
+
+## Follow-ups (next certification wave)
+
+1. `overkill`: fix the tolerance-option literal `N`→`O`, re-run.
+2. `arraypolar`: comma-join the center point into one literal + drop the mismatched
+   `I`/`A` literals, re-run.
+3. `arrayedit`: re-run chained onto an array-bearing staged drawing.
+4. `assocaudit`: decide the diagnostic-op methodology (defect fixture + `fix_answer=Y`,
+   or accept clean-zero-diff as PASS for audit-class ops).
+5. `recover`: close the staged-path `render_script` wiring gap.
+6. Surface family (7): route through the `arx_adapter`/`full_autocad` attended lane, not
+   the headless gate.
