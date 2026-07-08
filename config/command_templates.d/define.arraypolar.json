@@ -5,7 +5,7 @@
       "op_id": "define.assocarray.polar",
       "status": "implemented",
       "summary": "Create an associative polar array (ARRAYPOLAR) from the drawing's last-created entity, using explicit center, item count, angle, and rotate prompts.",
-      "headless_safe": false,
+      "headless_safe": true,
       "write_mode": {
         "default": "write_copy",
         "allowed": ["read", "write_copy"]
@@ -14,52 +14,35 @@
         { "literal": "ARRAYPOLAR" },
         { "literal": "L" },
         { "literal": "" },
-        { "slot": "center_x" },
-        { "slot": "center_y" },
-        { "slot": "center_z" },
-        { "literal": "I" },
+        { "slot": "center_point" },
         { "slot": "item_count" },
-        { "literal": "A" },
         { "slot": "angle_to_fill" },
-        { "slot": "rotate_items" }
+        { "literal": "X" }
       ],
       "slots": {
-        "center_x": {
-          "type": "float_range",
+        "center_point": {
+          "type": "point2",
           "min": -1000000,
           "max": 1000000,
-          "description": "Center point X coordinate for the polar array."
-        },
-        "center_y": {
-          "type": "float_range",
-          "min": -1000000,
-          "max": 1000000,
-          "description": "Center point Y coordinate for the polar array."
-        },
-        "center_z": {
-          "type": "float_range",
-          "min": -1000000,
-          "max": 1000000,
-          "description": "Center point Z coordinate for the polar array."
+          "default": "0,0",
+          "description": "Center point of the polar array as a single 'x,y' pair -- AutoCAD's 'specify center point' prompt consumes ONE comma-joined line (feeding x/y/z as separate script lines mis-lands on later prompts; measured live, cert wave 1)."
         },
         "item_count": {
           "type": "int_range",
           "min": 2,
           "max": 1000,
-          "description": "Total number of items in the polar array, including the source object."
+          "description": "Total number of items in the polar array, including the source object. Answered DIRECTLY at '항목 수 입력 [사이의 각도(A)/표현식(E)] <4>:' -- there is no 'I' option letter at this stage (measured live, cert wave 2)."
         },
         "angle_to_fill": {
           "type": "float_range",
           "min": -360,
           "max": 360,
-          "description": "Angle to fill for the polar array, in degrees."
-        },
-        "rotate_items": {
-          "type": "enum",
-          "values": ["Y", "N"],
-          "description": "Whether copied items rotate as they are created."
+          "default": 360,
+          "description": "Fill angle in degrees, answered DIRECTLY at '채울 각도 지정(+=ccw, -=cw) 또는 [표현식(EX)] <360>:' (no option letter; measured live, cert wave 2)."
         }
-      }
+      },
+      "notes": "v1 scope limitation (like define.arrayrect): selects via AutoCAD's 'L' (Last) option; rows/levels/rotate stay at command defaults. Rebuilt from live stdout (cert wave 2, three measured iterations): the headless flow is sequential value prompts -- center point (one comma-joined line), item count (direct integer), fill angle (direct number) -- FOLLOWED by the grip-edit option menu ('그립을 선택하여 배열을 편집하거나 [...] <종료>:'), which the trailing 'X' exits. The old 'I'/'A' option letters do not exist at the value-prompt stages on this Korean-locale build.",
+      "evidence_refs": ["reports/headless_cert_20260708_wave2/define_arraypolar.certification.json", "reports/headless_cert_20260708_wave2b/define_arraypolar.certification.json"]
     }
   ]
 }

@@ -13,17 +13,18 @@
       "command_sequence": [
         { "literal": "ARRAYEDIT" },
         { "literal": "L" },
-        { "literal": "" },
-        { "slot": "subcommand" }
+        { "slot": "subcommand" },
+        { "literal": "X" }
       ],
       "slots": {
         "subcommand": {
           "type": "enum",
-          "values": ["Reset", "Source"],
-          "description": "ARRAYEDIT subcommand to enter after selecting the last associative array."
+          "values": ["RES", "S"],
+          "default": "RES",
+          "description": "ARRAYEDIT option-menu letter after selecting the last associative array: RES(재설정/Reset) or S(원본/Source). Measured live (cert wave 2, Korean-locale build): the menu is [원본(S)/대치(REP)/기준점(B)/행(R)/열(C)/레벨(L)/재설정(RES)/종료(X)] -- the spelled words 'Reset'/'Source' are NOT accepted as commands, and 'ARRAYEDIT L' takes the single array directly (no blank selection-terminator line; a blank here consumes the menu's <종료> default and exits early)."
         }
       },
-      "notes": "Attended full_autocad only: this template covers the measured ARRAYEDIT entry path plus the Reset/Source branch choice, but is not certified headless-safe.",
+      "notes": "Rebuilt 2026-07-08 (cert wave 2) from live stdout: dropped the blank selection-terminator (ARRAYEDIT's '배열 선택:' is a single pick, and the blank fell through to the option menu's exit default), switched subcommand values to the menu's real option letters, and exit the menu with 'X'.",
       "evidence_refs": [
         "docs/GOVERNED_COMMAND_TEMPLATES.md#7-future-candidates",
         "research/native_arx/constraints-associativity.md"

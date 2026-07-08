@@ -30,7 +30,12 @@
           "expect_unchanged": true
         }
       ],
-      "notes": "v1 scope limitation (documented, not hidden): headless_safe is false because this template has NOT been live-measured against real accoreconsole (unlike the 4 templates in the base config/command_templates.json, all live-verified per docs/GOVERNED_COMMAND_TEMPLATES.md section 5) -- per that doc's own rule, headless_safe is trusted only after live measurement, never assumed. A second, separate gap: run_template() (tools/command_template_engine.py) does not currently pass its internally-generated staged-copy path into render_script()'s args, so recover_target_path has no way to be auto-supplied end-to-end through run_template() yet -- a caller would have to already know the staged path, which is only generated (with a fresh timestamp) inside stage_copy() at run time. Both gaps are flagged as follow-up work for the live-verification lane, not silently papered over. The staged_path validator itself (hostile-value rejection + staging/-root escape rejection) is exercised and passes fully offline in tests/unit/test_template_recover.py.",
+      "certification": {
+        "effect_mode": "diagnostic",
+        "diagnostic_stdout_pattern": "건의 오류를 찾아서 .*건이 수정됨|Total errors found .* fixed",
+        "note": "Diagnostic-class carve-out (cert wave 2, same rationale as define.assocaudit): RECOVER's repair pass on a healthy staged copy correctly yields a zero entity diff; the effect is proven by the audit-summary completion line RECOVER's pass prints to stdout."
+      },
+      "notes": "The former run_template() wiring gap is CLOSED (cert wave 2, 2026-07-08): run_template now stages the copy BEFORE rendering and auto-fills any staged_path slot with the freshly-staged copy path, so recover_target_path is supplied end-to-end (the effective args, including the auto-filled path, are recorded in the result envelope). headless_safe remains false pending the live certification verdict -- per docs/GOVERNED_COMMAND_TEMPLATES.md, headless_safe is trusted only after live measurement, never assumed. The staged_path validator itself (hostile-value rejection + staging/-root escape rejection) is exercised and passes fully offline in tests/unit/test_template_recover.py.",
       "evidence_refs": [
         "docs/GOVERNED_COMMAND_TEMPLATES.md#5-live-verification",
         "tests/unit/test_template_recover.py"

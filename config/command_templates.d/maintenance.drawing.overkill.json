@@ -5,7 +5,7 @@
       "op_id": "maintenance.drawing.overkill",
       "status": "catalogued",
       "summary": "Run the built-in -OVERKILL command (dialog-free command-line form) against the staged drawing to remove duplicate/overlapping geometry, using an explicit Numeric-fuzz tolerance sub-option.",
-      "headless_safe": false,
+      "headless_safe": true,
       "write_mode": {
         "default": "write_copy",
         "allowed": ["read", "write_copy"]
@@ -14,7 +14,7 @@
         { "literal": "-OVERKILL" },
         { "literal": "ALL" },
         { "literal": "" },
-        { "literal": "N" },
+        { "literal": "O" },
         { "slot": "tolerance" },
         { "literal": "" }
       ],
@@ -33,7 +33,8 @@
           "capture_before": true
         }
       ],
-      "notes": "Not live-verified (status: catalogued, headless_safe: false pending measurement) -- unlike maintenance.drawing.audit/purge and the two DCM templates already in config/command_templates.json, this entry has not yet been run against real accoreconsole on this machine; the engine refuses it with ATTENDED_ONLY_TEMPLATE until a future lane clears the same live-measurement bar those four templates document in their evidence_refs. The command_sequence follows Autodesk's documented dialog-free '-OVERKILL' command-line form (select objects, end selection, choose the 'Numeric fuzz' [N] sub-option, supply the fuzz distance, accept the remaining option defaults with a blank confirmation to run), but the exact number of trailing blank confirmations needed to fall through to execution on this machine's locale/AutoCAD build is unmeasured. v1 scope limitation (documented, not hidden): only the 'Numeric fuzz' tolerance is exposed as a slot -- -OVERKILL also has an independent 'Gap tolerance' sub-option and several boolean Ignore-* toggles (color/layer/linetype/lineweight/etc.) that are out of scope for this drop-in. No paired config/operations.v2.json entry yet (out of scope for this disjoint drop-in file)."
+      "notes": "Live-measured 2026-07-08 (headless_safe certification wave 2): the first cert run proved the previous 'N' option letter wrong for this machine's Korean-locale build -- the actual settings prompt is [종료(D)/무시(I)/공차(O)/폴리선 최적화(P)/부분 중첩 결합(T)/끝과 끝 결합(E)/연관성(A)] and tolerance ('tOlerance'/공차) is 'O', not 'N'; sending 'N' hangs the option loop until timeout (the wave-1 TIMEOUT_ATTENDED_SUSPECT verdict). The command_sequence follows Autodesk's documented dialog-free '-OVERKILL' command-line form (select objects, end selection, choose the tolerance [O] sub-option, supply the fuzz distance, accept the remaining option defaults with a blank confirmation to run). v1 scope limitation (documented, not hidden): only the 'Numeric fuzz' tolerance is exposed as a slot -- -OVERKILL also has an independent 'Gap tolerance' sub-option and several boolean Ignore-* toggles (color/layer/linetype/lineweight/etc.) that are out of scope for this drop-in. No paired config/operations.v2.json entry yet (out of scope for this disjoint drop-in file).",
+      "evidence_refs": ["reports/headless_cert_20260708_wave2/maintenance_drawing_overkill.certification.json", "reports/headless_cert_20260708_wave2b/maintenance_drawing_overkill.certification.json"]
     }
   ]
 }

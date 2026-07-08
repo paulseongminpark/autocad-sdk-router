@@ -1,0 +1,34 @@
+{
+  "schema": "ariadne.headless_safe_certification.v1",
+  "template_id": "define.arrayrect",
+  "template_fingerprint": "50a1e067285d0441f1e115fc5ade05303d710209f4047f71fb50e44e8f6525ec",
+  "verdict": "CERTIFIED",
+  "reason": "CERTIFIED",
+  "exit_code": 0,
+  "original_sha256_before": "eac5d4b13d67d89106e503321412539df7b39b8a7f4e44c033448e9295fe3f76",
+  "original_sha256_after": "eac5d4b13d67d89106e503321412539df7b39b8a7f4e44c033448e9295fe3f76",
+  "original_unchanged": true,
+  "staged_input_sha256": "eac5d4b13d67d89106e503321412539df7b39b8a7f4e44c033448e9295fe3f76",
+  "staged_result_sha256": "5f0c8ed4b6fd5e56466c3f8e7f69595f8b189b9bd38803fafd077c8e6a3dbb34",
+  "staged_whole_file_sha_changed": true,
+  "effect_took": true,
+  "effect_basis": "logical_ir_diff",
+  "effect_diff_summary": {
+    "added": 1,
+    "removed": 1,
+    "modified": 0,
+    "entity_count_before": 21747,
+    "entity_count_after": 21747
+  },
+  "effect_note": null,
+  "attended_markers": [],
+  "elapsed_sec": 2.609,
+  "timeout_sec": 180.0,
+  "evidence_paths": {
+    "envelope": "D:\\dev\\99_tools\\autocad-sdk-router\\reports\\headless_cert_20260708_wave2b\\define_arrayrect.certification.json",
+    "stdout": "D:\\dev\\99_tools\\autocad-sdk-router\\runs\\command_template_define_arrayrect_20260708_170147_510\\accoreconsole_stdout.txt",
+    "stderr": "D:\\dev\\99_tools\\autocad-sdk-router\\runs\\command_template_define_arrayrect_20260708_170147_510\\accoreconsole_stderr.txt",
+    "staged_copy": "D:\\dev\\99_tools\\autocad-sdk-router\\staging\\tmpl_define_arrayrect_20260708_170147_509\\input.dwg",
+    "staged_result": "D:\\dev\\99_tools\\autocad-sdk-router\\staging\\tmpl_define_arrayrect_20260708_170147_509\\input.dwg"
+  }
+}

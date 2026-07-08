@@ -84,14 +84,61 @@ the untested branches too. Argument-conditional certification is out of scope he
 logs are gitignored — the distilled envelope (verdict + effect diff summary) is the
 durable record.
 
-## Follow-ups (next certification wave)
+## Wave 2 (same day) — the follow-ups, executed
 
-1. `overkill`: fix the tolerance-option literal `N`→`O`, re-run.
-2. `arraypolar`: comma-join the center point into one literal + drop the mismatched
-   `I`/`A` literals, re-run.
-3. `arrayedit`: re-run chained onto an array-bearing staged drawing.
-4. `assocaudit`: decide the diagnostic-op methodology (defect fixture + `fix_answer=Y`,
-   or accept clean-zero-diff as PASS for audit-class ops).
-5. `recover`: close the staged-path `render_script` wiring gap.
-6. Surface family (7): route through the `arx_adapter`/`full_autocad` attended lane, not
-   the headless gate.
+All six follow-ups were executed the same day; final verdicts below. Evidence:
+`reports/headless_cert_20260708_wave2/` (+ `_wave2_arrayedit/` for the seeded-fixture
+run). Original fixtures byte-identical throughout.
+
+| Template | Wave-2 verdict | What changed / what the evidence says |
+|---|---|---|
+| maintenance.drawing.overkill | **CERTIFIED** (effect 4/235/177) | Option letter fixed `N`→`O` (Korean-locale 공차). Completed exit 0; deleted 47 duplicates + 266 overlapping segments on the staged copy — a large real dedup effect. Flag flipped. |
+| define.assocaudit | **CERTIFIED** (diagnostic) | Judged under the new registry-declared **diagnostic carve-out**: AUDIT's completion line `…건의 오류를 찾아서 0건이 수정됨` matched in stdout (`effect_basis: diagnostic_stdout`). Flag flipped. |
+| define.arraypolar | **CERTIFIED** (effect 1/1/0) | `command_sequence` rebuilt across three measured iterations: center as ONE `x,y` line (new `point2` slot type), item count + fill angle answered directly (no option letters), trailing `X` exits the grip-edit menu. Same associative-array signature as arrayrect. Flag flipped. |
+| define.arrayedit | NOT_CERTIFIED — NO_STAGED_EFFECT | Sequence fixed (menu letters `RES`/`S`, no blank terminator) and run against a NEW committed array-bearing fixture (`tests/fixtures/assoc_array_seed.dwg`, generated via the certified arrayrect template). It now **completes cleanly** (exit 0), but `RES` (Reset) on a pristine array is a logical no-op — nothing to restore. Honest terminal state: *executable headless, but no certifiable effect without an override-bearing array fixture* (producing one headless would itself require an uncertified edit path — circular). Stays attended-gated per the ruling's "a no-op is not certifiable". |
+| maintenance.drawing.recover | NOT_CERTIFIED — NO_STAGED_EFFECT | The engine wiring gap is **closed** (staging now precedes rendering; `staged_path` slots auto-filled — the live run answered RECOVER's filename prompt with the staged path and completed exit 0). But RECOVER on a healthy drawing prints **no** repair/audit summary at all, so there is no observable diagnostic evidence to certify on. Honest terminal state: wiring proven, effect unprovable on a healthy fixture. |
+
+### Verdict-logic correction (measured this wave)
+
+Wave-2's first overkill run exposed a false-negative in the gate itself: the engine
+writes scripts with `CMDECHO=1`, so every prompt the script *answers* is echoed to
+stdout — a **completed** (exit 0) run's echoed option prompt (`… <종료>:`) matched the
+default-bracket attended pattern and wrongly blocked a run with a real 478-entity
+effect. The verdict logic now treats attended markers as decisive **only on runs that
+failed to complete** (timeout / nonzero exit — i.e. the run died at a prompt); on a
+completed run markers are recorded on the envelope but the verdict is carried by the
+effect gate. A completed, original-immutable run with a real logical effect *is* the
+direct evidence of headless viability.
+
+### Envelope↔template content binding (adversarial-audit class fix)
+
+A post-wave-2 adversarial audit surfaced a general trust gap: an envelope was bound to
+`template_id` + fixture sha only — NOT to the template's *content* — so a
+`command_sequence` edited AFTER certification could still be flipped from the stale
+envelope with zero fresh evidence (`run_batch` resumes CERTIFIED envelopes without
+re-running CAD, by design). The audit's concrete instance did not reproduce (the
+"drifted" template was a stale read taken mid-edit; the current registry sequence
+matches the measured `.scr` token-for-token), but the class is real and is now closed:
+every envelope records a `template_fingerprint` (sha256 over the canonicalized
+`command_sequence` + `slots`), and `--apply` refuses a fingerprint mismatch **or a
+fingerprint-less legacy envelope** (fail-closed: re-certify fresh). A specificity floor
+on `diagnostic_stdout_pattern` (≥8 chars) backstops the diagnostic carve-out against
+trivially-matching patterns.
+
+**Wave 2b — final authoritative envelopes.** All four flipped templates were then
+re-certified fresh under the binding (`reports/headless_cert_20260708_wave2b/`):
+arrayrect CERTIFIED (1/1/0), overkill CERTIFIED (4/235/177), assocaudit CERTIFIED
+(diagnostic), arraypolar CERTIFIED (1/1/0) — effect signatures reproduced identically
+to their earlier runs, exit 0 across the batch, fixture byte-identical. Each flipped
+template's registry entry now carries its fingerprint-bound wave-2b envelope as the
+authoritative evidence_ref.
+
+### Final registry state (13 originally-gated templates)
+
+**Certified 4**: arrayrect (wave 1, re-certified 2b), overkill, assocaudit, arraypolar
+(wave 2, re-certified 2b) — all four backed by fingerprint-bound envelopes.
+**Honest NOT_CERTIFIED 9**: arrayedit + recover (terminal, evidence-based — see above);
+7 × surface family (registry-corroborated coreconsole-ineligible; attended/arx lane).
+
+No further open follow-ups: every wave-1 follow-up item was either certified with
+evidence or closed with a terminal, evidence-based honest verdict.

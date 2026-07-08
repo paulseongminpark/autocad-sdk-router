@@ -1,0 +1,28 @@
+{
+  "schema": "ariadne.headless_safe_certification.v1",
+  "template_id": "define.assocaudit",
+  "template_fingerprint": "59c395576f5dde4049bf98e9b450aeefc062bc7b56be4bf7660ef4c1fab278ce",
+  "verdict": "CERTIFIED",
+  "reason": "CERTIFIED",
+  "exit_code": 0,
+  "original_sha256_before": "eac5d4b13d67d89106e503321412539df7b39b8a7f4e44c033448e9295fe3f76",
+  "original_sha256_after": "eac5d4b13d67d89106e503321412539df7b39b8a7f4e44c033448e9295fe3f76",
+  "original_unchanged": true,
+  "staged_input_sha256": "eac5d4b13d67d89106e503321412539df7b39b8a7f4e44c033448e9295fe3f76",
+  "staged_result_sha256": "4a3f119ec42b96c1b8a7a6ed58d2a2ab4c1ef5c02cc1d37cd778f50cebefada8",
+  "staged_whole_file_sha_changed": true,
+  "effect_took": true,
+  "effect_basis": "diagnostic_stdout",
+  "effect_diff_summary": null,
+  "effect_note": "diagnostic output matched: '건의 오류를 찾아서 0건이 수정됨'",
+  "attended_markers": [],
+  "elapsed_sec": 4.969,
+  "timeout_sec": 180.0,
+  "evidence_paths": {
+    "envelope": "D:\\dev\\99_tools\\autocad-sdk-router\\reports\\headless_cert_20260708_wave2b\\define_assocaudit.certification.json",
+    "stdout": "D:\\dev\\99_tools\\autocad-sdk-router\\runs\\command_template_define_assocaudit_20260708_170316_612\\accoreconsole_stdout.txt",
+    "stderr": "D:\\dev\\99_tools\\autocad-sdk-router\\runs\\command_template_define_assocaudit_20260708_170316_612\\accoreconsole_stderr.txt",
+    "staged_copy": "D:\\dev\\99_tools\\autocad-sdk-router\\staging\\tmpl_define_assocaudit_20260708_170316_612\\input.dwg",
+    "staged_result": "D:\\dev\\99_tools\\autocad-sdk-router\\staging\\tmpl_define_assocaudit_20260708_170316_612\\input.dwg"
+  }
+}
