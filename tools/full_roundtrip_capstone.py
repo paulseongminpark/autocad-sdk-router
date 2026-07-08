@@ -49,7 +49,7 @@ Public API (pure -- no I/O, no CAD engine; independently unit-testable):
     layer_op_args_from_record(record, op_roundtrip_probe_mod) -> dict
     dimstyle_op_args_from_record(record, op_roundtrip_probe_mod) -> dict
     record_diff_report(kind_label, records, actual_ir, *, name_field, fields, diff_fn, lookup_fn) -> dict
-    per_kind_verdict(pre_ir, diff) -> dict
+    per_kind_verdict(pre_ir, diff, *, deferred=None) -> dict
     resolvable_ops_report(patch, patch_ops_mod=None) -> dict
     record_op_args_from_record(record, fields) -> dict
     build_records_patch(census_ir, target_dwg, patch_id, ...) -> (patch, meta)
@@ -399,7 +399,8 @@ def record_diff_report(label: str, records: List[Dict[str, Any]], actual_ir: Dic
 #    (dxf_name, layer, geometry) fingerprint/tolerance matching.
 # --------------------------------------------------------------------------- #
 
-def per_kind_verdict(pre_ir: Dict[str, Any], diff: Dict[str, Any]) -> Dict[str, Any]:
+def per_kind_verdict(pre_ir: Dict[str, Any], diff: Dict[str, Any], *,
+                     deferred: Optional[List[Dict[str, Any]]] = None) -> Dict[str, Any]:
     """Per-dxf_name regen verdict from a comparison_basis="geometry" diff
     between ``pre_ir`` (the filtered ORIGINAL production drawing's subset
     regen was asked to reproduce) and the regenerated-then-re-extracted
@@ -416,6 +417,21 @@ def per_kind_verdict(pre_ir: Dict[str, Any], diff: Dict[str, Any]) -> Dict[str, 
         e.get("dxf_name", "") or "" for e in (pre_ir.get("entities") or []) if isinstance(e, dict))
     by_type = (diff.get("summary") or {}).get("by_type") or {}
     changed = diff.get("changed_handles") or []
+    dxf_names_by_kind: Dict[str, Set[str]] = defaultdict(set)
+    for dxf_name, kind in CERTIFIED_BUCKETS:
+        dxf_names_by_kind[kind].add(dxf_name)
+    dxf_by_deferred_kind = {
+        kind: next(iter(dxf_names))
+        for kind, dxf_names in dxf_names_by_kind.items()
+        if len(dxf_names) == 1
+    }
+    deferred_counts: Counter = Counter()
+    for rec in deferred or []:
+        if not isinstance(rec, dict):
+            continue
+        dxf_name = dxf_by_deferred_kind.get(rec.get("kind", "") or "")
+        if dxf_name:
+            deferred_counts[dxf_name] += 1
 
     examples: Dict[str, Dict[str, List[Dict[str, Any]]]] = defaultdict(lambda: defaultdict(list))
     for rec in changed:
@@ -429,9 +445,12 @@ def per_kind_verdict(pre_ir: Dict[str, Any], diff: Dict[str, Any]) -> Dict[str, 
         pre_count = pre_counts.get(dxf, 0)
         t = by_type.get(dxf, {})
         added, removed, modified = t.get("added", 0), t.get("removed", 0), t.get("modified", 0)
+        deferred_count = deferred_counts.get(dxf, 0)
         rows.append({
             "dxf_name": dxf,
             "regen_attempted_count": pre_count,
+            "deferred_count": deferred_count,
+            "attempted_live_count": max(pre_count - deferred_count, 0),
             "diff0_count": pre_count - modified - removed,
             "modified_count": modified,
             "removed_count": removed,  # in pre (original), no post (regen) match -> real miss
@@ -443,6 +462,8 @@ def per_kind_verdict(pre_ir: Dict[str, Any], diff: Dict[str, Any]) -> Dict[str, 
         k: sum(r[k] for r in rows)
         for k in ("regen_attempted_count", "diff0_count", "modified_count", "removed_count", "added_count")
     }
+    totals["deferred_count"] = sum(r["deferred_count"] for r in rows)
+    totals["attempted_live_count"] = sum(r["attempted_live_count"] for r in rows)
     return {
         "comparison_basis": (diff.get("diagnostics") or {}).get("comparison_basis"),
         "rows": rows,
@@ -1145,7 +1166,7 @@ def main(argv=None) -> int:
         diff = cad_diff_mod.compute_diff(filtered, regenerated_ir, comparison_basis="geometry",
                                          diff_scope="modelspace_entities_only")
         _write_json(os.path.join(out_dir, "geometry_diff.json"), diff)
-        verdict = per_kind_verdict(filtered, diff)
+        verdict = per_kind_verdict(filtered, diff, deferred=batch["deferred"])
         summary["verdict"] = verdict
         _write_json(os.path.join(out_dir, "verdict.json"), verdict)
         if args.cross_verify:

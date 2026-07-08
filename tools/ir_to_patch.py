@@ -52,6 +52,62 @@ def build_patch_from_ir(ir: Dict[str, Any], target_dwg: Dict[str, Any], patch_id
         bd.get("name"): bd for bd in (ir.get("block_definitions") or []) if bd.get("name")
     }
     emitted_block_defs: set = set()
+    active_block_defs: List[str] = []
+    block_def_step_counts: Dict[int, int] = {}
+    cycle_notes_seen: set = set()
+
+    def _emit_block_def(block_name: str, root_entity_index: int) -> None:
+        if block_name in emitted_block_defs:
+            return
+        if block_name in active_block_defs:
+            return
+        block_def = block_defs_by_name.get(block_name)
+        if block_def is None:
+            return
+        active_block_defs.append(block_name)
+        try:
+            for def_entity_index, def_ent in enumerate(block_def.get("def_entities") or []):
+                nested_g = def_ent.get("geometry") or {}
+                if nested_g.get("kind") != "block_reference":
+                    continue
+                nested_block_name = nested_g.get("block_name")
+                if nested_block_name in emitted_block_defs:
+                    continue
+                if nested_block_name in active_block_defs:
+                    cycle_start = active_block_defs.index(nested_block_name)
+                    cycle_path = active_block_defs[cycle_start:] + [nested_block_name]
+                    note = {
+                        "block_name": block_name,
+                        "reason": "definition cycle detected at %r via %s" % (
+                            nested_block_name, " -> ".join(cycle_path)),
+                    }
+                    note_key = (note["block_name"], note["reason"])
+                    if note_key not in cycle_notes_seen:
+                        deferred.append(note)
+                        cycle_notes_seen.add(note_key)
+                    continue
+                if nested_block_name not in block_defs_by_name:
+                    deferred.append({
+                        "block_name": block_name,
+                        "def_entity_index": def_entity_index,
+                        "kind": "block_reference",
+                        "reason": "no block_definitions entry for nested block_name %r"
+                                  % (nested_block_name,),
+                    })
+                    continue
+                _emit_block_def(nested_block_name, root_entity_index)
+            bd_ops, bd_deferred = patch_ops.blocks.block_def_ops(block_def)
+            next_step = block_def_step_counts.get(root_entity_index, 0)
+            for bd_op in bd_ops:
+                bd_op["step_id"] = "bd%d_%d" % (root_entity_index, next_step)
+                ops.append(bd_op)
+                next_step += 1
+            block_def_step_counts[root_entity_index] = next_step
+            deferred.extend(bd_deferred)
+            emitted_block_defs.add(block_name)
+        finally:
+            active_block_defs.pop()
+
     for i, ent in enumerate(ir.get("entities") or []):
         g = ent.get("geometry") or {}
         kind = g.get("kind")
@@ -71,12 +127,7 @@ def build_patch_from_ir(ir: Dict[str, Any], target_dwg: Dict[str, Any], patch_id
                 })
                 continue
             if block_name not in emitted_block_defs:
-                bd_ops, bd_deferred = patch_ops.blocks.block_def_ops(block_def)
-                for j, bd_op in enumerate(bd_ops):
-                    bd_op["step_id"] = "bd%d_%d" % (i, j)
-                    ops.append(bd_op)
-                deferred.extend(bd_deferred)
-                emitted_block_defs.add(block_name)
+                _emit_block_def(block_name, i)
         op = _op_for(ent)
         if op is None:
             deferred.append({"index": i, "handle": ent.get("handle"), "kind": kind})

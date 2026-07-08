@@ -15,9 +15,12 @@ _ROUTER_HOME = os.path.dirname(_THIS_DIR)
 if _THIS_DIR not in sys.path:
     sys.path.insert(0, _THIS_DIR)
 
+from full_roundtrip_capstone import CERTIFIED_BUCKETS
+
 REPORT_SCHEMA = "ariadne.roundtrip_report.v1"
 RULE_KIND_DRIFT = "R_KIND_DRIFT_POLYLINE_LWPOLYLINE"
 RULE_DEFERRED_BLOCK_DEF = "R_DEFERRED_BLOCK_DEF"
+CERTIFIED_DXF_NAMES = {dxf_name for (dxf_name, _kind) in CERTIFIED_BUCKETS}
 KIND_DRIFT_NOTE = (
     "AutoCAD regenerates 2D polylines as LWPOLYLINE; geometric content preserved - "
     "candidate harmless pending human ratification"
@@ -218,12 +221,66 @@ def classify_patterns(verdict, deferred, harmless_rules=None) -> list[dict]:
     )
 
 
+def _status_from_counts(attempted: int, diff0: int) -> str:
+    if attempted > 0:
+        return "PASS" if diff0 == attempted else "FAIL"
+    return "VACUOUS"
+
+
+def _def_entity_budget(summary, census_report) -> dict | None:
+    summary = summary or {}
+    census_report = census_report or {}
+    budget = summary.get("def_entity_budget")
+    if budget is None:
+        return None
+
+    dropped_defs = []
+    for entry in budget.get("dropped_block_definitions") or []:
+        dropped_defs.append(
+            {
+                "name": entry.get("name"),
+                "def_entity_count": int(entry.get("def_entity_count", 0) or 0),
+            }
+        )
+    dropped_defs.sort(key=lambda item: (-item["def_entity_count"], str(item.get("name") or "")))
+
+    dropped_def_entity_total = sum(item["def_entity_count"] for item in dropped_defs)
+    census_total = int(census_report.get("block_definitions_entity_total", 0) or 0)
+    dropped_pct = round((dropped_def_entity_total / census_total) * 100, 1) if census_total else None
+
+    max_budget = budget.get("max_def_entities_per_block")
+    if max_budget is not None:
+        max_budget = int(max_budget)
+
+    return {
+        "max_def_entities_per_block": max_budget,
+        "dropped_def_count": len(dropped_defs),
+        "dropped_def_entity_total": dropped_def_entity_total,
+        "dropped_defs": dropped_defs,
+        "dropped_pct_of_block_def_entities": dropped_pct,
+    }
+
+
+def _per_layer_rollup(verdict) -> dict:
+    verdict = verdict or {}
+    per_layer: dict[str, dict[str, int]] = {}
+    for row in verdict.get("rows") or []:
+        examples_by_change = row.get("examples") or {}
+        for change in ("removed", "added", "modified"):
+            for example in examples_by_change.get(change) or []:
+                layer = str(example.get("layer") or "unspecified")
+                bucket = per_layer.setdefault(layer, {"removed": 0, "added": 0, "modified": 0})
+                bucket[change] += 1
+    return dict(sorted(per_layer.items()))
+
+
 def kind_buckets(census_report, verdict) -> dict:
     """Summarize per-kind PASS/FAIL/VACUOUS status from census certification and verdict rows."""
     census_report = census_report or {}
     verdict = verdict or {}
     row_by_name = {row.get("dxf_name"): row for row in verdict.get("rows") or []}
     buckets = {}
+    census_names = {bucket.get("dxf_name") for bucket in census_report.get("by_bucket") or []}
 
     for bucket in census_report.get("by_bucket") or []:
         if not bucket.get("certified"):
@@ -232,17 +289,17 @@ def kind_buckets(census_report, verdict) -> dict:
         row = row_by_name.get(dxf_name) or {}
         attempted = int(row.get("regen_attempted_count", 0) or 0)
         diff0 = int(row.get("diff0_count", 0) or 0)
-        if attempted > 0:
-            status = "PASS" if diff0 == attempted else "FAIL"
-        else:
-            status = "VACUOUS"
+        attempted_live = int(row.get("attempted_live_count", attempted) or attempted)
+        deferred_count = int(row.get("deferred_count", 0) or 0)
         buckets[dxf_name] = {
-            "status": status,
+            "status": _status_from_counts(attempted, diff0),
             "certified": True,
             "label": bucket.get("label"),
             "kind": bucket.get("kind"),
             "census_count": int(bucket.get("count", 0) or 0),
             "attempted_count": attempted,
+            "attempted_live_count": attempted_live,
+            "deferred_count": deferred_count,
             "diff0_count": diff0,
             "modified_count": int(row.get("modified_count", 0) or 0),
             "removed_count": int(row.get("removed_count", 0) or 0),
@@ -254,21 +311,40 @@ def kind_buckets(census_report, verdict) -> dict:
             continue
         attempted = int(row.get("regen_attempted_count", 0) or 0)
         diff0 = int(row.get("diff0_count", 0) or 0)
-        if attempted > 0:
-            status = "PASS" if diff0 == attempted else "FAIL"
-        else:
-            status = "VACUOUS"
+        attempted_live = int(row.get("attempted_live_count", attempted) or attempted)
+        deferred_count = int(row.get("deferred_count", 0) or 0)
         buckets[dxf_name] = {
-            "status": status,
+            "status": _status_from_counts(attempted, diff0),
             "certified": False,
             "label": None,
             "kind": None,
             "census_count": 0,
             "attempted_count": attempted,
+            "attempted_live_count": attempted_live,
+            "deferred_count": deferred_count,
             "diff0_count": diff0,
             "modified_count": int(row.get("modified_count", 0) or 0),
             "removed_count": int(row.get("removed_count", 0) or 0),
             "added_count": int(row.get("added_count", 0) or 0),
+        }
+
+    for dxf_name in CERTIFIED_DXF_NAMES:
+        if dxf_name in census_names or dxf_name in row_by_name or dxf_name in buckets:
+            continue
+        buckets[dxf_name] = {
+            "status": "VACUOUS",
+            "certified": True,
+            "label": None,
+            "kind": None,
+            "census_count": 0,
+            "attempted_count": 0,
+            "attempted_live_count": 0,
+            "deferred_count": 0,
+            "diff0_count": 0,
+            "modified_count": 0,
+            "removed_count": 0,
+            "added_count": 0,
+            "absent_from_drawing": True,
         }
 
     return dict(sorted(buckets.items()))
@@ -292,6 +368,15 @@ def build_report(run_dir, harmless_rules=None) -> dict:
     patterns = classify_patterns(verdict, deferred, harmless_rules=harmless_rules)
     naive = naive_count_verdict(verdict)
     smart_all_diff0 = _smart_all_diff0(verdict)
+    ceiling = {
+        "modelspace_entity_total": int(census.get("modelspace_entity_total", 0) or 0),
+        "certified_total": int(census.get("certified_total", 0) or 0),
+        "out_of_class_total": int(census.get("out_of_class_total", 0) or 0),
+        "deferred_count": len(deferred),
+    }
+    def_entity_budget = _def_entity_budget(summary, census)
+    if def_entity_budget is not None:
+        ceiling["def_entity_budget"] = def_entity_budget
 
     if naive["naive_pass"] and not smart_all_diff0:
         contrast_note = "Naive foil passes while smart diff0 gate fails; the foil is blind to moves and modifications."
@@ -308,13 +393,9 @@ def build_report(run_dir, harmless_rules=None) -> dict:
         "schema": REPORT_SCHEMA,
         "run_dir": str(Path(run_dir)),
         "source": source,
-        "ceiling": {
-            "modelspace_entity_total": int(census.get("modelspace_entity_total", 0) or 0),
-            "certified_total": int(census.get("certified_total", 0) or 0),
-            "out_of_class_total": int(census.get("out_of_class_total", 0) or 0),
-            "deferred_count": len(deferred),
-        },
+        "ceiling": ceiling,
         "kind_buckets": kind_buckets(census, verdict),
+        "per_layer": _per_layer_rollup(verdict),
         "patterns": patterns,
         "naive_vs_smart": {
             "naive_pass": naive["naive_pass"],
@@ -368,9 +449,38 @@ def render_markdown(report) -> str:
             f"- Certified total: {ceiling.get('certified_total', 0)}",
             f"- Out-of-class total: {ceiling.get('out_of_class_total', 0)}",
             f"- Deferred count: {ceiling.get('deferred_count', 0)}",
-            "",
         ]
     )
+    def_entity_budget = ceiling.get("def_entity_budget")
+    if def_entity_budget is not None:
+        dropped_pct = def_entity_budget.get("dropped_pct_of_block_def_entities")
+        lines.extend(
+            [
+                "",
+                "### Deferred block-definition budget",
+                f"- Max def entities per block: {def_entity_budget.get('max_def_entities_per_block')}",
+                f"- Dropped definitions: {def_entity_budget.get('dropped_def_count', 0)}",
+                f"- Dropped def entities: {def_entity_budget.get('dropped_def_entity_total', 0)}",
+                f"- Dropped pct of block-def entities: {'n/a' if dropped_pct is None else f'{dropped_pct:.1f}%'}",
+            ]
+        )
+        dropped_defs = def_entity_budget.get("dropped_defs") or []
+        if dropped_defs:
+            lines.extend(
+                [
+                    "",
+                    "| Block definition | Def entities |",
+                    "| --- | ---: |",
+                ]
+            )
+            for entry in dropped_defs:
+                lines.append(
+                    "| {name} | {count} |".format(
+                        name=entry.get("name"),
+                        count=entry.get("def_entity_count", 0),
+                    )
+                )
+    lines.append("")
 
     buckets = report.get("kind_buckets") or {}
     counts = _status_counts(buckets)
@@ -385,18 +495,57 @@ def render_markdown(report) -> str:
     )
     if buckets:
         for dxf_name, bucket in buckets.items():
+            attempted = bucket.get("attempted_count", 0)
+            attempted_live = bucket.get("attempted_live_count", attempted)
+            deferred_count = bucket.get("deferred_count", 0)
             lines.append(
                 "| {dxf} | {certified} | {census} | {attempted} | {diff0} | {status} |".format(
                     dxf=dxf_name,
                     certified="yes" if bucket.get("certified") else "no",
                     census=bucket.get("census_count", 0),
-                    attempted=bucket.get("attempted_count", 0),
+                    attempted=f"{attempted} (live {attempted_live})",
                     diff0=bucket.get("diff0_count", 0),
-                    status=bucket.get("status", ""),
+                    status=f"{bucket.get('status', '')} [deferred {deferred_count}]",
                 )
             )
     else:
-        lines.append("| (none) | no | 0 | 0 | 0 | VACUOUS |")
+        lines.append("| (none) | no | 0 | 0 (live 0) | 0 | VACUOUS [deferred 0] |")
+    lines.append("")
+
+    per_layer = report.get("per_layer") or {}
+    lines.extend(
+        [
+            "## Per-layer example rollup",
+            "- Aggregated from verdict examples only; if row totals exceed recorded examples, this table is a sample rather than a full census.",
+            "| Layer | Removed | Added | Modified | Total |",
+            "| --- | ---: | ---: | ---: | ---: |",
+        ]
+    )
+    ranked_layers = sorted(
+        per_layer.items(),
+        key=lambda item: (
+            -(item[1].get("removed", 0) + item[1].get("added", 0) + item[1].get("modified", 0)),
+            item[0],
+        ),
+    )[:20]
+    if ranked_layers:
+        for layer, counts_by_change in ranked_layers:
+            total = (
+                counts_by_change.get("removed", 0)
+                + counts_by_change.get("added", 0)
+                + counts_by_change.get("modified", 0)
+            )
+            lines.append(
+                "| {layer} | {removed} | {added} | {modified} | {total} |".format(
+                    layer=layer,
+                    removed=counts_by_change.get("removed", 0),
+                    added=counts_by_change.get("added", 0),
+                    modified=counts_by_change.get("modified", 0),
+                    total=total,
+                )
+            )
+    else:
+        lines.append("| (none) | 0 | 0 | 0 | 0 |")
     lines.append("")
 
     patterns = report.get("patterns") or []

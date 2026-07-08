@@ -160,6 +160,169 @@ def _viewbox_to_pixels(viewbox: Tuple[float, float, float, float], raster_size: 
     return px_w, px_h
 
 
+def _format_svg_number(value: float) -> str:
+    text = f"{float(value):.6f}".rstrip("0").rstrip(".")
+    return text or "0"
+
+
+def _parse_viewbox(raw: Optional[str]) -> Tuple[float, float, float, float]:
+    parts = [float(part) for part in re.split(r"[\s,]+", (raw or "").strip()) if part]
+    if len(parts) != 4:
+        raise ValueError(f"SVG has invalid viewBox: {raw!r}")
+    return parts[0], parts[1], parts[2], parts[3]
+
+
+def _read_svg_viewbox(svg_path: str) -> Tuple[float, float, float, float]:
+    return _parse_viewbox(ET.parse(svg_path).getroot().get("viewBox"))
+
+
+def _union_viewboxes(
+    viewboxes: Sequence[Tuple[float, float, float, float]]
+) -> Tuple[float, float, float, float]:
+    if not viewboxes:
+        raise ValueError("at least one viewBox is required")
+    min_x = min(vb[0] for vb in viewboxes)
+    min_y = min(vb[1] for vb in viewboxes)
+    max_x = max(vb[0] + max(vb[2], 0.0) for vb in viewboxes)
+    max_y = max(vb[1] + max(vb[3], 0.0) for vb in viewboxes)
+    width = max_x - min_x
+    height = max_y - min_y
+    if width <= 0:
+        width = 1.0
+    if height <= 0:
+        height = 1.0
+    return min_x, min_y, width, height
+
+
+def _flip_transform_for_viewbox(viewbox: Tuple[float, float, float, float]) -> str:
+    _, vb_y, _, vb_h = viewbox
+    return f"translate(0,{_format_svg_number(vb_y + vb_y + vb_h)}) scale(1,-1)"
+
+
+def _rewrite_svg_viewbox(svg_path: str, viewbox: Tuple[float, float, float, float]) -> None:
+    ET.register_namespace("", "http://www.w3.org/2000/svg")
+    tree = ET.parse(svg_path)
+    root = tree.getroot()
+    vb_x, vb_y, vb_w, vb_h = viewbox
+    root.set(
+        "viewBox",
+        " ".join(_format_svg_number(part) for part in (vb_x, vb_y, vb_w, vb_h)),
+    )
+    root.set("width", "1000")
+    root.set("height", _format_svg_number(1000.0 * (vb_h / vb_w) if vb_w > 0 else 1000.0))
+
+    for child in list(root):
+        if child.tag.split("}")[-1] == "rect" and child.get("fill") == "#ffffff":
+            child.set("x", _format_svg_number(vb_x))
+            child.set("y", _format_svg_number(vb_y))
+            child.set("width", _format_svg_number(vb_w))
+            child.set("height", _format_svg_number(vb_h))
+            break
+
+    for child in list(root):
+        if child.tag.split("}")[-1] == "g":
+            child.set("transform", _flip_transform_for_viewbox(viewbox))
+            break
+
+    tree.write(svg_path, encoding="utf-8", xml_declaration=True)
+
+
+def _apply_common_viewbox(svg_paths: Sequence[str]) -> Tuple[float, float, float, float]:
+    # visual_report does not expose an extents override, so the gate normalizes
+    # the rendered SVG files in place before rasterization.
+    common = _union_viewboxes([_read_svg_viewbox(path) for path in svg_paths])
+    for path in svg_paths:
+        _rewrite_svg_viewbox(path, common)
+    return common
+
+
+def _read_visual_diff_counts(artifact: Dict[str, Any]) -> Optional[Dict[str, int]]:
+    diagnostics = artifact.get("diagnostics")
+    if isinstance(diagnostics, dict):
+        counts = diagnostics.get("diff_counts")
+        if isinstance(counts, dict):
+            return {
+                "created": int(counts.get("created") or 0),
+                "modified": int(counts.get("modified") or 0),
+                "deleted": int(counts.get("deleted") or 0),
+            }
+
+    visual_diff_path = artifact.get("visual_diff")
+    if isinstance(visual_diff_path, str) and os.path.isfile(visual_diff_path):
+        try:
+            with open(visual_diff_path, "r", encoding="utf-8") as fh:
+                payload = json.load(fh)
+        except Exception:
+            return None
+        counts = payload.get("counts")
+        if isinstance(counts, dict):
+            return {
+                "created": int(counts.get("created") or 0),
+                "modified": int(counts.get("modified") or 0),
+                "deleted": int(counts.get("deleted") or 0),
+            }
+    return None
+
+
+def _sync_artifact_viewboxes(
+    artifact: Dict[str, Any],
+    common_viewbox: Tuple[float, float, float, float],
+) -> None:
+    common_box = [float(part) for part in common_viewbox]
+    artifact["common_viewbox"] = common_box
+    diagnostics = artifact.get("diagnostics")
+    if isinstance(diagnostics, dict):
+        diagnostics["common_viewbox"] = common_box
+        for side in ("before", "after"):
+            side_diag = diagnostics.get(side)
+            if isinstance(side_diag, dict) and isinstance(side_diag.get("viewbox"), list):
+                side_diag["original_viewbox"] = list(side_diag["viewbox"])
+                side_diag["viewbox"] = list(common_box)
+
+    visual_diff_path = artifact.get("visual_diff")
+    if not isinstance(visual_diff_path, str) or not os.path.isfile(visual_diff_path):
+        return
+    try:
+        with open(visual_diff_path, "r", encoding="utf-8") as fh:
+            payload = json.load(fh)
+    except Exception:
+        return
+    payload["common_viewbox"] = common_box
+    viewbox = payload.get("viewbox")
+    if not isinstance(viewbox, dict):
+        viewbox = {}
+        payload["viewbox"] = viewbox
+    for side in ("before", "after"):
+        if isinstance(viewbox.get(side), list):
+            viewbox[f"{side}_original"] = list(viewbox[side])
+        viewbox[side] = list(common_box)
+    _write_json(visual_diff_path, payload)
+
+
+def _coerce_reason(reason: Optional[Any], fallback: str) -> str:
+    text = str(reason).strip() if reason is not None else ""
+    return text or fallback
+
+
+def _compare_failure_reason(compare: Dict[str, Any], fallback_prefix: str) -> str:
+    return _coerce_reason(
+        compare.get("detail") or compare.get("error") or compare.get("compare_note"),
+        f"{fallback_prefix}: status={compare.get('status')} compare_status={compare.get('compare_status')}",
+    )
+
+
+def _entity_set_mismatch_reason(counts: Optional[Dict[str, int]]) -> Optional[str]:
+    if not isinstance(counts, dict):
+        return None
+    created = int(counts.get("created") or 0)
+    deleted = int(counts.get("deleted") or 0)
+    if deleted > 0:
+        return f"entity_set_mismatch: deleted={deleted} created={created} (deferred-regen ceiling)"
+    if created > 0:
+        return f"entity_set_mismatch: deleted={deleted} created={created}"
+    return None
+
+
 def rasterize_svg_to_png(svg_path: str, png_path: str, *, raster_size: int = 1600) -> str:
     import cv2
     import numpy as np
@@ -273,7 +436,7 @@ def _ensure_ir_path(dwg_path: Optional[str], ir_path: Optional[str], out_dir: st
     return generated
 
 
-def _render_visual_pair(pre_ir_path: str, post_ir_path: str, diff_path: Optional[str], out_dir: str) -> Dict[str, str]:
+def _render_visual_pair(pre_ir_path: str, post_ir_path: str, diff_path: Optional[str], out_dir: str) -> Dict[str, Any]:
     visual_dir = os.path.join(out_dir, "visual")
     os.makedirs(visual_dir, exist_ok=True)
     effective_diff = diff_path
@@ -291,6 +454,9 @@ def _render_visual_pair(pre_ir_path: str, post_ir_path: str, diff_path: Optional
         raise ValueError(f"visual_report failed: {artifact.get('status')} ({artifact.get('notes')})")
     before_svg = os.path.join(visual_dir, "before.svg")
     after_svg = os.path.join(visual_dir, "after.svg")
+    common_viewbox = _apply_common_viewbox((before_svg, after_svg))
+    _sync_artifact_viewboxes(artifact, common_viewbox)
+    visual_diff_counts = _read_visual_diff_counts(artifact)
     before_png = rasterize_svg_to_png(before_svg, os.path.join(visual_dir, "before.png"))
     after_png = rasterize_svg_to_png(after_svg, os.path.join(visual_dir, "after.png"))
     artifact_path = os.path.join(out_dir, "visual_artifact.json")
@@ -302,14 +468,25 @@ def _render_visual_pair(pre_ir_path: str, post_ir_path: str, diff_path: Optional
         "before_png": before_png,
         "after_png": after_png,
         "diff_path": effective_diff,
+        "common_viewbox": common_viewbox,
+        "visual_diff_counts": visual_diff_counts,
     }
 
 
 def measure_same_file_baseline(ir_path: str, *, out_dir: str) -> Dict[str, Any]:
-    refs = _render_visual_pair(ir_path, ir_path, None, out_dir)
+    try:
+        refs = _render_visual_pair(ir_path, ir_path, None, out_dir)
+    except Exception as exc:
+        return {"status": "error", "reason": _coerce_reason(str(exc), "baseline_render_failed")}
     compare = run_route.compare_raster_images(refs["before_png"], refs["after_png"])
     if compare.get("status") != "ok" or compare.get("ssim") is None:
-        return {"status": compare.get("status", "error"), "reason": compare.get("detail") or compare.get("error")}
+        status = compare.get("status", "error")
+        if status == "ok":
+            status = "blocked"
+        return {
+            "status": status,
+            "reason": _compare_failure_reason(compare, "baseline_compare_failed"),
+        }
     return {
         "status": "ok",
         "baseline_ssim": float(compare["ssim"]),
@@ -333,21 +510,39 @@ def visual_gate_from_ir_paths(
     os.makedirs(run_dir, exist_ok=True)
     baseline = measure_same_file_baseline(pre_ir_path, out_dir=os.path.join(run_dir, "baseline"))
     if baseline.get("status") != "ok":
-        return {"status": "blocked", "pass": False, "reason": baseline.get("reason"), "baseline": baseline}
-    refs = _render_visual_pair(pre_ir_path, post_ir_path, diff_path, os.path.join(run_dir, "gate"))
+        return {
+            "status": "blocked",
+            "pass": False,
+            "reason": _coerce_reason(baseline.get("reason"), "baseline_failed"),
+            "baseline": baseline,
+        }
+    try:
+        refs = _render_visual_pair(pre_ir_path, post_ir_path, diff_path, os.path.join(run_dir, "gate"))
+    except Exception as exc:
+        return {
+            "status": "blocked",
+            "pass": False,
+            "reason": _coerce_reason(str(exc), "visual_render_failed"),
+            "baseline": baseline,
+        }
     compare = run_route.compare_raster_images(refs["before_png"], refs["after_png"])
+    entity_set_reason = _entity_set_mismatch_reason(refs.get("visual_diff_counts"))
+    entity_set_blocked = bool((refs.get("visual_diff_counts") or {}).get("deleted"))
     if compare.get("status") != "ok" or compare.get("ssim") is None:
         return {
             "status": "blocked",
             "pass": False,
-            "reason": compare.get("detail") or compare.get("error"),
+            "reason": entity_set_reason or _compare_failure_reason(compare, "raster_compare_failed"),
             "baseline": baseline,
         }
     effective_threshold = float(baseline["threshold"] if threshold is None else threshold)
     score = float(compare["ssim"])
     passed = score >= effective_threshold
+    if entity_set_blocked:
+        passed = False
+    status = "ok" if passed else ("blocked" if entity_set_blocked else "mismatch")
     result = {
-        "status": "ok" if passed else "mismatch",
+        "status": status,
         "pass": passed,
         "ssim": score,
         "threshold": effective_threshold,
@@ -358,11 +553,15 @@ def visual_gate_from_ir_paths(
         "after_svg": refs["after_svg"],
         "visual_artifact": refs["artifact_path"],
         "diff_path": refs["diff_path"],
+        "common_viewbox": [float(part) for part in refs["common_viewbox"]],
+        "visual_diff_counts": refs.get("visual_diff_counts"),
         "notes": [
             "SSIM measures rasterized pixel similarity of the rendered views.",
             "A passing SSIM gate does not prove semantic CAD equivalence on its own.",
         ],
     }
+    if not passed:
+        result["reason"] = entity_set_reason or f"ssim_below_threshold: ssim={score:.6f} threshold={effective_threshold:.6f}"
     _write_json(os.path.join(run_dir, "visual_gate_verdict.json"), result)
     return result
 
@@ -405,7 +604,7 @@ def visual_gate(
         pre_ir = _ensure_ir_path(pre_dwg_path, pre_ir_path, run_dir, "pre")
         post_ir = _ensure_ir_path(post_dwg_path, post_ir_path, run_dir, "post")
     except Exception as exc:
-        return {"status": "blocked", "pass": False, "reason": str(exc)}
+        return {"status": "blocked", "pass": False, "reason": _coerce_reason(str(exc), "ir_resolution_failed")}
     return visual_gate_from_ir_paths(
         pre_ir,
         post_ir,

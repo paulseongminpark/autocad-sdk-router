@@ -1,0 +1,24 @@
+[
+  {
+    "id": "R_KIND_DRIFT_POLYLINE_LWPOLYLINE",
+    "note": "AutoCAD regenerates 2D polylines as LWPOLYLINE; geometric content preserved - candidate harmless pending human ratification",
+    "status": "candidate",
+    "ratified_by": null,
+    "ratified_at": null,
+    "evidence": [
+      "runs/capstone_final_20260706_062040"
+    ]
+  },
+  {
+    "id": "R_DEFERRED_BLOCK_DEF",
+    "match": "no block_definitions entry",
+    "judgment": "harmful",
+    "note": "Deferred op references a missing block definition; real fidelity loss.",
+    "status": "candidate",
+    "ratified_by": null,
+    "ratified_at": null,
+    "evidence": [
+      "runs/e2e_1dwg_R1b2_20260708"
+    ]
+  }
+]

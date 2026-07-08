@@ -307,3 +307,220 @@ def test_main_strict_returns_exit_code_3_for_harmful_pattern(tmp_path):
     assert exit_code == 3
     assert out_json.is_file()
     assert out_md.is_file()
+
+
+def test_kind_buckets_add_vacuous_certified_absent_surface():
+    tool = load_tool("roundtrip_report")
+    census_report = {
+        "modelspace_entity_total": 1,
+        "certified_total": 1,
+        "out_of_class_total": 0,
+        "by_bucket": [
+            {"dxf_name": "ARC", "kind": "arc", "count": 1, "certified": True, "label": "arc"}
+        ],
+    }
+    verdict = {
+        "rows": [
+            {
+                "dxf_name": "ARC",
+                "regen_attempted_count": 1,
+                "diff0_count": 1,
+                "modified_count": 0,
+                "removed_count": 0,
+                "added_count": 0,
+                "examples": {},
+            }
+        ]
+    }
+
+    buckets = tool.kind_buckets(census_report, verdict)
+
+    assert buckets["ELLIPSE"]["status"] == "VACUOUS"
+    assert buckets["ELLIPSE"]["certified"] is True
+    assert buckets["ELLIPSE"]["census_count"] == 0
+    assert buckets["ELLIPSE"]["attempted_count"] == 0
+    assert buckets["ELLIPSE"]["absent_from_drawing"] is True
+    assert "absent_from_drawing" not in buckets["ARC"]
+
+
+def test_build_report_includes_def_entity_budget_ceiling_and_markdown(tmp_path):
+    tool = load_tool("roundtrip_report")
+    census_report = {
+        "modelspace_entity_total": 1,
+        "certified_total": 1,
+        "out_of_class_total": 0,
+        "block_definitions_entity_total": 200,
+        "by_bucket": [
+            {"dxf_name": "LINE", "kind": "line", "count": 1, "certified": True, "label": "line"}
+        ],
+    }
+    verdict = {
+        "rows": [
+            {
+                "dxf_name": "LINE",
+                "regen_attempted_count": 1,
+                "diff0_count": 1,
+                "modified_count": 0,
+                "removed_count": 0,
+                "added_count": 0,
+                "examples": {},
+            }
+        ],
+        "totals": {"regen_attempted_count": 1, "diff0_count": 1},
+    }
+    summary = {
+        "staged": {
+            "original_path": r"D:\fixtures\input.dwg",
+            "original_sha256": "orig-sha",
+            "staged_sha256": "staged-sha",
+        },
+        "def_entity_budget": {
+            "max_def_entities_per_block": 100,
+            "dropped_block_definitions": [
+                {"name": "small", "handle": "10", "def_entity_count": 20, "reason": "too big"},
+                {"name": "large", "handle": "11", "def_entity_count": 80, "reason": "too big"},
+            ],
+        },
+    }
+    write_run_dir(tmp_path, census_report=census_report, verdict=verdict, summary=summary)
+
+    report = tool.build_report(tmp_path)
+    budget = report["ceiling"]["def_entity_budget"]
+
+    assert budget["max_def_entities_per_block"] == 100
+    assert budget["dropped_def_count"] == 2
+    assert budget["dropped_def_entity_total"] == 100
+    assert budget["dropped_defs"] == [
+        {"name": "large", "def_entity_count": 80},
+        {"name": "small", "def_entity_count": 20},
+    ]
+    assert budget["dropped_pct_of_block_def_entities"] == 50.0
+
+    md = tool.render_markdown(report)
+
+    assert "### Deferred block-definition budget" in md
+    assert "- Dropped definitions: 2" in md
+    assert "| Block definition | Def entities |" in md
+    assert "| large | 80 |" in md
+
+
+def test_build_report_rolls_up_per_layer_from_examples(tmp_path):
+    tool = load_tool("roundtrip_report")
+    census_report = {
+        "modelspace_entity_total": 3,
+        "certified_total": 3,
+        "out_of_class_total": 0,
+        "by_bucket": [
+            {"dxf_name": "LINE", "kind": "line", "count": 1, "certified": True, "label": "line"},
+            {"dxf_name": "ARC", "kind": "arc", "count": 1, "certified": True, "label": "arc"},
+            {"dxf_name": "CIRCLE", "kind": "circle", "count": 1, "certified": True, "label": "circle"},
+        ],
+    }
+    verdict = {
+        "rows": [
+            {
+                "dxf_name": "LINE",
+                "regen_attempted_count": 1,
+                "diff0_count": 0,
+                "modified_count": 0,
+                "removed_count": 3,
+                "added_count": 0,
+                "examples": {
+                    "removed": [
+                        {"handle": "10", "change": "removed", "dxf_name": "LINE", "layer": "A"},
+                        {"handle": "11", "change": "removed", "dxf_name": "LINE", "layer": "B"},
+                    ]
+                },
+            },
+            {
+                "dxf_name": "ARC",
+                "regen_attempted_count": 1,
+                "diff0_count": 0,
+                "modified_count": 1,
+                "removed_count": 0,
+                "added_count": 0,
+                "examples": {
+                    "modified": [
+                        {"handle": "20", "change": "modified", "dxf_name": "ARC", "layer": "A"}
+                    ]
+                },
+            },
+            {
+                "dxf_name": "CIRCLE",
+                "regen_attempted_count": 1,
+                "diff0_count": 0,
+                "modified_count": 0,
+                "removed_count": 0,
+                "added_count": 1,
+                "examples": {
+                    "added": [{"handle": "30", "change": "added", "dxf_name": "CIRCLE", "layer": "A"}]
+                },
+            },
+        ]
+    }
+    write_run_dir(tmp_path, census_report=census_report, verdict=verdict)
+
+    report = tool.build_report(tmp_path)
+
+    assert report["per_layer"] == {
+        "A": {"removed": 1, "added": 1, "modified": 1},
+        "B": {"removed": 1, "added": 0, "modified": 0},
+    }
+
+    md = tool.render_markdown(report)
+
+    assert "## Per-layer example rollup" in md
+    assert "sample rather than a full census" in md
+    assert "| A | 1 | 1 | 1 | 3 |" in md
+
+
+def test_kind_buckets_tolerate_verdict_rows_with_and_without_live_deferred_counts(tmp_path):
+    tool = load_tool("roundtrip_report")
+    census_report = {
+        "modelspace_entity_total": 2,
+        "certified_total": 2,
+        "out_of_class_total": 0,
+        "by_bucket": [
+            {"dxf_name": "LINE", "kind": "line", "count": 1, "certified": True, "label": "line"},
+            {"dxf_name": "ARC", "kind": "arc", "count": 1, "certified": True, "label": "arc"},
+        ],
+    }
+    verdict = {
+        "rows": [
+            {
+                "dxf_name": "LINE",
+                "regen_attempted_count": 1,
+                "diff0_count": 1,
+                "modified_count": 0,
+                "removed_count": 0,
+                "added_count": 0,
+                "examples": {},
+            },
+            {
+                "dxf_name": "ARC",
+                "regen_attempted_count": 2,
+                "attempted_live_count": 1,
+                "deferred_count": 1,
+                "diff0_count": 1,
+                "modified_count": 0,
+                "removed_count": 1,
+                "added_count": 0,
+                "examples": {
+                    "removed": [{"handle": "10", "change": "removed", "dxf_name": "ARC", "layer": "0"}]
+                },
+            },
+        ]
+    }
+    write_run_dir(tmp_path, census_report=census_report, verdict=verdict)
+
+    buckets = tool.kind_buckets(census_report, verdict)
+
+    assert buckets["LINE"]["attempted_live_count"] == 1
+    assert buckets["LINE"]["deferred_count"] == 0
+    assert buckets["ARC"]["attempted_live_count"] == 1
+    assert buckets["ARC"]["deferred_count"] == 1
+
+    md = tool.render_markdown(tool.build_report(tmp_path))
+
+    assert "| LINE | yes | 1 | 1 (live 1) | 1 | PASS [deferred 0] |" in md
+    assert "| ARC | yes | 1 | 2 (live 1) | 1 | FAIL [deferred 1] |" in md
