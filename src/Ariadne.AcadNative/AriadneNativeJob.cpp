@@ -1200,6 +1200,39 @@ static std::string hatchLoopsJson(AcDbHatch* pHatch, int& loopCount, int& vertex
     return arr.str();
 }
 
+static std::string hatchPatternDefinitionsJson(AcDbHatch* pHatch)
+{
+    std::ostringstream arr; arr.precision(kJsonDoublePrecision);
+    arr << "[";
+    bool firstDef = true;
+    const int defs = pHatch->numPatternDefinitions();
+    for (int di = 0; di < defs; ++di) {
+        double angle = 0.0, baseX = 0.0, baseY = 0.0, offsetX = 0.0, offsetY = 0.0;
+        AcGeDoubleArray dashes;
+        const Acad::ErrorStatus es =
+            pHatch->getPatternDefinitionAt(di, angle, baseX, baseY, offsetX, offsetY, dashes);
+        if (es != Acad::eOk)
+            continue;
+        if (!firstDef)
+            arr << ",";
+        firstDef = false;
+        // ObjectARX reports hatch definition angles in radians; preserve that
+        // verbatim so .pat synthesis is the single degrees-conversion site.
+        arr << "{\"angle\":" << angle
+            << ",\"base\":[" << baseX << "," << baseY << "]"
+            << ",\"offset\":[" << offsetX << "," << offsetY << "]"
+            << ",\"dashes\":[";
+        for (int dashIdx = 0; dashIdx < dashes.length(); ++dashIdx) {
+            if (dashIdx != 0)
+                arr << ",";
+            arr << dashes[dashIdx];
+        }
+        arr << "]}";
+    }
+    arr << "]";
+    return arr.str();
+}
+
 static bool jsonArrayHasItems(const std::string& arr)
 {
     return arr.size() > 2 && arr.find_first_not_of(" \t\r\n", 1) != arr.size() - 1;
@@ -1687,7 +1720,12 @@ static bool collectEntitiesFromBlock(AcDbBlockTableRecord* pBTR, const char* spa
             int loopCount = 0, vertexCount = 0;
             const std::string loopsJson = hatchLoopsJson(pHatch, loopCount, vertexCount);
             const AcGeVector3d hNormal = pHatch->normal();
+            const bool isSolidFill = pHatch->isSolidFill() ? true : false;
             const bool isGradientHatch = pHatch->isGradient() ? true : false;
+            const int patternDefinitionCount =
+                (!isSolidFill && !isGradientHatch) ? pHatch->numPatternDefinitions() : 0;
+            const std::string patternDefinitionsJson =
+                (patternDefinitionCount > 0) ? hatchPatternDefinitionsJson(pHatch) : std::string();
             // a1-hatchread: pattern/style/gradient state -- previously only
             // pattern_name + loops surfaced; is_solid_fill/is_associative/
             // pattern_scale/pattern_angle/pattern_double/hatch_style/elevation/
@@ -1708,13 +1746,15 @@ static bool collectEntitiesFromBlock(AcDbBlockTableRecord* pBTR, const char* spa
                 << ",\"pattern_scale\":" << pHatch->patternScale()
                 << ",\"pattern_double\":" << (pHatch->patternDouble() ? "true" : "false")
                 << ",\"hatch_style\":" << static_cast<int>(pHatch->hatchStyle())
-                << ",\"is_solid_fill\":" << (pHatch->isSolidFill() ? "true" : "false")
+                << ",\"is_solid_fill\":" << (isSolidFill ? "true" : "false")
                 << ",\"is_associative\":" << (pHatch->associative() ? "true" : "false")
                 << ",\"is_gradient\":" << (isGradientHatch ? "true" : "false")
                 << ",\"elevation\":" << pHatch->elevation()
                 << ",\"normal\":[" << hNormal.x << "," << hNormal.y << "," << hNormal.z << "]"
                 << ",\"loop_count\":" << loopCount
                 << ",\"loops\":" << loopsJson;
+            if (patternDefinitionCount > 0)
+                arr << ",\"pattern_definitions\":" << patternDefinitionsJson;
             if (isGradientHatch) {
                 arr << ",\"gradient_name\":\"" << jsonEscape(acharToAscii(pHatch->gradientName())) << "\""
                     << ",\"gradient_type\":" << static_cast<int>(pHatch->gradientType())

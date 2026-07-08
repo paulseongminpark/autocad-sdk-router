@@ -1040,6 +1040,12 @@ def _geometry_from_native_entity(raw: dict, kind: str) -> dict:
                 norm_fp.append(pt)
         if norm_fp:
             geom["fit_points"] = norm_fp
+    # Hatch pattern-definition lines are already structured by the native
+    # extractor; keep them verbatim so .pat synthesis remains the single
+    # degrees-conversion site for their angle values.
+    pattern_defs = raw.get("pattern_definitions")
+    if isinstance(pattern_defs, list) and pattern_defs:
+        geom["pattern_definitions"] = pattern_defs
     loops = raw.get("loops")
     if isinstance(loops, list) and loops:
         geom["loops"] = loops

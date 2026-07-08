@@ -21,3 +21,12 @@
 - If the orchestrator build shows `AcDbHatch` API/signature drift in this TU, back out the hatch native branch and re-check the SDK-visible signatures in `dbhatch.h` before reattempting.
 - If measured corpus demand expands beyond polyline-loop hatches, extend the Python/native contract to replay edge-based hatch loops explicitly instead of widening the current branch heuristically.
 - If a proven wipeout-in-block construction sequence appears that can target an arbitrary block table record, replace the Python defer with that exact sequence and keep the design note in sync.
+
+## 패턴 정의선 추출
+
+- Native extract contract: non-solid, non-gradient `AcDbHatch` entities now emit `geometry.pattern_definitions` only when `numPatternDefinitions() > 0`.
+- Row schema: each item is `{"angle": <rad>, "base": [baseX, baseY], "offset": [offsetX, offsetY], "dashes": [d1, d2, ...]}` from `getPatternDefinitionAt(i, angle, baseX, baseY, offsetX, offsetY, dashes)`.
+- Angle units stay in radians in the IR verbatim. No extractor-side conversion is allowed; `.pat` synthesis is the only place that converts `angle` to degrees.
+- `tools/ir_builder.py` is not a generic geometry passthrough for native graph entities; it lifts hatch fields explicitly, so `pattern_definitions` must be preserved there unchanged as a bare pass-through list.
+- REBUILD-side contract for the next packet: stage a temporary `.pat` entry as `*<NAME>\n<angle_deg>, <baseX>, <baseY>, <offsetX>, <offsetY>[, dashes...]`, then replay with `setPattern(kCustomDefined, <NAME>)` and apply `setPatternAngle(...)` / `setPatternScale(...)` separately.
+- Never bake the same transform twice: definition-line `angle_deg` comes only from the stored row radians, while hatch instance rotation/scale remain the existing `pattern_angle` and `pattern_scale` setters.
