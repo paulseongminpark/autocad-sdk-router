@@ -199,3 +199,35 @@ def test_block_reference_without_block_name_still_defers_honestly():
         "kind": "block_reference",
         "reason": "def_entity kind unsupported by write.block.append_entity",
     }]
+
+
+def test_spline_top_level_knots_and_weights_ride_along():
+    # Extractor shape on real drawings (R4 census): geometry carries only
+    # kind/degree/closed; control points + knots live at def-entity top level.
+    def_ent = {
+        "handle": "509", "layer": "X-FUR",
+        "geometry": {"kind": "spline", "degree": 2.0, "closed": False},
+        "spline_control_points": [[0.0, 0.0, 0.0], [1.0, 1.0, 0.0], [2.0, 0.0, 0.0]],
+        "spline_knots": [0.0, 0.0, 0.0, 1.0, 1.0, 1.0],
+    }
+    op = patch_ops_blocks._def_entity_append_op("B", def_ent)
+    assert op is not None
+    ent = op["args"]["entity"]
+    assert ent["kind"] == "spline"
+    assert ent["control_points"] == [[0.0, 0.0, 0.0], [1.0, 1.0, 0.0], [2.0, 0.0, 0.0]]
+    assert ent["knots"] == [0.0, 0.0, 0.0, 1.0, 1.0, 1.0]
+    assert "weights" not in ent
+
+
+def test_spline_weights_pass_through_when_present():
+    def_ent = {
+        "handle": "50A", "layer": "0",
+        "geometry": {"kind": "spline", "degree": 3.0, "closed": True},
+        "spline_control_points": [[0.0, 0.0, 0.0], [1.0, 0.0, 0.0], [1.0, 1.0, 0.0], [0.0, 1.0, 0.0]],
+        "spline_knots": [0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0, 1.0],
+        "spline_weights": [1.0, 0.5, 0.5, 1.0],
+    }
+    op = patch_ops_blocks._def_entity_append_op("B", def_ent)
+    ent = op["args"]["entity"]
+    assert ent["knots"] == [0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0, 1.0]
+    assert ent["weights"] == [1.0, 0.5, 0.5, 1.0]

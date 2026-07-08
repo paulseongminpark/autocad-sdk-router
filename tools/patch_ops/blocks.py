@@ -152,11 +152,24 @@ def _def_entity_append_op(block_name: str, def_ent: Dict[str, Any]) -> Optional[
         control_points = def_ent.get("spline_control_points")
         if control_points is None:
             control_points = g.get("control_points")
+        # Extractor emits spline data at the def-entity top level, not inside
+        # geometry: knots MUST ride along -- the native builder fail-louds on
+        # control_points without knots (measured: 45/45 b010 errors on R4).
+        knots = def_ent.get("spline_knots")
+        if knots is None:
+            knots = g.get("knots")
+        weights = def_ent.get("spline_weights")
+        if weights is None:
+            weights = g.get("weights")
         entity = {"kind": "spline",
                   "fit_points": list(g.get("fit_points") or []),
                   "control_points": list(control_points or []),
                   "degree": g.get("degree"),
                   "closed": g.get("closed")}
+        if knots:
+            entity["knots"] = list(knots)
+        if weights:
+            entity["weights"] = list(weights)
     elif kind == "lwpolyline":
         entity = {"kind": "lwpolyline", "points": _points2d(g.get("vertices")),
                   "closed": int(bool(g.get("closed")))}
