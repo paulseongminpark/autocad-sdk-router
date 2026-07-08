@@ -129,6 +129,21 @@ class TestInjectionRejection(unittest.TestCase):
             cte._validate_slot_value(slot_def, "color_index", "not_a_number")
         self.assertEqual(cte._validate_slot_value(slot_def, "color_index", 128), "128")
 
+    def test_point2_accepts_pair_and_rejects_malformed(self):
+        """point2 renders ONE 'x,y' token (AutoCAD point prompts consume a single
+        comma-joined line -- the ARRAYPOLAR wave-1 mis-landing root cause)."""
+        slot_def = {"type": "point2", "min": -1000, "max": 1000}
+        self.assertEqual(cte._validate_slot_value(slot_def, "center_point", "0,0"), "0.0,0.0")
+        self.assertEqual(cte._validate_slot_value(slot_def, "center_point", "1.5,-2"), "1.5,-2.0")
+        for bad in ["0", "0,0,0", "a,b", "1,", ",1", "1;2"]:
+            with self.assertRaises(cte.TemplateError, msg=repr(bad)):
+                cte._validate_slot_value(slot_def, "center_point", bad)
+        with self.assertRaises(cte.TemplateError):  # out of range component
+            cte._validate_slot_value(slot_def, "center_point", "0,1001")
+        for hostile in self.HOSTILE_VALUES:
+            with self.assertRaises(cte.TemplateError, msg=repr(hostile)):
+                cte._validate_slot_value(slot_def, "center_point", hostile)
+
     def test_staged_path_rejects_escape_outside_staging_root(self):
         slot_def = {"type": "staged_path"}
         with self.assertRaises(cte.TemplateError) as ctx:

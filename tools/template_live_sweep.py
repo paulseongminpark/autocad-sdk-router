@@ -141,11 +141,13 @@ def derive_sample_args(template: dict) -> tuple[dict | None, str | None]:
             sample[slot_name] = slot_def.get("min", 0.0)
         elif stype == "name_token":
             sample[slot_name] = "SampleToken"
+        elif stype == "point2":
+            sample[slot_name] = "0,0"
         elif stype == "staged_path":
-            notes.append(
-                f"{slot_name}: staged_path requires the runtime staging path; "
-                "cannot derive offline from template defaults/examples"
-            )
+            # Engine-supplied: run_template auto-fills staged_path slots with its
+            # own freshly-staged copy path (cert wave 2 wiring); nothing to derive
+            # here and its absence from the sample must NOT block the template.
+            continue
         else:
             notes.append(f"{slot_name}: no default/example derivable in registry")
 

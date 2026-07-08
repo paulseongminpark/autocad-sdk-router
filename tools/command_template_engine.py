@@ -217,6 +217,38 @@ def _validate_slot_value(slot_def: dict, slot_name: str, value) -> str:
             )
         return sval
 
+    if stype == "point2":
+        # A 2D point answer for a "specify point" prompt, written as ONE .scr
+        # line "x,y" (AutoCAD point prompts consume a single comma-joined line;
+        # feeding coordinates as separate lines mis-lands on later prompts --
+        # measured live on ARRAYPOLAR, headless_safe cert wave 1).
+        sval = str(value)
+        _reject_if_hostile(sval, slot_name)
+        parts = sval.split(",")
+        if len(parts) != 2:
+            raise TemplateError(
+                "VALIDATION_ERROR",
+                f"slot {slot_name!r} value {value!r} is not an 'x,y' point pair",
+                {"slot": slot_name},
+            )
+        try:
+            nums = [float(p) for p in parts]
+        except ValueError:
+            raise TemplateError(
+                "VALIDATION_ERROR",
+                f"slot {slot_name!r} point components {value!r} are not numeric",
+                {"slot": slot_name},
+            )
+        lo, hi = slot_def.get("min", -1e12), slot_def.get("max", 1e12)
+        for num in nums:
+            if not (lo <= num <= hi):
+                raise TemplateError(
+                    "VALIDATION_ERROR",
+                    f"slot {slot_name!r} point component {num} out of range [{lo}, {hi}]",
+                    {"slot": slot_name},
+                )
+        return f"{nums[0]},{nums[1]}"
+
     if stype == "staged_path":
         sval = str(value)
         _reject_if_hostile(sval, slot_name)
@@ -497,8 +529,22 @@ def run_template(template_id: str, args: dict, dwg_path: str, *,
                                 f"input DWG not found: {dwg_path}", retryable=False,
                                 status="blocked")
 
+    # Stage BEFORE rendering so engine-generated staged_path slots can be
+    # auto-filled (RECOVER-class templates target the staged copy itself; the
+    # path only exists after stage_copy, and a caller has no way to know the
+    # fresh timestamped path up front -- the previously-documented wiring gap).
+    # Staging on a later-refused render is a harmless throwaway copy under the
+    # gitignored staging/ tree.
+    original_sha_before = sha256_file(src)
+    staged = stage_copy(src, template_id)
+    render_args = dict(args or {})
+    for _slot_name, _slot_def in (template.get("slots") or {}).items():
+        if (isinstance(_slot_def, dict) and _slot_def.get("type") == "staged_path"
+                and _slot_name not in render_args):
+            render_args[_slot_name] = str(staged)
+
     try:
-        tokens = render_script(template, args or {})
+        tokens = render_script(template, render_args)
     except TemplateError as exc:
         return _error_envelope(env, exc.code, exc.message, retryable=False,
                                 details=exc.details, status="blocked")
@@ -514,9 +560,6 @@ def run_template(template_id: str, args: dict, dwg_path: str, *,
                  RUNS_DIR / f"command_template_{template_id.replace('.', '_')}_{stamp}")
     run_dir_p = run_dir_p.resolve()
     run_dir_p.mkdir(parents=True, exist_ok=True)
-
-    original_sha_before = sha256_file(src)
-    staged = stage_copy(src, template_id)
 
     # ---- assemble the .scr: sysvars, optional before-probe, template
     # tokens, optional after-probe, optional QSAVE, QUIT ----
@@ -614,7 +657,7 @@ def run_template(template_id: str, args: dict, dwg_path: str, *,
     env["diagnostics"] = diagnostics
     env["result"] = {
         "template_id": template_id,
-        "args": args or {},
+        "args": render_args,
         "postconditions": pc_results,
         "stdout_tail": "\n".join(
             [ln for ln in stdout_text.splitlines() if ln.strip()][-20:]

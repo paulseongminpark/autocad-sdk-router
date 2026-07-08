@@ -328,8 +328,68 @@ class TestCertifyHeadlessSafe(unittest.TestCase):
                 self.assertEqual(env["reason"], chs.REASON_NO_STAGED_EFFECT, label)
                 self.assertIsNotNone(env["effect_note"], label)
 
-    def test_certify_attended_marker_is_not_certified(self):
-        """WHY: an interactive prompt marker in the captured tail means the template is not headless-safe."""
+    def test_certify_diagnostic_template_judged_by_stdout_not_ir_diff(self):
+        """WHY (cert wave 2 carve-out): a registry-declared diagnostic template (AUDIT/
+        RECOVER class) correctly produces a ZERO entity diff on a healthy drawing, so its
+        effect is proven by the declared completion line in stdout instead. Fail-closed:
+        pattern present -> CERTIFIED even with empty IR diff; pattern absent -> NOT."""
+        tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(tmp.cleanup)
+        root = Path(tmp.name)
+        template = _minimal_template("tmpl.diag")
+        template["certification"] = {
+            "effect_mode": "diagnostic",
+            "diagnostic_stdout_pattern": "건의 오류를 찾아서 .*건이 수정됨|Total errors found .* fixed",
+        }
+        router, _frag = _synthetic_router(root, template)
+        dwg = root / "fixture.dwg"
+        dwg.write_bytes(b"DWG_BYTES")
+        out_dir = root / "out"
+
+        class DiagCad(_FakeCadBase):
+            diff_added = 0  # IR diff empty -- must NOT matter for a diagnostic template
+            stdout_text = "전체 0건의 오류를 찾아서 0건이 수정됨\n"
+
+            def run_command_template(self, template_id, slots, dwg=None, timeout_sec=None):
+                return _build_cad_env(self.router_home, Path(dwg), mutate_staged=True,
+                                      stdout_text=type(self).stdout_text)
+
+            def inspect(self, *a, **k):  # diagnostic path must never inspect
+                raise AssertionError("diagnostic template must not run the IR probe")
+
+        with mock.patch.object(chs.cadctl, "Cad", DiagCad):
+            env = chs.certify("tmpl.diag", dwg, out_dir / "match", 30, router_home=router)
+        self.assertEqual(env["verdict"], chs.CERTIFIED)
+        self.assertEqual(env["effect_basis"], "diagnostic_stdout")
+        self.assertIn("diagnostic output matched", env["effect_note"])
+
+        class DiagCadNoMatch(DiagCad):
+            stdout_text = "some unrelated output\n"
+
+        with mock.patch.object(chs.cadctl, "Cad", DiagCadNoMatch):
+            env = chs.certify("tmpl.diag", dwg, out_dir / "nomatch", 30, router_home=router)
+        self.assertEqual(env["verdict"], chs.NOT_CERTIFIED)
+        self.assertEqual(env["reason"], chs.REASON_NO_STAGED_EFFECT)
+        self.assertFalse(env["effect_took"])
+
+        # declared diagnostic mode WITHOUT a pattern must fail closed, not pass open
+        template_nopat = _minimal_template("tmpl.diag2")
+        template_nopat["certification"] = {"effect_mode": "diagnostic"}
+        tmp2 = tempfile.TemporaryDirectory()
+        self.addCleanup(tmp2.cleanup)
+        root2 = Path(tmp2.name)
+        router2, _f2 = _synthetic_router(root2, template_nopat)
+        dwg2 = root2 / "fixture.dwg"
+        dwg2.write_bytes(b"DWG_BYTES")
+        with mock.patch.object(chs.cadctl, "Cad", DiagCad):
+            env = chs.certify("tmpl.diag2", dwg2, root2 / "out", 30, router_home=router2)
+        self.assertEqual(env["verdict"], chs.NOT_CERTIFIED)
+        self.assertIn("no diagnostic_stdout_pattern", env["effect_note"])
+
+    def test_certify_attended_marker_on_incomplete_run_is_not_certified(self):
+        """WHY: a prompt marker in the tail of a run that FAILED to complete means it died
+        at an interactive prompt -- the attended signal (markers on a COMPLETED run are
+        echo artifacts; see the completed-run tests below)."""
         tmp, router, _frag_path, dwg, out_dir = self._router_and_dwg()
         self.addCleanup(tmp.cleanup)
 
@@ -339,6 +399,8 @@ class TestCertifyHeadlessSafe(unittest.TestCase):
                     self.router_home, Path(dwg),
                     mutate_staged=True,
                     stdout_text="Specify opposite corner:\n",
+                    status="error", exit_code=1,
+                    error_code="ROUTE_NONZERO_EXIT", reason="accoreconsole exited 1",
                 )
 
         with mock.patch.object(chs.cadctl, "Cad", FakeCad):
@@ -351,7 +413,7 @@ class TestCertifyHeadlessSafe(unittest.TestCase):
     def test_certify_broadened_attended_markers_catch_prompt_variants(self):
         """WHY (finding 4): the earlier marker set missed real accoreconsole prompts. Prove the
         broadened patterns catch a plural 'Select objects to array:' and a default-bracket
-        'Continue? <Y>:' -- both must block certification."""
+        'Continue? <Y>:' on an INCOMPLETE run -- both must block certification."""
         tmp, router, _frag_path, dwg, out_dir = self._router_and_dwg()
         self.addCleanup(tmp.cleanup)
 
@@ -365,6 +427,8 @@ class TestCertifyHeadlessSafe(unittest.TestCase):
                         return _build_cad_env(
                             self.router_home, Path(dwg),
                             mutate_staged=True, stdout_text=prompt,
+                            status="error", exit_code=1,
+                            error_code="ROUTE_NONZERO_EXIT", reason="accoreconsole exited 1",
                         )
 
                 with mock.patch.object(chs.cadctl, "Cad", FakeCad):
@@ -384,7 +448,11 @@ class TestCertifyHeadlessSafe(unittest.TestCase):
 
         class FakeCad(_FakeCadBase):
             def run_command_template(self, template_id, slots, dwg=None, timeout_sec=None):
-                env = _build_cad_env(self.router_home, Path(dwg), mutate_staged=True)
+                env = _build_cad_env(
+                    self.router_home, Path(dwg), mutate_staged=True,
+                    status="error", exit_code=1,
+                    error_code="ROUTE_NONZERO_EXIT", reason="accoreconsole exited 1",
+                )
                 # overwrite stderr with UTF-16LE bytes carrying a prompt marker
                 Path(env["stderr"]).write_bytes("Enter selection:\n".encode("utf-16-le"))
                 return env
@@ -395,6 +463,36 @@ class TestCertifyHeadlessSafe(unittest.TestCase):
         self.assertEqual(envelope["verdict"], chs.NOT_CERTIFIED)
         self.assertEqual(envelope["reason"], chs.REASON_ATTENDED_MARKERS)
         self.assertIn("Enter", envelope["attended_markers"])
+
+    def test_certify_completed_run_ignores_echoed_prompt_markers(self):
+        """WHY (cert wave 2, measured): CMDECHO=1 echoes every prompt the script ANSWERED,
+        so a marker in a COMPLETED (exit 0) run's tail is an echo artifact. -OVERKILL
+        completed with a real dedup effect yet its echoed option prompt matched the
+        default-bracket pattern -- that run must CERTIFY (markers stay recorded), and a
+        completed no-effect run must fall to NO_STAGED_EFFECT, not ATTENDED."""
+        tmp, router, _frag_path, dwg, out_dir = self._router_and_dwg()
+        self.addCleanup(tmp.cleanup)
+        # the echoed prompt that was ANSWERED WITH A BLANK line ends in the bare
+        # colon (exactly the live -OVERKILL tail shape that matched the pattern)
+        echoed = "변경할 옵션 입력 [종료(D)/공차(O)] <종료>:\ncompleted\n"
+
+        class EchoEffect(_FakeCadBase):  # completed + real effect + echoed prompt
+            def run_command_template(self, template_id, slots, dwg=None, timeout_sec=None):
+                return _build_cad_env(self.router_home, Path(dwg),
+                                      mutate_staged=True, stdout_text=echoed)
+
+        class EchoNoEffect(EchoEffect):  # completed + NO effect + echoed prompt
+            diff_added = 0
+
+        with mock.patch.object(chs.cadctl, "Cad", EchoEffect):
+            env = chs.certify("tmpl.audit", dwg, out_dir / "effect", 30, router_home=router)
+        self.assertEqual(env["verdict"], chs.CERTIFIED)
+        self.assertIn("default-bracket prompt", env["attended_markers"])  # recorded, not fatal
+
+        with mock.patch.object(chs.cadctl, "Cad", EchoNoEffect):
+            env = chs.certify("tmpl.audit", dwg, out_dir / "noeffect", 30, router_home=router)
+        self.assertEqual(env["verdict"], chs.NOT_CERTIFIED)
+        self.assertEqual(env["reason"], chs.REASON_NO_STAGED_EFFECT)
 
     def test_certify_crash_is_not_certified(self):
         """WHY: non-ok / nonzero execution must stay a failure even if the staged copy changed."""
@@ -614,19 +712,68 @@ class TestCertifyHeadlessSafe(unittest.TestCase):
         self.assertNotIn("evidence_refs", doc["templates"][0])
 
     def test_apply_trust_check_matches_and_rejects(self):
-        """Unit: _apply_trust_check passes only on schema + template_id + fixture-sha match."""
+        """Unit: _apply_trust_check passes only on schema + template_id + fixture-sha match,
+        and -- when the current template is supplied -- on a matching content fingerprint."""
         tmp, router, _frag, dwg, _out = self._router_and_dwg()
         self.addCleanup(tmp.cleanup)
+        template = chs._load_template_registry(router)["tmpl.audit"]
         good = {
             "schema": chs.ENVELOPE_SCHEMA,
             "template_id": "tmpl.audit",
             "original_sha256_before": chs.tls.sha256_file(dwg),
+            "template_fingerprint": chs._template_fingerprint(template),
         }
         self.assertTrue(chs._apply_trust_check(good, "tmpl.audit", dwg)[0])
         self.assertFalse(chs._apply_trust_check({**good, "schema": "x"}, "tmpl.audit", dwg)[0])
         self.assertFalse(chs._apply_trust_check(good, "other.id", dwg)[0])
         self.assertFalse(
             chs._apply_trust_check({**good, "original_sha256_before": "0" * 64}, "tmpl.audit", dwg)[0])
+        # content binding (adversarial-audit class fix): a fingerprint that does not
+        # match the CURRENT registry template refuses the flip...
+        ok, reason = chs._apply_trust_check(
+            {**good, "template_fingerprint": "f" * 64}, "tmpl.audit", dwg, template=template)
+        self.assertFalse(ok)
+        self.assertIn("drifted", reason)
+        # ...a fingerprint-less legacy envelope refuses fail-closed...
+        legacy = dict(good)
+        legacy.pop("template_fingerprint")
+        ok, reason = chs._apply_trust_check(legacy, "tmpl.audit", dwg, template=template)
+        self.assertFalse(ok)
+        self.assertIn("re-certify", reason)
+        # ...and the true current fingerprint passes.
+        self.assertTrue(chs._apply_trust_check(good, "tmpl.audit", dwg, template=template)[0])
+
+    def test_apply_refused_when_template_edited_after_certification(self):
+        """WHY (adversarial-audit general-class fix): certify, then EDIT the template's
+        command_sequence, then --apply from the stale envelope -- the flip must be refused
+        (the envelope proves the OLD sequence, not the one that would run in production)."""
+        tmp, router, frag_path, dwg, out_dir = self._router_and_dwg()
+        self.addCleanup(tmp.cleanup)
+
+        class FakeCad(_FakeCadBase):
+            def run_command_template(self, template_id, slots, dwg=None, timeout_sec=None):
+                return _build_cad_env(self.router_home, Path(dwg), mutate_staged=True)
+
+        with mock.patch.object(chs.cadctl, "Cad", FakeCad):
+            envelope = chs.certify("tmpl.audit", dwg, out_dir, 30, router_home=router)
+        self.assertEqual(envelope["verdict"], chs.CERTIFIED)
+        self.assertTrue(envelope.get("template_fingerprint"))
+
+        # post-certification template edit (append a step to command_sequence)
+        doc = json.loads(frag_path.read_text(encoding="utf-8-sig"))
+        doc["templates"][0]["command_sequence"].append({"literal": "EXTRA"})
+        frag_path.write_text(json.dumps(doc, ensure_ascii=False, indent=2) + "\n",
+                             encoding="utf-8")
+
+        with mock.patch.object(chs.cadctl, "Cad", FakeCad):
+            envelopes, exit_code = chs.run_batch(
+                ["tmpl.audit"], dwg_path=dwg, out_dir=out_dir,
+                timeout_sec=30, apply=True, router_home=router)  # resume: no CAD
+
+        self.assertGreaterEqual(exit_code, 1)
+        self.assertIn("drifted", envelopes[0].get("apply_refused_reason", ""))
+        doc = json.loads(frag_path.read_text(encoding="utf-8-sig"))
+        self.assertFalse(doc["templates"][0]["headless_safe"])
 
     def test_resume_skip_reuses_existing_envelope_without_invoking_cad(self):
         """WHY: certification is resumable; an existing envelope is the source of truth unless --force reruns it."""

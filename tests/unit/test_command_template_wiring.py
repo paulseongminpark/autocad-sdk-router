@@ -88,6 +88,34 @@ def test_timeout_sec_is_threaded_to_subprocess(monkeypatch, tmp_path):
     assert calls[-1]["timeout"] == 120.0
 
 
+def test_staged_path_slot_is_autofilled_with_staged_copy(monkeypatch, tmp_path):
+    """WHY (cert wave 2): run_template must stage BEFORE rendering and auto-fill a
+    staged_path slot with its own staged copy, closing the documented RECOVER wiring
+    gap (the fresh timestamped path is unknowable to a caller). The rendered .scr must
+    carry the staged path and the result envelope must record the effective args."""
+    dwg = _fake_dwg(tmp_path)
+    calls = []
+    _install_fake_accoreconsole(monkeypatch, tmp_path, calls)
+
+    env = cte.run_template(
+        "maintenance.drawing.recover", {}, str(dwg),
+        write_mode="write_copy", _force_unverified=True,
+    )
+
+    assert env["status"] == "ok"
+    details = env["details"]
+    staged = details["staged_input"]
+    # the auto-filled effective args are recorded (evidence of what actually ran)
+    eff_args = env["result"]["args"]
+    assert eff_args.get("recover_target_path"), env["result"]
+    assert Path(eff_args["recover_target_path"]).resolve() == Path(staged).resolve()
+    # the rendered .scr actually carries the staged path on the RECOVER answer line
+    scr_path = Path(details["scr_path"])
+    scr_lines = scr_path.read_text(encoding="ascii").splitlines()
+    ridx = scr_lines.index("RECOVER")
+    assert Path(scr_lines[ridx + 1]).resolve() == Path(staged).resolve()
+
+
 def test_mcp_tool_delegates_with_ok_result_envelope(monkeypatch, tmp_path):
     dwg = _fake_dwg(tmp_path)
     calls = []

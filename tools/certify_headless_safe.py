@@ -9,6 +9,7 @@ copy before the registry may be flipped under `--apply`.
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import shutil
 import sys
@@ -214,6 +215,65 @@ def _as_count(value) -> int:
     return n if n > 0 else 0
 
 
+def _template_fingerprint(template: dict) -> str:
+    """Content fingerprint of what a certification actually PROVES: the exact
+    command_sequence + slot definitions that ran. An envelope is bound to this
+    hash so a template edited AFTER its certification can never be flipped from
+    the stale envelope (adversarial-audit finding: template_id + fixture sha
+    alone left --apply blind to a post-certification command_sequence edit)."""
+    basis = {
+        "command_sequence": template.get("command_sequence"),
+        "slots": template.get("slots"),
+    }
+    canon = json.dumps(basis, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
+    return hashlib.sha256(canon.encode("utf-8")).hexdigest()
+
+
+def _diagnostic_effect(cert_spec: dict, stdout_path: str | None) -> dict:
+    """Effect signal for DIAGNOSTIC-class templates (registry-declared carve-out).
+
+    Gate condition (3) of the headless_safe ruling ("the effect actually took --
+    a no-op is not certifiable") exists to catch templates that are SILENTLY
+    refused or swallowed headless. For diagnostic/repair commands (AUDIT,
+    RECOVER) a zero entity diff on a healthy drawing is the CORRECT outcome, so
+    the logical-IR-diff bar cannot distinguish "ran its pass, nothing to fix"
+    from "never ran". The carve-out is governed: a template must DECLARE
+    `certification.effect_mode="diagnostic"` plus a `diagnostic_stdout_pattern`
+    in the reviewed registry, and the effect is only satisfied by that pattern
+    actually matching the run's decoded stdout (evidence the diagnostic pass
+    really executed). All other gate conditions (exit 0, no attended markers,
+    original immutable, under budget) still apply unchanged. Fail-closed: a
+    missing/invalid pattern or unmatched stdout is effect_took=False.
+    """
+    base = {"effect_took": False, "basis": "diagnostic_stdout", "summary": None, "note": None}
+    pattern = cert_spec.get("diagnostic_stdout_pattern")
+    if not pattern or not isinstance(pattern, str):
+        base["note"] = "diagnostic effect_mode declared but no diagnostic_stdout_pattern"
+        return base
+    # Specificity floor: a trivially-matching pattern ('.', '명령', ...) would let a
+    # never-ran template certify on ambient console noise. Human registry review is
+    # the primary control; this is the code-level backstop.
+    if len(pattern) < 8:
+        base["note"] = (f"diagnostic_stdout_pattern too weak ({pattern!r}, <8 chars); "
+                        "refusing to treat it as effect evidence")
+        return base
+    text = _read_stdout_text(stdout_path)
+    if not text:
+        base["note"] = "no stdout captured to match diagnostic pattern"
+        return base
+    try:
+        m = re.search(pattern, text, re.MULTILINE)
+    except re.error as exc:
+        base["note"] = f"invalid diagnostic_stdout_pattern: {exc}"
+        return base
+    if m:
+        base["effect_took"] = True
+        base["note"] = f"diagnostic output matched: {m.group(0)[:160]!r}"
+    else:
+        base["note"] = "diagnostic pattern not found in stdout"
+    return base
+
+
 def _structural_effect(cad, *, original_dwg: str | Path, staged_result: str | None,
                        out_dir: str | Path, baseline_ir: str | None = None,
                        tag: str = "adhoc") -> dict:
@@ -319,10 +379,20 @@ def _classify_verdict(cad_env: dict, *, effect_took: bool,
     exit_code = _extract_exit_code(cad_env)
     if _looks_like_timeout(cad_env):
         return NOT_CERTIFIED, REASON_TIMEOUT
-    if attended_markers:
-        return NOT_CERTIFIED, REASON_ATTENDED_MARKERS
-    if status != "ok" or exit_code != 0:
+    completed = (status == "ok" and exit_code == 0)
+    if not completed:
+        # A run that FAILED to complete with prompt markers in its tail died at
+        # (or right after) an interactive prompt -- that IS the attended signal.
+        if attended_markers:
+            return NOT_CERTIFIED, REASON_ATTENDED_MARKERS
         return NOT_CERTIFIED, REASON_CRASH
+    # Completed run (exit 0, status ok): CMDECHO=1 echoes every prompt the
+    # script ANSWERED, so a marker in the tail of a completed run is an echo
+    # artifact, not attended evidence -- measured live (cert wave 2):
+    # -OVERKILL completed exit 0 with a real dedup effect (47 duplicates +
+    # 266 overlaps deleted) yet its echoed, already-answered option prompt
+    # matched the default-bracket pattern. Markers stay RECORDED on the
+    # envelope for review; a completed run is judged by its effect.
     if not effect_took:
         return NOT_CERTIFIED, REASON_NO_STAGED_EFFECT
     return CERTIFIED, REASON_CERTIFIED
@@ -412,15 +482,20 @@ def certify(template_id: str, dwg_path: str | Path, out_dir: str | Path,
         # finding 6: the AUTHORITATIVE effect signal is the router's handle-based logical
         # IR diff of original vs staged_result (QSAVE-immune). Fail-closed. Skip the probe
         # entirely once an original mutation is detected -- that is an overriding safety
-        # stop, and no further CAD work should be spent on the fixture.
-        if original_unchanged:
+        # stop, and no further CAD work should be spent on the fixture. Diagnostic-class
+        # templates (registry-declared) are judged by their diagnostic stdout instead --
+        # see _diagnostic_effect for the governed carve-out rationale.
+        cert_spec = template.get("certification") or {}
+        if not original_unchanged:
+            effect = {"effect_took": False, "basis": "logical_ir_diff", "summary": None,
+                      "note": "skipped: original mutated (safety stop)"}
+        elif cert_spec.get("effect_mode") == "diagnostic":
+            effect = _diagnostic_effect(cert_spec, cad_env.get("stdout"))
+        else:
             effect = _structural_effect(
                 cad, original_dwg=dwg_path, staged_result=staged_result,
                 out_dir=out_dir, baseline_ir=baseline_ir, tag=_safe_name(template_id),
             )
-        else:
-            effect = {"effect_took": False, "basis": "logical_ir_diff", "summary": None,
-                      "note": "skipped: original mutated (safety stop)"}
         effect_took = effect["effect_took"]
         attended_markers = _find_attended_markers(
             cad_env.get("stdout"),
@@ -439,6 +514,7 @@ def certify(template_id: str, dwg_path: str | Path, out_dir: str | Path,
         envelope = {
             "schema": ENVELOPE_SCHEMA,
             "template_id": template_id,
+            "template_fingerprint": _template_fingerprint(template),
             "verdict": verdict,
             "reason": reason,
             "exit_code": _extract_exit_code(cad_env),
@@ -577,17 +653,21 @@ def _is_safety_envelope(envelope: dict) -> bool:
     )
 
 
-def _apply_trust_check(envelope: dict, template_id: str,
-                       dwg_path: str | Path) -> tuple[bool, str | None]:
+def _apply_trust_check(envelope: dict, template_id: str, dwg_path: str | Path,
+                       template: dict | None = None) -> tuple[bool, str | None]:
     """Guard the registry flip against an untrusted / stale / wrong-fixture envelope.
 
     run_batch resumes a CERTIFIED envelope from disk WITHOUT re-running CAD (by design),
     and --apply would otherwise flip headless_safe=true on nothing but that file's verdict
     string -- so `--dwg <anything> --out-dir <dir-with-a-CERTIFIED-envelope> --apply` could
     flip the registry with zero CAD in the invocation. Before honoring a CERTIFIED envelope
-    for apply, require that its identity + the fixture it was certified against match THIS
-    invocation: schema, template_id, and original_sha256_before == sha256 of the current
-    --dwg. Any mismatch refuses the flip."""
+    for apply, require that its identity + the fixture + the TEMPLATE CONTENT it was
+    certified against all match THIS invocation: schema, template_id,
+    original_sha256_before == sha256 of the current --dwg, and template_fingerprint ==
+    the fingerprint of the template as it stands in the registry NOW (adversarial-audit
+    finding: without the content binding, a command_sequence edited after certification
+    could be flipped from the stale envelope with zero fresh evidence). Any mismatch --
+    including a fingerprint-less legacy envelope -- refuses the flip; re-certify fresh."""
     if envelope.get("schema") != ENVELOPE_SCHEMA:
         return False, f"schema mismatch ({envelope.get('schema')!r})"
     if envelope.get("template_id") != template_id:
@@ -600,6 +680,16 @@ def _apply_trust_check(envelope: dict, template_id: str,
     if not recorded or recorded != actual:
         return False, (f"fixture sha mismatch (envelope {str(recorded)[:16]}... "
                        f"!= --dwg {actual[:16]}...)")
+    if template is not None:
+        env_fp = envelope.get("template_fingerprint")
+        if not env_fp:
+            return False, ("envelope carries no template_fingerprint (pre-binding legacy); "
+                           "re-certify fresh before --apply")
+        now_fp = _template_fingerprint(template)
+        if env_fp != now_fp:
+            return False, (f"template content drifted since certification "
+                           f"(envelope fp {env_fp[:12]}... != current {now_fp[:12]}...); "
+                           "re-certify fresh before --apply")
     return True, None
 
 
@@ -670,7 +760,18 @@ def run_batch(template_ids: list[str], *, dwg_path: str | Path, out_dir: str | P
                 _write_json_style(env_path, envelope)
 
         if apply and envelope.get("verdict") == CERTIFIED:
-            trust_ok, trust_reason = _apply_trust_check(envelope, template_id, dwg_path)
+            try:
+                current_template = _load_template_registry(router_home).get(template_id)
+            except Exception as exc:
+                current_template = None
+                envelope["apply_refused_reason"] = f"cannot load registry for trust check: {exc}"
+            if current_template is None:
+                trust_ok, trust_reason = False, (
+                    envelope.get("apply_refused_reason")
+                    or f"template {template_id!r} not found in the current registry")
+            else:
+                trust_ok, trust_reason = _apply_trust_check(
+                    envelope, template_id, dwg_path, template=current_template)
             if trust_ok:
                 apply_certification(template_id, envelope, router_home=router_home)
             else:

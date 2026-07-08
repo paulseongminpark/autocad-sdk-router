@@ -277,8 +277,10 @@ def test_live_refusal_maps_to_exit_code_2(monkeypatch, tmp_path):
     assert exit_code == 2
 
 
-def test_derive_sample_args_staged_path_honest_note():
-    """staged_path slots cannot be derived offline -- null + honest note."""
+def test_derive_sample_args_staged_path_is_engine_supplied():
+    """staged_path slots are auto-filled by run_template with its own staged copy
+    (cert wave 2 wiring), so derivation must neither sample them nor block the
+    template with a note -- an all-staged_path template derives to ({}, None)."""
     template = {
         "command_sequence": [{"literal": "RECOVER"}, {"slot": "recover_target_path"}],
         "slots": {
@@ -286,9 +288,9 @@ def test_derive_sample_args_staged_path_honest_note():
         },
     }
     sample, note = tls.derive_sample_args(template)
-    assert sample is None
-    assert note is not None
-    assert "staged_path" in note
+    assert sample == {}
+    assert "recover_target_path" not in sample
+    assert note is None
 
 
 def test_status_to_exit_code_matrix():

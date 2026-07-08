@@ -29,17 +29,19 @@ class TestArrayPolarTemplate(unittest.TestCase):
         self.assertNotIn("write_original", allowed)
 
     def test_hostile_slot_value_is_rejected_before_execution(self):
+        # cert wave 2 rebuilt the sequence: center_point (point2) is now the
+        # string-typed slot -- hostile injection must still be rejected there.
         template = cte.load_templates()["define.arraypolar"]
-        slot_def = template["slots"]["rotate_items"]
+        slot_def = template["slots"]["center_point"]
         with self.assertRaises(cte.TemplateError) as cm:
-            cte._validate_slot_value(slot_def, "rotate_items", "Y;QUIT")
+            cte._validate_slot_value(slot_def, "center_point", "0,0;QUIT")
         self.assertEqual(cm.exception.code, "INJECTION_REJECTED")
 
     def test_hostile_paren_value_is_rejected_before_execution(self):
         template = cte.load_templates()["define.arraypolar"]
-        slot_def = template["slots"]["rotate_items"]
+        slot_def = template["slots"]["center_point"]
         with self.assertRaises(cte.TemplateError) as cm:
-            cte._validate_slot_value(slot_def, "rotate_items", "Y(QUIT)")
+            cte._validate_slot_value(slot_def, "center_point", "0,0(QUIT)")
         self.assertEqual(cm.exception.code, "INJECTION_REJECTED")
 
 
