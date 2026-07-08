@@ -52,10 +52,12 @@ RUNNABLE (not DEGENERATE, not REACHABLE-arg-error) on a genuinely-authored
 valid-arg fixture. See V2_A4_REQUIRED_OPS / FIXTURES below.
 
 Each op's probe pair (empty-arg control + valid-arg fixture, where authored)
-runs in its OWN isolated child process (mirrors tools/probe_routes.py) so one
-hard crash can never poison the sweep or its exit code, and so a hung/
-interactive op can be killed on a bounded timeout instead of stalling the
-whole 457-op matrix.
+runs as TWO isolated child processes (one per leg, mirroring
+tools/probe_routes.py) so one hard crash can never poison the sweep or its
+exit code, and so a hung/interactive op can be killed on a bounded timeout
+instead of stalling the whole 457-op matrix. `--timeout-sec` applies PER LEG:
+the empty-arg control call and the valid-arg fixture call each get the full
+budget independently.
 
 Two run modes:
     --plan (default) -- NO CAD runtime touched. Emits one row per implemented
@@ -92,6 +94,7 @@ import json
 import os
 import subprocess
 import sys
+import time
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -217,13 +220,26 @@ def _policy_note(op: dict, cls: str) -> str:
 # Each entry is evidence-grounded: harvested from an existing, already-used
 # job fixture (test_native/job_*.json), the v2 job schema's per-op if/then arg
 # rules (schemas/cad_job.v2.schema.json), or the C++ handler's own arg-key
-# reads (src/Ariadne.AcadNative/families/m08g_handlers.inc / m08h_handlers.inc)
-# -- never a blind guess. Deliberately NOT authored for the ASM family
-# (solid3d.loft/revolve/sweep, nurbsurface, body, region): a genuinely
-# non-degenerate cross-section/profile is a modeler-dependent input barriered
-# behind the B6 ASM non-degeneracy gate (PLAN.md sec 0.6 v2-A5), out of F1's
-# scope -- leaving them fixture-less lets the empty-arg control probe's
-# RUNNABLE_BUT_DEGENERATE stand as their honest overall class.
+# reads (src/Ariadne.AcadNative/families/m08g_handlers.inc / m08h_handlers.inc /
+# AriadneNativeJob.cpp) -- never a blind guess. The remaining intentional gaps
+# are ops whose handler reads no meaningful caller args in this single-call
+# harness, `write.entity.body` (degenerate by construction), and externally
+# dependent rows such as `write.entity.region`.
+#
+# 2026-07-07 sweep promotions, reconciled 2026-07-08 (adversarial review, see
+# reports/crash_triage_20260707.md): of the solid3d ASM-family trio that
+# report originally flagged "deliberately deferred", `revolve` and `sweep`
+# ARE promoted below because their fixtures exercise a materially different
+# code path than the handler's own default args (270 deg OPEN revolve vs. the
+# handler's 360 deg CLOSED default; a distinct swept path vs. the handler's
+# default straight extrusion). `write.entity.solid3d.loft` stays fixture-less
+# on purpose: its only candidate fixture just rescales the SAME synthetic
+# same-profile rectangle the {} empty-arg call's defaults already produce via
+# createLoftedSolid() -- promoting it would game the RUNNABLE classifier
+# rather than prove non-degeneracy. Net promoted count: 23. Deferred/
+# no-fixture set: 7 -- write.entity.body, define.assocaction.create,
+# define.constraint.group, editor.react.events, live.overrule.enable,
+# live.reactor.enable, write.entity.solid3d.loft.
 # --------------------------------------------------------------------------- #
 _F1_LAYER = "ARIADNE_F1_PROBE"
 
@@ -317,6 +333,188 @@ FIXTURES: dict[str, dict] = {
     "write.xrecord.set": {
         "args": {"dictionary": "ARIADNE_F1_PROBE", "key": "f1_probe_key", "value": "f1-probe-value"},
         "evidence": "test_native/job_xrecord_set.json (existing working fixture)",
+    },
+    # 2026-07-07 sweep promotions: formerly-degenerate rows whose handlers
+    # read self-contained caller args the live sweep can exercise directly.
+    "write.dimstyle.create": {
+        "args": {"name": "ARIADNE_F1_PROBE_DIMSTYLE", "dimtxt": 3.25,
+                 "dimgap": 0.625, "dimclrd": 2},
+        "evidence": "src/Ariadne.AcadNative/AriadneNativeJob.cpp "
+                    "(write.dimstyle.create: name/dimtxt/dimgap/dimclrd keys)",
+    },
+    "write.entity.attribdef": {
+        "args": {"layer": _F1_LAYER, "position": {"x": 3.0, "y": 4.0, "z": 0.0},
+                 "text": "ARIADNE_F1_ATTRIB", "tag": "F1TAG",
+                 "prompt": "Enter F1 value", "height": 2.25},
+        "evidence": "src/Ariadne.AcadNative/families/m08g_handlers.inc "
+                    "(write.entity.attribdef: layer/position/text/tag/prompt/height keys)",
+    },
+    "write.entity.face": {
+        "args": {"layer": _F1_LAYER,
+                 "p0": {"x": 2.0, "y": 1.0, "z": 0.0},
+                 "p1": {"x": 6.0, "y": 1.0, "z": 0.0},
+                 "p2": {"x": 5.5, "y": 4.5, "z": 1.0},
+                 "p3": {"x": 1.5, "y": 4.0, "z": 0.5}},
+        "evidence": "src/Ariadne.AcadNative/families/m08g_handlers.inc "
+                    "(write.entity.face: layer/p0/p1/p2/p3 keys)",
+    },
+    "write.entity.nurbsurface": {
+        "args": {"layer": _F1_LAYER, "width": 4.0, "height": 2.5},
+        "evidence": "src/Ariadne.AcadNative/families/m08g_handlers.inc "
+                    "(write.entity.nurbsurface: layer/width/height keys)",
+    },
+    "write.entity.point": {
+        "args": {"layer": _F1_LAYER, "position": {"x": 3.5, "y": 4.5, "z": 0.0}},
+        "evidence": "src/Ariadne.AcadNative/families/m08g_handlers.inc "
+                    "(write.entity.point: layer/position keys)",
+    },
+    "write.entity.ray": {
+        "args": {"layer": _F1_LAYER, "base": {"x": 2.0, "y": 3.0, "z": 0.0},
+                 "direction": {"x": 0.0, "y": 1.0, "z": 1.0}},
+        "evidence": "src/Ariadne.AcadNative/families/m08g_handlers.inc "
+                    "(write.entity.ray: layer/base/direction keys)",
+    },
+    "write.entity.shape": {
+        "args": {"layer": _F1_LAYER, "position": {"x": 4.0, "y": 6.0, "z": 0.0},
+                 "size": 2.25, "rotation": 0.5, "width_factor": 0.75,
+                 "shape_number": 3, "name": "ARIADNE_F1_PROBE_SHAPE"},
+        "evidence": "src/Ariadne.AcadNative/families/m08g_handlers.inc "
+                    "(write.entity.shape: layer/position/size/rotation/width_factor/"
+                    "shape_number/name keys)",
+    },
+    "write.entity.solid2d": {
+        "args": {"layer": _F1_LAYER,
+                 "p0": {"x": 1.0, "y": 1.0, "z": 0.0},
+                 "p1": {"x": 4.5, "y": 1.0, "z": 0.0},
+                 "p2": {"x": 5.0, "y": 3.5, "z": 0.0},
+                 "p3": {"x": 0.5, "y": 3.0, "z": 0.0}},
+        "evidence": "src/Ariadne.AcadNative/families/m08g_handlers.inc "
+                    "(write.entity.solid2d: layer/p0/p1/p2/p3 keys)",
+    },
+    "write.entity.solid3d.extrude": {
+        "args": {"layer": _F1_LAYER, "width": 2.5, "depth": 1.25, "height": 4.0},
+        "evidence": "src/Ariadne.AcadNative/families/m08g_handlers.inc "
+                    "(write.entity.solid3d.extrude: layer/width/depth/height keys)",
+    },
+    # write.entity.solid3d.loft: INTENTIONALLY no fixture (reverted 2026-07-08,
+    # adversarial review). Its only self-contained args (width/depth/
+    # top_width/top_depth/height) merely rescale the SAME synthetic
+    # same-profile rectangle createLoftedSolid() already builds off the
+    # handler's own hardcoded defaults -- a numeric-only fixture here would
+    # game the RUNNABLE classifier (created:true) without demonstrating a
+    # materially different code path, unlike revolve/sweep below. See
+    # reports/crash_triage_20260707.md.
+    "write.entity.solid3d.primitive": {
+        "args": {"layer": _F1_LAYER, "primitive": "wedge",
+                 "x_len": 2.0, "y_len": 1.5, "z_len": 3.5},
+        "evidence": "src/Ariadne.AcadNative/families/m08g_handlers.inc "
+                    "(write.entity.solid3d.primitive: layer/primitive/x_len/y_len/z_len keys)",
+    },
+    "write.entity.solid3d.revolve": {
+        "args": {"layer": _F1_LAYER, "width": 1.25, "height": 2.75, "angle": 4.71238898},
+        "evidence": "src/Ariadne.AcadNative/families/m08g_handlers.inc "
+                    "(write.entity.solid3d.revolve: layer/width/height/angle keys)",
+    },
+    "write.entity.solid3d.sweep": {
+        "args": {"layer": _F1_LAYER, "width": 0.6, "height": 0.4, "length": 4.5},
+        "evidence": "src/Ariadne.AcadNative/families/m08g_handlers.inc "
+                    "(write.entity.solid3d.sweep: layer/width/height/length keys)",
+    },
+    "write.entity.subdmesh": {
+        "args": {"layer": _F1_LAYER, "x_len": 2.5, "y_len": 1.5, "z_len": 3.0},
+        "evidence": "src/Ariadne.AcadNative/families/m08g_handlers.inc "
+                    "(write.entity.subdmesh: layer/x_len/y_len/z_len keys)",
+    },
+    "write.entity.surface": {
+        "args": {"layer": _F1_LAYER, "width": 3.0, "height": 2.0},
+        "evidence": "src/Ariadne.AcadNative/families/m08g_handlers.inc "
+                    "(write.entity.surface: layer/width/height keys)",
+    },
+    "write.entity.table": {
+        "args": {"layer": _F1_LAYER, "text": "ARIADNE_F1_PROBE_TABLE",
+                 "position": {"x": 5.0, "y": 5.0, "z": 0.0},
+                 "rows": 3, "columns": 4, "row_height": 4.0,
+                 "column_width": 10.0, "text_height": 1.75},
+        "evidence": "src/Ariadne.AcadNative/families/m08h_handlers.inc "
+                    "(write.entity.table: layer/text/position/rows/columns/"
+                    "row_height/column_width/text_height keys)",
+    },
+    "write.entity.tolerance": {
+        # "normal" ({0,0,1}) intentionally equals the handler default
+        # (m08g_handlers.inc write.entity.tolerance: m08gVector(job,"normal",
+        # 0.0,0.0,1.0,normal)) -- a unit Z normal is the only sensible normal
+        # for a planar FCF on the XY plane. Non-degeneracy is already carried
+        # by text/location/direction, all of which differ from their defaults.
+        "args": {"layer": _F1_LAYER, "text": "%%v|A|B",
+                 "location": {"x": 8.0, "y": 1.0, "z": 0.0},
+                 "normal": {"x": 0.0, "y": 0.0, "z": 1.0},
+                 "direction": {"x": 1.0, "y": 1.0, "z": 0.0}},
+        "evidence": "src/Ariadne.AcadNative/families/m08g_handlers.inc "
+                    "(write.entity.tolerance: layer/text/location/normal/direction keys)",
+    },
+    "write.entity.trace": {
+        "args": {"layer": _F1_LAYER,
+                 "p0": {"x": 1.0, "y": 2.0, "z": 0.0},
+                 "p1": {"x": 3.0, "y": 0.0, "z": 0.0},
+                 "p2": {"x": 3.5, "y": 2.5, "z": 0.0},
+                 "p3": {"x": -0.5, "y": 2.0, "z": 0.0}},
+        "evidence": "src/Ariadne.AcadNative/families/m08g_handlers.inc "
+                    "(write.entity.trace: layer/p0/p1/p2/p3 keys)",
+    },
+    "write.entity.xline": {
+        "args": {"layer": _F1_LAYER, "base": {"x": 1.0, "y": 2.0, "z": 0.0},
+                 "direction": {"x": 1.0, "y": 1.0, "z": 0.0}},
+        "evidence": "src/Ariadne.AcadNative/families/m08g_handlers.inc "
+                    "(write.entity.xline: layer/base/direction keys)",
+    },
+    "write.linetype.create": {
+        "args": {"name": "ARIADNE_F1_PROBE_LINETYPE",
+                 "description": "Ariadne F1 probe linetype",
+                 "dash_lengths": [0.5, -0.25, 0.0]},
+        "evidence": "src/Ariadne.AcadNative/AriadneNativeJob.cpp "
+                    "(write.linetype.create: name/description/dash_lengths keys)",
+    },
+    "write.textstyle.create": {
+        "args": {"name": "ARIADNE_F1_PROBE_TEXTSTYLE", "height": 2.5,
+                 "width_factor": 0.75, "oblique_angle": 0.1},
+        "evidence": "src/Ariadne.AcadNative/AriadneNativeJob.cpp "
+                    "(write.textstyle.create: name/height/width_factor/oblique_angle keys)",
+    },
+    "write.ucs.create": {
+        "args": {"name": "ARIADNE_F1_PROBE_UCS",
+                 "origin": {"x": 2.0, "y": 3.0, "z": 0.0},
+                 "x_axis": {"x": 0.0, "y": 1.0, "z": 0.0},
+                 "y_axis": {"x": -1.0, "y": 0.0, "z": 0.0}},
+        "evidence": "src/Ariadne.AcadNative/AriadneNativeJob.cpp "
+                    "(write.ucs.create: name/origin/x_axis/y_axis keys)",
+    },
+    "write.view.create": {
+        "args": {"name": "ARIADNE_F1_PROBE_VIEW",
+                 "center": {"x": 12.0, "y": 7.0},
+                 "height": 20.0, "width": 30.0,
+                 "target": {"x": 0.0, "y": 0.0, "z": 0.0},
+                 "view_direction": {"x": 1.0, "y": 1.0, "z": 1.0},
+                 "twist": 0.2, "lens_length": 60.0,
+                 "perspective_enabled": 1},
+        "evidence": "src/Ariadne.AcadNative/AriadneNativeJob.cpp "
+                    "(write.view.create: name/center/height/width/target/"
+                    "view_direction/twist/lens_length/perspective_enabled keys)",
+    },
+    "write.vport.create": {
+        "args": {"name": "ARIADNE_F1_PROBE_VPORT",
+                 "lower_left": {"x": 0.0, "y": 0.0},
+                 "upper_right": {"x": 1.5, "y": 1.0},
+                 "center": {"x": 10.0, "y": 5.0},
+                 "height": 20.0, "width": 30.0,
+                 "target": {"x": 0.0, "y": 0.0, "z": 0.0},
+                 "view_direction": {"x": 0.0, "y": 0.0, "z": 1.0},
+                 "circle_sides": 24, "grid_enabled": 1,
+                 "snap_enabled": 1, "snap_angle": 0.2,
+                 "ucs_per_viewport": 1},
+        "evidence": "src/Ariadne.AcadNative/AriadneNativeJob.cpp "
+                    "(write.vport.create: name/lower_left/upper_right/center/"
+                    "height/width/target/view_direction/circle_sides/grid_enabled/"
+                    "snap_enabled/snap_angle/ucs_per_viewport keys)",
     },
 }
 
@@ -450,6 +648,11 @@ def classify_op_result(payload: dict) -> dict:
                           "reason": payload.get("reason") or "isolated probe worker crashed"}
         return {"class": CRASH, "empty_arg_probe": empty_summary, "valid_arg_probe": None,
                 "input_validated": None}
+    # This top-level `_probe_timeout` short-circuit is unreachable from the
+    # live `_run_isolated` path today (per-leg timeouts land nested inside
+    # empty_env/valid_env since the per-leg timeout-budget change); retained
+    # for callers that invoke classify_op_result() directly with a legacy/
+    # synthetic top-level-timeout payload shape -- do not remove.
     if payload.get("_probe_timeout"):
         empty_summary = {"attempted": True, "class": ATTENDED_ONLY, "status": None, "created": None,
                           "error_code": None,
@@ -468,7 +671,11 @@ def classify_op_result(payload: dict) -> dict:
         valid_class = classify_probe_response(valid_env, is_empty_arg=False)
         valid_summary = _probe_field_summary(valid_env, valid_class)
 
-    if valid_class == RUNNABLE:
+    if empty_class == CRASH or valid_class == CRASH:
+        overall = CRASH
+    elif empty_class == ATTENDED_ONLY or valid_class == ATTENDED_ONLY:
+        overall = ATTENDED_ONLY
+    elif valid_class == RUNNABLE:
         overall = RUNNABLE
     elif empty_class == RUNNABLE_BUT_DEGENERATE:
         overall = RUNNABLE_BUT_DEGENERATE
@@ -477,11 +684,13 @@ def classify_op_result(payload: dict) -> dict:
     else:
         overall = empty_class
 
+    input_validated = None if overall in (CRASH, ATTENDED_ONLY) else empty_class != RUNNABLE_BUT_DEGENERATE
+
     return {
         "class": overall,
         "empty_arg_probe": empty_summary,
         "valid_arg_probe": valid_summary,
-        "input_validated": empty_class != RUNNABLE_BUT_DEGENERATE,
+        "input_validated": input_validated,
     }
 
 
@@ -495,6 +704,15 @@ def _check_original_unchanged(op_id: str, probe_label: str, env: dict) -> None:
         )
 
 
+def _run_probe_call(cad: cadctl.Cad, op_id: str, dwg_path: Path | str, out_dir: Path | str,
+                    *, args: dict, probe_label: str) -> dict:
+    out_dir = Path(out_dir)
+    out_dir.mkdir(parents=True, exist_ok=True)
+    env = cad.run_operation(op_id, args=args, dwg_path=str(dwg_path), out_dir=str(out_dir))
+    _check_original_unchanged(op_id, probe_label, env)
+    return env
+
+
 def probe_one(op_id: str, dwg_path: Path | str, out_dir: Path | str, *, fixture: dict | None = None) -> dict:
     """Run the empty-arg control probe, then (if `fixture` is given) the
     valid-arg fixture probe, for ONE op, in-process, against a REAL
@@ -504,17 +722,13 @@ def probe_one(op_id: str, dwg_path: Path | str, out_dir: Path | str, *, fixture:
     cad = cadctl.Cad()
     out_dir = Path(out_dir)
 
-    empty_dir = out_dir / "empty"
-    empty_dir.mkdir(parents=True, exist_ok=True)
-    empty_env = cad.run_operation(op_id, args={}, dwg_path=str(dwg_path), out_dir=str(empty_dir))
-    _check_original_unchanged(op_id, "empty-arg", empty_env)
+    empty_env = _run_probe_call(cad, op_id, dwg_path, out_dir / "empty",
+                                args={}, probe_label="empty-arg")
 
     valid_env = None
     if fixture is not None:
-        valid_dir = out_dir / "valid"
-        valid_dir.mkdir(parents=True, exist_ok=True)
-        valid_env = cad.run_operation(op_id, args=fixture, dwg_path=str(dwg_path), out_dir=str(valid_dir))
-        _check_original_unchanged(op_id, "valid-arg", valid_env)
+        valid_env = _run_probe_call(cad, op_id, dwg_path, out_dir / "valid",
+                                    args=fixture, probe_label="valid-arg")
 
     return {"op_id": op_id, "empty_env": empty_env, "valid_env": valid_env}
 
@@ -528,14 +742,17 @@ def _write_json_atomic(path: Path, obj: dict) -> None:
 
 
 def _worker_main(op_id: str, dwg_path: str, out_dir: str, fixture_json: str | None) -> int:
-    """The `--probe-one` entrypoint: run ONE op's probe pair and write the
-    result to <out_dir>/probe_result.json. Runs as a CHILD process (spawned by
-    _run_isolated) so a native-layer crash here can never take down the sweep."""
+    """The `--probe-one` entrypoint: run ONE probe leg and write the raw
+    cadctl envelope to <out_dir>/probe_result.json. Runs as a CHILD process
+    (spawned by _run_isolated) so a native-layer crash here can never take
+    down the sweep."""
     fixture = json.loads(fixture_json) if fixture_json else None
     out_dir_p = Path(out_dir)
     result_path = out_dir_p / "probe_result.json"
+    probe_label = "valid-arg" if fixture is not None else "empty-arg"
     try:
-        payload = probe_one(op_id, dwg_path, out_dir_p, fixture=fixture)
+        payload = _run_probe_call(cadctl.Cad(), op_id, dwg_path, out_dir_p,
+                                  args=fixture or {}, probe_label=probe_label)
     except OriginalMutatedError as exc:
         _write_json_atomic(result_path, {"op_id": op_id, "_original_mutated": True, "error": str(exc)})
         return EXIT_ORIGINAL_MUTATED
@@ -580,19 +797,64 @@ def _spawn_worker(cmd: list[str], *, cwd: str, timeout_sec: float, result_path: 
         return {"_probe_crash": True, "reason": f"result file unreadable: {exc}"}
 
 
-def _run_isolated(op_id: str, dwg_path: Path | str, out_dir: Path | str,
-                   fixture: dict | None, timeout_sec: float) -> dict:
-    """Probe ONE op in its OWN child python process (mirrors probe_routes.py's
-    isolated-import pattern) so heavy geometry/solid ops (PLAN.md PART 3 F1
-    change (d)) -- or any op at all -- can crash or hang without poisoning the
-    sweep or its exit code."""
+def _run_probe_leg(op_id: str, dwg_path: Path | str, out_dir: Path | str, *,
+                   fixture: dict | None, timeout_sec: float) -> tuple[dict, float]:
     out_dir = Path(out_dir)
     cmd = [sys.executable, str(_THIS_FILE), "--probe-one", op_id,
            "--dwg", str(dwg_path), "--out-dir", str(out_dir)]
     if fixture is not None:
         cmd += ["--fixture-json", json.dumps(fixture, ensure_ascii=False)]
-    return _spawn_worker(cmd, cwd=str(ROUTER_HOME), timeout_sec=timeout_sec,
-                          result_path=out_dir / "probe_result.json")
+    started = time.monotonic()
+    payload = _spawn_worker(cmd, cwd=str(ROUTER_HOME), timeout_sec=timeout_sec,
+                            result_path=out_dir / "probe_result.json")
+    return payload, (time.monotonic() - started)
+
+
+def _leg_timeout_reason(probe_label: str, timeout_sec: float,
+                        completed_legs: list[tuple[str, float]] | None = None) -> str:
+    completed_legs = completed_legs or []
+    reason = f"{probe_label} leg exceeded {timeout_sec:.1f}s"
+    if not completed_legs:
+        return f"{reason} (no headless UI to answer it)"
+    details = "; ".join(f"{label} leg completed in {elapsed:.1f}s" for label, elapsed in completed_legs)
+    return f"{reason} ({details})"
+
+
+def _run_isolated(op_id: str, dwg_path: Path | str, out_dir: Path | str,
+                   fixture: dict | None, timeout_sec: float) -> dict:
+    """Probe ONE op with one isolated child python process per leg, so the
+    empty-arg control call and valid-arg fixture call each get their own full
+    timeout budget and can crash/hang without poisoning the sweep."""
+    out_dir = Path(out_dir)
+    empty_env, empty_elapsed = _run_probe_leg(op_id, dwg_path, out_dir / "empty",
+                                              fixture=None, timeout_sec=timeout_sec)
+    if empty_env.get("_original_mutated"):
+        return empty_env
+    if empty_env.get("_probe_timeout"):
+        return {
+            "op_id": op_id,
+            "empty_env": {
+                "_probe_timeout": True,
+                "timeout_sec": timeout_sec,
+                "reason": _leg_timeout_reason("empty-arg", timeout_sec),
+            },
+            "valid_env": None,
+        }
+    if empty_env.get("_probe_crash") or fixture is None:
+        return {"op_id": op_id, "empty_env": empty_env, "valid_env": None}
+
+    valid_env, _ = _run_probe_leg(op_id, dwg_path, out_dir / "valid",
+                                  fixture=fixture, timeout_sec=timeout_sec)
+    if valid_env.get("_original_mutated"):
+        return valid_env
+    if valid_env.get("_probe_timeout"):
+        valid_env = {
+            "_probe_timeout": True,
+            "timeout_sec": timeout_sec,
+            "reason": _leg_timeout_reason("valid-arg", timeout_sec,
+                                           [("empty-arg", empty_elapsed)]),
+        }
+    return {"op_id": op_id, "empty_env": empty_env, "valid_env": valid_env}
 
 
 # --------------------------------------------------------------------------- #
@@ -734,7 +996,7 @@ def _build_arg_parser() -> argparse.ArgumentParser:
     ap.add_argument("--ops", default=None,
                      help="comma-separated op_id subset for --live (omit = full sweep of every implemented op)")
     ap.add_argument("--timeout-sec", type=float, default=DEFAULT_TIMEOUT_SEC,
-                     help="per-op isolated-subprocess timeout (a hang past this = ATTENDED_ONLY)")
+                     help="per-probe-leg isolated-subprocess timeout (empty-arg and valid-arg each get the full budget; a true hang still = ATTENDED_ONLY)")
     ap.add_argument("--work-dir", default=None, help="scratch dir for staged copies (default: runs/probe_reachability/<ts>)")
     ap.add_argument("--check-runtime", action="store_true", help="report whether a --live sweep is even possible here, then exit")
     # Hidden worker entrypoint (spawned by _run_isolated); not part of the public contract.
