@@ -3073,20 +3073,21 @@ static std::string textStylesRichJson(AcDbDatabase* pDb, int& count)
     return arr.str();
 }
 
-// Block table records + the user-block-definition projection. w3-blockdef:
-// def geometry is now INLINED under block_definitions[].def_entities (the
-// docs/DWG_GRAPH_IR_SPEC.md Section 4.3 "inlined" strategy) via the SAME
-// collectEntitiesFromBlock per-entity extraction collectModelSpaceGraph
-// uses -- NOT referenced from the top-level entities[] by owner_handle. The
-// flat entities[] stays modelspace-only; its length is the golden-pinned
-// truth-gate numerator (tests/golden/expected_counts.json's
-// modelspace_total), so block-def contents must never be appended there.
+// Block table records + the capturable block-definition projection.
+// w3-blockdef: def geometry is now INLINED under
+// block_definitions[].def_entities (the docs/DWG_GRAPH_IR_SPEC.md Section
+// 4.3 "inlined" strategy) via the SAME collectEntitiesFromBlock per-entity
+// extraction collectModelSpaceGraph uses -- NOT referenced from the top-level
+// entities[] by owner_handle. The flat entities[] stays modelspace-only; its
+// length is the golden-pinned truth-gate numerator
+// (tests/golden/expected_counts.json's modelspace_total), so block-def
+// contents must never be appended there.
 static std::string blockTableRecordsJson(AcDbDatabase* pDb, int& btrCount,
-                                         int& userBlockDefs,
+                                         int& capturedBlockDefs,
                                          std::string& blockDefsJson)
 {
     btrCount = 0;
-    userBlockDefs = 0;
+    capturedBlockDefs = 0;
     std::ostringstream arr; arr.precision(kJsonDoublePrecision);
     arr << "[";
     bool first = true;
@@ -3115,21 +3116,20 @@ static std::string blockTableRecordsJson(AcDbDatabase* pDb, int& btrCount,
             const bool isLayout = pBTR->isLayout();
             const bool isAnon = pBTR->isAnonymous();
             const bool isXref = pBTR->isFromExternalReference();
-            const bool isUserBlock = !isLayout && !isAnon && !isXref;
+            const bool emitBlockDef = !isLayout && !isXref;
             int entityCount = 0;
             std::string defEntitiesJson = "[]";
-            if (isUserBlock) {
-                // w3-blockdef: full contents extraction for user block defs
-                // only (*Model_Space/paper-space layouts are already walked
-                // elsewhere; anonymous *U###/*D### and xref block contents
-                // are a documented v1 deferral, same class as attributes/
-                // nested-block recursion). entityCount comes from this SAME
-                // walk, so it can never disagree with len(def_entities).
-                // extension-dictionary/xrecord content and richCounters
-                // aggregation for block-def-owned entities are local/
-                // discarded here (v1 scope) -- the top-level
-                // extension_dictionaries[]/xrecords[]/coverage.counts stay
-                // modelspace-only, byte-identical to before this change.
+            if (emitBlockDef) {
+                // Capture every non-layout, non-xref block definition. Named
+                // defs preserve the legacy payload shape; anonymous *U###/*D###
+                // defs gain only an additive "anonymous":true marker so
+                // downstream rebuild can distinguish clone/remap paths later.
+                // entityCount comes from this SAME walk, so it can never
+                // disagree with len(def_entities). extension-dictionary/
+                // xrecord content and richCounters aggregation for block-def-
+                // owned entities are local/discarded here (v1 scope) -- the
+                // top-level extension_dictionaries[]/xrecords[]/coverage.counts
+                // stay modelspace-only, byte-identical to before this change.
                 std::string defExtDicts, defExtXrecords;
                 RichGraphCounters localCounters;
                 collectEntitiesFromBlock(pBTR, "block", entityCount, defEntitiesJson,
@@ -3153,14 +3153,16 @@ static std::string blockTableRecordsJson(AcDbDatabase* pDb, int& btrCount,
                 << ",\"is_xref\":" << (isXref ? "true" : "false")
                 << ",\"entity_count\":" << entityCount << "}";
             ++btrCount;
-            if (isUserBlock) {
-                ++userBlockDefs;
+            if (emitBlockDef) {
+                ++capturedBlockDefs;
                 if (!dfirst)
                     defs << ",";
                 dfirst = false;
                 defs << "{\"handle\":\"" << jsonEscape(handle) << "\""
-                     << ",\"name\":\"" << jsonEscape(name) << "\""
-                     << ",\"entity_count\":" << entityCount
+                     << ",\"name\":\"" << jsonEscape(name) << "\"";
+                if (isAnon)
+                    defs << ",\"anonymous\":true";
+                defs << ",\"entity_count\":" << entityCount
                      << ",\"def_entities\":" << defEntitiesJson << "}";
             }
             pBTR->close();
@@ -3380,9 +3382,9 @@ static std::string collectDatabaseGraph(AcDbDatabase* pDb,
         << ",\"views\":" << viewsJson << "}";
     addPresent("symbol_tables");
 
-    int btrCount = 0, userBlockDefs = 0;
+    int btrCount = 0, capturedBlockDefs = 0;
     std::string blockDefsJson;
-    const std::string btrJson = blockTableRecordsJson(pDb, btrCount, userBlockDefs, blockDefsJson);
+    const std::string btrJson = blockTableRecordsJson(pDb, btrCount, capturedBlockDefs, blockDefsJson);
     sec << ",\"block_table_records\":" << btrJson
         << ",\"block_definitions\":" << blockDefsJson;
     addPresent("block_table_records");
@@ -3437,7 +3439,7 @@ static std::string collectDatabaseGraph(AcDbDatabase* pDb,
         << ",\"ucs\":" << ucsCount
         << ",\"views\":" << viewCount
         << ",\"block_table_records\":" << btrCount
-        << ",\"block_definitions\":" << userBlockDefs
+        << ",\"block_definitions\":" << capturedBlockDefs
         << ",\"layouts\":" << layoutCount
         << ",\"xrefs\":" << xrefCount
         << ",\"dictionary_entries\":" << dictEntryCount

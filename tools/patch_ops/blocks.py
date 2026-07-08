@@ -13,9 +13,10 @@ p2-blockapp wave: two ops gain their first-ever patch_ops wiring.
                           families/m08e_handlers.inc) -- graduated from an
                           always-rollback probe to a REAL, persisting write in
                           this same wave (see that file's header comment).
-                          Appends one of {line,circle,arc,text} into a NAMED
-                          block-table record (or model space if 'block_name'
-                          is omitted).
+                          Appends one of {line,circle,arc,text,ellipse,point,
+                          spline,lwpolyline,polyline,block_reference} into a
+                          NAMED block-table record (or model space if
+                          'block_name' is omitted).
 create_blockref (write.entity.blockref, the INSERT itself) is registered in
 patch_ops.entities (its kind=="block_reference" IR-op-case), not this
 family -- w3-insert wired the WRITE_OP_MAP/build_job_args side there, but
@@ -88,6 +89,34 @@ def _pt(arr: Any) -> Optional[Dict[str, float]]:
     return {"x": arr[0], "y": arr[1], "z": arr[2] if len(arr) > 2 else 0.0}
 
 
+def _points2d(vertices: Any, *, include_widths: bool = False) -> List[Dict[str, float]]:
+    out: List[Dict[str, float]] = []
+    for v in (vertices or []):
+        p = v.get("point") if isinstance(v, dict) else v
+        if not p:
+            continue
+        item: Dict[str, float] = {
+            "x": p[0],
+            "y": p[1],
+            "bulge": (v.get("bulge", 0.0) if isinstance(v, dict) else 0.0),
+        }
+        if include_widths:
+            item["start_width"] = v.get("start_width", 0.0) if isinstance(v, dict) else 0.0
+            item["end_width"] = v.get("end_width", 0.0) if isinstance(v, dict) else 0.0
+        out.append(item)
+    return out
+
+
+def _points3d(vertices: Any) -> List[Dict[str, float]]:
+    out: List[Dict[str, float]] = []
+    for v in (vertices or []):
+        p = v.get("point") if isinstance(v, dict) else v
+        pt = _pt(p)
+        if pt is not None:
+            out.append(pt)
+    return out
+
+
 def ir_op_for(ent: Dict[str, Any]) -> Optional[Dict[str, Any]]:
     """Block family maps no IR entity ``kind`` of its own -- create_blockref
     (kind=="block_reference") is entities.py's case; see module docstring."""
@@ -97,11 +126,11 @@ def ir_op_for(ent: Dict[str, Any]) -> Optional[Dict[str, Any]]:
 def _def_entity_append_op(block_name: str, def_ent: Dict[str, Any]) -> Optional[Dict[str, Any]]:
     """One block_definitions[].def_entities[] item -> an append_block_entity
     op targeting ``block_name``, or None if this def_entity's kind is not one
-    of the 4 kinds write.block.append_entity's native handler
-    (m08eBuildEntityForAppend) can build: line/circle/arc/text."""
+    of the kinds write.block.append_entity's native handler can build."""
     g = def_ent.get("geometry") or {}
     kind = g.get("kind")
     layer = def_ent.get("layer")
+    native_class = def_ent.get("class")
     entity: Optional[Dict[str, Any]] = None
     if kind == "line":
         entity = {"kind": "line", "start": _pt(g.get("start")), "end": _pt(g.get("end"))}
@@ -113,6 +142,44 @@ def _def_entity_append_op(block_name: str, def_ent: Dict[str, Any]) -> Optional[
     elif kind == "text":
         entity = {"kind": "text", "position": _pt(g.get("position")), "text": g.get("text"),
                   "height": g.get("height", 2.5)}
+    elif kind == "ellipse":
+        entity = {"kind": "ellipse", "center": _pt(g.get("center")), "normal": _pt(g.get("normal")),
+                  "major_axis": _pt(g.get("major_axis")), "radius_ratio": g.get("radius_ratio"),
+                  "start_angle": g.get("start_angle"), "end_angle": g.get("end_angle")}
+    elif kind == "point":
+        entity = {"kind": "point", "position": _pt(g.get("position"))}
+    elif kind == "spline":
+        control_points = def_ent.get("spline_control_points")
+        if control_points is None:
+            control_points = g.get("control_points")
+        entity = {"kind": "spline",
+                  "fit_points": list(g.get("fit_points") or []),
+                  "control_points": list(control_points or []),
+                  "degree": g.get("degree"),
+                  "closed": g.get("closed")}
+    elif kind == "lwpolyline":
+        entity = {"kind": "lwpolyline", "points": _points2d(g.get("vertices")),
+                  "closed": int(bool(g.get("closed")))}
+        if "const_width" in g:
+            entity["const_width"] = g.get("const_width")
+    elif kind == "polyline":
+        if native_class == "AcDb3dPolyline":
+            entity = {"kind": "polyline", "class": native_class, "points": _points3d(g.get("vertices"))}
+        else:
+            entity = {"kind": "polyline",
+                      "points": _points2d(g.get("vertices"), include_widths=True),
+                      "closed": int(bool(g.get("closed"))),
+                      "elevation": g.get("elevation", 0.0),
+                      "default_start_width": g.get("default_start_width", 0.0),
+                      "default_end_width": g.get("default_end_width", 0.0)}
+            if native_class:
+                entity["class"] = native_class
+    elif kind == "block_reference":
+        nested_name = g.get("block_name")
+        if nested_name:
+            entity = {"kind": "block_reference", "block_name": nested_name,
+                      "position": _pt(g.get("position")), "scale": _pt(g.get("scale")),
+                      "rotation": g.get("rotation")}
     if entity is None:
         return None
     return {"operation": "append_block_entity",

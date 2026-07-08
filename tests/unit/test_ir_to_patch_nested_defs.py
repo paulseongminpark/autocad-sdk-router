@@ -67,13 +67,15 @@ class TestNestedBlockDefinitionSynthesis(unittest.TestCase):
         patch, deferred = self._build_patch(ir)
 
         self.assertEqual(self._create_block_names(patch), ["B", "A"])
+        # append-kind extension (2026-07-09): nested block_reference def-entities
+        # now APPEND (they no longer defer) - A's body carries line + ref-to-B.
         self.assertEqual(
             [op["operation"] for op in patch["operations"]],
             ["create_block", "append_block_entity", "create_block", "append_block_entity",
-             "create_blockref"],
+             "append_block_entity", "create_blockref"],
         )
         self.assertEqual(len(self._step_ids(patch)), len(set(self._step_ids(patch))))
-        self.assertTrue(any(d.get("kind") == "block_reference" for d in deferred))
+        self.assertFalse(any(d.get("kind") == "block_reference" for d in deferred))
 
     def test_three_level_chain_emits_deepest_definition_first(self):
         ir = {
@@ -88,11 +90,12 @@ class TestNestedBlockDefinitionSynthesis(unittest.TestCase):
         patch, _deferred = self._build_patch(ir)
 
         self.assertEqual(self._create_block_names(patch), ["C", "B", "A"])
+        # nested refs append now: B's body = line + ref-to-C, A's = line + ref-to-B.
         self.assertEqual(
             [op["operation"] for op in patch["operations"]],
             ["create_block", "append_block_entity",
-             "create_block", "append_block_entity",
-             "create_block", "append_block_entity",
+             "create_block", "append_block_entity", "append_block_entity",
+             "create_block", "append_block_entity", "append_block_entity",
              "create_blockref"],
         )
         self.assertEqual(len(self._step_ids(patch)), len(set(self._step_ids(patch))))
@@ -166,15 +169,19 @@ class TestNestedBlockDefinitionSynthesis(unittest.TestCase):
 
         self.assertEqual(self._create_block_names(patch), ["B", "A", "C"])
         self.assertEqual(self._create_block_names(patch).count("B"), 1)
+        # nested refs append now: A's and C's bodies each carry line + ref-to-B
+        # (B itself still emitted exactly once, before its first referrer).
         self.assertEqual(
             [(op["operation"], op["step_id"]) for op in patch["operations"]],
             [("create_block", "bd0_0"),
              ("append_block_entity", "bd0_1"),
              ("create_block", "bd0_2"),
              ("append_block_entity", "bd0_3"),
+             ("append_block_entity", "bd0_4"),
              ("create_blockref", "e0"),
              ("create_block", "bd1_0"),
              ("append_block_entity", "bd1_1"),
+             ("append_block_entity", "bd1_2"),
              ("create_blockref", "e1")],
         )
 
