@@ -566,30 +566,52 @@ static bool m08eFindFlag(const std::string& json, const char* key, bool& out)
     return false;
 }
 
+static bool m08eParsePlainNumberArray(const std::string& arrJson, std::vector<double>& out);
+
 static void m08eReadPoint(const std::string& json, const char* key,
                           double dx, double dy, double dz, AcGePoint3d& out)
 {
-    double x = dx, y = dy, z = dz;
     std::string obj;
     if (jsonFindObject(json, key, obj)) {
+        double x = dx, y = dy, z = dz;
         jsonFindNumber(obj, "x", x);
         jsonFindNumber(obj, "y", y);
         jsonFindNumber(obj, "z", z);
+        out.set(x, y, z);
+        return;
     }
-    out.set(x, y, z);
+    size_t lb = 0, rb = 0;
+    if (m08eFindArrayBounds(json, key, lb, rb)) {
+        std::vector<double> nums;
+        if (m08eParsePlainNumberArray(json.substr(lb, rb - lb + 1), nums) && nums.size() >= 2) {
+            out.set(nums[0], nums[1], nums.size() > 2 ? nums[2] : 0.0);
+            return;
+        }
+    }
+    out.set(dx, dy, dz);
 }
 
 static void m08eReadVector(const std::string& json, const char* key,
                            double dx, double dy, double dz, AcGeVector3d& out)
 {
-    double x = dx, y = dy, z = dz;
     std::string obj;
     if (jsonFindObject(json, key, obj)) {
+        double x = dx, y = dy, z = dz;
         jsonFindNumber(obj, "x", x);
         jsonFindNumber(obj, "y", y);
         jsonFindNumber(obj, "z", z);
+        out.set(x, y, z);
+        return;
     }
-    out.set(x, y, z);
+    size_t lb = 0, rb = 0;
+    if (m08eFindArrayBounds(json, key, lb, rb)) {
+        std::vector<double> nums;
+        if (m08eParsePlainNumberArray(json.substr(lb, rb - lb + 1), nums) && nums.size() >= 2) {
+            out.set(nums[0], nums[1], nums.size() > 2 ? nums[2] : 0.0);
+            return;
+        }
+    }
+    out.set(dx, dy, dz);
 }
 
 static bool m08eParsePlainNumberArray(const std::string& arrJson, std::vector<double>& out)
@@ -613,6 +635,81 @@ static bool m08eParsePlainNumberArray(const std::string& arrJson, std::vector<do
             return false;
         out.push_back(value);
         i = static_cast<size_t>(parseEnd - arrJson.c_str());
+    }
+    return true;
+}
+
+static bool m08eReadNumberTupleField(const std::string& json, const char* key,
+                                     std::vector<double>& out)
+{
+    size_t lb = 0, rb = 0;
+    if (!m08eFindArrayBounds(json, key, lb, rb))
+        return false;
+    return m08eParsePlainNumberArray(json.substr(lb, rb - lb + 1), out);
+}
+
+static bool m08eTryReadPoint(const std::string& json, const char* key, AcGePoint3d& out)
+{
+    std::string obj;
+    if (jsonFindObject(json, key, obj)) {
+        double x = 0.0, y = 0.0, z = 0.0;
+        if (!parsePointFromObject(obj, x, y, z))
+            return false;
+        out.set(x, y, z);
+        return true;
+    }
+    std::vector<double> nums;
+    if (!m08eReadNumberTupleField(json, key, nums) || nums.size() < 2)
+        return false;
+    out.set(nums[0], nums[1], nums.size() > 2 ? nums[2] : 0.0);
+    return true;
+}
+
+static bool m08eTryReadVector(const std::string& json, const char* key, AcGeVector3d& out)
+{
+    std::string obj;
+    if (jsonFindObject(json, key, obj)) {
+        double x = 0.0, y = 0.0, z = 0.0;
+        if (!parsePointFromObject(obj, x, y, z))
+            return false;
+        out.set(x, y, z);
+        return true;
+    }
+    std::vector<double> nums;
+    if (!m08eReadNumberTupleField(json, key, nums) || nums.size() < 2)
+        return false;
+    out.set(nums[0], nums[1], nums.size() > 2 ? nums[2] : 0.0);
+    return true;
+}
+
+static bool m08eReadFlagArray(const std::string& json, const char* key, std::vector<bool>& out)
+{
+    out.clear();
+    size_t lb = 0, rb = 0;
+    if (!m08eFindArrayBounds(json, key, lb, rb))
+        return false;
+    size_t scan = lb + 1;
+    while (scan < rb) {
+        while (scan < rb && (json[scan] == ',' || m08eIsJsonSpace(json[scan])))
+            ++scan;
+        if (scan >= rb)
+            break;
+        if (json.compare(scan, 4, "true") == 0) {
+            out.push_back(true);
+            scan += 4;
+            continue;
+        }
+        if (json.compare(scan, 5, "false") == 0) {
+            out.push_back(false);
+            scan += 5;
+            continue;
+        }
+        char* parseEnd = nullptr;
+        const double raw = strtod(json.c_str() + scan, &parseEnd);
+        if (parseEnd == json.c_str() + scan)
+            return false;
+        out.push_back(raw != 0.0);
+        scan = static_cast<size_t>(parseEnd - json.c_str());
     }
     return true;
 }
@@ -697,6 +794,69 @@ static bool m08eReadVertex2dArray(const std::string& json, const char* key,
         scan = oe + 1;
     }
     return true;
+}
+
+struct M08eHatchLoop
+{
+    Adesk::Int32 loopType = 0;
+    AcGePoint2dArray vertices;
+    AcGeDoubleArray bulges;
+};
+
+static bool m08eReadHatchLoops(const std::string& json, std::vector<M08eHatchLoop>& out)
+{
+    out.clear();
+    size_t lb = 0, rb = 0;
+    if (!m08eFindArrayBounds(json, "loops", lb, rb))
+        return false;
+    size_t scan = lb + 1;
+    while (scan < rb) {
+        while (scan < rb && (json[scan] == ',' || m08eIsJsonSpace(json[scan])))
+            ++scan;
+        if (scan >= rb)
+            break;
+        if (json[scan] != '{')
+            return false;
+        const size_t oe = m08eFindMatchingJsonDelimiter(json, scan, '{', '}');
+        if (oe == std::string::npos || oe > rb)
+            return false;
+        const std::string loopJson = json.substr(scan, oe - scan + 1);
+        double loopTypeRaw = 0.0;
+        if (!jsonFindNumber(loopJson, "loop_type", loopTypeRaw))
+            return false;
+        M08eHatchLoop loop;
+        loop.loopType = static_cast<Adesk::Int32>(loopTypeRaw);
+
+        size_t vlb = 0, vrb = 0;
+        if (!m08eFindArrayBounds(loopJson, "vertices", vlb, vrb))
+            return false;
+        size_t vscan = vlb + 1;
+        while (vscan < vrb) {
+            while (vscan < vrb && (loopJson[vscan] == ',' || m08eIsJsonSpace(loopJson[vscan])))
+                ++vscan;
+            if (vscan >= vrb)
+                break;
+            if (loopJson[vscan] != '{')
+                return false;
+            const size_t voe = m08eFindMatchingJsonDelimiter(loopJson, vscan, '{', '}');
+            if (voe == std::string::npos || voe > vrb)
+                return false;
+            const std::string vertexJson = loopJson.substr(vscan, voe - vscan + 1);
+            std::vector<double> pointNums;
+            if (!m08eReadNumberTupleField(vertexJson, "point", pointNums) || pointNums.size() < 2)
+                return false;
+            double bulge = 0.0;
+            jsonFindNumber(vertexJson, "bulge", bulge);
+            loop.vertices.append(AcGePoint2d(pointNums[0], pointNums[1]));
+            loop.bulges.append(bulge);
+            vscan = voe + 1;
+        }
+        if (loop.vertices.length() < 2)
+            return false;
+        out.push_back(loop);
+        scan = oe + 1;
+    }
+    return !out.empty();
 }
 
 static void m08eReadScaleFactors(const std::string& json, AcGeScale3d& out)
@@ -883,9 +1043,161 @@ static AcDbEntity* m08eBuildExtendedEntityForAppend(AcDbDatabase* pDb,
         }
         return pRef;
     }
+    if (kind == "hatch") {
+        bool isGradient = false;
+        m08eFindFlag(entityJson, "is_gradient", isGradient);
+        if (isGradient) {
+            errCode = "INVALID_INPUT";
+            errMsg = "entity.kind=hatch gradient replay is not supported";
+            return nullptr;
+        }
+
+        AcGeVector3d normal(0.0, 0.0, 1.0);
+        m08eTryReadVector(entityJson, "normal", normal);
+        double elevation = 0.0;
+        jsonFindNumber(entityJson, "elevation", elevation);
+        double patternAngle = 0.0;
+        jsonFindNumber(entityJson, "pattern_angle", patternAngle);
+        double patternScale = 1.0;
+        jsonFindNumber(entityJson, "pattern_scale", patternScale);
+        double hatchStyleRaw = static_cast<double>(AcDbHatch::kNormal);
+        jsonFindNumber(entityJson, "hatch_style", hatchStyleRaw);
+        bool patternDouble = false;
+        m08eFindFlag(entityJson, "pattern_double", patternDouble);
+        bool isSolidFill = false;
+        m08eFindFlag(entityJson, "is_solid_fill", isSolidFill);
+
+        std::string patternName;
+        if (!jsonFindString(entityJson, "pattern_name", patternName) || patternName.empty()) {
+            errCode = "MISSING_ARG";
+            errMsg = "entity.kind=hatch requires 'pattern_name'";
+            return nullptr;
+        }
+        std::vector<M08eHatchLoop> loops;
+        if (!m08eReadHatchLoops(entityJson, loops)) {
+            errCode = "MISSING_ARG";
+            errMsg = "entity.kind=hatch requires polyline 'loops' with 'vertices'";
+            return nullptr;
+        }
+
+        AcDbHatch* pHatch = new AcDbHatch();
+        pHatch->setDatabaseDefaults(pDb);
+        Acad::ErrorStatus es = pHatch->setNormal(normal);
+        if (es != Acad::eOk) {
+            delete pHatch;
+            errCode = "BUILD_FAILED";
+            errMsg = "entity.kind=hatch setNormal errorstatus " + std::to_string(static_cast<int>(es));
+            return nullptr;
+        }
+        es = pHatch->setElevation(elevation);
+        if (es != Acad::eOk) {
+            delete pHatch;
+            errCode = "BUILD_FAILED";
+            errMsg = "entity.kind=hatch setElevation errorstatus " + std::to_string(static_cast<int>(es));
+            return nullptr;
+        }
+        if (isSolidFill) {
+            es = pHatch->setPattern(AcDbHatch::kPreDefined, L"SOLID");
+        } else {
+            es = pHatch->setPattern(AcDbHatch::kPreDefined, utf8ToWide(patternName).c_str());
+        }
+        if (es != Acad::eOk) {
+            delete pHatch;
+            errCode = "BUILD_FAILED";
+            errMsg = "entity.kind=hatch setPattern errorstatus " + std::to_string(static_cast<int>(es));
+            return nullptr;
+        }
+        if (!isSolidFill) {
+            es = pHatch->setPatternAngle(patternAngle);
+            if (es != Acad::eOk) {
+                delete pHatch;
+                errCode = "BUILD_FAILED";
+                errMsg = "entity.kind=hatch setPatternAngle errorstatus " + std::to_string(static_cast<int>(es));
+                return nullptr;
+            }
+            es = pHatch->setPatternScale(patternScale);
+            if (es != Acad::eOk) {
+                delete pHatch;
+                errCode = "BUILD_FAILED";
+                errMsg = "entity.kind=hatch setPatternScale errorstatus " + std::to_string(static_cast<int>(es));
+                return nullptr;
+            }
+            es = pHatch->setPatternDouble(patternDouble);
+            if (es != Acad::eOk) {
+                delete pHatch;
+                errCode = "BUILD_FAILED";
+                errMsg = "entity.kind=hatch setPatternDouble errorstatus " + std::to_string(static_cast<int>(es));
+                return nullptr;
+            }
+        }
+        es = pHatch->setHatchStyle(static_cast<AcDbHatch::HatchStyle>(static_cast<int>(hatchStyleRaw)));
+        if (es != Acad::eOk) {
+            delete pHatch;
+            errCode = "BUILD_FAILED";
+            errMsg = "entity.kind=hatch setHatchStyle errorstatus " + std::to_string(static_cast<int>(es));
+            return nullptr;
+        }
+        for (size_t i = 0; i < loops.size(); ++i) {
+            es = pHatch->appendLoop(loops[i].loopType, loops[i].vertices, loops[i].bulges);
+            if (es != Acad::eOk) {
+                delete pHatch;
+                errCode = "BUILD_FAILED";
+                errMsg = "entity.kind=hatch appendLoop[" + std::to_string(i) +
+                         "] errorstatus " + std::to_string(static_cast<int>(es));
+                return nullptr;
+            }
+        }
+        es = pHatch->setAssociative(Adesk::kFalse);
+        if (es != Acad::eOk) {
+            delete pHatch;
+            errCode = "BUILD_FAILED";
+            errMsg = "entity.kind=hatch setAssociative errorstatus " + std::to_string(static_cast<int>(es));
+            return nullptr;
+        }
+        es = pHatch->evaluateHatch();
+        if (es != Acad::eOk) {
+            delete pHatch;
+            errCode = "BUILD_FAILED";
+            errMsg = "entity.kind=hatch evaluateHatch errorstatus " + std::to_string(static_cast<int>(es));
+            return nullptr;
+        }
+        return pHatch;
+    }
+    if (kind == "face3d") {
+        AcGePoint3d p0, p1, p2, p3;
+        if (!m08eTryReadPoint(entityJson, "p0", p0) ||
+            !m08eTryReadPoint(entityJson, "p1", p1) ||
+            !m08eTryReadPoint(entityJson, "p2", p2) ||
+            !m08eTryReadPoint(entityJson, "p3", p3)) {
+            errCode = "MISSING_ARG";
+            errMsg = "entity.kind=face3d requires p0/p1/p2/p3";
+            return nullptr;
+        }
+        std::vector<bool> edgeVisibility;
+        if (!m08eReadFlagArray(entityJson, "edge_visibility", edgeVisibility) ||
+            edgeVisibility.size() != 4) {
+            errCode = "MISSING_ARG";
+            errMsg = "entity.kind=face3d requires 'edge_visibility':[4 bool]";
+            return nullptr;
+        }
+        AcDbFace* pFace = new AcDbFace(p0, p1, p2, p3);
+        for (size_t i = 0; i < edgeVisibility.size(); ++i) {
+            const Acad::ErrorStatus es = edgeVisibility[i]
+                ? pFace->makeEdgeVisibleAt(static_cast<Adesk::UInt16>(i))
+                : pFace->makeEdgeInvisibleAt(static_cast<Adesk::UInt16>(i));
+            if (es != Acad::eOk) {
+                delete pFace;
+                errCode = "BUILD_FAILED";
+                errMsg = "entity.kind=face3d edge_visibility[" + std::to_string(i) +
+                         "] errorstatus " + std::to_string(static_cast<int>(es));
+                return nullptr;
+            }
+        }
+        return pFace;
+    }
 
     errCode = "UNSUPPORTED_KIND";
-    errMsg = "write.block.append_entity supports entity.kind in {line,circle,arc,text,ellipse,point,spline,lwpolyline,polyline,block_reference}; got '" + kind + "'";
+    errMsg = "write.block.append_entity supports entity.kind in {line,circle,arc,text,ellipse,point,spline,lwpolyline,polyline,block_reference,hatch,face3d}; got '" + kind + "'";
     return nullptr;
 }
 
@@ -1145,8 +1457,9 @@ static AcDbEntity* m08eBuildEntityForAppend(const std::string& entityJson,
 }
 
 // write.block.append_entity: append a real entity (the 4 legacy simple kinds via
-// m08eBuildEntityForAppend above, plus ellipse/point/spline/lwpolyline/polyline/block_reference
-// via m08e-local helpers that mirror the modelspace create handlers in m08g_handlers.inc) into a
+// m08eBuildEntityForAppend above, plus ellipse/point/spline/lwpolyline/polyline/block_reference/
+// hatch/face3d via m08e-local helpers that mirror the modelspace create handlers in
+// m08g_handlers.inc / m08h_handlers.inc) into a
 // NAMED block-table record ('block_name'), or model space if block_name is omitted. REAL,
 // PERSISTING primitive -- unlike this family's other write ops (see the file header comment),
 // this one does NOT wrap in AriadneStagedWriteTransaction: it mutates ctx.pDb directly, the same

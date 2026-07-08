@@ -49,6 +49,7 @@ ahead of the first create_blockref referencing that name.
 """
 from __future__ import annotations
 
+import copy
 from typing import Any, Dict, List, Optional, Tuple
 
 # patch op id -> native ObjectARX write op (operations.v2.json, status
@@ -58,6 +59,9 @@ WRITE_OP_MAP: Dict[str, str] = {
     "append_block_entity": "write.block.append_entity",
     "create_block_simple": "write.block.simple_create",
 }
+
+_UNSUPPORTED_APPEND_REASON = "def_entity kind unsupported by write.block.append_entity"
+_GRADIENT_HATCH_DEFER_REASON = _UNSUPPORTED_APPEND_REASON + " (no gradient replay)"
 
 
 def build_job_args(native_op: str, args: Dict[str, Any]) -> Optional[Dict[str, Any]]:
@@ -122,6 +126,33 @@ def _points3d(vertices: Any) -> List[Dict[str, float]]:
         if pt is not None:
             out.append(pt)
     return out
+
+
+def _is_numeric_array(value: Any, *, min_len: int) -> bool:
+    return isinstance(value, (list, tuple)) and len(value) >= min_len
+
+
+def _has_hatch_polyline_loops(loops: Any) -> bool:
+    if not isinstance(loops, list) or not loops:
+        return False
+    for loop in loops:
+        if not isinstance(loop, dict):
+            return False
+        vertices = loop.get("vertices")
+        if not isinstance(vertices, list) or len(vertices) < 3:
+            return False
+        for vertex in vertices:
+            point = vertex.get("point") if isinstance(vertex, dict) else vertex
+            if not _is_numeric_array(point, min_len=2):
+                return False
+    return True
+
+
+def _def_entity_append_reason(def_ent: Dict[str, Any]) -> str:
+    g = def_ent.get("geometry") or {}
+    if g.get("kind") == "hatch" and bool(g.get("is_gradient")):
+        return _GRADIENT_HATCH_DEFER_REASON
+    return _UNSUPPORTED_APPEND_REASON
 
 
 def ir_op_for(ent: Dict[str, Any]) -> Optional[Dict[str, Any]]:
@@ -200,6 +231,45 @@ def _def_entity_append_op(block_name: str, def_ent: Dict[str, Any]) -> Optional[
             entity = {"kind": "block_reference", "block_name": nested_name,
                       "position": _pt(g.get("position")), "scale": _pt(g.get("scale")),
                       "rotation": g.get("rotation")}
+    elif kind == "hatch":
+        if bool(g.get("is_gradient")):
+            return None
+        loops = g.get("loops")
+        if (_is_numeric_array(g.get("normal"), min_len=3)
+                and g.get("pattern_name")
+                and _has_hatch_polyline_loops(loops)):
+            entity = {
+                "kind": "hatch",
+                "normal": list(g.get("normal")),
+                "elevation": g.get("elevation"),
+                "pattern_angle": g.get("pattern_angle"),
+                "pattern_scale": g.get("pattern_scale"),
+                "pattern_type": g.get("pattern_type"),
+                "hatch_style": g.get("hatch_style"),
+                "loop_count": g.get("loop_count"),
+                "pattern_name": g.get("pattern_name"),
+                "pattern_double": g.get("pattern_double"),
+                "is_solid_fill": g.get("is_solid_fill"),
+                "is_associative": g.get("is_associative"),
+                "is_gradient": g.get("is_gradient"),
+                "loops": copy.deepcopy(loops),
+            }
+    elif kind == "face3d":
+        edge_visibility = g.get("edge_visibility")
+        if (_is_numeric_array(g.get("p0"), min_len=3)
+                and _is_numeric_array(g.get("p1"), min_len=3)
+                and _is_numeric_array(g.get("p2"), min_len=3)
+                and _is_numeric_array(g.get("p3"), min_len=3)
+                and isinstance(edge_visibility, list)
+                and len(edge_visibility) == 4):
+            entity = {
+                "kind": "face3d",
+                "p0": list(g.get("p0")),
+                "p1": list(g.get("p1")),
+                "p2": list(g.get("p2")),
+                "p3": list(g.get("p3")),
+                "edge_visibility": copy.deepcopy(edge_visibility),
+            }
     if entity is None:
         return None
     return {"operation": "append_block_entity",
@@ -237,7 +307,7 @@ def block_def_ops(block_def: Dict[str, Any]) -> Tuple[List[Dict[str, Any]], List
             deferred.append({
                 "block_name": name, "def_entity_index": i, "handle": def_ent.get("handle"),
                 "kind": (def_ent.get("geometry") or {}).get("kind"),
-                "reason": "def_entity kind unsupported by write.block.append_entity",
+                "reason": _def_entity_append_reason(def_ent),
             })
             continue
         ops.append(op)
