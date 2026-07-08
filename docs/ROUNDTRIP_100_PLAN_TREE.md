@@ -8,11 +8,15 @@
 
 | 층 | 측정기 | 현재 실측 | 소스 |
 |---|---|---|---|
-| L1 modelspace 인증 그래프 | verdict (geometry basis 1e-6) | **375/375 = 100%** | runs/e2e_1dwg_R3b_full_20260708/verdict.json |
-| L2 블록 내부 (def-entities) | tools/blockdef_diff.py | **66.1%** (13,785/20,851) | reports/interior100/blockdef_diff_R3b.json |
-| L3 전 IR 섹션 가중 | tools/ir_section_coverage.py | **67.84%** | reports/interior100/section_coverage_R3b.json |
-| L4 고정점 (gen1→gen2) | tools/roundtrip_idempotence.py | modelspace TRUE / interior **18.7%** | runs/e2e_1dwg_GEN2_20260709/idempotence_report.json |
+| L1 modelspace 인증 그래프 | verdict (geometry basis 1e-6) | **375/375 = 100%** | runs/e2e_1dwg_R4c_interior_20260709/verdict.json |
+| L2 블록 내부 named (def-entities) | tools/blockdef_diff.py 정준 | **95.86%** (19,987/20,851; R3b 66.1→R4b 93.78→정준 95.86) | reports/interior100/blockdef_diff_R4c.json |
+| L2' 내부 전체 (익명 포함 분모 28,183) | 〃 | **70.92%** (익명 7,332 = P2 리맵 대기) | 〃 |
+| L3 전 IR 섹션 가중 | tools/ir_section_coverage.py | **67.84%** (R3b 기준; R4c 재계산 대기) | reports/interior100/section_coverage_R3b.json |
+| L4 고정점 (gen1→gen2) | tools/roundtrip_idempotence.py | 내부 diff0 **100.00%** (21,447/21,447), 잔여 드리프트=seed선 +1×135 → R4c에서 **seed 0 확증**, GEN3 판정 대기 | runs/e2e_1dwg_GEN2b_20260709/idempotence_report.json |
 | L5 의미 게이트 (rules) | 미구축 | — | reports/alm_synthesis/04_rulepacks.md |
+
+> P1 완료 (6종 append 라이브, spline knots 픽스 @18cf14a) · P6 완료 (+1 근인=createSimpleBlock seed선
+> → seed_line 옵트아웃 @4db619f·배포 @238a8e5; spline 불일치=fit 표현 비대칭 → 정준 diff). 다음 최고가치 = P2 익명 리맵.
 
 ## 1. 분기(계획) 10개 — 가치 = 예상획득 × 실현성 ÷ 비용
 
