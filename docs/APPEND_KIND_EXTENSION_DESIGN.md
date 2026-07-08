@@ -64,3 +64,21 @@ Switch to B1a if native testing after merge shows that the create-then-clone pat
 reliably preserve block ownership semantics for nested `block_reference` entities, or if a
 kind that must remain geometry-identical proves impossible to express through the certified
 modelspace creator.
+
+## 구현 노트
+
+- 실제 landed 구현은 작업 지시에 맞춰 `src/Ariadne.AcadNative/families/m08e_handlers.inc` 안에서
+  append 대상 BTR로 직접 빌드/append 하는 B1a 형태로 추가했다.
+- 미러링 기준 modelspace handler:
+  `src/Ariadne.AcadNative/families/m08g_handlers.inc`
+  `write.entity.ellipse`, `write.entity.point`, `write.entity.spline`,
+  `write.entity.polyline`(LWPOLYLINE), `write.entity.polyline3d`,
+  `write.entity.polyline2d.deep`, `write.entity.blockref`.
+- `block_reference`는 modelspace `write.entity.blockref`와 같은 block-table lookup을 사용하고,
+  참조 대상 이름이 없으면 `BLOCK_NOT_FOUND`로 loud-fail 한다. silent skip은 없다.
+- 제약:
+  현재 Python append payload(`tools/patch_ops/blocks.py::_def_entity_append_op`)는 spline의
+  `control_points`는 보내지만 knot/weight 배열은 보내지 않는다. 그래서 native append는
+  knot vector가 같이 온 경우에만 control-point NURBS 경로를 쓰고, 그 외에는
+  `write.entity.spline`과 같은 fit-point 경로를 사용한다. 즉 `control_points` 단독 payload는
+  정보성 입력으로만 남고 직접적인 NURBS basis 재구성에는 쓰지 못한다.

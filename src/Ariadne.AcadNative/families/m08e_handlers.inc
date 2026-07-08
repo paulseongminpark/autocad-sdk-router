@@ -32,6 +32,10 @@
 // xdataBlocksJson, jsonFindString / jsonFindNumber, AriadneReadTransaction, RichGraphCounters.
 // NO original DWG writes (no save/saveAs/_QSAVE, no acedCommand/acedCmd, no append/set/clone).
 #include "dbidmap.h"      // AcDbIdMapping / AcDbIdPair for staged deep-clone proof
+#include "dbpl.h"         // AcDbPolyline (LWPOLYLINE append kind)
+#include "dbspline.h"     // AcDbSpline
+#include "dbelipse.h"     // AcDbEllipse
+#include "gedblar.h"      // AcGeDoubleArray
 
 // ---- op id constants (single source for HasOp + Dispatch; avoids string drift) -------------
 static const char* const kM08eOpEntityXdata   = "inspect.entity.get_xdata";
@@ -478,6 +482,554 @@ static bool m08eHandleEntitySetXdata(const AriadneJobCtx& ctx, std::ostringstrea
     return true;
 }
 
+static bool m08eIsJsonSpace(char c)
+{
+    return c == ' ' || c == '\t' || c == '\r' || c == '\n';
+}
+
+static size_t m08eFindMatchingJsonDelimiter(const std::string& json, size_t openPos,
+                                            char openCh, char closeCh)
+{
+    int depth = 0;
+    bool inString = false;
+    bool escaped = false;
+    for (size_t i = openPos; i < json.size(); ++i) {
+        const char c = json[i];
+        if (inString) {
+            if (escaped) {
+                escaped = false;
+            } else if (c == '\\') {
+                escaped = true;
+            } else if (c == '"') {
+                inString = false;
+            }
+            continue;
+        }
+        if (c == '"') {
+            inString = true;
+            continue;
+        }
+        if (c == openCh) {
+            ++depth;
+            continue;
+        }
+        if (c == closeCh) {
+            --depth;
+            if (depth == 0)
+                return i;
+            if (depth < 0)
+                return std::string::npos;
+        }
+    }
+    return std::string::npos;
+}
+
+static bool m08eFindArrayBounds(const std::string& json, const char* key,
+                                size_t& lbOut, size_t& rbOut)
+{
+    const std::string keyTok = std::string("\"") + key + "\"";
+    const size_t p = json.find(keyTok);
+    if (p == std::string::npos)
+        return false;
+    lbOut = json.find('[', p);
+    if (lbOut == std::string::npos)
+        return false;
+    rbOut = m08eFindMatchingJsonDelimiter(json, lbOut, '[', ']');
+    return rbOut != std::string::npos;
+}
+
+static bool m08eFindFlag(const std::string& json, const char* key, bool& out)
+{
+    double raw = 0.0;
+    if (jsonFindNumber(json, key, raw)) {
+        out = (raw != 0.0);
+        return true;
+    }
+    const std::string keyTok = std::string("\"") + key + "\"";
+    const size_t p = json.find(keyTok);
+    if (p == std::string::npos)
+        return false;
+    const size_t colon = json.find(':', p + keyTok.size());
+    if (colon == std::string::npos)
+        return false;
+    size_t i = colon + 1;
+    while (i < json.size() && m08eIsJsonSpace(json[i]))
+        ++i;
+    if (json.compare(i, 4, "true") == 0) {
+        out = true;
+        return true;
+    }
+    if (json.compare(i, 5, "false") == 0) {
+        out = false;
+        return true;
+    }
+    return false;
+}
+
+static void m08eReadPoint(const std::string& json, const char* key,
+                          double dx, double dy, double dz, AcGePoint3d& out)
+{
+    double x = dx, y = dy, z = dz;
+    std::string obj;
+    if (jsonFindObject(json, key, obj)) {
+        jsonFindNumber(obj, "x", x);
+        jsonFindNumber(obj, "y", y);
+        jsonFindNumber(obj, "z", z);
+    }
+    out.set(x, y, z);
+}
+
+static void m08eReadVector(const std::string& json, const char* key,
+                           double dx, double dy, double dz, AcGeVector3d& out)
+{
+    double x = dx, y = dy, z = dz;
+    std::string obj;
+    if (jsonFindObject(json, key, obj)) {
+        jsonFindNumber(obj, "x", x);
+        jsonFindNumber(obj, "y", y);
+        jsonFindNumber(obj, "z", z);
+    }
+    out.set(x, y, z);
+}
+
+static bool m08eParsePlainNumberArray(const std::string& arrJson, std::vector<double>& out)
+{
+    out.clear();
+    const size_t lb = arrJson.find('[');
+    if (lb == std::string::npos)
+        return false;
+    const size_t rb = m08eFindMatchingJsonDelimiter(arrJson, lb, '[', ']');
+    if (rb == std::string::npos)
+        return false;
+    size_t i = lb + 1;
+    while (i < rb) {
+        while (i < rb && (arrJson[i] == ',' || m08eIsJsonSpace(arrJson[i])))
+            ++i;
+        if (i >= rb)
+            break;
+        char* parseEnd = nullptr;
+        const double value = strtod(arrJson.c_str() + i, &parseEnd);
+        if (parseEnd == arrJson.c_str() + i)
+            return false;
+        out.push_back(value);
+        i = static_cast<size_t>(parseEnd - arrJson.c_str());
+    }
+    return true;
+}
+
+static bool m08eReadPoint3dArray(const std::string& json, const char* key, AcGePoint3dArray& out)
+{
+    out.removeAll();
+    size_t lb = 0, rb = 0;
+    if (!m08eFindArrayBounds(json, key, lb, rb))
+        return false;
+    size_t scan = lb + 1;
+    while (scan < rb) {
+        while (scan < rb && (json[scan] == ',' || m08eIsJsonSpace(json[scan])))
+            ++scan;
+        if (scan >= rb)
+            break;
+        if (json[scan] == '{') {
+            const size_t oe = m08eFindMatchingJsonDelimiter(json, scan, '{', '}');
+            if (oe == std::string::npos || oe > rb)
+                return false;
+            const std::string one = json.substr(scan, oe - scan + 1);
+            double x = 0.0, y = 0.0, z = 0.0;
+            if (!parsePointFromObject(one, x, y, z))
+                return false;
+            out.append(AcGePoint3d(x, y, z));
+            scan = oe + 1;
+            continue;
+        }
+        if (json[scan] == '[') {
+            const size_t ae = m08eFindMatchingJsonDelimiter(json, scan, '[', ']');
+            if (ae == std::string::npos || ae > rb)
+                return false;
+            std::vector<double> nums;
+            if (!m08eParsePlainNumberArray(json.substr(scan, ae - scan + 1), nums) || nums.size() < 2)
+                return false;
+            out.append(AcGePoint3d(nums[0], nums[1], nums.size() > 2 ? nums[2] : 0.0));
+            scan = ae + 1;
+            continue;
+        }
+        return false;
+    }
+    return true;
+}
+
+struct M08eVertex2d
+{
+    double x = 0.0;
+    double y = 0.0;
+    double bulge = 0.0;
+    double startWidth = 0.0;
+    double endWidth = 0.0;
+};
+
+static bool m08eReadVertex2dArray(const std::string& json, const char* key,
+                                  bool includeWidths, std::vector<M08eVertex2d>& out)
+{
+    out.clear();
+    size_t lb = 0, rb = 0;
+    if (!m08eFindArrayBounds(json, key, lb, rb))
+        return false;
+    size_t scan = lb + 1;
+    while (scan < rb) {
+        while (scan < rb && (json[scan] == ',' || m08eIsJsonSpace(json[scan])))
+            ++scan;
+        if (scan >= rb)
+            break;
+        if (json[scan] != '{')
+            return false;
+        const size_t oe = m08eFindMatchingJsonDelimiter(json, scan, '{', '}');
+        if (oe == std::string::npos || oe > rb)
+            return false;
+        const std::string one = json.substr(scan, oe - scan + 1);
+        M08eVertex2d v;
+        if (!jsonFindNumber(one, "x", v.x) || !jsonFindNumber(one, "y", v.y))
+            return false;
+        jsonFindNumber(one, "bulge", v.bulge);
+        if (includeWidths) {
+            jsonFindNumber(one, "start_width", v.startWidth);
+            jsonFindNumber(one, "end_width", v.endWidth);
+        }
+        out.push_back(v);
+        scan = oe + 1;
+    }
+    return true;
+}
+
+static void m08eReadScaleFactors(const std::string& json, AcGeScale3d& out)
+{
+    double sx = 1.0, sy = 1.0, sz = 1.0;
+    std::string scaleJson;
+    if (jsonFindObject(json, "scale", scaleJson)) {
+        jsonFindNumber(scaleJson, "x", sx);
+        jsonFindNumber(scaleJson, "y", sy);
+        jsonFindNumber(scaleJson, "z", sz);
+    } else {
+        double uniform = 1.0;
+        if (jsonFindNumber(json, "scale", uniform))
+            sx = sy = sz = uniform;
+    }
+    out = AcGeScale3d(sx, sy, sz);
+}
+
+static AcDbEntity* m08eBuildExtendedEntityForAppend(AcDbDatabase* pDb,
+                                                    const std::string& entityJson,
+                                                    const std::string& kind,
+                                                    std::string& errCode,
+                                                    std::string& errMsg)
+{
+    if (kind == "ellipse") {
+        AcGePoint3d center; m08eReadPoint(entityJson, "center", 0.0, 0.0, 0.0, center);
+        AcGeVector3d normal; m08eReadVector(entityJson, "normal", 0.0, 0.0, 1.0, normal);
+        AcGeVector3d major; m08eReadVector(entityJson, "major_axis", 1.0, 0.0, 0.0, major);
+        double ratio = 1.0, sa = 0.0, ea = 6.28318530717958647692;
+        jsonFindNumber(entityJson, "radius_ratio", ratio);
+        jsonFindNumber(entityJson, "start_angle", sa);
+        jsonFindNumber(entityJson, "end_angle", ea);
+        return new AcDbEllipse(center, normal, major, ratio, sa, ea);
+    }
+    if (kind == "point") {
+        AcGePoint3d pos; m08eReadPoint(entityJson, "position", 0.0, 0.0, 0.0, pos);
+        return new AcDbPoint(pos);
+    }
+    if (kind == "spline") {
+        AcGePoint3dArray fitPts;
+        AcGePoint3dArray controlPts;
+        const bool hasFitPoints = m08eReadPoint3dArray(entityJson, "fit_points", fitPts);
+        const bool hasControlPoints = m08eReadPoint3dArray(entityJson, "control_points", controlPts);
+        std::vector<double> knotVals = jsonFindNumberArray(entityJson, "knots");
+        if (knotVals.empty())
+            knotVals = jsonFindNumberArray(entityJson, "spline_knots");
+        const std::vector<double> weightVals = jsonFindNumberArray(entityJson, "weights");
+        double degreeRaw = 3.0;
+        jsonFindNumber(entityJson, "degree", degreeRaw);
+        int degree = static_cast<int>(degreeRaw);
+        if (degree < 1)
+            degree = 3;
+        bool closed = false;
+        m08eFindFlag(entityJson, "closed", closed);
+
+        if (hasControlPoints && controlPts.length() > 0 && !knotVals.empty()) {
+            if (!weightVals.empty() && weightVals.size() != static_cast<size_t>(controlPts.length())) {
+                errCode = "INVALID_INPUT";
+                errMsg = "entity.kind=spline weights length must equal control_points length";
+                return nullptr;
+            }
+            AcGeDoubleArray knots;
+            for (size_t i = 0; i < knotVals.size(); ++i)
+                knots.append(knotVals[i]);
+            AcGeDoubleArray weights;
+            for (size_t i = 0; i < weightVals.size(); ++i)
+                weights.append(weightVals[i]);
+            AcDbSpline* pSpline = new AcDbSpline();
+            const Acad::ErrorStatus es = pSpline->setNurbsData(
+                degree,
+                weightVals.empty() ? Adesk::kFalse : Adesk::kTrue,
+                closed ? Adesk::kTrue : Adesk::kFalse,
+                Adesk::kFalse,
+                controlPts,
+                knots,
+                weights,
+                0.0,
+                0.0);
+            if (es != Acad::eOk) {
+                delete pSpline;
+                errCode = "BUILD_FAILED";
+                errMsg = "entity.kind=spline setNurbsData errorstatus " +
+                         std::to_string(static_cast<int>(es));
+                return nullptr;
+            }
+            return pSpline;
+        }
+        if (!hasFitPoints || fitPts.length() < 2) {
+            errCode = "MISSING_ARG";
+            errMsg = (hasControlPoints && controlPts.length() > 0)
+                ? "entity.kind=spline control_points require 'knots' for native append"
+                : "entity.kind=spline requires 'fit_points':[>=2 [x,y,z]]";
+            return nullptr;
+        }
+        if (closed)
+            return new AcDbSpline(fitPts, true, AcGe::kUniform, degree, 0.0);
+        int order = degree + 1;
+        if (order < 2)
+            order = 4;
+        return new AcDbSpline(fitPts, order, 0.0);
+    }
+    if (kind == "lwpolyline") {
+        std::vector<M08eVertex2d> verts;
+        if (!m08eReadVertex2dArray(entityJson, "points", false, verts) || verts.size() < 2) {
+            errCode = "MISSING_ARG";
+            errMsg = "entity.kind=lwpolyline requires 'points':[>=2 {x,y}]";
+            return nullptr;
+        }
+        AcDbPolyline* pPoly = new AcDbPolyline();
+        for (size_t i = 0; i < verts.size(); ++i) {
+            const Acad::ErrorStatus es = pPoly->addVertexAt(
+                static_cast<unsigned int>(i),
+                AcGePoint2d(verts[i].x, verts[i].y),
+                verts[i].bulge);
+            if (es != Acad::eOk) {
+                delete pPoly;
+                errCode = "BUILD_FAILED";
+                errMsg = "entity.kind=lwpolyline addVertexAt errorstatus " +
+                         std::to_string(static_cast<int>(es));
+                return nullptr;
+            }
+        }
+        bool closed = false;
+        if (m08eFindFlag(entityJson, "closed", closed) && closed)
+            pPoly->setClosed(Adesk::kTrue);
+        double constWidth = 0.0;
+        if (jsonFindNumber(entityJson, "const_width", constWidth)) {
+            const Acad::ErrorStatus es = pPoly->setConstantWidth(constWidth);
+            if (es != Acad::eOk) {
+                delete pPoly;
+                errCode = "BUILD_FAILED";
+                errMsg = "entity.kind=lwpolyline setConstantWidth errorstatus " +
+                         std::to_string(static_cast<int>(es));
+                return nullptr;
+            }
+        }
+        return pPoly;
+    }
+    if (kind == "block_reference") {
+        std::string blockName;
+        if (!jsonFindString(entityJson, "block_name", blockName) || blockName.empty()) {
+            errCode = "MISSING_ARG";
+            errMsg = "entity.kind=block_reference requires 'block_name'";
+            return nullptr;
+        }
+        AcDbBlockTable* pBT = nullptr;
+        Acad::ErrorStatus es = pDb->getBlockTable(pBT, AcDb::kForRead);
+        if (es != Acad::eOk || pBT == nullptr) {
+            errCode = "BLOCK_TABLE_OPEN_FAILED";
+            errMsg = "could not open the block table";
+            return nullptr;
+        }
+        AcDbObjectId blockId = AcDbObjectId::kNull;
+        es = pBT->getAt(asciiToWide(blockName).c_str(), blockId);
+        pBT->close();
+        if (es != Acad::eOk || blockId.isNull()) {
+            errCode = "BLOCK_NOT_FOUND";
+            errMsg = "no block definition named '" + blockName + "'";
+            return nullptr;
+        }
+
+        AcGePoint3d pos; m08eReadPoint(entityJson, "position", 0.0, 0.0, 0.0, pos);
+        AcGeScale3d scale;
+        m08eReadScaleFactors(entityJson, scale);
+        double rotation = 0.0;
+        jsonFindNumber(entityJson, "rotation", rotation);
+
+        AcDbBlockReference* pRef = new AcDbBlockReference(pos, blockId);
+        es = pRef->setScaleFactors(scale);
+        if (es != Acad::eOk) {
+            delete pRef;
+            errCode = "BUILD_FAILED";
+            errMsg = "entity.kind=block_reference setScaleFactors errorstatus " +
+                     std::to_string(static_cast<int>(es));
+            return nullptr;
+        }
+        es = pRef->setRotation(rotation);
+        if (es != Acad::eOk) {
+            delete pRef;
+            errCode = "BUILD_FAILED";
+            errMsg = "entity.kind=block_reference setRotation errorstatus " +
+                     std::to_string(static_cast<int>(es));
+            return nullptr;
+        }
+        return pRef;
+    }
+
+    errCode = "UNSUPPORTED_KIND";
+    errMsg = "write.block.append_entity supports entity.kind in {line,circle,arc,text,ellipse,point,spline,lwpolyline,polyline,block_reference}; got '" + kind + "'";
+    return nullptr;
+}
+
+static Acad::ErrorStatus m08eAppendPolylineEntityForAppend(const std::string& entityJson,
+                                                           AcDbBlockTableRecord* pBTR,
+                                                           const std::string& layer,
+                                                           AcDbObjectId& newIdOut,
+                                                           std::string& errCode,
+                                                           std::string& errMsg)
+{
+    newIdOut = AcDbObjectId::kNull;
+    errCode.clear();
+    errMsg.clear();
+    std::string nativeClass;
+    jsonFindString(entityJson, "class", nativeClass);
+
+    if (nativeClass == "AcDb3dPolyline") {
+        AcGePoint3dArray verts;
+        if (!m08eReadPoint3dArray(entityJson, "points", verts) || verts.length() < 2) {
+            errCode = "MISSING_ARG";
+            errMsg = "entity.kind=polyline class=AcDb3dPolyline requires 'points':[>=2 {x,y,z}]";
+            return Acad::eInvalidInput;
+        }
+        AcDb3dPolyline* pPoly = new AcDb3dPolyline();
+        if (!layer.empty())
+            pPoly->setLayer(asciiToWide(layer).c_str());
+        Acad::ErrorStatus es = pBTR->appendAcDbEntity(newIdOut, pPoly);
+        if (es != Acad::eOk) {
+            delete pPoly;
+            return es;
+        }
+        for (int i = 0; i < verts.length(); ++i) {
+            AcDb3dPolylineVertex* pV = new AcDb3dPolylineVertex(verts[i]);
+            AcDbObjectId vid;
+            es = pPoly->appendVertex(vid, pV);
+            if (es == Acad::eOk) {
+                pV->close();
+                continue;
+            }
+            delete pV;
+            newIdOut = AcDbObjectId::kNull;
+            const Acad::ErrorStatus eraseEs = pPoly->erase();
+            pPoly->close();
+            if (eraseEs != Acad::eOk) {
+                errCode = "APPEND_FAILED";
+                errMsg = "appendVertex 3dpolyline rollback errorstatus " +
+                         std::to_string(static_cast<int>(eraseEs));
+            }
+            return es;
+        }
+        pPoly->close();
+        return Acad::eOk;
+    }
+
+    if (nativeClass == "AcDb2dPolyline") {
+        std::vector<M08eVertex2d> verts;
+        if (!m08eReadVertex2dArray(entityJson, "points", true, verts) || verts.size() < 2) {
+            errCode = "MISSING_ARG";
+            errMsg = "entity.kind=polyline class=AcDb2dPolyline requires 'points':[>=2 {x,y}]";
+            return Acad::eInvalidInput;
+        }
+        double elevation = 0.0;
+        jsonFindNumber(entityJson, "elevation", elevation);
+        bool closed = false;
+        m08eFindFlag(entityJson, "closed", closed);
+        double defStartW = 0.0, defEndW = 0.0;
+        jsonFindNumber(entityJson, "default_start_width", defStartW);
+        jsonFindNumber(entityJson, "default_end_width", defEndW);
+
+        AcDb2dPolyline* pPoly = new AcDb2dPolyline();
+        Acad::ErrorStatus es = pPoly->setElevation(elevation);
+        if (es != Acad::eOk) {
+            delete pPoly;
+            errCode = "BUILD_FAILED";
+            errMsg = "entity.kind=polyline setElevation errorstatus " +
+                     std::to_string(static_cast<int>(es));
+            return es;
+        }
+        if (closed) {
+            es = pPoly->setClosed(Adesk::kTrue);
+            if (es != Acad::eOk) {
+                delete pPoly;
+                errCode = "BUILD_FAILED";
+                errMsg = "entity.kind=polyline setClosed errorstatus " +
+                         std::to_string(static_cast<int>(es));
+                return es;
+            }
+        }
+        es = pPoly->setDefaultStartWidth(defStartW);
+        if (es != Acad::eOk) {
+            delete pPoly;
+            errCode = "BUILD_FAILED";
+            errMsg = "entity.kind=polyline setDefaultStartWidth errorstatus " +
+                     std::to_string(static_cast<int>(es));
+            return es;
+        }
+        es = pPoly->setDefaultEndWidth(defEndW);
+        if (es != Acad::eOk) {
+            delete pPoly;
+            errCode = "BUILD_FAILED";
+            errMsg = "entity.kind=polyline setDefaultEndWidth errorstatus " +
+                     std::to_string(static_cast<int>(es));
+            return es;
+        }
+        if (!layer.empty())
+            pPoly->setLayer(asciiToWide(layer).c_str());
+
+        es = pBTR->appendAcDbEntity(newIdOut, pPoly);
+        if (es != Acad::eOk) {
+            delete pPoly;
+            return es;
+        }
+        for (size_t i = 0; i < verts.size(); ++i) {
+            AcDb2dVertex* pV = new AcDb2dVertex(
+                AcGePoint3d(verts[i].x, verts[i].y, elevation),
+                verts[i].bulge,
+                verts[i].startWidth,
+                verts[i].endWidth);
+            AcDbObjectId vid;
+            es = pPoly->appendVertex(vid, pV);
+            if (es == Acad::eOk) {
+                pV->close();
+                continue;
+            }
+            delete pV;
+            newIdOut = AcDbObjectId::kNull;
+            const Acad::ErrorStatus eraseEs = pPoly->erase();
+            pPoly->close();
+            if (eraseEs != Acad::eOk) {
+                errCode = "APPEND_FAILED";
+                errMsg = "appendVertex 2dpolyline rollback errorstatus " +
+                         std::to_string(static_cast<int>(eraseEs));
+            }
+            return es;
+        }
+        pPoly->close();
+        return Acad::eOk;
+    }
+
+    errCode = "INVALID_INPUT";
+    errMsg = "entity.kind=polyline requires 'class' in {AcDb2dPolyline,AcDb3dPolyline}";
+    return Acad::eInvalidInput;
+}
+
 // Build one of the 4 certified entity kinds (line/circle/arc/text) from an "entity" job
 // sub-object -- {"kind":"...", ...kind-specific fields, same field names write.entity.line/
 // circle/arc/text already use}. m08e-local MINIMAL DUPLICATE of the per-kind AcDb* construction
@@ -565,19 +1117,20 @@ static AcDbEntity* m08eBuildEntityForAppend(const std::string& entityJson,
     }
 
     errCode = "UNSUPPORTED_KIND";
-    errMsg = "write.block.append_entity supports entity.kind in {line,circle,arc,text}; got '" + kindOut + "'";
+    errMsg = "write.block.append_entity supports entity.kind in {line,circle,arc,text,ellipse,point,spline,lwpolyline,polyline,block_reference}; got '" + kindOut + "'";
     return nullptr;
 }
 
-// write.block.append_entity: append a real entity (line/circle/arc/text, per
-// m08eBuildEntityForAppend above) into a NAMED block-table record ('block_name'), or model space
-// if block_name is omitted. REAL, PERSISTING primitive -- unlike this family's other write ops
-// (see the file header comment), this one does NOT wrap in AriadneStagedWriteTransaction: it
-// mutates ctx.pDb directly, the same no-wrapper shape every other real write handler in the
-// codebase uses (write.entity.line/circle/arc/text/... in m08g_handlers.inc / m08h_handlers.inc /
-// AriadneNativeJob.cpp), so the appended entity survives to the staged-copy DWG the router job
-// already operates on. Still never touches the ORIGINAL file (write_mode policy layer, same as
-// every other write op).
+// write.block.append_entity: append a real entity (the 4 legacy simple kinds via
+// m08eBuildEntityForAppend above, plus ellipse/point/spline/lwpolyline/polyline/block_reference
+// via m08e-local helpers that mirror the modelspace create handlers in m08g_handlers.inc) into a
+// NAMED block-table record ('block_name'), or model space if block_name is omitted. REAL,
+// PERSISTING primitive -- unlike this family's other write ops (see the file header comment),
+// this one does NOT wrap in AriadneStagedWriteTransaction: it mutates ctx.pDb directly, the same
+// no-wrapper shape every other real write handler in the codebase uses (write.entity.line/circle/
+// arc/text/... in m08g_handlers.inc / m08h_handlers.inc / AriadneNativeJob.cpp), so the appended
+// entity survives to the staged-copy DWG the router job already operates on. Still never touches
+// the ORIGINAL file (write_mode policy layer, same as every other write op).
 // APIs: AcDbBlockTable::getAt(name, AcDbBlockTableRecord*&, AcDb::kForWrite) (dbsymtb.h) to
 // resolve the target BTR by name (same read-mode shape m08eHandleBlockIterate above already
 // uses); AcDbBlockTableRecord::appendAcDbEntity(AcDbObjectId&, AcDbEntity*) (dbsymtb.h) to add
@@ -595,7 +1148,7 @@ static bool m08eHandleBlockAppend(const AriadneJobCtx& ctx, std::ostringstream& 
 
     std::string kind, buildErrCode, buildErrMsg;
     AcDbEntity* pEnt = m08eBuildEntityForAppend(entityJson, kind, buildErrCode, buildErrMsg);
-    if (pEnt == nullptr) {
+    if (pEnt == nullptr && buildErrCode != "UNSUPPORTED_KIND") {
         if (buildErrCode.empty())
             emitNativeError(r, "BUILD_FAILED", buildErrMsg);
         else
@@ -640,15 +1193,42 @@ static bool m08eHandleBlockAppend(const AriadneJobCtx& ctx, std::ostringstream& 
     const std::string btrHandle = handleOf(pBTR);
     const std::string btrName = hasBlockName ? blockName : std::string("*MODEL_SPACE");
 
-    if (!layer.empty())
-        pEnt->setLayer(asciiToWide(layer).c_str());
+    AcDbObjectId newId = AcDbObjectId::kNull;
+    if (pEnt != nullptr) {
+        if (!layer.empty())
+            pEnt->setLayer(asciiToWide(layer).c_str());
 
-    AcDbObjectId newId;
-    es = pBTR->appendAcDbEntity(newId, pEnt);
-    if (es == Acad::eOk)
-        pEnt->close();
-    else
-        delete pEnt;
+        es = pBTR->appendAcDbEntity(newId, pEnt);
+        if (es == Acad::eOk)
+            pEnt->close();
+        else
+            delete pEnt;
+    } else if (kind == "polyline") {
+        es = m08eAppendPolylineEntityForAppend(entityJson, pBTR, layer, newId, buildErrCode, buildErrMsg);
+        if (es != Acad::eOk && !buildErrCode.empty()) {
+            pBTR->close();
+            emitNativeError(r, buildErrCode.c_str(), buildErrMsg);
+            return true;
+        }
+    } else {
+        pEnt = m08eBuildExtendedEntityForAppend(ctx.pDb, entityJson, kind, buildErrCode, buildErrMsg);
+        if (pEnt == nullptr) {
+            pBTR->close();
+            if (buildErrCode.empty())
+                emitNativeError(r, "BUILD_FAILED", buildErrMsg);
+            else
+                emitNativeError(r, buildErrCode.c_str(), buildErrMsg);
+            return true;
+        }
+        if (!layer.empty())
+            pEnt->setLayer(asciiToWide(layer).c_str());
+
+        es = pBTR->appendAcDbEntity(newId, pEnt);
+        if (es == Acad::eOk)
+            pEnt->close();
+        else
+            delete pEnt;
+    }
 
     int entityCountAfter = -1;
     if (es == Acad::eOk) {

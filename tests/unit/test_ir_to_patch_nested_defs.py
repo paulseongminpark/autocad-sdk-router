@@ -186,5 +186,44 @@ class TestNestedBlockDefinitionSynthesis(unittest.TestCase):
         )
 
 
+class TestAnonymousDefinitionGuard(unittest.TestCase):
+    def _build_patch(self, ir):
+        return ir_to_patch.build_patch_from_ir(
+            ir, {"staged_path": "s", "original_path": "o"}, "anon")
+
+    def test_anonymous_def_and_its_modelspace_insert_defer(self):
+        ir = {
+            "entities": [_insert("*U172")],
+            "block_definitions": [
+                {"name": "*U172", "handle": "U1", "anonymous": True,
+                 "def_entities": [_line("U-L1")]},
+            ],
+        }
+        patch, deferred = self._build_patch(ir)
+        self.assertEqual(patch["operations"], [])
+        reasons = [d.get("reason", "") for d in deferred]
+        self.assertTrue(any("anonymous block definition rebuild pending remap" in r
+                            for r in reasons))
+        self.assertTrue(any("INSERT deferred" in r for r in reasons))
+
+    def test_nested_ref_to_anonymous_target_is_skipped_not_appended(self):
+        ir = {
+            "entities": [_insert("A")],
+            "block_definitions": [
+                {"name": "A", "handle": "A1",
+                 "def_entities": [_line("A-L1"), _nested_ref("*U9", "A-R1")]},
+                {"name": "*U9", "handle": "U9", "anonymous": True,
+                 "def_entities": [_line("U-L1")]},
+            ],
+        }
+        patch, deferred = self._build_patch(ir)
+        # A synthesizes (create + line append); the nested ref to *U9 must NOT
+        # become an append op (native would abort the batch on a missing BTR).
+        ops = [op["operation"] for op in patch["operations"]]
+        self.assertEqual(ops, ["create_block", "append_block_entity", "create_blockref"])
+        self.assertTrue(any("not synthesized (anonymous/missing/cycle)" in d.get("reason", "")
+                            for d in deferred))
+
+
 if __name__ == "__main__":
     unittest.main()

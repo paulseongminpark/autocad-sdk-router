@@ -64,6 +64,22 @@ def build_patch_from_ir(ir: Dict[str, Any], target_dwg: Dict[str, Any], patch_id
         block_def = block_defs_by_name.get(block_name)
         if block_def is None:
             return
+        if block_def.get("anonymous") or (isinstance(block_name, str)
+                                          and block_name.startswith("*")):
+            # Anonymous (dynamic-block) definitions are now CAPTURED in the IR
+            # (anonymous: true) but create_block cannot legally mint a
+            # '*'-prefixed name -- rebuild needs the name-remap design
+            # (docs/ANON_DEF_CAPTURE_DESIGN.md). Defer honestly, once per name.
+            note_key = ("anon_def", block_name)
+            if note_key not in cycle_notes_seen:
+                cycle_notes_seen.add(note_key)
+                deferred.append({
+                    "block_name": block_name,
+                    "kind": "block_definition",
+                    "reason": "anonymous block definition rebuild pending remap "
+                              "(captured in IR, not yet synthesizable)",
+                })
+            return
         active_block_defs.append(block_name)
         try:
             for def_entity_index, def_ent in enumerate(block_def.get("def_entities") or []):
@@ -99,6 +115,24 @@ def build_patch_from_ir(ir: Dict[str, Any], target_dwg: Dict[str, Any], patch_id
             bd_ops, bd_deferred = patch_ops.blocks.block_def_ops(block_def)
             next_step = block_def_step_counts.get(root_entity_index, 0)
             for bd_op in bd_ops:
+                # Nested block_reference appends are only sound when their
+                # target definition was actually synthesized (dependency
+                # order guarantees it is already in emitted_block_defs).
+                # Anonymous/missing/cycle targets never got emitted -- the
+                # native append would fail-loud on a missing block table
+                # record and abort the whole batch, so defer honestly here.
+                bd_ent = ((bd_op.get("args") or {}).get("entity") or {})
+                if (bd_op.get("operation") == "append_block_entity"
+                        and bd_ent.get("kind") == "block_reference"
+                        and bd_ent.get("block_name") not in emitted_block_defs):
+                    deferred.append({
+                        "block_name": block_name,
+                        "kind": "block_reference",
+                        "reason": "nested block_reference append skipped: target %r "
+                                  "not synthesized (anonymous/missing/cycle)"
+                                  % (bd_ent.get("block_name"),),
+                    })
+                    continue
                 bd_op["step_id"] = "bd%d_%d" % (root_entity_index, next_step)
                 ops.append(bd_op)
                 next_step += 1
@@ -128,6 +162,16 @@ def build_patch_from_ir(ir: Dict[str, Any], target_dwg: Dict[str, Any], patch_id
                 continue
             if block_name not in emitted_block_defs:
                 _emit_block_def(block_name, i)
+            if block_name not in emitted_block_defs:
+                # _emit_block_def declined (anonymous def / cycle): a
+                # create_blockref would target a name the seed cannot
+                # resolve -- defer the INSERT honestly.
+                deferred.append({
+                    "index": i, "handle": ent.get("handle"), "kind": kind,
+                    "reason": "block definition %r not synthesizable "
+                              "(anonymous/cycle) - INSERT deferred" % (block_name,),
+                })
+                continue
         op = _op_for(ent)
         if op is None:
             deferred.append({"index": i, "handle": ent.get("handle"), "kind": kind})
