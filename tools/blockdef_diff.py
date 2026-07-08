@@ -27,7 +27,8 @@ def _write_json(path: str, payload: Dict[str, Any]) -> None:
         fh.write("\n")
 
 
-def _canonical_entity(entity: Dict[str, Any]) -> Dict[str, Any]:
+def _canonical_entity(entity: Dict[str, Any],
+                      name_map: Optional[Dict[str, str]] = None) -> Dict[str, Any]:
     """Normalize representation-dependent geometry before comparison.
 
     Splines: the extractor stores the canonical B-spline definition at the
@@ -39,18 +40,28 @@ def _canonical_entity(entity: Dict[str, Any]) -> Dict[str, Any]:
     the canonical definition on both sides; fit authoring data is reported
     separately in totals, not silently dropped.
     """
+    canon = entity
     g = entity.get("geometry") or {}
+    if name_map and g.get("kind") == "block_reference":
+        block_name = g.get("block_name")
+        mapped_name = name_map.get(block_name)
+        if mapped_name and mapped_name != block_name:
+            canon = dict(entity)
+            g = dict(g)
+            g["block_name"] = mapped_name
+            canon["geometry"] = g
     if g.get("kind") != "spline":
-        return entity
+        return canon
     control_points = entity.get("spline_control_points")
     knots = entity.get("spline_knots")
     if not (control_points and knots):
-        return entity
+        return canon
     canon_g = dict(g)
     canon_g["control_points"] = control_points
     canon_g["knots"] = knots
     canon_g.pop("fit_points", None)
-    canon = dict(entity)
+    if canon is entity:
+        canon = dict(entity)
     canon["geometry"] = canon_g
     return canon
 
@@ -61,11 +72,13 @@ def _spline_fit_authored_count(entities: List[Dict[str, Any]]) -> int:
                    and (e.get("geometry") or {}).get("fit_points")))
 
 
-def _definition_entities(block_def: Dict[str, Any]) -> List[Dict[str, Any]]:
+def _definition_entities(block_def: Dict[str, Any],
+                         name_map: Optional[Dict[str, str]] = None) -> List[Dict[str, Any]]:
     entities = block_def.get("def_entities")
     if entities is None:
         entities = block_def.get("entities")
-    return [_canonical_entity(e) for e in (entities or []) if isinstance(e, dict)]
+    return [_canonical_entity(e, name_map=name_map)
+            for e in (entities or []) if isinstance(e, dict)]
 
 
 def _definitions_by_name(ir: Dict[str, Any]) -> Dict[str, Dict[str, Any]]:
@@ -96,7 +109,8 @@ def _kind_counts(definitions: Dict[str, Dict[str, Any]]) -> Dict[str, int]:
 
 
 def diff_block_definitions(ir_a: Dict[str, Any], ir_b: Dict[str, Any], *,
-                           tolerance: float = 1e-6) -> Dict[str, Any]:
+                           tolerance: float = 1e-6,
+                           name_map: Optional[Dict[str, str]] = None) -> Dict[str, Any]:
     defs_a = _definitions_by_name(ir_a or {})
     defs_b = _definitions_by_name(ir_b or {})
 
@@ -106,17 +120,21 @@ def diff_block_definitions(ir_a: Dict[str, Any], ir_b: Dict[str, Any], *,
     b_entity_total = 0
     fit_authored_a = 0
     fit_authored_b = 0
+    matched_b_names = set()
 
-    for name in sorted(set(defs_a) | set(defs_b)):
+    for name in sorted(defs_a):
+        b_name = (name_map or {}).get(name, name)
         def_a = defs_a.get(name)
-        def_b = defs_b.get(name)
+        def_b = defs_b.get(b_name)
+        if def_b is not None:
+            matched_b_names.add(b_name)
         raw_a = [e for e in ((def_a or {}).get("def_entities")
                              or (def_a or {}).get("entities") or []) if isinstance(e, dict)]
         raw_b = [e for e in ((def_b or {}).get("def_entities")
                              or (def_b or {}).get("entities") or []) if isinstance(e, dict)]
         fit_authored_a += _spline_fit_authored_count(raw_a)
         fit_authored_b += _spline_fit_authored_count(raw_b)
-        ents_a = _definition_entities(def_a) if def_a else []
+        ents_a = _definition_entities(def_a, name_map=name_map) if def_a else []
         ents_b = _definition_entities(def_b) if def_b else []
         a_total = len(ents_a)
         b_total = len(ents_b)
@@ -139,7 +157,7 @@ def diff_block_definitions(ir_a: Dict[str, Any], ir_b: Dict[str, Any], *,
 
         diff0 = int(summary.get("unchanged", 0) or 0)
         diff0_total += diff0
-        per_def.append({
+        row = {
             "name": name,
             "a_total": a_total,
             "b_total": b_total,
@@ -148,6 +166,37 @@ def diff_block_definitions(ir_a: Dict[str, Any], ir_b: Dict[str, Any], *,
             "added": int(summary.get("added", 0) or 0),
             "modified": int(summary.get("modified", 0) or 0),
             "missing_side": missing_side,
+        }
+        if b_name != name:
+            row["b_name"] = b_name
+        per_def.append(row)
+
+    for b_name in sorted(name for name in defs_b if name not in matched_b_names):
+        def_b = defs_b.get(b_name)
+        raw_b = [e for e in ((def_b or {}).get("def_entities")
+                             or (def_b or {}).get("entities") or []) if isinstance(e, dict)]
+        fit_authored_b += _spline_fit_authored_count(raw_b)
+        ents_b = _definition_entities(def_b) if def_b else []
+        b_total = len(ents_b)
+        b_entity_total += b_total
+
+        diff = cad_diff.compute_diff(
+            _synthetic_ir([]),
+            _synthetic_ir(ents_b),
+            comparison_basis="geometry",
+            geometry_tolerance=tolerance,
+            diff_scope=cad_diff.FULL_DATABASE,
+        )
+        summary = diff["summary"]
+        per_def.append({
+            "name": b_name,
+            "a_total": 0,
+            "b_total": b_total,
+            "diff0": int(summary.get("unchanged", 0) or 0),
+            "removed": int(summary.get("removed", 0) or 0),
+            "added": int(summary.get("added", 0) or 0),
+            "modified": int(summary.get("modified", 0) or 0),
+            "missing_side": "a",
         })
 
     by_kind_a = _kind_counts(defs_a)

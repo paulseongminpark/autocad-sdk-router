@@ -163,3 +163,16 @@ Abort the extractor-only direction and switch to the follow-up rebuild packet if
 
 1. Anonymous definitions are present in IR, but deferred nested `INSERT` counts remain dominated by anonymous names because the missing piece is now purely write-side remap.
 2. Downstream consumers reject additive `block_definitions[].anonymous` fields or assume every block name is directly legal/rebuildable without remapping.
+
+## Implementation Notes
+
+Python rebuild follow-up for `C1` is now implemented in `tools/ir_to_patch.py` and `tools/blockdef_diff.py`:
+
+- Anonymous source names are remapped deterministically to legal clone names as `ARIADNE_ANON_` plus the source name with `*` stripped and non-alphanumeric characters rewritten to `_`.
+- Clone-name collisions against existing block names are resolved by appending `_2`, `_3`, and so on; the exact source-to-clone table is recorded on the patch as `patch["anon_remap"]`.
+- Anonymous block definitions now synthesize through the same `create_block(seed_line=0)` plus `append_block_entity` path used for named definitions; nested and modelspace `block_reference` emissions rewrite `block_name` to the clone name.
+- `blockdef_diff.diff_block_definitions(..., name_map=...)` can compare source anonymous names against rebuilt clone names and normalizes nested `block_reference.block_name` fields through the same map.
+
+Limit that remains in force:
+
+- This rebuild restores a static snapshot clone only. Dynamic-block behavior, parameters, and evaluation semantics are not restored.

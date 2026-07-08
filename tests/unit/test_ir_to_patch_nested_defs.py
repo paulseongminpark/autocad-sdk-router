@@ -186,12 +186,12 @@ class TestNestedBlockDefinitionSynthesis(unittest.TestCase):
         )
 
 
-class TestAnonymousDefinitionGuard(unittest.TestCase):
+class TestAnonymousDefinitionRemap(unittest.TestCase):
     def _build_patch(self, ir):
         return ir_to_patch.build_patch_from_ir(
             ir, {"staged_path": "s", "original_path": "o"}, "anon")
 
-    def test_anonymous_def_and_its_modelspace_insert_defer(self):
+    def test_anonymous_def_and_its_modelspace_insert_remap(self):
         ir = {
             "entities": [_insert("*U172")],
             "block_definitions": [
@@ -200,13 +200,16 @@ class TestAnonymousDefinitionGuard(unittest.TestCase):
             ],
         }
         patch, deferred = self._build_patch(ir)
-        self.assertEqual(patch["operations"], [])
-        reasons = [d.get("reason", "") for d in deferred]
-        self.assertTrue(any("anonymous block definition rebuild pending remap" in r
-                            for r in reasons))
-        self.assertTrue(any("INSERT deferred" in r for r in reasons))
+        # anon-remap era (P2): anonymous defs synthesize as deterministic
+        # named clones instead of deferring; guard-era expectations retired.
+        self.assertEqual(deferred, [])
+        ops = [op["operation"] for op in patch["operations"]]
+        self.assertEqual(ops, ["create_block", "append_block_entity", "create_blockref"])
+        self.assertEqual(patch["operations"][0]["args"]["name"], "ARIADNE_ANON_U172")
+        self.assertEqual(patch["operations"][2]["args"]["block_name"], "ARIADNE_ANON_U172")
+        self.assertEqual(patch["anon_remap"], {"*U172": "ARIADNE_ANON_U172"})
 
-    def test_nested_ref_to_anonymous_target_is_skipped_not_appended(self):
+    def test_nested_ref_to_anonymous_target_appends_with_clone_name(self):
         ir = {
             "entities": [_insert("A")],
             "block_definitions": [
@@ -217,12 +220,14 @@ class TestAnonymousDefinitionGuard(unittest.TestCase):
             ],
         }
         patch, deferred = self._build_patch(ir)
-        # A synthesizes (create + line append); the nested ref to *U9 must NOT
-        # become an append op (native would abort the batch on a missing BTR).
+        self.assertEqual(deferred, [])
         ops = [op["operation"] for op in patch["operations"]]
-        self.assertEqual(ops, ["create_block", "append_block_entity", "create_blockref"])
-        self.assertTrue(any("not synthesized (anonymous/missing/cycle)" in d.get("reason", "")
-                            for d in deferred))
+        # *U9 clone synthesized first, then A (line + remapped nested ref).
+        self.assertEqual(ops, ["create_block", "append_block_entity",
+                               "create_block", "append_block_entity",
+                               "append_block_entity", "create_blockref"])
+        nested_append = patch["operations"][4]
+        self.assertEqual(nested_append["args"]["entity"]["block_name"], "ARIADNE_ANON_U9")
 
 
 if __name__ == "__main__":
