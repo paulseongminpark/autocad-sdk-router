@@ -888,6 +888,49 @@ def run_census(staged_path: str, original_path: str, run_dir: str, *,
         ir_builder_mod, run_res, staged_path, original_path, ir_path, "census")
 
 
+def census_extraction_vacuous(census_ir: Dict[str, Any]) -> bool:
+    """True when an extraction returned a structurally-valid but EMPTY graph
+    (0 entities AND 0 block definitions)."""
+    return (not (census_ir.get("entities") or [])
+            and not (census_ir.get("block_definitions") or []))
+
+
+def run_census_with_vacuous_retry(staged_path: str, original_path: str, out_dir: str,
+                                  *, retries: int = 2, pause_seconds: float = 10.0,
+                                  allow_empty: bool = False, census_fn=None):
+    """run_census plus a fail-closed vacuous-extraction guard.
+
+    Measured failure (runs/e2e_1dwg_R3_full_20260708, 2026-07-08): an
+    accoreconsole double-script race executed ARIADNE_NATIVE_JOB after the
+    first script instance's QUIT had discarded the drawing, so the native job
+    inspected a blank default document and reported 0 entities / 0 block
+    definitions with empty errors -- structurally valid, semantically vacuous
+    (native modelspace count null, coverage match vacuously true). A vacuous
+    extraction is retried (the race is transient) and, if it persists, the
+    census FAILS (VACUOUS != PASS) unless allow_empty declares the drawing
+    genuinely empty.
+
+    Returns (census, census_ir_or_None, attempts, vacuous_final).
+    """
+    census_fn = census_fn or run_census
+    attempts = 0
+    census: Dict[str, Any] = {}
+    census_ir = None
+    while attempts <= retries:
+        attempts += 1
+        census_dir = os.path.join(
+            out_dir, "census" if attempts == 1 else "census_retry%d" % (attempts - 1))
+        census = census_fn(staged_path, original_path, census_dir)
+        if not census.get("ok"):
+            return census, None, attempts, False
+        census_ir = json.load(open(census["ir_path"], encoding="utf-8-sig"))
+        if allow_empty or not census_extraction_vacuous(census_ir):
+            return census, census_ir, attempts, False
+        if attempts <= retries:
+            time.sleep(pause_seconds)
+    return census, census_ir, attempts, True
+
+
 def run_records_batch(census_ir: Dict[str, Any], blank_seed_path: str, run_dir: str,
                       patch_id: str, *, per_table_limit: Optional[int] = None,
                       table_classes: Tuple[Dict[str, str], ...] = RECORD_TABLE_CLASSES,
@@ -1082,6 +1125,10 @@ def build_arg_parser() -> argparse.ArgumentParser:
                    help="run LibreDWG sidecar verification as a post-write gate (default: on)")
     ap.add_argument("--visual-gate", dest="visual_gate", action=argparse.BooleanOptionalAction, default=True,
                    help="run SVG->raster SSIM visual verification as a post-write gate (default: on)")
+    ap.add_argument("--allow-empty-census", action="store_true",
+                   help="accept a 0-entity/0-blockdef extraction as census truth. Without "
+                        "this flag a vacuous extraction is retried and then FAILS the run "
+                        "(fail-closed guard for the accoreconsole blank-document race)")
     return ap
 
 
@@ -1107,17 +1154,22 @@ def main(argv=None) -> int:
         print(json.dumps(summary, ensure_ascii=False, indent=2, default=str))
         return 2
 
-    census = run_census(staged["staged_path"], staged["original_path"],
-                        os.path.join(out_dir, "census"))
-    summary["census_ok"] = census.get("ok")
-    if not census.get("ok"):
-        summary["status"] = "partial"
-        summary["reason"] = census.get("reason")
+    census, census_ir, census_attempts, census_vacuous = run_census_with_vacuous_retry(
+        staged["staged_path"], staged["original_path"], out_dir,
+        allow_empty=args.allow_empty_census)
+    summary["census_ok"] = bool(census.get("ok")) and not census_vacuous
+    summary["census_attempts"] = census_attempts
+    if not census.get("ok") or census_vacuous:
+        summary["status"] = "blocked" if census_vacuous else "partial"
+        summary["reason"] = (
+            ("census extraction vacuous after %d attempt(s): 0 entities and 0 "
+             "block definitions (VACUOUS != PASS; pass --allow-empty-census "
+             "only for a genuinely empty drawing)" % census_attempts)
+            if census_vacuous else census.get("reason"))
         _write_json(os.path.join(out_dir, "summary.json"), summary)
         print(json.dumps(summary, ensure_ascii=False, indent=2, default=str))
         return 2
 
-    census_ir = json.load(open(census["ir_path"], encoding="utf-8-sig"))
     report = census_report(census_ir)
     summary["census_report"] = report
     _write_json(os.path.join(out_dir, "census_report.json"), report)
