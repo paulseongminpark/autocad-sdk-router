@@ -921,7 +921,8 @@ def run_records_batch(census_ir: Dict[str, Any], blank_seed_path: str, run_dir: 
 
 
 def run_regen_batch(filtered_ir: Dict[str, Any], blank_seed_path: str, run_dir: str,
-                    patch_id: str, *, ir_to_patch_mod=None, patch_engine_mod=None
+                    patch_id: str, *, batch_size: Optional[int] = None,
+                    ir_to_patch_mod=None, patch_engine_mod=None
                     ) -> Dict[str, Any]:
     """Build ONE cad_patch.v1 from ``filtered_ir`` (via the existing, unedited
     ir_to_patch.build_patch_from_ir) and apply it in ONE patch_engine.
@@ -943,13 +944,28 @@ def run_regen_batch(filtered_ir: Dict[str, Any], blank_seed_path: str, run_dir: 
     patch, deferred = ir_to_patch_mod.build_patch_from_ir(filtered_ir, target_dwg, patch_id)
     ops_report = resolvable_ops_report(patch)
     t0 = time.time()
-    result = patch_engine_mod.apply_staged(patch, blank_seed_path, run_dir)
+    result = patch_engine_mod.apply_staged(
+        patch, blank_seed_path, run_dir, batch_size=batch_size)
     elapsed = time.time() - t0
     op_count = len(patch.get("operations") or [])
     return {
         "patch": patch, "deferred": deferred, "resolvable_ops": ops_report,
         "apply_result": result, "op_count": op_count, "elapsed_seconds": elapsed,
         "seconds_per_op": (elapsed / op_count) if op_count else None,
+    }
+
+
+def build_regen_summary(batch: Dict[str, Any], gate: Dict[str, Any]) -> Dict[str, Any]:
+    apply_result = (batch or {}).get("apply_result") or {}
+    return {
+        "op_count": batch["op_count"], "deferred_count": len(batch["deferred"]),
+        "resolvable_ops": batch["resolvable_ops"],
+        "elapsed_seconds": batch["elapsed_seconds"], "seconds_per_op": batch["seconds_per_op"],
+        "apply_status": apply_result.get("status"),
+        "apply_reason": apply_result.get("reason"),
+        "batch_size": apply_result.get("batch_size"),
+        "batch_count": apply_result.get("batch_count"),
+        "gate": gate,
     }
 
 
@@ -1053,6 +1069,8 @@ def build_arg_parser() -> argparse.ArgumentParser:
     ap.add_argument("--kinds", default=None, help="comma-separated geometry.kind allowlist for regen")
     ap.add_argument("--limit", type=int, default=None, help="global op cap for this batch")
     ap.add_argument("--per-kind-limit", type=int, default=None, help="per-kind op cap for this batch")
+    ap.add_argument("--batch-size", type=int, default=None,
+                   help="EXPERIMENTAL flag-gated native batching size for the regen apply_staged call")
     ap.add_argument("--max-def-entities-per-block", type=int, default=None,
                    help="drop block_definitions entries with more def_entities than this "
                         "from the regen input; their INSERTs then defer honestly in "
@@ -1137,16 +1155,11 @@ def main(argv=None) -> int:
     summary["regen_target"] = regen_target
 
     regen_dir = os.path.join(out_dir, "regen")
-    batch = run_regen_batch(filtered, regen_target["target"], regen_dir, "full_roundtrip_capstone/batch")
+    batch = run_regen_batch(
+        filtered, regen_target["target"], regen_dir, "full_roundtrip_capstone/batch",
+        batch_size=args.batch_size)
     entity_gate = regen_gate_report(batch["op_count"], batch["apply_result"])
-    summary["regen"] = {
-        "op_count": batch["op_count"], "deferred_count": len(batch["deferred"]),
-        "resolvable_ops": batch["resolvable_ops"],
-        "elapsed_seconds": batch["elapsed_seconds"], "seconds_per_op": batch["seconds_per_op"],
-        "apply_status": (batch["apply_result"] or {}).get("status"),
-        "apply_reason": (batch["apply_result"] or {}).get("reason"),
-        "gate": entity_gate,
-    }
+    summary["regen"] = build_regen_summary(batch, entity_gate)
     _write_json(os.path.join(out_dir, "regen_summary.json"), summary["regen"])
     _write_json(os.path.join(out_dir, "deferred.json"), batch["deferred"])
     gate_statuses = [entity_gate["gate_status"]]

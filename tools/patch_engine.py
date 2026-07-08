@@ -848,6 +848,7 @@ def _build_native_batch_script(
         '(setenv "ARIADNE_CAD_JOB_HOST_MODE" "coreconsole")',
         '(setenv "ARIADNE_CAD_JOB_WRITE_MODE" "write_copy")',
     ]
+    result_paths: Dict[str, str] = {}
 
     for seq, op_record in enumerate(op_records):
         safe_name = "%02d_%s" % (
@@ -861,6 +862,7 @@ def _build_native_batch_script(
         result_fwd = result_path.replace("\\", "/")
         start_marker = "ARIADNE_OP_START %s" % op_record["batch_marker_id"]
         end_marker = "ARIADNE_OP_END %s STATUS=OK" % op_record["batch_marker_id"]
+        result_paths[op_record["batch_marker_id"]] = result_path
         script_lines.extend([
             '(princ "\\n%s")' % _escape_lisp_string(start_marker),
             '(setenv "ARIADNE_CAD_JOB_IN" "%s")' % _escape_lisp_string(job_fwd),
@@ -876,7 +878,7 @@ def _build_native_batch_script(
     script_path = os.path.join(batch_dir, "%s.scr" % batch_id)
     with open(script_path, "w", encoding="ascii", newline="\n") as fh:
         fh.write("\n".join(script_lines))
-    return {"script_path": script_path}
+    return {"script_path": script_path, "results_dir": results_dir, "result_paths": result_paths}
 
 
 def _parse_first_json_object(text: str) -> Optional[Dict[str, Any]]:
@@ -919,6 +921,21 @@ def _read_console_text(path: Optional[str]) -> str:
     return raw.decode("utf-8", errors="replace")
 
 
+def _native_result_success_detail(result_path: Optional[str]) -> Tuple[bool, str]:
+    if not result_path or not os.path.isfile(result_path):
+        return False, "missing_result_file"
+    try:
+        doc = _load_json_bom(result_path)
+    except (OSError, TypeError, ValueError):
+        return False, "unparseable_result_file"
+    if not isinstance(doc, dict):
+        return False, "result_not_object"
+    result_obj = doc.get("result", doc)
+    if not isinstance(result_obj, dict):
+        return False, "result_not_object"
+    return (str(result_obj.get("status")) != "error"), "result_status_error"
+
+
 def _router_custom_run_paths(staged_used: Optional[str]) -> Tuple[Optional[str], Optional[str]]:
     if not staged_used:
         return None, None
@@ -934,17 +951,19 @@ def _router_custom_run_paths(staged_used: Optional[str]) -> Tuple[Optional[str],
 
 
 def _run_batched_native_ops(run_job, staged_dwg: str, batch_dir: str, batch_id: str,
-                            op_records: List[Dict[str, Any]], *,
-                            timeout: int = 600) -> Dict[str, Any]:
+                            op_records: List[Dict[str, Any]]) -> Dict[str, Any]:
     outer_stdout = os.path.join(batch_dir, "stdout.txt")
     outer_stderr = os.path.join(batch_dir, "stderr.txt")
+    script_timeout_ms = max(600000, 15000 * len(op_records))
     try:
         script_info = _build_native_batch_script(batch_dir, batch_id, op_records)
     except Exception as exc:
         _write_json(os.path.join(batch_dir, "batch_error.json"),
                     {"status": "error", "reason": "%s: %s" % (type(exc).__name__, exc)})
         return {"command": None, "exit_code": None, "stdout_path": outer_stdout,
-                "stderr_path": outer_stderr, "staged_used": None, "error": str(exc)}
+                "stderr_path": outer_stderr, "staged_used": None, "error": str(exc),
+                "elapsed_seconds": None, "script_timeout_ms": script_timeout_ms,
+                "result_paths": None}
 
     router_ps1 = getattr(run_job, "ROUTER_PS1", None)
     router_home = getattr(run_job, "ROUTER_HOME", _ROUTER_HOME)
@@ -969,12 +988,16 @@ def _run_batched_native_ops(run_job, staged_dwg: str, batch_dir: str, batch_id: 
         "-Intent", "dwg",
         "-InputPath", str(staged_dwg),
         "-Script", str(script_info["script_path"]),
+        "-ScriptTimeoutMs", str(script_timeout_ms),
     ]
     timed_out = False
     error = None
     stdout_text = ""
     stderr_text = ""
     code = None
+    elapsed_seconds = None
+    timeout_seconds = (script_timeout_ms / 1000.0) + 120.0
+    started = time.perf_counter()
     try:
         proc = subprocess.run(
             cmd,
@@ -983,18 +1006,20 @@ def _run_batched_native_ops(run_job, staged_dwg: str, batch_dir: str, batch_id: 
             text=True,
             encoding="utf-8",
             errors="replace",
-            timeout=timeout,
+            timeout=timeout_seconds,
         )
         stdout_text = proc.stdout or ""
         stderr_text = proc.stderr or ""
         code = proc.returncode
     except subprocess.TimeoutExpired as exc:
         timed_out = True
-        error = "router batch job timed out after %ss" % timeout
+        error = "router batch job timed out after %ss" % int(timeout_seconds)
         stdout_text = (exc.stdout or "") if isinstance(exc.stdout, str) else ""
         stderr_text = (exc.stderr or "") if isinstance(exc.stderr, str) else ""
     except OSError as exc:
         error = "failed to launch router: %s" % exc
+    finally:
+        elapsed_seconds = time.perf_counter() - started
 
     with open(outer_stdout, "w", encoding="utf-8") as fh:
         fh.write(stdout_text)
@@ -1024,11 +1049,15 @@ def _run_batched_native_ops(run_job, staged_dwg: str, batch_dir: str, batch_id: 
         "staged_used": staged_used,
         "timed_out": timed_out,
         "error": error,
+        "elapsed_seconds": elapsed_seconds,
+        "script_timeout_ms": script_timeout_ms,
+        "result_paths": script_info.get("result_paths"),
     }
 
 
 def _parse_batched_op_results(op_records: List[Dict[str, Any]], stdout_path: Optional[str],
-                              batch_id: str) -> List[Dict[str, Any]]:
+                              batch_id: str,
+                              result_paths: Optional[Dict[str, str]] = None) -> List[Dict[str, Any]]:
     stdout_text = _read_console_text(stdout_path)
     results: List[Dict[str, Any]] = []
     aborted = False
@@ -1044,16 +1073,30 @@ def _parse_batched_op_results(op_records: List[Dict[str, Any]], stdout_path: Opt
             results.append(rec)
             continue
         marker_id = op_record["batch_marker_id"]
+        result_path = ((result_paths or {}).get(marker_id)
+                       or op_record.get("result_path"))
         end_pat = re.compile(
             r"ARIADNE_OP_END\s+%s\s+STATUS=([A-Z0-9_]+)" % re.escape(marker_id))
         end_match = end_pat.search(stdout_text)
         if end_match:
             marker_status = end_match.group(1)
             if marker_status == "OK":
-                rec["status"] = "ok"
+                result_ok, detail = _native_result_success_detail(result_path)
+                if result_ok:
+                    rec["status"] = "ok"
+                else:
+                    rec["status"] = "failed"
+                    rec["reason"] = "marker_result_mismatch:%s" % detail
+                    aborted = True
             else:
                 rec["status"] = "failed"
-                rec["reason"] = "marker_status_%s" % marker_status.lower()
+                result_ok, _detail = _native_result_success_detail(result_path)
+                if result_ok:
+                    rec["reason"] = (
+                        "marker_result_mismatch:marker_status_%s_result_success"
+                        % marker_status.lower())
+                else:
+                    rec["reason"] = "marker_status_%s" % marker_status.lower()
                 aborted = True
         else:
             rec["status"] = "failed"
@@ -1462,7 +1505,8 @@ def apply_staged(patch: Dict[str, Any], dwg_path: str, out_dir: str,
             batch_run = _run_batched_native_ops(
                 run_job, current_input, apply_dir, batch_id, prepared_records)
             batch_results = _parse_batched_op_results(
-                prepared_records, batch_run.get("stdout_path"), batch_id)
+                prepared_records, batch_run.get("stdout_path"), batch_id,
+                batch_run.get("result_paths"))
             op_results_all.extend(batch_results)
             for op_result in batch_results:
                 step_status = "pass" if op_result["status"] == "ok" else "partial"
@@ -1489,6 +1533,7 @@ def apply_staged(patch: Dict[str, Any], dwg_path: str, out_dir: str,
                 except OSError as exc:
                     _step("apply_batch[%s]" % batch_id, "partial",
                           reason="failed to capture batch output: %s" % exc,
+                          elapsed_seconds=batch_run.get("elapsed_seconds"),
                           stdout=batch_run.get("stdout_path"),
                           stderr=batch_run.get("stderr_path"))
             first_failed = next((r for r in batch_results if r.get("status") != "ok"), None)
@@ -1496,6 +1541,7 @@ def apply_staged(patch: Dict[str, Any], dwg_path: str, out_dir: str,
                 reason = first_failed.get("reason") or "native batch failed"
                 _step("apply_batch[%s]" % batch_id,
                       "unavailable" if batch_run.get("error") else "partial",
+                      elapsed_seconds=batch_run.get("elapsed_seconds"),
                       reason=reason, stdout=batch_run.get("stdout_path"),
                       stderr=batch_run.get("stderr_path"),
                       exit_code=batch_run.get("exit_code"))
@@ -1517,6 +1563,7 @@ def apply_staged(patch: Dict[str, Any], dwg_path: str, out_dir: str,
                              "(staged_used=%r)" % mutated)
                 _step("apply_batch[%s]" % batch_id,
                       "unavailable" if batch_run.get("error") else "partial",
+                      elapsed_seconds=batch_run.get("elapsed_seconds"),
                       reason=reason, stdout=batch_run.get("stdout_path"),
                       stderr=batch_run.get("stderr_path"),
                       exit_code=batch_run.get("exit_code"))
@@ -1533,6 +1580,7 @@ def apply_staged(patch: Dict[str, Any], dwg_path: str, out_dir: str,
                            "batch_size": batch_size}))
             _step("apply_batch[%s]" % batch_id, "pass",
                   op_count=len(prepared_records), step_output=step_out,
+                  elapsed_seconds=batch_run.get("elapsed_seconds"),
                   staged_used=mutated, stdout=batch_run.get("stdout_path"),
                   stderr=batch_run.get("stderr_path"),
                   exit_code=batch_run.get("exit_code"))

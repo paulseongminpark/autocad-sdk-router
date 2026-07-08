@@ -16,6 +16,7 @@ param(
   [string]$HostMode = 'auto',
   [string]$Operation = '',
   [string]$OpListPath = '',
+  [int]$ScriptTimeoutMs = 120000,
   [string]$RouterHome = '',
   [string]$ConfigPath = '',
   [string]$PythonExe = ''
@@ -1408,7 +1409,7 @@ function Invoke-AutoCadRoute {
   if (-not [string]::IsNullOrWhiteSpace($Script) -and (Test-Path -LiteralPath $Script)) {
     $scrPath = Join-Path $stageRoot 'job.scr'
     Copy-Item -LiteralPath $Script -Destination $scrPath -Force
-    $r = Invoke-AccoreScr -Engine $engine -StagedDwg $stagedDwg -ScrPath $scrPath -DwgDir $dwgDir -RunOut $runOut -EnvVars @{} -Tag 'custom'
+    $r = Invoke-AccoreScr -Engine $engine -StagedDwg $stagedDwg -ScrPath $scrPath -DwgDir $dwgDir -RunOut $runOut -EnvVars @{} -Tag 'custom' -TimeoutMs $ScriptTimeoutMs
     return [ordered]@{
       engine_exit_code = $r.ExitCode
       engine_output    = [ordered]@{
