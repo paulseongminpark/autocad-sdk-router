@@ -466,9 +466,57 @@ def certify(template_id: str, dwg_path: str | Path, out_dir: str | Path,
             shutil.rmtree(temp_router_home, ignore_errors=True)
 
 
+def _flip_headless_safe_text(text: str) -> tuple[str, bool]:
+    """Flip the single `"headless_safe": false` -> true in place (single-template
+    doc). Returns (text, ok); ok is False unless exactly one occurrence was flipped."""
+    new, n = re.subn(r'("headless_safe"\s*:\s*)false\b', r"\1true", text, count=1)
+    return new, (n == 1)
+
+
+def _append_evidence_ref_text(text: str, new_ref: str) -> tuple[str, bool, str | None]:
+    """Append new_ref to an EXISTING evidence_refs array in place, preserving the
+    array's hand-authored single/multi-line style and the file's newline. Returns
+    (text, changed, reason); reason is set (changed False) when the array is
+    absent/unparseable/already-present."""
+    m = re.search(r'("evidence_refs"\s*:\s*)(\[.*?\])', text, re.DOTALL)
+    if not m:
+        return text, False, "no_array"
+    arr_text = m.group(2)
+    try:
+        arr = json.loads(arr_text)
+    except Exception:
+        return text, False, "unparseable"
+    if not isinstance(arr, list):
+        return text, False, "not_a_list"
+    if new_ref in arr:
+        return text, False, "duplicate"
+    items = arr + [new_ref]
+    if "\n" in arr_text:
+        nl = "\r\n" if "\r\n" in arr_text else "\n"
+        entry_m = re.search(r"[\r\n]([ \t]+)\"", arr_text)
+        indent = entry_m.group(1) if entry_m else "        "
+        close_m = re.search(r"[\r\n]([ \t]*)\]\s*$", arr_text)
+        close_indent = close_m.group(1) if close_m else "      "
+        body = (","+ nl).join(indent + json.dumps(i, ensure_ascii=False) for i in items)
+        new_arr = "[" + nl + body + nl + close_indent + "]"
+    else:
+        new_arr = "[" + ", ".join(json.dumps(i, ensure_ascii=False) for i in items) + "]"
+    new_text = text[:m.start(2)] + new_arr + text[m.end(2):]
+    return new_text, True, None
+
+
 def apply_certification(template_id: str, envelope: dict, *,
                         router_home: Path | str = ROUTER_HOME) -> bool:
-    """Flip headless_safe=true only for a CERTIFIED envelope."""
+    """Flip headless_safe=true (+ append the certification evidence_ref) only for a
+    CERTIFIED envelope.
+
+    The registry document is edited IN PLACE as text so a fragment's hand-authored
+    compact-array formatting is preserved -- a whole-doc re-dump would reflow every
+    array on each --apply (collateral diff; the arrays are compact-single-line for
+    some keys and multi-line for others, which no mechanical serializer reproduces).
+    Falls back to a structure-level re-dump ONLY when the surgical edit is not safely
+    applicable (a multi-template doc, or a template with no evidence_refs array), and
+    says so on stderr -- never a silent reformat."""
     if envelope.get("verdict") != CERTIFIED:
         return False
 
@@ -476,21 +524,47 @@ def apply_certification(template_id: str, envelope: dict, *,
     templates_path = router_home / "config" / "command_templates.json"
     doc_path, raw, templates, idx, template = _find_template_entry(template_id, templates_path)
 
+    evidence_ref = _repo_relative_ref(router_home, envelope["evidence_paths"]["envelope"])
+    already_safe = bool(template.get("headless_safe"))
+    existing_refs = template.get("evidence_refs")
+    has_refs_array = isinstance(existing_refs, list)
+    already_ref = has_refs_array and evidence_ref in existing_refs
+    if already_safe and already_ref:
+        return False
+
+    # Surgical, style-preserving path: single-template doc with an existing
+    # evidence_refs array (the certification-fragment shape).
+    if len(templates) == 1 and has_refs_array:
+        with open(doc_path, "r", encoding="utf-8-sig", newline="") as fh:
+            text = fh.read()
+        ok = True
+        if not already_safe:
+            text, ok = _flip_headless_safe_text(text)
+        if ok and not already_ref:
+            text, ok, _reason = _append_evidence_ref_text(text, evidence_ref)
+        if ok:
+            with open(doc_path, "w", encoding="utf-8", newline="") as fh:
+                fh.write(text)
+            return True
+        # fall through to the structural re-dump if the surgical edit did not apply
+
+    print(
+        f"[apply_certification] NOTE: structural re-dump of {doc_path} "
+        f"(style-preserving edit not applicable: templates={len(templates)}, "
+        f"has_evidence_refs={has_refs_array}); array formatting may reflow.",
+        file=sys.stderr,
+    )
     changed = False
-    if not template.get("headless_safe"):
+    if not already_safe:
         templates[idx]["headless_safe"] = True
         changed = True
-
-    evidence_refs = template.get("evidence_refs")
-    if not isinstance(evidence_refs, list):
-        evidence_refs = []
-        templates[idx]["evidence_refs"] = evidence_refs
+    if not has_refs_array:
+        existing_refs = []
+        templates[idx]["evidence_refs"] = existing_refs
         changed = True
-    evidence_ref = _repo_relative_ref(router_home, envelope["evidence_paths"]["envelope"])
-    if evidence_ref not in evidence_refs:
-        evidence_refs.append(evidence_ref)
+    if evidence_ref not in existing_refs:
+        existing_refs.append(evidence_ref)
         changed = True
-
     if changed:
         _write_json_style(doc_path, raw)
     return changed

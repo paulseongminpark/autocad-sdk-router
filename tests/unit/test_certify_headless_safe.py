@@ -518,6 +518,68 @@ class TestCertifyHeadlessSafe(unittest.TestCase):
         self.assertFalse(doc["templates"][0]["headless_safe"])
         self.assertNotIn("evidence_refs", doc["templates"][0])
 
+    def test_apply_preserves_compact_fragment_style(self):
+        """WHY: apply_certification edits a hand-authored compact fragment IN PLACE so a
+        --apply flip is a minimal diff, not a whole-file array reflow. Assert the compact
+        single-line arrays survive byte-for-byte while headless_safe flips and the
+        evidence_ref is appended (regression for the pre-push reformatting finding)."""
+        tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(tmp.cleanup)
+        root = Path(tmp.name)
+        frag_dir = root / "config" / "command_templates.d"
+        frag_dir.mkdir(parents=True)
+        _write_json(root / "config" / "command_templates.json", {"templates": []})
+        frag = frag_dir / "define_arrayrect.json"
+        compact = (
+            '{\n'
+            '  "templates": [\n'
+            '    {\n'
+            '      "template_id": "define.arrayrect",\n'
+            '      "headless_safe": false,\n'
+            '      "write_mode": {\n'
+            '        "default": "write_copy",\n'
+            '        "allowed": ["read", "write_copy"]\n'
+            '      },\n'
+            '      "command_sequence": [\n'
+            '        { "literal": "ARRAYRECT" },\n'
+            '        { "literal": "L" }\n'
+            '      ],\n'
+            '      "evidence_refs": [\n'
+            '        "docs/GOVERNED_COMMAND_TEMPLATES.md#5-live-verification"\n'
+            '      ]\n'
+            '    }\n'
+            '  ]\n'
+            '}\n'
+        )
+        frag.write_text(compact, encoding="utf-8")
+
+        envelope = {
+            "verdict": chs.CERTIFIED,
+            "evidence_paths": {
+                "envelope": str(root / "out" / "define_arrayrect.certification.json")},
+        }
+        changed = chs.apply_certification("define.arrayrect", envelope, router_home=root)
+        self.assertTrue(changed)
+
+        out = frag.read_text(encoding="utf-8")
+        # the two intended changes only
+        self.assertIn('"headless_safe": true', out)
+        self.assertNotIn('"headless_safe": false', out)
+        # compact hand-authored style preserved byte-for-byte
+        self.assertIn('"allowed": ["read", "write_copy"]', out)
+        self.assertIn('{ "literal": "ARRAYRECT" }', out)
+        self.assertIn('{ "literal": "L" }', out)
+        # command_sequence was NOT reflowed to expanded multi-line objects
+        self.assertNotIn('"literal": "ARRAYRECT"\n', out.replace('{ "literal": "ARRAYRECT" }', ''))
+        # structure is valid JSON with the flip + appended ref
+        doc = json.loads(out)
+        t = doc["templates"][0]
+        self.assertTrue(t["headless_safe"])
+        self.assertEqual(len(t["evidence_refs"]), 2)
+        self.assertEqual(t["evidence_refs"][-1], "out/define_arrayrect.certification.json")
+        # apply is idempotent (already-safe + already-ref -> no-op)
+        self.assertFalse(chs.apply_certification("define.arrayrect", envelope, router_home=root))
+
     def test_resume_skip_reuses_existing_envelope_without_invoking_cad(self):
         """WHY: certification is resumable; an existing envelope is the source of truth unless --force reruns it."""
         tmp, router, _frag_path, dwg, out_dir = self._router_and_dwg()
