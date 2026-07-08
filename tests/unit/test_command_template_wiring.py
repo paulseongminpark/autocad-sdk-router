@@ -70,6 +70,24 @@ def test_valid_template_dispatches_through_cad_run_command_template(monkeypatch,
     assert calls, "accoreconsole subprocess should be invoked for a valid template"
 
 
+def test_timeout_sec_is_threaded_to_subprocess(monkeypatch, tmp_path):
+    """WHY (finding 5): a caller's timeout_sec must reach subprocess.run's timeout= kwarg,
+    not be silently dropped at the engine's fixed 120s default."""
+    dwg = _fake_dwg(tmp_path)
+    calls = []
+    _install_fake_accoreconsole(monkeypatch, tmp_path, calls)
+
+    # explicit budget is forwarded end-to-end
+    cadctl.Cad().run_command_template(
+        "maintenance.drawing.audit", {"fix_answer": "Y"}, dwg=str(dwg), timeout_sec=47)
+    assert calls[-1]["timeout"] == 47
+
+    # no override falls back to the engine's documented 120s default
+    cadctl.Cad().run_command_template(
+        "maintenance.drawing.audit", {"fix_answer": "Y"}, dwg=str(dwg))
+    assert calls[-1]["timeout"] == 120.0
+
+
 def test_mcp_tool_delegates_with_ok_result_envelope(monkeypatch, tmp_path):
     dwg = _fake_dwg(tmp_path)
     calls = []

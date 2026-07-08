@@ -879,7 +879,8 @@ class Cad:
 
     # ----------------------------------------------------- run_command_template
     def run_command_template(self, template_id: str, slots: dict,
-                             dwg: str | None = None) -> dict:
+                             dwg: str | None = None, *,
+                             timeout_sec: float | None = None) -> dict:
         """Run a governed built-in-command template through W5-TMPL.
 
         The command_template_engine owns the closed template registry, hostile
@@ -943,6 +944,7 @@ class Cad:
             return env
 
         write_mode = (template.get("write_mode") or {}).get("default") or "read"
+        _tmpl_kw = {} if timeout_sec is None else {"timeout_sec": timeout_sec}
         try:
             result = command_template_engine.run_template(
                 template_id,
@@ -950,6 +952,7 @@ class Cad:
                 dwg,
                 write_mode=write_mode,
                 templates_path=templates_path,
+                **_tmpl_kw,
             )
         except Exception as exc:
             env.update({
@@ -1347,8 +1350,9 @@ def run_operation(op_id: str, args: dict | None = None, write_mode: str | None =
 
 
 def run_command_template(template_id: str, slots: dict,
-                         dwg: str | None = None) -> dict:
-    return Cad().run_command_template(template_id, slots, dwg)
+                         dwg: str | None = None, *,
+                         timeout_sec: float | None = None) -> dict:
+    return Cad().run_command_template(template_id, slots, dwg, timeout_sec=timeout_sec)
 
 
 def patch_dry_run(patch: dict) -> dict:
