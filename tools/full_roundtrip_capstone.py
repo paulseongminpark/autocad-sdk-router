@@ -296,6 +296,34 @@ def filter_ir_to_certified(ir: Dict[str, Any], *, kinds: Optional[Set[str]] = No
     return filtered
 
 
+def apply_def_entity_budget(ir: Dict[str, Any],
+                            max_def_entities: int) -> Tuple[Dict[str, Any], List[Dict[str, Any]]]:
+    """(ir-copy, dropped[]) where block_definitions entries whose def_entities
+    count exceeds ``max_def_entities`` are removed whole. ir_to_patch then
+    defers any create_blockref naming a dropped definition with its honest
+    'no block_definitions entry for block_name ...' reason instead of
+    attempting a synthesis whose per-op cost is out of wall-clock budget
+    (measured ~13 s/op; e.g. 1.dwg's X-평면도(기본형) is 20,567 def
+    entities in closure -- ~74 h per-op). Whole-def drop + explicit report
+    only; a definition is never silently truncated to fit the budget."""
+    dropped: List[Dict[str, Any]] = []
+    kept: List[Dict[str, Any]] = []
+    for bd in (ir.get("block_definitions") or []):
+        n = len(bd.get("def_entities") or [])
+        if n > max_def_entities:
+            dropped.append({
+                "name": bd.get("name"), "handle": bd.get("handle"),
+                "def_entity_count": n,
+                "reason": "def_entity_count %d > --max-def-entities-per-block %d" % (
+                    n, max_def_entities),
+            })
+        else:
+            kept.append(bd)
+    out = dict(ir)
+    out["block_definitions"] = kept
+    return out, dropped
+
+
 # --------------------------------------------------------------------------- #
 # 3. layer / dimstyle record regen + record-diff (reuses op_roundtrip_probe's
 #    EXISTING LAYER_RECORD_FIELDS/layer_record_diff and its documented
@@ -1004,6 +1032,11 @@ def build_arg_parser() -> argparse.ArgumentParser:
     ap.add_argument("--kinds", default=None, help="comma-separated geometry.kind allowlist for regen")
     ap.add_argument("--limit", type=int, default=None, help="global op cap for this batch")
     ap.add_argument("--per-kind-limit", type=int, default=None, help="per-kind op cap for this batch")
+    ap.add_argument("--max-def-entities-per-block", type=int, default=None,
+                   help="drop block_definitions entries with more def_entities than this "
+                        "from the regen input; their INSERTs then defer honestly in "
+                        "ir_to_patch ('no block_definitions entry'). Whole-def drop with "
+                        "an explicit report -- never a silent truncation")
     ap.add_argument("--with-records", action="store_true",
                    help="also regen+record-diff layer/dimstyle tables (stretch)")
     ap.add_argument("--cross-verify", dest="cross_verify", action=argparse.BooleanOptionalAction, default=True,
@@ -1066,6 +1099,14 @@ def main(argv=None) -> int:
     filtered = filter_ir_to_certified(census_ir, kinds=kinds, limit=args.limit,
                                       per_kind_limit=args.per_kind_limit)
     summary["filtered_entity_count"] = len(filtered.get("entities") or [])
+
+    if args.max_def_entities_per_block is not None:
+        filtered, dropped_defs = apply_def_entity_budget(
+            filtered, args.max_def_entities_per_block)
+        summary["def_entity_budget"] = {
+            "max_def_entities_per_block": args.max_def_entities_per_block,
+            "dropped_block_definitions": dropped_defs,
+        }
 
     if args.mint_seed_if_missing and not os.path.isfile(args.seed):
         seed_status = ensure_blank_seed(args.seed, out_dir)

@@ -20,6 +20,11 @@ runs/
 staging/
 ErrorReports/
 
+# e2e roundtrip: raw native IR extraction artifacts are large (measured:
+# 1.dwg rich IR 31 MB + native stdout 119 MB) -- keep only distilled
+# report .md / summary JSONs under reports/e2e_roundtrip_*/.
+reports/e2e_roundtrip_*/ir_a/
+
 # ── Caches / generated indexes ──
 .pytest_cache/
 __pycache__/

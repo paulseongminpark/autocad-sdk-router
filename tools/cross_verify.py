@@ -30,6 +30,18 @@ LIBREDWG_KIND_MAP: Dict[str, str] = {
     "POLYLINE_3D": "polyline",
     "LWPOLYLINE": "lwpolyline",
     "POINT": "point",
+    # All dimension subtypes fold to the IR's single "dimension" kind
+    # (mirror of ir_builder's dimension_all_subtypes bucket). Measured need:
+    # e2e_1dwg_R1a_20260708 cross-verify flagged DIMENSION_LINEAR as
+    # unmapped while the IR side counted kind:dimension 2 -- a label-map
+    # gap, not an entity mismatch.
+    "DIMENSION_LINEAR": "dimension",
+    "DIMENSION_ALIGNED": "dimension",
+    "DIMENSION_ANG2LN": "dimension",
+    "DIMENSION_ANG3PT": "dimension",
+    "DIMENSION_DIAMETER": "dimension",
+    "DIMENSION_RADIUS": "dimension",
+    "DIMENSION_ORDINATE": "dimension",
 }
 
 _JSON_ENCODINGS = ("utf-8-sig", "utf-8", "cp1252", "latin1")
