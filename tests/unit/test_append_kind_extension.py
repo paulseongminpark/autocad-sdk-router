@@ -231,3 +231,20 @@ def test_spline_weights_pass_through_when_present():
     ent = op["args"]["entity"]
     assert ent["knots"] == [0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0, 1.0]
     assert ent["weights"] == [1.0, 0.5, 0.5, 1.0]
+
+
+def test_create_block_synthesis_suppresses_seed_line():
+    ops, _deferred = patch_ops_blocks.block_def_ops(
+        {"name": "D", "handle": "H", "def_entities": [
+            {"handle": "L1", "layer": "0",
+             "geometry": {"kind": "line", "start": [0.0, 0.0, 0.0], "end": [1.0, 0.0, 0.0]}}]})
+    create = ops[0]
+    assert create["operation"] == "create_block"
+    assert create["args"]["seed_line"] == 0
+    job = patch_ops_blocks.build_job_args("write.block.simple_create", create["args"])
+    assert job["seed_line"] == 0
+
+
+def test_simple_create_without_seed_key_stays_legacy():
+    job = patch_ops_blocks.build_job_args("write.block.simple_create", {"name": "D"})
+    assert "seed_line" not in job

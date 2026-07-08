@@ -5515,7 +5515,8 @@ static bool listModelSpaceEntities(AcDbDatabase* pDb, const std::string& type,
 static Acad::ErrorStatus createSimpleBlock(AcDbDatabase* pDb,
                                            const std::string& name,
                                            bool& created,
-                                           int& definitionCount)
+                                           int& definitionCount,
+                                           bool seedLine = true)
 {
     created = false;
     definitionCount = 0;
@@ -5546,16 +5547,25 @@ static Acad::ErrorStatus createSimpleBlock(AcDbDatabase* pDb,
         return es;
     }
 
-    AcDbLine* pLine = new AcDbLine(AcGePoint3d(0.0, 0.0, 0.0),
-                                  AcGePoint3d(5.0, 0.0, 0.0));
-    AcDbObjectId lineId;
-    es = pBlock->appendAcDbEntity(lineId, pLine);
-    if (es == Acad::eOk) {
-        pLine->close();
-        created = true;
+    if (seedLine) {
+        // Self-test heritage: the original op proved writability by seeding a
+        // visible line. Regen synthesis passes seed_line=0 - a phantom
+        // (0,0,0)->(5,0,0) line in every rebuilt definition was the measured
+        // "+1 per def" fixed-point drift (GEN2 / R4b blockdef_diff).
+        AcDbLine* pLine = new AcDbLine(AcGePoint3d(0.0, 0.0, 0.0),
+                                      AcGePoint3d(5.0, 0.0, 0.0));
+        AcDbObjectId lineId;
+        es = pBlock->appendAcDbEntity(lineId, pLine);
+        if (es == Acad::eOk) {
+            pLine->close();
+            created = true;
+        }
+        else {
+            delete pLine;
+        }
     }
     else {
-        delete pLine;
+        created = true;
     }
     pBlock->close();
 
@@ -6703,13 +6713,16 @@ static void ariadneNativeJob()
     else if (op == "write.block.simple_create") {
         std::string name;
         jsonFindString(job, "name", name);
+        double seedLineNum = 1.0;
+        jsonFindNumber(job, "seed_line", seedLineNum);
         bool created = false;
         int definitionCount = 0;
         const Acad::ErrorStatus es = createSimpleBlock(
             pDb,
             name,
             created,
-            definitionCount);
+            definitionCount,
+            seedLineNum != 0.0);
         r << "\"result\":{\"created\":" << (created ? "true" : "false")
           << ",\"errorstatus\":" << static_cast<int>(es)
           << ",\"name\":\"" << jsonEscape(name) << "\""

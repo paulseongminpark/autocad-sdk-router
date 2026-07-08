@@ -27,11 +27,45 @@ def _write_json(path: str, payload: Dict[str, Any]) -> None:
         fh.write("\n")
 
 
+def _canonical_entity(entity: Dict[str, Any]) -> Dict[str, Any]:
+    """Normalize representation-dependent geometry before comparison.
+
+    Splines: the extractor stores the canonical B-spline definition at the
+    def-entity TOP level (spline_control_points / spline_knots) and, only for
+    fit-authored splines, an additional geometry.fit_points list. A rebuild
+    from control points + knots produces the mathematically identical curve
+    but re-extracts WITHOUT fit_points (measured on R4b: 139/139 canonical
+    match while geometry-dict compare called all of them modified). Compare
+    the canonical definition on both sides; fit authoring data is reported
+    separately in totals, not silently dropped.
+    """
+    g = entity.get("geometry") or {}
+    if g.get("kind") != "spline":
+        return entity
+    control_points = entity.get("spline_control_points")
+    knots = entity.get("spline_knots")
+    if not (control_points and knots):
+        return entity
+    canon_g = dict(g)
+    canon_g["control_points"] = control_points
+    canon_g["knots"] = knots
+    canon_g.pop("fit_points", None)
+    canon = dict(entity)
+    canon["geometry"] = canon_g
+    return canon
+
+
+def _spline_fit_authored_count(entities: List[Dict[str, Any]]) -> int:
+    return sum(1 for e in entities
+               if ((e.get("geometry") or {}).get("kind") == "spline"
+                   and (e.get("geometry") or {}).get("fit_points")))
+
+
 def _definition_entities(block_def: Dict[str, Any]) -> List[Dict[str, Any]]:
     entities = block_def.get("def_entities")
     if entities is None:
         entities = block_def.get("entities")
-    return [e for e in (entities or []) if isinstance(e, dict)]
+    return [_canonical_entity(e) for e in (entities or []) if isinstance(e, dict)]
 
 
 def _definitions_by_name(ir: Dict[str, Any]) -> Dict[str, Dict[str, Any]]:
@@ -70,10 +104,18 @@ def diff_block_definitions(ir_a: Dict[str, Any], ir_b: Dict[str, Any], *,
     diff0_total = 0
     a_entity_total = 0
     b_entity_total = 0
+    fit_authored_a = 0
+    fit_authored_b = 0
 
     for name in sorted(set(defs_a) | set(defs_b)):
         def_a = defs_a.get(name)
         def_b = defs_b.get(name)
+        raw_a = [e for e in ((def_a or {}).get("def_entities")
+                             or (def_a or {}).get("entities") or []) if isinstance(e, dict)]
+        raw_b = [e for e in ((def_b or {}).get("def_entities")
+                             or (def_b or {}).get("entities") or []) if isinstance(e, dict)]
+        fit_authored_a += _spline_fit_authored_count(raw_a)
+        fit_authored_b += _spline_fit_authored_count(raw_b)
         ents_a = _definition_entities(def_a) if def_a else []
         ents_b = _definition_entities(def_b) if def_b else []
         a_total = len(ents_a)
@@ -127,6 +169,11 @@ def diff_block_definitions(ir_a: Dict[str, Any], ir_b: Dict[str, Any], *,
             "interior_diff0_fraction": (
                 (float(diff0_total) / float(a_entity_total)) if a_entity_total else None
             ),
+            # Fit-authoring parity (honest annotation): splines compare on the
+            # canonical control/knot definition; a-side fit authoring data that
+            # the rebuild does not restore shows up as fit_authored_a > _b.
+            "spline_fit_authored_a": fit_authored_a,
+            "spline_fit_authored_b": fit_authored_b,
         },
         "by_kind_gap": by_kind_gap,
     }

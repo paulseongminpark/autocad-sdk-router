@@ -67,6 +67,13 @@ def build_job_args(native_op: str, args: Dict[str, Any]) -> Optional[Dict[str, A
         out: Dict[str, Any] = {}
         if "name" in args:
             out["name"] = args["name"]
+        # Passthrough only: block_def_ops emits seed_line=0 for SYNTHESIS
+        # create_block ops (suppresses the op's self-test heritage line, the
+        # measured "+1 per def" drift). create_block_simple keeps its legacy
+        # certified behavior by simply not carrying the key. Numeric 0/1 on
+        # purpose: the native handler reads it via jsonFindNumber.
+        if "seed_line" in args:
+            out["seed_line"] = args["seed_line"]
         return out
     if native_op == "write.block.append_entity":
         # Flat passthrough is correct here even though "entity" is itself a
@@ -210,7 +217,11 @@ def block_def_ops(block_def: Dict[str, Any]) -> Tuple[List[Dict[str, Any]], List
     is reported in ``deferred``, never silently dropped (no-fake-success).
     """
     name = block_def.get("name")
-    ops: List[Dict[str, Any]] = [{"operation": "create_block", "args": {"name": name}}]
+    # seed_line=0: synthesis rebuilds the definition from census def_entities
+    # only - the native op's default self-test line ((0,0,0)->(5,0,0)) was the
+    # measured "+1 per def" fixed-point drift (GEN2 / R4b blockdef_diff).
+    ops: List[Dict[str, Any]] = [
+        {"operation": "create_block", "args": {"name": name, "seed_line": 0}}]
     deferred: List[Dict[str, Any]] = []
     def_entities = block_def.get("def_entities") or []
     if not def_entities:

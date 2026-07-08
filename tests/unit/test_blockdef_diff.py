@@ -126,3 +126,36 @@ def test_empty_a_entity_total_yields_none_fraction():
 
     assert report["totals"]["a_entity_total"] == 0
     assert report["totals"]["interior_diff0_fraction"] is None
+
+
+def test_spline_canonical_representation_matches_across_fit_asymmetry():
+    # a-side: fit-authored spline (fit_points inline) + canonical top-level data;
+    # b-side: rebuilt from control/knots - no fit_points. Same curve => diff0.
+    cp = [[0.0, 0.0, 0.0], [1.0, 1.0, 0.0], [2.0, 0.0, 0.0]]
+    kn = [0.0, 0.0, 0.0, 1.0, 1.0, 1.0]
+    def spl(with_fit):
+        g = {"kind": "spline", "degree": 2.0, "closed": False}
+        if with_fit:
+            g["fit_points"] = [[0.0, 0.0, 0.0], [1.0, 0.5, 0.0], [2.0, 0.0, 0.0]]
+        return {"handle": "S1", "layer": "0", "geometry": g,
+                "spline_control_points": cp, "spline_knots": kn}
+    ir_a = {"block_definitions": [{"name": "D", "def_entities": [spl(True)]}]}
+    ir_b = {"block_definitions": [{"name": "D", "def_entities": [spl(False)]}]}
+    res = blockdef_diff.diff_block_definitions(ir_a, ir_b)
+    t = res["totals"]
+    assert t["diff0_total"] == 1 and t["a_entity_total"] == 1
+    assert t["interior_diff0_fraction"] == 1.0
+    assert t["spline_fit_authored_a"] == 1
+    assert t["spline_fit_authored_b"] == 0
+
+
+def test_spline_different_control_points_still_mismatch():
+    def spl(cp):
+        return {"handle": "S1", "layer": "0",
+                "geometry": {"kind": "spline", "degree": 2.0, "closed": False},
+                "spline_control_points": cp,
+                "spline_knots": [0.0, 0.0, 0.0, 1.0, 1.0, 1.0]}
+    ir_a = {"block_definitions": [{"name": "D", "def_entities": [spl([[0.0, 0.0, 0.0], [1.0, 1.0, 0.0], [2.0, 0.0, 0.0]])]}]}
+    ir_b = {"block_definitions": [{"name": "D", "def_entities": [spl([[0.0, 0.0, 0.0], [1.0, 9.9, 0.0], [2.0, 0.0, 0.0]])]}]}
+    res = blockdef_diff.diff_block_definitions(ir_a, ir_b)
+    assert res["totals"]["diff0_total"] == 0
