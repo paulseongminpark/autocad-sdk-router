@@ -37,6 +37,12 @@
 #include "dbelipse.h"     // AcDbEllipse
 #include "gedblar.h"      // AcGeDoubleArray
 #include "gevptar.h"      // AcGeVoidPointerArray
+#include "imgdef.h"       // AcDbRasterImageDef (wipeout image def)
+#include "imgent.h"       // AcDbRasterImage::ClipBoundaryType
+#include "dbwipe.h"       // AcDbWipeout
+#include "rxdlinkr.h"     // acrxDynamicLinker->loadModule
+
+#pragma comment(lib, "acismobj26.lib")
 
 // ---- op id constants (single source for HasOp + Dispatch; avoids string drift) -------------
 static const char* const kM08eOpEntityXdata   = "inspect.entity.get_xdata";
@@ -841,6 +847,79 @@ static bool m08eReadVertex2dArray(const std::string& json, const char* key,
     return true;
 }
 
+static bool m08eLoadWipeoutModule()
+{
+    static bool attempted = false;
+    static bool loaded = false;
+    if (!attempted) {
+        attempted = true;
+        loaded = (acrxDynamicLinker != nullptr &&
+                  acrxDynamicLinker->loadModule(L"acismobj26.dbx", false) == Acad::eOk);
+    }
+    return loaded;
+}
+
+static bool m08eEnsureWipeoutImageDef(AcDbDatabase* pDb,
+                                      AcDbObjectId& defId,
+                                      std::string& errCode,
+                                      std::string& errMsg)
+{
+    defId = AcDbObjectId::kNull;
+    if (!m08eLoadWipeoutModule()) {
+        errCode = "WIPEOUT_MODULE_UNAVAILABLE";
+        errMsg = "acismobj26.dbx could not be loaded for AcDbWipeout";
+        return false;
+    }
+
+    AcDbObjectId dictId = AcDbRasterImageDef::imageDictionary(pDb);
+    Acad::ErrorStatus es = Acad::eOk;
+    if (dictId.isNull())
+        es = AcDbRasterImageDef::createImageDictionary(pDb, dictId);
+    if (es != Acad::eOk || dictId.isNull()) {
+        errCode = "WIPEOUT_DICT_FAILED";
+        errMsg = "ACAD_IMAGE_DICT createImageDictionary errorstatus " +
+                 std::to_string(static_cast<int>(es));
+        return false;
+    }
+
+    AcDbDictionary* pDict = nullptr;
+    es = acdbOpenObject(pDict, dictId, AcDb::kForWrite);
+    if (es != Acad::eOk || pDict == nullptr) {
+        errCode = "WIPEOUT_DICT_OPEN_FAILED";
+        errMsg = "could not open ACAD_IMAGE_DICT errorstatus " +
+                 std::to_string(static_cast<int>(es));
+        return false;
+    }
+
+    const wchar_t* key = L"ARIADNE_WIPEOUT_DEF";
+    es = pDict->getAt(key, defId);
+    if (es == Acad::eOk && !defId.isNull()) {
+        pDict->close();
+        return true;
+    }
+    if (es != Acad::eKeyNotFound) {
+        pDict->close();
+        errCode = "WIPEOUT_DEF_FAILED";
+        errMsg = "ARIADNE_WIPEOUT_DEF lookup errorstatus " +
+                 std::to_string(static_cast<int>(es));
+        return false;
+    }
+
+    AcDbRasterImageDef* pDef = new AcDbRasterImageDef();
+    es = pDict->setAt(key, pDef, defId);
+    pDict->close();
+    if (es == Acad::eOk) {
+        pDef->close();
+        return true;
+    }
+
+    delete pDef;
+    errCode = "WIPEOUT_DEF_FAILED";
+    errMsg = "ARIADNE_WIPEOUT_DEF setAt errorstatus " +
+             std::to_string(static_cast<int>(es));
+    return false;
+}
+
 struct M08eHatchLoop
 {
     Adesk::Int32 loopType = 0;
@@ -1410,6 +1489,62 @@ static AcDbEntity* m08eBuildExtendedEntityForAppend(AcDbDatabase* pDb,
         }
         return pRef;
     }
+    if (kind == "wipeout") {
+        AcDbObjectId defId = AcDbObjectId::kNull;
+        if (!m08eEnsureWipeoutImageDef(pDb, defId, errCode, errMsg))
+            return nullptr;
+
+        AcGePoint3d origin;
+        m08eReadPoint(entityJson, "origin", 0.0, 0.0, 0.0, origin);
+        AcGeVector3d uVec;
+        m08eReadVector(entityJson, "u_vector", 1.0, 0.0, 0.0, uVec);
+        AcGeVector3d vVec;
+        m08eReadVector(entityJson, "v_vector", 0.0, 1.0, 0.0, vVec);
+
+        AcGePoint2dArray clipBoundary;
+        if (!m08eReadPoint2dArrayField(entityJson, "clip_boundary", clipBoundary) ||
+            clipBoundary.length() < 3) {
+            errCode = "MISSING_ARG";
+            errMsg = "entity.kind=wipeout requires 'clip_boundary':[>=3 [x,y]]";
+            return nullptr;
+        }
+        const AcGePoint2d firstClipPoint = clipBoundary[0];
+        const AcGePoint2d lastClipPoint = clipBoundary[clipBoundary.length() - 1];
+        if (firstClipPoint.x != lastClipPoint.x || firstClipPoint.y != lastClipPoint.y)
+            clipBoundary.append(firstClipPoint);
+
+        double clipTypeRaw = static_cast<double>(AcDbRasterImage::kPoly);
+        jsonFindNumber(entityJson, "clip_boundary_type", clipTypeRaw);
+        AcDbRasterImage::ClipBoundaryType clipType =
+            static_cast<AcDbRasterImage::ClipBoundaryType>(static_cast<int>(clipTypeRaw));
+
+        AcDbWipeout* pWipe = new AcDbWipeout();
+        pWipe->setDatabaseDefaults(pDb);
+        Acad::ErrorStatus es = pWipe->setImageDefId(defId);
+        if (es != Acad::eOk) {
+            delete pWipe;
+            errCode = "WIPEOUT_IMAGEDEFID_FAILED";
+            errMsg = "entity.kind=wipeout setImageDefId errorstatus " +
+                     std::to_string(static_cast<int>(es));
+            return nullptr;
+        }
+        if (!pWipe->setOrientation(origin, uVec, vVec)) {
+            delete pWipe;
+            errCode = "BUILD_FAILED";
+            errMsg = "entity.kind=wipeout setOrientation failed";
+            return nullptr;
+        }
+        es = pWipe->setClipBoundary(clipType, clipBoundary);
+        if (es != Acad::eOk) {
+            delete pWipe;
+            errCode = "WIPEOUT_CLIP_FAILED";
+            errMsg = "entity.kind=wipeout setClipBoundary errorstatus " +
+                     std::to_string(static_cast<int>(es));
+            return nullptr;
+        }
+        // frame_on has no public AcDbWipeout setter; preserve the default.
+        return pWipe;
+    }
     if (kind == "hatch") {
         bool isGradient = false;
         m08eFindFlag(entityJson, "is_gradient", isGradient);
@@ -1621,7 +1756,7 @@ static AcDbEntity* m08eBuildExtendedEntityForAppend(AcDbDatabase* pDb,
     }
 
     errCode = "UNSUPPORTED_KIND";
-    errMsg = "write.block.append_entity supports entity.kind in {line,circle,arc,text,ellipse,point,spline,lwpolyline,polyline,block_reference,hatch,face3d}; got '" + kind + "'";
+    errMsg = "write.block.append_entity supports entity.kind in {line,circle,arc,text,ellipse,point,spline,lwpolyline,polyline,block_reference,hatch,face3d,wipeout}; got '" + kind + "'";
     return nullptr;
 }
 
@@ -1876,7 +2011,7 @@ static AcDbEntity* m08eBuildEntityForAppend(const std::string& entityJson,
     }
 
     errCode = "UNSUPPORTED_KIND";
-    errMsg = "write.block.append_entity supports entity.kind in {line,circle,arc,text,ellipse,point,spline,lwpolyline,polyline,block_reference}; got '" + kindOut + "'";
+    errMsg = "write.block.append_entity supports entity.kind in {line,circle,arc,text,ellipse,point,spline,lwpolyline,polyline,block_reference,wipeout}; got '" + kindOut + "'";
     return nullptr;
 }
 
@@ -1986,8 +2121,16 @@ static bool m08eHandleBlockAppend(const AriadneJobCtx& ctx, std::ostringstream& 
         es = pBTR->appendAcDbEntity(newId, pEnt);
         if (es == Acad::eOk)
             pEnt->close();
-        else
+        else {
             delete pEnt;
+            if (kind == "wipeout" && (es == Acad::eInvalidInput || es == Acad::eNoClassId)) {
+                pBTR->close();
+                emitNativeError(r, "WIPEOUT_BTR_APPEND_UNPROVEN",
+                                "AcDbBlockTableRecord::appendAcDbEntity(AcDbWipeout) errorstatus " +
+                                std::to_string(static_cast<int>(es)));
+                return true;
+            }
+        }
     }
 
     int entityCountAfter = -1;
