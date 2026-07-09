@@ -1729,6 +1729,7 @@ static bool collectEntitiesFromBlock(AcDbBlockTableRecord* pBTR, const char* spa
             const AcGeVector3d hNormal = pHatch->normal();
             const bool isSolidFill = pHatch->isSolidFill() ? true : false;
             const bool isGradientHatch = pHatch->isGradient() ? true : false;
+            const bool isAssociativeHatch = pHatch->associative() ? true : false;
             const int patternDefinitionCount =
                 (!isSolidFill && !isGradientHatch) ? pHatch->numPatternDefinitions() : 0;
             const std::string patternDefinitionsJson =
@@ -1760,8 +1761,21 @@ static bool collectEntitiesFromBlock(AcDbBlockTableRecord* pBTR, const char* spa
                 << ",\"pattern_double\":" << (pHatch->patternDouble() ? "true" : "false")
                 << ",\"hatch_style\":" << static_cast<int>(pHatch->hatchStyle())
                 << ",\"is_solid_fill\":" << (isSolidFill ? "true" : "false")
-                << ",\"is_associative\":" << (pHatch->associative() ? "true" : "false")
-                << ",\"is_gradient\":" << (isGradientHatch ? "true" : "false")
+                << ",\"is_associative\":" << (isAssociativeHatch ? "true" : "false");
+            // R4n census 2026-07-09: 66 assoc-mismatch hatch pairs;
+            // loops carry no source refs, so this field is the re-link prerequisite.
+            if (isAssociativeHatch) {
+                AcDbObjectIdArray assocObjIds;
+                if (pHatch->getAssocObjIds(assocObjIds) == Acad::eOk && assocObjIds.length() > 0) {
+                    arr << ",\"assoc_source_handles\":[";
+                    for (int ai = 0; ai < assocObjIds.length(); ++ai) {
+                        if (ai) arr << ",";
+                        arr << "\"" << jsonEscape(handleOfId(assocObjIds[ai])) << "\"";
+                    }
+                    arr << "]";
+                }
+            }
+            arr << ",\"is_gradient\":" << (isGradientHatch ? "true" : "false")
                 << ",\"elevation\":" << pHatch->elevation()
                 << ",\"normal\":[" << hNormal.x << "," << hNormal.y << "," << hNormal.z << "]"
                 << ",\"loop_count\":" << loopCount
@@ -1773,13 +1787,6 @@ static bool collectEntitiesFromBlock(AcDbBlockTableRecord* pBTR, const char* spa
                     << ",\"gradient_type\":" << static_cast<int>(pHatch->gradientType())
                     << ",\"gradient_angle\":" << pHatch->gradientAngle();
             }
-            // Associated boundary object ids (associative hatches only, via
-            // getAssocObjIdsAt) are deliberately NOT resolved here: those ids
-            // name the OTHER entities (e.g. a circle) this hatch tracks, which
-            // is live-DB-state, not a property of the hatch itself -- same
-            // reasoning T3a's dim_block_handle omission-from-geometry already
-            // documents for dimensions (see op_roundtrip_probe.py). Noted as
-            // an honest exclusion, not silently dropped.
             richCounters.hatchLoops += loopCount;
             richCounters.hatchLoopVertices += vertexCount;
         }

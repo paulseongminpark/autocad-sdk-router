@@ -999,6 +999,10 @@ def _geometry_from_native_entity(raw: dict, kind: str) -> dict:
     if (isinstance(pattern_origin, list) and len(pattern_origin) >= 2
             and all(isinstance(v, (int, float)) for v in pattern_origin[:2])):
         geom["pattern_origin"] = [float(pattern_origin[0]), float(pattern_origin[1])]
+    assoc_source_handles = raw.get("assoc_source_handles")
+    if (isinstance(assoc_source_handles, list) and assoc_source_handles
+            and all(isinstance(v, str) for v in assoc_source_handles)):
+        geom["assoc_source_handles"] = assoc_source_handles
     if isinstance(raw.get("pattern_double"), bool):
         geom["pattern_double"] = raw["pattern_double"]
     if isinstance(raw.get("is_solid_fill"), bool):

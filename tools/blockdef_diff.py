@@ -234,6 +234,58 @@ def _cache_entity_total(caches: Dict[str, Dict[str, Any]]) -> int:
     return sum(len(_definition_entities(d)) for d in caches.values())
 
 
+def _diff_definition_row(name: str,
+                         def_a: Optional[Dict[str, Any]],
+                         def_b: Optional[Dict[str, Any]], *,
+                         tolerance: float = 1e-6,
+                         name_map: Optional[Dict[str, str]] = None,
+                         b_name: Optional[str] = None) -> Dict[str, Any]:
+    b_name = name if b_name is None else b_name
+    raw_a = [e for e in ((def_a or {}).get("def_entities")
+                         or (def_a or {}).get("entities") or []) if isinstance(e, dict)]
+    raw_b = [e for e in ((def_b or {}).get("def_entities")
+                         or (def_b or {}).get("entities") or []) if isinstance(e, dict)]
+    ents_a = _definition_entities(def_a, name_map=name_map) if def_a else []
+    ents_b = _definition_entities(def_b) if def_b else []
+    a_total = len(ents_a)
+    b_total = len(ents_b)
+
+    diff = cad_diff.compute_diff(
+        _synthetic_ir(ents_a),
+        _synthetic_ir(ents_b),
+        comparison_basis="geometry",
+        geometry_tolerance=tolerance,
+        diff_scope=cad_diff.FULL_DATABASE,
+    )
+    summary = diff["summary"]
+    missing_side: Optional[str] = None
+    if def_a is None:
+        missing_side = "a"
+    elif def_b is None:
+        missing_side = "b"
+
+    row = {
+        "name": name,
+        "a_total": a_total,
+        "b_total": b_total,
+        "diff0": int(summary.get("unchanged", 0) or 0),
+        "removed": int(summary.get("removed", 0) or 0),
+        "added": int(summary.get("added", 0) or 0),
+        "modified": int(summary.get("modified", 0) or 0),
+        "missing_side": missing_side,
+    }
+    if b_name != name:
+        row["b_name"] = b_name
+    return {
+        "row": row,
+        "a_total": a_total,
+        "b_total": b_total,
+        "diff0": row["diff0"],
+        "fit_authored_a": _spline_fit_authored_count(raw_a),
+        "fit_authored_b": _spline_fit_authored_count(raw_b),
+    }
+
+
 def diff_block_definitions(ir_a: Dict[str, Any], ir_b: Dict[str, Any], *,
                            tolerance: float = 1e-6,
                            name_map: Optional[Dict[str, str]] = None,
@@ -272,76 +324,22 @@ def diff_block_definitions(ir_a: Dict[str, Any], ir_b: Dict[str, Any], *,
         def_b = defs_b.get(b_name)
         if def_b is not None:
             matched_b_names.add(b_name)
-        raw_a = [e for e in ((def_a or {}).get("def_entities")
-                             or (def_a or {}).get("entities") or []) if isinstance(e, dict)]
-        raw_b = [e for e in ((def_b or {}).get("def_entities")
-                             or (def_b or {}).get("entities") or []) if isinstance(e, dict)]
-        fit_authored_a += _spline_fit_authored_count(raw_a)
-        fit_authored_b += _spline_fit_authored_count(raw_b)
-        ents_a = _definition_entities(def_a, name_map=name_map) if def_a else []
-        ents_b = _definition_entities(def_b) if def_b else []
-        a_total = len(ents_a)
-        b_total = len(ents_b)
-        a_entity_total += a_total
-        b_entity_total += b_total
-
-        diff = cad_diff.compute_diff(
-            _synthetic_ir(ents_a),
-            _synthetic_ir(ents_b),
-            comparison_basis="geometry",
-            geometry_tolerance=tolerance,
-            diff_scope=cad_diff.FULL_DATABASE,
-        )
-        summary = diff["summary"]
-        missing_side: Optional[str] = None
-        if def_a is None:
-            missing_side = "a"
-        elif def_b is None:
-            missing_side = "b"
-
-        diff0 = int(summary.get("unchanged", 0) or 0)
-        diff0_total += diff0
-        row = {
-            "name": name,
-            "a_total": a_total,
-            "b_total": b_total,
-            "diff0": diff0,
-            "removed": int(summary.get("removed", 0) or 0),
-            "added": int(summary.get("added", 0) or 0),
-            "modified": int(summary.get("modified", 0) or 0),
-            "missing_side": missing_side,
-        }
-        if b_name != name:
-            row["b_name"] = b_name
-        per_def.append(row)
+        compared = _diff_definition_row(
+            name, def_a, def_b, tolerance=tolerance, name_map=name_map, b_name=b_name)
+        fit_authored_a += compared["fit_authored_a"]
+        fit_authored_b += compared["fit_authored_b"]
+        a_entity_total += compared["a_total"]
+        b_entity_total += compared["b_total"]
+        diff0_total += compared["diff0"]
+        per_def.append(compared["row"])
 
     for b_name in sorted(name for name in defs_b if name not in matched_b_names):
         def_b = defs_b.get(b_name)
-        raw_b = [e for e in ((def_b or {}).get("def_entities")
-                             or (def_b or {}).get("entities") or []) if isinstance(e, dict)]
-        fit_authored_b += _spline_fit_authored_count(raw_b)
-        ents_b = _definition_entities(def_b) if def_b else []
-        b_total = len(ents_b)
-        b_entity_total += b_total
-
-        diff = cad_diff.compute_diff(
-            _synthetic_ir([]),
-            _synthetic_ir(ents_b),
-            comparison_basis="geometry",
-            geometry_tolerance=tolerance,
-            diff_scope=cad_diff.FULL_DATABASE,
-        )
-        summary = diff["summary"]
-        per_def.append({
-            "name": b_name,
-            "a_total": 0,
-            "b_total": b_total,
-            "diff0": int(summary.get("unchanged", 0) or 0),
-            "removed": int(summary.get("removed", 0) or 0),
-            "added": int(summary.get("added", 0) or 0),
-            "modified": int(summary.get("modified", 0) or 0),
-            "missing_side": "a",
-        })
+        compared = _diff_definition_row(
+            b_name, None, def_b, tolerance=tolerance, b_name=b_name)
+        fit_authored_b += compared["fit_authored_b"]
+        b_entity_total += compared["b_total"]
+        per_def.append(compared["row"])
 
     by_kind_a = _kind_counts(defs_a)
     by_kind_b = _kind_counts(defs_b)
@@ -372,6 +370,70 @@ def diff_block_definitions(ir_a: Dict[str, Any], ir_b: Dict[str, Any], *,
             "derived_cache_excluded": derived_cache_excluded,
         },
         "by_kind_gap": by_kind_gap,
+    }
+
+
+def diff_block_definitions_partial(census_ir: Dict[str, Any],
+                                   post_ir: Dict[str, Any],
+                                   def_names: Iterable[str], *,
+                                   name_map: Optional[Dict[str, str]] = None,
+                                   exclude_derived_caches: bool = True) -> Dict[str, Any]:
+    requested = list(def_names or [])
+    defs_a_all = _definitions_by_name(census_ir or {})
+    defs_b_all = _definitions_by_name(post_ir or {})
+    defs_a = defs_a_all
+    defs_b = defs_b_all
+    if exclude_derived_caches:
+        defs_a, _caches_a = _split_dim_caches(defs_a_all)
+        defs_b, _caches_b = _split_dim_caches(defs_b_all)
+
+    missing: List[Dict[str, str]] = []
+    per_def: List[Dict[str, Any]] = []
+    compared = 0
+    a_entity_total = 0
+    b_entity_total = 0
+    diff0_total = 0
+    seen = set()
+
+    for name in requested:
+        if name in seen:
+            continue
+        seen.add(name)
+        if exclude_derived_caches and name in defs_a_all and _DIM_CACHE_NAME.match(name):
+            missing.append({
+                "name": name,
+                "reason": "excluded_derived_cache",
+            })
+            continue
+        def_a = defs_a.get(name)
+        if def_a is None:
+            missing.append({
+                "name": name,
+                "reason": "not_found",
+            })
+            continue
+        b_name = (name_map or {}).get(name, name)
+        compared_row = _diff_definition_row(
+            name, def_a, defs_b.get(b_name), name_map=name_map, b_name=b_name)
+        per_def.append(compared_row["row"])
+        compared += 1
+        a_entity_total += compared_row["a_total"]
+        b_entity_total += compared_row["b_total"]
+        diff0_total += compared_row["diff0"]
+
+    return {
+        "schema": "ariadne.blockdef_diff.partial.v1",
+        "per_def": per_def,
+        "partial": {
+            "requested": requested,
+            "compared": compared,
+            "missing": missing,
+        },
+        "totals": {
+            "a_entity_total": a_entity_total,
+            "b_entity_total": b_entity_total,
+            "diff0_total": diff0_total,
+        },
     }
 
 

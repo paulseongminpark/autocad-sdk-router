@@ -1,0 +1,86 @@
+{
+  "schema": "ariadne.alm_bench.read.v0",
+  "source_ir": "D:\\dev\\99_tools\\autocad-sdk-router\\runs\\e2e_1dwg_R4n_origin_20260709\\census\\dwg_graph_ir.json",
+  "tasks": [
+    {
+      "budget_axis": "single_pass",
+      "gold": 375,
+      "gold_derivation": "count(entities where space == 'model')",
+      "id": "READ-001",
+      "question": "모델스페이스(entities) 엔티티는 총 몇 개입니까?",
+      "rubric": "exact_match"
+    },
+    {
+      "budget_axis": "single_pass",
+      "gold": 113,
+      "gold_derivation": "count(entities where space == 'model' and dxf_name == 'DIMENSION')",
+      "id": "READ-002",
+      "question": "모델스페이스 엔티티 중 DIMENSION(dxf_name)은 몇 개입니까?",
+      "rubric": "exact_match"
+    },
+    {
+      "budget_axis": "single_pass",
+      "gold": 117,
+      "gold_derivation": "count(entities where space == 'model' and dxf_name == 'TEXT')",
+      "id": "READ-003",
+      "question": "모델스페이스 엔티티 중 TEXT(dxf_name)는 몇 개입니까?",
+      "rubric": "exact_match"
+    },
+    {
+      "budget_axis": "single_pass",
+      "gold": 407,
+      "gold_derivation": "len(block_definitions)",
+      "id": "READ-004",
+      "question": "block_definitions 목록에 있는 블록 정의는 총 몇 개입니까?",
+      "rubric": "exact_match"
+    },
+    {
+      "budget_axis": "single_pass",
+      "gold": 113,
+      "gold_derivation": "count(block_definitions where regex('^\\*D\\d+$').match(name))",
+      "id": "READ-005",
+      "question": "이름이 정규식 ^\\*D\\d+$ 패턴과 일치하는 block_definitions는 몇 개입니까?",
+      "rubric": "exact_match"
+    },
+    {
+      "budget_axis": "single_pass",
+      "gold": 28183,
+      "gold_derivation": "sum(len(bd.def_entities) for bd in block_definitions)",
+      "id": "READ-006",
+      "question": "모든 block_definitions의 def_entities를 합산하면 총 몇 개입니까?",
+      "rubric": "exact_match"
+    },
+    {
+      "budget_axis": "single_pass",
+      "gold": 265,
+      "gold_derivation": "sum(count(de in bd.def_entities where de.dxf_name == 'HATCH') for bd in block_definitions)",
+      "id": "READ-007",
+      "question": "모든 block_definitions의 def_entities 중 dxf_name이 HATCH인 항목은 몇 개입니까?",
+      "rubric": "exact_match"
+    },
+    {
+      "budget_axis": "single_pass",
+      "gold": 6,
+      "gold_derivation": "len(set(e.dxf_name for e in entities where space == 'model'))",
+      "id": "READ-008",
+      "question": "모델스페이스 entities에서 서로 다른 dxf_name 값은 몇 종류입니까?",
+      "rubric": "exact_match"
+    },
+    {
+      "budget_axis": "single_pass",
+      "gold": 50,
+      "gold_derivation": "len(block_references)",
+      "id": "READ-009",
+      "question": "block_references 목록에 있는 블록 참조는 총 몇 개입니까?",
+      "rubric": "exact_match"
+    },
+    {
+      "budget_axis": "single_pass",
+      "gold": "X-평면도(기본형)",
+      "gold_derivation": "min(sorted(name for bd in block_definitions where bd.entity_count == max(entity_count)))",
+      "id": "READ-010",
+      "question": "entity_count가 가장 큰 block_definition의 이름은 무엇입니까? (동률이면 사전순으로 가장 앞선 이름)",
+      "rubric": "exact_match"
+    }
+  ]
+}
