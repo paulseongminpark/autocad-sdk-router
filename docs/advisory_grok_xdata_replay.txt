@@ -1,0 +1,35 @@
+`setXData`는 app 블록 안에서 control brace를 **스택으로 검증**한다.
+
+자주 터지는 패턴:
+- `}` 가 `{` 보다 많음 / 닫히지 않은 `{`
+- 1002 값이 정확히 `"{"` / `"}"`가 아님
+- brace를 **app 경계(1001) 밖으로** 걸침 — 각 1001 그룹 안에서 독립적으로 균형
+- 추출 시 brace row를 잃고 내용만 남김, 또는 반대로 빈 brace만 중복
+
+이 레포 `modify.entity.xdata`는 현재 **1002·1004를 의도적으로 제외**한다. full-fidelity replay면:
+- IR에 1002 row를 **순서 그대로** 넣고
+- app별로 balance 검사 후 `setXData`
+- 실패 시 `eBadDxfSequence` → 해당 app만 로그/스킵 (fail-loud 정책 유지)
+
+---
+
+### 5. 16KB 한도
+
+- 한도: **객체당 전체 xdata 합산 ~16KB** (앱 합산).
+- `setXData`는 **truncate 하지 않고 실패**한다 → `Acad::eXdataSizeExceeded` (loud).
+- 부가 한도: **1000** 문자열 ≤ 255자, **1004** 청크 ≤ 127바이트(넘으면 분할).
+
+Python 쪽에서 set 전에 byte-size estimate로 컷/분할하지 말고, native `errorstatus`를 그대로 올려라.
+
+---
+
+### 구현 체크리스트 (이 코드베이스 기준)
+
+1. Pass A 완료 전 `write.xdata.set` / `modify.entity.xdata` 호출 금지.  
+2. `write.regapp.register` / `ensureRegApp`를 xdata보다 먼저.  
+3. 1005: remap or `"0"`/drop-row — **never verbatim old**.  
+4. 1004: AutoCAD 2027에서는 write 경로 제외가 이미 설계 결론.  
+5. 1002: full replay 시에만 넣고, app 단위 balance.  
+6. `setXData` 실패는 coverage 숫자보다 **에러로 집계** (가짜 64/64 금지).
+
+이 순서만 지키면 blank-seed IR replay에서 xdata는 “추출 형태 유지 + soft-pointer 의미 유지”에 가장 가깝다.
