@@ -23,6 +23,7 @@ if _THIS_DIR not in sys.path:
     sys.path.insert(0, _THIS_DIR)
 
 import patch_ops  # per-family op-case dispatch (PLAN F9)
+from patch_ops.xdata import build_xdata_ops
 
 
 def _op_for(ent: Dict[str, Any]) -> Optional[Dict[str, Any]]:
@@ -77,7 +78,8 @@ def _build_anon_remap(ir: Dict[str, Any],
 
 
 def build_patch_from_ir(ir: Dict[str, Any], target_dwg: Dict[str, Any], patch_id: str,
-                        kinds: Optional[set] = None) -> Tuple[Dict[str, Any], List[Dict[str, Any]]]:
+                        kinds: Optional[set] = None,
+                        include_xdata: bool = False) -> Tuple[Dict[str, Any], List[Dict[str, Any]]]:
     """Build a (cad_patch.v1, deferred[]) pair from a native_full IR.
 
     kinds: optional set of geometry.kind to include (e.g. {"line","circle"} for a
@@ -96,6 +98,7 @@ def build_patch_from_ir(ir: Dict[str, Any], target_dwg: Dict[str, Any], patch_id
     }
     anon_remap = _build_anon_remap(ir, block_defs_by_name)
     emitted_block_defs: set = set()
+    handle_map: Dict[Any, Any] = {}
     active_block_defs: List[str] = []
     block_def_step_counts: Dict[int, int] = {}
     cycle_notes_seen: set = set()
@@ -249,6 +252,14 @@ def build_patch_from_ir(ir: Dict[str, Any], target_dwg: Dict[str, Any], patch_id
             continue
         op["step_id"] = "e%d" % i
         ops.append(op)
+        if ent.get("handle"):
+            handle_map[ent.get("handle")] = op["step_id"]
+    if include_xdata:
+        xdata_ops, xdata_deferred = build_xdata_ops(ir, handle_map)
+        for j, xdata_op in enumerate(xdata_ops):
+            xdata_op["step_id"] = "xd%d" % j
+            ops.append(xdata_op)
+        deferred.extend(xdata_deferred)
     patch = {
         "schema": "ariadne.cad_patch.v1",
         "patch_id": patch_id,

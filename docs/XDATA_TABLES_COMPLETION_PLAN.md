@@ -128,3 +128,11 @@
 - Group code `1001` starts a new app group and supplies `app`; it is not repeated as a row.
 - String codes, including `1005` handles, emit UTF-8 JSON strings. `1005` values are extracted verbatim; handle remap belongs to the following write packet.
 - Real and integer codes emit JSON numbers. Point codes emit `[x,y,z]` arrays.
+
+## 8. P4b replay design log
+- Python replay is opt-in only: `ir_to_patch.build_patch_from_ir(..., include_xdata=True)` appends a Pass B stream after all entity/block creation ops. The default remains off so the current capstone packet is unchanged until the orchestrator enables it after native verification.
+- Pass B emits all `write.regapp.register` ops first, deduped by app name in first-seen order, then emits `modify.entity.xdata` ops for replayable entity/app groups.
+- The xdata builder is handle-map driven. Entity targets and 1005 soft-pointer rows use `handle_map`; dangling 1005 rows are deferred and dropped, never written with verbatim old handles.
+- 1002 control rows are retained only after app-local brace balance validation. An unbalanced app group is deferred as `unbalanced 1002 braces`.
+- 1004 rows are deferred as `binary xdata excluded by design`. Long string rows over 255 characters are deferred; the total 16KB entity xdata limit is left to native `setXData` loud failure with no Python truncation.
+- Honest native caveat: current `modify.entity.xdata` still excludes 1002 and 1004 in its native handler. This Python stage prepares validated 1002 replay, but full 1002 persistence needs a native follow-up before the orchestrator should enable full-fidelity xdata replay.
