@@ -428,6 +428,16 @@ def _def_entity_append_op(block_name: str, def_ent: Dict[str, Any]) -> Optional[
             }
             if _is_custom_hatch_pattern(g) and _has_hatch_pattern_definitions(g):
                 entity["pattern_definitions"] = copy.deepcopy(g.get("pattern_definitions"))
+            # Per-hatch pattern origin (HPORIGIN) passthrough. Live cert
+            # 2026-07-09 (runs/hatch_origin_cert3_20260709): setOriginPoint
+            # [123.5, -77.25] -> DWG -> originPoint() -> final IR round-trips
+            # exactly. Replays whatever the census recorded; a census [0, 0]
+            # is the builder default, so unconditional passthrough is safe.
+            pattern_origin = g.get("pattern_origin")
+            if (isinstance(pattern_origin, list) and len(pattern_origin) >= 2
+                    and all(isinstance(v, (int, float)) for v in pattern_origin[:2])):
+                entity["pattern_origin"] = [float(pattern_origin[0]),
+                                            float(pattern_origin[1])]
     elif kind == "face3d":
         edge_visibility = g.get("edge_visibility")
         if (_is_numeric_array(g.get("p0"), min_len=3)

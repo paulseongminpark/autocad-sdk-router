@@ -989,6 +989,16 @@ def _geometry_from_native_entity(raw: dict, kind: str) -> dict:
     # equivalent (write.entity.hatch is attended-gated on this build; see
     # build_log.md), so this is verified via cross-oracle DXF comparison
     # instead of a create->re-extract P-gate diff like closed/m_closed above.
+    # hatch-origin cert (2026-07-09): AcDbHatch::originPoint() [x, y] -- the
+    # per-hatch pattern phase anchor (HPORIGIN). Live-verified round-trip:
+    # setOriginPoint([123.5, -77.25]) -> re-extract [123.5, -77.25] exactly
+    # (runs/hatch_origin_cert2_20260709; the native emit existed but THIS
+    # whitelist dropped the key). Same bare [x, y] passthrough shape as
+    # clip_boundary's pairs below.
+    pattern_origin = raw.get("pattern_origin")
+    if (isinstance(pattern_origin, list) and len(pattern_origin) >= 2
+            and all(isinstance(v, (int, float)) for v in pattern_origin[:2])):
+        geom["pattern_origin"] = [float(pattern_origin[0]), float(pattern_origin[1])]
     if isinstance(raw.get("pattern_double"), bool):
         geom["pattern_double"] = raw["pattern_double"]
     if isinstance(raw.get("is_solid_fill"), bool):

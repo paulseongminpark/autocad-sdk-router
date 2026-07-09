@@ -1751,6 +1751,12 @@ static bool collectEntitiesFromBlock(AcDbBlockTableRecord* pBTR, const char* spa
                 // DXF value, verified exactly, 0 exceptions across 669).
                 << ",\"pattern_angle\":" << pHatch->patternAngle()
                 << ",\"pattern_scale\":" << pHatch->patternScale()
+                // Per-hatch pattern origin (HPORIGIN) -- the phase anchor the
+                // R4l residue analysis had to INFER from scale-baked
+                // getPatternDefinitionAt bases (21/22 boundary-paired custom
+                // hatches differed only here). Direct read for direct replay.
+                << ",\"pattern_origin\":[" << pHatch->originPoint().x
+                << "," << pHatch->originPoint().y << "]"
                 << ",\"pattern_double\":" << (pHatch->patternDouble() ? "true" : "false")
                 << ",\"hatch_style\":" << static_cast<int>(pHatch->hatchStyle())
                 << ",\"is_solid_fill\":" << (isSolidFill ? "true" : "false")

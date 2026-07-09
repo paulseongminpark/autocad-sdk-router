@@ -144,3 +144,37 @@ def test_custom_pattern_hatch_defers_until_pat_synthesis():
     solid = {"handle": "H", "layer": "0",
              "geometry": dict(base, pattern_name="SOLID", is_solid_fill=True)}
     assert patch_ops_blocks._def_entity_append_op("B", solid) is not None
+
+
+def test_hatch_pattern_origin_passes_through_when_present():
+    # Live cert 2026-07-09 (runs/hatch_origin_cert3_20260709): originPoint()
+    # round-trips setOriginPoint exactly, and the original 1.dwg census reads
+    # 27/265 hatches with nonzero per-hatch origins (HPORIGIN). The serializer
+    # replays whatever the census recorded.
+    ent = _sample("hatch", require_vertices=True)
+    ent["geometry"]["pattern_origin"] = [-356718.6693916272, 148665.00000000006]
+
+    op = patch_ops_blocks._def_entity_append_op("BLK", ent)
+
+    if op is None:
+        # Drawing-custom pattern without definitions defers -- make the
+        # sample emittable the same way the custom-pat tests do.
+        ent["geometry"]["pattern_definitions"] = [
+            {"angle": 1.5707963267948966, "base": [0.0, 0.0],
+             "offset": [-1.0, 0.0], "dashes": []}]
+        op = patch_ops_blocks._def_entity_append_op("BLK", ent)
+    assert op is not None
+    assert op["args"]["entity"]["pattern_origin"] == [-356718.6693916272, 148665.00000000006]
+
+
+def test_hatch_without_pattern_origin_emits_no_origin_key():
+    ent = _sample("hatch", require_vertices=True)
+    ent["geometry"].pop("pattern_origin", None)
+    ent["geometry"]["pattern_definitions"] = [
+        {"angle": 1.5707963267948966, "base": [0.0, 0.0],
+         "offset": [-1.0, 0.0], "dashes": []}]
+
+    op = patch_ops_blocks._def_entity_append_op("BLK", ent)
+
+    assert op is not None
+    assert "pattern_origin" not in op["args"]["entity"]

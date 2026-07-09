@@ -1650,6 +1650,21 @@ static AcDbEntity* m08eBuildExtendedEntityForAppend(AcDbDatabase* pDb,
                 errMsg = "entity.kind=hatch setPatternDouble errorstatus " + std::to_string(static_cast<int>(es));
                 return nullptr;
             }
+            // Optional per-hatch pattern origin (HPORIGIN). R4l residue: 21/22
+            // boundary-paired custom hatches mismatched only in the per-hatch
+            // pattern phase -- the originals carry per-hatch origins, the .pat
+            // replay shares one base. Fail-loud: an origin the caller asked
+            // for that cannot be set must not silently degrade to phase drift.
+            AcGeVector2d patternOrigin(0.0, 0.0);
+            if (m08eTryReadVector2d(entityJson, "pattern_origin", patternOrigin)) {
+                es = pHatch->setOriginPoint(AcGePoint2d(patternOrigin.x, patternOrigin.y));
+                if (es != Acad::eOk) {
+                    delete pHatch;
+                    errCode = "BUILD_FAILED";
+                    errMsg = "entity.kind=hatch setOriginPoint errorstatus " + std::to_string(static_cast<int>(es));
+                    return nullptr;
+                }
+            }
         }
         es = pHatch->setHatchStyle(static_cast<AcDbHatch::HatchStyle>(static_cast<int>(hatchStyleRaw)));
         if (es != Acad::eOk) {
