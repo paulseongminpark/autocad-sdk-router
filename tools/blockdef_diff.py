@@ -7,13 +7,25 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import re
 import sys
-from typing import Any, Dict, Iterable, List, Optional
+from typing import Any, Dict, Iterable, List, Optional, Tuple
 
 import cad_diff
 
 _JSON_ENCODING = "utf-8-sig"
 SCHEMA_ID = "ariadne.blockdef_diff.v1"
+
+# *D<n> anonymous blocks are DIMENSION-DERIVED CACHES: every AcDbDimension
+# mints its own *D block holding that dimension's rendered representation, and
+# a rebuilt drawing's dimensions mint FRESH *D names. Comparing them by name
+# is a category error, measured on R4l: 2,183 of 2,534 residual mismatches
+# (86.1%) were exactly 113 a-side *D orphans + 113 freshly-minted b-side *D
+# defs -- a perfect pairing with the drawing's 113 dimensions, whose semantic
+# content the L5 dim_semantic_gate verifies directly (113/113 = 1.0 on the
+# same run). The caches are excluded from the name-matched comparison and
+# accounted honestly in totals.derived_cache_excluded.
+_DIM_CACHE_NAME = re.compile(r"^\*D\d+$")
 
 
 def _load_json(path: str) -> Dict[str, Any]:
@@ -108,11 +120,42 @@ def _kind_counts(definitions: Dict[str, Dict[str, Any]]) -> Dict[str, int]:
     return counts
 
 
+def _split_dim_caches(defs: Dict[str, Dict[str, Any]],
+                      ) -> Tuple[Dict[str, Dict[str, Any]], Dict[str, Dict[str, Any]]]:
+    kept: Dict[str, Dict[str, Any]] = {}
+    caches: Dict[str, Dict[str, Any]] = {}
+    for name, block_def in defs.items():
+        (caches if _DIM_CACHE_NAME.match(name) else kept)[name] = block_def
+    return kept, caches
+
+
+def _cache_entity_total(caches: Dict[str, Dict[str, Any]]) -> int:
+    return sum(len(_definition_entities(d)) for d in caches.values())
+
+
 def diff_block_definitions(ir_a: Dict[str, Any], ir_b: Dict[str, Any], *,
                            tolerance: float = 1e-6,
-                           name_map: Optional[Dict[str, str]] = None) -> Dict[str, Any]:
+                           name_map: Optional[Dict[str, str]] = None,
+                           exclude_derived_caches: bool = True) -> Dict[str, Any]:
     defs_a = _definitions_by_name(ir_a or {})
     defs_b = _definitions_by_name(ir_b or {})
+
+    derived_cache_excluded: Optional[Dict[str, Any]] = None
+    if exclude_derived_caches:
+        defs_a, caches_a = _split_dim_caches(defs_a)
+        defs_b, caches_b = _split_dim_caches(defs_b)
+        derived_cache_excluded = {
+            "name_pattern": _DIM_CACHE_NAME.pattern,
+            "a_def_count": len(caches_a),
+            "b_def_count": len(caches_b),
+            "a_entity_total": _cache_entity_total(caches_a),
+            "b_entity_total": _cache_entity_total(caches_b),
+            "reason": "*D anonymous blocks are per-dimension rendered caches; "
+                      "a rebuild's dimensions mint fresh *D names, so a "
+                      "name-matched def compare is a category error. The "
+                      "dimension entities themselves are verified by the L5 "
+                      "dim_semantic_gate.",
+        }
 
     per_def: List[Dict[str, Any]] = []
     diff0_total = 0
@@ -223,6 +266,9 @@ def diff_block_definitions(ir_a: Dict[str, Any], ir_b: Dict[str, Any], *,
             # the rebuild does not restore shows up as fit_authored_a > _b.
             "spline_fit_authored_a": fit_authored_a,
             "spline_fit_authored_b": fit_authored_b,
+            # Honest accounting of what the comparison deliberately skipped
+            # (None when exclude_derived_caches=False).
+            "derived_cache_excluded": derived_cache_excluded,
         },
         "by_kind_gap": by_kind_gap,
     }
@@ -246,6 +292,7 @@ def _render_markdown(report: Dict[str, Any]) -> str:
     totals = report.get("totals") or {}
     kind_gap = report.get("by_kind_gap") or {}
 
+    excluded = totals.get("derived_cache_excluded") or {}
     parts = [
         "# Block Definition Diff",
         "",
@@ -262,6 +309,12 @@ def _render_markdown(report: Dict[str, Any]) -> str:
                 totals.get("interior_diff0_fraction"),
             ]],
         ),
+        "",
+        ("Derived caches excluded (`%s`): a=%s defs/%s ents, b=%s defs/%s ents"
+         % (excluded.get("name_pattern"), excluded.get("a_def_count"),
+            excluded.get("a_entity_total"), excluded.get("b_def_count"),
+            excluded.get("b_entity_total"))) if excluded else
+        "Derived caches excluded: (none -- legacy full compare)",
         "",
         "## Per Definition",
         "",
@@ -296,12 +349,17 @@ def main(argv: Optional[List[str]] = None) -> int:
     parser.add_argument("ir_b")
     parser.add_argument("--out-json", dest="out_json")
     parser.add_argument("--out-md", dest="out_md")
+    parser.add_argument("--include-derived-caches", action="store_true",
+                        help="legacy full compare: keep *D dimension-cache "
+                             "defs in the name-matched comparison")
     args = parser.parse_args(argv)
 
     if not os.path.exists(args.ir_a) or not os.path.exists(args.ir_b):
         return 3
 
-    report = diff_block_definitions(_load_json(args.ir_a), _load_json(args.ir_b))
+    report = diff_block_definitions(
+        _load_json(args.ir_a), _load_json(args.ir_b),
+        exclude_derived_caches=not args.include_derived_caches)
 
     if args.out_json:
         _write_json(args.out_json, report)

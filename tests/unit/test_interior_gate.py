@@ -58,4 +58,5 @@ def test_interior_gate_blocks_without_baseline():
 def test_committed_baseline_config_loads():
     baseline, source = cap._load_interior_baseline()
     assert isinstance(baseline, float) and 0.0 < baseline <= 1.0
-    assert "R4e" in source
+    # FM9: the ratchet floor must cite the run that measured it.
+    assert "runs/e2e_1dwg_" in source

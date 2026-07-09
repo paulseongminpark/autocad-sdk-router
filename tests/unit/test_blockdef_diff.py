@@ -159,3 +159,75 @@ def test_spline_different_control_points_still_mismatch():
     ir_b = {"block_definitions": [{"name": "D", "def_entities": [spl([[0.0, 0.0, 0.0], [1.0, 9.9, 0.0], [2.0, 0.0, 0.0]])]}]}
     res = blockdef_diff.diff_block_definitions(ir_a, ir_b)
     assert res["totals"]["diff0_total"] == 0
+
+
+# ---- *D dimension-derived-cache measurement contract (R4l program review) ----
+# Measured on R4l: 2,183/2,534 residual mismatches were exactly 113 a-side *D
+# orphans + 113 freshly-minted b-side *D defs, dual to the drawing's 113
+# dimensions -- rendered caches, not authored content. The L5 dim_semantic_gate
+# verifies the dimensions themselves (1.0 on the same run).
+
+def test_dim_cache_defs_are_excluded_with_honest_accounting():
+    # A's dimension minted *D7; B's rebuilt dimension minted a FRESH *D9.
+    # Name-matched compare would score both as mismatches; the contract
+    # excludes them and accounts for them in totals.
+    ln = _entity("A1", "LINE", "line", start=[0, 0, 0], end=[1, 0, 0])
+    cache_a = _entity("C1", "MTEXT", "mtext", position=[5, 5, 0], text="1200")
+    cache_b = _entity("C2", "MTEXT", "mtext", position=[6, 5, 0], text="1200")
+    ir_a = _ir(_block("DOOR", copy.deepcopy(ln)), _block("*D7", cache_a))
+    ir_b = _ir(_block("DOOR", copy.deepcopy(ln)), _block("*D9", cache_b))
+
+    report = blockdef_diff.diff_block_definitions(ir_a, ir_b)
+
+    assert [row["name"] for row in report["per_def"]] == ["DOOR"]
+    totals = report["totals"]
+    assert totals["a_def_count"] == 1
+    assert totals["b_def_count"] == 1
+    assert totals["a_entity_total"] == 1
+    assert totals["diff0_total"] == 1
+    assert totals["interior_diff0_fraction"] == 1.0
+    assert totals["derived_cache_excluded"] == {
+        "name_pattern": r"^\*D\d+$",
+        "a_def_count": 1,
+        "b_def_count": 1,
+        "a_entity_total": 1,
+        "b_entity_total": 1,
+        "reason": totals["derived_cache_excluded"]["reason"],
+    }
+    assert "dim_semantic_gate" in totals["derived_cache_excluded"]["reason"]
+
+
+def test_include_derived_caches_restores_legacy_full_compare():
+    ln = _entity("A1", "LINE", "line", start=[0, 0, 0], end=[1, 0, 0])
+    cache_a = _entity("C1", "MTEXT", "mtext", position=[5, 5, 0], text="1200")
+    ir_a = _ir(_block("DOOR", copy.deepcopy(ln)), _block("*D7", cache_a))
+    ir_b = _ir(_block("DOOR", copy.deepcopy(ln)))
+
+    report = blockdef_diff.diff_block_definitions(
+        ir_a, ir_b, exclude_derived_caches=False)
+
+    assert sorted(row["name"] for row in report["per_def"]) == ["*D7", "DOOR"]
+    totals = report["totals"]
+    assert totals["a_entity_total"] == 2
+    assert totals["diff0_total"] == 1
+    assert totals["interior_diff0_fraction"] == 0.5
+    assert totals["derived_cache_excluded"] is None
+
+
+def test_dim_cache_pattern_is_strict_star_d_digits():
+    # Only *D<digits> is a dimension cache. "*D" alone, non-numeric suffixes,
+    # and other anonymous families (*U/*X) stay in the comparison.
+    ln = _entity("A1", "LINE", "line", start=[0, 0, 0], end=[1, 0, 0])
+    ir = _ir(
+        _block("*D", copy.deepcopy(ln)),
+        _block("*DX1", copy.deepcopy(ln)),
+        _block("*U172", copy.deepcopy(ln)),
+        _block("*D42", copy.deepcopy(ln)),
+    )
+
+    report = blockdef_diff.diff_block_definitions(ir, copy.deepcopy(ir))
+
+    assert sorted(row["name"] for row in report["per_def"]) == ["*D", "*DX1", "*U172"]
+    excluded = report["totals"]["derived_cache_excluded"]
+    assert excluded["a_def_count"] == 1
+    assert excluded["a_entity_total"] == 1
