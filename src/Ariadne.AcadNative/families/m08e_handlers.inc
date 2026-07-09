@@ -853,8 +853,11 @@ static bool m08eLoadWipeoutModule()
     static bool loaded = false;
     if (!attempted) {
         attempted = true;
+        // loadModule returns bool (true=loaded), NOT Acad::ErrorStatus.
+        // Comparing to eOk(=0) inverted the gate: a successful load (true=1)
+        // reported WIPEOUT_MODULE_UNAVAILABLE (live-measured, R4l cert run).
         loaded = (acrxDynamicLinker != nullptr &&
-                  acrxDynamicLinker->loadModule(L"acismobj26.dbx", false) == Acad::eOk);
+                  acrxDynamicLinker->loadModule(L"acismobj26.dbx", false));
     }
     return loaded;
 }

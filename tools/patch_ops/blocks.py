@@ -69,8 +69,8 @@ _WIPEOUT_EXTERNAL_IMAGE_DEFER_REASON = (_UNSUPPORTED_APPEND_REASON
                                         + " (external raster image wipeout)")
 _WIPEOUT_MISSING_CLIP_DEFER_REASON = (_UNSUPPORTED_APPEND_REASON
                                       + " (missing clip_boundary)")
-_WIPEOUT_NATIVE_BUILDER_PENDING_REASON = (_UNSUPPORTED_APPEND_REASON
-                                          + " (native wipeout builder pending)")
+_WIPEOUT_INCOMPLETE_GEOMETRY_REASON = (_UNSUPPORTED_APPEND_REASON
+                                       + " (incomplete wipeout geometry)")
 _SUPPORTED_HATCH_EDGE_TYPES = frozenset({"line", "arc", "ellipse", "spline"})
 
 # acad.pat standard pattern names resolvable headless via kPreDefined.
@@ -315,7 +315,7 @@ def _def_entity_append_reason(def_ent: Dict[str, Any]) -> str:
             return _WIPEOUT_EXTERNAL_IMAGE_DEFER_REASON
         if not _has_wipeout_clip_boundary(g):
             return _WIPEOUT_MISSING_CLIP_DEFER_REASON
-        return _WIPEOUT_NATIVE_BUILDER_PENDING_REASON
+        return _WIPEOUT_INCOMPLETE_GEOMETRY_REASON
     return _UNSUPPORTED_APPEND_REASON
 
 
@@ -445,12 +445,23 @@ def _def_entity_append_op(block_name: str, def_ent: Dict[str, Any]) -> Optional[
                 "edge_visibility": copy.deepcopy(edge_visibility),
             }
     elif kind == "wipeout":
-        # Serializer is ready but the NATIVE side is not: m08e's append gate
-        # has no wipeout builder (measured on R4k b017 -- UNSUPPORTED_KIND
-        # straight from the CRX, the emission premise in the fleet packet was
-        # wrong). Defer until the AcDbWipeout builder lands; representability
-        # still splits the deferral reasons honestly below.
-        entity = None
+        # Native builder live-certified 2026-07-09 (runs/wipeout_cert_census_
+        # 20260709): append_entity kind=wipeout returned appended:true and the
+        # census re-extraction matched the fixture exactly (clip 11pts,
+        # u/v_vector, origin, clip_type, frame_on). Root cause of the earlier
+        # WIPEOUT_MODULE_UNAVAILABLE was an inverted loadModule bool==eOk gate
+        # in m08e, not a missing module. Field set = the cert-proven payload;
+        # external-source / missing-clip inputs still defer via
+        # _def_entity_append_reason.
+        if _is_wipeout_representable(g):
+            entity = {
+                "kind": "wipeout",
+                "origin": list(g.get("origin")),
+                "u_vector": list(g.get("u_vector")),
+                "v_vector": list(g.get("v_vector")),
+                "clip_boundary_type": g.get("clip_boundary_type"),
+                "clip_boundary": copy.deepcopy(g.get("clip_boundary")),
+            }
     if entity is None:
         return None
     return {"operation": "append_block_entity",

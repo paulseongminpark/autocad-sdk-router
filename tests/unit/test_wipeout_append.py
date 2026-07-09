@@ -20,7 +20,7 @@ _FIXTURE = Path(_REPO) / "tests" / "fixtures" / "unsupported_kind_samples.json"
 _UNSUPPORTED = "def_entity kind unsupported by write.block.append_entity"
 _EXTERNAL = _UNSUPPORTED + " (external raster image wipeout)"
 _MISSING_CLIP = _UNSUPPORTED + " (missing clip_boundary)"
-_BUILDER_PENDING = _UNSUPPORTED + " (native wipeout builder pending)"
+_INCOMPLETE = _UNSUPPORTED + " (incomplete wipeout geometry)"
 
 
 def _samples() -> dict:
@@ -33,25 +33,37 @@ def _sample(kind: str = "wipeout") -> dict:
     raise AssertionError("fixture sample not found for %s" % kind)
 
 
-def test_wipeout_defers_until_native_builder_lands():
-    # Serializer readiness is NOT emission: R4k b017 measured the CRX
-    # rejecting kind=wipeout (UNSUPPORTED_KIND - m08e has no AcDbWipeout
-    # builder). Representable fixtures defer with the pending-builder reason
-    # until the native side actually exists.
+def test_representable_wipeout_emits_cert_proven_payload():
+    # Live-certified 2026-07-09 (runs/wipeout_cert_census_20260709): this
+    # exact field set appended handle 290 into WIPEOUT_CERT_BLK and the census
+    # re-extraction matched the fixture geometry bit-for-bit. Emission mirrors
+    # that cert payload -- nothing more (image_size/frame_on are not builder
+    # inputs; frame_on has no public AcDbWipeout setter).
     ent = _sample()
+    g = ent["geometry"]
 
-    assert patch_ops_blocks._def_entity_append_op("BLK", ent) is None
+    op = patch_ops_blocks._def_entity_append_op("BLK", ent)
+
+    assert op == {
+        "operation": "append_block_entity",
+        "args": {
+            "block_name": "BLK",
+            "entity": {
+                "kind": "wipeout",
+                "origin": list(g["origin"]),
+                "u_vector": list(g["u_vector"]),
+                "v_vector": list(g["v_vector"]),
+                "clip_boundary_type": g["clip_boundary_type"],
+                "clip_boundary": g["clip_boundary"],
+            },
+            "layer": ent["layer"],
+        },
+    }
 
     ops, deferred = patch_ops_blocks.block_def_ops(
         {"name": "BLK", "handle": "B1", "def_entities": [ent]})
-    assert [op["operation"] for op in ops] == ["create_block"]
-    assert deferred == [{
-        "block_name": "BLK",
-        "def_entity_index": 0,
-        "handle": ent["handle"],
-        "kind": "wipeout",
-        "reason": _BUILDER_PENDING,
-    }]
+    assert [o["operation"] for o in ops] == ["create_block", "append_block_entity"]
+    assert deferred == []
 
 
 def test_external_source_file_name_defers_with_explicit_reason():
@@ -88,10 +100,10 @@ def test_missing_clip_boundary_defers_with_explicit_reason():
     }]
 
 
-def test_incomplete_wipeout_geometry_defers_with_pending_reason():
-    # Missing u_vector but clip present: still a wipeout the FUTURE native
-    # builder owns, so it shares the pending-builder reason (external-source
-    # and missing-clip keep their finer reasons above).
+def test_incomplete_wipeout_geometry_defers_with_incomplete_reason():
+    # Missing u_vector but clip present: the builder is live, but this input
+    # cannot fill the cert-proven payload -- defer honestly as incomplete
+    # geometry (external-source and missing-clip keep their finer reasons).
     ent = _sample()
     del ent["geometry"]["u_vector"]
 
@@ -104,5 +116,5 @@ def test_incomplete_wipeout_geometry_defers_with_pending_reason():
         "def_entity_index": 0,
         "handle": ent["handle"],
         "kind": "wipeout",
-        "reason": _BUILDER_PENDING,
+        "reason": _INCOMPLETE,
     }]
