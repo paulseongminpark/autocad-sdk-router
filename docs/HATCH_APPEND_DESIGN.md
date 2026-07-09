@@ -59,3 +59,11 @@
   - `arc` -> `AcGeCircArc2d(center, radius, start_angle, end_angle, AcGeVector2d::kXAxis, !ccw)`
   - `ellipse` -> derive `majorRadius = |major|`, `minorRadius = majorRadius * ratio`, derive orthogonal unit major/minor axes from `major`, then construct `AcGeEllipArc2d(center, majorAxisUnit, minorAxisUnit, majorRadius, minorRadius, start_angle, end_angle)`
   - `spline` -> `AcGeNurbCurve2d(degree, knots, control)` when `rational == false`, otherwise `AcGeNurbCurve2d(degree, knots, control, weights)`
+
+## Edge Loop Rebuild Notes
+
+- Python emit gate: a hatch loop is replayable when it is either the existing polyline `vertices` form or a non-empty `edges` array whose rows all match the live `line` / `arc` / `ellipse` / `spline` schema. Any `unsupported_<n>` edge defers the whole hatch with `def_entity kind unsupported by write.block.append_entity (unsupported edge type in loop)`.
+- Arc rebuild keeps extractor radians verbatim and maps `ccw` directly to the `AcGeCircArc2d(..., AcGeVector2d::kXAxis, !ccw)` clockwise flag.
+- Ellipse rebuild treats `major` as the full major-axis vector: `majorRadius = |major|`, `majorAxisUnit = major / |major|`, `minorRadius = majorRadius * ratio`. `ccw=true` uses the left-hand perpendicular minor axis `(-uy, ux)`; `ccw=false` flips it to `(uy, -ux)` so the same start/end radians replay the opposite sweep.
+- Spline rebuild consumes `degree`, `control`, `knots`, `rational`, and `weights` exactly from the edge row. Rational splines require `len(weights) == len(control)`; otherwise the native builder fails loud with `HATCH_EDGE_LOOP_MALFORMED`.
+- Ownership rule: edge-loop replay allocates one heap `AcGeCurve2d` subclass per edge, passes those pointers to `AcDbHatch::appendLoop(loopType, edgePtrs, edgeTypes)`, then deletes the temporary curves immediately after `appendLoop` returns because `AcDbHatch` copies the boundary geometry. Parse or append failures must release any already-built edge curves before returning.

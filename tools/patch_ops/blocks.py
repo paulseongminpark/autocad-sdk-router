@@ -64,6 +64,8 @@ _UNSUPPORTED_APPEND_REASON = "def_entity kind unsupported by write.block.append_
 _GRADIENT_HATCH_DEFER_REASON = _UNSUPPORTED_APPEND_REASON + " (no gradient replay)"
 _CUSTOM_HATCH_DEFER_REASON = (_UNSUPPORTED_APPEND_REASON
                               + " (custom hatch pattern replay pending .pat synthesis)")
+_UNSUPPORTED_HATCH_EDGE_REASON = _UNSUPPORTED_APPEND_REASON + " (unsupported edge type in loop)"
+_SUPPORTED_HATCH_EDGE_TYPES = frozenset({"line", "arc", "ellipse", "spline"})
 
 # acad.pat standard pattern names resolvable headless via kPreDefined.
 # Anything else is drawing-custom and must wait for definition-line replay.
@@ -145,19 +147,116 @@ def _is_numeric_array(value: Any, *, min_len: int) -> bool:
     return isinstance(value, (list, tuple)) and len(value) >= min_len
 
 
+def _is_number(value: Any) -> bool:
+    return isinstance(value, (int, float)) and not isinstance(value, bool)
+
+
+def _is_flag_like(value: Any) -> bool:
+    return isinstance(value, bool) or _is_number(value)
+
+
+def _is_point2d_array(points: Any, *, min_len: int = 1) -> bool:
+    return (isinstance(points, list)
+            and len(points) >= min_len
+            and all(_is_numeric_array(point, min_len=2) for point in points))
+
+
+def _is_hatch_polyline_loop(loop: Any) -> bool:
+    if not isinstance(loop, dict):
+        return False
+    vertices = loop.get("vertices")
+    if not isinstance(vertices, list) or len(vertices) < 3:
+        return False
+    for vertex in vertices:
+        point = vertex.get("point") if isinstance(vertex, dict) else vertex
+        if not _is_numeric_array(point, min_len=2):
+            return False
+    return True
+
+
+def _is_hatch_supported_edge(edge: Any) -> bool:
+    if not isinstance(edge, dict):
+        return False
+    edge_type = edge.get("type")
+    if edge_type == "line":
+        return (_is_numeric_array(edge.get("start"), min_len=2)
+                and _is_numeric_array(edge.get("end"), min_len=2))
+    if edge_type == "arc":
+        return (_is_numeric_array(edge.get("center"), min_len=2)
+                and _is_number(edge.get("radius"))
+                and _is_number(edge.get("start_angle"))
+                and _is_number(edge.get("end_angle"))
+                and _is_flag_like(edge.get("ccw")))
+    if edge_type == "ellipse":
+        return (_is_numeric_array(edge.get("center"), min_len=2)
+                and _is_numeric_array(edge.get("major"), min_len=2)
+                and _is_number(edge.get("ratio"))
+                and _is_number(edge.get("start_angle"))
+                and _is_number(edge.get("end_angle"))
+                and _is_flag_like(edge.get("ccw")))
+    if edge_type == "spline":
+        control = edge.get("control")
+        weights = edge.get("weights")
+        rational = edge.get("rational")
+        if (not _is_number(edge.get("degree"))
+                or not _is_point2d_array(control)
+                or not isinstance(edge.get("knots"), list)
+                or not edge.get("knots")
+                or not _is_flag_like(rational)):
+            return False
+        if weights is not None and not isinstance(weights, list):
+            return False
+        if bool(rational) and len(weights or []) != len(control):
+            return False
+        return True
+    return False
+
+
+def _is_hatch_edge_loop(loop: Any) -> bool:
+    if not isinstance(loop, dict):
+        return False
+    edges = loop.get("edges")
+    if not isinstance(edges, list) or not edges:
+        return False
+    return all(_is_hatch_supported_edge(edge) for edge in edges)
+
+
+def _has_hatch_representable_loops(loops: Any) -> bool:
+    if not isinstance(loops, list) or not loops:
+        return False
+    for loop in loops:
+        if _is_hatch_polyline_loop(loop) or _is_hatch_edge_loop(loop):
+            continue
+        return False
+    return True
+
+
+def _has_hatch_unsupported_edge_type(loops: Any) -> bool:
+    if not isinstance(loops, list):
+        return False
+    for loop in loops:
+        if not isinstance(loop, dict):
+            continue
+        edges = loop.get("edges")
+        if not isinstance(edges, list):
+            continue
+        for edge in edges:
+            edge_type = edge.get("type") if isinstance(edge, dict) else None
+            if isinstance(edge_type, str) and edge_type.startswith("unsupported_"):
+                return True
+            if edge_type not in _SUPPORTED_HATCH_EDGE_TYPES:
+                if isinstance(edge_type, str) and edge_type.startswith("unsupported_"):
+                    return True
+                continue
+    return False
+
+
 def _has_hatch_polyline_loops(loops: Any) -> bool:
     if not isinstance(loops, list) or not loops:
         return False
     for loop in loops:
-        if not isinstance(loop, dict):
+        if not _is_hatch_polyline_loop(loop):
             return False
-        vertices = loop.get("vertices")
-        if not isinstance(vertices, list) or len(vertices) < 3:
-            return False
-        for vertex in vertices:
-            point = vertex.get("point") if isinstance(vertex, dict) else vertex
-            if not _is_numeric_array(point, min_len=2):
-                return False
     return True
 
 
@@ -177,6 +276,8 @@ def _def_entity_append_reason(def_ent: Dict[str, Any]) -> str:
             return _GRADIENT_HATCH_DEFER_REASON
         if g.get("pattern_name") and _is_custom_hatch_pattern(g) and not _has_hatch_pattern_definitions(g):
             return _CUSTOM_HATCH_DEFER_REASON
+        if _has_hatch_unsupported_edge_type(g.get("loops")):
+            return _UNSUPPORTED_HATCH_EDGE_REASON
     return _UNSUPPORTED_APPEND_REASON
 
 
@@ -270,7 +371,7 @@ def _def_entity_append_op(block_name: str, def_ent: Dict[str, Any]) -> Optional[
         loops = g.get("loops")
         if (_is_numeric_array(g.get("normal"), min_len=3)
                 and g.get("pattern_name")
-                and _has_hatch_polyline_loops(loops)):
+                and _has_hatch_representable_loops(loops)):
             entity = {
                 "kind": "hatch",
                 "normal": list(g.get("normal")),

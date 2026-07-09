@@ -36,6 +36,7 @@
 #include "dbspline.h"     // AcDbSpline
 #include "dbelipse.h"     // AcDbEllipse
 #include "gedblar.h"      // AcGeDoubleArray
+#include "gevptar.h"      // AcGeVoidPointerArray
 
 // ---- op id constants (single source for HasOp + Dispatch; avoids string drift) -------------
 static const char* const kM08eOpEntityXdata   = "inspect.entity.get_xdata";
@@ -682,6 +683,50 @@ static bool m08eTryReadVector(const std::string& json, const char* key, AcGeVect
     return true;
 }
 
+static bool m08eTryReadPoint2d(const std::string& json, const char* key, AcGePoint2d& out)
+{
+    std::vector<double> nums;
+    if (!m08eReadNumberTupleField(json, key, nums) || nums.size() < 2)
+        return false;
+    out = AcGePoint2d(nums[0], nums[1]);
+    return true;
+}
+
+static bool m08eTryReadVector2d(const std::string& json, const char* key, AcGeVector2d& out)
+{
+    std::vector<double> nums;
+    if (!m08eReadNumberTupleField(json, key, nums) || nums.size() < 2)
+        return false;
+    out = AcGeVector2d(nums[0], nums[1]);
+    return true;
+}
+
+static bool m08eReadPoint2dArrayField(const std::string& json, const char* key, AcGePoint2dArray& out)
+{
+    out.removeAll();
+    size_t lb = 0, rb = 0;
+    if (!m08eFindArrayBounds(json, key, lb, rb))
+        return false;
+    size_t scan = lb + 1;
+    while (scan < rb) {
+        while (scan < rb && (json[scan] == ',' || m08eIsJsonSpace(json[scan])))
+            ++scan;
+        if (scan >= rb)
+            break;
+        if (json[scan] != '[')
+            return false;
+        const size_t pe = m08eFindMatchingJsonDelimiter(json, scan, '[', ']');
+        if (pe == std::string::npos || pe > rb)
+            return false;
+        std::vector<double> nums;
+        if (!m08eParsePlainNumberArray(json.substr(scan, pe - scan + 1), nums) || nums.size() < 2)
+            return false;
+        out.append(AcGePoint2d(nums[0], nums[1]));
+        scan = pe + 1;
+    }
+    return out.length() > 0;
+}
+
 static bool m08eReadFlagArray(const std::string& json, const char* key, std::vector<bool>& out)
 {
     out.clear();
@@ -799,64 +844,314 @@ static bool m08eReadVertex2dArray(const std::string& json, const char* key,
 struct M08eHatchLoop
 {
     Adesk::Int32 loopType = 0;
+    bool hasEdges = false;
     AcGePoint2dArray vertices;
     AcGeDoubleArray bulges;
+    AcGeVoidPointerArray edgePtrs;
+    AcGeIntArray edgeTypes;
 };
 
-static bool m08eReadHatchLoops(const std::string& json, std::vector<M08eHatchLoop>& out)
+enum M08eHatchLoopReadStatus
+{
+    kM08eHatchLoopReadOk = 0,
+    kM08eHatchLoopReadMissing,
+    kM08eHatchLoopReadMalformedEdge,
+};
+
+static void m08eReleaseHatchLoop(M08eHatchLoop& loop)
+{
+    for (int i = 0; i < loop.edgePtrs.length(); ++i) {
+        AcGeCurve2d* curve = static_cast<AcGeCurve2d*>(loop.edgePtrs[i]);
+        if (curve == nullptr)
+            continue;
+        const int edgeType = (i < loop.edgeTypes.length()) ? loop.edgeTypes[i] : -1;
+        switch (edgeType) {
+        case AcDbHatch::kLine:
+            delete static_cast<AcGeLineSeg2d*>(curve);
+            break;
+        case AcDbHatch::kCirArc:
+            delete static_cast<AcGeCircArc2d*>(curve);
+            break;
+        case AcDbHatch::kEllArc:
+            delete static_cast<AcGeEllipArc2d*>(curve);
+            break;
+        case AcDbHatch::kSpline:
+            delete static_cast<AcGeNurbCurve2d*>(curve);
+            break;
+        default:
+            break;
+        }
+    }
+    loop.edgePtrs.removeAll();
+    loop.edgeTypes.removeAll();
+    loop.vertices.removeAll();
+    loop.bulges.removeAll();
+    loop.hasEdges = false;
+}
+
+static void m08eReleaseHatchLoops(std::vector<M08eHatchLoop>& loops)
+{
+    for (size_t i = 0; i < loops.size(); ++i)
+        m08eReleaseHatchLoop(loops[i]);
+    loops.clear();
+}
+
+static bool m08eReadHatchPolylineLoop(const std::string& loopJson, M08eHatchLoop& loop)
+{
+    loop.vertices.removeAll();
+    loop.bulges.removeAll();
+    size_t vlb = 0, vrb = 0;
+    if (!m08eFindArrayBounds(loopJson, "vertices", vlb, vrb))
+        return false;
+    size_t vscan = vlb + 1;
+    while (vscan < vrb) {
+        while (vscan < vrb && (loopJson[vscan] == ',' || m08eIsJsonSpace(loopJson[vscan])))
+            ++vscan;
+        if (vscan >= vrb)
+            break;
+        if (loopJson[vscan] != '{') {
+            loop.vertices.removeAll();
+            loop.bulges.removeAll();
+            return false;
+        }
+        const size_t voe = m08eFindMatchingJsonDelimiter(loopJson, vscan, '{', '}');
+        if (voe == std::string::npos || voe > vrb) {
+            loop.vertices.removeAll();
+            loop.bulges.removeAll();
+            return false;
+        }
+        const std::string vertexJson = loopJson.substr(vscan, voe - vscan + 1);
+        std::vector<double> pointNums;
+        if (!m08eReadNumberTupleField(vertexJson, "point", pointNums) || pointNums.size() < 2) {
+            loop.vertices.removeAll();
+            loop.bulges.removeAll();
+            return false;
+        }
+        double bulge = 0.0;
+        jsonFindNumber(vertexJson, "bulge", bulge);
+        loop.vertices.append(AcGePoint2d(pointNums[0], pointNums[1]));
+        loop.bulges.append(bulge);
+        vscan = voe + 1;
+    }
+    if (loop.vertices.length() < 2) {
+        loop.vertices.removeAll();
+        loop.bulges.removeAll();
+        return false;
+    }
+    loop.hasEdges = false;
+    return true;
+}
+
+static bool m08eReadHatchEdge(const std::string& edgeJson, void*& edgePtr, Adesk::Int32& edgeType)
+{
+    edgePtr = nullptr;
+    edgeType = 0;
+
+    std::string edgeKind;
+    if (!jsonFindString(edgeJson, "type", edgeKind) || edgeKind.empty())
+        return false;
+
+    if (edgeKind == "line") {
+        AcGePoint2d start, end;
+        if (!m08eTryReadPoint2d(edgeJson, "start", start) ||
+            !m08eTryReadPoint2d(edgeJson, "end", end)) {
+            return false;
+        }
+        edgePtr = static_cast<void*>(new AcGeLineSeg2d(start, end));
+        edgeType = AcDbHatch::kLine;
+        return true;
+    }
+
+    if (edgeKind == "arc") {
+        AcGePoint2d center;
+        double radius = 0.0, startAngle = 0.0, endAngle = 0.0;
+        bool ccw = false;
+        if (!m08eTryReadPoint2d(edgeJson, "center", center) ||
+            !jsonFindNumber(edgeJson, "radius", radius) ||
+            !jsonFindNumber(edgeJson, "start_angle", startAngle) ||
+            !jsonFindNumber(edgeJson, "end_angle", endAngle) ||
+            !m08eFindFlag(edgeJson, "ccw", ccw) ||
+            radius <= 0.0) {
+            return false;
+        }
+        edgePtr = static_cast<void*>(new AcGeCircArc2d(
+            center,
+            radius,
+            startAngle,
+            endAngle,
+            AcGeVector2d::kXAxis,
+            ccw ? Adesk::kFalse : Adesk::kTrue));
+        edgeType = AcDbHatch::kCirArc;
+        return true;
+    }
+
+    if (edgeKind == "ellipse") {
+        AcGePoint2d center;
+        AcGeVector2d major;
+        double ratio = 0.0, startAngle = 0.0, endAngle = 0.0;
+        bool ccw = false;
+        if (!m08eTryReadPoint2d(edgeJson, "center", center) ||
+            !m08eTryReadVector2d(edgeJson, "major", major) ||
+            !jsonFindNumber(edgeJson, "ratio", ratio) ||
+            !jsonFindNumber(edgeJson, "start_angle", startAngle) ||
+            !jsonFindNumber(edgeJson, "end_angle", endAngle) ||
+            !m08eFindFlag(edgeJson, "ccw", ccw) ||
+            ratio <= 0.0) {
+            return false;
+        }
+        const double majorRadius = major.length();
+        if (majorRadius <= 0.0)
+            return false;
+        const double minorRadius = majorRadius * ratio;
+        if (minorRadius <= 0.0)
+            return false;
+        const AcGeVector2d majorAxisUnit(major.x / majorRadius, major.y / majorRadius);
+        const AcGeVector2d minorAxisUnit = ccw
+            ? AcGeVector2d(-majorAxisUnit.y, majorAxisUnit.x)
+            : AcGeVector2d(majorAxisUnit.y, -majorAxisUnit.x);
+        edgePtr = static_cast<void*>(new AcGeEllipArc2d(
+            center,
+            majorAxisUnit,
+            minorAxisUnit,
+            majorRadius,
+            minorRadius,
+            startAngle,
+            endAngle));
+        edgeType = AcDbHatch::kEllArc;
+        return true;
+    }
+
+    if (edgeKind == "spline") {
+        double degreeRaw = 0.0;
+        bool rational = false;
+        AcGePoint2dArray control;
+        if (!jsonFindNumber(edgeJson, "degree", degreeRaw) ||
+            !m08eFindFlag(edgeJson, "rational", rational) ||
+            !m08eReadPoint2dArrayField(edgeJson, "control", control)) {
+            return false;
+        }
+        const int degree = static_cast<int>(degreeRaw);
+        if (degree < 1)
+            return false;
+        const std::vector<double> knotVals = jsonFindNumberArray(edgeJson, "knots");
+        if (knotVals.empty())
+            return false;
+        AcGeKnotVector knots;
+        for (size_t i = 0; i < knotVals.size(); ++i)
+            knots.append(knotVals[i]);
+        if (rational) {
+            const std::vector<double> weightVals = jsonFindNumberArray(edgeJson, "weights");
+            if (weightVals.size() != static_cast<size_t>(control.length()))
+                return false;
+            AcGeDoubleArray weights;
+            for (size_t i = 0; i < weightVals.size(); ++i)
+                weights.append(weightVals[i]);
+            edgePtr = static_cast<void*>(new AcGeNurbCurve2d(
+                degree, knots, control, weights, Adesk::kFalse));
+        } else {
+            edgePtr = static_cast<void*>(new AcGeNurbCurve2d(
+                degree, knots, control, Adesk::kFalse));
+        }
+        edgeType = AcDbHatch::kSpline;
+        return true;
+    }
+
+    return false;
+}
+
+static M08eHatchLoopReadStatus m08eReadHatchEdgeLoop(const std::string& loopJson, M08eHatchLoop& loop)
+{
+    size_t elb = 0, erb = 0;
+    if (!m08eFindArrayBounds(loopJson, "edges", elb, erb))
+        return kM08eHatchLoopReadMissing;
+
+    loop.hasEdges = true;
+    loop.edgePtrs.removeAll();
+    loop.edgeTypes.removeAll();
+    size_t escan = elb + 1;
+    while (escan < erb) {
+        while (escan < erb && (loopJson[escan] == ',' || m08eIsJsonSpace(loopJson[escan])))
+            ++escan;
+        if (escan >= erb)
+            break;
+        if (loopJson[escan] != '{') {
+            m08eReleaseHatchLoop(loop);
+            return kM08eHatchLoopReadMalformedEdge;
+        }
+        const size_t eoe = m08eFindMatchingJsonDelimiter(loopJson, escan, '{', '}');
+        if (eoe == std::string::npos || eoe > erb) {
+            m08eReleaseHatchLoop(loop);
+            return kM08eHatchLoopReadMalformedEdge;
+        }
+        const std::string edgeJson = loopJson.substr(escan, eoe - escan + 1);
+        void* edgePtr = nullptr;
+        Adesk::Int32 edgeType = 0;
+        if (!m08eReadHatchEdge(edgeJson, edgePtr, edgeType)) {
+            m08eReleaseHatchLoop(loop);
+            return kM08eHatchLoopReadMalformedEdge;
+        }
+        loop.edgePtrs.append(edgePtr);
+        loop.edgeTypes.append(edgeType);
+        escan = eoe + 1;
+    }
+    if (loop.edgePtrs.length() < 1) {
+        m08eReleaseHatchLoop(loop);
+        return kM08eHatchLoopReadMalformedEdge;
+    }
+    return kM08eHatchLoopReadOk;
+}
+
+static M08eHatchLoopReadStatus m08eReadHatchLoops(const std::string& json, std::vector<M08eHatchLoop>& out)
 {
     out.clear();
     size_t lb = 0, rb = 0;
     if (!m08eFindArrayBounds(json, "loops", lb, rb))
-        return false;
+        return kM08eHatchLoopReadMissing;
     size_t scan = lb + 1;
     while (scan < rb) {
         while (scan < rb && (json[scan] == ',' || m08eIsJsonSpace(json[scan])))
             ++scan;
         if (scan >= rb)
             break;
-        if (json[scan] != '{')
-            return false;
+        if (json[scan] != '{') {
+            m08eReleaseHatchLoops(out);
+            return kM08eHatchLoopReadMissing;
+        }
         const size_t oe = m08eFindMatchingJsonDelimiter(json, scan, '{', '}');
-        if (oe == std::string::npos || oe > rb)
-            return false;
+        if (oe == std::string::npos || oe > rb) {
+            m08eReleaseHatchLoops(out);
+            return kM08eHatchLoopReadMissing;
+        }
         const std::string loopJson = json.substr(scan, oe - scan + 1);
         double loopTypeRaw = 0.0;
-        if (!jsonFindNumber(loopJson, "loop_type", loopTypeRaw))
-            return false;
+        if (!jsonFindNumber(loopJson, "loop_type", loopTypeRaw)) {
+            m08eReleaseHatchLoops(out);
+            return kM08eHatchLoopReadMissing;
+        }
         M08eHatchLoop loop;
         loop.loopType = static_cast<Adesk::Int32>(loopTypeRaw);
-
-        size_t vlb = 0, vrb = 0;
-        if (!m08eFindArrayBounds(loopJson, "vertices", vlb, vrb))
-            return false;
-        size_t vscan = vlb + 1;
-        while (vscan < vrb) {
-            while (vscan < vrb && (loopJson[vscan] == ',' || m08eIsJsonSpace(loopJson[vscan])))
-                ++vscan;
-            if (vscan >= vrb)
-                break;
-            if (loopJson[vscan] != '{')
-                return false;
-            const size_t voe = m08eFindMatchingJsonDelimiter(loopJson, vscan, '{', '}');
-            if (voe == std::string::npos || voe > vrb)
-                return false;
-            const std::string vertexJson = loopJson.substr(vscan, voe - vscan + 1);
-            std::vector<double> pointNums;
-            if (!m08eReadNumberTupleField(vertexJson, "point", pointNums) || pointNums.size() < 2)
-                return false;
-            double bulge = 0.0;
-            jsonFindNumber(vertexJson, "bulge", bulge);
-            loop.vertices.append(AcGePoint2d(pointNums[0], pointNums[1]));
-            loop.bulges.append(bulge);
-            vscan = voe + 1;
+        if (m08eReadHatchPolylineLoop(loopJson, loop)) {
+            out.push_back(loop);
+            scan = oe + 1;
+            continue;
         }
-        if (loop.vertices.length() < 2)
-            return false;
-        out.push_back(loop);
-        scan = oe + 1;
+
+        const M08eHatchLoopReadStatus edgeStatus = m08eReadHatchEdgeLoop(loopJson, loop);
+        if (edgeStatus == kM08eHatchLoopReadOk) {
+            out.push_back(loop);
+            scan = oe + 1;
+            continue;
+        }
+        if (edgeStatus == kM08eHatchLoopReadMalformedEdge) {
+            m08eReleaseHatchLoops(out);
+            return kM08eHatchLoopReadMalformedEdge;
+        }
+        m08eReleaseHatchLoops(out);
+        return kM08eHatchLoopReadMissing;
     }
-    return !out.empty();
+    if (out.empty())
+        return kM08eHatchLoopReadMissing;
+    return kM08eHatchLoopReadOk;
 }
 
 static bool m08eFileExists(const std::wstring& path)
@@ -1148,12 +1443,6 @@ static AcDbEntity* m08eBuildExtendedEntityForAppend(AcDbDatabase* pDb,
         std::string patternPatPath;
         const bool hasPatternPatPath =
             jsonFindString(entityJson, "pattern_pat_path", patternPatPath) && !patternPatPath.empty();
-        std::vector<M08eHatchLoop> loops;
-        if (!m08eReadHatchLoops(entityJson, loops)) {
-            errCode = "MISSING_ARG";
-            errMsg = "entity.kind=hatch requires polyline 'loops' with 'vertices'";
-            return nullptr;
-        }
 
         AcDbHatch* pHatch = new AcDbHatch();
         pHatch->setDatabaseDefaults(pDb);
@@ -1231,9 +1520,27 @@ static AcDbEntity* m08eBuildExtendedEntityForAppend(AcDbDatabase* pDb,
             errMsg = "entity.kind=hatch setHatchStyle errorstatus " + std::to_string(static_cast<int>(es));
             return nullptr;
         }
+        std::vector<M08eHatchLoop> loops;
+        const M08eHatchLoopReadStatus loopStatus = m08eReadHatchLoops(entityJson, loops);
+        if (loopStatus != kM08eHatchLoopReadOk) {
+            delete pHatch;
+            if (loopStatus == kM08eHatchLoopReadMalformedEdge) {
+                errCode = "HATCH_EDGE_LOOP_MALFORMED";
+                errMsg = "HATCH_EDGE_LOOP_MALFORMED";
+            } else {
+                errCode = "MISSING_ARG";
+                errMsg = "entity.kind=hatch requires 'loops' with polyline 'vertices' or supported 'edges'";
+            }
+            return nullptr;
+        }
         for (size_t i = 0; i < loops.size(); ++i) {
-            es = pHatch->appendLoop(loops[i].loopType, loops[i].vertices, loops[i].bulges);
+            if (loops[i].hasEdges) {
+                es = pHatch->appendLoop(loops[i].loopType, loops[i].edgePtrs, loops[i].edgeTypes);
+            } else {
+                es = pHatch->appendLoop(loops[i].loopType, loops[i].vertices, loops[i].bulges);
+            }
             if (es != Acad::eOk) {
+                m08eReleaseHatchLoops(loops);
                 delete pHatch;
                 errCode = "BUILD_FAILED";
                 errMsg = "entity.kind=hatch appendLoop[" + std::to_string(i) +
@@ -1241,6 +1548,7 @@ static AcDbEntity* m08eBuildExtendedEntityForAppend(AcDbDatabase* pDb,
                 return nullptr;
             }
         }
+        m08eReleaseHatchLoops(loops);
         es = pHatch->setAssociative(Adesk::kFalse);
         if (es != Acad::eOk) {
             delete pHatch;
