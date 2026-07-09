@@ -178,3 +178,82 @@ def test_self_test_mutations_runs_without_failing():
     assert result["drop_edge"]["status"] == "blocked"
     assert result["count_change"]["status"] == "blocked"
     assert result["rename"]["status"] == "blocked"
+
+
+# ---- block_topology_gate_report (capstone wiring contract, R4l-verified) ----
+
+from tools.semantic_gates import block_topology  # noqa: E402
+
+
+def _gate_ir(defs, ms_inserts):
+    return {
+        "block_definitions": defs,
+        "entities": [
+            {"geometry": {"kind": "block_reference", "block_name": n,
+                          "position": [0.0, 0.0, 0.0]}}
+            for n in ms_inserts
+        ],
+    }
+
+
+def _gate_def(name, *refs):
+    return {
+        "name": name,
+        "def_entities": [
+            {"geometry": {"kind": "block_reference", "block_name": r,
+                          "position": [0.0, 0.0, 0.0]}}
+            for r in refs
+        ],
+    }
+
+
+def test_gate_report_ok_when_reachable_graph_preserved():
+    # Census: modelspace->A->B reachable; ORPHAN + arrow block (referenced
+    # only by the *D cache) unreachable; *D7 cache excluded pre-extraction.
+    census = _gate_ir(
+        [_gate_def("A", "B"), _gate_def("B"), _gate_def("ORPHAN"),
+         _gate_def("DIMDOT"), _gate_def("*D7", "DIMDOT")],
+        ms_inserts=["A"],
+    )
+    post = _gate_ir(
+        [_gate_def("A", "B"), _gate_def("B"), _gate_def("*D9", "SOMETHING")],
+        ms_inserts=["A"],
+    )
+
+    report = block_topology.block_topology_gate_report(census, post)
+
+    assert report["status"] == "ok"
+    assert report["census_defs_unreachable_from_modelspace"] == ["DIMDOT", "ORPHAN"]
+    assert report["derived_cache_defs_excluded"]["a"] == 1
+    assert report["derived_cache_defs_excluded"]["b"] == 1
+
+
+def test_gate_report_blocks_on_reachable_edge_loss():
+    census = _gate_ir([_gate_def("A", "B"), _gate_def("B")], ms_inserts=["A"])
+    post = _gate_ir([_gate_def("A"), _gate_def("B")], ms_inserts=["A"])
+
+    report = block_topology.block_topology_gate_report(census, post)
+
+    assert report["status"] == "blocked"
+    assert report["edges_missing"] == [["A", "B", 1]]
+
+
+def test_gate_report_applies_anon_remap_to_census_side():
+    census = _gate_ir([_gate_def("*U5", "B"), _gate_def("B")], ms_inserts=["*U5"])
+    post = _gate_ir([_gate_def("ANON_CLONE", "B"), _gate_def("B")],
+                    ms_inserts=["ANON_CLONE"])
+
+    report = block_topology.block_topology_gate_report(
+        census, post, name_map={"*U5": "ANON_CLONE"})
+
+    assert report["status"] == "ok"
+
+
+def test_gate_report_vacuous_ok_without_topology():
+    census = _gate_ir([], ms_inserts=[])
+    post = _gate_ir([], ms_inserts=[])
+
+    report = block_topology.block_topology_gate_report(census, post)
+
+    assert report["status"] == "ok"
+    assert "vacuously ok" in report["note"]

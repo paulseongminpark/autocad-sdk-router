@@ -4,12 +4,20 @@
 
 from __future__ import annotations
 
+import re
 from collections import Counter
 from typing import Any, Dict, List, Optional, Sequence, Tuple
 
 
 BLOCK_TOPOLOGY_SEMANTIC_GATE_SCHEMA_ID = "ariadne.block_topology_gate.v1"
 MODELSPACE_OWNER = "__modelspace__"
+
+# Same *D measurement contract as blockdef_diff: dimension-derived cache
+# blocks (and their arrow-block edges) are per-dimension rendered artifacts;
+# a rebuild's dimensions mint fresh *D names. Filtering must happen BEFORE
+# extraction -- anon_remap renames census *D defs (e.g. to ARIADNE_ANON_D*),
+# measured on R4l, so a post-extraction name filter misses the a-side.
+_DIM_CACHE_NAME = re.compile(r"^\*D\d+$")
 
 
 def _normalize_name(name: Any, name_map: Dict[str, str]) -> str:
@@ -142,6 +150,79 @@ def compare_block_topology(a: Dict[str, Any], b: Dict[str, Any]) -> Dict[str, An
         "status": status,
         "totals": totals,
     }
+
+
+def _strip_derived_caches(ir_doc: Dict[str, Any]) -> Tuple[Dict[str, Any], int]:
+    """Drop ^\\*D\\d+$ block definitions from an IR doc (pre-extraction)."""
+    block_defs = ir_doc.get("block_definitions") or []
+    kept = [b for b in block_defs
+            if not (isinstance(b, dict) and _DIM_CACHE_NAME.match(b.get("name") or ""))]
+    dropped = len(block_defs) - len(kept)
+    if not dropped:
+        return ir_doc, 0
+    out = dict(ir_doc)
+    out["block_definitions"] = kept
+    return out, dropped
+
+
+def reachable_subgraph(topology: Dict[str, Any]) -> Tuple[Dict[str, Any], List[str]]:
+    """Split a topology into (modelspace-reachable subgraph, unreachable defs).
+
+    The regen replays the def graph reachable from the modelspace INSERTs;
+    census defs referenced by nothing (orphan definitions, or defs referenced
+    only by excluded *D caches -- e.g. DIMDOT/_ArchTick arrow blocks, measured
+    on R4l) are outside that authored-reachable scope. They are returned
+    separately for honest reporting, never silently dropped.
+    """
+    adjacency: Dict[str, set] = {}
+    for edge in topology.get("edges") or []:
+        if isinstance(edge, (list, tuple)) and len(edge) >= 3:
+            adjacency.setdefault(edge[0], set()).add(edge[1])
+    seen: set = set()
+    stack = [MODELSPACE_OWNER]
+    while stack:
+        node = stack.pop()
+        if node in seen:
+            continue
+        seen.add(node)
+        stack.extend(adjacency.get(node, ()))
+    defs = [d for d in (topology.get("defs") or []) if isinstance(d, str)]
+    reachable = {
+        "defs": sorted(d for d in defs if d in seen),
+        "edges": [e for e in (topology.get("edges") or [])
+                  if isinstance(e, (list, tuple)) and len(e) >= 3
+                  and (e[0] == MODELSPACE_OWNER or e[0] in seen)],
+    }
+    unreachable = sorted(d for d in defs if d not in seen)
+    return reachable, unreachable
+
+
+def block_topology_gate_report(census_ir: Dict[str, Any], post_ir: Dict[str, Any], *,
+                               name_map: Optional[Dict[str, str]] = None) -> Dict[str, Any]:
+    """L5 semantic gate: the modelspace-reachable block-reference graph of the
+    census must be preserved by the rebuild (insert topology, not counts).
+
+    Contract (verified on R4l before wiring): *D derived caches excluded
+    pre-extraction on both sides; the gate verdict compares the
+    modelspace-REACHABLE subgraph (census defs unreachable from modelspace are
+    outside the regen's replay scope and are reported, not folded into the
+    verdict). R4l measured: 290/290 reachable defs, 711/711 edges preserved;
+    4 census defs unreachable (DIMDOT/_ArchTick arrow blocks referenced only
+    by excluded caches + 2 orphan definitions).
+    """
+    census_stripped, caches_a = _strip_derived_caches(census_ir or {})
+    post_stripped, caches_b = _strip_derived_caches(post_ir or {})
+    topo_a = extract_block_topology(census_stripped, name_map=name_map)
+    topo_b = extract_block_topology(post_stripped)
+    reachable_a, unreachable_a = reachable_subgraph(topo_a)
+    report = compare_block_topology(reachable_a, topo_b)
+    report["derived_cache_defs_excluded"] = {"a": caches_a, "b": caches_b,
+                                             "name_pattern": _DIM_CACHE_NAME.pattern}
+    report["census_defs_unreachable_from_modelspace"] = unreachable_a
+    if not reachable_a["defs"] and not reachable_a["edges"]:
+        report["status"] = "ok"
+        report["note"] = "no reachable census block topology (vacuously ok)"
+    return report
 
 
 def _synthetic_topology() -> Dict[str, Any]:

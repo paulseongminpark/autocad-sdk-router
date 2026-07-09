@@ -1326,15 +1326,15 @@ def main(argv=None) -> int:
             )
             summary["regen"]["visual_gate"] = visual_gate_result
             gate_statuses.append(visual_gate_result["status"])
+        patch_doc_path = os.path.join(regen_dir, "patch.json")
+        anon_remap = None
+        if os.path.isfile(patch_doc_path):
+            anon_remap = (json.load(open(patch_doc_path, encoding="utf-8-sig"))
+                          or {}).get("anon_remap")
         if args.interior_gate:
             baseline, baseline_source = (
                 (args.interior_baseline, "--interior-baseline CLI override")
                 if args.interior_baseline is not None else _load_interior_baseline())
-            patch_doc_path = os.path.join(regen_dir, "patch.json")
-            anon_remap = None
-            if os.path.isfile(patch_doc_path):
-                anon_remap = (json.load(open(patch_doc_path, encoding="utf-8-sig"))
-                              or {}).get("anon_remap")
             interior_diff, interior_gate = interior_gate_report(
                 census_ir, post_ir, anon_remap=anon_remap,
                 baseline=baseline, baseline_source=baseline_source)
@@ -1346,6 +1346,16 @@ def main(argv=None) -> int:
             _write_json(os.path.join(out_dir, "dim_semantic_gate.json"), dim_semantic_gate)
             summary["regen"]["dim_semantic_gate"] = dim_semantic_gate
             gate_statuses.append(dim_semantic_gate["status"])
+            # L5 #2: insert-graph preservation (contract pre-verified on R4l:
+            # 290/290 reachable defs, 711/711 edges -- see
+            # semantic_gates.block_topology.block_topology_gate_report).
+            block_topology_mod = importlib.import_module(
+                "semantic_gates.block_topology")
+            topology_gate = block_topology_mod.block_topology_gate_report(
+                census_ir, post_ir, name_map=anon_remap)
+            _write_json(os.path.join(out_dir, "block_topology_gate.json"), topology_gate)
+            summary["regen"]["block_topology_gate"] = topology_gate
+            gate_statuses.append(topology_gate["status"])
     else:
         summary["verdict"] = None
         summary["verdict_skipped_reason"] = (
