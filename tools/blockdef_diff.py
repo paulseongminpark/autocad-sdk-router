@@ -6,6 +6,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import math
 import os
 import re
 import sys
@@ -81,7 +82,29 @@ def _canonical_hatch_geometry(g: Dict[str, Any]) -> Dict[str, Any]:
         return g
     canon_g = dict(g)
     canon_g.pop("pattern_type", None)
-    divisor = scale if (ptype == 1.0 and scale) else 1.0
+    # Baked-vs-unit detection must NOT trust pattern_type: originals store
+    # type-1 rows scale-BAKED, but a type-1 PREDEFINED-name replay (DASH x66,
+    # R4p runs/e2e_1dwg_R4p_phase_20260709) stores UNIT rows -- same type,
+    # different baking. The scale signal lives in the row magnitudes
+    # themselves: baked offsets/dashes are O(scale), unit ones are O(1), so
+    # sqrt(scale) separates the two whenever scale > 1 (measured populations:
+    # 43.75..350 baked vs 0.125..1 unit at scales 300/350). Degenerate
+    # scales (<=1) or all-zero rows keep the legacy type-1 rule.
+    row_mag = 0.0
+    for _row in rows:
+        if not isinstance(_row, dict):
+            continue
+        for _key in ("offset", "dashes"):
+            _val = _row.get(_key)
+            if isinstance(_val, list):
+                for _v in (_val[:2] if _key == "offset" else _val):
+                    if isinstance(_v, (int, float)):
+                        row_mag = max(row_mag, abs(_v))
+    if scale and scale > 1.0 and row_mag > 0.0:
+        baked = row_mag > math.sqrt(scale)
+    else:
+        baked = (ptype == 1.0 and bool(scale))
+    divisor = scale if (baked and scale) else 1.0
 
     def _q(v: Any) -> Any:
         # Quantize AFTER unit-normalization: the .pat replay serializes at

@@ -347,3 +347,40 @@ def test_hatch_intra_pattern_structure_survives_rebase():
     report = blockdef_diff.diff_block_definitions(ir_a, ir_b)
 
     assert report["totals"]["diff0_total"] == 1
+
+
+# ---- predefined-name (type-1) unit replay (R4p, runs/e2e_1dwg_R4p_phase_
+# 20260709): predefined patterns (DASH x66 on 1.dwg) replay as TYPE-1 with
+# UNIT rows -- the drawing resolves the name, nothing bakes the scale --
+# carrying their per-hatch phase on HPORIGIN. pattern_type is provenance,
+# not baking truth: baked-vs-unit must be read off the row magnitudes.
+
+
+def test_hatch_predefined_type1_unit_replay_with_origin_equals_baked():
+    ir_a = _ir(_block("W", _hatch(
+        "A1", ptype=1.0, scale=350.0,
+        base=[-24474.999999999516, -149365.00000000003],
+        offset=[43.75, 43.75])))
+    b = _hatch("B1", ptype=1.0, scale=350.0, base=[0.0, 0.0], offset=[0.125, 0.125])
+    b["geometry"]["pattern_origin"] = [-24474.999999999516, -149365.00000000003]
+    ir_b = _ir(_block("W", b))
+
+    report = blockdef_diff.diff_block_definitions(ir_a, ir_b)
+
+    assert report["totals"]["diff0_total"] == 1
+
+
+def test_hatch_predefined_unit_replay_real_phase_shift_still_mismatches():
+    # Replay origin off by half a line spacing (0.0625 * 350 = 21.875 world
+    # units): a REAL phase difference folding must keep.
+    ir_a = _ir(_block("W", _hatch(
+        "A1", ptype=1.0, scale=350.0,
+        base=[-24475.0, -149365.0],
+        offset=[43.75, 43.75])))
+    b = _hatch("B1", ptype=1.0, scale=350.0, base=[0.0, 0.0], offset=[0.125, 0.125])
+    b["geometry"]["pattern_origin"] = [-24453.125, -149365.0]
+    ir_b = _ir(_block("W", b))
+
+    report = blockdef_diff.diff_block_definitions(ir_a, ir_b)
+
+    assert report["totals"]["diff0_total"] == 0

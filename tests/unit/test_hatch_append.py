@@ -215,3 +215,24 @@ def test_hatch_without_origin_and_without_defs_emits_no_origin_key():
         op = patch_ops_blocks._def_entity_append_op("BLK", ent)
     assert op is not None
     assert "pattern_origin" not in op["args"]["entity"]
+
+
+def test_predefined_hatch_with_census_defs_carries_origin_without_defs():
+    # R4p (runs/e2e_1dwg_R4p_phase_20260709): all 66 predefined-name (DASH)
+    # hatches lost their phase -- the origin fold read rows from the
+    # serialized entity, and predefined hatches never ride
+    # pattern_definitions in the job (the drawing resolves the name). The
+    # fold must read the CENSUS rows instead.
+    ent = _sample("hatch", require_vertices=True)
+    ent["geometry"]["pattern_name"] = "DASH"
+    ent["geometry"].pop("pattern_origin", None)
+    ent["geometry"]["pattern_definitions"] = [
+        {"angle": 0.0, "base": [-24474.999999999516, -149365.00000000003],
+         "offset": [43.75, 43.75], "dashes": [43.75, -43.75]}]
+
+    op = patch_ops_blocks._def_entity_append_op("BLK", ent)
+
+    assert op is not None
+    entity = op["args"]["entity"]
+    assert "pattern_definitions" not in entity
+    assert entity["pattern_origin"] == [-24474.999999999516, -149365.00000000003]

@@ -449,7 +449,13 @@ def _def_entity_append_op(block_name: str, def_ent: Dict[str, Any]) -> Optional[
                     and all(isinstance(v, (int, float)) for v in pattern_origin[:2])):
                 census_origin = [float(pattern_origin[0]), float(pattern_origin[1])]
                 entity["pattern_origin"] = list(census_origin)
-            rows = entity.get("pattern_definitions")
+            # Read rows from the CENSUS geometry, not the serialized entity:
+            # predefined-name patterns (DASH x66 on 1.dwg) never ride
+            # pattern_definitions in the job (the drawing resolves the name),
+            # yet their census rows carry the per-hatch phase in base -- R4p
+            # measured all 66 losing phase because this lookup used the
+            # entity and skipped the base fold for exactly that class.
+            rows = g.get("pattern_definitions")
             if isinstance(rows, list) and rows and isinstance(rows[0], dict):
                 base1 = rows[0].get("base")
                 if (isinstance(base1, list) and len(base1) >= 2
