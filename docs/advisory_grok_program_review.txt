@@ -1,0 +1,105 @@
+원문·잔여 데이터를 기준으로, 실험 프로그램의 약점과 처분을 레버리지 순으로 정리합니다.
+
+---
+
+## A. TOP-5 약점 (레버리지 순)
+
+### 1. `interior_diff0_fraction`이 복원 진척이 아니라 측정 오염을 점수화한다
+**비판 대상:** `ROUNDTRIP_100_PLAN_TREE.md` §0 L2/L2' · `residue_clusters_R4h.md` · `RESIDUE_ACTION_PLAN.md` 조치1
+
+잔여 2538 중 **2183(86%)이 `anon_dimension`**이다. 그런데 같은 계획서가 이미 밝힌다: DIMENSION 엔티티는 **113/113 diff0**, `*D`는 AutoCAD 내부 캐시라 이름 매칭이 성립하지 않으며, `ARIADNE_ANON_D*` create 경로 자체가 트리거되지 않는다.  
+0.661→0.938→0.950 사다리는 “에이전트가 도면을 읽었다”의 증거가 아니라, **비교 불가능한 `*D` 항을 분모에 남겨 둔 채 올린 점수**다. ALM 원문이 경고한 FM1(Fake PASS)의 정확한 형태다 (`05_alm_stage_notes.md` 마무리: 커닝 금지·2단 구조를 우회한 diff0).
+
+### 2. 게이트 체인이 상관된 기하 보존을 여러 번 세어 “의미 증명”으로 포장한다
+**비판 대상:** `EXPERIMENT_DESIGNS_V2.md` §1 현위치 · `SEMANTIC_GATES_L5.md` 전문 · 사용자 컨텍스트(LibreDWG/SSIM/L5#1/#2)
+
+원문 법칙: 라운드트립은 **domain IR에 무력** (`05` §1.1 IR1 경고; V2 법칙1). 그런데 현재 스택은 O1(diff) + 고정점 + interior 래칫 + LibreDWG + SSIM + N5(f(A)≟f(B')) + block-ref topology를 병렬로 켠다.  
+N5는 DIMENSION이 이미 L1에서 113/113이면 **거의 항상 PASS**한다 — 독립 오라클이 아니라 L1의 메아리다. `SEMANTIC_GATES_L5.md`가 말하는 “golden-free but not toothless”는 fixture 변이 자가테스트에만 이빨이 있고, **캡스톤에서 B'에 대한 유죄 판결(conviction) 축이 없다**. V2 §1이 스스로 비었다고 적은 **O3·O6·O7**을 채우지 않은 채 O4 껍데기만 양산 중이다.
+
+### 3. P7이 “소진할 1.1k anon”을 엔진 타깃으로 삼아, 공장2 통계 게이트를 잘못된 잔여에 조준한다
+**비판 대상:** `EXPERIMENT_DESIGNS_V2.md` §3 P7 · §5 순위2
+
+P7 재프레임은 공장2 서명 클러스터링으로 옳다. 그러나 목적문이 여전히 **“잔여 anon ~1.1k modified 소진”**이다. 그 질량의 대부분은 조치1이 이미 **반증 불가능한 불변식**으로 기각한 `*D`다.  
+min_freq·contrast_sharpness를 `*D` a_only/b_only 쌍에 돌리면 “패턴 발견”이 아니라 **측정 버그의 통계적 재확인**만 한다. 원문 C5(눈검사 금지)를 지키면서도, **잘못된 분모에 공장2를 적용**하는 설계 결함이다.
+
+### 4. n=1 위에서 게이트·래칫·의미를 동시에 튜닝한다 — 원문이 금지한 “자기 데이터로 자기 검증”
+**비판 대상:** V2 §3 P9 “실행은 Paul 대기” · §5에서 N1/P9를 하위 · `05` §1.4 corpus anti-overfitting · V2 법칙9·12
+
+골든 3축(production failure / coverage / adversarial)과 “발견≠검증”(`05` S4 §5)이 입법돼 있는데, 실행 순서는 **1.dwg에 게이트를 더 쌓는 쪽**이 위다. P9는 도면 수령 대기로 빠지고, **지금 IR만으로 가능한 adversarial canary(V2 P9-3, N1)** 는 순위 8이다.  
+결과: 모든 “PASS”는 single-case existence proof인데, 프로그램 언어는 사다리·래칫·L5 LOCK처럼 읽힌다. 원문 SCRIBE/SJH의 n=1 경계가 **문서에만 있고 게이트 계약에는 없다**.
+
+### 5. P4/P10c “provenance 채널”과 P5 dimstyle 왕관이, 잔여 데이터가 가리키는 병목과 어긋난다
+**비판 대상:** V2 §3 P4·P5·P10c · `RESIDUE_ACTION_PLAN` 조치1·4
+
+- **P4/P10c:** xdata는 미래 룰팩 provenance 운반체로 재프레임됐다. 지금은 룰팩이 **쓰는** 엔티티가 거의 없고, 기존 app xdata 왕복은 L3 장식이다. 1005 리맵(C2)은 진짜 공학 문제지만, **interior 100%나 L5 LOCK의 임계경로가 아니다**.
+- **P5 dimstyle 우선:** “치수 70%”는 probe 시대 질량 논증이다. R4h에서는 DIMENSION **엔티티**는 이미 닫혔고, 남은 것은 `*D` 캐시·SOLID 화살표 표현 차이(측정 아티팩트)다. dimstyle 완성은 dwg_truth **계약**에는 맞지만, **0.95→1.00 레버가 아니다**.
+
+---
+
+## B. KILL / MERGE (실행 비용 기준, 무자비)
+
+| 항목 | 처분 | 이유 |
+|---|---|---|
+| **P7 “1.1k anon 소진” 프레이밍** | **KILL 후 재정의** | 타깃이 가짜 잔여. `*D` 제외 **이후** residual(~355 ent)에만 mismatch_decomposition. |
+| **P4b + P10c를 interior/L5 임계경로로 두는 것** | **KILL(경로에서)** | plumbing은 opt-in 유지. provenance 게이트는 **에이전트가 xdata를 쓰기 시작하기 전** vacuous. VACUOUS≠PASS를 스스로 어김. |
+| **P5를 “100% 다음 수”로 올리는 것** | **Demote / MERGE** | 테이블 계약은 유지하되, **참조 무결성 최소핵만 P10a에 흡수**. dimstyle 전체 재생은 계약 부채, 잔여 전쟁 아님. |
+| **P10a ∩ P5 참조무결성** | **MERGE → 단일 `ref_integrity_gate`** | V2가 이미 “P10a와 공유”라고 씀. 두 실험으로 돌리면 동일 위반을 두 번 PASS로 적는다. |
+| **P10b (벽후보 metamorphic) without 의무 O3 foil** | **KILL 또는 조건부** | f(A)=f(B')만 있으면 L2 메아리. **합성 장면 N→N-1 유죄 테스트가 캡스톤 게이트에 묶이기 전엔 실행 금지**. |
+| **N2** | **MERGE or KILL** | LibreDWG 교차엔진이 이미 라이브면 카운트/표본 합의는 그 게이트의 강화 항목이지 별도 실험 슬롯이 아님. |
+| **N3** | **실험이 아니라 제도 — KEEP process, KILL “run slot”** | 골든 인덱스는 매 수리 커밋 세금. 별도 R-런 예산 쓰지 말 것. |
+| **N5** | **KEEP, but demote as “progress”** | 이미 113/113이면 **회귀 가드**지 상승 사다리가 아님. 새 점수 발표에 쓰지 말 것. |
+| **N1** | **KEEP · 승격** | tolerance cliff 반증은 상관 게이트 인플레이션을 깨는 거의 유일한 설계. 순위 8은 잘못. |
+| **N4** | **KEEP · 승격** | O6 최소형. “무변경 오염 0”은 현재 diff 특이도 공백을 직접 친다. |
+| **P9 실행** | **KEEP 대기, 단 변명 KILL** | 도면 대기는 OK. **그 사이 1.dwg에 게이트 추가 = P9 대체**라는 운영은 금지. 레지스트리+IR adversarial canary는 지금. |
+| **P10 전체 “의미 LOCK” 수사** | **KILL 수사** | 지금은 O4 보존 가드 일부. 2단계 LOCK 언어 사용 금지 (`05` §2: 시맨틱은 미착수). |
+
+**살아남을 실행 슬롯 (압축):**  
+`(측정교정 *D제외)` → `(HATCH 잔여 조사/수정)` → `(P7' on real residual)` → `(N4)` → `(N1)` → `(P10a/ref_integrity + O3-backed P10b만)` → `(P9 registry now / drawings later)`.
+
+---
+
+## C. 설계되지 않은 최고 레버리지 실험
+
+**이름: Identity-Preserving Semantic Sabotage (IPSS) — O3×O4×O5×naive-foil의 캡스톤 유죄 스위트**
+
+원문이 말하는 것: O3 합성 진리, O4 metamorphic, O5 그래프 제약, naive-foil(naive PASS & smart FAIL), 3-Graph(proposal→validation→trusted), 골든 adversarial 축.  
+현재 프로그램은 **좋은 왕복이 보존되는가**만 묻고, **기하·카운트를 유지한 채 의미를 망가뜨린 B'를 유죄로 잡는가**를 묻지 않는다. 그래서 L5가 “이빨 있다”고 말해도 상관 PASS만 쌓인다.
+
+**설계 (한 실험으로 묶음):**
+1. A에서 정상 B'를 만든 뒤, **IR 또는 patch 직후**에만 통제 변조 (원본 DWG 불변):
+   - DIM 표기값은 유지하고 defpoint/xline만 ε 이동 (N5가 잡아야 함)
+   - INSERT 수는 유지, `block_reference` → 잘못된 def / 깨진 FK (L5#2·P10a가 잡아야 함)
+   - 엔티티 수·bbox SSIM 근사 유지, layer/의미 레이블만 오염
+   - 무변경 대조군 (N4 시나리오 0)
+2. **naive 게이트**(count/SSIM/interior fraction)와 **smart 게이트**(N5·ref_integrity·관계표)를 동일 산출에 동시 실행.
+3. 3-Graph: 변조 패치는 `proposal`로만 존재; smart FAIL이면 `trusted` 승격 금지.
+
+**성공 기준 (게이트화):**
+- 4개 이상 sabotage 클래스에서 **naive PASS ∧ smart FAIL** (contrast_sharpness > 문서화 임계).
+- 무변조 B'에서는 smart도 PASS (특이도).
+- 한 클래스라도 smart가 침묵하면 해당 게이트는 **VACUOUS/치아없음**으로 capstone에서 강등 — “L5 live” 표기 금지.
+- 이 스위트 PASS 없이 P10b·추가 L5 셀 **머지 금지**.
+
+이것이 O7 홀드아웃 도면 없이도, 원문 adversarial 축·validator-validation·naive-foil을 **지금 1.dwg IR write 경로만으로** 소비하는 실험이다. P9 도면이 오면 같은 스위트를 canary별로 복제하면 된다.
+
+---
+
+## D. 이 도면 100%: 클러스터 추격 vs 구조적 수
+
+**클러스터별 픽스 추격은 `anon_dimension`에 대해 틀린 전략이다.** 잔여 데이터가 이미 구조적 수를 가리킨다.
+
+1. **한 수로 두 클러스터 붕괴:** `anon_dimension/10-99` + `/1-9` = 2183 ent. a_only 113 ↔ b_only 113 대칭 + DIMENSION 113/113 diff0 → **`*D`/`ARIADNE_ANON_D*`를 blockdef_diff 분모에서 명시 제외(VACUOUS 보고) + 치수는 N5/엔티티 정준만**. 이것이 “dimension re-association”이 아니라 **측정 계약 교정**이다. re-association을 쫓으면 AutoCAD가 매 저장마다 새로 뽑는 캐시를 에이전트 복원 문제로 오인한다.
+
+2. **다음 구조적 수 (콘텐츠):** `by_kind_gap.hatch` 최대 ~249 — 클러스터에 흩어진 **커스텀 `.pat` 재생 잔여**. 이미 체인 landed면 **census로 pattern_definitions 공백 원인 한 방**이지, def별 수동 패치가 아니다.
+
+3. **그다음:** `dynamic_instance`(~291) + `block_reference` net −227 — **중첩/익명 인스턴스 합성·리맵(P2 계열 구조)** 이 여러 mixed/a_only 행을 동시에 접는다. per-def entity 땜질보다 `ir_to_patch`의 nested ref defer 경로가 레버.
+
+4. **wipeout 33:** 계획서대로 **보류**. 0.12pp에 L비용.
+
+**정리:** 100%에 가까운 “점수”는 먼저 **측정 교정(+~3.7pp 정밀)** 으로 오고, 진짜 복원은 **HATCH 경로 + dynamic/nested 구조** 두 축이다. anon_dimension을 클러스터 패킷으로 쪼개 고치는 함대는 **레버리지 음수**.
+
+---
+
+## E. 한 문단 판결
+
+내일 아침부터는 새 게이트를 추가하지 않는다. R4l이 끝나는 대로 `*D`를 blockdef_diff에서 제외해 **정직한 interior 분모**를 다시 박고, 그 숫자만 사다리에 올린다. 이어서 hatch `pattern_definitions` 공백을 한 번의 census로 닫고, 남는 잔여에만 P7'를 돌리며, dynamic/nested는 인스턴스 합성 구조로 친다. 병렬로 IPSS(유죄 스위트)+N4+N1을 캡스톤에 묶어 **naive PASS/smart FAIL**이 나오기 전에는 어떤 것도 L5·의미 LOCK이라 부르지 않는다. P4/P10c/dimstyle 왕관/추가 SSIM 계열은 임계경로에서 내린다. P9 레지스트리와 IR adversarial canary는 도면 없이도 오늘 만들고, 1.dwg 점수 올리기로 P9를 대체하는 운영을 중단한다 — 지금 프로그램의 최대 위험은 복원 실패가 아니라 **상관된 보존 게이트로 0.95를 의미 증명처럼 읽게 만드는 것**이다.
