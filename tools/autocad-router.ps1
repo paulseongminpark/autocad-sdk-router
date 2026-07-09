@@ -374,7 +374,7 @@ function Test-NativeAcadModules {
     }
   }
 
-  $stamp = Get-Date -Format 'yyyyMMdd_HHmmss'
+  $stamp = (Get-Date -Format 'yyyyMMdd_HHmmssfff') + '_p' + $PID + '_' + (Get-Random -Maximum 9999).ToString('D4')  # collision-proof: second-granularity stamps let CONCURRENT pipelines claim the SAME staging dir (measured: R4j b149 ran on a foreign 37KB drawing staged by another process in the same second)
   $stageRoot = Join-Path $StagingDir "native_status_$stamp"
   $runOut = Join-Path $RunsDir "native_status_$stamp"
   New-Item -ItemType Directory -Force -Path $stageRoot | Out-Null
@@ -1065,7 +1065,7 @@ function Invoke-DwgWriteOriginalScript {
     }
   }
 
-  $stamp = Get-Date -Format 'yyyyMMdd_HHmmss'
+  $stamp = (Get-Date -Format 'yyyyMMdd_HHmmssfff') + '_p' + $PID + '_' + (Get-Random -Maximum 9999).ToString('D4')  # collision-proof: second-granularity stamps let CONCURRENT pipelines claim the SAME staging dir (measured: R4j b149 ran on a foreign 37KB drawing staged by another process in the same second)
   $runOut = Join-Path $RunsDir "dwg_truth_autocad_write_original_$stamp"
   New-Item -ItemType Directory -Force -Path $runOut | Out-Null
   $dwgDir = Split-Path -Parent $InputPath
@@ -1099,7 +1099,7 @@ function Invoke-CadJobRoute {
   }
 
   $effectiveWriteMode = Get-EffectiveDwgWriteMode
-  $stamp = Get-Date -Format 'yyyyMMdd_HHmmss'
+  $stamp = (Get-Date -Format 'yyyyMMdd_HHmmssfff') + '_p' + $PID + '_' + (Get-Random -Maximum 9999).ToString('D4')  # collision-proof: second-granularity stamps let CONCURRENT pipelines claim the SAME staging dir (measured: R4j b149 ran on a foreign 37KB drawing staged by another process in the same second)
   $runOut = Join-Path $RunsDir "dwg_truth_autocad_cad_job_$stamp"
   New-Item -ItemType Directory -Force -Path $runOut | Out-Null
 
@@ -1274,7 +1274,7 @@ function Invoke-CadNativeBatchRoute {
     return [ordered]@{ status = 'ERROR'; detail = "op list is empty: $OpListPath" }
   }
 
-  $stamp = Get-Date -Format 'yyyyMMdd_HHmmss'
+  $stamp = (Get-Date -Format 'yyyyMMdd_HHmmssfff') + '_p' + $PID + '_' + (Get-Random -Maximum 9999).ToString('D4')  # collision-proof: second-granularity stamps let CONCURRENT pipelines claim the SAME staging dir (measured: R4j b149 ran on a foreign 37KB drawing staged by another process in the same second)
   $runOut = Join-Path $RunsDir "native_batch_$stamp"
   $jobsDir = Join-Path $runOut 'jobs'
   $resDir = Join-Path $runOut 'results'
@@ -1397,7 +1397,7 @@ function Invoke-AutoCadRoute {
     return [ordered]@{ engine_exit_code = -1; engine_output = "Input DWG not found: $InputPath" }
   }
 
-  $stamp = Get-Date -Format 'yyyyMMdd_HHmmss'
+  $stamp = (Get-Date -Format 'yyyyMMdd_HHmmssfff') + '_p' + $PID + '_' + (Get-Random -Maximum 9999).ToString('D4')  # collision-proof: second-granularity stamps let CONCURRENT pipelines claim the SAME staging dir (measured: R4j b149 ran on a foreign 37KB drawing staged by another process in the same second)
   $stageRoot = Join-Path $StagingDir "dwg_$stamp"
   New-Item -ItemType Directory -Force -Path $stageRoot | Out-Null
   # ASCII-safe staged copy of the input for the batch extractor path.
@@ -1575,7 +1575,7 @@ switch ($Action) {
     if (
       ($HostMode -eq 'full_autocad' -or $jobRequiresAttendedHost) -and $hasJob
     ) {
-      $stamp = Get-Date -Format 'yyyyMMdd_HHmmss'
+      $stamp = (Get-Date -Format 'yyyyMMdd_HHmmssfff') + '_p' + $PID + '_' + (Get-Random -Maximum 9999).ToString('D4')  # collision-proof: second-granularity stamps let CONCURRENT pipelines claim the SAME staging dir (measured: R4j b149 ran on a foreign 37KB drawing staged by another process in the same second)
       $runOut = Join-Path $RunsDir "dwg_truth_autocad_full_job_$stamp"
       New-Item -ItemType Directory -Force -Path $runOut | Out-Null
       $exec = Invoke-FullAutoCadCadJob -RunOut $runOut
@@ -1584,7 +1584,7 @@ switch ($Action) {
       $exec = Invoke-CadJobRoute -Capabilities $capabilities
     }
       elseif ($HostMode -eq 'full_autocad' -or $effectiveWriteMode -eq 'live_edit') {
-        $stamp = Get-Date -Format 'yyyyMMdd_HHmmss'
+        $stamp = (Get-Date -Format 'yyyyMMdd_HHmmssfff') + '_p' + $PID + '_' + (Get-Random -Maximum 9999).ToString('D4')  # collision-proof: second-granularity stamps let CONCURRENT pipelines claim the SAME staging dir (measured: R4j b149 ran on a foreign 37KB drawing staged by another process in the same second)
         $runOut = Join-Path $RunsDir "dwg_truth_autocad_live_edit_$stamp"
         New-Item -ItemType Directory -Force -Path $runOut | Out-Null
         $exec = Invoke-FullAutoCadScript -RunOut $runOut
