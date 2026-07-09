@@ -41,3 +41,21 @@
 ## REBUILD Backtrack Trigger
 
 - If custom hatch replay starts failing with `HATCH_CUSTOM_PAT_UNRESOLVED` after the batch-side `.pat` file is present, back out the custom replay branch and re-verify the effective `accoreconsole` working directory / custom-pattern resolution behavior before widening the batch surface.
+
+## Edge Loops
+
+- Native extract contract for a non-polyline hatch loop: keep the existing loop wrapper fields `index`, `loop_type`, `closed`, and `status`, and emit `edges` instead of `vertices`.
+- Edge row schema:
+  - `{"type":"line","start":[x,y],"end":[x,y]}`
+  - `{"type":"arc","center":[x,y],"radius":r,"start_angle":a0,"end_angle":a1,"ccw":bool}`
+  - `{"type":"ellipse","center":[x,y],"major":[x,y],"ratio":k,"start_angle":a0,"end_angle":a1,"ccw":bool}`
+  - `{"type":"spline","degree":n,"control":[[x,y],...],"knots":[...],"rational":bool,"weights":[...]}`
+  - `{"type":"unsupported_<AcGe::EntityId int>"}` for any unexpected `AcGeCurve2d` subtype; extraction must count it honestly and never silently skip it.
+- Angle units stay in radians verbatim for `arc` and `ellipse` edges.
+- `ellipse.major` is the major-axis vector with the major radius baked into its magnitude, and `ellipse.ratio` is `minor_radius / major_radius`.
+- REBUILD contract for the next packet: construct one `AcGeCurve2d*` per `edges[]` row and replay the loop via `appendLoop(loopType, edgePtrs, edgeTypes)`.
+- REBUILD constructors:
+  - `line` -> `AcGeLineSeg2d(start, end)`
+  - `arc` -> `AcGeCircArc2d(center, radius, start_angle, end_angle, AcGeVector2d::kXAxis, !ccw)`
+  - `ellipse` -> derive `majorRadius = |major|`, `minorRadius = majorRadius * ratio`, derive orthogonal unit major/minor axes from `major`, then construct `AcGeEllipArc2d(center, majorAxisUnit, minorAxisUnit, majorRadius, minorRadius, start_angle, end_angle)`
+  - `spline` -> `AcGeNurbCurve2d(degree, knots, control)` when `rational == false`, otherwise `AcGeNurbCurve2d(degree, knots, control, weights)`

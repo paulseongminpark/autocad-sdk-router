@@ -1028,23 +1028,23 @@ static std::string extensionDictionaryJson(const std::string& ownerHandle,
 }
 
 // a1-hatchread: one hatch boundary edge, from the AcDbHatch::getLoopAt edge-array
-// overload. edgePtr is the raw AcGeVoidPointerArray element for this edge;
-// edgeType is AutoCAD's own AcDbHatch::HatchEdgeType tag (kLine=1/kCirArc=2/
-// kEllArc=3/kSpline=4) telling us which AcGeCurve2d subclass it actually points
-// at -- ObjectARX's documented contract is that EACH of these edge objects is
-// individually heap-allocated by getLoopAt and ownership passes to the caller
-// (must be deleted here, once, after this function has read it). Coordinates
-// are the curve's own 2D (loop-plane) values -- the hatch's elevation/normal
-// (emitted once at the entity level, not per-edge) already places that plane
-// in space, so no z is fabricated here (unlike the polyline-loop vertices
-// below, which keep the pre-existing "[x,y,elevation]" shape for continuity
-// with what op_roundtrip_probe/ir_builder already expect from THAT branch).
-static std::string hatchEdgeJson(void* edgePtr, int edgeType)
+// overload. edgePtr is the raw AcGeVoidPointerArray element for this edge.
+// getLoopAt also returns AutoCAD's HatchEdgeType tag per edge, but the JSON
+// contract here intentionally keys off the AcGeCurve2d object's own type() so
+// the emitted shape matches the real subclass. ObjectARX returns each edge
+// heap-allocated; this TU already takes ownership of recognized types and
+// deletes them after serialization, so this helper keeps that same memory
+// discipline. Coordinates are the curve's own 2D (loop-plane) values -- the
+// hatch's elevation/normal already places that plane in space, so no z is
+// fabricated here.
+static std::string hatchEdgeJson(void* edgePtr, int /*edgeType*/)
 {
     std::ostringstream o; o.precision(kJsonDoublePrecision);
-    switch (edgeType) {
-    case AcDbHatch::kLine: {
-        AcGeLineSeg2d* seg = static_cast<AcGeLineSeg2d*>(edgePtr);
+    AcGeCurve2d* curve = static_cast<AcGeCurve2d*>(edgePtr);
+    const int curveType = curve ? static_cast<int>(curve->type()) : -1;
+    switch (curve ? curve->type() : static_cast<AcGe::EntityId>(-1)) {
+    case AcGe::kLineSeg2d: {
+        AcGeLineSeg2d* seg = static_cast<AcGeLineSeg2d*>(curve);
         const AcGePoint2d sp = seg->startPoint();
         const AcGePoint2d ep = seg->endPoint();
         o << "{\"type\":\"line\""
@@ -1053,35 +1053,37 @@ static std::string hatchEdgeJson(void* edgePtr, int edgeType)
         delete seg;
         break;
     }
-    case AcDbHatch::kCirArc: {
-        AcGeCircArc2d* a = static_cast<AcGeCircArc2d*>(edgePtr);
+    case AcGe::kCircArc2d: {
+        AcGeCircArc2d* a = static_cast<AcGeCircArc2d*>(curve);
         const AcGePoint2d c = a->center();
-        o << "{\"type\":\"circ_arc\""
+        o << "{\"type\":\"arc\""
           << ",\"center\":[" << c.x << "," << c.y << "]"
           << ",\"radius\":" << a->radius()
           << ",\"start_angle\":" << a->startAng()
           << ",\"end_angle\":" << a->endAng()
-          << ",\"counterclockwise\":" << (a->isClockWise() ? "false" : "true") << "}";
+          << ",\"ccw\":" << (a->isClockWise() ? "false" : "true") << "}";
         delete a;
         break;
     }
-    case AcDbHatch::kEllArc: {
-        AcGeEllipArc2d* e = static_cast<AcGeEllipArc2d*>(edgePtr);
+    case AcGe::kEllipArc2d: {
+        AcGeEllipArc2d* e = static_cast<AcGeEllipArc2d*>(curve);
         const AcGePoint2d c = e->center();
-        const AcGeVector2d maj = e->majorAxis();
-        o << "{\"type\":\"ellipse_arc\""
+        const AcGeVector2d majorAxis = e->majorAxis();
+        const double majorRadius = e->majorRadius();
+        const double minorRadius = e->minorRadius();
+        const double ratio = (majorRadius != 0.0) ? (minorRadius / majorRadius) : 0.0;
+        o << "{\"type\":\"ellipse\""
           << ",\"center\":[" << c.x << "," << c.y << "]"
-          << ",\"major_axis\":[" << maj.x << "," << maj.y << "]"
-          << ",\"major_radius\":" << e->majorRadius()
-          << ",\"minor_radius\":" << e->minorRadius()
+          << ",\"major\":[" << (majorAxis.x * majorRadius) << "," << (majorAxis.y * majorRadius) << "]"
+          << ",\"ratio\":" << ratio
           << ",\"start_angle\":" << e->startAng()
           << ",\"end_angle\":" << e->endAng()
-          << ",\"counterclockwise\":" << (e->isClockWise() ? "false" : "true") << "}";
+          << ",\"ccw\":" << (e->isClockWise() ? "false" : "true") << "}";
         delete e;
         break;
     }
-    case AcDbHatch::kSpline: {
-        AcGeNurbCurve2d* n = static_cast<AcGeNurbCurve2d*>(edgePtr);
+    case AcGe::kNurbCurve2d: {
+        AcGeNurbCurve2d* n = static_cast<AcGeNurbCurve2d*>(curve);
         int degree = 0;
         Adesk::Boolean rational = Adesk::kFalse, periodic = Adesk::kFalse;
         AcGeKnotVector knots;
@@ -1103,23 +1105,28 @@ static std::string hatchEdgeJson(void* edgePtr, int edgeType)
             kns << knots[ki];
         }
         kns << "]";
+        std::ostringstream wts; wts.precision(kJsonDoublePrecision);
+        wts << "[";
+        for (int wi = 0; wi < weights.length(); ++wi) {
+            if (wi) wts << ",";
+            wts << weights[wi];
+        }
+        wts << "]";
         o << "{\"type\":\"spline\""
           << ",\"degree\":" << degree
+          << ",\"control\":" << cps.str()
+          << ",\"knots\":" << kns.str()
           << ",\"rational\":" << (rational ? "true" : "false")
-          << ",\"periodic\":" << (periodic ? "true" : "false")
-          << ",\"control_points\":" << cps.str()
-          << ",\"knots\":" << kns.str() << "}";
+          << ",\"weights\":" << wts.str() << "}";
         delete n;
         break;
     }
     default:
-        // No-fake-success: an edge type AutoCAD did not document to us yet
-        // (HatchEdgeType is a closed 4-value enum today) is surfaced honestly
-        // instead of silently dropped or misdecoded. Nothing to delete: we
-        // never cast (and therefore never identified an owning type for) an
-        // unrecognized edgePtr, so leaking a typed delete on an unknown
-        // subclass would be worse than leaving this one edge unreleased.
-        o << "{\"type\":\"unknown\",\"raw_edge_type\":" << edgeType << "}";
+        // No-fake-success: an unexpected AcGe subtype is surfaced honestly and
+        // countably instead of silently dropped. We do NOT delete unknown
+        // subclasses through AcGeCurve2d* here because this TU only performs
+        // typed deletes for recognized edge classes.
+        o << "{\"type\":\"unsupported_" << curveType << "\"}";
         break;
     }
     return o.str();
