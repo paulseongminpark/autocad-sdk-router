@@ -1,0 +1,5278 @@
+{
+  "out_dir": "D:\\dev\\99_tools\\autocad-sdk-router\\runs\\e2e_1dwg_R4h_interior_20260709",
+  "staged": {
+    "ok": true,
+    "staged_path": "D:\\dev\\99_tools\\autocad-sdk-router\\runs\\e2e_1dwg_R4h_interior_20260709\\census_stage\\staged_input.dwg",
+    "original_path": "D:\\dev\\.build\\1.dwg",
+    "original_sha256": "14eb65eb292d8a07f38ab5662dcafe9761c6185bc5ff0c8a9a008be15b598961",
+    "original_byte_size": 2368524,
+    "staged_sha256": "14eb65eb292d8a07f38ab5662dcafe9761c6185bc5ff0c8a9a008be15b598961",
+    "staged_byte_size": 2368524,
+    "staged_at": "2026-07-09T00:35:01.475454+00:00"
+  },
+  "census_ok": true,
+  "census_attempts": 1,
+  "census_report": {
+    "modelspace_entity_total": 375,
+    "certified_total": 375,
+    "out_of_class_total": 0,
+    "by_bucket": [
+      {
+        "dxf_name": "TEXT",
+        "kind": "text",
+        "count": 117,
+        "certified": true,
+        "label": "text"
+      },
+      {
+        "dxf_name": "DIMENSION",
+        "kind": "dimension",
+        "count": 113,
+        "certified": true,
+        "label": "dimension_all_subtypes"
+      },
+      {
+        "dxf_name": "LWPOLYLINE",
+        "kind": "lwpolyline",
+        "count": 73,
+        "certified": true,
+        "label": "lwpolyline"
+      },
+      {
+        "dxf_name": "INSERT",
+        "kind": "block_reference",
+        "count": 50,
+        "certified": true,
+        "label": "insert"
+      },
+      {
+        "dxf_name": "LINE",
+        "kind": "line",
+        "count": 21,
+        "certified": true,
+        "label": "line"
+      },
+      {
+        "dxf_name": "CIRCLE",
+        "kind": "circle",
+        "count": 1,
+        "certified": true,
+        "label": "circle"
+      }
+    ],
+    "block_definitions_count": 407,
+    "block_definitions_entity_total": 28183,
+    "block_definitions_by_bucket": [
+      {
+        "dxf_name": "LINE",
+        "kind": "line",
+        "count": 12117
+      },
+      {
+        "dxf_name": "LWPOLYLINE",
+        "kind": "lwpolyline",
+        "count": 7427
+      },
+      {
+        "dxf_name": "SPLINE",
+        "kind": "spline",
+        "count": 3973
+      },
+      {
+        "dxf_name": "ARC",
+        "kind": "arc",
+        "count": 2198
+      },
+      {
+        "dxf_name": "INSERT",
+        "kind": "block_reference",
+        "count": 1183
+      },
+      {
+        "dxf_name": "POINT",
+        "kind": "point",
+        "count": 341
+      },
+      {
+        "dxf_name": "HATCH",
+        "kind": "hatch",
+        "count": 265
+      },
+      {
+        "dxf_name": "ELLIPSE",
+        "kind": "ellipse",
+        "count": 201
+      },
+      {
+        "dxf_name": "TEXT",
+        "kind": "text",
+        "count": 154
+      },
+      {
+        "dxf_name": "CIRCLE",
+        "kind": "circle",
+        "count": 143
+      },
+      {
+        "dxf_name": "MTEXT",
+        "kind": "mtext",
+        "count": 113
+      },
+      {
+        "dxf_name": "3DFACE",
+        "kind": "face3d",
+        "count": 34
+      },
+      {
+        "dxf_name": "WIPEOUT",
+        "kind": "wipeout",
+        "count": 33
+      },
+      {
+        "dxf_name": "POLYLINE",
+        "kind": "polyline",
+        "count": 1
+      }
+    ],
+    "symbol_tables_present": [
+      "app_ids",
+      "block_table_records",
+      "dim_styles",
+      "layers",
+      "linetypes",
+      "text_styles",
+      "ucs",
+      "viewports",
+      "views"
+    ],
+    "symbol_table_record_counts": {
+      "layers": 91,
+      "linetypes": 18,
+      "text_styles": 8,
+      "dim_styles": 6,
+      "viewports": 1,
+      "app_ids": 25,
+      "ucs": 0,
+      "views": 0,
+      "block_table_records": 410
+    },
+    "diagnostics_entities_by_type": {
+      "INSERT": 50,
+      "LINE": 21,
+      "CIRCLE": 1,
+      "TEXT": 117,
+      "DIMENSION": 113,
+      "LWPOLYLINE": 73
+    }
+  },
+  "original_unchanged_after_census": null,
+  "filtered_entity_count": 375,
+  "def_entity_budget": {
+    "max_def_entities_per_block": 25000,
+    "dropped_block_definitions": []
+  },
+  "regen_target": {
+    "target": "tests\\fixtures\\blank_seed.dwg",
+    "used_blank_seed": true
+  },
+  "regen": {
+    "op_count": 27487,
+    "deferred_count": 280,
+    "resolvable_ops": {
+      "resolvable_count": 27487,
+      "unresolvable_count": 0,
+      "unresolvable_op_ids": []
+    },
+    "elapsed_seconds": 2358.010225534439,
+    "seconds_per_op": 0.08578637994449882,
+    "apply_status": "ok",
+    "apply_reason": null,
+    "batch_size": 100,
+    "batch_count": 161,
+    "gate": {
+      "requested_count": 27487,
+      "applied_count": 27487,
+      "dropped_count": 0,
+      "dropped_ops": [],
+      "apply_status": "ok",
+      "gate_status": "ok",
+      "ok": true
+    },
+    "cross_verify": {
+      "status": "ok",
+      "agree": true,
+      "dwg_path": "D:\\dev\\99_tools\\autocad-sdk-router\\runs\\e2e_1dwg_R4h_interior_20260709\\regen\\staged_output.dwg",
+      "ir_path": "D:\\dev\\99_tools\\autocad-sdk-router\\runs\\e2e_1dwg_R4h_interior_20260709\\regen\\post\\dwg_graph_ir.json",
+      "ir_source": "existing_ir",
+      "libredwg": {
+        "entity_total": 375,
+        "layer_count": 89,
+        "mapped_kind_counts": {
+          "block_reference": 50,
+          "circle": 1,
+          "dimension": 113,
+          "line": 21,
+          "lwpolyline": 73,
+          "text": 117
+        },
+        "unmapped": []
+      },
+      "ir": {
+        "entity_total": 375,
+        "layer_count": 89,
+        "mapped_kind_counts": {
+          "block_reference": 50,
+          "circle": 1,
+          "dimension": 113,
+          "line": 21,
+          "lwpolyline": 73,
+          "text": 117
+        }
+      },
+      "deltas": [],
+      "unmapped": [],
+      "notes": [
+        "LibreDWG is compared on modelspace entity total, layer table count, and explicit mapped kinds only.",
+        "Unmapped LibreDWG entities are surfaced in unmapped and excluded from per-kind equality checks."
+      ],
+      "sidecar": {
+        "run_dir": "D:\\dev\\99_tools\\autocad-sdk-router\\runs\\e2e_1dwg_R4h_interior_20260709\\cross_verify_regen\\dwg_libredwg_sidecar_20260709_011457",
+        "json_output": "D:\\dev\\99_tools\\autocad-sdk-router\\runs\\e2e_1dwg_R4h_interior_20260709\\cross_verify_regen\\dwg_libredwg_sidecar_20260709_011457\\libredwg_extract.json",
+        "dxf_output": "D:\\dev\\99_tools\\autocad-sdk-router\\runs\\e2e_1dwg_R4h_interior_20260709\\cross_verify_regen\\dwg_libredwg_sidecar_20260709_011457\\libredwg_export.dxf",
+        "license_boundary": "GPL LibreDWG invoked as a separate CLI process; no import/link."
+      },
+      "verdict_path": "D:\\dev\\99_tools\\autocad-sdk-router\\runs\\e2e_1dwg_R4h_interior_20260709\\cross_verify_regen\\cross_verify_verdict.json"
+    },
+    "visual_gate": {
+      "status": "ok",
+      "pass": true,
+      "ssim": 1.0,
+      "threshold": 1.0,
+      "baseline": {
+        "status": "ok",
+        "baseline_ssim": 1.0,
+        "threshold": 1.0,
+        "before_png": "D:\\dev\\99_tools\\autocad-sdk-router\\runs\\e2e_1dwg_R4h_interior_20260709\\visual_gate_regen\\baseline\\visual\\before.png",
+        "after_png": "D:\\dev\\99_tools\\autocad-sdk-router\\runs\\e2e_1dwg_R4h_interior_20260709\\visual_gate_regen\\baseline\\visual\\after.png",
+        "visual_artifact": "D:\\dev\\99_tools\\autocad-sdk-router\\runs\\e2e_1dwg_R4h_interior_20260709\\visual_gate_regen\\baseline\\visual_artifact.json",
+        "notes": [
+          "Threshold is set from a same-file render baseline; SSIM proves pixel similarity only."
+        ]
+      },
+      "before_png": "D:\\dev\\99_tools\\autocad-sdk-router\\runs\\e2e_1dwg_R4h_interior_20260709\\visual_gate_regen\\gate\\visual\\before.png",
+      "after_png": "D:\\dev\\99_tools\\autocad-sdk-router\\runs\\e2e_1dwg_R4h_interior_20260709\\visual_gate_regen\\gate\\visual\\after.png",
+      "before_svg": "D:\\dev\\99_tools\\autocad-sdk-router\\runs\\e2e_1dwg_R4h_interior_20260709\\visual_gate_regen\\gate\\visual\\before.svg",
+      "after_svg": "D:\\dev\\99_tools\\autocad-sdk-router\\runs\\e2e_1dwg_R4h_interior_20260709\\visual_gate_regen\\gate\\visual\\after.svg",
+      "visual_artifact": "D:\\dev\\99_tools\\autocad-sdk-router\\runs\\e2e_1dwg_R4h_interior_20260709\\visual_gate_regen\\gate\\visual_artifact.json",
+      "diff_path": "D:\\dev\\99_tools\\autocad-sdk-router\\runs\\e2e_1dwg_R4h_interior_20260709\\visual_gate_regen\\diff.json",
+      "common_viewbox": [
+        -262044.6398,
+        -116400.7628,
+        336490.411,
+        166991.9389
+      ],
+      "visual_diff_counts": {
+        "created": 0,
+        "modified": 0,
+        "deleted": 0
+      },
+      "notes": [
+        "SSIM measures rasterized pixel similarity of the rendered views.",
+        "A passing SSIM gate does not prove semantic CAD equivalence on its own."
+      ]
+    },
+    "interior_gate": {
+      "schema": "ariadne.interior_gate.v1",
+      "fraction": 0.9500408047404464,
+      "baseline": 0.948,
+      "baseline_source": "runs/e2e_1dwg_R4e_interior_20260709 canonical measurement 0.9485 (reports/interior100/blockdef_diff_R4e.json)",
+      "diff0_total": 26775,
+      "a_entity_total": 28183,
+      "status": "ok"
+    }
+  },
+  "verdict": {
+    "comparison_basis": "geometry",
+    "rows": [
+      {
+        "dxf_name": "CIRCLE",
+        "regen_attempted_count": 1,
+        "deferred_count": 0,
+        "attempted_live_count": 1,
+        "diff0_count": 1,
+        "modified_count": 0,
+        "removed_count": 0,
+        "added_count": 0,
+        "examples": {}
+      },
+      {
+        "dxf_name": "DIMENSION",
+        "regen_attempted_count": 113,
+        "deferred_count": 0,
+        "attempted_live_count": 113,
+        "diff0_count": 113,
+        "modified_count": 0,
+        "removed_count": 0,
+        "added_count": 0,
+        "examples": {}
+      },
+      {
+        "dxf_name": "INSERT",
+        "regen_attempted_count": 50,
+        "deferred_count": 0,
+        "attempted_live_count": 50,
+        "diff0_count": 50,
+        "modified_count": 0,
+        "removed_count": 0,
+        "added_count": 0,
+        "examples": {}
+      },
+      {
+        "dxf_name": "LINE",
+        "regen_attempted_count": 21,
+        "deferred_count": 0,
+        "attempted_live_count": 21,
+        "diff0_count": 21,
+        "modified_count": 0,
+        "removed_count": 0,
+        "added_count": 0,
+        "examples": {}
+      },
+      {
+        "dxf_name": "LWPOLYLINE",
+        "regen_attempted_count": 73,
+        "deferred_count": 0,
+        "attempted_live_count": 73,
+        "diff0_count": 73,
+        "modified_count": 0,
+        "removed_count": 0,
+        "added_count": 0,
+        "examples": {}
+      },
+      {
+        "dxf_name": "TEXT",
+        "regen_attempted_count": 117,
+        "deferred_count": 0,
+        "attempted_live_count": 117,
+        "diff0_count": 117,
+        "modified_count": 0,
+        "removed_count": 0,
+        "added_count": 0,
+        "examples": {}
+      }
+    ],
+    "totals": {
+      "regen_attempted_count": 375,
+      "diff0_count": 375,
+      "modified_count": 0,
+      "removed_count": 0,
+      "added_count": 0,
+      "deferred_count": 0,
+      "attempted_live_count": 375
+    }
+  },
+  "records_regen": {
+    "op_count": 124,
+    "skipped_unnamed": {},
+    "per_table_requested": {
+      "layer": 91,
+      "dimstyle": 6,
+      "linetype": 18,
+      "textstyle": 8,
+      "ucs": 0,
+      "view": 0,
+      "vport": 1
+    },
+    "resolvable_ops": {
+      "resolvable_count": 124,
+      "unresolvable_count": 0,
+      "unresolvable_op_ids": []
+    },
+    "elapsed_seconds": 1646.9848675727844,
+    "seconds_per_op": 13.282136028812777,
+    "apply_status": "ok",
+    "apply_reason": null,
+    "gate": {
+      "requested_count": 124,
+      "applied_count": 124,
+      "dropped_count": 0,
+      "dropped_ops": [],
+      "apply_status": "ok",
+      "gate_status": "ok",
+      "ok": true
+    },
+    "cross_verify": {
+      "status": "ok",
+      "agree": true,
+      "dwg_path": "D:\\dev\\99_tools\\autocad-sdk-router\\runs\\e2e_1dwg_R4h_interior_20260709\\regen_records\\staged_output.dwg",
+      "ir_path": "D:\\dev\\99_tools\\autocad-sdk-router\\runs\\e2e_1dwg_R4h_interior_20260709\\regen_records\\post\\dwg_graph_ir.json",
+      "ir_source": "existing_ir",
+      "libredwg": {
+        "entity_total": 0,
+        "layer_count": 91,
+        "mapped_kind_counts": {},
+        "unmapped": []
+      },
+      "ir": {
+        "entity_total": 0,
+        "layer_count": 91,
+        "mapped_kind_counts": {}
+      },
+      "deltas": [],
+      "unmapped": [],
+      "notes": [
+        "LibreDWG is compared on modelspace entity total, layer table count, and explicit mapped kinds only.",
+        "Unmapped LibreDWG entities are surfaced in unmapped and excluded from per-kind equality checks."
+      ],
+      "sidecar": {
+        "run_dir": "D:\\dev\\99_tools\\autocad-sdk-router\\runs\\e2e_1dwg_R4h_interior_20260709\\cross_verify_records\\dwg_libredwg_sidecar_20260709_014233",
+        "json_output": "D:\\dev\\99_tools\\autocad-sdk-router\\runs\\e2e_1dwg_R4h_interior_20260709\\cross_verify_records\\dwg_libredwg_sidecar_20260709_014233\\libredwg_extract.json",
+        "dxf_output": "D:\\dev\\99_tools\\autocad-sdk-router\\runs\\e2e_1dwg_R4h_interior_20260709\\cross_verify_records\\dwg_libredwg_sidecar_20260709_014233\\libredwg_export.dxf",
+        "license_boundary": "GPL LibreDWG invoked as a separate CLI process; no import/link."
+      },
+      "verdict_path": "D:\\dev\\99_tools\\autocad-sdk-router\\runs\\e2e_1dwg_R4h_interior_20260709\\cross_verify_records\\cross_verify_verdict.json"
+    },
+    "visual_gate": {
+      "status": "ok",
+      "pass": true,
+      "ssim": 1.0,
+      "threshold": 1.0,
+      "baseline": {
+        "status": "ok",
+        "baseline_ssim": 1.0,
+        "threshold": 1.0,
+        "before_png": "D:\\dev\\99_tools\\autocad-sdk-router\\runs\\e2e_1dwg_R4h_interior_20260709\\visual_gate_records\\baseline\\visual\\before.png",
+        "after_png": "D:\\dev\\99_tools\\autocad-sdk-router\\runs\\e2e_1dwg_R4h_interior_20260709\\visual_gate_records\\baseline\\visual\\after.png",
+        "visual_artifact": "D:\\dev\\99_tools\\autocad-sdk-router\\runs\\e2e_1dwg_R4h_interior_20260709\\visual_gate_records\\baseline\\visual_artifact.json",
+        "notes": [
+          "Threshold is set from a same-file render baseline; SSIM proves pixel similarity only."
+        ]
+      },
+      "before_png": "D:\\dev\\99_tools\\autocad-sdk-router\\runs\\e2e_1dwg_R4h_interior_20260709\\visual_gate_records\\gate\\visual\\before.png",
+      "after_png": "D:\\dev\\99_tools\\autocad-sdk-router\\runs\\e2e_1dwg_R4h_interior_20260709\\visual_gate_records\\gate\\visual\\after.png",
+      "before_svg": "D:\\dev\\99_tools\\autocad-sdk-router\\runs\\e2e_1dwg_R4h_interior_20260709\\visual_gate_records\\gate\\visual\\before.svg",
+      "after_svg": "D:\\dev\\99_tools\\autocad-sdk-router\\runs\\e2e_1dwg_R4h_interior_20260709\\visual_gate_records\\gate\\visual\\after.svg",
+      "visual_artifact": "D:\\dev\\99_tools\\autocad-sdk-router\\runs\\e2e_1dwg_R4h_interior_20260709\\visual_gate_records\\gate\\visual_artifact.json",
+      "diff_path": "D:\\dev\\99_tools\\autocad-sdk-router\\runs\\e2e_1dwg_R4h_interior_20260709\\visual_gate_records\\gate\\neutral_diff.json",
+      "common_viewbox": [
+        -0.02,
+        -0.02,
+        1.04,
+        1.04
+      ],
+      "visual_diff_counts": {
+        "created": 0,
+        "modified": 0,
+        "deleted": 0
+      },
+      "notes": [
+        "SSIM measures rasterized pixel similarity of the rendered views.",
+        "A passing SSIM gate does not prove semantic CAD equivalence on its own."
+      ]
+    }
+  },
+  "table_record_diffs": {
+    "layer": {
+      "label": "layer",
+      "table_key": "layers",
+      "records_compared": 91,
+      "zero_diff_count": 81,
+      "rows": [
+        {
+          "name": "0",
+          "expected": {
+            "color_index": 7,
+            "linetype": "Continuous",
+            "lineweight": -3,
+            "plottable": true,
+            "frozen": false,
+            "off": false,
+            "locked": false
+          },
+          "actual": {
+            "handle": "10",
+            "name": "0",
+            "color_index": 7,
+            "linetype": "Continuous",
+            "lineweight": -3,
+            "frozen": false,
+            "off": false,
+            "locked": false,
+            "plottable": true,
+            "is_xref_dependent": false
+          },
+          "record_diff": []
+        },
+        {
+          "name": "DEFPOINTS",
+          "expected": {
+            "color_index": 155,
+            "linetype": "Continuous",
+            "lineweight": -3,
+            "plottable": false,
+            "frozen": false,
+            "off": false,
+            "locked": false
+          },
+          "actual": {
+            "handle": "28B",
+            "name": "DEFPOINTS",
+            "color_index": 155,
+            "linetype": "Continuous",
+            "lineweight": -3,
+            "frozen": false,
+            "off": false,
+            "locked": false,
+            "plottable": false,
+            "is_xref_dependent": false
+          },
+          "record_diff": []
+        },
+        {
+          "name": "DIM",
+          "expected": {
+            "color_index": 7,
+            "linetype": "Continuous",
+            "lineweight": -3,
+            "plottable": true,
+            "frozen": false,
+            "off": false,
+            "locked": false
+          },
+          "actual": {
+            "handle": "29E",
+            "name": "DIM",
+            "color_index": 7,
+            "linetype": "Continuous",
+            "lineweight": -3,
+            "frozen": false,
+            "off": false,
+            "locked": false,
+            "plottable": true,
+            "is_xref_dependent": false
+          },
+          "record_diff": []
+        },
+        {
+          "name": "설비OPEN",
+          "expected": {
+            "color_index": 8,
+            "linetype": "Continuous",
+            "lineweight": -3,
+            "plottable": true,
+            "frozen": false,
+            "off": false,
+            "locked": false
+          },
+          "actual": {
+            "handle": "2B1",
+            "name": "설비OPEN",
+            "color_index": 8,
+            "linetype": "Continuous",
+            "lineweight": -3,
+            "frozen": false,
+            "off": false,
+            "locked": false,
+            "plottable": true,
+            "is_xref_dependent": false
+          },
+          "record_diff": []
+        },
+        {
+          "name": "3TXT",
+          "expected": {
+            "color_index": 3,
+            "linetype": "Continuous",
+            "lineweight": -3,
+            "plottable": true,
+            "frozen": false,
+            "off": false,
+            "locked": false
+          },
+          "actual": {
+            "handle": "2C4",
+            "name": "3TXT",
+            "color_index": 3,
+            "linetype": "Continuous",
+            "lineweight": -3,
+            "frozen": false,
+            "off": false,
+            "locked": false,
+            "plottable": true,
+            "is_xref_dependent": false
+          },
+          "record_diff": []
+        },
+        {
+          "name": "TITL",
+          "expected": {
+            "color_index": 2,
+            "linetype": "Continuous",
+            "lineweight": -3,
+            "plottable": true,
+            "frozen": false,
+            "off": false,
+            "locked": false
+          },
+          "actual": {
+            "handle": "2D7",
+            "name": "TITL",
+            "color_index": 2,
+            "linetype": "Continuous",
+            "lineweight": -3,
+            "frozen": false,
+            "off": false,
+            "locked": false,
+            "plottable": true,
+            "is_xref_dependent": false
+          },
+          "record_diff": []
+        },
+        {
+          "name": "SYMB",
+          "expected": {
+            "color_index": 7,
+            "linetype": "Continuous",
+            "lineweight": -3,
+            "plottable": true,
+            "frozen": false,
+            "off": false,
+            "locked": false
+          },
+          "actual": {
+            "handle": "2EA",
+            "name": "SYMB",
+            "color_index": 7,
+            "linetype": "Continuous",
+            "lineweight": -3,
+            "frozen": false,
+            "off": false,
+            "locked": false,
+            "plottable": true,
+            "is_xref_dependent": false
+          },
+          "record_diff": []
+        },
+        {
+          "name": "X-평면도(기본형)$0$W1",
+          "expected": {
+            "color_index": 2,
+            "linetype": "Continuous",
+            "lineweight": -3,
+            "plottable": true,
+            "frozen": false,
+            "off": false,
+            "locked": false
+          },
+          "actual": {
+            "handle": "2FD",
+            "name": "X-평면도(기본형)$0$W1",
+            "color_index": 2,
+            "linetype": "Continuous",
+            "lineweight": -3,
+            "frozen": false,
+            "off": false,
+            "locked": false,
+            "plottable": true,
+            "is_xref_dependent": false
+          },
+          "record_diff": []
+        },
+        {
+          "name": "X-평면도(기본형)$0$FUR",
+          "expected": {
+            "color_index": 6,
+            "linetype": "Continuous",
+            "lineweight": -3,
+            "plottable": true,
+            "frozen": false,
+            "off": false,
+            "locked": false
+          },
+          "actual": {
+            "handle": "310",
+            "name": "X-평면도(기본형)$0$FUR",
+            "color_index": 6,
+            "linetype": "Continuous",
+            "lineweight": -3,
+            "frozen": false,
+            "off": false,
+            "locked": false,
+            "plottable": true,
+            "is_xref_dependent": false
+          },
+          "record_diff": []
+        },
+        {
+          "name": "X-평면도(기본형)$0$FIN",
+          "expected": {
+            "color_index": 8,
+            "linetype": "Continuous",
+            "lineweight": -3,
+            "plottable": true,
+            "frozen": false,
+            "off": false,
+            "locked": false
+          },
+          "actual": {
+            "handle": "323",
+            "name": "X-평면도(기본형)$0$FIN",
+            "color_index": 8,
+            "linetype": "Continuous",
+            "lineweight": -3,
+            "frozen": false,
+            "off": false,
+            "locked": false,
+            "plottable": true,
+            "is_xref_dependent": false
+          },
+          "record_diff": []
+        },
+        {
+          "name": "X-평면도(기본형)$0$W2",
+          "expected": {
+            "color_index": 3,
+            "linetype": "Continuous",
+            "lineweight": -3,
+            "plottable": true,
+            "frozen": false,
+            "off": false,
+            "locked": false
+          },
+          "actual": {
+            "handle": "336",
+            "name": "X-평면도(기본형)$0$W2",
+            "color_index": 3,
+            "linetype": "Continuous",
+            "lineweight": -3,
+            "frozen": false,
+            "off": false,
+            "locked": false,
+            "plottable": true,
+            "is_xref_dependent": false
+          },
+          "record_diff": []
+        },
+        {
+          "name": "X-평면도(기본형)$0$DFM",
+          "expected": {
+            "color_index": 7,
+            "linetype": "Continuous",
+            "lineweight": -3,
+            "plottable": false,
+            "frozen": false,
+            "off": false,
+            "locked": false
+          },
+          "actual": {
+            "handle": "349",
+            "name": "X-평면도(기본형)$0$DFM",
+            "color_index": 7,
+            "linetype": "Continuous",
+            "lineweight": -3,
+            "frozen": false,
+            "off": false,
+            "locked": false,
+            "plottable": false,
+            "is_xref_dependent": false
+          },
+          "record_diff": []
+        },
+        {
+          "name": "X-평면도(기본형)$0$TEXT",
+          "expected": {
+            "color_index": 3,
+            "linetype": "Continuous",
+            "lineweight": -3,
+            "plottable": true,
+            "frozen": false,
+            "off": false,
+            "locked": false
+          },
+          "actual": {
+            "handle": "35C",
+            "name": "X-평면도(기본형)$0$TEXT",
+            "color_index": 3,
+            "linetype": "Continuous",
+            "lineweight": -3,
+            "frozen": false,
+            "off": false,
+            "locked": false,
+            "plottable": true,
+            "is_xref_dependent": false
+          },
+          "record_diff": []
+        },
+        {
+          "name": "X-평면도(기본형)$0$GRID",
+          "expected": {
+            "color_index": 243,
+            "linetype": "Continuous",
+            "lineweight": -3,
+            "plottable": false,
+            "frozen": false,
+            "off": false,
+            "locked": false
+          },
+          "actual": {
+            "handle": "36F",
+            "name": "X-평면도(기본형)$0$GRID",
+            "color_index": 243,
+            "linetype": "Continuous",
+            "lineweight": -3,
+            "frozen": false,
+            "off": false,
+            "locked": false,
+            "plottable": false,
+            "is_xref_dependent": false
+          },
+          "record_diff": []
+        },
+        {
+          "name": "X-평면도(기본형)$0$8ELE",
+          "expected": {
+            "color_index": 8,
+            "linetype": "Continuous",
+            "lineweight": -3,
+            "plottable": true,
+            "frozen": false,
+            "off": false,
+            "locked": false
+          },
+          "actual": {
+            "handle": "382",
+            "name": "X-평면도(기본형)$0$8ELE",
+            "color_index": 8,
+            "linetype": "Continuous",
+            "lineweight": -3,
+            "frozen": false,
+            "off": false,
+            "locked": false,
+            "plottable": true,
+            "is_xref_dependent": false
+          },
+          "record_diff": []
+        },
+        {
+          "name": "X-평면도(기본형)$0$4ELE",
+          "expected": {
+            "color_index": 4,
+            "linetype": "Continuous",
+            "lineweight": -3,
+            "plottable": true,
+            "frozen": false,
+            "off": false,
+            "locked": false
+          },
+          "actual": {
+            "handle": "395",
+            "name": "X-평면도(기본형)$0$4ELE",
+            "color_index": 4,
+            "linetype": "Continuous",
+            "lineweight": -3,
+            "frozen": false,
+            "off": false,
+            "locked": false,
+            "plottable": true,
+            "is_xref_dependent": false
+          },
+          "record_diff": []
+        },
+        {
+          "name": "X-평면도(기본형)$0$DOOR",
+          "expected": {
+            "color_index": 4,
+            "linetype": "Continuous",
+            "lineweight": -3,
+            "plottable": true,
+            "frozen": false,
+            "off": false,
+            "locked": false
+          },
+          "actual": {
+            "handle": "3A8",
+            "name": "X-평면도(기본형)$0$DOOR",
+            "color_index": 4,
+            "linetype": "Continuous",
+            "lineweight": -3,
+            "frozen": false,
+            "off": false,
+            "locked": false,
+            "plottable": true,
+            "is_xref_dependent": false
+          },
+          "record_diff": []
+        },
+        {
+          "name": "X-평면도(기본형)$0$WID",
+          "expected": {
+            "color_index": 4,
+            "linetype": "Continuous",
+            "lineweight": -3,
+            "plottable": true,
+            "frozen": false,
+            "off": false,
+            "locked": false
+          },
+          "actual": {
+            "handle": "3BB",
+            "name": "X-평면도(기본형)$0$WID",
+            "color_index": 4,
+            "linetype": "Continuous",
+            "lineweight": -3,
+            "frozen": false,
+            "off": false,
+            "locked": false,
+            "plottable": true,
+            "is_xref_dependent": false
+          },
+          "record_diff": []
+        },
+        {
+          "name": "X-평면도(기본형)$0$KIT",
+          "expected": {
+            "color_index": 6,
+            "linetype": "Continuous",
+            "lineweight": -3,
+            "plottable": true,
+            "frozen": false,
+            "off": false,
+            "locked": false
+          },
+          "actual": {
+            "handle": "3CE",
+            "name": "X-평면도(기본형)$0$KIT",
+            "color_index": 6,
+            "linetype": "Continuous",
+            "lineweight": -3,
+            "frozen": false,
+            "off": false,
+            "locked": false,
+            "plottable": true,
+            "is_xref_dependent": false
+          },
+          "record_diff": []
+        },
+        {
+          "name": "X-평면도(기본형)$0$CEN",
+          "expected": {
+            "color_index": 1,
+            "linetype": "X-평면도(기본형)$0$CEN",
+            "lineweight": -3,
+            "plottable": true,
+            "frozen": false,
+            "off": false,
+            "locked": false
+          },
+          "actual": {
+            "handle": "3E1",
+            "name": "X-평면도(기본형)$0$CEN",
+            "color_index": 1,
+            "linetype": "Continuous",
+            "lineweight": -3,
+            "frozen": false,
+            "off": false,
+            "locked": false,
+            "plottable": true,
+            "is_xref_dependent": false
+          },
+          "record_diff": [
+            "linetype"
+          ]
+        },
+        {
+          "name": "X-평면도(기본형)$0$TIL",
+          "expected": {
+            "color_index": 5,
+            "linetype": "Continuous",
+            "lineweight": -3,
+            "plottable": true,
+            "frozen": false,
+            "off": false,
+            "locked": false
+          },
+          "actual": {
+            "handle": "3F4",
+            "name": "X-평면도(기본형)$0$TIL",
+            "color_index": 5,
+            "linetype": "Continuous",
+            "lineweight": -3,
+            "frozen": false,
+            "off": false,
+            "locked": false,
+            "plottable": true,
+            "is_xref_dependent": false
+          },
+          "record_diff": []
+        },
+        {
+          "name": "X-평면도(기본형)$0$INS",
+          "expected": {
+            "color_index": 8,
+            "linetype": "Continuous",
+            "lineweight": -3,
+            "plottable": true,
+            "frozen": false,
+            "off": false,
+            "locked": false
+          },
+          "actual": {
+            "handle": "407",
+            "name": "X-평면도(기본형)$0$INS",
+            "color_index": 8,
+            "linetype": "Continuous",
+            "lineweight": -3,
+            "frozen": false,
+            "off": false,
+            "locked": false,
+            "plottable": true,
+            "is_xref_dependent": false
+          },
+          "record_diff": []
+        },
+        {
+          "name": "X-평면도(기본형)$0$MC",
+          "expected": {
+            "color_index": 171,
+            "linetype": "Continuous",
+            "lineweight": -3,
+            "plottable": false,
+            "frozen": false,
+            "off": false,
+            "locked": false
+          },
+          "actual": {
+            "handle": "41A",
+            "name": "X-평면도(기본형)$0$MC",
+            "color_index": 171,
+            "linetype": "Continuous",
+            "lineweight": -3,
+            "frozen": false,
+            "off": false,
+            "locked": false,
+            "plottable": false,
+            "is_xref_dependent": false
+          },
+          "record_diff": []
+        },
+        {
+          "name": "X-평면도(기본형)$0$4GYP",
+          "expected": {
+            "color_index": 4,
+            "linetype": "Continuous",
+            "lineweight": -3,
+            "plottable": true,
+            "frozen": false,
+            "off": false,
+            "locked": false
+          },
+          "actual": {
+            "handle": "42D",
+            "name": "X-평면도(기본형)$0$4GYP",
+            "color_index": 4,
+            "linetype": "Continuous",
+            "lineweight": -3,
+            "frozen": false,
+            "off": false,
+            "locked": false,
+            "plottable": true,
+            "is_xref_dependent": false
+          },
+          "record_diff": []
+        },
+        {
+          "name": "X-평면도(기본형)$0$7GYP",
+          "expected": {
+            "color_index": 7,
+            "linetype": "Continuous",
+            "lineweight": -3,
+            "plottable": true,
+            "frozen": false,
+            "off": false,
+            "locked": false
+          },
+          "actual": {
+            "handle": "440",
+            "name": "X-평면도(기본형)$0$7GYP",
+            "color_index": 7,
+            "linetype": "Continuous",
+            "lineweight": -3,
+            "frozen": false,
+            "off": false,
+            "locked": false,
+            "plottable": true,
+            "is_xref_dependent": false
+          },
+          "record_diff": []
+        },
+        {
+          "name": "X-평면도(기본형)$0$설비OPEN",
+          "expected": {
+            "color_index": 8,
+            "linetype": "Continuous",
+            "lineweight": -3,
+            "plottable": true,
+            "frozen": false,
+            "off": false,
+            "locked": false
+          },
+          "actual": {
+            "handle": "453",
+            "name": "X-평면도(기본형)$0$설비OPEN",
+            "color_index": 8,
+            "linetype": "Continuous",
+            "lineweight": -3,
+            "frozen": false,
+            "off": false,
+            "locked": false,
+            "plottable": true,
+            "is_xref_dependent": false
+          },
+          "record_diff": []
+        },
+        {
+          "name": "X-평면도(기본형)$0$피난구",
+          "expected": {
+            "color_index": 8,
+            "linetype": "Continuous",
+            "lineweight": -3,
+            "plottable": true,
+            "frozen": false,
+            "off": false,
+            "locked": false
+          },
+          "actual": {
+            "handle": "466",
+            "name": "X-평면도(기본형)$0$피난구",
+            "color_index": 8,
+            "linetype": "Continuous",
+            "lineweight": -3,
+            "frozen": false,
+            "off": false,
+            "locked": false,
+            "plottable": true,
+            "is_xref_dependent": false
+          },
+          "record_diff": []
+        },
+        {
+          "name": "X-평면도(기본형)$0$SYM",
+          "expected": {
+            "color_index": 7,
+            "linetype": "Continuous",
+            "lineweight": -3,
+            "plottable": true,
+            "frozen": false,
+            "off": false,
+            "locked": false
+          },
+          "actual": {
+            "handle": "479",
+            "name": "X-평면도(기본형)$0$SYM",
+            "color_index": 7,
+            "linetype": "Continuous",
+            "lineweight": -3,
+            "frozen": false,
+            "off": false,
+            "locked": false,
+            "plottable": true,
+            "is_xref_dependent": false
+          },
+          "record_diff": []
+        },
+        {
+          "name": "X-평면도(기본형)$0$STA",
+          "expected": {
+            "color_index": 4,
+            "linetype": "Continuous",
+            "lineweight": -3,
+            "plottable": true,
+            "frozen": false,
+            "off": false,
+            "locked": false
+          },
+          "actual": {
+            "handle": "48C",
+            "name": "X-평면도(기본형)$0$STA",
+            "color_index": 4,
+            "linetype": "Continuous",
+            "lineweight": -3,
+            "frozen": false,
+            "off": false,
+            "locked": false,
+            "plottable": true,
+            "is_xref_dependent": false
+          },
+          "record_diff": []
+        },
+        {
+          "name": "X-평면도(기본형)$0$NON",
+          "expected": {
+            "color_index": 6,
+            "linetype": "Continuous",
+            "lineweight": -3,
+            "plottable": true,
+            "frozen": false,
+            "off": false,
+            "locked": false
+          },
+          "actual": {
+            "handle": "49F",
+            "name": "X-평면도(기본형)$0$NON",
+            "color_index": 6,
+            "linetype": "Continuous",
+            "lineweight": -3,
+            "frozen": false,
+            "off": false,
+            "locked": false,
+            "plottable": true,
+            "is_xref_dependent": false
+          },
+          "record_diff": []
+        },
+        {
+          "name": "X-평면도(기본형)$0$ELEV",
+          "expected": {
+            "color_index": 8,
+            "linetype": "Continuous",
+            "lineweight": -3,
+            "plottable": true,
+            "frozen": false,
+            "off": false,
+            "locked": false
+          },
+          "actual": {
+            "handle": "4B2",
+            "name": "X-평면도(기본형)$0$ELEV",
+            "color_index": 8,
+            "linetype": "Continuous",
+            "lineweight": -3,
+            "frozen": false,
+            "off": false,
+            "locked": false,
+            "plottable": true,
+            "is_xref_dependent": false
+          },
+          "record_diff": []
+        },
+        {
+          "name": "X-평면도(기본형)$0$STL",
+          "expected": {
+            "color_index": 4,
+            "linetype": "Continuous",
+            "lineweight": -3,
+            "plottable": true,
+            "frozen": false,
+            "off": false,
+            "locked": false
+          },
+          "actual": {
+            "handle": "4C5",
+            "name": "X-평면도(기본형)$0$STL",
+            "color_index": 4,
+            "linetype": "Continuous",
+            "lineweight": -3,
+            "frozen": false,
+            "off": false,
+            "locked": false,
+            "plottable": true,
+            "is_xref_dependent": false
+          },
+          "record_diff": []
+        },
+        {
+          "name": "X-평면도(기본형)$0$A-DOOR",
+          "expected": {
+            "color_index": 4,
+            "linetype": "Continuous",
+            "lineweight": -3,
+            "plottable": true,
+            "frozen": false,
+            "off": false,
+            "locked": false
+          },
+          "actual": {
+            "handle": "4D8",
+            "name": "X-평면도(기본형)$0$A-DOOR",
+            "color_index": 4,
+            "linetype": "Continuous",
+            "lineweight": -3,
+            "frozen": false,
+            "off": false,
+            "locked": false,
+            "plottable": true,
+            "is_xref_dependent": false
+          },
+          "record_diff": []
+        },
+        {
+          "name": "X-평면도(기본형)$0$AA-CUTL7",
+          "expected": {
+            "color_index": 7,
+            "linetype": "Continuous",
+            "lineweight": -3,
+            "plottable": true,
+            "frozen": false,
+            "off": false,
+            "locked": false
+          },
+          "actual": {
+            "handle": "4EB",
+            "name": "X-평면도(기본형)$0$AA-CUTL7",
+            "color_index": 7,
+            "linetype": "Continuous",
+            "lineweight": -3,
+            "frozen": false,
+            "off": false,
+            "locked": false,
+            "plottable": true,
+            "is_xref_dependent": false
+          },
+          "record_diff": []
+        },
+        {
+          "name": "X-평면도(기본형)$0$S4ELE",
+          "expected": {
+            "color_index": 4,
+            "linetype": "Continuous",
+            "lineweight": -3,
+            "plottable": true,
+            "frozen": false,
+            "off": false,
+            "locked": false
+          },
+          "actual": {
+            "handle": "4FE",
+            "name": "X-평면도(기본형)$0$S4ELE",
+            "color_index": 4,
+            "linetype": "Continuous",
+            "lineweight": -3,
+            "frozen": false,
+            "off": false,
+            "locked": false,
+            "plottable": true,
+            "is_xref_dependent": false
+          },
+          "record_diff": []
+        },
+        {
+          "name": "X-평면도(기본형)$0$_A-WAL-2",
+          "expected": {
+            "color_index": 3,
+            "linetype": "Continuous",
+            "lineweight": -3,
+            "plottable": true,
+            "frozen": false,
+            "off": false,
+            "locked": false
+          },
+          "actual": {
+            "handle": "511",
+            "name": "X-평면도(기본형)$0$_A-WAL-2",
+            "color_index": 3,
+            "linetype": "Continuous",
+            "lineweight": -3,
+            "frozen": false,
+            "off": false,
+            "locked": false,
+            "plottable": true,
+            "is_xref_dependent": false
+          },
+          "record_diff": []
+        },
+        {
+          "name": "X-평면도(기본형)$0$A02-벽체-조적",
+          "expected": {
+            "color_index": 3,
+            "linetype": "Continuous",
+            "lineweight": -3,
+            "plottable": true,
+            "frozen": false,
+            "off": false,
+            "locked": false
+          },
+          "actual": {
+            "handle": "524",
+            "name": "X-평면도(기본형)$0$A02-벽체-조적",
+            "color_index": 3,
+            "linetype": "Continuous",
+            "lineweight": -3,
+            "frozen": false,
+            "off": false,
+            "locked": false,
+            "plottable": true,
+            "is_xref_dependent": false
+          },
+          "record_diff": []
+        },
+        {
+          "name": "X-평면도(기본형)$0$I-FL-FUR(B)",
+          "expected": {
+            "color_index": 6,
+            "linetype": "Continuous",
+            "lineweight": -3,
+            "plottable": true,
+            "frozen": false,
+            "off": false,
+            "locked": false
+          },
+          "actual": {
+            "handle": "537",
+            "name": "X-평면도(기본형)$0$I-FL-FUR(B)",
+            "color_index": 6,
+            "linetype": "Continuous",
+            "lineweight": -3,
+            "frozen": false,
+            "off": false,
+            "locked": false,
+            "plottable": true,
+            "is_xref_dependent": false
+          },
+          "record_diff": []
+        },
+        {
+          "name": "X-평면도(기본형)$0$F-FUR-FIX",
+          "expected": {
+            "color_index": 6,
+            "linetype": "Continuous",
+            "lineweight": 9,
+            "plottable": true,
+            "frozen": false,
+            "off": false,
+            "locked": false
+          },
+          "actual": {
+            "handle": "54A",
+            "name": "X-평면도(기본형)$0$F-FUR-FIX",
+            "color_index": 6,
+            "linetype": "Continuous",
+            "lineweight": 9,
+            "frozen": false,
+            "off": false,
+            "locked": false,
+            "plottable": true,
+            "is_xref_dependent": false
+          },
+          "record_diff": []
+        },
+        {
+          "name": "X-평면도(기본형)$0$PIPE",
+          "expected": {
+            "color_index": 4,
+            "linetype": "Continuous",
+            "lineweight": -3,
+            "plottable": true,
+            "frozen": false,
+            "off": false,
+            "locked": false
+          },
+          "actual": {
+            "handle": "55D",
+            "name": "X-평면도(기본형)$0$PIPE",
+            "color_index": 4,
+            "linetype": "Continuous",
+            "lineweight": -3,
+            "frozen": false,
+            "off": false,
+            "locked": false,
+            "plottable": true,
+            "is_xref_dependent": false
+          },
+          "record_diff": []
+        },
+        {
+          "name": "X-평면도(기본형)$0$A06-시설물-설비",
+          "expected": {
+            "color_index": 4,
+            "linetype": "Continuous",
+            "lineweight": -3,
+            "plottable": true,
+            "frozen": false,
+            "off": false,
+            "locked": false
+          },
+          "actual": {
+            "handle": "570",
+            "name": "X-평면도(기본형)$0$A06-시설물-설비",
+            "color_index": 4,
+            "linetype": "Continuous",
+            "lineweight": -3,
+            "frozen": false,
+            "off": false,
+            "locked": false,
+            "plottable": true,
+            "is_xref_dependent": false
+          },
+          "record_diff": []
+        },
+        {
+          "name": "X-평면도(기본형)$0$I-FL-FUR(S)",
+          "expected": {
+            "color_index": 1,
+            "linetype": "X-평면도(기본형)$0$-HID",
+            "lineweight": -3,
+            "plottable": true,
+            "frozen": false,
+            "off": false,
+            "locked": false
+          },
+          "actual": {
+            "handle": "583",
+            "name": "X-평면도(기본형)$0$I-FL-FUR(S)",
+            "color_index": 1,
+            "linetype": "Continuous",
+            "lineweight": -3,
+            "frozen": false,
+            "off": false,
+            "locked": false,
+            "plottable": true,
+            "is_xref_dependent": false
+          },
+          "record_diff": [
+            "linetype"
+          ]
+        },
+        {
+          "name": "X-평면도(기본형)$0$FUR-K",
+          "expected": {
+            "color_index": 6,
+            "linetype": "Continuous",
+            "lineweight": -3,
+            "plottable": true,
+            "frozen": false,
+            "off": false,
+            "locked": false
+          },
+          "actual": {
+            "handle": "596",
+            "name": "X-평면도(기본형)$0$FUR-K",
+            "color_index": 6,
+            "linetype": "Continuous",
+            "lineweight": -3,
+            "frozen": false,
+            "off": false,
+            "locked": false,
+            "plottable": true,
+            "is_xref_dependent": false
+          },
+          "record_diff": []
+        },
+        {
+          "name": "X-평면도(기본형)$0$DS-F-BATH",
+          "expected": {
+            "color_index": 6,
+            "linetype": "Continuous",
+            "lineweight": -3,
+            "plottable": true,
+            "frozen": false,
+            "off": false,
+            "locked": false
+          },
+          "actual": {
+            "handle": "5A9",
+            "name": "X-평면도(기본형)$0$DS-F-BATH",
+            "color_index": 6,
+            "linetype": "Continuous",
+            "lineweight": -3,
+            "frozen": false,
+            "off": false,
+            "locked": false,
+            "plottable": true,
+            "is_xref_dependent": false
+          },
+          "record_diff": []
+        },
+        {
+          "name": "X-평면도(기본형)$0$KITC",
+          "expected": {
+            "color_index": 6,
+            "linetype": "Continuous",
+            "lineweight": -3,
+            "plottable": true,
+            "frozen": false,
+            "off": false,
+            "locked": false
+          },
+          "actual": {
+            "handle": "5BC",
+            "name": "X-평면도(기본형)$0$KITC",
+            "color_index": 6,
+            "linetype": "Continuous",
+            "lineweight": -3,
+            "frozen": false,
+            "off": false,
+            "locked": false,
+            "plottable": true,
+            "is_xref_dependent": false
+          },
+          "record_diff": []
+        },
+        {
+          "name": "X-평면도(기본형)$0$DEFTXT",
+          "expected": {
+            "color_index": 141,
+            "linetype": "Continuous",
+            "lineweight": -3,
+            "plottable": false,
+            "frozen": false,
+            "off": false,
+            "locked": false
+          },
+          "actual": {
+            "handle": "5CF",
+            "name": "X-평면도(기본형)$0$DEFTXT",
+            "color_index": 141,
+            "linetype": "Continuous",
+            "lineweight": -3,
+            "frozen": false,
+            "off": false,
+            "locked": false,
+            "plottable": false,
+            "is_xref_dependent": false
+          },
+          "record_diff": []
+        },
+        {
+          "name": "TEXT",
+          "expected": {
+            "color_index": 3,
+            "linetype": "Continuous",
+            "lineweight": -3,
+            "plottable": true,
+            "frozen": false,
+            "off": false,
+            "locked": false
+          },
+          "actual": {
+            "handle": "5E2",
+            "name": "TEXT",
+            "color_index": 3,
+            "linetype": "Continuous",
+            "lineweight": -3,
+            "frozen": false,
+            "off": false,
+            "locked": false,
+            "plottable": true,
+            "is_xref_dependent": false
+          },
+          "record_diff": []
+        },
+        {
+          "name": "X-평면도(기본형)$0$FUR-FIX",
+          "expected": {
+            "color_index": 6,
+            "linetype": "Continuous",
+            "lineweight": 9,
+            "plottable": true,
+            "frozen": false,
+            "off": false,
+            "locked": false
+          },
+          "actual": {
+            "handle": "5F5",
+            "name": "X-평면도(기본형)$0$FUR-FIX",
+            "color_index": 6,
+            "linetype": "Continuous",
+            "lineweight": 9,
+            "frozen": false,
+            "off": false,
+            "locked": false,
+            "plottable": true,
+            "is_xref_dependent": false
+          },
+          "record_diff": []
+        },
+        {
+          "name": "X-평면도(기본형)$0$FUR-KIT",
+          "expected": {
+            "color_index": 6,
+            "linetype": "Continuous",
+            "lineweight": -3,
+            "plottable": true,
+            "frozen": false,
+            "off": false,
+            "locked": false
+          },
+          "actual": {
+            "handle": "608",
+            "name": "X-평면도(기본형)$0$FUR-KIT",
+            "color_index": 6,
+            "linetype": "Continuous",
+            "lineweight": -3,
+            "frozen": false,
+            "off": false,
+            "locked": false,
+            "plottable": true,
+            "is_xref_dependent": false
+          },
+          "record_diff": []
+        },
+        {
+          "name": "X-평면도(기본형)$0$I-CL-FUR",
+          "expected": {
+            "color_index": 8,
+            "linetype": "X-평면도(기본형)$0$-HID",
+            "lineweight": -3,
+            "plottable": true,
+            "frozen": false,
+            "off": false,
+            "locked": false
+          },
+          "actual": {
+            "handle": "61B",
+            "name": "X-평면도(기본형)$0$I-CL-FUR",
+            "color_index": 8,
+            "linetype": "Continuous",
+            "lineweight": -3,
+            "frozen": false,
+            "off": false,
+            "locked": false,
+            "plottable": true,
+            "is_xref_dependent": false
+          },
+          "record_diff": [
+            "linetype"
+          ]
+        },
+        {
+          "name": "X-평면도(기본형)$0$UIS",
+          "expected": {
+            "color_index": 7,
+            "linetype": "X-평면도(기본형)$0$HID2",
+            "lineweight": -3,
+            "plottable": true,
+            "frozen": false,
+            "off": false,
+            "locked": false
+          },
+          "actual": {
+            "handle": "62E",
+            "name": "X-평면도(기본형)$0$UIS",
+            "color_index": 7,
+            "linetype": "Continuous",
+            "lineweight": -3,
+            "frozen": false,
+            "off": false,
+            "locked": false,
+            "plottable": true,
+            "is_xref_dependent": false
+          },
+          "record_diff": [
+            "linetype"
+          ]
+        },
+        {
+          "name": "X-평면도(기본형)$0$AHID",
+          "expected": {
+            "color_index": 5,
+            "linetype": "X-평면도(기본형)$0$HID",
+            "lineweight": -3,
+            "plottable": true,
+            "frozen": false,
+            "off": false,
+            "locked": false
+          },
+          "actual": {
+            "handle": "641",
+            "name": "X-평면도(기본형)$0$AHID",
+            "color_index": 5,
+            "linetype": "Continuous",
+            "lineweight": -3,
+            "frozen": false,
+            "off": false,
+            "locked": false,
+            "plottable": true,
+            "is_xref_dependent": false
+          },
+          "record_diff": [
+            "linetype"
+          ]
+        },
+        {
+          "name": "X-평면도(기본형)$0$INSUL",
+          "expected": {
+            "color_index": 8,
+            "linetype": "Continuous",
+            "lineweight": -3,
+            "plottable": true,
+            "frozen": false,
+            "off": false,
+            "locked": false
+          },
+          "actual": {
+            "handle": "654",
+            "name": "X-평면도(기본형)$0$INSUL",
+            "color_index": 8,
+            "linetype": "Continuous",
+            "lineweight": -3,
+            "frozen": false,
+            "off": false,
+            "locked": false,
+            "plottable": true,
+            "is_xref_dependent": false
+          },
+          "record_diff": []
+        },
+        {
+          "name": "X-평면도(기본형)$0$40HAT",
+          "expected": {
+            "color_index": 8,
+            "linetype": "Continuous",
+            "lineweight": -3,
+            "plottable": true,
+            "frozen": false,
+            "off": false,
+            "locked": false
+          },
+          "actual": {
+            "handle": "667",
+            "name": "X-평면도(기본형)$0$40HAT",
+            "color_index": 8,
+            "linetype": "Continuous",
+            "lineweight": -3,
+            "frozen": false,
+            "off": false,
+            "locked": false,
+            "plottable": true,
+            "is_xref_dependent": false
+          },
+          "record_diff": []
+        },
+        {
+          "name": "X-평면도(기본형)$0$_0",
+          "expected": {
+            "color_index": 7,
+            "linetype": "Continuous",
+            "lineweight": -3,
+            "plottable": true,
+            "frozen": false,
+            "off": false,
+            "locked": false
+          },
+          "actual": {
+            "handle": "67A",
+            "name": "X-평면도(기본형)$0$_0",
+            "color_index": 7,
+            "linetype": "Continuous",
+            "lineweight": -3,
+            "frozen": false,
+            "off": false,
+            "locked": false,
+            "plottable": true,
+            "is_xref_dependent": false
+          },
+          "record_diff": []
+        },
+        {
+          "name": "AA-AXIS-DIM7",
+          "expected": {
+            "color_index": 7,
+            "linetype": "Continuous",
+            "lineweight": -3,
+            "plottable": true,
+            "frozen": false,
+            "off": false,
+            "locked": false
+          },
+          "actual": {
+            "handle": "68D",
+            "name": "AA-AXIS-DIM7",
+            "color_index": 7,
+            "linetype": "Continuous",
+            "lineweight": -3,
+            "frozen": false,
+            "off": false,
+            "locked": false,
+            "plottable": true,
+            "is_xref_dependent": false
+          },
+          "record_diff": []
+        },
+        {
+          "name": "LEAD",
+          "expected": {
+            "color_index": 4,
+            "linetype": "Continuous",
+            "lineweight": -3,
+            "plottable": true,
+            "frozen": false,
+            "off": false,
+            "locked": false
+          },
+          "actual": {
+            "handle": "6A0",
+            "name": "LEAD",
+            "color_index": 4,
+            "linetype": "Continuous",
+            "lineweight": -3,
+            "frozen": false,
+            "off": false,
+            "locked": false,
+            "plottable": true,
+            "is_xref_dependent": false
+          },
+          "record_diff": []
+        },
+        {
+          "name": "LEVEL",
+          "expected": {
+            "color_index": 6,
+            "linetype": "Continuous",
+            "lineweight": -3,
+            "plottable": true,
+            "frozen": false,
+            "off": false,
+            "locked": false
+          },
+          "actual": {
+            "handle": "6B3",
+            "name": "LEVEL",
+            "color_index": 6,
+            "linetype": "Continuous",
+            "lineweight": -3,
+            "frozen": false,
+            "off": false,
+            "locked": false,
+            "plottable": true,
+            "is_xref_dependent": false
+          },
+          "record_diff": []
+        },
+        {
+          "name": "A-DOOR-IDEN",
+          "expected": {
+            "color_index": 7,
+            "linetype": "Continuous",
+            "lineweight": -3,
+            "plottable": true,
+            "frozen": false,
+            "off": false,
+            "locked": false
+          },
+          "actual": {
+            "handle": "6C6",
+            "name": "A-DOOR-IDEN",
+            "color_index": 7,
+            "linetype": "Continuous",
+            "lineweight": -3,
+            "frozen": false,
+            "off": false,
+            "locked": false,
+            "plottable": true,
+            "is_xref_dependent": false
+          },
+          "record_diff": []
+        },
+        {
+          "name": "CEN",
+          "expected": {
+            "color_index": 1,
+            "linetype": "CEN",
+            "lineweight": -3,
+            "plottable": true,
+            "frozen": false,
+            "off": false,
+            "locked": false
+          },
+          "actual": {
+            "handle": "6D9",
+            "name": "CEN",
+            "color_index": 1,
+            "linetype": "Continuous",
+            "lineweight": -3,
+            "frozen": false,
+            "off": false,
+            "locked": false,
+            "plottable": true,
+            "is_xref_dependent": false
+          },
+          "record_diff": [
+            "linetype"
+          ]
+        },
+        {
+          "name": "X-평면도(기본형)$0$ETC",
+          "expected": {
+            "color_index": 8,
+            "linetype": "Continuous",
+            "lineweight": -3,
+            "plottable": true,
+            "frozen": false,
+            "off": false,
+            "locked": false
+          },
+          "actual": {
+            "handle": "6EC",
+            "name": "X-평면도(기본형)$0$ETC",
+            "color_index": 8,
+            "linetype": "Continuous",
+            "lineweight": -3,
+            "frozen": false,
+            "off": false,
+            "locked": false,
+            "plottable": true,
+            "is_xref_dependent": false
+          },
+          "record_diff": []
+        },
+        {
+          "name": "X-평면도(기본형)$0$국기계양대",
+          "expected": {
+            "color_index": 8,
+            "linetype": "Continuous",
+            "lineweight": -3,
+            "plottable": true,
+            "frozen": false,
+            "off": false,
+            "locked": false
+          },
+          "actual": {
+            "handle": "6FF",
+            "name": "X-평면도(기본형)$0$국기계양대",
+            "color_index": 8,
+            "linetype": "Continuous",
+            "lineweight": -3,
+            "frozen": false,
+            "off": false,
+            "locked": false,
+            "plottable": true,
+            "is_xref_dependent": false
+          },
+          "record_diff": []
+        },
+        {
+          "name": "X-평면도(기본형)$0$LV",
+          "expected": {
+            "color_index": 4,
+            "linetype": "Continuous",
+            "lineweight": -3,
+            "plottable": true,
+            "frozen": false,
+            "off": false,
+            "locked": false
+          },
+          "actual": {
+            "handle": "712",
+            "name": "X-평면도(기본형)$0$LV",
+            "color_index": 4,
+            "linetype": "Continuous",
+            "lineweight": -3,
+            "frozen": false,
+            "off": false,
+            "locked": false,
+            "plottable": true,
+            "is_xref_dependent": false
+          },
+          "record_diff": []
+        },
+        {
+          "name": "X-평면도(기본형)$0$TILE",
+          "expected": {
+            "color_index": 9,
+            "linetype": "Continuous",
+            "lineweight": -3,
+            "plottable": true,
+            "frozen": false,
+            "off": false,
+            "locked": false
+          },
+          "actual": {
+            "handle": "725",
+            "name": "X-평면도(기본형)$0$TILE",
+            "color_index": 9,
+            "linetype": "Continuous",
+            "lineweight": -3,
+            "frozen": false,
+            "off": false,
+            "locked": false,
+            "plottable": true,
+            "is_xref_dependent": false
+          },
+          "record_diff": []
+        },
+        {
+          "name": "X-평면도(기본형)$0$DEFPOINTS-1",
+          "expected": {
+            "color_index": 169,
+            "linetype": "Continuous",
+            "lineweight": -3,
+            "plottable": false,
+            "frozen": false,
+            "off": false,
+            "locked": false
+          },
+          "actual": {
+            "handle": "738",
+            "name": "X-평면도(기본형)$0$DEFPOINTS-1",
+            "color_index": 169,
+            "linetype": "Continuous",
+            "lineweight": -3,
+            "frozen": false,
+            "off": false,
+            "locked": false,
+            "plottable": false,
+            "is_xref_dependent": false
+          },
+          "record_diff": []
+        },
+        {
+          "name": "X-평면도(기본형)$0$0체크사항",
+          "expected": {
+            "color_index": 30,
+            "linetype": "Continuous",
+            "lineweight": -3,
+            "plottable": true,
+            "frozen": false,
+            "off": false,
+            "locked": false
+          },
+          "actual": {
+            "handle": "74B",
+            "name": "X-평면도(기본형)$0$0체크사항",
+            "color_index": 30,
+            "linetype": "Continuous",
+            "lineweight": -3,
+            "frozen": false,
+            "off": false,
+            "locked": false,
+            "plottable": true,
+            "is_xref_dependent": false
+          },
+          "record_diff": []
+        },
+        {
+          "name": "X-평면도(기본형)$0$WIN",
+          "expected": {
+            "color_index": 4,
+            "linetype": "Continuous",
+            "lineweight": -3,
+            "plottable": true,
+            "frozen": false,
+            "off": false,
+            "locked": false
+          },
+          "actual": {
+            "handle": "75E",
+            "name": "X-평면도(기본형)$0$WIN",
+            "color_index": 4,
+            "linetype": "Continuous",
+            "lineweight": -3,
+            "frozen": false,
+            "off": false,
+            "locked": false,
+            "plottable": true,
+            "is_xref_dependent": false
+          },
+          "record_diff": []
+        },
+        {
+          "name": "X-평면도(기본형)$0$AA-ELEV-WIN5",
+          "expected": {
+            "color_index": 5,
+            "linetype": "Continuous",
+            "lineweight": -3,
+            "plottable": true,
+            "frozen": false,
+            "off": false,
+            "locked": false
+          },
+          "actual": {
+            "handle": "771",
+            "name": "X-평면도(기본형)$0$AA-ELEV-WIN5",
+            "color_index": 5,
+            "linetype": "Continuous",
+            "lineweight": -3,
+            "frozen": false,
+            "off": false,
+            "locked": false,
+            "plottable": true,
+            "is_xref_dependent": false
+          },
+          "record_diff": []
+        },
+        {
+          "name": "JG",
+          "expected": {
+            "color_index": 4,
+            "linetype": "HID",
+            "lineweight": -3,
+            "plottable": true,
+            "frozen": false,
+            "off": false,
+            "locked": false
+          },
+          "actual": {
+            "handle": "784",
+            "name": "JG",
+            "color_index": 4,
+            "linetype": "Continuous",
+            "lineweight": -3,
+            "frozen": false,
+            "off": false,
+            "locked": false,
+            "plottable": true,
+            "is_xref_dependent": false
+          },
+          "record_diff": [
+            "linetype"
+          ]
+        },
+        {
+          "name": "X-평면도(기본형)$0$F-BATH",
+          "expected": {
+            "color_index": 6,
+            "linetype": "Continuous",
+            "lineweight": -3,
+            "plottable": true,
+            "frozen": false,
+            "off": false,
+            "locked": false
+          },
+          "actual": {
+            "handle": "797",
+            "name": "X-평면도(기본형)$0$F-BATH",
+            "color_index": 6,
+            "linetype": "Continuous",
+            "lineweight": -3,
+            "frozen": false,
+            "off": false,
+            "locked": false,
+            "plottable": true,
+            "is_xref_dependent": false
+          },
+          "record_diff": []
+        },
+        {
+          "name": "X-평면도(기본형)$0$수전",
+          "expected": {
+            "color_index": 5,
+            "linetype": "Continuous",
+            "lineweight": -3,
+            "plottable": true,
+            "frozen": false,
+            "off": false,
+            "locked": false
+          },
+          "actual": {
+            "handle": "7AA",
+            "name": "X-평면도(기본형)$0$수전",
+            "color_index": 5,
+            "linetype": "Continuous",
+            "lineweight": -3,
+            "frozen": false,
+            "off": false,
+            "locked": false,
+            "plottable": true,
+            "is_xref_dependent": false
+          },
+          "record_diff": []
+        },
+        {
+          "name": "X-평면도(기본형)$0$OPEN",
+          "expected": {
+            "color_index": 1,
+            "linetype": "Continuous",
+            "lineweight": -3,
+            "plottable": true,
+            "frozen": false,
+            "off": false,
+            "locked": false
+          },
+          "actual": {
+            "handle": "7BD",
+            "name": "X-평면도(기본형)$0$OPEN",
+            "color_index": 1,
+            "linetype": "Continuous",
+            "lineweight": -3,
+            "frozen": false,
+            "off": false,
+            "locked": false,
+            "plottable": true,
+            "is_xref_dependent": false
+          },
+          "record_diff": []
+        },
+        {
+          "name": "X-평면도(기본형)$0$W3",
+          "expected": {
+            "color_index": 6,
+            "linetype": "X-평면도(기본형)$0$HID",
+            "lineweight": -3,
+            "plottable": true,
+            "frozen": false,
+            "off": false,
+            "locked": false
+          },
+          "actual": {
+            "handle": "7D0",
+            "name": "X-평면도(기본형)$0$W3",
+            "color_index": 6,
+            "linetype": "Continuous",
+            "lineweight": -3,
+            "frozen": false,
+            "off": false,
+            "locked": false,
+            "plottable": true,
+            "is_xref_dependent": false
+          },
+          "record_diff": [
+            "linetype"
+          ]
+        },
+        {
+          "name": "X-평면도(기본형)$0$7RF",
+          "expected": {
+            "color_index": 7,
+            "linetype": "Continuous",
+            "lineweight": -3,
+            "plottable": true,
+            "frozen": false,
+            "off": false,
+            "locked": false
+          },
+          "actual": {
+            "handle": "7E3",
+            "name": "X-평면도(기본형)$0$7RF",
+            "color_index": 7,
+            "linetype": "Continuous",
+            "lineweight": -3,
+            "frozen": false,
+            "off": false,
+            "locked": false,
+            "plottable": true,
+            "is_xref_dependent": false
+          },
+          "record_diff": []
+        },
+        {
+          "name": "X-평면도(기본형)$0$8RF",
+          "expected": {
+            "color_index": 8,
+            "linetype": "Continuous",
+            "lineweight": -3,
+            "plottable": true,
+            "frozen": false,
+            "off": false,
+            "locked": false
+          },
+          "actual": {
+            "handle": "7F6",
+            "name": "X-평면도(기본형)$0$8RF",
+            "color_index": 8,
+            "linetype": "Continuous",
+            "lineweight": -3,
+            "frozen": false,
+            "off": false,
+            "locked": false,
+            "plottable": true,
+            "is_xref_dependent": false
+          },
+          "record_diff": []
+        },
+        {
+          "name": "X-평면도(기본형)$0$A-ELE8",
+          "expected": {
+            "color_index": 8,
+            "linetype": "Continuous",
+            "lineweight": -3,
+            "plottable": true,
+            "frozen": false,
+            "off": false,
+            "locked": false
+          },
+          "actual": {
+            "handle": "809",
+            "name": "X-평면도(기본형)$0$A-ELE8",
+            "color_index": 8,
+            "linetype": "Continuous",
+            "lineweight": -3,
+            "frozen": false,
+            "off": false,
+            "locked": false,
+            "plottable": true,
+            "is_xref_dependent": false
+          },
+          "record_diff": []
+        },
+        {
+          "name": "X-평면도(기본형)$0$M_1",
+          "expected": {
+            "color_index": 4,
+            "linetype": "Continuous",
+            "lineweight": -3,
+            "plottable": true,
+            "frozen": false,
+            "off": false,
+            "locked": false
+          },
+          "actual": {
+            "handle": "81C",
+            "name": "X-평면도(기본형)$0$M_1",
+            "color_index": 4,
+            "linetype": "Continuous",
+            "lineweight": -3,
+            "frozen": false,
+            "off": false,
+            "locked": false,
+            "plottable": true,
+            "is_xref_dependent": false
+          },
+          "record_diff": []
+        },
+        {
+          "name": "X-평면도(기본형)$0$M_2",
+          "expected": {
+            "color_index": 9,
+            "linetype": "Continuous",
+            "lineweight": -3,
+            "plottable": true,
+            "frozen": false,
+            "off": false,
+            "locked": false
+          },
+          "actual": {
+            "handle": "82F",
+            "name": "X-평면도(기본형)$0$M_2",
+            "color_index": 9,
+            "linetype": "Continuous",
+            "lineweight": -3,
+            "frozen": false,
+            "off": false,
+            "locked": false,
+            "plottable": true,
+            "is_xref_dependent": false
+          },
+          "record_diff": []
+        },
+        {
+          "name": "X-평면도(기본형)$0$무동력흡출기",
+          "expected": {
+            "color_index": 7,
+            "linetype": "Continuous",
+            "lineweight": -3,
+            "plottable": true,
+            "frozen": false,
+            "off": false,
+            "locked": false
+          },
+          "actual": {
+            "handle": "842",
+            "name": "X-평면도(기본형)$0$무동력흡출기",
+            "color_index": 7,
+            "linetype": "Continuous",
+            "lineweight": -3,
+            "frozen": false,
+            "off": false,
+            "locked": false,
+            "plottable": true,
+            "is_xref_dependent": false
+          },
+          "record_diff": []
+        },
+        {
+          "name": "X-평면도(기본형)$0$무동력흡출기CON",
+          "expected": {
+            "color_index": 4,
+            "linetype": "X-평면도(기본형)$0$HID",
+            "lineweight": -3,
+            "plottable": true,
+            "frozen": false,
+            "off": false,
+            "locked": false
+          },
+          "actual": {
+            "handle": "855",
+            "name": "X-평면도(기본형)$0$무동력흡출기CON",
+            "color_index": 4,
+            "linetype": "Continuous",
+            "lineweight": -3,
+            "frozen": false,
+            "off": false,
+            "locked": false,
+            "plottable": true,
+            "is_xref_dependent": false
+          },
+          "record_diff": [
+            "linetype"
+          ]
+        },
+        {
+          "name": "X-평면도(기본형)$0$A-ELE7-2",
+          "expected": {
+            "color_index": 7,
+            "linetype": "Continuous",
+            "lineweight": -3,
+            "plottable": true,
+            "frozen": false,
+            "off": false,
+            "locked": false
+          },
+          "actual": {
+            "handle": "868",
+            "name": "X-평면도(기본형)$0$A-ELE7-2",
+            "color_index": 7,
+            "linetype": "Continuous",
+            "lineweight": -3,
+            "frozen": false,
+            "off": false,
+            "locked": false,
+            "plottable": true,
+            "is_xref_dependent": false
+          },
+          "record_diff": []
+        },
+        {
+          "name": "X-평면도(기본형)$0$A-FINL",
+          "expected": {
+            "color_index": 6,
+            "linetype": "Continuous",
+            "lineweight": -3,
+            "plottable": true,
+            "frozen": false,
+            "off": false,
+            "locked": false
+          },
+          "actual": {
+            "handle": "87B",
+            "name": "X-평면도(기본형)$0$A-FINL",
+            "color_index": 6,
+            "linetype": "Continuous",
+            "lineweight": -3,
+            "frozen": false,
+            "off": false,
+            "locked": false,
+            "plottable": true,
+            "is_xref_dependent": false
+          },
+          "record_diff": []
+        },
+        {
+          "name": "X-평면도(기본형)$0$RW1",
+          "expected": {
+            "color_index": 2,
+            "linetype": "Continuous",
+            "lineweight": -3,
+            "plottable": true,
+            "frozen": false,
+            "off": false,
+            "locked": false
+          },
+          "actual": {
+            "handle": "88E",
+            "name": "X-평면도(기본형)$0$RW1",
+            "color_index": 2,
+            "linetype": "Continuous",
+            "lineweight": -3,
+            "frozen": false,
+            "off": false,
+            "locked": false,
+            "plottable": true,
+            "is_xref_dependent": false
+          },
+          "record_diff": []
+        },
+        {
+          "name": "X-평면도(기본형)$0$RSLAB",
+          "expected": {
+            "color_index": 7,
+            "linetype": "Continuous",
+            "lineweight": -3,
+            "plottable": true,
+            "frozen": false,
+            "off": false,
+            "locked": false
+          },
+          "actual": {
+            "handle": "8A1",
+            "name": "X-평면도(기본형)$0$RSLAB",
+            "color_index": 7,
+            "linetype": "Continuous",
+            "lineweight": -3,
+            "frozen": false,
+            "off": false,
+            "locked": false,
+            "plottable": true,
+            "is_xref_dependent": false
+          },
+          "record_diff": []
+        },
+        {
+          "name": "X-평면도(기본형)$0$RSLB-H",
+          "expected": {
+            "color_index": 5,
+            "linetype": "X-평면도(기본형)$0$HID",
+            "lineweight": -3,
+            "plottable": true,
+            "frozen": false,
+            "off": false,
+            "locked": false
+          },
+          "actual": {
+            "handle": "8B4",
+            "name": "X-평면도(기본형)$0$RSLB-H",
+            "color_index": 5,
+            "linetype": "Continuous",
+            "lineweight": -3,
+            "frozen": false,
+            "off": false,
+            "locked": false,
+            "plottable": true,
+            "is_xref_dependent": false
+          },
+          "record_diff": [
+            "linetype"
+          ]
+        },
+        {
+          "name": "X-평면도(기본형)$0$3RF",
+          "expected": {
+            "color_index": 3,
+            "linetype": "Continuous",
+            "lineweight": -3,
+            "plottable": true,
+            "frozen": false,
+            "off": false,
+            "locked": false
+          },
+          "actual": {
+            "handle": "8C7",
+            "name": "X-평면도(기본형)$0$3RF",
+            "color_index": 3,
+            "linetype": "Continuous",
+            "lineweight": -3,
+            "frozen": false,
+            "off": false,
+            "locked": false,
+            "plottable": true,
+            "is_xref_dependent": false
+          },
+          "record_diff": []
+        },
+        {
+          "name": "4L",
+          "expected": {
+            "color_index": 4,
+            "linetype": "Continuous",
+            "lineweight": -3,
+            "plottable": true,
+            "frozen": false,
+            "off": false,
+            "locked": false
+          },
+          "actual": {
+            "handle": "8DA",
+            "name": "4L",
+            "color_index": 4,
+            "linetype": "Continuous",
+            "lineweight": -3,
+            "frozen": false,
+            "off": false,
+            "locked": false,
+            "plottable": true,
+            "is_xref_dependent": false
+          },
+          "record_diff": []
+        },
+        {
+          "name": "X-FORM_청주$0$A-SHEET-TEXT",
+          "expected": {
+            "color_index": 6,
+            "linetype": "Continuous",
+            "lineweight": -3,
+            "plottable": true,
+            "frozen": false,
+            "off": false,
+            "locked": false
+          },
+          "actual": {
+            "handle": "8ED",
+            "name": "X-FORM_청주$0$A-SHEET-TEXT",
+            "color_index": 6,
+            "linetype": "Continuous",
+            "lineweight": -3,
+            "frozen": false,
+            "off": false,
+            "locked": false,
+            "plottable": true,
+            "is_xref_dependent": false
+          },
+          "record_diff": []
+        },
+        {
+          "name": "X-FORM_청주$0$A-SHEET",
+          "expected": {
+            "color_index": 7,
+            "linetype": "Continuous",
+            "lineweight": -3,
+            "plottable": true,
+            "frozen": false,
+            "off": false,
+            "locked": false
+          },
+          "actual": {
+            "handle": "900",
+            "name": "X-FORM_청주$0$A-SHEET",
+            "color_index": 7,
+            "linetype": "Continuous",
+            "lineweight": -3,
+            "frozen": false,
+            "off": false,
+            "locked": false,
+            "plottable": true,
+            "is_xref_dependent": false
+          },
+          "record_diff": []
+        },
+        {
+          "name": "X-FORM_청주$0$A-SHEET-DEF",
+          "expected": {
+            "color_index": 144,
+            "linetype": "Continuous",
+            "lineweight": -3,
+            "plottable": false,
+            "frozen": false,
+            "off": false,
+            "locked": false
+          },
+          "actual": {
+            "handle": "913",
+            "name": "X-FORM_청주$0$A-SHEET-DEF",
+            "color_index": 144,
+            "linetype": "Continuous",
+            "lineweight": -3,
+            "frozen": false,
+            "off": false,
+            "locked": false,
+            "plottable": false,
+            "is_xref_dependent": false
+          },
+          "record_diff": []
+        },
+        {
+          "name": "A-SHEET-TEXT",
+          "expected": {
+            "color_index": 6,
+            "linetype": "Continuous",
+            "lineweight": -3,
+            "plottable": true,
+            "frozen": false,
+            "off": false,
+            "locked": false
+          },
+          "actual": {
+            "handle": "926",
+            "name": "A-SHEET-TEXT",
+            "color_index": 6,
+            "linetype": "Continuous",
+            "lineweight": -3,
+            "frozen": false,
+            "off": false,
+            "locked": false,
+            "plottable": true,
+            "is_xref_dependent": false
+          },
+          "record_diff": []
+        }
+      ],
+      "diffs": [
+        {
+          "name": "X-평면도(기본형)$0$CEN",
+          "expected": {
+            "color_index": 1,
+            "linetype": "X-평면도(기본형)$0$CEN",
+            "lineweight": -3,
+            "plottable": true,
+            "frozen": false,
+            "off": false,
+            "locked": false
+          },
+          "actual": {
+            "handle": "3E1",
+            "name": "X-평면도(기본형)$0$CEN",
+            "color_index": 1,
+            "linetype": "Continuous",
+            "lineweight": -3,
+            "frozen": false,
+            "off": false,
+            "locked": false,
+            "plottable": true,
+            "is_xref_dependent": false
+          },
+          "record_diff": [
+            "linetype"
+          ]
+        },
+        {
+          "name": "X-평면도(기본형)$0$I-FL-FUR(S)",
+          "expected": {
+            "color_index": 1,
+            "linetype": "X-평면도(기본형)$0$-HID",
+            "lineweight": -3,
+            "plottable": true,
+            "frozen": false,
+            "off": false,
+            "locked": false
+          },
+          "actual": {
+            "handle": "583",
+            "name": "X-평면도(기본형)$0$I-FL-FUR(S)",
+            "color_index": 1,
+            "linetype": "Continuous",
+            "lineweight": -3,
+            "frozen": false,
+            "off": false,
+            "locked": false,
+            "plottable": true,
+            "is_xref_dependent": false
+          },
+          "record_diff": [
+            "linetype"
+          ]
+        },
+        {
+          "name": "X-평면도(기본형)$0$I-CL-FUR",
+          "expected": {
+            "color_index": 8,
+            "linetype": "X-평면도(기본형)$0$-HID",
+            "lineweight": -3,
+            "plottable": true,
+            "frozen": false,
+            "off": false,
+            "locked": false
+          },
+          "actual": {
+            "handle": "61B",
+            "name": "X-평면도(기본형)$0$I-CL-FUR",
+            "color_index": 8,
+            "linetype": "Continuous",
+            "lineweight": -3,
+            "frozen": false,
+            "off": false,
+            "locked": false,
+            "plottable": true,
+            "is_xref_dependent": false
+          },
+          "record_diff": [
+            "linetype"
+          ]
+        },
+        {
+          "name": "X-평면도(기본형)$0$UIS",
+          "expected": {
+            "color_index": 7,
+            "linetype": "X-평면도(기본형)$0$HID2",
+            "lineweight": -3,
+            "plottable": true,
+            "frozen": false,
+            "off": false,
+            "locked": false
+          },
+          "actual": {
+            "handle": "62E",
+            "name": "X-평면도(기본형)$0$UIS",
+            "color_index": 7,
+            "linetype": "Continuous",
+            "lineweight": -3,
+            "frozen": false,
+            "off": false,
+            "locked": false,
+            "plottable": true,
+            "is_xref_dependent": false
+          },
+          "record_diff": [
+            "linetype"
+          ]
+        },
+        {
+          "name": "X-평면도(기본형)$0$AHID",
+          "expected": {
+            "color_index": 5,
+            "linetype": "X-평면도(기본형)$0$HID",
+            "lineweight": -3,
+            "plottable": true,
+            "frozen": false,
+            "off": false,
+            "locked": false
+          },
+          "actual": {
+            "handle": "641",
+            "name": "X-평면도(기본형)$0$AHID",
+            "color_index": 5,
+            "linetype": "Continuous",
+            "lineweight": -3,
+            "frozen": false,
+            "off": false,
+            "locked": false,
+            "plottable": true,
+            "is_xref_dependent": false
+          },
+          "record_diff": [
+            "linetype"
+          ]
+        },
+        {
+          "name": "CEN",
+          "expected": {
+            "color_index": 1,
+            "linetype": "CEN",
+            "lineweight": -3,
+            "plottable": true,
+            "frozen": false,
+            "off": false,
+            "locked": false
+          },
+          "actual": {
+            "handle": "6D9",
+            "name": "CEN",
+            "color_index": 1,
+            "linetype": "Continuous",
+            "lineweight": -3,
+            "frozen": false,
+            "off": false,
+            "locked": false,
+            "plottable": true,
+            "is_xref_dependent": false
+          },
+          "record_diff": [
+            "linetype"
+          ]
+        },
+        {
+          "name": "JG",
+          "expected": {
+            "color_index": 4,
+            "linetype": "HID",
+            "lineweight": -3,
+            "plottable": true,
+            "frozen": false,
+            "off": false,
+            "locked": false
+          },
+          "actual": {
+            "handle": "784",
+            "name": "JG",
+            "color_index": 4,
+            "linetype": "Continuous",
+            "lineweight": -3,
+            "frozen": false,
+            "off": false,
+            "locked": false,
+            "plottable": true,
+            "is_xref_dependent": false
+          },
+          "record_diff": [
+            "linetype"
+          ]
+        },
+        {
+          "name": "X-평면도(기본형)$0$W3",
+          "expected": {
+            "color_index": 6,
+            "linetype": "X-평면도(기본형)$0$HID",
+            "lineweight": -3,
+            "plottable": true,
+            "frozen": false,
+            "off": false,
+            "locked": false
+          },
+          "actual": {
+            "handle": "7D0",
+            "name": "X-평면도(기본형)$0$W3",
+            "color_index": 6,
+            "linetype": "Continuous",
+            "lineweight": -3,
+            "frozen": false,
+            "off": false,
+            "locked": false,
+            "plottable": true,
+            "is_xref_dependent": false
+          },
+          "record_diff": [
+            "linetype"
+          ]
+        },
+        {
+          "name": "X-평면도(기본형)$0$무동력흡출기CON",
+          "expected": {
+            "color_index": 4,
+            "linetype": "X-평면도(기본형)$0$HID",
+            "lineweight": -3,
+            "plottable": true,
+            "frozen": false,
+            "off": false,
+            "locked": false
+          },
+          "actual": {
+            "handle": "855",
+            "name": "X-평면도(기본형)$0$무동력흡출기CON",
+            "color_index": 4,
+            "linetype": "Continuous",
+            "lineweight": -3,
+            "frozen": false,
+            "off": false,
+            "locked": false,
+            "plottable": true,
+            "is_xref_dependent": false
+          },
+          "record_diff": [
+            "linetype"
+          ]
+        },
+        {
+          "name": "X-평면도(기본형)$0$RSLB-H",
+          "expected": {
+            "color_index": 5,
+            "linetype": "X-평면도(기본형)$0$HID",
+            "lineweight": -3,
+            "plottable": true,
+            "frozen": false,
+            "off": false,
+            "locked": false
+          },
+          "actual": {
+            "handle": "8B4",
+            "name": "X-평면도(기본형)$0$RSLB-H",
+            "color_index": 5,
+            "linetype": "Continuous",
+            "lineweight": -3,
+            "frozen": false,
+            "off": false,
+            "locked": false,
+            "plottable": true,
+            "is_xref_dependent": false
+          },
+          "record_diff": [
+            "linetype"
+          ]
+        }
+      ],
+      "structural_note": null
+    },
+    "dimstyle": {
+      "label": "dimstyle",
+      "table_key": "dim_styles",
+      "records_compared": 6,
+      "zero_diff_count": 3,
+      "rows": [
+        {
+          "name": "Standard",
+          "expected": {
+            "dimtxt": 0.18,
+            "dimasz": 0.18,
+            "dimexe": 0.18,
+            "dimexo": 0.0625,
+            "dimdec": 4,
+            "dimscale": 1,
+            "dimclrd": 0,
+            "dimclre": 0,
+            "dimclrt": 0,
+            "dimse1": false,
+            "dimaltf": 25.4,
+            "dimaltrnd": 0,
+            "dimcen": 0.09,
+            "dimdle": 0,
+            "dimdli": 0.38,
+            "dimgap": 0.09,
+            "dimjogang": 0.7853981633974483,
+            "dimlfac": 1,
+            "dimrnd": 0,
+            "dimtfac": 1,
+            "dimtm": 0,
+            "dimtp": 0,
+            "dimtsz": 0,
+            "dimtvp": 0,
+            "dimfxlen": 1,
+            "dimmzf": 100,
+            "dimaltmzf": 100,
+            "dimadec": 0,
+            "dimaltd": 2,
+            "dimalttd": 2,
+            "dimalttz": 0,
+            "dimaltu": 2,
+            "dimaltz": 0,
+            "dimarcsym": 0,
+            "dimatfit": 3,
+            "dimaunit": 0,
+            "dimazin": 0,
+            "dimfrac": 0,
+            "dimjust": 0,
+            "dimlunit": 2,
+            "dimtad": 0,
+            "dimtdec": 4,
+            "dimtfill": 0,
+            "dimtmove": 0,
+            "dimtolj": 1,
+            "dimtzin": 0,
+            "dimzin": 0,
+            "dimalt": false,
+            "dimlim": false,
+            "dimsah": false,
+            "dimsd1": false,
+            "dimsd2": false,
+            "dimse2": false,
+            "dimsoxd": false,
+            "dimtih": true,
+            "dimtix": false,
+            "dimtofl": false,
+            "dimtoh": true,
+            "dimtol": false,
+            "dimupt": false,
+            "dimfxlenon": false,
+            "dimtxtdirection": false,
+            "dimapost": "",
+            "dimpost": "",
+            "dimmzs": "",
+            "dimaltmzs": "",
+            "dimdsep": ".",
+            "dimtfillclr": 0,
+            "dimlwd": -2,
+            "dimlwe": -2,
+            "dimblk": "",
+            "dimblk1": "",
+            "dimblk2": "",
+            "dimldrblk": "",
+            "dimltype": "",
+            "dimltex1": "",
+            "dimltex2": "",
+            "dimtxsty": "Standard"
+          },
+          "actual": {
+            "handle": "27",
+            "name": "Standard",
+            "dimtxt": 0.18,
+            "dimasz": 0.18,
+            "dimexe": 0.18,
+            "dimexo": 0.0625,
+            "dimdec": 4,
+            "dimscale": 1,
+            "dimclrd": 0,
+            "dimclre": 0,
+            "dimclrt": 0,
+            "dimse1": false,
+            "dimaltf": 25.4,
+            "dimaltrnd": 0,
+            "dimcen": 0.09,
+            "dimdle": 0,
+            "dimdli": 0.38,
+            "dimgap": 0.09,
+            "dimjogang": 0.7853981633974483,
+            "dimlfac": 1,
+            "dimrnd": 0,
+            "dimtfac": 1,
+            "dimtm": 0,
+            "dimtp": 0,
+            "dimtsz": 0,
+            "dimtvp": 0,
+            "dimfxlen": 1,
+            "dimmzf": 100,
+            "dimaltmzf": 100,
+            "dimadec": 0,
+            "dimaltd": 2,
+            "dimalttd": 2,
+            "dimalttz": 0,
+            "dimaltu": 2,
+            "dimaltz": 0,
+            "dimarcsym": 0,
+            "dimatfit": 3,
+            "dimaunit": 0,
+            "dimazin": 0,
+            "dimfrac": 0,
+            "dimjust": 0,
+            "dimlunit": 2,
+            "dimtad": 0,
+            "dimtdec": 4,
+            "dimtfill": 0,
+            "dimtmove": 0,
+            "dimtolj": 1,
+            "dimtzin": 0,
+            "dimzin": 0,
+            "dimalt": false,
+            "dimlim": false,
+            "dimsah": false,
+            "dimsd1": false,
+            "dimsd2": false,
+            "dimse2": false,
+            "dimsoxd": false,
+            "dimtih": true,
+            "dimtix": false,
+            "dimtofl": false,
+            "dimtoh": true,
+            "dimtol": false,
+            "dimupt": false,
+            "dimfxlenon": false,
+            "dimtxtdirection": false,
+            "dimapost": "",
+            "dimpost": "",
+            "dimmzs": "",
+            "dimaltmzs": "",
+            "dimdsep": ".",
+            "dimtfillclr": 0,
+            "dimlwd": -2,
+            "dimlwe": -2,
+            "dimblk": "",
+            "dimblk1": "",
+            "dimblk2": "",
+            "dimldrblk": "",
+            "dimltype": "",
+            "dimltex1": "",
+            "dimltex2": "",
+            "dimtxsty": "Standard"
+          },
+          "record_diff": []
+        },
+        {
+          "name": "주석",
+          "expected": {
+            "dimtxt": 2.5,
+            "dimasz": 2.5,
+            "dimexe": 1.25,
+            "dimexo": 0.625,
+            "dimdec": 2,
+            "dimscale": 0,
+            "dimclrd": 0,
+            "dimclre": 0,
+            "dimclrt": 0,
+            "dimse1": false,
+            "dimaltf": 0.03937007874016,
+            "dimaltrnd": 0,
+            "dimcen": 2.5,
+            "dimdle": 0,
+            "dimdli": 3.75,
+            "dimgap": 0.625,
+            "dimjogang": 0.7853981633974483,
+            "dimlfac": 1,
+            "dimrnd": 0,
+            "dimtfac": 1,
+            "dimtm": 0,
+            "dimtp": 0,
+            "dimtsz": 0,
+            "dimtvp": 0,
+            "dimfxlen": 1,
+            "dimmzf": 100,
+            "dimaltmzf": 100,
+            "dimadec": 0,
+            "dimaltd": 3,
+            "dimalttd": 3,
+            "dimalttz": 0,
+            "dimaltu": 2,
+            "dimaltz": 0,
+            "dimarcsym": 0,
+            "dimatfit": 3,
+            "dimaunit": 0,
+            "dimazin": 0,
+            "dimfrac": 0,
+            "dimjust": 0,
+            "dimlunit": 2,
+            "dimtad": 1,
+            "dimtdec": 2,
+            "dimtfill": 0,
+            "dimtmove": 0,
+            "dimtolj": 0,
+            "dimtzin": 8,
+            "dimzin": 8,
+            "dimalt": false,
+            "dimlim": false,
+            "dimsah": false,
+            "dimsd1": false,
+            "dimsd2": false,
+            "dimse2": false,
+            "dimsoxd": false,
+            "dimtih": false,
+            "dimtix": false,
+            "dimtofl": true,
+            "dimtoh": false,
+            "dimtol": false,
+            "dimupt": false,
+            "dimfxlenon": false,
+            "dimtxtdirection": false,
+            "dimapost": "",
+            "dimpost": "",
+            "dimmzs": "",
+            "dimaltmzs": "",
+            "dimdsep": ",",
+            "dimtfillclr": 0,
+            "dimlwd": -2,
+            "dimlwe": -2,
+            "dimblk": "",
+            "dimblk1": "",
+            "dimblk2": "",
+            "dimldrblk": "",
+            "dimltype": "",
+            "dimltex1": "",
+            "dimltex2": "",
+            "dimtxsty": "Standard"
+          },
+          "actual": {
+            "handle": "E1",
+            "name": "주석",
+            "dimtxt": 2.5,
+            "dimasz": 2.5,
+            "dimexe": 1.25,
+            "dimexo": 0.625,
+            "dimdec": 2,
+            "dimscale": 0,
+            "dimclrd": 0,
+            "dimclre": 0,
+            "dimclrt": 0,
+            "dimse1": false,
+            "dimaltf": 0.03937007874016,
+            "dimaltrnd": 0,
+            "dimcen": 2.5,
+            "dimdle": 0,
+            "dimdli": 3.75,
+            "dimgap": 0.625,
+            "dimjogang": 0.7853981633974483,
+            "dimlfac": 1,
+            "dimrnd": 0,
+            "dimtfac": 1,
+            "dimtm": 0,
+            "dimtp": 0,
+            "dimtsz": 0,
+            "dimtvp": 0,
+            "dimfxlen": 1,
+            "dimmzf": 100,
+            "dimaltmzf": 100,
+            "dimadec": 0,
+            "dimaltd": 3,
+            "dimalttd": 3,
+            "dimalttz": 0,
+            "dimaltu": 2,
+            "dimaltz": 0,
+            "dimarcsym": 0,
+            "dimatfit": 3,
+            "dimaunit": 0,
+            "dimazin": 0,
+            "dimfrac": 0,
+            "dimjust": 0,
+            "dimlunit": 2,
+            "dimtad": 1,
+            "dimtdec": 2,
+            "dimtfill": 0,
+            "dimtmove": 0,
+            "dimtolj": 0,
+            "dimtzin": 8,
+            "dimzin": 8,
+            "dimalt": false,
+            "dimlim": false,
+            "dimsah": false,
+            "dimsd1": false,
+            "dimsd2": false,
+            "dimse2": false,
+            "dimsoxd": false,
+            "dimtih": false,
+            "dimtix": false,
+            "dimtofl": true,
+            "dimtoh": false,
+            "dimtol": false,
+            "dimupt": false,
+            "dimfxlenon": false,
+            "dimtxtdirection": false,
+            "dimapost": "",
+            "dimpost": "",
+            "dimmzs": "",
+            "dimaltmzs": "",
+            "dimdsep": ",",
+            "dimtfillclr": 0,
+            "dimlwd": -2,
+            "dimlwe": -2,
+            "dimblk": "",
+            "dimblk1": "",
+            "dimblk2": "",
+            "dimldrblk": "",
+            "dimltype": "",
+            "dimltex1": "",
+            "dimltex2": "",
+            "dimtxsty": "Standard"
+          },
+          "record_diff": []
+        },
+        {
+          "name": "ISO-25",
+          "expected": {
+            "dimtxt": 2.5,
+            "dimasz": 2.5,
+            "dimexe": 1.25,
+            "dimexo": 0.625,
+            "dimdec": 2,
+            "dimscale": 1,
+            "dimclrd": 0,
+            "dimclre": 0,
+            "dimclrt": 0,
+            "dimse1": false,
+            "dimaltf": 0.03937007874016,
+            "dimaltrnd": 0,
+            "dimcen": 2.5,
+            "dimdle": 0,
+            "dimdli": 3.75,
+            "dimgap": 0.625,
+            "dimjogang": 0.7853981633974483,
+            "dimlfac": 1,
+            "dimrnd": 0,
+            "dimtfac": 1,
+            "dimtm": 0,
+            "dimtp": 0,
+            "dimtsz": 0,
+            "dimtvp": 0,
+            "dimfxlen": 1,
+            "dimmzf": 100,
+            "dimaltmzf": 100,
+            "dimadec": 0,
+            "dimaltd": 3,
+            "dimalttd": 3,
+            "dimalttz": 0,
+            "dimaltu": 2,
+            "dimaltz": 0,
+            "dimarcsym": 0,
+            "dimatfit": 3,
+            "dimaunit": 0,
+            "dimazin": 0,
+            "dimfrac": 0,
+            "dimjust": 0,
+            "dimlunit": 2,
+            "dimtad": 1,
+            "dimtdec": 2,
+            "dimtfill": 0,
+            "dimtmove": 0,
+            "dimtolj": 0,
+            "dimtzin": 8,
+            "dimzin": 8,
+            "dimalt": false,
+            "dimlim": false,
+            "dimsah": false,
+            "dimsd1": false,
+            "dimsd2": false,
+            "dimse2": false,
+            "dimsoxd": false,
+            "dimtih": false,
+            "dimtix": false,
+            "dimtofl": true,
+            "dimtoh": false,
+            "dimtol": false,
+            "dimupt": false,
+            "dimfxlenon": false,
+            "dimtxtdirection": false,
+            "dimapost": "",
+            "dimpost": "",
+            "dimmzs": "",
+            "dimaltmzs": "",
+            "dimdsep": ",",
+            "dimtfillclr": 0,
+            "dimlwd": -2,
+            "dimlwe": -2,
+            "dimblk": "",
+            "dimblk1": "",
+            "dimblk2": "",
+            "dimldrblk": "",
+            "dimltype": "",
+            "dimltex1": "",
+            "dimltex2": "",
+            "dimtxsty": "Standard"
+          },
+          "actual": {
+            "handle": "95D",
+            "name": "ISO-25",
+            "dimtxt": 2.5,
+            "dimasz": 2.5,
+            "dimexe": 1.25,
+            "dimexo": 0.625,
+            "dimdec": 2,
+            "dimscale": 1,
+            "dimclrd": 0,
+            "dimclre": 0,
+            "dimclrt": 0,
+            "dimse1": false,
+            "dimaltf": 0.03937007874016,
+            "dimaltrnd": 0,
+            "dimcen": 2.5,
+            "dimdle": 0,
+            "dimdli": 3.75,
+            "dimgap": 0.625,
+            "dimjogang": 0.7853981633974483,
+            "dimlfac": 1,
+            "dimrnd": 0,
+            "dimtfac": 1,
+            "dimtm": 0,
+            "dimtp": 0,
+            "dimtsz": 0,
+            "dimtvp": 0,
+            "dimfxlen": 1,
+            "dimmzf": 100,
+            "dimaltmzf": 100,
+            "dimadec": 0,
+            "dimaltd": 3,
+            "dimalttd": 3,
+            "dimalttz": 0,
+            "dimaltu": 2,
+            "dimaltz": 0,
+            "dimarcsym": 0,
+            "dimatfit": 3,
+            "dimaunit": 0,
+            "dimazin": 0,
+            "dimfrac": 0,
+            "dimjust": 0,
+            "dimlunit": 2,
+            "dimtad": 1,
+            "dimtdec": 2,
+            "dimtfill": 0,
+            "dimtmove": 0,
+            "dimtolj": 0,
+            "dimtzin": 8,
+            "dimzin": 8,
+            "dimalt": false,
+            "dimlim": false,
+            "dimsah": false,
+            "dimsd1": false,
+            "dimsd2": false,
+            "dimse2": false,
+            "dimsoxd": false,
+            "dimtih": false,
+            "dimtix": false,
+            "dimtofl": true,
+            "dimtoh": false,
+            "dimtol": false,
+            "dimupt": false,
+            "dimfxlenon": false,
+            "dimtxtdirection": false,
+            "dimapost": "",
+            "dimpost": "",
+            "dimmzs": "",
+            "dimaltmzs": "",
+            "dimdsep": ",",
+            "dimtfillclr": 0,
+            "dimlwd": -2,
+            "dimlwe": -2,
+            "dimblk": "",
+            "dimblk1": "",
+            "dimblk2": "",
+            "dimldrblk": "",
+            "dimltype": "",
+            "dimltex1": "",
+            "dimltex2": "",
+            "dimtxsty": "Standard"
+          },
+          "record_diff": []
+        },
+        {
+          "name": "DIM40",
+          "expected": {
+            "dimtxt": 3,
+            "dimasz": 1.5,
+            "dimexe": 2,
+            "dimexo": 2.5,
+            "dimdec": 0,
+            "dimscale": 40,
+            "dimclrd": 7,
+            "dimclre": 7,
+            "dimclrt": 3,
+            "dimse1": false,
+            "dimaltf": 25.4,
+            "dimaltrnd": 0,
+            "dimcen": 0.09,
+            "dimdle": 2,
+            "dimdli": 8,
+            "dimgap": 1,
+            "dimjogang": 0.7853981633974483,
+            "dimlfac": 1,
+            "dimrnd": 0,
+            "dimtfac": 1,
+            "dimtm": 0,
+            "dimtp": 0,
+            "dimtsz": 0,
+            "dimtvp": 0,
+            "dimfxlen": 2,
+            "dimmzf": 100,
+            "dimaltmzf": 100,
+            "dimadec": 0,
+            "dimaltd": 1,
+            "dimalttd": 1,
+            "dimalttz": 0,
+            "dimaltu": 2,
+            "dimaltz": 0,
+            "dimarcsym": 0,
+            "dimatfit": 3,
+            "dimaunit": 0,
+            "dimazin": 0,
+            "dimfrac": 0,
+            "dimjust": 0,
+            "dimlunit": 2,
+            "dimtad": 1,
+            "dimtdec": 0,
+            "dimtfill": 0,
+            "dimtmove": 2,
+            "dimtolj": 1,
+            "dimtzin": 0,
+            "dimzin": 0,
+            "dimalt": false,
+            "dimlim": false,
+            "dimsah": true,
+            "dimsd1": false,
+            "dimsd2": false,
+            "dimse2": false,
+            "dimsoxd": false,
+            "dimtih": false,
+            "dimtix": true,
+            "dimtofl": true,
+            "dimtoh": false,
+            "dimtol": false,
+            "dimupt": false,
+            "dimfxlenon": false,
+            "dimtxtdirection": false,
+            "dimapost": "",
+            "dimpost": "",
+            "dimmzs": "",
+            "dimaltmzs": "",
+            "dimdsep": ".",
+            "dimtfillclr": 0,
+            "dimlwd": -2,
+            "dimlwe": -2,
+            "dimblk": "",
+            "dimblk1": "DIMDOT",
+            "dimblk2": "DIMDOT",
+            "dimldrblk": "DIMDOT",
+            "dimltype": "",
+            "dimltex1": "",
+            "dimltex2": "",
+            "dimtxsty": "MG"
+          },
+          "actual": {
+            "handle": "970",
+            "name": "DIM40",
+            "dimtxt": 3,
+            "dimasz": 1.5,
+            "dimexe": 2,
+            "dimexo": 2.5,
+            "dimdec": 0,
+            "dimscale": 40,
+            "dimclrd": 7,
+            "dimclre": 7,
+            "dimclrt": 3,
+            "dimse1": false,
+            "dimaltf": 25.4,
+            "dimaltrnd": 0,
+            "dimcen": 0.09,
+            "dimdle": 2,
+            "dimdli": 8,
+            "dimgap": 1,
+            "dimjogang": 0.7853981633974483,
+            "dimlfac": 1,
+            "dimrnd": 0,
+            "dimtfac": 1,
+            "dimtm": 0,
+            "dimtp": 0,
+            "dimtsz": 0,
+            "dimtvp": 0,
+            "dimfxlen": 2,
+            "dimmzf": 100,
+            "dimaltmzf": 100,
+            "dimadec": 0,
+            "dimaltd": 1,
+            "dimalttd": 1,
+            "dimalttz": 0,
+            "dimaltu": 2,
+            "dimaltz": 0,
+            "dimarcsym": 0,
+            "dimatfit": 3,
+            "dimaunit": 0,
+            "dimazin": 0,
+            "dimfrac": 0,
+            "dimjust": 0,
+            "dimlunit": 2,
+            "dimtad": 1,
+            "dimtdec": 0,
+            "dimtfill": 0,
+            "dimtmove": 2,
+            "dimtolj": 1,
+            "dimtzin": 0,
+            "dimzin": 0,
+            "dimalt": false,
+            "dimlim": false,
+            "dimsah": true,
+            "dimsd1": false,
+            "dimsd2": false,
+            "dimse2": false,
+            "dimsoxd": false,
+            "dimtih": false,
+            "dimtix": true,
+            "dimtofl": true,
+            "dimtoh": false,
+            "dimtol": false,
+            "dimupt": false,
+            "dimfxlenon": false,
+            "dimtxtdirection": false,
+            "dimapost": "",
+            "dimpost": "",
+            "dimmzs": "",
+            "dimaltmzs": "",
+            "dimdsep": ".",
+            "dimtfillclr": 0,
+            "dimlwd": -2,
+            "dimlwe": -2,
+            "dimblk": "",
+            "dimblk1": "",
+            "dimblk2": "",
+            "dimldrblk": "",
+            "dimltype": "",
+            "dimltex1": "",
+            "dimltex2": "",
+            "dimtxsty": "Standard"
+          },
+          "record_diff": [
+            "dimblk1",
+            "dimblk2",
+            "dimldrblk",
+            "dimtxsty"
+          ]
+        },
+        {
+          "name": "MC40",
+          "expected": {
+            "dimtxt": 3,
+            "dimasz": 1,
+            "dimexe": 1.5,
+            "dimexo": 3,
+            "dimdec": 4,
+            "dimscale": 40,
+            "dimclrd": 256,
+            "dimclre": 256,
+            "dimclrt": 4,
+            "dimse1": false,
+            "dimaltf": 25.4,
+            "dimaltrnd": 0,
+            "dimcen": 0,
+            "dimdle": 1.5,
+            "dimdli": 8,
+            "dimgap": 1,
+            "dimjogang": 0.7853981633974483,
+            "dimlfac": 1,
+            "dimrnd": 0,
+            "dimtfac": 1,
+            "dimtm": 0,
+            "dimtp": 0,
+            "dimtsz": 0,
+            "dimtvp": 0,
+            "dimfxlen": 1,
+            "dimmzf": 100,
+            "dimaltmzf": 100,
+            "dimadec": 4,
+            "dimaltd": 2,
+            "dimalttd": 2,
+            "dimalttz": 0,
+            "dimaltu": 2,
+            "dimaltz": 0,
+            "dimarcsym": 0,
+            "dimatfit": 3,
+            "dimaunit": 0,
+            "dimazin": 3,
+            "dimfrac": 0,
+            "dimjust": 0,
+            "dimlunit": 2,
+            "dimtad": 1,
+            "dimtdec": 4,
+            "dimtfill": 0,
+            "dimtmove": 2,
+            "dimtolj": 1,
+            "dimtzin": 0,
+            "dimzin": 12,
+            "dimalt": false,
+            "dimlim": false,
+            "dimsah": true,
+            "dimsd1": false,
+            "dimsd2": false,
+            "dimse2": false,
+            "dimsoxd": false,
+            "dimtih": false,
+            "dimtix": true,
+            "dimtofl": true,
+            "dimtoh": false,
+            "dimtol": false,
+            "dimupt": false,
+            "dimfxlenon": false,
+            "dimtxtdirection": false,
+            "dimapost": "",
+            "dimpost": "",
+            "dimmzs": "",
+            "dimaltmzs": "",
+            "dimdsep": ".",
+            "dimtfillclr": 0,
+            "dimlwd": -1,
+            "dimlwe": -1,
+            "dimblk": "",
+            "dimblk1": "_ArchTick",
+            "dimblk2": "_ArchTick",
+            "dimldrblk": "_ArchTick",
+            "dimltype": "",
+            "dimltex1": "",
+            "dimltex2": "",
+            "dimtxsty": "맑은 고딕"
+          },
+          "actual": {
+            "handle": "987",
+            "name": "MC40",
+            "dimtxt": 3,
+            "dimasz": 1,
+            "dimexe": 1.5,
+            "dimexo": 3,
+            "dimdec": 4,
+            "dimscale": 40,
+            "dimclrd": 256,
+            "dimclre": 256,
+            "dimclrt": 4,
+            "dimse1": false,
+            "dimaltf": 25.4,
+            "dimaltrnd": 0,
+            "dimcen": 0,
+            "dimdle": 1.5,
+            "dimdli": 8,
+            "dimgap": 1,
+            "dimjogang": 0.7853981633974483,
+            "dimlfac": 1,
+            "dimrnd": 0,
+            "dimtfac": 1,
+            "dimtm": 0,
+            "dimtp": 0,
+            "dimtsz": 0,
+            "dimtvp": 0,
+            "dimfxlen": 1,
+            "dimmzf": 100,
+            "dimaltmzf": 100,
+            "dimadec": 4,
+            "dimaltd": 2,
+            "dimalttd": 2,
+            "dimalttz": 0,
+            "dimaltu": 2,
+            "dimaltz": 0,
+            "dimarcsym": 0,
+            "dimatfit": 3,
+            "dimaunit": 0,
+            "dimazin": 3,
+            "dimfrac": 0,
+            "dimjust": 0,
+            "dimlunit": 2,
+            "dimtad": 1,
+            "dimtdec": 4,
+            "dimtfill": 0,
+            "dimtmove": 2,
+            "dimtolj": 1,
+            "dimtzin": 0,
+            "dimzin": 12,
+            "dimalt": false,
+            "dimlim": false,
+            "dimsah": true,
+            "dimsd1": false,
+            "dimsd2": false,
+            "dimse2": false,
+            "dimsoxd": false,
+            "dimtih": false,
+            "dimtix": true,
+            "dimtofl": true,
+            "dimtoh": false,
+            "dimtol": false,
+            "dimupt": false,
+            "dimfxlenon": false,
+            "dimtxtdirection": false,
+            "dimapost": "",
+            "dimpost": "",
+            "dimmzs": "",
+            "dimaltmzs": "",
+            "dimdsep": ".",
+            "dimtfillclr": 0,
+            "dimlwd": -1,
+            "dimlwe": -1,
+            "dimblk": "",
+            "dimblk1": "_ArchTick",
+            "dimblk2": "_ArchTick",
+            "dimldrblk": "_ArchTick",
+            "dimltype": "",
+            "dimltex1": "",
+            "dimltex2": "",
+            "dimtxsty": "Standard"
+          },
+          "record_diff": [
+            "dimtxsty"
+          ]
+        },
+        {
+          "name": "DIM40s",
+          "expected": {
+            "dimtxt": 2.5,
+            "dimasz": 0.8333333333333334,
+            "dimexe": 1.5,
+            "dimexo": 3,
+            "dimdec": 4,
+            "dimscale": 40,
+            "dimclrd": 256,
+            "dimclre": 256,
+            "dimclrt": 4,
+            "dimse1": false,
+            "dimaltf": 25.4,
+            "dimaltrnd": 0,
+            "dimcen": 0,
+            "dimdle": 1.5,
+            "dimdli": 8,
+            "dimgap": 1,
+            "dimjogang": 0.7853981633974483,
+            "dimlfac": 1,
+            "dimrnd": 0,
+            "dimtfac": 1,
+            "dimtm": 0,
+            "dimtp": 0,
+            "dimtsz": 0,
+            "dimtvp": 0,
+            "dimfxlen": 1,
+            "dimmzf": 100,
+            "dimaltmzf": 100,
+            "dimadec": 4,
+            "dimaltd": 2,
+            "dimalttd": 2,
+            "dimalttz": 0,
+            "dimaltu": 2,
+            "dimaltz": 0,
+            "dimarcsym": 0,
+            "dimatfit": 3,
+            "dimaunit": 0,
+            "dimazin": 3,
+            "dimfrac": 0,
+            "dimjust": 0,
+            "dimlunit": 2,
+            "dimtad": 1,
+            "dimtdec": 4,
+            "dimtfill": 0,
+            "dimtmove": 2,
+            "dimtolj": 1,
+            "dimtzin": 0,
+            "dimzin": 12,
+            "dimalt": false,
+            "dimlim": false,
+            "dimsah": false,
+            "dimsd1": false,
+            "dimsd2": false,
+            "dimse2": false,
+            "dimsoxd": false,
+            "dimtih": false,
+            "dimtix": true,
+            "dimtofl": true,
+            "dimtoh": false,
+            "dimtol": false,
+            "dimupt": false,
+            "dimfxlenon": false,
+            "dimtxtdirection": false,
+            "dimapost": "",
+            "dimpost": "",
+            "dimmzs": "",
+            "dimaltmzs": "",
+            "dimdsep": ".",
+            "dimtfillclr": 0,
+            "dimlwd": -1,
+            "dimlwe": -1,
+            "dimblk": "DIMDOT",
+            "dimblk1": "",
+            "dimblk2": "",
+            "dimldrblk": "DIMDOT",
+            "dimltype": "",
+            "dimltex1": "",
+            "dimltex2": "",
+            "dimtxsty": "맑은 고딕"
+          },
+          "actual": {
+            "handle": "99A",
+            "name": "DIM40s",
+            "dimtxt": 2.5,
+            "dimasz": 0.8333333333333334,
+            "dimexe": 1.5,
+            "dimexo": 3,
+            "dimdec": 4,
+            "dimscale": 40,
+            "dimclrd": 256,
+            "dimclre": 256,
+            "dimclrt": 4,
+            "dimse1": false,
+            "dimaltf": 25.4,
+            "dimaltrnd": 0,
+            "dimcen": 0,
+            "dimdle": 1.5,
+            "dimdli": 8,
+            "dimgap": 1,
+            "dimjogang": 0.7853981633974483,
+            "dimlfac": 1,
+            "dimrnd": 0,
+            "dimtfac": 1,
+            "dimtm": 0,
+            "dimtp": 0,
+            "dimtsz": 0,
+            "dimtvp": 0,
+            "dimfxlen": 1,
+            "dimmzf": 100,
+            "dimaltmzf": 100,
+            "dimadec": 4,
+            "dimaltd": 2,
+            "dimalttd": 2,
+            "dimalttz": 0,
+            "dimaltu": 2,
+            "dimaltz": 0,
+            "dimarcsym": 0,
+            "dimatfit": 3,
+            "dimaunit": 0,
+            "dimazin": 3,
+            "dimfrac": 0,
+            "dimjust": 0,
+            "dimlunit": 2,
+            "dimtad": 1,
+            "dimtdec": 4,
+            "dimtfill": 0,
+            "dimtmove": 2,
+            "dimtolj": 1,
+            "dimtzin": 0,
+            "dimzin": 12,
+            "dimalt": false,
+            "dimlim": false,
+            "dimsah": false,
+            "dimsd1": false,
+            "dimsd2": false,
+            "dimse2": false,
+            "dimsoxd": false,
+            "dimtih": false,
+            "dimtix": true,
+            "dimtofl": true,
+            "dimtoh": false,
+            "dimtol": false,
+            "dimupt": false,
+            "dimfxlenon": false,
+            "dimtxtdirection": false,
+            "dimapost": "",
+            "dimpost": "",
+            "dimmzs": "",
+            "dimaltmzs": "",
+            "dimdsep": ".",
+            "dimtfillclr": 0,
+            "dimlwd": -1,
+            "dimlwe": -1,
+            "dimblk": "",
+            "dimblk1": "",
+            "dimblk2": "",
+            "dimldrblk": "",
+            "dimltype": "",
+            "dimltex1": "",
+            "dimltex2": "",
+            "dimtxsty": "Standard"
+          },
+          "record_diff": [
+            "dimblk",
+            "dimldrblk",
+            "dimtxsty"
+          ]
+        }
+      ],
+      "diffs": [
+        {
+          "name": "DIM40",
+          "expected": {
+            "dimtxt": 3,
+            "dimasz": 1.5,
+            "dimexe": 2,
+            "dimexo": 2.5,
+            "dimdec": 0,
+            "dimscale": 40,
+            "dimclrd": 7,
+            "dimclre": 7,
+            "dimclrt": 3,
+            "dimse1": false,
+            "dimaltf": 25.4,
+            "dimaltrnd": 0,
+            "dimcen": 0.09,
+            "dimdle": 2,
+            "dimdli": 8,
+            "dimgap": 1,
+            "dimjogang": 0.7853981633974483,
+            "dimlfac": 1,
+            "dimrnd": 0,
+            "dimtfac": 1,
+            "dimtm": 0,
+            "dimtp": 0,
+            "dimtsz": 0,
+            "dimtvp": 0,
+            "dimfxlen": 2,
+            "dimmzf": 100,
+            "dimaltmzf": 100,
+            "dimadec": 0,
+            "dimaltd": 1,
+            "dimalttd": 1,
+            "dimalttz": 0,
+            "dimaltu": 2,
+            "dimaltz": 0,
+            "dimarcsym": 0,
+            "dimatfit": 3,
+            "dimaunit": 0,
+            "dimazin": 0,
+            "dimfrac": 0,
+            "dimjust": 0,
+            "dimlunit": 2,
+            "dimtad": 1,
+            "dimtdec": 0,
+            "dimtfill": 0,
+            "dimtmove": 2,
+            "dimtolj": 1,
+            "dimtzin": 0,
+            "dimzin": 0,
+            "dimalt": false,
+            "dimlim": false,
+            "dimsah": true,
+            "dimsd1": false,
+            "dimsd2": false,
+            "dimse2": false,
+            "dimsoxd": false,
+            "dimtih": false,
+            "dimtix": true,
+            "dimtofl": true,
+            "dimtoh": false,
+            "dimtol": false,
+            "dimupt": false,
+            "dimfxlenon": false,
+            "dimtxtdirection": false,
+            "dimapost": "",
+            "dimpost": "",
+            "dimmzs": "",
+            "dimaltmzs": "",
+            "dimdsep": ".",
+            "dimtfillclr": 0,
+            "dimlwd": -2,
+            "dimlwe": -2,
+            "dimblk": "",
+            "dimblk1": "DIMDOT",
+            "dimblk2": "DIMDOT",
+            "dimldrblk": "DIMDOT",
+            "dimltype": "",
+            "dimltex1": "",
+            "dimltex2": "",
+            "dimtxsty": "MG"
+          },
+          "actual": {
+            "handle": "970",
+            "name": "DIM40",
+            "dimtxt": 3,
+            "dimasz": 1.5,
+            "dimexe": 2,
+            "dimexo": 2.5,
+            "dimdec": 0,
+            "dimscale": 40,
+            "dimclrd": 7,
+            "dimclre": 7,
+            "dimclrt": 3,
+            "dimse1": false,
+            "dimaltf": 25.4,
+            "dimaltrnd": 0,
+            "dimcen": 0.09,
+            "dimdle": 2,
+            "dimdli": 8,
+            "dimgap": 1,
+            "dimjogang": 0.7853981633974483,
+            "dimlfac": 1,
+            "dimrnd": 0,
+            "dimtfac": 1,
+            "dimtm": 0,
+            "dimtp": 0,
+            "dimtsz": 0,
+            "dimtvp": 0,
+            "dimfxlen": 2,
+            "dimmzf": 100,
+            "dimaltmzf": 100,
+            "dimadec": 0,
+            "dimaltd": 1,
+            "dimalttd": 1,
+            "dimalttz": 0,
+            "dimaltu": 2,
+            "dimaltz": 0,
+            "dimarcsym": 0,
+            "dimatfit": 3,
+            "dimaunit": 0,
+            "dimazin": 0,
+            "dimfrac": 0,
+            "dimjust": 0,
+            "dimlunit": 2,
+            "dimtad": 1,
+            "dimtdec": 0,
+            "dimtfill": 0,
+            "dimtmove": 2,
+            "dimtolj": 1,
+            "dimtzin": 0,
+            "dimzin": 0,
+            "dimalt": false,
+            "dimlim": false,
+            "dimsah": true,
+            "dimsd1": false,
+            "dimsd2": false,
+            "dimse2": false,
+            "dimsoxd": false,
+            "dimtih": false,
+            "dimtix": true,
+            "dimtofl": true,
+            "dimtoh": false,
+            "dimtol": false,
+            "dimupt": false,
+            "dimfxlenon": false,
+            "dimtxtdirection": false,
+            "dimapost": "",
+            "dimpost": "",
+            "dimmzs": "",
+            "dimaltmzs": "",
+            "dimdsep": ".",
+            "dimtfillclr": 0,
+            "dimlwd": -2,
+            "dimlwe": -2,
+            "dimblk": "",
+            "dimblk1": "",
+            "dimblk2": "",
+            "dimldrblk": "",
+            "dimltype": "",
+            "dimltex1": "",
+            "dimltex2": "",
+            "dimtxsty": "Standard"
+          },
+          "record_diff": [
+            "dimblk1",
+            "dimblk2",
+            "dimldrblk",
+            "dimtxsty"
+          ]
+        },
+        {
+          "name": "MC40",
+          "expected": {
+            "dimtxt": 3,
+            "dimasz": 1,
+            "dimexe": 1.5,
+            "dimexo": 3,
+            "dimdec": 4,
+            "dimscale": 40,
+            "dimclrd": 256,
+            "dimclre": 256,
+            "dimclrt": 4,
+            "dimse1": false,
+            "dimaltf": 25.4,
+            "dimaltrnd": 0,
+            "dimcen": 0,
+            "dimdle": 1.5,
+            "dimdli": 8,
+            "dimgap": 1,
+            "dimjogang": 0.7853981633974483,
+            "dimlfac": 1,
+            "dimrnd": 0,
+            "dimtfac": 1,
+            "dimtm": 0,
+            "dimtp": 0,
+            "dimtsz": 0,
+            "dimtvp": 0,
+            "dimfxlen": 1,
+            "dimmzf": 100,
+            "dimaltmzf": 100,
+            "dimadec": 4,
+            "dimaltd": 2,
+            "dimalttd": 2,
+            "dimalttz": 0,
+            "dimaltu": 2,
+            "dimaltz": 0,
+            "dimarcsym": 0,
+            "dimatfit": 3,
+            "dimaunit": 0,
+            "dimazin": 3,
+            "dimfrac": 0,
+            "dimjust": 0,
+            "dimlunit": 2,
+            "dimtad": 1,
+            "dimtdec": 4,
+            "dimtfill": 0,
+            "dimtmove": 2,
+            "dimtolj": 1,
+            "dimtzin": 0,
+            "dimzin": 12,
+            "dimalt": false,
+            "dimlim": false,
+            "dimsah": true,
+            "dimsd1": false,
+            "dimsd2": false,
+            "dimse2": false,
+            "dimsoxd": false,
+            "dimtih": false,
+            "dimtix": true,
+            "dimtofl": true,
+            "dimtoh": false,
+            "dimtol": false,
+            "dimupt": false,
+            "dimfxlenon": false,
+            "dimtxtdirection": false,
+            "dimapost": "",
+            "dimpost": "",
+            "dimmzs": "",
+            "dimaltmzs": "",
+            "dimdsep": ".",
+            "dimtfillclr": 0,
+            "dimlwd": -1,
+            "dimlwe": -1,
+            "dimblk": "",
+            "dimblk1": "_ArchTick",
+            "dimblk2": "_ArchTick",
+            "dimldrblk": "_ArchTick",
+            "dimltype": "",
+            "dimltex1": "",
+            "dimltex2": "",
+            "dimtxsty": "맑은 고딕"
+          },
+          "actual": {
+            "handle": "987",
+            "name": "MC40",
+            "dimtxt": 3,
+            "dimasz": 1,
+            "dimexe": 1.5,
+            "dimexo": 3,
+            "dimdec": 4,
+            "dimscale": 40,
+            "dimclrd": 256,
+            "dimclre": 256,
+            "dimclrt": 4,
+            "dimse1": false,
+            "dimaltf": 25.4,
+            "dimaltrnd": 0,
+            "dimcen": 0,
+            "dimdle": 1.5,
+            "dimdli": 8,
+            "dimgap": 1,
+            "dimjogang": 0.7853981633974483,
+            "dimlfac": 1,
+            "dimrnd": 0,
+            "dimtfac": 1,
+            "dimtm": 0,
+            "dimtp": 0,
+            "dimtsz": 0,
+            "dimtvp": 0,
+            "dimfxlen": 1,
+            "dimmzf": 100,
+            "dimaltmzf": 100,
+            "dimadec": 4,
+            "dimaltd": 2,
+            "dimalttd": 2,
+            "dimalttz": 0,
+            "dimaltu": 2,
+            "dimaltz": 0,
+            "dimarcsym": 0,
+            "dimatfit": 3,
+            "dimaunit": 0,
+            "dimazin": 3,
+            "dimfrac": 0,
+            "dimjust": 0,
+            "dimlunit": 2,
+            "dimtad": 1,
+            "dimtdec": 4,
+            "dimtfill": 0,
+            "dimtmove": 2,
+            "dimtolj": 1,
+            "dimtzin": 0,
+            "dimzin": 12,
+            "dimalt": false,
+            "dimlim": false,
+            "dimsah": true,
+            "dimsd1": false,
+            "dimsd2": false,
+            "dimse2": false,
+            "dimsoxd": false,
+            "dimtih": false,
+            "dimtix": true,
+            "dimtofl": true,
+            "dimtoh": false,
+            "dimtol": false,
+            "dimupt": false,
+            "dimfxlenon": false,
+            "dimtxtdirection": false,
+            "dimapost": "",
+            "dimpost": "",
+            "dimmzs": "",
+            "dimaltmzs": "",
+            "dimdsep": ".",
+            "dimtfillclr": 0,
+            "dimlwd": -1,
+            "dimlwe": -1,
+            "dimblk": "",
+            "dimblk1": "_ArchTick",
+            "dimblk2": "_ArchTick",
+            "dimldrblk": "_ArchTick",
+            "dimltype": "",
+            "dimltex1": "",
+            "dimltex2": "",
+            "dimtxsty": "Standard"
+          },
+          "record_diff": [
+            "dimtxsty"
+          ]
+        },
+        {
+          "name": "DIM40s",
+          "expected": {
+            "dimtxt": 2.5,
+            "dimasz": 0.8333333333333334,
+            "dimexe": 1.5,
+            "dimexo": 3,
+            "dimdec": 4,
+            "dimscale": 40,
+            "dimclrd": 256,
+            "dimclre": 256,
+            "dimclrt": 4,
+            "dimse1": false,
+            "dimaltf": 25.4,
+            "dimaltrnd": 0,
+            "dimcen": 0,
+            "dimdle": 1.5,
+            "dimdli": 8,
+            "dimgap": 1,
+            "dimjogang": 0.7853981633974483,
+            "dimlfac": 1,
+            "dimrnd": 0,
+            "dimtfac": 1,
+            "dimtm": 0,
+            "dimtp": 0,
+            "dimtsz": 0,
+            "dimtvp": 0,
+            "dimfxlen": 1,
+            "dimmzf": 100,
+            "dimaltmzf": 100,
+            "dimadec": 4,
+            "dimaltd": 2,
+            "dimalttd": 2,
+            "dimalttz": 0,
+            "dimaltu": 2,
+            "dimaltz": 0,
+            "dimarcsym": 0,
+            "dimatfit": 3,
+            "dimaunit": 0,
+            "dimazin": 3,
+            "dimfrac": 0,
+            "dimjust": 0,
+            "dimlunit": 2,
+            "dimtad": 1,
+            "dimtdec": 4,
+            "dimtfill": 0,
+            "dimtmove": 2,
+            "dimtolj": 1,
+            "dimtzin": 0,
+            "dimzin": 12,
+            "dimalt": false,
+            "dimlim": false,
+            "dimsah": false,
+            "dimsd1": false,
+            "dimsd2": false,
+            "dimse2": false,
+            "dimsoxd": false,
+            "dimtih": false,
+            "dimtix": true,
+            "dimtofl": true,
+            "dimtoh": false,
+            "dimtol": false,
+            "dimupt": false,
+            "dimfxlenon": false,
+            "dimtxtdirection": false,
+            "dimapost": "",
+            "dimpost": "",
+            "dimmzs": "",
+            "dimaltmzs": "",
+            "dimdsep": ".",
+            "dimtfillclr": 0,
+            "dimlwd": -1,
+            "dimlwe": -1,
+            "dimblk": "DIMDOT",
+            "dimblk1": "",
+            "dimblk2": "",
+            "dimldrblk": "DIMDOT",
+            "dimltype": "",
+            "dimltex1": "",
+            "dimltex2": "",
+            "dimtxsty": "맑은 고딕"
+          },
+          "actual": {
+            "handle": "99A",
+            "name": "DIM40s",
+            "dimtxt": 2.5,
+            "dimasz": 0.8333333333333334,
+            "dimexe": 1.5,
+            "dimexo": 3,
+            "dimdec": 4,
+            "dimscale": 40,
+            "dimclrd": 256,
+            "dimclre": 256,
+            "dimclrt": 4,
+            "dimse1": false,
+            "dimaltf": 25.4,
+            "dimaltrnd": 0,
+            "dimcen": 0,
+            "dimdle": 1.5,
+            "dimdli": 8,
+            "dimgap": 1,
+            "dimjogang": 0.7853981633974483,
+            "dimlfac": 1,
+            "dimrnd": 0,
+            "dimtfac": 1,
+            "dimtm": 0,
+            "dimtp": 0,
+            "dimtsz": 0,
+            "dimtvp": 0,
+            "dimfxlen": 1,
+            "dimmzf": 100,
+            "dimaltmzf": 100,
+            "dimadec": 4,
+            "dimaltd": 2,
+            "dimalttd": 2,
+            "dimalttz": 0,
+            "dimaltu": 2,
+            "dimaltz": 0,
+            "dimarcsym": 0,
+            "dimatfit": 3,
+            "dimaunit": 0,
+            "dimazin": 3,
+            "dimfrac": 0,
+            "dimjust": 0,
+            "dimlunit": 2,
+            "dimtad": 1,
+            "dimtdec": 4,
+            "dimtfill": 0,
+            "dimtmove": 2,
+            "dimtolj": 1,
+            "dimtzin": 0,
+            "dimzin": 12,
+            "dimalt": false,
+            "dimlim": false,
+            "dimsah": false,
+            "dimsd1": false,
+            "dimsd2": false,
+            "dimse2": false,
+            "dimsoxd": false,
+            "dimtih": false,
+            "dimtix": true,
+            "dimtofl": true,
+            "dimtoh": false,
+            "dimtol": false,
+            "dimupt": false,
+            "dimfxlenon": false,
+            "dimtxtdirection": false,
+            "dimapost": "",
+            "dimpost": "",
+            "dimmzs": "",
+            "dimaltmzs": "",
+            "dimdsep": ".",
+            "dimtfillclr": 0,
+            "dimlwd": -1,
+            "dimlwe": -1,
+            "dimblk": "",
+            "dimblk1": "",
+            "dimblk2": "",
+            "dimldrblk": "",
+            "dimltype": "",
+            "dimltex1": "",
+            "dimltex2": "",
+            "dimtxsty": "Standard"
+          },
+          "record_diff": [
+            "dimblk",
+            "dimldrblk",
+            "dimtxsty"
+          ]
+        }
+      ],
+      "structural_note": null
+    },
+    "linetype": {
+      "label": "linetype",
+      "table_key": "linetypes",
+      "records_compared": 18,
+      "zero_diff_count": 18,
+      "rows": [
+        {
+          "name": "ByBlock",
+          "expected": {
+            "description": "",
+            "dash_lengths": []
+          },
+          "actual": {
+            "handle": "14",
+            "name": "ByBlock",
+            "description": "",
+            "dash_lengths": []
+          },
+          "record_diff": []
+        },
+        {
+          "name": "ByLayer",
+          "expected": {
+            "description": "",
+            "dash_lengths": []
+          },
+          "actual": {
+            "handle": "15",
+            "name": "ByLayer",
+            "description": "",
+            "dash_lengths": []
+          },
+          "record_diff": []
+        },
+        {
+          "name": "Continuous",
+          "expected": {
+            "description": "Solid line",
+            "dash_lengths": []
+          },
+          "actual": {
+            "handle": "16",
+            "name": "Continuous",
+            "description": "Solid line",
+            "dash_lengths": []
+          },
+          "record_diff": []
+        },
+        {
+          "name": "X-평면도(기본형)$0$HID",
+          "expected": {
+            "description": "__ __ __ __ __ __ __ __ __ __ __ __ __ __ __ __",
+            "dash_lengths": [
+              1.8,
+              -1
+            ]
+          },
+          "actual": {
+            "handle": "9E3",
+            "name": "X-평면도(기본형)$0$HID",
+            "description": "__ __ __ __ __ __ __ __ __ __ __ __ __ __ __ __",
+            "dash_lengths": [
+              1.8,
+              -1
+            ]
+          },
+          "record_diff": []
+        },
+        {
+          "name": "X-평면도(기본형)$0$CEN",
+          "expected": {
+            "description": "------------ - -------------",
+            "dash_lengths": [
+              50,
+              -1,
+              0.5,
+              -1
+            ]
+          },
+          "actual": {
+            "handle": "9F6",
+            "name": "X-평면도(기본형)$0$CEN",
+            "description": "------------ - -------------",
+            "dash_lengths": [
+              50,
+              -1,
+              0.5,
+              -1
+            ]
+          },
+          "record_diff": []
+        },
+        {
+          "name": "X-평면도(기본형)$0$-HID",
+          "expected": {
+            "description": "",
+            "dash_lengths": [
+              1.5,
+              -1
+            ]
+          },
+          "actual": {
+            "handle": "A09",
+            "name": "X-평면도(기본형)$0$-HID",
+            "description": "",
+            "dash_lengths": [
+              1.5,
+              -1
+            ]
+          },
+          "record_diff": []
+        },
+        {
+          "name": "X-평면도(기본형)$0$HID2",
+          "expected": {
+            "description": "Hidden2 line for all scale",
+            "dash_lengths": [
+              6,
+              -1.5
+            ]
+          },
+          "actual": {
+            "handle": "A1C",
+            "name": "X-평면도(기본형)$0$HID2",
+            "description": "Hidden2 line for all scale",
+            "dash_lengths": [
+              6,
+              -1.5
+            ]
+          },
+          "record_diff": []
+        },
+        {
+          "name": "CEN",
+          "expected": {
+            "description": "------------ - -------------",
+            "dash_lengths": [
+              50,
+              -1,
+              0.5,
+              -1
+            ]
+          },
+          "actual": {
+            "handle": "A2F",
+            "name": "CEN",
+            "description": "------------ - -------------",
+            "dash_lengths": [
+              50,
+              -1,
+              0.5,
+              -1
+            ]
+          },
+          "record_diff": []
+        },
+        {
+          "name": "HID",
+          "expected": {
+            "description": "- - - - - - - - - - - - - -",
+            "dash_lengths": [
+              1.5,
+              -0.8
+            ]
+          },
+          "actual": {
+            "handle": "A42",
+            "name": "HID",
+            "description": "- - - - - - - - - - - - - -",
+            "dash_lengths": [
+              1.5,
+              -0.8
+            ]
+          },
+          "record_diff": []
+        },
+        {
+          "name": "X-FORM_청주$0$DOT2",
+          "expected": {
+            "description": "",
+            "dash_lengths": [
+              0,
+              -3.175
+            ]
+          },
+          "actual": {
+            "handle": "A55",
+            "name": "X-FORM_청주$0$DOT2",
+            "description": "",
+            "dash_lengths": [
+              0,
+              -3.175
+            ]
+          },
+          "record_diff": []
+        },
+        {
+          "name": "X-평면도(기본형)$0$CENN",
+          "expected": {
+            "description": "------------ - -------------",
+            "dash_lengths": [
+              4,
+              -1,
+              0.3,
+              -1
+            ]
+          },
+          "actual": {
+            "handle": "A68",
+            "name": "X-평면도(기본형)$0$CENN",
+            "description": "------------ - -------------",
+            "dash_lengths": [
+              4,
+              -1,
+              0.3,
+              -1
+            ]
+          },
+          "record_diff": []
+        },
+        {
+          "name": "X-평면도(기본형)$0$DASH",
+          "expected": {
+            "description": "",
+            "dash_lengths": [
+              0.25,
+              -0.1
+            ]
+          },
+          "actual": {
+            "handle": "A7B",
+            "name": "X-평면도(기본형)$0$DASH",
+            "description": "",
+            "dash_lengths": [
+              0.25,
+              -0.1
+            ]
+          },
+          "record_diff": []
+        },
+        {
+          "name": "X-평면도(기본형)$0$x-ref_plan S1$0$HID",
+          "expected": {
+            "description": "",
+            "dash_lengths": [
+              1.5,
+              -0.8
+            ]
+          },
+          "actual": {
+            "handle": "A8E",
+            "name": "X-평면도(기본형)$0$x-ref_plan S1$0$HID",
+            "description": "",
+            "dash_lengths": [
+              1.5,
+              -0.8
+            ]
+          },
+          "record_diff": []
+        },
+        {
+          "name": "X-평면도(기본형)$0$X-평면도$0$HID",
+          "expected": {
+            "description": "__ __ __ __ __ __ __ __ __ __ __ __ __ __ __ __",
+            "dash_lengths": [
+              1.8,
+              -1
+            ]
+          },
+          "actual": {
+            "handle": "AA1",
+            "name": "X-평면도(기본형)$0$X-평면도$0$HID",
+            "description": "__ __ __ __ __ __ __ __ __ __ __ __ __ __ __ __",
+            "dash_lengths": [
+              1.8,
+              -1
+            ]
+          },
+          "record_diff": []
+        },
+        {
+          "name": "X-평면도(기본형)$0$DASHDOTX2",
+          "expected": {
+            "description": "Dash dot (2x) ____  .  ____  .  ____  .  ___",
+            "dash_lengths": [
+              1,
+              -0.5,
+              0,
+              -0.5
+            ]
+          },
+          "actual": {
+            "handle": "AB4",
+            "name": "X-평면도(기본형)$0$DASHDOTX2",
+            "description": "Dash dot (2x) ____  .  ____  .  ____  .  ___",
+            "dash_lengths": [
+              1,
+              -0.5,
+              0,
+              -0.5
+            ]
+          },
+          "record_diff": []
+        },
+        {
+          "name": "X-평면도(기본형)$0$HIDDENX2",
+          "expected": {
+            "description": "",
+            "dash_lengths": [
+              0.5,
+              -0.25
+            ]
+          },
+          "actual": {
+            "handle": "AC7",
+            "name": "X-평면도(기본형)$0$HIDDENX2",
+            "description": "",
+            "dash_lengths": [
+              0.5,
+              -0.25
+            ]
+          },
+          "record_diff": []
+        },
+        {
+          "name": "X-평면도(기본형)$0$( Hidden )",
+          "expected": {
+            "description": "Hidden line stroke pattern",
+            "dash_lengths": [
+              0.25,
+              -0.125
+            ]
+          },
+          "actual": {
+            "handle": "ADA",
+            "name": "X-평면도(기본형)$0$( Hidden )",
+            "description": "Hidden line stroke pattern",
+            "dash_lengths": [
+              0.25,
+              -0.125
+            ]
+          },
+          "record_diff": []
+        },
+        {
+          "name": "X-평면도(기본형)$0$DDOT",
+          "expected": {
+            "description": "ddot line for all scale",
+            "dash_lengths": [
+              12,
+              -1,
+              0,
+              -1
+            ]
+          },
+          "actual": {
+            "handle": "AED",
+            "name": "X-평면도(기본형)$0$DDOT",
+            "description": "ddot line for all scale",
+            "dash_lengths": [
+              12,
+              -1,
+              0,
+              -1
+            ]
+          },
+          "record_diff": []
+        }
+      ],
+      "diffs": [],
+      "structural_note": null
+    },
+    "textstyle": {
+      "label": "textstyle",
+      "table_key": "text_styles",
+      "records_compared": 8,
+      "zero_diff_count": 8,
+      "rows": [
+        {
+          "name": "Standard",
+          "expected": {
+            "font_file": "arial.ttf",
+            "big_font_file": "",
+            "height": 0,
+            "width_factor": 1,
+            "oblique_angle": 0,
+            "is_shape_file": false,
+            "is_vertical": false
+          },
+          "actual": {
+            "handle": "11",
+            "name": "Standard",
+            "font_file": "arial.ttf",
+            "big_font_file": "",
+            "height": 0,
+            "width_factor": 1,
+            "oblique_angle": 0,
+            "is_shape_file": false,
+            "is_vertical": false
+          },
+          "record_diff": []
+        },
+        {
+          "name": "주석",
+          "expected": {
+            "font_file": "arial.ttf",
+            "big_font_file": "",
+            "height": 0,
+            "width_factor": 1,
+            "oblique_angle": 0,
+            "is_shape_file": false,
+            "is_vertical": false
+          },
+          "actual": {
+            "handle": "DC",
+            "name": "주석",
+            "font_file": "arial.ttf",
+            "big_font_file": "",
+            "height": 0,
+            "width_factor": 1,
+            "oblique_angle": 0,
+            "is_shape_file": false,
+            "is_vertical": false
+          },
+          "record_diff": []
+        },
+        {
+          "name": "MG",
+          "expected": {
+            "font_file": "malgun.ttf",
+            "big_font_file": "",
+            "height": 0,
+            "width_factor": 1,
+            "oblique_angle": 0,
+            "is_shape_file": false,
+            "is_vertical": false
+          },
+          "actual": {
+            "handle": "B24",
+            "name": "MG",
+            "font_file": "malgun.ttf",
+            "big_font_file": "",
+            "height": 0,
+            "width_factor": 1,
+            "oblique_angle": 0,
+            "is_shape_file": false,
+            "is_vertical": false
+          },
+          "record_diff": []
+        },
+        {
+          "name": "맑은고딕",
+          "expected": {
+            "font_file": "malgun.ttf",
+            "big_font_file": "",
+            "height": 0,
+            "width_factor": 1,
+            "oblique_angle": 0,
+            "is_shape_file": false,
+            "is_vertical": false
+          },
+          "actual": {
+            "handle": "B38",
+            "name": "맑은고딕",
+            "font_file": "malgun.ttf",
+            "big_font_file": "",
+            "height": 0,
+            "width_factor": 1,
+            "oblique_angle": 0,
+            "is_shape_file": false,
+            "is_vertical": false
+          },
+          "record_diff": []
+        },
+        {
+          "name": "맑은 고딕",
+          "expected": {
+            "font_file": "malgun.ttf",
+            "big_font_file": "",
+            "height": 0,
+            "width_factor": 1,
+            "oblique_angle": 0,
+            "is_shape_file": false,
+            "is_vertical": false
+          },
+          "actual": {
+            "handle": "B4C",
+            "name": "맑은 고딕",
+            "font_file": "malgun.ttf",
+            "big_font_file": "",
+            "height": 0,
+            "width_factor": 1,
+            "oblique_angle": 0,
+            "is_shape_file": false,
+            "is_vertical": false
+          },
+          "record_diff": []
+        },
+        {
+          "name": "X-FORM_청주$0$FONT-dA",
+          "expected": {
+            "font_file": "malgun.ttf",
+            "big_font_file": "",
+            "height": 0,
+            "width_factor": 1,
+            "oblique_angle": 0,
+            "is_shape_file": false,
+            "is_vertical": false
+          },
+          "actual": {
+            "handle": "B60",
+            "name": "X-FORM_청주$0$FONT-dA",
+            "font_file": "malgun.ttf",
+            "big_font_file": "",
+            "height": 0,
+            "width_factor": 1,
+            "oblique_angle": 0,
+            "is_shape_file": false,
+            "is_vertical": false
+          },
+          "record_diff": []
+        },
+        {
+          "name": "X-평면도(기본형)$0$MG",
+          "expected": {
+            "font_file": "malgun.ttf",
+            "big_font_file": "",
+            "height": 0,
+            "width_factor": 1,
+            "oblique_angle": 0,
+            "is_shape_file": false,
+            "is_vertical": false
+          },
+          "actual": {
+            "handle": "B74",
+            "name": "X-평면도(기본형)$0$MG",
+            "font_file": "malgun.ttf",
+            "big_font_file": "",
+            "height": 0,
+            "width_factor": 1,
+            "oblique_angle": 0,
+            "is_shape_file": false,
+            "is_vertical": false
+          },
+          "record_diff": []
+        },
+        {
+          "name": "X-평면도(기본형)$0$NBG",
+          "expected": {
+            "font_file": "",
+            "big_font_file": "",
+            "height": 0,
+            "width_factor": 1,
+            "oblique_angle": 0,
+            "is_shape_file": false,
+            "is_vertical": false
+          },
+          "actual": {
+            "handle": "B88",
+            "name": "X-평면도(기본형)$0$NBG",
+            "font_file": "",
+            "big_font_file": "",
+            "height": 0,
+            "width_factor": 1,
+            "oblique_angle": 0,
+            "is_shape_file": false,
+            "is_vertical": false
+          },
+          "record_diff": []
+        }
+      ],
+      "diffs": [],
+      "structural_note": null
+    },
+    "ucs": {
+      "label": "ucs",
+      "table_key": "ucs",
+      "records_compared": 0,
+      "zero_diff_count": 0,
+      "rows": [],
+      "diffs": [],
+      "structural_note": "0 named records in census for this table -- vacuously 0 compared, not evidence of a passing roundtrip"
+    },
+    "view": {
+      "label": "view",
+      "table_key": "views",
+      "records_compared": 0,
+      "zero_diff_count": 0,
+      "rows": [],
+      "diffs": [],
+      "structural_note": "0 named records in census for this table -- vacuously 0 compared, not evidence of a passing roundtrip"
+    },
+    "vport": {
+      "label": "vport",
+      "table_key": "viewports",
+      "records_compared": 1,
+      "zero_diff_count": 1,
+      "rows": [
+        {
+          "name": "*Active",
+          "expected": {
+            "lower_left": [
+              0.0,
+              0.0
+            ],
+            "upper_right": [
+              1.0,
+              1.0
+            ],
+            "center": [
+              183758.29430090112,
+              -21368.674904516258
+            ],
+            "height": 302488.2804636121,
+            "width": 501125.4320404005,
+            "target": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "view_direction": [
+              0.0,
+              0.0,
+              1.0
+            ],
+            "twist": 0,
+            "ucs_follow_mode": false,
+            "circle_sides": 1000,
+            "grid_enabled": true,
+            "snap_enabled": false,
+            "snap_angle": 0,
+            "ucs_per_viewport": true
+          },
+          "actual": {
+            "handle": "94",
+            "name": "*Active",
+            "lower_left": [
+              0.0,
+              0.0
+            ],
+            "upper_right": [
+              1.0,
+              1.0
+            ],
+            "center": [
+              21.320188017861092,
+              11.222682400458831
+            ],
+            "height": 25.401645837425974,
+            "width": 44.846057660446235,
+            "target": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "view_direction": [
+              0.0,
+              0.0,
+              1.0
+            ],
+            "twist": 0,
+            "ucs_follow_mode": false,
+            "circle_sides": 1000,
+            "grid_enabled": true,
+            "snap_enabled": false,
+            "snap_angle": 0,
+            "ucs_per_viewport": true
+          },
+          "record_diff": [],
+          "managed_field_drift": [
+            {
+              "field": "center",
+              "expected": [
+                183758.29430090112,
+                -21368.674904516258
+              ],
+              "actual": [
+                21.320188017861092,
+                11.222682400458831
+              ]
+            },
+            {
+              "field": "height",
+              "expected": 302488.2804636121,
+              "actual": 25.401645837425974
+            },
+            {
+              "field": "width",
+              "expected": 501125.4320404005,
+              "actual": 44.846057660446235
+            }
+          ]
+        }
+      ],
+      "diffs": [],
+      "structural_note": null
+    }
+  },
+  "status": "ok",
+  "dropped_ops": []
+}
