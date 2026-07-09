@@ -903,7 +903,7 @@ static std::string xdataBlocksJson(resbuf* rb, int& blockCount, int& itemCount)
             firstItem = true;
             const ACHAR* raw = cur->resval.rstring;
             arr << "{\"app\":\"" << jsonEscape(raw != nullptr ? acharToAscii(raw) : std::string())
-                << "\",\"items\":[";
+                << "\",\"rows\":[";
             ++blockCount;
             continue;
         }
@@ -913,7 +913,7 @@ static std::string xdataBlocksJson(resbuf* rb, int& blockCount, int& itemCount)
             firstBlock = false;
             blockOpen = true;
             firstItem = true;
-            arr << "{\"app\":\"\",\"items\":[";
+            arr << "{\"app\":\"\",\"rows\":[";
             ++blockCount;
         }
         if (!firstItem)

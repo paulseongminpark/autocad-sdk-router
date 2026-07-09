@@ -121,3 +121,10 @@
 | symbol_tables.block_table_records | 251 / 410 | 410 / 410 | write.block_table_record.create (신규) | L | `symbol_tables.block_table_records` |
 | xrecords | 1 / 2 | 2 / 2 | write.xrecord.set | M | `xrecords` |
 | extension_dictionaries | 0 / 1 | 1 / 1 | write.dictionary.set | S | `extension_dictionaries` |
+
+## 7. P4a extraction emission schema
+- `inspect.database.graph` entity records emit `xdata` only when `entity->xData(nullptr)` returns non-null; null xdata is omitted and empty arrays are not emitted.
+- Shape: `"xdata":[{"app":"REGAPP","rows":[{"code":1000,"value":"text"},{"code":1005,"value":"ABCD"},{"code":1040,"value":1.25},{"code":1010,"value":[1,2,3]}]}]`
+- Group code `1001` starts a new app group and supplies `app`; it is not repeated as a row.
+- String codes, including `1005` handles, emit UTF-8 JSON strings. `1005` values are extracted verbatim; handle remap belongs to the following write packet.
+- Real and integer codes emit JSON numbers. Point codes emit `[x,y,z]` arrays.

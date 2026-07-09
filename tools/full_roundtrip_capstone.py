@@ -1129,6 +1129,8 @@ def build_arg_parser() -> argparse.ArgumentParser:
                    help="gate on block-interior fidelity (blockdef_diff census vs post, "
                         "anon_remap-aware): fraction must not regress below the committed "
                         "ratchet baseline (default: on; P8, approved 2026-07-09)")
+    ap.add_argument("--semantic-gates", dest="semantic_gates", action=argparse.BooleanOptionalAction, default=True,
+                   help="run semantic-gates (L5 dimension-geometry consistency): on by default")
     ap.add_argument("--interior-baseline", type=float, default=None,
                    help="override the interior-gate ratchet floor (default: read "
                         "config/roundtrip_interior_baseline.json)")
@@ -1173,6 +1175,23 @@ def interior_gate_report(census_ir, post_ir, *, anon_remap=None,
         gate["reason"] = ("interior fraction %.4f regressed below ratchet baseline %.4f"
                           % (fraction or 0.0, baseline))
     return interior, gate
+
+
+def dim_semantic_gate_report(census_ir, post_ir):
+    """L5 semantic-gate predicate: dimensions in census IR should be preserved by
+    rebuild dimension extraction.
+
+    Vacuum branch: if census has no extractable dimensions this is explicitly vacuous
+    and returns ok.
+    """
+    dim_geometry_mod = importlib.import_module("semantic_gates.dim_geometry")
+    rows_a = dim_geometry_mod.extract_dim_relations(census_ir)
+    rows_b = dim_geometry_mod.extract_dim_relations(post_ir)
+    report = dim_geometry_mod.compare_dim_relations(rows_a, rows_b)
+    if not rows_a:
+        report["status"] = "ok"
+        report["note"] = "no source dimensions (vacuously ok)"
+    return report
 
 
 def _load_interior_baseline():
@@ -1322,6 +1341,11 @@ def main(argv=None) -> int:
             _write_json(os.path.join(out_dir, "interior_diff.json"), interior_diff)
             summary["regen"]["interior_gate"] = interior_gate
             gate_statuses.append(interior_gate["status"])
+        if args.semantic_gates:
+            dim_semantic_gate = dim_semantic_gate_report(census_ir, post_ir)
+            _write_json(os.path.join(out_dir, "dim_semantic_gate.json"), dim_semantic_gate)
+            summary["regen"]["dim_semantic_gate"] = dim_semantic_gate
+            gate_statuses.append(dim_semantic_gate["status"])
     else:
         summary["verdict"] = None
         summary["verdict_skipped_reason"] = (

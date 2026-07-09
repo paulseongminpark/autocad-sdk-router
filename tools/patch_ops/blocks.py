@@ -65,6 +65,10 @@ _GRADIENT_HATCH_DEFER_REASON = _UNSUPPORTED_APPEND_REASON + " (no gradient repla
 _CUSTOM_HATCH_DEFER_REASON = (_UNSUPPORTED_APPEND_REASON
                               + " (custom hatch pattern replay pending .pat synthesis)")
 _UNSUPPORTED_HATCH_EDGE_REASON = _UNSUPPORTED_APPEND_REASON + " (unsupported edge type in loop)"
+_WIPEOUT_EXTERNAL_IMAGE_DEFER_REASON = (_UNSUPPORTED_APPEND_REASON
+                                        + " (external raster image wipeout)")
+_WIPEOUT_MISSING_CLIP_DEFER_REASON = (_UNSUPPORTED_APPEND_REASON
+                                      + " (missing clip_boundary)")
 _SUPPORTED_HATCH_EDGE_TYPES = frozenset({"line", "arc", "ellipse", "spline"})
 
 # acad.pat standard pattern names resolvable headless via kPreDefined.
@@ -269,6 +273,32 @@ def _has_hatch_pattern_definitions(g: Dict[str, Any]) -> bool:
     return bool(g.get("pattern_definitions"))
 
 
+def _has_wipeout_clip_boundary(g: Dict[str, Any]) -> bool:
+    clip = g.get("clip_boundary")
+    return (isinstance(clip, list)
+            and len(clip) > 0
+            and all(_is_numeric_array(pt, min_len=2) for pt in clip))
+
+
+def _has_wipeout_external_source(g: Dict[str, Any]) -> bool:
+    src = g.get("source_file_name")
+    return isinstance(src, str) and src.strip() != ""
+
+
+def _is_wipeout_representable(g: Dict[str, Any]) -> bool:
+    # Field set mirrors m08eBuildExtendedEntityForAppend kind=wipeout
+    # (families/m08e_handlers.inc): origin/u_vector/v_vector/image_size,
+    # clip_boundary_type, clip_boundary, source_file_name, frame_on.
+    return (_is_numeric_array(g.get("origin"), min_len=3)
+            and _is_numeric_array(g.get("u_vector"), min_len=3)
+            and _is_numeric_array(g.get("v_vector"), min_len=3)
+            and _is_numeric_array(g.get("image_size"), min_len=2)
+            and _is_number(g.get("clip_boundary_type"))
+            and _has_wipeout_clip_boundary(g)
+            and _is_flag_like(g.get("frame_on"))
+            and not _has_wipeout_external_source(g))
+
+
 def _def_entity_append_reason(def_ent: Dict[str, Any]) -> str:
     g = def_ent.get("geometry") or {}
     if g.get("kind") == "hatch":
@@ -278,6 +308,11 @@ def _def_entity_append_reason(def_ent: Dict[str, Any]) -> str:
             return _CUSTOM_HATCH_DEFER_REASON
         if _has_hatch_unsupported_edge_type(g.get("loops")):
             return _UNSUPPORTED_HATCH_EDGE_REASON
+    if g.get("kind") == "wipeout":
+        if _has_wipeout_external_source(g):
+            return _WIPEOUT_EXTERNAL_IMAGE_DEFER_REASON
+        if not _has_wipeout_clip_boundary(g):
+            return _WIPEOUT_MISSING_CLIP_DEFER_REASON
     return _UNSUPPORTED_APPEND_REASON
 
 
@@ -405,6 +440,19 @@ def _def_entity_append_op(block_name: str, def_ent: Dict[str, Any]) -> Optional[
                 "p2": list(g.get("p2")),
                 "p3": list(g.get("p3")),
                 "edge_visibility": copy.deepcopy(edge_visibility),
+            }
+    elif kind == "wipeout":
+        if _is_wipeout_representable(g):
+            entity = {
+                "kind": "wipeout",
+                "origin": list(g.get("origin")),
+                "u_vector": list(g.get("u_vector")),
+                "v_vector": list(g.get("v_vector")),
+                "image_size": list(g.get("image_size")),
+                "clip_boundary_type": g.get("clip_boundary_type"),
+                "clip_boundary": copy.deepcopy(g.get("clip_boundary")),
+                "source_file_name": g.get("source_file_name", ""),
+                "frame_on": g.get("frame_on"),
             }
     if entity is None:
         return None

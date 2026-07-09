@@ -912,6 +912,11 @@ def _build_native_batch_script(
     trusted = os.path.dirname(crx).replace("\\", "\\\\")
 
     script_lines = [
+        # CER suppression: an accoreconsole crash in this batch must not pop
+        # the Autodesk error-report UI on an unattended box (REPORTERROR 0 for
+        # THIS session -- the session that would crash). getvar-guarded so a
+        # host without the sysvar just skips it.
+        '(if (getvar "REPORTERROR") (setvar "REPORTERROR" 0))',
         '(setvar "SECURELOAD" 0)',
         '(setvar "FILEDIA" 0)',
         '(setvar "CMDECHO" 0)',

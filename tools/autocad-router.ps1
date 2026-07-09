@@ -390,6 +390,7 @@ function Test-NativeAcadModules {
   $scrPath = Join-Path $stageRoot 'native_status.scr'
   $scrLines = @(
     '(vl-load-com)',
+    '(if (getvar "REPORTERROR") (setvar "REPORTERROR" 0))',
     '(setvar "SECURELOAD" 0)',
     '(setvar "FILEDIA" 0)',
     ('(setq dbx-r (vl-catch-all-apply ''arxload (list "{0}")))' -f $dbxFwd),
@@ -952,6 +953,7 @@ function Invoke-FullAutoCadCadJob {
     ('(setq ariadne-mailbox-file "{0}")' -f $mailboxFwd),
     '(defun ariadne-write-done (/ f) (setq f (open ariadne-done-file "w")) (if f (progn (write-line "done" f) (close f))) (princ))',
     ('(defun ariadne-write-mailbox (/ f) (setq f (open ariadne-mailbox-file "w")) (if f (progn (write-line "ARIADNE_CAD_JOB_IN={0}" f) (write-line "ARIADNE_CAD_JOB_OUT={1}" f) (write-line "ARIADNE_CAD_JOB_HOST_MODE=full_autocad" f) (close f))) (princ))' -f $jobFwd, $resultFwd),
+    '(if (getvar "REPORTERROR") (setvar "REPORTERROR" 0))',
     '(setvar "SECURELOAD" 0)',
     '(setvar "FILEDIA" 0)',
     '(setvar "CMDECHO" 0)',
@@ -1145,6 +1147,7 @@ function Invoke-CadJobRoute {
     $trusted = (Split-Path -Parent $crx).Replace('\', '\\')
     $scrPath = Join-Path $runOut 'native_cad_job.scr'
     $scrLines = @(
+      '(if (getvar "REPORTERROR") (setvar "REPORTERROR" 0))',
       '(setvar "SECURELOAD" 0)',
       '(setvar "FILEDIA" 0)',
       '(setvar "CMDECHO" 0)',
@@ -1292,6 +1295,7 @@ function Invoke-CadNativeBatchRoute {
   $trusted = (Split-Path -Parent $crx).Replace('\', '\\')
 
   $scrLines = [System.Collections.Generic.List[string]]::new()
+  $scrLines.Add('(if (getvar "REPORTERROR") (setvar "REPORTERROR" 0))')
   $scrLines.Add('(setvar "SECURELOAD" 0)')
   $scrLines.Add('(setvar "FILEDIA" 0)')
   $scrLines.Add('(setvar "CMDECHO" 0)')

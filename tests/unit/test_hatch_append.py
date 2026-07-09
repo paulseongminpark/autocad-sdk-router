@@ -109,21 +109,6 @@ def test_face3d_serializer_emits_four_corners_and_visibility():
     }
 
 
-def test_wipeout_stays_deferred_with_generic_reason():
-    ent = _sample("wipeout")
-
-    ops, deferred = patch_ops_blocks.block_def_ops({"name": "BLK", "handle": "B2", "def_entities": [ent]})
-
-    assert [op["operation"] for op in ops] == ["create_block"]
-    assert deferred == [{
-        "block_name": "BLK",
-        "def_entity_index": 0,
-        "handle": ent["handle"],
-        "kind": "wipeout",
-        "reason": _UNSUPPORTED,
-    }]
-
-
 def test_non_gradient_hatch_without_polyline_vertices_keeps_generic_reason():
     ent = _sample("hatch", require_vertices=False)
 

@@ -175,7 +175,7 @@ def test_unsupported_kinds_still_defer_with_same_reason():
     assert [op["operation"] for op in ops] == ["create_block", "append_block_entity"]
     assert [(row["kind"], row["reason"]) for row in deferred] == [
         ("hatch", "def_entity kind unsupported by write.block.append_entity"),
-        ("wipeout", "def_entity kind unsupported by write.block.append_entity"),
+        ("wipeout", "def_entity kind unsupported by write.block.append_entity (missing clip_boundary)"),
         ("face3d", "def_entity kind unsupported by write.block.append_entity"),
     ]
 
