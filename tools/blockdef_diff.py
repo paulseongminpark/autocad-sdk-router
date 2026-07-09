@@ -42,15 +42,34 @@ def _write_json(path: str, payload: Dict[str, Any]) -> None:
 def _canonical_hatch_geometry(g: Dict[str, Any]) -> Dict[str, Any]:
     """Unit-normalize hatch pattern definitions before comparison.
 
-    Measured on R4l (def X-...$0$111a, pattern H3, scale 300): the ORIGINAL
-    hatch extracts pattern_type=1 (kPreDefined) with getPatternDefinitionAt
-    values scale-BAKED (base [14135, -7335], offset [-300, ~0]); the .pat
-    replay rebuild extracts pattern_type=2 (kCustomDefined) with UNIT values
-    (base [47.1167, -24.45], offset [-1, ~0]) -- exactly a = b * scale, the
-    same line families rendered identically. Canonical form: divide type-1
-    base/offset/dashes by pattern_scale (type-2 rows are already unit) and
-    drop pattern_type (provenance, not geometry). Same measurement-contract
-    precedent as spline fit_points below.
+    Two legislated notational equivalences, both measured on 1.dwg:
+
+    1. Scale baking (R4l, def X-...$0$111a, pattern H3, scale 300): the
+       ORIGINAL hatch extracts pattern_type=1 (kPreDefined) with
+       getPatternDefinitionAt values scale-BAKED (base [14135, -7335], offset
+       [-300, ~0]); the .pat replay rebuild extracts pattern_type=2
+       (kCustomDefined) with UNIT values (base [47.1167, -24.45], offset
+       [-1, ~0]) -- exactly a = b * scale, the same line families rendered
+       identically. Canonical form: divide type-1 base/offset/dashes by
+       pattern_scale (type-2 rows are already unit) and drop pattern_type
+       (provenance, not geometry).
+
+    2. Phase carrier (R4n census probe, runs/e2e_1dwg_R4n_origin_20260709):
+       the per-hatch pattern phase may live EITHER baked into the row base
+       points (originals: 233/233 residual pairs = one common per-hatch base
+       vector, census pattern_origin [0,0]) OR in the HPORIGIN field with
+       zero-phase rows (the rebased-.pat replay: blocks.py emits
+       pattern_origin = rows[0].base + census origin). Same rendered lattice,
+       different carrier. Canonical form: rows carry INTRA-pattern structure
+       only (base rebased against rows[0].base) and the effective phase is
+       folded into one provenance-free field
+           pattern_phase = rows[0].base/divisor + pattern_origin/scale
+       (both terms in unit pattern space); pattern_origin is then dropped.
+       A REAL phase difference still differs after folding -- only the
+       carrier choice is quotiented out. Substitute verifier for the folded
+       representation: the visual gate lane.
+
+    Same measurement-contract precedent as spline fit_points below.
     """
     try:
         ptype = float(g.get("pattern_type"))
@@ -73,6 +92,23 @@ def _canonical_hatch_geometry(g: Dict[str, Any]) -> Dict[str, Any]:
         # far finer than any real pattern difference.
         return round(v / divisor, 6) if isinstance(v, (int, float)) else v
 
+    def _num_pair(val: Any) -> Optional[List[float]]:
+        if (isinstance(val, list) and len(val) >= 2
+                and all(isinstance(v, (int, float)) for v in val[:2])):
+            return [float(val[0]), float(val[1])]
+        return None
+
+    base1 = None
+    if rows and isinstance(rows[0], dict):
+        base1 = _num_pair(rows[0].get("base"))
+    origin = _num_pair(canon_g.pop("pattern_origin", None)) or [0.0, 0.0]
+    origin_div = scale if scale else divisor
+    phase_src = base1 or [0.0, 0.0]
+    canon_g["pattern_phase"] = [
+        round(phase_src[0] / divisor + origin[0] / origin_div, 6),
+        round(phase_src[1] / divisor + origin[1] / origin_div, 6),
+    ]
+
     norm_rows: List[Dict[str, Any]] = []
     for row in rows:
         if not isinstance(row, dict):
@@ -84,6 +120,13 @@ def _canonical_hatch_geometry(g: Dict[str, Any]) -> Dict[str, Any]:
         for key in ("base", "offset", "dashes"):
             val = row.get(key)
             if isinstance(val, list):
+                if key == "base" and base1 is not None:
+                    pair = _num_pair(val)
+                    if pair is not None:
+                        rebased = [pair[0] - base1[0], pair[1] - base1[1]]
+                        rebased.extend(val[2:])
+                        nrow[key] = [_q(v) for v in rebased]
+                        continue
                 nrow[key] = [_q(v) for v in val]
         norm_rows.append(nrow)
     canon_g["pattern_definitions"] = norm_rows

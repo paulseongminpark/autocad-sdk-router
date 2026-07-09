@@ -428,16 +428,35 @@ def _def_entity_append_op(block_name: str, def_ent: Dict[str, Any]) -> Optional[
             }
             if _is_custom_hatch_pattern(g) and _has_hatch_pattern_definitions(g):
                 entity["pattern_definitions"] = copy.deepcopy(g.get("pattern_definitions"))
-            # Per-hatch pattern origin (HPORIGIN) passthrough. Live cert
-            # 2026-07-09 (runs/hatch_origin_cert3_20260709): setOriginPoint
-            # [123.5, -77.25] -> DWG -> originPoint() -> final IR round-trips
-            # exactly. Replays whatever the census recorded; a census [0, 0]
-            # is the builder default, so unconditional passthrough is safe.
+            # Per-hatch pattern origin (HPORIGIN). Live cert 2026-07-09
+            # (runs/hatch_origin_cert3_20260709): setOriginPoint [123.5, -77.25]
+            # -> DWG -> originPoint() -> final IR round-trips exactly.
+            #
+            # Custom patterns with definition rows carry their per-hatch phase
+            # BAKED into the row base points, NOT in the origin field (R4n
+            # census probe, runs/e2e_1dwg_R4n_origin_20260709: all 233
+            # residual pairs differ by one common per-row base vector,
+            # divergent 0, while their census pattern_origin is [0,0]). The
+            # synthesized .pat is shared per NAME and rebased to zero phase
+            # (patch_engine._synthesize_batch_pat_files), so the per-hatch
+            # phase must ride HPORIGIN: effective origin = rows[0].base +
+            # census origin. Additivity of base+origin is evidenced by the 27
+            # nonzero-origin hatches already diff0 under the shared-base
+            # replay. Plain passthrough remains for defs-less hatches.
             pattern_origin = g.get("pattern_origin")
+            census_origin = None
             if (isinstance(pattern_origin, list) and len(pattern_origin) >= 2
                     and all(isinstance(v, (int, float)) for v in pattern_origin[:2])):
-                entity["pattern_origin"] = [float(pattern_origin[0]),
-                                            float(pattern_origin[1])]
+                census_origin = [float(pattern_origin[0]), float(pattern_origin[1])]
+                entity["pattern_origin"] = list(census_origin)
+            rows = entity.get("pattern_definitions")
+            if isinstance(rows, list) and rows and isinstance(rows[0], dict):
+                base1 = rows[0].get("base")
+                if (isinstance(base1, list) and len(base1) >= 2
+                        and all(isinstance(v, (int, float)) for v in base1[:2])):
+                    off = census_origin or [0.0, 0.0]
+                    entity["pattern_origin"] = [float(base1[0]) + off[0],
+                                                float(base1[1]) + off[1]]
     elif kind == "face3d":
         edge_visibility = g.get("edge_visibility")
         if (_is_numeric_array(g.get("p0"), min_len=3)

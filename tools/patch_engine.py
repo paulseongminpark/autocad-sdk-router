@@ -838,7 +838,8 @@ def _format_pat_number(value: Any) -> str:
     return text if text not in ("", "-0") else "0"
 
 
-def _pattern_definition_line(row: Dict[str, Any], *, scale: float = 1.0) -> str:
+def _pattern_definition_line(row: Dict[str, Any], *, scale: float = 1.0,
+                             rebase: Any = None) -> str:
     # getPatternDefinitionAt reports base/offset/dashes in EFFECTIVE drawing
     # units -- the entity's pattern_scale is already baked in (measured on the
     # target drawing: H3 offset magnitude == pattern_scale exactly), while
@@ -847,6 +848,19 @@ def _pattern_definition_line(row: Dict[str, Any], *, scale: float = 1.0) -> str:
     # baked scale must be divided OUT here or the pattern is scaled twice.
     div = scale if scale and scale > 0 else 1.0
     base = row.get("base") or [0.0, 0.0]
+    # Rebase every row against the seed row's base so the .pat itself is
+    # zero-phase (intra-pattern structure preserved). The .pat is synthesized
+    # ONCE per pattern NAME but the originals carry a DIFFERENT phase per
+    # hatch (R4n census, runs/e2e_1dwg_R4n_origin_20260709: 233/233 residual
+    # pairs = one common per-hatch base vector; the shared seed-baked .pat
+    # forced one phase onto all of them). The per-hatch phase rides HPORIGIN
+    # instead (patch_ops/blocks.py emits pattern_origin = rows[0].base +
+    # census origin; m08e setOriginPoint applies it, cert3-proven).
+    bx, by = float(base[0]), float(base[1])
+    if (isinstance(rebase, (list, tuple)) and len(rebase) >= 2
+            and all(isinstance(v, (int, float)) for v in rebase[:2])):
+        bx -= float(rebase[0])
+        by -= float(rebase[1])
     offset = row.get("offset") or [0.0, 0.0]
     angle = float(row.get("angle", 0.0))
     # .pat delta-x/delta-y are LINE-LOCAL (delta-x = shift along the line,
@@ -862,8 +876,8 @@ def _pattern_definition_line(row: Dict[str, Any], *, scale: float = 1.0) -> str:
     local_dy = -ox * sin_a + oy * cos_a
     values = [
         math.degrees(angle),
-        float(base[0]) / div,
-        float(base[1]) / div,
+        bx / div,
+        by / div,
         local_dx,
         local_dy,
     ]
@@ -888,7 +902,17 @@ def _synthesize_batch_pat_files(batch_dir: str, op_records: List[Dict[str, Any]]
             pat_path = os.path.abspath(os.path.join(batch_dir, "%s.pat" % upper_name))
             lines = ["*%s" % upper_name]
             pattern_scale = float(entity.get("pattern_scale") or 1.0)
-            lines.extend(_pattern_definition_line(row, scale=pattern_scale)
+            # Zero-phase the shared .pat: rebase all rows against the seed
+            # row's base (see _pattern_definition_line). Without this the
+            # seed hatch's phase is baked into every same-name hatch.
+            seed_base = None
+            if pattern_definitions and isinstance(pattern_definitions[0], dict):
+                cand = pattern_definitions[0].get("base")
+                if (isinstance(cand, list) and len(cand) >= 2
+                        and all(isinstance(v, (int, float)) for v in cand[:2])):
+                    seed_base = cand
+            lines.extend(_pattern_definition_line(row, scale=pattern_scale,
+                                                  rebase=seed_base)
                          for row in pattern_definitions)
             with open(pat_path, "w", encoding="utf-8", newline="\n") as fh:
                 fh.write("\n".join(lines) + "\n")

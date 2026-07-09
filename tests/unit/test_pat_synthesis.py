@@ -120,10 +120,15 @@ def test_batch_pat_synthesis_writes_exact_content_and_dedupes_names(monkeypatch,
     pe._build_native_batch_script(str(batch_dir), "b001", records)
 
     pat_path = (batch_dir / "H3.pat").resolve()
+    # The .pat is zero-phase: every row is rebased against the seed row's
+    # base (row1 [0, 1.25] -> [0, 0]; row2 [2, -3] -> [2, -4.25]) so the
+    # per-hatch phase rides HPORIGIN instead of the name-shared .pat (R4n
+    # census: 233/233 residual pairs were one shared-seed phase forced onto
+    # per-hatch bases; runs/e2e_1dwg_R4n_origin_20260709).
     assert pat_path.read_text(encoding="utf-8") == (
         "*H3\n"
-        "90, 0, 1.25, 0, 2.5, 0.5, -0.25, 0\n"
-        "30, 2, -3, 2.38125, 4.1244459855, -1.25, 0.625\n"
+        "90, 0, 0, 0, 2.5, 0.5, -0.25, 0\n"
+        "30, 2, -4.25, 2.38125, 4.1244459855, -1.25, 0.625\n"
     )
     assert [path.name for path in batch_dir.glob("*.pat")] == ["H3.pat"]
 
@@ -162,7 +167,9 @@ def test_pat_lines_divide_out_baked_scale_and_never_emit_scientific_notation(tmp
     assert fields[0] == "0"
     assert fields[3] == "0"
     assert abs(float(fields[4]) - 1.0) < 1e-9
-    assert abs(float(fields[1]) - 7429.999999999884 / 300.0) < 1e-6
+    # Base is rebased against the seed row (zero-phase .pat): both rows share
+    # the same base here, so both land at literal 0 after rebase + clamp.
+    assert fields[1] == "0" and fields[2] == "0"
 
     # 90-degree row: world offset (-300, ~0) must land line-local as (0, 1) --
     # perpendicular spacing 1, never the "-1, 0" zero-spacing family that made

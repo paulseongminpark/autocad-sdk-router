@@ -291,3 +291,59 @@ def test_hatch_canonicalization_is_self_stable():
     report = blockdef_diff.diff_block_definitions(ir, copy.deepcopy(ir))
 
     assert report["totals"]["interior_diff0_fraction"] == 1.0
+
+
+# ---- phase-carrier folding (R4n census, runs/e2e_1dwg_R4n_origin_20260709) --
+# The per-hatch phase may live baked in the row base points (originals: the
+# census pattern_origin field is [0,0]) OR on HPORIGIN over zero-phase rows
+# (the rebased-.pat replay). Same rendered lattice, two carriers. Values below
+# are the real defect pair (def X-...$0$84a, pattern H3, scale 350).
+
+def test_hatch_phase_in_row_base_equals_phase_in_origin_field():
+    ir_a = _ir(_block("W", _hatch(
+        "A1", ptype=1.0, scale=350.0,
+        base=[250000.00000000023, -234000.0], offset=[43.75, 43.75])))
+    b = _hatch("B1", ptype=2.0, scale=350.0,
+               base=[0.0, 0.0], offset=[0.125, 0.125])
+    b["geometry"]["pattern_origin"] = [250000.00000000023, -234000.0]
+    ir_b = _ir(_block("W", b))
+
+    report = blockdef_diff.diff_block_definitions(ir_a, ir_b)
+
+    assert report["totals"]["diff0_total"] == 1
+    assert report["totals"]["interior_diff0_fraction"] == 1.0
+
+
+def test_hatch_true_phase_difference_survives_folding():
+    ir_a = _ir(_block("W", _hatch(
+        "A1", ptype=1.0, scale=350.0,
+        base=[250000.0, -234000.0], offset=[43.75, 43.75])))
+    b = _hatch("B1", ptype=2.0, scale=350.0,
+               base=[0.0, 0.0], offset=[0.125, 0.125])
+    b["geometry"]["pattern_origin"] = [250012.5, -234000.0]  # half-spacing off
+    ir_b = _ir(_block("W", b))
+
+    report = blockdef_diff.diff_block_definitions(ir_a, ir_b)
+
+    assert report["totals"]["diff0_total"] == 0
+
+
+def test_hatch_intra_pattern_structure_survives_rebase():
+    # Two-row pattern (H3 shape): the rows' RELATIVE bases are structure, not
+    # phase -- rebasing must preserve them while folding the common phase.
+    a = _hatch("A1", ptype=1.0, scale=350.0,
+               base=[100.0, 200.0], offset=[43.75, 43.75])
+    a["geometry"]["pattern_definitions"].append(
+        {"angle": 0.5, "base": [100.0, 243.75], "offset": [43.75, 43.75],
+         "dashes": []})
+    b = _hatch("B1", ptype=2.0, scale=350.0,
+               base=[0.0, 0.0], offset=[0.125, 0.125])
+    b["geometry"]["pattern_definitions"].append(
+        {"angle": 0.5, "base": [0.0, 0.125], "offset": [0.125, 0.125],
+         "dashes": []})
+    b["geometry"]["pattern_origin"] = [100.0, 200.0]
+    ir_a, ir_b = _ir(_block("W", a)), _ir(_block("W", b))
+
+    report = blockdef_diff.diff_block_definitions(ir_a, ir_b)
+
+    assert report["totals"]["diff0_total"] == 1

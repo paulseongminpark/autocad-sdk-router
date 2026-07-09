@@ -167,14 +167,51 @@ def test_hatch_pattern_origin_passes_through_when_present():
     assert op["args"]["entity"]["pattern_origin"] == [-356718.6693916272, 148665.00000000006]
 
 
-def test_hatch_without_pattern_origin_emits_no_origin_key():
+def test_hatch_with_pattern_definitions_derives_origin_from_row_base():
+    # R4n census (runs/e2e_1dwg_R4n_origin_20260709): custom-pattern hatches
+    # carry their per-hatch phase BAKED into the row base points while the
+    # census pattern_origin field is [0,0] (233/233 residual pairs, one
+    # common per-hatch base vector). The name-shared .pat is rebased to zero
+    # phase, so the serializer must put the phase on HPORIGIN:
+    # effective origin = rows[0].base + census origin.
     ent = _sample("hatch", require_vertices=True)
     ent["geometry"].pop("pattern_origin", None)
     ent["geometry"]["pattern_definitions"] = [
-        {"angle": 1.5707963267948966, "base": [0.0, 0.0],
-         "offset": [-1.0, 0.0], "dashes": []}]
+        {"angle": 0.0, "base": [250000.00000000023, -234000.0],
+         "offset": [43.75, 43.75], "dashes": [43.75, -43.75]}]
 
     op = patch_ops_blocks._def_entity_append_op("BLK", ent)
 
+    assert op is not None
+    assert op["args"]["entity"]["pattern_origin"] == [250000.00000000023, -234000.0]
+
+
+def test_hatch_pattern_definitions_origin_adds_census_origin():
+    # Additivity of baked base + HPORIGIN: evidenced by the 27 nonzero-origin
+    # census hatches that were already diff0 under the shared-base replay.
+    ent = _sample("hatch", require_vertices=True)
+    ent["geometry"]["pattern_origin"] = [123.5, -77.25]
+    ent["geometry"]["pattern_definitions"] = [
+        {"angle": 0.0, "base": [100.0, 200.0],
+         "offset": [43.75, 43.75], "dashes": []}]
+
+    op = patch_ops_blocks._def_entity_append_op("BLK", ent)
+
+    assert op is not None
+    assert op["args"]["entity"]["pattern_origin"] == [223.5, 122.75]
+
+
+def test_hatch_without_origin_and_without_defs_emits_no_origin_key():
+    ent = _sample("hatch", require_vertices=True)
+    ent["geometry"].pop("pattern_origin", None)
+    ent["geometry"].pop("pattern_definitions", None)
+
+    op = patch_ops_blocks._def_entity_append_op("BLK", ent)
+
+    if op is None:
+        # Drawing-custom pattern without definitions defers by design; the
+        # no-key contract is only observable on an emittable hatch.
+        ent["geometry"]["pattern_name"] = "DASH"
+        op = patch_ops_blocks._def_entity_append_op("BLK", ent)
     assert op is not None
     assert "pattern_origin" not in op["args"]["entity"]
