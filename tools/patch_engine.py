@@ -826,20 +826,47 @@ def _prepare_batched_records(op_records: List[Dict[str, Any]]) -> List[Dict[str,
 
 
 def _format_pat_number(value: Any) -> str:
-    return format(float(value), ".10g")
+    # AutoCAD's .pat parser reads plain decimals ONLY -- scientific notation
+    # ("8.5e-14", which %.10g emits for tiny doubles) mis-parses. Those
+    # near-zero residues are double-arithmetic noise anyway: clamp to 0 and
+    # always emit fixed-point (the R4i b037 H3.pat carried such a token).
+    v = float(value)
+    if abs(v) < 1e-9:
+        return "0"
+    text = format(v, ".10f").rstrip("0").rstrip(".")
+    return text if text not in ("", "-0") else "0"
 
 
-def _pattern_definition_line(row: Dict[str, Any]) -> str:
+def _pattern_definition_line(row: Dict[str, Any], *, scale: float = 1.0) -> str:
+    # getPatternDefinitionAt reports base/offset/dashes in EFFECTIVE drawing
+    # units -- the entity's pattern_scale is already baked in (measured on the
+    # target drawing: H3 offset magnitude == pattern_scale exactly), while
+    # angles are NOT baked (row angle 0 vs entity pattern_angle 45deg). The
+    # rebuild side re-applies setPatternScale/Angle after setPattern, so the
+    # baked scale must be divided OUT here or the pattern is scaled twice.
+    div = scale if scale and scale > 0 else 1.0
     base = row.get("base") or [0.0, 0.0]
     offset = row.get("offset") or [0.0, 0.0]
+    angle = float(row.get("angle", 0.0))
+    # .pat delta-x/delta-y are LINE-LOCAL (delta-x = shift along the line,
+    # delta-y = perpendicular family spacing) while getPatternDefinitionAt
+    # reports the offset in world/pattern coordinates. Writing the world
+    # vector verbatim gave the 90-degree H3 row "-1, 0" = zero perpendicular
+    # spacing = infinite line family, which evaluateHatch rejects with
+    # eInvalidInput (Grok advisory #2, verdict confirmed by repro). Rotate by
+    # -angle into the line frame before writing.
+    ox, oy = float(offset[0]) / div, float(offset[1]) / div
+    cos_a, sin_a = math.cos(angle), math.sin(angle)
+    local_dx = ox * cos_a + oy * sin_a
+    local_dy = -ox * sin_a + oy * cos_a
     values = [
-        math.degrees(float(row.get("angle", 0.0))),
-        float(base[0]),
-        float(base[1]),
-        float(offset[0]),
-        float(offset[1]),
+        math.degrees(angle),
+        float(base[0]) / div,
+        float(base[1]) / div,
+        local_dx,
+        local_dy,
     ]
-    values.extend(float(dash) for dash in (row.get("dashes") or []))
+    values.extend(float(dash) / div for dash in (row.get("dashes") or []))
     return ", ".join(_format_pat_number(value) for value in values)
 
 
@@ -859,7 +886,9 @@ def _synthesize_batch_pat_files(batch_dir: str, op_records: List[Dict[str, Any]]
         if pat_path is None:
             pat_path = os.path.abspath(os.path.join(batch_dir, "%s.pat" % upper_name))
             lines = ["*%s" % upper_name]
-            lines.extend(_pattern_definition_line(row) for row in pattern_definitions)
+            pattern_scale = float(entity.get("pattern_scale") or 1.0)
+            lines.extend(_pattern_definition_line(row, scale=pattern_scale)
+                         for row in pattern_definitions)
             with open(pat_path, "w", encoding="utf-8", newline="\n") as fh:
                 fh.write("\n".join(lines) + "\n")
             synthesized[upper_name] = pat_path

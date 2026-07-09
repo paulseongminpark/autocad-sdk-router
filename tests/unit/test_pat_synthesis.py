@@ -122,8 +122,8 @@ def test_batch_pat_synthesis_writes_exact_content_and_dedupes_names(monkeypatch,
     pat_path = (batch_dir / "H3.pat").resolve()
     assert pat_path.read_text(encoding="utf-8") == (
         "*H3\n"
-        "90, 0, 1.25, -2.5, 0, 0.5, -0.25, 0\n"
-        "30, 2, -3, 0, 4.7625, -1.25, 0.625\n"
+        "90, 0, 1.25, 0, 2.5, 0.5, -0.25, 0\n"
+        "30, 2, -3, 2.38125, 4.1244459855, -1.25, 0.625\n"
     )
     assert [path.name for path in batch_dir.glob("*.pat")] == ["H3.pat"]
 
@@ -135,3 +135,39 @@ def test_batch_pat_synthesis_writes_exact_content_and_dedupes_names(monkeypatch,
         assert entity["pattern_pat_path"] == pat_path.as_posix()
         assert os.path.isabs(entity["pattern_pat_path"])
         assert "\\" not in entity["pattern_pat_path"]
+
+
+def test_pat_lines_divide_out_baked_scale_and_never_emit_scientific_notation(tmp_path):
+    # Regression for the R4i b037 evaluateHatch bomb: getPatternDefinitionAt
+    # values carry the entity pattern_scale baked in, and %.10g wrote tiny
+    # residues as "8.5e-14" which AutoCAD's .pat parser cannot read.
+    geometry = _custom_hatch()["geometry"] if isinstance(_custom_hatch(), dict) and "geometry" in _custom_hatch() else None
+    entity = _custom_hatch()
+    geom = entity.get("geometry", entity)
+    geom["pattern_scale"] = 300.0
+    geom["pattern_definitions"] = [
+        {"angle": 0.0, "base": [7429.999999999884, -5869.999999999971],
+         "offset": [8.526512829121202e-14, 300.0], "dashes": []},
+        {"angle": 1.5707963267948966, "base": [7429.999999999884, -5869.999999999971],
+         "offset": [-300.0, 8.526512829121202e-14], "dashes": []},
+    ]
+    op = {"operation": "append_block_entity",
+          "args": {"block_name": "B", "layer": "0", "entity": geom}}
+    pe._synthesize_batch_pat_files(str(tmp_path), [op])
+    text = (tmp_path / "H3.pat").read_text(encoding="utf-8")
+    assert "e-" not in text and "E-" not in text
+    line = text.splitlines()[1]
+    fields = [f.strip() for f in line.split(",")]
+    # angle 0 / base and offset divided by 300 / near-zero clamped to literal 0
+    assert fields[0] == "0"
+    assert fields[3] == "0"
+    assert abs(float(fields[4]) - 1.0) < 1e-9
+    assert abs(float(fields[1]) - 7429.999999999884 / 300.0) < 1e-6
+
+    # 90-degree row: world offset (-300, ~0) must land line-local as (0, 1) --
+    # perpendicular spacing 1, never the "-1, 0" zero-spacing family that made
+    # evaluateHatch refuse the whole hatch (Grok advisory #2 verdict).
+    line90 = [f.strip() for f in text.splitlines()[2].split(",")]
+    assert line90[0] == "90"
+    assert line90[3] == "0"
+    assert abs(float(line90[4]) - 1.0) < 1e-9

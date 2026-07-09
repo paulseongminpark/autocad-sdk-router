@@ -1536,6 +1536,17 @@ static AcDbEntity* m08eBuildExtendedEntityForAppend(AcDbDatabase* pDb,
         for (size_t i = 0; i < loops.size(); ++i) {
             if (loops[i].hasEdges) {
                 es = pHatch->appendLoop(loops[i].loopType, loops[i].edgePtrs, loops[i].edgeTypes);
+                if (es == Acad::eOk) {
+                    // The AcGeCurve2d* overload TRANSFERS ownership: the hatch
+                    // keeps these exact pointers (measured: deleting them here
+                    // left dangling edges and evaluateHatch AV'd reading 0x0000
+                    // -- the R4i b037 process kill). Drop our references without
+                    // deleting; m08eReleaseHatchLoops then only frees loops that
+                    // never made it into the hatch (error paths).
+                    loops[i].edgePtrs.removeAll();
+                    loops[i].edgeTypes.removeAll();
+                    loops[i].hasEdges = false;
+                }
             } else {
                 es = pHatch->appendLoop(loops[i].loopType, loops[i].vertices, loops[i].bulges);
             }
@@ -1549,6 +1560,17 @@ static AcDbEntity* m08eBuildExtendedEntityForAppend(AcDbDatabase* pDb,
             }
         }
         m08eReleaseHatchLoops(loops);
+        if (hasPatternPatPath && pHatch->numPatternDefinitions() <= 0) {
+            // Instrument, fail-loud: setPattern(kCustomDefined) returned eOk but
+            // no definition lines were actually loaded -- the .pat was not
+            // resolved by accoreconsole's pattern search. Proceeding would hand
+            // evaluateHatch a patternless custom hatch (eInvalidInput at best).
+            delete pHatch;
+            errCode = "HATCH_CUSTOM_PAT_EMPTY";
+            errMsg = "entity.kind=hatch custom pattern '" + patternName
+                   + "' loaded 0 definition lines (pat not resolved by search path)";
+            return nullptr;
+        }
         es = pHatch->setAssociative(Adesk::kFalse);
         if (es != Acad::eOk) {
             delete pHatch;
