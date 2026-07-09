@@ -8,7 +8,9 @@
 > - **조치 2 (HATCH) — 대부분 집행 완료.** `.pat` 합성 4결함 사슬 수리(과학표기·스케일 베이킹·line-local
 >   좌표·appendLoop 소유권)로 R4l에서 해치 249 실재. 잔여 표현차(스케일 베이킹 표현·pattern_type
 >   1↔2·%.10g 노이즈)는 `_canonical_hatch_geometry`로 정준화(+8, 0.987357). **실잔여**: 경계-쌍 22쌍 중
->   per-hatch pattern origin 위상차 21건(재생측 setOriginPoint 재현 실험 대기) + is_associative 5건(정직 잔차).
+>   per-hatch pattern origin 위상차 21건(재생측 setOriginPoint 재현 실험 대기) + is_associative 5건(정직 잔차)
+>   + arc-edge ccw 반전 1건(handle 2B43: 각도 동일·ccw만 True→False, 152 leaf 중 1 — 경계 방향 재현 프로브 대상,
+>   동일 각도에 방향 반전이면 점집합이 달라지므로 정준화 금지).
 > - **조치 4 (WIPEOUT) — 집행 완료, 보류 철회.** "증명된 경로 없음"은 반전된 `loadModule bool==eOk`
 >   게이트의 가짜 실패였음(acismobj26.dbx는 정상 로드). 라이브 인증: append→appended:true, census
 >   재추출 기하 완전 일치(clip 11점/u/v/origin). `blocks.py` 방출 복원 — R4m부터 유예 31→0 기대.
