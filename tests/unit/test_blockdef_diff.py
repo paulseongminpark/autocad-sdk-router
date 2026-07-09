@@ -231,3 +231,63 @@ def test_dim_cache_pattern_is_strict_star_d_digits():
     excluded = report["totals"]["derived_cache_excluded"]
     assert excluded["a_def_count"] == 1
     assert excluded["a_entity_total"] == 1
+
+
+# ---- hatch pattern-definition canonicalization (R4l residue analysis) -------
+# Measured pair (def X-...$0$111a, pattern H3, scale 300): original extracts
+# pattern_type=1 with getPatternDefinitionAt values scale-BAKED; the .pat
+# replay rebuild extracts pattern_type=2 with UNIT values serialized at %.10g.
+# Same line families, two representations. Genuinely different pattern bases
+# (per-hatch origin phase) must STILL mismatch.
+
+def _hatch(handle, *, ptype, scale, base, offset, angle=1.5707963267948966):
+    return _entity(
+        handle, "HATCH", "hatch",
+        pattern_name="H3", pattern_scale=scale, pattern_type=ptype,
+        pattern_angle=0.7853981633974483, is_solid_fill=False,
+        loops=[{"index": 0, "loop_type": 16, "closed": True}],
+        pattern_definitions=[
+            {"angle": angle, "base": list(base), "offset": list(offset), "dashes": []},
+        ],
+    )
+
+
+def test_hatch_scale_baked_vs_unit_pat_replay_are_canonically_equal():
+    # a: type-1, scale 300 baked into base/offset (census shape).
+    # b: type-2, unit values at .pat %.10g precision (rebuild shape).
+    ir_a = _ir(_block("W", _hatch(
+        "A1", ptype=1.0, scale=300.0,
+        base=[14135.0, -7334.999999999942],
+        offset=[-300.0, 5.684341886080802e-14])))
+    ir_b = _ir(_block("W", _hatch(
+        "B1", ptype=2.0, scale=300.0,
+        base=[47.1166666667, -24.45],
+        offset=[-1.0, 6.123233995736766e-17])))
+
+    report = blockdef_diff.diff_block_definitions(ir_a, ir_b)
+
+    assert report["totals"]["diff0_total"] == 1
+    assert report["totals"]["interior_diff0_fraction"] == 1.0
+
+
+def test_hatch_distinct_pattern_base_phase_still_mismatches():
+    # Per-hatch pattern origin (phase) is REAL render state, not
+    # representation: bases differing by a non-multiple of the line spacing
+    # shift the hatch lines. Canonicalization must not absorb it.
+    ir_a = _ir(_block("W", _hatch(
+        "A1", ptype=2.0, scale=300.0, base=[52.933333, 5.2], offset=[-1.0, 0.0])))
+    ir_b = _ir(_block("W", _hatch(
+        "B1", ptype=2.0, scale=300.0, base=[47.116667, -24.45], offset=[-1.0, 0.0])))
+
+    report = blockdef_diff.diff_block_definitions(ir_a, ir_b)
+
+    assert report["totals"]["diff0_total"] == 0
+
+
+def test_hatch_canonicalization_is_self_stable():
+    ir = _ir(_block("W", _hatch(
+        "A1", ptype=1.0, scale=300.0, base=[14135.0, -7335.0], offset=[-300.0, 0.0])))
+
+    report = blockdef_diff.diff_block_definitions(ir, copy.deepcopy(ir))
+
+    assert report["totals"]["interior_diff0_fraction"] == 1.0

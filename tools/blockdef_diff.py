@@ -39,6 +39,57 @@ def _write_json(path: str, payload: Dict[str, Any]) -> None:
         fh.write("\n")
 
 
+def _canonical_hatch_geometry(g: Dict[str, Any]) -> Dict[str, Any]:
+    """Unit-normalize hatch pattern definitions before comparison.
+
+    Measured on R4l (def X-...$0$111a, pattern H3, scale 300): the ORIGINAL
+    hatch extracts pattern_type=1 (kPreDefined) with getPatternDefinitionAt
+    values scale-BAKED (base [14135, -7335], offset [-300, ~0]); the .pat
+    replay rebuild extracts pattern_type=2 (kCustomDefined) with UNIT values
+    (base [47.1167, -24.45], offset [-1, ~0]) -- exactly a = b * scale, the
+    same line families rendered identically. Canonical form: divide type-1
+    base/offset/dashes by pattern_scale (type-2 rows are already unit) and
+    drop pattern_type (provenance, not geometry). Same measurement-contract
+    precedent as spline fit_points below.
+    """
+    try:
+        ptype = float(g.get("pattern_type"))
+        scale = float(g.get("pattern_scale"))
+    except (TypeError, ValueError):
+        return g
+    rows = g.get("pattern_definitions")
+    if not isinstance(rows, list):
+        return g
+    canon_g = dict(g)
+    canon_g.pop("pattern_type", None)
+    divisor = scale if (ptype == 1.0 and scale) else 1.0
+
+    def _q(v: Any) -> Any:
+        # Quantize AFTER unit-normalization: the .pat replay serializes at
+        # %.10g (measured residue ~3e-11 on base, ~1e-16 on near-zero
+        # offsets) while the census carries full doubles; cad_diff compares
+        # this nested field exactly, so equality needs a shared grid. 1e-6 in
+        # unit pattern space is far coarser than the serialization noise and
+        # far finer than any real pattern difference.
+        return round(v / divisor, 6) if isinstance(v, (int, float)) else v
+
+    norm_rows: List[Dict[str, Any]] = []
+    for row in rows:
+        if not isinstance(row, dict):
+            norm_rows.append(row)
+            continue
+        nrow = dict(row)
+        if isinstance(row.get("angle"), (int, float)):
+            nrow["angle"] = round(row["angle"], 6)  # angle is never scaled
+        for key in ("base", "offset", "dashes"):
+            val = row.get(key)
+            if isinstance(val, list):
+                nrow[key] = [_q(v) for v in val]
+        norm_rows.append(nrow)
+    canon_g["pattern_definitions"] = norm_rows
+    return canon_g
+
+
 def _canonical_entity(entity: Dict[str, Any],
                       name_map: Optional[Dict[str, str]] = None) -> Dict[str, Any]:
     """Normalize representation-dependent geometry before comparison.
@@ -62,6 +113,13 @@ def _canonical_entity(entity: Dict[str, Any],
             g = dict(g)
             g["block_name"] = mapped_name
             canon["geometry"] = g
+    if g.get("kind") == "hatch" and g.get("pattern_definitions"):
+        canon_g = _canonical_hatch_geometry(g)
+        if canon_g is not g:
+            if canon is entity:
+                canon = dict(entity)
+            canon["geometry"] = canon_g
+        return canon
     if g.get("kind") != "spline":
         return canon
     control_points = entity.get("spline_control_points")
