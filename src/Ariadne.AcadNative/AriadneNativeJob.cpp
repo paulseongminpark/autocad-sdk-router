@@ -2996,13 +2996,10 @@ static std::string vportsRichJson(AcDbDatabase* pDb, int& count)
 // LINETYPE table with the D-class TABLES tier's representative field subset
 // (w3-ltts): AcDbLinetypeTableRecord's own name/comments plus its dash
 // pattern (numDashes()/dashLengthAt(i) -- positive=dash, negative=gap, 0=dot,
-// per DXF/AutoCAD LINETYPE semantics). patternLength() is AutoCAD-maintained
-// FROM the dash array rather than an independent write input, so it is out
-// of scope here -- not part of write.linetype.create's own write contract
-// (see LinetypePropertyArgs below). Complex-linetype shape/text embedding
-// (shapeStyleAt/textAt et al.) is likewise out of scope: this covers simple
-// dash-only patterns only, the same "representative, not exhaustive" scoping
-// dimStylesRichJson already established for DIMVARs above.
+// per DXF/AutoCAD LINETYPE semantics). P5b also emits the synthesis-ready
+// pattern metadata and complex-linetype text/shape markers so .lin sidecar
+// generation can consume real extractor rows and defer unsupported segments
+// honestly.
 static std::string linetypesRichJson(AcDbDatabase* pDb, int& count)
 {
     count = 0;
@@ -3035,6 +3032,8 @@ static std::string linetypesRichJson(AcDbDatabase* pDb, int& count)
             arr << "{\"handle\":\"" << jsonEscape(handle) << "\""
                 << ",\"name\":\"" << jsonEscape(name) << "\""
                 << ",\"description\":\"" << jsonEscape(comments) << "\""
+                << ",\"pattern_length\":" << pRec->patternLength()
+                << ",\"is_scaled_to_fit\":" << (pRec->isScaledToFit() ? "true" : "false")
                 << ",\"dash_lengths\":[";
             const int numDashes = pRec->numDashes();
             for (int di = 0; di < numDashes; ++di) {
@@ -3042,7 +3041,31 @@ static std::string linetypesRichJson(AcDbDatabase* pDb, int& count)
                     arr << ",";
                 arr << pRec->dashLengthAt(di);
             }
-            arr << "]}";
+            arr << "]";
+            if (numDashes > 0) {
+                arr << ",\"dashes\":[";
+                for (int di = 0; di < numDashes; ++di) {
+                    if (di > 0)
+                        arr << ",";
+                    arr << "{\"length\":" << pRec->dashLengthAt(di);
+                    const ACHAR* textRaw = nullptr;
+                    if (pRec->textAt(di, textRaw) == Acad::eOk && textRaw != nullptr && textRaw[0] != 0)
+                        arr << ",\"text\":\"" << jsonEscape(acharToAscii(textRaw)) << "\"";
+                    const AcDbObjectId shapeStyleId = pRec->shapeStyleAt(di);
+                    if (!shapeStyleId.isNull()) {
+                        arr << ",\"shape\":true"
+                            << ",\"shape_number\":" << pRec->shapeNumberAt(di)
+                            << ",\"shape_style_handle\":\"" << jsonEscape(handleOfId(shapeStyleId)) << "\""
+                            << ",\"shape_scale\":" << pRec->shapeScaleAt(di)
+                            << ",\"shape_rotation\":" << pRec->shapeRotationAt(di)
+                            << ",\"shape_is_ucs_oriented\":"
+                            << (pRec->shapeIsUcsOrientedAt(di) ? "true" : "false");
+                    }
+                    arr << "}";
+                }
+                arr << "]";
+            }
+            arr << "}";
             ++count;
             pRec->close();
         }

@@ -104,6 +104,7 @@ import patch_batch_planner
 
 PATCH_SCHEMA_ID = "ariadne.cad_patch.v1"
 RESULT_SCHEMA_ID = "ariadne.cad_patch.result.v1"
+HANDLE_MAP_SCHEMA_ID = "ariadne.handle_map.v1"
 
 # The declared high-level mutation operations this shell understands, mapped to
 # the operation-registry id (config/operations.v2.json) that carries the native
@@ -999,19 +1000,63 @@ def _read_console_text(path: Optional[str]) -> str:
     return raw.decode("utf-8", errors="replace")
 
 
-def _native_result_success_detail(result_path: Optional[str]) -> Tuple[bool, str]:
+def _native_result_success_detail(
+        result_path: Optional[str]) -> Tuple[bool, str, Optional[Dict[str, Any]]]:
     if not result_path or not os.path.isfile(result_path):
-        return False, "missing_result_file"
+        return False, "missing_result_file", None
     try:
         doc = _load_json_bom(result_path)
     except (OSError, TypeError, ValueError):
-        return False, "unparseable_result_file"
+        return False, "unparseable_result_file", None
     if not isinstance(doc, dict):
-        return False, "result_not_object"
+        return False, "result_not_object", None
     result_obj = doc.get("result", doc)
     if not isinstance(result_obj, dict):
-        return False, "result_not_object"
-    return (str(result_obj.get("status")) != "error"), "result_status_error"
+        return False, "result_not_object", None
+    return (str(result_obj.get("status")) != "error"), "result_status_error", result_obj
+
+
+def _handle_token(value: Any) -> Optional[str]:
+    if value is None:
+        return None
+    text = str(value).strip()
+    return text or None
+
+
+def _source_handle_from_op_record(op_record: Dict[str, Any]) -> Optional[str]:
+    source_handle = _handle_token(op_record.get("source_handle"))
+    if source_handle:
+        return source_handle
+    source = op_record.get("source")
+    if isinstance(source, dict):
+        return _handle_token(source.get("handle"))
+    return None
+
+
+def _new_handle_map_doc() -> Dict[str, Any]:
+    return {
+        "schema": HANDLE_MAP_SCHEMA_ID,
+        "pairs": {},
+        "coverage": {
+            "ops_with_source": 0,
+            "ops_with_new_handle": 0,
+            "mapped": 0,
+        },
+    }
+
+
+def _record_handle_map_entry(handle_map_doc: Dict[str, Any], op_record: Dict[str, Any],
+                             op_result: Dict[str, Any]) -> None:
+    coverage = handle_map_doc["coverage"]
+    source_handle = _source_handle_from_op_record(op_record)
+    new_handle = _handle_token(op_result.get("new_handle"))
+    if source_handle:
+        coverage["ops_with_source"] += 1
+    if new_handle:
+        coverage["ops_with_new_handle"] += 1
+    if source_handle and new_handle:
+        handle_map_doc["pairs"][source_handle] = new_handle
+        coverage["mapped"] += 1
 
 
 def _router_custom_run_paths(staged_used: Optional[str]) -> Tuple[Optional[str], Optional[str]]:
@@ -1159,16 +1204,19 @@ def _parse_batched_op_results(op_records: List[Dict[str, Any]], stdout_path: Opt
         if end_match:
             marker_status = end_match.group(1)
             if marker_status == "OK":
-                result_ok, detail = _native_result_success_detail(result_path)
+                result_ok, detail, result_obj = _native_result_success_detail(result_path)
                 if result_ok:
                     rec["status"] = "ok"
+                    new_handle = _handle_token((result_obj or {}).get("new_handle"))
+                    if new_handle:
+                        rec["new_handle"] = new_handle
                 else:
                     rec["status"] = "failed"
                     rec["reason"] = "marker_result_mismatch:%s" % detail
                     aborted = True
             else:
                 rec["status"] = "failed"
-                result_ok, _detail = _native_result_success_detail(result_path)
+                result_ok, _detail, _result_obj = _native_result_success_detail(result_path)
                 if result_ok:
                     rec["reason"] = (
                         "marker_result_mismatch:marker_status_%s_result_success"
@@ -1349,6 +1397,9 @@ def apply_staged(patch: Dict[str, Any], dwg_path: str, out_dir: str,
     artifacts: List[Dict[str, Any]] = []
     journal_path = os.path.join(out_dir, "journal.json")
     result_path = os.path.join(out_dir, "result.json")
+    handle_map_path = os.path.join(out_dir, "handle_map.json")
+    handle_map_doc = _new_handle_map_doc()
+    _write_json(handle_map_path, handle_map_doc)
 
     def _step(name: str, status: str, **fields):
         rec = {"step": name, "status": status, "at": _now_iso()}
@@ -1360,6 +1411,7 @@ def apply_staged(patch: Dict[str, Any], dwg_path: str, out_dir: str,
         journal["finished_at"] = _now_iso()
         journal["result_status"] = env["status"]
         _write_json(journal_path, journal)
+        _write_json(handle_map_path, handle_map_doc)
         _write_json(result_path, env)
         return env
 
@@ -1587,6 +1639,9 @@ def apply_staged(patch: Dict[str, Any], dwg_path: str, out_dir: str,
                 batch_run.get("result_paths"))
             op_results_all.extend(batch_results)
             for op_result in batch_results:
+                op_record = applied_by_index.get(op_result["index"])
+                if op_record is not None:
+                    _record_handle_map_entry(handle_map_doc, op_record, op_result)
                 step_status = "pass" if op_result["status"] == "ok" else "partial"
                 _step("apply[%d]" % apply_index, step_status,
                       native_op=op_result["native_op"], batch_id=batch_id,

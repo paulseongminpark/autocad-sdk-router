@@ -58,3 +58,32 @@ linetype definitions:
    jobs that need it.
 4. Surface `deferred` rows in batch results so text/shape linetypes stay honest
    until complex segment replay is implemented.
+
+## Native Extraction Schema
+
+`inspect.database.graph` linetype rows carry the synthesis fields directly from
+`AcDbLinetypeTableRecord`:
+
+```python
+{
+    "name": str,
+    "description": str,
+    "pattern_length": float,      # patternLength()
+    "is_scaled_to_fit": bool,     # isScaledToFit()
+    "dashes": [                   # omitted when numDashes() == 0
+        {
+            "length": float,      # dashLengthAt(i)
+            "text": str,          # optional, textAt(i) when present
+            "shape": bool,        # optional complex-segment marker
+            "shape_number": int,  # optional, shapeNumberAt(i)
+            "shape_style_handle": str,
+            "shape_scale": float,
+            "shape_rotation": float,
+            "shape_is_ucs_oriented": bool,
+        }
+    ],
+}
+```
+
+`dash_lengths` remains in the native graph as the existing compact legacy mirror
+of `dashLengthAt(i)`. New replay code should prefer `dashes`.
