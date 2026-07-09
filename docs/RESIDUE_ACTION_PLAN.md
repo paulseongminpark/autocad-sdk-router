@@ -1,5 +1,22 @@
 # 잔여 클러스터 조치 계획 (RESIDUE_ACTION_PLAN)
 
+> ## 집행 현황 (2026-07-09 갱신 — 아래 원분석은 R4h 기준 사료로 보존)
+>
+> - **조치 1 (*D 측정 계약) — 집행 완료.** `blockdef_diff.py` `exclude_derived_caches=True` 기본값
+>   (`^\*D\d+$` 제외 + `totals.derived_cache_excluded` 정직 계정, `--include-derived-caches` 옵트아웃).
+>   R4l 재폴드 실측 26779/27130=0.987062, 래칫 0.948→**0.985** 인상. 커밋 "*D measurement contract".
+> - **조치 2 (HATCH) — 대부분 집행 완료.** `.pat` 합성 4결함 사슬 수리(과학표기·스케일 베이킹·line-local
+>   좌표·appendLoop 소유권)로 R4l에서 해치 249 실재. 잔여 표현차(스케일 베이킹 표현·pattern_type
+>   1↔2·%.10g 노이즈)는 `_canonical_hatch_geometry`로 정준화(+8, 0.987357). **실잔여**: 경계-쌍 22쌍 중
+>   per-hatch pattern origin 위상차 21건(재생측 setOriginPoint 재현 실험 대기) + is_associative 5건(정직 잔차).
+> - **조치 4 (WIPEOUT) — 집행 완료, 보류 철회.** "증명된 경로 없음"은 반전된 `loadModule bool==eOk`
+>   게이트의 가짜 실패였음(acismobj26.dbx는 정상 로드). 라이브 인증: append→appended:true, census
+>   재추출 기하 완전 일치(clip 11점/u/v/origin). `blocks.py` 방출 복원 — R4m부터 유예 31→0 기대.
+> - **조치 3 (mismatch_decomposition) — 부분 대체.** 경계-쌍 매칭 분석이 해치 잔여를 필드 수준까지 분해
+>   완료. 범용 도구는 잔여가 실질 소진된 뒤 가성비 재평가.
+> - **신규**: L5 게이트 2종 라이브(치수 113/113=1.0 + block topology 290/290 defs·711/711 edges) +
+>   IPSS 유죄 스위트(5 변조: naive PASS ∧ 의미게이트 유죄 5/5).
+
 > 근거: `reports/interior100/residue_clusters_R4h.md`(랭킹 클러스터) · `reports/interior100/blockdef_diff_R4h.json`(per_def 원자료, 520 rows) · `docs/EXPERIMENT_DESIGNS_V2.md` §3 P7잔여(L91~100) · 코드 직독(`tools/blockdef_diff.py`, `tools/residue_cluster.py`, `tools/ir_to_patch.py`, `tools/patch_ops/blocks.py`, `tools/patch_ops/entities.py`, `src/Ariadne.AcadNative/AriadneNativeJob.cpp` 경유 `docs/ANON_DEF_CAPTURE_DESIGN.md`, `docs/HATCH_APPEND_DESIGN.md`) + 기존 유닛테스트(`tests/unit/test_anon_remap.py`).
 > 원칙: 모든 수치는 `reports/interior100/blockdef_diff_R4h.json`의 `totals`/`per_def`를 재계산한 값이거나 인용 코드 라인에서 직접 도출. 인용 없는 추정은 UNKNOWN으로 표기.
 
