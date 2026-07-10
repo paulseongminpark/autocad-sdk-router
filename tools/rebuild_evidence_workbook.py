@@ -49,11 +49,18 @@ def _kind_histogram(entities: List[Dict[str, Any]]) -> str:
     return ", ".join(f"{k}:{v}" for k, v in counts.most_common())
 
 
-def build_workbook(run_dir: str, out_path: str, title: str) -> Dict[str, Any]:
+def build_workbook(run_dir: str, out_path: str, title: str,
+                   interior_diff_path: Optional[str] = None) -> Dict[str, Any]:
     census = _load(os.path.join(run_dir, "census", "dwg_graph_ir.json")) or {}
     summary = _load(os.path.join(run_dir, "summary.json")) or {}
     deferred_doc = _load(os.path.join(run_dir, "deferred.json"))
-    interior = _load(os.path.join(run_dir, "interior_diff.json")) or {}
+    # Measurement-legislation generations (R4s LEX-0009, R4r LEX-0008) adjudicate
+    # on a REMEASURE report over the same flight artifacts -- the workbook must
+    # show the adjudicated numbers, not the flight-time snapshot, so the
+    # interior source is overridable (remeasure reports share the same
+    # totals/per_def shape as interior_diff.json).
+    interior = (_load(interior_diff_path) if interior_diff_path
+                else _load(os.path.join(run_dir, "interior_diff.json"))) or {}
     dim_gate = _load(os.path.join(run_dir, "dim_semantic_gate.json")) or {}
     patch = _load(os.path.join(run_dir, "regen", "patch.json")) or {}
 
@@ -165,8 +172,12 @@ def main(argv: Optional[List[str]] = None) -> int:
     ap.add_argument("--run-dir", required=True)
     ap.add_argument("--out", required=True)
     ap.add_argument("--title", required=True)
+    ap.add_argument("--interior-diff", default=None,
+                    help="override the interior source with an adjudicated "
+                         "remeasure report (default: <run-dir>/interior_diff.json)")
     args = ap.parse_args(argv)
-    result = build_workbook(args.run_dir, args.out, args.title)
+    result = build_workbook(args.run_dir, args.out, args.title,
+                            interior_diff_path=args.interior_diff)
     print(json.dumps(result, ensure_ascii=False, indent=2))
     return 0
 
