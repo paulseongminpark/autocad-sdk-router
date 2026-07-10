@@ -482,6 +482,95 @@ def test_hatch_solid_orphan_assoc_folds_without_pattern_gate():
     assert report["totals"]["diff0_total"] == 1
 
 
+# ---- closed poly-loop cycle quotient (LEX-0012, R4v dissection) -------------
+# The id-derived boundary replay re-serializes a closed vertex loop starting
+# at a different vertex: same cycle, rotated (5/5 R4v pairs at point-cloud
+# distance exactly 0.0). Rotation of a closed cycle folds; open paths,
+# direction flips, and real shape differences must survive.
+
+
+def _poly_hatch(handle, verts, *, closed=True, loop_type=7):
+    return _entity(handle, "HATCH", "hatch",
+                   pattern_name="SOLID", is_solid_fill=True,
+                   loops=[{"index": 0, "loop_type": loop_type, "status": 1,
+                           "closed": closed, "vertices": verts}])
+
+
+def _dv(x, y, bulge=0):
+    return {"point": [x, y, 0], "bulge": bulge}
+
+
+def test_hatch_closed_poly_loop_rotation_folds():
+    # The exact 809B shape: [A,B,C,D,A] vs [B,C,D,A,B], both explicit-close.
+    a = _poly_hatch("A1", [_dv(-85, 5670), _dv(-85, 4770), _dv(955, 4770),
+                           _dv(955, 5670), _dv(-85, 5670)])
+    b = _poly_hatch("B1", [_dv(-85, 4770), _dv(955, 4770), _dv(955, 5670),
+                           _dv(-85, 5670), _dv(-85, 4770)])
+
+    report = blockdef_diff.diff_block_definitions(_ir(_block("W", a)), _ir(_block("W", b)))
+
+    assert report["totals"]["diff0_total"] == 1
+
+
+def test_hatch_closed_poly_loop_real_shape_difference_survives():
+    a = _poly_hatch("A1", [_dv(0, 0), _dv(10, 0), _dv(10, 10), _dv(0, 10), _dv(0, 0)])
+    b = _poly_hatch("B1", [_dv(0, 0), _dv(10, 0), _dv(10, 12), _dv(0, 10), _dv(0, 0)])
+
+    report = blockdef_diff.diff_block_definitions(_ir(_block("W", a)), _ir(_block("W", b)))
+
+    assert report["totals"]["diff0_total"] == 0
+
+
+def test_hatch_open_poly_path_rotation_survives():
+    # closed=False: an open path HAS a distinguished start -- never rotated,
+    # even when it happens to revisit its first point.
+    a = _poly_hatch("A1", [_dv(0, 0), _dv(10, 0), _dv(10, 10), _dv(0, 10), _dv(0, 0)],
+                    closed=False)
+    b = _poly_hatch("B1", [_dv(10, 0), _dv(10, 10), _dv(0, 10), _dv(0, 0), _dv(10, 0)],
+                    closed=False)
+
+    report = blockdef_diff.diff_block_definitions(_ir(_block("W", a)), _ir(_block("W", b)))
+
+    assert report["totals"]["diff0_total"] == 0
+
+
+def test_hatch_poly_loop_trailing_bulge_blocks_dup_drop():
+    # A trailing vertex carrying its own bulge is NOT a pure notation
+    # duplicate -- the quotient must leave the loop untouched.
+    a = _poly_hatch("A1", [_dv(0, 0), _dv(10, 0), _dv(10, 10), _dv(0, 10),
+                           _dv(0, 0, bulge=0.5)])
+    b = _poly_hatch("B1", [_dv(10, 0), _dv(10, 10), _dv(0, 10), _dv(0, 0),
+                           _dv(10, 0, bulge=0.5)])
+
+    report = blockdef_diff.diff_block_definitions(_ir(_block("W", a)), _ir(_block("W", b)))
+
+    assert report["totals"]["diff0_total"] == 0
+
+
+def test_hatch_poly_loop_direction_not_quotiented():
+    # Reversed traversal is OUTSIDE the quotient (unobserved on 1.dwg; keep
+    # the fold minimal -- LEX-0010 blind-spot rationale).
+    a = _poly_hatch("A1", [_dv(0, 0), _dv(10, 0), _dv(10, 10), _dv(0, 10), _dv(0, 0)])
+    b = _poly_hatch("B1", [_dv(0, 0), _dv(0, 10), _dv(10, 10), _dv(10, 0), _dv(0, 0)])
+
+    report = blockdef_diff.diff_block_definitions(_ir(_block("W", a)), _ir(_block("W", b)))
+
+    assert report["totals"]["diff0_total"] == 0
+
+
+def test_hatch_poly_loop_rotation_with_interior_bulge_folds():
+    # Bulges ride their vertex through the rotation: the same cycle with an
+    # arc segment folds regardless of serialization start.
+    a = _poly_hatch("A1", [_dv(0, 0, bulge=0.5), _dv(10, 0), _dv(10, 10),
+                           _dv(0, 10), _dv(0, 0)])
+    b = _poly_hatch("B1", [_dv(10, 0), _dv(10, 10), _dv(0, 10),
+                           _dv(0, 0, bulge=0.5), _dv(10, 0)])
+
+    report = blockdef_diff.diff_block_definitions(_ir(_block("W", a)), _ir(_block("W", b)))
+
+    assert report["totals"]["diff0_total"] == 1
+
+
 # ---- angle principal branch (LEX-0009, R4s dissection) ----------------------
 # Angles are circle-valued. Census 1.dwg carries a 2*pi-branch DASH row
 # vintage (4/66) and [-pi, pi)-branch ellipse params (16 pairs); the rebuild

@@ -1,0 +1,45 @@
+{
+  "schema": "ariadne.interior100.prereg.v1",
+  "arc": "R4w: LEX-0012 closed poly-loop cycle quotient -- measurement-only remeasure over the R4v flight artifacts (no new flight)",
+  "registered_at_local": "2026-07-11T02:3x (file mtime is the binding evidence; committed BEFORE the remeasure runs)",
+  "r4v_adjudication": {
+    "verdict": "FAIL (band) -- 27,116/27,130 = 0.9994839660892001 vs band [27,118, 27,123]; guards 4/4 OK incl. per-def no-regression",
+    "cause_measured": "The relink mechanism itself succeeded 66/66 (op status ok + associative_after=true, reports/interior100/R4v_remeasure_assoc.json + flight result files). The miss decomposes EXACTLY into three orthogonal classes, dissected pair-by-pair in reports/interior100/loops_residue_analysis_R4v.json: (1) 5 NEW polyline pairs -- the id-derived boundary replay re-serializes the closed vertex cycle ROTATED (point-cloud distance 0.0; plus 2e-12 source-derived float noise on 2465/6D12) = notation, quotiented by LEX-0012 on this remeasure; (2) 2 NEW spline pairs (dA logo) -- evaluateHatch re-decomposes multi-span spline edges into per-span Bezier segments (census 3/1 edges vs post 9/3), the prereg_R4v risk-register item that fired; curve-identical by substitute verifier (control-net point proxy 9.2e-4 on a drawing spanning thousands of units) but NOT safely foldable by serialization -- stays OUTSIDE the fingerprint, documented residue; (3) the old loops-7 (real geometry, max_nn 6.66..100.0, R4s list reproduced exactly) -- unrepaired, next arc.",
+    "lex_0011_ruling": "LEGISLATED. The prereg_R4v contract bound legislation to in-band adjudication; the run landed out-of-band, but the quotient's own correctness is fully evidenced: 59/66 assoc pairs folded with zero mis-folds (folded_but_geometry_diff=0 across lanes), the 7 non-folds are attributed to the two orthogonal loop-notation classes above (not to the cardinality quotient), and the unit contract holds. The R4v run verdict REMAINS FAIL; the law stands on the fold evidence, not the band."
+  },
+  "baseline": {
+    "report": "reports/interior100/R4v_remeasure_assoc.json",
+    "diff0_total": 27116,
+    "a_entity_total": 27130,
+    "a_def_count": 294,
+    "interior_diff0_fraction": 0.9994839660892001
+  },
+  "prediction": {
+    "diff0_total": 27121,
+    "band": [27121, 27121],
+    "interior_diff0_fraction_at_center": 0.9996682639144858,
+    "band_rationale": "Measurement-only remeasure of frozen artifacts with a deterministic instrument: the per-pair prereg probe ran production _canonical_entity (unpatched) over all 14 surviving loops-only pairs and measured EXACTLY 5 folds / 9 survivals; a point band is the honest prediction. Any deviation = instrument divergence = FAIL to investigate.",
+    "decomposition": [
+      {
+        "family": "LEX-0012 closed poly-loop cycle quotient",
+        "pairs": 5,
+        "handles": ["809B", "2464", "2465", "6D11", "6D12"],
+        "evidence": [
+          "reports/interior100/loops_residue_analysis_R4v.json: all 5 at point-cloud max_nn 0.0 after the analyzer's dict-vertex parsing repair; geom_eq=7 geom_diff=7 over the 14 pairs",
+          "population pin (both R4v sides): every polyline-vertex hatch loop is closed=True, loop_type=7, explicit duplicate closing vertex, trailing bulge=0 (16 loops per side)",
+          "prereg instrument: production canonical folds exactly the 5, survives the 9; census collision lane 265 hatches -> 232 canonical groups, merged=33, geometry_collisions=0",
+          "unit contract: tests/unit/test_blockdef_diff.py 6 LEX-0012 cases (rotation folds, real shape survives, open path survives, trailing-bulge gate, direction NOT quotiented, interior-bulge rotation folds); full suite 1890 passed / 8 skipped"
+        ]
+      }
+    ],
+    "residual_after_success": "9 pairs = 7 loops real-geometry (next arc) + 2 spline Bezier re-decomposition (substitute-verified notation, accepted residue). Fingerprint ceiling under current laws: 27,121/27,130."
+  },
+  "measurement_contract": "LEX-0012 (legislates on this adjudication): for a hatch polyline loop that is closed by its own flag AND carries an exact explicit duplicate closing vertex (trailing bulge 0), canonical form drops the duplicate, rotates the cycle to the lexicographically minimal (x, y, bulge)@6dp serialization, and emits vertices on the shared 6dp grid. Direction is NOT quotiented; open paths are NEVER touched. LEX-0008/0009/0011 unchanged.",
+  "population_pin": {
+    "census_ir": "runs/e2e_1dwg_R4v_assoc_20260711/census/dwg_graph_ir.json",
+    "post_ir": "runs/e2e_1dwg_R4v_assoc_20260711/regen/post/dwg_graph_ir.json",
+    "source_dwg_sha256": "14eb65eb292d8a07f38ab5662dcafe9761c6185bc5ff0c8a9a008be15b598961",
+    "launch_command": "python tools/remeasure_interior.py --census-ir runs/e2e_1dwg_R4v_assoc_20260711/census/dwg_graph_ir.json --post-ir runs/e2e_1dwg_R4v_assoc_20260711/regen/post/dwg_graph_ir.json --baseline-report reports/interior100/R4v_remeasure_assoc.json --prereg reports/interior100/prereg_R4w_lex0012.json --out-json reports/interior100/R4w_remeasure_lex0012.json --out-md reports/interior100/R4w_remeasure_lex0012.md",
+    "required": "294 defs / 27,130 entities reproduced; name map matches the R4v baseline rows; per-def diff0 >= R4v for every def (the quotient is a pure function applied to both sides -- it can only merge, never unmatch)"
+  }
+}

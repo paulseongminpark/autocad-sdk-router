@@ -297,6 +297,29 @@ def _bulge_arc_points(p0: List[float], p1: List[float], bulge: float,
         out.append((cx + rr * math.cos(a), cy + rr * math.sin(a)))
 
 
+def _poly_vertex(v: Any) -> Optional[Tuple[float, float, float]]:
+    """Normalize one polyline-loop vertex to (x, y, bulge).
+
+    The census/post IR stores dict form {"point": [x, y(, z)], "bulge": b};
+    list form is [x, y(, bulge)] (a bare point carries bulge in slot 2, not z).
+    """
+    if isinstance(v, dict):
+        p = v.get("point")
+        if isinstance(p, list) and len(p) >= 2:
+            try:
+                return (float(p[0]), float(p[1]), float(v.get("bulge") or 0.0))
+            except (TypeError, ValueError):
+                return None
+        return None
+    if isinstance(v, list) and len(v) >= 2:
+        try:
+            return (float(v[0]), float(v[1]),
+                    float(v[2]) if len(v) >= 3 else 0.0)
+        except (TypeError, ValueError):
+            return None
+    return None
+
+
 def sample_loop_points(loop: Dict[str, Any]) -> Tuple[List[Tuple[float, float]], List[str]]:
     pts: List[Tuple[float, float]] = []
     notes: List[str] = []
@@ -312,14 +335,14 @@ def sample_loop_points(loop: Dict[str, Any]) -> Tuple[List[Tuple[float, float]],
         n = len(verts)
         seg_count = n if loop.get("closed") else n - 1
         for i in range(max(seg_count, 0)):
-            v0 = verts[i]
-            v1 = verts[(i + 1) % n]
-            if not (isinstance(v0, list) and isinstance(v1, list)):
+            v0 = _poly_vertex(verts[i])
+            v1 = _poly_vertex(verts[(i + 1) % n])
+            if v0 is None or v1 is None:
                 notes.append("poly-nonlist-vertex")
                 continue
-            b = float(v0[2]) if len(v0) >= 3 else 0.0
+            b = v0[2]
             if b:
-                _bulge_arc_points(v0, v1, b, pts)
+                _bulge_arc_points(list(v0), list(v1), b, pts)
             else:
                 for j in range(_SAMPLES_PER_EDGE + 1):
                     u = j / _SAMPLES_PER_EDGE

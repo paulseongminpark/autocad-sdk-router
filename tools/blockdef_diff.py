@@ -198,6 +198,79 @@ def _canonical_ellipse_geometry(g: Dict[str, Any]) -> Dict[str, Any]:
     return canon_g
 
 
+def _loop_vertex_key(v: Any) -> Optional[Tuple[float, float, float]]:
+    """(x, y, bulge) on the 6dp grid, for LEX-0012 rotation ordering.
+
+    Accepts the IR dict form {"point": [x, y(, z)], "bulge": b} and the bare
+    list form [x, y(, bulge)]. Returns None when unparseable (the loop is
+    then left in its original notation -- never guessed)."""
+    if isinstance(v, dict):
+        p = v.get("point")
+        b = v.get("bulge") or 0.0
+    elif isinstance(v, list) and len(v) >= 2:
+        p, b = v[:2], (v[2] if len(v) >= 3 else 0.0)
+    else:
+        return None
+    if not (isinstance(p, list) and len(p) >= 2):
+        return None
+    try:
+        return (round(float(p[0]), 6), round(float(p[1]), 6),
+                round(float(b), 6))
+    except (TypeError, ValueError):
+        return None
+
+
+def _canonical_poly_loop(loop: Any) -> Any:
+    """Closed polyline-loop cycle quotient (LEX-0012, R4v).
+
+    The id-derived boundary replay (relink + evaluateHatch, R4v) re-serializes
+    a closed vertex loop starting at a DIFFERENT vertex: the same cycle,
+    rotated (5/5 measured pairs at point-cloud distance exactly 0.0,
+    reports/interior100/loops_residue_analysis_R4v.json). A closed cycle has
+    no distinguished first vertex, so the serialization start is notation.
+    Canonical form, applied ONLY when the loop is closed by its own flag AND
+    carries an exact explicit duplicate closing vertex (trailing bulge 0 --
+    the R4v population is 16/16 loops per side in exactly that shape):
+    drop the duplicate, rotate the cycle to its lexicographically minimal
+    (x, y, bulge)@6dp serialization, and EMIT the vertices on that same 6dp
+    grid (the replayed boundary re-derives coordinates from the relinked
+    sources with sub-grid float noise -- measured 2e-12 on the 2465/6D12
+    pairs -- and the ladder's shared 6dp grid is exactly the instrument
+    resolution, LEX-0009). Direction is NOT quotiented and open paths are
+    NEVER touched (a distinguished start is real there) -- the quotient
+    stays minimal per the LEX-0010 blind-spot rationale."""
+    if not isinstance(loop, dict) or not loop.get("closed"):
+        return loop
+    verts = loop.get("vertices")
+    if not (isinstance(verts, list) and len(verts) >= 3):
+        return loop
+    keys = [_loop_vertex_key(v) for v in verts]
+    if any(k is None for k in keys):
+        return loop
+    if not (keys[0][:2] == keys[-1][:2] and keys[-1][2] == 0.0):
+        return loop
+    body, body_keys = verts[:-1], keys[:-1]
+    n = len(body)
+    if n < 2:
+        return loop
+    best = min(range(n), key=lambda s: [body_keys[(s + j) % n] for j in range(n)])
+    cverts: List[Dict[str, Any]] = []
+    for j in range(n):
+        v = body[(best + j) % n]
+        x, y, b = body_keys[(best + j) % n]
+        p = v.get("point") if isinstance(v, dict) else v[:2]
+        pt = [x, y]
+        if isinstance(p, list) and len(p) >= 3:
+            try:
+                pt.extend(round(float(z), 6) for z in p[2:])
+            except (TypeError, ValueError):
+                pt = [x, y]
+        cverts.append({"point": pt, "bulge": b})
+    new_loop = dict(loop)
+    new_loop["vertices"] = cverts
+    return new_loop
+
+
 def _canonical_entity(entity: Dict[str, Any],
                       name_map: Optional[Dict[str, str]] = None) -> Dict[str, Any]:
     """Normalize representation-dependent geometry before comparison.
@@ -255,6 +328,18 @@ def _canonical_entity(entity: Dict[str, Any],
             canon_g["assoc_loop_source_counts"] = [
                 len(loop) if isinstance(loop, list) else -1 for loop in srcs
             ]
+        # Closed polyline-loop cycle quotient (LEX-0012, R4v): see
+        # _canonical_poly_loop. Spline edge-loop re-decomposition (the 2
+        # dA-logo pairs, census multi-span splines vs post per-span Bezier
+        # split) stays OUTSIDE the fingerprint: substitute-verified
+        # curve-identical (point proxy 9.2e-4), documented in the ledger.
+        loops = canon_g.get("loops")
+        if isinstance(loops, list) and loops:
+            new_loops = [_canonical_poly_loop(lp) for lp in loops]
+            if any(nl is not ol for nl, ol in zip(new_loops, loops)):
+                if canon_g is g:
+                    canon_g = dict(g)
+                canon_g["loops"] = new_loops
         if canon_g is not g:
             if canon is entity:
                 canon = dict(entity)
