@@ -1764,15 +1764,33 @@ static bool collectEntitiesFromBlock(AcDbBlockTableRecord* pBTR, const char* spa
                 << ",\"is_associative\":" << (isAssociativeHatch ? "true" : "false");
             // R4n census 2026-07-09: 66 assoc-mismatch hatch pairs;
             // loops carry no source refs, so this field is the re-link prerequisite.
+            // 2026-07-10 census probe: the hatch-level getAssocObjIds read 0/66
+            // on 1.dwg -- the real store is loop-local. Emit array-of-arrays
+            // aligned to loops[] via getAssocObjIdsAt (design contract in
+            // docs/ASSOC_RELINK_DESIGN.md); when every loop reads empty the
+            // field is omitted entirely (Missing == unsupported, honest).
             if (isAssociativeHatch) {
-                AcDbObjectIdArray assocObjIds;
-                if (pHatch->getAssocObjIds(assocObjIds) == Acad::eOk && assocObjIds.length() > 0) {
-                    arr << ",\"assoc_source_handles\":[";
-                    for (int ai = 0; ai < assocObjIds.length(); ++ai) {
-                        if (ai) arr << ",";
-                        arr << "\"" << jsonEscape(handleOfId(assocObjIds[ai])) << "\"";
+                const int assocLoopCount = pHatch->numLoops();
+                std::string assocJson("[");
+                bool anyLoopIds = false;
+                for (int li = 0; li < assocLoopCount; ++li) {
+                    if (li) assocJson += ",";
+                    assocJson += "[";
+                    AcDbObjectIdArray loopIds;
+                    if (pHatch->getAssocObjIdsAt(li, loopIds) == Acad::eOk) {
+                        for (int ai = 0; ai < loopIds.length(); ++ai) {
+                            if (ai) assocJson += ",";
+                            assocJson += "\"";
+                            assocJson += jsonEscape(handleOfId(loopIds[ai]));
+                            assocJson += "\"";
+                            anyLoopIds = true;
+                        }
                     }
-                    arr << "]";
+                    assocJson += "]";
+                }
+                assocJson += "]";
+                if (anyLoopIds) {
+                    arr << ",\"assoc_source_handles\":" << assocJson;
                 }
             }
             arr << ",\"is_gradient\":" << (isGradientHatch ? "true" : "false")

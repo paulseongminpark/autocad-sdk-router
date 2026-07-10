@@ -31,9 +31,9 @@ def _folded_hatch_geometry(**fields):
 
 
 def test_hatch_assoc_source_handles_survive_native_folding_verbatim():
-    geom = _folded_hatch_geometry(assoc_source_handles=["2F3A", "2F3B"])
+    geom = _folded_hatch_geometry(assoc_source_handles=[["2F3A", "2F3B"], []])
 
-    assert geom["assoc_source_handles"] == ["2F3A", "2F3B"]
+    assert geom["assoc_source_handles"] == [["2F3A", "2F3B"], []]
 
 
 def test_hatch_without_assoc_source_handles_gains_no_key():
@@ -43,7 +43,7 @@ def test_hatch_without_assoc_source_handles_gains_no_key():
 
 
 def test_hatch_malformed_assoc_source_handles_are_dropped():
-    for bad_value in ("2F3A", ["2F3A", 42]):
+    for bad_value in ("2F3A", ["2F3A", 42], ["2F3A", "2F3B"], [["2F3A"], "2F3B"]):
         geom = _folded_hatch_geometry(assoc_source_handles=bad_value)
 
         assert "assoc_source_handles" not in geom

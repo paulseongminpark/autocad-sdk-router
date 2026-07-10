@@ -1724,7 +1724,16 @@ static AcDbEntity* m08eBuildExtendedEntityForAppend(AcDbDatabase* pDb,
                    + "' loaded 0 definition lines (pat not resolved by search path)";
             return nullptr;
         }
-        es = pHatch->setAssociative(Adesk::kFalse);
+        // Faithful associativity replay (2026-07-10): 1.dwg carries 66 hatches
+        // with is_associative=true and NO boundary source refs anywhere --
+        // cross-verified ObjectARX getAssocObjIds/getAssocObjIdsAt both 0/66
+        // AND LibreDWG DXF shows no group 97/330 source refs (orphan-assoc).
+        // Copying the flag reproduces the original state exactly; a real
+        // re-link is impossible because the sources do not exist in the
+        // source drawing (docs/ASSOC_RELINK_DESIGN.md failure-mode ledger).
+        bool isAssociativeIn = false;
+        m08eFindFlag(entityJson, "is_associative", isAssociativeIn);
+        es = pHatch->setAssociative(isAssociativeIn ? Adesk::kTrue : Adesk::kFalse);
         if (es != Acad::eOk) {
             delete pHatch;
             errCode = "BUILD_FAILED";
