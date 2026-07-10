@@ -549,11 +549,13 @@ static bool m08eFindArrayBounds(const std::string& json, const char* key,
 
 static bool m08eFindFlag(const std::string& json, const char* key, bool& out)
 {
-    double raw = 0.0;
-    if (jsonFindNumber(json, key, raw)) {
-        out = (raw != 0.0);
-        return true;
-    }
+    // Boolean literals are matched BEFORE the numeric fallback. jsonFindNumber
+    // cannot reject a non-numeric value (strtod yields 0.0 and the helper still
+    // reports found), so probing numbers first silently read every JSON `true`
+    // as false and made the literal branch below dead code -- measured R4v:
+    // all 11 census ccw=true hatch arc edges rebuilt clockwise (the loops
+    // real-geometry residue), while numeric 0/1 payloads (entity `closed`)
+    // dodged the bug. Same literal-first idiom as m08eReadFlagArray.
     const std::string keyTok = std::string("\"") + key + "\"";
     const size_t p = json.find(keyTok);
     if (p == std::string::npos)
@@ -570,6 +572,11 @@ static bool m08eFindFlag(const std::string& json, const char* key, bool& out)
     }
     if (json.compare(i, 5, "false") == 0) {
         out = false;
+        return true;
+    }
+    double raw = 0.0;
+    if (jsonFindNumber(json, key, raw)) {
+        out = (raw != 0.0);
         return true;
     }
     return false;
@@ -1733,15 +1740,17 @@ static AcDbEntity* m08eBuildExtendedEntityForAppend(AcDbDatabase* pDb,
                    + "' loaded 0 definition lines (pat not resolved by search path)";
             return nullptr;
         }
-        // Associativity at CREATE time is flag-only and does NOT survive save
-        // without sources (measured R4u: job true -> saved false, 258/258).
-        // The orphan premise behind the original flag-copy is RETRACTED
-        // (docs/ASSOC_ORPHAN_FINDING.md): the 0/66 probes flew a stale binary;
-        // the sources are real and per-loop readable. The REAL re-link happens
+        // Associativity at CREATE time is flag-only; the REAL re-link happens
         // after the append pass via write.block.relink_hatch_assoc
         // (m08eHandleRelinkHatchAssoc below), which sets the ids + persistent
-        // reactors so the flag persists. The flag replay here stays harmless
-        // (kFalse-equivalent after save) and keeps the job payload contract.
+        // reactors so the flag persists. The orphan premise behind the
+        // original flag-copy is RETRACTED (docs/ASSOC_ORPHAN_FINDING.md).
+        // Mechanism correction (R4x): the R4u observation "job true -> saved
+        // false, 258/258" was measured on a binary where m08eFindFlag's
+        // numeric-first probe read every boolean literal as false -- the flag
+        // never reached setAssociative at create on that flight. Whether a
+        // sourceless create-time flag survives save on its own is therefore
+        // UNMEASURED; the relink pass owns the persisted truth either way.
         bool isAssociativeIn = false;
         m08eFindFlag(entityJson, "is_associative", isAssociativeIn);
         es = pHatch->setAssociative(isAssociativeIn ? Adesk::kTrue : Adesk::kFalse);
