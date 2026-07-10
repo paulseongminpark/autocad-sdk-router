@@ -92,3 +92,12 @@ Each entry uses the following fields, in order:
 - **substitute_verifier**: canonical field-level pair diff (geometry keys) on surviving pairs; `tools/residue_tail_report.py` field-combo census.
 - **status**: legislated
 - **refs**: `runs/e2e_1dwg_R4p_phase_20260709`, `runs/e2e_1dwg_R4q_dashphase_20260709`, commits `d261e44`, `reports/interior100/residue_tail_R4p.json`
+
+
+### [LEX-0008] orphan-assoc quotient (derived flag folds without sources)
+
+- **observation**: 1.dwg carries 66 hatches with `is_associative=true` and NO boundary source refs (3-way probe 2026-07-10: `getAssocObjIds` 0/66, `getAssocObjIdsAt` 0/66, LibreDWG DXF no group 97/330); replaying the flag measured job `True` -> saved `False` for all 66 (R4r, `runs/e2e_1dwg_R4r_assoc_20260710`) -- the engine RESETS a sourceless associative flag on save, so the original state is unreachable by any legitimate write path.
+- **rule**: `is_associative` is a DERIVED flag, meaningful only when `assoc_source_handles` exist. Canonical hatch comparison drops the flag on BOTH sides when a hatch has no source refs; hatches WITH real sources keep the flag and additionally compare the handle payload. Adjudicated in band: R4r remeasured 26,893/27,130 = 0.991264 vs prereg 26,900 band [26,890, 26,910]; +59 of the assoc-66 folded, the 7 remainder overlap the loops-mismatch class.
+- **substitute_verifier**: visual gate (associativity has no render effect) + `assoc_source_handles` round-trip whenever the field exists.
+- **status**: legislated
+- **refs**: `tools/blockdef_diff.py::_canonical_hatch_geometry`, `docs/ASSOC_ORPHAN_FINDING.md` falsifier (c), `reports/interior100/R4r_remeasure_lex0008.json`

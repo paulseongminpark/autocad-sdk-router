@@ -121,6 +121,19 @@ def _canonical_hatch_geometry(g: Dict[str, Any]) -> Dict[str, Any]:
             return [float(val[0]), float(val[1])]
         return None
 
+    # Orphan-assoc quotient (LEX-0008, R4r runs/e2e_1dwg_R4r_assoc_20260710):
+    # is_associative is a DERIVED flag -- it only has semantics when boundary
+    # source refs exist. 1.dwg carries 66 hatches with the flag set and NO
+    # sources anywhere (3-way probe: getAssocObjIds 0/66, getAssocObjIdsAt
+    # 0/66, LibreDWG DXF no group 97/330), and the engine RESETS a sourceless
+    # flag on save (R4r measured: job True -> saved False, all 66). A state
+    # no engine path can reproduce is notation, not geometry: when a hatch
+    # has no assoc_source_handles the flag is dropped from comparison on
+    # BOTH sides. Hatches with real sources keep the flag AND compare the
+    # handle payload. Substitute verifier: visual gate (associativity has
+    # no render effect) + assoc_source_handles round-trip when present.
+    if "is_associative" in canon_g and not g.get("assoc_source_handles"):
+        canon_g.pop("is_associative")
     base1 = None
     if rows and isinstance(rows[0], dict):
         base1 = _num_pair(rows[0].get("base"))

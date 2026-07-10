@@ -384,3 +384,34 @@ def test_hatch_predefined_unit_replay_real_phase_shift_still_mismatches():
     report = blockdef_diff.diff_block_definitions(ir_a, ir_b)
 
     assert report["totals"]["diff0_total"] == 0
+
+
+# ---- orphan-assoc quotient (LEX-0008, R4r): is_associative is derived --
+# meaningful only with real boundary sources. Sourceless flags fold; real
+# assoc payloads still compare.
+
+
+def test_hatch_orphan_assoc_flag_folds_when_no_sources():
+    a = _hatch("A1", ptype=1.0, scale=350.0,
+               base=[-24475.0, -149365.0], offset=[43.75, 43.75])
+    a["geometry"]["is_associative"] = True
+    b = _hatch("B1", ptype=1.0, scale=350.0, base=[0.0, 0.0], offset=[0.125, 0.125])
+    b["geometry"]["pattern_origin"] = [-24475.0, -149365.0]
+    b["geometry"]["is_associative"] = False
+
+    report = blockdef_diff.diff_block_definitions(_ir(_block("W", a)), _ir(_block("W", b)))
+
+    assert report["totals"]["diff0_total"] == 1
+
+
+def test_hatch_real_assoc_sources_still_compare():
+    a = _hatch("A1", ptype=2.0, scale=300.0, base=[0.0, 0.0], offset=[-1.0, 0.0])
+    a["geometry"]["is_associative"] = True
+    a["geometry"]["assoc_source_handles"] = [["2F3A", "2F3B"]]
+    b = _hatch("B1", ptype=2.0, scale=300.0, base=[0.0, 0.0], offset=[-1.0, 0.0])
+    b["geometry"]["is_associative"] = True
+    b["geometry"]["assoc_source_handles"] = [["9999", "2F3B"]]
+
+    report = blockdef_diff.diff_block_definitions(_ir(_block("W", a)), _ir(_block("W", b)))
+
+    assert report["totals"]["diff0_total"] == 0
