@@ -1,0 +1,32 @@
+{
+ "schema": "ariadne.e1_calibration.v0",
+ "common_defs": 377,
+ "role_agreement": {
+  "n": 377,
+  "agree": 207,
+  "rate": 0.5491
+ },
+ "wall_likelihood": {
+  "pearson": 0.4866,
+  "bucket_agreement": {
+   "n": 377,
+   "agree": 235,
+   "rate": 0.6233
+  }
+ },
+ "handle_jaccard": {
+  "n": 239,
+  "mean": 0.1319,
+  "zero_frac": 0.682
+ },
+ "coverage": {
+  "ornith": 377,
+  "sonnet": 384,
+  "common": 377
+ },
+ "preregistered_verdict": {
+  "role": "marginal",
+  "likelihood_buckets": "below_threshold",
+  "jaccard": "exploratory_v0_no_threshold"
+ }
+}
