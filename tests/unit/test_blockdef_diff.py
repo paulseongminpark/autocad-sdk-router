@@ -415,3 +415,81 @@ def test_hatch_real_assoc_sources_still_compare():
     report = blockdef_diff.diff_block_definitions(_ir(_block("W", a)), _ir(_block("W", b)))
 
     assert report["totals"]["diff0_total"] == 0
+
+
+def test_hatch_solid_orphan_assoc_folds_without_pattern_gate():
+    # LEX-0008 gate widening (R4s): 3 SOLID fills on 1.dwg carry the orphan
+    # flag with no pattern_definitions at all -- the fold must not hide
+    # behind the pattern gate.
+    def solid(handle, assoc):
+        return _entity(handle, "HATCH", "hatch",
+                       pattern_name="SOLID", is_solid_fill=True,
+                       is_associative=assoc, loops=[{"index": 0}])
+    report = blockdef_diff.diff_block_definitions(
+        _ir(_block("W", solid("A1", True))),
+        _ir(_block("W", solid("B1", False))))
+
+    assert report["totals"]["diff0_total"] == 1
+
+
+# ---- angle principal branch (LEX-0009, R4s dissection) ----------------------
+# Angles are circle-valued. Census 1.dwg carries a 2*pi-branch DASH row
+# vintage (4/66) and [-pi, pi)-branch ellipse params (16 pairs); the rebuild
+# re-reports both on other branches of the same circle. Same figure, two
+# numerals -- fold to [0, 2*pi). Real angular differences must survive.
+
+
+def test_pattern_row_two_pi_angle_branch_folds():
+    a = _hatch("A1", ptype=1.0, scale=350.0, base=[0.0, 0.0],
+               offset=[0.125, 0.125], angle=6.283185307179586)
+    b = _hatch("B1", ptype=1.0, scale=350.0, base=[0.0, 0.0],
+               offset=[0.125, 0.125], angle=0.0)
+
+    report = blockdef_diff.diff_block_definitions(_ir(_block("W", a)), _ir(_block("W", b)))
+
+    assert report["totals"]["diff0_total"] == 1
+
+
+def test_pattern_row_real_angle_difference_still_mismatches():
+    a = _hatch("A1", ptype=1.0, scale=350.0, base=[0.0, 0.0],
+               offset=[0.125, 0.125], angle=0.0)
+    b = _hatch("B1", ptype=1.0, scale=350.0, base=[0.0, 0.0],
+               offset=[0.125, 0.125], angle=0.7853981633974483)
+
+    report = blockdef_diff.diff_block_definitions(_ir(_block("W", a)), _ir(_block("W", b)))
+
+    assert report["totals"]["diff0_total"] == 0
+
+
+def _ellipse(handle, start, end):
+    return _entity(handle, "ELLIPSE", "ellipse",
+                   center=[100.0, 200.0, 0.0], major_axis=[50.0, 0.0, 0.0],
+                   radius_ratio=0.5, start_angle=start, end_angle=end)
+
+
+def test_ellipse_angle_branch_negative_vs_positive_folds():
+    # Measured R4s pair shape: -pi/2 -> ~0 (census) vs 3*pi/2 -> 2*pi
+    # (rebuild). Same quarter arc.
+    report = blockdef_diff.diff_block_definitions(
+        _ir(_block("W", _ellipse("A1", -1.5707963263492064, -5.4696306692161294e-11))),
+        _ir(_block("W", _ellipse("B1", 4.712388980830378, 6.2831853071248895))))
+
+    assert report["totals"]["diff0_total"] == 1
+
+
+def test_ellipse_real_sweep_difference_still_mismatches():
+    report = blockdef_diff.diff_block_definitions(
+        _ir(_block("W", _ellipse("A1", 0.0, 1.5707963267948966))),
+        _ir(_block("W", _ellipse("B1", 0.0, 3.141592653589793))))
+
+    assert report["totals"]["diff0_total"] == 0
+
+
+def test_ellipse_full_sweep_does_not_collapse_to_degenerate():
+    # Full ellipse (sweep 2*pi) vs a degenerate zero-sweep arc: the
+    # normalization must keep sweep in (0, 2*pi], not fold 2*pi to 0.
+    report = blockdef_diff.diff_block_definitions(
+        _ir(_block("W", _ellipse("A1", 0.0, 6.283185307179586))),
+        _ir(_block("W", _ellipse("B1", 0.0, 0.0))))
+
+    assert report["totals"]["diff0_total"] == 0

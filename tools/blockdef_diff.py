@@ -17,6 +17,9 @@ import cad_diff
 _JSON_ENCODING = "utf-8-sig"
 SCHEMA_ID = "ariadne.blockdef_diff.v1"
 
+_TWO_PI = 2.0 * math.pi
+_TWO_PI_6DP = round(_TWO_PI, 6)
+
 # *D<n> anonymous blocks are DIMENSION-DERIVED CACHES: every AcDbDimension
 # mints its own *D block holding that dimension's rendered representation, and
 # a rebuilt drawing's dimensions mint FRESH *D names. Comparing them by name
@@ -121,19 +124,6 @@ def _canonical_hatch_geometry(g: Dict[str, Any]) -> Dict[str, Any]:
             return [float(val[0]), float(val[1])]
         return None
 
-    # Orphan-assoc quotient (LEX-0008, R4r runs/e2e_1dwg_R4r_assoc_20260710):
-    # is_associative is a DERIVED flag -- it only has semantics when boundary
-    # source refs exist. 1.dwg carries 66 hatches with the flag set and NO
-    # sources anywhere (3-way probe: getAssocObjIds 0/66, getAssocObjIdsAt
-    # 0/66, LibreDWG DXF no group 97/330), and the engine RESETS a sourceless
-    # flag on save (R4r measured: job True -> saved False, all 66). A state
-    # no engine path can reproduce is notation, not geometry: when a hatch
-    # has no assoc_source_handles the flag is dropped from comparison on
-    # BOTH sides. Hatches with real sources keep the flag AND compare the
-    # handle payload. Substitute verifier: visual gate (associativity has
-    # no render effect) + assoc_source_handles round-trip when present.
-    if "is_associative" in canon_g and not g.get("assoc_source_handles"):
-        canon_g.pop("is_associative")
     base1 = None
     if rows and isinstance(rows[0], dict):
         base1 = _num_pair(rows[0].get("base"))
@@ -152,7 +142,16 @@ def _canonical_hatch_geometry(g: Dict[str, Any]) -> Dict[str, Any]:
             continue
         nrow = dict(row)
         if isinstance(row.get("angle"), (int, float)):
-            nrow["angle"] = round(row["angle"], 6)  # angle is never scaled
+            # Angle is never scaled; it IS circle-valued (LEX-0009): the
+            # census carries a 2*pi-branch DASH vintage (4/66 hatches at row
+            # angle 6.28318..., R4s dissection reports/interior100/
+            # loops_residue_analysis_R4s.json) that the predefined-name
+            # replay re-reports at 0.0 -- the same line family. Fold to the
+            # principal branch [0, 2*pi) on the shared 6dp grid.
+            ang = round(float(row["angle"]) % _TWO_PI, 6)
+            if ang >= _TWO_PI_6DP:
+                ang = 0.0
+            nrow["angle"] = ang
         for key in ("base", "offset", "dashes"):
             val = row.get(key)
             if isinstance(val, list):
@@ -166,6 +165,36 @@ def _canonical_hatch_geometry(g: Dict[str, Any]) -> Dict[str, Any]:
                 nrow[key] = [_q(v) for v in val]
         norm_rows.append(nrow)
     canon_g["pattern_definitions"] = norm_rows
+    return canon_g
+
+
+def _canonical_ellipse_geometry(g: Dict[str, Any]) -> Dict[str, Any]:
+    """Principal-branch ellipse arc angles (LEX-0009).
+
+    The census reports start/end params on the [-pi, pi) branch while the
+    rebuild engine re-reports [0, 2*pi) (R4s dissection: all 16 residual
+    ellipse pairs are the SAME arc in two branches, e.g. start -pi/2 -> end
+    ~0 vs start 3*pi/2 -> end 2*pi). Angles on a circle are equivalence
+    classes mod 2*pi; the arc itself is (start, sweep). Canonical form:
+    start folded to [0, 2*pi) on the 6dp grid, end = start + sweep with
+    sweep in (0, 2*pi] so a full ellipse stays full instead of collapsing
+    to empty. A REAL sweep or placement difference still differs after
+    folding. Substitute verifier: dense point sampling of both
+    parameterizations (tools/loops_residue_analysis.py, R4s)."""
+    try:
+        start = float(g.get("start_angle"))
+        end = float(g.get("end_angle"))
+    except (TypeError, ValueError):
+        return g
+    sweep = (end - start) % _TWO_PI
+    if sweep == 0.0 and abs(end - start) > 1e-9:
+        sweep = _TWO_PI
+    start_c = round(start % _TWO_PI, 6)
+    if start_c >= _TWO_PI_6DP:
+        start_c = 0.0
+    canon_g = dict(g)
+    canon_g["start_angle"] = start_c
+    canon_g["end_angle"] = round(start_c + round(sweep, 6), 6)
     return canon_g
 
 
@@ -192,8 +221,36 @@ def _canonical_entity(entity: Dict[str, Any],
             g = dict(g)
             g["block_name"] = mapped_name
             canon["geometry"] = g
-    if g.get("kind") == "hatch" and g.get("pattern_definitions"):
-        canon_g = _canonical_hatch_geometry(g)
+    if g.get("kind") == "hatch":
+        canon_g = g
+        if g.get("pattern_definitions"):
+            canon_g = _canonical_hatch_geometry(canon_g)
+        # Orphan-assoc quotient (LEX-0008, R4r runs/e2e_1dwg_R4r_assoc_20260710;
+        # gate widened on R4s): is_associative is a DERIVED flag -- it only has
+        # semantics when boundary source refs exist. 1.dwg carries 66 patterned
+        # hatches AND 3 SOLID fills (R4s dissection, def X-FORM_...$0$dA logo)
+        # with the flag set and NO sources anywhere (3-way probe: getAssocObjIds
+        # 0/66, getAssocObjIdsAt 0/66, LibreDWG DXF no group 97/330), and the
+        # engine RESETS a sourceless flag on save (R4r measured: job True ->
+        # saved False). A state no engine path can reproduce is notation, not
+        # geometry: when a hatch has no assoc_source_handles the flag drops
+        # from comparison on BOTH sides -- for EVERY hatch. The R4r
+        # implementation hid this fold behind the pattern_definitions gate;
+        # the 3 SOLID pairs measured on R4s were exactly the gap. Hatches with
+        # real sources keep the flag AND compare the handle payload.
+        # Substitute verifier: visual gate (associativity has no render
+        # effect) + assoc_source_handles round-trip when present.
+        if "is_associative" in canon_g and not canon_g.get("assoc_source_handles"):
+            if canon_g is g:
+                canon_g = dict(g)
+            canon_g.pop("is_associative")
+        if canon_g is not g:
+            if canon is entity:
+                canon = dict(entity)
+            canon["geometry"] = canon_g
+        return canon
+    if g.get("kind") == "ellipse":
+        canon_g = _canonical_ellipse_geometry(g)
         if canon_g is not g:
             if canon is entity:
                 canon = dict(entity)
