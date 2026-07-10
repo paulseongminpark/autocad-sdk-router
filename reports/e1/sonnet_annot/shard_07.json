@@ -1,0 +1,202 @@
+[
+  {
+    "unit_id": "defannot-u110-121",
+    "answer": {
+      "def": "*U110",
+      "role": "평면 부분도",
+      "wall_likelihood": 0.3,
+      "wall_line_handles": [],
+      "notes": "entity_count=38, 100% LWPOLYLINE on a single insulation layer (X-평면도(기본형)$0$INSUL), each with vertices=5 -- a homogeneous set of small closed boundary polygons, the signature of an anonymous hatch/insulation-batt boundary block (*U-prefixed anonymous block name) rather than a named furniture or dimension-cache block. No coordinate data is present in the projection, so individual entities cannot be distinguished as wall-line-like versus insulation-boundary-like; wall_likelihood reflects that insulation typically runs adjacent to walls but these entities are the insulation fill boundaries, not wall centerlines/faces themselves."
+    }
+  },
+  {
+    "unit_id": "defannot-u111-122",
+    "answer": {
+      "def": "*U111",
+      "role": "평면 부분도",
+      "wall_likelihood": 0.3,
+      "wall_line_handles": [],
+      "notes": "entity_count=22, 100% LWPOLYLINE on a single insulation layer (X-평면도(기본형)$0$INSUL), each with vertices=5 -- a homogeneous set of small closed boundary polygons, the signature of an anonymous hatch/insulation-batt boundary block (*U-prefixed anonymous block name) rather than a named furniture or dimension-cache block. No coordinate data is present in the projection, so individual entities cannot be distinguished as wall-line-like versus insulation-boundary-like; wall_likelihood reflects that insulation typically runs adjacent to walls but these entities are the insulation fill boundaries, not wall centerlines/faces themselves."
+    }
+  },
+  {
+    "unit_id": "defannot-u112-123",
+    "answer": {
+      "def": "*U112",
+      "role": "평면 부분도",
+      "wall_likelihood": 0.3,
+      "wall_line_handles": [],
+      "notes": "entity_count=12, 100% LWPOLYLINE on a single insulation layer (X-평면도(기본형)$0$INSUL), each with vertices=5 -- a homogeneous set of small closed boundary polygons, the signature of an anonymous hatch/insulation-batt boundary block (*U-prefixed anonymous block name) rather than a named furniture or dimension-cache block. No coordinate data is present in the projection, so individual entities cannot be distinguished as wall-line-like versus insulation-boundary-like; wall_likelihood reflects that insulation typically runs adjacent to walls but these entities are the insulation fill boundaries, not wall centerlines/faces themselves."
+    }
+  },
+  {
+    "unit_id": "defannot-u113-124",
+    "answer": {
+      "def": "*U113",
+      "role": "평면 부분도",
+      "wall_likelihood": 0.3,
+      "wall_line_handles": [],
+      "notes": "entity_count=41, 100% LWPOLYLINE on a single insulation layer (X-평면도(기본형)$0$INSUL), each with vertices=5 -- a homogeneous set of small closed boundary polygons, the signature of an anonymous hatch/insulation-batt boundary block (*U-prefixed anonymous block name) rather than a named furniture or dimension-cache block. No coordinate data is present in the projection, so individual entities cannot be distinguished as wall-line-like versus insulation-boundary-like; wall_likelihood reflects that insulation typically runs adjacent to walls but these entities are the insulation fill boundaries, not wall centerlines/faces themselves."
+    }
+  },
+  {
+    "unit_id": "defannot-u114-125",
+    "answer": {
+      "def": "*U114",
+      "role": "평면 부분도",
+      "wall_likelihood": 0.3,
+      "wall_line_handles": [],
+      "notes": "entity_count=13, 100% LWPOLYLINE on a single insulation layer (X-평면도(기본형)$0$INSUL), each with vertices=5 -- a homogeneous set of small closed boundary polygons, the signature of an anonymous hatch/insulation-batt boundary block (*U-prefixed anonymous block name) rather than a named furniture or dimension-cache block. No coordinate data is present in the projection, so individual entities cannot be distinguished as wall-line-like versus insulation-boundary-like; wall_likelihood reflects that insulation typically runs adjacent to walls but these entities are the insulation fill boundaries, not wall centerlines/faces themselves."
+    }
+  },
+  {
+    "unit_id": "defannot-u115-126",
+    "answer": {
+      "def": "*U115",
+      "role": "평면 부분도",
+      "wall_likelihood": 0.3,
+      "wall_line_handles": [],
+      "notes": "entity_count=149, 100% LWPOLYLINE on a single insulation layer (X-평면도(기본형)$0$INSUL), each with vertices=5 -- a homogeneous set of small closed boundary polygons, the signature of an anonymous hatch/insulation-batt boundary block (*U-prefixed anonymous block name) rather than a named furniture or dimension-cache block. No coordinate data is present in the projection, so individual entities cannot be distinguished as wall-line-like versus insulation-boundary-like; wall_likelihood reflects that insulation typically runs adjacent to walls but these entities are the insulation fill boundaries, not wall centerlines/faces themselves."
+    }
+  },
+  {
+    "unit_id": "defannot-u116-127",
+    "answer": {
+      "def": "*U116",
+      "role": "평면 부분도",
+      "wall_likelihood": 0.3,
+      "wall_line_handles": [],
+      "notes": "entity_count=29, 100% LWPOLYLINE on a single insulation layer (X-평면도(기본형)$0$INSUL), each with vertices=5 -- a homogeneous set of small closed boundary polygons, the signature of an anonymous hatch/insulation-batt boundary block (*U-prefixed anonymous block name) rather than a named furniture or dimension-cache block. No coordinate data is present in the projection, so individual entities cannot be distinguished as wall-line-like versus insulation-boundary-like; wall_likelihood reflects that insulation typically runs adjacent to walls but these entities are the insulation fill boundaries, not wall centerlines/faces themselves."
+    }
+  },
+  {
+    "unit_id": "defannot-u117-128",
+    "answer": {
+      "def": "*U117",
+      "role": "평면 부분도",
+      "wall_likelihood": 0.3,
+      "wall_line_handles": [],
+      "notes": "entity_count=78, 100% LWPOLYLINE on a single insulation layer (X-평면도(기본형)$0$INSUL), each with vertices=5 -- a homogeneous set of small closed boundary polygons, the signature of an anonymous hatch/insulation-batt boundary block (*U-prefixed anonymous block name) rather than a named furniture or dimension-cache block. No coordinate data is present in the projection, so individual entities cannot be distinguished as wall-line-like versus insulation-boundary-like; wall_likelihood reflects that insulation typically runs adjacent to walls but these entities are the insulation fill boundaries, not wall centerlines/faces themselves."
+    }
+  },
+  {
+    "unit_id": "defannot-u118-129",
+    "answer": {
+      "def": "*U118",
+      "role": "평면 부분도",
+      "wall_likelihood": 0.3,
+      "wall_line_handles": [],
+      "notes": "entity_count=16, 100% LWPOLYLINE on a single insulation layer (X-평면도(기본형)$0$INSUL), each with vertices=5 -- a homogeneous set of small closed boundary polygons, the signature of an anonymous hatch/insulation-batt boundary block (*U-prefixed anonymous block name) rather than a named furniture or dimension-cache block. No coordinate data is present in the projection, so individual entities cannot be distinguished as wall-line-like versus insulation-boundary-like; wall_likelihood reflects that insulation typically runs adjacent to walls but these entities are the insulation fill boundaries, not wall centerlines/faces themselves."
+    }
+  },
+  {
+    "unit_id": "defannot-u119-130",
+    "answer": {
+      "def": "*U119",
+      "role": "평면 부분도",
+      "wall_likelihood": 0.3,
+      "wall_line_handles": [],
+      "notes": "entity_count=40, 100% LWPOLYLINE on a single insulation layer (X-평면도(기본형)$0$INSUL), each with vertices=5 -- a homogeneous set of small closed boundary polygons, the signature of an anonymous hatch/insulation-batt boundary block (*U-prefixed anonymous block name) rather than a named furniture or dimension-cache block. No coordinate data is present in the projection, so individual entities cannot be distinguished as wall-line-like versus insulation-boundary-like; wall_likelihood reflects that insulation typically runs adjacent to walls but these entities are the insulation fill boundaries, not wall centerlines/faces themselves."
+    }
+  },
+  {
+    "unit_id": "defannot-u120-131",
+    "answer": {
+      "def": "*U120",
+      "role": "평면 부분도",
+      "wall_likelihood": 0.3,
+      "wall_line_handles": [],
+      "notes": "entity_count=10, 100% LWPOLYLINE on a single insulation layer (X-평면도(기본형)$0$INSUL), each with vertices=5 -- a homogeneous set of small closed boundary polygons, the signature of an anonymous hatch/insulation-batt boundary block (*U-prefixed anonymous block name) rather than a named furniture or dimension-cache block. No coordinate data is present in the projection, so individual entities cannot be distinguished as wall-line-like versus insulation-boundary-like; wall_likelihood reflects that insulation typically runs adjacent to walls but these entities are the insulation fill boundaries, not wall centerlines/faces themselves."
+    }
+  },
+  {
+    "unit_id": "defannot-u121-132",
+    "answer": {
+      "def": "*U121",
+      "role": "평면 부분도",
+      "wall_likelihood": 0.3,
+      "wall_line_handles": [],
+      "notes": "entity_count=51, 100% LWPOLYLINE on a single insulation layer (X-평면도(기본형)$0$INSUL), each with vertices=5 -- a homogeneous set of small closed boundary polygons, the signature of an anonymous hatch/insulation-batt boundary block (*U-prefixed anonymous block name) rather than a named furniture or dimension-cache block. No coordinate data is present in the projection, so individual entities cannot be distinguished as wall-line-like versus insulation-boundary-like; wall_likelihood reflects that insulation typically runs adjacent to walls but these entities are the insulation fill boundaries, not wall centerlines/faces themselves."
+    }
+  },
+  {
+    "unit_id": "defannot-u122-133",
+    "answer": {
+      "def": "*U122",
+      "role": "평면 부분도",
+      "wall_likelihood": 0.3,
+      "wall_line_handles": [],
+      "notes": "entity_count=10, 100% LWPOLYLINE on a single insulation layer (X-평면도(기본형)$0$INSUL), each with vertices=5 -- a homogeneous set of small closed boundary polygons, the signature of an anonymous hatch/insulation-batt boundary block (*U-prefixed anonymous block name) rather than a named furniture or dimension-cache block. No coordinate data is present in the projection, so individual entities cannot be distinguished as wall-line-like versus insulation-boundary-like; wall_likelihood reflects that insulation typically runs adjacent to walls but these entities are the insulation fill boundaries, not wall centerlines/faces themselves."
+    }
+  },
+  {
+    "unit_id": "defannot-u123-134",
+    "answer": {
+      "def": "*U123",
+      "role": "평면 부분도",
+      "wall_likelihood": 0.3,
+      "wall_line_handles": [],
+      "notes": "entity_count=54, 100% LWPOLYLINE on a single insulation layer (X-평면도(기본형)$0$INSUL), each with vertices=5 -- a homogeneous set of small closed boundary polygons, the signature of an anonymous hatch/insulation-batt boundary block (*U-prefixed anonymous block name) rather than a named furniture or dimension-cache block. No coordinate data is present in the projection, so individual entities cannot be distinguished as wall-line-like versus insulation-boundary-like; wall_likelihood reflects that insulation typically runs adjacent to walls but these entities are the insulation fill boundaries, not wall centerlines/faces themselves."
+    }
+  },
+  {
+    "unit_id": "defannot-u124-135",
+    "answer": {
+      "def": "*U124",
+      "role": "평면 부분도",
+      "wall_likelihood": 0.3,
+      "wall_line_handles": [],
+      "notes": "entity_count=69, 100% LWPOLYLINE on a single insulation layer (X-평면도(기본형)$0$INSUL), each with vertices=5 -- a homogeneous set of small closed boundary polygons, the signature of an anonymous hatch/insulation-batt boundary block (*U-prefixed anonymous block name) rather than a named furniture or dimension-cache block. No coordinate data is present in the projection, so individual entities cannot be distinguished as wall-line-like versus insulation-boundary-like; wall_likelihood reflects that insulation typically runs adjacent to walls but these entities are the insulation fill boundaries, not wall centerlines/faces themselves."
+    }
+  },
+  {
+    "unit_id": "defannot-u125-136",
+    "answer": {
+      "def": "*U125",
+      "role": "평면 부분도",
+      "wall_likelihood": 0.3,
+      "wall_line_handles": [],
+      "notes": "entity_count=30, 100% LWPOLYLINE on a single insulation layer (X-평면도(기본형)$0$INSUL), each with vertices=5 -- a homogeneous set of small closed boundary polygons, the signature of an anonymous hatch/insulation-batt boundary block (*U-prefixed anonymous block name) rather than a named furniture or dimension-cache block. No coordinate data is present in the projection, so individual entities cannot be distinguished as wall-line-like versus insulation-boundary-like; wall_likelihood reflects that insulation typically runs adjacent to walls but these entities are the insulation fill boundaries, not wall centerlines/faces themselves."
+    }
+  },
+  {
+    "unit_id": "defannot-u126-137",
+    "answer": {
+      "def": "*U126",
+      "role": "평면 부분도",
+      "wall_likelihood": 0.3,
+      "wall_line_handles": [],
+      "notes": "entity_count=51, 100% LWPOLYLINE on a single insulation layer (X-평면도(기본형)$0$INSUL), each with vertices=5 -- a homogeneous set of small closed boundary polygons, the signature of an anonymous hatch/insulation-batt boundary block (*U-prefixed anonymous block name) rather than a named furniture or dimension-cache block. No coordinate data is present in the projection, so individual entities cannot be distinguished as wall-line-like versus insulation-boundary-like; wall_likelihood reflects that insulation typically runs adjacent to walls but these entities are the insulation fill boundaries, not wall centerlines/faces themselves."
+    }
+  },
+  {
+    "unit_id": "defannot-u127-138",
+    "answer": {
+      "def": "*U127",
+      "role": "평면 부분도",
+      "wall_likelihood": 0.3,
+      "wall_line_handles": [],
+      "notes": "entity_count=6, 100% LWPOLYLINE on a single insulation layer (X-평면도(기본형)$0$INSUL), each with vertices=5 -- a homogeneous set of small closed boundary polygons, the signature of an anonymous hatch/insulation-batt boundary block (*U-prefixed anonymous block name) rather than a named furniture or dimension-cache block. No coordinate data is present in the projection, so individual entities cannot be distinguished as wall-line-like versus insulation-boundary-like; wall_likelihood reflects that insulation typically runs adjacent to walls but these entities are the insulation fill boundaries, not wall centerlines/faces themselves."
+    }
+  },
+  {
+    "unit_id": "defannot-u128-139",
+    "answer": {
+      "def": "*U128",
+      "role": "평면 부분도",
+      "wall_likelihood": 0.3,
+      "wall_line_handles": [],
+      "notes": "entity_count=6, 100% LWPOLYLINE on a single insulation layer (X-평면도(기본형)$0$INSUL), each with vertices=5 -- a homogeneous set of small closed boundary polygons, the signature of an anonymous hatch/insulation-batt boundary block (*U-prefixed anonymous block name) rather than a named furniture or dimension-cache block. No coordinate data is present in the projection, so individual entities cannot be distinguished as wall-line-like versus insulation-boundary-like; wall_likelihood reflects that insulation typically runs adjacent to walls but these entities are the insulation fill boundaries, not wall centerlines/faces themselves."
+    }
+  },
+  {
+    "unit_id": "defannot-u129-140",
+    "answer": {
+      "def": "*U129",
+      "role": "평면 부분도",
+      "wall_likelihood": 0.3,
+      "wall_line_handles": [],
+      "notes": "entity_count=17, 100% LWPOLYLINE on a single insulation layer (X-평면도(기본형)$0$INSUL), each with vertices=5 -- a homogeneous set of small closed boundary polygons, the signature of an anonymous hatch/insulation-batt boundary block (*U-prefixed anonymous block name) rather than a named furniture or dimension-cache block. No coordinate data is present in the projection, so individual entities cannot be distinguished as wall-line-like versus insulation-boundary-like; wall_likelihood reflects that insulation typically runs adjacent to walls but these entities are the insulation fill boundaries, not wall centerlines/faces themselves."
+    }
+  }
+]

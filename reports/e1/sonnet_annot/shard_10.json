@@ -1,0 +1,216 @@
+[
+  {
+    "unit_id": "defannot-u174-181",
+    "answer": {
+      "def": "*U174",
+      "role": "평면 부분도",
+      "wall_likelihood": 0.2,
+      "wall_line_handles": [],
+      "notes": "44 closed 5-vertex LWPOLYLINEs, all on X-평면도(기본형)$0$INSUL layer, uniform small rectangle shapes typical of an insulation hatch/fill pattern tiled within a wall assembly. No coordinates given so exact wall alignment can't be confirmed; no single entity is distinguishably more wall-like than another so no specific handles are flagged."
+    }
+  },
+  {
+    "unit_id": "defannot-u175-182",
+    "answer": {
+      "def": "*U175",
+      "role": "평면 부분도",
+      "wall_likelihood": 0.2,
+      "wall_line_handles": [],
+      "notes": "58 closed 5-vertex LWPOLYLINEs on X-평면도(기본형)$0$INSUL layer, same uniform-rectangle insulation-fill pattern as sibling *U17x/*U18x/*U19x definitions. No bbox data to confirm wall alignment."
+    }
+  },
+  {
+    "unit_id": "defannot-u176-183",
+    "answer": {
+      "def": "*U176",
+      "role": "평면 부분도",
+      "wall_likelihood": 0.2,
+      "wall_line_handles": [],
+      "notes": "30 closed 5-vertex LWPOLYLINEs on X-평면도(기본형)$0$INSUL layer, uniform insulation-fill rectangles. Handles are sequential (5379-539C), consistent with a single contiguous hatch generation pass."
+    }
+  },
+  {
+    "unit_id": "defannot-u177-184",
+    "answer": {
+      "def": "*U177",
+      "role": "심볼",
+      "wall_likelihood": 0.15,
+      "wall_line_handles": [
+        {"handle": "53A5", "reason": "long horizontal edge, exactly duplicated in reverse by 53B5 (double-traced boundary typical of a drawn outline, not a structural wall)"},
+        {"handle": "53B5", "reason": "duplicate of 53A5 reversed, paired collinear line"},
+        {"handle": "53A7", "reason": "long horizontal edge parallel to 53A5, offset ~50 units forming a banded outline"},
+        {"handle": "53AD", "reason": "duplicate of 53A7 reversed, paired collinear line"},
+        {"handle": "53A6", "reason": "short vertical closing the ~50-unit band at the left end"},
+        {"handle": "53A8", "reason": "short vertical closing the ~50-unit band at the right end"}
+      ],
+      "notes": "23 entities: 1 INSERT of block 'X-평면도(기본형)$0$국기계양대' (flagpole/flag-pole mast) plus 2 WIPEOUT and 20 LINE forming a stepped rectangular plinth outline (bbox ~2120x126). This is a flagpole base-mount detail symbol, not a building wall; the wall_likelihood reflects only the coincidental double-line/banded geometry."
+    }
+  },
+  {
+    "unit_id": "defannot-u179-185",
+    "answer": {
+      "def": "*U179",
+      "role": "평면 부분도",
+      "wall_likelihood": 0.2,
+      "wall_line_handles": [],
+      "notes": "20 closed 5-vertex LWPOLYLINEs on X-평면도(기본형)$0$INSUL layer, uniform insulation-fill rectangles, same family as other *U17x/*U18x definitions in this shard."
+    }
+  },
+  {
+    "unit_id": "defannot-u180-186",
+    "answer": {
+      "def": "*U180",
+      "role": "평면 부분도",
+      "wall_likelihood": 0.2,
+      "wall_line_handles": [],
+      "notes": "62 closed 5-vertex LWPOLYLINEs on X-평면도(기본형)$0$INSUL layer, uniform insulation-fill rectangles, same family pattern as sibling definitions."
+    }
+  },
+  {
+    "unit_id": "defannot-u181-187",
+    "answer": {
+      "def": "*U181",
+      "role": "심볼",
+      "wall_likelihood": 0.15,
+      "wall_line_handles": [
+        {"handle": "5455", "reason": "long horizontal edge, exactly duplicated in reverse by 5465 (double-traced boundary)"},
+        {"handle": "5465", "reason": "duplicate of 5455 reversed, paired collinear line"},
+        {"handle": "5457", "reason": "long horizontal edge parallel to 5455, offset ~50 units forming a banded outline"},
+        {"handle": "545D", "reason": "duplicate of 5457 reversed, paired collinear line"},
+        {"handle": "5456", "reason": "short vertical closing the ~50-unit band at the left end"},
+        {"handle": "5458", "reason": "short vertical closing the ~50-unit band at the right end"}
+      ],
+      "notes": "23 entities: 1 INSERT of block 'X-평면도(기본형)$0$국기계양대' (flagpole/flag-pole mast) plus 2 WIPEOUT and 20 LINE, same stepped-plinth pattern as *U177 but smaller (bbox ~1420x126). Flagpole base-mount detail symbol, not a building wall."
+    }
+  },
+  {
+    "unit_id": "defannot-u183-188",
+    "answer": {
+      "def": "*U183",
+      "role": "평면 부분도",
+      "wall_likelihood": 0.2,
+      "wall_line_handles": [],
+      "notes": "43 closed 5-vertex LWPOLYLINEs on X-평면도(기본형)$0$INSUL layer, uniform insulation-fill rectangles, same family pattern as sibling definitions in this shard."
+    }
+  },
+  {
+    "unit_id": "defannot-u184-189",
+    "answer": {
+      "def": "*U184",
+      "role": "평면 부분도",
+      "wall_likelihood": 0.2,
+      "wall_line_handles": [],
+      "notes": "26 closed 5-vertex LWPOLYLINEs on X-평면도(기본형)$0$INSUL layer, uniform insulation-fill rectangles."
+    }
+  },
+  {
+    "unit_id": "defannot-u185-190",
+    "answer": {
+      "def": "*U185",
+      "role": "평면 부분도",
+      "wall_likelihood": 0.2,
+      "wall_line_handles": [],
+      "notes": "46 closed 5-vertex LWPOLYLINEs on X-평면도(기본형)$0$INSUL layer, uniform insulation-fill rectangles."
+    }
+  },
+  {
+    "unit_id": "defannot-u186-191",
+    "answer": {
+      "def": "*U186",
+      "role": "평면 부분도",
+      "wall_likelihood": 0.2,
+      "wall_line_handles": [],
+      "notes": "18 closed 5-vertex LWPOLYLINEs on X-평면도(기본형)$0$INSUL layer, smallest of the INSUL group in this shard, same uniform insulation-fill rectangle pattern."
+    }
+  },
+  {
+    "unit_id": "defannot-u187-192",
+    "answer": {
+      "def": "*U187",
+      "role": "평면 부분도",
+      "wall_likelihood": 0.2,
+      "wall_line_handles": [],
+      "notes": "28 closed 5-vertex LWPOLYLINEs on X-평면도(기본형)$0$INSUL layer, uniform insulation-fill rectangles."
+    }
+  },
+  {
+    "unit_id": "defannot-u188-193",
+    "answer": {
+      "def": "*U188",
+      "role": "평면 부분도",
+      "wall_likelihood": 0.2,
+      "wall_line_handles": [],
+      "notes": "83 closed 5-vertex LWPOLYLINEs on X-평면도(기본형)$0$INSUL layer, uniform insulation-fill rectangles, larger repeat count suggesting a longer wall run being filled."
+    }
+  },
+  {
+    "unit_id": "defannot-u189-194",
+    "answer": {
+      "def": "*U189",
+      "role": "평면 부분도",
+      "wall_likelihood": 0.2,
+      "wall_line_handles": [],
+      "notes": "147 closed 5-vertex LWPOLYLINEs on X-평면도(기본형)$0$INSUL layer, the largest INSUL fill definition in this shard, uniform insulation-fill rectangles consistent with a long or multi-segment wall run."
+    }
+  },
+  {
+    "unit_id": "defannot-u191-195",
+    "answer": {
+      "def": "*U191",
+      "role": "평면 부분도",
+      "wall_likelihood": 0.2,
+      "wall_line_handles": [],
+      "notes": "36 closed 5-vertex LWPOLYLINEs on X-평면도(기본형)$0$INSUL layer, uniform insulation-fill rectangles."
+    }
+  },
+  {
+    "unit_id": "defannot-u192-196",
+    "answer": {
+      "def": "*U192",
+      "role": "평면 부분도",
+      "wall_likelihood": 0.2,
+      "wall_line_handles": [],
+      "notes": "41 closed 5-vertex LWPOLYLINEs on X-평면도(기본형)$0$INSUL layer, uniform insulation-fill rectangles."
+    }
+  },
+  {
+    "unit_id": "defannot-u193-197",
+    "answer": {
+      "def": "*U193",
+      "role": "평면 부분도",
+      "wall_likelihood": 0.2,
+      "wall_line_handles": [],
+      "notes": "32 closed 5-vertex LWPOLYLINEs on X-평면도(기본형)$0$INSUL layer, uniform insulation-fill rectangles."
+    }
+  },
+  {
+    "unit_id": "defannot-u194-198",
+    "answer": {
+      "def": "*U194",
+      "role": "평면 부분도",
+      "wall_likelihood": 0.2,
+      "wall_line_handles": [],
+      "notes": "Only 5 closed 5-vertex LWPOLYLINEs on X-평면도(기본형)$0$INSUL layer, the smallest INSUL fill definition in this shard, likely a short wall segment or corner infill."
+    }
+  },
+  {
+    "unit_id": "defannot-u195-199",
+    "answer": {
+      "def": "*U195",
+      "role": "평면 부분도",
+      "wall_likelihood": 0.2,
+      "wall_line_handles": [],
+      "notes": "15 closed 5-vertex LWPOLYLINEs on X-평면도(기본형)$0$INSUL layer, uniform insulation-fill rectangles."
+    }
+  },
+  {
+    "unit_id": "defannot-u196-200",
+    "answer": {
+      "def": "*U196",
+      "role": "평면 부분도",
+      "wall_likelihood": 0.2,
+      "wall_line_handles": [],
+      "notes": "38 closed 5-vertex LWPOLYLINEs on X-평면도(기본형)$0$INSUL layer, uniform insulation-fill rectangles."
+    }
+  }
+]

@@ -1,0 +1,9 @@
+{
+  "id": "READ-007",
+  "answer": 265,
+  "method": "Loaded dwg_graph_ir.json, iterated every block_definitions[*].def_entities[*], counted entries where dxf_name == 'HATCH'.",
+  "commands": [
+    "d = json.load(open(path, encoding='utf-8')); bd = d['block_definitions']; print(type(bd), len(bd))",
+    "count = 0\nfor b in bd:\n    for e in b.get('def_entities', []):\n        if e.get('dxf_name') == 'HATCH':\n            count += 1\nprint('HATCH count:', count)"
+  ]
+}

@@ -1,0 +1,216 @@
+[
+  {
+    "unit_id": "defannot-u151-161",
+    "answer": {
+      "def": "*U151",
+      "role": "기타",
+      "wall_likelihood": 0.25,
+      "wall_line_handles": [],
+      "notes": "All 24 entities are closed 5-vertex LWPOLYLINEs on a single X-평면도(기본형)$0$INSUL layer — a uniform repeated pattern consistent with wall-insulation hatch/fill tiles, not distinct wall centerlines. No bbox is derivable since there are no LINE entities. Entities are visually indistinguishable from one another so none stands out as more wall-line-like than the rest."
+    }
+  },
+  {
+    "unit_id": "defannot-u152-162",
+    "answer": {
+      "def": "*U152",
+      "role": "기타",
+      "wall_likelihood": 0.25,
+      "wall_line_handles": [],
+      "notes": "All 21 entities are closed 5-vertex LWPOLYLINEs on a single X-평면도(기본형)$0$INSUL layer — a uniform repeated pattern consistent with wall-insulation hatch/fill tiles, not distinct wall centerlines. No bbox is derivable since there are no LINE entities. Entities are visually indistinguishable from one another so none stands out as more wall-line-like than the rest."
+    }
+  },
+  {
+    "unit_id": "defannot-u156-163",
+    "answer": {
+      "def": "*U156",
+      "role": "기타",
+      "wall_likelihood": 0.25,
+      "wall_line_handles": [],
+      "notes": "All 92 entities are closed 5-vertex LWPOLYLINEs on a single X-평면도(기본형)$0$INSUL layer — a uniform repeated pattern consistent with wall-insulation hatch/fill tiles, not distinct wall centerlines. No bbox is derivable since there are no LINE entities. Entities are visually indistinguishable from one another so none stands out as more wall-line-like than the rest."
+    }
+  },
+  {
+    "unit_id": "defannot-u157-164",
+    "answer": {
+      "def": "*U157",
+      "role": "기타",
+      "wall_likelihood": 0.25,
+      "wall_line_handles": [],
+      "notes": "All 8 entities are closed 5-vertex LWPOLYLINEs on a single X-평면도(기본형)$0$INSUL layer — a uniform repeated pattern consistent with wall-insulation hatch/fill tiles, not distinct wall centerlines. No bbox is derivable since there are no LINE entities. Entities are visually indistinguishable from one another so none stands out as more wall-line-like than the rest."
+    }
+  },
+  {
+    "unit_id": "defannot-u158-165",
+    "answer": {
+      "def": "*U158",
+      "role": "기타",
+      "wall_likelihood": 0.25,
+      "wall_line_handles": [],
+      "notes": "All 17 entities are closed 5-vertex LWPOLYLINEs on a single X-평면도(기본형)$0$INSUL layer — a uniform repeated pattern consistent with wall-insulation hatch/fill tiles, not distinct wall centerlines. No bbox is derivable since there are no LINE entities. Entities are visually indistinguishable from one another so none stands out as more wall-line-like than the rest."
+    }
+  },
+  {
+    "unit_id": "defannot-u159-166",
+    "answer": {
+      "def": "*U159",
+      "role": "기타",
+      "wall_likelihood": 0.25,
+      "wall_line_handles": [],
+      "notes": "All 18 entities are closed 5-vertex LWPOLYLINEs on a single X-평면도(기본형)$0$INSUL layer — a uniform repeated pattern consistent with wall-insulation hatch/fill tiles, not distinct wall centerlines. No bbox is derivable since there are no LINE entities. Entities are visually indistinguishable from one another so none stands out as more wall-line-like than the rest."
+    }
+  },
+  {
+    "unit_id": "defannot-u160-167",
+    "answer": {
+      "def": "*U160",
+      "role": "기타",
+      "wall_likelihood": 0.25,
+      "wall_line_handles": [],
+      "notes": "All 87 entities are closed 5-vertex LWPOLYLINEs on a single X-평면도(기본형)$0$INSUL layer — a uniform repeated pattern consistent with wall-insulation hatch/fill tiles, not distinct wall centerlines. No bbox is derivable since there are no LINE entities. Entities are visually indistinguishable from one another so none stands out as more wall-line-like than the rest."
+    }
+  },
+  {
+    "unit_id": "defannot-u161-168",
+    "answer": {
+      "def": "*U161",
+      "role": "기타",
+      "wall_likelihood": 0.25,
+      "wall_line_handles": [],
+      "notes": "All 90 entities are closed 5-vertex LWPOLYLINEs on a single X-평면도(기본형)$0$INSUL layer — a uniform repeated pattern consistent with wall-insulation hatch/fill tiles, not distinct wall centerlines. No bbox is derivable since there are no LINE entities. Entities are visually indistinguishable from one another so none stands out as more wall-line-like than the rest."
+    }
+  },
+  {
+    "unit_id": "defannot-u162-169",
+    "answer": {
+      "def": "*U162",
+      "role": "기타",
+      "wall_likelihood": 0.25,
+      "wall_line_handles": [],
+      "notes": "All 81 entities are closed 5-vertex LWPOLYLINEs on a single X-평면도(기본형)$0$INSUL layer — a uniform repeated pattern consistent with wall-insulation hatch/fill tiles, not distinct wall centerlines. No bbox is derivable since there are no LINE entities. Entities are visually indistinguishable from one another so none stands out as more wall-line-like than the rest."
+    }
+  },
+  {
+    "unit_id": "defannot-u163-170",
+    "answer": {
+      "def": "*U163",
+      "role": "기타",
+      "wall_likelihood": 0.25,
+      "wall_line_handles": [],
+      "notes": "All 75 entities are closed 5-vertex LWPOLYLINEs on a single X-평면도(기본형)$0$INSUL layer — a uniform repeated pattern consistent with wall-insulation hatch/fill tiles, not distinct wall centerlines. No bbox is derivable since there are no LINE entities. Entities are visually indistinguishable from one another so none stands out as more wall-line-like than the rest."
+    }
+  },
+  {
+    "unit_id": "defannot-u164-171",
+    "answer": {
+      "def": "*U164",
+      "role": "기타",
+      "wall_likelihood": 0.25,
+      "wall_line_handles": [],
+      "notes": "All 37 entities are closed 5-vertex LWPOLYLINEs on a single X-평면도(기본형)$0$INSUL layer — a uniform repeated pattern consistent with wall-insulation hatch/fill tiles, not distinct wall centerlines. No bbox is derivable since there are no LINE entities. Entities are visually indistinguishable from one another so none stands out as more wall-line-like than the rest."
+    }
+  },
+  {
+    "unit_id": "defannot-u165-172",
+    "answer": {
+      "def": "*U165",
+      "role": "기타",
+      "wall_likelihood": 0.25,
+      "wall_line_handles": [],
+      "notes": "All 36 entities are closed 5-vertex LWPOLYLINEs on a single X-평면도(기본형)$0$INSUL layer — a uniform repeated pattern consistent with wall-insulation hatch/fill tiles, not distinct wall centerlines. No bbox is derivable since there are no LINE entities. Entities are visually indistinguishable from one another so none stands out as more wall-line-like than the rest."
+    }
+  },
+  {
+    "unit_id": "defannot-u166-173",
+    "answer": {
+      "def": "*U166",
+      "role": "기타",
+      "wall_likelihood": 0.25,
+      "wall_line_handles": [],
+      "notes": "All 13 entities are closed 5-vertex LWPOLYLINEs on a single X-평면도(기본형)$0$INSUL layer — a uniform repeated pattern consistent with wall-insulation hatch/fill tiles, not distinct wall centerlines. No bbox is derivable since there are no LINE entities. Entities are visually indistinguishable from one another so none stands out as more wall-line-like than the rest."
+    }
+  },
+  {
+    "unit_id": "defannot-u167-174",
+    "answer": {
+      "def": "*U167",
+      "role": "기타",
+      "wall_likelihood": 0.25,
+      "wall_line_handles": [],
+      "notes": "All 30 entities are closed 5-vertex LWPOLYLINEs on a single X-평면도(기본형)$0$INSUL layer — a uniform repeated pattern consistent with wall-insulation hatch/fill tiles, not distinct wall centerlines. No bbox is derivable since there are no LINE entities. Entities are visually indistinguishable from one another so none stands out as more wall-line-like than the rest."
+    }
+  },
+  {
+    "unit_id": "defannot-u168-175",
+    "answer": {
+      "def": "*U168",
+      "role": "기타",
+      "wall_likelihood": 0.25,
+      "wall_line_handles": [],
+      "notes": "All 14 entities are closed 5-vertex LWPOLYLINEs on a single X-평면도(기본형)$0$INSUL layer — a uniform repeated pattern consistent with wall-insulation hatch/fill tiles, not distinct wall centerlines. No bbox is derivable since there are no LINE entities. Entities are visually indistinguishable from one another so none stands out as more wall-line-like than the rest."
+    }
+  },
+  {
+    "unit_id": "defannot-u169-176",
+    "answer": {
+      "def": "*U169",
+      "role": "기타",
+      "wall_likelihood": 0.25,
+      "wall_line_handles": [],
+      "notes": "All 106 entities are closed 5-vertex LWPOLYLINEs on a single X-평면도(기본형)$0$INSUL layer — a uniform repeated pattern consistent with wall-insulation hatch/fill tiles, not distinct wall centerlines. No bbox is derivable since there are no LINE entities. Entities are visually indistinguishable from one another so none stands out as more wall-line-like than the rest."
+    }
+  },
+  {
+    "unit_id": "defannot-u170-177",
+    "answer": {
+      "def": "*U170",
+      "role": "심볼",
+      "wall_likelihood": 0.3,
+      "wall_line_handles": [
+        {"handle": "52A1", "reason": "long straight segment closing an inner rectangular band, parallel-offset pair typical of double-line wall drafting"},
+        {"handle": "52A2", "reason": "vertical inner-band edge paired with an outer edge at fixed offset, wall-like double-line pattern"},
+        {"handle": "52A3", "reason": "horizontal inner-band edge mirroring the outer boundary at a fixed offset"},
+        {"handle": "52A4", "reason": "vertical inner-band edge closing the rectangular strip"},
+        {"handle": "52A6", "reason": "long outer vertical edge running parallel to the inner band at consistent offset"},
+        {"handle": "52AC", "reason": "long outer vertical edge on the opposite side, mirrors 52A6"}
+      ],
+      "notes": "23-entity definition: 1 INSERT of block X-평면도(기본형)$0$국기계양대 (flagpole), 20 LINE, 2 WIPEOUT (masking), all but the flagpole INSERT on layer 0. The LINEs form a closed double-rectangle outline with a small gap/opening near y=22.5 on both sides — geometrically resembles a plan-view plinth/base enclosure around the flagpole rather than a building wall. Classified as a site-fixture symbol (flagpole + base detail); wall_likelihood reflects the double-line rectangular geometry, not an actual load-bearing wall. WIPEOUT and INSERT entities excluded from wall_line_handles."
+    }
+  },
+  {
+    "unit_id": "defannot-u171-178",
+    "answer": {
+      "def": "*U171",
+      "role": "기타",
+      "wall_likelihood": 0.25,
+      "wall_line_handles": [],
+      "notes": "All 29 entities are closed 5-vertex LWPOLYLINEs on a single X-평면도(기본형)$0$INSUL layer — a uniform repeated pattern consistent with wall-insulation hatch/fill tiles, not distinct wall centerlines. No bbox is derivable since there are no LINE entities. Entities are visually indistinguishable from one another so none stands out as more wall-line-like than the rest."
+    }
+  },
+  {
+    "unit_id": "defannot-u172-179",
+    "answer": {
+      "def": "*U172",
+      "role": "심볼",
+      "wall_likelihood": 0.3,
+      "wall_line_handles": [
+        {"handle": "52DF", "reason": "long straight segment closing an inner rectangular band, parallel-offset pair typical of double-line wall drafting"},
+        {"handle": "52E0", "reason": "vertical inner-band edge paired with an outer edge at fixed offset, wall-like double-line pattern"},
+        {"handle": "52E1", "reason": "horizontal inner-band edge mirroring the outer boundary at a fixed offset"},
+        {"handle": "52E2", "reason": "vertical inner-band edge closing the rectangular strip"},
+        {"handle": "52E4", "reason": "long outer vertical edge running parallel to the inner band at consistent offset"},
+        {"handle": "52EA", "reason": "long outer vertical edge on the opposite side, mirrors 52E4"}
+      ],
+      "notes": "23-entity definition, structurally identical to *U170 but larger (bbox [-810,-103.5]-[810,22.5]): 1 INSERT of block X-평면도(기본형)$0$국기계양대 (flagpole), 20 LINE, 2 WIPEOUT, all but the flagpole INSERT on layer 0. The LINEs form the same double-rectangle plinth/base outline pattern as *U170, scaled up. Classified as a site-fixture symbol (flagpole + base detail), not an actual building wall. WIPEOUT and INSERT entities excluded from wall_line_handles."
+    }
+  },
+  {
+    "unit_id": "defannot-u173-180",
+    "answer": {
+      "def": "*U173",
+      "role": "기타",
+      "wall_likelihood": 0.25,
+      "wall_line_handles": [],
+      "notes": "All 18 entities are closed 5-vertex LWPOLYLINEs on a single X-평면도(기본형)$0$INSUL layer — a uniform repeated pattern consistent with wall-insulation hatch/fill tiles, not distinct wall centerlines. No bbox is derivable since there are no LINE entities. Entities are visually indistinguishable from one another so none stands out as more wall-line-like than the rest."
+    }
+  }
+]

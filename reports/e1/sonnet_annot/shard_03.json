@@ -1,0 +1,202 @@
+[
+  {
+    "unit_id": "defannot-d335-41",
+    "answer": {
+      "def": "*D335",
+      "role": "치수캐시",
+      "wall_likelihood": 0.05,
+      "wall_line_handles": [],
+      "notes": "*D335: entities live on DIM/DEFPOINTS layers with 2x INSERT of _ArchTick (dimension tick/dot symbol), 1x MTEXT '\\A1;80' (the dimension override text), and 3x POINT on DEFPOINTS (dimension definition points). The 5 LINE entities are extension/witness lines and the dimension line itself, not structural geometry. This matches the anonymous *D-prefixed dimension-cache block AutoCAD generates per associative dimension, so wall_likelihood is low despite the LINE entities present."
+    }
+  },
+  {
+    "unit_id": "defannot-d336-42",
+    "answer": {
+      "def": "*D336",
+      "role": "치수캐시",
+      "wall_likelihood": 0.05,
+      "wall_line_handles": [],
+      "notes": "*D336: entities live on DIM/DEFPOINTS layers with 2x INSERT of _ArchTick (dimension tick/dot symbol), 1x MTEXT '\\A1;2500' (the dimension override text), and 3x POINT on DEFPOINTS (dimension definition points). The 3 LINE entities are extension/witness lines and the dimension line itself, not structural geometry. This matches the anonymous *D-prefixed dimension-cache block AutoCAD generates per associative dimension, so wall_likelihood is low despite the LINE entities present."
+    }
+  },
+  {
+    "unit_id": "defannot-d337-43",
+    "answer": {
+      "def": "*D337",
+      "role": "치수캐시",
+      "wall_likelihood": 0.05,
+      "wall_line_handles": [],
+      "notes": "*D337: entities live on DIM/DEFPOINTS layers with 2x INSERT of _ArchTick (dimension tick/dot symbol), 1x MTEXT '\\A1;135' (the dimension override text), and 3x POINT on DEFPOINTS (dimension definition points). The 5 LINE entities are extension/witness lines and the dimension line itself, not structural geometry. This matches the anonymous *D-prefixed dimension-cache block AutoCAD generates per associative dimension, so wall_likelihood is low despite the LINE entities present."
+    }
+  },
+  {
+    "unit_id": "defannot-d338-44",
+    "answer": {
+      "def": "*D338",
+      "role": "치수캐시",
+      "wall_likelihood": 0.05,
+      "wall_line_handles": [],
+      "notes": "*D338: entities live on DIM/DEFPOINTS layers with 2x INSERT of _ArchTick (dimension tick/dot symbol), 1x MTEXT '\\A1;320' (the dimension override text), and 3x POINT on DEFPOINTS (dimension definition points). The 5 LINE entities are extension/witness lines and the dimension line itself, not structural geometry. This matches the anonymous *D-prefixed dimension-cache block AutoCAD generates per associative dimension, so wall_likelihood is low despite the LINE entities present."
+    }
+  },
+  {
+    "unit_id": "defannot-d339-45",
+    "answer": {
+      "def": "*D339",
+      "role": "치수캐시",
+      "wall_likelihood": 0.05,
+      "wall_line_handles": [],
+      "notes": "*D339: entities live on DIM/DEFPOINTS layers with 2x INSERT of _ArchTick (dimension tick/dot symbol), 1x MTEXT '\\A1;6060' (the dimension override text), and 3x POINT on DEFPOINTS (dimension definition points). The 3 LINE entities are extension/witness lines and the dimension line itself, not structural geometry. This matches the anonymous *D-prefixed dimension-cache block AutoCAD generates per associative dimension, so wall_likelihood is low despite the LINE entities present."
+    }
+  },
+  {
+    "unit_id": "defannot-d340-46",
+    "answer": {
+      "def": "*D340",
+      "role": "치수캐시",
+      "wall_likelihood": 0.05,
+      "wall_line_handles": [],
+      "notes": "*D340: entities live on DIM/DEFPOINTS layers with 2x INSERT of _ArchTick (dimension tick/dot symbol), 1x MTEXT '\\A1;150' (the dimension override text), and 3x POINT on DEFPOINTS (dimension definition points). The 3 LINE entities are extension/witness lines and the dimension line itself, not structural geometry. This matches the anonymous *D-prefixed dimension-cache block AutoCAD generates per associative dimension, so wall_likelihood is low despite the LINE entities present."
+    }
+  },
+  {
+    "unit_id": "defannot-d341-47",
+    "answer": {
+      "def": "*D341",
+      "role": "치수캐시",
+      "wall_likelihood": 0.05,
+      "wall_line_handles": [],
+      "notes": "*D341: entities live on DIM/DEFPOINTS layers with 2x INSERT of _ArchTick (dimension tick/dot symbol), 1x MTEXT '\\A1;150' (the dimension override text), and 3x POINT on DEFPOINTS (dimension definition points). The 3 LINE entities are extension/witness lines and the dimension line itself, not structural geometry. This matches the anonymous *D-prefixed dimension-cache block AutoCAD generates per associative dimension, so wall_likelihood is low despite the LINE entities present."
+    }
+  },
+  {
+    "unit_id": "defannot-d342-48",
+    "answer": {
+      "def": "*D342",
+      "role": "치수캐시",
+      "wall_likelihood": 0.05,
+      "wall_line_handles": [],
+      "notes": "*D342: entities live on DIM/DEFPOINTS layers with 2x INSERT of _ArchTick (dimension tick/dot symbol), 1x MTEXT '\\A1;1700' (the dimension override text), and 3x POINT on DEFPOINTS (dimension definition points). The 3 LINE entities are extension/witness lines and the dimension line itself, not structural geometry. This matches the anonymous *D-prefixed dimension-cache block AutoCAD generates per associative dimension, so wall_likelihood is low despite the LINE entities present."
+    }
+  },
+  {
+    "unit_id": "defannot-d343-49",
+    "answer": {
+      "def": "*D343",
+      "role": "치수캐시",
+      "wall_likelihood": 0.05,
+      "wall_line_handles": [],
+      "notes": "*D343: entities live on DIM/DEFPOINTS layers with 2x INSERT of _ArchTick (dimension tick/dot symbol), 1x MTEXT '\\A1;130' (the dimension override text), and 3x POINT on DEFPOINTS (dimension definition points). The 3 LINE entities are extension/witness lines and the dimension line itself, not structural geometry. This matches the anonymous *D-prefixed dimension-cache block AutoCAD generates per associative dimension, so wall_likelihood is low despite the LINE entities present."
+    }
+  },
+  {
+    "unit_id": "defannot-d344-50",
+    "answer": {
+      "def": "*D344",
+      "role": "치수캐시",
+      "wall_likelihood": 0.05,
+      "wall_line_handles": [],
+      "notes": "*D344: entities live on DIM/DEFPOINTS layers with 2x INSERT of _ArchTick (dimension tick/dot symbol), 1x MTEXT '\\A1;130' (the dimension override text), and 3x POINT on DEFPOINTS (dimension definition points). The 3 LINE entities are extension/witness lines and the dimension line itself, not structural geometry. This matches the anonymous *D-prefixed dimension-cache block AutoCAD generates per associative dimension, so wall_likelihood is low despite the LINE entities present."
+    }
+  },
+  {
+    "unit_id": "defannot-d345-51",
+    "answer": {
+      "def": "*D345",
+      "role": "치수캐시",
+      "wall_likelihood": 0.05,
+      "wall_line_handles": [],
+      "notes": "*D345: entities live on DIM/DEFPOINTS layers with 2x INSERT of _ArchTick (dimension tick/dot symbol), 1x MTEXT '\\A1;1500' (the dimension override text), and 3x POINT on DEFPOINTS (dimension definition points). The 3 LINE entities are extension/witness lines and the dimension line itself, not structural geometry. This matches the anonymous *D-prefixed dimension-cache block AutoCAD generates per associative dimension, so wall_likelihood is low despite the LINE entities present."
+    }
+  },
+  {
+    "unit_id": "defannot-d346-52",
+    "answer": {
+      "def": "*D346",
+      "role": "치수캐시",
+      "wall_likelihood": 0.05,
+      "wall_line_handles": [],
+      "notes": "*D346: entities live on DIM/DEFPOINTS layers with 2x INSERT of _ArchTick (dimension tick/dot symbol), 1x MTEXT '\\A1;210' (the dimension override text), and 3x POINT on DEFPOINTS (dimension definition points). The 5 LINE entities are extension/witness lines and the dimension line itself, not structural geometry. This matches the anonymous *D-prefixed dimension-cache block AutoCAD generates per associative dimension, so wall_likelihood is low despite the LINE entities present."
+    }
+  },
+  {
+    "unit_id": "defannot-d347-53",
+    "answer": {
+      "def": "*D347",
+      "role": "치수캐시",
+      "wall_likelihood": 0.05,
+      "wall_line_handles": [],
+      "notes": "*D347: entities live on DIM/DEFPOINTS layers with 2x INSERT of DIMDOT (dimension tick/dot symbol), 1x MTEXT '\\A1;1735' (the dimension override text), and 3x POINT on DEFPOINTS (dimension definition points). The 3 LINE entities are extension/witness lines and the dimension line itself, not structural geometry. This matches the anonymous *D-prefixed dimension-cache block AutoCAD generates per associative dimension, so wall_likelihood is low despite the LINE entities present."
+    }
+  },
+  {
+    "unit_id": "defannot-d348-54",
+    "answer": {
+      "def": "*D348",
+      "role": "치수캐시",
+      "wall_likelihood": 0.05,
+      "wall_line_handles": [],
+      "notes": "*D348: entities live on DIM/DEFPOINTS layers with 2x INSERT of _ArchTick (dimension tick/dot symbol), 1x MTEXT '\\A1;375' (the dimension override text), and 3x POINT on DEFPOINTS (dimension definition points). The 3 LINE entities are extension/witness lines and the dimension line itself, not structural geometry. This matches the anonymous *D-prefixed dimension-cache block AutoCAD generates per associative dimension, so wall_likelihood is low despite the LINE entities present."
+    }
+  },
+  {
+    "unit_id": "defannot-d349-55",
+    "answer": {
+      "def": "*D349",
+      "role": "치수캐시",
+      "wall_likelihood": 0.05,
+      "wall_line_handles": [],
+      "notes": "*D349: entities live on DIM/DEFPOINTS layers with 2x INSERT of DIMDOT (dimension tick/dot symbol), 1x MTEXT '\\A1;5470' (the dimension override text), and 3x POINT on DEFPOINTS (dimension definition points). The 3 LINE entities are extension/witness lines and the dimension line itself, not structural geometry. This matches the anonymous *D-prefixed dimension-cache block AutoCAD generates per associative dimension, so wall_likelihood is low despite the LINE entities present."
+    }
+  },
+  {
+    "unit_id": "defannot-d350-56",
+    "answer": {
+      "def": "*D350",
+      "role": "치수캐시",
+      "wall_likelihood": 0.05,
+      "wall_line_handles": [],
+      "notes": "*D350: entities live on DIM/DEFPOINTS layers with 2x INSERT of DIMDOT (dimension tick/dot symbol), 1x MTEXT '\\A1;1645' (the dimension override text), and 3x POINT on DEFPOINTS (dimension definition points). The 3 LINE entities are extension/witness lines and the dimension line itself, not structural geometry. This matches the anonymous *D-prefixed dimension-cache block AutoCAD generates per associative dimension, so wall_likelihood is low despite the LINE entities present."
+    }
+  },
+  {
+    "unit_id": "defannot-d351-57",
+    "answer": {
+      "def": "*D351",
+      "role": "치수캐시",
+      "wall_likelihood": 0.05,
+      "wall_line_handles": [],
+      "notes": "*D351: entities live on DIM/DEFPOINTS layers with 2x INSERT of DIMDOT (dimension tick/dot symbol), 1x MTEXT '\\A1;1165' (the dimension override text), and 3x POINT on DEFPOINTS (dimension definition points). The 3 LINE entities are extension/witness lines and the dimension line itself, not structural geometry. This matches the anonymous *D-prefixed dimension-cache block AutoCAD generates per associative dimension, so wall_likelihood is low despite the LINE entities present."
+    }
+  },
+  {
+    "unit_id": "defannot-d352-58",
+    "answer": {
+      "def": "*D352",
+      "role": "치수캐시",
+      "wall_likelihood": 0.05,
+      "wall_line_handles": [],
+      "notes": "*D352: entities live on DIM/DEFPOINTS layers with 2x INSERT of DIMDOT (dimension tick/dot symbol), 1x MTEXT '\\A1;630' (the dimension override text), and 3x POINT on DEFPOINTS (dimension definition points). The 3 LINE entities are extension/witness lines and the dimension line itself, not structural geometry. This matches the anonymous *D-prefixed dimension-cache block AutoCAD generates per associative dimension, so wall_likelihood is low despite the LINE entities present."
+    }
+  },
+  {
+    "unit_id": "defannot-d353-59",
+    "answer": {
+      "def": "*D353",
+      "role": "치수캐시",
+      "wall_likelihood": 0.05,
+      "wall_line_handles": [],
+      "notes": "*D353: entities live on DIM/DEFPOINTS layers with 2x INSERT of DIMDOT (dimension tick/dot symbol), 1x MTEXT '\\A1;2640' (the dimension override text), and 3x POINT on DEFPOINTS (dimension definition points). The 3 LINE entities are extension/witness lines and the dimension line itself, not structural geometry. This matches the anonymous *D-prefixed dimension-cache block AutoCAD generates per associative dimension, so wall_likelihood is low despite the LINE entities present."
+    }
+  },
+  {
+    "unit_id": "defannot-d354-60",
+    "answer": {
+      "def": "*D354",
+      "role": "치수캐시",
+      "wall_likelihood": 0.05,
+      "wall_line_handles": [],
+      "notes": "*D354: entities live on DIM/DEFPOINTS layers with 2x INSERT of DIMDOT (dimension tick/dot symbol), 1x MTEXT '\\A1;3905' (the dimension override text), and 3x POINT on DEFPOINTS (dimension definition points). The 3 LINE entities are extension/witness lines and the dimension line itself, not structural geometry. This matches the anonymous *D-prefixed dimension-cache block AutoCAD generates per associative dimension, so wall_likelihood is low despite the LINE entities present."
+    }
+  }
+]

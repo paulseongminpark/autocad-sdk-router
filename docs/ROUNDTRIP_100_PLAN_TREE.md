@@ -18,6 +18,42 @@
 > P1 완료 (6종 append 라이브, spline knots 픽스 @18cf14a) · P6 완료 (+1 근인=createSimpleBlock seed선
 > → seed_line 옵트아웃 @4db619f·배포 @238a8e5; spline 불일치=fit 표현 비대칭 → 정준 diff). 다음 최고가치 = P2 익명 리맵.
 
+## 2026-07-10 arc update (R4o–R4r)
+
+R4o~R4r 아크: hatch phase 잔차 규명 → assoc(re-link) 가설 검증 → 고아(orphan) 판정까지.
+
+- **R4o 무효화** (wrong source): 32,545/32,551=0.9998로 돌파처럼 보였으나 population forensics가
+  R4n 대비 def-name 겹침 91/294, census 245-vs-407 불일치를 노출; `identity.json` 확인 결과
+  `--dwg` 인자 누락으로 `tests/fixtures/native_sample.dwg`(capstone 기본값)를 돌린 것으로 판명 —
+  `1.dwg`가 아님. population-control 선례로 legislated: **LEX-0006**
+  (`reports/interior100/population_forensics_R4nR4o.md`,
+  `runs/e2e_1dwg_R4o_phase_20260709/identity.json`, commit `8124edd`). 소스 sha256/def-population
+  신원 확인 전엔 어떤 cross-run 주장도 인정 불가.
+- **R4p 26,831**: two-site phase repair. (D1a) predefined-name 패턴(DASH×66)이 origin fold를
+  직렬화 엔티티 행에서 읽어 phase 손실(predefined job은 `pattern_definitions` 미보유) — origin
+  carriage를 predefined에도 적용하도록 수정; (D2) canonical divisor가 `pattern_type`을
+  신뢰(type-1=>baked 가정)했으나 predefined replay는 type-1 UNIT rows 저장 — divisor
+  타입-트러스트 버그 수정. 커밋 `d261e44` (`reports/interior100/residue_tail_R4p.json`).
+- **R4q 26,834**: 27,130분의 26,834 = 0.98909, phase arc **물리적으로 CLOSED** — 생존 DASH pair의
+  canonical geometry diff가 `is_associative` 필드 하나로만 남음(그 외 전 필드는 diff0). Headline은
+  +3만 이동(DASH 66 ∩ assoc 66 겹침 63건 — phase가 고쳐져도 assoc 불일치 쌍은 안 접힘). Legislated
+  as **LEX-0007**: 잔여 66은 ASSOC 클래스(59+4+3 필드조합). Next lever = assoc re-link, 예상 +66
+  (`reports/interior100/R4q_summary.json`, `docs/ASSOC_RELINK_DESIGN.md`).
+- **Orphan-assoc 판정** (3개 독립 프로브, 전부 음성): `AcDbHatch::getAssocObjIds` 0/66 ·
+  `getAssocObjIdsAt`(loop-local) 0/66 · LibreDWG DXF 그룹 97 부재(0/330) — 소스 자체에 살아있는
+  reactor/boundary 연결이 없다. 즉 R4q가 남긴 66-hatch 잔차는 "재연결하면 접히는 differential"이
+  아니라 **소스 DWG 안에서 이미 고아(orphan)인 associativity 플래그**다. flag-replay(플래그만
+  참으로 복제하고 실제 reactor는 안 건다)로 커밋 `6d59fd5`
+  ("assoc: loop-local extraction contract + faithful associativity replay")에 반영,
+  `is_associative` 필드 diff는 여기서 닫힘.
+- **R4r in flight** — prereg point **26,900**/27,130, band **[26,890, 26,910]** (26,834 +
+  flag-replay 접힘분 예측치). 진행 중, 라이브 검증 대기.
+
+**SUPERSEDED 표시**: 위 orphan 판정으로 "진짜 boundary reactor 재연결(native ObjectARX relink,
+`assoc_source_handles` 핸들맵 경유)"을 가정한 분기는 무효화된다 — 해당 hatch에 살아있는 소스
+연결 자체가 없으므로 재연결할 대상이 없다. 아래 §1 P3, §3 백트래킹 표의 관련 행을 SUPERSEDED로
+표기(텍스트 보존, 삭제 없음).
+
 ## 1. 분기(계획) 10개 — 가치 = 예상획득 × 실현성 ÷ 비용
 
 **P1. append 6종 확장** [가치 최상 — 집행됨, 검증 중]
@@ -30,8 +66,12 @@
 (create_block이 *-이름 거부 → `ARIADNE_ANON__U172` 클론+참조 리맵+diff의 이름-맵 인지).
 기대: L2 +~5%p & L4 수렴. 트리거: 리맵 후 blockdef_diff 불일치 → 정적 스냅샷 한계 문서화(동적성은 L5로).
 
-**P3. hatch 재건** — 265건. 전략분기: native create.hatch op(레지스트리 확인) vs 경계 폴리라인
-decompose(근사, 명시 플래그). 트리거: native hatch loop API 실패 → decompose 승격.
+**P3. hatch 재건** — 265건. ~~전략분기: native create.hatch op(레지스트리 확인) vs 경계 폴리라인
+decompose(근사, 명시 플래그). 트리거: native hatch loop API 실패 → decompose 승격.~~
+**[SUPERSEDED 2026-07-10]** native 재연결(re-link) 분기는 orphan-assoc 판정(3개 독립 프로브
+전부 음성 — getAssocObjIds 0/66, getAssocObjIdsAt 0/66, LibreDWG DXF group 97 부재 0/330)으로
+무효화: 소스에 살아있는 boundary reactor가 없어 재연결할 대상 자체가 없다. decompose(근사,
+명시 플래그)가 유일한 실행경로로 확정.
 
 **P4. xdata 재생성** — 64 entities→0. 신규 op write.entity.set_xdata (regapp 등록 포함).
 Ariadne 의미층에 직결. 소스: docs/XDATA_TABLES_COMPLETION_PLAN.md.
@@ -70,7 +110,7 @@ P9(코퍼스) ← P1·P2 착륙 후    P10(의미) ← P8 후
 |---|---|---|
 | P1 B1a | R4 append 실패율>1% / 기하 drift | B1b adopt-op |
 | P2 C1 리맵 | 리맵 diff 불일치 | C3 추출-only + 한계 문서화 |
-| P3 native | hatch loop API 불가 | decompose 근사(플래그) |
+| P3 native | hatch loop API 불가 | decompose 근사(플래그) — **SUPERSEDED 2026-07-10**: orphan-assoc 판정(프로브 3종 전부 음성)으로 트리거가 실측 확정됨, decompose가 유일 경로 |
 | P6 | +1 이상현상이 추출기 결함으로 판명 | 추출기 수리 우선, P8 보류 |
 
 ## 4. ALM 문서 고고학 반영 (reports/alm_synthesis/01~05)

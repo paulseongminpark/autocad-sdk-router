@@ -1,0 +1,241 @@
+[
+  {
+    "unit_id": "defannot-u130-141",
+    "answer": {
+      "def": "*U130",
+      "role": "심볼",
+      "wall_likelihood": 0.15,
+      "wall_line_handles": [],
+      "notes": "*U130: entity_count 6, 전량 LWPOLYLINE(vertices=5)이며 레이어명에 'INSUL'(단열재) 포함. 동일한 5-vertex 폐곡선(지그재그형 틱 마크)이 반복되는 패턴으로, 벽체 경계선 자체가 아니라 벽체 단면/평면 내부를 채우는 단열재 해치(빗금) 심볼로 판단됨. 개별 폴리라인이 직선 2점 LINE 형태가 아니라 5-vertex 닫힌 폴리곤이라는 점도 해치 틱 마크와 부합. 벽체와 공간적으로 연관되어 있으나(단열재는 벽체 내부에 위치) 엔티티 자체를 '벽체 선'으로 분류하지는 않음 -> wall_line_handles 없음, wall_likelihood는 낮은 값으로 설정."
+    }
+  },
+  {
+    "unit_id": "defannot-u131-142",
+    "answer": {
+      "def": "*U131",
+      "role": "심볼",
+      "wall_likelihood": 0.15,
+      "wall_line_handles": [],
+      "notes": "*U131: entity_count 6, 전량 LWPOLYLINE(vertices=5)이며 레이어명에 'INSUL'(단열재) 포함. 동일한 5-vertex 폐곡선(지그재그형 틱 마크)이 반복되는 패턴으로, 벽체 경계선 자체가 아니라 벽체 단면/평면 내부를 채우는 단열재 해치(빗금) 심볼로 판단됨. 개별 폴리라인이 직선 2점 LINE 형태가 아니라 5-vertex 닫힌 폴리곤이라는 점도 해치 틱 마크와 부합. 벽체와 공간적으로 연관되어 있으나(단열재는 벽체 내부에 위치) 엔티티 자체를 '벽체 선'으로 분류하지는 않음 -> wall_line_handles 없음, wall_likelihood는 낮은 값으로 설정."
+    }
+  },
+  {
+    "unit_id": "defannot-u132-143",
+    "answer": {
+      "def": "*U132",
+      "role": "심볼",
+      "wall_likelihood": 0.1,
+      "wall_line_handles": [
+        {
+          "handle": "4858",
+          "reason": "닫힌 사각 프레임의 변(길이 ~1000 내외) — 벽체가 아닌 국기계양대 기초/거치 디테일의 외곽선으로 추정"
+        },
+        {
+          "handle": "4859",
+          "reason": "닫힌 사각 프레임의 변(길이 ~1000 내외) — 벽체가 아닌 국기계양대 기초/거치 디테일의 외곽선으로 추정"
+        },
+        {
+          "handle": "485A",
+          "reason": "닫힌 사각 프레임의 변(길이 ~1000 내외) — 벽체가 아닌 국기계양대 기초/거치 디테일의 외곽선으로 추정"
+        }
+      ],
+      "notes": "*U132: entity_count 23 (INSERT=1 -> 국기계양대 블록 참조, LINE=20, WIPEOUT=2). 레이어 대부분 '0'이며 국기계양대(깃대) 인서트 1개를 포함한 소형 디테일 블록으로 판단됨. LINE들은 계단형 폐곡선(대칭적 노치 패턴)을 이루어 벽체 스팬이 아니라 깃대 기초판/받침 디테일의 외곽선/마운트 프레임으로 보임. WIPEOUT 2개는 배경 해치를 가리는 마스크로 흔히 심볼 디테일에 쓰이는 패턴. 따라서 role=심볼(설비/대지 요소 디테일), wall_likelihood는 낮게 평가."
+    }
+  },
+  {
+    "unit_id": "defannot-u133-144",
+    "answer": {
+      "def": "*U133",
+      "role": "심볼",
+      "wall_likelihood": 0.15,
+      "wall_line_handles": [],
+      "notes": "*U133: entity_count 14, 전량 LWPOLYLINE(vertices=5)이며 레이어명에 'INSUL'(단열재) 포함. 동일한 5-vertex 폐곡선(지그재그형 틱 마크)이 반복되는 패턴으로, 벽체 경계선 자체가 아니라 벽체 단면/평면 내부를 채우는 단열재 해치(빗금) 심볼로 판단됨. 개별 폴리라인이 직선 2점 LINE 형태가 아니라 5-vertex 닫힌 폴리곤이라는 점도 해치 틱 마크와 부합. 벽체와 공간적으로 연관되어 있으나(단열재는 벽체 내부에 위치) 엔티티 자체를 '벽체 선'으로 분류하지는 않음 -> wall_line_handles 없음, wall_likelihood는 낮은 값으로 설정."
+    }
+  },
+  {
+    "unit_id": "defannot-u134-145",
+    "answer": {
+      "def": "*U134",
+      "role": "심볼",
+      "wall_likelihood": 0.15,
+      "wall_line_handles": [],
+      "notes": "*U134: entity_count 7, 전량 LWPOLYLINE(vertices=5)이며 레이어명에 'INSUL'(단열재) 포함. 동일한 5-vertex 폐곡선(지그재그형 틱 마크)이 반복되는 패턴으로, 벽체 경계선 자체가 아니라 벽체 단면/평면 내부를 채우는 단열재 해치(빗금) 심볼로 판단됨. 개별 폴리라인이 직선 2점 LINE 형태가 아니라 5-vertex 닫힌 폴리곤이라는 점도 해치 틱 마크와 부합. 벽체와 공간적으로 연관되어 있으나(단열재는 벽체 내부에 위치) 엔티티 자체를 '벽체 선'으로 분류하지는 않음 -> wall_line_handles 없음, wall_likelihood는 낮은 값으로 설정."
+    }
+  },
+  {
+    "unit_id": "defannot-u135-146",
+    "answer": {
+      "def": "*U135",
+      "role": "심볼",
+      "wall_likelihood": 0.15,
+      "wall_line_handles": [],
+      "notes": "*U135: entity_count 20, 전량 LWPOLYLINE(vertices=5)이며 레이어명에 'INSUL'(단열재) 포함. 동일한 5-vertex 폐곡선(지그재그형 틱 마크)이 반복되는 패턴으로, 벽체 경계선 자체가 아니라 벽체 단면/평면 내부를 채우는 단열재 해치(빗금) 심볼로 판단됨. 개별 폴리라인이 직선 2점 LINE 형태가 아니라 5-vertex 닫힌 폴리곤이라는 점도 해치 틱 마크와 부합. 벽체와 공간적으로 연관되어 있으나(단열재는 벽체 내부에 위치) 엔티티 자체를 '벽체 선'으로 분류하지는 않음 -> wall_line_handles 없음, wall_likelihood는 낮은 값으로 설정."
+    }
+  },
+  {
+    "unit_id": "defannot-u136-147",
+    "answer": {
+      "def": "*U136",
+      "role": "심볼",
+      "wall_likelihood": 0.15,
+      "wall_line_handles": [],
+      "notes": "*U136: entity_count 32, 전량 LWPOLYLINE(vertices=5)이며 레이어명에 'INSUL'(단열재) 포함. 동일한 5-vertex 폐곡선(지그재그형 틱 마크)이 반복되는 패턴으로, 벽체 경계선 자체가 아니라 벽체 단면/평면 내부를 채우는 단열재 해치(빗금) 심볼로 판단됨. 개별 폴리라인이 직선 2점 LINE 형태가 아니라 5-vertex 닫힌 폴리곤이라는 점도 해치 틱 마크와 부합. 벽체와 공간적으로 연관되어 있으나(단열재는 벽체 내부에 위치) 엔티티 자체를 '벽체 선'으로 분류하지는 않음 -> wall_line_handles 없음, wall_likelihood는 낮은 값으로 설정."
+    }
+  },
+  {
+    "unit_id": "defannot-u137-148",
+    "answer": {
+      "def": "*U137",
+      "role": "심볼",
+      "wall_likelihood": 0.15,
+      "wall_line_handles": [],
+      "notes": "*U137: entity_count 9, 전량 LWPOLYLINE(vertices=5)이며 레이어명에 'INSUL'(단열재) 포함. 동일한 5-vertex 폐곡선(지그재그형 틱 마크)이 반복되는 패턴으로, 벽체 경계선 자체가 아니라 벽체 단면/평면 내부를 채우는 단열재 해치(빗금) 심볼로 판단됨. 개별 폴리라인이 직선 2점 LINE 형태가 아니라 5-vertex 닫힌 폴리곤이라는 점도 해치 틱 마크와 부합. 벽체와 공간적으로 연관되어 있으나(단열재는 벽체 내부에 위치) 엔티티 자체를 '벽체 선'으로 분류하지는 않음 -> wall_line_handles 없음, wall_likelihood는 낮은 값으로 설정."
+    }
+  },
+  {
+    "unit_id": "defannot-u138-149",
+    "answer": {
+      "def": "*U138",
+      "role": "심볼",
+      "wall_likelihood": 0.15,
+      "wall_line_handles": [],
+      "notes": "*U138: entity_count 10, 전량 LWPOLYLINE(vertices=5)이며 레이어명에 'INSUL'(단열재) 포함. 동일한 5-vertex 폐곡선(지그재그형 틱 마크)이 반복되는 패턴으로, 벽체 경계선 자체가 아니라 벽체 단면/평면 내부를 채우는 단열재 해치(빗금) 심볼로 판단됨. 개별 폴리라인이 직선 2점 LINE 형태가 아니라 5-vertex 닫힌 폴리곤이라는 점도 해치 틱 마크와 부합. 벽체와 공간적으로 연관되어 있으나(단열재는 벽체 내부에 위치) 엔티티 자체를 '벽체 선'으로 분류하지는 않음 -> wall_line_handles 없음, wall_likelihood는 낮은 값으로 설정."
+    }
+  },
+  {
+    "unit_id": "defannot-u139-150",
+    "answer": {
+      "def": "*U139",
+      "role": "심볼",
+      "wall_likelihood": 0.1,
+      "wall_line_handles": [
+        {
+          "handle": "48EE",
+          "reason": "닫힌 사각 프레임의 변(길이 ~1000 내외) — 벽체가 아닌 국기계양대 기초/거치 디테일의 외곽선으로 추정"
+        },
+        {
+          "handle": "48EF",
+          "reason": "닫힌 사각 프레임의 변(길이 ~1000 내외) — 벽체가 아닌 국기계양대 기초/거치 디테일의 외곽선으로 추정"
+        },
+        {
+          "handle": "48F0",
+          "reason": "닫힌 사각 프레임의 변(길이 ~1000 내외) — 벽체가 아닌 국기계양대 기초/거치 디테일의 외곽선으로 추정"
+        }
+      ],
+      "notes": "*U139: entity_count 23 (INSERT=1 -> 국기계양대 블록 참조, LINE=20, WIPEOUT=2). 레이어 대부분 '0'이며 국기계양대(깃대) 인서트 1개를 포함한 소형 디테일 블록으로 판단됨. LINE들은 계단형 폐곡선(대칭적 노치 패턴)을 이루어 벽체 스팬이 아니라 깃대 기초판/받침 디테일의 외곽선/마운트 프레임으로 보임. WIPEOUT 2개는 배경 해치를 가리는 마스크로 흔히 심볼 디테일에 쓰이는 패턴. 따라서 role=심볼(설비/대지 요소 디테일), wall_likelihood는 낮게 평가."
+    }
+  },
+  {
+    "unit_id": "defannot-u140-151",
+    "answer": {
+      "def": "*U140",
+      "role": "심볼",
+      "wall_likelihood": 0.1,
+      "wall_line_handles": [
+        {
+          "handle": "490A",
+          "reason": "닫힌 사각 프레임의 변(길이 ~1000 내외) — 벽체가 아닌 국기계양대 기초/거치 디테일의 외곽선으로 추정"
+        },
+        {
+          "handle": "490B",
+          "reason": "닫힌 사각 프레임의 변(길이 ~1000 내외) — 벽체가 아닌 국기계양대 기초/거치 디테일의 외곽선으로 추정"
+        },
+        {
+          "handle": "490C",
+          "reason": "닫힌 사각 프레임의 변(길이 ~1000 내외) — 벽체가 아닌 국기계양대 기초/거치 디테일의 외곽선으로 추정"
+        }
+      ],
+      "notes": "*U140: entity_count 23 (INSERT=1 -> 국기계양대 블록 참조, LINE=20, WIPEOUT=2). 레이어 대부분 '0'이며 국기계양대(깃대) 인서트 1개를 포함한 소형 디테일 블록으로 판단됨. LINE들은 계단형 폐곡선(대칭적 노치 패턴)을 이루어 벽체 스팬이 아니라 깃대 기초판/받침 디테일의 외곽선/마운트 프레임으로 보임. WIPEOUT 2개는 배경 해치를 가리는 마스크로 흔히 심볼 디테일에 쓰이는 패턴. 따라서 role=심볼(설비/대지 요소 디테일), wall_likelihood는 낮게 평가."
+    }
+  },
+  {
+    "unit_id": "defannot-u141-152",
+    "answer": {
+      "def": "*U141",
+      "role": "심볼",
+      "wall_likelihood": 0.15,
+      "wall_line_handles": [],
+      "notes": "*U141: entity_count 15, 전량 LWPOLYLINE(vertices=5)이며 레이어명에 'INSUL'(단열재) 포함. 동일한 5-vertex 폐곡선(지그재그형 틱 마크)이 반복되는 패턴으로, 벽체 경계선 자체가 아니라 벽체 단면/평면 내부를 채우는 단열재 해치(빗금) 심볼로 판단됨. 개별 폴리라인이 직선 2점 LINE 형태가 아니라 5-vertex 닫힌 폴리곤이라는 점도 해치 틱 마크와 부합. 벽체와 공간적으로 연관되어 있으나(단열재는 벽체 내부에 위치) 엔티티 자체를 '벽체 선'으로 분류하지는 않음 -> wall_line_handles 없음, wall_likelihood는 낮은 값으로 설정."
+    }
+  },
+  {
+    "unit_id": "defannot-u142-153",
+    "answer": {
+      "def": "*U142",
+      "role": "심볼",
+      "wall_likelihood": 0.15,
+      "wall_line_handles": [],
+      "notes": "*U142: entity_count 95, 전량 LWPOLYLINE(vertices=5)이며 레이어명에 'INSUL'(단열재) 포함. 동일한 5-vertex 폐곡선(지그재그형 틱 마크)이 반복되는 패턴으로, 벽체 경계선 자체가 아니라 벽체 단면/평면 내부를 채우는 단열재 해치(빗금) 심볼로 판단됨. 개별 폴리라인이 직선 2점 LINE 형태가 아니라 5-vertex 닫힌 폴리곤이라는 점도 해치 틱 마크와 부합. 벽체와 공간적으로 연관되어 있으나(단열재는 벽체 내부에 위치) 엔티티 자체를 '벽체 선'으로 분류하지는 않음 -> wall_line_handles 없음, wall_likelihood는 낮은 값으로 설정."
+    }
+  },
+  {
+    "unit_id": "defannot-u144-154",
+    "answer": {
+      "def": "*U144",
+      "role": "심볼",
+      "wall_likelihood": 0.15,
+      "wall_line_handles": [],
+      "notes": "*U144: entity_count 14, 전량 LWPOLYLINE(vertices=5)이며 레이어명에 'INSUL'(단열재) 포함. 동일한 5-vertex 폐곡선(지그재그형 틱 마크)이 반복되는 패턴으로, 벽체 경계선 자체가 아니라 벽체 단면/평면 내부를 채우는 단열재 해치(빗금) 심볼로 판단됨. 개별 폴리라인이 직선 2점 LINE 형태가 아니라 5-vertex 닫힌 폴리곤이라는 점도 해치 틱 마크와 부합. 벽체와 공간적으로 연관되어 있으나(단열재는 벽체 내부에 위치) 엔티티 자체를 '벽체 선'으로 분류하지는 않음 -> wall_line_handles 없음, wall_likelihood는 낮은 값으로 설정."
+    }
+  },
+  {
+    "unit_id": "defannot-u145-155",
+    "answer": {
+      "def": "*U145",
+      "role": "심볼",
+      "wall_likelihood": 0.15,
+      "wall_line_handles": [],
+      "notes": "*U145: entity_count 16, 전량 LWPOLYLINE(vertices=5)이며 레이어명에 'INSUL'(단열재) 포함. 동일한 5-vertex 폐곡선(지그재그형 틱 마크)이 반복되는 패턴으로, 벽체 경계선 자체가 아니라 벽체 단면/평면 내부를 채우는 단열재 해치(빗금) 심볼로 판단됨. 개별 폴리라인이 직선 2점 LINE 형태가 아니라 5-vertex 닫힌 폴리곤이라는 점도 해치 틱 마크와 부합. 벽체와 공간적으로 연관되어 있으나(단열재는 벽체 내부에 위치) 엔티티 자체를 '벽체 선'으로 분류하지는 않음 -> wall_line_handles 없음, wall_likelihood는 낮은 값으로 설정."
+    }
+  },
+  {
+    "unit_id": "defannot-u146-156",
+    "answer": {
+      "def": "*U146",
+      "role": "심볼",
+      "wall_likelihood": 0.15,
+      "wall_line_handles": [],
+      "notes": "*U146: entity_count 159, 전량 LWPOLYLINE(vertices=5)이며 레이어명에 'INSUL'(단열재) 포함. 동일한 5-vertex 폐곡선(지그재그형 틱 마크)이 반복되는 패턴으로, 벽체 경계선 자체가 아니라 벽체 단면/평면 내부를 채우는 단열재 해치(빗금) 심볼로 판단됨. 개별 폴리라인이 직선 2점 LINE 형태가 아니라 5-vertex 닫힌 폴리곤이라는 점도 해치 틱 마크와 부합. 벽체와 공간적으로 연관되어 있으나(단열재는 벽체 내부에 위치) 엔티티 자체를 '벽체 선'으로 분류하지는 않음 -> wall_line_handles 없음, wall_likelihood는 낮은 값으로 설정."
+    }
+  },
+  {
+    "unit_id": "defannot-u147-157",
+    "answer": {
+      "def": "*U147",
+      "role": "심볼",
+      "wall_likelihood": 0.15,
+      "wall_line_handles": [],
+      "notes": "*U147: entity_count 12, 전량 LWPOLYLINE(vertices=5)이며 레이어명에 'INSUL'(단열재) 포함. 동일한 5-vertex 폐곡선(지그재그형 틱 마크)이 반복되는 패턴으로, 벽체 경계선 자체가 아니라 벽체 단면/평면 내부를 채우는 단열재 해치(빗금) 심볼로 판단됨. 개별 폴리라인이 직선 2점 LINE 형태가 아니라 5-vertex 닫힌 폴리곤이라는 점도 해치 틱 마크와 부합. 벽체와 공간적으로 연관되어 있으나(단열재는 벽체 내부에 위치) 엔티티 자체를 '벽체 선'으로 분류하지는 않음 -> wall_line_handles 없음, wall_likelihood는 낮은 값으로 설정."
+    }
+  },
+  {
+    "unit_id": "defannot-u148-158",
+    "answer": {
+      "def": "*U148",
+      "role": "심볼",
+      "wall_likelihood": 0.15,
+      "wall_line_handles": [],
+      "notes": "*U148: entity_count 28, 전량 LWPOLYLINE(vertices=5)이며 레이어명에 'INSUL'(단열재) 포함. 동일한 5-vertex 폐곡선(지그재그형 틱 마크)이 반복되는 패턴으로, 벽체 경계선 자체가 아니라 벽체 단면/평면 내부를 채우는 단열재 해치(빗금) 심볼로 판단됨. 개별 폴리라인이 직선 2점 LINE 형태가 아니라 5-vertex 닫힌 폴리곤이라는 점도 해치 틱 마크와 부합. 벽체와 공간적으로 연관되어 있으나(단열재는 벽체 내부에 위치) 엔티티 자체를 '벽체 선'으로 분류하지는 않음 -> wall_line_handles 없음, wall_likelihood는 낮은 값으로 설정."
+    }
+  },
+  {
+    "unit_id": "defannot-u149-159",
+    "answer": {
+      "def": "*U149",
+      "role": "심볼",
+      "wall_likelihood": 0.15,
+      "wall_line_handles": [],
+      "notes": "*U149: entity_count 77, 전량 LWPOLYLINE(vertices=5)이며 레이어명에 'INSUL'(단열재) 포함. 동일한 5-vertex 폐곡선(지그재그형 틱 마크)이 반복되는 패턴으로, 벽체 경계선 자체가 아니라 벽체 단면/평면 내부를 채우는 단열재 해치(빗금) 심볼로 판단됨. 개별 폴리라인이 직선 2점 LINE 형태가 아니라 5-vertex 닫힌 폴리곤이라는 점도 해치 틱 마크와 부합. 벽체와 공간적으로 연관되어 있으나(단열재는 벽체 내부에 위치) 엔티티 자체를 '벽체 선'으로 분류하지는 않음 -> wall_line_handles 없음, wall_likelihood는 낮은 값으로 설정."
+    }
+  },
+  {
+    "unit_id": "defannot-u150-160",
+    "answer": {
+      "def": "*U150",
+      "role": "심볼",
+      "wall_likelihood": 0.15,
+      "wall_line_handles": [],
+      "notes": "*U150: entity_count 25, 전량 LWPOLYLINE(vertices=5)이며 레이어명에 'INSUL'(단열재) 포함. 동일한 5-vertex 폐곡선(지그재그형 틱 마크)이 반복되는 패턴으로, 벽체 경계선 자체가 아니라 벽체 단면/평면 내부를 채우는 단열재 해치(빗금) 심볼로 판단됨. 개별 폴리라인이 직선 2점 LINE 형태가 아니라 5-vertex 닫힌 폴리곤이라는 점도 해치 틱 마크와 부합. 벽체와 공간적으로 연관되어 있으나(단열재는 벽체 내부에 위치) 엔티티 자체를 '벽체 선'으로 분류하지는 않음 -> wall_line_handles 없음, wall_likelihood는 낮은 값으로 설정."
+    }
+  }
+]

@@ -1,0 +1,11 @@
+{
+  "id": "READ-008",
+  "answer": 6,
+  "method": "Loaded dwg_graph_ir.json, filtered entities where space=='model' (all 375 entities were model space), collected set of dxf_name values, counted distinct values.",
+  "commands": [
+    "d = json.load(open(p, encoding='utf-8')); ents = d['entities']; print(type(ents), len(ents))",
+    "spaces = set(e.get('space') for e in ents); print(spaces)",
+    "model_ents = [e for e in ents if e.get('space')=='model']; print(len(model_ents))",
+    "names = set(e.get('dxf_name') for e in model_ents); print(len(names), sorted(names))"
+  ]
+}

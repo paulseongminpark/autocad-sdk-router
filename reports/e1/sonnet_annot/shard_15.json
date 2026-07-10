@@ -1,0 +1,305 @@
+[
+  {
+    "unit_id": "defannot-x-0-104co2-281",
+    "answer": {
+      "def": "X-평면도(기본형)$0$104co2",
+      "role": "평면 부분도",
+      "wall_likelihood": 0.85,
+      "wall_line_handles": [
+        {"handle": "8113", "reason": "W1 layer short vertical segment, jamb/wall run"},
+        {"handle": "8114", "reason": "W1 layer vertical segment parallel to 8113, wall pair"},
+        {"handle": "8115", "reason": "W1 layer long vertical run, exterior wall"},
+        {"handle": "8116", "reason": "W1 layer vertical run, wall segment"},
+        {"handle": "8117", "reason": "W1 layer vertical run, interior wall"},
+        {"handle": "8118", "reason": "W1 layer horizontal run, interior wall"},
+        {"handle": "811A", "reason": "W1 layer horizontal run, wall"},
+        {"handle": "811B", "reason": "W1 layer horizontal run, wall"},
+        {"handle": "811D", "reason": "W1 layer horizontal run, wall"},
+        {"handle": "811E", "reason": "W1 layer short horizontal segment, wall/opening jamb"}
+      ],
+      "notes": "W1 layer holds 54 of 85 LINE entities (majority); CEN=16 centerlines pair with these walls; A-DOOR=3 suggests door openings cut into them."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-105co2-282",
+    "answer": {
+      "def": "X-평면도(기본형)$0$105co2",
+      "role": "평면 부분도",
+      "wall_likelihood": 0.85,
+      "wall_line_handles": [
+        {"handle": "817B", "reason": "W1 layer horizontal run, wall"},
+        {"handle": "817D", "reason": "W1 layer horizontal run, wall"},
+        {"handle": "817E", "reason": "W1 layer vertical run, wall"},
+        {"handle": "817F", "reason": "W1 layer vertical run continuing 817E, wall"},
+        {"handle": "8180", "reason": "W1 layer horizontal run, wall"},
+        {"handle": "8181", "reason": "W1 layer short horizontal segment, wall corner"},
+        {"handle": "8182", "reason": "W1 layer vertical segment, wall corner"},
+        {"handle": "8183", "reason": "W1 layer horizontal run, wall"},
+        {"handle": "8184", "reason": "W1 layer vertical run, wall"},
+        {"handle": "8185", "reason": "W1 layer vertical run, wall"}
+      ],
+      "notes": "W1=59 of 90 LINE entities dominate; CEN=16 centerlines align with these; A-DOOR=4 marks door cuts."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-111a-283",
+    "answer": {
+      "def": "X-평면도(기본형)$0$111a",
+      "role": "평면 부분도",
+      "wall_likelihood": 0.9,
+      "wall_line_handles": [
+        {"handle": "2B76", "reason": "INS layer vertical run, insulation line tracing adjacent wall face"},
+        {"handle": "2B77", "reason": "INS layer short horizontal jog, wall corner detail"},
+        {"handle": "2BB7", "reason": "INS layer horizontal run paired with 2B76, wall face offset"},
+        {"handle": "2BB8", "reason": "INS layer long horizontal run, exterior wall face line"},
+        {"handle": "2BB9", "reason": "INS layer parallel run to 2BB8, wall thickness pair"},
+        {"handle": "2BBA", "reason": "INS layer long vertical run, exterior wall face"},
+        {"handle": "2BBB", "reason": "INS layer parallel vertical run, wall thickness pair"}
+      ],
+      "notes": "Layer histogram shows W1=129, W2=105 as the dominant LINE layers (structural walls), but the sampled entities surfaced mostly INS/INSUL layers; listed handles are INS-layer lines that trace wall faces as a proxy since no W1/W2 lines appeared in the 30-entity sample."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-111arf-284",
+    "answer": {
+      "def": "X-평면도(기본형)$0$111ARF",
+      "role": "평면 부분도",
+      "wall_likelihood": 0.1,
+      "wall_line_handles": [],
+      "notes": "Roof-plan variant (7RF layer, 우수관/무동력휀 equipment inserts). All 21 entities are shown; the 2 W1-layer entities are equipment INSERTs (무동력휀300 fan blocks), not wall lines. Dominated by CEN centerlines and roof/equipment geometry, so wall content is minimal."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-111arf2-285",
+    "answer": {
+      "def": "X-평면도(기본형)$0$111ARF2",
+      "role": "평면 부분도",
+      "wall_likelihood": 0.05,
+      "wall_line_handles": [],
+      "notes": "Simplified roof-plan variant (8RF layer); no W1/W2 layer at all in the histogram. All LINE entities are on the CEN centerline layer; no wall content."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-111b-286",
+    "answer": {
+      "def": "X-평면도(기본형)$0$111b",
+      "role": "평면 부분도",
+      "wall_likelihood": 0.85,
+      "wall_line_handles": [
+        {"handle": "2F5A", "reason": "W2 layer horizontal segment, wall face line"},
+        {"handle": "2F5C", "reason": "W2 layer vertical segment, wall face line"},
+        {"handle": "2F56", "reason": "MC finish-line layer, long run parallel to nearby W2 wall face (proxy for wall)"},
+        {"handle": "2F58", "reason": "MC finish-line layer, parallel run to 2F56, wall-face pair"}
+      ],
+      "notes": "W1=122, W2=77 dominate the histogram; the sampled W2 lines confirm wall geometry. MC lines included as a secondary proxy since they run parallel/adjacent to the W2 wall lines."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-111brf-287",
+    "answer": {
+      "def": "X-평면도(기본형)$0$111BRF",
+      "role": "평면 부분도",
+      "wall_likelihood": 0.1,
+      "wall_line_handles": [],
+      "notes": "Roof-plan variant matching the 111a/111b family (7RF layer); the 2 W1-layer entities are equipment INSERTs (무동력휀300), not wall LINE entities."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-111brf2-288",
+    "answer": {
+      "def": "X-평면도(기본형)$0$111BRF2",
+      "role": "평면 부분도",
+      "wall_likelihood": 0.05,
+      "wall_line_handles": [],
+      "notes": "Simplified roof-plan variant (8RF layer); no W1/W2 layer present in the histogram at all."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-130a-289",
+    "answer": {
+      "def": "X-평면도(기본형)$0$130a",
+      "role": "평면 부분도",
+      "wall_likelihood": 0.9,
+      "wall_line_handles": [
+        {"handle": "6FF2", "reason": "W2 layer horizontal run, wall face"},
+        {"handle": "6FF3", "reason": "W2 layer horizontal run, wall face"},
+        {"handle": "6FF4", "reason": "W2 layer horizontal run, wall face"},
+        {"handle": "6FF5", "reason": "W2 layer vertical run, wall face"},
+        {"handle": "6FFA", "reason": "W2 layer vertical run, wall face"},
+        {"handle": "6FFB", "reason": "W2 layer horizontal run, wall face"},
+        {"handle": "6FFC", "reason": "W2 layer horizontal run, wall face"}
+      ],
+      "notes": "W1=113, W2=103 dominate the 582 LINE entities; large FUR=153 layer is also present but the block combines full-unit structure and furniture together. Wall_likelihood based on the clear W2 sample lines plus histogram dominance."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-130a1-290",
+    "answer": {
+      "def": "X-평면도(기본형)$0$130a1",
+      "role": "평면 부분도",
+      "wall_likelihood": 0.9,
+      "wall_line_handles": [
+        {"handle": "49C2", "reason": "W1 layer horizontal run, wall face"},
+        {"handle": "49E6", "reason": "W1 layer vertical run, wall face"},
+        {"handle": "49E5", "reason": "W2 layer short segment, wall face/jamb"},
+        {"handle": "49E7", "reason": "MC finish line parallel to 49E6 W1 wall"},
+        {"handle": "49AC", "reason": "INS layer line adjacent to wall face"}
+      ],
+      "notes": "W1=114, W2=103 dominate 580 LINE entities; variant of 130a with a slightly larger bbox (extra bay)."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-130b-291",
+    "answer": {
+      "def": "X-평면도(기본형)$0$130b",
+      "role": "평면 부분도",
+      "wall_likelihood": 0.88,
+      "wall_line_handles": [
+        {"handle": "34A8", "reason": "4GYP gypsum-lining layer, short segment tracing wall face"},
+        {"handle": "34A9", "reason": "4GYP layer long vertical run, wall face"},
+        {"handle": "34AA", "reason": "4GYP layer vertical run, wall face"},
+        {"handle": "34AB", "reason": "4GYP layer vertical run, wall face"},
+        {"handle": "34AC", "reason": "4GYP layer short jog, wall corner"},
+        {"handle": "34AD", "reason": "4GYP layer long vertical run, wall face"},
+        {"handle": "34AE", "reason": "MC finish line, long horizontal run parallel to wall"}
+      ],
+      "notes": "W1=104, W2=83 dominate 595 LINE entities per histogram; the sample only surfaced 4GYP/MC gypsum-lining lines (no direct W1/W2), used here as a wall-face proxy. FUR=171 is the single largest layer overall, but the block is a combined unit plan (walls+furniture)."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-84a-292",
+    "answer": {
+      "def": "X-평면도(기본형)$0$84a",
+      "role": "평면 부분도",
+      "wall_likelihood": 0.9,
+      "wall_line_handles": [
+        {"handle": "1F0C", "reason": "W2 layer vertical run, wall face"},
+        {"handle": "1F0D", "reason": "W2 layer vertical run, wall face"},
+        {"handle": "1F11", "reason": "W2 layer horizontal run, wall face"},
+        {"handle": "1F12", "reason": "W2 layer horizontal run, wall face"},
+        {"handle": "1F0E", "reason": "4GYP lining layer parallel to W2 wall"},
+        {"handle": "1F0F", "reason": "4GYP lining layer parallel pair"},
+        {"handle": "1F13", "reason": "4GYP lining layer parallel to W2 wall"},
+        {"handle": "1F14", "reason": "4GYP lining layer parallel pair"}
+      ],
+      "notes": "W1=112, W2=87 dominate 417 LINE entities; no FUR layer present (unlike the 130 series), consistent with a pure structural/finish floor-plan partial for unit 84."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-84a1-293",
+    "answer": {
+      "def": "X-평면도(기본형)$0$84a1",
+      "role": "평면 부분도",
+      "wall_likelihood": 0.9,
+      "wall_line_handles": [
+        {"handle": "27FB", "reason": "W1 layer segment, direct wall line"},
+        {"handle": "27FC", "reason": "W1 layer long vertical run, direct wall line"},
+        {"handle": "2800", "reason": "W1 layer long vertical run, exterior wall"},
+        {"handle": "280A", "reason": "W1 layer horizontal segment, wall"},
+        {"handle": "280B", "reason": "W1 layer horizontal segment, wall"},
+        {"handle": "280C", "reason": "W1 layer horizontal segment, wall"},
+        {"handle": "280D", "reason": "W1 layer horizontal segment, wall"},
+        {"handle": "280E", "reason": "W1 layer horizontal segment, wall"}
+      ],
+      "notes": "W1=109, W2=89 dominate 424 LINE entities; sample directly surfaced 8 W1-layer lines confirming wall geometry (long parallel exterior runs plus shorter interior jamb segments)."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-84b-294",
+    "answer": {
+      "def": "X-평면도(기본형)$0$84b",
+      "role": "평면 부분도",
+      "wall_likelihood": 0.85,
+      "wall_line_handles": [
+        {"handle": "21F2", "reason": "INS layer horizontal run tracing wall face"},
+        {"handle": "21F3", "reason": "INS layer parallel run, wall thickness pair"},
+        {"handle": "21F4", "reason": "INS layer long horizontal run, exterior wall face"},
+        {"handle": "21F5", "reason": "INS layer parallel run, wall thickness pair"},
+        {"handle": "21F9", "reason": "INS layer horizontal run, interior wall face"},
+        {"handle": "21FA", "reason": "INS layer parallel run, wall thickness pair"},
+        {"handle": "2200", "reason": "INS layer long vertical run, wall face"},
+        {"handle": "2201", "reason": "INS layer parallel vertical run, wall thickness pair"}
+      ],
+      "notes": "W1=115, W2=89 dominate 409 LINE entities per histogram, but the sample only surfaced INS-layer lines (insulation tracing wall faces) rather than direct W1/W2 lines; used as proxy. An INSERT on W1 (block=is) is a symbol reference, not a wall line, so excluded."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-84b1-295",
+    "answer": {
+      "def": "X-평면도(기본형)$0$84b1",
+      "role": "평면 부분도",
+      "wall_likelihood": 0.85,
+      "wall_line_handles": [
+        {"handle": "6D0B", "reason": "MC finish/centerline layer, long vertical run tracing wall"},
+        {"handle": "6D0C", "reason": "MC layer vertical run, wall face"},
+        {"handle": "6D0D", "reason": "MC layer parallel vertical run, wall thickness pair"},
+        {"handle": "6D0E", "reason": "MC layer parallel run, wall thickness pair"},
+        {"handle": "6D10", "reason": "MC layer long vertical run, exterior wall face"}
+      ],
+      "notes": "W1=111, W2=93 dominate 413 LINE entities; sample surfaced MC (finish/centerline) layer lines paired with CEN, used as wall-face proxy since no direct W1/W2 lines appeared in the sample."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-84c-296",
+    "answer": {
+      "def": "X-평면도(기본형)$0$84c",
+      "role": "평면 부분도",
+      "wall_likelihood": 0.85,
+      "wall_line_handles": [
+        {"handle": "254E", "reason": "INS layer horizontal run, wall face"},
+        {"handle": "254F", "reason": "INS layer parallel run, wall thickness pair"},
+        {"handle": "2550", "reason": "INS layer long horizontal run, wall face"},
+        {"handle": "2551", "reason": "INS layer parallel run, wall thickness pair"},
+        {"handle": "2552", "reason": "INS layer vertical run, wall face"},
+        {"handle": "2553", "reason": "INS layer parallel vertical run, wall thickness pair"}
+      ],
+      "notes": "W1=105, W2=92 dominate 451 LINE entities; sample surfaced INS-layer lines as wall-face proxy. Minor FUR/KITC/bath layers present but small (1-2 entities each), consistent with a structural/finish plan partial."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-84c1-297",
+    "answer": {
+      "def": "X-평면도(기본형)$0$84c1",
+      "role": "평면 부분도",
+      "wall_likelihood": 0.85,
+      "wall_line_handles": [
+        {"handle": "7402", "reason": "INS layer horizontal run, wall face"},
+        {"handle": "740A", "reason": "MC finish line, horizontal run near wall"},
+        {"handle": "740D", "reason": "MC layer vertical run, wall face"},
+        {"handle": "740E", "reason": "MC layer parallel vertical run, wall thickness pair"},
+        {"handle": "7411", "reason": "MC layer vertical run, wall face"}
+      ],
+      "notes": "W1=106, W2=92 dominate 456 LINE entities; sample surfaced INS/MC layer lines as wall-face proxy rather than direct W1/W2. Contains window/bath fixture inserts (wd170750, ba18601500) and 수전 (faucet) blocks."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-a-c019c01bd-298",
+    "answer": {
+      "def": "X-평면도(기본형)$0$A$C019C01BD",
+      "role": "가구",
+      "wall_likelihood": 0.02,
+      "wall_line_handles": [],
+      "notes": "Anonymous block name ($A$... pattern) with 100% of 117 entities on the FUR layer; small bbox (~192x1200 units) with dense ARC+LINE detail and SOLID hatches typical of a plumbing fixture (toilet/sink) silhouette, not a wall or floor-plan section."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-a-c01a306ae-299",
+    "answer": {
+      "def": "X-평면도(기본형)$0$A$C01A306AE",
+      "role": "가구",
+      "wall_likelihood": 0.02,
+      "wall_line_handles": [],
+      "notes": "Anonymous block name, 100% of 22 entities on the FUR layer; small bbox (500x104 units) with rounded-rectangle geometry (LINE+ARC corners), consistent with a small fixture/hardware detail rather than wall or floor-plan content."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-a-c04b05b29-300",
+    "answer": {
+      "def": "X-평면도(기본형)$0$A$C04B05B29",
+      "role": "가구",
+      "wall_likelihood": 0.03,
+      "wall_line_handles": [],
+      "notes": "Anonymous block name; all 24 entities split across FUR-FIX and FUR-KIT layers (kitchen fixture layers), small irregular bbox (~920x152 units) typical of a sink/counter fixture outline, no wall layer present."
+    }
+  }
+]

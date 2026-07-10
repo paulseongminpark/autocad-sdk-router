@@ -1,0 +1,257 @@
+[
+  {
+    "unit_id": "defannot-x-0-phg1200-361",
+    "answer": {
+      "def": "X-평면도(기본형)$0$phg1200",
+      "role": "심볼",
+      "wall_likelihood": 0.15,
+      "wall_line_handles": [
+        {"handle": "7D1D", "reason": "full-height vertical line (600,250)->(600,-50), could read as a wall/mullion centerline"},
+        {"handle": "7D2C", "reason": "long horizontal line spanning full width (40,0)->(1160,0), frame-like"},
+        {"handle": "7D1B", "reason": "long horizontal line (40,100)->(1160,100), parallel frame line"},
+        {"handle": "7D1F", "reason": "long horizontal line (40,200)->(1160,200), parallel frame line"},
+        {"handle": "7D2F", "reason": "long horizontal line (40,60)->(1160,60), parallel frame line"},
+        {"handle": "7D30", "reason": "long horizontal line (40,40)->(1160,40), parallel frame line"}
+      ],
+      "notes": "layer=$WIN and block name pattern (phg=window type code) indicate this is a window insert block; the many long parallel horizontal lines are sash/frame representations rather than structural walls."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-pkdr750190-362",
+    "answer": {
+      "def": "X-평면도(기본형)$0$pkdr750190",
+      "role": "심볼",
+      "wall_likelihood": 0.1,
+      "wall_line_handles": [
+        {"handle": "4117", "reason": "long vertical line (-20,750)->(-20,1420), jamb-like"},
+        {"handle": "4118", "reason": "long vertical line (-50,750)->(-50,1420), parallel jamb line"},
+        {"handle": "4123", "reason": "long vertical line (-259.988,720)->(-259.988,30), frame edge"},
+        {"handle": "4126", "reason": "long vertical line (-115,710)->(-115,40), frame edge"},
+        {"handle": "412B", "reason": "long vertical line (0,750)->(0,1420)"},
+        {"handle": "412C", "reason": "long vertical line (-10,750)->(-10,1420)"}
+      ],
+      "notes": "layer=$DOOR, dominated by small LWPOLYLINE hardware/leaf shapes; the long parallel vertical lines are door-jamb/frame lines, not structural walls."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-pkdr750190-1-363",
+    "answer": {
+      "def": "X-평면도(기본형)$0$pkdr750190-1",
+      "role": "심볼",
+      "wall_likelihood": 0.1,
+      "wall_line_handles": [
+        {"handle": "6CCC", "reason": "long vertical line (-20,750)->(-20,1460), jamb-like"},
+        {"handle": "6CCD", "reason": "long vertical line (-50,750)->(-50,1460), parallel jamb line"},
+        {"handle": "6CD8", "reason": "long vertical line (-259.988,720)->(-259.988,30), frame edge"},
+        {"handle": "6CDB", "reason": "long vertical line (-115,710)->(-115,40), frame edge"},
+        {"handle": "6CE0", "reason": "long vertical line (0,750)->(0,1460)"},
+        {"handle": "6CE1", "reason": "long vertical line (-10,750)->(-10,1460)"}
+      ],
+      "notes": "near-duplicate of pkdr750190 with slightly taller bbox (1460 vs 1420); same door-symbol interpretation, layer=$DOOR."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-psd700-2-364",
+    "answer": {
+      "def": "X-평면도(기본형)$0$PSD700_2",
+      "role": "기타",
+      "wall_likelihood": 0.05,
+      "wall_line_handles": [],
+      "notes": "only 5 entities (ARC+LINE+LWPOLYLINE) on $STL layer; the single LINE is a non-axis-aligned diagonal (-330,30)->(243.834,361.303), inconsistent with wall geometry — likely a small hardware/fixture symbol."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-sb1703-1500-365",
+    "answer": {
+      "def": "X-평면도(기본형)$0$SB1703 1500",
+      "role": "가구",
+      "wall_likelihood": 0.03,
+      "wall_line_handles": [],
+      "notes": "$FUR layer, 1312 entities dominated by SPLINE(814)/ARC(164)/ELLIPSE(12) plus many short LINE segments (<20 units) — complex curved furniture icon (e.g. upholstered seating), no wall-scale straight runs."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-sta-t-366",
+    "answer": {
+      "def": "X-평면도(기본형)$0$sta-t",
+      "role": "평면 부분도",
+      "wall_likelihood": 0.2,
+      "wall_line_handles": [
+        {"handle": "79BB", "reason": "long horizontal line (-1400,-1300)->(-2600,-1300), length 1200, flight-edge scale"},
+        {"handle": "79BF", "reason": "long horizontal line (-1400,-1820)->(-2600,-1820), repeats every ~260-520 units"},
+        {"handle": "79C3", "reason": "long horizontal line (-1400,-2080)->(-2600,-2080)"},
+        {"handle": "79B8", "reason": "long horizontal line (0,-1300)->(-1200,-1300), other flight run"},
+        {"handle": "79BC", "reason": "long horizontal line (0,-1820)->(-1200,-1820)"}
+      ],
+      "notes": "$STA layer with rows of parallel lines repeated at ~260-280 pitch across two runs (0..-1200 and -1400..-2600) — matches a staircase tread/flight plan rather than an iconic symbol; long lines could be mistaken for walls but represent tread/flight edges."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-sta-t-4-367",
+    "answer": {
+      "def": "X-평면도(기본형)$0$sta-t-4",
+      "role": "평면 부분도",
+      "wall_likelihood": 0.2,
+      "wall_line_handles": [
+        {"handle": "7CA3", "reason": "long horizontal line (-1400,-1300)->(-2600,-1300), length 1200, flight-edge scale"},
+        {"handle": "7CA7", "reason": "long horizontal line (-1400,-1820)->(-2600,-1820)"},
+        {"handle": "7CAB", "reason": "long horizontal line (-1400,-2080)->(-2600,-2080)"},
+        {"handle": "7CA0", "reason": "long horizontal line (0,-1300)->(-1200,-1300), other flight run"},
+        {"handle": "7CA4", "reason": "long horizontal line (0,-1820)->(-1200,-1820)"}
+      ],
+      "notes": "same repeated-tread staircase pattern as sta-t, one extra step row (deeper bbox to -3380) — stair plan variant."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-sta-t-5-368",
+    "answer": {
+      "def": "X-평면도(기본형)$0$sta-t-5",
+      "role": "평면 부분도",
+      "wall_likelihood": 0.2,
+      "wall_line_handles": [
+        {"handle": "7D7D", "reason": "long horizontal line (-1400,-1300)->(-2600,-1300), length 1200, flight-edge scale"},
+        {"handle": "7D81", "reason": "long horizontal line (-1400,-1820)->(-2600,-1820)"},
+        {"handle": "7D85", "reason": "long horizontal line (-1400,-2080)->(-2600,-2080)"},
+        {"handle": "7D7A", "reason": "long horizontal line (0,-1300)->(-1200,-1300), other flight run"},
+        {"handle": "7D7E", "reason": "long horizontal line (0,-1820)->(-1200,-1820)"}
+      ],
+      "notes": "another sta-t variant (bbox y to 0 instead of -1300), same repeated tread-row staircase pattern."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-t1-369",
+    "answer": {
+      "def": "X-평면도(기본형)$0$T1",
+      "role": "가구",
+      "wall_likelihood": 0.05,
+      "wall_line_handles": [],
+      "notes": "$FUR layer, densely-packed short horizontal lines (span ~80 units, ~20-unit vertical pitch) form a slat/texture pattern typical of furniture (e.g. shelving, blinds) rather than wall geometry; entity is narrow (90 wide, 670 tall)."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-wd120900-370",
+    "answer": {
+      "def": "X-평면도(기본형)$0$wd120900",
+      "role": "심볼",
+      "wall_likelihood": 0.15,
+      "wall_line_handles": [
+        {"handle": "1D17", "reason": "long horizontal line (860,80)->(40,80), length 820, could read as wall pair"},
+        {"handle": "1D18", "reason": "parallel long horizontal line (860,77)->(40,77), 3 units offset from 1D17"}
+      ],
+      "notes": "$DOOR layer with ARC (swing arc) plus many LWPOLYLINE (leaf/hardware) details; the two closely-spaced parallel long lines are door head/threshold lines, not a structural wall pair."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-wd160750-371",
+    "answer": {
+      "def": "X-평면도(기본형)$0$wd160750",
+      "role": "심볼",
+      "wall_likelihood": 0.1,
+      "wall_line_handles": [],
+      "notes": "$DOOR layer; short diagonal lines (e.g. (727,0)->(750,140)) form corner/hinge or bevel details of a door leaf, not wall-length geometry."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-wd170750-372",
+    "answer": {
+      "def": "X-평면도(기본형)$0$wd170750",
+      "role": "심볼",
+      "wall_likelihood": 0.1,
+      "wall_line_handles": [],
+      "notes": "near-identical structure to wd160750 (slightly taller, 150 vs 140), same door-leaf-corner diagonal-line pattern on $DOOR layer."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-wd200900-373",
+    "answer": {
+      "def": "X-평면도(기본형)$0$WD200900",
+      "role": "심볼",
+      "wall_likelihood": 0.15,
+      "wall_line_handles": [
+        {"handle": "410F", "reason": "long horizontal line (860,160)->(40,160), length 820, could read as wall pair"},
+        {"handle": "4110", "reason": "parallel long horizontal line (860,157)->(40,157), 3 units offset"}
+      ],
+      "notes": "same family as wd120900/wd250900 (wider door variant, wd=width code), $DOOR layer, same double-line head/threshold pattern."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-wd250900-374",
+    "answer": {
+      "def": "X-평면도(기본형)$0$wd250900",
+      "role": "심볼",
+      "wall_likelihood": 0.15,
+      "wall_line_handles": [
+        {"handle": "3842", "reason": "long horizontal line (860,210)->(40,210), length 820, could read as wall pair"},
+        {"handle": "3843", "reason": "parallel long horizontal line (860,207)->(40,207), 3 units offset"}
+      ],
+      "notes": "same door-symbol family as wd120900/WD200900, $DOOR layer, widest variant (250 height/width param)."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-wd850-375",
+    "answer": {
+      "def": "X-평면도(기본형)$0$WD850",
+      "role": "심볼",
+      "wall_likelihood": 0.2,
+      "wall_line_handles": [
+        {"handle": "584C", "reason": "long horizontal line (-40,-0)->(-810,0), length ~770, door-head scale"},
+        {"handle": "584D", "reason": "long horizontal line (-40,0)->(-810,0), duplicate/overlapping the above"},
+        {"handle": "584E", "reason": "long horizontal line (-30,-3)->(-820,-3), length ~790, parallel offset line"}
+      ],
+      "notes": "$DOOR layer, no swing ARC sampled but dominated by LWPOLYLINE hardware shapes; the three long near-parallel lines are door lintel/head lines whose length rivals a short wall segment, hence flagged but classified as door symbol given layer and entity mix."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-376",
+    "answer": {
+      "def": "X-평면도(기본형)$0$국기계양대",
+      "role": "심볼",
+      "wall_likelihood": 0.05,
+      "wall_line_handles": [],
+      "notes": "name translates to 'flagpole' (국기계양대); layer=0, a CIRCLE plus 16 short LINEs (max length ~65) forming a flagpole-base icon — site-furniture/equipment symbol, not a wall."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-300-377",
+    "answer": {
+      "def": "X-평면도(기본형)$0$무동력휀300",
+      "role": "심볼",
+      "wall_likelihood": 0.05,
+      "wall_line_handles": [],
+      "notes": "name = non-powered exhaust fan/vent (무동력흡출기); CIRCLE(radius=150) with diagonal cross lines and axis cross lines — standard roof-vent plan symbol, no wall-like geometry."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-378",
+    "answer": {
+      "def": "X-평면도(기본형)$0$세면대_공통",
+      "role": "가구",
+      "wall_likelihood": 0.1,
+      "wall_line_handles": [
+        {"handle": "58E5", "reason": "long straight line (765513.78,-195425.527)->(765014.78,-195425.527), length ~499, counter/mount edge"},
+        {"handle": "58EB", "reason": "long straight line (765021.78,-195870.527)->(765506.78,-195870.527), length ~485, parallel edge"}
+      ],
+      "notes": "name = wash basin (세면대) common block; $FUR layer, 191 entities dominated by SPLINE(139)/ARC(16) forming the curved basin outline — a bathroom fixture icon; a couple of long straight counter-mount edges could superficially resemble wall segments."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-379",
+    "answer": {
+      "def": "X-평면도(기본형)$0$수전",
+      "role": "심볼",
+      "wall_likelihood": 0.05,
+      "wall_line_handles": [],
+      "notes": "name = faucet/tap (수전); layer=A06-시설물-설비 (facility-equipment), ARC(19)/CIRCLE(3) dominated with only short LINEs (<70 units) — plumbing-fixture icon, no wall-like geometry."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-1-380",
+    "answer": {
+      "def": "X-평면도(기본형)$0$수전-1",
+      "role": "심볼",
+      "wall_likelihood": 0.05,
+      "wall_line_handles": [],
+      "notes": "faucet variant (수전-1), small bbox (~17x88), ARC/CIRCLE/LWPOLYLINE mix on $수전 layer — same plumbing-fixture icon family as unit 19."
+    }
+  }
+]

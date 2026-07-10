@@ -1,0 +1,3417 @@
+{
+  "schema": "ariadne.e1_crosscheck.v0",
+  "per_def": [
+    {
+      "def": "X-평면도(기본형)$0$101co2",
+      "wall_likelihood": 0.95,
+      "n_pairs": 52,
+      "n_h_ornith": 10,
+      "n_h_det": 55,
+      "jaccard": 0.14035087719298245,
+      "containment": 0.8
+    },
+    {
+      "def": "X-평면도(기본형)$0$103co1",
+      "wall_likelihood": 0.95,
+      "n_pairs": 57,
+      "n_h_ornith": 10,
+      "n_h_det": 59,
+      "jaccard": 0.11290322580645161,
+      "containment": 0.7
+    },
+    {
+      "def": "X-평면도(기본형)$0$104co1",
+      "wall_likelihood": 0.95,
+      "n_pairs": 61,
+      "n_h_ornith": 10,
+      "n_h_det": 63,
+      "jaccard": 0.07352941176470588,
+      "containment": 0.5
+    },
+    {
+      "def": "X-평면도(기본형)$0$104co2",
+      "wall_likelihood": 0.95,
+      "n_pairs": 58,
+      "n_h_ornith": 10,
+      "n_h_det": 60,
+      "jaccard": 0.14754098360655737,
+      "containment": 0.9
+    },
+    {
+      "def": "X-평면도(기본형)$0$111BRF2",
+      "wall_likelihood": 0.95,
+      "n_pairs": 0,
+      "n_h_ornith": 10,
+      "n_h_det": 0,
+      "jaccard": 0.0,
+      "containment": 0.0
+    },
+    {
+      "def": "X-평면도(기본형)$0$111a",
+      "wall_likelihood": 0.95,
+      "n_pairs": 651,
+      "n_h_ornith": 10,
+      "n_h_det": 459,
+      "jaccard": 0.02178649237472767,
+      "containment": 1.0
+    },
+    {
+      "def": "X-평면도(기본형)$0$130a",
+      "wall_likelihood": 0.95,
+      "n_pairs": 666,
+      "n_h_ornith": 10,
+      "n_h_det": 477,
+      "jaccard": 0.020964360587002098,
+      "containment": 1.0
+    },
+    {
+      "def": "X-평면도(기본형)$0$130a1",
+      "wall_likelihood": 0.95,
+      "n_pairs": 659,
+      "n_h_ornith": 5,
+      "n_h_det": 473,
+      "jaccard": 0.010570824524312896,
+      "containment": 1.0
+    },
+    {
+      "def": "X-평면도(기본형)$0$84a1",
+      "wall_likelihood": 0.95,
+      "n_pairs": 536,
+      "n_h_ornith": 8,
+      "n_h_det": 375,
+      "jaccard": 0.021333333333333333,
+      "containment": 1.0
+    },
+    {
+      "def": "X-평면도(기본형)$0$84b1",
+      "wall_likelihood": 0.95,
+      "n_pairs": 521,
+      "n_h_ornith": 8,
+      "n_h_det": 367,
+      "jaccard": 0.021798365122615803,
+      "containment": 1.0
+    },
+    {
+      "def": "X-평면도(기본형)$0$A$C019C01BD",
+      "wall_likelihood": 0.95,
+      "n_pairs": 7,
+      "n_h_ornith": 10,
+      "n_h_det": 8,
+      "jaccard": 0.125,
+      "containment": 0.2
+    },
+    {
+      "def": "X-평면도(기본형)$0$A$C059766AB",
+      "wall_likelihood": 0.95,
+      "n_pairs": 492,
+      "n_h_ornith": 10,
+      "n_h_det": 259,
+      "jaccard": 0.03861003861003861,
+      "containment": 1.0
+    },
+    {
+      "def": "X-평면도(기본형)$0$A$C0E9D10F9",
+      "wall_likelihood": 0.95,
+      "n_pairs": 10,
+      "n_h_ornith": 10,
+      "n_h_det": 17,
+      "jaccard": 0.42105263157894735,
+      "containment": 0.8
+    },
+    {
+      "def": "X-평면도(기본형)$0$A$C49112A41",
+      "wall_likelihood": 0.95,
+      "n_pairs": 7,
+      "n_h_ornith": 9,
+      "n_h_det": 13,
+      "jaccard": 0.4666666666666667,
+      "containment": 0.7777777777777778
+    },
+    {
+      "def": "X-평면도(기본형)$0$A$C57321CDF",
+      "wall_likelihood": 0.95,
+      "n_pairs": 5,
+      "n_h_ornith": 10,
+      "n_h_det": 7,
+      "jaccard": 0.5454545454545454,
+      "containment": 0.6
+    },
+    {
+      "def": "X-평면도(기본형)$0$A$C7D8E4760",
+      "wall_likelihood": 0.95,
+      "n_pairs": 91,
+      "n_h_ornith": 10,
+      "n_h_det": 64,
+      "jaccard": 0.15625,
+      "containment": 1.0
+    },
+    {
+      "def": "X-평면도(기본형)$0$CW900",
+      "wall_likelihood": 0.95,
+      "n_pairs": 15,
+      "n_h_ornith": 10,
+      "n_h_det": 18,
+      "jaccard": 0.4,
+      "containment": 0.8
+    },
+    {
+      "def": "X-평면도(기본형)$0$DW1500",
+      "wall_likelihood": 0.95,
+      "n_pairs": 32,
+      "n_h_ornith": 10,
+      "n_h_det": 18,
+      "jaccard": 0.5555555555555556,
+      "containment": 1.0
+    },
+    {
+      "def": "X-평면도(기본형)$0$cw1200",
+      "wall_likelihood": 0.95,
+      "n_pairs": 15,
+      "n_h_ornith": 10,
+      "n_h_det": 18,
+      "jaccard": 0.5555555555555556,
+      "containment": 1.0
+    },
+    {
+      "def": "X-평면도(기본형)$0$dw1200",
+      "wall_likelihood": 0.95,
+      "n_pairs": 32,
+      "n_h_ornith": 10,
+      "n_h_det": 18,
+      "jaccard": 0.4,
+      "containment": 0.8
+    },
+    {
+      "def": "X-평면도(기본형)$0$dw1600",
+      "wall_likelihood": 0.95,
+      "n_pairs": 32,
+      "n_h_ornith": 10,
+      "n_h_det": 18,
+      "jaccard": 0.5555555555555556,
+      "containment": 1.0
+    },
+    {
+      "def": "X-평면도(기본형)$0$ng",
+      "wall_likelihood": 0.95,
+      "n_pairs": 10,
+      "n_h_ornith": 10,
+      "n_h_det": 10,
+      "jaccard": 0.3333333333333333,
+      "containment": 0.5
+    },
+    {
+      "def": "X-평면도(기본형)$0$101co1",
+      "wall_likelihood": 0.92,
+      "n_pairs": 57,
+      "n_h_ornith": 10,
+      "n_h_det": 58,
+      "jaccard": 0.13333333333333333,
+      "containment": 0.8
+    },
+    {
+      "def": "X-평면도(기본형)$0$101co1-RF",
+      "wall_likelihood": 0.92,
+      "n_pairs": 50,
+      "n_h_ornith": 15,
+      "n_h_det": 54,
+      "jaccard": 0.21052631578947367,
+      "containment": 0.8
+    },
+    {
+      "def": "X-평면도(기본형)$0$111b",
+      "wall_likelihood": 0.92,
+      "n_pairs": 544,
+      "n_h_ornith": 2,
+      "n_h_det": 392,
+      "jaccard": 0.00510204081632653,
+      "containment": 1.0
+    },
+    {
+      "def": "X-평면도(기본형)$0$130b",
+      "wall_likelihood": 0.92,
+      "n_pairs": 665,
+      "n_h_ornith": 10,
+      "n_h_det": 468,
+      "jaccard": 0.014861995753715499,
+      "containment": 0.7
+    },
+    {
+      "def": "X-평면도(기본형)$0$84c",
+      "wall_likelihood": 0.92,
+      "n_pairs": 580,
+      "n_h_ornith": 6,
+      "n_h_det": 404,
+      "jaccard": 0.01485148514851485,
+      "containment": 1.0
+    },
+    {
+      "def": "X-평면도(기본형)$0$A$C5C7666B6",
+      "wall_likelihood": 0.92,
+      "n_pairs": 319,
+      "n_h_ornith": 10,
+      "n_h_det": 236,
+      "jaccard": 0.0423728813559322,
+      "containment": 1.0
+    },
+    {
+      "def": "X-평면도(기본형)$0$A$C5FEA68FE",
+      "wall_likelihood": 0.92,
+      "n_pairs": 67,
+      "n_h_ornith": 10,
+      "n_h_det": 52,
+      "jaccard": 0.05084745762711865,
+      "containment": 0.3
+    },
+    {
+      "def": "X-평면도(기본형)$0$Ca2405caa",
+      "wall_likelihood": 0.92,
+      "n_pairs": 15,
+      "n_h_ornith": 10,
+      "n_h_det": 11,
+      "jaccard": 0.75,
+      "containment": 0.9
+    },
+    {
+      "def": "X-평면도(기본형)$0$DW2700v",
+      "wall_likelihood": 0.92,
+      "n_pairs": 32,
+      "n_h_ornith": 10,
+      "n_h_det": 18,
+      "jaccard": 0.4,
+      "containment": 0.8
+    },
+    {
+      "def": "X-평면도(기본형)$0$IC708",
+      "wall_likelihood": 0.92,
+      "n_pairs": 58,
+      "n_h_ornith": 10,
+      "n_h_det": 42,
+      "jaccard": 0.20930232558139536,
+      "containment": 0.9
+    },
+    {
+      "def": "X-평면도(기본형)$0$KH-530S-1 TOP",
+      "wall_likelihood": 0.92,
+      "n_pairs": 67,
+      "n_h_ornith": 10,
+      "n_h_det": 49,
+      "jaccard": 0.20408163265306123,
+      "containment": 1.0
+    },
+    {
+      "def": "X-평면도(기본형)$0$ba15001400",
+      "wall_likelihood": 0.92,
+      "n_pairs": 21,
+      "n_h_ornith": 10,
+      "n_h_det": 20,
+      "jaccard": 0.5,
+      "containment": 1.0
+    },
+    {
+      "def": "X-평면도(기본형)$0$dw1400",
+      "wall_likelihood": 0.92,
+      "n_pairs": 32,
+      "n_h_ornith": 10,
+      "n_h_det": 18,
+      "jaccard": 0.5555555555555556,
+      "containment": 1.0
+    },
+    {
+      "def": "X-평면도(기본형)$0$ev13k",
+      "wall_likelihood": 0.92,
+      "n_pairs": 27,
+      "n_h_ornith": 10,
+      "n_h_det": 23,
+      "jaccard": 0.375,
+      "containment": 0.9
+    },
+    {
+      "def": "X-평면도(기본형)$0$ev16k",
+      "wall_likelihood": 0.92,
+      "n_pairs": 27,
+      "n_h_ornith": 10,
+      "n_h_det": 22,
+      "jaccard": 0.28,
+      "containment": 0.7
+    },
+    {
+      "def": "*U103",
+      "wall_likelihood": 0.9,
+      "n_pairs": 0,
+      "n_h_ornith": 10,
+      "n_h_det": 0,
+      "jaccard": 0.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*U142",
+      "wall_likelihood": 0.9,
+      "n_pairs": 0,
+      "n_h_ornith": 10,
+      "n_h_det": 0,
+      "jaccard": 0.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*U45",
+      "wall_likelihood": 0.9,
+      "n_pairs": 0,
+      "n_h_ornith": 10,
+      "n_h_det": 0,
+      "jaccard": 0.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*U53",
+      "wall_likelihood": 0.9,
+      "n_pairs": 0,
+      "n_h_ornith": 10,
+      "n_h_det": 0,
+      "jaccard": 0.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*U55",
+      "wall_likelihood": 0.9,
+      "n_pairs": 0,
+      "n_h_ornith": 10,
+      "n_h_det": 0,
+      "jaccard": 0.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*U88",
+      "wall_likelihood": 0.9,
+      "n_pairs": 0,
+      "n_h_ornith": 8,
+      "n_h_det": 0,
+      "jaccard": 0.0,
+      "containment": 0.0
+    },
+    {
+      "def": "X-평면도(기본형)$0$101co1-RF2",
+      "wall_likelihood": 0.9,
+      "n_pairs": 29,
+      "n_h_ornith": 10,
+      "n_h_det": 34,
+      "jaccard": 0.1891891891891892,
+      "containment": 0.7
+    },
+    {
+      "def": "X-평면도(기본형)$0$105co2",
+      "wall_likelihood": 0.9,
+      "n_pairs": 55,
+      "n_h_ornith": 10,
+      "n_h_det": 62,
+      "jaccard": 0.07462686567164178,
+      "containment": 0.5
+    },
+    {
+      "def": "X-평면도(기본형)$0$111ARF2",
+      "wall_likelihood": 0.9,
+      "n_pairs": 0,
+      "n_h_ornith": 10,
+      "n_h_det": 0,
+      "jaccard": 0.0,
+      "containment": 0.0
+    },
+    {
+      "def": "X-평면도(기본형)$0$84a",
+      "wall_likelihood": 0.9,
+      "n_pairs": 526,
+      "n_h_ornith": 10,
+      "n_h_det": 371,
+      "jaccard": 0.026954177897574125,
+      "containment": 1.0
+    },
+    {
+      "def": "X-평면도(기본형)$0$84b",
+      "wall_likelihood": 0.9,
+      "n_pairs": 504,
+      "n_h_ornith": 10,
+      "n_h_det": 358,
+      "jaccard": 0.016574585635359115,
+      "containment": 0.6
+    },
+    {
+      "def": "X-평면도(기본형)$0$A$C17C8346B",
+      "wall_likelihood": 0.9,
+      "n_pairs": 105,
+      "n_h_ornith": 10,
+      "n_h_det": 79,
+      "jaccard": 0.07228915662650602,
+      "containment": 0.6
+    },
+    {
+      "def": "X-평면도(기본형)$0$A$C4B913E7C",
+      "wall_likelihood": 0.9,
+      "n_pairs": 0,
+      "n_h_ornith": 10,
+      "n_h_det": 0,
+      "jaccard": 0.0,
+      "containment": 0.0
+    },
+    {
+      "def": "X-평면도(기본형)$0$A$C610442A9",
+      "wall_likelihood": 0.9,
+      "n_pairs": 42,
+      "n_h_ornith": 10,
+      "n_h_det": 34,
+      "jaccard": 0.07317073170731707,
+      "containment": 0.3
+    },
+    {
+      "def": "X-평면도(기본형)$0$A$C745B7F2C",
+      "wall_likelihood": 0.9,
+      "n_pairs": 5,
+      "n_h_ornith": 10,
+      "n_h_det": 7,
+      "jaccard": 0.4166666666666667,
+      "containment": 0.5
+    },
+    {
+      "def": "X-평면도(기본형)$0$A$Cc2871f03",
+      "wall_likelihood": 0.9,
+      "n_pairs": 18,
+      "n_h_ornith": 10,
+      "n_h_det": 18,
+      "jaccard": 0.2727272727272727,
+      "containment": 0.6
+    },
+    {
+      "def": "X-평면도(기본형)$0$ev16x2k",
+      "wall_likelihood": 0.9,
+      "n_pairs": 57,
+      "n_h_ornith": 10,
+      "n_h_det": 48,
+      "jaccard": 0.16,
+      "containment": 0.8
+    },
+    {
+      "def": "X-평면도(기본형)$0$hd1050",
+      "wall_likelihood": 0.9,
+      "n_pairs": 8,
+      "n_h_ornith": 10,
+      "n_h_det": 9,
+      "jaccard": 0.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*D324",
+      "wall_likelihood": 0.85,
+      "n_pairs": 0,
+      "n_h_ornith": 5,
+      "n_h_det": 0,
+      "jaccard": 0.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*U105",
+      "wall_likelihood": 0.85,
+      "n_pairs": 0,
+      "n_h_ornith": 10,
+      "n_h_det": 0,
+      "jaccard": 0.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*U106",
+      "wall_likelihood": 0.85,
+      "n_pairs": 0,
+      "n_h_ornith": 10,
+      "n_h_det": 0,
+      "jaccard": 0.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*U107",
+      "wall_likelihood": 0.85,
+      "n_pairs": 0,
+      "n_h_ornith": 10,
+      "n_h_det": 0,
+      "jaccard": 0.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*U109",
+      "wall_likelihood": 0.85,
+      "n_pairs": 0,
+      "n_h_ornith": 10,
+      "n_h_det": 0,
+      "jaccard": 0.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*U111",
+      "wall_likelihood": 0.85,
+      "n_pairs": 0,
+      "n_h_ornith": 10,
+      "n_h_det": 0,
+      "jaccard": 0.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*U125",
+      "wall_likelihood": 0.85,
+      "n_pairs": 0,
+      "n_h_ornith": 10,
+      "n_h_det": 0,
+      "jaccard": 0.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*U171",
+      "wall_likelihood": 0.85,
+      "n_pairs": 0,
+      "n_h_ornith": 10,
+      "n_h_det": 0,
+      "jaccard": 0.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*U184",
+      "wall_likelihood": 0.85,
+      "n_pairs": 0,
+      "n_h_ornith": 10,
+      "n_h_det": 0,
+      "jaccard": 0.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*U187",
+      "wall_likelihood": 0.85,
+      "n_pairs": 0,
+      "n_h_ornith": 8,
+      "n_h_det": 0,
+      "jaccard": 0.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*U239",
+      "wall_likelihood": 0.85,
+      "n_pairs": 0,
+      "n_h_ornith": 10,
+      "n_h_det": 0,
+      "jaccard": 0.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*U240",
+      "wall_likelihood": 0.85,
+      "n_pairs": 0,
+      "n_h_ornith": 10,
+      "n_h_det": 0,
+      "jaccard": 0.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*U281",
+      "wall_likelihood": 0.85,
+      "n_pairs": 0,
+      "n_h_ornith": 10,
+      "n_h_det": 0,
+      "jaccard": 0.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*U283",
+      "wall_likelihood": 0.85,
+      "n_pairs": 0,
+      "n_h_ornith": 10,
+      "n_h_det": 0,
+      "jaccard": 0.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*U48",
+      "wall_likelihood": 0.85,
+      "n_pairs": 0,
+      "n_h_ornith": 10,
+      "n_h_det": 0,
+      "jaccard": 0.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*U49",
+      "wall_likelihood": 0.85,
+      "n_pairs": 0,
+      "n_h_ornith": 10,
+      "n_h_det": 0,
+      "jaccard": 0.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*U51",
+      "wall_likelihood": 0.85,
+      "n_pairs": 0,
+      "n_h_ornith": 10,
+      "n_h_det": 0,
+      "jaccard": 0.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*U67",
+      "wall_likelihood": 0.85,
+      "n_pairs": 10,
+      "n_h_ornith": 10,
+      "n_h_det": 10,
+      "jaccard": 0.3333333333333333,
+      "containment": 0.5
+    },
+    {
+      "def": "X-평면도(기본형)$0$A$C01A306AE",
+      "wall_likelihood": 0.85,
+      "n_pairs": 18,
+      "n_h_ornith": 10,
+      "n_h_det": 14,
+      "jaccard": 0.5,
+      "containment": 0.8
+    },
+    {
+      "def": "X-평면도(기본형)$0$A$C0A097A0C",
+      "wall_likelihood": 0.85,
+      "n_pairs": 37,
+      "n_h_ornith": 10,
+      "n_h_det": 30,
+      "jaccard": 0.1111111111111111,
+      "containment": 0.4
+    },
+    {
+      "def": "X-평면도(기본형)$0$A$C0C1F5443",
+      "wall_likelihood": 0.85,
+      "n_pairs": 28,
+      "n_h_ornith": 10,
+      "n_h_det": 20,
+      "jaccard": 0.1111111111111111,
+      "containment": 0.3
+    },
+    {
+      "def": "X-평면도(기본형)$0$A$C4D747D6B",
+      "wall_likelihood": 0.85,
+      "n_pairs": 7,
+      "n_h_ornith": 10,
+      "n_h_det": 13,
+      "jaccard": 0.5333333333333333,
+      "containment": 0.8
+    },
+    {
+      "def": "X-평면도(기본형)$0$A$C7CF27C93",
+      "wall_likelihood": 0.85,
+      "n_pairs": 91,
+      "n_h_ornith": 10,
+      "n_h_det": 63,
+      "jaccard": 0.10606060606060606,
+      "containment": 0.7
+    },
+    {
+      "def": "X-평면도(기본형)$0$L933 TOP",
+      "wall_likelihood": 0.85,
+      "n_pairs": 23,
+      "n_h_ornith": 5,
+      "n_h_det": 16,
+      "jaccard": 0.05,
+      "containment": 0.2
+    },
+    {
+      "def": "X-평면도(기본형)$0$SB1703 1500",
+      "wall_likelihood": 0.85,
+      "n_pairs": 340,
+      "n_h_ornith": 10,
+      "n_h_det": 192,
+      "jaccard": 0.052083333333333336,
+      "containment": 1.0
+    },
+    {
+      "def": "X-평면도(기본형)$0$ba15002200",
+      "wall_likelihood": 0.85,
+      "n_pairs": 15,
+      "n_h_ornith": 10,
+      "n_h_det": 14,
+      "jaccard": 0.7142857142857143,
+      "containment": 1.0
+    },
+    {
+      "def": "X-평면도(기본형)$0$ba17001400",
+      "wall_likelihood": 0.85,
+      "n_pairs": 18,
+      "n_h_ornith": 10,
+      "n_h_det": 19,
+      "jaccard": 0.5263157894736842,
+      "containment": 1.0
+    },
+    {
+      "def": "X-평면도(기본형)$0$dw2100",
+      "wall_likelihood": 0.85,
+      "n_pairs": 32,
+      "n_h_ornith": 10,
+      "n_h_det": 18,
+      "jaccard": 0.47368421052631576,
+      "containment": 0.9
+    },
+    {
+      "def": "X-평면도(기본형)$0$pkdr750190-1",
+      "wall_likelihood": 0.85,
+      "n_pairs": 4,
+      "n_h_ornith": 8,
+      "n_h_det": 6,
+      "jaccard": 0.75,
+      "containment": 0.75
+    },
+    {
+      "def": "X-평면도(기본형)$0$국기계양대",
+      "wall_likelihood": 0.85,
+      "n_pairs": 10,
+      "n_h_ornith": 10,
+      "n_h_det": 12,
+      "jaccard": 0.6923076923076923,
+      "containment": 0.9
+    },
+    {
+      "def": "*U137",
+      "wall_likelihood": 0.8,
+      "n_pairs": 0,
+      "n_h_ornith": 9,
+      "n_h_det": 0,
+      "jaccard": 0.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*U163",
+      "wall_likelihood": 0.8,
+      "n_pairs": 0,
+      "n_h_ornith": 10,
+      "n_h_det": 0,
+      "jaccard": 0.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*U141",
+      "wall_likelihood": 0.75,
+      "n_pairs": 0,
+      "n_h_ornith": 10,
+      "n_h_det": 0,
+      "jaccard": 0.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*U148",
+      "wall_likelihood": 0.75,
+      "n_pairs": 0,
+      "n_h_ornith": 5,
+      "n_h_det": 0,
+      "jaccard": 0.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*U152",
+      "wall_likelihood": 0.75,
+      "n_pairs": 0,
+      "n_h_ornith": 10,
+      "n_h_det": 0,
+      "jaccard": 0.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*U172",
+      "wall_likelihood": 0.75,
+      "n_pairs": 10,
+      "n_h_ornith": 10,
+      "n_h_det": 10,
+      "jaccard": 0.3333333333333333,
+      "containment": 0.5
+    },
+    {
+      "def": "*U174",
+      "wall_likelihood": 0.75,
+      "n_pairs": 0,
+      "n_h_ornith": 10,
+      "n_h_det": 0,
+      "jaccard": 0.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*U188",
+      "wall_likelihood": 0.75,
+      "n_pairs": 0,
+      "n_h_ornith": 10,
+      "n_h_det": 0,
+      "jaccard": 0.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*U280",
+      "wall_likelihood": 0.75,
+      "n_pairs": 0,
+      "n_h_ornith": 0,
+      "n_h_det": 0,
+      "jaccard": 1.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*U62",
+      "wall_likelihood": 0.75,
+      "n_pairs": 0,
+      "n_h_ornith": 10,
+      "n_h_det": 0,
+      "jaccard": 0.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*U70",
+      "wall_likelihood": 0.75,
+      "n_pairs": 0,
+      "n_h_ornith": 8,
+      "n_h_det": 0,
+      "jaccard": 0.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*U75",
+      "wall_likelihood": 0.75,
+      "n_pairs": 10,
+      "n_h_ornith": 10,
+      "n_h_det": 10,
+      "jaccard": 0.42857142857142855,
+      "containment": 0.6
+    },
+    {
+      "def": "X-FORM_청주",
+      "wall_likelihood": 0.75,
+      "n_pairs": 171,
+      "n_h_ornith": 10,
+      "n_h_det": 98,
+      "jaccard": 0.10204081632653061,
+      "containment": 1.0
+    },
+    {
+      "def": "X-평면도 (기본형)$0$FU1",
+      "wall_likelihood": 0.75,
+      "n_pairs": 2,
+      "n_h_ornith": 10,
+      "n_h_det": 4,
+      "jaccard": 0.0,
+      "containment": 0.0
+    },
+    {
+      "def": "X-평면도(기본형)$0$111BRF",
+      "wall_likelihood": 0.75,
+      "n_pairs": 0,
+      "n_h_ornith": 10,
+      "n_h_det": 0,
+      "jaccard": 0.0,
+      "containment": 0.0
+    },
+    {
+      "def": "X-평면도(기본형)$0$A$C60D55377",
+      "wall_likelihood": 0.75,
+      "n_pairs": 90,
+      "n_h_ornith": 10,
+      "n_h_det": 63,
+      "jaccard": 0.140625,
+      "containment": 0.9
+    },
+    {
+      "def": "*U113",
+      "wall_likelihood": 0.7,
+      "n_pairs": 0,
+      "n_h_ornith": 10,
+      "n_h_det": 0,
+      "jaccard": 0.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*U119",
+      "wall_likelihood": 0.7,
+      "n_pairs": 0,
+      "n_h_ornith": 10,
+      "n_h_det": 0,
+      "jaccard": 0.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*U128",
+      "wall_likelihood": 0.7,
+      "n_pairs": 0,
+      "n_h_ornith": 6,
+      "n_h_det": 0,
+      "jaccard": 0.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*U144",
+      "wall_likelihood": 0.7,
+      "n_pairs": 0,
+      "n_h_ornith": 10,
+      "n_h_det": 0,
+      "jaccard": 0.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*U157",
+      "wall_likelihood": 0.7,
+      "n_pairs": 0,
+      "n_h_ornith": 8,
+      "n_h_det": 0,
+      "jaccard": 0.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*U161",
+      "wall_likelihood": 0.7,
+      "n_pairs": 0,
+      "n_h_ornith": 10,
+      "n_h_det": 0,
+      "jaccard": 0.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*U164",
+      "wall_likelihood": 0.7,
+      "n_pairs": 0,
+      "n_h_ornith": 10,
+      "n_h_det": 0,
+      "jaccard": 0.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*U173",
+      "wall_likelihood": 0.7,
+      "n_pairs": 0,
+      "n_h_ornith": 8,
+      "n_h_det": 0,
+      "jaccard": 0.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*U175",
+      "wall_likelihood": 0.7,
+      "n_pairs": 0,
+      "n_h_ornith": 10,
+      "n_h_det": 0,
+      "jaccard": 0.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*U199",
+      "wall_likelihood": 0.7,
+      "n_pairs": 0,
+      "n_h_ornith": 10,
+      "n_h_det": 0,
+      "jaccard": 0.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*U200",
+      "wall_likelihood": 0.7,
+      "n_pairs": 0,
+      "n_h_ornith": 10,
+      "n_h_det": 0,
+      "jaccard": 0.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*U202",
+      "wall_likelihood": 0.7,
+      "n_pairs": 0,
+      "n_h_ornith": 10,
+      "n_h_det": 0,
+      "jaccard": 0.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*U83",
+      "wall_likelihood": 0.7,
+      "n_pairs": 0,
+      "n_h_ornith": 9,
+      "n_h_det": 0,
+      "jaccard": 0.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*U91",
+      "wall_likelihood": 0.7,
+      "n_pairs": 0,
+      "n_h_ornith": 6,
+      "n_h_det": 0,
+      "jaccard": 0.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*U92",
+      "wall_likelihood": 0.7,
+      "n_pairs": 0,
+      "n_h_ornith": 10,
+      "n_h_det": 0,
+      "jaccard": 0.0,
+      "containment": 0.0
+    },
+    {
+      "def": "X-평면도(기본형)$0$101co1-RF3",
+      "wall_likelihood": 0.7,
+      "n_pairs": 1,
+      "n_h_ornith": 8,
+      "n_h_det": 2,
+      "jaccard": 0.0,
+      "containment": 0.0
+    },
+    {
+      "def": "X-평면도(기본형)$0$A$C41D360DF",
+      "wall_likelihood": 0.7,
+      "n_pairs": 2,
+      "n_h_ornith": 10,
+      "n_h_det": 4,
+      "jaccard": 0.0,
+      "containment": 0.0
+    },
+    {
+      "def": "X-평면도(기본형)$0$A$C71B42895",
+      "wall_likelihood": 0.7,
+      "n_pairs": 76,
+      "n_h_ornith": 10,
+      "n_h_det": 42,
+      "jaccard": 0.23809523809523808,
+      "containment": 1.0
+    },
+    {
+      "def": "X-평면도(기본형)$0$FSDFSDF321",
+      "wall_likelihood": 0.7,
+      "n_pairs": 1,
+      "n_h_ornith": 5,
+      "n_h_det": 2,
+      "jaccard": 0.4,
+      "containment": 0.4
+    },
+    {
+      "def": "X-평면도(기본형)$0$pkdr750190",
+      "wall_likelihood": 0.7,
+      "n_pairs": 4,
+      "n_h_ornith": 8,
+      "n_h_det": 6,
+      "jaccard": 0.75,
+      "containment": 0.75
+    },
+    {
+      "def": "*D338",
+      "wall_likelihood": 0.65,
+      "n_pairs": 1,
+      "n_h_ornith": 5,
+      "n_h_det": 2,
+      "jaccard": 0.4,
+      "containment": 0.4
+    },
+    {
+      "def": "*U121",
+      "wall_likelihood": 0.65,
+      "n_pairs": 0,
+      "n_h_ornith": 10,
+      "n_h_det": 0,
+      "jaccard": 0.0,
+      "containment": 0.0
+    },
+    {
+      "def": "X-평면도(기본형)$0$sta-t-5",
+      "wall_likelihood": 0.65,
+      "n_pairs": 35,
+      "n_h_ornith": 10,
+      "n_h_det": 38,
+      "jaccard": 0.2,
+      "containment": 0.8
+    },
+    {
+      "def": "*U104",
+      "wall_likelihood": 0.6,
+      "n_pairs": 0,
+      "n_h_ornith": 10,
+      "n_h_det": 0,
+      "jaccard": 0.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*U196",
+      "wall_likelihood": 0.6,
+      "n_pairs": 0,
+      "n_h_ornith": 5,
+      "n_h_det": 0,
+      "jaccard": 0.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*U279",
+      "wall_likelihood": 0.6,
+      "n_pairs": 0,
+      "n_h_ornith": 10,
+      "n_h_det": 0,
+      "jaccard": 0.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*U50",
+      "wall_likelihood": 0.6,
+      "n_pairs": 0,
+      "n_h_ornith": 10,
+      "n_h_det": 0,
+      "jaccard": 0.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*U52",
+      "wall_likelihood": 0.6,
+      "n_pairs": 0,
+      "n_h_ornith": 10,
+      "n_h_det": 0,
+      "jaccard": 0.0,
+      "containment": 0.0
+    },
+    {
+      "def": "X-평면도(기본형)$0$PSD700_2",
+      "wall_likelihood": 0.6,
+      "n_pairs": 0,
+      "n_h_ornith": 4,
+      "n_h_det": 0,
+      "jaccard": 0.0,
+      "containment": 0.0
+    },
+    {
+      "def": "X-평면도(기본형)$0$T1",
+      "wall_likelihood": 0.6,
+      "n_pairs": 58,
+      "n_h_ornith": 10,
+      "n_h_det": 30,
+      "jaccard": 0.21212121212121213,
+      "containment": 0.7
+    },
+    {
+      "def": "X-평면도(기본형)$0$ba18601500",
+      "wall_likelihood": 0.6,
+      "n_pairs": 7,
+      "n_h_ornith": 9,
+      "n_h_det": 9,
+      "jaccard": 1.0,
+      "containment": 1.0
+    },
+    {
+      "def": "X-평면도(기본형)$0$esp",
+      "wall_likelihood": 0.55,
+      "n_pairs": 0,
+      "n_h_ornith": 10,
+      "n_h_det": 0,
+      "jaccard": 0.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*U275",
+      "wall_likelihood": 0.45,
+      "n_pairs": 0,
+      "n_h_ornith": 10,
+      "n_h_det": 0,
+      "jaccard": 0.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*U140",
+      "wall_likelihood": 0.4,
+      "n_pairs": 10,
+      "n_h_ornith": 10,
+      "n_h_det": 10,
+      "jaccard": 0.25,
+      "containment": 0.4
+    },
+    {
+      "def": "*U185",
+      "wall_likelihood": 0.4,
+      "n_pairs": 0,
+      "n_h_ornith": 10,
+      "n_h_det": 0,
+      "jaccard": 0.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*U282",
+      "wall_likelihood": 0.4,
+      "n_pairs": 0,
+      "n_h_ornith": 10,
+      "n_h_det": 0,
+      "jaccard": 0.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*U57",
+      "wall_likelihood": 0.4,
+      "n_pairs": 0,
+      "n_h_ornith": 10,
+      "n_h_det": 0,
+      "jaccard": 0.0,
+      "containment": 0.0
+    },
+    {
+      "def": "X-평면도(기본형)$0$111ARF",
+      "wall_likelihood": 0.4,
+      "n_pairs": 0,
+      "n_h_ornith": 10,
+      "n_h_det": 0,
+      "jaccard": 0.0,
+      "containment": 0.0
+    },
+    {
+      "def": "X-평면도(기본형)$0$A$C04B05B29",
+      "wall_likelihood": 0.35,
+      "n_pairs": 5,
+      "n_h_ornith": 10,
+      "n_h_det": 7,
+      "jaccard": 0.4166666666666667,
+      "containment": 0.5
+    },
+    {
+      "def": "X-평면도(기본형)$0$A$C072C115F",
+      "wall_likelihood": 0.35,
+      "n_pairs": 2,
+      "n_h_ornith": 8,
+      "n_h_det": 3,
+      "jaccard": 0.375,
+      "containment": 0.375
+    },
+    {
+      "def": "*U115",
+      "wall_likelihood": 0.3,
+      "n_pairs": 0,
+      "n_h_ornith": 10,
+      "n_h_det": 0,
+      "jaccard": 0.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*U133",
+      "wall_likelihood": 0.3,
+      "n_pairs": 0,
+      "n_h_ornith": 10,
+      "n_h_det": 0,
+      "jaccard": 0.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*U168",
+      "wall_likelihood": 0.3,
+      "n_pairs": 0,
+      "n_h_ornith": 8,
+      "n_h_det": 0,
+      "jaccard": 0.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*U179",
+      "wall_likelihood": 0.3,
+      "n_pairs": 0,
+      "n_h_ornith": 5,
+      "n_h_det": 0,
+      "jaccard": 0.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*U192",
+      "wall_likelihood": 0.3,
+      "n_pairs": 0,
+      "n_h_ornith": 10,
+      "n_h_det": 0,
+      "jaccard": 0.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*U273",
+      "wall_likelihood": 0.3,
+      "n_pairs": 0,
+      "n_h_ornith": 0,
+      "n_h_det": 0,
+      "jaccard": 1.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*U54",
+      "wall_likelihood": 0.3,
+      "n_pairs": 0,
+      "n_h_ornith": 10,
+      "n_h_det": 0,
+      "jaccard": 0.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*U71",
+      "wall_likelihood": 0.3,
+      "n_pairs": 0,
+      "n_h_ornith": 10,
+      "n_h_det": 0,
+      "jaccard": 0.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*U84",
+      "wall_likelihood": 0.3,
+      "n_pairs": 0,
+      "n_h_ornith": 10,
+      "n_h_det": 0,
+      "jaccard": 0.0,
+      "containment": 0.0
+    },
+    {
+      "def": "X-평면도(기본형)$0$wd120900",
+      "wall_likelihood": 0.3,
+      "n_pairs": 0,
+      "n_h_ornith": 2,
+      "n_h_det": 0,
+      "jaccard": 0.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*U146",
+      "wall_likelihood": 0.25,
+      "n_pairs": 0,
+      "n_h_ornith": 10,
+      "n_h_det": 0,
+      "jaccard": 0.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*U149",
+      "wall_likelihood": 0.25,
+      "n_pairs": 0,
+      "n_h_ornith": 10,
+      "n_h_det": 0,
+      "jaccard": 0.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*U165",
+      "wall_likelihood": 0.25,
+      "n_pairs": 0,
+      "n_h_ornith": 8,
+      "n_h_det": 0,
+      "jaccard": 0.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*U167",
+      "wall_likelihood": 0.25,
+      "n_pairs": 0,
+      "n_h_ornith": 0,
+      "n_h_det": 0,
+      "jaccard": 1.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*U169",
+      "wall_likelihood": 0.25,
+      "n_pairs": 0,
+      "n_h_ornith": 0,
+      "n_h_det": 0,
+      "jaccard": 1.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*U74",
+      "wall_likelihood": 0.25,
+      "n_pairs": 0,
+      "n_h_ornith": 8,
+      "n_h_det": 0,
+      "jaccard": 0.0,
+      "containment": 0.0
+    },
+    {
+      "def": "X-평면도(기본형)$0$A$C66e6687a",
+      "wall_likelihood": 0.25,
+      "n_pairs": 0,
+      "n_h_ornith": 8,
+      "n_h_det": 0,
+      "jaccard": 0.0,
+      "containment": 0.0
+    },
+    {
+      "def": "X-평면도(기본형)$0$WD850",
+      "wall_likelihood": 0.25,
+      "n_pairs": 0,
+      "n_h_ornith": 3,
+      "n_h_det": 0,
+      "jaccard": 0.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*D333",
+      "wall_likelihood": 0.2,
+      "n_pairs": 0,
+      "n_h_ornith": 3,
+      "n_h_det": 0,
+      "jaccard": 0.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*U117",
+      "wall_likelihood": 0.2,
+      "n_pairs": 0,
+      "n_h_ornith": 5,
+      "n_h_det": 0,
+      "jaccard": 0.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*U120",
+      "wall_likelihood": 0.2,
+      "n_pairs": 0,
+      "n_h_ornith": 0,
+      "n_h_det": 0,
+      "jaccard": 1.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*U122",
+      "wall_likelihood": 0.2,
+      "n_pairs": 0,
+      "n_h_ornith": 0,
+      "n_h_det": 0,
+      "jaccard": 1.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*U134",
+      "wall_likelihood": 0.2,
+      "n_pairs": 0,
+      "n_h_ornith": 7,
+      "n_h_det": 0,
+      "jaccard": 0.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*U139",
+      "wall_likelihood": 0.2,
+      "n_pairs": 10,
+      "n_h_ornith": 10,
+      "n_h_det": 10,
+      "jaccard": 0.3333333333333333,
+      "containment": 0.5
+    },
+    {
+      "def": "*U150",
+      "wall_likelihood": 0.2,
+      "n_pairs": 0,
+      "n_h_ornith": 0,
+      "n_h_det": 0,
+      "jaccard": 1.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*U238",
+      "wall_likelihood": 0.2,
+      "n_pairs": 0,
+      "n_h_ornith": 10,
+      "n_h_det": 0,
+      "jaccard": 0.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*U64",
+      "wall_likelihood": 0.2,
+      "n_pairs": 0,
+      "n_h_ornith": 10,
+      "n_h_det": 0,
+      "jaccard": 0.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*U77",
+      "wall_likelihood": 0.2,
+      "n_pairs": 0,
+      "n_h_ornith": 10,
+      "n_h_det": 0,
+      "jaccard": 0.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*U79",
+      "wall_likelihood": 0.2,
+      "n_pairs": 0,
+      "n_h_ornith": 10,
+      "n_h_det": 0,
+      "jaccard": 0.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*U82",
+      "wall_likelihood": 0.2,
+      "n_pairs": 0,
+      "n_h_ornith": 5,
+      "n_h_det": 0,
+      "jaccard": 0.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*U85",
+      "wall_likelihood": 0.2,
+      "n_pairs": 0,
+      "n_h_ornith": 10,
+      "n_h_det": 0,
+      "jaccard": 0.0,
+      "containment": 0.0
+    },
+    {
+      "def": "X-FORM_청주$0$Block_5",
+      "wall_likelihood": 0.2,
+      "n_pairs": 0,
+      "n_h_ornith": 0,
+      "n_h_det": 0,
+      "jaccard": 1.0,
+      "containment": 0.0
+    },
+    {
+      "def": "X-평면도(기본형)",
+      "wall_likelihood": 0.2,
+      "n_pairs": 1367,
+      "n_h_ornith": 10,
+      "n_h_det": 912,
+      "jaccard": 0.0010857763300760044,
+      "containment": 0.1
+    },
+    {
+      "def": "X-평면도(기본형)$0$A$C0EF505D0",
+      "wall_likelihood": 0.2,
+      "n_pairs": 7,
+      "n_h_ornith": 8,
+      "n_h_det": 13,
+      "jaccard": 0.4,
+      "containment": 0.75
+    },
+    {
+      "def": "X-평면도(기본형)$0$A$C24B0555E",
+      "wall_likelihood": 0.2,
+      "n_pairs": 5,
+      "n_h_ornith": 5,
+      "n_h_det": 7,
+      "jaccard": 0.5,
+      "containment": 0.8
+    },
+    {
+      "def": "*D332",
+      "wall_likelihood": 0.15,
+      "n_pairs": 1,
+      "n_h_ornith": 5,
+      "n_h_det": 2,
+      "jaccard": 0.4,
+      "containment": 0.4
+    },
+    {
+      "def": "*D363",
+      "wall_likelihood": 0.15,
+      "n_pairs": 1,
+      "n_h_ornith": 0,
+      "n_h_det": 2,
+      "jaccard": 0.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*D391",
+      "wall_likelihood": 0.15,
+      "n_pairs": 0,
+      "n_h_ornith": 3,
+      "n_h_det": 0,
+      "jaccard": 0.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*U114",
+      "wall_likelihood": 0.15,
+      "n_pairs": 0,
+      "n_h_ornith": 10,
+      "n_h_det": 0,
+      "jaccard": 0.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*U123",
+      "wall_likelihood": 0.15,
+      "n_pairs": 0,
+      "n_h_ornith": 10,
+      "n_h_det": 0,
+      "jaccard": 0.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*U124",
+      "wall_likelihood": 0.15,
+      "n_pairs": 0,
+      "n_h_ornith": 10,
+      "n_h_det": 0,
+      "jaccard": 0.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*U126",
+      "wall_likelihood": 0.15,
+      "n_pairs": 0,
+      "n_h_ornith": 10,
+      "n_h_det": 0,
+      "jaccard": 0.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*U130",
+      "wall_likelihood": 0.15,
+      "n_pairs": 0,
+      "n_h_ornith": 0,
+      "n_h_det": 0,
+      "jaccard": 1.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*U132",
+      "wall_likelihood": 0.15,
+      "n_pairs": 10,
+      "n_h_ornith": 10,
+      "n_h_det": 10,
+      "jaccard": 0.3333333333333333,
+      "containment": 0.5
+    },
+    {
+      "def": "*U138",
+      "wall_likelihood": 0.15,
+      "n_pairs": 0,
+      "n_h_ornith": 10,
+      "n_h_det": 0,
+      "jaccard": 0.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*U145",
+      "wall_likelihood": 0.15,
+      "n_pairs": 0,
+      "n_h_ornith": 10,
+      "n_h_det": 0,
+      "jaccard": 0.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*U151",
+      "wall_likelihood": 0.15,
+      "n_pairs": 0,
+      "n_h_ornith": 10,
+      "n_h_det": 0,
+      "jaccard": 0.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*U159",
+      "wall_likelihood": 0.15,
+      "n_pairs": 0,
+      "n_h_ornith": 0,
+      "n_h_det": 0,
+      "jaccard": 1.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*U166",
+      "wall_likelihood": 0.15,
+      "n_pairs": 0,
+      "n_h_ornith": 10,
+      "n_h_det": 0,
+      "jaccard": 0.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*U176",
+      "wall_likelihood": 0.15,
+      "n_pairs": 0,
+      "n_h_ornith": 10,
+      "n_h_det": 0,
+      "jaccard": 0.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*U180",
+      "wall_likelihood": 0.15,
+      "n_pairs": 0,
+      "n_h_ornith": 0,
+      "n_h_det": 0,
+      "jaccard": 1.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*U183",
+      "wall_likelihood": 0.15,
+      "n_pairs": 0,
+      "n_h_ornith": 10,
+      "n_h_det": 0,
+      "jaccard": 0.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*U186",
+      "wall_likelihood": 0.15,
+      "n_pairs": 0,
+      "n_h_ornith": 10,
+      "n_h_det": 0,
+      "jaccard": 0.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*U197",
+      "wall_likelihood": 0.15,
+      "n_pairs": 10,
+      "n_h_ornith": 10,
+      "n_h_det": 10,
+      "jaccard": 0.6666666666666666,
+      "containment": 0.8
+    },
+    {
+      "def": "*U272",
+      "wall_likelihood": 0.15,
+      "n_pairs": 0,
+      "n_h_ornith": 0,
+      "n_h_det": 0,
+      "jaccard": 1.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*U274",
+      "wall_likelihood": 0.15,
+      "n_pairs": 0,
+      "n_h_ornith": 0,
+      "n_h_det": 0,
+      "jaccard": 1.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*U278",
+      "wall_likelihood": 0.15,
+      "n_pairs": 0,
+      "n_h_ornith": 10,
+      "n_h_det": 0,
+      "jaccard": 0.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*U290",
+      "wall_likelihood": 0.15,
+      "n_pairs": 0,
+      "n_h_ornith": 10,
+      "n_h_det": 0,
+      "jaccard": 0.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*U47",
+      "wall_likelihood": 0.15,
+      "n_pairs": 0,
+      "n_h_ornith": 10,
+      "n_h_det": 0,
+      "jaccard": 0.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*U60",
+      "wall_likelihood": 0.15,
+      "n_pairs": 0,
+      "n_h_ornith": 10,
+      "n_h_det": 0,
+      "jaccard": 0.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*U61",
+      "wall_likelihood": 0.15,
+      "n_pairs": 0,
+      "n_h_ornith": 0,
+      "n_h_det": 0,
+      "jaccard": 1.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*U63",
+      "wall_likelihood": 0.15,
+      "n_pairs": 0,
+      "n_h_ornith": 10,
+      "n_h_det": 0,
+      "jaccard": 0.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*U68",
+      "wall_likelihood": 0.15,
+      "n_pairs": 10,
+      "n_h_ornith": 10,
+      "n_h_det": 10,
+      "jaccard": 0.25,
+      "containment": 0.4
+    },
+    {
+      "def": "*U81",
+      "wall_likelihood": 0.15,
+      "n_pairs": 0,
+      "n_h_ornith": 10,
+      "n_h_det": 0,
+      "jaccard": 0.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*U87",
+      "wall_likelihood": 0.15,
+      "n_pairs": 0,
+      "n_h_ornith": 0,
+      "n_h_det": 0,
+      "jaccard": 1.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*U90",
+      "wall_likelihood": 0.15,
+      "n_pairs": 0,
+      "n_h_ornith": 10,
+      "n_h_det": 0,
+      "jaccard": 0.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*U93",
+      "wall_likelihood": 0.15,
+      "n_pairs": 0,
+      "n_h_ornith": 0,
+      "n_h_det": 0,
+      "jaccard": 1.0,
+      "containment": 0.0
+    },
+    {
+      "def": "X-평면도(기본형)$0$1000",
+      "wall_likelihood": 0.15,
+      "n_pairs": 0,
+      "n_h_ornith": 9,
+      "n_h_det": 0,
+      "jaccard": 0.0,
+      "containment": 0.0
+    },
+    {
+      "def": "X-평면도(기본형)$0$A$C5AA0109C",
+      "wall_likelihood": 0.15,
+      "n_pairs": 1,
+      "n_h_ornith": 4,
+      "n_h_det": 2,
+      "jaccard": 0.5,
+      "containment": 0.5
+    },
+    {
+      "def": "X-평면도(기본형)$0$wd160750",
+      "wall_likelihood": 0.15,
+      "n_pairs": 0,
+      "n_h_ornith": 8,
+      "n_h_det": 0,
+      "jaccard": 0.0,
+      "containment": 0.0
+    },
+    {
+      "def": "X-평면도(기본형)$0$wd250900",
+      "wall_likelihood": 0.15,
+      "n_pairs": 0,
+      "n_h_ornith": 8,
+      "n_h_det": 0,
+      "jaccard": 0.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*D305",
+      "wall_likelihood": 0.1,
+      "n_pairs": 1,
+      "n_h_ornith": 0,
+      "n_h_det": 2,
+      "jaccard": 0.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*D358",
+      "wall_likelihood": 0.1,
+      "n_pairs": 0,
+      "n_h_ornith": 0,
+      "n_h_det": 0,
+      "jaccard": 1.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*D359",
+      "wall_likelihood": 0.1,
+      "n_pairs": 1,
+      "n_h_ornith": 0,
+      "n_h_det": 2,
+      "jaccard": 0.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*U108",
+      "wall_likelihood": 0.1,
+      "n_pairs": 0,
+      "n_h_ornith": 0,
+      "n_h_det": 0,
+      "jaccard": 1.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*U110",
+      "wall_likelihood": 0.1,
+      "n_pairs": 0,
+      "n_h_ornith": 0,
+      "n_h_det": 0,
+      "jaccard": 1.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*U118",
+      "wall_likelihood": 0.1,
+      "n_pairs": 0,
+      "n_h_ornith": 0,
+      "n_h_det": 0,
+      "jaccard": 1.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*U127",
+      "wall_likelihood": 0.1,
+      "n_pairs": 0,
+      "n_h_ornith": 6,
+      "n_h_det": 0,
+      "jaccard": 0.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*U129",
+      "wall_likelihood": 0.1,
+      "n_pairs": 0,
+      "n_h_ornith": 0,
+      "n_h_det": 0,
+      "jaccard": 1.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*U131",
+      "wall_likelihood": 0.1,
+      "n_pairs": 0,
+      "n_h_ornith": 6,
+      "n_h_det": 0,
+      "jaccard": 0.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*U135",
+      "wall_likelihood": 0.1,
+      "n_pairs": 0,
+      "n_h_ornith": 0,
+      "n_h_det": 0,
+      "jaccard": 1.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*U158",
+      "wall_likelihood": 0.1,
+      "n_pairs": 0,
+      "n_h_ornith": 10,
+      "n_h_det": 0,
+      "jaccard": 0.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*U162",
+      "wall_likelihood": 0.1,
+      "n_pairs": 0,
+      "n_h_ornith": 0,
+      "n_h_det": 0,
+      "jaccard": 1.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*U170",
+      "wall_likelihood": 0.1,
+      "n_pairs": 10,
+      "n_h_ornith": 10,
+      "n_h_det": 10,
+      "jaccard": 0.42857142857142855,
+      "containment": 0.6
+    },
+    {
+      "def": "*U181",
+      "wall_likelihood": 0.1,
+      "n_pairs": 10,
+      "n_h_ornith": 0,
+      "n_h_det": 10,
+      "jaccard": 0.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*U189",
+      "wall_likelihood": 0.1,
+      "n_pairs": 0,
+      "n_h_ornith": 0,
+      "n_h_det": 0,
+      "jaccard": 1.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*U191",
+      "wall_likelihood": 0.1,
+      "n_pairs": 0,
+      "n_h_ornith": 0,
+      "n_h_det": 0,
+      "jaccard": 1.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*U193",
+      "wall_likelihood": 0.1,
+      "n_pairs": 0,
+      "n_h_ornith": 4,
+      "n_h_det": 0,
+      "jaccard": 0.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*U194",
+      "wall_likelihood": 0.1,
+      "n_pairs": 0,
+      "n_h_ornith": 0,
+      "n_h_det": 0,
+      "jaccard": 1.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*U195",
+      "wall_likelihood": 0.1,
+      "n_pairs": 0,
+      "n_h_ornith": 0,
+      "n_h_det": 0,
+      "jaccard": 1.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*U201",
+      "wall_likelihood": 0.1,
+      "n_pairs": 0,
+      "n_h_ornith": 0,
+      "n_h_det": 0,
+      "jaccard": 1.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*U232",
+      "wall_likelihood": 0.1,
+      "n_pairs": 0,
+      "n_h_ornith": 10,
+      "n_h_det": 0,
+      "jaccard": 0.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*U237",
+      "wall_likelihood": 0.1,
+      "n_pairs": 0,
+      "n_h_ornith": 5,
+      "n_h_det": 0,
+      "jaccard": 0.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*U241",
+      "wall_likelihood": 0.1,
+      "n_pairs": 0,
+      "n_h_ornith": 10,
+      "n_h_det": 0,
+      "jaccard": 0.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*U56",
+      "wall_likelihood": 0.1,
+      "n_pairs": 0,
+      "n_h_ornith": 0,
+      "n_h_det": 0,
+      "jaccard": 1.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*U58",
+      "wall_likelihood": 0.1,
+      "n_pairs": 0,
+      "n_h_ornith": 0,
+      "n_h_det": 0,
+      "jaccard": 1.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*U59",
+      "wall_likelihood": 0.1,
+      "n_pairs": 0,
+      "n_h_ornith": 10,
+      "n_h_det": 0,
+      "jaccard": 0.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*U72",
+      "wall_likelihood": 0.1,
+      "n_pairs": 0,
+      "n_h_ornith": 8,
+      "n_h_det": 0,
+      "jaccard": 0.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*U86",
+      "wall_likelihood": 0.1,
+      "n_pairs": 0,
+      "n_h_ornith": 0,
+      "n_h_det": 0,
+      "jaccard": 1.0,
+      "containment": 0.0
+    },
+    {
+      "def": "X-평면도(기본형)$0$100012",
+      "wall_likelihood": 0.1,
+      "n_pairs": 0,
+      "n_h_ornith": 3,
+      "n_h_det": 0,
+      "jaccard": 0.0,
+      "containment": 0.0
+    },
+    {
+      "def": "X-평면도(기본형)$0$A$C200833B1",
+      "wall_likelihood": 0.1,
+      "n_pairs": 5,
+      "n_h_ornith": 0,
+      "n_h_det": 7,
+      "jaccard": 0.0,
+      "containment": 0.0
+    },
+    {
+      "def": "X-평면도(기본형)$0$FSD1120",
+      "wall_likelihood": 0.1,
+      "n_pairs": 3,
+      "n_h_ornith": 3,
+      "n_h_det": 3,
+      "jaccard": 1.0,
+      "containment": 1.0
+    },
+    {
+      "def": "X-평면도(기본형)$0$FSD1500-2",
+      "wall_likelihood": 0.1,
+      "n_pairs": 3,
+      "n_h_ornith": 0,
+      "n_h_det": 3,
+      "jaccard": 0.0,
+      "containment": 0.0
+    },
+    {
+      "def": "X-평면도(기본형)$0$phg1200",
+      "wall_likelihood": 0.1,
+      "n_pairs": 22,
+      "n_h_ornith": 10,
+      "n_h_det": 12,
+      "jaccard": 0.6923076923076923,
+      "containment": 0.9
+    },
+    {
+      "def": "X-평면도(기본형)$0$sta-t",
+      "wall_likelihood": 0.1,
+      "n_pairs": 31,
+      "n_h_ornith": 7,
+      "n_h_det": 34,
+      "jaccard": 0.20588235294117646,
+      "containment": 1.0
+    },
+    {
+      "def": "X-평면도(기본형)$0$sta-t-4",
+      "wall_likelihood": 0.1,
+      "n_pairs": 35,
+      "n_h_ornith": 7,
+      "n_h_det": 38,
+      "jaccard": 0.18421052631578946,
+      "containment": 1.0
+    },
+    {
+      "def": "*D302",
+      "wall_likelihood": 0.05,
+      "n_pairs": 1,
+      "n_h_ornith": 2,
+      "n_h_det": 2,
+      "jaccard": 1.0,
+      "containment": 1.0
+    },
+    {
+      "def": "*D321",
+      "wall_likelihood": 0.05,
+      "n_pairs": 0,
+      "n_h_ornith": 0,
+      "n_h_det": 0,
+      "jaccard": 1.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*D350",
+      "wall_likelihood": 0.05,
+      "n_pairs": 0,
+      "n_h_ornith": 3,
+      "n_h_det": 0,
+      "jaccard": 0.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*D361",
+      "wall_likelihood": 0.05,
+      "n_pairs": 0,
+      "n_h_ornith": 3,
+      "n_h_det": 0,
+      "jaccard": 0.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*D362",
+      "wall_likelihood": 0.05,
+      "n_pairs": 1,
+      "n_h_ornith": 0,
+      "n_h_det": 2,
+      "jaccard": 0.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*U112",
+      "wall_likelihood": 0.05,
+      "n_pairs": 0,
+      "n_h_ornith": 0,
+      "n_h_det": 0,
+      "jaccard": 1.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*U116",
+      "wall_likelihood": 0.05,
+      "n_pairs": 0,
+      "n_h_ornith": 0,
+      "n_h_det": 0,
+      "jaccard": 1.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*U136",
+      "wall_likelihood": 0.05,
+      "n_pairs": 0,
+      "n_h_ornith": 0,
+      "n_h_det": 0,
+      "jaccard": 1.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*U147",
+      "wall_likelihood": 0.05,
+      "n_pairs": 0,
+      "n_h_ornith": 10,
+      "n_h_det": 0,
+      "jaccard": 0.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*U156",
+      "wall_likelihood": 0.05,
+      "n_pairs": 0,
+      "n_h_ornith": 10,
+      "n_h_det": 0,
+      "jaccard": 0.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*U160",
+      "wall_likelihood": 0.05,
+      "n_pairs": 0,
+      "n_h_ornith": 0,
+      "n_h_det": 0,
+      "jaccard": 1.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*U73",
+      "wall_likelihood": 0.05,
+      "n_pairs": 10,
+      "n_h_ornith": 10,
+      "n_h_det": 10,
+      "jaccard": 0.3333333333333333,
+      "containment": 0.5
+    },
+    {
+      "def": "*U76",
+      "wall_likelihood": 0.05,
+      "n_pairs": 10,
+      "n_h_ornith": 10,
+      "n_h_det": 10,
+      "jaccard": 0.25,
+      "containment": 0.4
+    },
+    {
+      "def": "*U89",
+      "wall_likelihood": 0.05,
+      "n_pairs": 0,
+      "n_h_ornith": 10,
+      "n_h_det": 0,
+      "jaccard": 0.0,
+      "containment": 0.0
+    },
+    {
+      "def": "X-평면도(기본형)$0$1000m",
+      "wall_likelihood": 0.05,
+      "n_pairs": 0,
+      "n_h_ornith": 2,
+      "n_h_det": 0,
+      "jaccard": 0.0,
+      "containment": 0.0
+    },
+    {
+      "def": "X-평면도(기본형)$0$A$C48BA1CD6",
+      "wall_likelihood": 0.05,
+      "n_pairs": 49,
+      "n_h_ornith": 5,
+      "n_h_det": 40,
+      "jaccard": 0.07142857142857142,
+      "containment": 0.6
+    },
+    {
+      "def": "X-평면도(기본형)$0$A$C66AC16F3",
+      "wall_likelihood": 0.05,
+      "n_pairs": 1,
+      "n_h_ornith": 8,
+      "n_h_det": 2,
+      "jaccard": 0.25,
+      "containment": 0.25
+    },
+    {
+      "def": "X-평면도(기본형)$0$HOBGAS19",
+      "wall_likelihood": 0.05,
+      "n_pairs": 1,
+      "n_h_ornith": 2,
+      "n_h_det": 2,
+      "jaccard": 1.0,
+      "containment": 1.0
+    },
+    {
+      "def": "X-평면도(기본형)$0$WD200900",
+      "wall_likelihood": 0.05,
+      "n_pairs": 0,
+      "n_h_ornith": 2,
+      "n_h_det": 0,
+      "jaccard": 0.0,
+      "containment": 0.0
+    },
+    {
+      "def": "X-평면도(기본형)$0$pd900",
+      "wall_likelihood": 0.05,
+      "n_pairs": 1,
+      "n_h_ornith": 8,
+      "n_h_det": 2,
+      "jaccard": 0.25,
+      "containment": 0.25
+    },
+    {
+      "def": "X-평면도(기본형)$0$wd170750",
+      "wall_likelihood": 0.05,
+      "n_pairs": 0,
+      "n_h_ornith": 1,
+      "n_h_det": 0,
+      "jaccard": 0.0,
+      "containment": 0.0
+    },
+    {
+      "def": "X-평면도(기본형)$0$세면대_공통",
+      "wall_likelihood": 0.05,
+      "n_pairs": 23,
+      "n_h_ornith": 0,
+      "n_h_det": 15,
+      "jaccard": 0.0,
+      "containment": 0.0
+    },
+    {
+      "def": "X-평면도(기본형)$0$수전",
+      "wall_likelihood": 0.05,
+      "n_pairs": 1,
+      "n_h_ornith": 8,
+      "n_h_det": 2,
+      "jaccard": 0.25,
+      "containment": 0.25
+    },
+    {
+      "def": "X-평면도(기본형)$0$수전-1",
+      "wall_likelihood": 0.05,
+      "n_pairs": 0,
+      "n_h_ornith": 10,
+      "n_h_det": 0,
+      "jaccard": 0.0,
+      "containment": 0.0
+    },
+    {
+      "def": "X-평면도(기본형)$0$씽크$0$59C$0$gasdfasdfs$0$COK3",
+      "wall_likelihood": 0.05,
+      "n_pairs": 0,
+      "n_h_ornith": 4,
+      "n_h_det": 0,
+      "jaccard": 0.0,
+      "containment": 0.0
+    },
+    {
+      "def": "X-평면도(기본형)$0$코너 선반",
+      "wall_likelihood": 0.05,
+      "n_pairs": 31,
+      "n_h_ornith": 10,
+      "n_h_det": 20,
+      "jaccard": 0.42857142857142855,
+      "containment": 0.9
+    },
+    {
+      "def": "*D295",
+      "wall_likelihood": 0.0,
+      "n_pairs": 0,
+      "n_h_ornith": 0,
+      "n_h_det": 0,
+      "jaccard": 1.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*D296",
+      "wall_likelihood": 0.0,
+      "n_pairs": 0,
+      "n_h_ornith": 0,
+      "n_h_det": 0,
+      "jaccard": 1.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*D297",
+      "wall_likelihood": 0.0,
+      "n_pairs": 0,
+      "n_h_ornith": 0,
+      "n_h_det": 0,
+      "jaccard": 1.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*D298",
+      "wall_likelihood": 0.0,
+      "n_pairs": 0,
+      "n_h_ornith": 0,
+      "n_h_det": 0,
+      "jaccard": 1.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*D299",
+      "wall_likelihood": 0.0,
+      "n_pairs": 0,
+      "n_h_ornith": 0,
+      "n_h_det": 0,
+      "jaccard": 1.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*D300",
+      "wall_likelihood": 0.0,
+      "n_pairs": 1,
+      "n_h_ornith": 5,
+      "n_h_det": 2,
+      "jaccard": 0.4,
+      "containment": 0.4
+    },
+    {
+      "def": "*D301",
+      "wall_likelihood": 0.0,
+      "n_pairs": 0,
+      "n_h_ornith": 0,
+      "n_h_det": 0,
+      "jaccard": 1.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*D303",
+      "wall_likelihood": 0.0,
+      "n_pairs": 1,
+      "n_h_ornith": 5,
+      "n_h_det": 2,
+      "jaccard": 0.4,
+      "containment": 0.4
+    },
+    {
+      "def": "*D304",
+      "wall_likelihood": 0.0,
+      "n_pairs": 0,
+      "n_h_ornith": 0,
+      "n_h_det": 0,
+      "jaccard": 1.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*D306",
+      "wall_likelihood": 0.0,
+      "n_pairs": 1,
+      "n_h_ornith": 0,
+      "n_h_det": 2,
+      "jaccard": 0.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*D307",
+      "wall_likelihood": 0.0,
+      "n_pairs": 0,
+      "n_h_ornith": 0,
+      "n_h_det": 0,
+      "jaccard": 1.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*D308",
+      "wall_likelihood": 0.0,
+      "n_pairs": 1,
+      "n_h_ornith": 0,
+      "n_h_det": 2,
+      "jaccard": 0.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*D309",
+      "wall_likelihood": 0.0,
+      "n_pairs": 1,
+      "n_h_ornith": 0,
+      "n_h_det": 2,
+      "jaccard": 0.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*D310",
+      "wall_likelihood": 0.0,
+      "n_pairs": 0,
+      "n_h_ornith": 0,
+      "n_h_det": 0,
+      "jaccard": 1.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*D311",
+      "wall_likelihood": 0.0,
+      "n_pairs": 1,
+      "n_h_ornith": 0,
+      "n_h_det": 2,
+      "jaccard": 0.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*D312",
+      "wall_likelihood": 0.0,
+      "n_pairs": 0,
+      "n_h_ornith": 0,
+      "n_h_det": 0,
+      "jaccard": 1.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*D313",
+      "wall_likelihood": 0.0,
+      "n_pairs": 0,
+      "n_h_ornith": 0,
+      "n_h_det": 0,
+      "jaccard": 1.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*D314",
+      "wall_likelihood": 0.0,
+      "n_pairs": 0,
+      "n_h_ornith": 0,
+      "n_h_det": 0,
+      "jaccard": 1.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*D315",
+      "wall_likelihood": 0.0,
+      "n_pairs": 0,
+      "n_h_ornith": 0,
+      "n_h_det": 0,
+      "jaccard": 1.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*D316",
+      "wall_likelihood": 0.0,
+      "n_pairs": 0,
+      "n_h_ornith": 0,
+      "n_h_det": 0,
+      "jaccard": 1.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*D317",
+      "wall_likelihood": 0.0,
+      "n_pairs": 0,
+      "n_h_ornith": 0,
+      "n_h_det": 0,
+      "jaccard": 1.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*D318",
+      "wall_likelihood": 0.0,
+      "n_pairs": 0,
+      "n_h_ornith": 0,
+      "n_h_det": 0,
+      "jaccard": 1.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*D319",
+      "wall_likelihood": 0.0,
+      "n_pairs": 1,
+      "n_h_ornith": 0,
+      "n_h_det": 2,
+      "jaccard": 0.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*D320",
+      "wall_likelihood": 0.0,
+      "n_pairs": 1,
+      "n_h_ornith": 0,
+      "n_h_det": 2,
+      "jaccard": 0.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*D322",
+      "wall_likelihood": 0.0,
+      "n_pairs": 1,
+      "n_h_ornith": 0,
+      "n_h_det": 2,
+      "jaccard": 0.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*D323",
+      "wall_likelihood": 0.0,
+      "n_pairs": 1,
+      "n_h_ornith": 0,
+      "n_h_det": 2,
+      "jaccard": 0.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*D325",
+      "wall_likelihood": 0.0,
+      "n_pairs": 1,
+      "n_h_ornith": 0,
+      "n_h_det": 2,
+      "jaccard": 0.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*D326",
+      "wall_likelihood": 0.0,
+      "n_pairs": 0,
+      "n_h_ornith": 0,
+      "n_h_det": 0,
+      "jaccard": 1.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*D327",
+      "wall_likelihood": 0.0,
+      "n_pairs": 0,
+      "n_h_ornith": 0,
+      "n_h_det": 0,
+      "jaccard": 1.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*D329",
+      "wall_likelihood": 0.0,
+      "n_pairs": 0,
+      "n_h_ornith": 0,
+      "n_h_det": 0,
+      "jaccard": 1.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*D330",
+      "wall_likelihood": 0.0,
+      "n_pairs": 0,
+      "n_h_ornith": 0,
+      "n_h_det": 0,
+      "jaccard": 1.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*D331",
+      "wall_likelihood": 0.0,
+      "n_pairs": 0,
+      "n_h_ornith": 0,
+      "n_h_det": 0,
+      "jaccard": 1.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*D334",
+      "wall_likelihood": 0.0,
+      "n_pairs": 1,
+      "n_h_ornith": 0,
+      "n_h_det": 2,
+      "jaccard": 0.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*D335",
+      "wall_likelihood": 0.0,
+      "n_pairs": 1,
+      "n_h_ornith": 0,
+      "n_h_det": 2,
+      "jaccard": 0.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*D336",
+      "wall_likelihood": 0.0,
+      "n_pairs": 0,
+      "n_h_ornith": 0,
+      "n_h_det": 0,
+      "jaccard": 1.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*D337",
+      "wall_likelihood": 0.0,
+      "n_pairs": 1,
+      "n_h_ornith": 0,
+      "n_h_det": 2,
+      "jaccard": 0.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*D339",
+      "wall_likelihood": 0.0,
+      "n_pairs": 0,
+      "n_h_ornith": 0,
+      "n_h_det": 0,
+      "jaccard": 1.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*D340",
+      "wall_likelihood": 0.0,
+      "n_pairs": 1,
+      "n_h_ornith": 0,
+      "n_h_det": 2,
+      "jaccard": 0.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*D341",
+      "wall_likelihood": 0.0,
+      "n_pairs": 1,
+      "n_h_ornith": 0,
+      "n_h_det": 2,
+      "jaccard": 0.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*D342",
+      "wall_likelihood": 0.0,
+      "n_pairs": 0,
+      "n_h_ornith": 0,
+      "n_h_det": 0,
+      "jaccard": 1.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*D343",
+      "wall_likelihood": 0.0,
+      "n_pairs": 1,
+      "n_h_ornith": 0,
+      "n_h_det": 2,
+      "jaccard": 0.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*D344",
+      "wall_likelihood": 0.0,
+      "n_pairs": 1,
+      "n_h_ornith": 0,
+      "n_h_det": 2,
+      "jaccard": 0.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*D345",
+      "wall_likelihood": 0.0,
+      "n_pairs": 0,
+      "n_h_ornith": 0,
+      "n_h_det": 0,
+      "jaccard": 1.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*D346",
+      "wall_likelihood": 0.0,
+      "n_pairs": 1,
+      "n_h_ornith": 0,
+      "n_h_det": 2,
+      "jaccard": 0.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*D347",
+      "wall_likelihood": 0.0,
+      "n_pairs": 0,
+      "n_h_ornith": 0,
+      "n_h_det": 0,
+      "jaccard": 1.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*D348",
+      "wall_likelihood": 0.0,
+      "n_pairs": 1,
+      "n_h_ornith": 3,
+      "n_h_det": 2,
+      "jaccard": 0.6666666666666666,
+      "containment": 0.6666666666666666
+    },
+    {
+      "def": "*D349",
+      "wall_likelihood": 0.0,
+      "n_pairs": 0,
+      "n_h_ornith": 0,
+      "n_h_det": 0,
+      "jaccard": 1.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*D351",
+      "wall_likelihood": 0.0,
+      "n_pairs": 0,
+      "n_h_ornith": 0,
+      "n_h_det": 0,
+      "jaccard": 1.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*D352",
+      "wall_likelihood": 0.0,
+      "n_pairs": 0,
+      "n_h_ornith": 0,
+      "n_h_det": 0,
+      "jaccard": 1.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*D353",
+      "wall_likelihood": 0.0,
+      "n_pairs": 0,
+      "n_h_ornith": 0,
+      "n_h_det": 0,
+      "jaccard": 1.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*D354",
+      "wall_likelihood": 0.0,
+      "n_pairs": 0,
+      "n_h_ornith": 0,
+      "n_h_det": 0,
+      "jaccard": 1.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*D355",
+      "wall_likelihood": 0.0,
+      "n_pairs": 0,
+      "n_h_ornith": 0,
+      "n_h_det": 0,
+      "jaccard": 1.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*D356",
+      "wall_likelihood": 0.0,
+      "n_pairs": 0,
+      "n_h_ornith": 0,
+      "n_h_det": 0,
+      "jaccard": 1.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*D357",
+      "wall_likelihood": 0.0,
+      "n_pairs": 0,
+      "n_h_ornith": 0,
+      "n_h_det": 0,
+      "jaccard": 1.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*D360",
+      "wall_likelihood": 0.0,
+      "n_pairs": 1,
+      "n_h_ornith": 0,
+      "n_h_det": 2,
+      "jaccard": 0.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*D364",
+      "wall_likelihood": 0.0,
+      "n_pairs": 1,
+      "n_h_ornith": 0,
+      "n_h_det": 2,
+      "jaccard": 0.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*D365",
+      "wall_likelihood": 0.0,
+      "n_pairs": 1,
+      "n_h_ornith": 0,
+      "n_h_det": 2,
+      "jaccard": 0.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*D366",
+      "wall_likelihood": 0.0,
+      "n_pairs": 0,
+      "n_h_ornith": 3,
+      "n_h_det": 0,
+      "jaccard": 0.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*D367",
+      "wall_likelihood": 0.0,
+      "n_pairs": 0,
+      "n_h_ornith": 0,
+      "n_h_det": 0,
+      "jaccard": 1.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*D368",
+      "wall_likelihood": 0.0,
+      "n_pairs": 0,
+      "n_h_ornith": 0,
+      "n_h_det": 0,
+      "jaccard": 1.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*D369",
+      "wall_likelihood": 0.0,
+      "n_pairs": 0,
+      "n_h_ornith": 0,
+      "n_h_det": 0,
+      "jaccard": 1.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*D370",
+      "wall_likelihood": 0.0,
+      "n_pairs": 0,
+      "n_h_ornith": 0,
+      "n_h_det": 0,
+      "jaccard": 1.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*D371",
+      "wall_likelihood": 0.0,
+      "n_pairs": 0,
+      "n_h_ornith": 0,
+      "n_h_det": 0,
+      "jaccard": 1.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*D372",
+      "wall_likelihood": 0.0,
+      "n_pairs": 0,
+      "n_h_ornith": 0,
+      "n_h_det": 0,
+      "jaccard": 1.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*D373",
+      "wall_likelihood": 0.0,
+      "n_pairs": 1,
+      "n_h_ornith": 0,
+      "n_h_det": 2,
+      "jaccard": 0.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*D374",
+      "wall_likelihood": 0.0,
+      "n_pairs": 0,
+      "n_h_ornith": 0,
+      "n_h_det": 0,
+      "jaccard": 1.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*D375",
+      "wall_likelihood": 0.0,
+      "n_pairs": 1,
+      "n_h_ornith": 0,
+      "n_h_det": 2,
+      "jaccard": 0.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*D376",
+      "wall_likelihood": 0.0,
+      "n_pairs": 0,
+      "n_h_ornith": 0,
+      "n_h_det": 0,
+      "jaccard": 1.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*D377",
+      "wall_likelihood": 0.0,
+      "n_pairs": 0,
+      "n_h_ornith": 0,
+      "n_h_det": 0,
+      "jaccard": 1.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*D378",
+      "wall_likelihood": 0.0,
+      "n_pairs": 0,
+      "n_h_ornith": 0,
+      "n_h_det": 0,
+      "jaccard": 1.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*D379",
+      "wall_likelihood": 0.0,
+      "n_pairs": 0,
+      "n_h_ornith": 0,
+      "n_h_det": 0,
+      "jaccard": 1.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*D380",
+      "wall_likelihood": 0.0,
+      "n_pairs": 0,
+      "n_h_ornith": 0,
+      "n_h_det": 0,
+      "jaccard": 1.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*D381",
+      "wall_likelihood": 0.0,
+      "n_pairs": 0,
+      "n_h_ornith": 9,
+      "n_h_det": 0,
+      "jaccard": 0.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*D382",
+      "wall_likelihood": 0.0,
+      "n_pairs": 0,
+      "n_h_ornith": 0,
+      "n_h_det": 0,
+      "jaccard": 1.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*D383",
+      "wall_likelihood": 0.0,
+      "n_pairs": 0,
+      "n_h_ornith": 0,
+      "n_h_det": 0,
+      "jaccard": 1.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*D384",
+      "wall_likelihood": 0.0,
+      "n_pairs": 0,
+      "n_h_ornith": 0,
+      "n_h_det": 0,
+      "jaccard": 1.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*D385",
+      "wall_likelihood": 0.0,
+      "n_pairs": 0,
+      "n_h_ornith": 0,
+      "n_h_det": 0,
+      "jaccard": 1.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*D386",
+      "wall_likelihood": 0.0,
+      "n_pairs": 0,
+      "n_h_ornith": 0,
+      "n_h_det": 0,
+      "jaccard": 1.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*D387",
+      "wall_likelihood": 0.0,
+      "n_pairs": 1,
+      "n_h_ornith": 0,
+      "n_h_det": 2,
+      "jaccard": 0.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*D388",
+      "wall_likelihood": 0.0,
+      "n_pairs": 0,
+      "n_h_ornith": 0,
+      "n_h_det": 0,
+      "jaccard": 1.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*D389",
+      "wall_likelihood": 0.0,
+      "n_pairs": 0,
+      "n_h_ornith": 3,
+      "n_h_det": 0,
+      "jaccard": 0.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*D390",
+      "wall_likelihood": 0.0,
+      "n_pairs": 1,
+      "n_h_ornith": 0,
+      "n_h_det": 2,
+      "jaccard": 0.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*D392",
+      "wall_likelihood": 0.0,
+      "n_pairs": 0,
+      "n_h_ornith": 0,
+      "n_h_det": 0,
+      "jaccard": 1.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*D393",
+      "wall_likelihood": 0.0,
+      "n_pairs": 0,
+      "n_h_ornith": 0,
+      "n_h_det": 0,
+      "jaccard": 1.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*D394",
+      "wall_likelihood": 0.0,
+      "n_pairs": 0,
+      "n_h_ornith": 0,
+      "n_h_det": 0,
+      "jaccard": 1.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*D395",
+      "wall_likelihood": 0.0,
+      "n_pairs": 0,
+      "n_h_ornith": 0,
+      "n_h_det": 0,
+      "jaccard": 1.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*D396",
+      "wall_likelihood": 0.0,
+      "n_pairs": 0,
+      "n_h_ornith": 0,
+      "n_h_det": 0,
+      "jaccard": 1.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*D397",
+      "wall_likelihood": 0.0,
+      "n_pairs": 0,
+      "n_h_ornith": 0,
+      "n_h_det": 0,
+      "jaccard": 1.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*D398",
+      "wall_likelihood": 0.0,
+      "n_pairs": 0,
+      "n_h_ornith": 0,
+      "n_h_det": 0,
+      "jaccard": 1.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*D399",
+      "wall_likelihood": 0.0,
+      "n_pairs": 0,
+      "n_h_ornith": 0,
+      "n_h_det": 0,
+      "jaccard": 1.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*D400",
+      "wall_likelihood": 0.0,
+      "n_pairs": 0,
+      "n_h_ornith": 0,
+      "n_h_det": 0,
+      "jaccard": 1.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*D401",
+      "wall_likelihood": 0.0,
+      "n_pairs": 1,
+      "n_h_ornith": 0,
+      "n_h_det": 2,
+      "jaccard": 0.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*D402",
+      "wall_likelihood": 0.0,
+      "n_pairs": 0,
+      "n_h_ornith": 0,
+      "n_h_det": 0,
+      "jaccard": 1.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*D403",
+      "wall_likelihood": 0.0,
+      "n_pairs": 0,
+      "n_h_ornith": 0,
+      "n_h_det": 0,
+      "jaccard": 1.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*D404",
+      "wall_likelihood": 0.0,
+      "n_pairs": 0,
+      "n_h_ornith": 0,
+      "n_h_det": 0,
+      "jaccard": 1.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*D405",
+      "wall_likelihood": 0.0,
+      "n_pairs": 0,
+      "n_h_ornith": 0,
+      "n_h_det": 0,
+      "jaccard": 1.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*D406",
+      "wall_likelihood": 0.0,
+      "n_pairs": 1,
+      "n_h_ornith": 0,
+      "n_h_det": 2,
+      "jaccard": 0.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*D407",
+      "wall_likelihood": 0.0,
+      "n_pairs": 0,
+      "n_h_ornith": 0,
+      "n_h_det": 0,
+      "jaccard": 1.0,
+      "containment": 0.0
+    },
+    {
+      "def": "*U236",
+      "wall_likelihood": 0.0,
+      "n_pairs": 0,
+      "n_h_ornith": 0,
+      "n_h_det": 0,
+      "jaccard": 1.0,
+      "containment": 0.0
+    },
+    {
+      "def": "X-FORM_청주$0$dA로고",
+      "wall_likelihood": 0.0,
+      "n_pairs": 0,
+      "n_h_ornith": 0,
+      "n_h_det": 0,
+      "jaccard": 1.0,
+      "containment": 0.0
+    },
+    {
+      "def": "X-평면도(기본형)$0$jjbl",
+      "wall_likelihood": 0.0,
+      "n_pairs": 0,
+      "n_h_ornith": 0,
+      "n_h_det": 0,
+      "jaccard": 1.0,
+      "containment": 0.0
+    },
+    {
+      "def": "X-평면도(기본형)$0$무동력휀300",
+      "wall_likelihood": 0.0,
+      "n_pairs": 0,
+      "n_h_ornith": 0,
+      "n_h_det": 0,
+      "jaccard": 1.0,
+      "containment": 0.0
+    },
+    {
+      "def": "X-평면도(기본형)$0$우수관_100A",
+      "wall_likelihood": 0.0,
+      "n_pairs": 0,
+      "n_h_ornith": 0,
+      "n_h_det": 0,
+      "jaccard": 1.0,
+      "containment": 0.0
+    }
+  ],
+  "summary": {
+    "joined": 376,
+    "unjoined_ornith": 7,
+    "unjoined_pairs": 31,
+    "likelihood_vs_pairs_pearson": 0.2842299995318348,
+    "top20_divergent": [
+      "X-평면도(기본형)$0$111BRF2",
+      "*U103",
+      "*U142",
+      "*U45",
+      "*U53",
+      "*U55",
+      "*U88",
+      "X-평면도(기본형)$0$111ARF2",
+      "X-평면도(기본형)$0$A$C4B913E7C",
+      "*D324",
+      "*U105",
+      "*U106",
+      "*U107",
+      "*U109",
+      "*U111",
+      "*U125",
+      "*U171",
+      "*U184",
+      "*U187",
+      "*U239"
+    ]
+  }
+}

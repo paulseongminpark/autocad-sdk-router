@@ -1,0 +1,504 @@
+{
+  "schema": "ariadne.modified_composition.v1",
+  "per_def": [
+    {
+      "def": "DIMDOT",
+      "dxf_name": "LINE",
+      "modified": 0,
+      "removed": 1,
+      "added": 0
+    },
+    {
+      "def": "DIMDOT",
+      "dxf_name": "LWPOLYLINE",
+      "modified": 0,
+      "removed": 2,
+      "added": 0
+    },
+    {
+      "def": "X-FORM_청주$0$dA로고",
+      "dxf_name": "HATCH",
+      "modified": 3,
+      "removed": 0,
+      "added": 0
+    },
+    {
+      "def": "X-평면도(기본형)",
+      "dxf_name": "ELLIPSE",
+      "modified": 5,
+      "removed": 0,
+      "added": 0
+    },
+    {
+      "def": "X-평면도(기본형)",
+      "dxf_name": "LWPOLYLINE",
+      "modified": 23,
+      "removed": 0,
+      "added": 0
+    },
+    {
+      "def": "X-평면도(기본형)$0$101co1",
+      "dxf_name": "HATCH",
+      "modified": 3,
+      "removed": 0,
+      "added": 0
+    },
+    {
+      "def": "X-평면도(기본형)$0$101co2",
+      "dxf_name": "HATCH",
+      "modified": 3,
+      "removed": 0,
+      "added": 0
+    },
+    {
+      "def": "X-평면도(기본형)$0$103co1",
+      "dxf_name": "HATCH",
+      "modified": 3,
+      "removed": 0,
+      "added": 0
+    },
+    {
+      "def": "X-평면도(기본형)$0$104co1",
+      "dxf_name": "HATCH",
+      "modified": 4,
+      "removed": 0,
+      "added": 0
+    },
+    {
+      "def": "X-평면도(기본형)$0$104co2",
+      "dxf_name": "HATCH",
+      "modified": 3,
+      "removed": 0,
+      "added": 0
+    },
+    {
+      "def": "X-평면도(기본형)$0$105co2",
+      "dxf_name": "HATCH",
+      "modified": 4,
+      "removed": 0,
+      "added": 0
+    },
+    {
+      "def": "X-평면도(기본형)$0$111a",
+      "dxf_name": "HATCH",
+      "modified": 21,
+      "removed": 0,
+      "added": 0
+    },
+    {
+      "def": "X-평면도(기본형)$0$111b",
+      "dxf_name": "HATCH",
+      "modified": 15,
+      "removed": 0,
+      "added": 0
+    },
+    {
+      "def": "X-평면도(기본형)$0$130a",
+      "dxf_name": "HATCH",
+      "modified": 19,
+      "removed": 0,
+      "added": 0
+    },
+    {
+      "def": "X-평면도(기본형)$0$130a1",
+      "dxf_name": "HATCH",
+      "modified": 19,
+      "removed": 0,
+      "added": 0
+    },
+    {
+      "def": "X-평면도(기본형)$0$130b",
+      "dxf_name": "HATCH",
+      "modified": 14,
+      "removed": 0,
+      "added": 0
+    },
+    {
+      "def": "X-평면도(기본형)$0$84a",
+      "dxf_name": "HATCH",
+      "modified": 18,
+      "removed": 0,
+      "added": 0
+    },
+    {
+      "def": "X-평면도(기본형)$0$84a1",
+      "dxf_name": "HATCH",
+      "modified": 17,
+      "removed": 0,
+      "added": 0
+    },
+    {
+      "def": "X-평면도(기본형)$0$84b",
+      "dxf_name": "HATCH",
+      "modified": 20,
+      "removed": 0,
+      "added": 0
+    },
+    {
+      "def": "X-평면도(기본형)$0$84b1",
+      "dxf_name": "HATCH",
+      "modified": 21,
+      "removed": 0,
+      "added": 0
+    },
+    {
+      "def": "X-평면도(기본형)$0$84c",
+      "dxf_name": "HATCH",
+      "modified": 20,
+      "removed": 0,
+      "added": 0
+    },
+    {
+      "def": "X-평면도(기본형)$0$84c1",
+      "dxf_name": "HATCH",
+      "modified": 20,
+      "removed": 0,
+      "added": 0
+    },
+    {
+      "def": "X-평면도(기본형)$0$A$C41D360DF",
+      "dxf_name": "ELLIPSE",
+      "modified": 3,
+      "removed": 0,
+      "added": 0
+    },
+    {
+      "def": "X-평면도(기본형)$0$IW990",
+      "dxf_name": "ELLIPSE",
+      "modified": 3,
+      "removed": 0,
+      "added": 0
+    },
+    {
+      "def": "X-평면도(기본형)$0$hd1050",
+      "dxf_name": "ELLIPSE",
+      "modified": 5,
+      "removed": 0,
+      "added": 0
+    },
+    {
+      "def": "X-평면도(기본형)$0$ins-l",
+      "dxf_name": "LWPOLYLINE",
+      "modified": 0,
+      "removed": 1,
+      "added": 0
+    },
+    {
+      "def": "X-평면도(기본형)$0$ng",
+      "dxf_name": "INSERT",
+      "modified": 0,
+      "removed": 1,
+      "added": 0
+    },
+    {
+      "def": "X-평면도(기본형)$0$ng",
+      "dxf_name": "LINE",
+      "modified": 0,
+      "removed": 20,
+      "added": 0
+    },
+    {
+      "def": "X-평면도(기본형)$0$ng",
+      "dxf_name": "WIPEOUT",
+      "modified": 0,
+      "removed": 2,
+      "added": 0
+    },
+    {
+      "def": "X-평면도(기본형)$0$씽크$0$59C$0$gasdfasdfs$0$COK3",
+      "dxf_name": "LWPOLYLINE",
+      "modified": 2,
+      "removed": 0,
+      "added": 0
+    },
+    {
+      "def": "_ArchTick",
+      "dxf_name": "LWPOLYLINE",
+      "modified": 0,
+      "removed": 1,
+      "added": 0
+    }
+  ],
+  "by_kind": {
+    "ELLIPSE": {
+      "modified": 16,
+      "removed": 0,
+      "added": 0
+    },
+    "HATCH": {
+      "modified": 227,
+      "removed": 0,
+      "added": 0
+    },
+    "INSERT": {
+      "modified": 0,
+      "removed": 1,
+      "added": 0
+    },
+    "LINE": {
+      "modified": 0,
+      "removed": 21,
+      "added": 0
+    },
+    "LWPOLYLINE": {
+      "modified": 25,
+      "removed": 4,
+      "added": 0
+    },
+    "WIPEOUT": {
+      "modified": 0,
+      "removed": 2,
+      "added": 0
+    }
+  },
+  "by_def_kind_top": [
+    {
+      "def": "X-평면도(기본형)",
+      "dxf_name": "LWPOLYLINE",
+      "modified": 23,
+      "removed": 0,
+      "added": 0,
+      "total": 23
+    },
+    {
+      "def": "X-평면도(기본형)$0$111a",
+      "dxf_name": "HATCH",
+      "modified": 21,
+      "removed": 0,
+      "added": 0,
+      "total": 21
+    },
+    {
+      "def": "X-평면도(기본형)$0$84b1",
+      "dxf_name": "HATCH",
+      "modified": 21,
+      "removed": 0,
+      "added": 0,
+      "total": 21
+    },
+    {
+      "def": "X-평면도(기본형)$0$84b",
+      "dxf_name": "HATCH",
+      "modified": 20,
+      "removed": 0,
+      "added": 0,
+      "total": 20
+    },
+    {
+      "def": "X-평면도(기본형)$0$84c",
+      "dxf_name": "HATCH",
+      "modified": 20,
+      "removed": 0,
+      "added": 0,
+      "total": 20
+    },
+    {
+      "def": "X-평면도(기본형)$0$84c1",
+      "dxf_name": "HATCH",
+      "modified": 20,
+      "removed": 0,
+      "added": 0,
+      "total": 20
+    },
+    {
+      "def": "X-평면도(기본형)$0$ng",
+      "dxf_name": "LINE",
+      "modified": 0,
+      "removed": 20,
+      "added": 0,
+      "total": 20
+    },
+    {
+      "def": "X-평면도(기본형)$0$130a",
+      "dxf_name": "HATCH",
+      "modified": 19,
+      "removed": 0,
+      "added": 0,
+      "total": 19
+    },
+    {
+      "def": "X-평면도(기본형)$0$130a1",
+      "dxf_name": "HATCH",
+      "modified": 19,
+      "removed": 0,
+      "added": 0,
+      "total": 19
+    },
+    {
+      "def": "X-평면도(기본형)$0$84a",
+      "dxf_name": "HATCH",
+      "modified": 18,
+      "removed": 0,
+      "added": 0,
+      "total": 18
+    },
+    {
+      "def": "X-평면도(기본형)$0$84a1",
+      "dxf_name": "HATCH",
+      "modified": 17,
+      "removed": 0,
+      "added": 0,
+      "total": 17
+    },
+    {
+      "def": "X-평면도(기본형)$0$111b",
+      "dxf_name": "HATCH",
+      "modified": 15,
+      "removed": 0,
+      "added": 0,
+      "total": 15
+    },
+    {
+      "def": "X-평면도(기본형)$0$130b",
+      "dxf_name": "HATCH",
+      "modified": 14,
+      "removed": 0,
+      "added": 0,
+      "total": 14
+    },
+    {
+      "def": "X-평면도(기본형)",
+      "dxf_name": "ELLIPSE",
+      "modified": 5,
+      "removed": 0,
+      "added": 0,
+      "total": 5
+    },
+    {
+      "def": "X-평면도(기본형)$0$hd1050",
+      "dxf_name": "ELLIPSE",
+      "modified": 5,
+      "removed": 0,
+      "added": 0,
+      "total": 5
+    },
+    {
+      "def": "X-평면도(기본형)$0$104co1",
+      "dxf_name": "HATCH",
+      "modified": 4,
+      "removed": 0,
+      "added": 0,
+      "total": 4
+    },
+    {
+      "def": "X-평면도(기본형)$0$105co2",
+      "dxf_name": "HATCH",
+      "modified": 4,
+      "removed": 0,
+      "added": 0,
+      "total": 4
+    },
+    {
+      "def": "X-FORM_청주$0$dA로고",
+      "dxf_name": "HATCH",
+      "modified": 3,
+      "removed": 0,
+      "added": 0,
+      "total": 3
+    },
+    {
+      "def": "X-평면도(기본형)$0$101co1",
+      "dxf_name": "HATCH",
+      "modified": 3,
+      "removed": 0,
+      "added": 0,
+      "total": 3
+    },
+    {
+      "def": "X-평면도(기본형)$0$101co2",
+      "dxf_name": "HATCH",
+      "modified": 3,
+      "removed": 0,
+      "added": 0,
+      "total": 3
+    },
+    {
+      "def": "X-평면도(기본형)$0$103co1",
+      "dxf_name": "HATCH",
+      "modified": 3,
+      "removed": 0,
+      "added": 0,
+      "total": 3
+    },
+    {
+      "def": "X-평면도(기본형)$0$104co2",
+      "dxf_name": "HATCH",
+      "modified": 3,
+      "removed": 0,
+      "added": 0,
+      "total": 3
+    },
+    {
+      "def": "X-평면도(기본형)$0$A$C41D360DF",
+      "dxf_name": "ELLIPSE",
+      "modified": 3,
+      "removed": 0,
+      "added": 0,
+      "total": 3
+    },
+    {
+      "def": "X-평면도(기본형)$0$IW990",
+      "dxf_name": "ELLIPSE",
+      "modified": 3,
+      "removed": 0,
+      "added": 0,
+      "total": 3
+    },
+    {
+      "def": "DIMDOT",
+      "dxf_name": "LWPOLYLINE",
+      "modified": 0,
+      "removed": 2,
+      "added": 0,
+      "total": 2
+    },
+    {
+      "def": "X-평면도(기본형)$0$ng",
+      "dxf_name": "WIPEOUT",
+      "modified": 0,
+      "removed": 2,
+      "added": 0,
+      "total": 2
+    },
+    {
+      "def": "X-평면도(기본형)$0$씽크$0$59C$0$gasdfasdfs$0$COK3",
+      "dxf_name": "LWPOLYLINE",
+      "modified": 2,
+      "removed": 0,
+      "added": 0,
+      "total": 2
+    },
+    {
+      "def": "DIMDOT",
+      "dxf_name": "LINE",
+      "modified": 0,
+      "removed": 1,
+      "added": 0,
+      "total": 1
+    },
+    {
+      "def": "X-평면도(기본형)$0$ins-l",
+      "dxf_name": "LWPOLYLINE",
+      "modified": 0,
+      "removed": 1,
+      "added": 0,
+      "total": 1
+    },
+    {
+      "def": "X-평면도(기본형)$0$ng",
+      "dxf_name": "INSERT",
+      "modified": 0,
+      "removed": 1,
+      "added": 0,
+      "total": 1
+    }
+  ],
+  "totals": {
+    "dirty_def_count": 27,
+    "def_kind_rows": 31,
+    "modified": 268,
+    "removed": 28,
+    "added": 0,
+    "residual": 296
+  }
+}

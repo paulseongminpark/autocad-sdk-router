@@ -1,0 +1,287 @@
+[
+  {
+    "unit_id": "defannot-u63-241",
+    "answer": {
+      "def": "*U63",
+      "role": "심볼",
+      "wall_likelihood": 0.15,
+      "wall_line_handles": [],
+      "notes": "All 151 entities are identical 5-vertex closed LWPOLYLINEs on the INSUL (단열재/insulation) sublayer of the floor-plan layer; each is a small closed rectangular hatch tile, not an open wall-boundary line, so no entity is listed as a wall line. bbox is not derivable (no LINE entities). The tile count scales with the length of wall being insulated, so the definition is spatially tied to walls without containing wall centerline/boundary geometry itself — classified as a repeated material symbol, low wall_likelihood."
+    }
+  },
+  {
+    "unit_id": "defannot-u64-242",
+    "answer": {
+      "def": "*U64",
+      "role": "심볼",
+      "wall_likelihood": 0.15,
+      "wall_line_handles": [],
+      "notes": "All 25 entities are identical 5-vertex closed LWPOLYLINEs on the INSUL (단열재/insulation) sublayer of the floor-plan layer; each is a small closed rectangular hatch tile, not an open wall-boundary line, so no entity is listed as a wall line. bbox is not derivable (no LINE entities). The tile count scales with the length of wall being insulated, so the definition is spatially tied to walls without containing wall centerline/boundary geometry itself — classified as a repeated material symbol, low wall_likelihood."
+    }
+  },
+  {
+    "unit_id": "defannot-u67-243",
+    "answer": {
+      "def": "*U67",
+      "role": "심볼",
+      "wall_likelihood": 0.15,
+      "wall_line_handles": [
+        {
+          "handle": "3D7F",
+          "reason": "long straight LINE forming outer edge of a ~50u-wide parallel channel, wall-pair-like spacing"
+        },
+        {
+          "handle": "3D8F",
+          "reason": "long straight LINE forming outer edge of a ~50u-wide parallel channel, wall-pair-like spacing"
+        },
+        {
+          "handle": "3D81",
+          "reason": "parallel counterpart LINE ~50u offset from partner, wall-pair-like spacing"
+        },
+        {
+          "handle": "3D87",
+          "reason": "parallel counterpart LINE ~50u offset from partner, wall-pair-like spacing"
+        }
+      ],
+      "notes": "23-entity INSERT+LINE+WIPEOUT bundle nests an INSERT of block 'X-평면도(기본형)$0$국기계양대' (flagpole hoist-stand), so semantically this is a site fixture symbol, not a building wall, despite a long (~3320u) thin bbox. Several LINE pairs run parallel ~50 units apart across the full length, a wall-pair-like geometric signature, which is why wall_likelihood is not zero; but the block-name evidence (flagpole mount) dominates the role classification over the raw geometry."
+    }
+  },
+  {
+    "unit_id": "defannot-u68-244",
+    "answer": {
+      "def": "*U68",
+      "role": "심볼",
+      "wall_likelihood": 0.15,
+      "wall_line_handles": [
+        {
+          "handle": "3D9B",
+          "reason": "long straight LINE forming outer edge of a ~50u-wide parallel channel, wall-pair-like spacing"
+        },
+        {
+          "handle": "3DAB",
+          "reason": "long straight LINE forming outer edge of a ~50u-wide parallel channel, wall-pair-like spacing"
+        },
+        {
+          "handle": "3D9D",
+          "reason": "parallel counterpart LINE ~50u offset from partner, wall-pair-like spacing"
+        },
+        {
+          "handle": "3DA3",
+          "reason": "parallel counterpart LINE ~50u offset from partner, wall-pair-like spacing"
+        }
+      ],
+      "notes": "23-entity INSERT+LINE+WIPEOUT bundle nests an INSERT of block 'X-평면도(기본형)$0$국기계양대' (flagpole hoist-stand), so semantically this is a site fixture symbol, not a building wall, despite a long (~920u) thin bbox. Several LINE pairs run parallel ~50 units apart across the full length, a wall-pair-like geometric signature, which is why wall_likelihood is not zero; but the block-name evidence (flagpole mount) dominates the role classification over the raw geometry."
+    }
+  },
+  {
+    "unit_id": "defannot-u70-245",
+    "answer": {
+      "def": "*U70",
+      "role": "심볼",
+      "wall_likelihood": 0.15,
+      "wall_line_handles": [],
+      "notes": "All 53 entities are identical 5-vertex closed LWPOLYLINEs on the INSUL (단열재/insulation) sublayer of the floor-plan layer; each is a small closed rectangular hatch tile, not an open wall-boundary line, so no entity is listed as a wall line. bbox is not derivable (no LINE entities). The tile count scales with the length of wall being insulated, so the definition is spatially tied to walls without containing wall centerline/boundary geometry itself — classified as a repeated material symbol, low wall_likelihood."
+    }
+  },
+  {
+    "unit_id": "defannot-u71-246",
+    "answer": {
+      "def": "*U71",
+      "role": "심볼",
+      "wall_likelihood": 0.15,
+      "wall_line_handles": [],
+      "notes": "All 41 entities are identical 5-vertex closed LWPOLYLINEs on the INSUL (단열재/insulation) sublayer of the floor-plan layer; each is a small closed rectangular hatch tile, not an open wall-boundary line, so no entity is listed as a wall line. bbox is not derivable (no LINE entities). The tile count scales with the length of wall being insulated, so the definition is spatially tied to walls without containing wall centerline/boundary geometry itself — classified as a repeated material symbol, low wall_likelihood."
+    }
+  },
+  {
+    "unit_id": "defannot-u72-247",
+    "answer": {
+      "def": "*U72",
+      "role": "심볼",
+      "wall_likelihood": 0.15,
+      "wall_line_handles": [],
+      "notes": "All 15 entities are identical 5-vertex closed LWPOLYLINEs on the INSUL (단열재/insulation) sublayer of the floor-plan layer; each is a small closed rectangular hatch tile, not an open wall-boundary line, so no entity is listed as a wall line. bbox is not derivable (no LINE entities). The tile count scales with the length of wall being insulated, so the definition is spatially tied to walls without containing wall centerline/boundary geometry itself — classified as a repeated material symbol, low wall_likelihood."
+    }
+  },
+  {
+    "unit_id": "defannot-u73-248",
+    "answer": {
+      "def": "*U73",
+      "role": "심볼",
+      "wall_likelihood": 0.15,
+      "wall_line_handles": [
+        {
+          "handle": "3E3B",
+          "reason": "long straight LINE forming outer edge of a ~50u-wide parallel channel, wall-pair-like spacing"
+        },
+        {
+          "handle": "3E4B",
+          "reason": "long straight LINE forming outer edge of a ~50u-wide parallel channel, wall-pair-like spacing"
+        },
+        {
+          "handle": "3E3D",
+          "reason": "parallel counterpart LINE ~50u offset from partner, wall-pair-like spacing"
+        },
+        {
+          "handle": "3E43",
+          "reason": "parallel counterpart LINE ~50u offset from partner, wall-pair-like spacing"
+        }
+      ],
+      "notes": "23-entity INSERT+LINE+WIPEOUT bundle nests an INSERT of block 'X-평면도(기본형)$0$국기계양대' (flagpole hoist-stand), so semantically this is a site fixture symbol, not a building wall, despite a long (~1820u) thin bbox. Several LINE pairs run parallel ~50 units apart across the full length, a wall-pair-like geometric signature, which is why wall_likelihood is not zero; but the block-name evidence (flagpole mount) dominates the role classification over the raw geometry."
+    }
+  },
+  {
+    "unit_id": "defannot-u74-249",
+    "answer": {
+      "def": "*U74",
+      "role": "심볼",
+      "wall_likelihood": 0.15,
+      "wall_line_handles": [],
+      "notes": "All 8 entities are identical 5-vertex closed LWPOLYLINEs on the INSUL (단열재/insulation) sublayer of the floor-plan layer; each is a small closed rectangular hatch tile, not an open wall-boundary line, so no entity is listed as a wall line. bbox is not derivable (no LINE entities). The tile count scales with the length of wall being insulated, so the definition is spatially tied to walls without containing wall centerline/boundary geometry itself — classified as a repeated material symbol, low wall_likelihood."
+    }
+  },
+  {
+    "unit_id": "defannot-u75-250",
+    "answer": {
+      "def": "*U75",
+      "role": "심볼",
+      "wall_likelihood": 0.15,
+      "wall_line_handles": [
+        {
+          "handle": "3E64",
+          "reason": "long straight LINE forming outer edge of a ~50u-wide parallel channel, wall-pair-like spacing"
+        },
+        {
+          "handle": "3E74",
+          "reason": "long straight LINE forming outer edge of a ~50u-wide parallel channel, wall-pair-like spacing"
+        },
+        {
+          "handle": "3E66",
+          "reason": "parallel counterpart LINE ~50u offset from partner, wall-pair-like spacing"
+        },
+        {
+          "handle": "3E6C",
+          "reason": "parallel counterpart LINE ~50u offset from partner, wall-pair-like spacing"
+        }
+      ],
+      "notes": "23-entity INSERT+LINE+WIPEOUT bundle nests an INSERT of block 'X-평면도(기본형)$0$국기계양대' (flagpole hoist-stand), so semantically this is a site fixture symbol, not a building wall, despite a long (~3920u) thin bbox. Several LINE pairs run parallel ~50 units apart across the full length, a wall-pair-like geometric signature, which is why wall_likelihood is not zero; but the block-name evidence (flagpole mount) dominates the role classification over the raw geometry."
+    }
+  },
+  {
+    "unit_id": "defannot-u76-251",
+    "answer": {
+      "def": "*U76",
+      "role": "심볼",
+      "wall_likelihood": 0.15,
+      "wall_line_handles": [
+        {
+          "handle": "3E80",
+          "reason": "long straight LINE forming outer edge of a ~50u-wide parallel channel, wall-pair-like spacing"
+        },
+        {
+          "handle": "3E90",
+          "reason": "long straight LINE forming outer edge of a ~50u-wide parallel channel, wall-pair-like spacing"
+        },
+        {
+          "handle": "3E82",
+          "reason": "parallel counterpart LINE ~50u offset from partner, wall-pair-like spacing"
+        },
+        {
+          "handle": "3E88",
+          "reason": "parallel counterpart LINE ~50u offset from partner, wall-pair-like spacing"
+        }
+      ],
+      "notes": "23-entity INSERT+LINE+WIPEOUT bundle nests an INSERT of block 'X-평면도(기본형)$0$국기계양대' (flagpole hoist-stand), so semantically this is a site fixture symbol, not a building wall, despite a long (~2420u) thin bbox. Several LINE pairs run parallel ~50 units apart across the full length, a wall-pair-like geometric signature, which is why wall_likelihood is not zero; but the block-name evidence (flagpole mount) dominates the role classification over the raw geometry."
+    }
+  },
+  {
+    "unit_id": "defannot-u77-252",
+    "answer": {
+      "def": "*U77",
+      "role": "심볼",
+      "wall_likelihood": 0.15,
+      "wall_line_handles": [],
+      "notes": "All 42 entities are identical 5-vertex closed LWPOLYLINEs on the INSUL (단열재/insulation) sublayer of the floor-plan layer; each is a small closed rectangular hatch tile, not an open wall-boundary line, so no entity is listed as a wall line. bbox is not derivable (no LINE entities). The tile count scales with the length of wall being insulated, so the definition is spatially tied to walls without containing wall centerline/boundary geometry itself — classified as a repeated material symbol, low wall_likelihood."
+    }
+  },
+  {
+    "unit_id": "defannot-u79-253",
+    "answer": {
+      "def": "*U79",
+      "role": "심볼",
+      "wall_likelihood": 0.15,
+      "wall_line_handles": [],
+      "notes": "All 33 entities are identical 5-vertex closed LWPOLYLINEs on the INSUL (단열재/insulation) sublayer of the floor-plan layer; each is a small closed rectangular hatch tile, not an open wall-boundary line, so no entity is listed as a wall line. bbox is not derivable (no LINE entities). The tile count scales with the length of wall being insulated, so the definition is spatially tied to walls without containing wall centerline/boundary geometry itself — classified as a repeated material symbol, low wall_likelihood."
+    }
+  },
+  {
+    "unit_id": "defannot-u81-254",
+    "answer": {
+      "def": "*U81",
+      "role": "심볼",
+      "wall_likelihood": 0.15,
+      "wall_line_handles": [],
+      "notes": "All 39 entities are identical 5-vertex closed LWPOLYLINEs on the INSUL (단열재/insulation) sublayer of the floor-plan layer; each is a small closed rectangular hatch tile, not an open wall-boundary line, so no entity is listed as a wall line. bbox is not derivable (no LINE entities). The tile count scales with the length of wall being insulated, so the definition is spatially tied to walls without containing wall centerline/boundary geometry itself — classified as a repeated material symbol, low wall_likelihood."
+    }
+  },
+  {
+    "unit_id": "defannot-u82-255",
+    "answer": {
+      "def": "*U82",
+      "role": "심볼",
+      "wall_likelihood": 0.15,
+      "wall_line_handles": [],
+      "notes": "All 19 entities are identical 5-vertex closed LWPOLYLINEs on the INSUL (단열재/insulation) sublayer of the floor-plan layer; each is a small closed rectangular hatch tile, not an open wall-boundary line, so no entity is listed as a wall line. bbox is not derivable (no LINE entities). The tile count scales with the length of wall being insulated, so the definition is spatially tied to walls without containing wall centerline/boundary geometry itself — classified as a repeated material symbol, low wall_likelihood."
+    }
+  },
+  {
+    "unit_id": "defannot-u83-256",
+    "answer": {
+      "def": "*U83",
+      "role": "심볼",
+      "wall_likelihood": 0.15,
+      "wall_line_handles": [],
+      "notes": "All 9 entities are identical 5-vertex closed LWPOLYLINEs on the INSUL (단열재/insulation) sublayer of the floor-plan layer; each is a small closed rectangular hatch tile, not an open wall-boundary line, so no entity is listed as a wall line. bbox is not derivable (no LINE entities). The tile count scales with the length of wall being insulated, so the definition is spatially tied to walls without containing wall centerline/boundary geometry itself — classified as a repeated material symbol, low wall_likelihood."
+    }
+  },
+  {
+    "unit_id": "defannot-u84-257",
+    "answer": {
+      "def": "*U84",
+      "role": "심볼",
+      "wall_likelihood": 0.15,
+      "wall_line_handles": [],
+      "notes": "All 71 entities are identical 5-vertex closed LWPOLYLINEs on the INSUL (단열재/insulation) sublayer of the floor-plan layer; each is a small closed rectangular hatch tile, not an open wall-boundary line, so no entity is listed as a wall line. bbox is not derivable (no LINE entities). The tile count scales with the length of wall being insulated, so the definition is spatially tied to walls without containing wall centerline/boundary geometry itself — classified as a repeated material symbol, low wall_likelihood."
+    }
+  },
+  {
+    "unit_id": "defannot-u85-258",
+    "answer": {
+      "def": "*U85",
+      "role": "심볼",
+      "wall_likelihood": 0.15,
+      "wall_line_handles": [],
+      "notes": "All 18 entities are identical 5-vertex closed LWPOLYLINEs on the INSUL (단열재/insulation) sublayer of the floor-plan layer; each is a small closed rectangular hatch tile, not an open wall-boundary line, so no entity is listed as a wall line. bbox is not derivable (no LINE entities). The tile count scales with the length of wall being insulated, so the definition is spatially tied to walls without containing wall centerline/boundary geometry itself — classified as a repeated material symbol, low wall_likelihood."
+    }
+  },
+  {
+    "unit_id": "defannot-u86-259",
+    "answer": {
+      "def": "*U86",
+      "role": "심볼",
+      "wall_likelihood": 0.15,
+      "wall_line_handles": [],
+      "notes": "All 16 entities are identical 5-vertex closed LWPOLYLINEs on the INSUL (단열재/insulation) sublayer of the floor-plan layer; each is a small closed rectangular hatch tile, not an open wall-boundary line, so no entity is listed as a wall line. bbox is not derivable (no LINE entities). The tile count scales with the length of wall being insulated, so the definition is spatially tied to walls without containing wall centerline/boundary geometry itself — classified as a repeated material symbol, low wall_likelihood."
+    }
+  },
+  {
+    "unit_id": "defannot-u87-260",
+    "answer": {
+      "def": "*U87",
+      "role": "심볼",
+      "wall_likelihood": 0.15,
+      "wall_line_handles": [],
+      "notes": "All 68 entities are identical 5-vertex closed LWPOLYLINEs on the INSUL (단열재/insulation) sublayer of the floor-plan layer; each is a small closed rectangular hatch tile, not an open wall-boundary line, so no entity is listed as a wall line. bbox is not derivable (no LINE entities). The tile count scales with the length of wall being insulated, so the definition is spatially tied to walls without containing wall centerline/boundary geometry itself — classified as a repeated material symbol, low wall_likelihood."
+    }
+  }
+]
