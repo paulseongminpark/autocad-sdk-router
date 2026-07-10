@@ -12,29 +12,28 @@ interior-100 프로그램의 현재 상태 도시에(dossier). 측정 사다리,
 - R4r (LEX-0008 orphan-assoc quotient 재측정) = **26,893** = 0.991264 — prereg 26,900 대역 [26,890, 26,910] 내 적중 (`reports/interior100/R4r_remeasure_lex0008.json`)
 - R4s (LEX-0009 angle-branch + LEX-0008 게이트 확장, 측정 전용 재측정) = **26,916** = **0.992112** — prereg 26,916 대역 [26,914, 26,918] **정중앙 적중**, 가드 4/4 (`reports/interior100/R4s_remeasure_angle_branch.json`, prereg는 `prereg_R4s_angle_branch.json`)
 - R4t (P2 수리 3종 재비행) = **27,098** = 0.998820 — prereg 대역 [27,105, 27,123] **FAIL-by-7**: H3 vintage +154·orphan-def sweep +28 착지, lw-z 무효과 = **stale-deploy 함정**(patch_engine이 prebuilt/<최신>을 src/bin보다 우선, 리빌드가 prebuilt 미갱신 → 07-09 crx로 비행). 수리: prebuilt 갱신 + 빌드스크립트 자동배포 (`reports/interior100/R4t_remeasure_vintage.json`)
-- R4u (lw-z 재비행, 신선 prebuilt 첫 비행) = **27,057** = 0.997309 — prereg 대역 [27,118, 27,123] **FAIL**, per-def 가드 FAIL: lw-z **+25 정확 착지**(gainers가 예측 def에 정확 일치), 그러나 **−66 unmask** — 신선 crx가 6d59fd5의 loop-local 추출을 처음 실어 census가 66 해치의 per-loop 소스 핸들을 처음 방출(전원 in-def 해석: lwpolyline 63+spline 14, 미해석 0) → orphan 주장 반증·철회, 재구축이 연관성을 복원하지 않는 **실 결함**이 드러남. R4t 27,098은 눈먼 계기 수치; **27,057이 정직한 현행 기록** (`reports/interior100/R4u_remeasure_lwz.json`, prereg `prereg_R4u_lwz_reflight.json`)
+- R4u (lw-z 재비행, 신선 prebuilt 첫 비행) = **27,057** = 0.997309 — prereg 대역 [27,118, 27,123] **FAIL**, per-def 가드 FAIL: lw-z **+25 정확 착지**(gainers가 예측 def에 정확 일치), 그러나 **−66 unmask** — 신선 crx가 6d59fd5의 loop-local 추출을 처음 실어 census가 66 해치의 per-loop 소스 핸들을 처음 방출(전원 in-def 해석: lwpolyline 63+spline 14, 미해석 0) → orphan 주장 반증·철회, 재구축이 연관성을 복원하지 않는 **실 결함**이 드러남. R4t 27,098은 눈먼 계기 수치; 27,057이 당시의 정직 기록 (`reports/interior100/R4u_remeasure_lwz.json`, prereg `prereg_R4u_lwz_reflight.json`)
+- R4v (P3 assoc relink 비행, commit `37c6480`) = **27,116** = 0.999484 — prereg 대역 [27,118, 27,123] **FAIL-by-2**, 가드 4/4 OK(per-def 무회귀 포함): relink 기계 자체는 **66/66 성공**(op ok + `associative_after=true`), +59 순증. 미달 2+5는 수리가 unmask한 loop 표기 드리프트 — 해부로 3클래스 확정: **회전 5**(점군 0.0, LEX-0012로 입법) + **spline Bézier 재분해 2**(prereg 리스크 레지스터 항목 발화; 곡선 동일 9.2e-4, 수용 잔차) + 구 실기하 7. LEX-0011은 fold 증거(59/66, 오접힘 0)로 legislated — 런 판정은 FAIL 유지 (`reports/interior100/R4v_remeasure_assoc.json`, 해부 `loops_residue_analysis_R4v.json`)
+- R4w (LEX-0012 측정 전용 재측정, prereg 커밋 `c51def8` 후 실행) = **27,121** = **0.999668** — prereg **점 대역 [27,121, 27,121] 정확 명중**, 가드 4/4 (`reports/interior100/R4w_remeasure_lex0012.json`, prereg `prereg_R4w_lex0012.json`). **현행 법 하 fingerprint 천장 도달** — 잔차 9 전원이 판별 완료된 비표기(실기하 7) 또는 수용 표기(spline 2).
 
 ## Arc history
 
 - **Phase arc (R4o–R4r)**: R4o 무효런(LEX-0006) → R4p 2-사이트 수리(D1a/D2) → R4q 위상 물리 왕복 실증(LEX-0007) → R4r orphan-assoc 몫 입법(LEX-0008). 종결.
 - **Residue arc P1 (R4s, 2026-07-10)**: "loops 표기" 정찰 가설을 전수 해부로 **반증**(LEX-0010) — loops-only는 7쌍뿐, 전부 점군 실측 기하 차이. 진짜 조성 확정 후 angle principal-branch 몫 입법(LEX-0009: ellipse 16 + DASH row 2π 4) + LEX-0008 구현 갭 봉합(SOLID 3). 재측정 26,916 정중앙 적중. 도구: `tools/loops_residue_analysis.py`(페어 캡처·점군 검증·collision test), `tools/remeasure_interior.py`(prereg 판정 러너, 가드 4종 내장).
 - **Residue arc P2 (R4t–R4u, 2026-07-10)**: 재생 수리 3종(H3 `.pat` 세대별 분리 + lwpolyline elevation + orphan-def sweep). R4t FAIL-by-7이 **stale-deploy 함정** 적발(수리: prebuilt 자동배포). R4u 재비행이 lw-z +25 착지를 실증하는 동시에 **계기 업그레이드의 unmask −66**: 신선 crx의 loop-local 추출(6d59fd5)이 66 해치의 실재 소스를 처음 드러내 "orphan" 전제를 반증(`docs/ASSOC_ORPHAN_FINDING.md` 철회) — 재구축의 연관성 미복원이 실 결함으로 확정. FAIL 2건 모두 개명 없이 조사로 종결, 산출은 정직 기록 27,057.
+- **Residue arc P3 (R4v–R4w, 2026-07-11, commits `37c6480`→`c51def8`)**: assoc relink 전 사슬 구현(append `source` 원장 → 엔진 census→rebuilt 치환, 미해석 loud FAIL → 배치 플래너 relink 배리어 → 네이티브 id-derived loop 교체 `removeLoopAt`+`insertLoopAt(int, type, ids)`+`evaluateHatch`+persistent reactor). R4v 비행: relink **66/66 기계 성공**, +59, FAIL-by-2 — 수리가 unmask한 표기 드리프트를 쌍 단위 전수 해부(분석기의 dict-vertex 파싱 갭 수리가 선행 — 5쌍은 "측정 안 됨"이었지 "기하 차이"가 아니었음): 회전 5(점군 0.0) + spline 재분해 2(곡선 동일) + 구 실기하 7. **LEX-0012 입법**(closed cycle의 직렬화 시작점 = 표기; dup-drop + rotation-minimal + 6dp 방출, LEX-0010의 재개 조건 발화) 후 R4w 측정 전용 재측정이 점 대역 정확 명중. FAIL은 개명 없이 조사로 종결.
 
-## Residue composition — R4u 이후 (73 = 27,130 − 27,057)
+## Residue composition — R4w 이후 (9 = 27,130 − 27,121, 전원 판별 완료)
 
-전수 실측 (`reports/interior100/R4u_remeasure_lwz.json` + `assoc_source_resolve_probe`):
+전수 실측 (`reports/interior100/loops_residue_analysis_R4v.json`, dict-vertex 파싱 수리 후):
 
-- **assoc 미복원 66** — REAL 재생 결함 (R4u가 unmask). census 66 해치 `is_associative=true` + per-loop `assoc_source_handles` 실재(in-def 해석 77/77: lwpolyline 63 + spline 14), post는 258/258 비연관 — 재구축이 setAssocObjIdsAt를 수행하지 않음. 수리 = P3 relink 아크.
-- **loops 실기하 7** — 점군 max-NN ≥ 1e-3. 경계 재생 결함 후보, 별도 아크 (P3 뒤).
+- **loops 실기하 7** (구 7, R4s 리스트와 핸들 단위 일치: 20F9/2283/24C7/28C4/2B43/6EDC/741A) — 점군 max-NN 6.66~100.0, 전부 비연관(assoc-66 밖). 경계 재생 실 결함, 차기 아크.
+- **spline Bézier 재분해 2** (1BDF/1BE6, dA로고) — census 다중스팬 spline 3/1 엣지 vs post 스팬별 Bézier 9/3 엣지: `evaluateHatch`가 재파생하며 분해. 곡선 동일(control-net 점군 프록시 9.2e-4, 도면 스케일 수천 단위). Bézier 추출 정규화는 2쌍 대비 블라인드 리스크 과대 — fingerprint 밖 수용 잔차로 문서화(대체검증 담당).
 
-## Next levers (P3 — assoc relink + R4v 재비행)
+## Next levers (P4 — loops 실기하 7 수리, Paul 보고 후)
 
-1. append op에 `source_handle` 원장 추가 (`ir_to_patch`) — census→post 핸들 대응을 op↔result(`new_handle`)로 명시화.
-2. op 스트림 말미에 `write.block.relink_hatch_assoc` 방출 (census 핸들 payload) — 전 소스가 이미 생성된 뒤 실행됨 (Step C 순서 충족).
-3. `patch_engine`: 배치 결과에서 원장 축적 → relink job 방출 시 census→post 치환, 미해석은 loud FAIL.
-4. 네이티브 핸들러: 핸들→ObjectId, `setAssociative(true)` + per-loop **id-derived loop 교체**(`removeLoopAt`+`insertLoopAt(int, type, AcDbObjectIdArray)` — ObjectARX 2027엔 per-loop assoc setter가 없음, id-derived insert 오버로드가 유일한 쓰기 경로) + `evaluateHatch` + 소스에 persistent reactor. 미니 E2E 프로브로 선검증 후 풀비행.
-5. 측정: LEX-0011(candidate) — canonical payload = per-loop cardinality; 정확 대응 검증은 post-flight assoc audit(양측 IR join + kind multiset)으로.
-6. prereg_R4v: 27,057 + 66 = **27,123** 대역 [27,118, 27,123] (천장 27,130 − loops 7) — 발사 전 커밋.
+1. 구 7쌍의 경계 재생 결함 근인 조사: append 경로가 6.66~100 유닛급 왜곡을 만드는 지점(추출 vs 방출 vs 재파생) 격리.
+2. 수리 후 재비행 prereg: 27,121 + 7 = 27,128? — 단 spline 2는 현행 법으로 잔존하므로 실측 천장 = 27,128/27,130. (E1 골든 리뷰와 함께 Paul 결재 대상.)
 
 ## E1 lane (동결 상태)
 

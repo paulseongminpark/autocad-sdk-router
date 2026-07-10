@@ -1,5 +1,15 @@
 # Associative hatch re-link — design v0
 
+> **OUTCOME 2026-07-11 (R4v flight + R4w remeasure): ARC CLOSED — relink landed 66/66.**
+> Every relink op returned ok with `associative_after=true` (flight result files +
+> `reports/interior100/R4v_remeasure_assoc.json`); net +59, R4v adjudicated FAIL-by-2
+> against its band because the repair UNMASKED loop-notation drift of the id-derived
+> re-derivation (the prereg risk-register item): 5 closed-cycle rotations (point-cloud
+> 0.0, legislated LEX-0012, folded on R4w = 27,121/27,130 point-band hit) + 2 spline
+> multi-span → per-Bézier re-decompositions (curve-identical 9.2e-4 proxy, accepted
+> residue outside the fingerprint). Dissection: `loops_residue_analysis_R4v.json`.
+> The design text below is preserved as-built.
+
 > **STATUS 2026-07-10 (evening): LIVE — this design is the active repair arc (P3 → R4v).**
 > The intervening orphan claim (`docs/ASSOC_ORPHAN_FINDING.md`, "sources do not
 > exist, re-link is moot") is RETRACTED — it was a stale-deploy artifact; R4u's
