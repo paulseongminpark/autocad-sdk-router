@@ -1,0 +1,29 @@
+{
+ "schema": "ariadne.interior100.run_summary.v1",
+ "run": "R4q_dashphase_20260709",
+ "source_sha256": "14eb65eb292d8a07f38ab5662dcafe9761c6185bc5ff0c8a9a008be15b598961",
+ "interior": {
+  "defs": 294,
+  "a_total": 27130,
+  "diff0": 26834,
+  "fraction": 0.98909,
+  "modified": 268,
+  "removed": 28
+ },
+ "prereg": {
+  "point": 26897,
+  "band": [
+   26880,
+   26910
+  ],
+  "verdict": "MISS",
+  "explanation": "DASH66/assoc66 overlap 63: phase repaired physically but pairs still differ on is_associative; +3 == phase-only DASH count"
+ },
+ "lineage": {
+  "R4n": 26818,
+  "R4p": 26831,
+  "R4q": 26834
+ },
+ "phase_arc": "CLOSED (canonical geometry diff of surviving DASH pair == is_associative only)",
+ "next_lever": "assoc re-link (docs/ASSOC_RELINK_DESIGN.md), predicted ~ +66"
+}

@@ -75,3 +75,20 @@ Each entry uses the following fields, in order:
 - **substitute_verifier**: n/a
 - **status**: rejected
 - **refs**: `runs/e2e_1dwg_R4m_wipeout_20260709`, `runs/e2e_1dwg_R4n_origin_20260709`
+
+
+### [LEX-0006] population control before any cross-run claim
+
+- **observation**: R4o landed 32,545/32,551 = 0.9998 and briefly read as a breakthrough; population forensics showed only 91/294 def-name overlap with R4n and a 245-vs-407 census mismatch, and `identity.json` proved the run had executed against `tests/fixtures/native_sample.dwg` (launch omitted `--dwg`; capstone default), not `1.dwg` (`runs/e2e_1dwg_R4o_phase_20260709`, 2026-07-09).
+- **rule**: no cross-run fidelity claim (record, ratchet, prereg adjudication) is admissible until source identity (sha256) AND def-population identity are verified; a launch that omits the source argument is an invalid run regardless of how good its numbers look.
+- **substitute_verifier**: `tools/population_forensics.py` (re-keys per_def rows onto the census side, reports transitions + key diagnosis) + `identity.json` sha check.
+- **status**: legislated
+- **refs**: `reports/interior100/population_forensics_R4nR4o.md`, `runs/e2e_1dwg_R4o_phase_20260709/identity.json`, commit `8124edd`
+
+### [LEX-0007] phase arc closed; DASH/assoc overlap explains the residual plateau
+
+- **observation**: R4p measured the true phase-loss mechanism split in two: (D1a) predefined-name patterns (DASH x66) lost their per-hatch phase because the origin fold read rows from the serialized entity (predefined jobs never carry `pattern_definitions`), while custom H3/H1 carriage succeeded 182/182; (D2) the canonical divisor trusted `pattern_type` (type-1 => baked) but predefined replays store type-1 UNIT rows. After the two-site repair (commit `d261e44`), R4q round-trips phase physically (job -> `setOriginPoint` -> DWG -> extracted IR, canonical geometry diff of a surviving DASH pair = `is_associative` ONLY). Headline moved only +3 (26,834/27,130) because DASH 66 and assoc 66 overlap in 63 hatches: phase repair cannot fold a pair that still differs on `is_associative`.
+- **rule**: the remaining hatch residue is legislated as the ASSOC class (66 = 59+4+3 by field combo); phase is no longer an open mechanism on 1.dwg. Next admissible lever is associative re-link (docs/ASSOC_RELINK_DESIGN.md), predicted fold ~ +66.
+- **substitute_verifier**: canonical field-level pair diff (geometry keys) on surviving pairs; `tools/residue_tail_report.py` field-combo census.
+- **status**: legislated
+- **refs**: `runs/e2e_1dwg_R4p_phase_20260709`, `runs/e2e_1dwg_R4q_dashphase_20260709`, commits `d261e44`, `reports/interior100/residue_tail_R4p.json`
