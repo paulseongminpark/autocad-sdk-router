@@ -199,29 +199,32 @@ def reachable_subgraph(topology: Dict[str, Any]) -> Tuple[Dict[str, Any], List[s
 
 def block_topology_gate_report(census_ir: Dict[str, Any], post_ir: Dict[str, Any], *,
                                name_map: Optional[Dict[str, str]] = None) -> Dict[str, Any]:
-    """L5 semantic gate: the modelspace-reachable block-reference graph of the
-    census must be preserved by the rebuild (insert topology, not counts).
+    """L5 semantic gate: the census block-reference graph must be preserved
+    by the rebuild (insert topology, not counts).
 
-    Contract (verified on R4l before wiring): *D derived caches excluded
-    pre-extraction on both sides; the gate verdict compares the
-    modelspace-REACHABLE subgraph (census defs unreachable from modelspace are
-    outside the regen's replay scope and are reported, not folded into the
-    verdict). R4l measured: 290/290 reachable defs, 711/711 edges preserved;
-    4 census defs unreachable (DIMDOT/_ArchTick arrow blocks referenced only
-    by excluded caches + 2 orphan definitions).
+    Contract: *D derived caches excluded pre-extraction on both sides; the
+    gate verdict compares the FULL non-*D census topology against the post
+    topology. Until R4t the verdict compared only the modelspace-REACHABLE
+    census subgraph, because the regen replayed the reachable closure; the
+    R4t orphan-def sweep (ir_to_patch, commit 93ffb3d) made the FULL authored
+    def graph the replay scope, and on R4t the reachable-only expectation
+    misread the 4 restored orphan defs (DIMDOT/_ArchTick/$0$ins-l/$0$ng, 28
+    entities) as defs_extra and blocked a correct rebuild. defs_extra now
+    means what it says: defs in the post that exist NOWHERE in the census.
+    The reachable/unreachable split stays as an honest annotation.
     """
     census_stripped, caches_a = _strip_derived_caches(census_ir or {})
     post_stripped, caches_b = _strip_derived_caches(post_ir or {})
     topo_a = extract_block_topology(census_stripped, name_map=name_map)
     topo_b = extract_block_topology(post_stripped)
-    reachable_a, unreachable_a = reachable_subgraph(topo_a)
-    report = compare_block_topology(reachable_a, topo_b)
+    _reachable_a, unreachable_a = reachable_subgraph(topo_a)
+    report = compare_block_topology(topo_a, topo_b)
     report["derived_cache_defs_excluded"] = {"a": caches_a, "b": caches_b,
                                              "name_pattern": _DIM_CACHE_NAME.pattern}
     report["census_defs_unreachable_from_modelspace"] = unreachable_a
-    if not reachable_a["defs"] and not reachable_a["edges"]:
+    if not topo_a["defs"] and not topo_a["edges"]:
         report["status"] = "ok"
-        report["note"] = "no reachable census block topology (vacuously ok)"
+        report["note"] = "no census block topology (vacuously ok)"
     return report
 
 

@@ -1,0 +1,41 @@
+{
+  "schema": "ariadne.interior100.prereg.v1",
+  "arc": "R4u reflight: identical repair set as R4t, flown on the REFRESHED prebuilt crx (lwpolyline setElevation actually deployed)",
+  "registered_at_local": "2026-07-10T16:1x (file mtime is the binding evidence; committed BEFORE launch)",
+  "r4t_adjudication": {
+    "verdict": "FAIL (band) -- measured 27,098/27,130 = 0.998820 vs band [27,105, 27,123]",
+    "cause_measured": "stale-deploy trap: patch_engine resolves native modules from prebuilt/<newest>/ BEFORE src/bin; the rebuild refreshed src/bin only, so the flight arxloaded the 07-09 crx without the lwpolyline setElevation repair. Evidence: 25/25 lwpolyline jobs carried the elevation key (values match census exactly: 0.401062 x23, -80 x1, 10 x1) while post vertex z stayed 0.0; batch .scr arxload lines point at prebuilt/2027; prebuilt crx mtime 2026-07-09 18:07 vs fresh build 15:19.",
+    "what_worked": "H3 vintage restoration +154 and orphan-def sweep +28 landed exactly (26,916 + 182 = 27,098); per-def no-regression guard 0 regressions; block_topology_gate blocked ONLY because its expectation still encoded the pre-sweep reachable-only contract (fixed this commit).",
+    "report": "reports/interior100/R4t_remeasure_vintage.json"
+  },
+  "baseline": {
+    "report": "reports/interior100/R4t_remeasure_vintage.json",
+    "diff0_total": 27098,
+    "a_entity_total": 27130,
+    "a_def_count": 294,
+    "interior_diff0_fraction": 0.9988204939181717
+  },
+  "prediction": {
+    "diff0_total": 27123,
+    "band": [27118, 27123],
+    "interior_diff0_fraction_at_center": 0.9997420567,
+    "ceiling_note": "27,123 = 27,130 minus the 7 loops real-geometry pairs (unrepaired, next arc).",
+    "decomposition": [
+      {
+        "family": "lwpolyline elevation carry (now actually deployed)",
+        "pairs": 25,
+        "evidence": "probe runs/lw_elevation_probe_20260710: z=0.4010621945564553 round-trips exactly through the refreshed prebuilt crx; R4t jobs already proved the Python side emits 25/25 correct values"
+      }
+    ],
+    "band_rationale": "single deterministic mechanism remains, probe-verified end-to-end; floor 27,118 absorbs small flight-to-flight noise only. H3/sweep families re-fly too and are protected by the per-def no-regression guard vs the R4t baseline.",
+    "residual_after_success": "7 loops real-geometry pairs, 0 removed"
+  },
+  "gate_contract_change": "block_topology_gate now compares the FULL non-*D census topology (sweep is law); pre-R4t it compared the modelspace-reachable subgraph and misread the 4 restored orphan defs as defs_extra. Tests updated: restored-orphans ok / unrestored-orphans blocked / hallucinated-extra blocked.",
+  "structural_fix": "tools/build_native_acad.ps1 now auto-deploys dbx+crx into prebuilt/<newest>/ after every canonical build (non-isolated, non-suffixed), reporting prebuilt_deployed in its JSON -- the stale-deploy trap class is closed, not just this instance.",
+  "population_pin": {
+    "source_dwg": "D:\\dev\\.build\\1.dwg",
+    "source_dwg_sha256": "14eb65eb292d8a07f38ab5662dcafe9761c6185bc5ff0c8a9a008be15b598961",
+    "launch_command": "python tools/full_roundtrip_capstone.py --dwg D:\\dev\\.build\\1.dwg --out-dir runs\\e2e_1dwg_R4u_lwz_20260710 --batch-size 100 --with-records",
+    "required": "census must reproduce 294 defs / 27,130 entities; identity sha must equal the pin (LEX-0006); per-def diff0 >= R4t for every def"
+  }
+}

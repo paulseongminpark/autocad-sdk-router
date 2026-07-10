@@ -207,16 +207,18 @@ def _gate_def(name, *refs):
     }
 
 
-def test_gate_report_ok_when_reachable_graph_preserved():
-    # Census: modelspace->A->B reachable; ORPHAN + arrow block (referenced
-    # only by the *D cache) unreachable; *D7 cache excluded pre-extraction.
+def test_gate_report_ok_when_full_census_graph_preserved():
+    # R4t contract: the orphan-def sweep makes the FULL authored def graph
+    # the replay scope -- a correct rebuild carries ORPHAN and the arrow
+    # block too; *D caches stay excluded pre-extraction on both sides.
     census = _gate_ir(
         [_gate_def("A", "B"), _gate_def("B"), _gate_def("ORPHAN"),
          _gate_def("DIMDOT"), _gate_def("*D7", "DIMDOT")],
         ms_inserts=["A"],
     )
     post = _gate_ir(
-        [_gate_def("A", "B"), _gate_def("B"), _gate_def("*D9", "SOMETHING")],
+        [_gate_def("A", "B"), _gate_def("B"), _gate_def("ORPHAN"),
+         _gate_def("DIMDOT"), _gate_def("*D9", "SOMETHING")],
         ms_inserts=["A"],
     )
 
@@ -226,6 +228,34 @@ def test_gate_report_ok_when_reachable_graph_preserved():
     assert report["census_defs_unreachable_from_modelspace"] == ["DIMDOT", "ORPHAN"]
     assert report["derived_cache_defs_excluded"]["a"] == 1
     assert report["derived_cache_defs_excluded"]["b"] == 1
+
+
+def test_gate_report_blocks_when_orphan_defs_not_restored():
+    # The pre-R4t tolerance (reachable-only expectation) is now the defect
+    # case: a rebuild that drops unreachable authored defs loses content
+    # (measured 4 defs / 28 entities on every pre-R4t run).
+    census = _gate_ir(
+        [_gate_def("A", "B"), _gate_def("B"), _gate_def("ORPHAN")],
+        ms_inserts=["A"],
+    )
+    post = _gate_ir([_gate_def("A", "B"), _gate_def("B")], ms_inserts=["A"])
+
+    report = block_topology.block_topology_gate_report(census, post)
+
+    assert report["status"] == "blocked"
+    assert report["defs_missing"] == ["ORPHAN"]
+
+
+def test_gate_report_blocks_on_hallucinated_extra_def():
+    # defs_extra keeps meaning what it says: a post def that exists NOWHERE
+    # in the census is a fabrication, not a restoration.
+    census = _gate_ir([_gate_def("A")], ms_inserts=["A"])
+    post = _gate_ir([_gate_def("A"), _gate_def("MADE_UP")], ms_inserts=["A"])
+
+    report = block_topology.block_topology_gate_report(census, post)
+
+    assert report["status"] == "blocked"
+    assert report["defs_extra"] == ["MADE_UP"]
 
 
 def test_gate_report_blocks_on_reachable_edge_loss():
