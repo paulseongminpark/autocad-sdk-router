@@ -1,4 +1,21 @@
 # Associative hatch re-link — design v0
+
+> **STATUS 2026-07-10 (evening): LIVE — this design is the active repair arc (P3 → R4v).**
+> The intervening orphan claim (`docs/ASSOC_ORPHAN_FINDING.md`, "sources do not
+> exist, re-link is moot") is RETRACTED — it was a stale-deploy artifact; R4u's
+> census (first flight of the loop-local emission) reads 66/66 flagged hatches
+> with per-loop sources, all 77 refs resolving in-def (63 lwpolyline + 14
+> spline). Implementation binding for R4v: Step A handle translation uses the
+> append-op `source_handle` → result `new_handle` ledger accumulated by
+> `patch_engine` across batches (explicit per-op correspondence, not positional);
+> relink ops are emitted at the END of the op stream (all boundary sources
+> exist by then — Step C ordering satisfied); Step B1 native op is
+> `write.block.relink_hatch_assoc` (open by handle, `setAssociative(kTrue)`,
+> per-loop `setAssocObjIdsAt`, persistent reactors on sources); translate
+> failure is a loud per-op error result (no fake success). Fingerprint
+> comparison of the payload is legislated as per-loop cardinality (LEX-0011);
+> exact-correspondence checking lives in the post-flight assoc audit (Gate 2).
+
 ## Evidence base
 - Native extraction sealed diff exists at `D:\dev\99_tools\octoloop\runs\LOOP-20260709113826-18k0wul\evidence\assoc-source-extraction.diff.patch`.
 - The diff introduces the IR field name `assoc_source_handles` in `AriadneNativeJob.cpp`.

@@ -1,5 +1,26 @@
 # Orphan-assoc finding
 
+> **RETRACTED 2026-07-10 (evening) — falsifier (b) fired.** The claim below is
+> FALSE; it was an artifact of the stale-deploy trap (`prereg_R4t_vintage_reflight.json`
+> forensics): both probe runs cited under Evidence arxloaded the 2026-07-09
+> prebuilt crx, which predates the `getAssocObjIdsAt` emission code (commit
+> `6d59fd5`, 07-10 10:23) entirely. Measured mechanism: both probe census IRs
+> contain ZERO occurrences of the `assoc_source_handles` field (not
+> present-but-empty — never emitted). The first flight that actually carried
+> the emission code is R4u (`runs/e2e_1dwg_R4u_lwz_20260710`, refreshed
+> prebuilt): its census reads **66/66 flagged hatches WITH per-loop source
+> handles, and all 77 source refs resolve to real entities in the same block
+> def** (63 lwpolyline + 14 spline, 0 unresolved — probe
+> `assoc_source_resolve_probe.py`, 2026-07-10). The sources exist; re-link is
+> feasible; `docs/ASSOC_RELINK_DESIGN.md` is live work (falsifier (b)'s exact
+> consequence). The LibreDWG probe (#3) remains unexplained in isolation
+> (suspected projection gap for this format vintage) but cannot outweigh two
+> live positive reads on the pinned file. LEX-0008's RULE (derived flag,
+> compare payload when sources exist) stands; its observation is corrected in
+> the ledger. Flag-copy replay (the Implication below) flew in R4u and did NOT
+> persist (post reads `is_associative=false` 258/258) — consistent with a
+> sourceless flag being unsaveable; real re-link with sources is the repair.
+
 ## Claim
 
 The 66 `is_associative=true` hatches in `1.dwg` (sha `14eb65eb...`) reference boundary sources that **do not exist** in the drawing. The associativity flag is orphaned — there is nothing left to re-link it to. Consequently "re-linking" the boundary is not a feasible operation; faithful replay reduces to copying the flag verbatim rather than reconstructing an association.
