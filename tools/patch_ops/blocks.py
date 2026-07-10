@@ -58,6 +58,11 @@ WRITE_OP_MAP: Dict[str, str] = {
     "create_block": "write.block.simple_create",
     "append_block_entity": "write.block.append_entity",
     "create_block_simple": "write.block.simple_create",
+    # P3 assoc-relink arc (R4v): re-arm hatch associativity AFTER all appends.
+    # Patch-time args carry CENSUS handles; patch_engine translates them to
+    # rebuilt handles through the source_handle->new_handle ledger right
+    # before the job is written (the map only exists at batch time).
+    "relink_hatch_assoc": "write.block.relink_hatch_assoc",
 }
 
 _UNSUPPORTED_APPEND_REASON = "def_entity kind unsupported by write.block.append_entity"
@@ -108,6 +113,15 @@ def build_job_args(native_op: str, args: Dict[str, Any]) -> Optional[Dict[str, A
         # per-field flattening belongs on the Python side.
         out = {}
         for k in ("block_name", "entity", "layer"):
+            if k in args:
+                out[k] = args[k]
+        return out
+    if native_op == "write.block.relink_hatch_assoc":
+        # By the time this reaches the job JSON the handles are REBUILT-drawing
+        # handles (patch_engine._translate_relink_records) -- block_name rides
+        # along for diagnostics only; the native handler opens by handle.
+        out = {}
+        for k in ("block_name", "hatch_handle", "loops_source_handles"):
             if k in args:
                 out[k] = args[k]
         return out
@@ -526,8 +540,16 @@ def _def_entity_append_op(block_name: str, def_ent: Dict[str, Any]) -> Optional[
             }
     if entity is None:
         return None
-    return {"operation": "append_block_entity",
-            "args": {"block_name": block_name, "entity": entity, "layer": layer}}
+    op = {"operation": "append_block_entity",
+          "args": {"block_name": block_name, "entity": entity, "layer": layer}}
+    # Census identity ledger: patch_engine._record_handle_map_entry pairs this
+    # with the append result's new_handle into handle_map.json (the plumbing
+    # existed but no op ever carried a source -- R4u measured coverage
+    # ops_with_source=0/27130). The census->rebuilt correspondence is what the
+    # assoc relink pass (and any future by-handle audit) translates through.
+    if def_ent.get("handle"):
+        op["source"] = {"handle": def_ent.get("handle")}
+    return op
 
 
 def block_def_ops(block_def: Dict[str, Any]) -> Tuple[List[Dict[str, Any]], List[Dict[str, Any]]]:
@@ -566,3 +588,54 @@ def block_def_ops(block_def: Dict[str, Any]) -> Tuple[List[Dict[str, Any]], List
             continue
         ops.append(op)
     return ops, deferred
+
+
+def _is_loops_source_handles(value: Any) -> bool:
+    """Per-loop source shape (docs/ASSOC_RELINK_DESIGN.md): outer list aligned
+    to loops[], each item a list of handle strings, at least one handle total."""
+    if not isinstance(value, list) or not value:
+        return False
+    total = 0
+    for loop_srcs in value:
+        if not isinstance(loop_srcs, list):
+            return False
+        for h in loop_srcs:
+            if not isinstance(h, str) or not h:
+                return False
+            total += 1
+    return total > 0
+
+
+def relink_hatch_assoc_ops(block_def: Dict[str, Any]) -> List[Dict[str, Any]]:
+    """Relink ops (CENSUS handles) for every associative hatch in this def.
+
+    Emitted at the END of the op stream (ir_to_patch), i.e. after every append
+    in every def -- Step C of docs/ASSOC_RELINK_DESIGN.md: all boundary sources
+    exist before any relink runs. Handles stay census-side here; the engine
+    translates them through the accumulated handle-map at batch time and
+    fail-louds on any miss (no fake success). Empty/missing source lists mean
+    non-associative replay per the design contract -- no op, LEX-0008 folds the
+    flag on both sides.
+    """
+    name = block_def.get("name")
+    out: List[Dict[str, Any]] = []
+    for def_ent in (block_def.get("def_entities") or []):
+        g = def_ent.get("geometry") or {}
+        if g.get("kind") != "hatch" or not g.get("is_associative"):
+            continue
+        srcs = g.get("assoc_source_handles")
+        if not _is_loops_source_handles(srcs):
+            continue
+        handle = def_ent.get("handle")
+        if not handle:
+            continue
+        out.append({
+            "operation": "relink_hatch_assoc",
+            "args": {
+                "block_name": name,
+                "hatch_handle": handle,
+                "loops_source_handles": [list(loop) for loop in srcs],
+            },
+            "source": {"handle": handle},
+        })
+    return out

@@ -10,8 +10,11 @@
 > `patch_engine` across batches (explicit per-op correspondence, not positional);
 > relink ops are emitted at the END of the op stream (all boundary sources
 > exist by then — Step C ordering satisfied); Step B1 native op is
-> `write.block.relink_hatch_assoc` (open by handle, `setAssociative(kTrue)`,
-> per-loop `setAssocObjIdsAt`, persistent reactors on sources); translate
+> `write.block.relink_hatch_assoc` (open by handle, `setAssociative(true)`,
+> per-loop id-derived loop REPLACEMENT via `removeLoopAt` +
+> `insertLoopAt(int, type, AcDbObjectIdArray)` — ObjectARX 2027 exposes no
+> per-loop assoc setter; `setAssocObjIdsAt` named below predates the header
+> check — then `evaluateHatch` + persistent reactors on sources); translate
 > failure is a loud per-op error result (no fake success). Fingerprint
 > comparison of the payload is legislated as per-loop cardinality (LEX-0011);
 > exact-correspondence checking lives in the post-flight assoc audit (Gate 2).

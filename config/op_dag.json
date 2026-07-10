@@ -12,11 +12,11 @@
     "acceptance_test_id": "registry tests[0] (current best-evidence test ref; F3's future per-op W+D roundtrip gate is not built in this tree yet)"
   },
   "totals": {
-    "catalogue_count": 550,
-    "node_count": 550,
-    "edge_count": 1404,
+    "catalogue_count": 551,
+    "node_count": 551,
+    "edge_count": 1408,
     "by_persistence_class": {
-      "D": 60,
+      "D": 61,
       "L": 35,
       "NON_GOAL": 62,
       "P": 59,
@@ -7270,6 +7270,27 @@
         "tests/test_native_arx_dbx_contract.py"
       ],
       "acceptance_test_id": "tests/test_native_arx_dbx_contract.py::insertBlockReference",
+      "persistence_class": "D"
+    },
+    {
+      "op_id": "write.block.relink_hatch_assoc",
+      "predecessors": [
+        "infra.hostapp.provide_services",
+        "inspect.block.iterate",
+        "inspect.dynblock.properties",
+        "inspect.dynblock.references"
+      ],
+      "arg_keys": [],
+      "target_files": [
+        "docs/ASSOC_RELINK_DESIGN.md",
+        "reports/interior100/R4u_remeasure_lwz.json",
+        "src/Ariadne.AcadNative/families/m08e_handlers.inc",
+        "tests/unit/test_m08e_handlers.py",
+        "tests/unit/test_relink_assoc.py",
+        "tools/patch_engine.py",
+        "tools/patch_ops/blocks.py"
+      ],
+      "acceptance_test_id": "tests/unit/test_relink_assoc.py",
       "persistence_class": "D"
     },
     {

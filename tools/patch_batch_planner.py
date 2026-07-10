@@ -91,6 +91,15 @@ def _batch_units(
     return units
 
 
+def _is_relink_barrier_op(op: Dict[str, Any]) -> bool:
+    """Relink ops translate CENSUS handles through the engine's handle ledger
+    at batch-PREP time, so every append whose new_handle they need must be in
+    a STRICTLY EARLIER batch (the ledger is parsed from a batch's results only
+    after that whole batch ran). A batch mixing appends with relinks would
+    translate against a ledger that cannot contain those appends yet."""
+    return op.get("operation") == "relink_hatch_assoc"
+
+
 def _make_batch(batch_number: int, op_indices: List[int], *, oversized: bool = False) -> Dict[str, Any]:
     batch = {
         "batch_id": "b%03d" % batch_number,
@@ -112,8 +121,16 @@ def plan_batches(
     units = _batch_units(operations, atomic_groups)
     batches: List[Dict[str, Any]] = []
     current: List[int] = []
+    current_is_relink = False
     for unit in units:
         unit_size = len(unit)
+        unit_is_relink = _is_relink_barrier_op(operations[unit[0]])
+        if current and unit_is_relink != current_is_relink:
+            # relink barrier: never share a batch across the append/relink
+            # boundary (see _is_relink_barrier_op).
+            batches.append(_make_batch(len(batches), current))
+            current = []
+        current_is_relink = unit_is_relink
         if unit_size > max_ops_per_batch:
             if current:
                 batches.append(_make_batch(len(batches), current))
@@ -194,6 +211,20 @@ def validate_plan(plan: Dict[str, Any], operations: List[Dict[str, Any]]) -> Lis
                 "atomic group split across batches for block %r: %s"
                 % (group["block_name"], group["op_indices"])
             )
+
+    for batch_number, batch in enumerate(batches):
+        op_indices = batch.get("op_indices")
+        if not isinstance(op_indices, list):
+            continue
+        kinds_in_batch = {
+            _is_relink_barrier_op(operations[i])
+            for i in op_indices
+            if isinstance(i, int) and 0 <= i < len(operations)
+        }
+        if len(kinds_in_batch) > 1:
+            violations.append(
+                "batch %s mixes relink ops with non-relink ops (handle ledger "
+                "cannot cover same-batch appends)" % batch.get("batch_id", batch_number))
 
     totals = plan.get("totals")
     if not isinstance(totals, dict):

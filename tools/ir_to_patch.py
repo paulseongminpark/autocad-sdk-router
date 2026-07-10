@@ -108,6 +108,7 @@ def build_patch_from_ir(ir: Dict[str, Any], target_dwg: Dict[str, Any], patch_id
     active_block_defs: List[str] = []
     block_def_step_counts: Dict[int, int] = {}
     cycle_notes_seen: set = set()
+    relink_ops: List[Dict[str, Any]] = []
 
     def _emit_block_name(block_name: Any) -> Any:
         return anon_remap.get(block_name, block_name)
@@ -215,6 +216,12 @@ def build_patch_from_ir(ir: Dict[str, Any], target_dwg: Dict[str, Any], patch_id
                 next_step += 1
             block_def_step_counts[root_entity_index] = next_step
             deferred.extend(bd_deferred)
+            # Assoc relink (P3, docs/ASSOC_RELINK_DESIGN.md): collected here
+            # per emitted def but appended to the op stream LAST (below), so
+            # every boundary source in every def exists before any relink job
+            # runs. Args carry CENSUS handles; patch_engine translates.
+            relink_ops.extend(
+                patch_ops.blocks.relink_hatch_assoc_ops(_block_def_for_emit(block_name)))
             emitted_block_defs.add(block_name)
             remapped_name = anon_remap.get(block_name)
             if remapped_name:
@@ -283,6 +290,12 @@ def build_patch_from_ir(ir: Dict[str, Any], target_dwg: Dict[str, Any], patch_id
             xdata_op["step_id"] = "xd%d" % j
             ops.append(xdata_op)
         deferred.extend(xdata_deferred)
+    # Relink jobs are the absolute tail of the stream: every append (entity,
+    # def, sweep, xdata) precedes them, so the engine's handle ledger is
+    # complete for every source they will translate.
+    for j, relink_op in enumerate(relink_ops):
+        relink_op["step_id"] = "rl%d" % j
+        ops.append(relink_op)
     patch = {
         "schema": "ariadne.cad_patch.v1",
         "patch_id": patch_id,

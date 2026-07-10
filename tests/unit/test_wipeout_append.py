@@ -58,6 +58,10 @@ def test_representable_wipeout_emits_cert_proven_payload():
             },
             "layer": ent["layer"],
         },
+        # census identity ledger (P3 assoc-relink arc): every append op carries
+        # its census handle so the engine can pair it with the result's
+        # new_handle in handle_map.json.
+        "source": {"handle": ent["handle"]},
     }
 
     ops, deferred = patch_ops_blocks.block_def_ops(

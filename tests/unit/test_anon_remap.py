@@ -121,7 +121,15 @@ def test_anonymous_clone_name_collision_gets_suffix():
     assert deferred == []
     assert patch["anon_remap"] == {"*U172": "ARIADNE_ANON_U172_2"}
     assert patch["operations"][0]["args"]["name"] == "ARIADNE_ANON_U172_2"
-    assert patch["operations"][-1]["args"]["block_name"] == "ARIADNE_ANON_U172_2"
+    # operations[-1] is no longer the INSERT: the orphan-def sweep (R4t)
+    # appends the never-INSERTed named def ARIADNE_ANON_U172 after the entity
+    # stream. Address the INSERT explicitly.
+    inserts = [op for op in patch["operations"]
+               if op["operation"] == "create_blockref"]
+    assert inserts and inserts[-1]["args"]["block_name"] == "ARIADNE_ANON_U172_2"
+    sweep_defs = {op["args"]["name"] for op in patch["operations"]
+                  if op["operation"] == "create_block"}
+    assert "ARIADNE_ANON_U172" in sweep_defs  # authored orphan def carried
 
 
 def test_missing_and_cycle_targets_still_defer_honestly():

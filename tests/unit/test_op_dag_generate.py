@@ -81,7 +81,8 @@ class TestOpDagBuild(unittest.TestCase):
         # wave-7 adds four headless python ops (inspect.entity.identity_contract,
         # inspect.xdata.semantic_anchor, run.corpus.batch, verify.cross_engine.dwg)
         # -- 541 -> 545. w7-native adds five (materials x3 + annoscale x2) -- 545 -> 550.
-        self.assertEqual(len(self.nodes), 550, "operations.v2.json is currently 550 ops; a "
+        # P3 assoc-relink adds write.block.relink_hatch_assoc -- 550 -> 551.
+        self.assertEqual(len(self.nodes), 551, "operations.v2.json is currently 551 ops; a "
                                                 "count drift here means the catalogue changed "
                                                 "underneath this test, not a generator bug")
 

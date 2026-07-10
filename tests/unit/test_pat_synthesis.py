@@ -119,7 +119,13 @@ def test_batch_pat_synthesis_writes_exact_content_and_dedupes_names(monkeypatch,
 
     pe._build_native_batch_script(str(batch_dir), "b001", records)
 
-    pat_path = (batch_dir / "H3.pat").resolve()
+    # R4t vintage contract: .pat files live under pats/<digest>/<NAME>.pat
+    # (leaf name stays <NAME>.pat for cwd resolution; vintages separate by
+    # DIRECTORY). Identical zero-phase content -- here the same definitions
+    # under case-variant names -- dedupes to ONE file.
+    pat_paths = sorted(batch_dir.glob("pats/*/H3.pat"))
+    assert len(pat_paths) == 1
+    pat_path = pat_paths[0].resolve()
     # The .pat is zero-phase: every row is rebased against the seed row's
     # base (row1 [0, 1.25] -> [0, 0]; row2 [2, -3] -> [2, -4.25]) so the
     # per-hatch phase rides HPORIGIN instead of the name-shared .pat (R4n
@@ -130,7 +136,6 @@ def test_batch_pat_synthesis_writes_exact_content_and_dedupes_names(monkeypatch,
         "90, 0, 0, 0, 2.5, 0.5, -0.25, 0\n"
         "30, 2, -4.25, 2.38125, 4.1244459855, -1.25, 0.625\n"
     )
-    assert [path.name for path in batch_dir.glob("*.pat")] == ["H3.pat"]
 
     job_paths = sorted((batch_dir / "jobs").glob("*.json"))
     assert len(job_paths) == 2
@@ -140,6 +145,36 @@ def test_batch_pat_synthesis_writes_exact_content_and_dedupes_names(monkeypatch,
         assert entity["pattern_pat_path"] == pat_path.as_posix()
         assert os.path.isabs(entity["pattern_pat_path"])
         assert "\\" not in entity["pattern_pat_path"]
+
+
+def test_batch_pat_synthesis_separates_vintages_by_digest_dir(tmp_path):
+    # The H3 clobber defect (R4s, 154 X-grid hatches rendered as plus-grid):
+    # same NAME + DIFFERENT row geometry must produce TWO files in different
+    # digest dirs, each job pointing at its own vintage.
+    defs_a = _pattern_definitions()
+    defs_b = [{"angle": 0.25, "base": [0.0, 0.0], "offset": [0.0, 3.0],
+               "dashes": [1.0, -0.5]}]
+    op_a = {"operation": "append_block_entity",
+            "args": {"block_name": "B", "layer": "0",
+                     "entity": patch_ops_blocks._def_entity_append_op(
+                         "B", _custom_hatch(pattern_name="H3",
+                                            pattern_definitions=defs_a),
+                     )["args"]["entity"]}}
+    op_b = {"operation": "append_block_entity",
+            "args": {"block_name": "B", "layer": "0",
+                     "entity": patch_ops_blocks._def_entity_append_op(
+                         "B", _custom_hatch(pattern_name="H3",
+                                            pattern_definitions=defs_b),
+                     )["args"]["entity"]}}
+
+    out = pe._synthesize_batch_pat_files(str(tmp_path), [op_a, op_b])
+
+    assert len(out) == 2
+    paths = sorted(Path(p) for p in out.values())
+    assert [p.name for p in paths] == ["H3.pat", "H3.pat"]
+    assert paths[0].parent != paths[1].parent
+    assert (op_a["args"]["entity"]["pattern_pat_path"]
+            != op_b["args"]["entity"]["pattern_pat_path"])
 
 
 def test_pat_lines_divide_out_baked_scale_and_never_emit_scientific_notation(tmp_path):
@@ -158,8 +193,9 @@ def test_pat_lines_divide_out_baked_scale_and_never_emit_scientific_notation(tmp
     ]
     op = {"operation": "append_block_entity",
           "args": {"block_name": "B", "layer": "0", "entity": geom}}
-    pe._synthesize_batch_pat_files(str(tmp_path), [op])
-    text = (tmp_path / "H3.pat").read_text(encoding="utf-8")
+    out = pe._synthesize_batch_pat_files(str(tmp_path), [op])
+    assert len(out) == 1
+    text = Path(next(iter(out.values()))).read_text(encoding="utf-8")
     assert "e-" not in text and "E-" not in text
     line = text.splitlines()[1]
     fields = [f.strip() for f in line.split(",")]

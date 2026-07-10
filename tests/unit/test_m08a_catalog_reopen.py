@@ -145,8 +145,9 @@ class TestM08ACatalogReopen(unittest.TestCase):
         # w6-dynblk x3, w6-section x3) -- 465 -> 479; w6-sheetset x2 are blocked.
         # wave-7 adds 4 implemented headless python ops (identity_contract,
         # semantic_anchor, corpus.batch, cross_engine) -- 479 -> 483; w7-native
-        # materials x3 + annoscale x2 -- 483 -> 488.
-        self.assertEqual(by_status.get("implemented", 0), 488)
+        # materials x3 + annoscale x2 -- 483 -> 488; P3 assoc-relink
+        # (write.block.relink_hatch_assoc) -- 488 -> 489.
+        self.assertEqual(by_status.get("implemented", 0), 489)
         self.assertEqual(by_status.get("blocked", 0), 62)
         # W6-SHEETSET added two new blocked synthetic COM read records for the
         # measured Sheet Set Manager gap; implemented count is unchanged.

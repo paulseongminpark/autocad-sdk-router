@@ -40,7 +40,9 @@ def test_build_report_counts_modified_and_removed_by_kind():
             "H1",
             "HATCH",
             "hatch",
-            is_associative=True,
+            # pattern_scale is the REAL difference driving the modified pair:
+            # the original is_associative-flag difference stopped counting
+            # when LEX-0008 legislated the sourceless-flag fold (R4r/R4s).
             pattern_name="SOLID",
             pattern_scale=1.0,
             pattern_type=1.0,
@@ -57,9 +59,8 @@ def test_build_report_counts_modified_and_removed_by_kind():
             "H9",
             "HATCH",
             "hatch",
-            is_associative=False,
             pattern_name="SOLID",
-            pattern_scale=1.0,
+            pattern_scale=2.0,
             pattern_type=1.0,
             is_solid_fill=False,
             loops=[{"index": 0, "loop_type": 16, "closed": True}],

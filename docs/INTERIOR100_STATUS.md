@@ -32,7 +32,7 @@ interior-100 프로그램의 현재 상태 도시에(dossier). 측정 사다리,
 1. append op에 `source_handle` 원장 추가 (`ir_to_patch`) — census→post 핸들 대응을 op↔result(`new_handle`)로 명시화.
 2. op 스트림 말미에 `write.block.relink_hatch_assoc` 방출 (census 핸들 payload) — 전 소스가 이미 생성된 뒤 실행됨 (Step C 순서 충족).
 3. `patch_engine`: 배치 결과에서 원장 축적 → relink job 방출 시 census→post 치환, 미해석은 loud FAIL.
-4. 네이티브 핸들러: 핸들→ObjectId, `setAssociative(kTrue)` + per-loop `setAssocObjIdsAt` + 소스에 persistent reactor. 미니 E2E 프로브로 선검증 후 풀비행.
+4. 네이티브 핸들러: 핸들→ObjectId, `setAssociative(true)` + per-loop **id-derived loop 교체**(`removeLoopAt`+`insertLoopAt(int, type, AcDbObjectIdArray)` — ObjectARX 2027엔 per-loop assoc setter가 없음, id-derived insert 오버로드가 유일한 쓰기 경로) + `evaluateHatch` + 소스에 persistent reactor. 미니 E2E 프로브로 선검증 후 풀비행.
 5. 측정: LEX-0011(candidate) — canonical payload = per-loop cardinality; 정확 대응 검증은 post-flight assoc audit(양측 IR join + kind multiset)으로.
 6. prereg_R4v: 27,057 + 66 = **27,123** 대역 [27,118, 27,123] (천장 27,130 − loops 7) — 발사 전 커밋.
 

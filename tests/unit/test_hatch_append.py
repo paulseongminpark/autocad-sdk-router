@@ -67,6 +67,9 @@ def test_hatch_serializer_emits_real_pattern_fields_and_loops_verbatim():
                 "loops": geom["loops"],
             },
         },
+        # census identity ledger (P3 assoc-relink arc): pairs with the
+        # result's new_handle in handle_map.json.
+        "source": {"handle": ent["handle"]},
     }
 
 
@@ -106,6 +109,7 @@ def test_face3d_serializer_emits_four_corners_and_visibility():
                 "edge_visibility": geom["edge_visibility"],
             },
         },
+        "source": {"handle": ent["handle"]},
     }
 
 

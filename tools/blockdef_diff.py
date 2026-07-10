@@ -226,24 +226,35 @@ def _canonical_entity(entity: Dict[str, Any],
         if g.get("pattern_definitions"):
             canon_g = _canonical_hatch_geometry(canon_g)
         # Orphan-assoc quotient (LEX-0008, R4r runs/e2e_1dwg_R4r_assoc_20260710;
-        # gate widened on R4s): is_associative is a DERIVED flag -- it only has
-        # semantics when boundary source refs exist. 1.dwg carries 66 patterned
-        # hatches AND 3 SOLID fills (R4s dissection, def X-FORM_...$0$dA logo)
-        # with the flag set and NO sources anywhere (3-way probe: getAssocObjIds
-        # 0/66, getAssocObjIdsAt 0/66, LibreDWG DXF no group 97/330), and the
-        # engine RESETS a sourceless flag on save (R4r measured: job True ->
-        # saved False). A state no engine path can reproduce is notation, not
-        # geometry: when a hatch has no assoc_source_handles the flag drops
-        # from comparison on BOTH sides -- for EVERY hatch. The R4r
-        # implementation hid this fold behind the pattern_definitions gate;
-        # the 3 SOLID pairs measured on R4s were exactly the gap. Hatches with
-        # real sources keep the flag AND compare the handle payload.
-        # Substitute verifier: visual gate (associativity has no render
-        # effect) + assoc_source_handles round-trip when present.
+        # gate widened on R4s; observation corrected on R4u -- the 0/66 probes
+        # had flown a stale binary, docs/ASSOC_ORPHAN_FINDING.md retraction):
+        # is_associative is a DERIVED flag -- it only has semantics when
+        # boundary source refs exist. A sourceless flag cannot survive save
+        # (R4u measured with the LIVE flag replay: job True -> saved False,
+        # 258/258), so when a hatch has no assoc_source_handles the flag drops
+        # from comparison on BOTH sides -- for EVERY hatch. Hatches with real
+        # sources keep the flag AND compare the source payload (below).
         if "is_associative" in canon_g and not canon_g.get("assoc_source_handles"):
             if canon_g is g:
                 canon_g = dict(g)
             canon_g.pop("is_associative")
+        # Assoc payload quotient (LEX-0011, R4u): handle IDENTITY is not
+        # rebuild-stable -- a rebuild mints fresh handles, so raw handle
+        # strings can never match across census and rebuild (same category as
+        # *D cache names, LEX-0001, and anonymous block names). Canonical
+        # form: per-loop source CARDINALITY, order-aligned to loops[]. A
+        # relink to wrong-but-same-count sources still fingerprint-matches --
+        # that residual risk rides the substitute verifier (post-flight assoc
+        # audit: pairing + per-loop source-kind multisets + the
+        # source_handle->new_handle ledger), not the fingerprint.
+        srcs = canon_g.get("assoc_source_handles")
+        if isinstance(srcs, list) and srcs:
+            if canon_g is g:
+                canon_g = dict(g)
+            canon_g.pop("assoc_source_handles")
+            canon_g["assoc_loop_source_counts"] = [
+                len(loop) if isinstance(loop, list) else -1 for loop in srcs
+            ]
         if canon_g is not g:
             if canon is entity:
                 canon = dict(entity)

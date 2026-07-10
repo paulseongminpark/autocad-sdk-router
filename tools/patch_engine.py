@@ -721,7 +721,8 @@ def _resolve_native_write_op(patch: Dict[str, Any]) -> Tuple[Optional[Dict[str, 
     if native_op is None:
         return None, _unknown_patch_op_reason(patch_op, live_map)
     return ({"index": 0, "step_id": op.get("step_id"), "patch_op": patch_op,
-             "native_op": native_op, "args": op.get("args", {}) or {}}, None)
+             "native_op": native_op, "args": op.get("args", {}) or {},
+             "source": op.get("source")}, None)
 
 
 def _resolve_native_write_ops(
@@ -755,7 +756,11 @@ def _resolve_native_write_ops(
                              "reason": _unknown_patch_op_reason(patch_op, live_map)})
             continue
         applied.append({"index": i, "step_id": op.get("step_id"), "patch_op": patch_op,
-                        "native_op": native_op, "args": op.get("args", {}) or {}})
+                        "native_op": native_op, "args": op.get("args", {}) or {},
+                        # Census identity ledger: rides op["source"]={"handle"}
+                        # into _record_handle_map_entry so append results pair
+                        # census handle -> new_handle in handle_map.json.
+                        "source": op.get("source")})
     return applied, deferred, None
 
 
@@ -824,6 +829,64 @@ def _prepare_batched_records(op_records: List[Dict[str, Any]]) -> List[Dict[str,
         enriched["batch_marker_id"] = _batch_marker_id(op_record, seen)
         prepared.append(enriched)
     return prepared
+
+
+_RELINK_NATIVE_OP = "write.block.relink_hatch_assoc"
+
+
+def _translate_relink_records(
+        op_records: List[Dict[str, Any]],
+        handle_map_doc: Dict[str, Any]) -> Tuple[Optional[List[Dict[str, Any]]], Optional[str]]:
+    """Swap the CENSUS handles in relink-op args for REBUILT-drawing handles.
+
+    Relink ops are authored with census handles (patch_ops.blocks.
+    relink_hatch_assoc_ops) because rebuilt handles do not exist until the
+    append batches have run. Called per batch AFTER earlier batches populated
+    ``handle_map_doc["pairs"]`` (source_handle -> new_handle ledger); the batch
+    planner guarantees a relink op never shares a batch with the appends it
+    depends on (_is_relink_barrier_op). Returns (translated_records, None), or
+    (None, reason) when any census handle has no ledger entry -- a miss means
+    that source was never successfully appended, and relinking a hatch against
+    guessed object ids would be a fake success (ASSOC_RELINK_UNRESOLVED,
+    docs/ASSOC_RELINK_DESIGN.md failure modes).
+    """
+    pairs = handle_map_doc.get("pairs") or {}
+    out: List[Dict[str, Any]] = []
+    for rec in op_records:
+        if rec.get("native_op") != _RELINK_NATIVE_OP:
+            out.append(rec)
+            continue
+        args = rec.get("args") or {}
+        missing: List[str] = []
+        hatch_census = _handle_token(args.get("hatch_handle"))
+        hatch_new = pairs.get(hatch_census) if hatch_census else None
+        if not hatch_new:
+            missing.append(hatch_census or "<missing hatch_handle>")
+        loops_new: List[List[str]] = []
+        for loop_srcs in (args.get("loops_source_handles") or []):
+            loop_new: List[str] = []
+            for h in (loop_srcs or []):
+                tok = _handle_token(h)
+                mapped = pairs.get(tok) if tok else None
+                if not mapped:
+                    missing.append(tok or "<malformed handle>")
+                else:
+                    loop_new.append(mapped)
+            loops_new.append(loop_new)
+        if missing:
+            return None, (
+                "ASSOC_RELINK_UNRESOLVED: no rebuilt handle for census handle(s) "
+                "%s (op index %s, block %r): the ledger maps successfully "
+                "appended entities only -- refusing to relink against guesses"
+                % (sorted(set(missing)), rec.get("index"),
+                   args.get("block_name")))
+        translated = dict(rec)
+        new_args = dict(args)
+        new_args["hatch_handle"] = hatch_new
+        new_args["loops_source_handles"] = loops_new
+        translated["args"] = new_args
+        out.append(translated)
+    return out, None
 
 
 def _format_pat_number(value: Any) -> str:
@@ -1618,6 +1681,18 @@ def apply_staged(patch: Dict[str, Any], dwg_path: str, out_dir: str,
     op_results_all: List[Dict[str, Any]] = []
     batch_count_used: Optional[int] = None
     if batch_size is None:
+        relink_record = next((r for r in applied_records
+                              if r.get("native_op") == _RELINK_NATIVE_OP), None)
+        if relink_record is not None:
+            reason = ("relink_hatch_assoc requires batch mode: the census->rebuilt "
+                      "handle ledger is only accumulated from batched op results "
+                      "(pass --batch-size); refusing the non-batched path")
+            _step("apply", "blocked", reason=reason)
+            return _finish(_result_envelope(
+                "blocked", patch_id=patch_id, out_dir=out_dir,
+                journal_path=journal_path, artifacts=artifacts,
+                original_unchanged=_original_unchanged(), reason=reason,
+                deferred_ops=deferred_ops))
         for n, op_record in enumerate(applied_records):
             apply_dir = os.path.join(out_dir, "apply", "op_%02d" % n)
             os.makedirs(apply_dir, exist_ok=True)
@@ -1675,6 +1750,20 @@ def apply_staged(patch: Dict[str, Any], dwg_path: str, out_dir: str,
                 continue
             batch_count_used += 1
             prepared_records = _prepare_batched_records(batch_records)
+            prepared_records, relink_reason = _translate_relink_records(
+                prepared_records, handle_map_doc)
+            if relink_reason:
+                _step("apply_batch[%s]" % batch_id, "partial", reason=relink_reason)
+                return _finish(_result_envelope(
+                    "partial", patch_id=patch_id, out_dir=out_dir,
+                    journal_path=journal_path, artifacts=artifacts,
+                    original_unchanged=_original_unchanged(),
+                    reason="apply batch %s refused: %s" % (batch_id, relink_reason),
+                    deferred_ops=deferred_ops,
+                    extra={"applied_ops": applied_ok,
+                           "op_results": op_results_all,
+                           "batch_count": batch_count_used,
+                           "batch_size": batch_size}))
             apply_dir = os.path.join(out_dir, "apply", batch_id)
             os.makedirs(apply_dir, exist_ok=True)
             batch_run = _run_batched_native_ops(

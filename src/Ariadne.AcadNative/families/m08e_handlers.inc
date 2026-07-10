@@ -56,6 +56,7 @@ static const char* const kM08eOpRegappRegister = "write.regapp.register";
 static const char* const kM08eOpDictionarySet  = "write.dictionary.set";
 static const char* const kM08eOpEntitySetXdata = "write.entity.set_xdata";
 static const char* const kM08eOpBlockAppend    = "write.block.append_entity";
+static const char* const kM08eOpRelinkAssoc    = "write.block.relink_hatch_assoc";
 static const char* const kM08eOpDeepClone      = "transform.database.deep_clone";
 static const char* const kM08eOpInsertBlock    = "transform.database.insert_block";
 
@@ -72,6 +73,7 @@ static bool m08eHasOp(const std::string& op)
         || op == kM08eOpDictionarySet
         || op == kM08eOpEntitySetXdata
         || op == kM08eOpBlockAppend
+        || op == kM08eOpRelinkAssoc
         || op == kM08eOpDeepClone
         || op == kM08eOpInsertBlock;
 }
@@ -1731,13 +1733,15 @@ static AcDbEntity* m08eBuildExtendedEntityForAppend(AcDbDatabase* pDb,
                    + "' loaded 0 definition lines (pat not resolved by search path)";
             return nullptr;
         }
-        // Faithful associativity replay (2026-07-10): 1.dwg carries 66 hatches
-        // with is_associative=true and NO boundary source refs anywhere --
-        // cross-verified ObjectARX getAssocObjIds/getAssocObjIdsAt both 0/66
-        // AND LibreDWG DXF shows no group 97/330 source refs (orphan-assoc).
-        // Copying the flag reproduces the original state exactly; a real
-        // re-link is impossible because the sources do not exist in the
-        // source drawing (docs/ASSOC_RELINK_DESIGN.md failure-mode ledger).
+        // Associativity at CREATE time is flag-only and does NOT survive save
+        // without sources (measured R4u: job true -> saved false, 258/258).
+        // The orphan premise behind the original flag-copy is RETRACTED
+        // (docs/ASSOC_ORPHAN_FINDING.md): the 0/66 probes flew a stale binary;
+        // the sources are real and per-loop readable. The REAL re-link happens
+        // after the append pass via write.block.relink_hatch_assoc
+        // (m08eHandleRelinkHatchAssoc below), which sets the ids + persistent
+        // reactors so the flag persists. The flag replay here stays harmless
+        // (kFalse-equivalent after save) and keeps the job payload contract.
         bool isAssociativeIn = false;
         m08eFindFlag(entityJson, "is_associative", isAssociativeIn);
         es = pHatch->setAssociative(isAssociativeIn ? Adesk::kTrue : Adesk::kFalse);
@@ -2255,6 +2259,212 @@ static bool m08eHandleDeepClone(const AriadneJobCtx& ctx, std::ostringstream& r)
     return true;
 }
 
+// "loops_source_handles": [["1BD9"],["1BE1","1BE0"],...] -- outer array aligned
+// to the hatch's loops[] (the loop-local extraction contract of
+// assoc_source_handles), each inner array the handle strings of that loop's
+// boundary sources. Same hand-rolled scanning idiom as m08eReadHatchLoops.
+static bool m08eReadLoopsSourceHandles(const std::string& json,
+                                       std::vector<std::vector<std::string>>& out)
+{
+    out.clear();
+    size_t lb = 0, rb = 0;
+    if (!m08eFindArrayBounds(json, "loops_source_handles", lb, rb))
+        return false;
+    size_t scan = lb + 1;
+    while (scan < rb) {
+        while (scan < rb && (json[scan] == ',' || m08eIsJsonSpace(json[scan])))
+            ++scan;
+        if (scan >= rb)
+            break;
+        if (json[scan] != '[')
+            return false;
+        const size_t ie = m08eFindMatchingJsonDelimiter(json, scan, '[', ']');
+        if (ie == std::string::npos || ie > rb)
+            return false;
+        std::vector<std::string> loop;
+        size_t s = scan + 1;
+        while (s < ie) {
+            while (s < ie && (json[s] == ',' || m08eIsJsonSpace(json[s])))
+                ++s;
+            if (s >= ie)
+                break;
+            if (json[s] != '"')
+                return false;
+            size_t e = s + 1;
+            while (e < ie && json[e] != '"') {
+                if (json[e] == '\\')
+                    ++e;
+                ++e;
+            }
+            if (e >= ie)
+                return false;
+            loop.push_back(json.substr(s + 1, e - s - 1));
+            s = e + 1;
+        }
+        out.push_back(loop);
+        scan = ie + 1;
+    }
+    return !out.empty();
+}
+
+// write.block.relink_hatch_assoc: re-arm hatch associativity AFTER the append
+// pass (P3 assoc-relink arc, docs/ASSOC_RELINK_DESIGN.md Step B1). The job
+// carries REBUILT-drawing handles -- patch_engine translates the census
+// handles through its append-result ledger before this job is written, so
+// this handler never sees a census handle. Steps: open the hatch kForWrite,
+// verify the loop count matches the payload, resolve EVERY source id first
+// (all-or-nothing per hatch), setAssociative(kTrue), setAssocObjIdsAt per
+// loop, then addPersistentReactor(hatch) on each source -- the reactor is
+// what makes the association real; a sourceless flag does not survive save
+// (measured R4u: job true -> saved false, 258/258). Every failure mode is a
+// loud ASSOC_RELINK_* error (design doc's failure-mode ledger), never a
+// silent skip. Like write.block.append_entity, mutates ctx.pDb directly (no
+// staged-write wrapper): the router job already operates on the staged copy
+// and the ORIGINAL file is protected by the write_mode policy layer.
+static bool m08eHandleRelinkHatchAssoc(const AriadneJobCtx& ctx, std::ostringstream& r)
+{
+    std::string hatchHandle;
+    if (!jsonFindString(ctx.job, "hatch_handle", hatchHandle) || hatchHandle.empty()) {
+        emitNativeError(r, "MISSING_ARG",
+                        "write.block.relink_hatch_assoc requires 'hatch_handle'");
+        return true;
+    }
+    std::vector<std::vector<std::string>> loopsSources;
+    if (!m08eReadLoopsSourceHandles(ctx.job, loopsSources)) {
+        emitNativeError(r, "MISSING_ARG",
+                        "write.block.relink_hatch_assoc requires 'loops_source_handles' "
+                        "(array of per-loop handle-string arrays)");
+        return true;
+    }
+    AcDbObjectId hatchId = AcDbObjectId::kNull;
+    if (!resolveHandle(ctx.pDb, hatchHandle, hatchId)) {
+        emitNativeError(r, "ASSOC_RELINK_HATCH_NOT_FOUND",
+                        "no object with handle '" + hatchHandle + "'");
+        return true;
+    }
+    AcDbEntity* pEnt = nullptr;
+    Acad::ErrorStatus es = acdbOpenObject(pEnt, hatchId, AcDb::kForWrite);
+    if (es != Acad::eOk || pEnt == nullptr) {
+        emitNativeError(r, "ASSOC_RELINK_HATCH_OPEN_FAILED",
+                        "acdbOpenObject('" + hatchHandle + "') errorstatus "
+                        + std::to_string(static_cast<int>(es)));
+        return true;
+    }
+    AcDbHatch* pHatch = AcDbHatch::cast(pEnt);
+    if (pHatch == nullptr) {
+        pEnt->close();
+        emitNativeError(r, "ASSOC_RELINK_NOT_A_HATCH",
+                        "object '" + hatchHandle + "' is not an AcDbHatch");
+        return true;
+    }
+    const int numLoops = pHatch->numLoops();
+    if (numLoops != static_cast<int>(loopsSources.size())) {
+        pHatch->close();
+        emitNativeError(r, "ASSOC_RELINK_LOOP_MISMATCH",
+                        "hatch '" + hatchHandle + "' has "
+                        + std::to_string(numLoops) + " loops but payload carries "
+                        + std::to_string(loopsSources.size()));
+        return true;
+    }
+    // Resolve every source BEFORE mutating anything: all-or-nothing per hatch.
+    std::vector<AcDbObjectIdArray> loopIds(loopsSources.size());
+    for (size_t i = 0; i < loopsSources.size(); ++i) {
+        for (size_t k = 0; k < loopsSources[i].size(); ++k) {
+            AcDbObjectId sid = AcDbObjectId::kNull;
+            if (!resolveHandle(ctx.pDb, loopsSources[i][k], sid)) {
+                pHatch->close();
+                emitNativeError(r, "ASSOC_RELINK_SOURCE_NOT_FOUND",
+                                "loop " + std::to_string(i) + " source handle '"
+                                + loopsSources[i][k] + "' does not resolve");
+                return true;
+            }
+            loopIds[i].append(sid);
+        }
+    }
+    // ObjectARX 2027 has NO per-loop assoc SETTER (dbhatch.h association
+    // methods: getAssocObjIdsAt / getAssocObjIds / removeAssocObjIds only).
+    // The WRITE path is the id-derived loop overload under "Hatch Association
+    // Methods": insertLoopAt(int, Adesk::Int32, const AcDbObjectIdArray&).
+    // Re-arm by REPLACING each geometric loop with an id-derived loop at the
+    // same index and type -- the same (type, ids) pairing the original
+    // drawing's own associative hatches store; the loop geometry re-derives
+    // from the rebuilt boundary sources, which themselves round-trip diff0.
+    es = pHatch->setAssociative(true);
+    if (es != Acad::eOk) {
+        pHatch->close();
+        emitNativeError(r, "ASSOC_RELINK_SET_ASSOC_FAILED",
+                        "setAssociative(true) errorstatus "
+                        + std::to_string(static_cast<int>(es)));
+        return true;
+    }
+    int sourcesLinked = 0;
+    int loopsReplaced = 0;
+    for (int i = 0; i < numLoops; ++i) {
+        if (loopIds[static_cast<size_t>(i)].isEmpty())
+            continue;  // per-loop empty list = that loop stays underived (contract)
+        const Adesk::Int32 loopType = pHatch->loopTypeAt(i);
+        es = pHatch->removeLoopAt(i);
+        if (es != Acad::eOk) {
+            pHatch->close();
+            emitNativeError(r, "ASSOC_RELINK_REMOVE_LOOP_FAILED",
+                            "removeLoopAt(" + std::to_string(i) + ") errorstatus "
+                            + std::to_string(static_cast<int>(es)));
+            return true;
+        }
+        es = pHatch->insertLoopAt(i, loopType, loopIds[static_cast<size_t>(i)]);
+        if (es != Acad::eOk) {
+            pHatch->close();
+            emitNativeError(r, "ASSOC_RELINK_INSERT_LOOP_FAILED",
+                            "insertLoopAt(" + std::to_string(i) + ", ids) errorstatus "
+                            + std::to_string(static_cast<int>(es))
+                            + " (loop " + std::to_string(i)
+                            + " removed but not re-inserted -- batch aborts, run is partial)");
+            return true;
+        }
+        sourcesLinked += loopIds[static_cast<size_t>(i)].length();
+        ++loopsReplaced;
+    }
+    if (loopsReplaced > 0) {
+        es = pHatch->evaluateHatch();
+        if (es != Acad::eOk) {
+            pHatch->close();
+            emitNativeError(r, "ASSOC_RELINK_EVALUATE_FAILED",
+                            "evaluateHatch after loop replacement errorstatus "
+                            + std::to_string(static_cast<int>(es)));
+            return true;
+        }
+    }
+    int reactorsAdded = 0;
+    for (size_t i = 0; i < loopIds.size(); ++i) {
+        for (int k = 0; k < loopIds[i].length(); ++k) {
+            AcDbEntity* pSrc = nullptr;
+            es = acdbOpenObject(pSrc, loopIds[i].at(k), AcDb::kForWrite);
+            if (es != Acad::eOk || pSrc == nullptr) {
+                pHatch->close();
+                emitNativeError(r, "ASSOC_RELINK_SOURCE_OPEN_FAILED",
+                                "loop " + std::to_string(i) + " source open errorstatus "
+                                + std::to_string(static_cast<int>(es)));
+                return true;
+            }
+            pSrc->addPersistentReactor(hatchId);
+            pSrc->close();
+            ++reactorsAdded;
+        }
+    }
+    const bool assocAfter = pHatch->associative();
+    pHatch->close();
+    r << "\"result\":{\"relinked\":true"
+      << ",\"hatch_handle\":" << njsonStr(hatchHandle)
+      << ",\"loops\":" << numLoops
+      << ",\"loops_replaced\":" << loopsReplaced
+      << ",\"sources_linked\":" << sourcesLinked
+      << ",\"reactors_added\":" << reactorsAdded
+      << ",\"associative_after\":" << (assocAfter ? "true" : "false")
+      << ",\"errorstatus\":0"
+      << "},\"status\":\"ok\"}";
+    return true;
+}
+
 static bool m08eDispatch(const std::string& op, const AriadneJobCtx& ctx, std::ostringstream& r)
 {
     if (op == kM08eOpEntityXdata)
@@ -2279,6 +2489,8 @@ static bool m08eDispatch(const std::string& op, const AriadneJobCtx& ctx, std::o
         return m08eHandleEntitySetXdata(ctx, r);
     if (op == kM08eOpBlockAppend)
         return m08eHandleBlockAppend(ctx, r);
+    if (op == kM08eOpRelinkAssoc)
+        return m08eHandleRelinkHatchAssoc(ctx, r);
     if (op == kM08eOpDeepClone)
         return m08eHandleDeepClone(ctx, r);
     if (op == kM08eOpInsertBlock)

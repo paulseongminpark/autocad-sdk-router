@@ -65,6 +65,9 @@ def test_existing_four_kinds_are_unchanged():
         assert op == {
             "operation": "append_block_entity",
             "args": {"block_name": "BLK", "entity": expected, "layer": ent["layer"]},
+            # census identity ledger (P3 assoc-relink arc): pairs with the
+            # result's new_handle in handle_map.json.
+            "source": {"handle": ent["handle"]},
         }
 
 

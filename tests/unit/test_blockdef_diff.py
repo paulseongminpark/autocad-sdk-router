@@ -404,13 +404,63 @@ def test_hatch_orphan_assoc_flag_folds_when_no_sources():
     assert report["totals"]["diff0_total"] == 1
 
 
-def test_hatch_real_assoc_sources_still_compare():
+def test_hatch_assoc_payload_folds_on_per_loop_cardinality():
+    # LEX-0011 (R4u): handle identity is not rebuild-stable -- a rebuild mints
+    # fresh handles, so a faithful relink NEVER reproduces the raw strings.
+    # Same per-loop source cardinality = canonical match. (This test formerly
+    # asserted raw-handle compare -- that law punished perfect relinks.)
     a = _hatch("A1", ptype=2.0, scale=300.0, base=[0.0, 0.0], offset=[-1.0, 0.0])
     a["geometry"]["is_associative"] = True
     a["geometry"]["assoc_source_handles"] = [["2F3A", "2F3B"]]
     b = _hatch("B1", ptype=2.0, scale=300.0, base=[0.0, 0.0], offset=[-1.0, 0.0])
     b["geometry"]["is_associative"] = True
-    b["geometry"]["assoc_source_handles"] = [["9999", "2F3B"]]
+    b["geometry"]["assoc_source_handles"] = [["9999", "8888"]]
+
+    report = blockdef_diff.diff_block_definitions(_ir(_block("W", a)), _ir(_block("W", b)))
+
+    assert report["totals"]["diff0_total"] == 1
+
+
+def test_hatch_assoc_cardinality_difference_still_mismatches():
+    # A REAL payload difference (2 sources vs 1 on the same loop) survives
+    # the LEX-0011 fold.
+    a = _hatch("A1", ptype=2.0, scale=300.0, base=[0.0, 0.0], offset=[-1.0, 0.0])
+    a["geometry"]["is_associative"] = True
+    a["geometry"]["assoc_source_handles"] = [["2F3A", "2F3B"]]
+    b = _hatch("B1", ptype=2.0, scale=300.0, base=[0.0, 0.0], offset=[-1.0, 0.0])
+    b["geometry"]["is_associative"] = True
+    b["geometry"]["assoc_source_handles"] = [["9999"]]
+
+    report = blockdef_diff.diff_block_definitions(_ir(_block("W", a)), _ir(_block("W", b)))
+
+    assert report["totals"]["diff0_total"] == 0
+
+
+def test_hatch_assoc_vs_unlinked_rebuild_still_mismatches():
+    # The R4u unmask class: census carries sources, the rebuild does not
+    # relink at all. LEX-0011 must NOT fold this -- it is the real defect the
+    # relink arc repairs (census side keeps flag + counts, rebuild side has
+    # neither).
+    a = _hatch("A1", ptype=2.0, scale=300.0, base=[0.0, 0.0], offset=[-1.0, 0.0])
+    a["geometry"]["is_associative"] = True
+    a["geometry"]["assoc_source_handles"] = [["2F3A"]]
+    b = _hatch("B1", ptype=2.0, scale=300.0, base=[0.0, 0.0], offset=[-1.0, 0.0])
+    b["geometry"]["is_associative"] = False
+
+    report = blockdef_diff.diff_block_definitions(_ir(_block("W", a)), _ir(_block("W", b)))
+
+    assert report["totals"]["diff0_total"] == 0
+
+
+def test_hatch_assoc_loop_count_order_matters():
+    # Cardinality list is order-aligned to loops[]: [1,2] vs [2,1] is a REAL
+    # difference (sources attached to the wrong loops), not notation.
+    a = _hatch("A1", ptype=2.0, scale=300.0, base=[0.0, 0.0], offset=[-1.0, 0.0])
+    a["geometry"]["is_associative"] = True
+    a["geometry"]["assoc_source_handles"] = [["2F3A"], ["2F3B", "2F3C"]]
+    b = _hatch("B1", ptype=2.0, scale=300.0, base=[0.0, 0.0], offset=[-1.0, 0.0])
+    b["geometry"]["is_associative"] = True
+    b["geometry"]["assoc_source_handles"] = [["9999", "8888"], ["7777"]]
 
     report = blockdef_diff.diff_block_definitions(_ir(_block("W", a)), _ir(_block("W", b)))
 
