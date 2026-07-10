@@ -15,6 +15,7 @@ from __future__ import annotations
 
 import json
 import os
+import re
 import sys
 from typing import Any, Dict, List, Optional, Tuple
 
@@ -23,6 +24,11 @@ if _THIS_DIR not in sys.path:
     sys.path.insert(0, _THIS_DIR)
 
 import patch_ops  # per-family op-case dispatch (PLAN F9)
+
+# *D<n> anonymous defs are per-dimension rendered caches (LEX-0001): the
+# rebuilt drawing's dimensions mint their own fresh *D records, so census
+# caches are never re-emitted -- including by the orphan-def sweep below.
+_DIM_CACHE_NAME = re.compile(r"^\*D\d+$")
 from patch_ops.xdata import build_xdata_ops
 
 
@@ -254,6 +260,23 @@ def build_patch_from_ir(ir: Dict[str, Any], target_dwg: Dict[str, Any], patch_id
         ops.append(op)
         if ent.get("handle"):
             handle_map[ent.get("handle")] = op["step_id"]
+    if kinds is None:
+        # Orphan-def sweep (R4s removed-28 finding): reference-reachability
+        # alone misses defs that are authored content but never INSERTed --
+        # measured on 1.dwg: DIMDOT + _ArchTick (referenced only from *D
+        # dimension caches, which the rebuild intentionally never emits,
+        # LEX-0001) and two unreferenced defs (...$0$ins-l, ...$0$ng), 4 defs
+        # / 28 entities scored removed on every R4 run. Emit every remaining
+        # non-*D-cache definition after the entity stream so the rebuilt
+        # drawing carries the full authored block table. Skipped for
+        # kind-filtered (tiered) runs, which are deliberately partial.
+        sweep_root = len(ir.get("entities") or [])
+        for block_name in sorted(block_defs_by_name):
+            if block_name in emitted_block_defs:
+                continue
+            if _DIM_CACHE_NAME.match(block_name or ""):
+                continue
+            _emit_block_def(block_name, sweep_root)
     if include_xdata:
         xdata_ops, xdata_deferred = build_xdata_ops(ir, handle_map)
         for j, xdata_op in enumerate(xdata_ops):

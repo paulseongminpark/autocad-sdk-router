@@ -1442,6 +1442,13 @@ static AcDbEntity* m08eBuildExtendedEntityForAppend(AcDbDatabase* pDb,
                 return nullptr;
             }
         }
+        // OCS elevation: the census bakes it into every vertex z and the job
+        // carries the common value as 'elevation' (R4s measured 25 pairs
+        // flattened to 0 without this; patch_ops/blocks.py _common_vertex_z).
+        // AcDbPolyline::setElevation returns void (unlike AcDb2dPolyline's).
+        double elevation = 0.0;
+        if (jsonFindNumber(entityJson, "elevation", elevation) && elevation != 0.0)
+            pPoly->setElevation(elevation);
         return pPoly;
     }
     if (kind == "block_reference") {

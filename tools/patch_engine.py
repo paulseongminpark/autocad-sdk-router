@@ -886,7 +886,22 @@ def _pattern_definition_line(row: Dict[str, Any], *, scale: float = 1.0,
 
 
 def _synthesize_batch_pat_files(batch_dir: str, op_records: List[Dict[str, Any]]) -> Dict[str, str]:
-    synthesized: Dict[str, str] = {}
+    # Keyed by (NAME, zero-phase content digest), NOT by name alone. A
+    # per-NAME shared .pat seeded from the first-encountered hatch forces the
+    # seed's ROW GEOMETRY onto every same-name hatch -- measured on R4s
+    # (reports/interior100/loops_residue_analysis_R4s.json + prereg
+    # explicit_non_targets): census 1.dwg carries FOUR H3 vintages (X-grid
+    # 45/135 x154, plus-grid x27 in three notations) and the seed-shared file
+    # rendered 154 X-grid hatches as plus-grid -- a REAL render defect, not
+    # notation. Every hatch now derives its .pat from its OWN census rows;
+    # identical zero-phase content dedupes to one file, a different vintage
+    # gets its own file under pats/<digest>/<NAME>.pat. The leaf filename
+    # must stay <NAME>.pat (setPattern resolves <name>.pat through the
+    # accoreconsole cwd) so vintages separate by DIRECTORY; m08e re-copies
+    # the per-entity source into the cwd before EVERY setPattern
+    # (m08eEnsureCustomPatDiscoverable, CopyFileW bFailIfExists=FALSE), so
+    # sequential jobs each resolve their own vintage.
+    synthesized: Dict[Tuple[str, str], str] = {}
     for op_record in op_records:
         args = op_record.get("args") or {}
         entity = args.get("entity") if isinstance(args, dict) else None
@@ -897,28 +912,34 @@ def _synthesize_batch_pat_files(batch_dir: str, op_records: List[Dict[str, Any]]
         if not pattern_name or not pattern_definitions:
             continue
         upper_name = pattern_name.upper()
-        pat_path = synthesized.get(upper_name)
+        lines = ["*%s" % upper_name]
+        pattern_scale = float(entity.get("pattern_scale") or 1.0)
+        # Zero-phase each .pat: rebase all rows against THIS hatch's first
+        # row base (see _pattern_definition_line); the per-hatch phase rides
+        # HPORIGIN (patch_ops/blocks.py). Zero-phasing is also what makes
+        # same-vintage hatches at different phases dedupe to one digest.
+        seed_base = None
+        if pattern_definitions and isinstance(pattern_definitions[0], dict):
+            cand = pattern_definitions[0].get("base")
+            if (isinstance(cand, list) and len(cand) >= 2
+                    and all(isinstance(v, (int, float)) for v in cand[:2])):
+                seed_base = cand
+        lines.extend(_pattern_definition_line(row, scale=pattern_scale,
+                                              rebase=seed_base)
+                     for row in pattern_definitions)
+        content = "\n".join(lines) + "\n"
+        digest = hashlib.sha256(content.encode("utf-8")).hexdigest()[:12]
+        key = (upper_name, digest)
+        pat_path = synthesized.get(key)
         if pat_path is None:
-            pat_path = os.path.abspath(os.path.join(batch_dir, "%s.pat" % upper_name))
-            lines = ["*%s" % upper_name]
-            pattern_scale = float(entity.get("pattern_scale") or 1.0)
-            # Zero-phase the shared .pat: rebase all rows against the seed
-            # row's base (see _pattern_definition_line). Without this the
-            # seed hatch's phase is baked into every same-name hatch.
-            seed_base = None
-            if pattern_definitions and isinstance(pattern_definitions[0], dict):
-                cand = pattern_definitions[0].get("base")
-                if (isinstance(cand, list) and len(cand) >= 2
-                        and all(isinstance(v, (int, float)) for v in cand[:2])):
-                    seed_base = cand
-            lines.extend(_pattern_definition_line(row, scale=pattern_scale,
-                                                  rebase=seed_base)
-                         for row in pattern_definitions)
+            pat_dir = os.path.join(batch_dir, "pats", digest)
+            os.makedirs(pat_dir, exist_ok=True)
+            pat_path = os.path.abspath(os.path.join(pat_dir, "%s.pat" % upper_name))
             with open(pat_path, "w", encoding="utf-8", newline="\n") as fh:
-                fh.write("\n".join(lines) + "\n")
-            synthesized[upper_name] = pat_path
+                fh.write(content)
+            synthesized[key] = pat_path
         entity["pattern_pat_path"] = pat_path.replace("\\", "/")
-    return synthesized
+    return {"%s@%s" % key: path for key, path in synthesized.items()}
 
 
 def _build_native_batch_script(

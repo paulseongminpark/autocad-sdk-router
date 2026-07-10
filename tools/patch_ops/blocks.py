@@ -139,6 +139,24 @@ def _points2d(vertices: Any, *, include_widths: bool = False) -> List[Dict[str, 
     return out
 
 
+def _common_vertex_z(vertices: Any) -> float:
+    """Common z of a vertex list, or 0.0 when absent/mixed.
+
+    The census extractor writes lwpolyline vertices as OCS [x, y, z] with z =
+    the entity's elevation on every vertex; a mixed-z list is not a planar
+    lwpolyline and returns 0.0 (fail-safe: no carry, honest mismatch)."""
+    zs: List[float] = []
+    for v in (vertices or []):
+        p = v.get("point") if isinstance(v, dict) else v
+        if not p or len(p) < 3 or not isinstance(p[2], (int, float)):
+            return 0.0
+        zs.append(float(p[2]))
+    if not zs:
+        return 0.0
+    z0 = zs[0]
+    return z0 if all(abs(z - z0) <= 1e-9 for z in zs) else 0.0
+
+
 def _points3d(vertices: Any) -> List[Dict[str, float]]:
     out: List[Dict[str, float]] = []
     for v in (vertices or []):
@@ -377,6 +395,15 @@ def _def_entity_append_op(block_name: str, def_ent: Dict[str, Any]) -> Optional[
                   "closed": int(bool(g.get("closed")))}
         if "const_width" in g:
             entity["const_width"] = g.get("const_width")
+        # LWPOLYLINE geometry has no elevation field in the IR -- the OCS
+        # elevation rides baked into every census vertex point's z (measured
+        # R4s, reports/interior100/loops_residue_analysis_R4s.json: 25
+        # residual pairs, all vertices z=0.4010621945564553, replay
+        # flattened them to 0.0 because nothing carried it). A planar
+        # lwpolyline has one common z; carry it so m08e can setElevation.
+        elevation = _common_vertex_z(g.get("vertices"))
+        if elevation:
+            entity["elevation"] = elevation
     elif kind == "polyline":
         if native_class == "AcDb3dPolyline":
             entity = {"kind": "polyline", "class": native_class, "points": _points3d(g.get("vertices"))}

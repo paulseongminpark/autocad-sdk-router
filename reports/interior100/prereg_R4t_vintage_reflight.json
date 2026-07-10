@@ -1,0 +1,47 @@
+{
+  "schema": "ariadne.interior100.prereg.v1",
+  "arc": "R4t replay-repair reflight: per-vintage .pat synthesis + lwpolyline elevation carry + orphan-def sweep",
+  "registered_at_local": "2026-07-10T14:0x (file mtime is the binding evidence of pre-registration order; committed BEFORE launch)",
+  "baseline": {
+    "report": "reports/interior100/R4s_remeasure_angle_branch.json",
+    "diff0_total": 26916,
+    "a_entity_total": 27130,
+    "a_def_count": 294,
+    "interior_diff0_fraction": 0.9921120530777737
+  },
+  "prediction": {
+    "diff0_total": 27123,
+    "band": [27105, 27123],
+    "interior_diff0_fraction_at_center": 0.9997420567,
+    "ceiling_note": "27,123 is the theoretical ceiling: 27,130 minus the 7 loops real-geometry pairs this reflight does NOT repair. The band is deliberately asymmetric (center == ceiling) because every repair is additive.",
+    "decomposition": [
+      {
+        "family": "H3 pattern-vintage restoration",
+        "pairs": 154,
+        "mechanism": "patch_engine._synthesize_batch_pat_files now keys .pat by (NAME, zero-phase content digest) under pats/<digest>/<NAME>.pat; every hatch replays its OWN census rows",
+        "evidence": "engine cache probe PASS (runs/pat_vintage_probe_20260710: two same-name vintages in ONE accoreconsole batch session round-tripped to their own row sets X=[0.7854,2.3562], PLUS=[1.5708,3.1416]); the 154 pairs' only changed canonical key was pattern_definitions"
+      },
+      {
+        "family": "lwpolyline elevation carry",
+        "pairs": 25,
+        "mechanism": "blocks.py _common_vertex_z -> entity.elevation; m08e lwpolyline branch setElevation (native rebuild exit 0)",
+        "evidence": "R4s dissection: all 25 pairs differ only in vertex z 0.4010621945564553 -> 0.0"
+      },
+      {
+        "family": "orphan-def sweep",
+        "pairs": 28,
+        "mechanism": "ir_to_patch emits every non-*D census def after the entity stream (4 defs never reachable via INSERTs: DIMDOT, _ArchTick, $0$ins-l, $0$ng)",
+        "evidence": "kinds all representable (DIMDOT line1+lw2, _ArchTick lw1, ins-l lw1, ng wipeout2+blockref1+line20); wipeout cert-proven, nested blockref target present in census"
+      }
+    ],
+    "band_rationale": "floor 27,105 absorbs partial failures in the sweep family (ng nested blockref ordering, wipeout edge cases) and small flight-to-flight noise; H3/lwpolyline families are deterministic mechanism repairs verified by probe/dissection. Any landing BELOW 27,105 is a FAIL to investigate, not to rename.",
+    "residual_after_success": "7 loops real-geometry pairs (next arc) + 0 removed"
+  },
+  "guards": "adjudicated by tools/remeasure_interior.py: name-map authenticity, LEX-0006 population identity (294 defs / 27,130 ents), per-def no-regression vs R4s, prereg band",
+  "population_pin": {
+    "source_dwg": "D:\\dev\\.build\\1.dwg",
+    "source_dwg_sha256": "14eb65eb292d8a07f38ab5662dcafe9761c6185bc5ff0c8a9a008be15b598961",
+    "launch_command": "python tools/full_roundtrip_capstone.py --dwg D:\\dev\\.build\\1.dwg --out-dir runs\\e2e_1dwg_R4t_vintage_20260710 --batch-size 100 --with-records",
+    "required": "census in the NEW run dir must reproduce 294 defs / 27,130 entities; identity.json sha must equal the pin (LEX-0006)"
+  }
+}
