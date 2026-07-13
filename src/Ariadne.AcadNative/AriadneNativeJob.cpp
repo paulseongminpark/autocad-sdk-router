@@ -769,6 +769,35 @@ static std::string serializeEntityCommon(AcDbEntity* pEnt)
     return o.str();
 }
 
+// #24/#28: emit the entity's raw color as stored -- color_index (raw ACI,
+// including the sentinels 256=ByLayer and 0=ByBlock), the color method, and a
+// true_color RGB triple when the entity carries a 24-bit color. The graph/IR
+// path (collectEntitiesFromBlock) previously emitted NO per-entity color, so a
+// consumer could only fall back to the layer color (ByLayer) -- wrong for any
+// entity with an explicit override or ByBlock (commonly text and block
+// content). With the raw value present the consumer resolves the real display
+// color: ByLayer -> layer color, ByBlock -> owning INSERT's color, else the
+// explicit ACI / true color. dbcolor.h (AcCmColor) is already included above.
+static std::string entityColorJson(AcDbEntity* pEnt)
+{
+    std::ostringstream o; o.precision(kJsonDoublePrecision);
+    if (pEnt == nullptr)
+        return o.str();
+    o << ",\"color_index\":" << static_cast<int>(pEnt->colorIndex());
+    const AcCmColor col = pEnt->color();
+    const char* method = "byaci";
+    if (col.isByLayer())      method = "bylayer";
+    else if (col.isByBlock()) method = "byblock";
+    else if (col.isByColor()) method = "bycolor";
+    o << ",\"color_method\":\"" << method << "\"";
+    if (col.isByColor()) {
+        o << ",\"true_color\":{\"r\":" << static_cast<int>(col.red())
+          << ",\"g\":" << static_cast<int>(col.green())
+          << ",\"b\":" << static_cast<int>(col.blue()) << "}";
+    }
+    return o.str();
+}
+
 static bool resbufCodeIsString(short code)
 {
     return code == 1 || code == 2 || code == 3 || code == 4 || code == 5 ||
@@ -1327,6 +1356,7 @@ static bool collectEntitiesFromBlock(AcDbBlockTableRecord* pBTR, const char* spa
             << ",\"layer\":\"" << jsonEscape(layer) << "\""
             << ",\"owner_handle\":\"" << jsonEscape(ownerStr) << "\""
             << ",\"space\":\"" << spaceLabel << "\"";
+        arr << entityColorJson(pEnt);  // #24/#28: raw color_index + method + true_color
 
         resbuf* xdata = pEnt->xData(nullptr);
         if (xdata != nullptr) {

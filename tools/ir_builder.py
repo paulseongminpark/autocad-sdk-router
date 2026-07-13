@@ -1108,6 +1108,19 @@ def _entity_from_native(raw: dict, source_block: dict) -> dict:
             "decoded": decoded,
         },
     }
+    # #24/#28: raw per-entity color from the native emitter -- color_index (raw
+    # ACI including the sentinels 256=ByLayer and 0=ByBlock), color_method, and a
+    # true_color RGB triple when the entity uses a 24-bit color. Passthrough so a
+    # consumer can resolve the real display color (ByLayer -> layer color,
+    # ByBlock -> owning INSERT's color, else the explicit ACI / true color).
+    # `is not None` (not truthiness) because ByBlock's color_index is 0. Older
+    # native modules that predate the emit simply omit these -> fields absent.
+    if raw.get("color_index") is not None:
+        entity["color_index"] = int(raw["color_index"])
+    if raw.get("color_method"):
+        entity["color_method"] = str(raw["color_method"])
+    if isinstance(raw.get("true_color"), dict):
+        entity["true_color"] = raw["true_color"]
     if raw.get("block_record_handle"):
         entity["block_record_handle"] = str(raw["block_record_handle"])
     if isinstance(raw.get("xdata"), list) and raw["xdata"]:
