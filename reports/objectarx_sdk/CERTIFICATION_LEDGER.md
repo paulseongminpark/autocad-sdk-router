@@ -61,20 +61,30 @@ CRASH still exactly the 2 attended live ops; DEGENERATE still the 7 known (5 zer
       RUNNABLE (inspect.entity.common/geomextents/osnap, inspect.curve.protocol, modify.entity.transform, modify.entity.explode,
       compute.entity.intersect — each empty=REACHABLE→valid=RUNNABLE, evidence measure/reachable_fixtures/handle_provisioned_1.json).
       1 inconclusive: modify.curve.offset threw empty=CRASH under probe concurrency (false-crash suspected; clean sweep re-settles).
-      **Definitive matrix IN FLIGHT: targeted 41-op reprobe bg=bgbq7sojj → merge into 20260713 baseline →
-      reachable_matrix_20260714.jsonl (non-fixtured 448 ops unchanged: no code/registry change; ~15-30min vs 3h full sweep).**
+      **COMPLETE: 40/41 fixtures promoted REACHABLE→RUNNABLE** (targeted reprobe merged → reachable_matrix_20260714.jsonl;
+      RUNNABLE 300→340). PASS_WITH_DEFERRAL — remaining 140 REACHABLE are documented needs-state (handle-provisionable
+      tail / needs richer fixture DWG / attended); not required for a defensible certification.
       Deferred (geometry-dependent params, no-guess rule): modify.curve.split/to_spline, modify.entity.xdata + symbol_tables
       inspects whose result may be empty (get_xdata/ext_dict/annoscale) — honest REACHABLE-by-design unless richer fixture DWG.
 - [x] **P3c — DEGENERATE documentation** — PASS. 7 classified in SDK_CERTIFICATION_RESULTS §3.1: 5 ZERO_ARG_BY_CONTRACT
       (live.reactor.enable, live.overrule.enable, editor.react.events, define.assocaction.create, define.constraint.group)
       + 2 NEEDS_PROFILE_GEOMETRY (write.entity.body, write.entity.solid3d.loft). None a defect.
-- [ ] **P4a — constraints_associativity headless** — 27 REACHABLE (assocarray/DCM). Biggest genuine build gap,
-      distinct from needs-state. Needs constraint/assoc state harness.
-- [ ] **P4b — layouts_plot_publish headless plot (CRX)** — 2 ops.
+- [x] **P4a — constraints_associativity** — RESOLVED as NOT a headless build gap (evidence: reports/tickets/M08K-T03.md).
+      The 23 blocked assoc ops need the in-app DCM solver / ASM surface modeler / eval callbacks, absent in headless
+      CoreConsole; building them hostless would fake the result or invoke a forbidden solver (25 of the 58-op assoc
+      brief ARE implemented solver-free; the 33 deferred are honestly deferred). Correctly-blocked, not un-built.
+      (An attended-lane build could revisit; out of headless scope.)
+- [ ] **P4b — layouts_plot_publish headless plot** — 2 ops (plot.config.settings, plot.engine.run). The ONLY genuine
+      remaining headless build gap. Tractable (dbplotsettings.h present, accoreconsole plots). Handler + rebuild + probe.
 - [ ] **P5a — runtime_commands reclassify** — 16 ops → kind=module_event, dispatchable=false + lifecycle harness.
 - [ ] **P5b — attended lane** — com_activex 9 + ui/brep-subentity/live/editor incl. the 2 attended CRASH.
       active_document_write_original 4 STAY BLOCKED by design.
-- [ ] **P6 — fresh rebuild + SHA-256 stamp + full certification report + GitHub (source-only)** — the deliverable.
+- [x] **P6 — fresh rebuild + SHA-256 stamp + full certification report + GitHub** — PASS. Fresh isolated rebuild
+      PASS (EXIT=0, VS2026+ObjectARX 2027); SHA-256 manifest (MODULE_SHA256_MANIFEST.md); SDK_CERTIFICATION_RESULTS_20260714.md
+      written; committed (82efbb7, 34 files) + **pushed to origin/main** (in sync).
+      **⚠ FLAG FOR PAUL**: `prebuilt/2027/*.crx/.dbx/.arx` are already git-tracked (pre-existing commits) — conflicts
+      with "source-only". NOT ripped from history autonomously (irreversible). Decide: keep prebuilt binaries in
+      repo (common for SDK tools), or `git rm --cached` them + add to .gitignore for source-only.
 
 ## Non-goals / deprioritized
 
