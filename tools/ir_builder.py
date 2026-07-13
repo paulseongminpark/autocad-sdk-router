@@ -41,6 +41,10 @@ STABLE_ID_FLOAT_EPSILON = 1e-6
 _STABLE_ID_EXCLUDED_ENTITY_FIELDS = frozenset((
     "bbox",
     "block_record_handle",
+    # color_index / true_color are volatile DISPLAY attributes: emitted in the
+    # output entity for diffing, but a recolor must read as a MODIFY (not
+    # delete+create), so they are excluded from stable identity (SBC-20260714-001).
+    "color_index",
     "dim_block_handle",
     "dim_block_name",
     "extension_dictionary_handle",
@@ -55,6 +59,7 @@ _STABLE_ID_EXCLUDED_ENTITY_FIELDS = frozenset((
     "spline_knots",
     "stable_id",
     "stable_id_ordinal",
+    "true_color",
     "xdata",
 ))
 _STABLE_ID_VIEWPORT_GEOMETRY_EXCLUDES = frozenset(VPORT_MANAGED_FIELDS)
@@ -447,7 +452,7 @@ def stable_identity_payload(entity: dict) -> dict:
     attrs = {"space": str(entity.get("space", "model") or "model")}
     if entity.get("layout"):
         attrs["layout"] = str(entity["layout"])
-    for key in ("class", "linetype", "color_index", "lineweight", "visible"):
+    for key in ("class", "linetype", "lineweight", "visible"):
         if key in entity:
             attrs[key] = entity[key]
     payload = {
@@ -465,7 +470,7 @@ def stable_identity_payload(entity: dict) -> dict:
         if key in _STABLE_ID_EXCLUDED_ENTITY_FIELDS:
             continue
         if key in ("class", "dxf_name", "geometry", "layer", "layout", "space",
-                   "linetype", "color_index", "lineweight", "visible"):
+                   "linetype", "lineweight", "visible"):
             continue
         extras[key] = _normalize_for_stable_hash(entity[key])
     if extras:
@@ -1134,6 +1139,15 @@ def _entity_from_native(raw: dict, source_block: dict) -> dict:
             "decoded": decoded,
         },
     }
+    # SBC-20260714-001 (issues #24/#28): pass through raw per-entity color from
+    # collectEntitiesFromBlock. color_index is raw ACI (0=ByBlock, 256=ByLayer,
+    # 1-255=ACI) -- membership test (not truthiness) so the 0 sentinel survives.
+    # true_color is the optional explicit-RGB {r,g,b}. Both are display attributes
+    # excluded from stable identity (see _STABLE_ID_EXCLUDED_ENTITY_FIELDS).
+    if "color_index" in raw:
+        entity["color_index"] = raw["color_index"]
+    if isinstance(raw.get("true_color"), dict) and raw["true_color"]:
+        entity["true_color"] = raw["true_color"]
     if raw.get("block_record_handle"):
         entity["block_record_handle"] = str(raw["block_record_handle"])
     if isinstance(raw.get("xdata"), list) and raw["xdata"]:

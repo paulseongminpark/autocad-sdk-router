@@ -235,7 +235,9 @@ Required per entity: `handle`, `class`, `dxf_name`, `owner_handle`, `space`, `la
 | `owner_handle` | Handle of the owning BTR (model space, paper space, or a block definition). Empty string allowed when the owner is unresolved. |
 | `space` | `model \| paper \| block`. |
 | `layout` | Layout/tab name when `space == "paper"`. |
-| `layer`, `linetype`, `color_index`, `lineweight`, `visible` | Common entity properties. |
+| `layer`, `linetype`, `lineweight`, `visible` | Common entity properties. |
+| `color_index` | Raw ACI color index from `AcDbEntity::colorIndex()`, emitted verbatim: `0` = ByBlock, `256` = ByLayer, `1-255` = explicit ACI. Sentinels are not resolved/interpreted. |
+| `true_color` | Optional `{r,g,b}` (each `0-255`) explicit RGB color, present only when the entity's color method is by-color (RGB); omitted (not null) for ByLayer/ByBlock/ACI colors. |
 | `bbox` | Axis-aligned box `[minX,minY,minZ,maxX,maxY,maxZ]` (`$defs.bbox`); `[]` = no bbox computed. |
 | `geometry` | Coordinate payload (`$defs.geometry`, below). |
 | `xdata[]` | XDATA blocks per registered app (`$defs.xdata_block`: `app` + `items[]` of resbuf). |

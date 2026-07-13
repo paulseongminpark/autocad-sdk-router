@@ -777,9 +777,20 @@
         "layout": { "type": "string", "description": "Layout/tab name when space == paper." },
         "layer": { "type": "string" },
         "linetype": { "type": "string" },
-        "color_index": { "type": "integer" },
+        "color_index": { "type": "integer", "description": "Raw ACI color index, emitted verbatim (0=ByBlock, 256=ByLayer, 1-255=ACI); sentinels are not resolved." },
         "lineweight": { "type": "integer" },
         "visible": { "type": "boolean" },
+        "true_color": {
+          "type": "object",
+          "description": "Explicit 24-bit RGB color; present only when the entity's color method is by-color (RGB), omitted for ByLayer/ByBlock/ACI.",
+          "additionalProperties": false,
+          "required": ["r", "g", "b"],
+          "properties": {
+            "r": { "type": "integer", "minimum": 0, "maximum": 255 },
+            "g": { "type": "integer", "minimum": 0, "maximum": 255 },
+            "b": { "type": "integer", "minimum": 0, "maximum": 255 }
+          }
+        },
         "bbox": { "$ref": "#/$defs/bbox" },
         "geometry": { "$ref": "#/$defs/geometry" },
         "xdata": {

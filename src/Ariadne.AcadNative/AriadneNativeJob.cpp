@@ -1368,6 +1368,18 @@ static bool collectEntitiesFromBlock(AcDbBlockTableRecord* pBTR, const char* spa
             << ",\"owner_handle\":\"" << jsonEscape(ownerStr) << "\""
             << ",\"space\":\"" << spaceLabel << "\"";
 
+        // color_index is raw ACI, emitted verbatim (0=ByBlock, 256=ByLayer,
+        // 1-255=ACI) -- no ByLayer/ByBlock resolution here (SBC-20260714-001).
+        arr << ",\"color_index\":" << static_cast<int>(pEnt->colorIndex());
+        {
+            const AcCmColor entColor = pEnt->color();
+            if (entColor.colorMethod() == AcCmEntityColor::kByColor) {
+                arr << ",\"true_color\":{\"r\":" << static_cast<int>(entColor.red())
+                    << ",\"g\":" << static_cast<int>(entColor.green())
+                    << ",\"b\":" << static_cast<int>(entColor.blue()) << "}";
+            }
+        }
+
         resbuf* xdata = pEnt->xData(nullptr);
         if (xdata != nullptr) {
             int blockCount = 0, itemCount = 0;
