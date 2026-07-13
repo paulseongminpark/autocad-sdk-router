@@ -4,6 +4,29 @@
 > 막다른 길에서 백트래킹(각 분기에 명시된 트리거). 선형 디코딩이 아니라 전역 선택.
 > 모든 수치는 산출 아티팩트 병기 (FM9). 기준 도면: `D:\dev\.build\1.dwg` (원본 READ-ONLY).
 
+## 2026-07-13 이행 감사 — 설계 대비 집행 대조 (P1~P10 전수)
+
+원 질문: "설계 문서를 충실히 전부 이행했고 결과가 제대로 나왔는가." 분기별 실측 대조:
+
+| 분기 | 설계 목표 | 집행 실측 | 증거 | 판정 |
+|---|---|---|---|---|
+| P1 append 6종 | L2 66.1→93%+ | R4 사다리 11세대, 최종 **0.999926** | `R4x_remeasure_ccw.json` | **초과 달성** |
+| P2 익명 리맵 | L2 +5%p, L4 수렴 | name_map 리맵 라이브, 전 재측정에 name-map 가드 내장 | remeasure 가드 4종 | 완료 |
+| P3 hatch 재건 | native relink vs decompose | **아래 SUPERSEDED 주석은 다시 반전됨**: orphan 판정은 stale-deploy 오진으로 철회(`ASSOC_ORPHAN_FINDING.md` RETRACTED), 원 설계(native re-link)가 R4v에서 66/66 성공 | R4v/R4w/R4x, LEX-0011/0012 | 완료 (원 설계안이 옳았음) |
+| P4 xdata 재생성 | 64 entities→0 | `write.entity.set_xdata` 등 xdata ops 6종 라이브, 스트림 방출 | `config/operations.v2.json` | 완료 |
+| P5 심볼테이블 | layers 91→66 등 | records 레인 (`records_regen`+`table_record_diffs`) 라이브; **비참조 레코드는 잔여**(dim_styles 6→2 등) | `R4l_summary.json`, `section_coverage_R4x.json` | 대부분 완료 (비참조 레코드 잔여) |
+| P6 고정점 랩 | GEN2b + +1 근인 | GEN2/2b/3 완료, +1 근인=seed_line 옵트아웃, **GEN3 fixed_point=TRUE**; 최종(R4x) 파이프라인 재검증 = GEN2c 진행 중 | `idempotence_GEN3.json`, `runs/e2e_1dwg_GEN2c_20260713` | 완료 (+최종 재검증 진행) |
+| P7 잔여 소탕 | face3d·wipeout 등 | m08e 핸들러 라이브, 사다리 수치에 포함 | R4x 잔차 2쌍뿐 | 완료 |
+| P8 게이트 승격 | interior를 verdict에 | capstone `--gate-interior`(ratchet: 커밋 기준선 미만 회귀 금지) + `--semantic-gates` 기본 ON | `full_roundtrip_capstone.py` | 완료 |
+| P9 코퍼스 일반화 | input.dwg 샘플드 + 타 도면 1개 전량 | corpus census 9 dwg만 완료 — **라운드트립 미집행** | `runs/corpus_census_20260708` | **유일한 실질 미이행** |
+| P10 의미 게이트 v1 | 게이트 2개 (치수+중심선) | dim_semantic_gate 라이브(113/113 PASS, capstone 기본 ON); **중심선 위상 게이트 미구현** | `dim_semantic_gate.v1`, R4l | 절반 (1/2) |
+
+상태함수 최종 실측: L1 **100%** (375/375) · L2 **0.999926** (27,128/27,130, 잔차 2 = 곡선 동일 spline 표기; 재구축은 기하 완전 동치) · L3 **99.63%** (`section_coverage_R4x.json`; 잔여=비참조 심볼테이블) · L4 fixed_point **TRUE** (GEN3; 최종 파이프라인 GEN2c 재검증 비행 중) · L5 dim 게이트 **113/113 PASS**.
+
+측정 계기 자체의 입법 원장: LEX-0006~0012 (population control · 물리 왕복 · orphan-assoc · angle principal-branch · cycle-notation 기각→재개 · assoc cardinality · closed-cycle rotation). 판정 규율: 전 세대 prereg 선커밋, FAIL 3건(R4o/R4t/R4u/R4v)은 전부 개명 없이 조사로 종결되어 각각 LEX-0006, stale-deploy 수리, orphan 반증, LEX-0012+ccw 근인을 낳았다.
+
+**잔여 작업 처분 (2026-07-13 판단)**: ① P9 = 다음 아크 (발견도면≠검증도면 원칙상 프로그램의 마지막 실질 실험 — 1.dwg에서 발견한 수리 11건+법 7건이 도면 특이적 오버피팅이 아님을 증명) ② GEN2c 판정 ③ P10 중심선 게이트·P5 비참조 레코드 = ALM 후속 백로그(interior-100 종결 요건 아님) ④ spline 잔차 2쌍 = 수용 유지 판단 보고됨 (Paul 결재 대기).
+
 ## 0. 상태 함수 (무엇을 100%로 세는가)
 
 | 층 | 측정기 | 현재 실측 | 소스 |
