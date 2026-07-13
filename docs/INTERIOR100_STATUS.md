@@ -15,7 +15,16 @@ interior-100 프로그램의 현재 상태 도시에(dossier). 측정 사다리,
 - R4u (lw-z 재비행, 신선 prebuilt 첫 비행) = **27,057** = 0.997309 — prereg 대역 [27,118, 27,123] **FAIL**, per-def 가드 FAIL: lw-z **+25 정확 착지**(gainers가 예측 def에 정확 일치), 그러나 **−66 unmask** — 신선 crx가 6d59fd5의 loop-local 추출을 처음 실어 census가 66 해치의 per-loop 소스 핸들을 처음 방출(전원 in-def 해석: lwpolyline 63+spline 14, 미해석 0) → orphan 주장 반증·철회, 재구축이 연관성을 복원하지 않는 **실 결함**이 드러남. R4t 27,098은 눈먼 계기 수치; 27,057이 당시의 정직 기록 (`reports/interior100/R4u_remeasure_lwz.json`, prereg `prereg_R4u_lwz_reflight.json`)
 - R4v (P3 assoc relink 비행, commit `37c6480`) = **27,116** = 0.999484 — prereg 대역 [27,118, 27,123] **FAIL-by-2**, 가드 4/4 OK(per-def 무회귀 포함): relink 기계 자체는 **66/66 성공**(op ok + `associative_after=true`), +59 순증. 미달 2+5는 수리가 unmask한 loop 표기 드리프트 — 해부로 3클래스 확정: **회전 5**(점군 0.0, LEX-0012로 입법) + **spline Bézier 재분해 2**(prereg 리스크 레지스터 항목 발화; 곡선 동일 9.2e-4, 수용 잔차) + 구 실기하 7. LEX-0011은 fold 증거(59/66, 오접힘 0)로 legislated — 런 판정은 FAIL 유지 (`reports/interior100/R4v_remeasure_assoc.json`, 해부 `loops_residue_analysis_R4v.json`)
 - R4w (LEX-0012 측정 전용 재측정, prereg 커밋 `c51def8` 후 실행) = **27,121** = **0.999668** — prereg **점 대역 [27,121, 27,121] 정확 명중**, 가드 4/4 (`reports/interior100/R4w_remeasure_lex0012.json`, prereg `prereg_R4w_lex0012.json`).
-- R4x (ccw flag-parse 수리 재비행, prereg 커밋 `263f0ff` 후 발사) = **27,128** = **0.999926** — prereg 27,128 대역 [27,126, 27,128] **정확 명중**, 가드 4/4 (`reports/interior100/R4x_remeasure_ccw.json`, prereg `prereg_R4x_ccw_flagparse.json`). **실기하 잔차 소멸**(재해부 geom_diff=0, `loops_residue_analysis_R4x.json`) — 잔차 2 = spline Bézier 재분해 쌍(1BDF/1BE6, 곡선 동일 9.2e-4)뿐. **현행 법 하 fingerprint 천장 도달: 재구축 도면이 원본과 기하학적으로 완전 동치.**
+- R4x (ccw flag-parse 수리 재비행, prereg 커밋 `263f0ff` 후 발사) = **27,128** = **0.999926** — prereg 27,128 대역 [27,126, 27,128] **정확 명중**, 가드 4/4 (`reports/interior100/R4x_remeasure_ccw.json`, prereg `prereg_R4x_ccw_flagparse.json`). **실기하 잔차 소멸**(재해부 geom_diff=0, `loops_residue_analysis_R4x.json`) — 잔차 2 = spline Bézier 재분해 쌍(1BDF/1BE6, 곡선 동일 9.2e-4)뿐. **forward fingerprint 천장 도달: 재구축 도면이 원본과 기하학적으로 완전 동치.**
+
+## Idempotence 축 (내부 고정점, forward와 직교) — 2026-07-13
+
+forward 충실도(census 1.dwg vs 재구축)와 별개로, **재구축을 재처리하면 변하는가**(gen1→gen2 고정점)를 측정. 설계 P6의 "무손실 증명".
+
+- **GEN2c** (R4x 파이프라인 첫 고정점 측정) = `fixed_point=False`, interior **26,947/27,130 = 0.9933**, 13 hatch def drift. modelspace 엔티티는 완전 고정점(0/0/0)이나 블록 내부 hatch 패턴이 재생성마다 40×(=pattern_scale) 축소. (ultracode 워크플로 `wf_da1ab407` 3-suspect 근인 규명.)
+- **근인 (empirical, gen0/gen1/gen2 + 실 .pat 대조)**: `.pat` 합성기(`patch_engine.py:_pattern_definition_line`)가 census offset을 pattern_scale로 나눔 — 이 baking 가정은 원본(kPreDefined type=1)에만 참, 재구축 hatch(setPattern kCustomDefined→type=2, census가 raw로 읽음)엔 이중적용. **DASH 대조군 drift 0으로 증명.** 수정: divide를 `pattern_type≤1`에만 게이트 (commit `b939f8d`).
+- **GEN2d** (수정 재비행) = 26,947→**27,129**, 13→1 dirty def. 잔차 1 = ellipse hd1050/853의 full-ellipse 2π 브랜치 float knife-edge(gen1 end−start=2π+1.8e-15→~0 vs gen2 2π−2e-15→~2π; LEX-0009 `sweep==0.0` 가드가 한쪽 empty·한쪽 full로 접음).
+- **최종** (robust full-ellipse fold, LEX-0009 확장, commit 후속) = 측정 전용 재-diff **27,130/27,130 = 1.0, fixed_point=TRUE, dirty def 0** (`reports/interior100/GEN2d_idempotence_remeasure.json`). forward R4x는 delta +0(27,128) 무회귀. **파이프라인이 진짜 내부 고정점 — 재구축 도면을 재처리해도 변하지 않음.**
 
 ## Arc history
 
