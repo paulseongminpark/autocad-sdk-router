@@ -2,9 +2,9 @@
 
 - packet: `CADOS_M08_FULL_OPERATION_COVERAGE_CLOSURE`
 - generated_from: `config/operations.v2.json`
-- total operations: **541** · implemented 479 · stub 0 · blocked 62 · catalogued 0 · deprecated 0 · **unknown 0**
-- v1-target: **541** (implemented 479 · blocked 62 · **deferred 0**)
-- agent-exposed ops: 479
+- total operations: **551** · implemented 489 · stub 0 · blocked 62 · catalogued 0 · deprecated 0 · **unknown 0**
+- v1-target: **551** (implemented 489 · blocked 62 · **deferred 0**)
+- agent-exposed ops: 489
 
 ## Gate
 
@@ -26,20 +26,20 @@
 
 | group | implemented | stub | blocked | catalogued | v1_target |
 |---|---|---|---|---|---|
-| read | 63 | 0 | 0 | 0 | 63 |
+| read | 70 | 0 | 0 | 0 | 70 |
 | query | 1 | 0 | 0 | 0 | 1 |
-| write_patch | 19 | 0 | 4 | 0 | 23 |
+| write_patch | 20 | 0 | 4 | 0 | 24 |
 | validate_diff | 3 | 0 | 0 | 0 | 3 |
 | render_visual | 10 | 0 | 2 | 0 | 12 |
 | live | 6 | 0 | 1 | 0 | 7 |
-| native_only | 377 | 0 | 55 | 0 | 432 |
+| native_only | 379 | 0 | 55 | 0 | 434 |
 
 ## Risk class distribution
 
 | risk_class | count |
 |---|---|
-| read_safe | 357 |
-| staged_write | 128 |
+| read_safe | 366 |
+| staged_write | 129 |
 | live_edit | 50 |
 | raw_command | 6 |
 
@@ -125,6 +125,7 @@
 | transform.database.deep_clone | blocks_xrefs_clone | implemented | live_edit | live_edit | True | m08eDispatch |  |
 | transform.database.insert_block | blocks_xrefs_clone | implemented | staged_write | write_copy | True | m08eDispatch |  |
 | write.block.append_entity | blocks_xrefs_clone | implemented | staged_write | write_copy | True | m08eDispatch |  |
+| write.block.relink_hatch_assoc | blocks_xrefs_clone | implemented | staged_write | write_copy | True | m08eDispatch |  |
 | write.dynblock.property | blocks_xrefs_clone | implemented | staged_write | write_copy | True | w6dynblkDispatch |  |
 | compute.brep.line_containment | brep_solids | implemented | read_safe | read | True | m08dDispatch |  |
 | compute.brep.massprops | brep_solids | implemented | read_safe | read | True | m08dDispatch |  |
@@ -253,6 +254,7 @@
 | inspect.constraint.node | constraints_associativity | implemented | staged_write | write_copy | True | m08kcDispatch |  |
 | inspect.constraint.status | constraints_associativity | implemented | read_safe | read | True | m08kcDispatch |  |
 | inspect.parameter.evaluate | constraints_associativity | implemented | read_safe | read | True | m08kcDispatch |  |
+| run.corpus.batch | corpus | implemented | read_safe | read | True | corpus_batch.run_corpus_batch |  |
 | extend.customclass.declare | custom_objects_protocols | implemented | read_safe | read | True | m08kDispatch |  |
 | extend.customclass.define | custom_objects_protocols | implemented | read_safe | read | True | m08kDispatch |  |
 | extend.customclass.define_cons | custom_objects_protocols | implemented | read_safe | read | True | m08kDispatch |  |
@@ -447,6 +449,7 @@
 | inspect.database.graph | inspect | implemented | read_safe | read | True | collectModelSpaceGraph + collectDatabaseGraph |  |
 | inspect.entities | inspect | implemented | read_safe | read | True | listModelSpaceEntities |  |
 | inspect.entity.count | inspect | implemented | read_safe | read | True | countModelSpaceEntitiesByType |  |
+| inspect.entity.identity_contract | inspect | implemented | read_safe | read | True | entity_identity.verify_identity_stability |  |
 | inspect.jig.host_support | inspect | implemented | read_safe | read | True | jigHostSupportJson |  |
 | inspect.layers | inspect | implemented | read_safe | read | True | listLayerRecords |  |
 | inspect.layout.list | inspect | implemented | read_safe | read | True | listLayouts |  |
@@ -455,6 +458,7 @@
 | inspect.reactor.registry | inspect | implemented | read_safe | read | True | reactorRegistryJson |  |
 | inspect.runtime.capabilities | inspect | implemented | read_safe | read | True | runtimeCapabilitiesJson |  |
 | inspect.xdata.get | inspect | implemented | read_safe | read | True | getDatabaseXdata |  |
+| inspect.xdata.semantic_anchor | inspect | implemented | read_safe | read | True | semantic_anchor.read_semantic_anchors |  |
 | inspect.xref.list | inspect | implemented | read_safe | read | True | listXrefs |  |
 | live.jig.point_probe | live | implemented | live_edit | live_edit | True | runLineJigProbe |  |
 | live.overrule.disable | live | implemented | live_edit | live_edit | True | disableObjectOverrule |  |
@@ -520,13 +524,18 @@
 | module.register_mdi | runtime_commands | implemented | read_safe | read | True | m08nDispatch |  |
 | module.register_service | runtime_commands | implemented | read_safe | read | True | m08nDispatch |  |
 | acdb.database.create | symbol_tables_dictionaries | implemented | read_safe | read | True | m08eDispatch |  |
+| inspect.annoscale.list | symbol_tables_dictionaries | implemented | read_safe | read | True | annoscaleReadDispatch |  |
 | inspect.dictionary.get | symbol_tables_dictionaries | implemented | read_safe | read | True | m08eDispatch |  |
 | inspect.dictionary.named_objects | symbol_tables_dictionaries | implemented | read_safe | read | True | m08eDispatch |  |
+| inspect.entity.annoscale.contexts | symbol_tables_dictionaries | implemented | read_safe | read | True | annoscaleReadDispatch |  |
 | inspect.entity.get_xdata | symbol_tables_dictionaries | implemented | read_safe | read | True | m08eDispatch |  |
 | inspect.layerstates.list | symbol_tables_dictionaries | implemented | read_safe | read | True | w6LayerStateDispatch |  |
+| inspect.material.enumerate | symbol_tables_dictionaries | implemented | read_safe | read | True | materialsReadDispatch |  |
+| inspect.material.properties | symbol_tables_dictionaries | implemented | read_safe | read | True | materialsReadDispatch |  |
 | inspect.object.ext_dict | symbol_tables_dictionaries | implemented | read_safe | read | True | m08cDispatch |  |
 | inspect.symboltable.block | symbol_tables_dictionaries | implemented | read_safe | read | True | m08cDispatch |  |
 | inspect.symboltable.layers | symbol_tables_dictionaries | implemented | read_safe | read | True | m08cDispatch |  |
+| inspect.visualstyle.enumerate | symbol_tables_dictionaries | implemented | read_safe | read | True | materialsReadDispatch |  |
 | inspect.xrecord.get | symbol_tables_dictionaries | implemented | read_safe | read | True | getXrecord |  |
 | transform.database.wblock | symbol_tables_dictionaries | implemented | read_safe | read | True | m08cDispatch |  |
 | transform.database.wblock_clone | symbol_tables_dictionaries | implemented | live_edit | live_edit | True | m08cDispatch |  |
@@ -584,9 +593,10 @@
 | editor.tray.remove | ui_customization | implemented | read_safe | read | True | m08nDispatch |  |
 | validate.ir | validate | implemented | read_safe | read | True | validator.validate_target |  |
 | validate.patch | validate | implemented | read_safe | read | True | validator.validate_target |  |
+| verify.cross_engine.dwg | verify | implemented | read_safe | read | True | verify_cross_engine |  |
 | write.block.insert | write | implemented | staged_write | write_copy | True | insertBlockReference |  |
 | write.block.simple_create | write | implemented | staged_write | write_copy | True | createSimpleBlock |  |
 | write.layout.create | write | implemented | staged_write | write_copy | True | createLayout |  |
 | write.xdata.set | write | implemented | staged_write | write_copy | True | setDatabaseXdata |  |
 
-> Full 517-operation detail (all 13 fields per op) is in `reports/operation_coverage_full_matrix.json` — this table lists only the 541 v1-target ops. The 0 catalogued ops are classified future-version native capability (v1_target=false), not omitted.
+> Full 551-operation detail (all 13 fields per op) is in `reports/operation_coverage_full_matrix.json` — this table lists only the 551 v1-target ops. The 0 catalogued ops are classified future-version native capability (v1_target=false), not omitted.

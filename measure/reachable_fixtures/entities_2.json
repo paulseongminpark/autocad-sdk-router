@@ -1,0 +1,76 @@
+{
+  "family": "entities_2",
+  "fixtures": {
+    "write.entity.hatch": {
+      "args": {
+        "layer": "ARIADNE_F1_PROBE",
+        "vertices": [
+          {"x": 0.0, "y": 0.0, "z": 0.0},
+          {"x": 10.0, "y": 0.0, "z": 0.0},
+          {"x": 10.0, "y": 10.0, "z": 0.0},
+          {"x": 0.0, "y": 10.0, "z": 0.0}
+        ]
+      },
+      "evidence": "m08h_handlers.inc (write.entity.hatch, line 641: layer via jsonFindString(job,\"layer\"); vertices via m08hReadVertexArray -> m08hReadPointArray3d(job,\"vertices\") reading {x,y,z} objects, requires >=3)"
+    },
+    "write.entity.leader": {
+      "args": {
+        "layer": "ARIADNE_F1_PROBE",
+        "vertices": [
+          {"x": 0.0, "y": 0.0, "z": 0.0},
+          {"x": 5.0, "y": 5.0, "z": 0.0},
+          {"x": 10.0, "y": 5.0, "z": 0.0}
+        ],
+        "text": "ARIADNE_LEADER_PROBE",
+        "height": 2.5
+      },
+      "evidence": "m08h_handlers.inc (write.entity.leader, line 251: layer via jsonFindString(job,\"layer\"); text via jsonFindString(job,\"text\"); vertices (fallback points) via m08hReadPointArray3d reading {x,y,z} objects, requires >=2; height via jsonFindNumber(job,\"height\"))"
+    },
+    "write.entity.mleader": {
+      "args": {
+        "layer": "ARIADNE_F1_PROBE",
+        "vertices": [
+          {"x": 0.0, "y": 0.0, "z": 0.0},
+          {"x": 8.0, "y": 8.0, "z": 0.0}
+        ],
+        "text": "ARIADNE_MLEADER_PROBE",
+        "height": 3.0
+      },
+      "evidence": "m08h_handlers.inc (write.entity.mleader, line 310: layer via jsonFindString(job,\"layer\"); text via jsonFindString(job,\"text\"); vertices (fallback points) via m08hReadPointArray3d reading {x,y,z} objects, requires >=2; height via jsonFindNumber(job,\"height\"))"
+    },
+    "write.entity.polyfacemesh": {
+      "args": {
+        "layer": "ARIADNE_F1_PROBE",
+        "points": [
+          {"x": 0.0, "y": 0.0, "z": 0.0},
+          {"x": 10.0, "y": 0.0, "z": 0.0},
+          {"x": 10.0, "y": 10.0, "z": 0.0},
+          {"x": 0.0, "y": 10.0, "z": 0.0}
+        ]
+      },
+      "evidence": "m08g_handlers.inc (write.entity.polyfacemesh, line 1044: layer via outer-dispatch jsonFindString(job,\"layer\") at line 503; points (fallback vertices) via m08gReadPointArray(job,\"points\") reading {x,y,z} objects, requires >=3)"
+    }
+  },
+  "needs_state": [
+    {
+      "op": "modify.entity.explode",
+      "reason": "m08g_handlers.inc line 1848 requires 'handle' (m08gFindHandle) of an ALREADY database-resident entity, resolved via resolveHandle+acdbOpenObject before calling explode(); a single stateless fixture call has no prior entity handle to reference."
+    },
+    {
+      "op": "modify.entity.xdata",
+      "reason": "m08g_handlers.inc line 1673 requires 'handle' (m08gFindHandle) of an ALREADY database-resident entity opened for write (m08gOpenEntityForWrite), plus 'app_name' and a 'values' array; needs a pre-existing entity handle a stateless call can't supply."
+    },
+    {
+      "op": "write.entity.attribute",
+      "reason": "m08g_handlers.inc line 876 requires 'blockref_handle' (fallback 'handle' via m08gFindHandle) of an ALREADY database-resident AcDbBlockReference, opened via acdbOpenObject(kForWrite), to attach the new AcDbAttribute to -- no such handle exists without a prior insert already in the database."
+    },
+    {
+      "op": "write.entity.blockref",
+      "reason": "m08g_handlers.inc line 1152 requires 'name' to already exist as a block TABLE RECORD (pBT->getAt(name) -> BLOCK_NOT_FOUND otherwise); a stateless/fresh drawing has no user-defined block definition to reference by name, and the built-in layout blocks (*Model_Space/*Paper_Space) are not valid insertable targets."
+    },
+    {
+      "op": "write.entity.minsert",
+      "reason": "Same handler and same 'name'-must-already-exist-in-block-table requirement as write.entity.blockref (m08g_handlers.inc line 1152, shared branch `op == \"write.entity.blockref\" || op == \"write.entity.minsert\"`); no pre-existing block definition available to a stateless fixture call."
+    }
+  ]
+}

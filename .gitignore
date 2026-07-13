@@ -98,3 +98,9 @@ desktop.ini
 build_iso/
 
 ~$*.xlsx
+
+# Cert arc hygiene (2026-07-14): scratch dirs + regenerable code index (never source)
+.codegraph/
+/tmp/
+/tmpfe33cjfy/
+/tmp_extract_V00903.*

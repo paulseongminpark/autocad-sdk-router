@@ -1,0 +1,22 @@
+{
+  "family": "handle_provisioned",
+  "_note": "Batch 2. Same proven mechanism as handle_provisioned_1: args reference real native_sample.dwg handles (LINE=11935, ARC=11BF8), values geometry-independent (never guessed). Keys harvested from handlers m08c_handlers.inc / m08g_handlers.inc.",
+  "fixtures": {
+    "write.object.create_ext_dict": {
+      "args": {"handle": "11935"},
+      "evidence": "m08c_handlers.inc:289-303 (m08cFindHandleArg 'handle'/'object_handle'); creates extension dictionary on object 11935"
+    },
+    "transform.database.wblock_clone": {
+      "args": {"handles": ["11935", "11BF8"]},
+      "evidence": "m08c_handlers.inc:330-341 (jsonFindStringArray 'handles' or single m08cFindHandleArg); wblockClone LINE 11935 + ARC 11BF8 into a fresh AcDbDatabase"
+    },
+    "modify.entity.copy_transformed": {
+      "args": {"handle": "11935", "translate": {"x": 20.0, "y": 0.0, "z": 0.0}},
+      "evidence": "m08g_handlers.inc:1620-1634 (m08gFindHandle 'handle' + m08gReadTransform 'translate'); getTransformedCopy of LINE 11935"
+    },
+    "modify.entity.common": {
+      "args": {"handle": "11935", "set_color_index": 3},
+      "evidence": "m08g_handlers.inc:1645-1659 (m08gFindHandle 'handle' + jsonFindNumber 'set_color_index'); setColorIndex on LINE 11935"
+    }
+  }
+}

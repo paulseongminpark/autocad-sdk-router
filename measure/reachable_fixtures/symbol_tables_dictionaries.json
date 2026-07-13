@@ -1,0 +1,54 @@
+{
+  "family": "symbol_tables_dictionaries",
+  "fixtures": {
+    "inspect.dictionary.get": {
+      "args": {
+        "key": "ACAD_GROUP"
+      },
+      "evidence": "m08e_handlers.inc (inspect.dictionary.get / m08eHandleDictGet: 'key' required via jsonFindString; 'dict_handle' optional via jsonFindString, defaults to the Named Objects Dictionary when absent — 'ACAD_GROUP' is a standard NOD sub-dictionary present in any AutoCAD drawing, so this exercises the found:true / is_dictionary branch, not just the not-found path)"
+    },
+    "write.layerstate.save": {
+      "args": {
+        "name": "ARIADNE_F1_PROBE_LAYERSTATE",
+        "description": "Ariadne F1 valid-arg fixture probe layer state",
+        "mask": ["all"],
+        "overwrite": 1
+      },
+      "evidence": "w6_layerstate_handlers.inc (write.layerstate.save: 'name' required via w6FindNameArg/jsonFindString; 'description' optional via jsonFindString; 'mask' optional string array via jsonFindStringArray/w6ParseSaveMask, token 'all' -> AcDbLayerStateManager::kAll; 'overwrite' optional via jsonFindNumber. Snapshots the CURRENT layer table — every drawing has at least layer '0', so no pre-existing saved state is required to exercise saveLayerState())"
+    }
+  },
+  "needs_state": [
+    {
+      "op": "inspect.entity.annoscale.contexts",
+      "reason": "annoscale_read.inc / annoscaleReadEntityContexts requires 'handle' (jsonFindString) resolving via resolveHandle to a pre-existing entity object so its AcDbObjectContextInterface participation can be queried; a stateless args-only call has no real handle to supply."
+    },
+    {
+      "op": "inspect.entity.get_xdata",
+      "reason": "m08e_handlers.inc / m08eHandleEntityXdata requires 'handle' (jsonFindString) resolving via resolveHandle to a pre-existing object to open and read xData() from; handles are per-drawing identifiers that cannot be synthesized from args alone."
+    },
+    {
+      "op": "inspect.material.properties",
+      "reason": "materials_read.inc / materialsReadHandleProperties requires 'handle' (jsonFindString) resolving to a pre-existing AcDbMaterial or AcDbVisualStyle object already filed under the ACAD_MATERIAL/ACAD_VISUALSTYLE NOD dictionaries; no such object exists without prior creation."
+    },
+    {
+      "op": "inspect.object.ext_dict",
+      "reason": "m08c_handlers.inc requires 'handle'/'object_handle' (m08cFindHandleArg) resolving via resolveHandle to a pre-existing database object whose extensionDictionary() is read; needs a real object handle from an already-loaded drawing."
+    },
+    {
+      "op": "transform.database.wblock_clone",
+      "reason": "m08c_handlers.inc requires 'handles' (jsonFindStringArray) or a single 'handle'/'object_handle' (m08cFindHandleArg) naming pre-existing objects to wblockCloneObjects() into a scratch database; needs real, already-resident object handles."
+    },
+    {
+      "op": "write.layerstate.delete",
+      "reason": "w6_layerstate_handlers.inc requires 'name' (w6FindNameArg) of an ALREADY-SAVED layer state — the handler calls lsm.hasLayerState(name) and returns LAYERSTATE_NOT_FOUND otherwise; a single stateless fixture call cannot pre-create that saved state before deleting it."
+    },
+    {
+      "op": "write.layerstate.restore",
+      "reason": "w6_layerstate_handlers.inc requires 'name' (w6FindNameArg) of an ALREADY-SAVED layer state — the handler calls lsm.hasLayerState(name) and returns LAYERSTATE_NOT_FOUND otherwise; same prerequisite-state gap as write.layerstate.delete, unmet by a stateless single-call fixture."
+    },
+    {
+      "op": "write.object.create_ext_dict",
+      "reason": "m08c_handlers.inc requires 'handle'/'object_handle' (m08cFindHandleArg) resolving via resolveHandle to a pre-existing database object to open kForWrite and attach an extension dictionary to; needs a real object handle from an already-loaded drawing."
+    }
+  ]
+}

@@ -24,27 +24,27 @@
     "host_support": "host_eligibility (cheapest-first), '|'-joined"
   },
   "totals": {
-    "total": 541,
+    "total": 551,
     "by_status": {
-      "implemented": 479,
+      "implemented": 489,
       "blocked": 62
     },
-    "implemented": 479,
+    "implemented": 489,
     "wired": 0,
     "stub": 0,
     "catalogued": 0,
     "blocked": 62,
     "deprecated": 0,
     "unknown": 0,
-    "v1_target_total": 541,
-    "v1_target_implemented": 479,
+    "v1_target_total": 551,
+    "v1_target_implemented": 489,
     "v1_target_blocked": 62,
     "v1_target_deferred": 0,
     "by_family": {
       "objectdbx_database": 21,
-      "symbol_tables_dictionaries": 26,
+      "symbol_tables_dictionaries": 31,
       "geometry_kernel": 25,
-      "inspect": 16,
+      "inspect": 18,
       "write": 4,
       "live": 7,
       "extend": 2,
@@ -56,7 +56,7 @@
       "patch": 2,
       "diff": 1,
       "active_document_write_original": 8,
-      "blocks_xrefs_clone": 8,
+      "blocks_xrefs_clone": 9,
       "brep_solids": 54,
       "com_activex": 51,
       "constraints_associativity": 58,
@@ -67,24 +67,26 @@
       "layouts_plot_publish": 2,
       "reactors_events": 22,
       "runtime_commands": 26,
-      "ui_customization": 39
+      "ui_customization": 39,
+      "corpus": 1,
+      "verify": 1
     },
     "by_family_group": {
-      "read": 63,
-      "native_only": 432,
-      "write_patch": 23,
+      "read": 70,
+      "native_only": 434,
+      "write_patch": 24,
       "live": 7,
       "query": 1,
       "render_visual": 12,
       "validate_diff": 3
     },
     "by_risk_class": {
-      "read_safe": 357,
-      "staged_write": 128,
+      "read_safe": 366,
+      "staged_write": 129,
       "live_edit": 50,
       "raw_command": 6
     },
-    "agent_exposed_count": 479
+    "agent_exposed_count": 489
   },
   "gate": {
     "all_classified": true,
@@ -1541,6 +1543,31 @@
       "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
       "engine_tier": "objectdbx_capable",
       "mapping_type": "exact"
+    },
+    {
+      "operation": "write.block.relink_hatch_assoc",
+      "family": "blocks_xrefs_clone",
+      "v1_target": true,
+      "status": "implemented",
+      "host_support": "dbx|coreconsole|arx_adapter|full_autocad",
+      "handler": "m08eDispatch",
+      "test_ref": [
+        "tests/unit/test_relink_assoc.py",
+        "tests/unit/test_m08e_handlers.py"
+      ],
+      "evidence_ref": [
+        "docs/ASSOC_RELINK_DESIGN.md",
+        "src/Ariadne.AcadNative/families/m08e_handlers.inc:m08eHandleRelinkHatchAssoc",
+        "tools/patch_ops/blocks.py:relink_hatch_assoc_ops",
+        "reports/interior100/R4u_remeasure_lwz.json"
+      ],
+      "blocker_ref": "",
+      "risk_class": "staged_write",
+      "write_level": "write_copy",
+      "agent_exposed": true,
+      "notes": "P3 assoc-relink arc (R4v). Opens the (already appended, non-associative) hatch by its rebuilt handle, sets the associative flag, then per loop index REPLACES the geometric loop with an id-derived loop (removeLoopAt + insertLoopAt(int, type,",
+      "engine_tier": "objectdbx_capable",
+      "mapping_type": "synthetic"
     },
     {
       "operation": "write.block.append_entity",
@@ -14503,13 +14530,210 @@
       "notes": "New op, no catalog precedent (same R3_coverage.md G0 / catalog_completeness.py disposition as its sibling section ops). INITIALLY ASSUMED full_autocad-only (ASM + AutoCAD generate-section UI machinery); MEASURED THIS WAVE to be false -- gen",
       "engine_tier": "objectdbx_capable",
       "mapping_type": "synthetic"
+    },
+    {
+      "operation": "inspect.entity.identity_contract",
+      "family": "inspect",
+      "v1_target": true,
+      "status": "implemented",
+      "host_support": "dbx|coreconsole|arx_adapter|full_autocad",
+      "handler": "entity_identity.verify_identity_stability",
+      "test_ref": [
+        "tests/unit/test_entity_identity.py::TestVerifyIdentityStability"
+      ],
+      "evidence_ref": [
+        "tools/entity_identity.py::verify_identity_stability",
+        "tools/entity_identity.py::entity_identity_key"
+      ],
+      "blocker_ref": "",
+      "risk_class": "read_safe",
+      "write_level": "read",
+      "agent_exposed": true,
+      "notes": "Pure-Python identity contract comparator: handle-primary matching with xdata/dictionary anchor fallback + coarse geometry drift detection.",
+      "engine_tier": "objectdbx_capable",
+      "mapping_type": "synthetic"
+    },
+    {
+      "operation": "inspect.xdata.semantic_anchor",
+      "family": "inspect",
+      "v1_target": true,
+      "status": "implemented",
+      "host_support": "dbx|coreconsole|arx_adapter|full_autocad",
+      "handler": "semantic_anchor.read_semantic_anchors",
+      "test_ref": [
+        "tests/unit/test_semantic_anchor.py"
+      ],
+      "evidence_ref": [
+        "tools/semantic_anchor.py::read_semantic_anchors",
+        "tests/unit/test_semantic_anchor.py"
+      ],
+      "blocker_ref": "",
+      "risk_class": "read_safe",
+      "write_level": "read",
+      "agent_exposed": true,
+      "notes": "IMPLEMENTED. Pure Python, stdlib-only, no DWG access. Returns an empty-but-ok result when no xdata or extension-dictionary anchors are present.",
+      "engine_tier": "objectdbx_capable",
+      "mapping_type": "synthetic"
+    },
+    {
+      "operation": "run.corpus.batch",
+      "family": "corpus",
+      "v1_target": true,
+      "status": "implemented",
+      "host_support": "dbx|coreconsole|arx_adapter|full_autocad",
+      "handler": "corpus_batch.run_corpus_batch",
+      "test_ref": [
+        "tests/unit/test_corpus_batch.py"
+      ],
+      "evidence_ref": [
+        "tools/corpus_batch.py::run_corpus_batch",
+        "tests/unit/test_corpus_batch.py"
+      ],
+      "blocker_ref": "",
+      "risk_class": "read_safe",
+      "write_level": "read",
+      "agent_exposed": true,
+      "notes": "IMPLEMENTED. Handler = tools/corpus_batch.py run_corpus_batch (staged copy per file, resumable JSONL ledger, bounded concurrency, failure isolation). Offline tests cover resume-skip, failure counting, original immutability.",
+      "engine_tier": "objectdbx_capable",
+      "mapping_type": "synthetic"
+    },
+    {
+      "operation": "verify.cross_engine.dwg",
+      "family": "verify",
+      "v1_target": true,
+      "status": "implemented",
+      "host_support": "dbx|coreconsole|arx_adapter|full_autocad",
+      "handler": "verify_cross_engine",
+      "test_ref": [
+        "tests/unit/test_cross_engine_verify.py::test_match_reports_concordant",
+        "tests/unit/test_cross_engine_verify.py::test_mismatch_reports_deltas",
+        "tests/unit/test_cross_engine_verify.py::test_missing_libredwg_bin_returns_not_available"
+      ],
+      "evidence_ref": [
+        "tools/validator.py::validate_target",
+        "tools/cadctl.py::Cad.validate",
+        "runs/m02_cadctl_rich/dwg_graph_ir.json (21747 entities)",
+        "docs/OPERATION_REGISTRY_SPEC.md"
+      ],
+      "blocker_ref": "",
+      "risk_class": "read_safe",
+      "write_level": "read",
+      "agent_exposed": true,
+      "notes": "Stage a READ-ONLY DWG copy under staging/cross_engine_verify, invoke dwgread as a separate sidecar through subprocess, compute AutoCAD-vs-LibreDWG entity_count/layer deltas, and include original_unchanged via SHA-256 pre/post verification. ",
+      "engine_tier": "objectdbx_capable",
+      "mapping_type": "synthetic"
+    },
+    {
+      "operation": "inspect.annoscale.list",
+      "family": "symbol_tables_dictionaries",
+      "v1_target": true,
+      "status": "implemented",
+      "host_support": "arx_adapter|full_autocad",
+      "handler": "annoscaleReadDispatch",
+      "test_ref": [
+        "tests/unit/test_nat_annoscale_fragment.py"
+      ],
+      "evidence_ref": [
+        "src/Ariadne.AcadNative/families/annoscale_read.inc"
+      ],
+      "blocker_ref": "",
+      "risk_class": "read_safe",
+      "write_level": "read",
+      "agent_exposed": true,
+      "notes": "IMPLEMENTED (w7-annoscale). Handler = annoscaleReadDispatch in families/annoscale_read.inc (AcDbObjectContextManager ANNOTATIONSCALES collection iterate, kForRead only). ARX-side (native_arx_only). Compiled 2026-07-07.",
+      "engine_tier": "native_arx_only",
+      "mapping_type": "synthetic"
+    },
+    {
+      "operation": "inspect.entity.annoscale.contexts",
+      "family": "symbol_tables_dictionaries",
+      "v1_target": true,
+      "status": "implemented",
+      "host_support": "arx_adapter|full_autocad",
+      "handler": "annoscaleReadDispatch",
+      "test_ref": [
+        "tests/unit/test_nat_annoscale_fragment.py"
+      ],
+      "evidence_ref": [
+        "src/Ariadne.AcadNative/families/annoscale_read.inc"
+      ],
+      "blocker_ref": "",
+      "risk_class": "read_safe",
+      "write_level": "read",
+      "agent_exposed": true,
+      "notes": "IMPLEMENTED (w7-annoscale). Handler = annoscaleReadDispatch in families/annoscale_read.inc (per-entity annotation context enumeration, kForRead only). ARX-side. Compiled 2026-07-07.",
+      "engine_tier": "native_arx_only",
+      "mapping_type": "synthetic"
+    },
+    {
+      "operation": "inspect.material.enumerate",
+      "family": "symbol_tables_dictionaries",
+      "v1_target": true,
+      "status": "implemented",
+      "host_support": "dbx|coreconsole|arx_adapter|full_autocad",
+      "handler": "materialsReadDispatch",
+      "test_ref": [
+        "tests/unit/test_nat_materials_fragment.py"
+      ],
+      "evidence_ref": [
+        "src/Ariadne.AcadNative/families/materials_read.inc"
+      ],
+      "blocker_ref": "",
+      "risk_class": "read_safe",
+      "write_level": "read",
+      "agent_exposed": true,
+      "notes": "IMPLEMENTED (w7-materials). Handler = materialsReadDispatch in families/materials_read.inc (AcDbDictionary ACDB_MATERIAL_DICT iterate, kForRead only). Compiled into Ariadne.AcadNative.arx (build_iso, 2026-07-07); registration paired with th",
+      "engine_tier": "objectdbx_capable",
+      "mapping_type": "synthetic"
+    },
+    {
+      "operation": "inspect.material.properties",
+      "family": "symbol_tables_dictionaries",
+      "v1_target": true,
+      "status": "implemented",
+      "host_support": "dbx|coreconsole|arx_adapter|full_autocad",
+      "handler": "materialsReadDispatch",
+      "test_ref": [
+        "tests/unit/test_nat_materials_fragment.py"
+      ],
+      "evidence_ref": [
+        "src/Ariadne.AcadNative/families/materials_read.inc"
+      ],
+      "blocker_ref": "",
+      "risk_class": "read_safe",
+      "write_level": "read",
+      "agent_exposed": true,
+      "notes": "IMPLEMENTED (w7-materials). Handler = materialsReadDispatch in families/materials_read.inc (AcDbMaterial property read by name/handle, kForRead only). Compiled 2026-07-07.",
+      "engine_tier": "objectdbx_capable",
+      "mapping_type": "synthetic"
+    },
+    {
+      "operation": "inspect.visualstyle.enumerate",
+      "family": "symbol_tables_dictionaries",
+      "v1_target": true,
+      "status": "implemented",
+      "host_support": "dbx|coreconsole|arx_adapter|full_autocad",
+      "handler": "materialsReadDispatch",
+      "test_ref": [
+        "tests/unit/test_nat_materials_fragment.py"
+      ],
+      "evidence_ref": [
+        "src/Ariadne.AcadNative/families/materials_read.inc"
+      ],
+      "blocker_ref": "",
+      "risk_class": "read_safe",
+      "write_level": "read",
+      "agent_exposed": true,
+      "notes": "IMPLEMENTED (w7-materials). Handler = materialsReadDispatch in families/materials_read.inc (ACDB_VISUALSTYLE_DICT iterate, kForRead only). Compiled 2026-07-07.",
+      "engine_tier": "objectdbx_capable",
+      "mapping_type": "synthetic"
     }
   ],
   "closure_gate": {
     "schema": "ariadne.cad_os.closure_gate.v1",
     "ticket_basis": "M08A-T01",
     "totals_by_status": {
-      "implemented": 479,
+      "implemented": 489,
       "blocked": 62
     },
     "catalogued": 0,

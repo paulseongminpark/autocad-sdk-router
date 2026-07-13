@@ -1,0 +1,307 @@
+{
+  "method": "Files/fields used. (1) catalogued = per-family count of config/operations.v2.json .operations[].family over the LIVE 551-op registry (schema ariadne.operations_registry.v2, generated_at 2026-06-23). I report the live-551 counts because that is the current SoT I joined every other number against; where the task's cited 517-snapshot (reports/registry_coverage_latest.json .totals.by_family) differs, the family GREW after the snapshot (entities 56->61, symbol_tables 16->31, com_activex 49->51, inspect 16->18, blocks_xrefs 5->9). The 26 named families sum to 545 in the live registry; 6 more ops live in 3 router-internal families (anchor=4, corpus=1, verify=1) outside the task's 26, giving the live total 551. (2) really_implemented = native-wired + router-wired. native-wired computed by scanning src/Ariadne.AcadNative/AriadneNativeJob.cpp + src/Ariadne.AcadNative/families/*.inc (16 handler includes: m08c..m08n, w6_dynblk/layerstate/section, materials_read, annoscale_read) + src/Ariadne.AcadNativeDbx/*.cpp for any op-id-shaped string literal that equals a registry id (dispatch form is `op == \\\"id\\\"` inline OR `op == kConst` with `static const char* const kConst = \\\"id\\\"`; comment lines excluded). That yields 474 registry ids with a real native handler branch (file:line evidence retained per op). router-wired = the 10 (of 26 families) ops implemented in the Python/managed router plane not as native branches (families patch/validate/query/render/apply/diff + 2 inspect ops with execution_context=python_post_process); verified via .handler.router_lane / .execution_context in operations.v2.json. I confirmed handlers are real, not stubs: read write.entity.line (AriadneNativeJob.cpp:6694 builds AcDbLine via appendLine and returns errorstatus), and grep found ZERO host_required/blocked/stub sentinels in the handler bodies (they annotate hostless-vs-full-host inline). (3) crx_eligible/arx_only/dbx_layer = partition of each family's catalogued ops by operations.v2.json .host_eligibility[] + .handler.execution_host_class: arx_only = host_eligibility contains neither 'dbx' nor 'coreconsole' (needs interactive acad.exe); dbx_layer = headless AND execution_host_class=='dbx' (host-agnostic ObjectDBX, loads in .dbx AND headless .crx); crx_eligible = headless but not pure-dbx (accoreconsole console/managed plane). Global partition dbx=250, crx=20, arx=281; headless total dbx+crx = 270, which reproduces the project's established RUNNABLE-270 figure (CADOS build plan) and cross-checks the classification. (4) sample_unimplemented = family ops that are neither native-wired nor router-wired, cross-checked against config/cad_job_operation_aliases.json to exclude alias/synthetic ops that route to a wired handler (none did). CENTRAL DISCREPANCY RESOLVED: the '37' in registry_coverage_latest.json is a STALE pre-M08 snapshot (that report predates the m08c..m08n family .inc handlers, each 40-125 KB, which wired the bulk of handlers; its cadctl.registry_coverage() generator merely counts the status field, which then held honest 37/catalogued-474 values but now holds declared 489). The declared 489 is SUBSTANTIALLY ACCURATE: 473 declared-implemented ops have native op== dispatch branches and 16 are router-plane implemented = all 489 accounted for with evidence; +1 declared-blocked op (live.apply_patch) also has a branch, giving native-wired 474. CAVEAT surfaced (no fake PASS): a wired native handler is NOT the same as headless-functional — only 240 of the 474 wired ops are host-eligible for headless .crx execution; the other 234 are compiled into the module but require interactive acad.exe at runtime (families ui_customization/reactors_events/graphics_system/live/com_activex are almost entirely arx-runtime), and the project's own certification separately flags ~24 as degenerate. Per-family notes give the wired-headless vs wired-arx split. really_implemented here counts 'has a genuine handler on some plane' (evidence-backed), which is the honest answer to the declared-vs-real question; the crx_eligible column is the headless-buildable view for a console pipeline.",
+  "total_catalogued": 545,
+  "total_really_implemented": 484,
+  "total_gap": 61,
+  "families": [
+    {
+      "family": "custom_objects_protocols",
+      "catalogued": 63,
+      "really_implemented": 63,
+      "crx_eligible": 1,
+      "arx_only": 57,
+      "dbx_layer": 5,
+      "sample_unimplemented_op_ids": [],
+      "notes": "100% native-wired (m08k_handlers.inc, e.g. :372) — AcRxClass/AcDbObject/OPM custom-protocol authoring. BUT only 6 of 63 run headless; 57 wired handlers are arx-runtime-only (custom-object registration is app-bound). No build gap, but a HEADLESS gap: 57 need interactive acad.exe. Largest arx-only family."
+    },
+    {
+      "family": "constraints_associativity",
+      "catalogued": 58,
+      "really_implemented": 35,
+      "crx_eligible": 0,
+      "arx_only": 19,
+      "dbx_layer": 39,
+      "sample_unimplemented_op_ids": [
+        "define.assocarray.create",
+        "define.assocarray.path",
+        "define.assocarray.polar",
+        "define.assocarray.rectangular",
+        "define.assocsurface.blend",
+        "define.assocsurface.extrude"
+      ],
+      "notes": "Biggest single native build gap: 23 unbuilt = define.assocarray.* (4) + define.assocsurface.* (blend/extrude/fillet/loft/...). 35 wired via m08kc_handlers.inc (assocaction/dependency/network); 30 of 35 run headless (dbx). assocsurface ops carry execution_context=host. mapping_type=exact, none aliased to a wired op."
+    },
+    {
+      "family": "entities",
+      "catalogued": 61,
+      "really_implemented": 61,
+      "crx_eligible": 0,
+      "arx_only": 0,
+      "dbx_layer": 61,
+      "sample_unimplemented_op_ids": [],
+      "notes": "FULLY DONE and fully headless: 61/61 native-wired (m08d_handlers.inc :221+), 61/61 dbx-layer, 61/61 headless. Core entity CRUD/geometry. No backlog. (live 61 vs stale-snapshot 56 — family grew.)"
+    },
+    {
+      "family": "brep_solids",
+      "catalogued": 54,
+      "really_implemented": 50,
+      "crx_eligible": 0,
+      "arx_only": 10,
+      "dbx_layer": 44,
+      "sample_unimplemented_op_ids": [
+        "edit.subentity.add_paths",
+        "edit.subentity.delete_paths",
+        "edit.subentity.transform",
+        "ui.subentity.highlight"
+      ],
+      "notes": "50/54 native-wired (m08d compute.brep.* massprops/volume/area/containment :258+). 44 headless (dbx), 6 arx. 4 unbuilt = interactive subentity edit/highlight (edit.subentity.*, ui.subentity.highlight) needing live selection. Solid modeling core is headless-complete."
+    },
+    {
+      "family": "com_activex",
+      "catalogued": 51,
+      "really_implemented": 42,
+      "crx_eligible": 0,
+      "arx_only": 43,
+      "dbx_layer": 8,
+      "sample_unimplemented_op_ids": [
+        "automate.com.get_app",
+        "automate.com.get_document",
+        "automate.com.get_for_command",
+        "automate.com.get_winapp",
+        "automate.com.send_command",
+        "automate.com.wrapper_for_object"
+      ],
+      "notes": "HOST-BOUNDARY family: 42/51 native-wired (m08m_handlers.inc :963), but only 8 run headless (the OPM/property-authoring 'hostless' ops); 34 wired need a live full-acad COM server; 9 unbuilt = automate.com.get_app/get_document/send_command/etc (live COM, execution_context=host / external_com_install_bound). Not realizable in .crx beyond the 8 DB/class-level ops."
+    },
+    {
+      "family": "ui_customization",
+      "catalogued": 39,
+      "really_implemented": 37,
+      "crx_eligible": 0,
+      "arx_only": 39,
+      "dbx_layer": 0,
+      "sample_unimplemented_op_ids": [
+        "command.menu.invoke",
+        "editor.toolpalette.tool_execute"
+      ],
+      "notes": "ENTIRELY interactive: 37/39 native-wired (m08n_handlers.inc :347) but ALL 37 are arx-runtime — menus/ribbon/CUI/palettes/statusbar need full acad UI. 0 headless. 2 unbuilt (command.menu.invoke, editor.toolpalette.tool_execute). Not a headless-pipeline target."
+    },
+    {
+      "family": "editor_input",
+      "catalogued": 27,
+      "really_implemented": 26,
+      "crx_eligible": 10,
+      "arx_only": 17,
+      "dbx_layer": 0,
+      "sample_unimplemented_op_ids": [
+        "command.queue.post"
+      ],
+      "notes": "26/27 native-wired (m08n :304). Split host: 10 headless (editor config/sysvar-style, crx_eligible) + 16 arx-runtime (interactive prompts/jigs/pick). 1 unbuilt (command.queue.post, live editor). Prompt-driven ops inherently need interactive acad."
+    },
+    {
+      "family": "runtime_commands",
+      "catalogued": 26,
+      "really_implemented": 10,
+      "crx_eligible": 2,
+      "arx_only": 23,
+      "dbx_layer": 1,
+      "sample_unimplemented_op_ids": [
+        "module.command.lookup",
+        "module.command.remove_group",
+        "module.entrypoint.define",
+        "module.entrypoint.dispatch",
+        "module.lifecycle.init",
+        "module.lifecycle.on_load_dwg"
+      ],
+      "notes": "STRUCTURAL gap: 16 unbuilt = module.lifecycle.* / module.command.* / module.entrypoint.* — these are ObjectARX app-load/unload CALLBACKS (kInitAppMsg etc), not job-dispatchable operations, so most are not buildable as run_operation handlers. 10/26 native-wired (m08n :332); only 1 headless. Reclassify most of the 16 as non-op module hooks."
+    },
+    {
+      "family": "geometry_kernel",
+      "catalogued": 25,
+      "really_implemented": 25,
+      "crx_eligible": 0,
+      "arx_only": 16,
+      "dbx_layer": 9,
+      "sample_unimplemented_op_ids": [],
+      "notes": "25/25 native-wired (AriadneNativeJob.cpp :6062 + m08d compute.geometry.*). 9 dbx/headless (AcGe point/matrix/curve eval) + 16 catalogued with arx host-eligibility. No build gap; verify whether the 16 arx-flagged AcGe ops could be re-hosted headless (pure geometry should be hostless — host_eligibility may be conservative)."
+    },
+    {
+      "family": "reactors_events",
+      "catalogued": 22,
+      "really_implemented": 22,
+      "crx_eligible": 0,
+      "arx_only": 22,
+      "dbx_layer": 0,
+      "sample_unimplemented_op_ids": [],
+      "notes": "22/22 native-wired (m08m react.* :1022) but ALL 22 arx-runtime — reactors fire on live app/editor/document events; wired-but-headless-inert in accoreconsole. Handler comments distinguish hostless DB reactors from full-host editor/docmanager reactors. No build gap; headless value near zero."
+    },
+    {
+      "family": "objectdbx_database",
+      "catalogued": 21,
+      "really_implemented": 21,
+      "crx_eligible": 0,
+      "arx_only": 3,
+      "dbx_layer": 18,
+      "sample_unimplemented_op_ids": [],
+      "notes": "21/21 native-wired (AriadneNativeJob.cpp :6053). 18 dbx/headless + 3 arx. Core host-agnostic DB family — near-fully headless. No backlog."
+    },
+    {
+      "family": "symbol_tables_dictionaries",
+      "catalogued": 31,
+      "really_implemented": 31,
+      "crx_eligible": 0,
+      "arx_only": 3,
+      "dbx_layer": 28,
+      "sample_unimplemented_op_ids": [],
+      "notes": "31/31 native-wired (AriadneNativeJob.cpp :6055 + m08e dictionary handlers). 28 dbx/headless + 3 arx. No build gap. (live 31 vs stale-snapshot 16 — family more than doubled post-M08.)"
+    },
+    {
+      "family": "inspect",
+      "catalogued": 18,
+      "really_implemented": 18,
+      "crx_eligible": 4,
+      "arx_only": 3,
+      "dbx_layer": 11,
+      "sample_unimplemented_op_ids": [],
+      "notes": "18/18 implemented: 16 native-wired (AriadneNativeJob.cpp :6064) + 2 router-plane (inspect.entity.identity_contract, inspect.xdata.semantic_anchor — execution_context=python_post_process). 13 headless. Read-only family, fully covered. (live 18 vs snapshot 16.)"
+    },
+    {
+      "family": "graphics_system",
+      "catalogued": 9,
+      "really_implemented": 9,
+      "crx_eligible": 0,
+      "arx_only": 9,
+      "dbx_layer": 0,
+      "sample_unimplemented_op_ids": [],
+      "notes": "9/9 native-wired (m08l_handlers.inc :638) but ALL 9 arx-runtime — AcGs viewport/view/graphics need a display device. 0 headless. No build gap; not a headless target."
+    },
+    {
+      "family": "active_document_write_original",
+      "catalogued": 8,
+      "really_implemented": 4,
+      "crx_eligible": 3,
+      "arx_only": 5,
+      "dbx_layer": 0,
+      "sample_unimplemented_op_ids": [
+        "command.invoke.coroutine",
+        "command.invoke.sync",
+        "command.invoke.sync.resbuf",
+        "doc.sendstring"
+      ],
+      "notes": "4/8 native-wired (m08n :342); 0 headless — writing the live/original document is arx/live by design (policy also forbids write_original in headless). 4 unbuilt = command.invoke.* / doc.sendstring (live-document command injection). This family intentionally targets interactive acad."
+    },
+    {
+      "family": "live",
+      "catalogued": 7,
+      "really_implemented": 7,
+      "crx_eligible": 0,
+      "arx_only": 7,
+      "dbx_layer": 0,
+      "sample_unimplemented_op_ids": [],
+      "notes": "7/7 native-wired (AriadneNativeJob.cpp :6079, live.echo/status/list_documents/active_document/inspect_entity/apply_patch/etc) but ALL 7 arx-runtime by definition — the live-acad bridge. (live.apply_patch is declared 'blocked' yet has a branch; works only interactively.) Not headless."
+    },
+    {
+      "family": "blocks_xrefs_clone",
+      "catalogued": 9,
+      "really_implemented": 9,
+      "crx_eligible": 0,
+      "arx_only": 1,
+      "dbx_layer": 8,
+      "sample_unimplemented_op_ids": [],
+      "notes": "9/9 native-wired (m08e_handlers.inc :52+, block iterate/append/insert, deep_clone, wblock). 8 dbx/headless + 1 arx. No build gap. (live 9 vs stale-snapshot 5.)"
+    },
+    {
+      "family": "write",
+      "catalogued": 4,
+      "really_implemented": 4,
+      "crx_eligible": 0,
+      "arx_only": 0,
+      "dbx_layer": 4,
+      "sample_unimplemented_op_ids": [],
+      "notes": "FULLY DONE + headless: 4/4 native-wired (AriadneNativeJob.cpp :6067), 4/4 dbx-layer, 4/4 headless. Core staged-write primitives (layer/line/circle/dimstyle create). No backlog."
+    },
+    {
+      "family": "extend",
+      "catalogued": 2,
+      "really_implemented": 2,
+      "crx_eligible": 0,
+      "arx_only": 2,
+      "dbx_layer": 0,
+      "sample_unimplemented_op_ids": [],
+      "notes": "2/2 native-wired (AriadneNativeJob.cpp :6093, extend.deep_native.firing_selftest + inspect.deep_native.firing_report). Both arx-tier (deep-native firing self-test exercises the ARX firing path). No gap."
+    },
+    {
+      "family": "validate",
+      "catalogued": 2,
+      "really_implemented": 2,
+      "crx_eligible": 0,
+      "arx_only": 0,
+      "dbx_layer": 2,
+      "sample_unimplemented_op_ids": [],
+      "notes": "2/2 ROUTER-plane implemented (validate.ir, validate.patch) in the Python router (execution_context python_post_process / cadctl validator) — NOT native .crx handlers, and correctly so (IR/patch schema validation is host-independent). dbx-layer targets. No native build needed."
+    },
+    {
+      "family": "patch",
+      "catalogued": 2,
+      "really_implemented": 2,
+      "crx_eligible": 0,
+      "arx_only": 0,
+      "dbx_layer": 2,
+      "sample_unimplemented_op_ids": [],
+      "notes": "2/2 ROUTER-plane implemented (patch.dry_run, patch.apply_staged) as Python pre-flight in the router; native write is delegated to write.* handlers. No native .crx branch by design. No backlog."
+    },
+    {
+      "family": "layouts_plot_publish",
+      "catalogued": 2,
+      "really_implemented": 0,
+      "crx_eligible": 0,
+      "arx_only": 2,
+      "dbx_layer": 0,
+      "sample_unimplemented_op_ids": [
+        "plot.config.settings",
+        "plot.engine.run"
+      ],
+      "notes": "FULL GAP: 0/2 implemented. plot.config.settings (execution_context in_process_host) + plot.engine.run need the AutoCAD plot engine / host. mapping_type=exact, not aliased. Only true zero-coverage family; both are host-bound (plotting is not available in bare accoreconsole without a plot config)."
+    },
+    {
+      "family": "query",
+      "catalogued": 1,
+      "really_implemented": 1,
+      "crx_eligible": 0,
+      "arx_only": 0,
+      "dbx_layer": 1,
+      "sample_unimplemented_op_ids": [],
+      "notes": "1/1 ROUTER-plane implemented (query.entities) — router-side entity query over extracted IR, dbx-layer/headless. No native branch needed."
+    },
+    {
+      "family": "render",
+      "catalogued": 1,
+      "really_implemented": 1,
+      "crx_eligible": 0,
+      "arx_only": 0,
+      "dbx_layer": 1,
+      "sample_unimplemented_op_ids": [],
+      "notes": "1/1 ROUTER-plane implemented (render.layout) — deterministic IR-to-SVG visual report (router_lane ARIADNE_CAD_JOB, managed/python), not photoreal render. Headless. No native build."
+    },
+    {
+      "family": "apply",
+      "catalogued": 1,
+      "really_implemented": 1,
+      "crx_eligible": 0,
+      "arx_only": 0,
+      "dbx_layer": 1,
+      "sample_unimplemented_op_ids": [],
+      "notes": "1/1 ROUTER-plane implemented (apply.patch) — staged-patch apply orchestrated by the router over native write handlers. Headless. No native branch of its own."
+    },
+    {
+      "family": "diff",
+      "catalogued": 1,
+      "really_implemented": 1,
+      "crx_eligible": 0,
+      "arx_only": 0,
+      "dbx_layer": 1,
+      "sample_unimplemented_op_ids": [],
+      "notes": "1/1 ROUTER-plane implemented (diff.before_after) — before/after DWG diff in the router. Headless. No native build needed."
+    }
+  ]
+}

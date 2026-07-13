@@ -1,0 +1,42 @@
+{
+  "family": "entities_1",
+  "fixtures": {},
+  "needs_state": [
+    {
+      "op": "inspect.curve.protocol",
+      "reason": "m08dDispatch requires 'handle' (m08dFindHandle) resolved via resolveHandle() against an entity already present in the drawing; a stateless args-only fixture cannot supply an existing object handle to open. src/Ariadne.AcadNative/families/m08d_handlers.inc (inspect.curve.protocol: handle)"
+    },
+    {
+      "op": "inspect.entity.common",
+      "reason": "m08dDispatch requires 'handle' (m08dFindHandle) resolved via resolveHandle()/m08dOpenEntity against an entity already present in the drawing; no other arg key is read. src/Ariadne.AcadNative/families/m08d_handlers.inc (inspect.entity.common: handle)"
+    },
+    {
+      "op": "inspect.entity.geomextents",
+      "reason": "m08dDispatch requires 'handle' (m08dFindHandle) resolved via resolveHandle()/m08dOpenEntity against an entity already present in the drawing; no other arg key is read. src/Ariadne.AcadNative/families/m08d_handlers.inc (inspect.entity.geomextents: handle)"
+    },
+    {
+      "op": "inspect.entity.osnap",
+      "reason": "m08dDispatch requires 'handle' (m08dFindHandle) resolved via resolveHandle()/m08dOpenEntity against an entity already present in the drawing; the osnap probe itself uses fixed origin/identity-transform constants, not caller args. src/Ariadne.AcadNative/families/m08d_handlers.inc (inspect.entity.osnap: handle)"
+    },
+    {
+      "op": "modify.curve.offset",
+      "reason": "m08gDispatch requires 'handle' (m08gFindHandle) resolved via resolveHandle() to an existing AcDbCurve entity to open/offset; 'distance' alone cannot exercise the op without a real curve handle. src/Ariadne.AcadNative/families/m08g_handlers.inc (modify.curve.offset: handle, distance)"
+    },
+    {
+      "op": "modify.curve.split",
+      "reason": "m08gDispatch requires 'handle' (m08gFindHandle) resolved via resolveHandle() to an existing AcDbCurve entity to open/split; 'params' alone cannot exercise the op without a real curve handle. src/Ariadne.AcadNative/families/m08g_handlers.inc (modify.curve.split: handle, params)"
+    },
+    {
+      "op": "modify.curve.to_spline",
+      "reason": "m08gDispatch requires 'handle' (m08gFindHandle) resolved via resolveHandle() to an existing AcDbCurve entity to open and convert; no other arg key is read. src/Ariadne.AcadNative/families/m08g_handlers.inc (modify.curve.to_spline: handle)"
+    },
+    {
+      "op": "modify.entity.common",
+      "reason": "m08gDispatch requires 'handle' (m08gFindHandle) resolved via m08gOpenEntityForWrite() to an existing writable entity; 'set_layer'/'set_color_index'/'set_linetype' only mutate that pre-existing entity, they cannot create one. src/Ariadne.AcadNative/families/m08g_handlers.inc (modify.entity.common: handle, set_layer, set_color_index, set_linetype)"
+    },
+    {
+      "op": "modify.entity.copy_transformed",
+      "reason": "m08gDispatch requires 'handle' (m08gFindHandle) resolved via resolveHandle() to an existing source entity to open and getTransformedCopy() from; the transform args (scale/rotate/pivot, read by m08gReadTransform) only modify that pre-existing source. src/Ariadne.AcadNative/families/m08g_handlers.inc (modify.entity.copy_transformed: handle, scale, rotate, pivot)"
+    }
+  ]
+}
