@@ -130,14 +130,20 @@ def test_lwpolyline_mixed_z_fails_safe_to_no_carry():
 # 3. per-vintage .pat synthesis
 # --------------------------------------------------------------------------- #
 
-def _hatch_op(handle, rows, *, name="H3", scale=40.0):
-    return {
-        "operation": "append_block_entity",
-        "args": {"block_name": "W", "entity": {
-            "kind": "hatch", "pattern_name": name, "pattern_scale": scale,
-            "pattern_definitions": rows,
-        }},
+def _hatch_op(handle, rows, *, name="H3", scale=40.0, pattern_type=None):
+    entity = {
+        "kind": "hatch", "pattern_name": name, "pattern_scale": scale,
+        "pattern_definitions": rows,
     }
+    if pattern_type is not None:
+        entity["pattern_type"] = pattern_type
+    return {"operation": "append_block_entity",
+            "args": {"block_name": "W", "entity": entity}}
+
+
+def _pat_row_delta_y(line):
+    # .pat row: angle, x-origin, y-origin, delta-x, delta-y[, dashes...]
+    return float([f.strip() for f in line.split(",")][4])
 
 
 _X_GRID = [
@@ -182,3 +188,59 @@ def test_same_vintage_different_phase_dedupes_to_one_file(tmp_path):
     patch_engine._synthesize_batch_pat_files(str(tmp_path), [op_a, op_b])
     assert (op_a["args"]["entity"]["pattern_pat_path"]
             == op_b["args"]["entity"]["pattern_pat_path"])
+
+
+# ---- GEN2c idempotence repair: pattern-scale double-division ---------------
+# The .pat synthesizer divides base/offset/dashes by pattern_scale to undo the
+# scale-baking of a kPreDefined census read. But a REBUILT hatch is created as
+# kCustomDefined(2) and its census offset comes back in DEFINITION space (raw);
+# dividing that again shrinks the family spacing by `scale` every regeneration
+# (measured GEN2c: 2F3A gen1 0.7071 -> gen2 0.017678 = /40). The divide must be
+# gated on the read convention (pattern_type <= 1 == baked).
+
+_UNIT_ROW = {"angle": 0.0, "base": [0.0, 0.0], "offset": [0.0, 40.0], "dashes": []}
+
+
+def test_predefined_row_divides_scale_out():
+    # kPreDefined(1) census offset is scale-baked -> divide (forward fidelity;
+    # keeps R4x at 27,128 unchanged). offset 40 / scale 40 == unit spacing 1.
+    line = patch_engine._pattern_definition_line(
+        dict(_UNIT_ROW), scale=40.0, pattern_type=1.0)
+    assert _pat_row_delta_y(line) == 1.0
+
+
+def test_absent_pattern_type_keeps_legacy_divide():
+    # No pattern_type threaded -> legacy all-divide default (unchanged behavior
+    # for any caller that does not know the read convention).
+    line = patch_engine._pattern_definition_line(dict(_UNIT_ROW), scale=40.0)
+    assert _pat_row_delta_y(line) == 1.0
+
+
+def test_customdefined_row_does_not_re_divide_scale():
+    # kCustomDefined(2) census offset is already definition-space (raw). It must
+    # NOT be divided again: delta-y == the raw offset, not offset/scale.
+    line = patch_engine._pattern_definition_line(
+        dict(_UNIT_ROW), scale=40.0, pattern_type=2.0)
+    assert _pat_row_delta_y(line) == 40.0
+
+
+def test_custom_pattern_is_a_scale_fixed_point():
+    # The idempotence property the GEN2c reflight validates: for a custom
+    # (type 2) hatch, the delta the synthesizer writes equals the offset a
+    # subsequent census reads back, so a second synthesis is byte-identical --
+    # a fixed point. Pre-fix this shrank by `scale` each pass.
+    scale = 40.0
+    off = 0.7071067811865476
+    row1 = {"angle": 0.0, "base": [0.0, 0.0], "offset": [0.0, off], "dashes": []}
+    line1 = patch_engine._pattern_definition_line(
+        row1, scale=scale, pattern_type=2.0)
+    read_back = _pat_row_delta_y(line1)          # census re-reads this raw
+    # NOT shrunk by scale (pre-fix this was off/40 == 0.017678); equal to the
+    # input within the .pat write precision (10dp).
+    assert abs(read_back - off) < 1e-9
+    assert abs(read_back - off / scale) > 1e-3    # explicitly not the /scale bug
+    row2 = {"angle": 0.0, "base": [0.0, 0.0], "offset": [0.0, read_back],
+            "dashes": []}
+    line2 = patch_engine._pattern_definition_line(
+        row2, scale=scale, pattern_type=2.0)
+    assert line1 == line2                          # byte-identical == fixed point

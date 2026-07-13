@@ -902,14 +902,34 @@ def _format_pat_number(value: Any) -> str:
 
 
 def _pattern_definition_line(row: Dict[str, Any], *, scale: float = 1.0,
-                             rebase: Any = None) -> str:
+                             rebase: Any = None, pattern_type: Any = None) -> str:
     # getPatternDefinitionAt reports base/offset/dashes in EFFECTIVE drawing
     # units -- the entity's pattern_scale is already baked in (measured on the
     # target drawing: H3 offset magnitude == pattern_scale exactly), while
     # angles are NOT baked (row angle 0 vs entity pattern_angle 45deg). The
     # rebuild side re-applies setPatternScale/Angle after setPattern, so the
     # baked scale must be divided OUT here or the pattern is scaled twice.
-    div = scale if scale and scale > 0 else 1.0
+    #
+    # ...but that scale-baking is READ-CONVENTION-specific: getPatternDefinitionAt
+    # returns EFFECTIVE (scale-baked) rows only for kUserDefined(0)/kPreDefined(1)
+    # patterns. Every REBUILT hatch is created via setPattern(kCustomDefined) and
+    # STAYS pattern_type=2; its census offset then comes back in DEFINITION space
+    # (raw, already unscaled). Dividing THAT by scale a second time shrinks the
+    # family spacing by `scale` on every regeneration -- the GEN2c idempotence
+    # defect (2F3A H3: gen1 offset 0.7071 -> gen2 0.017678 = /40, and the rebuilt
+    # render is `scale`x too dense). Control: DASH (non-custom) never drifts.
+    # Gate the division on the read convention; divide only when the row was
+    # scale-baked. pattern_type absent -> assume baked (legacy all-divide default
+    # for callers that do not thread the type -- e.g. the original kPreDefined
+    # census, which is exactly the case that must keep dividing so forward
+    # fidelity is unchanged).
+    bake_divided = True
+    if pattern_type is not None:
+        try:
+            bake_divided = float(pattern_type) <= 1.0
+        except (TypeError, ValueError):
+            bake_divided = True
+    div = (scale if scale and scale > 0 else 1.0) if bake_divided else 1.0
     base = row.get("base") or [0.0, 0.0]
     # Rebase every row against the seed row's base so the .pat itself is
     # zero-phase (intra-pattern structure preserved). The .pat is synthesized
@@ -977,6 +997,10 @@ def _synthesize_batch_pat_files(batch_dir: str, op_records: List[Dict[str, Any]]
         upper_name = pattern_name.upper()
         lines = ["*%s" % upper_name]
         pattern_scale = float(entity.get("pattern_scale") or 1.0)
+        # kCustomDefined(2) census rows are already definition-space; see
+        # _pattern_definition_line -- threading pattern_type gates the
+        # divide-by-scale so a rebuilt (custom) hatch is a .pat fixed point.
+        pattern_type = entity.get("pattern_type")
         # Zero-phase each .pat: rebase all rows against THIS hatch's first
         # row base (see _pattern_definition_line); the per-hatch phase rides
         # HPORIGIN (patch_ops/blocks.py). Zero-phasing is also what makes
@@ -988,7 +1012,8 @@ def _synthesize_batch_pat_files(batch_dir: str, op_records: List[Dict[str, Any]]
                     and all(isinstance(v, (int, float)) for v in cand[:2])):
                 seed_base = cand
         lines.extend(_pattern_definition_line(row, scale=pattern_scale,
-                                              rebase=seed_base)
+                                              rebase=seed_base,
+                                              pattern_type=pattern_type)
                      for row in pattern_definitions)
         content = "\n".join(lines) + "\n"
         digest = hashlib.sha256(content.encode("utf-8")).hexdigest()[:12]
