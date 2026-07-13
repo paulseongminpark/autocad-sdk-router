@@ -1,7 +1,15 @@
-# M08PLOT — native layouts_plot_publish (2 blocked ops → headless build)
+# M08PLOT — native layouts_plot_publish (2 blocked ops)
 
-Execution-ready ticket for the SOLE remaining headless-buildable blocked ops. Follows the M08L/M08KC
-family-addition pattern. **NO FAKES.** Hostless on `ctx.pDb`. Verify feasibility BY BUILDING + PROBING.
+> **STATUS (2026-07-14): NOT a headless build gap — design record only.** The registry Wave3 no-fake-PASS audit
+> already hard-blocked both ops with rationale: `plot.engine.run` = HOST_UNAVAILABLE (AcPlPlotEngine needs an
+> attended/full-AutoCAD plot host, unavailable in CoreConsole); `plot.config.settings` = SAFETY_FORBIDDEN (it is a
+> live_edit page-setup MUTATION and no bounded CAD-OS staged-write/validation contract exists in this tree).
+> This plan is kept as the design record for a *future* path only: (a) an ATTENDED-lane plot for engine.run, and/or
+> (b) a NEW CAD-OS staged-write contract for plot settings + a READ-ONLY `plot.config.settings` variant. Do NOT
+> flip either op to `implemented` in the headless lane. The design below is written as if building; honor the
+> STATUS gate above first.
+
+Design record (follows the M08L/M08KC family-addition pattern). **NO FAKES.** Hostless on `ctx.pDb`.
 
 ## Scope (2 ops, family `layouts_plot_publish`)
 - `plot.config.settings` — read (and optionally set) a layout's plot settings. **HIGH feasibility (DB-resident).**

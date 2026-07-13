@@ -74,8 +74,11 @@ CRASH still exactly the 2 attended live ops; DEGENERATE still the 7 known (5 zer
       CoreConsole; building them hostless would fake the result or invoke a forbidden solver (25 of the 58-op assoc
       brief ARE implemented solver-free; the 33 deferred are honestly deferred). Correctly-blocked, not un-built.
       (An attended-lane build could revisit; out of headless scope.)
-- [ ] **P4b — layouts_plot_publish headless plot** — 2 ops (plot.config.settings, plot.engine.run). The ONLY genuine
-      remaining headless build gap. Tractable (dbplotsettings.h present, accoreconsole plots). Handler + rebuild + probe.
+- [x] **P4b — layouts_plot_publish** — RESOLVED as NOT a headless build gap (evidence: registry Wave3 no-fake-PASS
+      audit notes). `plot.engine.run` = HOST_UNAVAILABLE (AcPlPlotEngine needs an attended/full-AutoCAD plot host);
+      `plot.config.settings` = SAFETY_FORBIDDEN (live_edit page-setup mutation, no bounded CAD-OS staged-write contract).
+      Both accepted as hard blocks. PLAN_M08PLOT.md retained as design record for a future attended lane / staged-write
+      contract + read-only variant. **Net: 0 clean headless build gaps; the headless surface is complete.**
 - [ ] **P5a — runtime_commands reclassify** — 16 ops → kind=module_event, dispatchable=false + lifecycle harness.
 - [ ] **P5b — attended lane** — com_activex 9 + ui/brep-subentity/live/editor incl. the 2 attended CRASH.
       active_document_write_original 4 STAY BLOCKED by design.

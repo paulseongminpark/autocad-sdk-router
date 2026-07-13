@@ -14,32 +14,34 @@ Evidence: `config/operations.v2.json` (registry), `tools/reconcile_native_regist
 ```
 551 total ops
 ├── 489 implemented   (native ObjectARX handlers, dispatch-verified, family live-gate = 435/16 families)
-└──  62 blocked
-     ├──  2 headless-BUILDABLE (genuine remaining build gap)
-     │    └── layouts_plot_publish       2  (plot.config.settings, plot.engine.run — headless plot via
-     │                                       accoreconsole; dbplotsettings.h available)
-     └── 60 correctly-blocked (cannot be built hostless without faking a result or driving an absent engine)
-          ├── constraints_associativity  23  (need the in-app DCM solver / ASM surface modeler / eval callbacks —
-          │                                   AUTHORITATIVE: reports/tickets/M08K-T03.md tested this: 25 of the 58-op
-          │                                   assoc brief are implemented solver-free; the other 33 — assocsurface.*
-          │                                   (ASM), *.evaluate (the solver itself), assocarray create/edit (the
-          │                                   createInstance layout pass IS the evaluator), DCM constraint authoring,
-          │                                   repair/audit, eval callbacks — "implementing them hostless would either
-          │                                   fake the result or invoke the solver, both forbidden by the brief")
-          ├── runtime_commands            16  (command.invoke.* / doc.sendstring — live command loop / module_event)
-          ├── com_activex                  9  (automate.com.* / embed.ole.frame — needs running acad.exe + COM)
-          ├── active_document_write_original 4  (STAY BLOCKED BY DESIGN — original DWG is READ-ONLY invariant)
-          ├── brep_solids subentity        4  (edit.subentity.* / ui.subentity.highlight — interactive selection)
-          ├── ui_customization             2  (attended UI)
-          ├── live.apply_patch             1  (disabled — use m05 staged governor, not the live pump)
-          └── editor_input                 1  (attended editor)
+└──  62 blocked — 0 clean headless build gaps; EVERY op blocked by a genuine engine / host / policy / invariant limit
+     ├── constraints_associativity  23  (need the in-app DCM solver / ASM surface modeler / eval callbacks —
+     │                                   AUTHORITATIVE reports/tickets/M08K-T03.md: 25 of the 58-op assoc brief are
+     │                                   implemented solver-free; the other 33 — assocsurface.* (ASM), *.evaluate
+     │                                   (the solver itself), assocarray create/edit (the createInstance layout pass
+     │                                   IS the evaluator), DCM constraint authoring, repair/audit, eval callbacks —
+     │                                   "implementing them hostless would either fake the result or invoke the solver")
+     ├── runtime_commands            16  (command.invoke.* / doc.sendstring — live command loop / module_event)
+     ├── com_activex                  9  (automate.com.* / embed.ole.frame — needs running acad.exe + COM)
+     ├── active_document_write_original 4  (STAY BLOCKED BY DESIGN — original DWG is READ-ONLY invariant)
+     ├── brep_solids subentity        4  (edit.subentity.* / ui.subentity.highlight — interactive selection)
+     ├── layouts_plot_publish         2  (Wave3 no-fake-PASS audit accepted BOTH as hard blocks: plot.engine.run =
+     │                                   HOST_UNAVAILABLE — AcPlPlotEngine needs an attended/full-AutoCAD plot host;
+     │                                   plot.config.settings = SAFETY_FORBIDDEN — a live_edit page-setup MUTATION
+     │                                   with no bounded CAD-OS staged-write/validation contract in this tree)
+     ├── ui_customization             2  (attended UI)
+     ├── live.apply_patch             1  (disabled — use m05 staged governor, not the live pump)
+     └── editor_input                 1  (attended editor)
 ```
 
-> **Correction note (2026-07-14):** an earlier draft of this report called 25 ops "headless-buildable"
-> (23 assoc + 2 plot). That over-counted: `reports/tickets/M08K-T03.md` — the authoritative, tested M08KC
-> outcome — establishes the 23 constraints_associativity ops need the in-app evaluation solver / ASM modeler,
-> which headless CoreConsole lacks; building them hostless would fake or invoke a forbidden solver. Only the
-> **2 plot ops** are genuinely headless-buildable. The corrected split is 2 buildable / 60 correctly-blocked.
+> **Audit trail (2026-07-14, two corrections against authoritative evidence):** the "headless-buildable" count
+> was walked 25 → 2 → **0** as prior audits surfaced. (1) 23 assoc ops need the in-app solver/ASM — `M08K-T03.md`.
+> (2) The last 2 (plot) were ALREADY hard-blocked by the Wave3 no-fake-PASS audit: `plot.engine.run` HOST_UNAVAILABLE
+> (attended plot host), `plot.config.settings` SAFETY_FORBIDDEN (unstaged live_edit mutation — no staged-write contract).
+> **Net: there is no clean remaining headless build gap** — the native headless surface is complete for every op
+> that is both headless-feasible and write-safe; all 62 blocked ops are correctly blocked with a documented reason.
+> (PLAN_M08PLOT.md is retained only as the design record for a *future* read-only config.settings + a staged-write
+> contract, or an attended-lane plot; it is NOT a headless build gap.)
 
 ## 2. Integrity classification of the 489 implemented ops
 
@@ -114,12 +116,13 @@ All 7 succeed on empty args = near-no-op; none is a defect. Split:
 
 ## 5. Remaining work (honest, scoped)
 
-- **P4b (build)**: 2 plot ops (`plot.config.settings`, `plot.engine.run`) — the ONLY genuine headless build gap.
-  Tractable: `dbplotsettings.h`/`dbplotsetval.h` present; plotting is available in accoreconsole. Needs a
-  handler + rebuild + probe. This is the sole remaining "build it all" headless piece.
-- **P4a is NOT a headless build gap** — the 23 constraints_associativity ops are correctly deferred (need the
-  in-app DCM solver / ASM modeler; M08K-T03.md). "Building" them headless would fake the result or invoke a
-  forbidden solver. They are attended/eval-dependent, not un-built. (An attended-lane build could revisit them.)
+- **There is NO clean headless build gap remaining.** Every blocked op is blocked by a genuine limit:
+  - **P4a (23 assoc)**: need the in-app DCM solver / ASM modeler (M08K-T03.md) — building them headless would fake
+    or invoke a forbidden solver. Attended/eval-dependent, not un-built.
+  - **P4b (2 plot)**: already hard-blocked by the Wave3 no-fake-PASS audit — `plot.engine.run` HOST_UNAVAILABLE
+    (attended plot host); `plot.config.settings` SAFETY_FORBIDDEN (unstaged live_edit mutation, no staged-write
+    contract). Revisiting requires either an attended lane, or a NEW CAD-OS staged-write contract + a read-only
+    config.settings variant (design captured in PLAN_M08PLOT.md) — NOT a headless build gap as specified.
 - **P3b tail**: ~29 more needs-state REACHABLE promotable via handle-provisioning / richer fixture DWG.
 - **P5 (attended lane)**: the 37 attended-policy blocked + 2 attended CRASH — verified with a running acad.exe.
 - **active_document_write_original (4)**: STAY BLOCKED by design.
@@ -130,9 +133,11 @@ The 489 implemented ObjectARX operations are integrity-verified in the headless 
 unexplained crashes**: **340 RUNNABLE** (real verified work), **140 REACHABLE** (dispatch + arg-validation proven,
 needs-state documented per op), **7 intentional-degenerate** (5 zero-arg-by-contract + 2 needs-profile-geometry),
 and **2 attended-only** (`live.jig.point_probe`, `live.status` — verified in the attended lane, not a headless
-defect). All 62 blocked ops are accounted for: **2 are a genuine headless build gap** (plot → P4b); **60 are correctly
-blocked** — 23 need the in-app DCM solver / ASM modeler (M08K-T03.md: building them hostless would fake or invoke
-a forbidden solver), and 37 need attended AutoCAD (COM/UI/editor/subentity) or violate the read-only-original
-invariant. Originals were never mutated (sha-verified unchanged on every one of the 489 probes). This is a
-defensible, evidence-backed certification of the current native module surface — no status was raised without
-its artifact, and the one over-count (25→2 headless-buildable) was corrected against the authoritative ticket.
+defect). All 62 blocked ops are accounted for and **there is no clean remaining headless build gap** — every one is blocked
+by a genuine engine/host/policy/invariant limit: 23 need the in-app DCM solver / ASM modeler (M08K-T03.md), 2 plot
+were hard-blocked by the Wave3 no-fake-PASS audit (HOST_UNAVAILABLE + SAFETY_FORBIDDEN), and 37 need attended
+AutoCAD (COM/UI/editor/subentity) or violate the read-only-original invariant. The native headless surface is
+therefore **complete** for every op that is both headless-feasible and write-safe. Originals were never mutated
+(sha-verified unchanged on every one of the 489 probes). No status was raised without its artifact; the
+headless-buildable count was walked 25 → 2 → 0 as each authoritative prior audit surfaced — that convergence,
+not a single confident number, is the honest result.
