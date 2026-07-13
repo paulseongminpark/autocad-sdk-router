@@ -42,6 +42,7 @@
 #include "imgent.h"    // wA-cert: AcDbRasterImage (rasterimage read branch)
 #include "dbwipe.h"    // wA-cert: AcDbWipeout (wipeout read branch -- IS-A AcDbRasterImage)
 #include "dbmpolygon.h" // wA-cert: AcDbMPolygon (mpolygon read branch)
+#include "dbspfilt.h"  // w8-xclip: AcDbSpatialFilter (block-reference XCLIP read branch)
 #include "dbelipse.h"  // T3a: AcDbEllipse (collectModelSpaceGraph read branch)
 #include "dbdim.h"     // T3a: AcDbRotatedDimension; T3a-batch2: AcDbAlignedDimension/
                        // AcDbRadialDimension/AcDbDiametricDimension; T3a-batch3:
@@ -1524,6 +1525,53 @@ static bool collectEntitiesFromBlock(AcDbBlockTableRecord* pBTR, const char* spa
                 delete pAIt;
                 attrs << "]";
                 arr << ",\"attributes\":" << attrs.str();
+            }
+            // w8-xclip: block-reference XCLIP spatial filter. A clipped INSERT
+            // hangs an AcDbSpatialFilter off its OWN extension dictionary at
+            // ACAD_FILTER/SPATIAL (dbspfilt.h) -- not off the block definition
+            // -- so this is looked up per-block-reference, same as the
+            // attributes[] walk just above. Only emitted when every lookup
+            // step succeeds (the common case is no XCLIP at all); every
+            // opened dictionary/filter is closed on every path.
+            {
+                const AcDbObjectId extDictId = pRef->extensionDictionary();
+                if (!extDictId.isNull()) {
+                    AcDbDictionary* pExtDict = nullptr;
+                    if (acdbOpenObject(pExtDict, extDictId, AcDb::kForRead) == Acad::eOk) {
+                        AcDbObjectId filterDictId;
+                        AcDbDictionary* pFilterDict = nullptr;
+                        if (pExtDict->getAt(ACRX_T("ACAD_FILTER"), filterDictId) == Acad::eOk &&
+                            acdbOpenObject(pFilterDict, filterDictId, AcDb::kForRead) == Acad::eOk) {
+                            AcDbObjectId spatialId;
+                            AcDbSpatialFilter* pSF = nullptr;
+                            if (pFilterDict->getAt(ACRX_T("SPATIAL"), spatialId) == Acad::eOk &&
+                                acdbOpenObject(pSF, spatialId, AcDb::kForRead) == Acad::eOk) {
+                                AcGePoint2dArray clipPts;
+                                AcGeVector3d clipNormal;
+                                double clipElevation = 0.0, clipFrontClip = 0.0, clipBackClip = 0.0;
+                                Adesk::Boolean clipEnabled = Adesk::kFalse;
+                                if (pSF->getDefinition(clipPts, clipNormal, clipElevation, clipFrontClip,
+                                                        clipBackClip, clipEnabled) == Acad::eOk) {
+                                    std::ostringstream boundaryArr;
+                                    for (int bi = 0; bi < clipPts.length(); ++bi) {
+                                        if (bi) boundaryArr << ",";
+                                        boundaryArr << "[" << clipPts[bi].x << "," << clipPts[bi].y << "]";
+                                    }
+                                    arr << ",\"clip\":{\"enabled\":" << (clipEnabled ? "true" : "false")
+                                        << ",\"inverted\":" << (pSF->isInverted() ? "true" : "false")
+                                        << ",\"elevation\":" << clipElevation
+                                        << ",\"front_clip\":" << clipFrontClip
+                                        << ",\"back_clip\":" << clipBackClip
+                                        << ",\"normal\":[" << clipNormal.x << "," << clipNormal.y << "," << clipNormal.z << "]"
+                                        << ",\"boundary\":[" << boundaryArr.str() << "]}";
+                                }
+                                pSF->close();
+                            }
+                            pFilterDict->close();
+                        }
+                        pExtDict->close();
+                    }
+                }
             }
         }
         // p3-insattr: AcDbAttributeDefinition (ATTDEF) -- derives from AcDbText

@@ -494,6 +494,24 @@
       "maxItems": 16,
       "items": { "type": "number" }
     },
+    "block_reference_clip": {
+      "type": "object",
+      "description": "XCLIP spatial-filter clip definition (AcDbSpatialFilter) hung off a block reference's own extension dictionary at ACAD_FILTER/SPATIAL. boundary is in the block reference's ECS; a 2-point boundary is a rectangular clip (min/max corners), verbatim, not expanded.",
+      "additionalProperties": true,
+      "properties": {
+        "enabled": { "type": "boolean" },
+        "inverted": { "type": "boolean", "description": "AcDbSpatialFilter::isInverted() -- true when the clip excludes rather than includes the boundary interior." },
+        "elevation": { "type": "number" },
+        "front_clip": { "type": "number" },
+        "back_clip": { "type": "number" },
+        "normal": { "$ref": "#/$defs/point3" },
+        "boundary": {
+          "type": "array",
+          "description": "Clip boundary vertices, 2D in the block reference's ECS.",
+          "items": { "$ref": "#/$defs/point2" }
+        }
+      }
+    },
     "xref_record": {
       "type": "object",
       "description": "An external reference block.",
@@ -788,6 +806,10 @@
           "items": { "$ref": "#/$defs/xdata_block" }
         },
         "extension_dictionary_handle": { "$ref": "#/$defs/handle" },
+        "clip": {
+          "$ref": "#/$defs/block_reference_clip",
+          "description": "XCLIP spatial-filter clip boundary (class == AcDbBlockReference only). Present only when the INSERT is XCLIP-clipped; a display/visibility attribute, not identity-bearing (excluded from stable_id)."
+        },
         "reactors": {
           "type": "array",
           "description": "Handles of persistent reactors attached to this entity.",

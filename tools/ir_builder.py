@@ -41,6 +41,7 @@ STABLE_ID_FLOAT_EPSILON = 1e-6
 _STABLE_ID_EXCLUDED_ENTITY_FIELDS = frozenset((
     "bbox",
     "block_record_handle",
+    "clip",
     "dim_block_handle",
     "dim_block_name",
     "extension_dictionary_handle",
@@ -1179,6 +1180,13 @@ def _entity_from_native(raw: dict, source_block: dict) -> dict:
     origin = _as_point3(raw.get("origin"))
     if origin is not None:
         entity["origin"] = origin
+    # w8-xclip: block-reference XCLIP spatial filter (native "clip" key, only
+    # present when the native side found an ACAD_FILTER/SPATIAL extension-
+    # dictionary entry on the block reference). A display/visibility
+    # attribute of the INSERT, not part of its identity -- see "clip" in
+    # _STABLE_ID_EXCLUDED_ENTITY_FIELDS above.
+    if isinstance(raw.get("clip"), dict) and raw["clip"]:
+        entity["clip"] = raw["clip"]
     return entity
 
 

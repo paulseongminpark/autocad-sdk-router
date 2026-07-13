@@ -240,6 +240,7 @@ Required per entity: `handle`, `class`, `dxf_name`, `owner_handle`, `space`, `la
 | `geometry` | Coordinate payload (`$defs.geometry`, below). |
 | `xdata[]` | XDATA blocks per registered app (`$defs.xdata_block`: `app` + `items[]` of resbuf). |
 | `extension_dictionary_handle` | Handle of this entity's extension dictionary, if any. |
+| `clip{}` | XCLIP spatial-filter clip on a clipped `AcDbBlockReference` (INSERT): `enabled`, `inverted`, `elevation`, `front_clip`, `back_clip`, `normal`, `boundary` (2D vertices in the block reference's ECS). Emitted only when the INSERT is XCLIP-clipped (`ACAD_FILTER`/`SPATIAL` on the block reference's own extension dictionary). Display/visibility attribute — excluded from `stable_id`. |
 | `reactors[]` | Handles of persistent reactors attached to the entity. |
 | `source{}` | Per-entity provenance: `extractor`, `engine_tier`, `decoded` (false ⇒ `geometry.kind == unsupported`/proxy fallback), `notes`. Lets a merged/partial IR attribute each entity. |
 
