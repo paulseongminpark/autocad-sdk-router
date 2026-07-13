@@ -89,7 +89,24 @@ function Write-Json {
   $json = $Payload | ConvertTo-Json -Depth 16
   if (-not [string]::IsNullOrWhiteSpace($Path)) {
     New-Item -ItemType Directory -Force -Path (Split-Path -Parent $Path) | Out-Null
-    $json | Set-Content -LiteralPath $Path -Encoding UTF8
+    # Concurrency-safe write: a parallel across-drawing sweep runs many router
+    # invocations at once, and the 'status'/'run' actions all write the SHARED
+    # reports\autocad_router_status_latest.json. A bare Set-Content fails
+    # "cannot create the stream" when two writers race the destination handle --
+    # observed to abort a concurrent pre-inspect 'run' entirely. Render to a
+    # per-process temp (each writer owns its temp, so the slow write never
+    # contends), then atomically rename over the target with a short retry (a
+    # fast metadata op; last-writer-wins on the shared status file is harmless
+    # telemetry). Result files go to unique out-dirs, so they never contend and
+    # rename on the first try; a real IO error on the temp write still throws.
+    $tmp = "$Path.$PID.tmp"
+    $json | Set-Content -LiteralPath $tmp -Encoding UTF8 -ErrorAction Stop
+    $renamed = $false
+    for ($i = 0; $i -lt 6 -and -not $renamed; $i++) {
+      try { Move-Item -LiteralPath $tmp -Destination $Path -Force -ErrorAction Stop; $renamed = $true }
+      catch { Start-Sleep -Milliseconds 50 }
+    }
+    if (-not $renamed) { Remove-Item -LiteralPath $tmp -Force -ErrorAction SilentlyContinue }
   }
   $json
 }
