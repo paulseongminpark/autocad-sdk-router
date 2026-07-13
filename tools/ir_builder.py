@@ -1121,6 +1121,11 @@ def _entity_from_native(raw: dict, source_block: dict) -> dict:
         entity["color_method"] = str(raw["color_method"])
     if isinstance(raw.get("true_color"), dict):
         entity["true_color"] = raw["true_color"]
+    # #27: XCLIP clip boundary (AcDbSpatialFilter) emitted by the native side for
+    # block references that carry one -- boundary points, enabled/inverted flags,
+    # normal, front/back clip. Absent for entities with no spatial filter.
+    if isinstance(raw.get("xclip"), dict):
+        entity["xclip"] = raw["xclip"]
     if raw.get("block_record_handle"):
         entity["block_record_handle"] = str(raw["block_record_handle"])
     if isinstance(raw.get("xdata"), list) and raw["xdata"]:

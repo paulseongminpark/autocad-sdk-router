@@ -28,6 +28,7 @@
 #include "dbtrans.h"   // M08B-T03: AcTransactionManager / AcTransaction (txn wrappers)
 #include "dbdict.h"
 #include "dbents.h"
+#include "dbspfilt.h"  // #27: AcDbSpatialFilter (XCLIP clip boundary)
 #include "dbmtext.h"
 #include "dbpl.h"
 #include "dbhatch.h"
@@ -798,6 +799,65 @@ static std::string entityColorJson(AcDbEntity* pEnt)
     return o.str();
 }
 
+// #27: emit a block reference's XCLIP clip boundary. XCLIP is stored as an
+// AcDbSpatialFilter reached through the entity's extension dictionary:
+//   extDict -> "ACAD_FILTER" (a sub-dictionary) -> "SPATIAL" -> AcDbSpatialFilter
+// The graph previously recorded only that the ACAD_FILTER entry existed (via
+// extensionDictionaryJson), never the boundary, so consumers reproduced the
+// block UNCLIPPED (its full content). This resolves the filter and emits the
+// clip definition: boundary points (in the block reference's coordinate space --
+// 2 points = a rectangular window, N points = a polygonal clip), the
+// enabled/inverted flags, the clip-plane normal, and front/back clip distances.
+// Returns "" (no field) when the entity has no spatial filter. dbspfilt.h is
+// included above; dbdict.h (AcDbDictionary) already was.
+static std::string spatialFilterJson(const AcDbObjectId& extDictId)
+{
+    std::ostringstream o; o.precision(kJsonDoublePrecision);
+    if (extDictId.isNull())
+        return o.str();
+    AcDbDictionary* pExtDict = nullptr;
+    if (acdbOpenObject(pExtDict, extDictId, AcDb::kForRead) != Acad::eOk)
+        return o.str();
+    AcDbObjectId filterDictId;
+    Acad::ErrorStatus es = pExtDict->getAt(ACRX_T("ACAD_FILTER"), filterDictId);
+    pExtDict->close();
+    if (es != Acad::eOk || filterDictId.isNull())
+        return o.str();
+    AcDbDictionary* pFilterDict = nullptr;
+    if (acdbOpenObject(pFilterDict, filterDictId, AcDb::kForRead) != Acad::eOk)
+        return o.str();
+    AcDbObjectId spId;
+    es = pFilterDict->getAt(ACRX_T("SPATIAL"), spId);
+    pFilterDict->close();
+    if (es != Acad::eOk || spId.isNull())
+        return o.str();
+    AcDbSpatialFilter* pSF = nullptr;
+    if (acdbOpenObject(pSF, spId, AcDb::kForRead) != Acad::eOk)
+        return o.str();
+    AcGePoint2dArray pts;
+    AcGeVector3d normal;
+    double elevation = 0.0, frontClip = 0.0, backClip = 0.0;
+    Adesk::Boolean enabled = Adesk::kFalse;
+    es = pSF->getDefinition(pts, normal, elevation, frontClip, backClip, enabled);
+    const bool inverted = pSF->isInverted();
+    pSF->close();
+    if (es != Acad::eOk)
+        return o.str();
+    o << ",\"xclip\":{\"enabled\":" << (enabled ? "true" : "false")
+      << ",\"inverted\":" << (inverted ? "true" : "false")
+      << ",\"elevation\":" << elevation
+      << ",\"front_clip\":" << frontClip
+      << ",\"back_clip\":" << backClip
+      << ",\"normal\":[" << normal.x << "," << normal.y << "," << normal.z << "]"
+      << ",\"boundary\":[";
+    for (int i = 0; i < pts.length(); ++i) {
+        if (i) o << ",";
+        o << "[" << pts[i].x << "," << pts[i].y << "]";
+    }
+    o << "]}";
+    return o.str();
+}
+
 static bool resbufCodeIsString(short code)
 {
     return code == 1 || code == 2 || code == 3 || code == 4 || code == 5 ||
@@ -1374,6 +1434,7 @@ static bool collectEntitiesFromBlock(AcDbBlockTableRecord* pBTR, const char* spa
         if (!extDictId.isNull()) {
             arr << ",\"extension_dictionary_handle\":\""
                 << jsonEscape(handleOfId(extDictId)) << "\"";
+            arr << spatialFilterJson(extDictId);  // #27: XCLIP clip boundary, if any
             const std::string extJson = extensionDictionaryJson(
                 handleStr, extDictId, extensionXrecords, extensionXrecordFirst, richCounters);
             if (!extJson.empty()) {
