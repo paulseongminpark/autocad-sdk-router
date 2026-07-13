@@ -632,3 +632,38 @@ def test_ellipse_full_sweep_does_not_collapse_to_degenerate():
         _ir(_block("W", _ellipse("B1", 0.0, 0.0))))
 
     assert report["totals"]["diff0_total"] == 0
+
+
+def test_ellipse_full_ellipse_float_branch_folds_idempotent():
+    # The GEN2d idempotence residual (hd1050 handle 853): the SAME full ellipse
+    # re-extracts with end-start on opposite sides of 2*pi by float noise --
+    # gen1 end-start = 2*pi + 1.8e-15 (%2pi -> ~0), gen2 = 2*pi - 2e-15
+    # (%2pi -> ~2pi). The old exact `sweep == 0.0` guard folded gen1 to an empty
+    # arc and gen2 to full -> a spurious 1-entity mismatch. Both are full and
+    # must MATCH.
+    report = blockdef_diff.diff_block_definitions(
+        _ir(_block("W", _ellipse("A1", 3.1420536623096766, 9.425238969489264))),
+        _ir(_block("W", _ellipse("B1", 3.142053662309676, 9.42523896948926))))
+
+    assert report["totals"]["diff0_total"] == 1
+
+
+def test_ellipse_near_full_within_grid_folds_to_full():
+    # A full ellipse whose residual sits within the shared 6dp grid of a full
+    # turn folds to full; the exact-2*pi and the noisy-2*pi encodings unify.
+    report = blockdef_diff.diff_block_definitions(
+        _ir(_block("W", _ellipse("A1", 0.0, 6.283185307179586))),
+        _ir(_block("W", _ellipse("B1", 0.0, 6.283185307179586 - 5e-7))))
+
+    assert report["totals"]["diff0_total"] == 1
+
+
+def test_ellipse_genuine_partial_arc_is_not_snapped_full():
+    # A real ~359.99deg arc (residual 1.7e-5 > grid) must stay a partial arc,
+    # not be snapped to a full ellipse -- the fold is grid-tight.
+    partial_end = 6.283185307179586 - 1.7e-5
+    report = blockdef_diff.diff_block_definitions(
+        _ir(_block("W", _ellipse("A1", 0.0, partial_end))),
+        _ir(_block("W", _ellipse("B1", 0.0, 6.283185307179586))))
+
+    assert report["totals"]["diff0_total"] == 0

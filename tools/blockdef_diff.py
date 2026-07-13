@@ -187,7 +187,20 @@ def _canonical_ellipse_geometry(g: Dict[str, Any]) -> Dict[str, Any]:
     except (TypeError, ValueError):
         return g
     sweep = (end - start) % _TWO_PI
-    if sweep == 0.0 and abs(end - start) > 1e-9:
+    # Robust full-ellipse detection (LEX-0009, extended on the GEN2d idempotence
+    # residual hd1050/853). A full ellipse has |end-start| ~ k*2pi, and a
+    # re-extraction lands the %2pi residual on EITHER side of 0/2pi by float
+    # noise: measured gen1 end-start = 2pi + 1.8e-15 -> sweep ~ 0; gen2 =
+    # 2pi - 2e-15 -> sweep ~ 2pi. The old exact `sweep == 0.0` guard folded one
+    # generation to an EMPTY arc (sweep rounds to 0) and the other to FULL -- a
+    # 1-entity gen1->gen2 break (and a latent forward mis-fold: 1.dwg's own
+    # 1CDF full ellipse canonicalized to empty, harmless only because forward
+    # was symmetric). Treat the arc as full when it spans at least ~one turn AND
+    # the residual sits within the shared 6dp grid of a full turn. A genuine
+    # partial arc (sweep not near 0/2pi) and a genuine empty arc
+    # (|end-start| < grid) are untouched; a 1.5-turn arc (sweep ~ pi) is not
+    # folded because its residual is not near 0/2pi.
+    if abs(end - start) >= _TWO_PI - 1e-6 and (sweep <= 1e-6 or sweep >= _TWO_PI - 1e-6):
         sweep = _TWO_PI
     start_c = round(start % _TWO_PI, 6)
     if start_c >= _TWO_PI_6DP:
