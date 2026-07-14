@@ -3275,9 +3275,18 @@ static std::string blockTableRecordsJson(AcDbDatabase* pDb, int& btrCount,
             const bool isAnon = pBTR->isAnonymous();
             const bool isXref = pBTR->isFromExternalReference();
             const bool isUserBlock = !isLayout && !isAnon && !isXref;
+            // #66: anonymous *D### dimension blocks hold the actual rendered
+            // dimension geometry (extension lines, arrows, the dimension text in
+            // its real style/font). Collecting their def_entities lets a consumer
+            // reproduce a dimension EXACTLY, instead of re-deriving it from
+            // defpoints + a partial dimstyle. Other anonymous blocks (*U###/*X###
+            // dynamic-block reps etc.) stay deferred.
+            const bool isDimBlock = isAnon && name.size() >= 2 &&
+                                    name[0] == '*' && (name[1] == 'D' || name[1] == 'd');
+            const bool collectDefs = isUserBlock || isDimBlock;
             int entityCount = 0;
             std::string defEntitiesJson = "[]";
-            if (isUserBlock) {
+            if (collectDefs) {
                 // w3-blockdef: full contents extraction for user block defs
                 // only (*Model_Space/paper-space layouts are already walked
                 // elsewhere; anonymous *U###/*D### and xref block contents
@@ -3312,7 +3321,7 @@ static std::string blockTableRecordsJson(AcDbDatabase* pDb, int& btrCount,
                 << ",\"is_xref\":" << (isXref ? "true" : "false")
                 << ",\"entity_count\":" << entityCount << "}";
             ++btrCount;
-            if (isUserBlock) {
+            if (collectDefs) {
                 ++userBlockDefs;
                 if (!dfirst)
                     defs << ",";
