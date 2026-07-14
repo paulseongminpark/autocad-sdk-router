@@ -1553,6 +1553,7 @@ static bool collectEntitiesFromBlock(AcDbBlockTableRecord* pBTR, const char* spa
                                 if (pSF->getDefinition(clipPts, clipNormal, clipElevation, clipFrontClip,
                                                         clipBackClip, clipEnabled) == Acad::eOk) {
                                     std::ostringstream boundaryArr;
+                                    boundaryArr.precision(kJsonDoublePrecision);  // full double fidelity, matching arr (SBC audit)
                                     for (int bi = 0; bi < clipPts.length(); ++bi) {
                                         if (bi) boundaryArr << ",";
                                         boundaryArr << "[" << clipPts[bi].x << "," << clipPts[bi].y << "]";
