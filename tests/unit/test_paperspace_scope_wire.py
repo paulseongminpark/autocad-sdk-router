@@ -72,6 +72,18 @@ class TestMixedModelAndPaperSpaceWiring(unittest.TestCase):
         # entities[] realized length includes model + paper entities.
         self.assertEqual(len(self.ir["entities"]), 3)
         self.assertEqual(self.ir["diagnostics"]["entity_count"], 3)
+        # The realized array length is modelspace_entities + paperspace_entities
+        # (2 + 1 == 3). The truth gate must compare against that TOTAL, not against
+        # modelspace_entities alone -- else every paper-bearing drawing raises a
+        # false "!= realized" mismatch. Regression guard for that exact bug
+        # (caught by adversarial audit SBC-20260714-001).
+        diag = self.ir["diagnostics"]
+        self.assertEqual(
+            [w for w in diag["warnings"] if "realized" in w], [],
+            f"spurious paperspace truth-gate mismatch warning: {diag['warnings']}")
+        self.assertTrue(diag["coverage"]["match"], "coverage.match must hold with paper space")
+        # the modelspace-named field stays model-only (accurate), not the total.
+        self.assertEqual(diag["coverage"]["modelspace_count_from_native"], 2)
 
     def test_count_scope_is_modelspace_and_paperspace(self):
         self.assertEqual(

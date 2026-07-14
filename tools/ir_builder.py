@@ -1235,7 +1235,14 @@ def build_ir_from_database_graph(graph_result: dict, source_meta: dict) -> dict:
     assign_stable_entity_identity(entities)
 
     entity_count = len(entities)
-    asserted = graph_result.get("modelspace_entities")
+    # entities[] holds model space PLUS every non-Model layout's paper space (the
+    # native inspect.database.graph splices them in), so the realized array length is
+    # modelspace_entities + paperspace_entities -- NOT modelspace_entities alone.
+    # Comparing the realized length against the model-space count only would flag a
+    # false mismatch on every drawing that has any paper-space geometry.
+    asserted_model = graph_result.get("modelspace_entities")
+    asserted_paper = graph_result.get("paperspace_entities") or 0
+    asserted = (asserted_model + asserted_paper) if asserted_model is not None else None
     entities_by_type: dict[str, int] = {}
     proxy_undecoded = 0
     for ent in entities:
@@ -1248,7 +1255,7 @@ def build_ir_from_database_graph(graph_result: dict, source_meta: dict) -> dict:
     errors: list[str] = []
     if asserted is not None and asserted != entity_count:
         warnings.append(
-            f"native modelspace_entities {asserted} != realized {entity_count}")
+            f"native modelspace+paperspace entities {asserted} != realized {entity_count}")
 
     native_cov = graph_result.get("coverage") or {}
     sections_present = list(native_cov.get("sections_present") or [])
@@ -1303,7 +1310,7 @@ def build_ir_from_database_graph(graph_result: dict, source_meta: dict) -> dict:
         "warnings": warnings,
         "errors": errors,
         "coverage": {
-            "modelspace_count_from_native": asserted,
+            "modelspace_count_from_native": asserted_model,
             "realized_entity_count": entity_count,
             "match": (asserted is None) or (asserted == entity_count),
             "sections_present": sections_present,

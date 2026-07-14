@@ -6263,10 +6263,10 @@ static void ariadneNativeJob()
         // spaceLabel="paper") model space and block defs already use. Layout
         // enumeration mirrors layoutsRichJson (~line 3280) above. The "Model"
         // layout is skipped (already walked via collectModelSpaceGraph).
-        // NON_GOAL: folding paper entities' extension-dictionary/xrecord
-        // CONTENTS into the rich sections below is out of scope here -- each
-        // paper entity's own extension_dictionary_handle field is still
-        // emitted; the contents-section richness is a documented follow-up.
+        // Paper entities' extension-dictionary/xrecord CONTENTS are folded into the
+        // same top-level rich sections as model space (below), so the shared
+        // richCounters stay consistent with the emitted content: a paper entity that
+        // increments a coverage counter also lands in the emitted arrays (SBC audit).
         int paperTotal = 0;
         AcDbDictionary* pLayouts = nullptr;
         if (pDb->getLayoutDictionary(pLayouts, AcDb::kForRead) == Acad::eOk) {
@@ -6290,6 +6290,8 @@ static void ariadneNativeJob()
                                         pBTR, "paper", paperCount, paperEntitiesJson,
                                         paperExtDicts, paperXrecords, richCounters)) {
                                     entitiesJson = mergeJsonArrays(entitiesJson, paperEntitiesJson);
+                                    extensionDictionariesJson = mergeJsonArrays(extensionDictionariesJson, paperExtDicts);
+                                    extensionXrecordsJson = mergeJsonArrays(extensionXrecordsJson, paperXrecords);
                                     paperTotal += paperCount;
                                 }
                                 pBTR->close();
