@@ -797,6 +797,11 @@ static std::string entityColorJson(AcDbEntity* pEnt)
           << ",\"g\":" << static_cast<int>(col.green())
           << ",\"b\":" << static_cast<int>(col.blue()) << "}";
     }
+    // #64: linetype (name; "ByLayer"/"ByBlock"/"Continuous" or a named ltype) and
+    // lineweight (1/100 mm, or the sentinels -1=ByLayer, -2=ByBlock, -3=Default)
+    // so dashed / thick entities render correctly. The graph path emitted neither.
+    o << ",\"linetype\":\"" << jsonEscape(acharToAscii(pEnt->linetype())) << "\"";
+    o << ",\"lineweight\":" << static_cast<int>(pEnt->lineWeight());
     return o.str();
 }
 

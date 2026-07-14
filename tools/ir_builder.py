@@ -1121,6 +1121,11 @@ def _entity_from_native(raw: dict, source_block: dict) -> dict:
         entity["color_method"] = str(raw["color_method"])
     if isinstance(raw.get("true_color"), dict):
         entity["true_color"] = raw["true_color"]
+    # #64: per-entity linetype (name) + lineweight, for dashed/thick rendering.
+    if raw.get("linetype"):
+        entity["linetype"] = str(raw["linetype"])
+    if raw.get("lineweight") is not None:
+        entity["lineweight"] = int(raw["lineweight"])
     # #27: XCLIP clip boundary (AcDbSpatialFilter) emitted by the native side for
     # block references that carry one -- boundary points, enabled/inverted flags,
     # normal, front/back clip. Absent for entities with no spatial filter.
