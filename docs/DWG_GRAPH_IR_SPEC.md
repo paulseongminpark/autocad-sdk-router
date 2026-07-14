@@ -224,6 +224,14 @@ block-definition geometry, when not inlined under `block_definitions`). This arr
 Required per entity: `handle`, `class`, `dxf_name`, `owner_handle`, `space`, `layer`,
 `bbox`, `geometry`, `source`.
 
+**Paper space.** The native `inspect.database.graph` op walks model space first, then
+appends every non-Model layout's paper-space entities (each carrying `space == "paper"`)
+using the same per-entity walker. The native result reports both counts —
+`modelspace_entities` and `paperspace_entities` — and `entities[].length ==
+modelspace_entities + paperspace_entities` when paper entities are present. A drawing
+with no paper-space geometry (or a native collector that predates this) simply reports
+`paperspace_entities: 0`.
+
 | field | meaning |
 |---|---|
 | `handle` | DWG handle (uppercase hex). Portable join key. |
@@ -321,6 +329,12 @@ The IR's single hardest invariant.
 `diagnostics.count_scope`
 (`modelspace \| modelspace_and_paperspace \| all_including_block_definitions \| total`).
 `diagnostics.realized_entity_count` is the **actual** length of `entities[]` as emitted.
+
+`count_scope` is **derived** by `ir_builder`, never hardcoded: it inspects the actual
+`space` values realized across `entities[]` and reports `modelspace_and_paperspace` when
+any entity carries `space == "paper"`, else `modelspace`. This keeps the declared scope
+truthful for both `build_ir_from_extract` (geometry-only extracts, model-space only today)
+and `build_ir_from_database_graph` (native graph results, which may include paper space).
 
 **Gate**: for the matching scope,
 

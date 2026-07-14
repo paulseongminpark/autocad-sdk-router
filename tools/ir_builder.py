@@ -504,6 +504,12 @@ def apply_stable_entity_identity(ir: dict) -> dict:
 
 # --- entity normalization ------------------------------------------------------
 
+def _derive_count_scope(entities: list) -> str:
+    """Derive diagnostics.count_scope from the entity spaces actually present."""
+    spaces = {e.get("space", "model") for e in entities}
+    return "modelspace_and_paperspace" if "paper" in spaces else "modelspace"
+
+
 def _normalize_entity(raw, source_block):
     """Map one dwg_geometry_extract entity to one IR entity (all required fields)."""
     handle = str(raw.get("handle", "") or "")
@@ -629,7 +635,7 @@ def build_ir_from_extract(extract: dict, summary: dict | None, source_meta: dict
 
     diagnostics = {
         "entity_count": entity_count,
-        "count_scope": "modelspace",
+        "count_scope": _derive_count_scope(entities),
         "realized_entity_count": entity_count,
         "entities_by_type": entities_by_type,
         "warnings": warnings,
@@ -1291,7 +1297,7 @@ def build_ir_from_database_graph(graph_result: dict, source_meta: dict) -> dict:
 
     diagnostics = {
         "entity_count": entity_count,
-        "count_scope": "modelspace",
+        "count_scope": _derive_count_scope(entities),
         "realized_entity_count": entity_count,
         "entities_by_type": entities_by_type,
         "warnings": warnings,
