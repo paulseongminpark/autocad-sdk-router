@@ -1684,18 +1684,30 @@ static bool collectEntitiesFromBlock(AcDbBlockTableRecord* pBTR, const char* spa
         else if (AcDbPolyline* pPl = AcDbPolyline::cast(pEnt)) {
             const unsigned int n = pPl->numVerts();
             arr << ",\"vertex_count\":" << n
-                << ",\"closed\":" << (pPl->isClosed() ? "true" : "false")
-                << ",\"vertices\":[";
+                << ",\"closed\":" << (pPl->isClosed() ? "true" : "false");
+            // #65: constant width (a "thick" polyline) -- getConstantWidth
+            // succeeds only when every segment shares one width; else widths
+            // vary per vertex (emitted below). The graph dropped both, so thick
+            // polylines came back hairline.
+            double constW = 0.0;
+            if (pPl->getConstantWidth(constW) == Acad::eOk && constW != 0.0)
+                arr << ",\"const_width\":" << constW;
+            arr << ",\"vertices\":[";
             for (unsigned int vi = 0; vi < n; ++vi) {
                 AcGePoint3d vp;
                 if (pPl->getPointAt(vi, vp) != Acad::eOk)
                     break;
                 double bulge = 0.0;
                 pPl->getBulgeAt(vi, bulge);
+                double sw = 0.0, ew = 0.0;
+                pPl->getWidthsAt(vi, sw, ew);
                 if (vi != 0)
                     arr << ",";
                 arr << "{\"point\":[" << vp.x << "," << vp.y << "," << vp.z << "]"
-                    << ",\"bulge\":" << bulge << "}";
+                    << ",\"bulge\":" << bulge;
+                if (sw != 0.0 || ew != 0.0)
+                    arr << ",\"start_width\":" << sw << ",\"end_width\":" << ew;
+                arr << "}";
             }
             arr << "]";
         }
