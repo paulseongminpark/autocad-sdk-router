@@ -29,6 +29,7 @@
 #include "dbdict.h"
 #include "dbents.h"
 #include "dbspfilt.h"  // #27: AcDbSpatialFilter (XCLIP clip boundary)
+#include "gemat3d.h"   // #63: AcGeMatrix3d (clip-space -> WCS transform)
 #include "dbmtext.h"
 #include "dbpl.h"
 #include "dbhatch.h"
@@ -840,6 +841,16 @@ static std::string spatialFilterJson(const AcDbObjectId& extDictId)
     Adesk::Boolean enabled = Adesk::kFalse;
     es = pSF->getDefinition(pts, normal, elevation, frontClip, backClip, enabled);
     const bool inverted = pSF->isInverted();
+    // #63: getDefinition() returns the boundary in the filter's CLIP SPACE, not
+    // WCS -- that is why the raw points do not line up with where the clip is
+    // drawn. AcDbSpatialFilter carries the clip-space -> WCS transform; apply it
+    // so we can also emit the boundary in world coordinates (where the clip
+    // actually appears). Keep the raw boundary + the matrix for completeness.
+    AcGeMatrix3d clipToWcs;   // clip space -> WCS
+    AcGeMatrix3d invBlockXf;  // clip space -> block-local (inverse of the block
+                              // transform at clip time == reference-code M1)
+    pSF->getClipSpaceToWCSMatrix(clipToWcs);
+    pSF->getOriginalInverseBlockXform(invBlockXf);
     pSF->close();
     if (es != Acad::eOk)
         return o.str();
@@ -854,6 +865,46 @@ static std::string spatialFilterJson(const AcDbObjectId& extDictId)
         if (i) o << ",";
         o << "[" << pts[i].x << "," << pts[i].y << "]";
     }
+    o << "]";
+    // #63: boundary in BLOCK-LOCAL coordinates -- clip-space points transformed
+    // by getOriginalInverseBlockXform (== the reference code's M1: clip space ->
+    // block local). This is what an XCLIP consumer wants (e.g. ezdxf
+    // set_block_clipping_path expects block coords); the block reference's own
+    // insert transform then places it in the drawing. Clip-space points are 2D
+    // (z=0 in that space).
+    // A 2-point boundary is a rectangular window (opposite corners) in the
+    // axis-aligned CLIP space; expand it to 4 corners BEFORE transforming, so a
+    // rotated inverse-block transform yields the correct (rotated) quad.
+    AcGePoint2dArray poly;
+    if (pts.length() == 2) {
+        poly.append(AcGePoint2d(pts[0].x, pts[0].y));
+        poly.append(AcGePoint2d(pts[1].x, pts[0].y));
+        poly.append(AcGePoint2d(pts[1].x, pts[1].y));
+        poly.append(AcGePoint2d(pts[0].x, pts[1].y));
+    } else {
+        for (int i = 0; i < pts.length(); ++i) poly.append(pts[i]);
+    }
+    o << ",\"boundary_block\":[";
+    for (int i = 0; i < poly.length(); ++i) {
+        AcGePoint3d bp(poly[i].x, poly[i].y, 0.0);
+        bp.transformBy(invBlockXf);
+        if (i) o << ",";
+        o << "[" << bp.x << "," << bp.y << "]";
+    }
+    o << "]";
+    // boundary in WCS (clip space -> WCS), for reference/debug
+    o << ",\"boundary_wcs\":[";
+    for (int i = 0; i < pts.length(); ++i) {
+        AcGePoint3d wp(pts[i].x, pts[i].y, 0.0);
+        wp.transformBy(clipToWcs);
+        if (i) o << ",";
+        o << "[" << wp.x << "," << wp.y << "," << wp.z << "]";
+    }
+    o << "]";
+    o << ",\"inv_block_xform\":[";
+    for (int r = 0; r < 4; ++r)
+        for (int c = 0; c < 4; ++c)
+            o << ((r == 0 && c == 0) ? "" : ",") << invBlockXf.entry[r][c];
     o << "]}";
     return o.str();
 }
