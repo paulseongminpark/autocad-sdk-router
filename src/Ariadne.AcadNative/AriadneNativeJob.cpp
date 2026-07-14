@@ -1673,7 +1673,14 @@ static bool collectEntitiesFromBlock(AcDbBlockTableRecord* pBTR, const char* spa
             const AcGePoint3d p = pM->location();
             arr << ",\"position\":[" << p.x << "," << p.y << "," << p.z << "]"
                 << ",\"text\":\"" << jsonEscape(acharToAscii(pM->contents())) << "\""
-                << ",\"height\":" << pM->textHeight();
+                << ",\"height\":" << pM->textHeight()
+                // #68: attachment point (1-9 = top-left..bottom-right, 5 =
+                // middle-center) + rotation. Without these the text anchors
+                // top-left and renders offset from its true position -- most
+                // visible on dimension text, which is middle-anchored.
+                << ",\"attachment_point\":" << static_cast<int>(pM->attachment())
+                << ",\"rotation\":" << pM->rotation()
+                << ",\"width\":" << pM->width();
         }
         else if (AcDbText* pT = AcDbText::cast(pEnt)) {
             const AcGePoint3d p = pT->position();

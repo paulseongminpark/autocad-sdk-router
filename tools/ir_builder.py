@@ -906,6 +906,12 @@ def _geometry_from_native_entity(raw: dict, kind: str) -> dict:
                    # convention as pattern_type/hatch_style above) and
                    # AcDbMPolygon's loop_count (numMPolygonLoops()).
                    ("clip_boundary_type", "clip_boundary_type"),
+                   # #68: AcDbMText attachment point (1-9; 5 = middle-center) and
+                   # defined box width -- without the attachment point the text
+                   # anchors top-left and renders offset (most visible on
+                   # dimension text, which is middle-anchored).
+                   ("attachment_point", "attachment_point"),
+                   ("width", "width"),
                    ("loop_count", "loop_count")):
         num = _to_number(raw.get(nk))
         if num is not None:
