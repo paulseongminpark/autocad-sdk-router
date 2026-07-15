@@ -6410,9 +6410,10 @@ static void ariadneNativeJob()
     else if (op == "inspect.database.graph") {
         // Pure DB read -> NO host gating (runs in coreconsole + full_autocad).
         // The enclosing AriadneDocumentWriteLock is kept as-is (harmless for a
-        // read). modelspace_entities is the array length by construction, so the
-        // emitted count and entities[] are internally consistent and (modulo the
-        // same model-space walk) equal to inspect.database.summary's count.
+        // read). entities[] now holds model space PLUS every non-Model layout's
+        // paper space (spliced in below), so modelspace_entities is no longer
+        // the array length by construction -- entities[].length ==
+        // modelspace_entities + paperspace_entities.
         int total = 0;
         std::string entitiesJson;
         std::string extensionDictionariesJson;
@@ -6425,6 +6426,54 @@ static void ariadneNativeJob()
             extensionDictionariesJson = "[]";
             extensionXrecordsJson = "[]";
         }
+
+        // w-paperscope: splice paper-space (layout) entities into entities[]
+        // using the SAME per-entity walker (collectEntitiesFromBlock,
+        // spaceLabel="paper") model space and block defs already use. Layout
+        // enumeration mirrors layoutsRichJson (~line 3280) above. The "Model"
+        // layout is skipped (already walked via collectModelSpaceGraph).
+        // Paper entities' extension-dictionary/xrecord CONTENTS are folded into the
+        // same top-level rich sections as model space (below), so the shared
+        // richCounters stay consistent with the emitted content: a paper entity that
+        // increments a coverage counter also lands in the emitted arrays (SBC audit).
+        int paperTotal = 0;
+        AcDbDictionary* pLayouts = nullptr;
+        if (pDb->getLayoutDictionary(pLayouts, AcDb::kForRead) == Acad::eOk) {
+            AcDbDictionaryIterator* pIt = pLayouts->newIterator();
+            for (; pIt != nullptr && !pIt->done(); pIt->next()) {
+                AcDbObject* pObj = nullptr;
+                if (acdbOpenObject(pObj, pIt->objectId(), AcDb::kForRead) == Acad::eOk) {
+                    AcDbLayout* pLayout = AcDbLayout::cast(pObj);
+                    if (pLayout != nullptr) {
+                        const ACHAR* nameRaw = nullptr;
+                        std::string layoutName;
+                        if (pLayout->getLayoutName(nameRaw) == Acad::eOk)
+                            layoutName = acharToAscii(nameRaw);
+                        if (layoutName != "Model") {
+                            AcDbBlockTableRecord* pBTR = nullptr;
+                            if (acdbOpenObject(pBTR, pLayout->getBlockTableRecordId(),
+                                                AcDb::kForRead) == Acad::eOk) {
+                                int paperCount = 0;
+                                std::string paperEntitiesJson, paperExtDicts, paperXrecords;
+                                if (collectEntitiesFromBlock(
+                                        pBTR, "paper", paperCount, paperEntitiesJson,
+                                        paperExtDicts, paperXrecords, richCounters)) {
+                                    entitiesJson = mergeJsonArrays(entitiesJson, paperEntitiesJson);
+                                    extensionDictionariesJson = mergeJsonArrays(extensionDictionariesJson, paperExtDicts);
+                                    extensionXrecordsJson = mergeJsonArrays(extensionXrecordsJson, paperXrecords);
+                                    paperTotal += paperCount;
+                                }
+                                pBTR->close();
+                            }
+                        }
+                    }
+                    pObj->close();
+                }
+            }
+            delete pIt;
+            pLayouts->close();
+        }
+
         // M02: rich database graph (symbol tables, blocks, layouts, xrefs,
         // dictionaries, xrecords) spliced alongside the model-space entities[].
         // collectDatabaseGraph is a guarded pure read; coverage reports which
@@ -6433,6 +6482,7 @@ static void ariadneNativeJob()
         const std::string richSections = collectDatabaseGraph(
             pDb, extensionDictionariesJson, extensionXrecordsJson, richCounters, coverageJson);
         r << "\"result\":{\"modelspace_entities\":" << total
+          << ",\"paperspace_entities\":" << paperTotal
           << ",\"entities\":" << entitiesJson
           << "," << richSections
           << ",\"coverage\":" << coverageJson << "},"
