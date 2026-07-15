@@ -906,6 +906,12 @@ def _geometry_from_native_entity(raw: dict, kind: str) -> dict:
                    # convention as pattern_type/hatch_style above) and
                    # AcDbMPolygon's loop_count (numMPolygonLoops()).
                    ("clip_boundary_type", "clip_boundary_type"),
+                   # #68: AcDbMText attachment point (1-9; 5 = middle-center) and
+                   # defined box width -- without the attachment point the text
+                   # anchors top-left and renders offset (most visible on
+                   # dimension text, which is middle-anchored).
+                   ("attachment_point", "attachment_point"),
+                   ("width", "width"),
                    ("loop_count", "loop_count")):
         num = _to_number(raw.get(nk))
         if num is not None:
@@ -1134,6 +1140,29 @@ def _entity_from_native(raw: dict, source_block: dict) -> dict:
             "decoded": decoded,
         },
     }
+    # #24/#28: raw per-entity color from the native emitter -- color_index (raw
+    # ACI including the sentinels 256=ByLayer and 0=ByBlock), color_method, and a
+    # true_color RGB triple when the entity uses a 24-bit color. Passthrough so a
+    # consumer can resolve the real display color (ByLayer -> layer color,
+    # ByBlock -> owning INSERT's color, else the explicit ACI / true color).
+    # `is not None` (not truthiness) because ByBlock's color_index is 0. Older
+    # native modules that predate the emit simply omit these -> fields absent.
+    if raw.get("color_index") is not None:
+        entity["color_index"] = int(raw["color_index"])
+    if raw.get("color_method"):
+        entity["color_method"] = str(raw["color_method"])
+    if isinstance(raw.get("true_color"), dict):
+        entity["true_color"] = raw["true_color"]
+    # #64: per-entity linetype (name) + lineweight, for dashed/thick rendering.
+    if raw.get("linetype"):
+        entity["linetype"] = str(raw["linetype"])
+    if raw.get("lineweight") is not None:
+        entity["lineweight"] = int(raw["lineweight"])
+    # #27: XCLIP clip boundary (AcDbSpatialFilter) emitted by the native side for
+    # block references that carry one -- boundary points, enabled/inverted flags,
+    # normal, front/back clip. Absent for entities with no spatial filter.
+    if isinstance(raw.get("xclip"), dict):
+        entity["xclip"] = raw["xclip"]
     if raw.get("block_record_handle"):
         entity["block_record_handle"] = str(raw["block_record_handle"])
     if isinstance(raw.get("xdata"), list) and raw["xdata"]:
