@@ -494,6 +494,41 @@
       "maxItems": 16,
       "items": { "type": "number" }
     },
+    "xclip_filter": {
+      "type": "object",
+      "description": "XCLIP spatial-filter clip definition (AcDbSpatialFilter) hung off a block reference's own extension dictionary at ACAD_FILTER/SPATIAL. boundary is VERBATIM in the filter's clip space (2 points = rectangular window, not expanded); boundary_block is in block-local coordinates (clip space transformed by getOriginalInverseBlockXform, 2-point windows expanded to 4 corners in clip space first); boundary_wcs is in world coordinates (getClipSpaceToWCSMatrix).",
+      "additionalProperties": true,
+      "properties": {
+        "enabled": { "type": "boolean" },
+        "inverted": { "type": "boolean", "description": "AcDbSpatialFilter::isInverted() -- true when the clip excludes rather than includes the boundary interior." },
+        "elevation": { "type": "number" },
+        "front_clip": { "type": "number" },
+        "back_clip": { "type": "number" },
+        "normal": { "$ref": "#/$defs/point3" },
+        "boundary": {
+          "type": "array",
+          "description": "Clip boundary vertices, 2D, verbatim in CLIP SPACE.",
+          "items": { "$ref": "#/$defs/point2" }
+        },
+        "boundary_block": {
+          "type": "array",
+          "description": "Clip boundary in BLOCK-LOCAL coordinates (what a block-space consumer, e.g. ezdxf set_block_clipping_path, needs).",
+          "items": { "$ref": "#/$defs/point2" }
+        },
+        "boundary_wcs": {
+          "type": "array",
+          "description": "Clip boundary transformed to WCS (3D points).",
+          "items": { "$ref": "#/$defs/point3" }
+        },
+        "inv_block_xform": {
+          "type": "array",
+          "description": "getOriginalInverseBlockXform as a row-major 4x4 (16 numbers): clip space -> block-local.",
+          "minItems": 16,
+          "maxItems": 16,
+          "items": { "type": "number" }
+        }
+      }
+    },
     "xref_record": {
       "type": "object",
       "description": "An external reference block.",
@@ -776,10 +811,23 @@
         "space": { "$ref": "#/$defs/space" },
         "layout": { "type": "string", "description": "Layout/tab name when space == paper." },
         "layer": { "type": "string" },
-        "linetype": { "type": "string" },
-        "color_index": { "type": "integer" },
-        "lineweight": { "type": "integer" },
+        "linetype": { "type": "string", "description": "Entity linetype NAME as stored (ByLayer / ByBlock / Continuous or a named ltype like HID); the dash pattern lives in symbol_tables.linetypes. Display attribute, excluded from stable_id." },
+        "color_index": { "type": "integer", "description": "Raw ACI color index, emitted verbatim (0=ByBlock, 256=ByLayer, 1-255=ACI); sentinels are not resolved. Display attribute, excluded from stable_id." },
+        "color_method": { "type": "string", "enum": ["bylayer", "byblock", "bycolor", "byaci"], "description": "How the entity's color is stored (AcCmColor method); bycolor implies true_color is present." },
+        "true_color": {
+          "type": "object",
+          "description": "Explicit 24-bit RGB color; present only when color_method == bycolor, omitted for ByLayer/ByBlock/ACI. Display attribute, excluded from stable_id.",
+          "additionalProperties": false,
+          "required": ["r", "g", "b"],
+          "properties": {
+            "r": { "type": "integer", "minimum": 0, "maximum": 255 },
+            "g": { "type": "integer", "minimum": 0, "maximum": 255 },
+            "b": { "type": "integer", "minimum": 0, "maximum": 255 }
+          }
+        },
+        "lineweight": { "type": "integer", "description": "Lineweight in 1/100 mm, or the sentinels -1=ByLayer, -2=ByBlock, -3=Default. Display attribute, excluded from stable_id." },
         "visible": { "type": "boolean" },
+        "xclip": { "$ref": "#/$defs/xclip_filter", "description": "XCLIP spatial-filter clip (AcDbBlockReference only). Present only when the INSERT is XCLIP-clipped; a display/visibility attribute, excluded from stable_id." },
         "bbox": { "$ref": "#/$defs/bbox" },
         "geometry": { "$ref": "#/$defs/geometry" },
         "xdata": {

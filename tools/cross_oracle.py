@@ -179,6 +179,8 @@ _ENGINE_INTENT = {
 _KNOWN_ENTITY_FIELDS = frozenset({
     "handle", "stable_id", "stable_id_ordinal", "object_id", "class", "dxf_name", "owner_handle", "space",
     "layout", "layer", "linetype", "color_index", "lineweight", "visible",
+    # PR #29 display set: color method + explicit RGB + XCLIP spatial filter.
+    "color_method", "true_color", "xclip",
     "bbox", "geometry", "xdata", "extension_dictionary_handle", "reactors",
     "source",
 })

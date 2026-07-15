@@ -41,11 +41,20 @@ STABLE_ID_FLOAT_EPSILON = 1e-6
 _STABLE_ID_EXCLUDED_ENTITY_FIELDS = frozenset((
     "bbox",
     "block_record_handle",
+    # color_index/color_method/true_color, linetype/lineweight, and xclip are
+    # volatile DISPLAY attributes (PR #29 emission): kept in the output entity for
+    # faithful rendering, but a recolor / re-linetype / re-clip must diff as a
+    # MODIFY of the same entity (not delete+create), so they are excluded from
+    # stable identity. Also keeps stable_ids drift-free vs pre-#29 IRs.
+    "color_index",
+    "color_method",
     "dim_block_handle",
     "dim_block_name",
     "extension_dictionary_handle",
     "handle",
     "leader_length",
+    "linetype",
+    "lineweight",
     "object_id",
     "origin",
     "owner_handle",
@@ -55,6 +64,8 @@ _STABLE_ID_EXCLUDED_ENTITY_FIELDS = frozenset((
     "spline_knots",
     "stable_id",
     "stable_id_ordinal",
+    "true_color",
+    "xclip",
     "xdata",
 ))
 _STABLE_ID_VIEWPORT_GEOMETRY_EXCLUDES = frozenset(VPORT_MANAGED_FIELDS)
@@ -447,7 +458,10 @@ def stable_identity_payload(entity: dict) -> dict:
     attrs = {"space": str(entity.get("space", "model") or "model")}
     if entity.get("layout"):
         attrs["layout"] = str(entity["layout"])
-    for key in ("class", "linetype", "color_index", "lineweight", "visible"):
+    # linetype/color_index/lineweight moved OUT of identity attrs when native
+    # emission landed (PR #29 + supplement): they are display attributes now
+    # excluded via _STABLE_ID_EXCLUDED_ENTITY_FIELDS above.
+    for key in ("class", "visible"):
         if key in entity:
             attrs[key] = entity[key]
     payload = {
@@ -465,7 +479,7 @@ def stable_identity_payload(entity: dict) -> dict:
         if key in _STABLE_ID_EXCLUDED_ENTITY_FIELDS:
             continue
         if key in ("class", "dxf_name", "geometry", "layer", "layout", "space",
-                   "linetype", "color_index", "lineweight", "visible"):
+                   "visible"):
             continue
         extras[key] = _normalize_for_stable_hash(entity[key])
     if extras:
@@ -897,6 +911,11 @@ def _geometry_from_native_entity(raw: dict, kind: str) -> dict:
                    ("jog_angle", "jog_angle"), ("elevation", "elevation"),
                    ("default_start_width", "default_start_width"),
                    ("default_end_width", "default_end_width"),
+                   # #35 supplement: AcDbPolyline constant width. PR #29's native
+                   # side emits const_width but the numeric allow-list here was
+                   # never taught it, so the lift silently DROPPED it (the
+                   # per-vertex start_width/end_width lift below already worked).
+                   ("const_width", "const_width"),
                    # a1-hatchread: AcDbHatch's own plane/pattern/gradient
                    # numbers. pattern_type/hatch_style/gradient_type are
                    # AutoCAD enum ordinals (AcDbHatch::HatchPatternType/
@@ -912,6 +931,12 @@ def _geometry_from_native_entity(raw: dict, kind: str) -> dict:
                    # convention as pattern_type/hatch_style above) and
                    # AcDbMPolygon's loop_count (numMPolygonLoops()).
                    ("clip_boundary_type", "clip_boundary_type"),
+                   # #68: AcDbMText attachment point (1-9; 5 = middle-center) and
+                   # defined box width -- without the attachment point the text
+                   # anchors top-left and renders offset (most visible on
+                   # dimension text, which is middle-anchored).
+                   ("attachment_point", "attachment_point"),
+                   ("width", "width"),
                    ("loop_count", "loop_count")):
         num = _to_number(raw.get(nk))
         if num is not None:
@@ -1140,6 +1165,29 @@ def _entity_from_native(raw: dict, source_block: dict) -> dict:
             "decoded": decoded,
         },
     }
+    # #24/#28: raw per-entity color from the native emitter -- color_index (raw
+    # ACI including the sentinels 256=ByLayer and 0=ByBlock), color_method, and a
+    # true_color RGB triple when the entity uses a 24-bit color. Passthrough so a
+    # consumer can resolve the real display color (ByLayer -> layer color,
+    # ByBlock -> owning INSERT's color, else the explicit ACI / true color).
+    # `is not None` (not truthiness) because ByBlock's color_index is 0. Older
+    # native modules that predate the emit simply omit these -> fields absent.
+    if raw.get("color_index") is not None:
+        entity["color_index"] = int(raw["color_index"])
+    if raw.get("color_method"):
+        entity["color_method"] = str(raw["color_method"])
+    if isinstance(raw.get("true_color"), dict):
+        entity["true_color"] = raw["true_color"]
+    # #64: per-entity linetype (name) + lineweight, for dashed/thick rendering.
+    if raw.get("linetype"):
+        entity["linetype"] = str(raw["linetype"])
+    if raw.get("lineweight") is not None:
+        entity["lineweight"] = int(raw["lineweight"])
+    # #27: XCLIP clip boundary (AcDbSpatialFilter) emitted by the native side for
+    # block references that carry one -- boundary points, enabled/inverted flags,
+    # normal, front/back clip. Absent for entities with no spatial filter.
+    if isinstance(raw.get("xclip"), dict):
+        entity["xclip"] = raw["xclip"]
     if raw.get("block_record_handle"):
         entity["block_record_handle"] = str(raw["block_record_handle"])
     if isinstance(raw.get("xdata"), list) and raw["xdata"]:

@@ -28,6 +28,8 @@
 #include "dbtrans.h"   // M08B-T03: AcTransactionManager / AcTransaction (txn wrappers)
 #include "dbdict.h"
 #include "dbents.h"
+#include "dbspfilt.h"  // #27: AcDbSpatialFilter (XCLIP clip boundary)
+#include "gemat3d.h"   // #63: AcGeMatrix3d (clip-space -> WCS transform)
 #include "dbmtext.h"
 #include "dbpl.h"
 #include "dbhatch.h"
@@ -769,6 +771,149 @@ static std::string serializeEntityCommon(AcDbEntity* pEnt)
     return o.str();
 }
 
+// #24/#28: emit the entity's raw color as stored -- color_index (raw ACI,
+// including the sentinels 256=ByLayer and 0=ByBlock), the color method, and a
+// true_color RGB triple when the entity carries a 24-bit color. The graph/IR
+// path (collectEntitiesFromBlock) previously emitted NO per-entity color, so a
+// consumer could only fall back to the layer color (ByLayer) -- wrong for any
+// entity with an explicit override or ByBlock (commonly text and block
+// content). With the raw value present the consumer resolves the real display
+// color: ByLayer -> layer color, ByBlock -> owning INSERT's color, else the
+// explicit ACI / true color. dbcolor.h (AcCmColor) is already included above.
+static std::string entityColorJson(AcDbEntity* pEnt)
+{
+    std::ostringstream o; o.precision(kJsonDoublePrecision);
+    if (pEnt == nullptr)
+        return o.str();
+    o << ",\"color_index\":" << static_cast<int>(pEnt->colorIndex());
+    const AcCmColor col = pEnt->color();
+    const char* method = "byaci";
+    if (col.isByLayer())      method = "bylayer";
+    else if (col.isByBlock()) method = "byblock";
+    else if (col.isByColor()) method = "bycolor";
+    o << ",\"color_method\":\"" << method << "\"";
+    if (col.isByColor()) {
+        o << ",\"true_color\":{\"r\":" << static_cast<int>(col.red())
+          << ",\"g\":" << static_cast<int>(col.green())
+          << ",\"b\":" << static_cast<int>(col.blue()) << "}";
+    }
+    // #64: linetype (name; "ByLayer"/"ByBlock"/"Continuous" or a named ltype) and
+    // lineweight (1/100 mm, or the sentinels -1=ByLayer, -2=ByBlock, -3=Default)
+    // so dashed / thick entities render correctly. The graph path emitted neither.
+    o << ",\"linetype\":\"" << jsonEscape(acharToAscii(pEnt->linetype())) << "\"";
+    o << ",\"lineweight\":" << static_cast<int>(pEnt->lineWeight());
+    return o.str();
+}
+
+// #27: emit a block reference's XCLIP clip boundary. XCLIP is stored as an
+// AcDbSpatialFilter reached through the entity's extension dictionary:
+//   extDict -> "ACAD_FILTER" (a sub-dictionary) -> "SPATIAL" -> AcDbSpatialFilter
+// The graph previously recorded only that the ACAD_FILTER entry existed (via
+// extensionDictionaryJson), never the boundary, so consumers reproduced the
+// block UNCLIPPED (its full content). This resolves the filter and emits the
+// clip definition: boundary points (in the block reference's coordinate space --
+// 2 points = a rectangular window, N points = a polygonal clip), the
+// enabled/inverted flags, the clip-plane normal, and front/back clip distances.
+// Returns "" (no field) when the entity has no spatial filter. dbspfilt.h is
+// included above; dbdict.h (AcDbDictionary) already was.
+static std::string spatialFilterJson(const AcDbObjectId& extDictId)
+{
+    std::ostringstream o; o.precision(kJsonDoublePrecision);
+    if (extDictId.isNull())
+        return o.str();
+    AcDbDictionary* pExtDict = nullptr;
+    if (acdbOpenObject(pExtDict, extDictId, AcDb::kForRead) != Acad::eOk)
+        return o.str();
+    AcDbObjectId filterDictId;
+    Acad::ErrorStatus es = pExtDict->getAt(ACRX_T("ACAD_FILTER"), filterDictId);
+    pExtDict->close();
+    if (es != Acad::eOk || filterDictId.isNull())
+        return o.str();
+    AcDbDictionary* pFilterDict = nullptr;
+    if (acdbOpenObject(pFilterDict, filterDictId, AcDb::kForRead) != Acad::eOk)
+        return o.str();
+    AcDbObjectId spId;
+    es = pFilterDict->getAt(ACRX_T("SPATIAL"), spId);
+    pFilterDict->close();
+    if (es != Acad::eOk || spId.isNull())
+        return o.str();
+    AcDbSpatialFilter* pSF = nullptr;
+    if (acdbOpenObject(pSF, spId, AcDb::kForRead) != Acad::eOk)
+        return o.str();
+    AcGePoint2dArray pts;
+    AcGeVector3d normal;
+    double elevation = 0.0, frontClip = 0.0, backClip = 0.0;
+    Adesk::Boolean enabled = Adesk::kFalse;
+    es = pSF->getDefinition(pts, normal, elevation, frontClip, backClip, enabled);
+    const bool inverted = pSF->isInverted();
+    // #63: getDefinition() returns the boundary in the filter's CLIP SPACE, not
+    // WCS -- that is why the raw points do not line up with where the clip is
+    // drawn. AcDbSpatialFilter carries the clip-space -> WCS transform; apply it
+    // so we can also emit the boundary in world coordinates (where the clip
+    // actually appears). Keep the raw boundary + the matrix for completeness.
+    AcGeMatrix3d clipToWcs;   // clip space -> WCS
+    AcGeMatrix3d invBlockXf;  // clip space -> block-local (inverse of the block
+                              // transform at clip time == reference-code M1)
+    pSF->getClipSpaceToWCSMatrix(clipToWcs);
+    pSF->getOriginalInverseBlockXform(invBlockXf);
+    pSF->close();
+    if (es != Acad::eOk)
+        return o.str();
+    o << ",\"xclip\":{\"enabled\":" << (enabled ? "true" : "false")
+      << ",\"inverted\":" << (inverted ? "true" : "false")
+      << ",\"elevation\":" << elevation
+      << ",\"front_clip\":" << frontClip
+      << ",\"back_clip\":" << backClip
+      << ",\"normal\":[" << normal.x << "," << normal.y << "," << normal.z << "]"
+      << ",\"boundary\":[";
+    for (int i = 0; i < pts.length(); ++i) {
+        if (i) o << ",";
+        o << "[" << pts[i].x << "," << pts[i].y << "]";
+    }
+    o << "]";
+    // #63: boundary in BLOCK-LOCAL coordinates -- clip-space points transformed
+    // by getOriginalInverseBlockXform (== the reference code's M1: clip space ->
+    // block local). This is what an XCLIP consumer wants (e.g. ezdxf
+    // set_block_clipping_path expects block coords); the block reference's own
+    // insert transform then places it in the drawing. Clip-space points are 2D
+    // (z=0 in that space).
+    // A 2-point boundary is a rectangular window (opposite corners) in the
+    // axis-aligned CLIP space; expand it to 4 corners BEFORE transforming, so a
+    // rotated inverse-block transform yields the correct (rotated) quad.
+    AcGePoint2dArray poly;
+    if (pts.length() == 2) {
+        poly.append(AcGePoint2d(pts[0].x, pts[0].y));
+        poly.append(AcGePoint2d(pts[1].x, pts[0].y));
+        poly.append(AcGePoint2d(pts[1].x, pts[1].y));
+        poly.append(AcGePoint2d(pts[0].x, pts[1].y));
+    } else {
+        for (int i = 0; i < pts.length(); ++i) poly.append(pts[i]);
+    }
+    o << ",\"boundary_block\":[";
+    for (int i = 0; i < poly.length(); ++i) {
+        AcGePoint3d bp(poly[i].x, poly[i].y, 0.0);
+        bp.transformBy(invBlockXf);
+        if (i) o << ",";
+        o << "[" << bp.x << "," << bp.y << "]";
+    }
+    o << "]";
+    // boundary in WCS (clip space -> WCS), for reference/debug
+    o << ",\"boundary_wcs\":[";
+    for (int i = 0; i < pts.length(); ++i) {
+        AcGePoint3d wp(pts[i].x, pts[i].y, 0.0);
+        wp.transformBy(clipToWcs);
+        if (i) o << ",";
+        o << "[" << wp.x << "," << wp.y << "," << wp.z << "]";
+    }
+    o << "]";
+    o << ",\"inv_block_xform\":[";
+    for (int r = 0; r < 4; ++r)
+        for (int c = 0; c < 4; ++c)
+            o << ((r == 0 && c == 0) ? "" : ",") << invBlockXf.entry[r][c];
+    o << "]}";
+    return o.str();
+}
+
 static bool resbufCodeIsString(short code)
 {
     return code == 1 || code == 2 || code == 3 || code == 4 || code == 5 ||
@@ -1367,6 +1512,7 @@ static bool collectEntitiesFromBlock(AcDbBlockTableRecord* pBTR, const char* spa
             << ",\"layer\":\"" << jsonEscape(layer) << "\""
             << ",\"owner_handle\":\"" << jsonEscape(ownerStr) << "\""
             << ",\"space\":\"" << spaceLabel << "\"";
+        arr << entityColorJson(pEnt);  // #24/#28: raw color_index + method + true_color
 
         resbuf* xdata = pEnt->xData(nullptr);
         if (xdata != nullptr) {
@@ -1384,6 +1530,7 @@ static bool collectEntitiesFromBlock(AcDbBlockTableRecord* pBTR, const char* spa
         if (!extDictId.isNull()) {
             arr << ",\"extension_dictionary_handle\":\""
                 << jsonEscape(handleOfId(extDictId)) << "\"";
+            arr << spatialFilterJson(extDictId);  // #27: XCLIP clip boundary, if any
             const std::string extJson = extensionDictionaryJson(
                 handleStr, extDictId, extensionXrecords, extensionXrecordFirst, richCounters);
             if (!extJson.empty()) {
@@ -1566,7 +1713,14 @@ static bool collectEntitiesFromBlock(AcDbBlockTableRecord* pBTR, const char* spa
             const AcGePoint3d p = pM->location();
             arr << ",\"position\":[" << p.x << "," << p.y << "," << p.z << "]"
                 << ",\"text\":\"" << jsonEscape(acharToAscii(pM->contents())) << "\""
-                << ",\"height\":" << pM->textHeight();
+                << ",\"height\":" << pM->textHeight()
+                // #68: attachment point (1-9 = top-left..bottom-right, 5 =
+                // middle-center) + rotation. Without these the text anchors
+                // top-left and renders offset from its true position -- most
+                // visible on dimension text, which is middle-anchored.
+                << ",\"attachment_point\":" << static_cast<int>(pM->attachment())
+                << ",\"rotation\":" << pM->rotation()
+                << ",\"width\":" << pM->width();
         }
         else if (AcDbText* pT = AcDbText::cast(pEnt)) {
             const AcGePoint3d p = pT->position();
@@ -1577,18 +1731,30 @@ static bool collectEntitiesFromBlock(AcDbBlockTableRecord* pBTR, const char* spa
         else if (AcDbPolyline* pPl = AcDbPolyline::cast(pEnt)) {
             const unsigned int n = pPl->numVerts();
             arr << ",\"vertex_count\":" << n
-                << ",\"closed\":" << (pPl->isClosed() ? "true" : "false")
-                << ",\"vertices\":[";
+                << ",\"closed\":" << (pPl->isClosed() ? "true" : "false");
+            // #65: constant width (a "thick" polyline) -- getConstantWidth
+            // succeeds only when every segment shares one width; else widths
+            // vary per vertex (emitted below). The graph dropped both, so thick
+            // polylines came back hairline.
+            double constW = 0.0;
+            if (pPl->getConstantWidth(constW) == Acad::eOk && constW != 0.0)
+                arr << ",\"const_width\":" << constW;
+            arr << ",\"vertices\":[";
             for (unsigned int vi = 0; vi < n; ++vi) {
                 AcGePoint3d vp;
                 if (pPl->getPointAt(vi, vp) != Acad::eOk)
                     break;
                 double bulge = 0.0;
                 pPl->getBulgeAt(vi, bulge);
+                double sw = 0.0, ew = 0.0;
+                pPl->getWidthsAt(vi, sw, ew);
                 if (vi != 0)
                     arr << ",";
                 arr << "{\"point\":[" << vp.x << "," << vp.y << "," << vp.z << "]"
-                    << ",\"bulge\":" << bulge << "}";
+                    << ",\"bulge\":" << bulge;
+                if (sw != 0.0 || ew != 0.0)
+                    arr << ",\"start_width\":" << sw << ",\"end_width\":" << ew;
+                arr << "}";
             }
             arr << "]";
         }
@@ -3217,14 +3383,17 @@ static std::string blockTableRecordsJson(AcDbDatabase* pDb, int& btrCount,
             const bool isLayout = pBTR->isLayout();
             const bool isAnon = pBTR->isAnonymous();
             const bool isXref = pBTR->isFromExternalReference();
+            // Capture every non-layout, non-xref block definition. Named
+            // defs preserve the legacy payload shape; anonymous *U###/*D###
+            // defs gain only an additive "anonymous":true marker so
+            // downstream rebuild can distinguish clone/remap paths later.
+            // (#66 note: this SUPERSET already covers PR #29's *D### dimension-
+            // block collection -- *D defs carry the rendered dimension geometry,
+            // and *U/*X dynamic-block reps are captured too.)
             const bool emitBlockDef = !isLayout && !isXref;
             int entityCount = 0;
             std::string defEntitiesJson = "[]";
             if (emitBlockDef) {
-                // Capture every non-layout, non-xref block definition. Named
-                // defs preserve the legacy payload shape; anonymous *U###/*D###
-                // defs gain only an additive "anonymous":true marker so
-                // downstream rebuild can distinguish clone/remap paths later.
                 // entityCount comes from this SAME walk, so it can never
                 // disagree with len(def_entities). extension-dictionary/
                 // xrecord content and richCounters aggregation for block-def-

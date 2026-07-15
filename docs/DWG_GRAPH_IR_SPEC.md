@@ -243,7 +243,13 @@ with no paper-space geometry (or a native collector that predates this) simply r
 | `owner_handle` | Handle of the owning BTR (model space, paper space, or a block definition). Empty string allowed when the owner is unresolved. |
 | `space` | `model \| paper \| block`. |
 | `layout` | Layout/tab name when `space == "paper"`. |
-| `layer`, `linetype`, `color_index`, `lineweight`, `visible` | Common entity properties. |
+| `layer`, `visible` | Common entity properties. |
+| `linetype` | Entity linetype NAME as stored (`ByLayer` / `ByBlock` / `Continuous` or a named ltype like `HID`); the dash pattern itself lives in `symbol_tables.linetypes`. Display attribute — excluded from `stable_id`. |
+| `color_index` | Raw ACI color index from `AcDbEntity::colorIndex()`, emitted verbatim: `0` = ByBlock, `256` = ByLayer, `1-255` = explicit ACI. Sentinels are not resolved. Display attribute — excluded from `stable_id`. |
+| `color_method` | How the color is stored (`bylayer` / `byblock` / `bycolor` / `byaci`); `bycolor` ⇒ `true_color` present. |
+| `true_color` | Optional `{r,g,b}` (each `0-255`) explicit RGB color, present only when `color_method == "bycolor"`; omitted (not null) otherwise. Excluded from `stable_id`. |
+| `lineweight` | Lineweight in 1/100 mm, or the sentinels `-1` = ByLayer / `-2` = ByBlock / `-3` = Default. Display attribute — excluded from `stable_id`. |
+| `xclip{}` | XCLIP spatial-filter clip on a clipped `AcDbBlockReference` (`ACAD_FILTER`/`SPATIAL` on the reference's own extension dictionary): `enabled`, `inverted`, `elevation`, `front_clip`, `back_clip`, `normal`, `boundary` (verbatim CLIP-SPACE 2D vertices; 2 points = rectangular window), `boundary_block` (block-local — what e.g. ezdxf `set_block_clipping_path` needs; 2-point windows expanded to 4 corners before transform), `boundary_wcs` (WCS, 3D), `inv_block_xform` (row-major 4×4, clip→block). Display attribute — excluded from `stable_id`. |
 | `bbox` | Axis-aligned box `[minX,minY,minZ,maxX,maxY,maxZ]` (`$defs.bbox`); `[]` = no bbox computed. |
 | `geometry` | Coordinate payload (`$defs.geometry`, below). |
 | `xdata[]` | XDATA blocks per registered app (`$defs.xdata_block`: `app` + `items[]` of resbuf). |
