@@ -79,7 +79,12 @@ CRASH still exactly the 2 attended live ops; DEGENERATE still the 7 known (5 zer
       `plot.config.settings` = SAFETY_FORBIDDEN (live_edit page-setup mutation, no bounded CAD-OS staged-write contract).
       Both accepted as hard blocks. PLAN_M08PLOT.md retained as design record for a future attended lane / staged-write
       contract + read-only variant. **Net: 0 clean headless build gaps; the headless surface is complete.**
-- [ ] **P5a — runtime_commands reclassify** — 16 ops → kind=module_event, dispatchable=false + lifecycle harness.
+- [x] **P5a — runtime_commands reclassify** — PASS (2026-07-16). 16 blocked runtime_commands ops → `kind=module_event`,
+      `dispatchable=false` (host-owned lifecycle deliveries / forbidden loader mutations — never job-dispatchable).
+      Registry contract locked by tests/unit/test_module_event_registry.py (4 tests: exact 16-set, flags, no stray,
+      10 RUNNABLE registration ops stay dispatchable). Lifecycle certified INDIRECTLY the only honest way — live run
+      of tools/module_lifecycle_harness.py: staged fixture → sanctioned probe (inspect.runtime.capabilities) EXIT=0 +
+      result ok ⇒ load → kInitAppMsg → dispatch → clean unload all occurred (HARNESS_EXIT=0).
 - [ ] **P5b — attended lane** — com_activex 9 + ui/brep-subentity/live/editor incl. the 2 attended CRASH.
       active_document_write_original 4 STAY BLOCKED by design.
 - [x] **P6 — fresh rebuild + SHA-256 stamp + full certification report + GitHub** — PASS. Fresh isolated rebuild
@@ -91,7 +96,16 @@ CRASH still exactly the 2 attended live ops; DEGENERATE still the 7 known (5 zer
 
 ## Non-goals / deprioritized
 
-- P2 (custom_objects/geometry arx→dbx capability audit): DEPRIORITIZED — ops already run headless; hygiene only.
+- [x] P2 (custom_objects/geometry arx→dbx capability audit): was DEPRIORITIZED (hygiene only) — **completed 2026-07-16**.
+  P2a static audit (tools/dbx_capability_audit.py — declared native_api tokens + dispatch code slice + 1-level helper
+  taint): 88 audited = 87 dbx_capable + 1 asm_boundary_review (modify.entity.solid3d.boolean, ASM defer line per
+  ObjectDBX write-feasibility boundary) + 0 arx_required. Artifact: P2A_DBX_CAPABILITY_AUDIT_20260716.{json,md}.
+  P2c applied: 57 ops re-tiered native_arx_only→objectdbx_capable (audit-provenance note per op; engine_tier is
+  reporting-only — cadctl by_tier), totals.by_engine_tier rolled (177 arx_only / 306 dbx_capable), suite 1959 passed.
+  Runtime corroboration: tools/dbx_import_audit.py (stdlib PE import-table parse) — Ariadne.AcadNativeDbx.dbx imports
+  7 DLLs, ALL db-layer (acdb26, AcGe26, CRT/kernel; zero aced/acad/UI binding) ⇒ loadable by a pure DBX host; crx
+  control shows the contrast (accore.dll + ASM/BRep enablers). Static verdicts necessary-not-sufficient; the dbx
+  module's import purity is the runtime-level proof for the shared code paths.
 
 ## Failure-mode guards active this arc
 
