@@ -1,0 +1,3214 @@
+{
+ "schema": "ariadne.interior100.remeasure.v1",
+ "verdict": "PASS",
+ "guards": [
+  {
+   "guard": "name_map_matches_baseline",
+   "ok": true,
+   "mismatches": []
+  },
+  {
+   "guard": "population_identity",
+   "ok": true,
+   "measured": {
+    "a_def_count": 294,
+    "a_entity_total": 27130
+   },
+   "pinned": {
+    "a_def_count": 294,
+    "a_entity_total": 27130
+   }
+  },
+  {
+   "guard": "per_def_no_regression",
+   "ok": true,
+   "regressions": []
+  },
+  {
+   "guard": "prereg_band",
+   "ok": true,
+   "band": [
+    27130,
+    27130
+   ],
+   "measured_diff0_total": 27130,
+   "predicted": 27130
+  }
+ ],
+ "inputs": {
+  "census_ir": "D:\\dev\\99_tools\\autocad-sdk-router\\runs\\e2e_1dwg_R4x_ccw_20260711\\census\\dwg_graph_ir.json",
+  "census_ir_sha256": "15c6c6c6d4502116ccd7b3bcb1cec955cd335713aca4e27b6a0c2a54e679543c",
+  "post_ir": "D:\\dev\\99_tools\\autocad-sdk-router\\runs\\e2e_1dwg_R4x_ccw_20260711\\regen\\post\\dwg_graph_ir.json",
+  "post_ir_sha256": "fefd28061943d6816e6d82fdcb1de508c4d9f5bfd3a6cc44ec79abb29caeda45",
+  "baseline_report": "D:\\dev\\99_tools\\autocad-sdk-router\\reports\\interior100\\R4x_remeasure_ccw.json",
+  "prereg": "D:\\dev\\99_tools\\autocad-sdk-router\\reports\\interior100\\prereg_R4y_lex0013.json"
+ },
+ "totals": {
+  "a_def_count": 294,
+  "b_def_count": 294,
+  "a_entity_total": 27130,
+  "b_entity_total": 27130,
+  "diff0_total": 27130,
+  "interior_diff0_fraction": 1.0,
+  "spline_fit_authored_a": 432,
+  "spline_fit_authored_b": 0,
+  "derived_cache_excluded": {
+   "name_pattern": "^\\*D\\d+$",
+   "a_def_count": 113,
+   "b_def_count": 113,
+   "a_entity_total": 1053,
+   "b_entity_total": 1130,
+   "reason": "*D anonymous blocks are per-dimension rendered caches; a rebuild's dimensions mint fresh *D names, so a name-matched def compare is a category error. The dimension entities themselves are verified by the L5 dim_semantic_gate."
+  }
+ },
+ "per_def": [
+  {
+   "name": "*U103",
+   "a_total": 159,
+   "b_total": 159,
+   "diff0": 159,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null,
+   "b_name": "ARIADNE_ANON_U103"
+  },
+  {
+   "name": "*U104",
+   "a_total": 25,
+   "b_total": 25,
+   "diff0": 25,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null,
+   "b_name": "ARIADNE_ANON_U104"
+  },
+  {
+   "name": "*U105",
+   "a_total": 38,
+   "b_total": 38,
+   "diff0": 38,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null,
+   "b_name": "ARIADNE_ANON_U105"
+  },
+  {
+   "name": "*U106",
+   "a_total": 24,
+   "b_total": 24,
+   "diff0": 24,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null,
+   "b_name": "ARIADNE_ANON_U106"
+  },
+  {
+   "name": "*U107",
+   "a_total": 74,
+   "b_total": 74,
+   "diff0": 74,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null,
+   "b_name": "ARIADNE_ANON_U107"
+  },
+  {
+   "name": "*U108",
+   "a_total": 15,
+   "b_total": 15,
+   "diff0": 15,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null,
+   "b_name": "ARIADNE_ANON_U108"
+  },
+  {
+   "name": "*U109",
+   "a_total": 13,
+   "b_total": 13,
+   "diff0": 13,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null,
+   "b_name": "ARIADNE_ANON_U109"
+  },
+  {
+   "name": "*U110",
+   "a_total": 38,
+   "b_total": 38,
+   "diff0": 38,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null,
+   "b_name": "ARIADNE_ANON_U110"
+  },
+  {
+   "name": "*U111",
+   "a_total": 22,
+   "b_total": 22,
+   "diff0": 22,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null,
+   "b_name": "ARIADNE_ANON_U111"
+  },
+  {
+   "name": "*U112",
+   "a_total": 12,
+   "b_total": 12,
+   "diff0": 12,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null,
+   "b_name": "ARIADNE_ANON_U112"
+  },
+  {
+   "name": "*U113",
+   "a_total": 41,
+   "b_total": 41,
+   "diff0": 41,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null,
+   "b_name": "ARIADNE_ANON_U113"
+  },
+  {
+   "name": "*U114",
+   "a_total": 13,
+   "b_total": 13,
+   "diff0": 13,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null,
+   "b_name": "ARIADNE_ANON_U114"
+  },
+  {
+   "name": "*U115",
+   "a_total": 149,
+   "b_total": 149,
+   "diff0": 149,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null,
+   "b_name": "ARIADNE_ANON_U115"
+  },
+  {
+   "name": "*U116",
+   "a_total": 29,
+   "b_total": 29,
+   "diff0": 29,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null,
+   "b_name": "ARIADNE_ANON_U116"
+  },
+  {
+   "name": "*U117",
+   "a_total": 78,
+   "b_total": 78,
+   "diff0": 78,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null,
+   "b_name": "ARIADNE_ANON_U117"
+  },
+  {
+   "name": "*U118",
+   "a_total": 16,
+   "b_total": 16,
+   "diff0": 16,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null,
+   "b_name": "ARIADNE_ANON_U118"
+  },
+  {
+   "name": "*U119",
+   "a_total": 40,
+   "b_total": 40,
+   "diff0": 40,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null,
+   "b_name": "ARIADNE_ANON_U119"
+  },
+  {
+   "name": "*U120",
+   "a_total": 10,
+   "b_total": 10,
+   "diff0": 10,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null,
+   "b_name": "ARIADNE_ANON_U120"
+  },
+  {
+   "name": "*U121",
+   "a_total": 51,
+   "b_total": 51,
+   "diff0": 51,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null,
+   "b_name": "ARIADNE_ANON_U121"
+  },
+  {
+   "name": "*U122",
+   "a_total": 10,
+   "b_total": 10,
+   "diff0": 10,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null,
+   "b_name": "ARIADNE_ANON_U122"
+  },
+  {
+   "name": "*U123",
+   "a_total": 54,
+   "b_total": 54,
+   "diff0": 54,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null,
+   "b_name": "ARIADNE_ANON_U123"
+  },
+  {
+   "name": "*U124",
+   "a_total": 69,
+   "b_total": 69,
+   "diff0": 69,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null,
+   "b_name": "ARIADNE_ANON_U124"
+  },
+  {
+   "name": "*U125",
+   "a_total": 30,
+   "b_total": 30,
+   "diff0": 30,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null,
+   "b_name": "ARIADNE_ANON_U125"
+  },
+  {
+   "name": "*U126",
+   "a_total": 51,
+   "b_total": 51,
+   "diff0": 51,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null,
+   "b_name": "ARIADNE_ANON_U126"
+  },
+  {
+   "name": "*U127",
+   "a_total": 6,
+   "b_total": 6,
+   "diff0": 6,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null,
+   "b_name": "ARIADNE_ANON_U127"
+  },
+  {
+   "name": "*U128",
+   "a_total": 6,
+   "b_total": 6,
+   "diff0": 6,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null,
+   "b_name": "ARIADNE_ANON_U128"
+  },
+  {
+   "name": "*U129",
+   "a_total": 17,
+   "b_total": 17,
+   "diff0": 17,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null,
+   "b_name": "ARIADNE_ANON_U129"
+  },
+  {
+   "name": "*U130",
+   "a_total": 6,
+   "b_total": 6,
+   "diff0": 6,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null,
+   "b_name": "ARIADNE_ANON_U130"
+  },
+  {
+   "name": "*U131",
+   "a_total": 6,
+   "b_total": 6,
+   "diff0": 6,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null,
+   "b_name": "ARIADNE_ANON_U131"
+  },
+  {
+   "name": "*U132",
+   "a_total": 23,
+   "b_total": 23,
+   "diff0": 23,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null,
+   "b_name": "ARIADNE_ANON_U132"
+  },
+  {
+   "name": "*U133",
+   "a_total": 14,
+   "b_total": 14,
+   "diff0": 14,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null,
+   "b_name": "ARIADNE_ANON_U133"
+  },
+  {
+   "name": "*U134",
+   "a_total": 7,
+   "b_total": 7,
+   "diff0": 7,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null,
+   "b_name": "ARIADNE_ANON_U134"
+  },
+  {
+   "name": "*U135",
+   "a_total": 20,
+   "b_total": 20,
+   "diff0": 20,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null,
+   "b_name": "ARIADNE_ANON_U135"
+  },
+  {
+   "name": "*U136",
+   "a_total": 32,
+   "b_total": 32,
+   "diff0": 32,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null,
+   "b_name": "ARIADNE_ANON_U136"
+  },
+  {
+   "name": "*U137",
+   "a_total": 9,
+   "b_total": 9,
+   "diff0": 9,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null,
+   "b_name": "ARIADNE_ANON_U137"
+  },
+  {
+   "name": "*U138",
+   "a_total": 10,
+   "b_total": 10,
+   "diff0": 10,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null,
+   "b_name": "ARIADNE_ANON_U138"
+  },
+  {
+   "name": "*U139",
+   "a_total": 23,
+   "b_total": 23,
+   "diff0": 23,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null,
+   "b_name": "ARIADNE_ANON_U139"
+  },
+  {
+   "name": "*U140",
+   "a_total": 23,
+   "b_total": 23,
+   "diff0": 23,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null,
+   "b_name": "ARIADNE_ANON_U140"
+  },
+  {
+   "name": "*U141",
+   "a_total": 15,
+   "b_total": 15,
+   "diff0": 15,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null,
+   "b_name": "ARIADNE_ANON_U141"
+  },
+  {
+   "name": "*U142",
+   "a_total": 95,
+   "b_total": 95,
+   "diff0": 95,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null,
+   "b_name": "ARIADNE_ANON_U142"
+  },
+  {
+   "name": "*U144",
+   "a_total": 14,
+   "b_total": 14,
+   "diff0": 14,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null,
+   "b_name": "ARIADNE_ANON_U144"
+  },
+  {
+   "name": "*U145",
+   "a_total": 16,
+   "b_total": 16,
+   "diff0": 16,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null,
+   "b_name": "ARIADNE_ANON_U145"
+  },
+  {
+   "name": "*U146",
+   "a_total": 159,
+   "b_total": 159,
+   "diff0": 159,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null,
+   "b_name": "ARIADNE_ANON_U146"
+  },
+  {
+   "name": "*U147",
+   "a_total": 12,
+   "b_total": 12,
+   "diff0": 12,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null,
+   "b_name": "ARIADNE_ANON_U147"
+  },
+  {
+   "name": "*U148",
+   "a_total": 28,
+   "b_total": 28,
+   "diff0": 28,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null,
+   "b_name": "ARIADNE_ANON_U148"
+  },
+  {
+   "name": "*U149",
+   "a_total": 77,
+   "b_total": 77,
+   "diff0": 77,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null,
+   "b_name": "ARIADNE_ANON_U149"
+  },
+  {
+   "name": "*U150",
+   "a_total": 25,
+   "b_total": 25,
+   "diff0": 25,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null,
+   "b_name": "ARIADNE_ANON_U150"
+  },
+  {
+   "name": "*U151",
+   "a_total": 24,
+   "b_total": 24,
+   "diff0": 24,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null,
+   "b_name": "ARIADNE_ANON_U151"
+  },
+  {
+   "name": "*U152",
+   "a_total": 21,
+   "b_total": 21,
+   "diff0": 21,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null,
+   "b_name": "ARIADNE_ANON_U152"
+  },
+  {
+   "name": "*U155",
+   "a_total": 3,
+   "b_total": 3,
+   "diff0": 3,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null,
+   "b_name": "ARIADNE_ANON_U155"
+  },
+  {
+   "name": "*U156",
+   "a_total": 92,
+   "b_total": 92,
+   "diff0": 92,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null,
+   "b_name": "ARIADNE_ANON_U156"
+  },
+  {
+   "name": "*U157",
+   "a_total": 8,
+   "b_total": 8,
+   "diff0": 8,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null,
+   "b_name": "ARIADNE_ANON_U157"
+  },
+  {
+   "name": "*U158",
+   "a_total": 17,
+   "b_total": 17,
+   "diff0": 17,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null,
+   "b_name": "ARIADNE_ANON_U158"
+  },
+  {
+   "name": "*U159",
+   "a_total": 18,
+   "b_total": 18,
+   "diff0": 18,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null,
+   "b_name": "ARIADNE_ANON_U159"
+  },
+  {
+   "name": "*U160",
+   "a_total": 87,
+   "b_total": 87,
+   "diff0": 87,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null,
+   "b_name": "ARIADNE_ANON_U160"
+  },
+  {
+   "name": "*U161",
+   "a_total": 90,
+   "b_total": 90,
+   "diff0": 90,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null,
+   "b_name": "ARIADNE_ANON_U161"
+  },
+  {
+   "name": "*U162",
+   "a_total": 81,
+   "b_total": 81,
+   "diff0": 81,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null,
+   "b_name": "ARIADNE_ANON_U162"
+  },
+  {
+   "name": "*U163",
+   "a_total": 75,
+   "b_total": 75,
+   "diff0": 75,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null,
+   "b_name": "ARIADNE_ANON_U163"
+  },
+  {
+   "name": "*U164",
+   "a_total": 37,
+   "b_total": 37,
+   "diff0": 37,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null,
+   "b_name": "ARIADNE_ANON_U164"
+  },
+  {
+   "name": "*U165",
+   "a_total": 36,
+   "b_total": 36,
+   "diff0": 36,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null,
+   "b_name": "ARIADNE_ANON_U165"
+  },
+  {
+   "name": "*U166",
+   "a_total": 13,
+   "b_total": 13,
+   "diff0": 13,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null,
+   "b_name": "ARIADNE_ANON_U166"
+  },
+  {
+   "name": "*U167",
+   "a_total": 30,
+   "b_total": 30,
+   "diff0": 30,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null,
+   "b_name": "ARIADNE_ANON_U167"
+  },
+  {
+   "name": "*U168",
+   "a_total": 14,
+   "b_total": 14,
+   "diff0": 14,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null,
+   "b_name": "ARIADNE_ANON_U168"
+  },
+  {
+   "name": "*U169",
+   "a_total": 106,
+   "b_total": 106,
+   "diff0": 106,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null,
+   "b_name": "ARIADNE_ANON_U169"
+  },
+  {
+   "name": "*U170",
+   "a_total": 23,
+   "b_total": 23,
+   "diff0": 23,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null,
+   "b_name": "ARIADNE_ANON_U170"
+  },
+  {
+   "name": "*U171",
+   "a_total": 29,
+   "b_total": 29,
+   "diff0": 29,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null,
+   "b_name": "ARIADNE_ANON_U171"
+  },
+  {
+   "name": "*U172",
+   "a_total": 23,
+   "b_total": 23,
+   "diff0": 23,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null,
+   "b_name": "ARIADNE_ANON_U172"
+  },
+  {
+   "name": "*U173",
+   "a_total": 18,
+   "b_total": 18,
+   "diff0": 18,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null,
+   "b_name": "ARIADNE_ANON_U173"
+  },
+  {
+   "name": "*U174",
+   "a_total": 44,
+   "b_total": 44,
+   "diff0": 44,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null,
+   "b_name": "ARIADNE_ANON_U174"
+  },
+  {
+   "name": "*U175",
+   "a_total": 58,
+   "b_total": 58,
+   "diff0": 58,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null,
+   "b_name": "ARIADNE_ANON_U175"
+  },
+  {
+   "name": "*U176",
+   "a_total": 30,
+   "b_total": 30,
+   "diff0": 30,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null,
+   "b_name": "ARIADNE_ANON_U176"
+  },
+  {
+   "name": "*U177",
+   "a_total": 23,
+   "b_total": 23,
+   "diff0": 23,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null,
+   "b_name": "ARIADNE_ANON_U177"
+  },
+  {
+   "name": "*U179",
+   "a_total": 20,
+   "b_total": 20,
+   "diff0": 20,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null,
+   "b_name": "ARIADNE_ANON_U179"
+  },
+  {
+   "name": "*U180",
+   "a_total": 62,
+   "b_total": 62,
+   "diff0": 62,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null,
+   "b_name": "ARIADNE_ANON_U180"
+  },
+  {
+   "name": "*U181",
+   "a_total": 23,
+   "b_total": 23,
+   "diff0": 23,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null,
+   "b_name": "ARIADNE_ANON_U181"
+  },
+  {
+   "name": "*U183",
+   "a_total": 43,
+   "b_total": 43,
+   "diff0": 43,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null,
+   "b_name": "ARIADNE_ANON_U183"
+  },
+  {
+   "name": "*U184",
+   "a_total": 26,
+   "b_total": 26,
+   "diff0": 26,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null,
+   "b_name": "ARIADNE_ANON_U184"
+  },
+  {
+   "name": "*U185",
+   "a_total": 46,
+   "b_total": 46,
+   "diff0": 46,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null,
+   "b_name": "ARIADNE_ANON_U185"
+  },
+  {
+   "name": "*U186",
+   "a_total": 18,
+   "b_total": 18,
+   "diff0": 18,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null,
+   "b_name": "ARIADNE_ANON_U186"
+  },
+  {
+   "name": "*U187",
+   "a_total": 28,
+   "b_total": 28,
+   "diff0": 28,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null,
+   "b_name": "ARIADNE_ANON_U187"
+  },
+  {
+   "name": "*U188",
+   "a_total": 83,
+   "b_total": 83,
+   "diff0": 83,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null,
+   "b_name": "ARIADNE_ANON_U188"
+  },
+  {
+   "name": "*U189",
+   "a_total": 147,
+   "b_total": 147,
+   "diff0": 147,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null,
+   "b_name": "ARIADNE_ANON_U189"
+  },
+  {
+   "name": "*U191",
+   "a_total": 36,
+   "b_total": 36,
+   "diff0": 36,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null,
+   "b_name": "ARIADNE_ANON_U191"
+  },
+  {
+   "name": "*U192",
+   "a_total": 41,
+   "b_total": 41,
+   "diff0": 41,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null,
+   "b_name": "ARIADNE_ANON_U192"
+  },
+  {
+   "name": "*U193",
+   "a_total": 32,
+   "b_total": 32,
+   "diff0": 32,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null,
+   "b_name": "ARIADNE_ANON_U193"
+  },
+  {
+   "name": "*U194",
+   "a_total": 5,
+   "b_total": 5,
+   "diff0": 5,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null,
+   "b_name": "ARIADNE_ANON_U194"
+  },
+  {
+   "name": "*U195",
+   "a_total": 15,
+   "b_total": 15,
+   "diff0": 15,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null,
+   "b_name": "ARIADNE_ANON_U195"
+  },
+  {
+   "name": "*U196",
+   "a_total": 38,
+   "b_total": 38,
+   "diff0": 38,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null,
+   "b_name": "ARIADNE_ANON_U196"
+  },
+  {
+   "name": "*U197",
+   "a_total": 23,
+   "b_total": 23,
+   "diff0": 23,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null,
+   "b_name": "ARIADNE_ANON_U197"
+  },
+  {
+   "name": "*U199",
+   "a_total": 17,
+   "b_total": 17,
+   "diff0": 17,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null,
+   "b_name": "ARIADNE_ANON_U199"
+  },
+  {
+   "name": "*U200",
+   "a_total": 11,
+   "b_total": 11,
+   "diff0": 11,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null,
+   "b_name": "ARIADNE_ANON_U200"
+  },
+  {
+   "name": "*U201",
+   "a_total": 7,
+   "b_total": 7,
+   "diff0": 7,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null,
+   "b_name": "ARIADNE_ANON_U201"
+  },
+  {
+   "name": "*U202",
+   "a_total": 12,
+   "b_total": 12,
+   "diff0": 12,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null,
+   "b_name": "ARIADNE_ANON_U202"
+  },
+  {
+   "name": "*U232",
+   "a_total": 27,
+   "b_total": 27,
+   "diff0": 27,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null,
+   "b_name": "ARIADNE_ANON_U232"
+  },
+  {
+   "name": "*U236",
+   "a_total": 61,
+   "b_total": 61,
+   "diff0": 61,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null,
+   "b_name": "ARIADNE_ANON_U236"
+  },
+  {
+   "name": "*U237",
+   "a_total": 23,
+   "b_total": 23,
+   "diff0": 23,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null,
+   "b_name": "ARIADNE_ANON_U237"
+  },
+  {
+   "name": "*U238",
+   "a_total": 214,
+   "b_total": 214,
+   "diff0": 214,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null,
+   "b_name": "ARIADNE_ANON_U238"
+  },
+  {
+   "name": "*U239",
+   "a_total": 159,
+   "b_total": 159,
+   "diff0": 159,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null,
+   "b_name": "ARIADNE_ANON_U239"
+  },
+  {
+   "name": "*U240",
+   "a_total": 106,
+   "b_total": 106,
+   "diff0": 106,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null,
+   "b_name": "ARIADNE_ANON_U240"
+  },
+  {
+   "name": "*U241",
+   "a_total": 19,
+   "b_total": 19,
+   "diff0": 19,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null,
+   "b_name": "ARIADNE_ANON_U241"
+  },
+  {
+   "name": "*U272",
+   "a_total": 45,
+   "b_total": 45,
+   "diff0": 45,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null,
+   "b_name": "ARIADNE_ANON_U272"
+  },
+  {
+   "name": "*U273",
+   "a_total": 17,
+   "b_total": 17,
+   "diff0": 17,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null,
+   "b_name": "ARIADNE_ANON_U273"
+  },
+  {
+   "name": "*U274",
+   "a_total": 7,
+   "b_total": 7,
+   "diff0": 7,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null,
+   "b_name": "ARIADNE_ANON_U274"
+  },
+  {
+   "name": "*U275",
+   "a_total": 18,
+   "b_total": 18,
+   "diff0": 18,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null,
+   "b_name": "ARIADNE_ANON_U275"
+  },
+  {
+   "name": "*U278",
+   "a_total": 79,
+   "b_total": 79,
+   "diff0": 79,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null,
+   "b_name": "ARIADNE_ANON_U278"
+  },
+  {
+   "name": "*U279",
+   "a_total": 42,
+   "b_total": 42,
+   "diff0": 42,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null,
+   "b_name": "ARIADNE_ANON_U279"
+  },
+  {
+   "name": "*U280",
+   "a_total": 95,
+   "b_total": 95,
+   "diff0": 95,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null,
+   "b_name": "ARIADNE_ANON_U280"
+  },
+  {
+   "name": "*U281",
+   "a_total": 23,
+   "b_total": 23,
+   "diff0": 23,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null,
+   "b_name": "ARIADNE_ANON_U281"
+  },
+  {
+   "name": "*U282",
+   "a_total": 42,
+   "b_total": 42,
+   "diff0": 42,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null,
+   "b_name": "ARIADNE_ANON_U282"
+  },
+  {
+   "name": "*U283",
+   "a_total": 70,
+   "b_total": 70,
+   "diff0": 70,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null,
+   "b_name": "ARIADNE_ANON_U283"
+  },
+  {
+   "name": "*U290",
+   "a_total": 30,
+   "b_total": 30,
+   "diff0": 30,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null,
+   "b_name": "ARIADNE_ANON_U290"
+  },
+  {
+   "name": "*U45",
+   "a_total": 38,
+   "b_total": 38,
+   "diff0": 38,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null,
+   "b_name": "ARIADNE_ANON_U45"
+  },
+  {
+   "name": "*U47",
+   "a_total": 38,
+   "b_total": 38,
+   "diff0": 38,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null,
+   "b_name": "ARIADNE_ANON_U47"
+  },
+  {
+   "name": "*U48",
+   "a_total": 12,
+   "b_total": 12,
+   "diff0": 12,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null,
+   "b_name": "ARIADNE_ANON_U48"
+  },
+  {
+   "name": "*U49",
+   "a_total": 105,
+   "b_total": 105,
+   "diff0": 105,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null,
+   "b_name": "ARIADNE_ANON_U49"
+  },
+  {
+   "name": "*U50",
+   "a_total": 41,
+   "b_total": 41,
+   "diff0": 41,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null,
+   "b_name": "ARIADNE_ANON_U50"
+  },
+  {
+   "name": "*U51",
+   "a_total": 101,
+   "b_total": 101,
+   "diff0": 101,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null,
+   "b_name": "ARIADNE_ANON_U51"
+  },
+  {
+   "name": "*U52",
+   "a_total": 102,
+   "b_total": 102,
+   "diff0": 102,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null,
+   "b_name": "ARIADNE_ANON_U52"
+  },
+  {
+   "name": "*U53",
+   "a_total": 19,
+   "b_total": 19,
+   "diff0": 19,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null,
+   "b_name": "ARIADNE_ANON_U53"
+  },
+  {
+   "name": "*U54",
+   "a_total": 68,
+   "b_total": 68,
+   "diff0": 68,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null,
+   "b_name": "ARIADNE_ANON_U54"
+  },
+  {
+   "name": "*U55",
+   "a_total": 23,
+   "b_total": 23,
+   "diff0": 23,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null,
+   "b_name": "ARIADNE_ANON_U55"
+  },
+  {
+   "name": "*U56",
+   "a_total": 130,
+   "b_total": 130,
+   "diff0": 130,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null,
+   "b_name": "ARIADNE_ANON_U56"
+  },
+  {
+   "name": "*U57",
+   "a_total": 112,
+   "b_total": 112,
+   "diff0": 112,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null,
+   "b_name": "ARIADNE_ANON_U57"
+  },
+  {
+   "name": "*U58",
+   "a_total": 19,
+   "b_total": 19,
+   "diff0": 19,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null,
+   "b_name": "ARIADNE_ANON_U58"
+  },
+  {
+   "name": "*U59",
+   "a_total": 63,
+   "b_total": 63,
+   "diff0": 63,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null,
+   "b_name": "ARIADNE_ANON_U59"
+  },
+  {
+   "name": "*U60",
+   "a_total": 18,
+   "b_total": 18,
+   "diff0": 18,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null,
+   "b_name": "ARIADNE_ANON_U60"
+  },
+  {
+   "name": "*U61",
+   "a_total": 16,
+   "b_total": 16,
+   "diff0": 16,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null,
+   "b_name": "ARIADNE_ANON_U61"
+  },
+  {
+   "name": "*U62",
+   "a_total": 23,
+   "b_total": 23,
+   "diff0": 23,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null,
+   "b_name": "ARIADNE_ANON_U62"
+  },
+  {
+   "name": "*U63",
+   "a_total": 151,
+   "b_total": 151,
+   "diff0": 151,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null,
+   "b_name": "ARIADNE_ANON_U63"
+  },
+  {
+   "name": "*U64",
+   "a_total": 25,
+   "b_total": 25,
+   "diff0": 25,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null,
+   "b_name": "ARIADNE_ANON_U64"
+  },
+  {
+   "name": "*U67",
+   "a_total": 23,
+   "b_total": 23,
+   "diff0": 23,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null,
+   "b_name": "ARIADNE_ANON_U67"
+  },
+  {
+   "name": "*U68",
+   "a_total": 23,
+   "b_total": 23,
+   "diff0": 23,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null,
+   "b_name": "ARIADNE_ANON_U68"
+  },
+  {
+   "name": "*U70",
+   "a_total": 53,
+   "b_total": 53,
+   "diff0": 53,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null,
+   "b_name": "ARIADNE_ANON_U70"
+  },
+  {
+   "name": "*U71",
+   "a_total": 41,
+   "b_total": 41,
+   "diff0": 41,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null,
+   "b_name": "ARIADNE_ANON_U71"
+  },
+  {
+   "name": "*U72",
+   "a_total": 15,
+   "b_total": 15,
+   "diff0": 15,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null,
+   "b_name": "ARIADNE_ANON_U72"
+  },
+  {
+   "name": "*U73",
+   "a_total": 23,
+   "b_total": 23,
+   "diff0": 23,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null,
+   "b_name": "ARIADNE_ANON_U73"
+  },
+  {
+   "name": "*U74",
+   "a_total": 8,
+   "b_total": 8,
+   "diff0": 8,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null,
+   "b_name": "ARIADNE_ANON_U74"
+  },
+  {
+   "name": "*U75",
+   "a_total": 23,
+   "b_total": 23,
+   "diff0": 23,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null,
+   "b_name": "ARIADNE_ANON_U75"
+  },
+  {
+   "name": "*U76",
+   "a_total": 23,
+   "b_total": 23,
+   "diff0": 23,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null,
+   "b_name": "ARIADNE_ANON_U76"
+  },
+  {
+   "name": "*U77",
+   "a_total": 42,
+   "b_total": 42,
+   "diff0": 42,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null,
+   "b_name": "ARIADNE_ANON_U77"
+  },
+  {
+   "name": "*U79",
+   "a_total": 33,
+   "b_total": 33,
+   "diff0": 33,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null,
+   "b_name": "ARIADNE_ANON_U79"
+  },
+  {
+   "name": "*U81",
+   "a_total": 39,
+   "b_total": 39,
+   "diff0": 39,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null,
+   "b_name": "ARIADNE_ANON_U81"
+  },
+  {
+   "name": "*U82",
+   "a_total": 19,
+   "b_total": 19,
+   "diff0": 19,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null,
+   "b_name": "ARIADNE_ANON_U82"
+  },
+  {
+   "name": "*U83",
+   "a_total": 9,
+   "b_total": 9,
+   "diff0": 9,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null,
+   "b_name": "ARIADNE_ANON_U83"
+  },
+  {
+   "name": "*U84",
+   "a_total": 71,
+   "b_total": 71,
+   "diff0": 71,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null,
+   "b_name": "ARIADNE_ANON_U84"
+  },
+  {
+   "name": "*U85",
+   "a_total": 18,
+   "b_total": 18,
+   "diff0": 18,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null,
+   "b_name": "ARIADNE_ANON_U85"
+  },
+  {
+   "name": "*U86",
+   "a_total": 16,
+   "b_total": 16,
+   "diff0": 16,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null,
+   "b_name": "ARIADNE_ANON_U86"
+  },
+  {
+   "name": "*U87",
+   "a_total": 68,
+   "b_total": 68,
+   "diff0": 68,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null,
+   "b_name": "ARIADNE_ANON_U87"
+  },
+  {
+   "name": "*U88",
+   "a_total": 8,
+   "b_total": 8,
+   "diff0": 8,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null,
+   "b_name": "ARIADNE_ANON_U88"
+  },
+  {
+   "name": "*U89",
+   "a_total": 30,
+   "b_total": 30,
+   "diff0": 30,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null,
+   "b_name": "ARIADNE_ANON_U89"
+  },
+  {
+   "name": "*U90",
+   "a_total": 41,
+   "b_total": 41,
+   "diff0": 41,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null,
+   "b_name": "ARIADNE_ANON_U90"
+  },
+  {
+   "name": "*U91",
+   "a_total": 6,
+   "b_total": 6,
+   "diff0": 6,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null,
+   "b_name": "ARIADNE_ANON_U91"
+  },
+  {
+   "name": "*U92",
+   "a_total": 23,
+   "b_total": 23,
+   "diff0": 23,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null,
+   "b_name": "ARIADNE_ANON_U92"
+  },
+  {
+   "name": "*U93",
+   "a_total": 6,
+   "b_total": 6,
+   "diff0": 6,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null,
+   "b_name": "ARIADNE_ANON_U93"
+  },
+  {
+   "name": "C",
+   "a_total": 2,
+   "b_total": 2,
+   "diff0": 2,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null
+  },
+  {
+   "name": "DIMDOT",
+   "a_total": 3,
+   "b_total": 3,
+   "diff0": 3,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null
+  },
+  {
+   "name": "LV",
+   "a_total": 1,
+   "b_total": 1,
+   "diff0": 1,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null
+  },
+  {
+   "name": "LV2",
+   "a_total": 2,
+   "b_total": 2,
+   "diff0": 2,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null
+  },
+  {
+   "name": "SC",
+   "a_total": 2,
+   "b_total": 2,
+   "diff0": 2,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null
+  },
+  {
+   "name": "X-FORM_청주",
+   "a_total": 196,
+   "b_total": 196,
+   "diff0": 196,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null
+  },
+  {
+   "name": "X-FORM_청주$0$Block_5",
+   "a_total": 6,
+   "b_total": 6,
+   "diff0": 6,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null
+  },
+  {
+   "name": "X-FORM_청주$0$dA로고",
+   "a_total": 30,
+   "b_total": 30,
+   "diff0": 30,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null
+  },
+  {
+   "name": "X-평면도(기본형)",
+   "a_total": 4723,
+   "b_total": 4723,
+   "diff0": 4723,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null
+  },
+  {
+   "name": "X-평면도(기본형)$0$1000",
+   "a_total": 16,
+   "b_total": 16,
+   "diff0": 16,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null
+  },
+  {
+   "name": "X-평면도(기본형)$0$100012",
+   "a_total": 16,
+   "b_total": 16,
+   "diff0": 16,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null
+  },
+  {
+   "name": "X-평면도(기본형)$0$1000m",
+   "a_total": 14,
+   "b_total": 14,
+   "diff0": 14,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null
+  },
+  {
+   "name": "X-평면도(기본형)$0$101co1",
+   "a_total": 98,
+   "b_total": 98,
+   "diff0": 98,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null
+  },
+  {
+   "name": "X-평면도(기본형)$0$101co1-RF",
+   "a_total": 86,
+   "b_total": 86,
+   "diff0": 86,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null
+  },
+  {
+   "name": "X-평면도(기본형)$0$101co1-RF2",
+   "a_total": 60,
+   "b_total": 60,
+   "diff0": 60,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null
+  },
+  {
+   "name": "X-평면도(기본형)$0$101co1-RF3",
+   "a_total": 14,
+   "b_total": 14,
+   "diff0": 14,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null
+  },
+  {
+   "name": "X-평면도(기본형)$0$101co2",
+   "a_total": 99,
+   "b_total": 99,
+   "diff0": 99,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null
+  },
+  {
+   "name": "X-평면도(기본형)$0$103co1",
+   "a_total": 106,
+   "b_total": 106,
+   "diff0": 106,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null
+  },
+  {
+   "name": "X-평면도(기본형)$0$104co1",
+   "a_total": 106,
+   "b_total": 106,
+   "diff0": 106,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null
+  },
+  {
+   "name": "X-평면도(기본형)$0$104co2",
+   "a_total": 102,
+   "b_total": 102,
+   "diff0": 102,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null
+  },
+  {
+   "name": "X-평면도(기본형)$0$105co2",
+   "a_total": 114,
+   "b_total": 114,
+   "diff0": 114,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null
+  },
+  {
+   "name": "X-평면도(기본형)$0$111ARF",
+   "a_total": 21,
+   "b_total": 21,
+   "diff0": 21,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null
+  },
+  {
+   "name": "X-평면도(기본형)$0$111ARF2",
+   "a_total": 11,
+   "b_total": 11,
+   "diff0": 11,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null
+  },
+  {
+   "name": "X-평면도(기본형)$0$111BRF",
+   "a_total": 24,
+   "b_total": 24,
+   "diff0": 24,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null
+  },
+  {
+   "name": "X-평면도(기본형)$0$111BRF2",
+   "a_total": 14,
+   "b_total": 14,
+   "diff0": 14,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null
+  },
+  {
+   "name": "X-평면도(기본형)$0$111a",
+   "a_total": 639,
+   "b_total": 639,
+   "diff0": 639,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null
+  },
+  {
+   "name": "X-평면도(기본형)$0$111b",
+   "a_total": 546,
+   "b_total": 546,
+   "diff0": 546,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null
+  },
+  {
+   "name": "X-평면도(기본형)$0$130A-S1",
+   "a_total": 4,
+   "b_total": 4,
+   "diff0": 4,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null
+  },
+  {
+   "name": "X-평면도(기본형)$0$130a",
+   "a_total": 784,
+   "b_total": 784,
+   "diff0": 784,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null
+  },
+  {
+   "name": "X-평면도(기본형)$0$130a1",
+   "a_total": 780,
+   "b_total": 780,
+   "diff0": 780,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null
+  },
+  {
+   "name": "X-평면도(기본형)$0$130b",
+   "a_total": 776,
+   "b_total": 776,
+   "diff0": 776,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null
+  },
+  {
+   "name": "X-평면도(기본형)$0$84a",
+   "a_total": 527,
+   "b_total": 527,
+   "diff0": 527,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null
+  },
+  {
+   "name": "X-평면도(기본형)$0$84a1",
+   "a_total": 533,
+   "b_total": 533,
+   "diff0": 533,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null
+  },
+  {
+   "name": "X-평면도(기본형)$0$84b",
+   "a_total": 525,
+   "b_total": 525,
+   "diff0": 525,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null
+  },
+  {
+   "name": "X-평면도(기본형)$0$84b1",
+   "a_total": 527,
+   "b_total": 527,
+   "diff0": 527,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null
+  },
+  {
+   "name": "X-평면도(기본형)$0$84c",
+   "a_total": 571,
+   "b_total": 571,
+   "diff0": 571,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null
+  },
+  {
+   "name": "X-평면도(기본형)$0$84c1",
+   "a_total": 577,
+   "b_total": 577,
+   "diff0": 577,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null
+  },
+  {
+   "name": "X-평면도(기본형)$0$A$C019C01BD",
+   "a_total": 117,
+   "b_total": 117,
+   "diff0": 117,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null
+  },
+  {
+   "name": "X-평면도(기본형)$0$A$C01A306AE",
+   "a_total": 22,
+   "b_total": 22,
+   "diff0": 22,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null
+  },
+  {
+   "name": "X-평면도(기본형)$0$A$C04B05B29",
+   "a_total": 24,
+   "b_total": 24,
+   "diff0": 24,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null
+  },
+  {
+   "name": "X-평면도(기본형)$0$A$C059766AB",
+   "a_total": 308,
+   "b_total": 308,
+   "diff0": 308,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null
+  },
+  {
+   "name": "X-평면도(기본형)$0$A$C072C115F",
+   "a_total": 23,
+   "b_total": 23,
+   "diff0": 23,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null
+  },
+  {
+   "name": "X-평면도(기본형)$0$A$C0A097A0C",
+   "a_total": 125,
+   "b_total": 125,
+   "diff0": 125,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null
+  },
+  {
+   "name": "X-평면도(기본형)$0$A$C0C1F5443",
+   "a_total": 93,
+   "b_total": 93,
+   "diff0": 93,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null
+  },
+  {
+   "name": "X-평면도(기본형)$0$A$C0E9D10F9",
+   "a_total": 46,
+   "b_total": 46,
+   "diff0": 46,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null
+  },
+  {
+   "name": "X-평면도(기본형)$0$A$C0EF505D0",
+   "a_total": 32,
+   "b_total": 32,
+   "diff0": 32,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null
+  },
+  {
+   "name": "X-평면도(기본형)$0$A$C12CA7994",
+   "a_total": 3,
+   "b_total": 3,
+   "diff0": 3,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null
+  },
+  {
+   "name": "X-평면도(기본형)$0$A$C17C8346B",
+   "a_total": 188,
+   "b_total": 188,
+   "diff0": 188,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null
+  },
+  {
+   "name": "X-평면도(기본형)$0$A$C200833B1",
+   "a_total": 24,
+   "b_total": 24,
+   "diff0": 24,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null
+  },
+  {
+   "name": "X-평면도(기본형)$0$A$C24B0555E",
+   "a_total": 24,
+   "b_total": 24,
+   "diff0": 24,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null
+  },
+  {
+   "name": "X-평면도(기본형)$0$A$C38AD67D4",
+   "a_total": 3,
+   "b_total": 3,
+   "diff0": 3,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null
+  },
+  {
+   "name": "X-평면도(기본형)$0$A$C41D360DF",
+   "a_total": 107,
+   "b_total": 107,
+   "diff0": 107,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null
+  },
+  {
+   "name": "X-평면도(기본형)$0$A$C48BA1CD6",
+   "a_total": 127,
+   "b_total": 127,
+   "diff0": 127,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null
+  },
+  {
+   "name": "X-평면도(기본형)$0$A$C49112A41",
+   "a_total": 32,
+   "b_total": 32,
+   "diff0": 32,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null
+  },
+  {
+   "name": "X-평면도(기본형)$0$A$C4B913E7C",
+   "a_total": 14,
+   "b_total": 14,
+   "diff0": 14,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null
+  },
+  {
+   "name": "X-평면도(기본형)$0$A$C4D747D6B",
+   "a_total": 32,
+   "b_total": 32,
+   "diff0": 32,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null
+  },
+  {
+   "name": "X-평면도(기본형)$0$A$C4cfca2ef",
+   "a_total": 3,
+   "b_total": 3,
+   "diff0": 3,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null
+  },
+  {
+   "name": "X-평면도(기본형)$0$A$C57321CDF",
+   "a_total": 24,
+   "b_total": 24,
+   "diff0": 24,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null
+  },
+  {
+   "name": "X-평면도(기본형)$0$A$C57620E0B",
+   "a_total": 3,
+   "b_total": 3,
+   "diff0": 3,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null
+  },
+  {
+   "name": "X-평면도(기본형)$0$A$C590B6141",
+   "a_total": 3,
+   "b_total": 3,
+   "diff0": 3,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null
+  },
+  {
+   "name": "X-평면도(기본형)$0$A$C5AA0109C",
+   "a_total": 9,
+   "b_total": 9,
+   "diff0": 9,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null
+  },
+  {
+   "name": "X-평면도(기본형)$0$A$C5C3D4CBD",
+   "a_total": 3,
+   "b_total": 3,
+   "diff0": 3,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null
+  },
+  {
+   "name": "X-평면도(기본형)$0$A$C5C7666B6",
+   "a_total": 865,
+   "b_total": 865,
+   "diff0": 865,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null
+  },
+  {
+   "name": "X-평면도(기본형)$0$A$C5FEA68FE",
+   "a_total": 402,
+   "b_total": 402,
+   "diff0": 402,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null
+  },
+  {
+   "name": "X-평면도(기본형)$0$A$C60D55377",
+   "a_total": 146,
+   "b_total": 146,
+   "diff0": 146,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null
+  },
+  {
+   "name": "X-평면도(기본형)$0$A$C610442A9",
+   "a_total": 136,
+   "b_total": 136,
+   "diff0": 136,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null
+  },
+  {
+   "name": "X-평면도(기본형)$0$A$C651D2038",
+   "a_total": 3,
+   "b_total": 3,
+   "diff0": 3,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null
+  },
+  {
+   "name": "X-평면도(기본형)$0$A$C66AC16F3",
+   "a_total": 32,
+   "b_total": 32,
+   "diff0": 32,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null
+  },
+  {
+   "name": "X-평면도(기본형)$0$A$C66e6687a",
+   "a_total": 122,
+   "b_total": 122,
+   "diff0": 122,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null
+  },
+  {
+   "name": "X-평면도(기본형)$0$A$C6FEB5B01",
+   "a_total": 3,
+   "b_total": 3,
+   "diff0": 3,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null
+  },
+  {
+   "name": "X-평면도(기본형)$0$A$C71B42895",
+   "a_total": 144,
+   "b_total": 144,
+   "diff0": 144,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null
+  },
+  {
+   "name": "X-평면도(기본형)$0$A$C745B7F2C",
+   "a_total": 24,
+   "b_total": 24,
+   "diff0": 24,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null
+  },
+  {
+   "name": "X-평면도(기본형)$0$A$C7CF27C93",
+   "a_total": 146,
+   "b_total": 146,
+   "diff0": 146,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null
+  },
+  {
+   "name": "X-평면도(기본형)$0$A$C7D8E4760",
+   "a_total": 345,
+   "b_total": 345,
+   "diff0": 345,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null
+  },
+  {
+   "name": "X-평면도(기본형)$0$A$Cc2871f03",
+   "a_total": 42,
+   "b_total": 42,
+   "diff0": 42,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null
+  },
+  {
+   "name": "X-평면도(기본형)$0$BA23502100",
+   "a_total": 28,
+   "b_total": 28,
+   "diff0": 28,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null
+  },
+  {
+   "name": "X-평면도(기본형)$0$BS-03 TOP",
+   "a_total": 33,
+   "b_total": 33,
+   "diff0": 33,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null
+  },
+  {
+   "name": "X-평면도(기본형)$0$CW900",
+   "a_total": 31,
+   "b_total": 31,
+   "diff0": 31,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null
+  },
+  {
+   "name": "X-평면도(기본형)$0$Ca2405caa",
+   "a_total": 31,
+   "b_total": 31,
+   "diff0": 31,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null
+  },
+  {
+   "name": "X-평면도(기본형)$0$DW1500",
+   "a_total": 53,
+   "b_total": 53,
+   "diff0": 53,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null
+  },
+  {
+   "name": "X-평면도(기본형)$0$DW2700v",
+   "a_total": 53,
+   "b_total": 53,
+   "diff0": 53,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null
+  },
+  {
+   "name": "X-평면도(기본형)$0$FSD1120",
+   "a_total": 7,
+   "b_total": 7,
+   "diff0": 7,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null
+  },
+  {
+   "name": "X-평면도(기본형)$0$FSD1500-2",
+   "a_total": 9,
+   "b_total": 9,
+   "diff0": 9,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null
+  },
+  {
+   "name": "X-평면도(기본형)$0$FSDFSDF321",
+   "a_total": 5,
+   "b_total": 5,
+   "diff0": 5,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null
+  },
+  {
+   "name": "X-평면도(기본형)$0$FU1",
+   "a_total": 115,
+   "b_total": 115,
+   "diff0": 115,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null
+  },
+  {
+   "name": "X-평면도(기본형)$0$HOBGAS19",
+   "a_total": 30,
+   "b_total": 30,
+   "diff0": 30,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null
+  },
+  {
+   "name": "X-평면도(기본형)$0$IC708",
+   "a_total": 100,
+   "b_total": 100,
+   "diff0": 100,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null
+  },
+  {
+   "name": "X-평면도(기본형)$0$IW990",
+   "a_total": 451,
+   "b_total": 451,
+   "diff0": 451,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null
+  },
+  {
+   "name": "X-평면도(기본형)$0$KH-530S-1 TOP",
+   "a_total": 132,
+   "b_total": 132,
+   "diff0": 132,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null
+  },
+  {
+   "name": "X-평면도(기본형)$0$L933 TOP",
+   "a_total": 191,
+   "b_total": 191,
+   "diff0": 191,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null
+  },
+  {
+   "name": "X-평면도(기본형)$0$PSD700_2",
+   "a_total": 5,
+   "b_total": 5,
+   "diff0": 5,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null
+  },
+  {
+   "name": "X-평면도(기본형)$0$SB1703 1500",
+   "a_total": 1312,
+   "b_total": 1312,
+   "diff0": 1312,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null
+  },
+  {
+   "name": "X-평면도(기본형)$0$T1",
+   "a_total": 33,
+   "b_total": 33,
+   "diff0": 33,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null
+  },
+  {
+   "name": "X-평면도(기본형)$0$WD200900",
+   "a_total": 16,
+   "b_total": 16,
+   "diff0": 16,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null
+  },
+  {
+   "name": "X-평면도(기본형)$0$WD850",
+   "a_total": 12,
+   "b_total": 12,
+   "diff0": 12,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null
+  },
+  {
+   "name": "X-평면도(기본형)$0$ba15001400",
+   "a_total": 28,
+   "b_total": 28,
+   "diff0": 28,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null
+  },
+  {
+   "name": "X-평면도(기본형)$0$ba15002200",
+   "a_total": 22,
+   "b_total": 22,
+   "diff0": 22,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null
+  },
+  {
+   "name": "X-평면도(기본형)$0$ba15002700",
+   "a_total": 144,
+   "b_total": 144,
+   "diff0": 144,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null
+  },
+  {
+   "name": "X-평면도(기본형)$0$ba17001400",
+   "a_total": 26,
+   "b_total": 26,
+   "diff0": 26,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null
+  },
+  {
+   "name": "X-평면도(기본형)$0$ba18601500",
+   "a_total": 14,
+   "b_total": 14,
+   "diff0": 14,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null
+  },
+  {
+   "name": "X-평면도(기본형)$0$cw1200",
+   "a_total": 31,
+   "b_total": 31,
+   "diff0": 31,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null
+  },
+  {
+   "name": "X-평면도(기본형)$0$dffm",
+   "a_total": 3,
+   "b_total": 3,
+   "diff0": 3,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null
+  },
+  {
+   "name": "X-평면도(기본형)$0$dw1200",
+   "a_total": 53,
+   "b_total": 53,
+   "diff0": 53,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null
+  },
+  {
+   "name": "X-평면도(기본형)$0$dw1400",
+   "a_total": 53,
+   "b_total": 53,
+   "diff0": 53,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null
+  },
+  {
+   "name": "X-평면도(기본형)$0$dw1600",
+   "a_total": 53,
+   "b_total": 53,
+   "diff0": 53,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null
+  },
+  {
+   "name": "X-평면도(기본형)$0$dw2100",
+   "a_total": 53,
+   "b_total": 53,
+   "diff0": 53,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null
+  },
+  {
+   "name": "X-평면도(기본형)$0$esp",
+   "a_total": 11,
+   "b_total": 11,
+   "diff0": 11,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null
+  },
+  {
+   "name": "X-평면도(기본형)$0$ev13k",
+   "a_total": 47,
+   "b_total": 47,
+   "diff0": 47,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null
+  },
+  {
+   "name": "X-평면도(기본형)$0$ev16k",
+   "a_total": 47,
+   "b_total": 47,
+   "diff0": 47,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null
+  },
+  {
+   "name": "X-평면도(기본형)$0$ev16x2k",
+   "a_total": 94,
+   "b_total": 94,
+   "diff0": 94,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null
+  },
+  {
+   "name": "X-평면도(기본형)$0$evj",
+   "a_total": 2,
+   "b_total": 2,
+   "diff0": 2,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null
+  },
+  {
+   "name": "X-평면도(기본형)$0$hd1050",
+   "a_total": 244,
+   "b_total": 244,
+   "diff0": 244,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null
+  },
+  {
+   "name": "X-평면도(기본형)$0$ins-l",
+   "a_total": 1,
+   "b_total": 1,
+   "diff0": 1,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null
+  },
+  {
+   "name": "X-평면도(기본형)$0$is",
+   "a_total": 2,
+   "b_total": 2,
+   "diff0": 2,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null
+  },
+  {
+   "name": "X-평면도(기본형)$0$is1",
+   "a_total": 4,
+   "b_total": 4,
+   "diff0": 4,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null
+  },
+  {
+   "name": "X-평면도(기본형)$0$is2",
+   "a_total": 4,
+   "b_total": 4,
+   "diff0": 4,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null
+  },
+  {
+   "name": "X-평면도(기본형)$0$is3",
+   "a_total": 4,
+   "b_total": 4,
+   "diff0": 4,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null
+  },
+  {
+   "name": "X-평면도(기본형)$0$jjbl",
+   "a_total": 37,
+   "b_total": 37,
+   "diff0": 37,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null
+  },
+  {
+   "name": "X-평면도(기본형)$0$ng",
+   "a_total": 23,
+   "b_total": 23,
+   "diff0": 23,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null
+  },
+  {
+   "name": "X-평면도(기본형)$0$pd900",
+   "a_total": 19,
+   "b_total": 19,
+   "diff0": 19,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null
+  },
+  {
+   "name": "X-평면도(기본형)$0$phg1200",
+   "a_total": 22,
+   "b_total": 22,
+   "diff0": 22,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null
+  },
+  {
+   "name": "X-평면도(기본형)$0$pkdr750190",
+   "a_total": 25,
+   "b_total": 25,
+   "diff0": 25,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null
+  },
+  {
+   "name": "X-평면도(기본형)$0$pkdr750190-1",
+   "a_total": 25,
+   "b_total": 25,
+   "diff0": 25,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null
+  },
+  {
+   "name": "X-평면도(기본형)$0$sta-t",
+   "a_total": 60,
+   "b_total": 60,
+   "diff0": 60,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null
+  },
+  {
+   "name": "X-평면도(기본형)$0$sta-t-4",
+   "a_total": 66,
+   "b_total": 66,
+   "diff0": 66,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null
+  },
+  {
+   "name": "X-평면도(기본형)$0$sta-t-5",
+   "a_total": 65,
+   "b_total": 65,
+   "diff0": 65,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null
+  },
+  {
+   "name": "X-평면도(기본형)$0$wd120900",
+   "a_total": 16,
+   "b_total": 16,
+   "diff0": 16,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null
+  },
+  {
+   "name": "X-평면도(기본형)$0$wd160750",
+   "a_total": 15,
+   "b_total": 15,
+   "diff0": 15,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null
+  },
+  {
+   "name": "X-평면도(기본형)$0$wd170750",
+   "a_total": 15,
+   "b_total": 15,
+   "diff0": 15,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null
+  },
+  {
+   "name": "X-평면도(기본형)$0$wd250900",
+   "a_total": 16,
+   "b_total": 16,
+   "diff0": 16,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null
+  },
+  {
+   "name": "X-평면도(기본형)$0$국기계양대",
+   "a_total": 17,
+   "b_total": 17,
+   "diff0": 17,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null
+  },
+  {
+   "name": "X-평면도(기본형)$0$무동력휀300",
+   "a_total": 8,
+   "b_total": 8,
+   "diff0": 8,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null
+  },
+  {
+   "name": "X-평면도(기본형)$0$세면대_공통",
+   "a_total": 191,
+   "b_total": 191,
+   "diff0": 191,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null
+  },
+  {
+   "name": "X-평면도(기본형)$0$수전",
+   "a_total": 33,
+   "b_total": 33,
+   "diff0": 33,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null
+  },
+  {
+   "name": "X-평면도(기본형)$0$수전-1",
+   "a_total": 15,
+   "b_total": 15,
+   "diff0": 15,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null
+  },
+  {
+   "name": "X-평면도(기본형)$0$씽크$0$59C$0$gasdfasdfs$0$COK3",
+   "a_total": 38,
+   "b_total": 38,
+   "diff0": 38,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null
+  },
+  {
+   "name": "X-평면도(기본형)$0$안전사다리",
+   "a_total": 50,
+   "b_total": 50,
+   "diff0": 50,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null
+  },
+  {
+   "name": "X-평면도(기본형)$0$우수관_100A",
+   "a_total": 6,
+   "b_total": 6,
+   "diff0": 6,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null
+  },
+  {
+   "name": "X-평면도(기본형)$0$코너  선반",
+   "a_total": 47,
+   "b_total": 47,
+   "diff0": 47,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null
+  },
+  {
+   "name": "_ArchTick",
+   "a_total": 1,
+   "b_total": 1,
+   "diff0": 1,
+   "removed": 0,
+   "added": 0,
+   "modified": 0,
+   "missing_side": null
+  }
+ ],
+ "by_kind_gap": {
+  "arc": {
+   "a_count": 2198,
+   "b_count": 2198
+  },
+  "block_reference": {
+   "a_count": 957,
+   "b_count": 957
+  },
+  "circle": {
+   "a_count": 143,
+   "b_count": 143
+  },
+  "ellipse": {
+   "a_count": 201,
+   "b_count": 201
+  },
+  "face3d": {
+   "a_count": 34,
+   "b_count": 34
+  },
+  "hatch": {
+   "a_count": 265,
+   "b_count": 265
+  },
+  "line": {
+   "a_count": 11742,
+   "b_count": 11742
+  },
+  "lwpolyline": {
+   "a_count": 7427,
+   "b_count": 7427
+  },
+  "point": {
+   "a_count": 2,
+   "b_count": 2
+  },
+  "polyline": {
+   "a_count": 1,
+   "b_count": 1
+  },
+  "spline": {
+   "a_count": 3973,
+   "b_count": 3973
+  },
+  "text": {
+   "a_count": 154,
+   "b_count": 154
+  },
+  "wipeout": {
+   "a_count": 33,
+   "b_count": 33
+  }
+ }
+}

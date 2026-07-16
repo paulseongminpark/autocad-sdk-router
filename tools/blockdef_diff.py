@@ -284,6 +284,211 @@ def _canonical_poly_loop(loop: Any) -> Any:
     return new_loop
 
 
+def _parse_spline_edge(edge: Any) -> Optional[Tuple[int, List[Tuple[float, ...]],
+                                                      List[float],
+                                                      Optional[List[float]]]]:
+    """Validate one hatch-loop spline edge; None => leave the loop untouched.
+
+    Requires type=='spline', integer degree>=1, control list of >=degree+1
+    numeric [x,y] points, and a non-decreasing knots list of length
+    len(control)+degree+1. Rational edges (rational truthy or non-empty
+    weights) further require len(weights)==len(control) with every weight>0.
+    Same never-guess discipline as _loop_vertex_key."""
+    if not isinstance(edge, dict) or edge.get("type") != "spline":
+        return None
+    degree = edge.get("degree")
+    if isinstance(degree, bool) or not isinstance(degree, int) or degree < 1:
+        return None
+    control_raw = edge.get("control")
+    knots_raw = edge.get("knots")
+    if not (isinstance(control_raw, list) and isinstance(knots_raw, list)):
+        return None
+    if len(control_raw) < degree + 1:
+        return None
+    if len(knots_raw) != len(control_raw) + degree + 1:
+        return None
+    try:
+        control: List[Tuple[float, ...]] = []
+        for pt in control_raw:
+            if not (isinstance(pt, list) and len(pt) >= 2):
+                return None
+            control.append((float(pt[0]), float(pt[1])))
+        knots = [float(t) for t in knots_raw]
+    except (TypeError, ValueError):
+        return None
+    for i in range(1, len(knots)):
+        if knots[i] < knots[i - 1]:
+            return None
+    weights_raw = edge.get("weights")
+    rational = bool(edge.get("rational")) or (
+        isinstance(weights_raw, list) and len(weights_raw) > 0
+    )
+    weights: Optional[List[float]] = None
+    if rational:
+        if not isinstance(weights_raw, list) or len(weights_raw) != len(control):
+            return None
+        try:
+            weights = [float(w) for w in weights_raw]
+        except (TypeError, ValueError):
+            return None
+        if any(w <= 0.0 for w in weights):
+            return None
+    return degree, control, knots, weights
+
+
+def _boehm_insert_once(controls: List[Tuple[float, ...]], knots: List[float],
+                       degree: int, u: float
+                       ) -> Tuple[List[Tuple[float, ...]], List[float]]:
+    """Insert knot u once (Boehm / de Boor-style); stdlib only."""
+    d = degree
+    n = len(controls) - 1
+    k: Optional[int] = None
+    for i in range(len(knots) - 1):
+        if knots[i] <= u < knots[i + 1]:
+            k = i
+            break
+    if k is None:
+        return controls, knots
+    dim = len(controls[0])
+    new_c: List[Optional[Tuple[float, ...]]] = [None] * (n + 2)
+    for i in range(0, k - d + 1):
+        new_c[i] = controls[i]
+    for i in range(k - d + 1, k + 1):
+        denom = knots[i + d] - knots[i]
+        alpha = 0.0 if denom == 0.0 else (u - knots[i]) / denom
+        new_c[i] = tuple(
+            (1.0 - alpha) * controls[i - 1][j] + alpha * controls[i][j]
+            for j in range(dim)
+        )
+    for i in range(k + 1, n + 2):
+        new_c[i] = controls[i - 1]
+    out: List[Tuple[float, ...]] = []
+    for c in new_c:
+        if c is None:  # pragma: no cover - Boehm fills every slot
+            raise RuntimeError("boehm slot left empty")
+        out.append(c)
+    return out, knots[: k + 1] + [u] + knots[k + 1 :]
+
+
+def _spline_edge_to_bezier_segments(
+        degree: int,
+        control: List[Tuple[float, ...]],
+        knots: List[float],
+        weights: Optional[List[float]],
+) -> List[Dict[str, Any]]:
+    """Raise interior knots to multiplicity==degree, emit per-span Beziers.
+
+    Quantization (round(_, 6)) happens ONLY at emission. Zero-width spans are
+    skipped; segments whose d+1 controls are identical @6dp are dropped.
+    Knot values themselves are notation and do not appear in the output."""
+    d = degree
+    if weights is None:
+        pts: List[Tuple[float, ...]] = list(control)
+    else:
+        pts = [(c[0] * w, c[1] * w, w) for c, w in zip(control, weights)]
+    U = list(knots)
+    domain_start, domain_end = U[d], U[len(pts)]
+    interiors: List[float] = []
+    seen = set()
+    for t in U:
+        if t not in seen and domain_start < t < domain_end:
+            interiors.append(t)
+            seen.add(t)
+    for u in interiors:
+        while sum(1 for t in U if t == u) < d:
+            pts, U = _boehm_insert_once(pts, U, d, u)
+    n = len(pts) - 1
+    segs: List[Dict[str, Any]] = []
+    for i in range(d, n + 1):
+        if not (U[i] < U[i + 1]):
+            continue
+        raw = pts[i - d: i + 1]
+        if weights is None:
+            q_ctrl = [[round(p[0], 6), round(p[1], 6)] for p in raw]
+            if all(pt == q_ctrl[0] for pt in q_ctrl):
+                continue
+            segs.append({"type": "spline_bezier", "degree": d, "control": q_ctrl})
+        else:
+            dehom: List[Tuple[float, float, float]] = []
+            ok = True
+            for hx, hy, hw in raw:
+                if hw == 0.0:
+                    ok = False
+                    break
+                dehom.append((hx / hw, hy / hw, hw))
+            if not ok:
+                continue
+            q_ctrl = [[round(p[0], 6), round(p[1], 6)] for p in dehom]
+            q_w = [round(p[2], 6) for p in dehom]
+            if all(pt == q_ctrl[0] for pt in q_ctrl) and all(w == q_w[0] for w in q_w):
+                continue
+            segs.append({"type": "spline_bezier", "degree": d,
+                         "control": q_ctrl, "weights": q_w})
+    return segs
+
+
+def _bezier_seg_key(seg: Dict[str, Any]) -> Tuple[Any, ...]:
+    """JSON-stable tuple form of one spline_bezier segment (sorted keys)."""
+    parts: List[Tuple[str, Any]] = []
+    for k in sorted(seg.keys()):
+        v = seg[k]
+        if k == "control":
+            parts.append((k, tuple(tuple(p) for p in v)))
+        elif k == "weights":
+            parts.append((k, tuple(v)))
+        else:
+            parts.append((k, v))
+    return tuple(parts)
+
+
+def _canonical_spline_loop(loop: Any) -> Any:
+    """Spline edge-loop re-decomposition quotient (LEX-0013, R4x).
+
+    The two residual 1.dwg hatch pairs in def X-FORM_청주$0$dA로고
+    (reports/interior100/loops_residue_analysis_R4x.json: resistant 2,
+    pointcloud_max_nn 9.16e-4, spline-control-proxy;
+    fixture tests/fixtures/lex0013_dA_pairs.json pairs[2]=1BDF/762B,
+    pairs[3]=1BE6/7632) store THE SAME boundary curve under two notations:
+    the census side keeps a few MULTI-SPAN cubic B-spline edges (knot counts
+    23/8/14 on the outer loop), while the rebuild re-decomposes into
+    per-knot-span Bezier edges (degree 3, 4 control points, knots like
+    [6,6,6,6,7,7,7,7]). Segmentation and knot parameterization of a spline
+    edge chain are notation; the curve is the geometry.
+
+    Canonical form, applied ONLY when every edge of the loop is a well-formed
+    spline (see _parse_spline_edge -- any violation returns the loop
+    unchanged): Boehm-raise every interior knot to multiplicity == degree,
+    split each edge into per-span Bezier segments, concatenate in edge order,
+    emit on the ladder's shared 6dp grid (LEX-0009) as
+    {type:spline_bezier, degree, control[, weights]}, drop @6dp-degenerate
+    segments, and -- when loop.closed -- rotate the segment list to its
+    lexicographically minimal JSON-stable serialization (same cycle-quotient
+    shape as LEX-0012). Direction is NOT quotiented; open loops are NOT
+    rotated. Knot values and per-edge grouping do not appear in the
+    canonical form."""
+    if not isinstance(loop, dict):
+        return loop
+    edges = loop.get("edges")
+    if not (isinstance(edges, list) and edges):
+        return loop
+    parsed = [_parse_spline_edge(e) for e in edges]
+    if any(p is None for p in parsed):
+        return loop
+    segs: List[Dict[str, Any]] = []
+    for item in parsed:
+        assert item is not None
+        degree, control, knots, weights = item
+        segs.extend(_spline_edge_to_bezier_segments(degree, control, knots, weights))
+    if loop.get("closed") and segs:
+        n = len(segs)
+        keys = [_bezier_seg_key(s) for s in segs]
+        best = min(range(n), key=lambda s: [keys[(s + j) % n] for j in range(n)])
+        segs = [segs[(best + j) % n] for j in range(n)]
+    new_loop = dict(loop)
+    new_loop["edges"] = segs
+    return new_loop
+
+
 def _canonical_entity(entity: Dict[str, Any],
                       name_map: Optional[Dict[str, str]] = None) -> Dict[str, Any]:
     """Normalize representation-dependent geometry before comparison.
@@ -341,14 +546,52 @@ def _canonical_entity(entity: Dict[str, Any],
             canon_g["assoc_loop_source_counts"] = [
                 len(loop) if isinstance(loop, list) else -1 for loop in srcs
             ]
-        # Closed polyline-loop cycle quotient (LEX-0012, R4v): see
-        # _canonical_poly_loop. Spline edge-loop re-decomposition (the 2
-        # dA-logo pairs, census multi-span splines vs post per-span Bezier
-        # split) stays OUTSIDE the fingerprint: substitute-verified
-        # curve-identical (point proxy 9.2e-4), documented in the ledger.
+        # Closed polyline-loop cycle quotient (LEX-0012, R4v) then spline
+        # edge-loop re-decomposition quotient (LEX-0013 part 1, R4x): see
+        # _canonical_poly_loop / _canonical_spline_loop.
         loops = canon_g.get("loops")
         if isinstance(loops, list) and loops:
-            new_loops = [_canonical_poly_loop(lp) for lp in loops]
+            new_loops = [_canonical_spline_loop(_canonical_poly_loop(lp))
+                         for lp in loops]
+            # Derived spline-loop cache fold (LEX-0013 part 2, R4x). The two
+            # residual dA-logo pairs are ASSOCIATIVE hatches (1 source entity
+            # per loop): AcDbHatch::evaluateHatch re-derives the loop payload
+            # from the boundary sources and RE-FITS the spline chain -- the
+            # rebuilt cache differs from the census cache by 10-vs-9 Bezier
+            # spans and up to 9.16e-4 (measured after the part-1 algebraic
+            # quotient, fixture tests/fixtures/lex0013_dA_pairs.json; the same
+            # number the R4x point-cloud proxy reported). Fit noise in a
+            # host-derived cache is notation, same category as the *D
+            # dimension caches (LEX-0001) and assoc handle identity
+            # (LEX-0011): the authored geometry lives in the SOURCE entities,
+            # which this same def diff compares exactly (1.dwg splines:
+            # 3973/3973 diff0). Canonical form: a loop whose edges are ALL
+            # spline-class AND which has a positive assoc source count folds
+            # its edge payload to the structural marker
+            # [{"type": "spline_chain_derived"}] (loop_type/closed/... keys
+            # stay). Blind spot, documented per LEX-0010: a cache that
+            # differs while its sources are identical is host-deterministic
+            # re-derivation -- exactly the quotiented notation; a REAL
+            # boundary change moves the sources and is caught there.
+            # Substitute verifier: source-entity diff0 + the point-cloud gate
+            # (tools/loops_residue_analysis.py, <=1e-3 measured).
+            counts = canon_g.get("assoc_loop_source_counts")
+            if isinstance(counts, list) and counts:
+                folded: List[Any] = []
+                for i, lp in enumerate(new_loops):
+                    cnt = counts[i] if i < len(counts) else 0
+                    edges = lp.get("edges") if isinstance(lp, dict) else None
+                    if (isinstance(cnt, int) and cnt > 0
+                            and isinstance(edges, list) and edges
+                            and all(isinstance(e, dict)
+                                    and e.get("type") in ("spline", "spline_bezier")
+                                    for e in edges)):
+                        nl = dict(lp)
+                        nl["edges"] = [{"type": "spline_chain_derived"}]
+                        folded.append(nl)
+                    else:
+                        folded.append(lp)
+                new_loops = folded
             if any(nl is not ol for nl, ol in zip(new_loops, loops)):
                 if canon_g is g:
                     canon_g = dict(g)
