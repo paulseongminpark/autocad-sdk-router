@@ -11,6 +11,7 @@ family slug (e.g. `brep_solids.json`).
 ```json
 {
   "family": "<family slug>",
+  "dwg": "tests/fixtures/<purpose-built fixture>.dwg",
   "fixtures": {
     "<op.id>": {
       "args": { "...": "valid args exercising a NON-DEGENERATE path" },
@@ -19,6 +20,14 @@ family slug (e.g. `brep_solids.json`).
   }
 }
 ```
+
+`dwg` (optional, fragment-level): when the fixture args reference handles that
+only exist in a purpose-built fixture DWG (e.g. the P3b enriched seed built by
+`tools/build_enriched_fixture.py`), name it here (repo-relative). The sweep
+probes those ops against THAT dwg instead of the sweep default — otherwise the
+valid leg dies on a dead handle and silently demotes the row. Handles in such
+a fragment must be harvested from the fixture's build manifest
+(`measure/reachable_fixtures/enriched_manifest.json`), never guessed.
 
 ## Authoring rules (hard — a fixture that violates these fails the probe gate)
 

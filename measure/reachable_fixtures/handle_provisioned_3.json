@@ -1,0 +1,279 @@
+{
+  "family": "p3b_tail_enriched (cross-family: brep_solids + geometry_kernel + entities + symbol_tables_dictionaries + constraints_associativity)",
+  "dwg": "tests/fixtures/enriched_seed_20260716.dwg",
+  "_provenance": "Handles are REAL and harvested, never guessed: measure/reachable_fixtures/enriched_manifest.json (built by tools/build_enriched_fixture.py -- a sequential sanctioned-probe chain over ops already RUNNABLE in reachable_matrix_20260714). solid_a=19191 (wedge, + ARIADNE_P3B_TAIL xdata + extension dict), solid_b=191A7 (coincident wedge), line_1=191BB (1,2,0)-(11,12,0), line_2=191CF (0,0,0)-(10,0,0), circle_1=191E3 (r=3.5), assoc_action=19237, preexisting INSERT=11995, preexisting MTEXT=1199B, material Global=EE (inspect.material.enumerate, runs/p3b_tail/mat_enum). The fragment-level 'dwg' key routes sweep probes of THESE ops to the enriched seed (probe_reachability._merge_reachable_fixtures).",
+  "fixtures": {
+    "inspect.brep.from_entity": {
+      "args": {
+        "handle": "19191"
+      },
+      "evidence": "m08d_handlers.inc L926-937,943-946 (m08dFindHandle 'handle' -> m08dBindBrep; bind success returns source_class); handle=solid_a per enriched_manifest.json"
+    },
+    "inspect.brep.bounds": {
+      "args": {
+        "handle": "19191"
+      },
+      "evidence": "m08d_handlers.inc L926-937,968-980 (m08dFindHandle 'handle' -> m08dBindBrep -> brep.getBoundBlock); handle=solid_a"
+    },
+    "inspect.brep.changed": {
+      "args": {
+        "handle": "19191"
+      },
+      "evidence": "m08d_handlers.inc L926-937,954-958 (m08dFindHandle 'handle' -> m08dBindBrep -> brep.brepChanged); handle=solid_a"
+    },
+    "compute.brep.volume": {
+      "args": {
+        "handle": "19191"
+      },
+      "evidence": "m08d_handlers.inc L926-937,1015-1029 (m08dFindHandle 'handle' -> m08dBindBrep -> brep.getVolume); handle=solid_a"
+    },
+    "compute.brep.surface_area": {
+      "args": {
+        "handle": "19191"
+      },
+      "evidence": "m08d_handlers.inc L926-937,1031-1039 (brep.getSurfaceArea); handle=solid_a"
+    },
+    "compute.brep.perimeter": {
+      "args": {
+        "handle": "19191"
+      },
+      "evidence": "m08d_handlers.inc L926-937,1041-1046 (brep.getPerimeterLength); handle=solid_a"
+    },
+    "compute.brep.massprops": {
+      "args": {
+        "handle": "19191"
+      },
+      "evidence": "m08d_handlers.inc L926-937,1048-1062 (brep.getMassProps); handle=solid_a"
+    },
+    "compute.brep.point_containment": {
+      "args": {
+        "handle": "19191",
+        "point": {
+          "x": 0.25,
+          "y": 0.25,
+          "z": 0.25
+        }
+      },
+      "evidence": "m08d_handlers.inc L926-937,1064-1068 (m08dFindNamedPoint 'point' -- {x,y,z} object per m08dFindNamedPoint/parsePointFromObject); handle=solid_a (2.0x1.5x3.5 wedge); any well-formed point exercises the containment computation"
+    },
+    "compute.brep.line_containment": {
+      "args": {
+        "handle": "19191",
+        "a": {
+          "x": -5.0,
+          "y": 0.3,
+          "z": 0.3
+        },
+        "b": {
+          "x": 5.0,
+          "y": 0.3,
+          "z": 0.3
+        }
+      },
+      "evidence": "m08d_handlers.inc L926-937,1083-1088 (m08dFindNamedPoint 'a'/'b'); handle=solid_a; the line crosses the wedge's neighborhood"
+    },
+    "compute.solid3d.interference": {
+      "args": {
+        "handle_a": "19191",
+        "handle_b": "191A7"
+      },
+      "evidence": "m08d_handlers.inc L736 (m08dOpenEntity+AcDb3dSolid::cast on 'handle_a'/'handle_b'); solid_a/solid_b are coincident wedges (guaranteed overlap) per enriched_manifest.json"
+    },
+    "modify.entity.solid3d.boolean": {
+      "args": {
+        "handle": "19191",
+        "other_handle": "191A7",
+        "bool_op": "unite"
+      },
+      "evidence": "m08g_handlers.inc L1877 (m08gFindHandle 'handle', jsonFindString 'other_handle', 'bool_op' default unite); both AcDb3dSolid per enriched_manifest.json"
+    },
+    "modify.curve.split": {
+      "args": {
+        "handle": "191BB",
+        "params": [
+          7.0710678
+        ]
+      },
+      "evidence": "m08g_handlers.inc L1946 (m08gFindHandle 'handle', 'params' double array); line_1 built at (1,2,0)-(11,12,0) by build_enriched_fixture.py => length sqrt(200)=14.1421, param 7.0710678 = midpoint (KNOWN geometry, not guessed)"
+    },
+    "modify.curve.to_spline": {
+      "args": {
+        "handle": "191BB"
+      },
+      "evidence": "m08g_handlers.inc (modify.curve.to_spline: only 'handle' read via m08gFindHandle); line_1 per enriched_manifest.json"
+    },
+    "modify.entity.xdata": {
+      "args": {
+        "handle": "191CF",
+        "app_name": "ARIADNE_P3B_TAIL2",
+        "values": [
+          {
+            "code": 1000,
+            "value": "p3b-tail-fixture"
+          },
+          {
+            "code": 1040,
+            "value": 7.25
+          }
+        ]
+      },
+      "evidence": "m08g_handlers.inc L1673 (m08gFindHandle 'handle', jsonFindString 'app_name', 'values' array of {code,value}; codes 1000 string / 1040 numeric per the in-handler 1000-1071 validation table); handle=line_2"
+    },
+    "inspect.entity.get_xdata": {
+      "args": {
+        "handle": "19191"
+      },
+      "evidence": "m08e_handlers.inc m08eHandleEntityXdata ('handle' via jsonFindString -> resolveHandle -> xData()); solid_a carries ARIADNE_P3B_TAIL xdata (verified in graph IR by build_enriched_fixture.py harvest step) => non-empty, non-degenerate read"
+    },
+    "inspect.object.ext_dict": {
+      "args": {
+        "handle": "19191"
+      },
+      "evidence": "m08c_handlers.inc (m08cFindHandleArg 'handle'/'object_handle' -> extensionDictionary()); solid_a's extension dictionary created by chain step e06 (write.object.create_ext_dict, status ok) => non-empty read"
+    },
+    "inspect.material.properties": {
+      "args": {
+        "handle": "EE"
+      },
+      "evidence": "materials_read.inc materialsReadHandleProperties ('handle' via jsonFindString -> AcDbMaterial under ACAD_MATERIAL NOD); handle=Global material harvested live via inspect.material.enumerate (runs/p3b_tail/mat_enum: entries ByBlock=ED ByLayer=EC Global=EE)"
+    },
+    "inspect.entity.annoscale.contexts": {
+      "args": {
+        "handle": "1199B"
+      },
+      "evidence": "annoscale_read.inc annoscaleReadEntityContexts ('handle' via jsonFindString -> AcDbObjectContextInterface); handle=preexisting MTEXT 1199B per enriched_manifest.json; if the MTEXT is non-annotative an empty context list is the honest result (op may legitimately stay REACHABLE)"
+    },
+    "write.layerstate.restore": {
+      "args": {
+        "name": "ARIADNE_P3B_TAIL_LS"
+      },
+      "evidence": "w6_layerstate_handlers.inc (w6FindNameArg 'name'; lsm.hasLayerState gate); state saved by chain step e08 (write.layerstate.save, status ok) per enriched_manifest.json"
+    },
+    "write.layerstate.delete": {
+      "args": {
+        "name": "ARIADNE_P3B_TAIL_LS"
+      },
+      "evidence": "w6_layerstate_handlers.inc (w6FindNameArg 'name'; lsm.hasLayerState gate); same saved state as write.layerstate.restore (each probe stages its own copy, so restore/delete cannot interfere)"
+    },
+    "write.entity.attribute": {
+      "args": {
+        "blockref_handle": "11995",
+        "tag": "P3B_TAG",
+        "text": "p3b-attribute",
+        "height": 2.5,
+        "position": {
+          "x": 0.0,
+          "y": 0.0,
+          "z": 0.0
+        }
+      },
+      "evidence": "m08g_handlers.inc L876 ('blockref_handle' fallback m08gFindHandle; 'tag'/'text'/'height'/'position' reads in-branch); 11995 = pre-existing AcDbBlockReference harvested from the graph IR (enriched_manifest.json)"
+    },
+    "write.entity.blockref": {
+      "args": {
+        "name": "X-평면도(기본형)$0$ev16x2k",
+        "position": {
+          "x": 100.0,
+          "y": 100.0,
+          "z": 0.0
+        }
+      },
+      "evidence": "m08g_handlers.inc L1152 ('name' -> pBT->getAt; 'position' via m08gPoint); name = the block definition the pre-existing INSERT 11995 references (graph IR harvest) -- a REAL insertable block table record; non-ASCII name doubles as a UTF-8 name-path probe"
+    },
+    "write.entity.minsert": {
+      "args": {
+        "name": "X-평면도(기본형)$0$ev16x2k",
+        "position": {
+          "x": 200.0,
+          "y": 200.0,
+          "z": 0.0
+        },
+        "columns": 2,
+        "rows": 2,
+        "col_spacing": 50.0,
+        "row_spacing": 50.0
+      },
+      "evidence": "m08g_handlers.inc L1152 shared branch + L1184 ('columns'/'rows'/'col_spacing'/'row_spacing' via jsonFindNumber); same harvested block name as write.entity.blockref"
+    },
+    "write.entity.region": {
+      "args": {
+        "curves": [
+          "191E3"
+        ]
+      },
+      "evidence": "m08g_handlers.inc L1100-1149 ('curves':[<handle>...] -> resolveHandle + acdbOpenObject -> AcDbRegion::createFromCurves); 191E3 = circle_1 (closed planar curve) per enriched_manifest.json"
+    },
+    "write.entity.rasterimage": {
+      "args": {
+        "image_path": "tests/fixtures/probe_image.bmp"
+      },
+      "evidence": "m08g_handlers.inc L1497-1528 ('image_path' non-empty -> AcDbRasterImageDef source/active filename); tests/fixtures/probe_image.bmp is a real 70-byte 2x2 24-bit BMP committed to the repo; NOTE path is repo-relative -- the promotion runner absolutizes it (a bare sweep may honestly fail the valid leg if accoreconsole's CWD differs)"
+    },
+    "define.constraint.addGeometry": {
+      "args": {
+        "target_handle": "191BB"
+      },
+      "evidence": "m08kc_handlers.inc L313 (m08kcFindHandle 'target_handle'/'handle' -> m08kcAddGeometryForHandle -> m08kcMakeFullSubentPath; 'group_handle' optional, auto-created); target=line_1"
+    },
+    "define.perssubentid.resolve": {
+      "args": {
+        "target_handle": "191BB"
+      },
+      "evidence": "m08kc_handlers.inc L864-905 (m08kcFindHandle 'target_handle'/'handle' -> subentPtr enumeration of real edges/vertices); target=line_1"
+    }
+  },
+  "needs_state": [
+    {
+      "op": "define.dimassoc.geometryDriven",
+      "reason": "requires 'dimension_handle' of a resident AcDbDimension (m08kc_handlers.inc L403-417); NO dimension entity exists in native_sample.dwg or the enriched seed, and no write.entity.dimension.* create op exists in the registry to bake one -- stays honestly REACHABLE until a dimension-bearing fixture DWG exists."
+    },
+    {
+      "op": "define.assocaction.valueParam",
+      "reason": "chain-created AcDbAssocAction (19237, define.assocaction.create status ok) does NOT survive the DWG save/reload round-trip in the headless host -- on reopen the handle no longer casts to AcDbAssocAction (proxy/culled). Assoc-action state is SAME-SESSION only; a cross-file fixture cannot supply it. Live evidence 2026-07-16: ACTION_NOT_FOUND: handle 19237 is not an AcDbAssocAction (runs/p3b_tail/promote, matrix row classification_source=p3b_tail_enriched_20260716)"
+    },
+    {
+      "op": "define.assocdependency.attach",
+      "reason": "chain-created AcDbAssocAction (19237, define.assocaction.create status ok) does NOT survive the DWG save/reload round-trip in the headless host -- on reopen the handle no longer casts to AcDbAssocAction (proxy/culled). Assoc-action state is SAME-SESSION only; a cross-file fixture cannot supply it. Live evidence 2026-07-16: ACTION_NOT_FOUND: handle 19237 is not an AcDbAssocAction (runs/p3b_tail/promote, matrix row classification_source=p3b_tail_enriched_20260716)"
+    },
+    {
+      "op": "define.assocgeomdependency.subent",
+      "reason": "chain-created AcDbAssocAction (19237, define.assocaction.create status ok) does NOT survive the DWG save/reload round-trip in the headless host -- on reopen the handle no longer casts to AcDbAssocAction (proxy/culled). Assoc-action state is SAME-SESSION only; a cross-file fixture cannot supply it. Live evidence 2026-07-16: ACTION_NOT_FOUND: handle 19237 is not an AcDbAssocAction (runs/p3b_tail/promote, matrix row classification_source=p3b_tail_enriched_20260716)"
+    },
+    {
+      "op": "define.assocnetwork.addAction",
+      "reason": "chain-created AcDbAssocAction (19237, define.assocaction.create status ok) does NOT survive the DWG save/reload round-trip in the headless host -- on reopen the handle no longer casts to AcDbAssocAction (proxy/culled). Assoc-action state is SAME-SESSION only; a cross-file fixture cannot supply it. Live evidence 2026-07-16: ACTION_NOT_FOUND: no action for handle 19237 (runs/p3b_tail/promote, matrix row classification_source=p3b_tail_enriched_20260716)"
+    },
+    {
+      "op": "define.assocvaluedependency.value",
+      "reason": "chain-created AcDbAssocAction (19237, define.assocaction.create status ok) does NOT survive the DWG save/reload round-trip in the headless host -- on reopen the handle no longer casts to AcDbAssocAction (proxy/culled). Assoc-action state is SAME-SESSION only; a cross-file fixture cannot supply it. Live evidence 2026-07-16: ACTION_NOT_FOUND: handle 19237 is not an AcDbAssocAction (runs/p3b_tail/promote, matrix row classification_source=p3b_tail_enriched_20260716)"
+    },
+    {
+      "op": "define.georef.subent",
+      "reason": "chain-created AcDbAssocAction (19237, define.assocaction.create status ok) does NOT survive the DWG save/reload round-trip in the headless host -- on reopen the handle no longer casts to AcDbAssocAction (proxy/culled). Assoc-action state is SAME-SESSION only; a cross-file fixture cannot supply it. Live evidence 2026-07-16: ACTION_NOT_FOUND: handle 19237 is not an AcDbAssocAction (runs/p3b_tail/promote, matrix row classification_source=p3b_tail_enriched_20260716)"
+    },
+    {
+      "op": "edit.assocnetwork.removeAction",
+      "reason": "chain-created AcDbAssocAction (19237, define.assocaction.create status ok) does NOT survive the DWG save/reload round-trip in the headless host -- on reopen the handle no longer casts to AcDbAssocAction (proxy/culled). Assoc-action state is SAME-SESSION only; a cross-file fixture cannot supply it. Live evidence 2026-07-16: ACTION_NOT_FOUND: no action for handle 19237 (runs/p3b_tail/promote, matrix row classification_source=p3b_tail_enriched_20260716)"
+    },
+    {
+      "op": "define.constraint.autoConstrain",
+      "reason": "constraint CREATION engages the in-app DCM solve path and fails headless on real entities -- consistent with the P4a DCM boundary (define-side addGeometry/perssubentid DID promote; solve-side constraint creation did not). Live evidence 2026-07-16: CONSTRAINT_CREATE_FAILED errorstatus 3 (runs/p3b_tail/promote, matrix row classification_source=p3b_tail_enriched_20260716)"
+    },
+    {
+      "op": "define.constraint.geometric",
+      "reason": "constraint CREATION engages the in-app DCM solve path and fails headless on real entities -- consistent with the P4a DCM boundary (define-side addGeometry/perssubentid DID promote; solve-side constraint creation did not). Live evidence 2026-07-16: CONSTRAINT_CREATE_FAILED errorstatus 3 (runs/p3b_tail/promote, matrix row classification_source=p3b_tail_enriched_20260716)"
+    },
+    {
+      "op": "define.constraint.dimensional.angle",
+      "reason": "constraint CREATION engages the in-app DCM solve path and fails headless on real entities -- consistent with the P4a DCM boundary (define-side addGeometry/perssubentid DID promote; solve-side constraint creation did not). Live evidence 2026-07-16: DIMENSIONAL_CONSTRAINT_FAILED errorstatus 16 (runs/p3b_tail/promote, matrix row classification_source=p3b_tail_enriched_20260716)"
+    },
+    {
+      "op": "define.constraint.dimensional.distance",
+      "reason": "constraint CREATION engages the in-app DCM solve path and fails headless on real entities -- consistent with the P4a DCM boundary (define-side addGeometry/perssubentid DID promote; solve-side constraint creation did not). Live evidence 2026-07-16: DIMENSIONAL_CONSTRAINT_FAILED errorstatus 16 (runs/p3b_tail/promote, matrix row classification_source=p3b_tail_enriched_20260716)"
+    },
+    {
+      "op": "define.constraint.dimensional.radiusDiameter",
+      "reason": "constraint CREATION engages the in-app DCM solve path and fails headless on real entities -- consistent with the P4a DCM boundary (define-side addGeometry/perssubentid DID promote; solve-side constraint creation did not). Live evidence 2026-07-16: DIMENSIONAL_CONSTRAINT_FAILED errorstatus 16 (runs/p3b_tail/promote, matrix row classification_source=p3b_tail_enriched_20260716)"
+    }
+  ]
+}

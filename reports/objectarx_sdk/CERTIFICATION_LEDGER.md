@@ -36,6 +36,13 @@ confirms: `runLineJigProbe` (AriadneNativeJob.cpp:3926) already guards `if (jobH
 (only write.entity.wipeout stayed REACHABLE — invalid clip boundary in fixture, not a defect). 340/489 = 69.5% RUNNABLE.
 CRASH still exactly the 2 attended live ops; DEGENERATE still the 7 known (5 zero-arg-by-contract + 2 needs-profile).
 
+**SUPERSEDED 2026-07-16 by measure/reachable_matrix_20260716.jsonl** (P3b tail, enriched-fixture reprobe merged):
+**RUNNABLE 367 (+27) / REACHABLE 113 (−27) / DEGENERATE 7 / CRASH 2.** 367/489 = 75.1% RUNNABLE. The former
+needs_3d_solid "genuine ceiling" is GONE — tools/build_enriched_fixture.py bakes solids/xdata/ext-dict/layerstate
+into tests/fixtures/enriched_seed_20260716.dwg using only already-RUNNABLE ops (see P3b TAIL under the P3b checkbox).
+Remaining 113 REACHABLE = assoc/constraint solver-or-session-bound state (live native evidence recorded per op)
++ attended/external-state tails — every one documented in a fragment needs_state entry or the matrix row itself.
+
 ## REACHABLE→RUNNABLE fixture work (evidence: measure/reachable_fixtures/*.json, 10 files)
 
 - **29 valid-arg fixtures authored + applied** (fleet-harvested, gate-PASS, in-contract). Reprobe pending.
@@ -66,6 +73,22 @@ CRASH still exactly the 2 attended live ops; DEGENERATE still the 7 known (5 zer
       tail / needs richer fixture DWG / attended); not required for a defensible certification.
       Deferred (geometry-dependent params, no-guess rule): modify.curve.split/to_spline, modify.entity.xdata + symbol_tables
       inspects whose result may be empty (get_xdata/ext_dict/annoscale) — honest REACHABLE-by-design unless richer fixture DWG.
+      **P3b TAIL (2026-07-16) — the "purpose-built fixture DWG" unlock BUILT + 27 more promoted (RUNNABLE 340→367,
+      REACHABLE 140→113; matrix reachable_matrix_20260716.jsonl).** tools/build_enriched_fixture.py chains RUNNABLE
+      write ops through the sanctioned probe path (each step staged from the previous step's staged_result; original
+      sha-verified) into tests/fixtures/enriched_seed_20260716.dwg: 2 wedge solids + 2 known-geometry lines + circle +
+      xdata + ext-dict + saved layerstate + assoc action; handles harvested into enriched_manifest.json (never guessed).
+      handle_provisioned_3.json (fragment-level `dwg` override, loader+sweep support in probe_reachability + 4 unit
+      tests) promoted: the ENTIRE former "genuine ceiling" needs_3d_solid class (9 brep + solid3d.interference +
+      solid3d.boolean), curve.split/to_spline (self-built line ⇒ params known, no-guess satisfied), entity xdata
+      write+read, ext_dict read, material.properties (Global via inspect.material.enumerate), annoscale.contexts,
+      layerstate restore/delete, attribute/blockref/minsert (non-ASCII block name round-trips), region, rasterimage
+      (repo BMP fixture), + assoc define-side addGeometry / perssubentid.resolve. NOT promoted (12, all assoc/
+      constraint, live native evidence in-matrix): 7× ACTION_NOT_FOUND — a chain-created AcDbAssocAction does NOT
+      survive DWG save/reload in the headless host (same-session-only state; cross-file fixture cannot supply it);
+      5× CONSTRAINT/DIMENSIONAL_FAILED (errorstatus 3/16) — constraint CREATION engages the DCM solve path (P4a
+      boundary; define-side ops promoted, solve-side blocked). +1 define.dimassoc.geometryDriven needs a resident
+      AcDbDimension (no dimension entity in any fixture; no dimension-create op exists to bake one).
 - [x] **P3c — DEGENERATE documentation** — PASS. 7 classified in SDK_CERTIFICATION_RESULTS §3.1: 5 ZERO_ARG_BY_CONTRACT
       (live.reactor.enable, live.overrule.enable, editor.react.events, define.assocaction.create, define.constraint.group)
       + 2 NEEDS_PROFILE_GEOMETRY (write.entity.body, write.entity.solid3d.loft). None a defect.

@@ -141,3 +141,30 @@ therefore **complete** for every op that is both headless-feasible and write-saf
 (sha-verified unchanged on every one of the 489 probes). No status was raised without its artifact; the
 headless-buildable count was walked 25 → 2 → 0 as each authoritative prior audit surfaced — that convergence,
 not a single confident number, is the honest result.
+
+## 7. Addendum 2026-07-16 — P3b tail: enriched fixture + 27 promotions
+
+The §6 statement above is the 2026-07-14 snapshot. Superseding matrix:
+**measure/reachable_matrix_20260716.jsonl — RUNNABLE 367 / REACHABLE 113 / DEGENERATE 7 / CRASH 2** (367/489 = 75.1%).
+
+- **The §2 "genuine ceiling" (needs_3d_solid, 12 ops) is broken**, exactly by the unlock §2 named: a purpose-built
+  fixture DWG. `tools/build_enriched_fixture.py` chains ops already RUNNABLE (solid3d.primitive ×2, line ×2, circle,
+  create_ext_dict, entity xdata, layerstate.save, assocaction.create) through the sanctioned probe path — each step
+  staged from the previous step's `staged_result`, original sha-verified every step — into
+  `tests/fixtures/enriched_seed_20260716.dwg`; handles are harvested into
+  `measure/reachable_fixtures/enriched_manifest.json`, never guessed.
+- **27 promoted** (fixtures: `handle_provisioned_3.json`, fragment-level `dwg` override wired into
+  probe_reachability's loader + sweep, locked by tests/unit/test_fixture_dwg_override.py): all 9 brep computes/
+  inspects, solid3d.interference, solid3d.boolean, curve.split/to_spline (self-built line ⇒ params known — the
+  no-guess deferral of §3 is satisfied, not waived), modify.entity.xdata + inspect.entity.get_xdata,
+  inspect.object.ext_dict, inspect.material.properties, inspect.entity.annoscale.contexts, layerstate
+  restore/delete, write.entity.attribute/blockref/minsert (the non-ASCII block table name round-trips)/region/
+  rasterimage, define.constraint.addGeometry, define.perssubentid.resolve.
+- **12 not promoted — all assoc/constraint, with live native evidence** (matrix rows,
+  classification_source=p3b_tail_enriched_20260716): 7× ACTION_NOT_FOUND — a chain-created AcDbAssocAction does
+  not survive the DWG save/reload round-trip in this host (assoc-action state is same-session-only; no cross-file
+  fixture can supply it); 5× CONSTRAINT_CREATE/DIMENSIONAL_FAILED (errorstatus 3/16) — constraint creation engages
+  the DCM solve path (the P4a boundary measured live: define-side ops promote, solve-side ops do not).
+  +define.dimassoc.geometryDriven stays needs-state (no AcDbDimension in any fixture and no dimension-create op).
+- Remaining 113 REACHABLE: the 13 above + attended/external-state tails — each documented in a fragment
+  needs_state entry or its matrix row. Suite: 1963 unit tests passing at this addendum.

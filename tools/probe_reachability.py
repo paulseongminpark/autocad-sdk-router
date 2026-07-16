@@ -549,6 +549,11 @@ def _merge_reachable_fixtures() -> int:
         entries = data.get("fixtures", data) if isinstance(data, dict) else {}
         if not isinstance(entries, dict):
             continue
+        # Optional fragment-level "dwg": these fixtures reference handles that
+        # only exist in a PURPOSE-BUILT fixture DWG (e.g. the P3b enriched
+        # seed) -- the sweep must probe those ops against THAT dwg, or the
+        # valid leg dies on a dead handle and silently demotes the row.
+        frag_dwg = data.get("dwg") if isinstance(data, dict) else None
         for op_id, entry in entries.items():
             if op_id in FIXTURES:                 # curated inline set wins
                 continue
@@ -558,6 +563,8 @@ def _merge_reachable_fixtures() -> int:
                     "evidence": entry.get("evidence", ""),
                     "source_fragment": frag.name,
                 }
+                if isinstance(frag_dwg, str) and frag_dwg:
+                    FIXTURES[op_id]["dwg"] = frag_dwg
                 merged += 1
     return merged
 
@@ -1028,9 +1035,15 @@ def run_live(registry_path: Path | str = OPERATIONS_V2, dwg_path: Path | str = D
         elif wanted is not None and op_id not in wanted:
             rows.append(build_row(op))  # stays "pending" -- not in this run's subset
         else:
-            fixture = FIXTURES.get(op_id, {}).get("args")
+            fx = FIXTURES.get(op_id, {})
+            fixture = fx.get("args")
+            op_dwg = dwg_path
+            if fx.get("dwg"):
+                cand = ROUTER_HOME / fx["dwg"]
+                if cand.is_file():
+                    op_dwg = cand      # fixture-DWG override (see _merge_reachable_fixtures)
             op_dir = work_dir / _safe_name(op_id)
-            payload = _run_isolated(op_id, dwg_path, op_dir, fixture, timeout_sec)
+            payload = _run_isolated(op_id, op_dwg, op_dir, fixture, timeout_sec)
             if payload.get("_original_mutated"):
                 write_jsonl(rows + [build_row(op)], out_path)  # DISK-FIRST before aborting
                 raise OriginalMutatedError(f"{op_id}: {payload}")
