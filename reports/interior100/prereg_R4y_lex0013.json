@@ -1,0 +1,50 @@
+{
+ "schema": "ariadne.interior100.prereg.v1",
+ "arc": "R4y: LEX-0013 spline edge-loop quotient (part 1 algebraic Bezier re-segmentation + part 2 assoc-derived spline-chain cache fold) -- measurement-only remeasure over the pinned R4x IRs",
+ "registered_at_local": "2026-07-17T08:05:22+09:00 (file committed BEFORE the remeasure run; commit timestamp is the binding evidence)",
+ "root_cause_measured": {
+  "defect": "NOT an engine defect -- a measurer notation gap. The 2 R4x resistant pairs (def X-FORM_청주$0$dA로고, 1BDF/762B + 1BE6/7632) are ASSOCIATIVE hatches (1 boundary source entity per loop, is_associative=true both sides): AcDbHatch::evaluateHatch re-derives the loop payload from the sources and RE-FITS the spline chain -- census carries multi-span cubic B-spline edges (knots 23/8/14), the rebuild carries per-span Bezier edges (10-vs-9 spans on loop0 after algebraic normalization, max curve deviation 9.16e-4 measured by de Casteljau nearest-neighbour sampling of the part-1 canonical chains; the same figure the R4x point-cloud proxy reported).",
+  "blast_radius_measured": [
+   "census-wide fold scope audit (both sides): 265 hatches, 29 all-spline loops, exactly 14 loops on exactly the 3 assoc hatches of def X-FORM_청주$0$dA로고 fold under part 2; zero same-def canonical-fingerprint collisions introduced",
+   "part 1 (algebraic Boehm split to Bezier chain, 6dp emission, closed-cycle rotation) is identity-preserving: independent de Boor/de Casteljau oracle holds every sampled point within 1e-9 on the hand cubic, the rational quarter-circle, and both resistant a-side loops",
+   "sourceless all-spline loops (29-14=15 per side) keep their full part-1 chain -- fingerprint sharpness for authored spline boundaries is unchanged (1e-3 perturbation still detected, unit test)"
+  ]
+ },
+ "measurement_contract": {
+  "rule": "LEX-0013: segmentation and knot parameterization of a spline edge chain are notation (part 1); the evaluateHatch-derived, re-fit spline-chain cache of an assoc-SOURCED loop is notation whose authored truth lives in the source entities, compared exactly in the same def diff (part 2, LEX-0011/LEX-0001 precedent). Blind spot documented: a cache difference with identical sources is host-deterministic re-derivation, exactly the quotiented notation; real boundary changes move the sources.",
+  "substitute_verifier": "source-entity exact diff (1.dwg splines 3973/3973 diff0) + point-cloud gate tools/loops_residue_analysis.py (<=1e-3, measured 9.16e-4) + part-1 oracle tests (tests/unit/test_blockdef_diff_lex0013.py, 49 tests)"
+ },
+ "population_pin": {
+  "census_ir": "runs/e2e_1dwg_R4x_ccw_20260711/census/dwg_graph_ir.json",
+  "census_ir_sha256": "15c6c6c6d4502116ccd7b3bcb1cec955cd335713aca4e27b6a0c2a54e679543c",
+  "post_ir": "runs/e2e_1dwg_R4x_ccw_20260711/regen/post/dwg_graph_ir.json",
+  "post_ir_sha256": "fefd28061943d6816e6d82fdcb1de508c4d9f5bfd3a6cc44ec79abb29caeda45",
+  "required": "the SAME pinned R4x IRs (no re-extraction); census must reproduce 294 defs / 27,130 entities"
+ },
+ "baseline": {
+  "report": "reports/interior100/R4x_remeasure_ccw.json",
+  "diff0_total": 27128,
+  "a_entity_total": 27130,
+  "a_def_count": 294,
+  "interior_diff0_fraction": 0.9999262808698858
+ },
+ "prediction": {
+  "diff0_total": 27130,
+  "band": [
+   27130,
+   27130
+  ],
+  "interior_diff0_fraction_at_center": 1.0,
+  "decomposition": [
+   {
+    "family": "assoc-derived spline-chain cache fold (LEX-0013 part 2)",
+    "pairs": 2,
+    "handles": [
+     "1BDF/762B",
+     "1BE6/7632"
+    ],
+    "evidence": "dry-run of the legislated measurer over the pinned IRs: diff0 27130/27130, per-def regressions none, dA def 30/30 (this session); fixture tests/fixtures/lex0013_dA_pairs.json"
+   }
+  ]
+ }
+}
