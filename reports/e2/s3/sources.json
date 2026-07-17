@@ -1,0 +1,45 @@
+{
+  "sources": "src.v1",
+  "sets": {
+    "floorplancad": {
+      "homepage": "https://floorplancad.github.io/",
+      "artifacts": [
+        {
+          "name": "floorplancad_svg_annotated",
+          "url": "https://floorplancad.github.io/",
+          "sha256": null,
+          "size_hint": null,
+          "verified": false
+        },
+        {
+          "name": "floorplancad_github_mirror",
+          "url": "https://github.com/Artisma/FloorPlanCAD",
+          "sha256": null,
+          "size_hint": null,
+          "verified": false
+        }
+      ],
+      "license_note": "labels NC; research use approved by owner 2026-07-17"
+    },
+    "cubicasa": {
+      "homepage": "https://github.com/CubiCasa/CubiCasa5k",
+      "artifacts": [
+        {
+          "name": "cubicasa5k_zenodo",
+          "url": "https://zenodo.org/records/2613548",
+          "sha256": null,
+          "size_hint": null,
+          "verified": false
+        },
+        {
+          "name": "cubicasa5k_github",
+          "url": "https://github.com/CubiCasa/CubiCasa5k",
+          "sha256": null,
+          "size_hint": null,
+          "verified": false
+        }
+      ],
+      "license_note": "research / academic use per CubiCasa5K release terms; research use approved by owner 2026-07-17"
+    }
+  }
+}

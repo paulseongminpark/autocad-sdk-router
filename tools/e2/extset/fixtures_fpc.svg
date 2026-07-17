@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <line class="wall" x1="0" y1="0" x2="10" y2="0" />
+  <line class="wall" x1="10" y1="0" x2="10" y2="10" />
+  <line data-class="opening" x1="10" y1="10" x2="15" y2="10" />
+  <line class="other" x1="15" y1="10" x2="15" y2="15" />
+  <polyline class="wall" points="0,20 10,20 10,30" />
+  <polyline data-class="opening" points="20,20 30,20 30,30" />
+  <polyline class="other" points="40,20 50,20 50,30" />
+  <path class="wall" d="M 0 40 L 10 40 L 10 50" />
+  <path data-class="opening" d="M 20 40 L 30 40" />
+  <path class="other" d="M 40 40 L 50 40" />
+</svg>

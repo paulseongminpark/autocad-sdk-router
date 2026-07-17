@@ -1,0 +1,32 @@
+{
+  "bands": "s2.fidelity.v1",
+  "draft_pending_prereg": true,
+  "note": "DRAFT thresholds only. These are NOT sealed by pre-registration. They exist so the S2-F comparator machinery has something to read and produce *_DRAFT verdicts. Bands will be sealed by a separate prereg step later; until then all verdicts carry the _DRAFT suffix and MUST NOT be cited as a passing/failing result.",
+  "written_by": "tools/e2/s2_fidelity.py CARD S2-F",
+  "statistics": {
+    "thickness_ks": {
+      "metric": "ks",
+      "op": "<=",
+      "threshold": 0.20,
+      "pass_verdict": "PASS_DRAFT",
+      "fail_verdict": "FAIL_DRAFT",
+      "desc": "Two-sample Kolmogorov-Smirnov statistic between parallel-pair offset (wall thickness) distributions of pack vs real."
+    },
+    "entity_mix_tv": {
+      "metric": "tv",
+      "op": "<=",
+      "threshold": 0.25,
+      "pass_verdict": "PASS_DRAFT",
+      "fail_verdict": "FAIL_DRAFT",
+      "desc": "Total-variation distance between the categorical entity-type mixes (LINE/LWPOLYLINE/ARC/...) of pack vs real."
+    },
+    "layer_tokens_tv": {
+      "metric": "tv",
+      "op": "<=",
+      "threshold": null,
+      "pass_verdict": "PASS_DRAFT",
+      "fail_verdict": "FAIL_DRAFT",
+      "desc": "Total-variation distance between the categorical layer-token mixes of pack vs real. No draft threshold is set here (the card specifies bands only for thickness KS and entity-mix TV); this statistic is computed and reported with a NO_BAND verdict until prereg assigns a threshold."
+    }
+  }
+}

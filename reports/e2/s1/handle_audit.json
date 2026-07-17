@@ -1,0 +1,355 @@
+{
+  "schema": "ariadne.e2_s1_handle_audit.v1",
+  "card": "E2 S1-A cited-handle reality audit",
+  "band_rule": {
+    "INSTRUMENTATION_BUG": "pct_nonexistent > 5",
+    "MINOR_NOISE": "1 <= pct_nonexistent <= 5",
+    "CLEAN": "pct_nonexistent < 1",
+    "applied": "per judge; overall = worst band"
+  },
+  "verdict": "CLEAN",
+  "verdict_live_judges_only": "CLEAN",
+  "audit_validity": "negative control passed: the checker flags handles the judge never saw",
+  "negative_control": {
+    "method": "each record re-pointed at a different def via half-list rotation; expect ~100% nonexistent from a working checker",
+    "expectation": "pct_nonexistent >= 90 for every judge with citations",
+    "per_judge": {
+      "opus48_max": {
+        "n_cited": 246,
+        "pct_nonexistent": 100.0
+      },
+      "fable5_high": {
+        "n_cited": 264,
+        "pct_nonexistent": 100.0
+      },
+      "sol56_xhigh": {
+        "n_cited": 166,
+        "pct_nonexistent": 100.0
+      },
+      "sonnet5_xhigh": {
+        "n_cited": 229,
+        "pct_nonexistent": 100.0
+      },
+      "grok45_xhigh": {
+        "n_cited": 314,
+        "pct_nonexistent": 100.0
+      },
+      "ornith_v0": {
+        "n_cited": 2045,
+        "pct_nonexistent": 100.0
+      }
+    },
+    "control_ok": true,
+    "min_pct_nonexistent": 100.0
+  },
+  "inputs": {
+    "shard_dir": "D:\\dev\\99_tools\\octoloop\\.wt\\LOOP-20260717120806-17xckkd\\w0-s1a-handle-audit\\bench\\e1_shards",
+    "n_shard_files": 20,
+    "n_projections": 384,
+    "judge_raw_dir": "D:\\dev\\99_tools\\octoloop\\.wt\\LOOP-20260717120806-17xckkd\\w0-s1a-handle-audit\\reports\\e1\\annot_v1\\raw",
+    "judges": [
+      "opus48_max",
+      "fable5_high",
+      "sol56_xhigh",
+      "sonnet5_xhigh",
+      "grok45_xhigh",
+      "ornith_v0"
+    ],
+    "v0_path": "D:\\dev\\99_tools\\octoloop\\.wt\\LOOP-20260717120806-17xckkd\\w0-s1a-handle-audit\\reports\\e1\\ornith_annot_v0.jsonl",
+    "cluster_probe_path": "D:\\dev\\99_tools\\octoloop\\.wt\\LOOP-20260717120806-17xckkd\\w0-s1a-handle-audit\\reports\\e1\\annot_v1\\cluster_probe_v1.json",
+    "calibration_path": "D:\\dev\\99_tools\\octoloop\\.wt\\LOOP-20260717120806-17xckkd\\w0-s1a-handle-audit\\reports\\e1\\panel_20260717\\evidence\\calibration_v0.json"
+  },
+  "totals": {
+    "n_cited_all_judges": 3264,
+    "n_nonexistent_all_judges": 0,
+    "n_distinct_handles_in_projections": 7539
+  },
+  "per_judge": [
+    {
+      "judge": "opus48_max",
+      "n_records": 384,
+      "n_records_with_citations": 64,
+      "n_cited": 246,
+      "n_cited_distinct": 246,
+      "n_nonexistent": 0,
+      "pct_nonexistent": 0.0,
+      "band": "CLEAN",
+      "kind_histogram": {
+        "LINE": 246
+      },
+      "worst_offender_defs": [],
+      "n_uncheckable_citations": 0,
+      "unresolved_unit_ids": {},
+      "n_normalization_rescued": 0,
+      "def_name_mismatches": [],
+      "n_def_name_mismatches": 0,
+      "skipped_handle_items": [],
+      "n_skipped_handle_items": 0
+    },
+    {
+      "judge": "fable5_high",
+      "n_records": 384,
+      "n_records_with_citations": 54,
+      "n_cited": 264,
+      "n_cited_distinct": 264,
+      "n_nonexistent": 0,
+      "pct_nonexistent": 0.0,
+      "band": "CLEAN",
+      "kind_histogram": {
+        "LINE": 257,
+        "LWPOLYLINE": 5,
+        "INSERT": 2
+      },
+      "worst_offender_defs": [],
+      "n_uncheckable_citations": 0,
+      "unresolved_unit_ids": {},
+      "n_normalization_rescued": 0,
+      "def_name_mismatches": [],
+      "n_def_name_mismatches": 0,
+      "skipped_handle_items": [],
+      "n_skipped_handle_items": 0
+    },
+    {
+      "judge": "sol56_xhigh",
+      "n_records": 384,
+      "n_records_with_citations": 22,
+      "n_cited": 166,
+      "n_cited_distinct": 166,
+      "n_nonexistent": 0,
+      "pct_nonexistent": 0.0,
+      "band": "CLEAN",
+      "kind_histogram": {
+        "LINE": 166
+      },
+      "worst_offender_defs": [],
+      "n_uncheckable_citations": 0,
+      "unresolved_unit_ids": {},
+      "n_normalization_rescued": 0,
+      "def_name_mismatches": [],
+      "n_def_name_mismatches": 0,
+      "skipped_handle_items": [],
+      "n_skipped_handle_items": 0
+    },
+    {
+      "judge": "sonnet5_xhigh",
+      "n_records": 384,
+      "n_records_with_citations": 61,
+      "n_cited": 229,
+      "n_cited_distinct": 229,
+      "n_nonexistent": 0,
+      "pct_nonexistent": 0.0,
+      "band": "CLEAN",
+      "kind_histogram": {
+        "LINE": 194,
+        "LWPOLYLINE": 35
+      },
+      "worst_offender_defs": [],
+      "n_uncheckable_citations": 0,
+      "unresolved_unit_ids": {},
+      "n_normalization_rescued": 0,
+      "def_name_mismatches": [],
+      "n_def_name_mismatches": 0,
+      "skipped_handle_items": [],
+      "n_skipped_handle_items": 0
+    },
+    {
+      "judge": "grok45_xhigh",
+      "n_records": 384,
+      "n_records_with_citations": 61,
+      "n_cited": 314,
+      "n_cited_distinct": 314,
+      "n_nonexistent": 0,
+      "pct_nonexistent": 0.0,
+      "band": "CLEAN",
+      "kind_histogram": {
+        "LINE": 308,
+        "LWPOLYLINE": 6
+      },
+      "worst_offender_defs": [],
+      "n_uncheckable_citations": 0,
+      "unresolved_unit_ids": {},
+      "n_normalization_rescued": 0,
+      "def_name_mismatches": [],
+      "n_def_name_mismatches": 0,
+      "skipped_handle_items": [],
+      "n_skipped_handle_items": 0
+    },
+    {
+      "judge": "ornith_v0",
+      "n_records": 377,
+      "n_records_with_citations": 235,
+      "n_cited": 2045,
+      "n_cited_distinct": 2045,
+      "n_nonexistent": 0,
+      "pct_nonexistent": 0.0,
+      "band": "CLEAN",
+      "kind_histogram": {
+        "LWPOLYLINE": 1042,
+        "LINE": 968,
+        "ARC": 20,
+        "INSERT": 9,
+        "POINT": 3,
+        "MTEXT": 1,
+        "HATCH": 1,
+        "CIRCLE": 1
+      },
+      "worst_offender_defs": [],
+      "n_uncheckable_citations": 0,
+      "unresolved_unit_ids": {},
+      "n_normalization_rescued": 0,
+      "def_name_mismatches": [
+        {
+          "unit_id": "defannot-d328-34",
+          "judge_def": "DIM annotation block",
+          "projection_def": "*D328"
+        },
+        {
+          "unit_id": "defannot-x-0-384",
+          "judge_def": "X-평면도(기본형)$0$코너 선반",
+          "projection_def": "X-평면도(기본형)$0$코너  선반"
+        },
+        {
+          "unit_id": "defannot-x-0-fu1-351",
+          "judge_def": "X-평면도 (기본형)$0$FU1",
+          "projection_def": "X-평면도(기본형)$0$FU1"
+        }
+      ],
+      "n_def_name_mismatches": 3,
+      "skipped_handle_items": [],
+      "n_skipped_handle_items": 0
+    }
+  ],
+  "global_worst_offender_defs": [],
+  "cross_tabs": {
+    "by_projection_truncation": {
+      "truncated_defs": {
+        "n_cited": 2102,
+        "n_nonexistent": 0,
+        "pct": 0.0
+      },
+      "complete_defs": {
+        "n_cited": 1162,
+        "n_nonexistent": 0,
+        "pct": 0.0
+      },
+      "n_defs_truncated": 137,
+      "n_defs_total": 384
+    },
+    "by_divergence_list": {
+      "full_split_defs": {
+        "n_cited": 517,
+        "n_nonexistent": 0,
+        "pct": 0.0
+      },
+      "soft_split_defs": {
+        "n_cited": 186,
+        "n_nonexistent": 0,
+        "pct": 0.0
+      },
+      "non_divergent_defs": {
+        "n_cited": 2561,
+        "n_nonexistent": 0,
+        "pct": 0.0
+      },
+      "n_full_split_defs": 73,
+      "n_soft_split_defs": 28
+    }
+  },
+  "data_quality": {
+    "load_problems": [
+      {
+        "judge": "ornith_v0",
+        "line": 184,
+        "unit_id": "defannot-u177-184",
+        "error": "not an annotation payload (run receipt?)"
+      },
+      {
+        "judge": "ornith_v0",
+        "line": 295,
+        "unit_id": "defannot-x-0-382",
+        "error": "parsed is a bare {handle,reason} object, not an annotation"
+      },
+      {
+        "judge": "ornith_v0",
+        "line": 302,
+        "unit_id": "defannot-x-0-84c1-297",
+        "error": "parsed is a bare {handle,reason} object, not an annotation"
+      },
+      {
+        "judge": "ornith_v0",
+        "line": 335,
+        "unit_id": "defannot-x-0-ba15002700-330",
+        "error": "parsed is a bare {handle,reason} object, not an annotation"
+      },
+      {
+        "judge": "ornith_v0",
+        "line": 338,
+        "unit_id": "defannot-x-0-bs-03-top-334",
+        "error": "not an annotation payload (run receipt?)"
+      },
+      {
+        "judge": "ornith_v0",
+        "line": 359,
+        "unit_id": "defannot-x-0-iw990-355",
+        "error": "not an annotation payload (run receipt?)"
+      }
+    ],
+    "n_load_problems": 6,
+    "v0_bare_handle_records": [
+      {
+        "unit_id": "defannot-x-0-382",
+        "line": 295,
+        "handle": "7CE8",
+        "reason": "horizontal platform edge, straight but symbol geometry",
+        "handle_exists_in_projection": true
+      },
+      {
+        "unit_id": "defannot-x-0-84c1-297",
+        "line": 302,
+        "handle": "7402",
+        "reason": "Long horizontal LINE on INS layer spanning 3520mm, consistent with wall top/bottom plate",
+        "handle_exists_in_projection": true
+      },
+      {
+        "unit_id": "defannot-x-0-ba15002700-330",
+        "line": 335,
+        "handle": "6496",
+        "reason": "Long vertical line (1200,-900)->(1200,-2700), 1800mm span, could be cabinet side panel",
+        "handle_exists_in_projection": true
+      }
+    ],
+    "note": "v0 'parsed' payloads that are run receipts or bare {handle,reason} objects are excluded from every denominator, not salvaged."
+  },
+  "context_calibration_v0": {
+    "schema": "ariadne.e1_calibration.v0",
+    "common_defs": 377,
+    "role_agreement": {
+      "n": 377,
+      "agree": 207,
+      "rate": 0.5491
+    },
+    "wall_likelihood": {
+      "pearson": 0.4866,
+      "bucket_agreement": {
+        "n": 377,
+        "agree": 235,
+        "rate": 0.6233
+      }
+    },
+    "handle_jaccard": {
+      "n": 239,
+      "mean": 0.1319,
+      "zero_frac": 0.682
+    },
+    "coverage": {
+      "ornith": 377,
+      "sonnet": 384,
+      "common": 377
+    },
+    "preregistered_verdict": {
+      "role": "marginal",
+      "likelihood_buckets": "below_threshold",
+      "jaccard": "exploratory_v0_no_threshold"
+    }
+  }
+}
