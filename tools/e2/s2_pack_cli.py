@@ -95,8 +95,9 @@ TIER_MODULES = {
 }
 
 FN_CANDIDATES = {
-    "grammar": ["build_plan", "generate", "make_plan", "build", "plan"],
-    "openings": ["add_openings", "apply", "add", "openings", "place_openings"],
+    # canonical S2-card contract names first (plan_random / assign), legacy guesses after
+    "grammar": ["plan_random", "build_plan", "generate", "make_plan", "build", "plan"],
+    "openings": ["assign", "add_openings", "apply", "add", "openings", "place_openings"],
     "noise": ["add_noise", "apply", "add", "noise", "apply_noise"],
 }
 
@@ -252,6 +253,7 @@ def _draw_distractor(msp, d):
 def render_plan(plan, drawing_id):
     """Return (ezdxf doc, TRUTH-LEDGER v1 dict) for a WallPlan."""
     doc = ezdxf.new(DXF_VERSION)
+    doc.header["$INSUNITS"] = 4  # plans are authored in millimetres; say so honestly
     _ensure_layers(doc)
     msp = doc.modelspace()
 
@@ -308,10 +310,20 @@ def generate_plans(tier, seeds, noise_level):
     required = TIER_MODULES[tier]
     resolved = {}
     meta = {}
+    post_emit = None
     for name in required:
         module = load_synth_module(name)
         if module is None:
             raise MissingModule(name)
+        if name == "noise" and not any(callable(getattr(module, c, None)) for c in FN_CANDIDATES["noise"]):
+            # S2-D card contract: noise is DXF-level messify(dxf_in, dxf_out, seed, level, ledger)
+            # -> applied post-emit in write_pack, not as a plan stage.
+            fn = getattr(module, "messify", None)
+            if not callable(fn):
+                raise InterfaceError("noise.py exposes neither a plan-stage callable nor messify()")
+            post_emit = fn
+            meta[name] = {"path": str(SYNTH_DIR / f"{name}.py"), "fn": "messify(post-emit)"}
+            continue
         fn = resolve_callable(module, FN_CANDIDATES[name])
         resolved[name] = fn
         meta[name] = {"path": str(SYNTH_DIR / f"{name}.py"), "fn": fn.__name__}
@@ -325,10 +337,10 @@ def generate_plans(tier, seeds, noise_level):
         if "noise" in resolved:
             plan = call_noise(resolved["noise"], plan, s, noise_level)
         plans.append(plan)
-    return plans, meta
+    return plans, meta, post_emit
 
 
-def write_pack(outdir, tier, base_seed, plans, seeds, noise_level, modules_meta):
+def write_pack(outdir, tier, base_seed, plans, seeds, noise_level, modules_meta, post_emit=None):
     """Render each plan and write NNNN.dxf + NNNN.truth.json + manifest.json."""
     outdir = Path(outdir)
     outdir.mkdir(parents=True, exist_ok=True)
@@ -340,6 +352,11 @@ def write_pack(outdir, tier, base_seed, plans, seeds, noise_level, modules_meta)
         dxf_name = f"{drawing_id}.dxf"
         truth_name = f"{drawing_id}.truth.json"
         doc.saveas(outdir / dxf_name)   # ascii DXF
+        if post_emit is not None:
+            raw = outdir / f"{drawing_id}.raw.dxf"
+            (outdir / dxf_name).replace(raw)
+            truth, _handle_map = post_emit(str(raw), str(outdir / dxf_name), seed, noise_level, truth)
+            raw.unlink()
         _write_json(outdir / truth_name, truth)
         files.append({
             "drawing_id": drawing_id, "dxf": dxf_name,
@@ -513,8 +530,8 @@ def selftest():
         if grammar_present:
             log("mode        : module-driven -- building real 2-drawing S pack")
             seeds = [1234, 1235]
-            plans, meta = generate_plans("S", seeds, noise_level=2)
-            write_pack(tmp, "S", 1234, plans, seeds, 2, meta)
+            plans, meta, post_emit = generate_plans("S", seeds, noise_level=2)
+            write_pack(tmp, "S", 1234, plans, seeds, 2, meta, post_emit)
         else:
             log("mode        : DEGRADED -- grammar.py absent; manifest-schema check "
                 "via built-in reference plan (same render+manifest code path)")
@@ -555,7 +572,7 @@ def cmd_build(args):
         return 2
     seeds = [args.seed + i for i in range(args.n)]
     try:
-        plans, meta = generate_plans(tier, seeds, noise_level)
+        plans, meta, post_emit = generate_plans(tier, seeds, noise_level)
     except MissingModule as mm:
         print(f"[s2_pack_cli] required synth module absent for tier {tier}: "
               f"{mm.name}.py (expected at {SYNTH_DIR / (mm.name + '.py')}). "
@@ -565,7 +582,7 @@ def cmd_build(args):
     except InterfaceError as ie:
         print(f"[s2_pack_cli] synth interface error: {ie}", file=sys.stderr)
         return 4
-    manifest = write_pack(args.out, tier, args.seed, plans, seeds, noise_level, meta)
+    manifest = write_pack(args.out, tier, args.seed, plans, seeds, noise_level, meta, post_emit)
     print(f"[s2_pack_cli] built tier={tier} n={manifest['n']} seed={args.seed} "
           f"-> {Path(args.out).resolve()}")
     print(f"[s2_pack_cli] files: manifest.json + "

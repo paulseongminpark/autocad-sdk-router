@@ -1,0 +1,168 @@
+{
+  "manifest": "s2pack.v1",
+  "tier": "M",
+  "n": 20,
+  "seed": 43,
+  "seeds": [
+    43,
+    44,
+    45,
+    46,
+    47,
+    48,
+    49,
+    50,
+    51,
+    52,
+    53,
+    54,
+    55,
+    56,
+    57,
+    58,
+    59,
+    60,
+    61,
+    62
+  ],
+  "noise_level": 2,
+  "dxf_version": "R2018",
+  "truth_schema": "wall.v1",
+  "modules": {
+    "grammar": {
+      "path": "D:\\dev\\99_tools\\autocad-sdk-router\\tools\\e2\\synth\\grammar.py",
+      "fn": "plan_random"
+    },
+    "openings": {
+      "path": "D:\\dev\\99_tools\\autocad-sdk-router\\tools\\e2\\synth\\openings.py",
+      "fn": "assign"
+    },
+    "noise": {
+      "path": "D:\\dev\\99_tools\\autocad-sdk-router\\tools\\e2\\synth\\noise.py",
+      "fn": "messify(post-emit)"
+    }
+  },
+  "files": [
+    {
+      "drawing_id": "0000",
+      "dxf": "0000.dxf",
+      "truth": "0000.truth.json",
+      "seed": 43
+    },
+    {
+      "drawing_id": "0001",
+      "dxf": "0001.dxf",
+      "truth": "0001.truth.json",
+      "seed": 44
+    },
+    {
+      "drawing_id": "0002",
+      "dxf": "0002.dxf",
+      "truth": "0002.truth.json",
+      "seed": 45
+    },
+    {
+      "drawing_id": "0003",
+      "dxf": "0003.dxf",
+      "truth": "0003.truth.json",
+      "seed": 46
+    },
+    {
+      "drawing_id": "0004",
+      "dxf": "0004.dxf",
+      "truth": "0004.truth.json",
+      "seed": 47
+    },
+    {
+      "drawing_id": "0005",
+      "dxf": "0005.dxf",
+      "truth": "0005.truth.json",
+      "seed": 48
+    },
+    {
+      "drawing_id": "0006",
+      "dxf": "0006.dxf",
+      "truth": "0006.truth.json",
+      "seed": 49
+    },
+    {
+      "drawing_id": "0007",
+      "dxf": "0007.dxf",
+      "truth": "0007.truth.json",
+      "seed": 50
+    },
+    {
+      "drawing_id": "0008",
+      "dxf": "0008.dxf",
+      "truth": "0008.truth.json",
+      "seed": 51
+    },
+    {
+      "drawing_id": "0009",
+      "dxf": "0009.dxf",
+      "truth": "0009.truth.json",
+      "seed": 52
+    },
+    {
+      "drawing_id": "0010",
+      "dxf": "0010.dxf",
+      "truth": "0010.truth.json",
+      "seed": 53
+    },
+    {
+      "drawing_id": "0011",
+      "dxf": "0011.dxf",
+      "truth": "0011.truth.json",
+      "seed": 54
+    },
+    {
+      "drawing_id": "0012",
+      "dxf": "0012.dxf",
+      "truth": "0012.truth.json",
+      "seed": 55
+    },
+    {
+      "drawing_id": "0013",
+      "dxf": "0013.dxf",
+      "truth": "0013.truth.json",
+      "seed": 56
+    },
+    {
+      "drawing_id": "0014",
+      "dxf": "0014.dxf",
+      "truth": "0014.truth.json",
+      "seed": 57
+    },
+    {
+      "drawing_id": "0015",
+      "dxf": "0015.dxf",
+      "truth": "0015.truth.json",
+      "seed": 58
+    },
+    {
+      "drawing_id": "0016",
+      "dxf": "0016.dxf",
+      "truth": "0016.truth.json",
+      "seed": 59
+    },
+    {
+      "drawing_id": "0017",
+      "dxf": "0017.dxf",
+      "truth": "0017.truth.json",
+      "seed": 60
+    },
+    {
+      "drawing_id": "0018",
+      "dxf": "0018.dxf",
+      "truth": "0018.truth.json",
+      "seed": 61
+    },
+    {
+      "drawing_id": "0019",
+      "dxf": "0019.dxf",
+      "truth": "0019.truth.json",
+      "seed": 62
+    }
+  ],
+  "created_utc": "2026-07-17T13:17:10.291203+00:00"
+}

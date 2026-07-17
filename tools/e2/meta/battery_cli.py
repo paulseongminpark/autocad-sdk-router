@@ -41,7 +41,7 @@ KNOWN_TRANSFORMS = frozenset(
 )
 
 DEFAULT_PARAMS: Dict[str, Dict[str, Any]] = {
-    "rotate": {"angle_deg": 90.0},
+    "rotate": {"angle": 90.0},
     "mirror": {"axis": "x"},
     "scale": {"factor": 2.0},
     "units": {},

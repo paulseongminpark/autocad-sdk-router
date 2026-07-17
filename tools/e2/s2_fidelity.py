@@ -59,6 +59,32 @@ _CATEGORICAL_FIELD = {"entity_mix_tv": "entity_mix", "layer_tokens_tv": "layer_t
 # --------------------------------------------------------------------------- #
 # Distance math (stdlib-only, self-contained, unit-tested by --selftest)
 # --------------------------------------------------------------------------- #
+_FLATTEN_META_KEYS = {"n_defs", "total_entities", "n_pairs", "meta", "stats"}
+
+
+def _flatten_counts(m):
+    """Flatten flat {cat: n} or nested {group: {...: {cat: n}}} count maps to {cat: n}.
+
+    real_stats (rs.v1) nests counts (entity_mix_by_role -> role -> entity_types -> counts;
+    layer_tokens -> layer_freq -> counts); pack stats are flat. Meta count keys are skipped
+    so document totals don't pollute the categorical distribution.
+    """
+    flat = {}
+
+    def rec(d):
+        for k, v in d.items():
+            if k in _FLATTEN_META_KEYS:
+                continue
+            if isinstance(v, dict):
+                rec(v)
+            elif isinstance(v, (int, float)) and not isinstance(v, bool):
+                flat[k] = flat.get(k, 0) + v
+
+    if isinstance(m, dict):
+        rec(m)
+    return flat
+
+
 def ks_statistic(a, b):
     """Two-sample Kolmogorov-Smirnov statistic from raw sample lists.
 
@@ -319,6 +345,20 @@ def _distance_for(stat_key, spec, pack, real):
             return ks_statistic(pa, ra), "ks_raw", (len(pa), len(ra))
         ha = pack.get("thickness_hist")
         hb = real.get("thickness_hist")
+        # real_stats (rs.v1, S2-A card) ships a histogram under 'bin_edges' and no raw
+        # samples -- rebin the pack's raw samples onto the real edges so both sides share
+        # identical bins (ks_from_hist's precondition).
+        real_edges = (hb or {}).get("edges") or (hb or {}).get("bin_edges")
+        if pa and real_edges and sum((hb or {}).get("counts", [])) > 0:
+            counts = [0] * (len(real_edges) - 1)
+            for x in pa:
+                i = bisect.bisect_right(real_edges, float(x)) - 1
+                if 0 <= i < len(counts):
+                    counts[i] += 1
+            if sum(counts) > 0:
+                ha2 = {"edges": real_edges, "counts": counts}
+                hb2 = {"edges": real_edges, "counts": hb["counts"]}
+                return ks_from_hist(ha2, hb2), "ks_hist_rebinned", (sum(counts), sum(hb["counts"]))
         if (
             ha and hb
             and ha.get("edges") == hb.get("edges")
@@ -335,8 +375,8 @@ def _distance_for(stat_key, spec, pack, real):
         field = _CATEGORICAL_FIELD.get(stat_key)
         if field is None:
             return None, "no_field_mapping", None
-        pm = pack.get(field, {}) or {}
-        rm = real.get(field, {}) or {}
+        pm = _flatten_counts(pack.get(field, {}) or {})
+        rm = _flatten_counts(real.get(field, {}) or {})
         if sum(pm.values()) > 0 and sum(rm.values()) > 0:
             return total_variation(pm, rm), "tv", (sum(pm.values()), sum(rm.values()))
         return None, "no_data", None

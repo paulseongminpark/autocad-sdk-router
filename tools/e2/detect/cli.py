@@ -173,15 +173,18 @@ def run_detect(dxf_path, no_layer_channel, mods):
     if not seg_ir.get("drawing_id") or seg_ir["drawing_id"] == "unknown":
         seg_ir["drawing_id"] = drawing_id
 
-    # 3) scale via unit_anchor
+    # 3) scale via unit_anchor — adopt only geometrically anchored scales.
+    # INSUNITS-header-only inference reports confidence 0.45 by design (weak);
+    # adopting it unconditionally shrank the thickness band 1000x on metre-flagged
+    # drawings and zeroed the parallel channel (W1 B2 S-tier forensics, 2026-07-17).
     anchor = unit_anchor.infer_from_dxf(dxf_path) or {}
-    if anchor.get("scale_mm_per_unit") is not None:
+    if anchor.get("scale_mm_per_unit") is not None and anchor.get("confidence", 0.0) >= 0.5:
         seg_ir["scale_mm_per_unit"] = anchor["scale_mm_per_unit"]
 
     # 4) scores via evidence_grid; --no-layer-channel disables the layer channel
     params = None
     if no_layer_channel:
-        params = {"layer_channel": False, "disable_channels": ["layer"]}
+        params = {"use_layer": False}
     scores = evidence_grid.score(seg_ir, params=params)
     if not isinstance(scores, dict):
         scores = {"per_handle": {}, "walls": []}
