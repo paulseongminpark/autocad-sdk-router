@@ -66,7 +66,10 @@ P = []
 
 
 def pk(pid, lane, files, prompt):
-    P.append({'id': pid, 'laneKey': lane, 'files': files, 'prompt': prompt.strip() + '\n' + RULES})
+    # 'type'/'parent' = octoloop provenance envelope (schema.mjs PacketSchema) — file-loaded
+    # packets bypass the CLI's mintPacket wrapper, so the envelope must be present here.
+    P.append({'id': pid, 'type': 'packet', 'parent': [], 'laneKey': lane, 'files': files,
+              'prompt': prompt.strip() + '\n' + RULES})
 
 
 # ───────────────────────── sonnet_d (opus) x5 — S1 forensic audit ─────────────────────────

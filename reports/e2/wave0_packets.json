@@ -1,6 +1,8 @@
 [
  {
   "id": "w0-s1a-handle-audit",
+  "type": "packet",
+  "parent": [],
   "laneKey": "sonnet_d",
   "files": [
    "tools/e2/s1_handle_audit.py",
@@ -11,6 +13,8 @@
  },
  {
   "id": "w0-s1b-entity-census",
+  "type": "packet",
+  "parent": [],
   "laneKey": "sonnet_d",
   "files": [
    "tools/e2/s1_entity_census.py",
@@ -21,6 +25,8 @@
  },
  {
   "id": "w0-s1c-bbox-units",
+  "type": "packet",
+  "parent": [],
   "laneKey": "sonnet_d",
   "files": [
    "tools/e2/s1_bbox_units.py",
@@ -31,6 +37,8 @@
  },
  {
   "id": "w0-s1d-sortkey-probe",
+  "type": "packet",
+  "parent": [],
   "laneKey": "sonnet_d",
   "files": [
    "tools/e2/s1_sortkey_probe.py",
@@ -41,6 +49,8 @@
  },
  {
   "id": "w0-s1e-censoring",
+  "type": "packet",
+  "parent": [],
   "laneKey": "sonnet_d",
   "files": [
    "tools/e2/s1_censoring.py",
@@ -51,6 +61,8 @@
  },
  {
   "id": "w0-s4a-normalize",
+  "type": "packet",
+  "parent": [],
   "laneKey": "sonnet_e",
   "files": [
    "tools/e2/detect/normalize.py"
@@ -59,6 +71,8 @@
  },
  {
   "id": "w0-s4b-insert-expand",
+  "type": "packet",
+  "parent": [],
   "laneKey": "sonnet_e",
   "files": [
    "tools/e2/detect/insert_expand.py"
@@ -67,6 +81,8 @@
  },
  {
   "id": "w0-s4c-unit-anchor",
+  "type": "packet",
+  "parent": [],
   "laneKey": "sonnet_e",
   "files": [
    "tools/e2/detect/unit_anchor.py"
@@ -75,6 +91,8 @@
  },
  {
   "id": "w0-s4d-evidence-grid",
+  "type": "packet",
+  "parent": [],
   "laneKey": "sonnet_e",
   "files": [
    "tools/e2/detect/evidence_grid.py"
@@ -83,6 +101,8 @@
  },
  {
   "id": "w0-s4e-cli",
+  "type": "packet",
+  "parent": [],
   "laneKey": "sonnet_e",
   "files": [
    "tools/e2/detect/cli.py",
@@ -92,6 +112,8 @@
  },
  {
   "id": "w0-s2b-grammar",
+  "type": "packet",
+  "parent": [],
   "laneKey": "sonnet_b",
   "files": [
    "tools/e2/synth/grammar.py"
@@ -100,6 +122,8 @@
  },
  {
   "id": "w0-s2c-openings",
+  "type": "packet",
+  "parent": [],
   "laneKey": "sonnet_b",
   "files": [
    "tools/e2/synth/openings.py"
@@ -108,6 +132,8 @@
  },
  {
   "id": "w0-s2d-noise",
+  "type": "packet",
+  "parent": [],
   "laneKey": "sonnet_b",
   "files": [
    "tools/e2/synth/noise.py"
@@ -116,6 +142,8 @@
  },
  {
   "id": "w0-s2a-real-stats",
+  "type": "packet",
+  "parent": [],
   "laneKey": "sonnet_c",
   "files": [
    "tools/e2/s2_real_stats.py",
@@ -126,6 +154,8 @@
  },
  {
   "id": "w0-s2e-pack-cli",
+  "type": "packet",
+  "parent": [],
   "laneKey": "sonnet_c",
   "files": [
    "tools/e2/s2_pack_cli.py"
@@ -134,6 +164,8 @@
  },
  {
   "id": "w0-s2f-fidelity",
+  "type": "packet",
+  "parent": [],
   "laneKey": "sonnet_c",
   "files": [
    "tools/e2/s2_fidelity.py",
@@ -143,6 +175,8 @@
  },
  {
   "id": "w0-s3b-fpc-parse",
+  "type": "packet",
+  "parent": [],
   "laneKey": "codex_56terra",
   "files": [
    "tools/e2/extset/fpc_parse.py",
@@ -152,6 +186,8 @@
  },
  {
   "id": "w0-s3c-label-map",
+  "type": "packet",
+  "parent": [],
   "laneKey": "codex_56terra",
   "files": [
    "tools/e2/extset/label_map.py",
@@ -161,6 +197,8 @@
  },
  {
   "id": "w0-s3d-cubicasa-parse",
+  "type": "packet",
+  "parent": [],
   "laneKey": "codex_56terra",
   "files": [
    "tools/e2/extset/cubicasa_parse.py",
@@ -170,6 +208,8 @@
  },
  {
   "id": "w0-s3e-features",
+  "type": "packet",
+  "parent": [],
   "laneKey": "codex_56terra",
   "files": [
    "tools/e2/extset/features.py"
@@ -178,6 +218,8 @@
  },
  {
   "id": "w0-s5a-transforms-rigid",
+  "type": "packet",
+  "parent": [],
   "laneKey": "grok",
   "files": [
    "tools/e2/meta/transforms_rigid.py"
@@ -186,6 +228,8 @@
  },
  {
   "id": "w0-s5b-transforms-struct",
+  "type": "packet",
+  "parent": [],
   "laneKey": "grok",
   "files": [
    "tools/e2/meta/transforms_struct.py"
@@ -194,6 +238,8 @@
  },
  {
   "id": "w0-s5c-invariance",
+  "type": "packet",
+  "parent": [],
   "laneKey": "grok",
   "files": [
    "tools/e2/meta/invariance.py"
@@ -202,6 +248,8 @@
  },
  {
   "id": "w0-s5d-battery-cli",
+  "type": "packet",
+  "parent": [],
   "laneKey": "grok",
   "files": [
    "tools/e2/meta/battery_cli.py"
@@ -210,6 +258,8 @@
  },
  {
   "id": "w0-s3a-fetch",
+  "type": "packet",
+  "parent": [],
   "laneKey": "grok",
   "files": [
    "tools/e2/extset/fetch.py",
