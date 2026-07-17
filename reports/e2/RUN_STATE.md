@@ -34,5 +34,33 @@ Lanes: sonnet_b/c=opus x3each (sunapse/sunapse-kdw) · sonnet_d/e=opus x5each (j
 1. On fleet completion: octavius collect --run <id> → verify 25 receipts, review diffs.
 2. Merge eligible diffs into main (single-writer: orchestrator session), run selftests post-merge.
 3. S1 verdicts (A..E) fold into reports/e2/s1/ — these gate S4 calibration and prereg sealing.
-4. Real-data steps deferred by cards: FloorPlanCAD/CubiCasa download (D:\mirror\extsets), staged 1.dwg
-   DXF run of detector v1 — orchestrator, after merge.
+4. Real-data steps deferred by cards: extset real-data validation, staged 1.dwg DXF run of detector v1
+   — orchestrator, after merge.
+
+## HARVEST (2026-07-17, runs LOOP-20260717120806-17xckkd + refire LOOP-20260717122756-1exo0ma)
+
+- Fleet run_finished: dispatched 25, runner-failed 0. Receipts: 20 DONE_WITH_CONCERNS + 5 BLOCKED.
+- BLOCKED forensics (payload-truth): s1a/s1c/s1d = adapter misclassification (claude CLI stderr
+  "no stdin data received in 3s" warning read as error; all declared files delivered — merged).
+  s2c-openings = genuine no-output; s5b-transforms-struct = cursor cli-config.json rename race
+  (3 simultaneous grok starts — "grok 다중동시 기아" precedent root-caused).
+- Merge: 23 diffs @d6e1133 + refire 2 @aac35d0, all `git apply` clean (filesets disjoint by design).
+- Spot selftests PASS 6/6: detect/cli (end-to-end), synth/grammar, synth/openings, meta/transforms_rigid,
+  meta/transforms_struct, extset/fpc_parse. ezdxf 1.4.3.
+- S1 verdicts (reports/e2/s1/*.json): handle_audit CLEAN · entity_census BLINDNESS_CONFIRMED
+  (divergent median LINE-share 0.0 vs uniform 0.333) · bbox_units table delivered · sortkey MIXED
+  (top-20 Jaccard 0.4–0.7) · censoring: ornith_v0 CAP_CENSORED, live top-tier judges NOT_CENSORED.
+- Kernel observability ticket: detached-runner packet errors are returned in-memory only — never
+  ledgered (first fleet's 25 instant failures left zero per-node reasons on disk).
+
+## TERMINAL (2026-07-17)
+
+- Fold: **success** — 25/25 cards delivered (23 first pass + 2 refire), spot selftests PASS.
+- S3-A REVISED by discovery (Paul correction: "이거 다 내 로컬에 깔려있어"): FloorPlanCAD already local —
+  FiftyOne raster export, 5,308 PNG + per-object wall bbox/segmask (samples.json 60MB) at
+  `D:\dev\_ariadne\huggingface\datasets\floorplancad` (= `_ariadne\alm\datasets\FloorPlanCAD`).
+  cubicasa5k local copy = card stub (no data). Prior fine-tuned models exist:
+  `_ariadne\huggingface\models\qwen25_vl_3b_floorplan_{sft,grpo}`. Download step CANCELLED;
+  the vector (SVG line-label) variant is the only non-local artifact — acquisition decision = Paul.
+- `D:\datasets` junction dangles (pre-Catalog target `_ariadne\harness\runs\alm\datasets`) — repair
+  pending approval (drive-root change).
