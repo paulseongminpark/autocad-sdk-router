@@ -1,0 +1,308 @@
+[
+  {
+    "unit_id": "defannot-u174-181",
+    "def": "*U174",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.1,
+    "wall_line_handles": [],
+    "notes": "단열재(INSUL) 레이어의 LWPOLYLINE 44개로 구성된 반복 채움 타일 패턴; 벽체 선 자체는 아님",
+    "rationale": {
+      "evidence": "전체 44개 엔티티가 예외 없이 LWPOLYLINE이며 단일 레이어 'X-평면도(기본형)$0$INSUL'에만 속한다. 샘플된 엔티티 전부가 정점 5개(닫힌 4변형)로 동일한 형태이며 핸들이 연속적으로 이어져 반복 배열된 타일임을 시사한다. LINE 엔티티가 전혀 없어 두 점 직선 쌍으로 나타나는 전형적 벽체 표현과 구조가 다르다.",
+      "rule": "레이어명에 'INSUL'(단열재)이 포함되고 정의 전체가 동일 형태의 LWPOLYLINE 반복 타일로만 구성되면, 이는 벽체 자체가 아니라 벽체에 부속된 단열재 채움 요소로 분류하고 wall_likelihood를 낮게 매긴다.",
+      "counterfactual": "만약 이 정의에 두께를 가진 긴 직선형 LINE/LWPOLYLINE 쌍(벽 중심선·외곽선 형태)이 섞여 있었거나 레이어명이 벽체 레이어였다면 wall_likelihood를 크게 높였을 것이다.",
+      "uncertainty": "이 투영에는 각 폴리라인의 실제 정점 좌표와 bbox가 제공되지 않아, 타일들이 실제 벽체 외곽선을 따라 배치되는지를 기하학적으로 확인할 수 없다."
+    }
+  },
+  {
+    "unit_id": "defannot-u175-182",
+    "def": "*U175",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.1,
+    "wall_line_handles": [],
+    "notes": "단열재(INSUL) 레이어의 LWPOLYLINE 58개로 구성된 반복 채움 타일 패턴; 벽체 선 자체는 아님",
+    "rationale": {
+      "evidence": "전체 58개 엔티티가 예외 없이 LWPOLYLINE이며 단일 레이어 'X-평면도(기본형)$0$INSUL'에만 속한다. 샘플된 엔티티 전부가 정점 5개(닫힌 4변형)로 동일한 형태이며 핸들이 연속적으로 이어져 반복 배열된 타일임을 시사한다. LINE 엔티티가 전혀 없어 두 점 직선 쌍으로 나타나는 전형적 벽체 표현과 구조가 다르다.",
+      "rule": "레이어명에 'INSUL'(단열재)이 포함되고 정의 전체가 동일 형태의 LWPOLYLINE 반복 타일로만 구성되면, 이는 벽체 자체가 아니라 벽체에 부속된 단열재 채움 요소로 분류하고 wall_likelihood를 낮게 매긴다.",
+      "counterfactual": "만약 이 정의에 두께를 가진 긴 직선형 LINE/LWPOLYLINE 쌍(벽 중심선·외곽선 형태)이 섞여 있었거나 레이어명이 벽체 레이어였다면 wall_likelihood를 크게 높였을 것이다.",
+      "uncertainty": "이 투영에는 각 폴리라인의 실제 정점 좌표와 bbox가 제공되지 않아, 타일들이 실제 벽체 외곽선을 따라 배치되는지를 기하학적으로 확인할 수 없다."
+    }
+  },
+  {
+    "unit_id": "defannot-u176-183",
+    "def": "*U176",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.1,
+    "wall_line_handles": [],
+    "notes": "단열재(INSUL) 레이어의 LWPOLYLINE 30개로 구성된 반복 채움 타일 패턴; 벽체 선 자체는 아님",
+    "rationale": {
+      "evidence": "전체 30개 엔티티가 예외 없이 LWPOLYLINE이며 단일 레이어 'X-평면도(기본형)$0$INSUL'에만 속한다. 샘플된 엔티티 전부가 정점 5개(닫힌 4변형)로 동일한 형태이며 핸들이 연속적으로 이어져 반복 배열된 타일임을 시사한다. LINE 엔티티가 전혀 없어 두 점 직선 쌍으로 나타나는 전형적 벽체 표현과 구조가 다르다.",
+      "rule": "레이어명에 'INSUL'(단열재)이 포함되고 정의 전체가 동일 형태의 LWPOLYLINE 반복 타일로만 구성되면, 이는 벽체 자체가 아니라 벽체에 부속된 단열재 채움 요소로 분류하고 wall_likelihood를 낮게 매긴다.",
+      "counterfactual": "만약 이 정의에 두께를 가진 긴 직선형 LINE/LWPOLYLINE 쌍(벽 중심선·외곽선 형태)이 섞여 있었거나 레이어명이 벽체 레이어였다면 wall_likelihood를 크게 높였을 것이다.",
+      "uncertainty": "이 투영에는 각 폴리라인의 실제 정점 좌표와 bbox가 제공되지 않아, 타일들이 실제 벽체 외곽선을 따라 배치되는지를 기하학적으로 확인할 수 없다."
+    }
+  },
+  {
+    "unit_id": "defannot-u177-184",
+    "def": "*U177",
+    "role": "심볼",
+    "wall_likelihood": 0.2,
+    "wall_line_handles": [
+      {
+        "handle": "53A5",
+        "reason": "가장 긴 수평 직선, 벽 중심선과 유사한 길이"
+      },
+      {
+        "handle": "53AD",
+        "reason": "상단과 평행한 긴 수평 직선"
+      },
+      {
+        "handle": "53AA",
+        "reason": "긴 수직 직선, 벽 모서리처럼 보이는 형태"
+      }
+    ],
+    "notes": "국기게양대 INSERT 1개 + WIPEOUT 2개 + LINE 20개로 이루어진 계단형 프레임 설치물 심볼; 벽체라기보다 시설물 상세로 판단",
+    "rationale": {
+      "evidence": "엔티티 23개 중 INSERT 1개가 'X-평면도(기본형)$0$국기계양대' 블록을 참조하고, WIPEOUT 2개가 배경을 마스킹하며, LINE 20개가 bbox [-1060, -103.5, 0, 1060, 22.5, 0] 범위 안에서 단차(step)가 있는 닫힌 프레임 외곽선을 이룬다. 레이어는 대부분 '0'이고 INSERT만 '국기계양대' 레이어에 있어, 이 정의가 하나의 독립된 설치물(국기게양대 좌대) 심볼 조립체임을 시사한다.",
+      "rule": "INSERT로 명명된 특정 설치물 블록(예: 국기게양대)을 참조하고 WIPEOUT으로 배경을 마스킹하는 정의는, 직선 요소가 존재하더라도 벽체가 아니라 해당 설치물의 평면 심볼/상세로 분류한다.",
+      "counterfactual": "만약 INSERT/WIPEOUT 없이 LINE들만으로 실내 공간을 감싸는 긴 평행선 쌍이 이어졌다면 wall_likelihood를 크게 높였을 것이다.",
+      "uncertainty": "WIPEOUT의 실제 마스킹 영역 형상과 국기계양대 하위 블록 내부 지오메트리가 제공되지 않아, 이 프레임이 실제 벽체에 인접·부착되는 구조인지는 이 투영만으로 판단할 수 없다."
+    }
+  },
+  {
+    "unit_id": "defannot-u179-185",
+    "def": "*U179",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.1,
+    "wall_line_handles": [],
+    "notes": "단열재(INSUL) 레이어의 LWPOLYLINE 20개로 구성된 반복 채움 타일 패턴; 벽체 선 자체는 아님",
+    "rationale": {
+      "evidence": "전체 20개 엔티티가 예외 없이 LWPOLYLINE이며 단일 레이어 'X-평면도(기본형)$0$INSUL'에만 속한다. 샘플된 엔티티 전부가 정점 5개(닫힌 4변형)로 동일한 형태이며 핸들이 연속적으로 이어져 반복 배열된 타일임을 시사한다. LINE 엔티티가 전혀 없어 두 점 직선 쌍으로 나타나는 전형적 벽체 표현과 구조가 다르다.",
+      "rule": "레이어명에 'INSUL'(단열재)이 포함되고 정의 전체가 동일 형태의 LWPOLYLINE 반복 타일로만 구성되면, 이는 벽체 자체가 아니라 벽체에 부속된 단열재 채움 요소로 분류하고 wall_likelihood를 낮게 매긴다.",
+      "counterfactual": "만약 이 정의에 두께를 가진 긴 직선형 LINE/LWPOLYLINE 쌍(벽 중심선·외곽선 형태)이 섞여 있었거나 레이어명이 벽체 레이어였다면 wall_likelihood를 크게 높였을 것이다.",
+      "uncertainty": "이 투영에는 각 폴리라인의 실제 정점 좌표와 bbox가 제공되지 않아, 타일들이 실제 벽체 외곽선을 따라 배치되는지를 기하학적으로 확인할 수 없다."
+    }
+  },
+  {
+    "unit_id": "defannot-u180-186",
+    "def": "*U180",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.1,
+    "wall_line_handles": [],
+    "notes": "단열재(INSUL) 레이어의 LWPOLYLINE 62개로 구성된 반복 채움 타일 패턴; 벽체 선 자체는 아님",
+    "rationale": {
+      "evidence": "전체 62개 엔티티가 예외 없이 LWPOLYLINE이며 단일 레이어 'X-평면도(기본형)$0$INSUL'에만 속한다. 샘플된 엔티티 전부가 정점 5개(닫힌 4변형)로 동일한 형태이며 핸들이 연속적으로 이어져 반복 배열된 타일임을 시사한다. LINE 엔티티가 전혀 없어 두 점 직선 쌍으로 나타나는 전형적 벽체 표현과 구조가 다르다.",
+      "rule": "레이어명에 'INSUL'(단열재)이 포함되고 정의 전체가 동일 형태의 LWPOLYLINE 반복 타일로만 구성되면, 이는 벽체 자체가 아니라 벽체에 부속된 단열재 채움 요소로 분류하고 wall_likelihood를 낮게 매긴다.",
+      "counterfactual": "만약 이 정의에 두께를 가진 긴 직선형 LINE/LWPOLYLINE 쌍(벽 중심선·외곽선 형태)이 섞여 있었거나 레이어명이 벽체 레이어였다면 wall_likelihood를 크게 높였을 것이다.",
+      "uncertainty": "이 투영에는 각 폴리라인의 실제 정점 좌표와 bbox가 제공되지 않아, 타일들이 실제 벽체 외곽선을 따라 배치되는지를 기하학적으로 확인할 수 없다."
+    }
+  },
+  {
+    "unit_id": "defannot-u181-187",
+    "def": "*U181",
+    "role": "심볼",
+    "wall_likelihood": 0.2,
+    "wall_line_handles": [
+      {
+        "handle": "5455",
+        "reason": "가장 긴 수평 직선, 벽 중심선과 유사한 길이"
+      },
+      {
+        "handle": "545D",
+        "reason": "상단과 평행한 긴 수평 직선"
+      },
+      {
+        "handle": "545A",
+        "reason": "긴 수직 직선, 벽 모서리처럼 보이는 형태"
+      }
+    ],
+    "notes": "국기게양대 INSERT 1개 + WIPEOUT 2개 + LINE 20개로 이루어진 계단형 프레임 설치물 심볼; 벽체라기보다 시설물 상세로 판단",
+    "rationale": {
+      "evidence": "엔티티 23개 중 INSERT 1개가 'X-평면도(기본형)$0$국기계양대' 블록을 참조하고, WIPEOUT 2개가 배경을 마스킹하며, LINE 20개가 bbox [-710, -103.5, 0, 710, 22.5, 0] 범위 안에서 단차(step)가 있는 닫힌 프레임 외곽선을 이룬다. 레이어는 대부분 '0'이고 INSERT만 '국기계양대' 레이어에 있어, 이 정의가 하나의 독립된 설치물(국기게양대 좌대) 심볼 조립체임을 시사한다.",
+      "rule": "INSERT로 명명된 특정 설치물 블록(예: 국기게양대)을 참조하고 WIPEOUT으로 배경을 마스킹하는 정의는, 직선 요소가 존재하더라도 벽체가 아니라 해당 설치물의 평면 심볼/상세로 분류한다.",
+      "counterfactual": "만약 INSERT/WIPEOUT 없이 LINE들만으로 실내 공간을 감싸는 긴 평행선 쌍이 이어졌다면 wall_likelihood를 크게 높였을 것이다.",
+      "uncertainty": "WIPEOUT의 실제 마스킹 영역 형상과 국기계양대 하위 블록 내부 지오메트리가 제공되지 않아, 이 프레임이 실제 벽체에 인접·부착되는 구조인지는 이 투영만으로 판단할 수 없다."
+    }
+  },
+  {
+    "unit_id": "defannot-u183-188",
+    "def": "*U183",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.1,
+    "wall_line_handles": [],
+    "notes": "단열재(INSUL) 레이어의 LWPOLYLINE 43개로 구성된 반복 채움 타일 패턴; 벽체 선 자체는 아님",
+    "rationale": {
+      "evidence": "전체 43개 엔티티가 예외 없이 LWPOLYLINE이며 단일 레이어 'X-평면도(기본형)$0$INSUL'에만 속한다. 샘플된 엔티티 전부가 정점 5개(닫힌 4변형)로 동일한 형태이며 핸들이 연속적으로 이어져 반복 배열된 타일임을 시사한다. LINE 엔티티가 전혀 없어 두 점 직선 쌍으로 나타나는 전형적 벽체 표현과 구조가 다르다.",
+      "rule": "레이어명에 'INSUL'(단열재)이 포함되고 정의 전체가 동일 형태의 LWPOLYLINE 반복 타일로만 구성되면, 이는 벽체 자체가 아니라 벽체에 부속된 단열재 채움 요소로 분류하고 wall_likelihood를 낮게 매긴다.",
+      "counterfactual": "만약 이 정의에 두께를 가진 긴 직선형 LINE/LWPOLYLINE 쌍(벽 중심선·외곽선 형태)이 섞여 있었거나 레이어명이 벽체 레이어였다면 wall_likelihood를 크게 높였을 것이다.",
+      "uncertainty": "이 투영에는 각 폴리라인의 실제 정점 좌표와 bbox가 제공되지 않아, 타일들이 실제 벽체 외곽선을 따라 배치되는지를 기하학적으로 확인할 수 없다."
+    }
+  },
+  {
+    "unit_id": "defannot-u184-189",
+    "def": "*U184",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.1,
+    "wall_line_handles": [],
+    "notes": "단열재(INSUL) 레이어의 LWPOLYLINE 26개로 구성된 반복 채움 타일 패턴; 벽체 선 자체는 아님",
+    "rationale": {
+      "evidence": "전체 26개 엔티티가 예외 없이 LWPOLYLINE이며 단일 레이어 'X-평면도(기본형)$0$INSUL'에만 속한다. 샘플된 엔티티 전부가 정점 5개(닫힌 4변형)로 동일한 형태이며 핸들이 연속적으로 이어져 반복 배열된 타일임을 시사한다. LINE 엔티티가 전혀 없어 두 점 직선 쌍으로 나타나는 전형적 벽체 표현과 구조가 다르다.",
+      "rule": "레이어명에 'INSUL'(단열재)이 포함되고 정의 전체가 동일 형태의 LWPOLYLINE 반복 타일로만 구성되면, 이는 벽체 자체가 아니라 벽체에 부속된 단열재 채움 요소로 분류하고 wall_likelihood를 낮게 매긴다.",
+      "counterfactual": "만약 이 정의에 두께를 가진 긴 직선형 LINE/LWPOLYLINE 쌍(벽 중심선·외곽선 형태)이 섞여 있었거나 레이어명이 벽체 레이어였다면 wall_likelihood를 크게 높였을 것이다.",
+      "uncertainty": "이 투영에는 각 폴리라인의 실제 정점 좌표와 bbox가 제공되지 않아, 타일들이 실제 벽체 외곽선을 따라 배치되는지를 기하학적으로 확인할 수 없다."
+    }
+  },
+  {
+    "unit_id": "defannot-u185-190",
+    "def": "*U185",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.1,
+    "wall_line_handles": [],
+    "notes": "단열재(INSUL) 레이어의 LWPOLYLINE 46개로 구성된 반복 채움 타일 패턴; 벽체 선 자체는 아님",
+    "rationale": {
+      "evidence": "전체 46개 엔티티가 예외 없이 LWPOLYLINE이며 단일 레이어 'X-평면도(기본형)$0$INSUL'에만 속한다. 샘플된 엔티티 전부가 정점 5개(닫힌 4변형)로 동일한 형태이며 핸들이 연속적으로 이어져 반복 배열된 타일임을 시사한다. LINE 엔티티가 전혀 없어 두 점 직선 쌍으로 나타나는 전형적 벽체 표현과 구조가 다르다.",
+      "rule": "레이어명에 'INSUL'(단열재)이 포함되고 정의 전체가 동일 형태의 LWPOLYLINE 반복 타일로만 구성되면, 이는 벽체 자체가 아니라 벽체에 부속된 단열재 채움 요소로 분류하고 wall_likelihood를 낮게 매긴다.",
+      "counterfactual": "만약 이 정의에 두께를 가진 긴 직선형 LINE/LWPOLYLINE 쌍(벽 중심선·외곽선 형태)이 섞여 있었거나 레이어명이 벽체 레이어였다면 wall_likelihood를 크게 높였을 것이다.",
+      "uncertainty": "이 투영에는 각 폴리라인의 실제 정점 좌표와 bbox가 제공되지 않아, 타일들이 실제 벽체 외곽선을 따라 배치되는지를 기하학적으로 확인할 수 없다."
+    }
+  },
+  {
+    "unit_id": "defannot-u186-191",
+    "def": "*U186",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.1,
+    "wall_line_handles": [],
+    "notes": "단열재(INSUL) 레이어의 LWPOLYLINE 18개로 구성된 반복 채움 타일 패턴; 벽체 선 자체는 아님",
+    "rationale": {
+      "evidence": "전체 18개 엔티티가 예외 없이 LWPOLYLINE이며 단일 레이어 'X-평면도(기본형)$0$INSUL'에만 속한다. 샘플된 엔티티 전부가 정점 5개(닫힌 4변형)로 동일한 형태이며 핸들이 연속적으로 이어져 반복 배열된 타일임을 시사한다. LINE 엔티티가 전혀 없어 두 점 직선 쌍으로 나타나는 전형적 벽체 표현과 구조가 다르다.",
+      "rule": "레이어명에 'INSUL'(단열재)이 포함되고 정의 전체가 동일 형태의 LWPOLYLINE 반복 타일로만 구성되면, 이는 벽체 자체가 아니라 벽체에 부속된 단열재 채움 요소로 분류하고 wall_likelihood를 낮게 매긴다.",
+      "counterfactual": "만약 이 정의에 두께를 가진 긴 직선형 LINE/LWPOLYLINE 쌍(벽 중심선·외곽선 형태)이 섞여 있었거나 레이어명이 벽체 레이어였다면 wall_likelihood를 크게 높였을 것이다.",
+      "uncertainty": "이 투영에는 각 폴리라인의 실제 정점 좌표와 bbox가 제공되지 않아, 타일들이 실제 벽체 외곽선을 따라 배치되는지를 기하학적으로 확인할 수 없다."
+    }
+  },
+  {
+    "unit_id": "defannot-u187-192",
+    "def": "*U187",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.1,
+    "wall_line_handles": [],
+    "notes": "단열재(INSUL) 레이어의 LWPOLYLINE 28개로 구성된 반복 채움 타일 패턴; 벽체 선 자체는 아님",
+    "rationale": {
+      "evidence": "전체 28개 엔티티가 예외 없이 LWPOLYLINE이며 단일 레이어 'X-평면도(기본형)$0$INSUL'에만 속한다. 샘플된 엔티티 전부가 정점 5개(닫힌 4변형)로 동일한 형태이며 핸들이 연속적으로 이어져 반복 배열된 타일임을 시사한다. LINE 엔티티가 전혀 없어 두 점 직선 쌍으로 나타나는 전형적 벽체 표현과 구조가 다르다.",
+      "rule": "레이어명에 'INSUL'(단열재)이 포함되고 정의 전체가 동일 형태의 LWPOLYLINE 반복 타일로만 구성되면, 이는 벽체 자체가 아니라 벽체에 부속된 단열재 채움 요소로 분류하고 wall_likelihood를 낮게 매긴다.",
+      "counterfactual": "만약 이 정의에 두께를 가진 긴 직선형 LINE/LWPOLYLINE 쌍(벽 중심선·외곽선 형태)이 섞여 있었거나 레이어명이 벽체 레이어였다면 wall_likelihood를 크게 높였을 것이다.",
+      "uncertainty": "이 투영에는 각 폴리라인의 실제 정점 좌표와 bbox가 제공되지 않아, 타일들이 실제 벽체 외곽선을 따라 배치되는지를 기하학적으로 확인할 수 없다."
+    }
+  },
+  {
+    "unit_id": "defannot-u188-193",
+    "def": "*U188",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.1,
+    "wall_line_handles": [],
+    "notes": "단열재(INSUL) 레이어의 LWPOLYLINE 83개로 구성된 반복 채움 타일 패턴; 벽체 선 자체는 아님",
+    "rationale": {
+      "evidence": "전체 83개 엔티티가 예외 없이 LWPOLYLINE이며 단일 레이어 'X-평면도(기본형)$0$INSUL'에만 속한다. 샘플된 엔티티 전부가 정점 5개(닫힌 4변형)로 동일한 형태이며 핸들이 연속적으로 이어져 반복 배열된 타일임을 시사한다. LINE 엔티티가 전혀 없어 두 점 직선 쌍으로 나타나는 전형적 벽체 표현과 구조가 다르다.",
+      "rule": "레이어명에 'INSUL'(단열재)이 포함되고 정의 전체가 동일 형태의 LWPOLYLINE 반복 타일로만 구성되면, 이는 벽체 자체가 아니라 벽체에 부속된 단열재 채움 요소로 분류하고 wall_likelihood를 낮게 매긴다.",
+      "counterfactual": "만약 이 정의에 두께를 가진 긴 직선형 LINE/LWPOLYLINE 쌍(벽 중심선·외곽선 형태)이 섞여 있었거나 레이어명이 벽체 레이어였다면 wall_likelihood를 크게 높였을 것이다.",
+      "uncertainty": "이 투영에는 각 폴리라인의 실제 정점 좌표와 bbox가 제공되지 않아, 타일들이 실제 벽체 외곽선을 따라 배치되는지를 기하학적으로 확인할 수 없다."
+    }
+  },
+  {
+    "unit_id": "defannot-u189-194",
+    "def": "*U189",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.1,
+    "wall_line_handles": [],
+    "notes": "단열재(INSUL) 레이어의 LWPOLYLINE 147개로 구성된 반복 채움 타일 패턴; 벽체 선 자체는 아님",
+    "rationale": {
+      "evidence": "전체 147개 엔티티가 예외 없이 LWPOLYLINE이며 단일 레이어 'X-평면도(기본형)$0$INSUL'에만 속한다. 샘플된 엔티티 전부가 정점 5개(닫힌 4변형)로 동일한 형태이며 핸들이 연속적으로 이어져 반복 배열된 타일임을 시사한다. LINE 엔티티가 전혀 없어 두 점 직선 쌍으로 나타나는 전형적 벽체 표현과 구조가 다르다.",
+      "rule": "레이어명에 'INSUL'(단열재)이 포함되고 정의 전체가 동일 형태의 LWPOLYLINE 반복 타일로만 구성되면, 이는 벽체 자체가 아니라 벽체에 부속된 단열재 채움 요소로 분류하고 wall_likelihood를 낮게 매긴다.",
+      "counterfactual": "만약 이 정의에 두께를 가진 긴 직선형 LINE/LWPOLYLINE 쌍(벽 중심선·외곽선 형태)이 섞여 있었거나 레이어명이 벽체 레이어였다면 wall_likelihood를 크게 높였을 것이다.",
+      "uncertainty": "이 투영에는 각 폴리라인의 실제 정점 좌표와 bbox가 제공되지 않아, 타일들이 실제 벽체 외곽선을 따라 배치되는지를 기하학적으로 확인할 수 없다."
+    }
+  },
+  {
+    "unit_id": "defannot-u191-195",
+    "def": "*U191",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.1,
+    "wall_line_handles": [],
+    "notes": "단열재(INSUL) 레이어의 LWPOLYLINE 36개로 구성된 반복 채움 타일 패턴; 벽체 선 자체는 아님",
+    "rationale": {
+      "evidence": "전체 36개 엔티티가 예외 없이 LWPOLYLINE이며 단일 레이어 'X-평면도(기본형)$0$INSUL'에만 속한다. 샘플된 엔티티 전부가 정점 5개(닫힌 4변형)로 동일한 형태이며 핸들이 연속적으로 이어져 반복 배열된 타일임을 시사한다. LINE 엔티티가 전혀 없어 두 점 직선 쌍으로 나타나는 전형적 벽체 표현과 구조가 다르다.",
+      "rule": "레이어명에 'INSUL'(단열재)이 포함되고 정의 전체가 동일 형태의 LWPOLYLINE 반복 타일로만 구성되면, 이는 벽체 자체가 아니라 벽체에 부속된 단열재 채움 요소로 분류하고 wall_likelihood를 낮게 매긴다.",
+      "counterfactual": "만약 이 정의에 두께를 가진 긴 직선형 LINE/LWPOLYLINE 쌍(벽 중심선·외곽선 형태)이 섞여 있었거나 레이어명이 벽체 레이어였다면 wall_likelihood를 크게 높였을 것이다.",
+      "uncertainty": "이 투영에는 각 폴리라인의 실제 정점 좌표와 bbox가 제공되지 않아, 타일들이 실제 벽체 외곽선을 따라 배치되는지를 기하학적으로 확인할 수 없다."
+    }
+  },
+  {
+    "unit_id": "defannot-u192-196",
+    "def": "*U192",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.1,
+    "wall_line_handles": [],
+    "notes": "단열재(INSUL) 레이어의 LWPOLYLINE 41개로 구성된 반복 채움 타일 패턴; 벽체 선 자체는 아님",
+    "rationale": {
+      "evidence": "전체 41개 엔티티가 예외 없이 LWPOLYLINE이며 단일 레이어 'X-평면도(기본형)$0$INSUL'에만 속한다. 샘플된 엔티티 전부가 정점 5개(닫힌 4변형)로 동일한 형태이며 핸들이 연속적으로 이어져 반복 배열된 타일임을 시사한다. LINE 엔티티가 전혀 없어 두 점 직선 쌍으로 나타나는 전형적 벽체 표현과 구조가 다르다.",
+      "rule": "레이어명에 'INSUL'(단열재)이 포함되고 정의 전체가 동일 형태의 LWPOLYLINE 반복 타일로만 구성되면, 이는 벽체 자체가 아니라 벽체에 부속된 단열재 채움 요소로 분류하고 wall_likelihood를 낮게 매긴다.",
+      "counterfactual": "만약 이 정의에 두께를 가진 긴 직선형 LINE/LWPOLYLINE 쌍(벽 중심선·외곽선 형태)이 섞여 있었거나 레이어명이 벽체 레이어였다면 wall_likelihood를 크게 높였을 것이다.",
+      "uncertainty": "이 투영에는 각 폴리라인의 실제 정점 좌표와 bbox가 제공되지 않아, 타일들이 실제 벽체 외곽선을 따라 배치되는지를 기하학적으로 확인할 수 없다."
+    }
+  },
+  {
+    "unit_id": "defannot-u193-197",
+    "def": "*U193",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.1,
+    "wall_line_handles": [],
+    "notes": "단열재(INSUL) 레이어의 LWPOLYLINE 32개로 구성된 반복 채움 타일 패턴; 벽체 선 자체는 아님",
+    "rationale": {
+      "evidence": "전체 32개 엔티티가 예외 없이 LWPOLYLINE이며 단일 레이어 'X-평면도(기본형)$0$INSUL'에만 속한다. 샘플된 엔티티 전부가 정점 5개(닫힌 4변형)로 동일한 형태이며 핸들이 연속적으로 이어져 반복 배열된 타일임을 시사한다. LINE 엔티티가 전혀 없어 두 점 직선 쌍으로 나타나는 전형적 벽체 표현과 구조가 다르다.",
+      "rule": "레이어명에 'INSUL'(단열재)이 포함되고 정의 전체가 동일 형태의 LWPOLYLINE 반복 타일로만 구성되면, 이는 벽체 자체가 아니라 벽체에 부속된 단열재 채움 요소로 분류하고 wall_likelihood를 낮게 매긴다.",
+      "counterfactual": "만약 이 정의에 두께를 가진 긴 직선형 LINE/LWPOLYLINE 쌍(벽 중심선·외곽선 형태)이 섞여 있었거나 레이어명이 벽체 레이어였다면 wall_likelihood를 크게 높였을 것이다.",
+      "uncertainty": "이 투영에는 각 폴리라인의 실제 정점 좌표와 bbox가 제공되지 않아, 타일들이 실제 벽체 외곽선을 따라 배치되는지를 기하학적으로 확인할 수 없다."
+    }
+  },
+  {
+    "unit_id": "defannot-u194-198",
+    "def": "*U194",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.1,
+    "wall_line_handles": [],
+    "notes": "단열재(INSUL) 레이어의 LWPOLYLINE 5개로 구성된 반복 채움 타일 패턴; 벽체 선 자체는 아님",
+    "rationale": {
+      "evidence": "전체 5개 엔티티가 예외 없이 LWPOLYLINE이며 단일 레이어 'X-평면도(기본형)$0$INSUL'에만 속한다. 샘플된 엔티티 전부가 정점 5개(닫힌 4변형)로 동일한 형태이며 핸들이 연속적으로 이어져 반복 배열된 타일임을 시사한다. LINE 엔티티가 전혀 없어 두 점 직선 쌍으로 나타나는 전형적 벽체 표현과 구조가 다르다.",
+      "rule": "레이어명에 'INSUL'(단열재)이 포함되고 정의 전체가 동일 형태의 LWPOLYLINE 반복 타일로만 구성되면, 이는 벽체 자체가 아니라 벽체에 부속된 단열재 채움 요소로 분류하고 wall_likelihood를 낮게 매긴다.",
+      "counterfactual": "만약 이 정의에 두께를 가진 긴 직선형 LINE/LWPOLYLINE 쌍(벽 중심선·외곽선 형태)이 섞여 있었거나 레이어명이 벽체 레이어였다면 wall_likelihood를 크게 높였을 것이다.",
+      "uncertainty": "이 투영에는 각 폴리라인의 실제 정점 좌표와 bbox가 제공되지 않아, 타일들이 실제 벽체 외곽선을 따라 배치되는지를 기하학적으로 확인할 수 없다."
+    }
+  },
+  {
+    "unit_id": "defannot-u195-199",
+    "def": "*U195",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.1,
+    "wall_line_handles": [],
+    "notes": "단열재(INSUL) 레이어의 LWPOLYLINE 15개로 구성된 반복 채움 타일 패턴; 벽체 선 자체는 아님",
+    "rationale": {
+      "evidence": "전체 15개 엔티티가 예외 없이 LWPOLYLINE이며 단일 레이어 'X-평면도(기본형)$0$INSUL'에만 속한다. 샘플된 엔티티 전부가 정점 5개(닫힌 4변형)로 동일한 형태이며 핸들이 연속적으로 이어져 반복 배열된 타일임을 시사한다. LINE 엔티티가 전혀 없어 두 점 직선 쌍으로 나타나는 전형적 벽체 표현과 구조가 다르다.",
+      "rule": "레이어명에 'INSUL'(단열재)이 포함되고 정의 전체가 동일 형태의 LWPOLYLINE 반복 타일로만 구성되면, 이는 벽체 자체가 아니라 벽체에 부속된 단열재 채움 요소로 분류하고 wall_likelihood를 낮게 매긴다.",
+      "counterfactual": "만약 이 정의에 두께를 가진 긴 직선형 LINE/LWPOLYLINE 쌍(벽 중심선·외곽선 형태)이 섞여 있었거나 레이어명이 벽체 레이어였다면 wall_likelihood를 크게 높였을 것이다.",
+      "uncertainty": "이 투영에는 각 폴리라인의 실제 정점 좌표와 bbox가 제공되지 않아, 타일들이 실제 벽체 외곽선을 따라 배치되는지를 기하학적으로 확인할 수 없다."
+    }
+  },
+  {
+    "unit_id": "defannot-u196-200",
+    "def": "*U196",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.1,
+    "wall_line_handles": [],
+    "notes": "단열재(INSUL) 레이어의 LWPOLYLINE 38개로 구성된 반복 채움 타일 패턴; 벽체 선 자체는 아님",
+    "rationale": {
+      "evidence": "전체 38개 엔티티가 예외 없이 LWPOLYLINE이며 단일 레이어 'X-평면도(기본형)$0$INSUL'에만 속한다. 샘플된 엔티티 전부가 정점 5개(닫힌 4변형)로 동일한 형태이며 핸들이 연속적으로 이어져 반복 배열된 타일임을 시사한다. LINE 엔티티가 전혀 없어 두 점 직선 쌍으로 나타나는 전형적 벽체 표현과 구조가 다르다.",
+      "rule": "레이어명에 'INSUL'(단열재)이 포함되고 정의 전체가 동일 형태의 LWPOLYLINE 반복 타일로만 구성되면, 이는 벽체 자체가 아니라 벽체에 부속된 단열재 채움 요소로 분류하고 wall_likelihood를 낮게 매긴다.",
+      "counterfactual": "만약 이 정의에 두께를 가진 긴 직선형 LINE/LWPOLYLINE 쌍(벽 중심선·외곽선 형태)이 섞여 있었거나 레이어명이 벽체 레이어였다면 wall_likelihood를 크게 높였을 것이다.",
+      "uncertainty": "이 투영에는 각 폴리라인의 실제 정점 좌표와 bbox가 제공되지 않아, 타일들이 실제 벽체 외곽선을 따라 배치되는지를 기하학적으로 확인할 수 없다."
+    }
+  }
+]

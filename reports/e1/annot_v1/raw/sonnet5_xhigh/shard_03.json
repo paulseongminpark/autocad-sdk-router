@@ -1,0 +1,282 @@
+[
+  {
+    "unit_id": "defannot-d335-41",
+    "def": "*D335",
+    "role": "치수캐시",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "Linear dimension sub-block (value 80); dimension line 8CD1 spans exactly the extension-line gap, no wall geometry present.",
+    "rationale": {
+      "evidence": "LINE 8CCC and 8CCD are parallel extension lines 80 units apart (46068.83 to 46148.83); LINE 8CD1 is the connecting dimension line of length exactly 80, matching MTEXT 8CD0 '\\A1;80'. Two short return ticks (8CCE, 8CCF) and two _ArchTick INSERTs (8CD2, 8CD3) sit at the extension endpoints, and three DEFPOINTS POINTs (8CD4-8CD6) mark the dimension's definition points.",
+      "rule": "An anonymous *D#### block on layer DIM containing DEFPOINTS points, tick/arrowhead block inserts, and an MTEXT numeric override whose value equals the spacing between two parallel LINEs is AutoCAD's standard anonymous dimension block, not modeled building geometry.",
+      "counterfactual": "If the block instead sat on a WALL/A-WALL-style layer, contained closed double-line or hatched profiles representing thickness, and lacked DEFPOINTS/tick inserts, it would read as wall geometry rather than a dimension cache.",
+      "uncertainty": "The projection does not show which model entity this dimension measures or the drawing's overall layer/block hierarchy, so I cannot confirm it isn't nested near wall annotation elsewhere in the file."
+    }
+  },
+  {
+    "unit_id": "defannot-d336-42",
+    "def": "*D336",
+    "role": "치수캐시",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "Linear dimension sub-block (value 2500); extension-line spacing matches MTEXT exactly.",
+    "rationale": {
+      "evidence": "LINE 8CD7 (x=46148.83) and 8CD8 (x=48648.83) are parallel extension lines 2500 units apart, matching MTEXT 8CDC '\\A1;2500'. LINE 8CD9 is the dimension line, slightly overshooting the extension lines on each side to accommodate the two _ArchTick INSERTs (8CDA, 8CDB); three DEFPOINTS POINTs (8CDD-8CDF) complete the definition-point set typical of this block type.",
+      "rule": "When extension-line spacing equals the MTEXT override value and the block carries tick-symbol INSERTs plus DEFPOINTS points, the block is a dimension annotation object, independent of the drawing's actual wall layout.",
+      "counterfactual": "A wall reading would require thickness-bearing parallel lines forming a closed profile on a structural layer, without an MTEXT text override numerically tied to the line spacing.",
+      "uncertainty": "Cannot verify from this projection whether the dimensioned span (2500) corresponds to a real wall run elsewhere in the drawing or a different measured feature."
+    }
+  },
+  {
+    "unit_id": "defannot-d337-43",
+    "def": "*D337",
+    "role": "치수캐시",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "Linear dimension sub-block (value 135); short-span dimension identical in structure to *D335.",
+    "rationale": {
+      "evidence": "LINE 8CE0 (x=48648.83) and 8CE1 (x=48783.83) are extension lines 135 units apart; dimension line 8CE4 spans the same 135 units, matching MTEXT 8CE7 '\\A1;135'. Return ticks 8CE2/8CE3 and _ArchTick INSERTs 8CE5/8CE6 plus DEFPOINTS POINTs 8CE8-8CEA round out the 11-entity dimension-block signature.",
+      "rule": "Numeric agreement between an MTEXT override and the LINE-derived span, combined with tick-block inserts and DEFPOINTS points, is the reliable signature of an anonymous dimension block regardless of the measured distance's magnitude.",
+      "counterfactual": "If the MTEXT value diverged from the line spacing, or the layer were not DIM/DEFPOINTS, this would instead suggest generic annotation or geometry rather than a dimension.",
+      "uncertainty": "The projection gives no visibility into what real-world feature this 135-unit span measures, so its relation to any wall cannot be assessed."
+    }
+  },
+  {
+    "unit_id": "defannot-d338-44",
+    "def": "*D338",
+    "role": "치수캐시",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "Linear dimension sub-block (value 320); same 5-line/2-tick/2-INSERT/3-POINT structure as *D335/*D337.",
+    "rationale": {
+      "evidence": "LINE 8CEB (x=48998.83) and 8CEC (x=49318.83) are extension lines 320 apart; dimension line 8CEF spans exactly 320, matching MTEXT 8CF2 '\\A1;320'. Return ticks 8CED/8CEE and _ArchTick INSERTs 8CF0/8CF1 with DEFPOINTS POINTs 8CF3-8CF5 complete the pattern.",
+      "rule": "The repeated 5-LINE + 2-tick-INSERT + 3-DEFPOINTS-POINT template with a numerically matching MTEXT is architectural-style ('_ArchTick') linear dimensioning, a documentation object rather than drawn geometry.",
+      "counterfactual": "Replacing the DIM/DEFPOINTS layers with a structural layer and removing the tick INSERTs and matching MTEXT would be needed to reclassify this as wall geometry.",
+      "uncertainty": "Cannot determine from the projection alone which physical opening or wall segment (if any) this 320-unit dimension annotates."
+    }
+  },
+  {
+    "unit_id": "defannot-d339-45",
+    "def": "*D339",
+    "role": "치수캐시",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "Linear dimension sub-block (value 6060), long overall span, DIMDOT-style ticks.",
+    "rationale": {
+      "evidence": "LINE 8CF6 (x=49318.83) and 8CF7 (x=55378.83) are extension lines 6060 apart, matching MTEXT 8CFB '\\A1;6060'. Dimension line 8CF8 connects them with a slight overshoot to seat the two _ArchTick INSERTs 8CF9/8CFA; three DEFPOINTS POINTs (8CFC-8CFE) mark the definition points.",
+      "rule": "A large extension-line span with an exactly matching MTEXT override and DEFPOINTS/tick-INSERT support is still an anonymous dimension block irrespective of the span's length, which can legitimately exceed typical wall dimensions.",
+      "counterfactual": "If this same 6060-unit LINE pair appeared on a wall/geometry layer without the paired tick INSERTs or matching MTEXT, wall likelihood would rise substantially.",
+      "uncertainty": "Whether the 6060-unit run corresponds to an overall building dimension versus a room or wall run cannot be resolved from this isolated projection."
+    }
+  },
+  {
+    "unit_id": "defannot-d340-46",
+    "def": "*D340",
+    "role": "치수캐시",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "Linear dimension sub-block (value 150); adjacent chained dimension segment following *D339.",
+    "rationale": {
+      "evidence": "LINE 8CFF (x=55378.83) and 8D00 (x=55528.83) are extension lines 150 apart, matching MTEXT 8D02 '\\A1;150'. Dimension line 8D01 spans the same interval, flanked by _ArchTick INSERTs 8D03/8D04 and three DEFPOINTS POINTs (8D05-8D07).",
+      "rule": "Chained dimension segments sharing a common baseline coordinate (here x=55378.83, contiguous with *D339's endpoint) are a normal feature of dimension strings and reinforce the dimension-object classification.",
+      "counterfactual": "A wall interpretation would require this segment to be a modeled centerline or face-of-wall LINE on a wall layer, not an extension-line pair paired with tick INSERTs and matching text.",
+      "uncertainty": "Cannot confirm from the projection whether *D340 is part of the same dimension string as *D339/*D341 at the drawing level, though the shared coordinates strongly suggest it."
+    }
+  },
+  {
+    "unit_id": "defannot-d341-47",
+    "def": "*D341",
+    "role": "치수캐시",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "Linear dimension sub-block (value 150); continues the chained dimension string.",
+    "rationale": {
+      "evidence": "LINE 8D08 (x=55528.83) and 8D09 (x=55678.83) are extension lines 150 apart, matching MTEXT 8D0B '\\A1;150'. Dimension line 8D0A spans the same 150 units, with _ArchTick INSERTs 8D0C/8D0D and DEFPOINTS POINTs 8D0E-8D10 completing the block.",
+      "rule": "Identical structural signature (extension-line spacing = MTEXT value, tick INSERTs, DEFPOINTS points) recurring across consecutive anonymous blocks indicates a dimension string, not repeated wall segments.",
+      "counterfactual": "If successive blocks like this instead had constant offset thickness and no MTEXT/tick pairing, they would more plausibly represent a series of wall segments.",
+      "uncertainty": "The projection cannot confirm the underlying measured feature (e.g., a door or window bay) that this 150-unit increment annotates."
+    }
+  },
+  {
+    "unit_id": "defannot-d342-48",
+    "def": "*D342",
+    "role": "치수캐시",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "Linear dimension sub-block (value 1700); mid-length chained dimension segment.",
+    "rationale": {
+      "evidence": "LINE 8D11 (x=55678.83) and 8D12 (x=57378.83) are extension lines 1700 apart, matching MTEXT 8D16 '\\A1;1700'. Dimension line 8D13 spans the interval, with _ArchTick INSERTs 8D14/8D15 and DEFPOINTS POINTs 8D17-8D19.",
+      "rule": "Consistent numeric agreement between LINE spacing and MTEXT override across many sibling blocks (*D340-*D346) confirms a systematic dimension-string generation pattern rather than coincidental geometry.",
+      "counterfactual": "Absence of the matching MTEXT override, or presence of hatch/solid fill suggesting wall thickness, would shift this toward a geometry classification.",
+      "uncertainty": "Cannot tell from this projection what building feature spans this particular 1700-unit run."
+    }
+  },
+  {
+    "unit_id": "defannot-d343-49",
+    "def": "*D343",
+    "role": "치수캐시",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "Linear dimension sub-block (value 130); short chained segment.",
+    "rationale": {
+      "evidence": "LINE 8D1A (x=57378.83) and 8D1B (x=57508.83) are extension lines 130 apart, matching MTEXT 8D1D '\\A1;130'. Dimension line 8D1C spans the same 130 units, with _ArchTick INSERTs 8D1E/8D1F and DEFPOINTS POINTs 8D20-8D22.",
+      "rule": "Short numeric spans (130) with the same dimension-block template as longer spans in this file confirm the block type is scale-independent — it is defined by structure, not by the magnitude of the measured value.",
+      "counterfactual": "If this were a wall, I would expect a constant thickness dimension (e.g., 150-200 typical wall width) drawn as a closed double-line profile rather than a single-value linear dimension chain link.",
+      "uncertainty": "Cannot determine whether this 130-unit dimension marks a jog, mullion, or other small architectural feature without the surrounding model geometry."
+    }
+  },
+  {
+    "unit_id": "defannot-d344-50",
+    "def": "*D344",
+    "role": "치수캐시",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "Linear dimension sub-block (value 130); adjacent to *D343 in the same dimension string.",
+    "rationale": {
+      "evidence": "LINE 8D23 (x=57508.83) and 8D24 (x=57638.83) are extension lines 130 apart, matching MTEXT 8D26 '\\A1;130'. Dimension line 8D25 spans the interval, with _ArchTick INSERTs 8D27/8D28 and DEFPOINTS POINTs 8D29-8D2B.",
+      "rule": "Two consecutive blocks (*D343, *D344) sharing the same 130 value and contiguous baseline coordinate (x=57508.83) reflect a repeated module in a dimension string, a documentation pattern rather than wall repetition.",
+      "counterfactual": "A repeated wall module would show as repeated closed-profile LINE/POLYLINE geometry with constant thickness, not paired extension lines plus a numerically matching MTEXT.",
+      "uncertainty": "The projection does not indicate whether the repeated 130 value corresponds to a grid module, structural bay, or unrelated coincidence."
+    }
+  },
+  {
+    "unit_id": "defannot-d345-51",
+    "def": "*D345",
+    "role": "치수캐시",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "Linear dimension sub-block (value 1500); longer chained segment closing out this dimension run.",
+    "rationale": {
+      "evidence": "LINE 8D2C (x=57638.83) and 8D2D (x=59138.83) are extension lines 1500 apart, matching MTEXT 8D31 '\\A1;1500'. Dimension line 8D2E spans the same interval, with _ArchTick INSERTs 8D2F/8D30 and DEFPOINTS POINTs 8D32-8D34.",
+      "rule": "Regardless of span length, the recurring signature (extension-line gap = MTEXT value, tick INSERTs, DEFPOINTS points, layer DIM) is diagnostic of an anonymous dimension block.",
+      "counterfactual": "If the block instead carried hatch or solid entities filling the 1500-unit gap, that would suggest a wall or slab rather than an open dimension span.",
+      "uncertainty": "Cannot confirm from this projection what specific room or wall boundary the 1500-unit measurement corresponds to."
+    }
+  },
+  {
+    "unit_id": "defannot-d346-52",
+    "def": "*D346",
+    "role": "치수캐시",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "Linear dimension sub-block (value 210); 11-entity variant with return ticks, closing this dimension chain.",
+    "rationale": {
+      "evidence": "LINE 8D35 (x=59138.83) and 8D36 (x=59348.83) are extension lines 210 apart, matching MTEXT 8D3C '\\A1;210'. Dimension line 8D39 spans exactly 210, with return ticks 8D37/8D38, _ArchTick INSERTs 8D3A/8D3B, and DEFPOINTS POINTs 8D3D-8D3F.",
+      "rule": "The 11-entity variant (5 LINEs including return ticks) is functionally identical to the 9-entity variant; both encode a single linear dimension via matching extension-line spacing and MTEXT override.",
+      "counterfactual": "Absence of the return-tick LINEs or the matching MTEXT value would weaken the dimension classification, but neither condition holds here.",
+      "uncertainty": "The projection does not reveal whether *D346 terminates this dimension string at a wall corner, opening, or arbitrary reference point."
+    }
+  },
+  {
+    "unit_id": "defannot-d347-53",
+    "def": "*D347",
+    "role": "치수캐시",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "Vertical-direction linear dimension (value 1735); DIMDOT tick style, orientation differs from the D335-346 series.",
+    "rationale": {
+      "evidence": "LINE 8D40 (y=33970.207) and 8D41 (y=35705.207) are horizontal extension lines vertically 1735 apart, matching MTEXT 8D45 '\\A1;1735'. LINE 8D42 is a vertical dimension line at x=41368.83, with two DIMDOT INSERTs (8D43, 8D44) and DEFPOINTS POINTs 8D46-8D48.",
+      "rule": "Dimension blocks can be rotated (extension lines horizontal, dimension line vertical) while retaining the same diagnostic pattern: extension-line spacing equal to the MTEXT override, plus DEFPOINTS points and tick-symbol INSERTs — orientation does not change the classification.",
+      "counterfactual": "If the vertical LINE 8D42 instead had thickness or paired with a second parallel vertical LINE forming a channel, it could suggest a wall segment rather than a single dimension line.",
+      "uncertainty": "Cannot determine from this projection which vertical building extent (e.g., floor-to-floor or opening height) the 1735-unit value measures."
+    }
+  },
+  {
+    "unit_id": "defannot-d348-54",
+    "def": "*D348",
+    "role": "치수캐시",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "Vertical linear dimension (value 375); short segment using _ArchTick markers.",
+    "rationale": {
+      "evidence": "LINE 8D49 (y=35705.207) and 8D4A (y=36080.207) are horizontal extension lines 375 apart, matching MTEXT 8D4E '\\A1;375'. LINE 8D4B is the vertical dimension line at x=54223.83, overshooting the extension span slightly to seat _ArchTick INSERTs 8D4C/8D4D; DEFPOINTS POINTs 8D4F-8D51 complete the block.",
+      "rule": "The same vertical-dimension template as *D347 recurs here with a different tick style (_ArchTick vs DIMDOT) and shorter span, confirming the pattern generalizes across tick-symbol choice and magnitude.",
+      "counterfactual": "A wall reading would need the 375-unit gap filled with a closed profile or hatch (consistent with typical wall thickness) rather than bounded only by extension lines and a single dimension LINE.",
+      "uncertainty": "375 units falls within a plausible wall-thickness range, but the presence of DEFPOINTS/tick-INSERT/MTEXT-match structure indicates this is a dimension annotation, not the wall itself; I cannot rule out that a nearby (unprojected) block does represent that wall's actual geometry."
+    }
+  },
+  {
+    "unit_id": "defannot-d349-55",
+    "def": "*D349",
+    "role": "치수캐시",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "Linear dimension sub-block (value 5470); DIMDOT tick style, long horizontal span.",
+    "rationale": {
+      "evidence": "LINE 8D52 (x=48998.83) and 8D53 (x=54468.83) are extension lines 5470 apart, matching MTEXT 8D57 '\\A1;5470'. Dimension line 8D54 spans between them with a small inset, flanked by DIMDOT INSERTs 8D55/8D56 and DEFPOINTS POINTs 8D58-8D5A.",
+      "rule": "DIMDOT-style tick INSERTs combined with matching extension-line spacing and MTEXT override identify this as a dimension block, consistent across the D349-D354 sub-series at a different y-band (37180-37560) than D335-D346.",
+      "counterfactual": "If the two long parallel LINEs instead bounded a hatched or solid region on a wall layer, that would indicate wall geometry rather than an open dimensioned span.",
+      "uncertainty": "The projection does not indicate what real feature spans 5470 units here, nor whether this is a room-width or building-perimeter dimension."
+    }
+  },
+  {
+    "unit_id": "defannot-d350-56",
+    "def": "*D350",
+    "role": "치수캐시",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "Linear dimension sub-block (value 1645); DIMDOT ticks, chained after *D349.",
+    "rationale": {
+      "evidence": "LINE 8D5B (x=54468.83) and 8D5C (x=56113.83) are extension lines 1645 apart, matching MTEXT 8D60 '\\A1;1645'. Dimension line 8D5D spans the interval, with DIMDOT INSERTs 8D5E/8D5F and DEFPOINTS POINTs 8D61-8D63.",
+      "rule": "Shared baseline coordinate (x=54468.83) between *D349 and *D350 shows these are adjacent links in one dimension string, reinforcing the annotation rather than geometry classification.",
+      "counterfactual": "Independent, non-adjoining LINE pairs without a shared endpoint and without matching MTEXT would weaken the dimension-chain interpretation.",
+      "uncertainty": "Cannot confirm from the projection whether this chain runs along a single wall face or crosses multiple rooms."
+    }
+  },
+  {
+    "unit_id": "defannot-d351-57",
+    "def": "*D351",
+    "role": "치수캐시",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "Linear dimension sub-block (value 1165); final link in the *D349-*D351 chain.",
+    "rationale": {
+      "evidence": "LINE 8D64 (x=56113.83) and 8D65 (x=57278.83) are extension lines 1165 apart, matching MTEXT 8D69 '\\A1;1165'. Dimension line 8D66 spans the interval, with DIMDOT INSERTs 8D67/8D68 and DEFPOINTS POINTs 8D6A-8D6C.",
+      "rule": "The full chain *D349->*D350->*D351 shares contiguous x-coordinates (48998.83 -> 54468.83 -> 56113.83 -> 57278.83), a hallmark of a continuous dimension string measuring successive building bays.",
+      "counterfactual": "If any segment's MTEXT diverged from its LINE spacing, that segment would need re-examination as possibly non-dimension geometry; none do here.",
+      "uncertainty": "Cannot determine what the three chained spans (5470/1645/1165) collectively measure without visibility into the plan geometry they annotate."
+    }
+  },
+  {
+    "unit_id": "defannot-d352-58",
+    "def": "*D352",
+    "role": "치수캐시",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "Vertical linear dimension (value 630); DIMDOT ticks, distinct coordinate band (~y 33925-34555).",
+    "rationale": {
+      "evidence": "LINE 8D6D (y=34555.207) and 8D6E (y=33925.207) are horizontal extension lines 630 apart, matching MTEXT 8D72 '\\A1;630'. LINE 8D6F is the vertical dimension line at x=62053.83, inset by 60 units from each extension line, with DIMDOT INSERTs 8D70/8D71 and DEFPOINTS POINTs 8D73-8D75.",
+      "rule": "The 60-unit inset between the dimension line's endpoints and the extension lines is a consistent rendering offset across this file's dimension blocks, further confirming the family resemblance to *D347/*D348.",
+      "counterfactual": "A 630-unit gap filled with parallel wall-face LINEs and no DEFPOINTS/tick/MTEXT pairing would instead suggest a wall of that thickness.",
+      "uncertainty": "Cannot verify from this projection alone whether 630 corresponds to a wall-adjacent clearance or an unrelated vertical dimension target."
+    }
+  },
+  {
+    "unit_id": "defannot-d353-59",
+    "def": "*D353",
+    "role": "치수캐시",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "Vertical linear dimension (value 2640); chained above *D352 in the same x-band (x~60793-62133).",
+    "rationale": {
+      "evidence": "LINE 8D76 (y=33925.207) and 8D77 (y=31285.207) are horizontal extension lines 2640 apart, matching MTEXT 8D7B '\\A1;2640'. LINE 8D78 is the vertical dimension line at x=62053.83, with DIMDOT INSERTs 8D79/8D7A and DEFPOINTS POINTs 8D7C-8D7E.",
+      "rule": "Shared y-coordinate (33925.207) and x-band with *D352 indicates *D352-*D353 form a continuous vertical dimension chain, the vertical analogue of the *D349-*D351 horizontal chain.",
+      "counterfactual": "If the extension lines here bounded a hatched/solid vertical strip instead of being paired with DEFPOINTS points and DIMDOT ticks, a wall interpretation would be more plausible.",
+      "uncertainty": "The specific building feature spanning 2640 units in this vertical band cannot be identified from the projection alone."
+    }
+  },
+  {
+    "unit_id": "defannot-d354-60",
+    "def": "*D354",
+    "role": "치수캐시",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "Vertical linear dimension (value 3905); final link continuing the *D352-*D354 chain.",
+    "rationale": {
+      "evidence": "LINE 8D7F (y=31285.207) and 8D80 (y=27380.207) are horizontal extension lines 3905 apart, matching MTEXT 8D84 '\\A1;3905'. LINE 8D81 is the vertical dimension line at x=62053.83, with DIMDOT INSERTs 8D82/8D83 and DEFPOINTS POINTs 8D85-8D87.",
+      "rule": "The chain *D352(630)->*D353(2640)->*D354(3905) shares the y=31285.207/33925.207 junction coordinates, confirming a single continuous vertical dimension string rather than independent wall segments.",
+      "counterfactual": "Divergent (non-matching) MTEXT and LINE-spacing values, or the presence of filled/thick geometry instead of open extension lines, would be needed to reclassify this as a wall.",
+      "uncertainty": "Without the host drawing's plan geometry, I cannot identify which vertical building extent (e.g., a full floor height or facade run) the 3905-unit dimension measures."
+    }
+  }
+]

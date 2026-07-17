@@ -1,0 +1,282 @@
+[
+  {
+    "unit_id": "defannot-d315-21",
+    "def": "*D315",
+    "role": "치수캐시",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "Anonymous dimension block *D315 (DIM layer, DEFPOINTS points, DIMDOT arrowheads, MTEXT '5795') -- a linear dimension cache, not a wall.",
+    "rationale": {
+      "evidence": "All 9 entities sit on DIM/DEFPOINTS layers: two parallel witness LINEs (8C0E, 8C0F) and one perpendicular dimension LINE (8C10) frame a bbox whose long axis (5795 units, y from 27375.207 to 33170.207) matches the MTEXT '\\A1;5795' text exactly. Two DIMDOT INSERTs (8C11, 8C12) sit at the line ends as arrowhead blocks, and three DEFPOINTS POINTs (8C14-8C16) mark the dimension's definition points.",
+      "rule": "A *D-prefixed anonymous block name combined with DIM-layer LINE/INSERT geometry, DEFPOINTS POINT entities, and an MTEXT field code (\\A1;<number>) matching the geometric span is the AutoCAD fingerprint of an associative linear dimension block, not architectural wall geometry, regardless of the raw line lengths involved.",
+      "counterfactual": "If the LINE entities were on an architectural wall layer (e.g. A-WALL) instead of DIM, or if the DEFPOINTS points and DIMDOT arrowhead INSERTs were absent, the wall_likelihood judgment would rise substantially.",
+      "uncertainty": "The projection cannot confirm whether this anonymous block is actually referenced by a live DIMENSION entity in the host layout or is an orphaned/unreferenced definition, since parent-layout usage is outside the block-definition projection."
+    }
+  },
+  {
+    "unit_id": "defannot-d316-22",
+    "def": "*D316",
+    "role": "치수캐시",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "Anonymous dimension block *D316 (DIM layer, DEFPOINTS points, DIMDOT arrowheads, MTEXT '1420') -- a linear dimension cache, not a wall.",
+    "rationale": {
+      "evidence": "9 entities on DIM/DEFPOINTS layers: witness LINEs 8C17 and 8C18 run parallel at y=27375.207 and y=25955.207 (a 1420-unit span matching MTEXT '\\A1;1420'), joined by perpendicular dimension LINE 8C19. DIMDOT INSERTs 8C1A/8C1B mark the arrowhead ends and three DEFPOINTS POINTs (8C1D-8C1F) are present, identical in structure to the adjacent *D315 dimension.",
+      "rule": "A *D-prefixed anonymous block name combined with DIM-layer LINE/INSERT geometry, DEFPOINTS POINT entities, and an MTEXT field code matching the geometric span is the AutoCAD fingerprint of an associative linear dimension block, not architectural wall geometry.",
+      "counterfactual": "Replacing the DIM/DEFPOINTS layers with a wall layer, or removing the DIMDOT arrowhead INSERTs and MTEXT text, would push this toward a wall/plan-fragment classification instead.",
+      "uncertainty": "Cannot verify from this projection whether the DIM layer is frozen or non-plotting in the host drawing, or whether the block is currently referenced by an active DIMENSION entity."
+    }
+  },
+  {
+    "unit_id": "defannot-d317-23",
+    "def": "*D317",
+    "role": "치수캐시",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "Anonymous dimension block *D317 (DIM layer, DEFPOINTS points, DIMDOT arrowheads, MTEXT '10400') -- a large-span linear dimension cache, not a wall.",
+    "rationale": {
+      "evidence": "9 entities on DIM/DEFPOINTS layers: witness LINEs 8C20 and 8C21 span y=25680.207 to y=36080.207 (10400 units), matching MTEXT '\\A1;10400' exactly, joined by dimension LINE 8C22. DIMDOT INSERTs 8C23/8C24 sit at the ends and three DEFPOINTS POINTs (8C26-8C28) round out the standard 9-entity dimension pattern seen across this cluster.",
+      "rule": "A *D-prefixed anonymous block name combined with DIM-layer LINE/INSERT geometry, DEFPOINTS POINT entities, and an MTEXT field code matching the geometric span is the AutoCAD fingerprint of an associative linear dimension block, regardless of how large the dimensioned span is.",
+      "counterfactual": "A 10400-unit span with no accompanying MTEXT/DEFPOINTS/DIMDOT scaffolding, sitting on a wall layer, would instead read as a long wall run rather than a dimension.",
+      "uncertainty": "Cannot determine from this isolated projection whether the 10400 value corresponds to an overall building dimension or a subdivided run, since that requires the surrounding layout context."
+    }
+  },
+  {
+    "unit_id": "defannot-d318-24",
+    "def": "*D318",
+    "role": "치수캐시",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "Anonymous dimension block *D318 (DIM layer, DEFPOINTS points, DIMDOT arrowheads, MTEXT '800') -- a short linear dimension cache, not a wall.",
+    "rationale": {
+      "evidence": "9 entities on DIM/DEFPOINTS layers: witness LINEs 8C29 and 8C2A span y=33170.207 to y=33970.207 (800 units), matching MTEXT '\\A1;800', joined by dimension LINE 8C2B. DIMDOT INSERTs 8C2C/8C2D and three DEFPOINTS POINTs (8C2F-8C31) complete the identical scaffold seen in *D315-*D317.",
+      "rule": "A *D-prefixed anonymous block name combined with DIM-layer LINE/INSERT geometry, DEFPOINTS POINT entities, and a matching MTEXT field code is the fingerprint of an associative linear dimension block, independent of the absolute span length.",
+      "counterfactual": "If this 800-unit LINE pair instead sat on an architectural layer without DEFPOINTS/DIMDOT/MTEXT scaffolding, it could plausibly represent a short wall segment or jamb instead.",
+      "uncertainty": "The projection alone cannot confirm this block is still actively inserted in a current layout rather than a stale/leftover dimension definition from an earlier revision."
+    }
+  },
+  {
+    "unit_id": "defannot-d319-25",
+    "def": "*D319",
+    "role": "치수캐시",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "Anonymous dimension block *D319 (DIM layer, DEFPOINTS points, DIMDOT arrowheads, MTEXT '375') -- a short linear dimension cache, not a wall.",
+    "rationale": {
+      "evidence": "9 entities on DIM/DEFPOINTS layers: witness LINEs 8C32 and 8C33 span y=35705.207 to y=36080.207 (375 units), matching MTEXT '\\A1;375', joined by dimension LINE 8C34. DIMDOT INSERTs 8C35/8C36 and three DEFPOINTS POINTs (8C38-8C3A) match the recurring 9-entity dimension template.",
+      "rule": "A *D-prefixed anonymous block name combined with DIM-layer LINE/INSERT geometry, DEFPOINTS POINT entities, and a matching MTEXT field code is the fingerprint of an associative linear dimension block, independent of the absolute span length.",
+      "counterfactual": "Absent the DEFPOINTS points and DIMDOT arrowhead inserts, a bare 375-unit LINE pair on a generic layer would be ambiguous between a short wall segment and a fixture edge.",
+      "uncertainty": "Cannot confirm from this projection alone whether 375 represents a partition offset, a door jamb dimension, or another architectural quantity -- that requires the parent layout context."
+    }
+  },
+  {
+    "unit_id": "defannot-d320-26",
+    "def": "*D320",
+    "role": "치수캐시",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "Anonymous dimension block *D320 (DIM layer, DEFPOINTS points, _ArchTick arrowheads, MTEXT '185') with a 5-LINE jog scaffold for a short 185-unit span -- a dimension cache, not a wall.",
+    "rationale": {
+      "evidence": "11 entities on DIM/DEFPOINTS layers: horizontal LINEs 8C3B/8C3C are the witness lines, while short perpendicular jog LINEs 8C3D/8C3E and the connecting dimension LINE 8C3F form AutoCAD's standard 'shoulder' pattern used when a dimension line (here 185 units, matching MTEXT '\\A1;185') is too short for text/ticks to fit inline. Two _ArchTick INSERTs (8C40/8C41, architectural tick marks rather than DIMDOT dots) and three DEFPOINTS POINTs (8C43-8C45) complete the block.",
+      "rule": "The 5-LINE 'jog/shoulder' variant (vs. the 3-LINE baseline) still fingerprints as an associative dimension block -- it appears specifically when the MTEXT numeric value is small relative to the drawing scale, so extra LINEs extend the witness/dimension lines outward to fit arrowheads and text, not because extra wall segments exist.",
+      "counterfactual": "If the two short perpendicular LINEs (8C3D, 8C3E) were part of a continuous wall outline rather than symmetric jogs centered on the dimension midpoint, or if DEFPOINTS/_ArchTick scaffolding were absent, this would read as wall geometry instead.",
+      "uncertainty": "Cannot verify from this projection whether the _ArchTick tick-mark style (vs. DIMDOT elsewhere in this shard) reflects a genuine drawing-wide dimension-style change or a per-dimension style override, since dimension style definitions are outside this block-level projection."
+    }
+  },
+  {
+    "unit_id": "defannot-d321-27",
+    "def": "*D321",
+    "role": "치수캐시",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "Anonymous dimension block *D321 (DIM layer, DEFPOINTS points, _ArchTick arrowheads, MTEXT '2400') -- a linear dimension cache, not a wall.",
+    "rationale": {
+      "evidence": "9 entities on DIM/DEFPOINTS layers: witness LINEs 8C46 and 8C47 span y=27560.207 to y=29960.207 (2400 units), matching MTEXT '\\A1;2400', joined by dimension LINE 8C48. Two _ArchTick INSERTs (8C49/8C4A) and three DEFPOINTS POINTs (8C4C-8C4E) match the standard 9-entity dimension template used throughout this second dimension chain (D320-D325).",
+      "rule": "A *D-prefixed anonymous block name combined with DIM-layer LINE/INSERT geometry, DEFPOINTS POINT entities, and a matching MTEXT field code is the fingerprint of an associative linear dimension block, whether the arrowhead style is DIMDOT or _ArchTick.",
+      "counterfactual": "If the bounding LINEs were on an architectural wall layer and lacked the DIM-specific INSERT/POINT/MTEXT scaffolding, a 2400-unit span would plausibly read as a partition wall run instead.",
+      "uncertainty": "Cannot determine from this projection whether this dimension chains directly with *D320/*D322 to sum to a larger overall dimension, since inter-block relationships require the parent layout."
+    }
+  },
+  {
+    "unit_id": "defannot-d322-28",
+    "def": "*D322",
+    "role": "치수캐시",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "Anonymous dimension block *D322 (DIM layer, DEFPOINTS points, _ArchTick arrowheads, MTEXT '80') with a 5-LINE jog scaffold for a very short 80-unit span -- a dimension cache, not a wall.",
+    "rationale": {
+      "evidence": "11 entities on DIM/DEFPOINTS layers: witness LINEs 8C4F/8C50 and jog LINEs 8C51/8C52 bracket the short dimension LINE 8C54 (80 units, matching MTEXT '\\A1;80'), reproducing the same shoulder-jog pattern as *D320. Two _ArchTick INSERTs (8C55/8C56) and three DEFPOINTS POINTs (8C57-8C59) complete the block.",
+      "rule": "The 5-LINE jog variant fingerprints as an associative dimension block whenever the MTEXT numeric value is small enough that AutoCAD must extend witness lines to fit arrowheads/text outside the dimension line -- this is a scale artifact of dimensioning, not evidence of extra wall segments.",
+      "counterfactual": "If the jog LINEs 8C51/8C52 were asymmetric or extended far beyond what a small-dimension shoulder requires, or if DEFPOINTS/tick scaffolding were missing, that would instead suggest genuine wall/furniture line geometry.",
+      "uncertainty": "Cannot confirm whether the 80-unit value represents a real small architectural offset (e.g. a reveal or step) or a rounding/snap artifact from the source drawing, since only the dimension cache -- not the dimensioned object -- is visible here."
+    }
+  },
+  {
+    "unit_id": "defannot-d323-29",
+    "def": "*D323",
+    "role": "치수캐시",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "Anonymous dimension block *D323 (DIM layer, DEFPOINTS points, _ArchTick arrowheads, MTEXT '80') -- a linear dimension cache, not a wall.",
+    "rationale": {
+      "evidence": "9 entities on DIM/DEFPOINTS layers: witness LINEs 8C5A and 8C5B span y=30040.207 to y=30120.207 (80 units), matching MTEXT '\\A1;80', joined by dimension LINE 8C5C. Two _ArchTick INSERTs (8C5E/8C5F) and three DEFPOINTS POINTs (8C60-8C62) form the standard 9-entity template -- notably this 80-unit span uses the baseline 3-LINE form rather than the jog form seen in *D322, since the dimension line itself is long enough here.",
+      "rule": "A *D-prefixed anonymous block name combined with DIM-layer LINE/INSERT geometry, DEFPOINTS POINT entities, and a matching MTEXT field code is the fingerprint of an associative linear dimension block; whether the jog/shoulder variant appears depends on available space, not on the numeric value alone.",
+      "counterfactual": "If this LINE trio sat on an architectural layer without the DIM/DEFPOINTS/_ArchTick/MTEXT scaffolding, an 80-unit line pair could otherwise be mistaken for a small wall return or reveal.",
+      "uncertainty": "Cannot determine from this projection why *D322 (same 80-unit value) uses the 5-LINE jog form while *D323 uses the 3-LINE baseline form, since that depends on surrounding geometry/text placement not captured here."
+    }
+  },
+  {
+    "unit_id": "defannot-d324-30",
+    "def": "*D324",
+    "role": "치수캐시",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "Anonymous dimension block *D324 (DIM layer, DEFPOINTS points, _ArchTick arrowheads, MTEXT '2200') -- a linear dimension cache, not a wall.",
+    "rationale": {
+      "evidence": "9 entities on DIM/DEFPOINTS layers: witness LINEs 8C63 and 8C64 span y=30120.207 to y=32320.207 (2200 units), matching MTEXT '\\A1;2200', joined by dimension LINE 8C65. Two _ArchTick INSERTs (8C66/8C67) and three DEFPOINTS POINTs (8C69-8C6B) complete the standard 9-entity template consistent with the rest of this dimension chain.",
+      "rule": "A *D-prefixed anonymous block name combined with DIM-layer LINE/INSERT geometry, DEFPOINTS POINT entities, and a matching MTEXT field code is the fingerprint of an associative linear dimension block, regardless of chain position within a running dimension series.",
+      "counterfactual": "If the LINE pair instead sat on an architectural wall layer with no DEFPOINTS/tick/MTEXT scaffolding, a 2200-unit span would be a plausible interior partition wall length instead.",
+      "uncertainty": "Cannot verify whether *D321, *D323, *D324, and neighboring blocks form one continuous chained dimension string in the host layout, since chaining relationships are not captured in a per-block projection."
+    }
+  },
+  {
+    "unit_id": "defannot-d325-31",
+    "def": "*D325",
+    "role": "치수캐시",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "Anonymous dimension block *D325 (DIM layer, DEFPOINTS points, _ArchTick arrowheads, MTEXT '70') with a 5-LINE jog scaffold for a very short 70-unit span -- a dimension cache, not a wall.",
+    "rationale": {
+      "evidence": "11 entities on DIM/DEFPOINTS layers: witness LINEs 8C6C/8C6D and jog LINEs 8C6E/8C6F bracket dimension LINE 8C70 (70 units, matching MTEXT '\\A1;70'), the same shoulder-jog pattern as *D320/*D322. Two _ArchTick INSERTs (8C71/8C72) and three DEFPOINTS POINTs (8C74-8C76) complete the block.",
+      "rule": "The 5-LINE jog variant fingerprints as an associative dimension block whenever the MTEXT numeric value is small enough that AutoCAD must extend witness lines outward to fit arrowheads/text -- a scale artifact of dimensioning, not extra wall segments.",
+      "counterfactual": "If the two jog LINEs extended asymmetrically or connected to unrelated geometry beyond the dimension midpoint, or if DEFPOINTS/tick scaffolding were absent, this would instead suggest genuine wall or trim-line geometry.",
+      "uncertainty": "Cannot confirm whether the 70-unit value corresponds to a real architectural detail (e.g. a small offset or reveal) versus a rounding artifact, since the dimensioned object itself is outside this projection."
+    }
+  },
+  {
+    "unit_id": "defannot-d326-32",
+    "def": "*D326",
+    "role": "치수캐시",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "Anonymous dimension block *D326 (DIM layer, DEFPOINTS points, DIMDOT arrowheads, MTEXT '1820') -- a horizontal-run linear dimension cache, not a wall.",
+    "rationale": {
+      "evidence": "9 entities on DIM/DEFPOINTS layers: vertical witness LINEs 8C77 and 8C78 sit at x=44248.83 and x=46068.83 (1820 units apart, matching MTEXT '\\A1;1820'), joined by horizontal dimension LINE 8C79. DIMDOT INSERTs 8C7A/8C7B and three DEFPOINTS POINTs (8C7D-8C7F) form the standard 9-entity template, mirroring the orientation-rotated form of the earlier vertical-run dimensions (*D315-*D319).",
+      "rule": "A *D-prefixed anonymous block name combined with DIM-layer LINE/INSERT geometry, DEFPOINTS POINT entities, and a matching MTEXT field code fingerprints an associative linear dimension block regardless of whether the witness lines run vertically or horizontally.",
+      "counterfactual": "If these two 1820-unit-apart vertical LINEs sat on a wall layer without DEFPOINTS/DIMDOT/MTEXT scaffolding, they would be plausible candidates for parallel wall faces instead.",
+      "uncertainty": "Cannot determine from this projection whether *D326 dimensions a room width, a structural bay, or another horizontal-run quantity, since that requires the surrounding floor-plan context."
+    }
+  },
+  {
+    "unit_id": "defannot-d327-33",
+    "def": "*D327",
+    "role": "치수캐시",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "Anonymous dimension block *D327 (DIM layer, DEFPOINTS points, DIMDOT arrowheads, MTEXT '2715') -- a horizontal-run linear dimension cache, not a wall.",
+    "rationale": {
+      "evidence": "9 entities on DIM/DEFPOINTS layers: vertical witness LINEs 8C80 and 8C81 sit at x=46068.83 and x=48783.83 (2715 units apart, matching MTEXT '\\A1;2715'), joined by horizontal dimension LINE 8C82. DIMDOT INSERTs 8C83/8C84 and three DEFPOINTS POINTs (8C86-8C88) match the recurring 9-entity template, and the shared x=46068.83 witness line suggests this dimension chains directly off *D326.",
+      "rule": "A *D-prefixed anonymous block name combined with DIM-layer LINE/INSERT geometry, DEFPOINTS POINT entities, and a matching MTEXT field code fingerprints an associative linear dimension block regardless of chain position.",
+      "counterfactual": "Without the DEFPOINTS/DIMDOT/MTEXT scaffolding, this 2715-unit vertical LINE pair on its own could be mistaken for two parallel wall faces.",
+      "uncertainty": "Cannot confirm from this isolated projection whether *D326 and *D327 are formally linked as a continuous dimension string in the host layout, since chain adjacency is only inferable from the shared coordinate, not verified."
+    }
+  },
+  {
+    "unit_id": "defannot-d328-34",
+    "def": "*D328",
+    "role": "치수캐시",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "Anonymous dimension block *D328 (DIM layer, DEFPOINTS points, DIMDOT arrowheads, MTEXT '6530') -- a long horizontal-run linear dimension cache, not a wall.",
+    "rationale": {
+      "evidence": "9 entities on DIM/DEFPOINTS layers: vertical witness LINEs 8C89 and 8C8A sit at x=48998.83 and x=55528.83 (6530 units apart, matching MTEXT '\\A1;6530'), joined by horizontal dimension LINE 8C8B. DIMDOT INSERTs 8C8C/8C8D and three DEFPOINTS POINTs (8C8F-8C91) match the standard 9-entity template despite the large span.",
+      "rule": "A *D-prefixed anonymous block name combined with DIM-layer LINE/INSERT geometry, DEFPOINTS POINT entities, and a matching MTEXT field code fingerprints an associative linear dimension block regardless of how large the dimensioned span is.",
+      "counterfactual": "A bare 6530-unit LINE pair on a wall layer with no DEFPOINTS/DIMDOT/MTEXT scaffolding would instead be a plausible long exterior wall run.",
+      "uncertainty": "Cannot determine whether the 6530-unit value corresponds to an overall facade width or a subdivided structural grid span, since that requires the parent floor-plan layout."
+    }
+  },
+  {
+    "unit_id": "defannot-d329-35",
+    "def": "*D329",
+    "role": "치수캐시",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "Anonymous dimension block *D329 (DIM layer, DEFPOINTS points, DIMDOT arrowheads, MTEXT '1980') -- a horizontal-run linear dimension cache, not a wall.",
+    "rationale": {
+      "evidence": "9 entities on DIM/DEFPOINTS layers: vertical witness LINEs 8C92 and 8C93 sit at x=55528.83 and x=57508.83 (1980 units apart, matching MTEXT '\\A1;1980'), joined by horizontal dimension LINE 8C94. DIMDOT INSERTs 8C95/8C96 and three DEFPOINTS POINTs (8C98-8C9A) match the standard 9-entity template, with the shared x=55528.83 witness line suggesting a chain continuation from *D328.",
+      "rule": "A *D-prefixed anonymous block name combined with DIM-layer LINE/INSERT geometry, DEFPOINTS POINT entities, and a matching MTEXT field code fingerprints an associative linear dimension block regardless of chain position.",
+      "counterfactual": "Without the DIM-specific scaffolding, this 1980-unit vertical LINE pair could be mistaken for two parallel wall faces on its own.",
+      "uncertainty": "Cannot confirm from this projection alone whether *D328/*D329/*D330 form one continuous chained overall dimension string, since chain linkage is only suggested by coordinate reuse, not verified."
+    }
+  },
+  {
+    "unit_id": "defannot-d330-36",
+    "def": "*D330",
+    "role": "치수캐시",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "Anonymous dimension block *D330 (DIM layer, DEFPOINTS points, DIMDOT arrowheads, MTEXT '1840') -- a horizontal-run linear dimension cache, not a wall.",
+    "rationale": {
+      "evidence": "9 entities on DIM/DEFPOINTS layers: vertical witness LINEs 8C9B and 8C9C sit at x=57508.83 and x=59348.83 (1840 units apart, matching MTEXT '\\A1;1840'), joined by horizontal dimension LINE 8C9D. DIMDOT INSERTs 8C9E/8C9F and three DEFPOINTS POINTs (8CA1-8CA3) complete the standard 9-entity template consistent with the rest of this chain.",
+      "rule": "A *D-prefixed anonymous block name combined with DIM-layer LINE/INSERT geometry, DEFPOINTS POINT entities, and a matching MTEXT field code fingerprints an associative linear dimension block regardless of chain position.",
+      "counterfactual": "Without the DEFPOINTS/DIMDOT/MTEXT scaffolding, this 1840-unit vertical LINE pair alone could be mistaken for two parallel wall faces.",
+      "uncertainty": "Cannot verify whether the reused x=57508.83 witness position formally links *D329 and *D330 into one continuous dimension string in the host layout."
+    }
+  },
+  {
+    "unit_id": "defannot-d331-37",
+    "def": "*D331",
+    "role": "치수캐시",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "Anonymous dimension block *D331 (DIM layer, DEFPOINTS points, DIMDOT arrowheads, MTEXT '15100') -- an overall/summary linear dimension cache spanning the full D326-D330 chain, not a wall.",
+    "rationale": {
+      "evidence": "9 entities on DIM/DEFPOINTS layers: vertical witness LINEs 8CA4 and 8CA5 sit at x=59348.83 and x=44248.83 (15100 units apart, matching MTEXT '\\A1;15100' and exactly equal to 1820+2715+6530+1980+1840 from *D326-*D330), joined by horizontal dimension LINE 8CA6. DIMDOT INSERTs 8CA7/8CA8 and three DEFPOINTS POINTs (8CAA-8CAC) complete the block, and the x-endpoints exactly match the outer extents of the *D326/*D330 chain, confirming this is the overall/summary dimension for that run.",
+      "rule": "A *D-prefixed anonymous block name combined with DIM-layer LINE/INSERT geometry, DEFPOINTS POINT entities, and an MTEXT value that equals the sum of an adjacent chained dimension series is the fingerprint of an overall/summary associative dimension, not wall geometry.",
+      "counterfactual": "If the 15100-unit MTEXT value did not equal the sum of the neighboring dimension chain and instead sat on a wall layer without DIM scaffolding, it would suggest a single long wall run rather than a summary dimension.",
+      "uncertainty": "This projection confirms the numeric sum coincidentally/structurally matches the *D326-*D330 chain but cannot verify the formal DIMENSION-entity linkage (e.g. shared defpoint anchors) that AutoCAD would use to associate them, since that requires the host layout's DIMENSION objects."
+    }
+  },
+  {
+    "unit_id": "defannot-d332-38",
+    "def": "*D332",
+    "role": "치수캐시",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "Anonymous dimension block *D332 (DIM layer, DEFPOINTS points, _ArchTick arrowheads, MTEXT '240') with a 5-LINE jog scaffold for a short 240-unit span -- a dimension cache, not a wall.",
+    "rationale": {
+      "evidence": "11 entities on DIM/DEFPOINTS layers: vertical witness LINEs 8CAD/8CAE and jog LINEs 8CAF/8CB0 bracket horizontal dimension LINE 8CB1 (240 units, matching MTEXT '\\A1;240'), the same shoulder-jog pattern seen in *D320/*D322/*D325. Two _ArchTick INSERTs (8CB2/8CB3) and three DEFPOINTS POINTs (8CB5-8CB7) complete the block.",
+      "rule": "The 5-LINE jog variant fingerprints as an associative dimension block whenever the MTEXT numeric value is small enough that AutoCAD must extend witness/dimension lines outward to fit arrowheads and text -- a scale artifact of dimensioning, not extra wall segments.",
+      "counterfactual": "If the jog LINEs extended asymmetrically beyond a small-dimension shoulder, or if DEFPOINTS/_ArchTick scaffolding were absent, this would instead suggest genuine wall or door-frame geometry.",
+      "uncertainty": "Cannot confirm whether the 240-unit value represents a door/window jamb offset or another small architectural feature, since the dimensioned object itself is outside this block-level projection."
+    }
+  },
+  {
+    "unit_id": "defannot-d333-39",
+    "def": "*D333",
+    "role": "치수캐시",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "Anonymous dimension block *D333 (DIM layer, DEFPOINTS points, _ArchTick arrowheads, MTEXT '1500') -- a linear dimension cache, not a wall.",
+    "rationale": {
+      "evidence": "9 entities on DIM/DEFPOINTS layers: vertical witness LINEs 8CB8 and 8CB9 sit at x=44488.83 and x=45988.83 (1500 units apart, matching MTEXT '\\A1;1500'), joined by horizontal dimension LINE 8CBA. Two _ArchTick INSERTs (8CBB/8CBC) and three DEFPOINTS POINTs (8CBE-8CC0) match the standard 9-entity template, with x=44488.83 shared with *D332's right jog boundary, suggesting a chained series.",
+      "rule": "A *D-prefixed anonymous block name combined with DIM-layer LINE/INSERT geometry, DEFPOINTS POINT entities, and a matching MTEXT field code fingerprints an associative linear dimension block regardless of chain position or arrowhead style.",
+      "counterfactual": "Without the DEFPOINTS/_ArchTick/MTEXT scaffolding, this 1500-unit vertical LINE pair could be mistaken for two parallel wall faces on its own.",
+      "uncertainty": "Cannot verify whether *D332, *D333, and *D334 are formally chained into one continuous dimension string via shared DIMENSION-entity defpoints, since that linkage lives outside this per-block projection."
+    }
+  },
+  {
+    "unit_id": "defannot-d334-40",
+    "def": "*D334",
+    "role": "치수캐시",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "Anonymous dimension block *D334 (DIM layer, DEFPOINTS points, _ArchTick arrowheads, MTEXT '80') with a 5-LINE jog scaffold for a very short 80-unit span -- a dimension cache, not a wall.",
+    "rationale": {
+      "evidence": "11 entities on DIM/DEFPOINTS layers: vertical witness LINEs 8CC1/8CC2 and jog LINEs 8CC3/8CC4 bracket horizontal dimension LINE 8CC6 (80 units, matching MTEXT '\\A1;80'), reproducing the same shoulder-jog pattern as *D320/*D322/*D325/*D332. Two _ArchTick INSERTs (8CC7/8CC8) and three DEFPOINTS POINTs (8CC9-8CCB) complete the block.",
+      "rule": "The 5-LINE jog variant fingerprints as an associative dimension block whenever the MTEXT numeric value is small enough that AutoCAD must extend witness/dimension lines outward to fit arrowheads and text -- a scale artifact of dimensioning, not extra wall segments.",
+      "counterfactual": "If the jog LINEs were asymmetric or connected onward to unrelated geometry past the dimension midpoint, or if DEFPOINTS/tick scaffolding were absent, this would instead suggest genuine wall or trim geometry.",
+      "uncertainty": "Cannot confirm whether this 80-unit value (matching *D322's value elsewhere in the shard) reflects a recurring small architectural module or is coincidental, since cross-block semantic comparison requires the full drawing context."
+    }
+  }
+]

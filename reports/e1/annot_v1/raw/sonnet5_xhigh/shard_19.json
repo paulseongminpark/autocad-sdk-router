@@ -1,0 +1,323 @@
+[
+  {
+    "unit_id": "defannot-x-0-phg1200-361",
+    "def": "X-평면도(기본형)$0$phg1200",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.15,
+    "wall_line_handles": [
+      {"handle": "7D1B", "reason": "near full-width horizontal line at window head height"},
+      {"handle": "7D1F", "reason": "near full-width horizontal line resembling a long straight run"},
+      {"handle": "7D2C", "reason": "near full-width sill-level horizontal line"}
+    ],
+    "notes": "Window frame/sash assembly on dedicated WIN layer; repeated full-width parallel lines are mullions/sash bars, not a wall.",
+    "rationale": {
+      "evidence": "All 22 entities sit on a single X-...$WIN layer, and the sampled LINE entities repeat at multiple parallel y-offsets (0,40,60,100,200) spanning nearly the full 1160mm width, which is the classic plan-view signature of a window frame with several sash/mullion bars rather than a single wall run; the LWPOLYLINE entities (5-6 vertices) likely trace glazing panes or frame corners.",
+      "rule": "A dedicated *WIN layer plus several parallel full-span lines at evenly spaced offsets indicates a window/mullion assembly; genuine wall lines are normally a single parallel pair (inner/outer face) rather than 4+ evenly stacked lines.",
+      "counterfactual": "If the layer name lacked the WIN suffix and only two parallel lines existed at a spacing matching a standard wall thickness (100-300mm) with no intermediate mullion lines, this would read as a wall segment instead.",
+      "uncertainty": "Without the parent drawing's wall layer list or the insertion context (is this nested inside a wall block or floating in an opening?), it cannot be confirmed whether this window sits within a masonry or curtain-wall opening."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-pkdr750190-362",
+    "def": "X-평면도(기본형)$0$pkdr750190",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.08,
+    "wall_line_handles": [
+      {"handle": "4117", "reason": "long vertical jamb line paired with a parallel line 30mm away"},
+      {"handle": "4118", "reason": "parallel jamb line forming a thin double-line strip"},
+      {"handle": "4123", "reason": "long vertical frame line ~690mm"}
+    ],
+    "notes": "Door leaf/frame block on DOOR layer with jamb lines and multiple small hardware polylines; parallel gaps are too narrow for wall thickness.",
+    "rationale": {
+      "evidence": "entity_count=25 sits entirely on the X-...$DOOR layer; the LINE entities form pairs of long near-vertical lines (e.g. x=-20 and x=-50, spanning y=750-1420) only 30mm apart, and the many small LWPOLYLINE shapes (3-12 vertices) are consistent with door leaf, hinge, and handle detailing rather than wall fill.",
+      "rule": "Parallel line pairs with a gap far below the typical interior wall thickness range (roughly 100-200mm) should be read as a door/frame reveal, not a wall, regardless of individual line length.",
+      "counterfactual": "If the parallel-line gap were widened to a standard wall thickness and the layer were an ARCH-WALL style name instead of DOOR, the same geometric pattern would flip to a wall classification.",
+      "uncertainty": "The exact door swing direction and whether this leaf sits in an exterior or partition wall cannot be determined without the arc/swing entity, which is not present among the sampled entities."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-pkdr750190-1-363",
+    "def": "X-평면도(기본형)$0$pkdr750190-1",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.08,
+    "wall_line_handles": [
+      {"handle": "6CCC", "reason": "long vertical jamb line paired 30mm from a twin line"},
+      {"handle": "6CCD", "reason": "parallel jamb line forming a thin double-line strip"},
+      {"handle": "6CD8", "reason": "long vertical frame line ~690mm"}
+    ],
+    "notes": "Near-duplicate of pkdr750190 with a taller bounding box (1460 vs 1420); same DOOR-layer jamb/hardware pattern.",
+    "rationale": {
+      "evidence": "Identical entity histogram (LINE=8, LWPOLYLINE=17) and identical DOOR layer to definition 2, with the same pattern of paired near-vertical lines 30mm apart (e.g. x=-20/-50); only the bbox upper bound differs (1460 vs 1420), suggesting a resized variant of the same door family.",
+      "rule": "When two block definitions share an entity histogram, layer, and line-spacing pattern but differ only in overall extent, treat them as size variants of the same non-wall component type rather than re-deriving the role from scratch.",
+      "counterfactual": "A materially different vertex count or a new layer assignment (e.g., moving to a WALL-named layer) would break the variant relationship and require independent re-classification.",
+      "uncertainty": "It is not possible to tell from this projection alone whether the 40mm height difference reflects a different door height code or a drafting duplication error."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-psd700-2-364",
+    "def": "X-평면도(기본형)$0$PSD700_2",
+    "role": "심볼",
+    "wall_likelihood": 0.03,
+    "wall_line_handles": [],
+    "notes": "Tiny 5-entity STL-layer group (arc + diagonal line + 3 small polylines) reads as a door swing/leaf symbol fragment, not a wall.",
+    "rationale": {
+      "evidence": "Only 5 entities total: one ARC, one diagonal LINE running corner-to-corner of the bbox (-330,30)->(243.834,361.303), and three 4-vertex LWPOLYLINEs; this small mixed set combining exactly one arc with one diagonal line is the standard plan-view convention for a door leaf drawn open with its swing arc, rather than any wall or furniture fill.",
+      "rule": "A handful of entities combining exactly one arc with one diagonal (non-orthogonal) line, on a layer whose suffix doesn't match FUR/DOOR/WIN conventions, generally signals a compact symbol fragment rather than structural or furniture content.",
+      "counterfactual": "If the diagonal line were replaced by two long orthogonal parallel lines and the arc were absent, this would more plausibly represent a short wall stub instead of a swing symbol.",
+      "uncertainty": "The STL layer suffix does not match any layer seen elsewhere in this shard, so its exact semantic meaning (steel? sill? a project-specific code?) cannot be confirmed from this projection alone."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-sb1703-1500-365",
+    "def": "X-평면도(기본형)$0$SB1703 1500",
+    "role": "가구",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "1312-entity FUR-layer block dominated by SPLINE/ARC curves (814 splines, 164 arcs) — a large upholstered furniture item (sofa/bed), not wall geometry.",
+    "rationale": {
+      "evidence": "entity_count=1312 with a dxf_name histogram dominated by SPLINE=814 and ARC=164 plus ELLIPSE=12, all on the single X-...$FUR layer; the sampled LINE entities are short (tens of mm) and irregular, consistent with cushion seams and upholstery stitching detail rather than any structural line work.",
+      "rule": "A single FUR-layer definition with an overwhelming majority of curve entities (SPLINE/ARC/ELLIPSE) relative to straight LINE entities is characteristic of upholstered furniture rendered in plan, and should be scored near-zero for wall likelihood regardless of entity count.",
+      "counterfactual": "If the curve-heavy geometry were instead a small minority and long straight parallel LINE pairs dominated the layer, the classification would shift toward a wall or built-in furniture edge.",
+      "uncertainty": "The name 'SB1703 1500' suggests a specific catalog model and 1500mm dimension, but the exact furniture type (sofa vs. bed vs. sectional) cannot be confirmed without a title-block or text label, which is absent from this projection."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-sta-t-366",
+    "def": "X-평면도(기본형)$0$sta-t",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.18,
+    "wall_line_handles": [
+      {"handle": "79BB", "reason": "1200mm-long straight line at outer edge of a tread row"},
+      {"handle": "79BF", "reason": "1200mm-long parallel line one step down, matching prior spacing"},
+      {"handle": "79C3", "reason": "repeated long straight run at regular ~260mm interval"}
+    ],
+    "notes": "STA/SYM/NON-layer stair-flight plan: repeated tread nosing lines ~260mm apart (standard tread depth), not a stacked wall series.",
+    "rationale": {
+      "evidence": "60 entities split across DEFPOINTS-1(1), NON(18), STA(34), SYM(7); the STA-layer LINE entities recur as long (up to 1200mm) horizontal segments at y-values -1300,-1820,-2080,-2340,-2600,-2860,-3120 — a near-constant ~260mm spacing that matches typical stair tread depth rather than wall-to-wall module spacing, and each row is itself split into 3-4 shorter collinear segments (an opening/centerline gap pattern typical of tread nosing plus a centered handrail post gap).",
+      "rule": "A dense stack of long, evenly-spaced parallel lines should first be checked against known building-element pitch dimensions (stair tread ~250-300mm vs. structural bay/parking module 2400mm+) before being scored as a wall series, since regular spacing alone is a weak signal shared by stairs, parking stripes, and repeated walls.",
+      "counterfactual": "If the row spacing matched typical wall-to-wall spans (2000mm+) instead of tread depth, or if the SYM/DEFPOINTS layers were absent and a WALL-named layer carried the geometry, this would flip toward a genuine stacked-wall or corridor interpretation.",
+      "uncertainty": "Because the SYM-layer entities (likely up/down direction arrows typical of stair plans) were not included in the 30-entity sample, their exact shape cannot be verified to confirm the stair-flight interpretation beyond the tread-spacing evidence."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-sta-t-4-367",
+    "def": "X-평면도(기본형)$0$sta-t-4",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.18,
+    "wall_line_handles": [
+      {"handle": "7CA3", "reason": "1200mm-long straight line at outer edge of a tread row"},
+      {"handle": "7CA7", "reason": "parallel long line one step down at regular spacing"},
+      {"handle": "7CB9", "reason": "terminal long run closing the flight at -3380"}
+    ],
+    "notes": "Same stair-flight family as sta-t with one additional tread row (bbox extends to -3380 vs -3120).",
+    "rationale": {
+      "evidence": "Layer histogram and entity mix (DEFPOINTS-1=1, NON=20, STA=38, SYM=7) closely mirror definition 6 but with 6 more entities and a taller bbox (down to y=-3380 vs -3120), consistent with the same tread-row pattern extended by one additional ~260mm step; the sampled STA-layer lines repeat the identical x-break pattern (0/-1200, -1250/-1275, -1325/-1350, -1400/-2600) seen in sta-t.",
+      "rule": "When a family of similarly-named block definitions (sta-t, sta-t-4, sta-t-5) shares layer composition and a repeating row pattern that only grows in count, treat them as a parametric family of the same building element (here, stair flights of different step counts) rather than independent unknowns.",
+      "counterfactual": "A break in the x-position pattern of the tread rows (e.g., a shifted centerline gap) would suggest a genuinely different stair configuration rather than a simple step-count variant.",
+      "uncertainty": "Without a shared parent drawing or naming legend, it is not certain whether the '-4' suffix literally encodes '4 steps' or refers to an unrelated revision index."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-sta-t-5-368",
+    "def": "X-평면도(기본형)$0$sta-t-5",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.18,
+    "wall_line_handles": [
+      {"handle": "7D7D", "reason": "1200mm-long straight line at outer edge of a tread row"},
+      {"handle": "7D81", "reason": "parallel long line one step down at regular spacing"},
+      {"handle": "7D93", "reason": "terminal long run closing the flight at -3380"}
+    ],
+    "notes": "Same stair-flight family as sta-t/sta-t-4; fewer SYM entities (3 vs 7) and one CIRCLE fewer, otherwise same tread pattern.",
+    "rationale": {
+      "evidence": "Layer histogram (DEFPOINTS-1=1, NON=21, STA=40, SYM=3) and bbox (down to y=-3380, same as sta-t-4) again reproduce the same ~260mm-spaced long horizontal tread lines seen in definitions 6-7, with the same characteristic x-axis breaks (0/-1200, -1250/-1275, -1325/-1350, -1400/-2600) on the STA layer.",
+      "rule": "A drop in SYM-layer entity count (7 to 3) while the STA tread-line pattern stays structurally identical suggests the family member differs in symbol/annotation content (e.g., fewer direction arrows) rather than in the underlying architectural element being represented.",
+      "counterfactual": "If the STA-layer line count or spacing pattern diverged instead of just the SYM count, this would indicate a genuinely different stair geometry rather than an annotation-only variant.",
+      "uncertainty": "It cannot be determined from counts alone which specific symbols were dropped (e.g., an up arrow vs. a down arrow) since SYM-layer entities are not present in the 30-entity sample."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-t1-369",
+    "def": "X-평면도(기본형)$0$T1",
+    "role": "가구",
+    "wall_likelihood": 0.04,
+    "wall_line_handles": [],
+    "notes": "FUR-layer block of 30 short (80mm) evenly-spaced parallel lines within a narrow 90x640mm envelope — shelf/closet slat texture, not a wall.",
+    "rationale": {
+      "evidence": "All 33 entities are on the X-...$FUR layer; the sampled LINE entities are short, uniform-length (80mm, from x=10 to x=90) horizontal segments repeating every 20mm down a narrow 90mm-wide, 640mm-tall envelope, which reads as shelf/slat or drawer-front hatching for a built-in furniture unit rather than any wall fabric.",
+      "rule": "Short (well under any standard wall-thickness-to-length ratio), narrow-envelope repeating lines confined to a FUR layer should default to a furniture-texture interpretation, since real wall segments are not normally packed at 20mm intervals across a 90mm-wide strip.",
+      "counterfactual": "If the envelope widened to a plausible room dimension (multiple meters) and the line spacing corresponded to standard wall thickness rather than a repeating decorative pitch, this would indicate a wall system instead.",
+      "uncertainty": "The name 'T1' gives no semantic hint of furniture subtype (wardrobe vs. shelving vs. cabinet), so the exact furniture category beyond 'FUR-layer built-in' cannot be pinned down from this projection."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-wd120900-370",
+    "def": "X-평면도(기본형)$0$wd120900",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.1,
+    "wall_line_handles": [
+      {"handle": "1D17", "reason": "820mm-long line spanning near-full width"},
+      {"handle": "1D18", "reason": "parallel 820mm line only 3mm from the other"}
+    ],
+    "notes": "DOOR-layer swing-door block (ARC + long thin double-line + hardware polylines); the 3mm line gap is a threshold/sill stroke, not a wall face pair.",
+    "rationale": {
+      "evidence": "16 entities on the X-...$DOOR layer include one ARC (swing indicator), a short diagonal jamb LINE, and two long (820mm) near-parallel LINEs at y=80 and y=77 (only 3mm apart), plus a cluster of LWPOLYLINEs with high vertex counts (17, 19) typical of door leaf/hardware detailing.",
+      "rule": "Long parallel lines with a gap far thinner than any realistic wall thickness (here 3mm vs. a 100mm+ wall) should be read as a double-stroke drafting convention for a threshold or sill line, not as the two faces of a wall.",
+      "counterfactual": "Widening that 3mm gap to a standard wall-thickness value while removing the door's ARC and hardware detail would flip this toward a genuine wall/opening jamb reading.",
+      "uncertainty": "Whether this door sits in an exterior or interior partition (which would affect expected wall thickness at the opening) cannot be determined without the surrounding wall geometry from the host drawing."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-wd160750-371",
+    "def": "X-평면도(기본형)$0$wd160750",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.05,
+    "wall_line_handles": [],
+    "notes": "DOOR-layer swing door with diagonal corner-bevel lines (~145mm) rather than long orthogonal runs; low wall-line resemblance.",
+    "rationale": {
+      "evidence": "15 entities on the X-...$DOOR layer include an ARC swing indicator and four short diagonal LINEs (e.g., (727,0)->(750,140), length ~145mm) forming corner miters at both jambs, alongside multiple small LWPOLYLINEs (4-8 vertices) for leaf and hardware detail — none of the LINE entities are long or orthogonal enough to mimic a wall face.",
+      "rule": "Diagonal (non-axis-aligned), short LINE entities paired with an ARC on a DOOR layer are a strong negative signal for wall likelihood, since walls are represented almost exclusively with long orthogonal line pairs.",
+      "counterfactual": "Replacing these diagonal miter lines with a pair of long orthogonal lines spanning the full 750mm width would raise wall likelihood substantially.",
+      "uncertainty": "The precise door swing direction and leaf count (single vs. double swing) cannot be fully confirmed without inspecting the LWPOLYLINE vertex geometry beyond vertex counts."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-wd170750-372",
+    "def": "X-평면도(기본형)$0$wd170750",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.05,
+    "wall_line_handles": [],
+    "notes": "Near-identical structure to wd160750 (same DOOR layer, diagonal miter lines, ARC swing) with a 10mm taller leaf (150 vs 140).",
+    "rationale": {
+      "evidence": "Entity histogram (ARC=1, LINE=4, LWPOLYLINE=10) and DOOR layer match wd160750 almost exactly; sampled diagonal LINEs (727,0)->(750,150) again form short corner miters rather than long orthogonal runs, with only the height dimension (150 vs 140) differing from the previous definition.",
+      "rule": "When entity histogram, layer, and geometric pattern all match a known non-wall definition and only a single dimension differs, classify by the established pattern rather than re-deriving from scratch, while noting the dimension delta in notes.",
+      "counterfactual": "A change in entity histogram (e.g., loss of the ARC or a shift to long orthogonal lines) rather than just a dimension delta would call the door classification into question.",
+      "uncertainty": "Whether the 10mm height difference reflects a genuinely distinct door hardware size or a rounding/drafting variant cannot be determined from geometry alone."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-wd200900-373",
+    "def": "X-평면도(기본형)$0$WD200900",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.1,
+    "wall_line_handles": [
+      {"handle": "410F", "reason": "820mm-long line spanning near-full width"},
+      {"handle": "4110", "reason": "parallel 820mm line only 3mm from the other"}
+    ],
+    "notes": "Same wd120900-style pattern (ARC + long thin double-line + hardware polylines) at a taller 200mm leaf height.",
+    "rationale": {
+      "evidence": "16 entities, ARC=1/LINE=3/LWPOLYLINE=12 on the DOOR layer, reproduce the wd120900 pattern exactly: a diagonal jamb line, two long (820mm) near-parallel lines 3mm apart at y=160/157, and the same high-vertex-count LWPOLYLINE cluster (17, 19 vertices) for hardware.",
+      "rule": "A recurring histogram+layer+line-spacing signature across differently-named door definitions should be treated as one parametric door family, with wall likelihood driven by the same thin-gap-disqualifies-wall logic each time.",
+      "counterfactual": "If the 3mm gap were instead widened to standard wall thickness, this and its sibling definitions would need re-scoring toward wall likelihood.",
+      "uncertainty": "The specific role of the 3mm double-line (threshold strip vs. sill vs. drafting duplication) cannot be distinguished without an elevation view or text annotation."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-wd250900-374",
+    "def": "X-평면도(기본형)$0$wd250900",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.1,
+    "wall_line_handles": [
+      {"handle": "3842", "reason": "820mm-long line spanning near-full width"},
+      {"handle": "3843", "reason": "parallel 820mm line only 3mm from the other"}
+    ],
+    "notes": "Same wd120900/WD200900 family pattern, now at 250mm leaf height, with one extra hardware LWPOLYLINE.",
+    "rationale": {
+      "evidence": "16 entities (ARC=1, LINE=3, LWPOLYLINE=12) on the DOOR layer again show the diagonal jamb line plus two long (820mm) near-parallel lines 3mm apart at y=210/207, matching the same signature as wd120900 and WD200900 with only the y-offset (leaf height) changing.",
+      "rule": "Consistent recurrence of the same thin-double-line-plus-ARC signature across a door family confirms the thin-gap heuristic (gap much smaller than wall thickness implies not a wall) generalizes across the whole size range rather than being coincidental to one instance.",
+      "counterfactual": "A departure from the 3mm gap toward a wall-thickness-scale gap in any one family member would be the specific signal needed to flip that instance's classification.",
+      "uncertainty": "Whether 'wd250900' denotes a 250mm-wide sidelight/transom addition or simply a taller door leaf cannot be confirmed without the drawing's door schedule."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-wd850-375",
+    "def": "X-평면도(기본형)$0$WD850",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.1,
+    "wall_line_handles": [
+      {"handle": "584C", "reason": "770mm-long line spanning most of the width"},
+      {"handle": "584E", "reason": "parallel 790mm line only 3mm offset from the pair above"}
+    ],
+    "notes": "DOOR-layer block with no ARC (no swing shown) — likely a fixed/sliding leaf or frame-only reference, but the thin double-line pattern still reads as non-wall.",
+    "rationale": {
+      "evidence": "12 entities on the DOOR layer with LINE=3, LWPOLYLINE=9 and no ARC in the histogram — unlike the wd120900/WD200900/wd250900 family, this definition never shows a swing arc; the two long lines at y=-0/0 (770mm) and a third at y=-3 (790mm) sit only 3mm apart, reusing the thin-double-line drafting convention seen elsewhere in the DOOR family.",
+      "rule": "Absence of a swing ARC on an otherwise DOOR-layer, hardware-laden block suggests a fixed, sliding, or frame-reference variant rather than a hinged leaf, but the same thin-parallel-line heuristic (gap much smaller than wall thickness) still rules out a wall reading regardless of swing presence.",
+      "counterfactual": "If an ARC entity were present and the line gap matched the rest of the wd-family exactly, this would be classified as an ordinary hinged door like its siblings rather than flagged as a possible fixed-leaf variant.",
+      "uncertainty": "Without the ARC or a name suffix indicating leaf type, it cannot be determined whether WD850 is a sliding door, a fixed panel, or simply a door leaf captured mid-family without its swing arc sampled."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-376",
+    "def": "X-평면도(기본형)$0$국기계양대",
+    "role": "심볼",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "17-entity block of short lines + one circle on default layer 0, forming a small flagpole-base icon (~64x140mm) — a site-plan symbol, not building fabric.",
+    "rationale": {
+      "evidence": "All 17 entities sit on the generic layer '0' rather than any thematic FUR/DOOR/WIN layer, and every LINE is short (under 65mm) forming a compact right-angle outline around a single CIRCLE (radius 15) at the top — consistent with a small flagpole/flagstand icon drawn for a site or roof plan rather than any scaled building element.",
+      "rule": "Entities placed on the generic default layer '0' with a small (under ~150mm) bounding box and a mix of short orthogonal lines around one circle typically indicate a standalone site/equipment icon rather than a plan partial or furniture item, since real architectural fabric is normally assigned to a named thematic layer.",
+      "counterfactual": "If this geometry instead sat on a named structural/furniture layer and scaled to typical wall or furniture dimensions (meters, not tens of mm), it would no longer read as a small icon symbol.",
+      "uncertainty": "Because layer '0' carries no semantic label, the exact real-world scale/placement convention for this flagpole symbol (e.g., is it drawn true-to-scale or as an oversized icon) cannot be confirmed from this projection."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-300-377",
+    "def": "X-평면도(기본형)$0$무동력휀300",
+    "role": "심볼",
+    "wall_likelihood": 0.06,
+    "wall_line_handles": [
+      {"handle": "7BDE", "reason": "650mm straight line through symbol center, could look wall-length in isolation"}
+    ],
+    "notes": "8-entity circular roof-vent symbol (circle + cross lines) on 무동력흡출기/CON layers — a mechanical equipment icon, not a wall.",
+    "rationale": {
+      "evidence": "8 entities split across two equipment-named layers (무동력흡출기 / 무동력흡출기CON — 'non-powered exhaust unit'), with a perfectly symmetric bbox (-325,-325 to 325,325), a central CIRCLE (radius 150), and both an orthogonal cross (LINE pair through center) and a diagonal X cross (LINE pair) — the classic plan-view convention for a roof turbine/passive ventilator symbol.",
+      "rule": "A small, perfectly symmetric entity set combining a circle with both an orthogonal and a diagonal line pair through its center, on layers named for mechanical equipment, should be read as an equipment icon regardless of any individual line's length matching a wall-scale dimension.",
+      "counterfactual": "If the circle were absent and only the long orthogonal lines remained, spaced at a wall-thickness-consistent offset, the pattern would more plausibly suggest a wall corner rather than a vent symbol.",
+      "uncertainty": "Whether this symbol is drawn true-to-scale (300mm-class vent) or enlarged for visibility on the roof plan cannot be confirmed without the parent drawing's scale/legend."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-378",
+    "def": "X-평면도(기본형)$0$세면대_공통",
+    "role": "가구",
+    "wall_likelihood": 0.07,
+    "wall_line_handles": [
+      {"handle": "58E5", "reason": "~499mm straight line forming the basin's back edge"},
+      {"handle": "58F0", "reason": "~432mm straight line forming the basin's side edge"}
+    ],
+    "notes": "191-entity FUR-layer washbasin block dominated by SPLINE/ARC curves (139 splines, 16 arcs) describing a curved basin outline; the few long straight lines are basin edges, not walls.",
+    "rationale": {
+      "evidence": "191 entities all on the X-...$FUR layer, with SPLINE=139 and ARC=16 dominating the histogram — consistent with a curved washbasin bowl outline — while the 34 LINE entities include a few longer straight runs (e.g., ~499mm and ~432mm) that most plausibly form the basin's rectangular back-counter edges rather than any wall face.",
+      "rule": "When a FUR-layer definition's entity mix is spline/arc-dominated with only a handful of straight lines near furniture-scale lengths (hundreds of mm, not multi-meter runs), the straight lines should be read as fixture edges, not walls, even if their length superficially overlaps short wall-segment ranges.",
+      "counterfactual": "If the straight LINE entities instead dominated the count and the curves were absent, with lengths reaching multi-meter room-scale spans, this would suggest a wall outline instead of a basin.",
+      "uncertainty": "The unusually large absolute coordinates (bbox around x=765000, y=-195000) suggest this block definition may have been captured from an exploded/inserted instance at its world location rather than reset to a local origin, so its true local geometry relative to a standard insertion base point cannot be fully verified from this projection."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-379",
+    "def": "X-평면도(기본형)$0$수전",
+    "role": "심볼",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "33-entity ARC/CIRCLE-dominated equipment symbol on 'A06-시설물-설비' (facility/equipment) layer with POINT reference markers — a faucet icon, not building fabric.",
+    "rationale": {
+      "evidence": "33 entities on a single facility-equipment layer (A06-시설물-설비) are dominated by ARC=19 and CIRCLE=3 with only 9 short LINEs (longest under 35mm) and 2 POINT entities, which is the standard AutoCAD convention for small equipment/fixture symbols where POINT entities mark insertion or leader-reference locations.",
+      "rule": "A small bbox (well under a meter) combined with ARC/CIRCLE dominance, short LINE entities, and POINT markers on an explicitly equipment-named layer should be classified as a symbol, since real furniture or wall fabric rarely relies on POINT entities for its own geometry.",
+      "counterfactual": "If the POINT entities and equipment-layer name were replaced by long straight lines on a wall-named layer at architectural scale, this would no longer read as a small fixture symbol.",
+      "uncertainty": "The exact faucet type (wall-mounted vs. deck-mounted) cannot be determined from the arc/circle geometry alone without a matching elevation or a text label."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-1-380",
+    "def": "X-평면도(기본형)$0$수전-1",
+    "role": "심볼",
+    "wall_likelihood": 0.03,
+    "wall_line_handles": [],
+    "notes": "Companion faucet symbol variant, drawn onto a layer literally named after the block ('수전') rather than a standard facility-code layer; short arcs/lines/polylines only.",
+    "rationale": {
+      "evidence": "15 entities (ARC=4, CIRCLE=1, LINE=4, LWPOLYLINE=6) sit on a layer named '수전' (faucet) — the same word as the block name — rather than the 'A06-시설물-설비' facility-code layer used by definition 19, and all LINE entities are short (under 90mm) and diagonal, matching a small fixture icon rather than any wall fabric.",
+      "rule": "When a layer name duplicates the block/definition name itself (instead of following a project facility-code convention), treat it as an ad hoc or manually-drawn instance of the same symbol family rather than a structurally distinct element type.",
+      "counterfactual": "If this geometry instead appeared on a named structural layer at multi-meter scale, or lost its ARC/CIRCLE dominance in favor of long orthogonal lines, it would no longer read as a faucet symbol variant.",
+      "uncertainty": "The large absolute bbox coordinates (x≈33542-33558, y≈-11143 to -11055) suggest this may be an exploded/captured instance at its world insertion point rather than a locally-normalized definition, so its relationship to definition 19 (e.g., simplified vs. detailed variant) cannot be fully confirmed from this projection."
+    }
+  }
+]

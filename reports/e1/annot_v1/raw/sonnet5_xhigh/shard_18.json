@@ -1,0 +1,300 @@
+[
+  {
+    "unit_id": "defannot-x-0-dw1600-341",
+    "def": "X-평면도(기본형)$0$dw1600",
+    "role": "치수캐시",
+    "wall_likelihood": 0.15,
+    "wall_line_handles": [
+      {"handle": "1D32", "reason": "full-width line spans entire block extent, resembles a header/sill line"}
+    ],
+    "notes": "Width-dimension annotation block (1600) on dedicated WID layer; not a physical wall.",
+    "rationale": {
+      "evidence": "All 53 entities sit on a single dedicated 'WID' layer, and the geometry repeats a stereotyped pattern: a full-span line, two ~4mm-gap parallel line pairs each closed by a short perpendicular tick, and small 4/8-vertex LWPOLYLINE shapes that read as arrowhead/tick markers. The 4mm gap between the paired lines is far too thin to be a wall (typical wall thickness runs 100-300mm), and the pattern repeats twice within the block at different y-offsets, consistent with a witness-line/dimension-line construct rather than a structural boundary.",
+      "rule": "When a block's entities are concentrated on a single non-structural layer (here 'WID') and show a repeated thin double-line-plus-perpendicular-tick motif with sub-10mm gaps, treat it as a dimension/annotation cache rather than wall geometry, regardless of one long full-span line being present.",
+      "counterfactual": "If the paired lines were 100-300mm apart and ran the full length of the block on a wall-named layer (e.g. A-WALL), this would flip to a plan/wall classification; the full-span line at y=0 is the only element ambiguous enough to keep wall_likelihood non-zero.",
+      "uncertainty": "The projection gives no access to the layer's true semantic meaning or to how this block is inserted/scaled in the parent drawing, so it cannot be confirmed whether 'WID' literally denotes a width-dimension layer or something else entirely."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-dw2100-342",
+    "def": "X-평면도(기본형)$0$dw2100",
+    "role": "치수캐시",
+    "wall_likelihood": 0.15,
+    "wall_line_handles": [
+      {"handle": "53BC", "reason": "full-width line spans entire block extent, resembles a header/sill line"}
+    ],
+    "notes": "Width-dimension annotation block (2100), same WID-layer family as dw1600.",
+    "rationale": {
+      "evidence": "Same 53-entity, single-layer ('WID') composition as the 1600 variant, differing only in the scaled x-extent (bbox width ~2010 vs ~1510), with the identical 4mm-gap double-line-plus-tick motif repeated twice and small LWPOLYLINE markers at the ends of each pair.",
+      "rule": "When a block's entities are concentrated on a single non-structural layer (here 'WID') and show a repeated thin double-line-plus-perpendicular-tick motif with sub-10mm gaps, treat it as a dimension/annotation cache rather than wall geometry.",
+      "counterfactual": "If the paired lines had a wall-typical 100-300mm gap on a wall-named layer instead of 'WID', this would flip to a plan/wall classification.",
+      "uncertainty": "This block shares its exact structure with dw1600/DW2700v, so this projection alone cannot rule out that all three are parametric variants of one detail block rather than independently authored content."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-dw2700v-343",
+    "def": "X-평면도(기본형)$0$DW2700v",
+    "role": "치수캐시",
+    "wall_likelihood": 0.15,
+    "wall_line_handles": [
+      {"handle": "3F24", "reason": "full-width line spans entire block extent, resembles a header/sill line"}
+    ],
+    "notes": "Width-dimension annotation block (2700, 'v' variant), same WID-layer family as dw1600/dw2100.",
+    "rationale": {
+      "evidence": "Same single-layer 'WID' composition scaled to a ~2610-unit span, with the same twice-repeated 4mm double-line-plus-tick motif; the 'v' suffix in the name (versus plain 'dw1600'/'dw2100') suggests a naming variant of the same width-dimension family rather than structurally different content.",
+      "rule": "When a block's entities are concentrated on a single non-structural layer (here 'WID') and show a repeated thin double-line-plus-perpendicular-tick motif with sub-10mm gaps, treat it as a dimension/annotation cache rather than wall geometry.",
+      "counterfactual": "If the 'v' variant introduced a genuinely different geometry (e.g. an actual double-line wall segment at 100-300mm spacing), the role would need to shift to 평면 부분도; the sampled geometry does not show that.",
+      "uncertainty": "The meaning of the 'v' suffix cannot be determined from this projection, so it is unclear whether it denotes a vertical orientation, a version, or another parameter."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-esp-344",
+    "def": "X-평면도(기본형)$0$esp",
+    "role": "심볼",
+    "wall_likelihood": 0.03,
+    "wall_line_handles": [],
+    "notes": "Evacuation-opening (피난구) cross-mark symbol, not furniture or wall.",
+    "rationale": {
+      "evidence": "6 of 11 entities sit on layer '피난구' (evacuation opening) and form two diagonal X-crossing line pairs (handles 1D70/1D71 and 1D74/1D75) plus closing LWPOLYLINE rectangles — the classic Korean floor-plan pictogram for a refuge-balcony break-away panel. The remaining entities on 'FUR'/'MC' are small 4-vertex rectangles, likely frame/hinge markers rather than furniture bulk.",
+      "rule": "A dominant '피난구' layer combined with diagonal X-shaped line pairs is a reliable signature for an evacuation-opening symbol; classify as 심볼 even when a minority of entities sit on a furniture-like layer.",
+      "counterfactual": "If the FUR-layer entities dominated entity count and the X-cross lines were absent, this would read as furniture instead of an evacuation symbol.",
+      "uncertainty": "Cannot confirm from this projection whether the symbol denotes an actual openable panel or is purely a labeling pictogram, since no TEXT/attribute entity is present to disambiguate."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-ev13k-345",
+    "def": "X-평면도(기본형)$0$ev13k",
+    "role": "심볼",
+    "wall_likelihood": 0.2,
+    "wall_line_handles": [
+      {"handle": "7FD3", "reason": "parallel line at x=780, 50mm from x=830 pair, resembles thin wall/partition"},
+      {"handle": "7FDC", "reason": "parallel counterpart at x=830 forming 50mm-gap double-line"}
+    ],
+    "notes": "13-person evacuation elevator car symbol (ELEV layer).",
+    "rationale": {
+      "evidence": "A TEXT entity reads '13인승(피난용)' (13-person, evacuation use) on a dedicated DEFTXT layer, and 45 of 47 entities sit on 'ELEV', forming a rectangular nested outline (e.g. lines at x=780 and x=830) consistent with an elevator cab plan symbol rather than a room or structural wall.",
+      "rule": "A TEXT label naming a passenger capacity plus a dedicated ELEV/EV-prefixed layer is a strong, transferable signal for an elevator-car symbol; classify as 심볼 even though the outline lines are straight and orthogonal like walls.",
+      "counterfactual": "The 50mm gap between the outline line pairs (7FD3/7FDC) is thin enough to pass as a partition wall; if this block sat on a generic 'A-WALL' layer instead of 'ELEV', wall_likelihood would be substantially higher.",
+      "uncertainty": "Cannot determine from this projection whether the ELEV-layer lines coincide with the actual elevator shaft wall in the real building or are purely a diagrammatic car outline drawn inside the shaft."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-ev16k-346",
+    "def": "X-평면도(기본형)$0$ev16k",
+    "role": "심볼",
+    "wall_likelihood": 0.2,
+    "wall_line_handles": [
+      {"handle": "8007", "reason": "parallel line at x=880, 50mm from x=930 pair, resembles thin wall/partition"},
+      {"handle": "8010", "reason": "parallel counterpart at x=930 forming 50mm-gap double-line"}
+    ],
+    "notes": "16-person elevator car symbol (ELEV layer), scaled-up variant of ev13k.",
+    "rationale": {
+      "evidence": "TEXT '16인승' on DEFTXT layer plus 45/47 entities on ELEV layer forming the same nested-rectangle car outline pattern as the 13-person variant, scaled up (bbox extends to y=2525 vs 2190), with line pairs at x=880/930 (50mm gap).",
+      "rule": "A TEXT label naming a passenger capacity plus a dedicated ELEV/EV-prefixed layer is a strong, transferable signal for an elevator-car symbol; classify as 심볼.",
+      "counterfactual": "If this block instead sat on a generic wall layer with no capacity TEXT, wall_likelihood would need to rise given the identical 50mm parallel-line geometry.",
+      "uncertainty": "Cannot determine from this projection whether the ELEV-layer lines coincide with the actual elevator shaft wall in the real building or are purely a diagrammatic car outline."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-ev16x2k-347",
+    "def": "X-평면도(기본형)$0$ev16x2k",
+    "role": "심볼",
+    "wall_likelihood": 0.2,
+    "wall_line_handles": [
+      {"handle": "803B", "reason": "parallel line at x=880, 50mm from x=930 pair, resembles thin wall/partition"},
+      {"handle": "8044", "reason": "parallel counterpart at x=930 forming 50mm-gap double-line"}
+    ],
+    "notes": "16-person emergency-use elevator symbol, likely a paired/twin car configuration.",
+    "rationale": {
+      "evidence": "TEXT '16인승(비상용)' (16-person, emergency use) plus 91/94 entities on ELEV layer; the bbox x-range [-1220,3575] is roughly double a single-car width, and entity_count (94) is roughly double the single ev16k block (47), consistent with a twin/paired elevator-car symbol rather than a single cab or a wall segment.",
+      "rule": "A TEXT label naming a passenger capacity plus a dedicated ELEV/EV-prefixed layer is a strong, transferable signal for an elevator-car symbol; classify as 심볼 regardless of whether the block represents one or two cabs.",
+      "counterfactual": "If entity_count and bbox width matched a single ev16k car exactly rather than doubling, this would read as one elevator, not a paired configuration; that ambiguity affects notes but not the role.",
+      "uncertainty": "Cannot confirm from the 30-entity sample whether this is truly two adjacent cabs sharing one block or one unusually wide cab, since only the first 30 of 94 entities are visible."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-fsd1120-348",
+    "def": "X-평면도(기본형)$0$FSD1120",
+    "role": "심볼",
+    "wall_likelihood": 0.08,
+    "wall_line_handles": [],
+    "notes": "Single door-leaf swing symbol (DOOR layer), width 1120.",
+    "rationale": {
+      "evidence": "7 entities all on 'DOOR' layer: one ARC (door swing arc), three LWPOLYLINE (door leaf/frame outlines), and three LINE forming the jamb/sill lines (y=0,60,100) — the canonical minimal door-swing symbol composition.",
+      "rule": "A small entity count concentrated on a DOOR-named layer with exactly one ARC plus a handful of LINE/LWPOLYLINE jamb elements is diagnostic of a single door-leaf swing symbol; classify as 심볼.",
+      "counterfactual": "Absence of the ARC (swing indicator) would make this ambiguous with a simple wall-opening line, lowering confidence in the door classification.",
+      "uncertainty": "Cannot verify the door's actual swing direction or fire rating (the 'FSD' prefix may imply a fire/smoke door) since no TEXT or attribute entity is present."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-fsd1500-2-349",
+    "def": "X-평면도(기본형)$0$FSD1500-2",
+    "role": "심볼",
+    "wall_likelihood": 0.08,
+    "wall_line_handles": [],
+    "notes": "Double door-leaf swing symbol (A-DOOR layer), width 1500.",
+    "rationale": {
+      "evidence": "9 entities on 'A-DOOR' layer including two ARC (two swing arcs, suggesting a double-leaf door) and three LINE forming stepped jamb lines (y=0,-40,-100), matching the fsd1120 pattern but with an extra arc and LWPOLYLINE, consistent with a double-leaf variant.",
+      "rule": "A small entity count concentrated on a DOOR-named layer with one or more ARC swing indicators plus jamb LINE/LWPOLYLINE elements is diagnostic of a door swing symbol; classify as 심볼.",
+      "counterfactual": "A single ARC instead of two would indicate a single-leaf door rather than a double-leaf configuration.",
+      "uncertainty": "Cannot determine the exact leaf split ratio (e.g. equal vs unequal double doors) from the sampled geometry alone."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-fsdfsdf321-350",
+    "def": "X-평면도(기본형)$0$FSDFSDF321",
+    "role": "심볼",
+    "wall_likelihood": 0.03,
+    "wall_line_handles": [],
+    "notes": "Small facility-equipment fixture symbol (A06-시설물-설비 layer).",
+    "rationale": {
+      "evidence": "All 5 entities sit on 'A06-시설물-설비' (facility/equipment) layer within a tiny 100x33-unit bbox, combining a CIRCLE(radius 50) with two short parallel LINE and two LWPOLYLINE — consistent with a small floor/wall-mounted fixture icon (e.g. valve, outlet, or sensor) rather than a room element.",
+      "rule": "A tiny bbox on a '시설물-설비' (facility/equipment) layer with a mix of CIRCLE and small closed polylines indicates a point-fixture symbol; classify as 심볼.",
+      "counterfactual": "If the bbox were room-scale (multiple meters) instead of ~100mm, this would more likely be a partial plan rather than a point symbol.",
+      "uncertainty": "The garbled name 'FSDFSDF321' gives no semantic hint of which specific fixture type this represents."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-fu1-351",
+    "def": "X-평면도(기본형)$0$FU1",
+    "role": "가구",
+    "wall_likelihood": 0.05,
+    "wall_line_handles": [],
+    "notes": "Furniture item on FUR layer with complex curved geometry.",
+    "rationale": {
+      "evidence": "115 entities almost entirely on 'FUR' layer, dominated by SPLINE(45)/ARC(31)/ELLIPSE(23) with only 16 LINE — a curve-heavy composition typical of a decorative furniture silhouette rather than a rectilinear architectural element; the bbox has a nonzero z-extent (0 to 36.5), hinting at a pseudo-3D or elevation-style furniture rendering.",
+      "rule": "Entities dominated by SPLINE/ARC/ELLIPSE on a 'FUR' layer, with little or no straight-line wall-like structure, are furniture; classify as 가구.",
+      "counterfactual": "If LINE entities dominated instead and formed parallel wall-thickness pairs, this would need re-examination as a plan fragment despite the FUR layer name.",
+      "uncertainty": "Cannot identify the specific furniture type (e.g. chair vs plant vs lamp) from geometry class counts alone without visual rendering."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-hd1050-352",
+    "def": "X-평면도(기본형)$0$hd1050",
+    "role": "심볼",
+    "wall_likelihood": 0.05,
+    "wall_line_handles": [],
+    "notes": "Door symbol with detailed glazing/hatch pattern (DOOR layer), width 1050.",
+    "rationale": {
+      "evidence": "244 entities on 'DOOR' layer, dominated by LINE(210) and ELLIPSE(28) clustered into a tight ~10mm sub-region (e.g. handles 1C12-1C2D), consistent with a cross-hatch or glazing-bar detail pattern inside a door leaf, plus one large 38-vertex LWPOLYLINE likely tracing the leaf/frame outline.",
+      "rule": "A DOOR-layer block with an unusually high LINE count clustered in a small sub-region relative to the overall bbox indicates surface detailing (hatch/glazing) within a door symbol, not a wall; classify as 심볼.",
+      "counterfactual": "If the many short LINE entities were spread evenly across the whole bbox at consistent parallel offsets rather than clustered, that would look more like a hatch fill for a different element (e.g. a floor finish), changing the read.",
+      "uncertainty": "Cannot confirm from the 30-entity sample whether the dense line cluster represents glazing bars, a hinge detail, or a hardware icon, since only a small sub-region of the 244 entities is visible."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-hobgas19-353",
+    "def": "X-평면도(기본형)$0$HOBGAS19",
+    "role": "심볼",
+    "wall_likelihood": 0.03,
+    "wall_line_handles": [],
+    "notes": "Gas hob/stovetop appliance symbol (KIT layer).",
+    "rationale": {
+      "evidence": "30 entities on 'KIT' (kitchen) layer, with 12 CIRCLE of varying radii (burner rings/knobs) and 16 LWPOLYLINE forming the appliance footprint and grate outlines — a standard gas-range plan icon composed of concentric/paired circles for burners.",
+      "rule": "Multiple same-family CIRCLE entities (burner rings) on a KIT layer is diagnostic of a kitchen-appliance symbol; classify as 심볼 rather than 가구, reserving 가구 for FUR-layer curved furniture.",
+      "counterfactual": "If these circles sat on a 'FUR' layer instead of 'KIT', a 가구 classification would be more defensible under the layer-based rule.",
+      "uncertainty": "Cannot verify the burner count/arrangement corresponds to a real '19'-suffixed model without a manufacturer spec reference."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-ic708-354",
+    "def": "X-평면도(기본형)$0$IC708",
+    "role": "가구",
+    "wall_likelihood": 0.05,
+    "wall_line_handles": [],
+    "notes": "Bathroom/furniture fixture on FUR layer at real-world (non-origin) coordinates.",
+    "rationale": {
+      "evidence": "100 entities on 'FUR' layer with ARC(32)/LINE(52)/SPLINE(14)/CIRCLE(2), and the bbox sits at large absolute coordinates (~284000, ~50000) rather than near origin, suggesting this projection was sampled from an inserted instance rather than the raw definition origin; the curved/arced outline (e.g. handles 5F8D-5FA7) matches a basin/fixture silhouette.",
+      "rule": "FUR-layer entities with an arc-and-line rim outline plus curve detail (splines) but no wall-thickness double-line pattern indicate a fixture/furniture item; classify as 가구.",
+      "counterfactual": "If the bbox were near origin like most other FUR blocks in this shard, that would suggest a normal definition-space projection instead of a coordinate anomaly worth flagging under uncertainty.",
+      "uncertainty": "The large absolute coordinates are unexplained by this projection alone — it is unclear whether this reflects the true block-definition origin or a data-extraction artifact, which could affect downstream geometric comparisons."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-iw990-355",
+    "def": "X-평면도(기본형)$0$IW990",
+    "role": "가구",
+    "wall_likelihood": 0.05,
+    "wall_line_handles": [],
+    "notes": "Large bathroom fixture (bathtub/vanity) spanning FUR and F-BATH layers.",
+    "rationale": {
+      "evidence": "451 entities, 449 of them on 'FUR' and 2 on 'F-BATH' (bath-specific layer), with a very high SPLINE(133)/ARC(97)/ELLIPSE(8) count and only 195 LINE mostly as tiny sub-mm fragments (e.g. 238482.159 to 238482.235) — consistent with a richly detailed bathroom fixture render (tub or vanity) rather than architectural line-work.",
+      "rule": "A high entity count dominated by SPLINE/ARC/ELLIPSE with an explicit bath-related layer present (even as a minority) confirms a bathroom furniture/fixture item; classify as 가구.",
+      "counterfactual": "If F-BATH were the majority layer instead of FUR, the same conclusion would hold, but a shift toward long straight LINE pairs at consistent offsets would instead suggest wall/partition content.",
+      "uncertainty": "The 30-entity sample cannot resolve whether this is a single fixture (e.g. one bathtub) or a fixture group (tub+surround), given the very high total entity count relative to what's shown."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-jjbl-356",
+    "def": "X-평면도(기본형)$0$jjbl",
+    "role": "심볼",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "Floor drain/tile-pattern symbol (TILE layer), no line geometry present.",
+    "rationale": {
+      "evidence": "37 entities on 'TILE' layer, 36 of them identical CIRCLE(radius=10) arranged with one enclosing LWPOLYLINE, and no bbox derivable from LINE (there are none) — a repeated small-circle grid is typical of a floor-drain grate or decorative tile-inlay pattern rather than furniture or a wall.",
+      "rule": "A large count of identically-sized small CIRCLE entities on a TILE-type layer with no LINE geometry at all indicates a floor-pattern/fixture symbol; classify as 심볼.",
+      "counterfactual": "If the circles varied widely in size and sat on a FUR layer, this would look more like decorative furniture inlay instead of a drain/tile grate.",
+      "uncertainty": "Without LINE-derived bbox or a TEXT label, it cannot be confirmed whether this represents a drain grate, a manhole cover, or purely decorative tile dots."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-kh-530s-1-top-357",
+    "def": "X-평면도(기본형)$0$KH-530S-1 TOP",
+    "role": "가구",
+    "wall_likelihood": 0.05,
+    "wall_line_handles": [],
+    "notes": "Furniture/equipment top-view symbol (range hood or counter unit), FUR layer.",
+    "rationale": {
+      "evidence": "132 entities on 'FUR' layer with ARC(24)/LINE(66)/SPLINE(38) and large absolute coordinates (~830000,-150000); the '-1 TOP' suffix in the name and the mix of many short LINE segments (1-40mm apart, irregular) plus splines matches a top-view furniture/equipment rendering with panel-seam detail rather than a wall-thickness pattern.",
+      "rule": "A FUR-layer block whose name ends in a view qualifier like 'TOP' and shows irregular short-line detailing alongside splines/arcs is a furniture/equipment top-view symbol; classify as 가구.",
+      "counterfactual": "If the LINE segments were consistently spaced at a single wall-typical offset (100-300mm) running the block's full length, that would suggest wall geometry instead of panel-seam detail.",
+      "uncertainty": "The model code 'KH-530S-1' gives no way to confirm the exact appliance type (hood, counter, sink) from geometry alone."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-l933-top-358",
+    "def": "X-평면도(기본형)$0$L933 TOP",
+    "role": "가구",
+    "wall_likelihood": 0.05,
+    "wall_line_handles": [],
+    "notes": "Furniture/equipment top-view symbol (FUR layer), spline-dominated.",
+    "rationale": {
+      "evidence": "191 entities on 'FUR' layer, dominated by SPLINE(139) with only 34 LINE (mostly sub-mm fragments like 830261.591 to 830261.591) and 16 ARC — an even more spline-heavy composition than kh-530s-1-top, consistent with a detailed curved furniture/equipment top-view outline.",
+      "rule": "A FUR-layer block whose name ends in a view qualifier like 'TOP' and is dominated by SPLINE/ARC with only fragmentary LINE entities is a furniture/equipment top-view symbol; classify as 가구.",
+      "counterfactual": "A lower SPLINE fraction and consistent parallel LINE offsets would push this toward a plan/wall classification instead.",
+      "uncertainty": "Cannot identify what 'L933' denotes (model number vs internal code) or confirm the item type without a rendered view."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-ng-359",
+    "def": "X-평면도(기본형)$0$ng",
+    "role": "심볼",
+    "wall_likelihood": 0.2,
+    "wall_line_handles": [
+      {"handle": "3D63", "reason": "inner rectangular boundary line of a stepped frame around the flagpole base"},
+      {"handle": "3D6B", "reason": "outer rectangular boundary line ~3mm offset from the inner one, resembles a thin curb/wall pair"}
+    ],
+    "notes": "Flagpole base/site marker; nested block references an actual flagpole symbol.",
+    "rationale": {
+      "evidence": "The block contains an INSERT of 'X-평면도(기본형)$0$국기계양대' (flagpole) plus 20 LINE on layer '0' forming a stepped rectangular frame (inner ring at y=-3/-53, outer ring offset by ~3mm at y=0/-56) and two WIPEOUT entities, consistent with a small pedestal/curb symbol drawn around a flagpole insertion point.",
+      "rule": "A block whose entities are dominated by an INSERT reference to a named site object (here a flagpole) plus a small stepped frame on the generic '0' layer is a site/civil symbol; classify as 심볼 even when the frame lines are numerous.",
+      "counterfactual": "The ~3mm step between the inner and outer rectangle is thin enough to be a border/frame; if that gap were closer to 100-300mm it would more plausibly be a real base wall/curb, raising wall_likelihood well above 0.2.",
+      "uncertainty": "Cannot confirm from this projection whether the stepped frame represents a physical curb/pedestal or is purely a graphical border, since the WIPEOUT entities (used to mask underlying geometry) suggest this may be a masked annotation rather than solid structure."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-pd900-360",
+    "def": "X-평면도(기본형)$0$pd900",
+    "role": "심볼",
+    "wall_likelihood": 0.05,
+    "wall_line_handles": [],
+    "notes": "Double door-leaf swing symbol (DOOR layer), width 900.",
+    "rationale": {
+      "evidence": "19 entities on 'DOOR' layer with an ARC and paired diagonal LINE crossing patterns (e.g. 1BF9/1BFA and 1C00/1C01) forming X-shaped leaf indicators at both ends of the 900-wide opening, plus stepped jamb LINE at y=100/140 — consistent with a double-swing or bi-fold door symbol.",
+      "rule": "A small entity count concentrated on a DOOR-named layer with ARC swing indicators plus diagonal leaf-crossing LINE pairs is diagnostic of a door swing symbol; classify as 심볼.",
+      "counterfactual": "A single diagonal pair instead of two would indicate a single-leaf door rather than a double/bi-fold configuration.",
+      "uncertainty": "The final ARC entity (handle 1C0A) is not shown in the truncated sample, so its exact role (swing arc vs corner fillet) cannot be fully confirmed."
+    }
+  }
+]

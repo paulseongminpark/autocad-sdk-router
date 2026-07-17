@@ -1,0 +1,282 @@
+[
+  {
+    "unit_id": "defannot-u110-121",
+    "def": "*U110",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.15,
+    "wall_line_handles": [],
+    "notes": "*U110: 38 five-vertex LWPOLYLINEs on the INSUL floor-plan layer; insulation-fill fragment, not primary wall geometry.",
+    "rationale": {
+      "evidence": "All 38 entities in *U110 are LWPOLYLINE with 5 vertices, 100% on layer 'X-평면도(기본형)$0$INSUL'; the layer token encodes '평면도'(floor plan) and 'INSUL' (insulation), and no TEXT, DIMENSION, INSERT, or HATCH entities appear in the histogram, so the block is geometrically homogeneous.",
+      "rule": "A block whose entities are exclusively polylines on a layer name that explicitly marks an insulation-material role (rather than a wall/structure layer name), with no dimension or furniture entity types present, should be read as a floor-plan geometry fragment, and adjacency to walls alone should not be treated as evidence of being the primary wall line.",
+      "counterfactual": "If the layer name instead used a wall/structure convention (e.g. '벽체' or a dedicated WALL/구조 layer) or coordinate data showed paired offset polylines at typical wall-thickness spacing, wall_likelihood would rise substantially; if TEXT or DIMENSION-associated entities were present the role would shift toward 치수캐시, or if furniture INSERT references appeared it would shift toward 가구.",
+      "uncertainty": "No bbox or vertex coordinates are derivable from this projection (LINE-based bbox extraction does not apply to LWPOLYLINE), so whether these 5-vertex loops actually trace a wall face or sit elsewhere in the plan cannot be confirmed from this projection alone."
+    }
+  },
+  {
+    "unit_id": "defannot-u111-122",
+    "def": "*U111",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.15,
+    "wall_line_handles": [],
+    "notes": "*U111: 22 five-vertex LWPOLYLINEs on the INSUL floor-plan layer; insulation-fill fragment, not primary wall geometry.",
+    "rationale": {
+      "evidence": "All 22 entities in *U111 are LWPOLYLINE with 5 vertices, 100% on layer 'X-평면도(기본형)$0$INSUL'; the layer token encodes '평면도'(floor plan) and 'INSUL' (insulation), and no TEXT, DIMENSION, INSERT, or HATCH entities appear in the histogram, so the block is geometrically homogeneous.",
+      "rule": "A block whose entities are exclusively polylines on a layer name that explicitly marks an insulation-material role (rather than a wall/structure layer name), with no dimension or furniture entity types present, should be read as a floor-plan geometry fragment, and adjacency to walls alone should not be treated as evidence of being the primary wall line.",
+      "counterfactual": "If the layer name instead used a wall/structure convention (e.g. '벽체' or a dedicated WALL/구조 layer) or coordinate data showed paired offset polylines at typical wall-thickness spacing, wall_likelihood would rise substantially; if TEXT or DIMENSION-associated entities were present the role would shift toward 치수캐시, or if furniture INSERT references appeared it would shift toward 가구.",
+      "uncertainty": "No bbox or vertex coordinates are derivable from this projection (LINE-based bbox extraction does not apply to LWPOLYLINE), so whether these 5-vertex loops actually trace a wall face or sit elsewhere in the plan cannot be confirmed from this projection alone."
+    }
+  },
+  {
+    "unit_id": "defannot-u112-123",
+    "def": "*U112",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.15,
+    "wall_line_handles": [],
+    "notes": "*U112: 12 five-vertex LWPOLYLINEs on the INSUL floor-plan layer; insulation-fill fragment, not primary wall geometry.",
+    "rationale": {
+      "evidence": "All 12 entities in *U112 are LWPOLYLINE with 5 vertices, 100% on layer 'X-평면도(기본형)$0$INSUL'; the layer token encodes '평면도'(floor plan) and 'INSUL' (insulation), and no TEXT, DIMENSION, INSERT, or HATCH entities appear in the histogram, so the block is geometrically homogeneous.",
+      "rule": "A block whose entities are exclusively polylines on a layer name that explicitly marks an insulation-material role (rather than a wall/structure layer name), with no dimension or furniture entity types present, should be read as a floor-plan geometry fragment, and adjacency to walls alone should not be treated as evidence of being the primary wall line.",
+      "counterfactual": "If the layer name instead used a wall/structure convention (e.g. '벽체' or a dedicated WALL/구조 layer) or coordinate data showed paired offset polylines at typical wall-thickness spacing, wall_likelihood would rise substantially; if TEXT or DIMENSION-associated entities were present the role would shift toward 치수캐시, or if furniture INSERT references appeared it would shift toward 가구.",
+      "uncertainty": "No bbox or vertex coordinates are derivable from this projection (LINE-based bbox extraction does not apply to LWPOLYLINE), so whether these 5-vertex loops actually trace a wall face or sit elsewhere in the plan cannot be confirmed from this projection alone."
+    }
+  },
+  {
+    "unit_id": "defannot-u113-124",
+    "def": "*U113",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.15,
+    "wall_line_handles": [],
+    "notes": "*U113: 41 five-vertex LWPOLYLINEs on the INSUL floor-plan layer; insulation-fill fragment, not primary wall geometry.",
+    "rationale": {
+      "evidence": "All 41 entities in *U113 are LWPOLYLINE with 5 vertices, 100% on layer 'X-평면도(기본형)$0$INSUL'; the layer token encodes '평면도'(floor plan) and 'INSUL' (insulation), and no TEXT, DIMENSION, INSERT, or HATCH entities appear in the histogram, so the block is geometrically homogeneous.",
+      "rule": "A block whose entities are exclusively polylines on a layer name that explicitly marks an insulation-material role (rather than a wall/structure layer name), with no dimension or furniture entity types present, should be read as a floor-plan geometry fragment, and adjacency to walls alone should not be treated as evidence of being the primary wall line.",
+      "counterfactual": "If the layer name instead used a wall/structure convention (e.g. '벽체' or a dedicated WALL/구조 layer) or coordinate data showed paired offset polylines at typical wall-thickness spacing, wall_likelihood would rise substantially; if TEXT or DIMENSION-associated entities were present the role would shift toward 치수캐시, or if furniture INSERT references appeared it would shift toward 가구.",
+      "uncertainty": "No bbox or vertex coordinates are derivable from this projection (LINE-based bbox extraction does not apply to LWPOLYLINE), so whether these 5-vertex loops actually trace a wall face or sit elsewhere in the plan cannot be confirmed from this projection alone."
+    }
+  },
+  {
+    "unit_id": "defannot-u114-125",
+    "def": "*U114",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.15,
+    "wall_line_handles": [],
+    "notes": "*U114: 13 five-vertex LWPOLYLINEs on the INSUL floor-plan layer; insulation-fill fragment, not primary wall geometry.",
+    "rationale": {
+      "evidence": "All 13 entities in *U114 are LWPOLYLINE with 5 vertices, 100% on layer 'X-평면도(기본형)$0$INSUL'; the layer token encodes '평면도'(floor plan) and 'INSUL' (insulation), and no TEXT, DIMENSION, INSERT, or HATCH entities appear in the histogram, so the block is geometrically homogeneous.",
+      "rule": "A block whose entities are exclusively polylines on a layer name that explicitly marks an insulation-material role (rather than a wall/structure layer name), with no dimension or furniture entity types present, should be read as a floor-plan geometry fragment, and adjacency to walls alone should not be treated as evidence of being the primary wall line.",
+      "counterfactual": "If the layer name instead used a wall/structure convention (e.g. '벽체' or a dedicated WALL/구조 layer) or coordinate data showed paired offset polylines at typical wall-thickness spacing, wall_likelihood would rise substantially; if TEXT or DIMENSION-associated entities were present the role would shift toward 치수캐시, or if furniture INSERT references appeared it would shift toward 가구.",
+      "uncertainty": "No bbox or vertex coordinates are derivable from this projection (LINE-based bbox extraction does not apply to LWPOLYLINE), so whether these 5-vertex loops actually trace a wall face or sit elsewhere in the plan cannot be confirmed from this projection alone."
+    }
+  },
+  {
+    "unit_id": "defannot-u115-126",
+    "def": "*U115",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.15,
+    "wall_line_handles": [],
+    "notes": "*U115: 149 five-vertex LWPOLYLINEs on the INSUL floor-plan layer; insulation-fill fragment, not primary wall geometry.",
+    "rationale": {
+      "evidence": "All 149 entities in *U115 are LWPOLYLINE with 5 vertices, 100% on layer 'X-평면도(기본형)$0$INSUL'; the layer token encodes '평면도'(floor plan) and 'INSUL' (insulation), and no TEXT, DIMENSION, INSERT, or HATCH entities appear in the histogram, so the block is geometrically homogeneous.",
+      "rule": "A block whose entities are exclusively polylines on a layer name that explicitly marks an insulation-material role (rather than a wall/structure layer name), with no dimension or furniture entity types present, should be read as a floor-plan geometry fragment, and adjacency to walls alone should not be treated as evidence of being the primary wall line.",
+      "counterfactual": "If the layer name instead used a wall/structure convention (e.g. '벽체' or a dedicated WALL/구조 layer) or coordinate data showed paired offset polylines at typical wall-thickness spacing, wall_likelihood would rise substantially; if TEXT or DIMENSION-associated entities were present the role would shift toward 치수캐시, or if furniture INSERT references appeared it would shift toward 가구.",
+      "uncertainty": "No bbox or vertex coordinates are derivable from this projection (LINE-based bbox extraction does not apply to LWPOLYLINE), so whether these 5-vertex loops actually trace a wall face or sit elsewhere in the plan cannot be confirmed from this projection alone."
+    }
+  },
+  {
+    "unit_id": "defannot-u116-127",
+    "def": "*U116",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.15,
+    "wall_line_handles": [],
+    "notes": "*U116: 29 five-vertex LWPOLYLINEs on the INSUL floor-plan layer; insulation-fill fragment, not primary wall geometry.",
+    "rationale": {
+      "evidence": "All 29 entities in *U116 are LWPOLYLINE with 5 vertices, 100% on layer 'X-평면도(기본형)$0$INSUL'; the layer token encodes '평면도'(floor plan) and 'INSUL' (insulation), and no TEXT, DIMENSION, INSERT, or HATCH entities appear in the histogram, so the block is geometrically homogeneous.",
+      "rule": "A block whose entities are exclusively polylines on a layer name that explicitly marks an insulation-material role (rather than a wall/structure layer name), with no dimension or furniture entity types present, should be read as a floor-plan geometry fragment, and adjacency to walls alone should not be treated as evidence of being the primary wall line.",
+      "counterfactual": "If the layer name instead used a wall/structure convention (e.g. '벽체' or a dedicated WALL/구조 layer) or coordinate data showed paired offset polylines at typical wall-thickness spacing, wall_likelihood would rise substantially; if TEXT or DIMENSION-associated entities were present the role would shift toward 치수캐시, or if furniture INSERT references appeared it would shift toward 가구.",
+      "uncertainty": "No bbox or vertex coordinates are derivable from this projection (LINE-based bbox extraction does not apply to LWPOLYLINE), so whether these 5-vertex loops actually trace a wall face or sit elsewhere in the plan cannot be confirmed from this projection alone."
+    }
+  },
+  {
+    "unit_id": "defannot-u117-128",
+    "def": "*U117",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.15,
+    "wall_line_handles": [],
+    "notes": "*U117: 78 five-vertex LWPOLYLINEs on the INSUL floor-plan layer; insulation-fill fragment, not primary wall geometry.",
+    "rationale": {
+      "evidence": "All 78 entities in *U117 are LWPOLYLINE with 5 vertices, 100% on layer 'X-평면도(기본형)$0$INSUL'; the layer token encodes '평면도'(floor plan) and 'INSUL' (insulation), and no TEXT, DIMENSION, INSERT, or HATCH entities appear in the histogram, so the block is geometrically homogeneous.",
+      "rule": "A block whose entities are exclusively polylines on a layer name that explicitly marks an insulation-material role (rather than a wall/structure layer name), with no dimension or furniture entity types present, should be read as a floor-plan geometry fragment, and adjacency to walls alone should not be treated as evidence of being the primary wall line.",
+      "counterfactual": "If the layer name instead used a wall/structure convention (e.g. '벽체' or a dedicated WALL/구조 layer) or coordinate data showed paired offset polylines at typical wall-thickness spacing, wall_likelihood would rise substantially; if TEXT or DIMENSION-associated entities were present the role would shift toward 치수캐시, or if furniture INSERT references appeared it would shift toward 가구.",
+      "uncertainty": "No bbox or vertex coordinates are derivable from this projection (LINE-based bbox extraction does not apply to LWPOLYLINE), so whether these 5-vertex loops actually trace a wall face or sit elsewhere in the plan cannot be confirmed from this projection alone."
+    }
+  },
+  {
+    "unit_id": "defannot-u118-129",
+    "def": "*U118",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.15,
+    "wall_line_handles": [],
+    "notes": "*U118: 16 five-vertex LWPOLYLINEs on the INSUL floor-plan layer; insulation-fill fragment, not primary wall geometry.",
+    "rationale": {
+      "evidence": "All 16 entities in *U118 are LWPOLYLINE with 5 vertices, 100% on layer 'X-평면도(기본형)$0$INSUL'; the layer token encodes '평면도'(floor plan) and 'INSUL' (insulation), and no TEXT, DIMENSION, INSERT, or HATCH entities appear in the histogram, so the block is geometrically homogeneous.",
+      "rule": "A block whose entities are exclusively polylines on a layer name that explicitly marks an insulation-material role (rather than a wall/structure layer name), with no dimension or furniture entity types present, should be read as a floor-plan geometry fragment, and adjacency to walls alone should not be treated as evidence of being the primary wall line.",
+      "counterfactual": "If the layer name instead used a wall/structure convention (e.g. '벽체' or a dedicated WALL/구조 layer) or coordinate data showed paired offset polylines at typical wall-thickness spacing, wall_likelihood would rise substantially; if TEXT or DIMENSION-associated entities were present the role would shift toward 치수캐시, or if furniture INSERT references appeared it would shift toward 가구.",
+      "uncertainty": "No bbox or vertex coordinates are derivable from this projection (LINE-based bbox extraction does not apply to LWPOLYLINE), so whether these 5-vertex loops actually trace a wall face or sit elsewhere in the plan cannot be confirmed from this projection alone."
+    }
+  },
+  {
+    "unit_id": "defannot-u119-130",
+    "def": "*U119",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.15,
+    "wall_line_handles": [],
+    "notes": "*U119: 40 five-vertex LWPOLYLINEs on the INSUL floor-plan layer; insulation-fill fragment, not primary wall geometry.",
+    "rationale": {
+      "evidence": "All 40 entities in *U119 are LWPOLYLINE with 5 vertices, 100% on layer 'X-평면도(기본형)$0$INSUL'; the layer token encodes '평면도'(floor plan) and 'INSUL' (insulation), and no TEXT, DIMENSION, INSERT, or HATCH entities appear in the histogram, so the block is geometrically homogeneous.",
+      "rule": "A block whose entities are exclusively polylines on a layer name that explicitly marks an insulation-material role (rather than a wall/structure layer name), with no dimension or furniture entity types present, should be read as a floor-plan geometry fragment, and adjacency to walls alone should not be treated as evidence of being the primary wall line.",
+      "counterfactual": "If the layer name instead used a wall/structure convention (e.g. '벽체' or a dedicated WALL/구조 layer) or coordinate data showed paired offset polylines at typical wall-thickness spacing, wall_likelihood would rise substantially; if TEXT or DIMENSION-associated entities were present the role would shift toward 치수캐시, or if furniture INSERT references appeared it would shift toward 가구.",
+      "uncertainty": "No bbox or vertex coordinates are derivable from this projection (LINE-based bbox extraction does not apply to LWPOLYLINE), so whether these 5-vertex loops actually trace a wall face or sit elsewhere in the plan cannot be confirmed from this projection alone."
+    }
+  },
+  {
+    "unit_id": "defannot-u120-131",
+    "def": "*U120",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.15,
+    "wall_line_handles": [],
+    "notes": "*U120: 10 five-vertex LWPOLYLINEs on the INSUL floor-plan layer; insulation-fill fragment, not primary wall geometry.",
+    "rationale": {
+      "evidence": "All 10 entities in *U120 are LWPOLYLINE with 5 vertices, 100% on layer 'X-평면도(기본형)$0$INSUL'; the layer token encodes '평면도'(floor plan) and 'INSUL' (insulation), and no TEXT, DIMENSION, INSERT, or HATCH entities appear in the histogram, so the block is geometrically homogeneous.",
+      "rule": "A block whose entities are exclusively polylines on a layer name that explicitly marks an insulation-material role (rather than a wall/structure layer name), with no dimension or furniture entity types present, should be read as a floor-plan geometry fragment, and adjacency to walls alone should not be treated as evidence of being the primary wall line.",
+      "counterfactual": "If the layer name instead used a wall/structure convention (e.g. '벽체' or a dedicated WALL/구조 layer) or coordinate data showed paired offset polylines at typical wall-thickness spacing, wall_likelihood would rise substantially; if TEXT or DIMENSION-associated entities were present the role would shift toward 치수캐시, or if furniture INSERT references appeared it would shift toward 가구.",
+      "uncertainty": "No bbox or vertex coordinates are derivable from this projection (LINE-based bbox extraction does not apply to LWPOLYLINE), so whether these 5-vertex loops actually trace a wall face or sit elsewhere in the plan cannot be confirmed from this projection alone."
+    }
+  },
+  {
+    "unit_id": "defannot-u121-132",
+    "def": "*U121",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.15,
+    "wall_line_handles": [],
+    "notes": "*U121: 51 five-vertex LWPOLYLINEs on the INSUL floor-plan layer; insulation-fill fragment, not primary wall geometry.",
+    "rationale": {
+      "evidence": "All 51 entities in *U121 are LWPOLYLINE with 5 vertices, 100% on layer 'X-평면도(기본형)$0$INSUL'; the layer token encodes '평면도'(floor plan) and 'INSUL' (insulation), and no TEXT, DIMENSION, INSERT, or HATCH entities appear in the histogram, so the block is geometrically homogeneous.",
+      "rule": "A block whose entities are exclusively polylines on a layer name that explicitly marks an insulation-material role (rather than a wall/structure layer name), with no dimension or furniture entity types present, should be read as a floor-plan geometry fragment, and adjacency to walls alone should not be treated as evidence of being the primary wall line.",
+      "counterfactual": "If the layer name instead used a wall/structure convention (e.g. '벽체' or a dedicated WALL/구조 layer) or coordinate data showed paired offset polylines at typical wall-thickness spacing, wall_likelihood would rise substantially; if TEXT or DIMENSION-associated entities were present the role would shift toward 치수캐시, or if furniture INSERT references appeared it would shift toward 가구.",
+      "uncertainty": "No bbox or vertex coordinates are derivable from this projection (LINE-based bbox extraction does not apply to LWPOLYLINE), so whether these 5-vertex loops actually trace a wall face or sit elsewhere in the plan cannot be confirmed from this projection alone."
+    }
+  },
+  {
+    "unit_id": "defannot-u122-133",
+    "def": "*U122",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.15,
+    "wall_line_handles": [],
+    "notes": "*U122: 10 five-vertex LWPOLYLINEs on the INSUL floor-plan layer; insulation-fill fragment, not primary wall geometry.",
+    "rationale": {
+      "evidence": "All 10 entities in *U122 are LWPOLYLINE with 5 vertices, 100% on layer 'X-평면도(기본형)$0$INSUL'; the layer token encodes '평면도'(floor plan) and 'INSUL' (insulation), and no TEXT, DIMENSION, INSERT, or HATCH entities appear in the histogram, so the block is geometrically homogeneous.",
+      "rule": "A block whose entities are exclusively polylines on a layer name that explicitly marks an insulation-material role (rather than a wall/structure layer name), with no dimension or furniture entity types present, should be read as a floor-plan geometry fragment, and adjacency to walls alone should not be treated as evidence of being the primary wall line.",
+      "counterfactual": "If the layer name instead used a wall/structure convention (e.g. '벽체' or a dedicated WALL/구조 layer) or coordinate data showed paired offset polylines at typical wall-thickness spacing, wall_likelihood would rise substantially; if TEXT or DIMENSION-associated entities were present the role would shift toward 치수캐시, or if furniture INSERT references appeared it would shift toward 가구.",
+      "uncertainty": "No bbox or vertex coordinates are derivable from this projection (LINE-based bbox extraction does not apply to LWPOLYLINE), so whether these 5-vertex loops actually trace a wall face or sit elsewhere in the plan cannot be confirmed from this projection alone."
+    }
+  },
+  {
+    "unit_id": "defannot-u123-134",
+    "def": "*U123",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.15,
+    "wall_line_handles": [],
+    "notes": "*U123: 54 five-vertex LWPOLYLINEs on the INSUL floor-plan layer; insulation-fill fragment, not primary wall geometry.",
+    "rationale": {
+      "evidence": "All 54 entities in *U123 are LWPOLYLINE with 5 vertices, 100% on layer 'X-평면도(기본형)$0$INSUL'; the layer token encodes '평면도'(floor plan) and 'INSUL' (insulation), and no TEXT, DIMENSION, INSERT, or HATCH entities appear in the histogram, so the block is geometrically homogeneous.",
+      "rule": "A block whose entities are exclusively polylines on a layer name that explicitly marks an insulation-material role (rather than a wall/structure layer name), with no dimension or furniture entity types present, should be read as a floor-plan geometry fragment, and adjacency to walls alone should not be treated as evidence of being the primary wall line.",
+      "counterfactual": "If the layer name instead used a wall/structure convention (e.g. '벽체' or a dedicated WALL/구조 layer) or coordinate data showed paired offset polylines at typical wall-thickness spacing, wall_likelihood would rise substantially; if TEXT or DIMENSION-associated entities were present the role would shift toward 치수캐시, or if furniture INSERT references appeared it would shift toward 가구.",
+      "uncertainty": "No bbox or vertex coordinates are derivable from this projection (LINE-based bbox extraction does not apply to LWPOLYLINE), so whether these 5-vertex loops actually trace a wall face or sit elsewhere in the plan cannot be confirmed from this projection alone."
+    }
+  },
+  {
+    "unit_id": "defannot-u124-135",
+    "def": "*U124",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.15,
+    "wall_line_handles": [],
+    "notes": "*U124: 69 five-vertex LWPOLYLINEs on the INSUL floor-plan layer; insulation-fill fragment, not primary wall geometry.",
+    "rationale": {
+      "evidence": "All 69 entities in *U124 are LWPOLYLINE with 5 vertices, 100% on layer 'X-평면도(기본형)$0$INSUL'; the layer token encodes '평면도'(floor plan) and 'INSUL' (insulation), and no TEXT, DIMENSION, INSERT, or HATCH entities appear in the histogram, so the block is geometrically homogeneous.",
+      "rule": "A block whose entities are exclusively polylines on a layer name that explicitly marks an insulation-material role (rather than a wall/structure layer name), with no dimension or furniture entity types present, should be read as a floor-plan geometry fragment, and adjacency to walls alone should not be treated as evidence of being the primary wall line.",
+      "counterfactual": "If the layer name instead used a wall/structure convention (e.g. '벽체' or a dedicated WALL/구조 layer) or coordinate data showed paired offset polylines at typical wall-thickness spacing, wall_likelihood would rise substantially; if TEXT or DIMENSION-associated entities were present the role would shift toward 치수캐시, or if furniture INSERT references appeared it would shift toward 가구.",
+      "uncertainty": "No bbox or vertex coordinates are derivable from this projection (LINE-based bbox extraction does not apply to LWPOLYLINE), so whether these 5-vertex loops actually trace a wall face or sit elsewhere in the plan cannot be confirmed from this projection alone."
+    }
+  },
+  {
+    "unit_id": "defannot-u125-136",
+    "def": "*U125",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.15,
+    "wall_line_handles": [],
+    "notes": "*U125: 30 five-vertex LWPOLYLINEs on the INSUL floor-plan layer; insulation-fill fragment, not primary wall geometry.",
+    "rationale": {
+      "evidence": "All 30 entities in *U125 are LWPOLYLINE with 5 vertices, 100% on layer 'X-평면도(기본형)$0$INSUL'; the layer token encodes '평면도'(floor plan) and 'INSUL' (insulation), and no TEXT, DIMENSION, INSERT, or HATCH entities appear in the histogram, so the block is geometrically homogeneous.",
+      "rule": "A block whose entities are exclusively polylines on a layer name that explicitly marks an insulation-material role (rather than a wall/structure layer name), with no dimension or furniture entity types present, should be read as a floor-plan geometry fragment, and adjacency to walls alone should not be treated as evidence of being the primary wall line.",
+      "counterfactual": "If the layer name instead used a wall/structure convention (e.g. '벽체' or a dedicated WALL/구조 layer) or coordinate data showed paired offset polylines at typical wall-thickness spacing, wall_likelihood would rise substantially; if TEXT or DIMENSION-associated entities were present the role would shift toward 치수캐시, or if furniture INSERT references appeared it would shift toward 가구.",
+      "uncertainty": "No bbox or vertex coordinates are derivable from this projection (LINE-based bbox extraction does not apply to LWPOLYLINE), so whether these 5-vertex loops actually trace a wall face or sit elsewhere in the plan cannot be confirmed from this projection alone."
+    }
+  },
+  {
+    "unit_id": "defannot-u126-137",
+    "def": "*U126",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.15,
+    "wall_line_handles": [],
+    "notes": "*U126: 51 five-vertex LWPOLYLINEs on the INSUL floor-plan layer; insulation-fill fragment, not primary wall geometry.",
+    "rationale": {
+      "evidence": "All 51 entities in *U126 are LWPOLYLINE with 5 vertices, 100% on layer 'X-평면도(기본형)$0$INSUL'; the layer token encodes '평면도'(floor plan) and 'INSUL' (insulation), and no TEXT, DIMENSION, INSERT, or HATCH entities appear in the histogram, so the block is geometrically homogeneous.",
+      "rule": "A block whose entities are exclusively polylines on a layer name that explicitly marks an insulation-material role (rather than a wall/structure layer name), with no dimension or furniture entity types present, should be read as a floor-plan geometry fragment, and adjacency to walls alone should not be treated as evidence of being the primary wall line.",
+      "counterfactual": "If the layer name instead used a wall/structure convention (e.g. '벽체' or a dedicated WALL/구조 layer) or coordinate data showed paired offset polylines at typical wall-thickness spacing, wall_likelihood would rise substantially; if TEXT or DIMENSION-associated entities were present the role would shift toward 치수캐시, or if furniture INSERT references appeared it would shift toward 가구.",
+      "uncertainty": "No bbox or vertex coordinates are derivable from this projection (LINE-based bbox extraction does not apply to LWPOLYLINE), so whether these 5-vertex loops actually trace a wall face or sit elsewhere in the plan cannot be confirmed from this projection alone."
+    }
+  },
+  {
+    "unit_id": "defannot-u127-138",
+    "def": "*U127",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.15,
+    "wall_line_handles": [],
+    "notes": "*U127: 6 five-vertex LWPOLYLINEs on the INSUL floor-plan layer; insulation-fill fragment, not primary wall geometry.",
+    "rationale": {
+      "evidence": "All 6 entities in *U127 are LWPOLYLINE with 5 vertices, 100% on layer 'X-평면도(기본형)$0$INSUL'; the layer token encodes '평면도'(floor plan) and 'INSUL' (insulation), and no TEXT, DIMENSION, INSERT, or HATCH entities appear in the histogram, so the block is geometrically homogeneous.",
+      "rule": "A block whose entities are exclusively polylines on a layer name that explicitly marks an insulation-material role (rather than a wall/structure layer name), with no dimension or furniture entity types present, should be read as a floor-plan geometry fragment, and adjacency to walls alone should not be treated as evidence of being the primary wall line.",
+      "counterfactual": "If the layer name instead used a wall/structure convention (e.g. '벽체' or a dedicated WALL/구조 layer) or coordinate data showed paired offset polylines at typical wall-thickness spacing, wall_likelihood would rise substantially; if TEXT or DIMENSION-associated entities were present the role would shift toward 치수캐시, or if furniture INSERT references appeared it would shift toward 가구.",
+      "uncertainty": "No bbox or vertex coordinates are derivable from this projection (LINE-based bbox extraction does not apply to LWPOLYLINE), so whether these 5-vertex loops actually trace a wall face or sit elsewhere in the plan cannot be confirmed from this projection alone."
+    }
+  },
+  {
+    "unit_id": "defannot-u128-139",
+    "def": "*U128",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.15,
+    "wall_line_handles": [],
+    "notes": "*U128: 6 five-vertex LWPOLYLINEs on the INSUL floor-plan layer; insulation-fill fragment, not primary wall geometry.",
+    "rationale": {
+      "evidence": "All 6 entities in *U128 are LWPOLYLINE with 5 vertices, 100% on layer 'X-평면도(기본형)$0$INSUL'; the layer token encodes '평면도'(floor plan) and 'INSUL' (insulation), and no TEXT, DIMENSION, INSERT, or HATCH entities appear in the histogram, so the block is geometrically homogeneous.",
+      "rule": "A block whose entities are exclusively polylines on a layer name that explicitly marks an insulation-material role (rather than a wall/structure layer name), with no dimension or furniture entity types present, should be read as a floor-plan geometry fragment, and adjacency to walls alone should not be treated as evidence of being the primary wall line.",
+      "counterfactual": "If the layer name instead used a wall/structure convention (e.g. '벽체' or a dedicated WALL/구조 layer) or coordinate data showed paired offset polylines at typical wall-thickness spacing, wall_likelihood would rise substantially; if TEXT or DIMENSION-associated entities were present the role would shift toward 치수캐시, or if furniture INSERT references appeared it would shift toward 가구.",
+      "uncertainty": "No bbox or vertex coordinates are derivable from this projection (LINE-based bbox extraction does not apply to LWPOLYLINE), so whether these 5-vertex loops actually trace a wall face or sit elsewhere in the plan cannot be confirmed from this projection alone."
+    }
+  },
+  {
+    "unit_id": "defannot-u129-140",
+    "def": "*U129",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.15,
+    "wall_line_handles": [],
+    "notes": "*U129: 17 five-vertex LWPOLYLINEs on the INSUL floor-plan layer; insulation-fill fragment, not primary wall geometry.",
+    "rationale": {
+      "evidence": "All 17 entities in *U129 are LWPOLYLINE with 5 vertices, 100% on layer 'X-평면도(기본형)$0$INSUL'; the layer token encodes '평면도'(floor plan) and 'INSUL' (insulation), and no TEXT, DIMENSION, INSERT, or HATCH entities appear in the histogram, so the block is geometrically homogeneous.",
+      "rule": "A block whose entities are exclusively polylines on a layer name that explicitly marks an insulation-material role (rather than a wall/structure layer name), with no dimension or furniture entity types present, should be read as a floor-plan geometry fragment, and adjacency to walls alone should not be treated as evidence of being the primary wall line.",
+      "counterfactual": "If the layer name instead used a wall/structure convention (e.g. '벽체' or a dedicated WALL/구조 layer) or coordinate data showed paired offset polylines at typical wall-thickness spacing, wall_likelihood would rise substantially; if TEXT or DIMENSION-associated entities were present the role would shift toward 치수캐시, or if furniture INSERT references appeared it would shift toward 가구.",
+      "uncertainty": "No bbox or vertex coordinates are derivable from this projection (LINE-based bbox extraction does not apply to LWPOLYLINE), so whether these 5-vertex loops actually trace a wall face or sit elsewhere in the plan cannot be confirmed from this projection alone."
+    }
+  }
+]
