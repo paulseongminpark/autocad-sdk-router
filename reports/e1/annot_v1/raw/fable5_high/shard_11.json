@@ -1,0 +1,299 @@
+[
+  {
+    "unit_id": "defannot-u197-201",
+    "def": "*U197",
+    "role": "심볼",
+    "wall_likelihood": 0.3,
+    "wall_line_handles": [
+      {
+        "handle": "57AF",
+        "reason": "1176-long horizontal line paired 50 below (57B1), wall-like double line"
+      },
+      {
+        "handle": "57B1",
+        "reason": "parallel mate of 57AF at 50 offset, forms wall-thickness band"
+      },
+      {
+        "handle": "57BF",
+        "reason": "geometric duplicate of 57AF, same long parallel band"
+      },
+      {
+        "handle": "57B7",
+        "reason": "geometric duplicate of 57B1, same long parallel band"
+      }
+    ],
+    "notes": "국기계양대 심볼 INSERT + WIPEOUT 2개 + 가늘고 긴(1220x126) 이중선 브래킷/레일 외곽선으로 구성된 익명 조립 심볼 블록",
+    "rationale": {
+      "evidence": "The block nests INSERT 57AE of 'X-평면도(기본형)$0$국기계양대' (flagpole mount), two WIPEOUTs (57AC/57AD) for masking, and 20 LINEs on layer 0. The lines trace a long thin band: a 1176x50 rectangle (57AF-57B2, duplicated by 57B7/57BF) inside a 1220x126 outline with small end notches (57B3-57C2). This shape reads as a mounting rail/bracket elevation-in-plan around the flagpole symbol rather than building fabric.",
+      "rule": "An anonymous block that nests a named equipment symbol plus WIPEOUT masking and a small self-contained outline is a composed annotation/equipment symbol; long parallel line pairs inside it are symbol linework unless they extend at building scale and connect to other fabric.",
+      "counterfactual": "If the parallel 50-offset lines extended over several meters, sat on a wall layer, or joined other wall segments, I would reclassify toward 평면 부분도 and raise wall_likelihood; absence of the 국기계양대 INSERT would remove the symbol reading entirely.",
+      "uncertainty": "From this projection I cannot see the drawing context (what the block is inserted next to) or layer semantics of layer 0 here, so whether the 50-wide band is a real wall stub or purely symbol framing is not fully decidable; the 0.3 likelihood reflects that residual chance."
+    }
+  },
+  {
+    "unit_id": "defannot-u199-202",
+    "def": "*U199",
+    "role": "기타",
+    "wall_likelihood": 0.1,
+    "wall_line_handles": [],
+    "notes": "INSUL 레이어 5-정점 LWPOLYLINE 17개만으로 구성된 단열재 해치(배트) 패턴 블록 — 짧은 단열재 구간",
+    "rationale": {
+      "evidence": "All 17 entities are LWPOLYLINEs with exactly 5 vertices on layer 'X-평면도(기본형)$0$INSUL' (handles 5802..5812, all 17 listed). The uniform 5-vertex closed tiles repeated on an INSUL layer are the classic batt-insulation zigzag hatch, and there are no LINEs, arcs, text, or dimension entities at all; the LINE-derived bbox is even reported as not derivable because no LINE exists.",
+      "rule": "A block whose entire content is many identical small closed polylines on an insulation (INSUL) layer is a pattern-fill fragment (insulation hatch), not a symbol, furniture, dimension cache, or plan fragment; the entity homogeneity plus the layer name decides it.",
+      "counterfactual": "If the block also contained long parallel LINEs bounding the tile run, or the layer were a wall layer instead of INSUL, I would treat it as a wall plan fragment (평면 부분도) and list those boundary lines as wall candidates; text or dimension entities would push it toward 치수캐시.",
+      "uncertainty": "Vertex coordinates are not given, so I cannot confirm the tiles form a linear zigzag run nor measure its length or orientation; insulation normally sits inside a wall cavity, so the block marks where a wall likely is, but it contains no wall lines itself — hence low but nonzero wall_likelihood."
+    }
+  },
+  {
+    "unit_id": "defannot-u200-203",
+    "def": "*U200",
+    "role": "기타",
+    "wall_likelihood": 0.1,
+    "wall_line_handles": [],
+    "notes": "INSUL 레이어 5-정점 LWPOLYLINE 11개만으로 구성된 단열재 해치(배트) 패턴 블록 — 짧은 단열재 구간",
+    "rationale": {
+      "evidence": "All 11 entities are LWPOLYLINEs with exactly 5 vertices on layer 'X-평면도(기본형)$0$INSUL' (handles 5818..5822, all 11 listed). The uniform 5-vertex closed tiles repeated on an INSUL layer are the classic batt-insulation zigzag hatch, and there are no LINEs, arcs, text, or dimension entities at all; the LINE-derived bbox is even reported as not derivable because no LINE exists.",
+      "rule": "A block whose entire content is many identical small closed polylines on an insulation (INSUL) layer is a pattern-fill fragment (insulation hatch), not a symbol, furniture, dimension cache, or plan fragment; the entity homogeneity plus the layer name decides it.",
+      "counterfactual": "If the block also contained long parallel LINEs bounding the tile run, or the layer were a wall layer instead of INSUL, I would treat it as a wall plan fragment (평면 부분도) and list those boundary lines as wall candidates; text or dimension entities would push it toward 치수캐시.",
+      "uncertainty": "Vertex coordinates are not given, so I cannot confirm the tiles form a linear zigzag run nor measure its length or orientation; insulation normally sits inside a wall cavity, so the block marks where a wall likely is, but it contains no wall lines itself — hence low but nonzero wall_likelihood."
+    }
+  },
+  {
+    "unit_id": "defannot-u201-204",
+    "def": "*U201",
+    "role": "기타",
+    "wall_likelihood": 0.1,
+    "wall_line_handles": [],
+    "notes": "INSUL 레이어 5-정점 LWPOLYLINE 7개만으로 구성된 단열재 해치(배트) 패턴 블록 — 짧은 단열재 구간",
+    "rationale": {
+      "evidence": "All 7 entities are LWPOLYLINEs with exactly 5 vertices on layer 'X-평면도(기본형)$0$INSUL' (handles 5828..582E, all 7 listed). The uniform 5-vertex closed tiles repeated on an INSUL layer are the classic batt-insulation zigzag hatch, and there are no LINEs, arcs, text, or dimension entities at all; the LINE-derived bbox is even reported as not derivable because no LINE exists.",
+      "rule": "A block whose entire content is many identical small closed polylines on an insulation (INSUL) layer is a pattern-fill fragment (insulation hatch), not a symbol, furniture, dimension cache, or plan fragment; the entity homogeneity plus the layer name decides it.",
+      "counterfactual": "If the block also contained long parallel LINEs bounding the tile run, or the layer were a wall layer instead of INSUL, I would treat it as a wall plan fragment (평면 부분도) and list those boundary lines as wall candidates; text or dimension entities would push it toward 치수캐시.",
+      "uncertainty": "Vertex coordinates are not given, so I cannot confirm the tiles form a linear zigzag run nor measure its length or orientation; insulation normally sits inside a wall cavity, so the block marks where a wall likely is, but it contains no wall lines itself — hence low but nonzero wall_likelihood."
+    }
+  },
+  {
+    "unit_id": "defannot-u202-205",
+    "def": "*U202",
+    "role": "기타",
+    "wall_likelihood": 0.1,
+    "wall_line_handles": [],
+    "notes": "INSUL 레이어 5-정점 LWPOLYLINE 12개만으로 구성된 단열재 해치(배트) 패턴 블록 — 짧은 단열재 구간",
+    "rationale": {
+      "evidence": "All 12 entities are LWPOLYLINEs with exactly 5 vertices on layer 'X-평면도(기본형)$0$INSUL' (handles 5834..583F, all 12 listed). The uniform 5-vertex closed tiles repeated on an INSUL layer are the classic batt-insulation zigzag hatch, and there are no LINEs, arcs, text, or dimension entities at all; the LINE-derived bbox is even reported as not derivable because no LINE exists.",
+      "rule": "A block whose entire content is many identical small closed polylines on an insulation (INSUL) layer is a pattern-fill fragment (insulation hatch), not a symbol, furniture, dimension cache, or plan fragment; the entity homogeneity plus the layer name decides it.",
+      "counterfactual": "If the block also contained long parallel LINEs bounding the tile run, or the layer were a wall layer instead of INSUL, I would treat it as a wall plan fragment (평면 부분도) and list those boundary lines as wall candidates; text or dimension entities would push it toward 치수캐시.",
+      "uncertainty": "Vertex coordinates are not given, so I cannot confirm the tiles form a linear zigzag run nor measure its length or orientation; insulation normally sits inside a wall cavity, so the block marks where a wall likely is, but it contains no wall lines itself — hence low but nonzero wall_likelihood."
+    }
+  },
+  {
+    "unit_id": "defannot-u232-206",
+    "def": "*U232",
+    "role": "기타",
+    "wall_likelihood": 0.1,
+    "wall_line_handles": [],
+    "notes": "INSUL 레이어 5-정점 LWPOLYLINE 27개만으로 구성된 단열재 해치(배트) 패턴 블록 — 짧은 단열재 구간",
+    "rationale": {
+      "evidence": "All 27 entities are LWPOLYLINEs with exactly 5 vertices on layer 'X-평면도(기본형)$0$INSUL' (handles 6CE9..6D03, all 27 listed). The uniform 5-vertex closed tiles repeated on an INSUL layer are the classic batt-insulation zigzag hatch, and there are no LINEs, arcs, text, or dimension entities at all; the LINE-derived bbox is even reported as not derivable because no LINE exists.",
+      "rule": "A block whose entire content is many identical small closed polylines on an insulation (INSUL) layer is a pattern-fill fragment (insulation hatch), not a symbol, furniture, dimension cache, or plan fragment; the entity homogeneity plus the layer name decides it.",
+      "counterfactual": "If the block also contained long parallel LINEs bounding the tile run, or the layer were a wall layer instead of INSUL, I would treat it as a wall plan fragment (평면 부분도) and list those boundary lines as wall candidates; text or dimension entities would push it toward 치수캐시.",
+      "uncertainty": "Vertex coordinates are not given, so I cannot confirm the tiles form a linear zigzag run nor measure its length or orientation; insulation normally sits inside a wall cavity, so the block marks where a wall likely is, but it contains no wall lines itself — hence low but nonzero wall_likelihood."
+    }
+  },
+  {
+    "unit_id": "defannot-u236-207",
+    "def": "*U236",
+    "role": "기타",
+    "wall_likelihood": 0.1,
+    "wall_line_handles": [],
+    "notes": "INSUL 레이어 5-정점 LWPOLYLINE 61개만으로 구성된 단열재 해치(배트) 패턴 블록 — 중간~긴 단열재 구간",
+    "rationale": {
+      "evidence": "All 61 entities are LWPOLYLINEs with exactly 5 vertices on layer 'X-평면도(기본형)$0$INSUL' (handles 7727..7744, sampled 30 of 61). The uniform 5-vertex closed tiles repeated on an INSUL layer are the classic batt-insulation zigzag hatch, and there are no LINEs, arcs, text, or dimension entities at all; the LINE-derived bbox is even reported as not derivable because no LINE exists.",
+      "rule": "A block whose entire content is many identical small closed polylines on an insulation (INSUL) layer is a pattern-fill fragment (insulation hatch), not a symbol, furniture, dimension cache, or plan fragment; the entity homogeneity plus the layer name decides it.",
+      "counterfactual": "If the block also contained long parallel LINEs bounding the tile run, or the layer were a wall layer instead of INSUL, I would treat it as a wall plan fragment (평면 부분도) and list those boundary lines as wall candidates; text or dimension entities would push it toward 치수캐시.",
+      "uncertainty": "Vertex coordinates are not given, so I cannot confirm the tiles form a linear zigzag run nor measure its length or orientation; insulation normally sits inside a wall cavity, so the block marks where a wall likely is, but it contains no wall lines itself — hence low but nonzero wall_likelihood."
+    }
+  },
+  {
+    "unit_id": "defannot-u237-208",
+    "def": "*U237",
+    "role": "기타",
+    "wall_likelihood": 0.1,
+    "wall_line_handles": [],
+    "notes": "INSUL 레이어 5-정점 LWPOLYLINE 23개만으로 구성된 단열재 해치(배트) 패턴 블록 — 짧은 단열재 구간",
+    "rationale": {
+      "evidence": "All 23 entities are LWPOLYLINEs with exactly 5 vertices on layer 'X-평면도(기본형)$0$INSUL' (handles 7769..777F, all 23 listed). The uniform 5-vertex closed tiles repeated on an INSUL layer are the classic batt-insulation zigzag hatch, and there are no LINEs, arcs, text, or dimension entities at all; the LINE-derived bbox is even reported as not derivable because no LINE exists.",
+      "rule": "A block whose entire content is many identical small closed polylines on an insulation (INSUL) layer is a pattern-fill fragment (insulation hatch), not a symbol, furniture, dimension cache, or plan fragment; the entity homogeneity plus the layer name decides it.",
+      "counterfactual": "If the block also contained long parallel LINEs bounding the tile run, or the layer were a wall layer instead of INSUL, I would treat it as a wall plan fragment (평면 부분도) and list those boundary lines as wall candidates; text or dimension entities would push it toward 치수캐시.",
+      "uncertainty": "Vertex coordinates are not given, so I cannot confirm the tiles form a linear zigzag run nor measure its length or orientation; insulation normally sits inside a wall cavity, so the block marks where a wall likely is, but it contains no wall lines itself — hence low but nonzero wall_likelihood."
+    }
+  },
+  {
+    "unit_id": "defannot-u238-209",
+    "def": "*U238",
+    "role": "기타",
+    "wall_likelihood": 0.1,
+    "wall_line_handles": [],
+    "notes": "INSUL 레이어 5-정점 LWPOLYLINE 214개만으로 구성된 단열재 해치(배트) 패턴 블록 — 매우 긴 단열재 구간(수백 타일)",
+    "rationale": {
+      "evidence": "All 214 entities are LWPOLYLINEs with exactly 5 vertices on layer 'X-평면도(기본형)$0$INSUL' (handles 7785..77A2, sampled 30 of 214). The uniform 5-vertex closed tiles repeated on an INSUL layer are the classic batt-insulation zigzag hatch, and there are no LINEs, arcs, text, or dimension entities at all; the LINE-derived bbox is even reported as not derivable because no LINE exists.",
+      "rule": "A block whose entire content is many identical small closed polylines on an insulation (INSUL) layer is a pattern-fill fragment (insulation hatch), not a symbol, furniture, dimension cache, or plan fragment; the entity homogeneity plus the layer name decides it.",
+      "counterfactual": "If the block also contained long parallel LINEs bounding the tile run, or the layer were a wall layer instead of INSUL, I would treat it as a wall plan fragment (평면 부분도) and list those boundary lines as wall candidates; text or dimension entities would push it toward 치수캐시.",
+      "uncertainty": "Vertex coordinates are not given, so I cannot confirm the tiles form a linear zigzag run nor measure its length or orientation; insulation normally sits inside a wall cavity, so the block marks where a wall likely is, but it contains no wall lines itself — hence low but nonzero wall_likelihood."
+    }
+  },
+  {
+    "unit_id": "defannot-u239-210",
+    "def": "*U239",
+    "role": "기타",
+    "wall_likelihood": 0.1,
+    "wall_line_handles": [],
+    "notes": "INSUL 레이어 5-정점 LWPOLYLINE 159개만으로 구성된 단열재 해치(배트) 패턴 블록 — 매우 긴 단열재 구간(수백 타일)",
+    "rationale": {
+      "evidence": "All 159 entities are LWPOLYLINEs with exactly 5 vertices on layer 'X-평면도(기본형)$0$INSUL' (handles 7860..787D, sampled 30 of 159). The uniform 5-vertex closed tiles repeated on an INSUL layer are the classic batt-insulation zigzag hatch, and there are no LINEs, arcs, text, or dimension entities at all; the LINE-derived bbox is even reported as not derivable because no LINE exists.",
+      "rule": "A block whose entire content is many identical small closed polylines on an insulation (INSUL) layer is a pattern-fill fragment (insulation hatch), not a symbol, furniture, dimension cache, or plan fragment; the entity homogeneity plus the layer name decides it.",
+      "counterfactual": "If the block also contained long parallel LINEs bounding the tile run, or the layer were a wall layer instead of INSUL, I would treat it as a wall plan fragment (평면 부분도) and list those boundary lines as wall candidates; text or dimension entities would push it toward 치수캐시.",
+      "uncertainty": "Vertex coordinates are not given, so I cannot confirm the tiles form a linear zigzag run nor measure its length or orientation; insulation normally sits inside a wall cavity, so the block marks where a wall likely is, but it contains no wall lines itself — hence low but nonzero wall_likelihood."
+    }
+  },
+  {
+    "unit_id": "defannot-u240-211",
+    "def": "*U240",
+    "role": "기타",
+    "wall_likelihood": 0.1,
+    "wall_line_handles": [],
+    "notes": "INSUL 레이어 5-정점 LWPOLYLINE 106개만으로 구성된 단열재 해치(배트) 패턴 블록 — 매우 긴 단열재 구간(수백 타일)",
+    "rationale": {
+      "evidence": "All 106 entities are LWPOLYLINEs with exactly 5 vertices on layer 'X-평면도(기본형)$0$INSUL' (handles 7904..7921, sampled 30 of 106). The uniform 5-vertex closed tiles repeated on an INSUL layer are the classic batt-insulation zigzag hatch, and there are no LINEs, arcs, text, or dimension entities at all; the LINE-derived bbox is even reported as not derivable because no LINE exists.",
+      "rule": "A block whose entire content is many identical small closed polylines on an insulation (INSUL) layer is a pattern-fill fragment (insulation hatch), not a symbol, furniture, dimension cache, or plan fragment; the entity homogeneity plus the layer name decides it.",
+      "counterfactual": "If the block also contained long parallel LINEs bounding the tile run, or the layer were a wall layer instead of INSUL, I would treat it as a wall plan fragment (평면 부분도) and list those boundary lines as wall candidates; text or dimension entities would push it toward 치수캐시.",
+      "uncertainty": "Vertex coordinates are not given, so I cannot confirm the tiles form a linear zigzag run nor measure its length or orientation; insulation normally sits inside a wall cavity, so the block marks where a wall likely is, but it contains no wall lines itself — hence low but nonzero wall_likelihood."
+    }
+  },
+  {
+    "unit_id": "defannot-u241-212",
+    "def": "*U241",
+    "role": "기타",
+    "wall_likelihood": 0.1,
+    "wall_line_handles": [],
+    "notes": "INSUL 레이어 5-정점 LWPOLYLINE 19개만으로 구성된 단열재 해치(배트) 패턴 블록 — 짧은 단열재 구간",
+    "rationale": {
+      "evidence": "All 19 entities are LWPOLYLINEs with exactly 5 vertices on layer 'X-평면도(기본형)$0$INSUL' (handles 7973..7985, all 19 listed). The uniform 5-vertex closed tiles repeated on an INSUL layer are the classic batt-insulation zigzag hatch, and there are no LINEs, arcs, text, or dimension entities at all; the LINE-derived bbox is even reported as not derivable because no LINE exists.",
+      "rule": "A block whose entire content is many identical small closed polylines on an insulation (INSUL) layer is a pattern-fill fragment (insulation hatch), not a symbol, furniture, dimension cache, or plan fragment; the entity homogeneity plus the layer name decides it.",
+      "counterfactual": "If the block also contained long parallel LINEs bounding the tile run, or the layer were a wall layer instead of INSUL, I would treat it as a wall plan fragment (평면 부분도) and list those boundary lines as wall candidates; text or dimension entities would push it toward 치수캐시.",
+      "uncertainty": "Vertex coordinates are not given, so I cannot confirm the tiles form a linear zigzag run nor measure its length or orientation; insulation normally sits inside a wall cavity, so the block marks where a wall likely is, but it contains no wall lines itself — hence low but nonzero wall_likelihood."
+    }
+  },
+  {
+    "unit_id": "defannot-u272-213",
+    "def": "*U272",
+    "role": "기타",
+    "wall_likelihood": 0.1,
+    "wall_line_handles": [],
+    "notes": "INSUL 레이어 5-정점 LWPOLYLINE 45개만으로 구성된 단열재 해치(배트) 패턴 블록 — 중간~긴 단열재 구간",
+    "rationale": {
+      "evidence": "All 45 entities are LWPOLYLINEs with exactly 5 vertices on layer 'X-평면도(기본형)$0$INSUL' (handles 7DD0..7DED, sampled 30 of 45). The uniform 5-vertex closed tiles repeated on an INSUL layer are the classic batt-insulation zigzag hatch, and there are no LINEs, arcs, text, or dimension entities at all; the LINE-derived bbox is even reported as not derivable because no LINE exists.",
+      "rule": "A block whose entire content is many identical small closed polylines on an insulation (INSUL) layer is a pattern-fill fragment (insulation hatch), not a symbol, furniture, dimension cache, or plan fragment; the entity homogeneity plus the layer name decides it.",
+      "counterfactual": "If the block also contained long parallel LINEs bounding the tile run, or the layer were a wall layer instead of INSUL, I would treat it as a wall plan fragment (평면 부분도) and list those boundary lines as wall candidates; text or dimension entities would push it toward 치수캐시.",
+      "uncertainty": "Vertex coordinates are not given, so I cannot confirm the tiles form a linear zigzag run nor measure its length or orientation; insulation normally sits inside a wall cavity, so the block marks where a wall likely is, but it contains no wall lines itself — hence low but nonzero wall_likelihood."
+    }
+  },
+  {
+    "unit_id": "defannot-u273-214",
+    "def": "*U273",
+    "role": "기타",
+    "wall_likelihood": 0.1,
+    "wall_line_handles": [],
+    "notes": "INSUL 레이어 5-정점 LWPOLYLINE 17개만으로 구성된 단열재 해치(배트) 패턴 블록 — 짧은 단열재 구간",
+    "rationale": {
+      "evidence": "All 17 entities are LWPOLYLINEs with exactly 5 vertices on layer 'X-평면도(기본형)$0$INSUL' (handles 7E02..7E12, all 17 listed). The uniform 5-vertex closed tiles repeated on an INSUL layer are the classic batt-insulation zigzag hatch, and there are no LINEs, arcs, text, or dimension entities at all; the LINE-derived bbox is even reported as not derivable because no LINE exists.",
+      "rule": "A block whose entire content is many identical small closed polylines on an insulation (INSUL) layer is a pattern-fill fragment (insulation hatch), not a symbol, furniture, dimension cache, or plan fragment; the entity homogeneity plus the layer name decides it.",
+      "counterfactual": "If the block also contained long parallel LINEs bounding the tile run, or the layer were a wall layer instead of INSUL, I would treat it as a wall plan fragment (평면 부분도) and list those boundary lines as wall candidates; text or dimension entities would push it toward 치수캐시.",
+      "uncertainty": "Vertex coordinates are not given, so I cannot confirm the tiles form a linear zigzag run nor measure its length or orientation; insulation normally sits inside a wall cavity, so the block marks where a wall likely is, but it contains no wall lines itself — hence low but nonzero wall_likelihood."
+    }
+  },
+  {
+    "unit_id": "defannot-u274-215",
+    "def": "*U274",
+    "role": "기타",
+    "wall_likelihood": 0.1,
+    "wall_line_handles": [],
+    "notes": "INSUL 레이어 5-정점 LWPOLYLINE 7개만으로 구성된 단열재 해치(배트) 패턴 블록 — 짧은 단열재 구간",
+    "rationale": {
+      "evidence": "All 7 entities are LWPOLYLINEs with exactly 5 vertices on layer 'X-평면도(기본형)$0$INSUL' (handles 7E18..7E1E, all 7 listed). The uniform 5-vertex closed tiles repeated on an INSUL layer are the classic batt-insulation zigzag hatch, and there are no LINEs, arcs, text, or dimension entities at all; the LINE-derived bbox is even reported as not derivable because no LINE exists.",
+      "rule": "A block whose entire content is many identical small closed polylines on an insulation (INSUL) layer is a pattern-fill fragment (insulation hatch), not a symbol, furniture, dimension cache, or plan fragment; the entity homogeneity plus the layer name decides it.",
+      "counterfactual": "If the block also contained long parallel LINEs bounding the tile run, or the layer were a wall layer instead of INSUL, I would treat it as a wall plan fragment (평면 부분도) and list those boundary lines as wall candidates; text or dimension entities would push it toward 치수캐시.",
+      "uncertainty": "Vertex coordinates are not given, so I cannot confirm the tiles form a linear zigzag run nor measure its length or orientation; insulation normally sits inside a wall cavity, so the block marks where a wall likely is, but it contains no wall lines itself — hence low but nonzero wall_likelihood."
+    }
+  },
+  {
+    "unit_id": "defannot-u275-216",
+    "def": "*U275",
+    "role": "기타",
+    "wall_likelihood": 0.1,
+    "wall_line_handles": [],
+    "notes": "INSUL 레이어 5-정점 LWPOLYLINE 18개만으로 구성된 단열재 해치(배트) 패턴 블록 — 짧은 단열재 구간",
+    "rationale": {
+      "evidence": "All 18 entities are LWPOLYLINEs with exactly 5 vertices on layer 'X-평면도(기본형)$0$INSUL' (handles 7E24..7E35, all 18 listed). The uniform 5-vertex closed tiles repeated on an INSUL layer are the classic batt-insulation zigzag hatch, and there are no LINEs, arcs, text, or dimension entities at all; the LINE-derived bbox is even reported as not derivable because no LINE exists.",
+      "rule": "A block whose entire content is many identical small closed polylines on an insulation (INSUL) layer is a pattern-fill fragment (insulation hatch), not a symbol, furniture, dimension cache, or plan fragment; the entity homogeneity plus the layer name decides it.",
+      "counterfactual": "If the block also contained long parallel LINEs bounding the tile run, or the layer were a wall layer instead of INSUL, I would treat it as a wall plan fragment (평면 부분도) and list those boundary lines as wall candidates; text or dimension entities would push it toward 치수캐시.",
+      "uncertainty": "Vertex coordinates are not given, so I cannot confirm the tiles form a linear zigzag run nor measure its length or orientation; insulation normally sits inside a wall cavity, so the block marks where a wall likely is, but it contains no wall lines itself — hence low but nonzero wall_likelihood."
+    }
+  },
+  {
+    "unit_id": "defannot-u278-217",
+    "def": "*U278",
+    "role": "기타",
+    "wall_likelihood": 0.1,
+    "wall_line_handles": [],
+    "notes": "INSUL 레이어 5-정점 LWPOLYLINE 79개만으로 구성된 단열재 해치(배트) 패턴 블록 — 중간~긴 단열재 구간",
+    "rationale": {
+      "evidence": "All 79 entities are LWPOLYLINEs with exactly 5 vertices on layer 'X-평면도(기본형)$0$INSUL' (handles 7E51..7E6E, sampled 30 of 79). The uniform 5-vertex closed tiles repeated on an INSUL layer are the classic batt-insulation zigzag hatch, and there are no LINEs, arcs, text, or dimension entities at all; the LINE-derived bbox is even reported as not derivable because no LINE exists.",
+      "rule": "A block whose entire content is many identical small closed polylines on an insulation (INSUL) layer is a pattern-fill fragment (insulation hatch), not a symbol, furniture, dimension cache, or plan fragment; the entity homogeneity plus the layer name decides it.",
+      "counterfactual": "If the block also contained long parallel LINEs bounding the tile run, or the layer were a wall layer instead of INSUL, I would treat it as a wall plan fragment (평면 부분도) and list those boundary lines as wall candidates; text or dimension entities would push it toward 치수캐시.",
+      "uncertainty": "Vertex coordinates are not given, so I cannot confirm the tiles form a linear zigzag run nor measure its length or orientation; insulation normally sits inside a wall cavity, so the block marks where a wall likely is, but it contains no wall lines itself — hence low but nonzero wall_likelihood."
+    }
+  },
+  {
+    "unit_id": "defannot-u279-218",
+    "def": "*U279",
+    "role": "기타",
+    "wall_likelihood": 0.1,
+    "wall_line_handles": [],
+    "notes": "INSUL 레이어 5-정점 LWPOLYLINE 42개만으로 구성된 단열재 해치(배트) 패턴 블록 — 중간~긴 단열재 구간",
+    "rationale": {
+      "evidence": "All 42 entities are LWPOLYLINEs with exactly 5 vertices on layer 'X-평면도(기본형)$0$INSUL' (handles 7EA5..7EC2, sampled 30 of 42). The uniform 5-vertex closed tiles repeated on an INSUL layer are the classic batt-insulation zigzag hatch, and there are no LINEs, arcs, text, or dimension entities at all; the LINE-derived bbox is even reported as not derivable because no LINE exists.",
+      "rule": "A block whose entire content is many identical small closed polylines on an insulation (INSUL) layer is a pattern-fill fragment (insulation hatch), not a symbol, furniture, dimension cache, or plan fragment; the entity homogeneity plus the layer name decides it.",
+      "counterfactual": "If the block also contained long parallel LINEs bounding the tile run, or the layer were a wall layer instead of INSUL, I would treat it as a wall plan fragment (평면 부분도) and list those boundary lines as wall candidates; text or dimension entities would push it toward 치수캐시.",
+      "uncertainty": "Vertex coordinates are not given, so I cannot confirm the tiles form a linear zigzag run nor measure its length or orientation; insulation normally sits inside a wall cavity, so the block marks where a wall likely is, but it contains no wall lines itself — hence low but nonzero wall_likelihood."
+    }
+  },
+  {
+    "unit_id": "defannot-u280-219",
+    "def": "*U280",
+    "role": "기타",
+    "wall_likelihood": 0.1,
+    "wall_line_handles": [],
+    "notes": "INSUL 레이어 5-정점 LWPOLYLINE 95개만으로 구성된 단열재 해치(배트) 패턴 블록 — 중간~긴 단열재 구간",
+    "rationale": {
+      "evidence": "All 95 entities are LWPOLYLINEs with exactly 5 vertices on layer 'X-평면도(기본형)$0$INSUL' (handles 7ED4..7EF1, sampled 30 of 95). The uniform 5-vertex closed tiles repeated on an INSUL layer are the classic batt-insulation zigzag hatch, and there are no LINEs, arcs, text, or dimension entities at all; the LINE-derived bbox is even reported as not derivable because no LINE exists.",
+      "rule": "A block whose entire content is many identical small closed polylines on an insulation (INSUL) layer is a pattern-fill fragment (insulation hatch), not a symbol, furniture, dimension cache, or plan fragment; the entity homogeneity plus the layer name decides it.",
+      "counterfactual": "If the block also contained long parallel LINEs bounding the tile run, or the layer were a wall layer instead of INSUL, I would treat it as a wall plan fragment (평면 부분도) and list those boundary lines as wall candidates; text or dimension entities would push it toward 치수캐시.",
+      "uncertainty": "Vertex coordinates are not given, so I cannot confirm the tiles form a linear zigzag run nor measure its length or orientation; insulation normally sits inside a wall cavity, so the block marks where a wall likely is, but it contains no wall lines itself — hence low but nonzero wall_likelihood."
+    }
+  },
+  {
+    "unit_id": "defannot-u281-220",
+    "def": "*U281",
+    "role": "기타",
+    "wall_likelihood": 0.1,
+    "wall_line_handles": [],
+    "notes": "INSUL 레이어 5-정점 LWPOLYLINE 23개만으로 구성된 단열재 해치(배트) 패턴 블록 — 짧은 단열재 구간",
+    "rationale": {
+      "evidence": "All 23 entities are LWPOLYLINEs with exactly 5 vertices on layer 'X-평면도(기본형)$0$INSUL' (handles 7F38..7F4E, all 23 listed). The uniform 5-vertex closed tiles repeated on an INSUL layer are the classic batt-insulation zigzag hatch, and there are no LINEs, arcs, text, or dimension entities at all; the LINE-derived bbox is even reported as not derivable because no LINE exists.",
+      "rule": "A block whose entire content is many identical small closed polylines on an insulation (INSUL) layer is a pattern-fill fragment (insulation hatch), not a symbol, furniture, dimension cache, or plan fragment; the entity homogeneity plus the layer name decides it.",
+      "counterfactual": "If the block also contained long parallel LINEs bounding the tile run, or the layer were a wall layer instead of INSUL, I would treat it as a wall plan fragment (평면 부분도) and list those boundary lines as wall candidates; text or dimension entities would push it toward 치수캐시.",
+      "uncertainty": "Vertex coordinates are not given, so I cannot confirm the tiles form a linear zigzag run nor measure its length or orientation; insulation normally sits inside a wall cavity, so the block marks where a wall likely is, but it contains no wall lines itself — hence low but nonzero wall_likelihood."
+    }
+  }
+]

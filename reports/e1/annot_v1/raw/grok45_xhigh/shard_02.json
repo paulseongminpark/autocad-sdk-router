@@ -1,0 +1,282 @@
+[
+ {
+  "unit_id": "defannot-d315-21",
+  "def": "*D315",
+  "role": "치수캐시",
+  "wall_likelihood": 0.0,
+  "wall_line_handles": [],
+  "notes": "Anonymous dim block: DIM lines, DIMDOT ticks, MTEXT 5795, DEFPOINTS.",
+  "rationale": {
+   "evidence": "Name *D315 plus layer mix DIM/DEFPOINTS, DIMDOT inserts, and MTEXT '\\A1;5795' match an exploded/cached dimension. The three LINEs are parallel extension/dimension geometry on DIM, not wall outlines.",
+   "rule": "Blocks named *D### with only DIM/DEFPOINTS content, dim ticks, and numeric MTEXT are dimension caches, not plan geometry.",
+   "counterfactual": "WALL/A-WALL polylines or door/window symbology without DIM ticks would flip away from 치수캐시.",
+   "uncertainty": "Cannot see the parent DIMENSION entity or measured feature; only this anonymous definition projection is available."
+  }
+ },
+ {
+  "unit_id": "defannot-d316-22",
+  "def": "*D316",
+  "role": "치수캐시",
+  "wall_likelihood": 0.0,
+  "wall_line_handles": [],
+  "notes": "Dim cache: three DIM lines, DIMDOTs, MTEXT 1420, DEFPOINTS.",
+  "rationale": {
+   "evidence": "*D316 contains only DIM-layer LINEs, two DIMDOT INSERTs, numeric MTEXT 1420, and DEFPOINTS POINTs—classic anonymous dimension exploded content.",
+   "rule": "Treat *D* definitions whose entities are exclusively dimension graphics and DEFPOINTS as 치수캐시.",
+   "counterfactual": "If LINEs lived on a construction wall layer with thickness pairs and no dim text/ticks, wall_likelihood would rise.",
+   "uncertainty": "Orientation relative to the plan and what is being measured cannot be confirmed from this projection alone."
+  }
+ },
+ {
+  "unit_id": "defannot-d317-23",
+  "def": "*D317",
+  "role": "치수캐시",
+  "wall_likelihood": 0.0,
+  "wall_line_handles": [],
+  "notes": "Large vertical dim cache with MTEXT 10400 and DIMDOT markers.",
+  "rationale": {
+   "evidence": "Entity set is DIM lines + DIMDOT + MTEXT 10400 + DEFPOINTS; bbox is a long thin measurement span, not a room/wall assembly.",
+   "rule": "Numeric MTEXT on DIM with tick inserts and DEFPOINTS points indicates dimension cache regardless of span length.",
+   "counterfactual": "Presence of hatch, wall centerlines, or furniture blocks would challenge the 치수캐시 label.",
+   "uncertainty": "Whether 10400 is mm or another unit, and which plan edge it annotates, is unknown here."
+  }
+ },
+ {
+  "unit_id": "defannot-d318-24",
+  "def": "*D318",
+  "role": "치수캐시",
+  "wall_likelihood": 0.0,
+  "wall_line_handles": [],
+  "notes": "Short dim segment cache: MTEXT 800, DIMDOT, DIM/DEFPOINTS only.",
+  "rationale": {
+   "evidence": "Same pattern as other *D blocks: three DIM LINEs, DIMDOT inserts, MTEXT 800, three DEFPOINTS—no architectural layers.",
+   "rule": "Absence of non-DIM geometry plus dimension tick blocks forces role=치수캐시 and wall_likelihood near zero.",
+   "counterfactual": "Replacing DIMDOT/MTEXT with continuous double-line wall outlines on A-WALL would flip the judgment.",
+   "uncertainty": "Cannot tell if this is an overall or partial dimension without the host drawing context."
+  }
+ },
+ {
+  "unit_id": "defannot-d319-25",
+  "def": "*D319",
+  "role": "치수캐시",
+  "wall_likelihood": 0.0,
+  "wall_line_handles": [],
+  "notes": "Very short dim cache MTEXT 375 with DIMDOT and DEFPOINTS.",
+  "rationale": {
+   "evidence": "Compact bbox and entities limited to DIM LINEs, DIMDOT, MTEXT 375, DEFPOINTS match a small dimension cache, not walls.",
+   "rule": "Short measured spans with dim graphics remain 치수캐시; wall lines require non-DIM layer structure.",
+   "counterfactual": "If the projection included closed wall polylines or openings, role could shift to 평면 부분도.",
+   "uncertainty": "What feature is 375 units long cannot be inferred from the anonymous block alone."
+  }
+ },
+ {
+  "unit_id": "defannot-d320-26",
+  "def": "*D320",
+  "role": "치수캐시",
+  "wall_likelihood": 0.0,
+  "wall_line_handles": [],
+  "notes": "Dim cache with _ArchTick ends, five DIM lines, MTEXT 185.",
+  "rationale": {
+   "evidence": "Five DIM LINEs form extension/dimension stubs with _ArchTick inserts and MTEXT 185 plus DEFPOINTS—architectural tick style dimension cache.",
+   "rule": "_ArchTick or DIMDOT on DIM with numeric MTEXT and DEFPOINTS classifies the block as 치수캐시.",
+   "counterfactual": "Removing ticks/MTEXT and adding parallel wall core/finish lines on WALL layers would raise wall_likelihood.",
+   "uncertainty": "Tick style implies architectural dims but not which building element is measured."
+  }
+ },
+ {
+  "unit_id": "defannot-d321-27",
+  "def": "*D321",
+  "role": "치수캐시",
+  "wall_likelihood": 0.0,
+  "wall_line_handles": [],
+  "notes": "Vertical dim cache MTEXT 2400 with _ArchTick markers.",
+  "rationale": {
+   "evidence": "Three DIM LINEs spanning ~2400, _ArchTick INSERTs, MTEXT 2400, DEFPOINTS—standard anonymous dimension definition.",
+   "rule": "Anonymous *D blocks that are only dimension graphics are never walls or furniture.",
+   "counterfactual": "Furniture INSERT names or seat/table geometry would move role toward 가구.",
+   "uncertainty": "Link to the live DIMENSION object and override values is not visible in this projection."
+  }
+ },
+ {
+  "unit_id": "defannot-d322-28",
+  "def": "*D322",
+  "role": "치수캐시",
+  "wall_likelihood": 0.0,
+  "wall_line_handles": [],
+  "notes": "Tight dim cache MTEXT 80 with _ArchTick and stub LINEs.",
+  "rationale": {
+   "evidence": "Eleven entities all on DIM/DEFPOINTS: stub extension LINEs, _ArchTick, MTEXT 80—dimension cache for a small gap.",
+   "rule": "Even multi-LINE dim assemblies stay 치수캐시 when layers and ticks are dim-only.",
+   "counterfactual": "If LINEs were on WALL and formed a closed corridor outline without dim text, judgment would flip.",
+   "uncertainty": "Whether 80 is clearance, thickness, or another attribute cannot be known from entities alone."
+  }
+ },
+ {
+  "unit_id": "defannot-d323-29",
+  "def": "*D323",
+  "role": "치수캐시",
+  "wall_likelihood": 0.0,
+  "wall_line_handles": [],
+  "notes": "Dim cache MTEXT 80, _ArchTick, three DIM lines, DEFPOINTS.",
+  "rationale": {
+   "evidence": "Identical dim-cache signature: DIM LINEs, _ArchTick, numeric MTEXT 80, DEFPOINTS POINTs; no plan layers.",
+   "rule": "Role is driven by entity/layer/tick pattern, not by measured value size.",
+   "counterfactual": "Symbol block inserts (e.g. electrical) without dim ticks would suggest 심볼 instead.",
+   "uncertainty": "Spatial relation to adjacent *D322/*D324 dims is outside this single definition."
+  }
+ },
+ {
+  "unit_id": "defannot-d324-30",
+  "def": "*D324",
+  "role": "치수캐시",
+  "wall_likelihood": 0.0,
+  "wall_line_handles": [],
+  "notes": "Dim cache MTEXT 2200 with _ArchTick on DIM/DEFPOINTS.",
+  "rationale": {
+   "evidence": "Long vertical DIM dimension line set with _ArchTick and MTEXT 2200 plus DEFPOINTS matches anonymous dimension cache.",
+   "rule": "DIM-layer measurement graphics with tick blocks and DEFPOINTS => 치수캐시; wall_line_handles empty.",
+   "counterfactual": "Adding A-WALL double lines coincident with the measured span would still keep this block as dim cache, but a separate wall block would be needed for walls.",
+   "uncertainty": "Host view scale and dimension style name are not in the projection."
+  }
+ },
+ {
+  "unit_id": "defannot-d325-31",
+  "def": "*D325",
+  "role": "치수캐시",
+  "wall_likelihood": 0.0,
+  "wall_line_handles": [],
+  "notes": "Small dim cache MTEXT 70 with _ArchTick and five DIM lines.",
+  "rationale": {
+   "evidence": "Stub LINEs around a 70-unit span, _ArchTick inserts, MTEXT 70, DEFPOINTS—pure dimension exploded content.",
+   "rule": "Count of LINEs (3 vs 5) does not change classification when all content remains dim ticks and DIM/DEFPOINTS.",
+   "counterfactual": "Non-numeric MTEXT labels or title text without ticks could suggest annotation other than dim cache.",
+   "uncertainty": "Cannot verify association to a specific wall thickness or opening from this block alone."
+  }
+ },
+ {
+  "unit_id": "defannot-d326-32",
+  "def": "*D326",
+  "role": "치수캐시",
+  "wall_likelihood": 0.0,
+  "wall_line_handles": [],
+  "notes": "Horizontal dim cache MTEXT 1820 with DIMDOT ticks.",
+  "rationale": {
+   "evidence": "Two vertical extension LINEs and one horizontal dim LINE on DIM, DIMDOT inserts, MTEXT 1820, DEFPOINTS—horizontal dimension cache.",
+   "rule": "Orthogonal extension+dimension LINE triples with dim ticks and numeric MTEXT are 치수캐시, not wall outlines.",
+   "counterfactual": "If the three LINEs formed a continuous wall path on a wall layer without MTEXT/ticks, wall_likelihood would increase.",
+   "uncertainty": "Plan north and which bay/room width is annotated remain unknown."
+  }
+ },
+ {
+  "unit_id": "defannot-d327-33",
+  "def": "*D327",
+  "role": "치수캐시",
+  "wall_likelihood": 0.0,
+  "wall_line_handles": [],
+  "notes": "Horizontal dim cache MTEXT 2715, DIMDOT, DEFPOINTS.",
+  "rationale": {
+   "evidence": "Same horizontal dim pattern as *D326: DIM extension/dim LINEs, DIMDOT, MTEXT 2715, DEFPOINTS only.",
+   "rule": "Anonymous *D### + DIM/DEFPOINTS + dim tick + numeric MTEXT => role 치수캐시, wall_likelihood 0.",
+   "counterfactual": "Furniture geometry (chair, desk outlines) would flip role to 가구.",
+   "uncertainty": "Continuity with neighboring horizontal dims is not encoded in this isolated definition."
+  }
+ },
+ {
+  "unit_id": "defannot-d328-34",
+  "def": "*D328",
+  "role": "치수캐시",
+  "wall_likelihood": 0.0,
+  "wall_line_handles": [],
+  "notes": "Wide horizontal dim cache MTEXT 6530 with DIMDOT.",
+  "rationale": {
+   "evidence": "Wide bbox (~6530) but content is still DIM LINEs, DIMDOT, MTEXT 6530, DEFPOINTS—long overall dimension cache, not walls.",
+   "rule": "Span length alone never implies walls; layer and dim-tick evidence dominate.",
+   "counterfactual": "Closed multi-segment wall polylines spanning the same bbox on WALL would indicate 평면 부분도.",
+   "uncertainty": "Whether this is a building overall width or a chain segment needs the parent dim chain."
+  }
+ },
+ {
+  "unit_id": "defannot-d329-35",
+  "def": "*D329",
+  "role": "치수캐시",
+  "wall_likelihood": 0.0,
+  "wall_line_handles": [],
+  "notes": "Horizontal dim cache MTEXT 1980, DIMDOT, DIM/DEFPOINTS.",
+  "rationale": {
+   "evidence": "Standard horizontal dimension exploded set: extension LINEs, dim LINE, DIMDOT, MTEXT 1980, DEFPOINTS.",
+   "rule": "Classify as 치수캐시 whenever the projection is dim graphics only under *D names.",
+   "counterfactual": "Absence of MTEXT and ticks plus presence of door swing arcs would suggest plan detail instead.",
+   "uncertainty": "Measured object identity (room, grid, opening) cannot be read from handles alone."
+  }
+ },
+ {
+  "unit_id": "defannot-d330-36",
+  "def": "*D330",
+  "role": "치수캐시",
+  "wall_likelihood": 0.0,
+  "wall_line_handles": [],
+  "notes": "Horizontal dim cache MTEXT 1840 with DIMDOT markers.",
+  "rationale": {
+   "evidence": "DIM-layer LINEs, DIMDOT INSERTs, MTEXT 1840, DEFPOINTS POINTs with no non-dim content.",
+   "rule": "Dim tick block names (DIMDOT/_ArchTick) plus DEFPOINTS are strong negative evidence for walls.",
+   "counterfactual": "Wall_likelihood would rise only if substantial non-DIM linework representing thickness appeared.",
+   "uncertainty": "Drawing units and dim style overrides are not present in the projection."
+  }
+ },
+ {
+  "unit_id": "defannot-d331-37",
+  "def": "*D331",
+  "role": "치수캐시",
+  "wall_likelihood": 0.0,
+  "wall_line_handles": [],
+  "notes": "Overall horizontal dim cache MTEXT 15100 spanning full width.",
+  "rationale": {
+   "evidence": "Very wide horizontal dim: DIM extension LINEs at ends, dim LINE, DIMDOT, MTEXT 15100, DEFPOINTS—overall dimension cache.",
+   "rule": "Overall dimensions are still 치수캐시; large bbox does not imply plan partial drawing.",
+   "counterfactual": "If the block contained grid bubbles, room tags, and wall outlines, role would become 평면 부분도.",
+   "uncertainty": "Whether 15100 sums prior segments (*D326–*D330) cannot be verified here."
+  }
+ },
+ {
+  "unit_id": "defannot-d332-38",
+  "def": "*D332",
+  "role": "치수캐시",
+  "wall_likelihood": 0.0,
+  "wall_line_handles": [],
+  "notes": "Vertical-ish dim cache MTEXT 240 with _ArchTick stubs.",
+  "rationale": {
+   "evidence": "Five DIM LINEs with short stubs, _ArchTick inserts, MTEXT 240, DEFPOINTS—dimension cache, not wall core.",
+   "rule": "Stub extension segments on DIM with architectural ticks remain dimension graphics.",
+   "counterfactual": "Parallel offset pairs on WALL forming a thickness would be candidate wall lines.",
+   "uncertainty": "Exact measurement axis relative to the building shell is not shown beyond LINE coordinates."
+  }
+ },
+ {
+  "unit_id": "defannot-d333-39",
+  "def": "*D333",
+  "role": "치수캐시",
+  "wall_likelihood": 0.0,
+  "wall_line_handles": [],
+  "notes": "Dim cache MTEXT 1500 with _ArchTick on DIM/DEFPOINTS.",
+  "rationale": {
+   "evidence": "Three DIM LINEs, _ArchTick pair, MTEXT 1500, DEFPOINTS—anonymous dimension definition pattern.",
+   "rule": "Keep wall_line_handles empty when every LINE is on DIM and accompanied by dim ticks/text.",
+   "counterfactual": "Symbol-only content (no numeric dim text) would push toward 심볼.",
+   "uncertainty": "Parent dimension associativity and override state are invisible in this shard."
+  }
+ },
+ {
+  "unit_id": "defannot-d334-40",
+  "def": "*D334",
+  "role": "치수캐시",
+  "wall_likelihood": 0.0,
+  "wall_line_handles": [],
+  "notes": "Narrow dim cache MTEXT 80 with _ArchTick and five DIM lines.",
+  "rationale": {
+   "evidence": "Compact five-LINE DIM assembly, _ArchTick inserts, MTEXT 80, DEFPOINTS—matches adjacent small-gap dimension caches.",
+   "rule": "DIM/DEFPOINTS-only *D blocks with tick inserts and numeric MTEXT are always 치수캐시 with wall_likelihood 0.",
+   "counterfactual": "Replacing this content with door/window block geometry would change role to 심볼 or 평면 부분도.",
+   "uncertainty": "Which clearance or thickness 80 represents requires the host plan entities not present here."
+  }
+ }
+]

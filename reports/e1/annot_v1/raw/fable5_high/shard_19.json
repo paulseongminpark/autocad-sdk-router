@@ -1,0 +1,291 @@
+[
+  {
+    "unit_id": "defannot-x-0-phg1200-361",
+    "def": "X-평면도(기본형)$0$phg1200",
+    "role": "심볼",
+    "wall_likelihood": 0.3,
+    "wall_line_handles": [
+      {"handle": "7D2C", "reason": "full-width line at y=0, likely wall face of opening"},
+      {"handle": "7D1F", "reason": "full-width line at y=200, likely opposite wall face"}
+    ],
+    "notes": "1200-wide window block (phg) on WIN layer: parallel glazing lines between two full-span wall-face lines.",
+    "rationale": {
+      "evidence": "All 22 entities sit on a dedicated WIN layer and the name 'phg1200' matches the ~1160mm bbox width. Long parallel horizontal lines at y=0, 40, 60, 100, 200 spanning 40..1160 form the classic plan-view window sandwich (frame/glass lines between wall faces), with small LWPOLYLINEs as mullion/frame details.",
+      "rule": "A compact block whose entities all live on a WIN/DOOR-type layer and consist of a few long parallel lines bounded by two outer face lines is an opening symbol, not building fabric itself; its outer face lines coincide with wall faces.",
+      "counterfactual": "If the layer histogram showed WAL-type layers or hatched poche polylines instead of WIN, or the bbox depth exceeded typical wall thickness (~200mm here), I would reclassify toward 평면 부분도 and raise wall_likelihood.",
+      "uncertainty": "Without linetype/color or the parent-plan insertion context I cannot confirm whether y=0/y=200 lines are literal wall faces or frame outlines; LWPOLYLINE vertex coordinates are not shown, so their shapes are inferred."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-pkdr750190-362",
+    "def": "X-평면도(기본형)$0$pkdr750190",
+    "role": "심볼",
+    "wall_likelihood": 0.15,
+    "wall_line_handles": [
+      {"handle": "4117", "reason": "long vertical line paired 30mm from 4118, possible wall/frame stub"},
+      {"handle": "4118", "reason": "parallel mate of 4117, possible wall/frame stub"}
+    ],
+    "notes": "750-wide door unit block (pkdr750190) on DOOR layer: leaf, frame and side-panel geometry.",
+    "rationale": {
+      "evidence": "All 25 entities are on a single DOOR layer and the name encodes a door size (750/190). Vertical line groups at x=0,-10,-20,-50 spanning y=750..1420 read as a door leaf/side panel in plan, and the diagonal ticks (4128, 412A) are typical frame chamfer marks; many small LWPOLYLINEs are frame sections.",
+      "rule": "Blocks confined to a DOOR layer with size-encoded names and leaf/frame line bundles are opening symbols; parallel thin line pairs inside them are frame or leaf edges rather than structural walls.",
+      "counterfactual": "If the paired lines 4117/4118 were much thicker apart (100mm+) and extended beyond the door extents, or a WAL-type layer appeared, I would treat them as wall stubs and raise wall_likelihood.",
+      "uncertainty": "LWPOLYLINE vertex data is hidden, so I cannot verify whether any polyline traces a wall stub; the 30mm pair spacing is ambiguous between a frame member and a thin partition edge."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-pkdr750190-1-363",
+    "def": "X-평면도(기본형)$0$pkdr750190-1",
+    "role": "심볼",
+    "wall_likelihood": 0.15,
+    "wall_line_handles": [
+      {"handle": "6CCC", "reason": "long vertical line paired 30mm from 6CCD, possible wall/frame stub"},
+      {"handle": "6CCD", "reason": "parallel mate of 6CCC, possible wall/frame stub"}
+    ],
+    "notes": "Variant copy of the pkdr750190 door block (taller side panel to y=1460), same DOOR-layer composition.",
+    "rationale": {
+      "evidence": "Entity mix (8 LINE, 17 LWPOLYLINE on one DOOR layer) and coordinates are near-identical to defannot-x-0-pkdr750190-362, differing only in the panel top (1460 vs 1420). The '-1' suffix marks an anonymous-style duplicate created when a block is redefined or copied with edits.",
+      "rule": "When a block duplicates an already-classified sibling with only a dimensional tweak and a numeric suffix, it inherits the sibling's role; suffix duplicates of opening symbols remain opening symbols.",
+      "counterfactual": "If the duplicate had gained WAL-layer entities or lost the leaf/frame bundle, the inheritance would break and it would need independent classification.",
+      "uncertainty": "As with its sibling, hidden LWPOLYLINE vertices prevent confirming frame vs wall-stub geometry, and the actual functional difference between the two variants (door height vs adjacent panel) is not determinable from this projection."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-psd700-2-364",
+    "def": "X-평면도(기본형)$0$PSD700_2",
+    "role": "심볼",
+    "wall_likelihood": 0.05,
+    "wall_line_handles": [],
+    "notes": "Small 5-entity PS-door 700 block on STL layer: swing arc plus diagonal leaf line and jamb polylines.",
+    "rationale": {
+      "evidence": "Only 5 entities: one ARC (door swing), one long diagonal LINE (-330,30)->(243.8,361.3) that reads as an open leaf, and three 4-vertex LWPOLYLINEs that read as jamb/frame rectangles. Name PSD700 encodes a 700-size pipe-shaft or PS door.",
+      "rule": "An arc plus a single leaf line plus a couple of jamb rectangles is the minimal plan-door symbol signature regardless of layer name; entity economy (<10) also argues for a symbol over a plan fragment.",
+      "counterfactual": "If the polylines were long and parallel spanning beyond the swing extents, they could be wall stubs and the block might carry wall geometry; the ARC being a full circle instead of a swing would suggest a different fixture.",
+      "uncertainty": "ARC parameters (center/radius) are not shown, so the swing interpretation rests on the name and the diagonal line; the STL layer's meaning (steel? shaft?) cannot be verified from this projection."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-sb1703-1500-365",
+    "def": "X-평면도(기본형)$0$SB1703 1500",
+    "role": "가구",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "1312-entity spline-heavy block on FUR layer, 1500x830 footprint: detailed furniture/appliance (likely sink-bench or sofa-bed unit) plan.",
+    "rationale": {
+      "evidence": "Every one of the 1312 entities is on the FUR layer, with 814 SPLINEs and 164 ARCs — organic curve density typical of manufacturer-drawn furniture/fixture blocks. The 1500x830 bbox matches a catalog furniture module and the name 'SB1703 1500' looks like a product code plus width.",
+      "rule": "Blocks living entirely on a FUR layer with very high spline/arc counts and a product-code name are imported furniture symbols; walls are never drawn with hundreds of splines.",
+      "counterfactual": "If a second layer such as WAL appeared, or long straight lines traced the bbox perimeter at wall-like 100-200mm pair offsets, I would suspect embedded room fabric and raise wall_likelihood.",
+      "uncertainty": "The exact object type (sink bench, sofa, appliance) cannot be resolved from 30 sampled entities out of 1312; sampling may also hide a few non-FUR strays beyond what the layer histogram shows it cannot."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-sta-t-366",
+    "def": "X-평면도(기본형)$0$sta-t",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.15,
+    "wall_line_handles": [],
+    "notes": "Stair plan fragment on STA layer: tread lines every 260mm with break-line gaps at x=-1250..-1400, plus NON/SYM annotation entities.",
+    "rationale": {
+      "evidence": "34 LINEs on the STA layer form evenly spaced tread lines (y=-1300,-1820,-2080,... step 260) split into left/right runs with short 25mm stubs around x=-1250..-1350 — a classic stair-with-break-line plan. Multiple layers (STA, NON, SYM, DEFPOINTS-1) plus CIRCLEs indicate an assembled drawing fragment, not a single-purpose symbol.",
+      "rule": "A block mixing building-element layers with annotation/symbol layers and depicting an area of the building (stair flight with break lines) is a partial plan fragment rather than a reusable unit symbol.",
+      "counterfactual": "If all entities sat on one SYM-type layer or the geometry were a bare arrow/tag, I would call it 심볼; if wall-thickness line pairs bounded the stair shaft, wall_likelihood would rise sharply.",
+      "uncertainty": "The NON-layer polylines' shapes are hidden, so I cannot rule out that one traces the stair-shaft walls; CIRCLE radii and SYM-layer content (likely a direction arrow) are also not visible."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-sta-t-4-367",
+    "def": "X-평면도(기본형)$0$sta-t-4",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.15,
+    "wall_line_handles": [],
+    "notes": "Variant of the sta-t stair fragment extended one tread deeper (to y=-3380), same STA/NON/SYM layer mix.",
+    "rationale": {
+      "evidence": "Entity composition (38 LINE on STA, NON=20, SYM=7, 2 CIRCLE) and tread coordinates replicate sta-t exactly through y=-2860, with the bottom tread moved to -3380 — a longer flight. The '-4' suffix marks a copied/redefined variant of the same stair fragment.",
+      "rule": "Suffix variants that preserve a sibling's layer mix and geometry pattern inherit its classification; changing flight length does not change what the block is.",
+      "counterfactual": "If the variant had dropped the STA tread pattern or collapsed to a single symbol layer, inheritance would not apply and I would reclassify.",
+      "uncertainty": "Same blind spots as sta-t: hidden NON/SYM polyline shapes could conceal shaft-wall outlines, and the functional difference between variants (which floor/flight) is not recoverable here."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-sta-t-5-368",
+    "def": "X-평면도(기본형)$0$sta-t-5",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.15,
+    "wall_line_handles": [],
+    "notes": "Third sta-t stair-fragment variant (40 STA tread lines, bbox to y=0, fewer SYM entities), same break-line tread pattern.",
+    "rationale": {
+      "evidence": "40 STA-layer LINEs repeat the identical tread/break-line pattern of sta-t and sta-t-4 (rows at -1300..-3380 with 25mm stubs near x=-1300), with NON=21 and SYM reduced to 3. The bbox extends to y=0, suggesting extra landing geometry beyond the sampled rows.",
+      "rule": "Same inheritance rule as other suffix variants: preserved layer mix plus preserved geometry pattern means preserved role (stair plan fragment).",
+      "counterfactual": "If the additional entities near y=0 turned out to be wall poche or shaft outline pairs, wall_likelihood would rise; if SYM/NON vanished entirely, a pure 심볼 reading would become viable.",
+      "uncertainty": "The sample truncates at 30 of 65 entities, so the landing-area geometry implied by the y=0 bbox edge is unseen; NON-layer polyline shapes remain unverifiable."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-t1-369",
+    "def": "X-평면도(기본형)$0$T1",
+    "role": "가구",
+    "wall_likelihood": 0.05,
+    "wall_line_handles": [],
+    "notes": "Narrow 90x670 FUR-layer block of evenly spaced 20mm rungs — reads as a ladder/towel-rail/shelf unit in plan or elevation.",
+    "rationale": {
+      "evidence": "All 33 entities are on the FUR layer; 24+ LINEs run horizontally 10..90 at a constant 20mm pitch over a 90-wide, 670-tall strip, framed by LWPOLYLINEs — a rung/slat pattern typical of a ladder, towel rail, or slatted shelf fixture. The terse name 'T1' is a numbered fixture tag.",
+      "rule": "Single-FUR-layer blocks with small footprints and regular slat patterns are furniture/fixture symbols; regular sub-25mm line pitch is joinery detail, never wall structure.",
+      "counterfactual": "If the strip were 100-200mm wide with only two boundary lines, it could pass for a wall segment; the presence of a dense rung fill rules that out.",
+      "uncertainty": "Whether this is drawn in plan (grating/slats seen from above) or is a mixed elevation fragment cannot be determined; T1's meaning in the project legend is unknown from this projection."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-wd120900-370",
+    "def": "X-평면도(기본형)$0$wd120900",
+    "role": "심볼",
+    "wall_likelihood": 0.1,
+    "wall_line_handles": [],
+    "notes": "Wood door 900 block (wd120900) on DOOR layer: swing arc, leaf line, frame polylines, and a long threshold line pair at y=80/77.",
+    "rationale": {
+      "evidence": "16 entities all on DOOR layer with one ARC (swing), a short diagonal LINE (-20,120)->(0,0) as the leaf, high-vertex LWPOLYLINEs (17/19 vertices) as frame sections, and a 3mm-spaced long pair (1D17/1D18) spanning 40..860 that reads as a threshold/sill line. Name encodes wood door, 120 frame, 900 width.",
+      "rule": "DOOR-layer blocks with size-coded 'wd' names, one swing arc, and frame polylines are door symbols; long thin pairs at 3mm offset are threshold lines, not walls (walls pair at 100-200mm).",
+      "counterfactual": "If the long pair were offset by wall-scale distance or extended past the door bbox, I would flag them as wall stubs and raise wall_likelihood.",
+      "uncertainty": "ARC geometry and polyline vertices are hidden, so leaf/frame reading rests on the name convention; whether the block includes any jamb-embedded wall return cannot be confirmed."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-wd160750-371",
+    "def": "X-평면도(기본형)$0$wd160750",
+    "role": "심볼",
+    "wall_likelihood": 0.1,
+    "wall_line_handles": [],
+    "notes": "Wood door 750 block on DOOR layer with X-crossed jamb marks at both ends and a swing arc.",
+    "rationale": {
+      "evidence": "15 DOOR-layer entities; the two line pairs (1D21/1D22 at x=727..750 and 1D26/1D27 at x=0..23) form the X-cross jamb symbols conventional at door frames, plus one ARC for the swing and frame LWPOLYLINEs. Name wd160750 encodes a 750-wide wood door with 160 frame depth, matching the 750x140 bbox.",
+      "rule": "X-crossed short line pairs at both ends of a size-coded DOOR-layer block are frame-section marks — a strong door-symbol signature; nothing wall-like remains once frame and swing are accounted for.",
+      "counterfactual": "If the crosses were absent and instead two long parallel lines ran the full width at frame depth, a lintel/wall-over reading would compete and raise wall_likelihood.",
+      "uncertainty": "The ARC's extent is unknown, so the swing direction/angle is assumed; hidden polyline shapes could include a sill line I cannot see."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-wd170750-372",
+    "def": "X-평면도(기본형)$0$wd170750",
+    "role": "심볼",
+    "wall_likelihood": 0.1,
+    "wall_line_handles": [],
+    "notes": "Wood door 750 block, 170 frame depth — near-identical twin of wd160750 with 150 bbox height.",
+    "rationale": {
+      "evidence": "Identical histogram to wd160750 (ARC=1, LINE=4, LWPOLYLINE=10, all DOOR layer) and identical X-cross jamb pairs (6921/6922, 6926/6927) at the same x positions, differing only in height (150 vs 140) per the deeper 170 frame in the name.",
+      "rule": "A block that replicates an already-classified door block's structure with only a frame-depth change is the same symbol family; size-family members share one role.",
+      "counterfactual": "Any added layer or loss of the swing arc plus jamb crosses would break the family inheritance and force independent judgment.",
+      "uncertainty": "Same as its twin: arc extent and polyline vertices unseen, so internal frame details are assumed from convention rather than observed."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-wd200900-373",
+    "def": "X-평면도(기본형)$0$WD200900",
+    "role": "심볼",
+    "wall_likelihood": 0.1,
+    "wall_line_handles": [],
+    "notes": "Wood door 900 block with 200 frame depth — same template as wd120900 with threshold pair at y=160/157.",
+    "rationale": {
+      "evidence": "16 DOOR-layer entities exactly mirroring wd120900's composition: leaf line (-20,200)->(0,0), swing ARC, the same 17/19-vertex frame polylines, and a 3mm threshold pair (410F/4110) spanning 40..860. Only the frame depth (200 vs 120) differs, as the name encodes.",
+      "rule": "Template-stamped door blocks that vary only the size digits in the name and one dimension in geometry belong to one symbol family and share the door-symbol role.",
+      "counterfactual": "A wall-scale offset in the long line pair or extra non-DOOR layers would be the flip trigger toward wall-bearing geometry.",
+      "uncertainty": "Cannot verify from the projection whether the 200 depth is frame or includes a wall-return; arc parameters are hidden."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-wd250900-374",
+    "def": "X-평면도(기본형)$0$wd250900",
+    "role": "심볼",
+    "wall_likelihood": 0.1,
+    "wall_line_handles": [],
+    "notes": "Wood door 900 block with 250 frame depth — same door-symbol template, threshold pair at y=210/207.",
+    "rationale": {
+      "evidence": "Composition matches the wd-900 family (16 entities, DOOR layer, leaf line (-20,250)->(0,0), one ARC, 17/19-vertex frame polylines, 3mm threshold pair 3842/3843 spanning 40..860); the name's 250 matches the bbox height.",
+      "rule": "Same size-family inheritance rule as WD200900/wd120900: template geometry plus size-coded name equals one shared door-symbol role.",
+      "counterfactual": "Departure from the template (missing swing arc, added hatch poche, non-DOOR layers) would invalidate inheritance and could indicate embedded wall fabric.",
+      "uncertainty": "As across the family, hidden ARC and polyline internals mean the frame-vs-wall boundary at the jambs is assumed from naming convention, not measured."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-wd850-375",
+    "def": "X-평면도(기본형)$0$WD850",
+    "role": "심볼",
+    "wall_likelihood": 0.1,
+    "wall_line_handles": [],
+    "notes": "850-wide door block on DOOR layer drawn leftward from origin: frame polylines plus three near-collinear threshold lines, no swing arc sampled.",
+    "rationale": {
+      "evidence": "All 12 entities on DOOR layer; the same 17/19-vertex frame LWPOLYLINE signature seen in the wd-900 family, plus three long lines (584C/584D/584E) at y=0 and y=-3 spanning -30..-820 that read as threshold/sill lines for an 850 opening (name WD850).",
+      "rule": "Frame-polyline signature plus size-coded WD name on a DOOR layer identifies a door symbol even when the swing arc is absent (sliding or arc-less representation); 3mm line offsets are graphic, not structural.",
+      "counterfactual": "If the three long lines were spaced at wall thickness rather than 3mm, or a WAL layer appeared, I would treat this as an opening cut into wall fabric and raise wall_likelihood.",
+      "uncertainty": "No ARC exists in the histogram, so the door type (sliding vs swing, or a frame-only lintel block) cannot be pinned down; the near-duplicate lines 584C/584D suggest drafting duplication I cannot confirm."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-376",
+    "def": "X-평면도(기본형)$0$국기계양대",
+    "role": "심볼",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "Flagpole-holder (국기계양대) detail symbol on layer 0: 64x140 bracket outline with a 15-radius circle.",
+    "rationale": {
+      "evidence": "The Korean name means flag-hoisting bracket, and the 17 entities (16 short LINEs plus one CIRCLE r=15) trace a small 64x140 bracket profile — pure equipment depiction. Everything sits on layer 0, typical for standalone symbol blocks meant to inherit insert-layer properties.",
+      "rule": "Named equipment blocks at accessory scale (tens of mm) drawn on layer 0 are unit symbols; nothing at this scale can be a wall or plan fragment.",
+      "counterfactual": "Only a scale reinterpretation (units in cm/m rather than mm) could make this large enough to be building fabric, and the name would still contradict that.",
+      "uncertainty": "Whether this is a plan or elevation view of the bracket is indeterminate; drawing units are assumed to be mm from context."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-300-377",
+    "def": "X-평면도(기본형)$0$무동력휀300",
+    "role": "심볼",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "Non-powered roof ventilator 300 symbol: centered circle r=150 with axis lines and X-cross on dedicated 무동력흡출기 layers.",
+    "rationale": {
+      "evidence": "8 entities centered on the origin: a 150-radius CIRCLE with full crosshair axis lines (±325) and a diagonal X (7BE1/7BE2) on a 'CON' sublayer — the standard schematic for a 300-diameter gravity ventilator, matching the name 무동력휀300. Dedicated equipment layers (무동력흡출기/…CON) confirm an MEP symbol.",
+      "rule": "Circle-plus-crosshair-plus-X compositions centered at origin on equipment-named layers are mechanical fixture symbols; symmetric axis lines are locator graphics, not geometry of the building.",
+      "counterfactual": "If the crosshair lines extended far beyond the symbol and joined other fabric, or the layers were architectural, the locator-graphic reading would weaken.",
+      "uncertainty": "Whether 'CON' marks a connection/센터 guide sublayer is inferred; mounting context (roof vs wall) is not recoverable from the block alone."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-378",
+    "def": "X-평면도(기본형)$0$세면대_공통",
+    "role": "가구",
+    "wall_likelihood": 0.05,
+    "wall_line_handles": [],
+    "notes": "Common washbasin/counter (세면대_공통) fixture block on FUR layer, drawn at world coordinates (~765000,-195000) with 139 splines.",
+    "rationale": {
+      "evidence": "The name means 'washbasin_common' and all 191 entities are on the FUR layer, with 139 SPLINEs and 16 ARCs shaping basin curves, a faucet circle (r=17.5), and a ~505x490 counter outline. Curve-heavy single-FUR-layer content is the sanitary-fixture signature.",
+      "rule": "Named sanitary fixtures on FUR-type layers are furniture/fixture blocks in this taxonomy; basin geometry is drawn with splines/arcs, which walls never are.",
+      "counterfactual": "If the outer rectangle lines paired at 100-200mm offsets with poche, part of the block could be wall-backed counter fabric, nudging wall_likelihood up.",
+      "uncertainty": "The block's base point is far from origin (world coordinates ~765km/-196km in mm), so whether the straight boundary lines are counter edges or traced room walls cannot be settled without the parent plan."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-379",
+    "def": "X-평면도(기본형)$0$수전",
+    "role": "심볼",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "Faucet (수전) symbol on an A06-시설물-설비 (facilities/plumbing) layer: 90x108mm arc-and-circle valve/spout figure.",
+    "rationale": {
+      "evidence": "The name means faucet and the 33 entities — 19 ARCs, 3 concentric-scale CIRCLEs (r≈8.8/22.2/23.6), short LINEs, 2 POINTs — fit a plan/front faucet figure within a 90x108mm bbox. The layer A06-시설물-설비 explicitly declares plumbing-equipment content.",
+      "rule": "Sub-100mm blocks on equipment/설비 layers with arc-dominated geometry are plumbing fixture symbols; scale alone excludes any wall or plan-fragment reading.",
+      "counterfactual": "A units misread (block drawn in meters) would be the only route to reinterpreting this as large geometry, and the fixture name would still contradict it.",
+      "uncertainty": "POINT entities' purpose (snap nodes vs connection markers) is not determinable; whether the view is plan or elevation of the faucet is ambiguous."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-1-380",
+    "def": "X-평면도(기본형)$0$수전-1",
+    "role": "심볼",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "Faucet variant (수전-1) on its own 수전 layer, drawn at offset world coordinates (~33550,-11100): lever-style faucet with symmetric handle lines.",
+    "rationale": {
+      "evidence": "Named 수전-1 with all 15 entities on a 수전 (faucet) layer; symmetric slanted line pairs (688E/688F vs 6895/6896), small CIRCLE r=5.9, ARCs and small LWPOLYLINEs compose a ~17x88mm faucet figure. Scale and name both scream fixture symbol.",
+      "rule": "Suffix variant of a named fixture with fixture-scale geometry on a fixture-named layer keeps the symbol role; tiny (<100mm) extents categorically exclude building fabric.",
+      "counterfactual": "Only if the layer or name were generic and the extents building-scale would any non-symbol role become plausible.",
+      "uncertainty": "The block's remote base point (~33.5m offset in mm units) means its insertion behavior is odd; whether it duplicates 수전 (item 19) functionally or depicts a different faucet type cannot be resolved here."
+    }
+  }
+]

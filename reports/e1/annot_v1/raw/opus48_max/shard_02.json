@@ -1,0 +1,282 @@
+[
+  {
+    "unit_id": "defannot-d315-21",
+    "def": "*D315",
+    "role": "치수캐시",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "세로 5795mm 연관 치수 블록(DIMDOT 화살표); DIM 레이어 witness·dim 라인이라 벽선 아님 → 치수캐시",
+    "rationale": {
+      "evidence": "블록명 *D315는 *D#### 형태의 익명 블록이고 9개 엔티티가 전부 DIM·DEFPOINTS 레이어에만 있다. 수평 witness 라인 2개(8C0E, 8C0F)와 수직 dim 라인(8C10), 양끝 DIMDOT INSERT 2개, DEFPOINTS POINT 3개, 치수값 MTEXT '5795'로 구성된다. MTEXT 값 5795가 두 witness 라인 사이 세로(y) 간격과 정확히 일치하여 연관 치수의 지오메트리 캐시임을 확정한다.",
+      "rule": "이름이 *D+숫자인 익명 블록이 DIM/DEFPOINTS 레이어의 witness·dim 라인, 화살표 INSERT(DIMDOT/_ArchTick), 단일 숫자 MTEXT, DEFPOINTS POINT만으로 구성되면 실제 모델 지오메트리가 아니라 연관 치수(associative dimension)의 지오메트리 캐시(치수캐시)로 분류한다. MTEXT 숫자가 bbox 스팬과 일치하는지가 결정적 판별자다.",
+      "counterfactual": "동일한 라인이 벽 레이어(예: WALL/A-WALL 등)에 있고 숫자 MTEXT·DEFPOINTS POINT·화살표 INSERT가 없거나, MTEXT 값이 bbox 스팬과 불일치했다면 치수캐시가 아니라 벽/모델 지오메트리(평면 부분도)로 판정이 뒤집혔을 것이다.",
+      "uncertainty": "이 블록 정의만으로는 이 치수가 실제로 무엇(벽·개구부·슬래브 등)의 길이를 재는지, 삽입 시 스케일·회전·위치가 무엇인지 알 수 없다. 따라서 치수가 가리키는 대상이 벽인지 여부는 정의 단독으로는 판정 불가하다."
+    }
+  },
+  {
+    "unit_id": "defannot-d316-22",
+    "def": "*D316",
+    "role": "치수캐시",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "세로 1420mm 연관 치수 블록(DIMDOT 화살표); DIM 레이어 witness·dim 라인이라 벽선 아님 → 치수캐시",
+    "rationale": {
+      "evidence": "블록명 *D316는 *D#### 형태의 익명 블록이고 9개 엔티티가 전부 DIM·DEFPOINTS 레이어에만 있다. 수평 witness 라인 2개(8C17, 8C18)와 수직 dim 라인(8C19), 양끝 DIMDOT INSERT 2개, DEFPOINTS POINT 3개, 치수값 MTEXT '1420'로 구성된다. MTEXT 값 1420가 두 witness 라인 사이 세로(y) 간격과 정확히 일치하여 연관 치수의 지오메트리 캐시임을 확정한다.",
+      "rule": "이름이 *D+숫자인 익명 블록이 DIM/DEFPOINTS 레이어의 witness·dim 라인, 화살표 INSERT(DIMDOT/_ArchTick), 단일 숫자 MTEXT, DEFPOINTS POINT만으로 구성되면 실제 모델 지오메트리가 아니라 연관 치수(associative dimension)의 지오메트리 캐시(치수캐시)로 분류한다. MTEXT 숫자가 bbox 스팬과 일치하는지가 결정적 판별자다.",
+      "counterfactual": "동일한 라인이 벽 레이어(예: WALL/A-WALL 등)에 있고 숫자 MTEXT·DEFPOINTS POINT·화살표 INSERT가 없거나, MTEXT 값이 bbox 스팬과 불일치했다면 치수캐시가 아니라 벽/모델 지오메트리(평면 부분도)로 판정이 뒤집혔을 것이다.",
+      "uncertainty": "이 블록 정의만으로는 이 치수가 실제로 무엇(벽·개구부·슬래브 등)의 길이를 재는지, 삽입 시 스케일·회전·위치가 무엇인지 알 수 없다. 따라서 치수가 가리키는 대상이 벽인지 여부는 정의 단독으로는 판정 불가하다."
+    }
+  },
+  {
+    "unit_id": "defannot-d317-23",
+    "def": "*D317",
+    "role": "치수캐시",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "세로 10400mm 연관 치수 블록(DIMDOT 화살표); DIM 레이어 witness·dim 라인이라 벽선 아님 → 치수캐시",
+    "rationale": {
+      "evidence": "블록명 *D317는 *D#### 형태의 익명 블록이고 9개 엔티티가 전부 DIM·DEFPOINTS 레이어에만 있다. 수평 witness 라인 2개(8C20, 8C21)와 수직 dim 라인(8C22), 양끝 DIMDOT INSERT 2개, DEFPOINTS POINT 3개, 치수값 MTEXT '10400'로 구성된다. MTEXT 값 10400가 두 witness 라인 사이 세로(y) 간격과 정확히 일치하여 연관 치수의 지오메트리 캐시임을 확정한다.",
+      "rule": "이름이 *D+숫자인 익명 블록이 DIM/DEFPOINTS 레이어의 witness·dim 라인, 화살표 INSERT(DIMDOT/_ArchTick), 단일 숫자 MTEXT, DEFPOINTS POINT만으로 구성되면 실제 모델 지오메트리가 아니라 연관 치수(associative dimension)의 지오메트리 캐시(치수캐시)로 분류한다. MTEXT 숫자가 bbox 스팬과 일치하는지가 결정적 판별자다.",
+      "counterfactual": "동일한 라인이 벽 레이어(예: WALL/A-WALL 등)에 있고 숫자 MTEXT·DEFPOINTS POINT·화살표 INSERT가 없거나, MTEXT 값이 bbox 스팬과 불일치했다면 치수캐시가 아니라 벽/모델 지오메트리(평면 부분도)로 판정이 뒤집혔을 것이다.",
+      "uncertainty": "이 블록 정의만으로는 이 치수가 실제로 무엇(벽·개구부·슬래브 등)의 길이를 재는지, 삽입 시 스케일·회전·위치가 무엇인지 알 수 없다. 따라서 치수가 가리키는 대상이 벽인지 여부는 정의 단독으로는 판정 불가하다."
+    }
+  },
+  {
+    "unit_id": "defannot-d318-24",
+    "def": "*D318",
+    "role": "치수캐시",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "세로 800mm 연관 치수 블록(DIMDOT 화살표); DIM 레이어 witness·dim 라인이라 벽선 아님 → 치수캐시",
+    "rationale": {
+      "evidence": "블록명 *D318는 *D#### 형태의 익명 블록이고 9개 엔티티가 전부 DIM·DEFPOINTS 레이어에만 있다. 수평 witness 라인 2개(8C29, 8C2A)와 수직 dim 라인(8C2B), 양끝 DIMDOT INSERT 2개, DEFPOINTS POINT 3개, 치수값 MTEXT '800'로 구성된다. MTEXT 값 800가 두 witness 라인 사이 세로(y) 간격과 정확히 일치하여 연관 치수의 지오메트리 캐시임을 확정한다.",
+      "rule": "이름이 *D+숫자인 익명 블록이 DIM/DEFPOINTS 레이어의 witness·dim 라인, 화살표 INSERT(DIMDOT/_ArchTick), 단일 숫자 MTEXT, DEFPOINTS POINT만으로 구성되면 실제 모델 지오메트리가 아니라 연관 치수(associative dimension)의 지오메트리 캐시(치수캐시)로 분류한다. MTEXT 숫자가 bbox 스팬과 일치하는지가 결정적 판별자다.",
+      "counterfactual": "동일한 라인이 벽 레이어(예: WALL/A-WALL 등)에 있고 숫자 MTEXT·DEFPOINTS POINT·화살표 INSERT가 없거나, MTEXT 값이 bbox 스팬과 불일치했다면 치수캐시가 아니라 벽/모델 지오메트리(평면 부분도)로 판정이 뒤집혔을 것이다.",
+      "uncertainty": "이 블록 정의만으로는 이 치수가 실제로 무엇(벽·개구부·슬래브 등)의 길이를 재는지, 삽입 시 스케일·회전·위치가 무엇인지 알 수 없다. 따라서 치수가 가리키는 대상이 벽인지 여부는 정의 단독으로는 판정 불가하다."
+    }
+  },
+  {
+    "unit_id": "defannot-d319-25",
+    "def": "*D319",
+    "role": "치수캐시",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "세로 375mm 연관 치수 블록(DIMDOT 화살표); DIM 레이어 witness·dim 라인이라 벽선 아님 → 치수캐시",
+    "rationale": {
+      "evidence": "블록명 *D319는 *D#### 형태의 익명 블록이고 9개 엔티티가 전부 DIM·DEFPOINTS 레이어에만 있다. 수평 witness 라인 2개(8C32, 8C33)와 수직 dim 라인(8C34), 양끝 DIMDOT INSERT 2개, DEFPOINTS POINT 3개, 치수값 MTEXT '375'로 구성된다. MTEXT 값 375가 두 witness 라인 사이 세로(y) 간격과 정확히 일치하여 연관 치수의 지오메트리 캐시임을 확정한다.",
+      "rule": "이름이 *D+숫자인 익명 블록이 DIM/DEFPOINTS 레이어의 witness·dim 라인, 화살표 INSERT(DIMDOT/_ArchTick), 단일 숫자 MTEXT, DEFPOINTS POINT만으로 구성되면 실제 모델 지오메트리가 아니라 연관 치수(associative dimension)의 지오메트리 캐시(치수캐시)로 분류한다. MTEXT 숫자가 bbox 스팬과 일치하는지가 결정적 판별자다.",
+      "counterfactual": "동일한 라인이 벽 레이어(예: WALL/A-WALL 등)에 있고 숫자 MTEXT·DEFPOINTS POINT·화살표 INSERT가 없거나, MTEXT 값이 bbox 스팬과 불일치했다면 치수캐시가 아니라 벽/모델 지오메트리(평면 부분도)로 판정이 뒤집혔을 것이다.",
+      "uncertainty": "이 블록 정의만으로는 이 치수가 실제로 무엇(벽·개구부·슬래브 등)의 길이를 재는지, 삽입 시 스케일·회전·위치가 무엇인지 알 수 없다. 따라서 치수가 가리키는 대상이 벽인지 여부는 정의 단독으로는 판정 불가하다."
+    }
+  },
+  {
+    "unit_id": "defannot-d320-26",
+    "def": "*D320",
+    "role": "치수캐시",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "세로 185mm 연관 치수 블록(_ArchTick 화살표); DIM 레이어 witness·dim 라인이라 벽선 아님 → 치수캐시",
+    "rationale": {
+      "evidence": "블록명 *D320는 *D#### 형태의 익명 블록이고 11개 엔티티가 전부 DIM·DEFPOINTS 레이어에만 있다. 수평 witness 라인 2개(8C3B, 8C3C)와 수직 dim 라인(8C3F), 양끝 _ArchTick INSERT 2개, DEFPOINTS POINT 3개, 치수값 MTEXT '185'로 구성된다. MTEXT 값 185가 두 witness 라인 사이 세로(y) 간격과 정확히 일치하여 연관 치수의 지오메트리 캐시임을 확정한다. 짧은 치수라 witness 바깥으로 뻗는 dim 라인 jog 세그먼트가 추가돼 LINE이 5개다.",
+      "rule": "이름이 *D+숫자인 익명 블록이 DIM/DEFPOINTS 레이어의 witness·dim 라인, 화살표 INSERT(DIMDOT/_ArchTick), 단일 숫자 MTEXT, DEFPOINTS POINT만으로 구성되면 실제 모델 지오메트리가 아니라 연관 치수(associative dimension)의 지오메트리 캐시(치수캐시)로 분류한다. MTEXT 숫자가 bbox 스팬과 일치하는지가 결정적 판별자다.",
+      "counterfactual": "동일한 라인이 벽 레이어(예: WALL/A-WALL 등)에 있고 숫자 MTEXT·DEFPOINTS POINT·화살표 INSERT가 없거나, MTEXT 값이 bbox 스팬과 불일치했다면 치수캐시가 아니라 벽/모델 지오메트리(평면 부분도)로 판정이 뒤집혔을 것이다.",
+      "uncertainty": "이 블록 정의만으로는 이 치수가 실제로 무엇(벽·개구부·슬래브 등)의 길이를 재는지, 삽입 시 스케일·회전·위치가 무엇인지 알 수 없다. 따라서 치수가 가리키는 대상이 벽인지 여부는 정의 단독으로는 판정 불가하다."
+    }
+  },
+  {
+    "unit_id": "defannot-d321-27",
+    "def": "*D321",
+    "role": "치수캐시",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "세로 2400mm 연관 치수 블록(_ArchTick 화살표); DIM 레이어 witness·dim 라인이라 벽선 아님 → 치수캐시",
+    "rationale": {
+      "evidence": "블록명 *D321는 *D#### 형태의 익명 블록이고 9개 엔티티가 전부 DIM·DEFPOINTS 레이어에만 있다. 수평 witness 라인 2개(8C46, 8C47)와 수직 dim 라인(8C48), 양끝 _ArchTick INSERT 2개, DEFPOINTS POINT 3개, 치수값 MTEXT '2400'로 구성된다. MTEXT 값 2400가 두 witness 라인 사이 세로(y) 간격과 정확히 일치하여 연관 치수의 지오메트리 캐시임을 확정한다.",
+      "rule": "이름이 *D+숫자인 익명 블록이 DIM/DEFPOINTS 레이어의 witness·dim 라인, 화살표 INSERT(DIMDOT/_ArchTick), 단일 숫자 MTEXT, DEFPOINTS POINT만으로 구성되면 실제 모델 지오메트리가 아니라 연관 치수(associative dimension)의 지오메트리 캐시(치수캐시)로 분류한다. MTEXT 숫자가 bbox 스팬과 일치하는지가 결정적 판별자다.",
+      "counterfactual": "동일한 라인이 벽 레이어(예: WALL/A-WALL 등)에 있고 숫자 MTEXT·DEFPOINTS POINT·화살표 INSERT가 없거나, MTEXT 값이 bbox 스팬과 불일치했다면 치수캐시가 아니라 벽/모델 지오메트리(평면 부분도)로 판정이 뒤집혔을 것이다.",
+      "uncertainty": "이 블록 정의만으로는 이 치수가 실제로 무엇(벽·개구부·슬래브 등)의 길이를 재는지, 삽입 시 스케일·회전·위치가 무엇인지 알 수 없다. 따라서 치수가 가리키는 대상이 벽인지 여부는 정의 단독으로는 판정 불가하다."
+    }
+  },
+  {
+    "unit_id": "defannot-d322-28",
+    "def": "*D322",
+    "role": "치수캐시",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "세로 80mm 연관 치수 블록(_ArchTick 화살표); DIM 레이어 witness·dim 라인이라 벽선 아님 → 치수캐시",
+    "rationale": {
+      "evidence": "블록명 *D322는 *D#### 형태의 익명 블록이고 11개 엔티티가 전부 DIM·DEFPOINTS 레이어에만 있다. 수평 witness 라인 2개(8C4F, 8C50)와 수직 dim 라인(8C54), 양끝 _ArchTick INSERT 2개, DEFPOINTS POINT 3개, 치수값 MTEXT '80'로 구성된다. MTEXT 값 80가 두 witness 라인 사이 세로(y) 간격과 정확히 일치하여 연관 치수의 지오메트리 캐시임을 확정한다. 짧은 치수라 witness 바깥으로 뻗는 dim 라인 jog 세그먼트가 추가돼 LINE이 5개다.",
+      "rule": "이름이 *D+숫자인 익명 블록이 DIM/DEFPOINTS 레이어의 witness·dim 라인, 화살표 INSERT(DIMDOT/_ArchTick), 단일 숫자 MTEXT, DEFPOINTS POINT만으로 구성되면 실제 모델 지오메트리가 아니라 연관 치수(associative dimension)의 지오메트리 캐시(치수캐시)로 분류한다. MTEXT 숫자가 bbox 스팬과 일치하는지가 결정적 판별자다.",
+      "counterfactual": "동일한 라인이 벽 레이어(예: WALL/A-WALL 등)에 있고 숫자 MTEXT·DEFPOINTS POINT·화살표 INSERT가 없거나, MTEXT 값이 bbox 스팬과 불일치했다면 치수캐시가 아니라 벽/모델 지오메트리(평면 부분도)로 판정이 뒤집혔을 것이다.",
+      "uncertainty": "이 블록 정의만으로는 이 치수가 실제로 무엇(벽·개구부·슬래브 등)의 길이를 재는지, 삽입 시 스케일·회전·위치가 무엇인지 알 수 없다. 따라서 치수가 가리키는 대상이 벽인지 여부는 정의 단독으로는 판정 불가하다."
+    }
+  },
+  {
+    "unit_id": "defannot-d323-29",
+    "def": "*D323",
+    "role": "치수캐시",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "세로 80mm 연관 치수 블록(_ArchTick 화살표); DIM 레이어 witness·dim 라인이라 벽선 아님 → 치수캐시",
+    "rationale": {
+      "evidence": "블록명 *D323는 *D#### 형태의 익명 블록이고 9개 엔티티가 전부 DIM·DEFPOINTS 레이어에만 있다. 수평 witness 라인 2개(8C5A, 8C5B)와 수직 dim 라인(8C5C), 양끝 _ArchTick INSERT 2개, DEFPOINTS POINT 3개, 치수값 MTEXT '80'로 구성된다. MTEXT 값 80가 두 witness 라인 사이 세로(y) 간격과 정확히 일치하여 연관 치수의 지오메트리 캐시임을 확정한다.",
+      "rule": "이름이 *D+숫자인 익명 블록이 DIM/DEFPOINTS 레이어의 witness·dim 라인, 화살표 INSERT(DIMDOT/_ArchTick), 단일 숫자 MTEXT, DEFPOINTS POINT만으로 구성되면 실제 모델 지오메트리가 아니라 연관 치수(associative dimension)의 지오메트리 캐시(치수캐시)로 분류한다. MTEXT 숫자가 bbox 스팬과 일치하는지가 결정적 판별자다.",
+      "counterfactual": "동일한 라인이 벽 레이어(예: WALL/A-WALL 등)에 있고 숫자 MTEXT·DEFPOINTS POINT·화살표 INSERT가 없거나, MTEXT 값이 bbox 스팬과 불일치했다면 치수캐시가 아니라 벽/모델 지오메트리(평면 부분도)로 판정이 뒤집혔을 것이다.",
+      "uncertainty": "이 블록 정의만으로는 이 치수가 실제로 무엇(벽·개구부·슬래브 등)의 길이를 재는지, 삽입 시 스케일·회전·위치가 무엇인지 알 수 없다. 따라서 치수가 가리키는 대상이 벽인지 여부는 정의 단독으로는 판정 불가하다."
+    }
+  },
+  {
+    "unit_id": "defannot-d324-30",
+    "def": "*D324",
+    "role": "치수캐시",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "세로 2200mm 연관 치수 블록(_ArchTick 화살표); DIM 레이어 witness·dim 라인이라 벽선 아님 → 치수캐시",
+    "rationale": {
+      "evidence": "블록명 *D324는 *D#### 형태의 익명 블록이고 9개 엔티티가 전부 DIM·DEFPOINTS 레이어에만 있다. 수평 witness 라인 2개(8C63, 8C64)와 수직 dim 라인(8C65), 양끝 _ArchTick INSERT 2개, DEFPOINTS POINT 3개, 치수값 MTEXT '2200'로 구성된다. MTEXT 값 2200가 두 witness 라인 사이 세로(y) 간격과 정확히 일치하여 연관 치수의 지오메트리 캐시임을 확정한다.",
+      "rule": "이름이 *D+숫자인 익명 블록이 DIM/DEFPOINTS 레이어의 witness·dim 라인, 화살표 INSERT(DIMDOT/_ArchTick), 단일 숫자 MTEXT, DEFPOINTS POINT만으로 구성되면 실제 모델 지오메트리가 아니라 연관 치수(associative dimension)의 지오메트리 캐시(치수캐시)로 분류한다. MTEXT 숫자가 bbox 스팬과 일치하는지가 결정적 판별자다.",
+      "counterfactual": "동일한 라인이 벽 레이어(예: WALL/A-WALL 등)에 있고 숫자 MTEXT·DEFPOINTS POINT·화살표 INSERT가 없거나, MTEXT 값이 bbox 스팬과 불일치했다면 치수캐시가 아니라 벽/모델 지오메트리(평면 부분도)로 판정이 뒤집혔을 것이다.",
+      "uncertainty": "이 블록 정의만으로는 이 치수가 실제로 무엇(벽·개구부·슬래브 등)의 길이를 재는지, 삽입 시 스케일·회전·위치가 무엇인지 알 수 없다. 따라서 치수가 가리키는 대상이 벽인지 여부는 정의 단독으로는 판정 불가하다."
+    }
+  },
+  {
+    "unit_id": "defannot-d325-31",
+    "def": "*D325",
+    "role": "치수캐시",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "세로 70mm 연관 치수 블록(_ArchTick 화살표); DIM 레이어 witness·dim 라인이라 벽선 아님 → 치수캐시",
+    "rationale": {
+      "evidence": "블록명 *D325는 *D#### 형태의 익명 블록이고 11개 엔티티가 전부 DIM·DEFPOINTS 레이어에만 있다. 수평 witness 라인 2개(8C6C, 8C6D)와 수직 dim 라인(8C70), 양끝 _ArchTick INSERT 2개, DEFPOINTS POINT 3개, 치수값 MTEXT '70'로 구성된다. MTEXT 값 70가 두 witness 라인 사이 세로(y) 간격과 정확히 일치하여 연관 치수의 지오메트리 캐시임을 확정한다. 짧은 치수라 witness 바깥으로 뻗는 dim 라인 jog 세그먼트가 추가돼 LINE이 5개다.",
+      "rule": "이름이 *D+숫자인 익명 블록이 DIM/DEFPOINTS 레이어의 witness·dim 라인, 화살표 INSERT(DIMDOT/_ArchTick), 단일 숫자 MTEXT, DEFPOINTS POINT만으로 구성되면 실제 모델 지오메트리가 아니라 연관 치수(associative dimension)의 지오메트리 캐시(치수캐시)로 분류한다. MTEXT 숫자가 bbox 스팬과 일치하는지가 결정적 판별자다.",
+      "counterfactual": "동일한 라인이 벽 레이어(예: WALL/A-WALL 등)에 있고 숫자 MTEXT·DEFPOINTS POINT·화살표 INSERT가 없거나, MTEXT 값이 bbox 스팬과 불일치했다면 치수캐시가 아니라 벽/모델 지오메트리(평면 부분도)로 판정이 뒤집혔을 것이다.",
+      "uncertainty": "이 블록 정의만으로는 이 치수가 실제로 무엇(벽·개구부·슬래브 등)의 길이를 재는지, 삽입 시 스케일·회전·위치가 무엇인지 알 수 없다. 따라서 치수가 가리키는 대상이 벽인지 여부는 정의 단독으로는 판정 불가하다."
+    }
+  },
+  {
+    "unit_id": "defannot-d326-32",
+    "def": "*D326",
+    "role": "치수캐시",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "가로 1820mm 연관 치수 블록(DIMDOT 화살표); DIM 레이어 witness·dim 라인이라 벽선 아님 → 치수캐시",
+    "rationale": {
+      "evidence": "블록명 *D326는 *D#### 형태의 익명 블록이고 9개 엔티티가 전부 DIM·DEFPOINTS 레이어에만 있다. 수직 witness 라인 2개(8C77, 8C78)와 수평 dim 라인(8C79), 양끝 DIMDOT INSERT 2개, DEFPOINTS POINT 3개, 치수값 MTEXT '1820'로 구성된다. MTEXT 값 1820가 두 witness 라인 사이 가로(x) 간격과 정확히 일치하여 연관 치수의 지오메트리 캐시임을 확정한다.",
+      "rule": "이름이 *D+숫자인 익명 블록이 DIM/DEFPOINTS 레이어의 witness·dim 라인, 화살표 INSERT(DIMDOT/_ArchTick), 단일 숫자 MTEXT, DEFPOINTS POINT만으로 구성되면 실제 모델 지오메트리가 아니라 연관 치수(associative dimension)의 지오메트리 캐시(치수캐시)로 분류한다. MTEXT 숫자가 bbox 스팬과 일치하는지가 결정적 판별자다.",
+      "counterfactual": "동일한 라인이 벽 레이어(예: WALL/A-WALL 등)에 있고 숫자 MTEXT·DEFPOINTS POINT·화살표 INSERT가 없거나, MTEXT 값이 bbox 스팬과 불일치했다면 치수캐시가 아니라 벽/모델 지오메트리(평면 부분도)로 판정이 뒤집혔을 것이다.",
+      "uncertainty": "이 블록 정의만으로는 이 치수가 실제로 무엇(벽·개구부·슬래브 등)의 길이를 재는지, 삽입 시 스케일·회전·위치가 무엇인지 알 수 없다. 따라서 치수가 가리키는 대상이 벽인지 여부는 정의 단독으로는 판정 불가하다."
+    }
+  },
+  {
+    "unit_id": "defannot-d327-33",
+    "def": "*D327",
+    "role": "치수캐시",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "가로 2715mm 연관 치수 블록(DIMDOT 화살표); DIM 레이어 witness·dim 라인이라 벽선 아님 → 치수캐시",
+    "rationale": {
+      "evidence": "블록명 *D327는 *D#### 형태의 익명 블록이고 9개 엔티티가 전부 DIM·DEFPOINTS 레이어에만 있다. 수직 witness 라인 2개(8C80, 8C81)와 수평 dim 라인(8C82), 양끝 DIMDOT INSERT 2개, DEFPOINTS POINT 3개, 치수값 MTEXT '2715'로 구성된다. MTEXT 값 2715가 두 witness 라인 사이 가로(x) 간격과 정확히 일치하여 연관 치수의 지오메트리 캐시임을 확정한다.",
+      "rule": "이름이 *D+숫자인 익명 블록이 DIM/DEFPOINTS 레이어의 witness·dim 라인, 화살표 INSERT(DIMDOT/_ArchTick), 단일 숫자 MTEXT, DEFPOINTS POINT만으로 구성되면 실제 모델 지오메트리가 아니라 연관 치수(associative dimension)의 지오메트리 캐시(치수캐시)로 분류한다. MTEXT 숫자가 bbox 스팬과 일치하는지가 결정적 판별자다.",
+      "counterfactual": "동일한 라인이 벽 레이어(예: WALL/A-WALL 등)에 있고 숫자 MTEXT·DEFPOINTS POINT·화살표 INSERT가 없거나, MTEXT 값이 bbox 스팬과 불일치했다면 치수캐시가 아니라 벽/모델 지오메트리(평면 부분도)로 판정이 뒤집혔을 것이다.",
+      "uncertainty": "이 블록 정의만으로는 이 치수가 실제로 무엇(벽·개구부·슬래브 등)의 길이를 재는지, 삽입 시 스케일·회전·위치가 무엇인지 알 수 없다. 따라서 치수가 가리키는 대상이 벽인지 여부는 정의 단독으로는 판정 불가하다."
+    }
+  },
+  {
+    "unit_id": "defannot-d328-34",
+    "def": "*D328",
+    "role": "치수캐시",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "가로 6530mm 연관 치수 블록(DIMDOT 화살표); DIM 레이어 witness·dim 라인이라 벽선 아님 → 치수캐시",
+    "rationale": {
+      "evidence": "블록명 *D328는 *D#### 형태의 익명 블록이고 9개 엔티티가 전부 DIM·DEFPOINTS 레이어에만 있다. 수직 witness 라인 2개(8C89, 8C8A)와 수평 dim 라인(8C8B), 양끝 DIMDOT INSERT 2개, DEFPOINTS POINT 3개, 치수값 MTEXT '6530'로 구성된다. MTEXT 값 6530가 두 witness 라인 사이 가로(x) 간격과 정확히 일치하여 연관 치수의 지오메트리 캐시임을 확정한다.",
+      "rule": "이름이 *D+숫자인 익명 블록이 DIM/DEFPOINTS 레이어의 witness·dim 라인, 화살표 INSERT(DIMDOT/_ArchTick), 단일 숫자 MTEXT, DEFPOINTS POINT만으로 구성되면 실제 모델 지오메트리가 아니라 연관 치수(associative dimension)의 지오메트리 캐시(치수캐시)로 분류한다. MTEXT 숫자가 bbox 스팬과 일치하는지가 결정적 판별자다.",
+      "counterfactual": "동일한 라인이 벽 레이어(예: WALL/A-WALL 등)에 있고 숫자 MTEXT·DEFPOINTS POINT·화살표 INSERT가 없거나, MTEXT 값이 bbox 스팬과 불일치했다면 치수캐시가 아니라 벽/모델 지오메트리(평면 부분도)로 판정이 뒤집혔을 것이다.",
+      "uncertainty": "이 블록 정의만으로는 이 치수가 실제로 무엇(벽·개구부·슬래브 등)의 길이를 재는지, 삽입 시 스케일·회전·위치가 무엇인지 알 수 없다. 따라서 치수가 가리키는 대상이 벽인지 여부는 정의 단독으로는 판정 불가하다."
+    }
+  },
+  {
+    "unit_id": "defannot-d329-35",
+    "def": "*D329",
+    "role": "치수캐시",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "가로 1980mm 연관 치수 블록(DIMDOT 화살표); DIM 레이어 witness·dim 라인이라 벽선 아님 → 치수캐시",
+    "rationale": {
+      "evidence": "블록명 *D329는 *D#### 형태의 익명 블록이고 9개 엔티티가 전부 DIM·DEFPOINTS 레이어에만 있다. 수직 witness 라인 2개(8C92, 8C93)와 수평 dim 라인(8C94), 양끝 DIMDOT INSERT 2개, DEFPOINTS POINT 3개, 치수값 MTEXT '1980'로 구성된다. MTEXT 값 1980가 두 witness 라인 사이 가로(x) 간격과 정확히 일치하여 연관 치수의 지오메트리 캐시임을 확정한다.",
+      "rule": "이름이 *D+숫자인 익명 블록이 DIM/DEFPOINTS 레이어의 witness·dim 라인, 화살표 INSERT(DIMDOT/_ArchTick), 단일 숫자 MTEXT, DEFPOINTS POINT만으로 구성되면 실제 모델 지오메트리가 아니라 연관 치수(associative dimension)의 지오메트리 캐시(치수캐시)로 분류한다. MTEXT 숫자가 bbox 스팬과 일치하는지가 결정적 판별자다.",
+      "counterfactual": "동일한 라인이 벽 레이어(예: WALL/A-WALL 등)에 있고 숫자 MTEXT·DEFPOINTS POINT·화살표 INSERT가 없거나, MTEXT 값이 bbox 스팬과 불일치했다면 치수캐시가 아니라 벽/모델 지오메트리(평면 부분도)로 판정이 뒤집혔을 것이다.",
+      "uncertainty": "이 블록 정의만으로는 이 치수가 실제로 무엇(벽·개구부·슬래브 등)의 길이를 재는지, 삽입 시 스케일·회전·위치가 무엇인지 알 수 없다. 따라서 치수가 가리키는 대상이 벽인지 여부는 정의 단독으로는 판정 불가하다."
+    }
+  },
+  {
+    "unit_id": "defannot-d330-36",
+    "def": "*D330",
+    "role": "치수캐시",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "가로 1840mm 연관 치수 블록(DIMDOT 화살표); DIM 레이어 witness·dim 라인이라 벽선 아님 → 치수캐시",
+    "rationale": {
+      "evidence": "블록명 *D330는 *D#### 형태의 익명 블록이고 9개 엔티티가 전부 DIM·DEFPOINTS 레이어에만 있다. 수직 witness 라인 2개(8C9B, 8C9C)와 수평 dim 라인(8C9D), 양끝 DIMDOT INSERT 2개, DEFPOINTS POINT 3개, 치수값 MTEXT '1840'로 구성된다. MTEXT 값 1840가 두 witness 라인 사이 가로(x) 간격과 정확히 일치하여 연관 치수의 지오메트리 캐시임을 확정한다.",
+      "rule": "이름이 *D+숫자인 익명 블록이 DIM/DEFPOINTS 레이어의 witness·dim 라인, 화살표 INSERT(DIMDOT/_ArchTick), 단일 숫자 MTEXT, DEFPOINTS POINT만으로 구성되면 실제 모델 지오메트리가 아니라 연관 치수(associative dimension)의 지오메트리 캐시(치수캐시)로 분류한다. MTEXT 숫자가 bbox 스팬과 일치하는지가 결정적 판별자다.",
+      "counterfactual": "동일한 라인이 벽 레이어(예: WALL/A-WALL 등)에 있고 숫자 MTEXT·DEFPOINTS POINT·화살표 INSERT가 없거나, MTEXT 값이 bbox 스팬과 불일치했다면 치수캐시가 아니라 벽/모델 지오메트리(평면 부분도)로 판정이 뒤집혔을 것이다.",
+      "uncertainty": "이 블록 정의만으로는 이 치수가 실제로 무엇(벽·개구부·슬래브 등)의 길이를 재는지, 삽입 시 스케일·회전·위치가 무엇인지 알 수 없다. 따라서 치수가 가리키는 대상이 벽인지 여부는 정의 단독으로는 판정 불가하다."
+    }
+  },
+  {
+    "unit_id": "defannot-d331-37",
+    "def": "*D331",
+    "role": "치수캐시",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "가로 15100mm 연관 치수 블록(DIMDOT 화살표); DIM 레이어 witness·dim 라인이라 벽선 아님 → 치수캐시 (체인 전체 총 치수)",
+    "rationale": {
+      "evidence": "블록명 *D331는 *D#### 형태의 익명 블록이고 9개 엔티티가 전부 DIM·DEFPOINTS 레이어에만 있다. 수직 witness 라인 2개(8CA4, 8CA5)와 수평 dim 라인(8CA6), 양끝 DIMDOT INSERT 2개, DEFPOINTS POINT 3개, 치수값 MTEXT '15100'로 구성된다. MTEXT 값 15100가 두 witness 라인 사이 가로(x) 간격과 정확히 일치하여 연관 치수의 지오메트리 캐시임을 확정한다. bbox 스팬이 하위 세그먼트 합과 같은, 체인 전체를 아우르는 총(overall) 치수다.",
+      "rule": "이름이 *D+숫자인 익명 블록이 DIM/DEFPOINTS 레이어의 witness·dim 라인, 화살표 INSERT(DIMDOT/_ArchTick), 단일 숫자 MTEXT, DEFPOINTS POINT만으로 구성되면 실제 모델 지오메트리가 아니라 연관 치수(associative dimension)의 지오메트리 캐시(치수캐시)로 분류한다. MTEXT 숫자가 bbox 스팬과 일치하는지가 결정적 판별자다.",
+      "counterfactual": "동일한 라인이 벽 레이어(예: WALL/A-WALL 등)에 있고 숫자 MTEXT·DEFPOINTS POINT·화살표 INSERT가 없거나, MTEXT 값이 bbox 스팬과 불일치했다면 치수캐시가 아니라 벽/모델 지오메트리(평면 부분도)로 판정이 뒤집혔을 것이다.",
+      "uncertainty": "이 블록 정의만으로는 이 치수가 실제로 무엇(벽·개구부·슬래브 등)의 길이를 재는지, 삽입 시 스케일·회전·위치가 무엇인지 알 수 없다. 따라서 치수가 가리키는 대상이 벽인지 여부는 정의 단독으로는 판정 불가하다."
+    }
+  },
+  {
+    "unit_id": "defannot-d332-38",
+    "def": "*D332",
+    "role": "치수캐시",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "가로 240mm 연관 치수 블록(_ArchTick 화살표); DIM 레이어 witness·dim 라인이라 벽선 아님 → 치수캐시",
+    "rationale": {
+      "evidence": "블록명 *D332는 *D#### 형태의 익명 블록이고 11개 엔티티가 전부 DIM·DEFPOINTS 레이어에만 있다. 수직 witness 라인 2개(8CAD, 8CAE)와 수평 dim 라인(8CB1), 양끝 _ArchTick INSERT 2개, DEFPOINTS POINT 3개, 치수값 MTEXT '240'로 구성된다. MTEXT 값 240가 두 witness 라인 사이 가로(x) 간격과 정확히 일치하여 연관 치수의 지오메트리 캐시임을 확정한다. 짧은 치수라 witness 바깥으로 뻗는 dim 라인 jog 세그먼트가 추가돼 LINE이 5개다.",
+      "rule": "이름이 *D+숫자인 익명 블록이 DIM/DEFPOINTS 레이어의 witness·dim 라인, 화살표 INSERT(DIMDOT/_ArchTick), 단일 숫자 MTEXT, DEFPOINTS POINT만으로 구성되면 실제 모델 지오메트리가 아니라 연관 치수(associative dimension)의 지오메트리 캐시(치수캐시)로 분류한다. MTEXT 숫자가 bbox 스팬과 일치하는지가 결정적 판별자다.",
+      "counterfactual": "동일한 라인이 벽 레이어(예: WALL/A-WALL 등)에 있고 숫자 MTEXT·DEFPOINTS POINT·화살표 INSERT가 없거나, MTEXT 값이 bbox 스팬과 불일치했다면 치수캐시가 아니라 벽/모델 지오메트리(평면 부분도)로 판정이 뒤집혔을 것이다.",
+      "uncertainty": "이 블록 정의만으로는 이 치수가 실제로 무엇(벽·개구부·슬래브 등)의 길이를 재는지, 삽입 시 스케일·회전·위치가 무엇인지 알 수 없다. 따라서 치수가 가리키는 대상이 벽인지 여부는 정의 단독으로는 판정 불가하다."
+    }
+  },
+  {
+    "unit_id": "defannot-d333-39",
+    "def": "*D333",
+    "role": "치수캐시",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "가로 1500mm 연관 치수 블록(_ArchTick 화살표); DIM 레이어 witness·dim 라인이라 벽선 아님 → 치수캐시",
+    "rationale": {
+      "evidence": "블록명 *D333는 *D#### 형태의 익명 블록이고 9개 엔티티가 전부 DIM·DEFPOINTS 레이어에만 있다. 수직 witness 라인 2개(8CB8, 8CB9)와 수평 dim 라인(8CBA), 양끝 _ArchTick INSERT 2개, DEFPOINTS POINT 3개, 치수값 MTEXT '1500'로 구성된다. MTEXT 값 1500가 두 witness 라인 사이 가로(x) 간격과 정확히 일치하여 연관 치수의 지오메트리 캐시임을 확정한다.",
+      "rule": "이름이 *D+숫자인 익명 블록이 DIM/DEFPOINTS 레이어의 witness·dim 라인, 화살표 INSERT(DIMDOT/_ArchTick), 단일 숫자 MTEXT, DEFPOINTS POINT만으로 구성되면 실제 모델 지오메트리가 아니라 연관 치수(associative dimension)의 지오메트리 캐시(치수캐시)로 분류한다. MTEXT 숫자가 bbox 스팬과 일치하는지가 결정적 판별자다.",
+      "counterfactual": "동일한 라인이 벽 레이어(예: WALL/A-WALL 등)에 있고 숫자 MTEXT·DEFPOINTS POINT·화살표 INSERT가 없거나, MTEXT 값이 bbox 스팬과 불일치했다면 치수캐시가 아니라 벽/모델 지오메트리(평면 부분도)로 판정이 뒤집혔을 것이다.",
+      "uncertainty": "이 블록 정의만으로는 이 치수가 실제로 무엇(벽·개구부·슬래브 등)의 길이를 재는지, 삽입 시 스케일·회전·위치가 무엇인지 알 수 없다. 따라서 치수가 가리키는 대상이 벽인지 여부는 정의 단독으로는 판정 불가하다."
+    }
+  },
+  {
+    "unit_id": "defannot-d334-40",
+    "def": "*D334",
+    "role": "치수캐시",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "가로 80mm 연관 치수 블록(_ArchTick 화살표); DIM 레이어 witness·dim 라인이라 벽선 아님 → 치수캐시",
+    "rationale": {
+      "evidence": "블록명 *D334는 *D#### 형태의 익명 블록이고 11개 엔티티가 전부 DIM·DEFPOINTS 레이어에만 있다. 수직 witness 라인 2개(8CC1, 8CC2)와 수평 dim 라인(8CC6), 양끝 _ArchTick INSERT 2개, DEFPOINTS POINT 3개, 치수값 MTEXT '80'로 구성된다. MTEXT 값 80가 두 witness 라인 사이 가로(x) 간격과 정확히 일치하여 연관 치수의 지오메트리 캐시임을 확정한다. 짧은 치수라 witness 바깥으로 뻗는 dim 라인 jog 세그먼트가 추가돼 LINE이 5개다.",
+      "rule": "이름이 *D+숫자인 익명 블록이 DIM/DEFPOINTS 레이어의 witness·dim 라인, 화살표 INSERT(DIMDOT/_ArchTick), 단일 숫자 MTEXT, DEFPOINTS POINT만으로 구성되면 실제 모델 지오메트리가 아니라 연관 치수(associative dimension)의 지오메트리 캐시(치수캐시)로 분류한다. MTEXT 숫자가 bbox 스팬과 일치하는지가 결정적 판별자다.",
+      "counterfactual": "동일한 라인이 벽 레이어(예: WALL/A-WALL 등)에 있고 숫자 MTEXT·DEFPOINTS POINT·화살표 INSERT가 없거나, MTEXT 값이 bbox 스팬과 불일치했다면 치수캐시가 아니라 벽/모델 지오메트리(평면 부분도)로 판정이 뒤집혔을 것이다.",
+      "uncertainty": "이 블록 정의만으로는 이 치수가 실제로 무엇(벽·개구부·슬래브 등)의 길이를 재는지, 삽입 시 스케일·회전·위치가 무엇인지 알 수 없다. 따라서 치수가 가리키는 대상이 벽인지 여부는 정의 단독으로는 판정 불가하다."
+    }
+  }
+]

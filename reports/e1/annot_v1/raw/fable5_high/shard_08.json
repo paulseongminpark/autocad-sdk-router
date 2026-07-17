@@ -1,0 +1,333 @@
+[
+  {
+    "unit_id": "defannot-u130-141",
+    "def": "*U130",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.3,
+    "wall_line_handles": [],
+    "notes": "Anonymous block of 6 uniform 5-vertex LWPOLYLINEs on xref-bound INSUL layer - insulation batt fill fragment of the base plan; no wall boundary lines present.",
+    "rationale": {
+      "evidence": "All 6 entities are LWPOLYLINEs with exactly 5 vertices on the single xref-bound layer X-평면도(기본형)$0$INSUL (sampled handles 483F through 4844). The uniform 5-vertex signature repeated across the block is the classic zigzag batt-insulation motif laid along a wall cavity run. There are no LINE, TEXT, DIMENSION, or HATCH entities, so the block carries plan fill content only.",
+      "rule": "An anonymous *U block whose contents are exclusively short, equal-vertex-count polylines on an insulation (INSUL) layer bound from a plan xref is an insulation-fill fragment of the plan drawing, not a standalone symbol, furniture item, or dimension cache.",
+      "counterfactual": "If these polylines sat on a wall or centerline layer, or if long paired parallel LINEs appeared alongside them, I would raise wall_likelihood sharply and nominate those as wall lines; if TEXT or DIMENSION entities were present the block would shift toward 치수캐시.",
+      "uncertainty": "Vertex coordinates are not exposed, so the zigzag interpretation rests on the layer name and the 5-vertex-per-polyline signature alone; the actual extent, orientation, and which wall cavity the insulation run occupies cannot be determined from this projection."
+    }
+  },
+  {
+    "unit_id": "defannot-u131-142",
+    "def": "*U131",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.3,
+    "wall_line_handles": [],
+    "notes": "Anonymous block of 6 uniform 5-vertex LWPOLYLINEs on xref-bound INSUL layer - insulation batt fill fragment of the base plan; no wall boundary lines present.",
+    "rationale": {
+      "evidence": "All 6 entities are LWPOLYLINEs with exactly 5 vertices on the single xref-bound layer X-평면도(기본형)$0$INSUL (sampled handles 484A through 484F). The uniform 5-vertex signature repeated across the block is the classic zigzag batt-insulation motif laid along a wall cavity run. There are no LINE, TEXT, DIMENSION, or HATCH entities, so the block carries plan fill content only.",
+      "rule": "An anonymous *U block whose contents are exclusively short, equal-vertex-count polylines on an insulation (INSUL) layer bound from a plan xref is an insulation-fill fragment of the plan drawing, not a standalone symbol, furniture item, or dimension cache.",
+      "counterfactual": "If these polylines sat on a wall or centerline layer, or if long paired parallel LINEs appeared alongside them, I would raise wall_likelihood sharply and nominate those as wall lines; if TEXT or DIMENSION entities were present the block would shift toward 치수캐시.",
+      "uncertainty": "Vertex coordinates are not exposed, so the zigzag interpretation rests on the layer name and the 5-vertex-per-polyline signature alone; the actual extent, orientation, and which wall cavity the insulation run occupies cannot be determined from this projection."
+    }
+  },
+  {
+    "unit_id": "defannot-u132-143",
+    "def": "*U132",
+    "role": "심볼",
+    "wall_likelihood": 0.35,
+    "wall_line_handles": [
+      {
+        "handle": "4858",
+        "reason": "1076-long chord, upper of 50-apart parallel pair"
+      },
+      {
+        "handle": "4860",
+        "reason": "1076-long chord, lower of 50-apart parallel pair"
+      },
+      {
+        "handle": "485A",
+        "reason": "long lower chord retraced across full band"
+      },
+      {
+        "handle": "4868",
+        "reason": "long upper chord retraced across full band"
+      }
+    ],
+    "notes": "Composite plan symbol: 1120x126 line band (two 50-apart parallel chords with symmetric end caps) + 2 WIPEOUTs + 국기계양대 insert - reads as a window/railing band with flag-pole holder, not raw wall geometry.",
+    "rationale": {
+      "evidence": "Twenty LINEs on layer 0 form a symmetric 1120x126 band: two long parallel chords at y=-50.5 and y=-100.5 spanning x=±538 (50 apart), an outer frame reaching x=±560 with jamb-like end caps, plus 2 WIPEOUTs masking the background and one INSERT of block X-평면도(기본형)$0$국기계양대 (flag-pole holder). The wipeout+insert+thin-band composition reads as a manufactured plan-view fixture (window/railing band with attached flag-holder), not loose plan linework.",
+      "rule": "An anonymous block that combines background WIPEOUTs, a named fixture INSERT, and a mirror-symmetric thin band of parallel lines with end jambs is a composite architectural symbol (opening/railing fixture) rather than wall geometry, even when its long chords superficially resemble wall lines.",
+      "counterfactual": "If the two long parallel chords were spaced at a typical wall thickness (100-200 units) on a wall layer, or extended beyond the block extents without end jambs, I would reclassify them as true wall lines and the block as 평면 부분도; removing the 국기계양대 insert would leave a plain window/railing band.",
+      "uncertainty": "This projection cannot show whether the 50-unit gap is a railing, window frame, or a thin wall leaf, nor the insertion context (exterior wall, parapet, or balcony edge), so the wall-vs-fixture reading of the long chords stays moderately uncertain."
+    }
+  },
+  {
+    "unit_id": "defannot-u133-144",
+    "def": "*U133",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.3,
+    "wall_line_handles": [],
+    "notes": "Anonymous block of 14 uniform 5-vertex LWPOLYLINEs on xref-bound INSUL layer - insulation batt fill fragment of the base plan; no wall boundary lines present.",
+    "rationale": {
+      "evidence": "All 14 entities are LWPOLYLINEs with exactly 5 vertices on the single xref-bound layer X-평면도(기본형)$0$INSUL (sampled handles 4871 through 487E). The uniform 5-vertex signature repeated across the block is the classic zigzag batt-insulation motif laid along a wall cavity run. There are no LINE, TEXT, DIMENSION, or HATCH entities, so the block carries plan fill content only.",
+      "rule": "An anonymous *U block whose contents are exclusively short, equal-vertex-count polylines on an insulation (INSUL) layer bound from a plan xref is an insulation-fill fragment of the plan drawing, not a standalone symbol, furniture item, or dimension cache.",
+      "counterfactual": "If these polylines sat on a wall or centerline layer, or if long paired parallel LINEs appeared alongside them, I would raise wall_likelihood sharply and nominate those as wall lines; if TEXT or DIMENSION entities were present the block would shift toward 치수캐시.",
+      "uncertainty": "Vertex coordinates are not exposed, so the zigzag interpretation rests on the layer name and the 5-vertex-per-polyline signature alone; the actual extent, orientation, and which wall cavity the insulation run occupies cannot be determined from this projection."
+    }
+  },
+  {
+    "unit_id": "defannot-u134-145",
+    "def": "*U134",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.3,
+    "wall_line_handles": [],
+    "notes": "Anonymous block of 7 uniform 5-vertex LWPOLYLINEs on xref-bound INSUL layer - insulation batt fill fragment of the base plan; no wall boundary lines present.",
+    "rationale": {
+      "evidence": "All 7 entities are LWPOLYLINEs with exactly 5 vertices on the single xref-bound layer X-평면도(기본형)$0$INSUL (sampled handles 4884 through 488A). The uniform 5-vertex signature repeated across the block is the classic zigzag batt-insulation motif laid along a wall cavity run. There are no LINE, TEXT, DIMENSION, or HATCH entities, so the block carries plan fill content only.",
+      "rule": "An anonymous *U block whose contents are exclusively short, equal-vertex-count polylines on an insulation (INSUL) layer bound from a plan xref is an insulation-fill fragment of the plan drawing, not a standalone symbol, furniture item, or dimension cache.",
+      "counterfactual": "If these polylines sat on a wall or centerline layer, or if long paired parallel LINEs appeared alongside them, I would raise wall_likelihood sharply and nominate those as wall lines; if TEXT or DIMENSION entities were present the block would shift toward 치수캐시.",
+      "uncertainty": "Vertex coordinates are not exposed, so the zigzag interpretation rests on the layer name and the 5-vertex-per-polyline signature alone; the actual extent, orientation, and which wall cavity the insulation run occupies cannot be determined from this projection."
+    }
+  },
+  {
+    "unit_id": "defannot-u135-146",
+    "def": "*U135",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.3,
+    "wall_line_handles": [],
+    "notes": "Anonymous block of 20 uniform 5-vertex LWPOLYLINEs on xref-bound INSUL layer - insulation batt fill fragment of the base plan; no wall boundary lines present.",
+    "rationale": {
+      "evidence": "All 20 entities are LWPOLYLINEs with exactly 5 vertices on the single xref-bound layer X-평면도(기본형)$0$INSUL (sampled handles 4890 through 48A3). The uniform 5-vertex signature repeated across the block is the classic zigzag batt-insulation motif laid along a wall cavity run. There are no LINE, TEXT, DIMENSION, or HATCH entities, so the block carries plan fill content only.",
+      "rule": "An anonymous *U block whose contents are exclusively short, equal-vertex-count polylines on an insulation (INSUL) layer bound from a plan xref is an insulation-fill fragment of the plan drawing, not a standalone symbol, furniture item, or dimension cache.",
+      "counterfactual": "If these polylines sat on a wall or centerline layer, or if long paired parallel LINEs appeared alongside them, I would raise wall_likelihood sharply and nominate those as wall lines; if TEXT or DIMENSION entities were present the block would shift toward 치수캐시.",
+      "uncertainty": "Vertex coordinates are not exposed, so the zigzag interpretation rests on the layer name and the 5-vertex-per-polyline signature alone; the actual extent, orientation, and which wall cavity the insulation run occupies cannot be determined from this projection."
+    }
+  },
+  {
+    "unit_id": "defannot-u136-147",
+    "def": "*U136",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.3,
+    "wall_line_handles": [],
+    "notes": "Anonymous block of 32 uniform 5-vertex LWPOLYLINEs on xref-bound INSUL layer - insulation batt fill fragment of the base plan; no wall boundary lines present.",
+    "rationale": {
+      "evidence": "All 32 entities are LWPOLYLINEs with exactly 5 vertices on the single xref-bound layer X-평면도(기본형)$0$INSUL (sampled handles 48A9 through 48C6 (only 30 of 32 sampled, all identical in type/layer/vertex count)). The uniform 5-vertex signature repeated across the block is the classic zigzag batt-insulation motif laid along a wall cavity run. There are no LINE, TEXT, DIMENSION, or HATCH entities, so the block carries plan fill content only.",
+      "rule": "An anonymous *U block whose contents are exclusively short, equal-vertex-count polylines on an insulation (INSUL) layer bound from a plan xref is an insulation-fill fragment of the plan drawing, not a standalone symbol, furniture item, or dimension cache.",
+      "counterfactual": "If these polylines sat on a wall or centerline layer, or if long paired parallel LINEs appeared alongside them, I would raise wall_likelihood sharply and nominate those as wall lines; if TEXT or DIMENSION entities were present the block would shift toward 치수캐시.",
+      "uncertainty": "Vertex coordinates are not exposed, so the zigzag interpretation rests on the layer name and the 5-vertex-per-polyline signature alone; the actual extent, orientation, and which wall cavity the insulation run occupies cannot be determined from this projection."
+    }
+  },
+  {
+    "unit_id": "defannot-u137-148",
+    "def": "*U137",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.3,
+    "wall_line_handles": [],
+    "notes": "Anonymous block of 9 uniform 5-vertex LWPOLYLINEs on xref-bound INSUL layer - insulation batt fill fragment of the base plan; no wall boundary lines present.",
+    "rationale": {
+      "evidence": "All 9 entities are LWPOLYLINEs with exactly 5 vertices on the single xref-bound layer X-평면도(기본형)$0$INSUL (sampled handles 48CE through 48D6). The uniform 5-vertex signature repeated across the block is the classic zigzag batt-insulation motif laid along a wall cavity run. There are no LINE, TEXT, DIMENSION, or HATCH entities, so the block carries plan fill content only.",
+      "rule": "An anonymous *U block whose contents are exclusively short, equal-vertex-count polylines on an insulation (INSUL) layer bound from a plan xref is an insulation-fill fragment of the plan drawing, not a standalone symbol, furniture item, or dimension cache.",
+      "counterfactual": "If these polylines sat on a wall or centerline layer, or if long paired parallel LINEs appeared alongside them, I would raise wall_likelihood sharply and nominate those as wall lines; if TEXT or DIMENSION entities were present the block would shift toward 치수캐시.",
+      "uncertainty": "Vertex coordinates are not exposed, so the zigzag interpretation rests on the layer name and the 5-vertex-per-polyline signature alone; the actual extent, orientation, and which wall cavity the insulation run occupies cannot be determined from this projection."
+    }
+  },
+  {
+    "unit_id": "defannot-u138-149",
+    "def": "*U138",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.3,
+    "wall_line_handles": [],
+    "notes": "Anonymous block of 10 uniform 5-vertex LWPOLYLINEs on xref-bound INSUL layer - insulation batt fill fragment of the base plan; no wall boundary lines present.",
+    "rationale": {
+      "evidence": "All 10 entities are LWPOLYLINEs with exactly 5 vertices on the single xref-bound layer X-평면도(기본형)$0$INSUL (sampled handles 48DC through 48E5). The uniform 5-vertex signature repeated across the block is the classic zigzag batt-insulation motif laid along a wall cavity run. There are no LINE, TEXT, DIMENSION, or HATCH entities, so the block carries plan fill content only.",
+      "rule": "An anonymous *U block whose contents are exclusively short, equal-vertex-count polylines on an insulation (INSUL) layer bound from a plan xref is an insulation-fill fragment of the plan drawing, not a standalone symbol, furniture item, or dimension cache.",
+      "counterfactual": "If these polylines sat on a wall or centerline layer, or if long paired parallel LINEs appeared alongside them, I would raise wall_likelihood sharply and nominate those as wall lines; if TEXT or DIMENSION entities were present the block would shift toward 치수캐시.",
+      "uncertainty": "Vertex coordinates are not exposed, so the zigzag interpretation rests on the layer name and the 5-vertex-per-polyline signature alone; the actual extent, orientation, and which wall cavity the insulation run occupies cannot be determined from this projection."
+    }
+  },
+  {
+    "unit_id": "defannot-u139-150",
+    "def": "*U139",
+    "role": "심볼",
+    "wall_likelihood": 0.35,
+    "wall_line_handles": [
+      {
+        "handle": "48EE",
+        "reason": "1076-long chord, upper of 50-apart parallel pair"
+      },
+      {
+        "handle": "48F0",
+        "reason": "1076-long chord, lower of 50-apart parallel pair"
+      },
+      {
+        "handle": "48F6",
+        "reason": "long lower chord retraced across full band"
+      },
+      {
+        "handle": "48FE",
+        "reason": "long upper chord retraced across full band"
+      }
+    ],
+    "notes": "Composite plan symbol: 1120x126 line band (two 50-apart parallel chords with symmetric end caps) + 2 WIPEOUTs + 국기계양대 insert - reads as a window/railing band with flag-pole holder, not raw wall geometry.",
+    "rationale": {
+      "evidence": "Twenty LINEs on layer 0 form a symmetric 1120x126 band: two long parallel chords at y=-50.5 and y=-100.5 spanning x=±538 (50 apart), an outer frame reaching x=±560 with jamb-like end caps, plus 2 WIPEOUTs masking the background and one INSERT of block X-평면도(기본형)$0$국기계양대 (flag-pole holder). The wipeout+insert+thin-band composition reads as a manufactured plan-view fixture (window/railing band with attached flag-holder), not loose plan linework.",
+      "rule": "An anonymous block that combines background WIPEOUTs, a named fixture INSERT, and a mirror-symmetric thin band of parallel lines with end jambs is a composite architectural symbol (opening/railing fixture) rather than wall geometry, even when its long chords superficially resemble wall lines.",
+      "counterfactual": "If the two long parallel chords were spaced at a typical wall thickness (100-200 units) on a wall layer, or extended beyond the block extents without end jambs, I would reclassify them as true wall lines and the block as 평면 부분도; removing the 국기계양대 insert would leave a plain window/railing band.",
+      "uncertainty": "This projection cannot show whether the 50-unit gap is a railing, window frame, or a thin wall leaf, nor the insertion context (exterior wall, parapet, or balcony edge), so the wall-vs-fixture reading of the long chords stays moderately uncertain."
+    }
+  },
+  {
+    "unit_id": "defannot-u140-151",
+    "def": "*U140",
+    "role": "심볼",
+    "wall_likelihood": 0.35,
+    "wall_line_handles": [
+      {
+        "handle": "490A",
+        "reason": "976-long chord, upper of 50-apart parallel pair"
+      },
+      {
+        "handle": "490C",
+        "reason": "976-long chord, lower of 50-apart parallel pair"
+      },
+      {
+        "handle": "4912",
+        "reason": "long lower chord retraced across full band"
+      },
+      {
+        "handle": "491A",
+        "reason": "long upper chord retraced across full band"
+      }
+    ],
+    "notes": "Composite plan symbol: 1020x126 line band (two 50-apart parallel chords with symmetric end caps) + 2 WIPEOUTs + 국기계양대 insert - reads as a window/railing band with flag-pole holder, not raw wall geometry.",
+    "rationale": {
+      "evidence": "Twenty LINEs on layer 0 form a symmetric 1020x126 band: two long parallel chords at y=-50.5 and y=-100.5 spanning x=±488 (50 apart), an outer frame reaching x=±510 with jamb-like end caps, plus 2 WIPEOUTs masking the background and one INSERT of block X-평면도(기본형)$0$국기계양대 (flag-pole holder). The wipeout+insert+thin-band composition reads as a manufactured plan-view fixture (window/railing band with attached flag-holder), not loose plan linework.",
+      "rule": "An anonymous block that combines background WIPEOUTs, a named fixture INSERT, and a mirror-symmetric thin band of parallel lines with end jambs is a composite architectural symbol (opening/railing fixture) rather than wall geometry, even when its long chords superficially resemble wall lines.",
+      "counterfactual": "If the two long parallel chords were spaced at a typical wall thickness (100-200 units) on a wall layer, or extended beyond the block extents without end jambs, I would reclassify them as true wall lines and the block as 평면 부분도; removing the 국기계양대 insert would leave a plain window/railing band.",
+      "uncertainty": "This projection cannot show whether the 50-unit gap is a railing, window frame, or a thin wall leaf, nor the insertion context (exterior wall, parapet, or balcony edge), so the wall-vs-fixture reading of the long chords stays moderately uncertain."
+    }
+  },
+  {
+    "unit_id": "defannot-u141-152",
+    "def": "*U141",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.3,
+    "wall_line_handles": [],
+    "notes": "Anonymous block of 15 uniform 5-vertex LWPOLYLINEs on xref-bound INSUL layer - insulation batt fill fragment of the base plan; no wall boundary lines present.",
+    "rationale": {
+      "evidence": "All 15 entities are LWPOLYLINEs with exactly 5 vertices on the single xref-bound layer X-평면도(기본형)$0$INSUL (sampled handles 4923 through 4931). The uniform 5-vertex signature repeated across the block is the classic zigzag batt-insulation motif laid along a wall cavity run. There are no LINE, TEXT, DIMENSION, or HATCH entities, so the block carries plan fill content only.",
+      "rule": "An anonymous *U block whose contents are exclusively short, equal-vertex-count polylines on an insulation (INSUL) layer bound from a plan xref is an insulation-fill fragment of the plan drawing, not a standalone symbol, furniture item, or dimension cache.",
+      "counterfactual": "If these polylines sat on a wall or centerline layer, or if long paired parallel LINEs appeared alongside them, I would raise wall_likelihood sharply and nominate those as wall lines; if TEXT or DIMENSION entities were present the block would shift toward 치수캐시.",
+      "uncertainty": "Vertex coordinates are not exposed, so the zigzag interpretation rests on the layer name and the 5-vertex-per-polyline signature alone; the actual extent, orientation, and which wall cavity the insulation run occupies cannot be determined from this projection."
+    }
+  },
+  {
+    "unit_id": "defannot-u142-153",
+    "def": "*U142",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.3,
+    "wall_line_handles": [],
+    "notes": "Anonymous block of 95 uniform 5-vertex LWPOLYLINEs on xref-bound INSUL layer - insulation batt fill fragment of the base plan; no wall boundary lines present.",
+    "rationale": {
+      "evidence": "All 95 entities are LWPOLYLINEs with exactly 5 vertices on the single xref-bound layer X-평면도(기본형)$0$INSUL (sampled handles 4937 through 4954 (only 30 of 95 sampled, all identical in type/layer/vertex count)). The uniform 5-vertex signature repeated across the block is the classic zigzag batt-insulation motif laid along a wall cavity run. There are no LINE, TEXT, DIMENSION, or HATCH entities, so the block carries plan fill content only.",
+      "rule": "An anonymous *U block whose contents are exclusively short, equal-vertex-count polylines on an insulation (INSUL) layer bound from a plan xref is an insulation-fill fragment of the plan drawing, not a standalone symbol, furniture item, or dimension cache.",
+      "counterfactual": "If these polylines sat on a wall or centerline layer, or if long paired parallel LINEs appeared alongside them, I would raise wall_likelihood sharply and nominate those as wall lines; if TEXT or DIMENSION entities were present the block would shift toward 치수캐시.",
+      "uncertainty": "Vertex coordinates are not exposed, so the zigzag interpretation rests on the layer name and the 5-vertex-per-polyline signature alone; the actual extent, orientation, and which wall cavity the insulation run occupies cannot be determined from this projection."
+    }
+  },
+  {
+    "unit_id": "defannot-u144-154",
+    "def": "*U144",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.3,
+    "wall_line_handles": [],
+    "notes": "Anonymous block of 14 uniform 5-vertex LWPOLYLINEs on xref-bound INSUL layer - insulation batt fill fragment of the base plan; no wall boundary lines present.",
+    "rationale": {
+      "evidence": "All 14 entities are LWPOLYLINEs with exactly 5 vertices on the single xref-bound layer X-평면도(기본형)$0$INSUL (sampled handles 4D9F through 4DAC). The uniform 5-vertex signature repeated across the block is the classic zigzag batt-insulation motif laid along a wall cavity run. There are no LINE, TEXT, DIMENSION, or HATCH entities, so the block carries plan fill content only.",
+      "rule": "An anonymous *U block whose contents are exclusively short, equal-vertex-count polylines on an insulation (INSUL) layer bound from a plan xref is an insulation-fill fragment of the plan drawing, not a standalone symbol, furniture item, or dimension cache.",
+      "counterfactual": "If these polylines sat on a wall or centerline layer, or if long paired parallel LINEs appeared alongside them, I would raise wall_likelihood sharply and nominate those as wall lines; if TEXT or DIMENSION entities were present the block would shift toward 치수캐시.",
+      "uncertainty": "Vertex coordinates are not exposed, so the zigzag interpretation rests on the layer name and the 5-vertex-per-polyline signature alone; the actual extent, orientation, and which wall cavity the insulation run occupies cannot be determined from this projection."
+    }
+  },
+  {
+    "unit_id": "defannot-u145-155",
+    "def": "*U145",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.3,
+    "wall_line_handles": [],
+    "notes": "Anonymous block of 16 uniform 5-vertex LWPOLYLINEs on xref-bound INSUL layer - insulation batt fill fragment of the base plan; no wall boundary lines present.",
+    "rationale": {
+      "evidence": "All 16 entities are LWPOLYLINEs with exactly 5 vertices on the single xref-bound layer X-평면도(기본형)$0$INSUL (sampled handles 4DB2 through 4DC1). The uniform 5-vertex signature repeated across the block is the classic zigzag batt-insulation motif laid along a wall cavity run. There are no LINE, TEXT, DIMENSION, or HATCH entities, so the block carries plan fill content only.",
+      "rule": "An anonymous *U block whose contents are exclusively short, equal-vertex-count polylines on an insulation (INSUL) layer bound from a plan xref is an insulation-fill fragment of the plan drawing, not a standalone symbol, furniture item, or dimension cache.",
+      "counterfactual": "If these polylines sat on a wall or centerline layer, or if long paired parallel LINEs appeared alongside them, I would raise wall_likelihood sharply and nominate those as wall lines; if TEXT or DIMENSION entities were present the block would shift toward 치수캐시.",
+      "uncertainty": "Vertex coordinates are not exposed, so the zigzag interpretation rests on the layer name and the 5-vertex-per-polyline signature alone; the actual extent, orientation, and which wall cavity the insulation run occupies cannot be determined from this projection."
+    }
+  },
+  {
+    "unit_id": "defannot-u146-156",
+    "def": "*U146",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.3,
+    "wall_line_handles": [],
+    "notes": "Anonymous block of 159 uniform 5-vertex LWPOLYLINEs on xref-bound INSUL layer - insulation batt fill fragment of the base plan; no wall boundary lines present.",
+    "rationale": {
+      "evidence": "All 159 entities are LWPOLYLINEs with exactly 5 vertices on the single xref-bound layer X-평면도(기본형)$0$INSUL (sampled handles 4DC7 through 4DE4 (only 30 of 159 sampled, all identical in type/layer/vertex count)). The uniform 5-vertex signature repeated across the block is the classic zigzag batt-insulation motif laid along a wall cavity run. There are no LINE, TEXT, DIMENSION, or HATCH entities, so the block carries plan fill content only.",
+      "rule": "An anonymous *U block whose contents are exclusively short, equal-vertex-count polylines on an insulation (INSUL) layer bound from a plan xref is an insulation-fill fragment of the plan drawing, not a standalone symbol, furniture item, or dimension cache.",
+      "counterfactual": "If these polylines sat on a wall or centerline layer, or if long paired parallel LINEs appeared alongside them, I would raise wall_likelihood sharply and nominate those as wall lines; if TEXT or DIMENSION entities were present the block would shift toward 치수캐시.",
+      "uncertainty": "Vertex coordinates are not exposed, so the zigzag interpretation rests on the layer name and the 5-vertex-per-polyline signature alone; the actual extent, orientation, and which wall cavity the insulation run occupies cannot be determined from this projection."
+    }
+  },
+  {
+    "unit_id": "defannot-u147-157",
+    "def": "*U147",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.3,
+    "wall_line_handles": [],
+    "notes": "Anonymous block of 12 uniform 5-vertex LWPOLYLINEs on xref-bound INSUL layer - insulation batt fill fragment of the base plan; no wall boundary lines present.",
+    "rationale": {
+      "evidence": "All 12 entities are LWPOLYLINEs with exactly 5 vertices on the single xref-bound layer X-평면도(기본형)$0$INSUL (sampled handles 4E6B through 4E76). The uniform 5-vertex signature repeated across the block is the classic zigzag batt-insulation motif laid along a wall cavity run. There are no LINE, TEXT, DIMENSION, or HATCH entities, so the block carries plan fill content only.",
+      "rule": "An anonymous *U block whose contents are exclusively short, equal-vertex-count polylines on an insulation (INSUL) layer bound from a plan xref is an insulation-fill fragment of the plan drawing, not a standalone symbol, furniture item, or dimension cache.",
+      "counterfactual": "If these polylines sat on a wall or centerline layer, or if long paired parallel LINEs appeared alongside them, I would raise wall_likelihood sharply and nominate those as wall lines; if TEXT or DIMENSION entities were present the block would shift toward 치수캐시.",
+      "uncertainty": "Vertex coordinates are not exposed, so the zigzag interpretation rests on the layer name and the 5-vertex-per-polyline signature alone; the actual extent, orientation, and which wall cavity the insulation run occupies cannot be determined from this projection."
+    }
+  },
+  {
+    "unit_id": "defannot-u148-158",
+    "def": "*U148",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.3,
+    "wall_line_handles": [],
+    "notes": "Anonymous block of 28 uniform 5-vertex LWPOLYLINEs on xref-bound INSUL layer - insulation batt fill fragment of the base plan; no wall boundary lines present.",
+    "rationale": {
+      "evidence": "All 28 entities are LWPOLYLINEs with exactly 5 vertices on the single xref-bound layer X-평면도(기본형)$0$INSUL (sampled handles 4E7C through 4E97). The uniform 5-vertex signature repeated across the block is the classic zigzag batt-insulation motif laid along a wall cavity run. There are no LINE, TEXT, DIMENSION, or HATCH entities, so the block carries plan fill content only.",
+      "rule": "An anonymous *U block whose contents are exclusively short, equal-vertex-count polylines on an insulation (INSUL) layer bound from a plan xref is an insulation-fill fragment of the plan drawing, not a standalone symbol, furniture item, or dimension cache.",
+      "counterfactual": "If these polylines sat on a wall or centerline layer, or if long paired parallel LINEs appeared alongside them, I would raise wall_likelihood sharply and nominate those as wall lines; if TEXT or DIMENSION entities were present the block would shift toward 치수캐시.",
+      "uncertainty": "Vertex coordinates are not exposed, so the zigzag interpretation rests on the layer name and the 5-vertex-per-polyline signature alone; the actual extent, orientation, and which wall cavity the insulation run occupies cannot be determined from this projection."
+    }
+  },
+  {
+    "unit_id": "defannot-u149-159",
+    "def": "*U149",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.3,
+    "wall_line_handles": [],
+    "notes": "Anonymous block of 77 uniform 5-vertex LWPOLYLINEs on xref-bound INSUL layer - insulation batt fill fragment of the base plan; no wall boundary lines present.",
+    "rationale": {
+      "evidence": "All 77 entities are LWPOLYLINEs with exactly 5 vertices on the single xref-bound layer X-평면도(기본형)$0$INSUL (sampled handles 4E9D through 4EBA (only 30 of 77 sampled, all identical in type/layer/vertex count)). The uniform 5-vertex signature repeated across the block is the classic zigzag batt-insulation motif laid along a wall cavity run. There are no LINE, TEXT, DIMENSION, or HATCH entities, so the block carries plan fill content only.",
+      "rule": "An anonymous *U block whose contents are exclusively short, equal-vertex-count polylines on an insulation (INSUL) layer bound from a plan xref is an insulation-fill fragment of the plan drawing, not a standalone symbol, furniture item, or dimension cache.",
+      "counterfactual": "If these polylines sat on a wall or centerline layer, or if long paired parallel LINEs appeared alongside them, I would raise wall_likelihood sharply and nominate those as wall lines; if TEXT or DIMENSION entities were present the block would shift toward 치수캐시.",
+      "uncertainty": "Vertex coordinates are not exposed, so the zigzag interpretation rests on the layer name and the 5-vertex-per-polyline signature alone; the actual extent, orientation, and which wall cavity the insulation run occupies cannot be determined from this projection."
+    }
+  },
+  {
+    "unit_id": "defannot-u150-160",
+    "def": "*U150",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.3,
+    "wall_line_handles": [],
+    "notes": "Anonymous block of 25 uniform 5-vertex LWPOLYLINEs on xref-bound INSUL layer - insulation batt fill fragment of the base plan; no wall boundary lines present.",
+    "rationale": {
+      "evidence": "All 25 entities are LWPOLYLINEs with exactly 5 vertices on the single xref-bound layer X-평면도(기본형)$0$INSUL (sampled handles 4EEF through 4F07). The uniform 5-vertex signature repeated across the block is the classic zigzag batt-insulation motif laid along a wall cavity run. There are no LINE, TEXT, DIMENSION, or HATCH entities, so the block carries plan fill content only.",
+      "rule": "An anonymous *U block whose contents are exclusively short, equal-vertex-count polylines on an insulation (INSUL) layer bound from a plan xref is an insulation-fill fragment of the plan drawing, not a standalone symbol, furniture item, or dimension cache.",
+      "counterfactual": "If these polylines sat on a wall or centerline layer, or if long paired parallel LINEs appeared alongside them, I would raise wall_likelihood sharply and nominate those as wall lines; if TEXT or DIMENSION entities were present the block would shift toward 치수캐시.",
+      "uncertainty": "Vertex coordinates are not exposed, so the zigzag interpretation rests on the layer name and the 5-vertex-per-polyline signature alone; the actual extent, orientation, and which wall cavity the insulation run occupies cannot be determined from this projection."
+    }
+  }
+]

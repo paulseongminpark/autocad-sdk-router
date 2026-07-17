@@ -1,0 +1,282 @@
+[
+  {
+    "unit_id": "defannot-d395-101",
+    "def": "*D395",
+    "role": "치수캐시",
+    "wall_likelihood": 0.03,
+    "wall_line_handles": [],
+    "notes": "Anonymous associative horizontal dimension block reading 700 mm; DIM layer + DIMDOT + DEFPOINTS, no wall geometry.",
+    "rationale": {
+      "evidence": "All 9 entities lie on DIM (6) and DEFPOINTS (3) layers: two vertical extension lines (8EF8, 8EF9) and a horizontal dimension line (8EFA) whose span equals 700, matching the single MTEXT 8EFD '\\A1;700' (=700 mm). Two DIMDOT INSERT arrow-heads (8EFB, 8EFC) and three DEFPOINTS POINTs (8EFE, 8EFF, 8F00) complete the associative-dimension signature.",
+      "rule": "Anonymous '*D####' block-table definitions whose entities are entirely DIM-layer LINEs plus DIMDOT terminator INSERTs, DEFPOINTS POINTs, and one measurement MTEXT equal to the extension-line span are AutoCAD associative dimension caches, not drawn geometry; this holds in any AutoCAD drawing.",
+      "counterfactual": "If those LINEs were on a wall/architectural layer and lacked the DIMDOT arrows, DEFPOINTS points, and the 700-valued MTEXT, the block would read as wall linework and wall_likelihood would rise toward 1.",
+      "uncertainty": "The projection shows the measurement but not the real edge it annotates, so whether 700 mm is a wall length, an opening, or a clear dimension cannot be resolved; either way the block itself carries no wall line."
+    }
+  },
+  {
+    "unit_id": "defannot-d396-102",
+    "def": "*D396",
+    "role": "치수캐시",
+    "wall_likelihood": 0.03,
+    "wall_line_handles": [],
+    "notes": "Anonymous associative horizontal dimension block reading 1170 mm; DIM layer + DIMDOT + DEFPOINTS, no wall geometry.",
+    "rationale": {
+      "evidence": "All 9 entities lie on DIM (6) and DEFPOINTS (3) layers: two vertical extension lines (8F01, 8F02) and a horizontal dimension line (8F03) whose span equals 1170, matching the single MTEXT 8F06 '\\A1;1170' (=1170 mm). Two DIMDOT INSERT arrow-heads (8F04, 8F05) and three DEFPOINTS POINTs (8F07, 8F08, 8F09) complete the associative-dimension signature.",
+      "rule": "Anonymous '*D####' block-table definitions whose entities are entirely DIM-layer LINEs plus DIMDOT terminator INSERTs, DEFPOINTS POINTs, and one measurement MTEXT equal to the extension-line span are AutoCAD associative dimension caches, not drawn geometry; this holds in any AutoCAD drawing.",
+      "counterfactual": "If those LINEs were on a wall/architectural layer and lacked the DIMDOT arrows, DEFPOINTS points, and the 1170-valued MTEXT, the block would read as wall linework and wall_likelihood would rise toward 1.",
+      "uncertainty": "The projection shows the measurement but not the real edge it annotates, so whether 1170 mm is a wall length, an opening, or a clear dimension cannot be resolved; either way the block itself carries no wall line."
+    }
+  },
+  {
+    "unit_id": "defannot-d397-103",
+    "def": "*D397",
+    "role": "치수캐시",
+    "wall_likelihood": 0.03,
+    "wall_line_handles": [],
+    "notes": "Anonymous associative horizontal dimension block reading 1805 mm; DIM layer + DIMDOT + DEFPOINTS, no wall geometry.",
+    "rationale": {
+      "evidence": "All 9 entities lie on DIM (6) and DEFPOINTS (3) layers: two vertical extension lines (8F0A, 8F0B) and a horizontal dimension line (8F0C) whose span equals 1805, matching the single MTEXT 8F0F '\\A1;1805' (=1805 mm). Two DIMDOT INSERT arrow-heads (8F0D, 8F0E) and three DEFPOINTS POINTs (8F10, 8F11, 8F12) complete the associative-dimension signature.",
+      "rule": "Anonymous '*D####' block-table definitions whose entities are entirely DIM-layer LINEs plus DIMDOT terminator INSERTs, DEFPOINTS POINTs, and one measurement MTEXT equal to the extension-line span are AutoCAD associative dimension caches, not drawn geometry; this holds in any AutoCAD drawing.",
+      "counterfactual": "If those LINEs were on a wall/architectural layer and lacked the DIMDOT arrows, DEFPOINTS points, and the 1805-valued MTEXT, the block would read as wall linework and wall_likelihood would rise toward 1.",
+      "uncertainty": "The projection shows the measurement but not the real edge it annotates, so whether 1805 mm is a wall length, an opening, or a clear dimension cannot be resolved; either way the block itself carries no wall line."
+    }
+  },
+  {
+    "unit_id": "defannot-d398-104",
+    "def": "*D398",
+    "role": "치수캐시",
+    "wall_likelihood": 0.03,
+    "wall_line_handles": [],
+    "notes": "Anonymous associative horizontal dimension block reading 910 mm; DIM layer + DIMDOT + DEFPOINTS, no wall geometry.",
+    "rationale": {
+      "evidence": "All 9 entities lie on DIM (6) and DEFPOINTS (3) layers: two vertical extension lines (8F13, 8F14) and a horizontal dimension line (8F15) whose span equals 910, matching the single MTEXT 8F18 '\\A1;910' (=910 mm). Two DIMDOT INSERT arrow-heads (8F16, 8F17) and three DEFPOINTS POINTs (8F19, 8F1A, 8F1B) complete the associative-dimension signature.",
+      "rule": "Anonymous '*D####' block-table definitions whose entities are entirely DIM-layer LINEs plus DIMDOT terminator INSERTs, DEFPOINTS POINTs, and one measurement MTEXT equal to the extension-line span are AutoCAD associative dimension caches, not drawn geometry; this holds in any AutoCAD drawing.",
+      "counterfactual": "If those LINEs were on a wall/architectural layer and lacked the DIMDOT arrows, DEFPOINTS points, and the 910-valued MTEXT, the block would read as wall linework and wall_likelihood would rise toward 1.",
+      "uncertainty": "The projection shows the measurement but not the real edge it annotates, so whether 910 mm is a wall length, an opening, or a clear dimension cannot be resolved; either way the block itself carries no wall line."
+    }
+  },
+  {
+    "unit_id": "defannot-d399-105",
+    "def": "*D399",
+    "role": "치수캐시",
+    "wall_likelihood": 0.03,
+    "wall_line_handles": [],
+    "notes": "Anonymous associative vertical dimension block reading 760 mm; DIM layer + DIMDOT + DEFPOINTS, no wall geometry.",
+    "rationale": {
+      "evidence": "All 9 entities lie on DIM (6) and DEFPOINTS (3) layers: two horizontal extension lines (8F1C, 8F1D) and a vertical dimension line (8F1E) whose span equals 760, matching the single MTEXT 8F21 '\\A1;760' (=760 mm). Two DIMDOT INSERT arrow-heads (8F1F, 8F20) and three DEFPOINTS POINTs (8F22, 8F23, 8F24) complete the associative-dimension signature.",
+      "rule": "Anonymous '*D####' block-table definitions whose entities are entirely DIM-layer LINEs plus DIMDOT terminator INSERTs, DEFPOINTS POINTs, and one measurement MTEXT equal to the extension-line span are AutoCAD associative dimension caches, not drawn geometry; this holds in any AutoCAD drawing.",
+      "counterfactual": "If those LINEs were on a wall/architectural layer and lacked the DIMDOT arrows, DEFPOINTS points, and the 760-valued MTEXT, the block would read as wall linework and wall_likelihood would rise toward 1.",
+      "uncertainty": "The projection shows the measurement but not the real edge it annotates, so whether 760 mm is a wall length, an opening, or a clear dimension cannot be resolved; either way the block itself carries no wall line."
+    }
+  },
+  {
+    "unit_id": "defannot-d400-106",
+    "def": "*D400",
+    "role": "치수캐시",
+    "wall_likelihood": 0.03,
+    "wall_line_handles": [],
+    "notes": "Anonymous associative vertical dimension block reading 1145 mm; DIM layer + DIMDOT + DEFPOINTS, no wall geometry.",
+    "rationale": {
+      "evidence": "All 9 entities lie on DIM (6) and DEFPOINTS (3) layers: two horizontal extension lines (8F25, 8F26) and a vertical dimension line (8F27) whose span equals 1145, matching the single MTEXT 8F2A '\\A1;1145' (=1145 mm). Two DIMDOT INSERT arrow-heads (8F28, 8F29) and three DEFPOINTS POINTs (8F2B, 8F2C, 8F2D) complete the associative-dimension signature.",
+      "rule": "Anonymous '*D####' block-table definitions whose entities are entirely DIM-layer LINEs plus DIMDOT terminator INSERTs, DEFPOINTS POINTs, and one measurement MTEXT equal to the extension-line span are AutoCAD associative dimension caches, not drawn geometry; this holds in any AutoCAD drawing.",
+      "counterfactual": "If those LINEs were on a wall/architectural layer and lacked the DIMDOT arrows, DEFPOINTS points, and the 1145-valued MTEXT, the block would read as wall linework and wall_likelihood would rise toward 1.",
+      "uncertainty": "The projection shows the measurement but not the real edge it annotates, so whether 1145 mm is a wall length, an opening, or a clear dimension cannot be resolved; either way the block itself carries no wall line."
+    }
+  },
+  {
+    "unit_id": "defannot-d401-107",
+    "def": "*D401",
+    "role": "치수캐시",
+    "wall_likelihood": 0.03,
+    "wall_line_handles": [],
+    "notes": "Anonymous associative horizontal dimension block reading 470 mm; DIM layer + DIMDOT + DEFPOINTS, no wall geometry.",
+    "rationale": {
+      "evidence": "All 9 entities lie on DIM (6) and DEFPOINTS (3) layers: two vertical extension lines (8F2E, 8F2F) and a horizontal dimension line (8F30) whose span equals 470, matching the single MTEXT 8F33 '\\A1;470' (=470 mm). Two DIMDOT INSERT arrow-heads (8F31, 8F32) and three DEFPOINTS POINTs (8F34, 8F35, 8F36) complete the associative-dimension signature.",
+      "rule": "Anonymous '*D####' block-table definitions whose entities are entirely DIM-layer LINEs plus DIMDOT terminator INSERTs, DEFPOINTS POINTs, and one measurement MTEXT equal to the extension-line span are AutoCAD associative dimension caches, not drawn geometry; this holds in any AutoCAD drawing.",
+      "counterfactual": "If those LINEs were on a wall/architectural layer and lacked the DIMDOT arrows, DEFPOINTS points, and the 470-valued MTEXT, the block would read as wall linework and wall_likelihood would rise toward 1.",
+      "uncertainty": "The projection shows the measurement but not the real edge it annotates, so whether 470 mm is a wall length, an opening, or a clear dimension cannot be resolved; either way the block itself carries no wall line."
+    }
+  },
+  {
+    "unit_id": "defannot-d402-108",
+    "def": "*D402",
+    "role": "치수캐시",
+    "wall_likelihood": 0.03,
+    "wall_line_handles": [],
+    "notes": "Anonymous associative vertical dimension block reading 1020 mm; DIM layer + DIMDOT + DEFPOINTS, no wall geometry.",
+    "rationale": {
+      "evidence": "All 9 entities lie on DIM (6) and DEFPOINTS (3) layers: two horizontal extension lines (8F37, 8F38) and a vertical dimension line (8F39) whose span equals 1020, matching the single MTEXT 8F3C '\\A1;1020' (=1020 mm). Two DIMDOT INSERT arrow-heads (8F3A, 8F3B) and three DEFPOINTS POINTs (8F3D, 8F3E, 8F3F) complete the associative-dimension signature.",
+      "rule": "Anonymous '*D####' block-table definitions whose entities are entirely DIM-layer LINEs plus DIMDOT terminator INSERTs, DEFPOINTS POINTs, and one measurement MTEXT equal to the extension-line span are AutoCAD associative dimension caches, not drawn geometry; this holds in any AutoCAD drawing.",
+      "counterfactual": "If those LINEs were on a wall/architectural layer and lacked the DIMDOT arrows, DEFPOINTS points, and the 1020-valued MTEXT, the block would read as wall linework and wall_likelihood would rise toward 1.",
+      "uncertainty": "The projection shows the measurement but not the real edge it annotates, so whether 1020 mm is a wall length, an opening, or a clear dimension cannot be resolved; either way the block itself carries no wall line."
+    }
+  },
+  {
+    "unit_id": "defannot-d403-109",
+    "def": "*D403",
+    "role": "치수캐시",
+    "wall_likelihood": 0.03,
+    "wall_line_handles": [],
+    "notes": "Anonymous associative vertical dimension block reading 1620 mm; DIM layer + DIMDOT + DEFPOINTS, no wall geometry.",
+    "rationale": {
+      "evidence": "All 9 entities lie on DIM (6) and DEFPOINTS (3) layers: two horizontal extension lines (8F40, 8F41) and a vertical dimension line (8F42) whose span equals 1620, matching the single MTEXT 8F45 '\\A1;1620' (=1620 mm). Two DIMDOT INSERT arrow-heads (8F43, 8F44) and three DEFPOINTS POINTs (8F46, 8F47, 8F48) complete the associative-dimension signature.",
+      "rule": "Anonymous '*D####' block-table definitions whose entities are entirely DIM-layer LINEs plus DIMDOT terminator INSERTs, DEFPOINTS POINTs, and one measurement MTEXT equal to the extension-line span are AutoCAD associative dimension caches, not drawn geometry; this holds in any AutoCAD drawing.",
+      "counterfactual": "If those LINEs were on a wall/architectural layer and lacked the DIMDOT arrows, DEFPOINTS points, and the 1620-valued MTEXT, the block would read as wall linework and wall_likelihood would rise toward 1.",
+      "uncertainty": "The projection shows the measurement but not the real edge it annotates, so whether 1620 mm is a wall length, an opening, or a clear dimension cannot be resolved; either way the block itself carries no wall line."
+    }
+  },
+  {
+    "unit_id": "defannot-d404-110",
+    "def": "*D404",
+    "role": "치수캐시",
+    "wall_likelihood": 0.03,
+    "wall_line_handles": [],
+    "notes": "Anonymous associative horizontal dimension block reading 580 mm; DIM layer + DIMDOT + DEFPOINTS, no wall geometry.",
+    "rationale": {
+      "evidence": "All 9 entities lie on DIM (6) and DEFPOINTS (3) layers: two vertical extension lines (8F49, 8F4A) and a horizontal dimension line (8F4B) whose span equals 580, matching the single MTEXT 8F4E '\\A1;580' (=580 mm). Two DIMDOT INSERT arrow-heads (8F4C, 8F4D) and three DEFPOINTS POINTs (8F4F, 8F50, 8F51) complete the associative-dimension signature.",
+      "rule": "Anonymous '*D####' block-table definitions whose entities are entirely DIM-layer LINEs plus DIMDOT terminator INSERTs, DEFPOINTS POINTs, and one measurement MTEXT equal to the extension-line span are AutoCAD associative dimension caches, not drawn geometry; this holds in any AutoCAD drawing.",
+      "counterfactual": "If those LINEs were on a wall/architectural layer and lacked the DIMDOT arrows, DEFPOINTS points, and the 580-valued MTEXT, the block would read as wall linework and wall_likelihood would rise toward 1.",
+      "uncertainty": "The projection shows the measurement but not the real edge it annotates, so whether 580 mm is a wall length, an opening, or a clear dimension cannot be resolved; either way the block itself carries no wall line."
+    }
+  },
+  {
+    "unit_id": "defannot-d405-111",
+    "def": "*D405",
+    "role": "치수캐시",
+    "wall_likelihood": 0.03,
+    "wall_line_handles": [],
+    "notes": "Anonymous associative vertical dimension block reading 1100 mm; DIM layer + DIMDOT + DEFPOINTS, no wall geometry.",
+    "rationale": {
+      "evidence": "All 9 entities lie on DIM (6) and DEFPOINTS (3) layers: two horizontal extension lines (8F52, 8F53) and a vertical dimension line (8F54) whose span equals 1100, matching the single MTEXT 8F57 '\\A1;1100' (=1100 mm). Two DIMDOT INSERT arrow-heads (8F55, 8F56) and three DEFPOINTS POINTs (8F58, 8F59, 8F5A) complete the associative-dimension signature.",
+      "rule": "Anonymous '*D####' block-table definitions whose entities are entirely DIM-layer LINEs plus DIMDOT terminator INSERTs, DEFPOINTS POINTs, and one measurement MTEXT equal to the extension-line span are AutoCAD associative dimension caches, not drawn geometry; this holds in any AutoCAD drawing.",
+      "counterfactual": "If those LINEs were on a wall/architectural layer and lacked the DIMDOT arrows, DEFPOINTS points, and the 1100-valued MTEXT, the block would read as wall linework and wall_likelihood would rise toward 1.",
+      "uncertainty": "The projection shows the measurement but not the real edge it annotates, so whether 1100 mm is a wall length, an opening, or a clear dimension cannot be resolved; either way the block itself carries no wall line."
+    }
+  },
+  {
+    "unit_id": "defannot-d406-112",
+    "def": "*D406",
+    "role": "치수캐시",
+    "wall_likelihood": 0.03,
+    "wall_line_handles": [],
+    "notes": "Anonymous associative horizontal dimension block reading 215 mm (small-gap variant with split dimension line); DIM + DIMDOT + DEFPOINTS, no wall geometry.",
+    "rationale": {
+      "evidence": "This dimension has 11 entities (LINE=5): two vertical extension lines (8F5B, 8F5C) bound a 215-unit gap too small for internal arrows, so the dimension line is split into inner segment 8F5F plus outer stub segments 8F5D and 8F5E. Two DIMDOT INSERTs (8F60, 8F61), one MTEXT 8F62 '\\A1;215' (=215 mm), and three DEFPOINTS POINTs (8F63-8F65) confirm an associative dimension.",
+      "rule": "Anonymous '*D####' block-table definitions whose entities are entirely DIM-layer LINEs plus DIMDOT terminator INSERTs, DEFPOINTS POINTs, and one measurement MTEXT equal to the extension-line span are AutoCAD associative dimension caches, not drawn geometry; this holds in any AutoCAD drawing.",
+      "counterfactual": "If those LINEs were on a wall/architectural layer and lacked the DIMDOT arrows, DEFPOINTS points, and the 215-valued MTEXT, the block would read as wall linework and wall_likelihood would rise toward 1.",
+      "uncertainty": "215 mm is consistent with an interior wall thickness, but the measured edge is not in the projection so this cannot be confirmed; the block still contains no wall line."
+    }
+  },
+  {
+    "unit_id": "defannot-d407-113",
+    "def": "*D407",
+    "role": "치수캐시",
+    "wall_likelihood": 0.03,
+    "wall_line_handles": [],
+    "notes": "Anonymous associative horizontal dimension block reading 950 mm; DIM layer + DIMDOT + DEFPOINTS, no wall geometry.",
+    "rationale": {
+      "evidence": "All 9 entities lie on DIM (6) and DEFPOINTS (3) layers: two vertical extension lines (8F66, 8F67) and a horizontal dimension line (8F68) whose span equals 950, matching the single MTEXT 8F6B '\\A1;950' (=950 mm). Two DIMDOT INSERT arrow-heads (8F69, 8F6A) and three DEFPOINTS POINTs (8F6C, 8F6D, 8F6E) complete the associative-dimension signature.",
+      "rule": "Anonymous '*D####' block-table definitions whose entities are entirely DIM-layer LINEs plus DIMDOT terminator INSERTs, DEFPOINTS POINTs, and one measurement MTEXT equal to the extension-line span are AutoCAD associative dimension caches, not drawn geometry; this holds in any AutoCAD drawing.",
+      "counterfactual": "If those LINEs were on a wall/architectural layer and lacked the DIMDOT arrows, DEFPOINTS points, and the 950-valued MTEXT, the block would read as wall linework and wall_likelihood would rise toward 1.",
+      "uncertainty": "The projection shows the measurement but not the real edge it annotates, so whether 950 mm is a wall length, an opening, or a clear dimension cannot be resolved; either way the block itself carries no wall line."
+    }
+  },
+  {
+    "unit_id": "defannot-u103-114",
+    "def": "*U103",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.3,
+    "wall_line_handles": [],
+    "notes": "Insulation (INSUL) pattern fragment of the basic-type floor plan (평면도 기본형): 159 uniform 5-vertex LWPOLYLINEs of wall-cavity insulation; no wall-face line.",
+    "rationale": {
+      "evidence": "All 159 entities are LWPOLYLINE on the single bound layer 'X-평면도(기본형)$0$INSUL' (handles 4376..4414), each with exactly 5 vertices - the fingerprint of a repeated insulation-batting fill, not long wall edges. The '$0$' token marks the layer as bound from an xref of the 평면도(기본형) plan, and 'INSUL' identifies it as insulation, i.e. wall-assembly material.",
+      "rule": "A block-table definition made entirely of uniform LWPOLYLINEs on a plan's INSUL/material layer is wall-assembly insulation fill: it reliably marks where walls run yet its polylines are pattern segments, so it signals wall PRESENCE without yielding an extractable wall-FACE line. This transfers to any plan carrying a material sublayer.",
+      "counterfactual": "If these were long 2-point straight LINE/LWPOLYLINE runs on a WALL/구조(structural) layer instead of 5-vertex INSUL pattern loops, they would read as wall faces and both wall_likelihood and wall_line_handles would jump.",
+      "uncertainty": "Vertex coordinates are not in the projection, so the exact wall runs traced and whether they are exterior vs interior walls cannot be recovered; the role could alternatively be read as 심볼(패턴) or 기타 rather than 평면 부분도 since the block is single-layer pattern fill, not a composite plan chunk."
+    }
+  },
+  {
+    "unit_id": "defannot-u104-115",
+    "def": "*U104",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.3,
+    "wall_line_handles": [],
+    "notes": "Insulation (INSUL) pattern fragment of the basic-type floor plan (평면도 기본형): 25 uniform 5-vertex LWPOLYLINEs of wall-cavity insulation; no wall-face line.",
+    "rationale": {
+      "evidence": "All 25 entities are LWPOLYLINE on the single bound layer 'X-평면도(기본형)$0$INSUL' (handles 441A..4432), each with exactly 5 vertices - the fingerprint of a repeated insulation-batting fill, not long wall edges. The '$0$' token marks the layer as bound from an xref of the 평면도(기본형) plan, and 'INSUL' identifies it as insulation, i.e. wall-assembly material.",
+      "rule": "A block-table definition made entirely of uniform LWPOLYLINEs on a plan's INSUL/material layer is wall-assembly insulation fill: it reliably marks where walls run yet its polylines are pattern segments, so it signals wall PRESENCE without yielding an extractable wall-FACE line. This transfers to any plan carrying a material sublayer.",
+      "counterfactual": "If these were long 2-point straight LINE/LWPOLYLINE runs on a WALL/구조(structural) layer instead of 5-vertex INSUL pattern loops, they would read as wall faces and both wall_likelihood and wall_line_handles would jump.",
+      "uncertainty": "Vertex coordinates are not in the projection, so the exact wall runs traced and whether they are exterior vs interior walls cannot be recovered; the role could alternatively be read as 심볼(패턴) or 기타 rather than 평면 부분도 since the block is single-layer pattern fill, not a composite plan chunk."
+    }
+  },
+  {
+    "unit_id": "defannot-u105-116",
+    "def": "*U105",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.3,
+    "wall_line_handles": [],
+    "notes": "Insulation (INSUL) pattern fragment of the basic-type floor plan (평면도 기본형): 38 uniform 5-vertex LWPOLYLINEs of wall-cavity insulation; no wall-face line.",
+    "rationale": {
+      "evidence": "All 38 entities are LWPOLYLINE on the single bound layer 'X-평면도(기본형)$0$INSUL' (handles 4438..445D), each with exactly 5 vertices - the fingerprint of a repeated insulation-batting fill, not long wall edges. The '$0$' token marks the layer as bound from an xref of the 평면도(기본형) plan, and 'INSUL' identifies it as insulation, i.e. wall-assembly material.",
+      "rule": "A block-table definition made entirely of uniform LWPOLYLINEs on a plan's INSUL/material layer is wall-assembly insulation fill: it reliably marks where walls run yet its polylines are pattern segments, so it signals wall PRESENCE without yielding an extractable wall-FACE line. This transfers to any plan carrying a material sublayer.",
+      "counterfactual": "If these were long 2-point straight LINE/LWPOLYLINE runs on a WALL/구조(structural) layer instead of 5-vertex INSUL pattern loops, they would read as wall faces and both wall_likelihood and wall_line_handles would jump.",
+      "uncertainty": "Vertex coordinates are not in the projection, so the exact wall runs traced and whether they are exterior vs interior walls cannot be recovered; the role could alternatively be read as 심볼(패턴) or 기타 rather than 평면 부분도 since the block is single-layer pattern fill, not a composite plan chunk."
+    }
+  },
+  {
+    "unit_id": "defannot-u106-117",
+    "def": "*U106",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.3,
+    "wall_line_handles": [],
+    "notes": "Insulation (INSUL) pattern fragment of the basic-type floor plan (평면도 기본형): 24 uniform 5-vertex LWPOLYLINEs of wall-cavity insulation; no wall-face line.",
+    "rationale": {
+      "evidence": "All 24 entities are LWPOLYLINE on the single bound layer 'X-평면도(기본형)$0$INSUL' (handles 4463..447A), each with exactly 5 vertices - the fingerprint of a repeated insulation-batting fill, not long wall edges. The '$0$' token marks the layer as bound from an xref of the 평면도(기본형) plan, and 'INSUL' identifies it as insulation, i.e. wall-assembly material.",
+      "rule": "A block-table definition made entirely of uniform LWPOLYLINEs on a plan's INSUL/material layer is wall-assembly insulation fill: it reliably marks where walls run yet its polylines are pattern segments, so it signals wall PRESENCE without yielding an extractable wall-FACE line. This transfers to any plan carrying a material sublayer.",
+      "counterfactual": "If these were long 2-point straight LINE/LWPOLYLINE runs on a WALL/구조(structural) layer instead of 5-vertex INSUL pattern loops, they would read as wall faces and both wall_likelihood and wall_line_handles would jump.",
+      "uncertainty": "Vertex coordinates are not in the projection, so the exact wall runs traced and whether they are exterior vs interior walls cannot be recovered; the role could alternatively be read as 심볼(패턴) or 기타 rather than 평면 부분도 since the block is single-layer pattern fill, not a composite plan chunk."
+    }
+  },
+  {
+    "unit_id": "defannot-u107-118",
+    "def": "*U107",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.3,
+    "wall_line_handles": [],
+    "notes": "Insulation (INSUL) pattern fragment of the basic-type floor plan (평면도 기본형): 74 uniform 5-vertex LWPOLYLINEs of wall-cavity insulation; no wall-face line.",
+    "rationale": {
+      "evidence": "All 74 entities are LWPOLYLINE on the single bound layer 'X-평면도(기본형)$0$INSUL' (handles 4480..44CD), each with exactly 5 vertices - the fingerprint of a repeated insulation-batting fill, not long wall edges. The '$0$' token marks the layer as bound from an xref of the 평면도(기본형) plan, and 'INSUL' identifies it as insulation, i.e. wall-assembly material.",
+      "rule": "A block-table definition made entirely of uniform LWPOLYLINEs on a plan's INSUL/material layer is wall-assembly insulation fill: it reliably marks where walls run yet its polylines are pattern segments, so it signals wall PRESENCE without yielding an extractable wall-FACE line. This transfers to any plan carrying a material sublayer.",
+      "counterfactual": "If these were long 2-point straight LINE/LWPOLYLINE runs on a WALL/구조(structural) layer instead of 5-vertex INSUL pattern loops, they would read as wall faces and both wall_likelihood and wall_line_handles would jump.",
+      "uncertainty": "Vertex coordinates are not in the projection, so the exact wall runs traced and whether they are exterior vs interior walls cannot be recovered; the role could alternatively be read as 심볼(패턴) or 기타 rather than 평면 부분도 since the block is single-layer pattern fill, not a composite plan chunk."
+    }
+  },
+  {
+    "unit_id": "defannot-u108-119",
+    "def": "*U108",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.3,
+    "wall_line_handles": [],
+    "notes": "Insulation (INSUL) pattern fragment of the basic-type floor plan (평면도 기본형): 15 uniform 5-vertex LWPOLYLINEs of wall-cavity insulation; no wall-face line.",
+    "rationale": {
+      "evidence": "All 15 entities are LWPOLYLINE on the single bound layer 'X-평면도(기본형)$0$INSUL' (handles 44CF..44DD), each with exactly 5 vertices - the fingerprint of a repeated insulation-batting fill, not long wall edges. The '$0$' token marks the layer as bound from an xref of the 평면도(기본형) plan, and 'INSUL' identifies it as insulation, i.e. wall-assembly material.",
+      "rule": "A block-table definition made entirely of uniform LWPOLYLINEs on a plan's INSUL/material layer is wall-assembly insulation fill: it reliably marks where walls run yet its polylines are pattern segments, so it signals wall PRESENCE without yielding an extractable wall-FACE line. This transfers to any plan carrying a material sublayer.",
+      "counterfactual": "If these were long 2-point straight LINE/LWPOLYLINE runs on a WALL/구조(structural) layer instead of 5-vertex INSUL pattern loops, they would read as wall faces and both wall_likelihood and wall_line_handles would jump.",
+      "uncertainty": "Vertex coordinates are not in the projection, so the exact wall runs traced and whether they are exterior vs interior walls cannot be recovered; the role could alternatively be read as 심볼(패턴) or 기타 rather than 평면 부분도 since the block is single-layer pattern fill, not a composite plan chunk."
+    }
+  },
+  {
+    "unit_id": "defannot-u109-120",
+    "def": "*U109",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.3,
+    "wall_line_handles": [],
+    "notes": "Insulation (INSUL) pattern fragment of the basic-type floor plan (평면도 기본형): 13 uniform 5-vertex LWPOLYLINEs of wall-cavity insulation; no wall-face line.",
+    "rationale": {
+      "evidence": "All 13 entities are LWPOLYLINE on the single bound layer 'X-평면도(기본형)$0$INSUL' (handles 44E3..44EF), each with exactly 5 vertices - the fingerprint of a repeated insulation-batting fill, not long wall edges. The '$0$' token marks the layer as bound from an xref of the 평면도(기본형) plan, and 'INSUL' identifies it as insulation, i.e. wall-assembly material.",
+      "rule": "A block-table definition made entirely of uniform LWPOLYLINEs on a plan's INSUL/material layer is wall-assembly insulation fill: it reliably marks where walls run yet its polylines are pattern segments, so it signals wall PRESENCE without yielding an extractable wall-FACE line. This transfers to any plan carrying a material sublayer.",
+      "counterfactual": "If these were long 2-point straight LINE/LWPOLYLINE runs on a WALL/구조(structural) layer instead of 5-vertex INSUL pattern loops, they would read as wall faces and both wall_likelihood and wall_line_handles would jump.",
+      "uncertainty": "Vertex coordinates are not in the projection, so the exact wall runs traced and whether they are exterior vs interior walls cannot be recovered; the role could alternatively be read as 심볼(패턴) or 기타 rather than 평면 부분도 since the block is single-layer pattern fill, not a composite plan chunk."
+    }
+  }
+]

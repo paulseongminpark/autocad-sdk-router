@@ -1,0 +1,282 @@
+[
+ {
+  "unit_id": "defannot-u151-161",
+  "def": "*U151",
+  "role": "기타",
+  "wall_likelihood": 0.08,
+  "wall_line_handles": [],
+  "notes": "Anonymous INSUL-layer 5-vertex LWPOLYLINE cluster; insulation fill, not walls.",
+  "rationale": {
+   "evidence": "All 24 entities are LWPOLYLINE on X-평면도(기본형)$0$INSUL with identical 5-vertex samples. No LINE/ARC/INSERT/DIMENSION content appears. The INSUL layer name and uniform polyline pattern indicate insulation hatch geometry rather than wall outlines.",
+   "rule": "Treat homogeneous anonymous *U* blocks whose only layer token is INSUL and whose entities are short closed/open polylines as insulation fills (기타), not wall partial plans. Do not promote wall_likelihood from polyline count alone when the layer explicitly names insulation.",
+   "counterfactual": "If entities were on a WALL/A-WALL/구조 layer with long parallel double-line pairs, or if LINE wall spines with door gaps appeared, wall_likelihood and role would flip toward 평면 부분도. Presence of DIMENSION or 치수 layers would push toward 치수캐시.",
+   "uncertainty": "Vertex coordinates and closed/open flags are not given, so geometric wall-likeness cannot be verified. Placement context of the anonymous block insert is unknown from this projection alone."
+  }
+ },
+ {
+  "unit_id": "defannot-u152-162",
+  "def": "*U152",
+  "role": "기타",
+  "wall_likelihood": 0.08,
+  "wall_line_handles": [],
+  "notes": "Same INSUL-only LWPOLYLINE insulation pattern as neighboring *U blocks.",
+  "rationale": {
+   "evidence": "21/21 entities are LWPOLYLINE on INSUL with 5 vertices each in the sample. No structural linework, furniture inserts, or dimension entities are present. Layer token INSUL dominates the judgment away from walls.",
+   "rule": "When a definition is 100% INSUL LWPOLYLINE with uniform vertex counts, classify as insulation fill (기타) and keep wall_line_handles empty.",
+   "counterfactual": "Wall-core layers or paired parallel long segments would raise wall_likelihood. Furniture block INSERTs would shift role to 가구.",
+   "uncertainty": "Without bbox or vertex XY, segment length and alignment to walls cannot be assessed; insert scale/rotation is unknown."
+  }
+ },
+ {
+  "unit_id": "defannot-u156-163",
+  "def": "*U156",
+  "role": "기타",
+  "wall_likelihood": 0.1,
+  "wall_line_handles": [],
+  "notes": "Large INSUL LWPOLYLINE pack (92); insulation hatching mass, not wall def.",
+  "rationale": {
+   "evidence": "All 92 entities are LWPOLYLINE on INSUL; sampled handles show repeated 5-vertex polylines. High count suggests a dense insulation hatch region, not a sparse wall centerline set. No non-INSUL layers appear.",
+   "rule": "Entity count alone does not make a block a wall partial plan; layer semantics (INSUL) override quantity when entity types are uniform hatch-like polylines.",
+   "counterfactual": "If a minority of entities were WALL-layer LINE/LWPOLYLINE forming continuous envelopes, those handles could be listed and wall_likelihood raised. Mixed layers with 벽/벽체 naming would also flip role.",
+   "uncertainty": "Only 30 of 92 entities are sampled, so unsampled entities could differ in type though the histogram says LWPOLYLINE=92. Spatial footprint remains unknown."
+  }
+ },
+ {
+  "unit_id": "defannot-u157-164",
+  "def": "*U157",
+  "role": "기타",
+  "wall_likelihood": 0.07,
+  "wall_line_handles": [],
+  "notes": "Small 8-entity INSUL LWPOLYLINE insulation scrap.",
+  "rationale": {
+   "evidence": "Eight LWPOLYLINEs exclusively on INSUL with 5 vertices each. Small anonymous fill fragment consistent with insulation batts, not architectural walls or symbols.",
+   "rule": "Small INSUL-only polyline anonymous blocks are insulation scraps (기타) with near-zero wall likelihood.",
+   "counterfactual": "Renaming/layering onto wall layers or replacing with long orthographic LINE pairs would indicate walls. A single named symbol INSERT would suggest 심볼.",
+   "uncertainty": "Cannot tell whether these polylines sit inside wall cavities or are free-standing fills without coordinates or host insert context."
+  }
+ },
+ {
+  "unit_id": "defannot-u158-165",
+  "def": "*U158",
+  "role": "기타",
+  "wall_likelihood": 0.08,
+  "wall_line_handles": [],
+  "notes": "17 INSUL LWPOLYLINEs; insulation fill cluster.",
+  "rationale": {
+   "evidence": "Histogram and samples are exclusively INSUL LWPOLYLINE with 5 vertices. No dimension, furniture, or wall-named content supports any other role.",
+   "rule": "Uniform INSUL polyline anonymous blocks map to 기타 (insulation), not 평면 부분도, unless wall-layer geometry is co-present.",
+   "counterfactual": "Adding A-WALL/벽 LINE geometry or door/window cuts would flip toward 평면 부분도 with non-empty wall_line_handles.",
+   "uncertainty": "Projection lacks vertex coordinates and closed flags, so individual polylines cannot be scored as wall candidates by shape."
+  }
+ },
+ {
+  "unit_id": "defannot-u159-166",
+  "def": "*U159",
+  "role": "기타",
+  "wall_likelihood": 0.08,
+  "wall_line_handles": [],
+  "notes": "18 INSUL LWPOLYLINEs; same insulation-fill anonymous pattern.",
+  "rationale": {
+   "evidence": "All 18 entities are INSUL LWPOLYLINE; samples are identical 5-vertex polylines. Pattern matches insulation hatching, not symbols or furniture.",
+   "rule": "Role follows dominant layer semantics: INSUL-only geometry ⇒ 기타/insulation, wall_likelihood low, no wall handles.",
+   "counterfactual": "If layer were 가구/FF&E or INSERT furniture blocks appeared, role would become 가구. Explicit wall layers would raise wall_likelihood.",
+   "uncertainty": "Anonymous *U name gives no semantic title; true drafting intent beyond layer token cannot be confirmed."
+  }
+ },
+ {
+  "unit_id": "defannot-u160-167",
+  "def": "*U160",
+  "role": "기타",
+  "wall_likelihood": 0.1,
+  "wall_line_handles": [],
+  "notes": "87 INSUL LWPOLYLINEs; dense insulation hatch anonymous block.",
+  "rationale": {
+   "evidence": "87 LWPOLYLINEs all on INSUL; sampled entities are uniform 5-vertex polylines. Dense count fits insulation fill regions in floor-plan Xrefs, not wall spines.",
+   "rule": "Dense homogeneous INSUL polyline packs are insulation fills; do not list them as wall_line_handles.",
+   "counterfactual": "Co-presence of WALL-layer long LINEs or a wall-core polyline subset would justify non-empty wall_line_handles and higher wall_likelihood.",
+   "uncertainty": "62 entities are unsampled though histogram asserts LWPOLYLINE-only; exact geometry and adjacency to walls remain unknown."
+  }
+ },
+ {
+  "unit_id": "defannot-u161-168",
+  "def": "*U161",
+  "role": "기타",
+  "wall_likelihood": 0.1,
+  "wall_line_handles": [],
+  "notes": "90 INSUL LWPOLYLINEs; insulation mass, not wall definition.",
+  "rationale": {
+   "evidence": "Entity histogram is LWPOLYLINE=90 on INSUL only. Samples show repeated 5-vertex polylines typical of insulation hatch cells. No symbol INSERT or dimension cache entities.",
+   "rule": "Ignore anonymous-block size; classify by layer token and entity mix. INSUL+LWPOLYLINE-only ⇒ 기타 with empty wall handles.",
+   "counterfactual": "Wall-layer double lines or slab/wall hatch layers named 벽 would flip judgment. DIMENSION-heavy content would indicate 치수캐시.",
+   "uncertainty": "Bbox not derivable from LINE start/end because there are no LINEs; overall extent and orientation are unknown."
+  }
+ },
+ {
+  "unit_id": "defannot-u162-169",
+  "def": "*U162",
+  "role": "기타",
+  "wall_likelihood": 0.1,
+  "wall_line_handles": [],
+  "notes": "81 INSUL LWPOLYLINEs; insulation hatch anonymous block.",
+  "rationale": {
+   "evidence": "All 81 entities are INSUL LWPOLYLINE with uniform 5-vertex samples. Floor-plan parent layer path includes 평면도 but the leaf token is INSUL, which is the decisive semantic cue against walls.",
+   "rule": "Prefer the leaf layer purpose (INSUL) over the parent plan name when assigning role and wall_likelihood.",
+   "counterfactual": "If leaf layer were 벽체/WALL and polylines formed long parallel pairs, role would become 평면 부분도 with selected wall handles.",
+   "uncertainty": "Cannot see whether polylines are zigzag insulation symbols or rectangular loops without vertex coordinates."
+  }
+ },
+ {
+  "unit_id": "defannot-u163-170",
+  "def": "*U163",
+  "role": "기타",
+  "wall_likelihood": 0.1,
+  "wall_line_handles": [],
+  "notes": "75 INSUL LWPOLYLINEs; insulation fill, not walls.",
+  "rationale": {
+   "evidence": "Histogram LWPOLYLINE=75 and layer INSUL=75 with matching 5-vertex samples. No LINE wall candidates exist in this definition at all.",
+   "rule": "If no entities resemble wall centerlines/faces (especially when layer is INSUL), wall_line_handles must be [] and wall_likelihood stay low.",
+   "counterfactual": "Replacement of INSUL polylines by WALL LINEs with door gaps would flip to 평면 부분도. Furniture geometry would flip to 가구.",
+   "uncertainty": "Partial sample (30/75) and missing XY prevent shape-based confirmation beyond layer/type evidence."
+  }
+ },
+ {
+  "unit_id": "defannot-u164-171",
+  "def": "*U164",
+  "role": "기타",
+  "wall_likelihood": 0.09,
+  "wall_line_handles": [],
+  "notes": "37 INSUL LWPOLYLINEs; mid-size insulation anonymous block.",
+  "rationale": {
+   "evidence": "37 LWPOLYLINEs solely on INSUL; samples are 5-vertex polylines. Composition matches insulation fill fragments used in plan drawings.",
+   "rule": "Mid-count INSUL polyline anonymous blocks remain 기타; quantity thresholds alone do not imply walls.",
+   "counterfactual": "Named non-anonymous def with wall layers, or mixed INSERT symbols, would change role. Explicit 치수 entities would suggest 치수캐시.",
+   "uncertainty": "Insert host and relation to adjacent wall geometry are outside this projection."
+  }
+ },
+ {
+  "unit_id": "defannot-u165-172",
+  "def": "*U165",
+  "role": "기타",
+  "wall_likelihood": 0.09,
+  "wall_line_handles": [],
+  "notes": "36 INSUL LWPOLYLINEs; insulation fill cluster.",
+  "rationale": {
+   "evidence": "All entities are INSUL LWPOLYLINE with uniform 5-vertex samples; no competing layers. Evidence aligns with insulation hatching, not architectural walls or furniture.",
+   "rule": "Homogeneous INSUL LWPOLYLINE definitions are insulation (기타) with empty wall_line_handles.",
+   "counterfactual": "Presence of long orthographic WALL LINEs or door/window blocks would raise wall_likelihood and possibly change role to 평면 부분도.",
+   "uncertainty": "Closed/open status and real-world scale are not available from the projection text."
+  }
+ },
+ {
+  "unit_id": "defannot-u166-173",
+  "def": "*U166",
+  "role": "기타",
+  "wall_likelihood": 0.07,
+  "wall_line_handles": [],
+  "notes": "13 INSUL LWPOLYLINEs; small insulation scrap.",
+  "rationale": {
+   "evidence": "Thirteen INSUL LWPOLYLINEs only; identical 5-vertex sample pattern. Too sparse and layer-specific to be a plan partial or wall set.",
+   "rule": "Small INSUL-only anonymous polyline packs are insulation scraps (기타), not 심볼 unless an explicit symbol INSERT/name appears.",
+   "counterfactual": "A titled INSERT or attribute text identifying a device would push toward 심볼. Wall-layer lines would push toward 평면 부분도.",
+   "uncertainty": "Whether this scrap is part of a larger wall cavity assembly cannot be known without nesting/insert context."
+  }
+ },
+ {
+  "unit_id": "defannot-u167-174",
+  "def": "*U167",
+  "role": "기타",
+  "wall_likelihood": 0.08,
+  "wall_line_handles": [],
+  "notes": "30 INSUL LWPOLYLINEs; full-sample insulation fill block.",
+  "rationale": {
+   "evidence": "Exactly 30 LWPOLYLINEs on INSUL and all are sampled with 5 vertices. Complete sample still shows no wall LINE candidates or non-INSUL layers.",
+   "rule": "Even with full entity sampling, INSUL-only polyline sets stay 기타 with wall_likelihood near zero and empty wall handles.",
+   "counterfactual": "If any sampled handle were a long WALL-layer LINE forming an envelope, it would be listed in wall_line_handles and wall_likelihood raised.",
+   "uncertainty": "Vertex coordinates absent, so geometric resemblance to wall outlines cannot be double-checked beyond layer naming."
+  }
+ },
+ {
+  "unit_id": "defannot-u168-175",
+  "def": "*U168",
+  "role": "기타",
+  "wall_likelihood": 0.07,
+  "wall_line_handles": [],
+  "notes": "14 INSUL LWPOLYLINEs; small insulation anonymous block.",
+  "rationale": {
+   "evidence": "14/14 entities are INSUL LWPOLYLINE with 5-vertex samples. Pattern is consistent with insulation fill, not furniture, dimensions, or wall cores.",
+   "rule": "Classify by exclusive INSUL polyline composition as 기타 insulation; do not invent wall handles from hatch-like polylines.",
+   "counterfactual": "Furniture outlines on 가구 layers or chair/table INSERTs would switch role to 가구. Dimension entities would switch to 치수캐시.",
+   "uncertainty": "Anonymous block purpose beyond layer token is opaque; parent Xref usage is not shown."
+  }
+ },
+ {
+  "unit_id": "defannot-u169-176",
+  "def": "*U169",
+  "role": "기타",
+  "wall_likelihood": 0.12,
+  "wall_line_handles": [],
+  "notes": "Largest INSUL LWPOLYLINE pack (106); insulation hatch mass.",
+  "rationale": {
+   "evidence": "106 LWPOLYLINEs all on INSUL; samples remain uniform 5-vertex polylines. Largest count in this shard still lacks any WALL/LINE/INSERT evidence for walls or symbols.",
+   "rule": "Maximum entity count does not override INSUL semantics; large insulation hatches remain 기타 with empty wall_line_handles.",
+   "counterfactual": "If histogram included WALL LINEs or structural polylines co-layered with INSUL, those non-INSUL entities could be wall candidates. A mixed plan fragment with rooms would support 평면 부분도.",
+   "uncertainty": "Only 30/106 sampled; unsampled polylines could theoretically differ in vertex count though not in dxf_name per histogram. Spatial extent unknown."
+  }
+ },
+ {
+  "unit_id": "defannot-u170-177",
+  "def": "*U170",
+  "role": "심볼",
+  "wall_likelihood": 0.05,
+  "wall_line_handles": [],
+  "notes": "Flagpole INSERT plus wipeouts and rectangular detail frame LINEs; not walls.",
+  "rationale": {
+   "evidence": "Contains INSERT of block X-평면도(기본형)$0$국기계양대 (national flagpole), two WIPEOUTs, and twenty LINEs on layer 0 forming a wide shallow rectangular frame (bbox ~1220 x 126). Composition is a framed detail/symbol assembly, not floor-plan wallwork.",
+   "rule": "When a definition is dominated by a named equipment/symbol INSERT plus border LINEs and wipeouts, role is 심볼; border lines are annotation frames, not wall_line_handles.",
+   "counterfactual": "If the INSERT were absent and LINEs formed room-scale parallel wall pairs with openings on wall layers, role would shift to 평면 부분도 with selected wall handles. Pure DIMENSION content would indicate 치수캐시.",
+   "uncertainty": "Inner flagpole geometry lives in the nested block and is not expanded here. Whether the frame is a title strip vs. scaled detail border is inferred from bbox aspect, not proven."
+  }
+ },
+ {
+  "unit_id": "defannot-u171-178",
+  "def": "*U171",
+  "role": "기타",
+  "wall_likelihood": 0.08,
+  "wall_line_handles": [],
+  "notes": "29 INSUL LWPOLYLINEs; insulation fill anonymous block.",
+  "rationale": {
+   "evidence": "All 29 entities are INSUL LWPOLYLINE with 5-vertex samples. Returns to the insulation-fill pattern after the flagpole symbol definition; no wall LINE content.",
+   "rule": "Resume INSUL-only polyline rule: 기타, low wall_likelihood, empty wall_line_handles.",
+   "counterfactual": "Wall-layer lines or a non-INSUL structural layer would flip judgment. An equipment INSERT like 국기계양대 would flip to 심볼.",
+   "uncertainty": "Coordinates unavailable; cannot confirm insulation zigzag vs. rectangular cell geometry from text alone."
+  }
+ },
+ {
+  "unit_id": "defannot-u172-179",
+  "def": "*U172",
+  "role": "심볼",
+  "wall_likelihood": 0.05,
+  "wall_line_handles": [],
+  "notes": "Wider twin of *U170: flagpole INSERT, wipeouts, framed LINE border.",
+  "rationale": {
+   "evidence": "Same recipe as *U170: WIPEOUT×2, INSERT 국기계양대, LINE×20 on layer 0. Bbox is wider (~1620 x 126) but still a shallow frame around a flagpole symbol, not architectural walls.",
+   "rule": "Repeated framed INSERT-of-named-symbol patterns are 심볼; scale differences in border LINEs do not create walls. Do not list frame LINEs as wall_line_handles.",
+   "counterfactual": "Absence of the 국기계양대 INSERT with only a rectangle might reduce confidence to 기타/annotation frame. Wall-layer plan geometry would flip to 평면 부분도.",
+   "uncertainty": "Nested flagpole block contents are opaque; exact drafting standard (detail callout vs. elevation mark) cannot be fully settled from this projection."
+  }
+ },
+ {
+  "unit_id": "defannot-u173-180",
+  "def": "*U173",
+  "role": "기타",
+  "wall_likelihood": 0.08,
+  "wall_line_handles": [],
+  "notes": "18 INSUL LWPOLYLINEs; closing insulation-fill anonymous block.",
+  "rationale": {
+   "evidence": "Eighteen LWPOLYLINEs exclusively on INSUL with uniform 5-vertex samples. Matches the dominant insulation anonymous-block family in this shard, not the flagpole symbol pattern.",
+   "rule": "INSUL-only LWPOLYLINE anonymous blocks ⇒ 기타 (insulation), wall_likelihood low, wall_line_handles [].",
+   "counterfactual": "If entities switched to WALL LINEs or included 국기계양대-like INSERTs, role would become 평면 부분도 or 심볼 respectively.",
+   "uncertainty": "No LINE bbox and no vertex XY; spatial relationship to walls or inserts remains undetermined."
+  }
+ }
+]

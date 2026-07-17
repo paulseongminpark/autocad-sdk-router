@@ -1,0 +1,282 @@
+[
+  {
+    "unit_id": "defannot-d395-101",
+    "def": "*D395",
+    "role": "치수캐시",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "Anonymous *D dimension-cache block: linear dimension reading 700, all geometry on DIM/DEFPOINTS layers.",
+    "rationale": {
+      "evidence": "The block holds 3 LINEs on layer DIM (8EF8, 8EF9 as extension lines, 8EFA as the dimension line), two INSERTs of block DIMDOT (arrow/tick symbol), one MTEXT '\\A1;700', and three POINTs on DEFPOINTS (dimension definition points). The horizontal measured span matches the text: x-span 59348.83-58648.83 = 700 equals MTEXT '700'. This 9-to-11-entity DIM+DEFPOINTS composition is the canonical exploded anatomy of an AutoCAD dimension entity.",
+      "rule": "An anonymous block named *D<number> whose contents are exclusively extension/dimension lines on a dimension layer, arrowhead INSERTs, one measurement MTEXT, and DEFPOINTS points is the render cache of a DIMENSION entity, never model geometry.",
+      "counterfactual": "If the block contained lines on building-fabric layers (WALL/CON/기둥) or the MTEXT value did not equal the distance between the extension lines, I would reconsider it as a plan fragment or generic annotation instead of a dimension cache.",
+      "uncertainty": "The projection cannot show which DIMENSION entity owns this cache, its dimstyle, or what building element the 700 mm measurement annotates; the DIMDOT sub-block geometry is also not expanded here."
+    }
+  },
+  {
+    "unit_id": "defannot-d396-102",
+    "def": "*D396",
+    "role": "치수캐시",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "Anonymous *D dimension-cache block: linear dimension reading 1170, all geometry on DIM/DEFPOINTS layers.",
+    "rationale": {
+      "evidence": "The block holds 3 LINEs on layer DIM (8F01, 8F02 as extension lines, 8F03 as the dimension line), two INSERTs of block DIMDOT (arrow/tick symbol), one MTEXT '\\A1;1170', and three POINTs on DEFPOINTS (dimension definition points). The horizontal measured span matches the text: x-span 49953.83-48783.83 = 1170 equals MTEXT '1170'. This 9-to-11-entity DIM+DEFPOINTS composition is the canonical exploded anatomy of an AutoCAD dimension entity.",
+      "rule": "An anonymous block named *D<number> whose contents are exclusively extension/dimension lines on a dimension layer, arrowhead INSERTs, one measurement MTEXT, and DEFPOINTS points is the render cache of a DIMENSION entity, never model geometry.",
+      "counterfactual": "If the block contained lines on building-fabric layers (WALL/CON/기둥) or the MTEXT value did not equal the distance between the extension lines, I would reconsider it as a plan fragment or generic annotation instead of a dimension cache.",
+      "uncertainty": "The projection cannot show which DIMENSION entity owns this cache, its dimstyle, or what building element the 1170 mm measurement annotates; the DIMDOT sub-block geometry is also not expanded here."
+    }
+  },
+  {
+    "unit_id": "defannot-d397-103",
+    "def": "*D397",
+    "role": "치수캐시",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "Anonymous *D dimension-cache block: linear dimension reading 1805, all geometry on DIM/DEFPOINTS layers.",
+    "rationale": {
+      "evidence": "The block holds 3 LINEs on layer DIM (8F0A, 8F0B as extension lines, 8F0C as the dimension line), two INSERTs of block DIMDOT (arrow/tick symbol), one MTEXT '\\A1;1805', and three POINTs on DEFPOINTS (dimension definition points). The horizontal measured span matches the text: x-span 48783.83-46978.83 = 1805 equals MTEXT '1805'. This 9-to-11-entity DIM+DEFPOINTS composition is the canonical exploded anatomy of an AutoCAD dimension entity.",
+      "rule": "An anonymous block named *D<number> whose contents are exclusively extension/dimension lines on a dimension layer, arrowhead INSERTs, one measurement MTEXT, and DEFPOINTS points is the render cache of a DIMENSION entity, never model geometry.",
+      "counterfactual": "If the block contained lines on building-fabric layers (WALL/CON/기둥) or the MTEXT value did not equal the distance between the extension lines, I would reconsider it as a plan fragment or generic annotation instead of a dimension cache.",
+      "uncertainty": "The projection cannot show which DIMENSION entity owns this cache, its dimstyle, or what building element the 1805 mm measurement annotates; the DIMDOT sub-block geometry is also not expanded here."
+    }
+  },
+  {
+    "unit_id": "defannot-d398-104",
+    "def": "*D398",
+    "role": "치수캐시",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "Anonymous *D dimension-cache block: linear dimension reading 910, all geometry on DIM/DEFPOINTS layers.",
+    "rationale": {
+      "evidence": "The block holds 3 LINEs on layer DIM (8F13, 8F14 as extension lines, 8F15 as the dimension line), two INSERTs of block DIMDOT (arrow/tick symbol), one MTEXT '\\A1;910', and three POINTs on DEFPOINTS (dimension definition points). The horizontal measured span matches the text: x-span 46978.83-46068.83 = 910 equals MTEXT '910'. This 9-to-11-entity DIM+DEFPOINTS composition is the canonical exploded anatomy of an AutoCAD dimension entity.",
+      "rule": "An anonymous block named *D<number> whose contents are exclusively extension/dimension lines on a dimension layer, arrowhead INSERTs, one measurement MTEXT, and DEFPOINTS points is the render cache of a DIMENSION entity, never model geometry.",
+      "counterfactual": "If the block contained lines on building-fabric layers (WALL/CON/기둥) or the MTEXT value did not equal the distance between the extension lines, I would reconsider it as a plan fragment or generic annotation instead of a dimension cache.",
+      "uncertainty": "The projection cannot show which DIMENSION entity owns this cache, its dimstyle, or what building element the 910 mm measurement annotates; the DIMDOT sub-block geometry is also not expanded here."
+    }
+  },
+  {
+    "unit_id": "defannot-d399-105",
+    "def": "*D399",
+    "role": "치수캐시",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "Anonymous *D dimension-cache block: linear dimension reading 760, all geometry on DIM/DEFPOINTS layers.",
+    "rationale": {
+      "evidence": "The block holds 3 LINEs on layer DIM (8F1C, 8F1D as extension lines, 8F1E as the dimension line), two INSERTs of block DIMDOT (arrow/tick symbol), one MTEXT '\\A1;760', and three POINTs on DEFPOINTS (dimension definition points). The vertical measured span matches the text: y-span 32025.207-31265.207 = 760 equals MTEXT '760'. This 9-to-11-entity DIM+DEFPOINTS composition is the canonical exploded anatomy of an AutoCAD dimension entity.",
+      "rule": "An anonymous block named *D<number> whose contents are exclusively extension/dimension lines on a dimension layer, arrowhead INSERTs, one measurement MTEXT, and DEFPOINTS points is the render cache of a DIMENSION entity, never model geometry.",
+      "counterfactual": "If the block contained lines on building-fabric layers (WALL/CON/기둥) or the MTEXT value did not equal the distance between the extension lines, I would reconsider it as a plan fragment or generic annotation instead of a dimension cache.",
+      "uncertainty": "The projection cannot show which DIMENSION entity owns this cache, its dimstyle, or what building element the 760 mm measurement annotates; the DIMDOT sub-block geometry is also not expanded here."
+    }
+  },
+  {
+    "unit_id": "defannot-d400-106",
+    "def": "*D400",
+    "role": "치수캐시",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "Anonymous *D dimension-cache block: linear dimension reading 1145, all geometry on DIM/DEFPOINTS layers.",
+    "rationale": {
+      "evidence": "The block holds 3 LINEs on layer DIM (8F25, 8F26 as extension lines, 8F27 as the dimension line), two INSERTs of block DIMDOT (arrow/tick symbol), one MTEXT '\\A1;1145', and three POINTs on DEFPOINTS (dimension definition points). The vertical measured span matches the text: y-span 33170.207-32025.207 = 1145 equals MTEXT '1145'. This 9-to-11-entity DIM+DEFPOINTS composition is the canonical exploded anatomy of an AutoCAD dimension entity.",
+      "rule": "An anonymous block named *D<number> whose contents are exclusively extension/dimension lines on a dimension layer, arrowhead INSERTs, one measurement MTEXT, and DEFPOINTS points is the render cache of a DIMENSION entity, never model geometry.",
+      "counterfactual": "If the block contained lines on building-fabric layers (WALL/CON/기둥) or the MTEXT value did not equal the distance between the extension lines, I would reconsider it as a plan fragment or generic annotation instead of a dimension cache.",
+      "uncertainty": "The projection cannot show which DIMENSION entity owns this cache, its dimstyle, or what building element the 1145 mm measurement annotates; the DIMDOT sub-block geometry is also not expanded here."
+    }
+  },
+  {
+    "unit_id": "defannot-d401-107",
+    "def": "*D401",
+    "role": "치수캐시",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "Anonymous *D dimension-cache block: linear dimension reading 470, all geometry on DIM/DEFPOINTS layers.",
+    "rationale": {
+      "evidence": "The block holds 3 LINEs on layer DIM (8F2E, 8F2F as extension lines, 8F30 as the dimension line), two INSERTs of block DIMDOT (arrow/tick symbol), one MTEXT '\\A1;470', and three POINTs on DEFPOINTS (dimension definition points). The horizontal measured span matches the text: x-span 49253.83-48783.83 = 470 equals MTEXT '470'. This 9-to-11-entity DIM+DEFPOINTS composition is the canonical exploded anatomy of an AutoCAD dimension entity.",
+      "rule": "An anonymous block named *D<number> whose contents are exclusively extension/dimension lines on a dimension layer, arrowhead INSERTs, one measurement MTEXT, and DEFPOINTS points is the render cache of a DIMENSION entity, never model geometry.",
+      "counterfactual": "If the block contained lines on building-fabric layers (WALL/CON/기둥) or the MTEXT value did not equal the distance between the extension lines, I would reconsider it as a plan fragment or generic annotation instead of a dimension cache.",
+      "uncertainty": "The projection cannot show which DIMENSION entity owns this cache, its dimstyle, or what building element the 470 mm measurement annotates; the DIMDOT sub-block geometry is also not expanded here."
+    }
+  },
+  {
+    "unit_id": "defannot-d402-108",
+    "def": "*D402",
+    "role": "치수캐시",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "Anonymous *D dimension-cache block: linear dimension reading 1020, all geometry on DIM/DEFPOINTS layers.",
+    "rationale": {
+      "evidence": "The block holds 3 LINEs on layer DIM (8F37, 8F38 as extension lines, 8F39 as the dimension line), two INSERTs of block DIMDOT (arrow/tick symbol), one MTEXT '\\A1;1020', and three POINTs on DEFPOINTS (dimension definition points). The vertical measured span matches the text: y-span 33925.207-32905.207 = 1020 equals MTEXT '1020'. This 9-to-11-entity DIM+DEFPOINTS composition is the canonical exploded anatomy of an AutoCAD dimension entity.",
+      "rule": "An anonymous block named *D<number> whose contents are exclusively extension/dimension lines on a dimension layer, arrowhead INSERTs, one measurement MTEXT, and DEFPOINTS points is the render cache of a DIMENSION entity, never model geometry.",
+      "counterfactual": "If the block contained lines on building-fabric layers (WALL/CON/기둥) or the MTEXT value did not equal the distance between the extension lines, I would reconsider it as a plan fragment or generic annotation instead of a dimension cache.",
+      "uncertainty": "The projection cannot show which DIMENSION entity owns this cache, its dimstyle, or what building element the 1020 mm measurement annotates; the DIMDOT sub-block geometry is also not expanded here."
+    }
+  },
+  {
+    "unit_id": "defannot-d403-109",
+    "def": "*D403",
+    "role": "치수캐시",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "Anonymous *D dimension-cache block: linear dimension reading 1620, all geometry on DIM/DEFPOINTS layers.",
+    "rationale": {
+      "evidence": "The block holds 3 LINEs on layer DIM (8F40, 8F41 as extension lines, 8F42 as the dimension line), two INSERTs of block DIMDOT (arrow/tick symbol), one MTEXT '\\A1;1620', and three POINTs on DEFPOINTS (dimension definition points). The vertical measured span matches the text: y-span 32905.207-31285.207 = 1620 equals MTEXT '1620'. This 9-to-11-entity DIM+DEFPOINTS composition is the canonical exploded anatomy of an AutoCAD dimension entity.",
+      "rule": "An anonymous block named *D<number> whose contents are exclusively extension/dimension lines on a dimension layer, arrowhead INSERTs, one measurement MTEXT, and DEFPOINTS points is the render cache of a DIMENSION entity, never model geometry.",
+      "counterfactual": "If the block contained lines on building-fabric layers (WALL/CON/기둥) or the MTEXT value did not equal the distance between the extension lines, I would reconsider it as a plan fragment or generic annotation instead of a dimension cache.",
+      "uncertainty": "The projection cannot show which DIMENSION entity owns this cache, its dimstyle, or what building element the 1620 mm measurement annotates; the DIMDOT sub-block geometry is also not expanded here."
+    }
+  },
+  {
+    "unit_id": "defannot-d404-110",
+    "def": "*D404",
+    "role": "치수캐시",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "Anonymous *D dimension-cache block: linear dimension reading 580, all geometry on DIM/DEFPOINTS layers.",
+    "rationale": {
+      "evidence": "The block holds 3 LINEs on layer DIM (8F49, 8F4A as extension lines, 8F4B as the dimension line), two INSERTs of block DIMDOT (arrow/tick symbol), one MTEXT '\\A1;580', and three POINTs on DEFPOINTS (dimension definition points). The horizontal measured span matches the text: x-span 56108.83-55528.83 = 580 equals MTEXT '580'. This 9-to-11-entity DIM+DEFPOINTS composition is the canonical exploded anatomy of an AutoCAD dimension entity.",
+      "rule": "An anonymous block named *D<number> whose contents are exclusively extension/dimension lines on a dimension layer, arrowhead INSERTs, one measurement MTEXT, and DEFPOINTS points is the render cache of a DIMENSION entity, never model geometry.",
+      "counterfactual": "If the block contained lines on building-fabric layers (WALL/CON/기둥) or the MTEXT value did not equal the distance between the extension lines, I would reconsider it as a plan fragment or generic annotation instead of a dimension cache.",
+      "uncertainty": "The projection cannot show which DIMENSION entity owns this cache, its dimstyle, or what building element the 580 mm measurement annotates; the DIMDOT sub-block geometry is also not expanded here."
+    }
+  },
+  {
+    "unit_id": "defannot-d405-111",
+    "def": "*D405",
+    "role": "치수캐시",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "Anonymous *D dimension-cache block: linear dimension reading 1100, all geometry on DIM/DEFPOINTS layers.",
+    "rationale": {
+      "evidence": "The block holds 3 LINEs on layer DIM (8F52, 8F53 as extension lines, 8F54 as the dimension line), two INSERTs of block DIMDOT (arrow/tick symbol), one MTEXT '\\A1;1100', and three POINTs on DEFPOINTS (dimension definition points). The vertical measured span matches the text: y-span 36080.207-34980.207 = 1100 equals MTEXT '1100'. This 9-to-11-entity DIM+DEFPOINTS composition is the canonical exploded anatomy of an AutoCAD dimension entity.",
+      "rule": "An anonymous block named *D<number> whose contents are exclusively extension/dimension lines on a dimension layer, arrowhead INSERTs, one measurement MTEXT, and DEFPOINTS points is the render cache of a DIMENSION entity, never model geometry.",
+      "counterfactual": "If the block contained lines on building-fabric layers (WALL/CON/기둥) or the MTEXT value did not equal the distance between the extension lines, I would reconsider it as a plan fragment or generic annotation instead of a dimension cache.",
+      "uncertainty": "The projection cannot show which DIMENSION entity owns this cache, its dimstyle, or what building element the 1100 mm measurement annotates; the DIMDOT sub-block geometry is also not expanded here."
+    }
+  },
+  {
+    "unit_id": "defannot-d406-112",
+    "def": "*D406",
+    "role": "치수캐시",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "Anonymous *D dimension-cache block: linear dimension reading 215, all geometry on DIM/DEFPOINTS layers.",
+    "rationale": {
+      "evidence": "The block holds 5 LINEs on layer DIM (8F5B, 8F5C as extension lines, 8F5F as the dimension line), two INSERTs of block DIMDOT (arrow/tick symbol), one MTEXT '\\A1;215', and three POINTs on DEFPOINTS (dimension definition points). The horizontal measured span matches the text: x-span 57278.83-57063.83 = 215 equals MTEXT '215'; two extra outboard dimension-line stubs (8F5D, 8F5E) indicate outside-placed arrows for a short segment. This 9-to-11-entity DIM+DEFPOINTS composition is the canonical exploded anatomy of an AutoCAD dimension entity.",
+      "rule": "An anonymous block named *D<number> whose contents are exclusively extension/dimension lines on a dimension layer, arrowhead INSERTs, one measurement MTEXT, and DEFPOINTS points is the render cache of a DIMENSION entity, never model geometry.",
+      "counterfactual": "If the block contained lines on building-fabric layers (WALL/CON/기둥) or the MTEXT value did not equal the distance between the extension lines, I would reconsider it as a plan fragment or generic annotation instead of a dimension cache.",
+      "uncertainty": "The projection cannot show which DIMENSION entity owns this cache, its dimstyle, or what building element the 215 mm measurement annotates; the DIMDOT sub-block geometry is also not expanded here."
+    }
+  },
+  {
+    "unit_id": "defannot-d407-113",
+    "def": "*D407",
+    "role": "치수캐시",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "Anonymous *D dimension-cache block: linear dimension reading 950, all geometry on DIM/DEFPOINTS layers.",
+    "rationale": {
+      "evidence": "The block holds 3 LINEs on layer DIM (8F66, 8F67 as extension lines, 8F68 as the dimension line), two INSERTs of block DIMDOT (arrow/tick symbol), one MTEXT '\\A1;950', and three POINTs on DEFPOINTS (dimension definition points). The horizontal measured span matches the text: x-span 57063.83-56113.83 = 950 equals MTEXT '950'. This 9-to-11-entity DIM+DEFPOINTS composition is the canonical exploded anatomy of an AutoCAD dimension entity.",
+      "rule": "An anonymous block named *D<number> whose contents are exclusively extension/dimension lines on a dimension layer, arrowhead INSERTs, one measurement MTEXT, and DEFPOINTS points is the render cache of a DIMENSION entity, never model geometry.",
+      "counterfactual": "If the block contained lines on building-fabric layers (WALL/CON/기둥) or the MTEXT value did not equal the distance between the extension lines, I would reconsider it as a plan fragment or generic annotation instead of a dimension cache.",
+      "uncertainty": "The projection cannot show which DIMENSION entity owns this cache, its dimstyle, or what building element the 950 mm measurement annotates; the DIMDOT sub-block geometry is also not expanded here."
+    }
+  },
+  {
+    "unit_id": "defannot-u103-114",
+    "def": "*U103",
+    "role": "기타",
+    "wall_likelihood": 0.2,
+    "wall_line_handles": [],
+    "notes": "Anonymous *U block of 159 uniform 5-vertex LWPOLYLINEs on xref-bound INSUL layer — insulation hatch-pattern fragment, not semantic plan geometry.",
+    "rationale": {
+      "evidence": "All 159 entities are LWPOLYLINEs with exactly 5 vertices each (sampled 30: handles 4376..4393), on the single layer 'X-평면도(기본형)$0$INSUL' — an xref-bind-renamed insulation layer from the base floor-plan drawing. The anonymous *U name marks an AutoCAD-generated block (typically from a group, wipeout, or exploded/cached hatch), and the uniform small repeating polylines match the zigzag batt-insulation pattern drawn inside wall cavities.",
+      "rule": "An anonymous *U block containing only one entity type in uniform repeats on a single INSUL-suffixed bound-xref layer is a generated pattern/hatch fragment ('기타'), not a plan partial, symbol, dimension cache, or furniture.",
+      "counterfactual": "If the block also carried long continuous lines on wall/column layers, door or window symbol INSERTs, or text, I would flip to '평면 부분도'; if the polylines traced closed wall outlines rather than uniform 5-vertex repeats, wall_likelihood would rise sharply.",
+      "uncertainty": "No vertex coordinates or bbox are derivable from this projection, so the actual zigzag shape, extent, and placement inside wall cavities cannot be verified; insulation implies adjacency to walls, but whether any polyline coincides with a wall line is undeterminable here."
+    }
+  },
+  {
+    "unit_id": "defannot-u104-115",
+    "def": "*U104",
+    "role": "기타",
+    "wall_likelihood": 0.2,
+    "wall_line_handles": [],
+    "notes": "Anonymous *U block of 25 uniform 5-vertex LWPOLYLINEs on xref-bound INSUL layer — insulation hatch-pattern fragment, not semantic plan geometry.",
+    "rationale": {
+      "evidence": "All 25 entities are LWPOLYLINEs with exactly 5 vertices each (sampled 25: handles 441A..4432), on the single layer 'X-평면도(기본형)$0$INSUL' — an xref-bind-renamed insulation layer from the base floor-plan drawing. The anonymous *U name marks an AutoCAD-generated block (typically from a group, wipeout, or exploded/cached hatch), and the uniform small repeating polylines match the zigzag batt-insulation pattern drawn inside wall cavities.",
+      "rule": "An anonymous *U block containing only one entity type in uniform repeats on a single INSUL-suffixed bound-xref layer is a generated pattern/hatch fragment ('기타'), not a plan partial, symbol, dimension cache, or furniture.",
+      "counterfactual": "If the block also carried long continuous lines on wall/column layers, door or window symbol INSERTs, or text, I would flip to '평면 부분도'; if the polylines traced closed wall outlines rather than uniform 5-vertex repeats, wall_likelihood would rise sharply.",
+      "uncertainty": "No vertex coordinates or bbox are derivable from this projection, so the actual zigzag shape, extent, and placement inside wall cavities cannot be verified; insulation implies adjacency to walls, but whether any polyline coincides with a wall line is undeterminable here."
+    }
+  },
+  {
+    "unit_id": "defannot-u105-116",
+    "def": "*U105",
+    "role": "기타",
+    "wall_likelihood": 0.2,
+    "wall_line_handles": [],
+    "notes": "Anonymous *U block of 38 uniform 5-vertex LWPOLYLINEs on xref-bound INSUL layer — insulation hatch-pattern fragment, not semantic plan geometry.",
+    "rationale": {
+      "evidence": "All 38 entities are LWPOLYLINEs with exactly 5 vertices each (sampled 30: handles 4438..4455), on the single layer 'X-평면도(기본형)$0$INSUL' — an xref-bind-renamed insulation layer from the base floor-plan drawing. The anonymous *U name marks an AutoCAD-generated block (typically from a group, wipeout, or exploded/cached hatch), and the uniform small repeating polylines match the zigzag batt-insulation pattern drawn inside wall cavities.",
+      "rule": "An anonymous *U block containing only one entity type in uniform repeats on a single INSUL-suffixed bound-xref layer is a generated pattern/hatch fragment ('기타'), not a plan partial, symbol, dimension cache, or furniture.",
+      "counterfactual": "If the block also carried long continuous lines on wall/column layers, door or window symbol INSERTs, or text, I would flip to '평면 부분도'; if the polylines traced closed wall outlines rather than uniform 5-vertex repeats, wall_likelihood would rise sharply.",
+      "uncertainty": "No vertex coordinates or bbox are derivable from this projection, so the actual zigzag shape, extent, and placement inside wall cavities cannot be verified; insulation implies adjacency to walls, but whether any polyline coincides with a wall line is undeterminable here."
+    }
+  },
+  {
+    "unit_id": "defannot-u106-117",
+    "def": "*U106",
+    "role": "기타",
+    "wall_likelihood": 0.2,
+    "wall_line_handles": [],
+    "notes": "Anonymous *U block of 24 uniform 5-vertex LWPOLYLINEs on xref-bound INSUL layer — insulation hatch-pattern fragment, not semantic plan geometry.",
+    "rationale": {
+      "evidence": "All 24 entities are LWPOLYLINEs with exactly 5 vertices each (sampled 24: handles 4463..447A), on the single layer 'X-평면도(기본형)$0$INSUL' — an xref-bind-renamed insulation layer from the base floor-plan drawing. The anonymous *U name marks an AutoCAD-generated block (typically from a group, wipeout, or exploded/cached hatch), and the uniform small repeating polylines match the zigzag batt-insulation pattern drawn inside wall cavities.",
+      "rule": "An anonymous *U block containing only one entity type in uniform repeats on a single INSUL-suffixed bound-xref layer is a generated pattern/hatch fragment ('기타'), not a plan partial, symbol, dimension cache, or furniture.",
+      "counterfactual": "If the block also carried long continuous lines on wall/column layers, door or window symbol INSERTs, or text, I would flip to '평면 부분도'; if the polylines traced closed wall outlines rather than uniform 5-vertex repeats, wall_likelihood would rise sharply.",
+      "uncertainty": "No vertex coordinates or bbox are derivable from this projection, so the actual zigzag shape, extent, and placement inside wall cavities cannot be verified; insulation implies adjacency to walls, but whether any polyline coincides with a wall line is undeterminable here."
+    }
+  },
+  {
+    "unit_id": "defannot-u107-118",
+    "def": "*U107",
+    "role": "기타",
+    "wall_likelihood": 0.2,
+    "wall_line_handles": [],
+    "notes": "Anonymous *U block of 74 uniform 5-vertex LWPOLYLINEs on xref-bound INSUL layer — insulation hatch-pattern fragment, not semantic plan geometry.",
+    "rationale": {
+      "evidence": "All 74 entities are LWPOLYLINEs with exactly 5 vertices each (sampled 30: handles 4480..449D), on the single layer 'X-평면도(기본형)$0$INSUL' — an xref-bind-renamed insulation layer from the base floor-plan drawing. The anonymous *U name marks an AutoCAD-generated block (typically from a group, wipeout, or exploded/cached hatch), and the uniform small repeating polylines match the zigzag batt-insulation pattern drawn inside wall cavities.",
+      "rule": "An anonymous *U block containing only one entity type in uniform repeats on a single INSUL-suffixed bound-xref layer is a generated pattern/hatch fragment ('기타'), not a plan partial, symbol, dimension cache, or furniture.",
+      "counterfactual": "If the block also carried long continuous lines on wall/column layers, door or window symbol INSERTs, or text, I would flip to '평면 부분도'; if the polylines traced closed wall outlines rather than uniform 5-vertex repeats, wall_likelihood would rise sharply.",
+      "uncertainty": "No vertex coordinates or bbox are derivable from this projection, so the actual zigzag shape, extent, and placement inside wall cavities cannot be verified; insulation implies adjacency to walls, but whether any polyline coincides with a wall line is undeterminable here."
+    }
+  },
+  {
+    "unit_id": "defannot-u108-119",
+    "def": "*U108",
+    "role": "기타",
+    "wall_likelihood": 0.2,
+    "wall_line_handles": [],
+    "notes": "Anonymous *U block of 15 uniform 5-vertex LWPOLYLINEs on xref-bound INSUL layer — insulation hatch-pattern fragment, not semantic plan geometry.",
+    "rationale": {
+      "evidence": "All 15 entities are LWPOLYLINEs with exactly 5 vertices each (sampled 15: handles 44CF..44DD), on the single layer 'X-평면도(기본형)$0$INSUL' — an xref-bind-renamed insulation layer from the base floor-plan drawing. The anonymous *U name marks an AutoCAD-generated block (typically from a group, wipeout, or exploded/cached hatch), and the uniform small repeating polylines match the zigzag batt-insulation pattern drawn inside wall cavities.",
+      "rule": "An anonymous *U block containing only one entity type in uniform repeats on a single INSUL-suffixed bound-xref layer is a generated pattern/hatch fragment ('기타'), not a plan partial, symbol, dimension cache, or furniture.",
+      "counterfactual": "If the block also carried long continuous lines on wall/column layers, door or window symbol INSERTs, or text, I would flip to '평면 부분도'; if the polylines traced closed wall outlines rather than uniform 5-vertex repeats, wall_likelihood would rise sharply.",
+      "uncertainty": "No vertex coordinates or bbox are derivable from this projection, so the actual zigzag shape, extent, and placement inside wall cavities cannot be verified; insulation implies adjacency to walls, but whether any polyline coincides with a wall line is undeterminable here."
+    }
+  },
+  {
+    "unit_id": "defannot-u109-120",
+    "def": "*U109",
+    "role": "기타",
+    "wall_likelihood": 0.2,
+    "wall_line_handles": [],
+    "notes": "Anonymous *U block of 13 uniform 5-vertex LWPOLYLINEs on xref-bound INSUL layer — insulation hatch-pattern fragment, not semantic plan geometry.",
+    "rationale": {
+      "evidence": "All 13 entities are LWPOLYLINEs with exactly 5 vertices each (sampled 13: handles 44E3..44EF), on the single layer 'X-평면도(기본형)$0$INSUL' — an xref-bind-renamed insulation layer from the base floor-plan drawing. The anonymous *U name marks an AutoCAD-generated block (typically from a group, wipeout, or exploded/cached hatch), and the uniform small repeating polylines match the zigzag batt-insulation pattern drawn inside wall cavities.",
+      "rule": "An anonymous *U block containing only one entity type in uniform repeats on a single INSUL-suffixed bound-xref layer is a generated pattern/hatch fragment ('기타'), not a plan partial, symbol, dimension cache, or furniture.",
+      "counterfactual": "If the block also carried long continuous lines on wall/column layers, door or window symbol INSERTs, or text, I would flip to '평면 부분도'; if the polylines traced closed wall outlines rather than uniform 5-vertex repeats, wall_likelihood would rise sharply.",
+      "uncertainty": "No vertex coordinates or bbox are derivable from this projection, so the actual zigzag shape, extent, and placement inside wall cavities cannot be verified; insulation implies adjacency to walls, but whether any polyline coincides with a wall line is undeterminable here."
+    }
+  }
+]

@@ -1,0 +1,296 @@
+[
+  {
+    "unit_id": "defannot-x-0-a-c059766ab-301",
+    "def": "X-평면도(기본형)$0$A$C059766AB",
+    "role": "가구",
+    "wall_likelihood": 0.15,
+    "wall_line_handles": [
+      {"handle": "328B", "reason": "long vertical line paired 20 offset from 328C"},
+      {"handle": "328C", "reason": "20-offset parallel of 328B, wall-like double line"},
+      {"handle": "3291", "reason": "long horizontal paired 20 below 3292"},
+      {"handle": "3292", "reason": "20-offset parallel of 3291 at top edge"}
+    ],
+    "notes": "Kitchen counter/sink assembly on KIT layer: sink circles r81/91/95, burner arcs, double-line counter edges; anonymous dynamic-block geometry.",
+    "rationale": {
+      "evidence": "307 of 308 entities sit on layer X-평면도(기본형)$0$KIT, a kitchen layer. Concentric CIRCLEs (r=81, 91, 95, handles 3288-328A) read as a sink drain, and the 40 ARCs cluster like burner/faucet graphics. Parallel LINE pairs offset exactly 20 (327D/327E, 3283/3284, 328B/328C) trace a counter outline around a ~960x475 footprint.",
+      "rule": "When nearly all entities live on a single fixture layer (KIT/FUR) and the geometry combines concentric circles, arc clusters, and a thin-offset outline, the block is a fixture/furniture element rather than a plan fragment or symbol.",
+      "counterfactual": "If the perimeter double lines sat on a WALL/CON layer, or the block mixed door, wall, and furniture layers together, I would flip toward 평면 부분도 with higher wall likelihood.",
+      "uncertainty": "ARC parameters (center/radius) are not shown, so burner vs. faucet interpretation is inferred; only 30 of 308 entities are sampled, so unseen entities could include wall-layer geometry."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-a-c072c115f-302",
+    "def": "X-평면도(기본형)$0$A$C072C115F",
+    "role": "가구",
+    "wall_likelihood": 0.05,
+    "wall_line_handles": [],
+    "notes": "Built-in furniture strip (I-FL-FUR(B)/F-FUR-FIX): 20-thick double-line carcass with X cross marks marking cabinet fronts.",
+    "rationale": {
+      "evidence": "All 23 entities are on furniture layers I-FL-FUR(B) and F-FUR-FIX. LINE pairs offset 18-20 (e.g. 413A/413B at y=-818/-800) form a thin panel outline, and crossed diagonals (4146/4147: (0,0)->(100,-18) and (100,0)->(0,-18)) are the standard X mark used on built-in cabinet fronts.",
+      "rule": "Furniture-coded layers plus thin rectangular carcass outlines with X cross marks indicate a built-in furniture (붙박이가구) block; the thin double lines are panel thickness, not walls.",
+      "counterfactual": "If the double lines were 100-200 apart or sat on wall/structure layers, I would treat them as wall lines and reconsider 평면 부분도.",
+      "uncertainty": "LWPOLYLINE vertex coordinates are hidden, so the exact cabinet module layout is unverified; the specific furniture type (shoe cabinet vs. wardrobe) cannot be determined from this projection."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-a-c0a097a0c-303",
+    "def": "X-평면도(기본형)$0$A$C0A097A0C",
+    "role": "가구",
+    "wall_likelihood": 0.05,
+    "wall_line_handles": [],
+    "notes": "Counter/sink run on I-FL-FUR(S): long counter edges with repeated faucet symbol clusters (short lines + small arcs).",
+    "rationale": {
+      "evidence": "All 125 entities are on the single furniture layer I-FL-FUR(S). Long boundary lines (31FB spanning 2310 vertically) outline a counter run, while dense micro-clusters of short LINEs and ARCs around (-140,300) and (-655,-50) match the recurring faucet/fixture glyph seen in sibling blocks (paired 30-long lines plus connecting arcs).",
+      "rule": "A single sanitary/furniture layer with one long outline plus repeated small fixture glyphs is a counter-with-fixtures furniture block, not a plan fragment.",
+      "counterfactual": "Presence of a second parallel long line 100-200 away on a wall/structure layer, or door/dimension entities, would push toward 평면 부분도.",
+      "uncertainty": "Arc geometry is not exposed, so the fixture glyph identification is pattern-based; whether the long edge (31FB) coincides with a wall face cannot be verified from block-local coordinates alone."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-a-c0c1f5443-304",
+    "def": "X-평면도(기본형)$0$A$C0C1F5443",
+    "role": "가구",
+    "wall_likelihood": 0.05,
+    "wall_line_handles": [],
+    "notes": "Composite built-in furniture: cabinet carcass with X marks (I-FL-FUR(B)) plus counter with faucet glyph (I-FL-FUR(S)).",
+    "rationale": {
+      "evidence": "Layers are exclusively furniture-coded: I-FL-FUR(S)=70, I-FL-FUR(B)=21, F-FUR-FIX=2. The 20-thick vertical strip (2AE2/2AE3 at x=40/20) with crossed diagonals (2AF2/2AF3, 2AF5/2AF6) is the built-in cabinet pattern, and the I-FL-FUR(S) cluster repeats the faucet glyph (paired 30-long lines 2AF9/2AFA plus arc 2AFC).",
+      "rule": "Blocks composed entirely of FUR-coded layers combining carcass double-lines, X cross marks, and fixture glyphs are furniture assemblies regardless of entity count.",
+      "counterfactual": "Any wall/column/door layer content, or double lines at wall thickness (100+) spanning the bbox, would flip this to 평면 부분도.",
+      "uncertainty": "Only 30 of 93 entities are sampled and ARC/LWPOLYLINE geometry is hidden, so the split between counter and cabinet zones is partly inferred."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-a-c0e9d10f9-305",
+    "def": "X-평면도(기본형)$0$A$C0E9D10F9",
+    "role": "가구",
+    "wall_likelihood": 0.05,
+    "wall_line_handles": [],
+    "notes": "Built-in wardrobe/cabinet run (370 deep, ~2380 long) on I-FL-FUR(B) with X door marks and F-FUR-FIX fittings.",
+    "rationale": {
+      "evidence": "All 46 entities are on I-FL-FUR(B) (40) and F-FUR-FIX (6). A 370-deep rectangular carcass (33C0 vertical at x=-370, shelf lines at y=18/36/54, 776/794/812, 1551/1569/1587) with 18-offset triple lines reads as shelf/panel edges, and crossed diagonals (33C4/33C5, 33C7/33C8) mark cabinet fronts.",
+      "rule": "FUR(B)-layer rectangles ~300-600 deep with regularly spaced 18-20 offset panel lines and X marks are built-in storage furniture in plan.",
+      "counterfactual": "If the long verticals were duplicated at 100-200 offset on a non-FUR layer, or the block included openings/doors, I would reconsider it as a wall-bearing plan fragment.",
+      "uncertainty": "The 18 LWPOLYLINEs' shapes are hidden, so hardware/fitting details are unverified; function (wardrobe vs. pantry) is not determinable from geometry alone."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-a-c0ef505d0-306",
+    "def": "X-평면도(기본형)$0$A$C0EF505D0",
+    "role": "가구",
+    "wall_likelihood": 0.05,
+    "wall_line_handles": [],
+    "notes": "Built-in cabinet block 400x1650 on I-FL-FUR(B): 20-thick side panel, shelf triple-lines, X door-swing marks.",
+    "rationale": {
+      "evidence": "All 32 entities are on furniture layers (I-FL-FUR(B)=28, F-FUR-FIX=4). The 20-wide strip (1E3F/1E40 at x=400/380), 18-offset shelf line groups (y=0/18/36, 715/733/751, 1440/1458/1476), and X diagonals (1E4C/1E4D, 1E4F/1E50) replicate the standard built-in cabinet drawing pattern.",
+      "rule": "Same-structured FUR(B) blocks (thin carcass + shelf offsets + X marks) recur as a furniture family; classify by the shared pattern, not by size differences.",
+      "counterfactual": "A change of the carcass lines to a wall layer, or hatching typical of walls, would flip the role toward 평면 부분도 and raise wall likelihood.",
+      "uncertainty": "Cannot confirm from this projection whether the block abuts a wall in model space; LWPOLYLINE contents are opaque."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-a-c17c8346b-307",
+    "def": "X-평면도(기본형)$0$A$C17C8346B",
+    "role": "가구",
+    "wall_likelihood": 0.1,
+    "wall_line_handles": [
+      {"handle": "4204", "reason": "1660-long edge, possibly counter back along wall"},
+      {"handle": "4219", "reason": "long vertical edge parallel to 4204 group"}
+    ],
+    "notes": "L-shaped counter/sink run on I-FL-FUR(S) (~1360x1660) with faucet glyphs and panel double-lines; likely kitchen or utility counter.",
+    "rationale": {
+      "evidence": "All 188 entities are on I-FL-FUR(S). Long boundary lines (4204: 1660 long; 4205/4206 forming an L return) outline the counter footprint, and the sampled micro-geometry repeats the faucet glyph (paired 30-long lines 421D/421E, connecting arc 4220) and 18-wide panel strips (4210-4213 near x=-1450).",
+      "rule": "Single FUR(S)-layer blocks whose geometry is a large L/straight outline plus repeated fixture glyphs are counter furniture; boundary lines that merely bound the counter are not wall lines unless layered as walls.",
+      "counterfactual": "If 4204/4219-class long lines were paired at 100-200 offset or carried a wall layer name, the block would read as a plan fragment with real walls.",
+      "uncertainty": "Whether the long straight edges coincide with room walls is unknowable block-locally; 158 unsampled entities could contain other element types."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-a-c200833b1-308",
+    "def": "X-평면도(기본형)$0$A$C200833B1",
+    "role": "가구",
+    "wall_likelihood": 0.05,
+    "wall_line_handles": [],
+    "notes": "Upper/wall-cabinet strip ~900x150 on FUR-FIX with FUR-KIT outline; diagonal hidden-front lines, not walls.",
+    "rationale": {
+      "evidence": "Entities split FUR-FIX=21, FUR-KIT=3. A long thin band (FUR-KIT outline 3421-3423 spanning x=-920..-20 at y=-118..32) with 20-high end tabs (3413/3414) and slanted lines (3419: (-20,0)->(0,-100); 341B) matches an overhead/wall cabinet drawn with splayed projection lines in plan.",
+      "rule": "FUR-KIT/FUR-FIX thin horizontal bands with short end returns and diagonal projection lines are kitchen wall-cabinet furniture, not wall geometry despite their elongated shape.",
+      "counterfactual": "If the band edges were on a wall layer or the band thickness matched wall thickness with door openings, I would flip to 평면 부분도.",
+      "uncertainty": "The 8 LWPOLYLINEs are opaque, so panel subdivision is inferred; upper vs. base cabinet cannot be distinguished without elevation context."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-a-c24b0555e-309",
+    "def": "X-평면도(기본형)$0$A$C24B0555E",
+    "role": "가구",
+    "wall_likelihood": 0.05,
+    "wall_line_handles": [],
+    "notes": "Kitchen cabinet strip ~920x150, mirror-sibling of C200833B1 but mostly on FUR-KIT layer.",
+    "rationale": {
+      "evidence": "Same geometry family as definition 8: thin band outline (4F87-4F89 spanning x=20..820 at y=-118..32) on FUR-KIT=20 with FUR-FIX=4, end tabs (4F79/4F7A, 4F7C/4F7D), and diagonal projection lines (4F7F: (820,0)->(840,-100); 4F81). Coordinates mirror the def-8 block, confirming a paired left/right cabinet family.",
+      "rule": "When a block is a coordinate-mirrored twin of an already-classified furniture block with the same layer vocabulary, assign the same role.",
+      "counterfactual": "Divergence from the twin - e.g. wall-layer entities or door arcs appearing here - would break the family inference and force independent reclassification.",
+      "uncertainty": "LWPOLYLINE shapes unseen; the functional difference implied by KIT-dominant vs FIX-dominant layer split between the twins cannot be resolved from geometry."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-a-c41d360df-310",
+    "def": "X-평면도(기본형)$0$A$C41D360DF",
+    "role": "가구",
+    "wall_likelihood": 0.0,
+    "wall_line_handles": [],
+    "notes": "Organic decorative object (plant/foliage) on FUR layer: 45 SPLINEs, 15 ELLIPSEs, 31 ARCs in a 49x538 footprint.",
+    "rationale": {
+      "evidence": "All 107 entities are on layer FUR. The histogram is dominated by freeform curves (SPLINE=45, ELLIPSE=15, ARC=31) with only 16 LINEs, and a single central stem line (6C5D: (0,-575.746)->(0,-37.825)) with curve clusters around it - the signature of a plant or decorative foliage block.",
+      "rule": "Spline/ellipse-dominated single-FUR-layer blocks with a stem axis and no orthogonal structure are decorative furniture/props; they carry zero wall information.",
+      "counterfactual": "If the splines were replaced by orthogonal line networks or the layer were non-FUR, I would reconsider symbol or plan-fragment roles.",
+      "uncertainty": "Curve control points are hidden, so plant vs. other organic prop (fabric, artwork) is not distinguishable; the 3D z-extent (36.5) hints at non-planar data whose meaning is unclear here."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-a-c48ba1cd6-311",
+    "def": "X-평면도(기본형)$0$A$C48BA1CD6",
+    "role": "가구",
+    "wall_likelihood": 0.05,
+    "wall_line_handles": [],
+    "notes": "Composite furniture group: FUR(S) counter with faucet glyphs plus FUR(B) cabinet carcass, spanning ~900x1650.",
+    "rationale": {
+      "evidence": "Layers are all furniture: I-FL-FUR(S)=104, I-FL-FUR(B)=21, F-FUR-FIX=2. Sampled geometry shows the faucet glyph cluster (1E7D/1E7E paired 30-long lines, arc 1E80), 18-wide panel strips (1E70-1E73 near x=10..33), and a long counter edge (1E64: 1490 long at x=760) - the same counter+cabinet vocabulary as definitions 3, 4, and 7.",
+      "rule": "Reuse the established layer-vocabulary mapping: blocks drawn wholly in I-FL-FUR(*)/F-FUR-FIX layers with counter outlines and fixture glyphs are furniture assemblies.",
+      "counterfactual": "Introduction of wall-, door-, or window-layer entities, or dimension entities, would move this toward 평면 부분도 or 치수캐시 respectively.",
+      "uncertainty": "97 entities are unsampled; the exact fixture types along the counter (sink vs. cooktop) cannot be read from line/arc fragments alone."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-a-c49112a41-312",
+    "def": "X-평면도(기본형)$0$A$C49112A41",
+    "role": "가구",
+    "wall_likelihood": 0.05,
+    "wall_line_handles": [],
+    "notes": "Built-in cabinet 400x1940 on I-FL-FUR(B): 20-thick side panel, shelf triple-lines at two heights, X door marks.",
+    "rationale": {
+      "evidence": "All 32 entities are furniture-layer (I-FL-FUR(B)=28, F-FUR-FIX=4). The pattern matches the FUR(B) cabinet family exactly: 20-wide vertical strip (31D6 at x=-430 vs 31F1/31D8 returns at x=-410), 18-offset shelf groups (y=-917/-935/-953, -1782/-1800/-1818), and X diagonals (31E2/31E3, 31E5/31E6).",
+      "rule": "Blocks matching the established FUR(B) carcass+shelf+X-mark template are built-in furniture; orientation and size variation within the family does not change the role.",
+      "counterfactual": "Wall-thickness double lines on non-FUR layers, or an opening with a door arc, would flip this to a plan fragment.",
+      "uncertainty": "LWPOLYLINE geometry is opaque; whether this cabinet is the same product as defs 5/6/14 or a different module is not determinable."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-a-c4b913e7c-313",
+    "def": "X-평면도(기본형)$0$A$C4B913E7C",
+    "role": "심볼",
+    "wall_likelihood": 0.05,
+    "wall_line_handles": [],
+    "notes": "Door block on DOOR layer: door leaf (paired lines at x=40/43, 920 long), swing arc, and multi-vertex frame polylines.",
+    "rationale": {
+      "evidence": "All 14 entities are on layer X-평면도(기본형)$0$DOOR. Two parallel 920-long lines only 3 apart (8251/8252 at x=40/43) form the door leaf, one ARC (8248) is the swing, and the 11 LWPOLYLINEs (5-19 vertices) are frame/jamb details - the canonical plan door symbol.",
+      "rule": "A DOOR-layer block with a thin leaf rectangle plus a single swing arc is a door symbol; doors are drawing symbols, not furniture or plan fragments.",
+      "counterfactual": "If wall-layer segments flanked the jambs inside this block, I would call it a small 평면 부분도 (door-with-wall assembly) instead of a pure symbol.",
+      "uncertainty": "Polyline vertices are hidden, so jamb vs. threshold detail is inferred; door type (single swing assumed from one ARC) could differ if unsampled geometry existed, though all 14 entities are listed here."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-a-c4d747d6b-314",
+    "def": "X-평면도(기본형)$0$A$C4D747D6B",
+    "role": "가구",
+    "wall_likelihood": 0.05,
+    "wall_line_handles": [],
+    "notes": "Built-in cabinet 400x1650 on I-FL-FUR(B): same carcass/shelf/X-mark template as defs 5, 6, 12.",
+    "rationale": {
+      "evidence": "All 32 entities on furniture layers (I-FL-FUR(B)=28, F-FUR-FIX=4). The 20-wide side panel (1EE8/1EE9 at x=-20/0), 18-offset shelf groups (y=132/150/168, 849.5/867.5/885.5, 1572/1590/1608), and X diagonals (1EF5/1EF6, 1EF8/1EF9) exactly repeat the established built-in cabinet pattern.",
+      "rule": "Template-matched members of the FUR(B) cabinet family are classified 가구 wholesale; per-member re-derivation is unnecessary once the template is anchored to layer+geometry evidence.",
+      "counterfactual": "A member deviating from the template - wall layers, door arcs, dimension entities - would exit the family and need fresh classification.",
+      "uncertainty": "LWPOLYLINE contents unseen; mounting condition (free-standing vs wall-fixed) is not resolvable from block-local data."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-a-c57321cdf-315",
+    "def": "X-평면도(기본형)$0$A$C57321CDF",
+    "role": "가구",
+    "wall_likelihood": 0.05,
+    "wall_line_handles": [],
+    "notes": "Vertical kitchen cabinet strip ~150x930 on FUR-FIX/FUR-KIT: band outline with end tabs and splayed projection lines.",
+    "rationale": {
+      "evidence": "Layers FUR-FIX=21, FUR-KIT=3 only. Vertical thin band (FUR-KIT outline 41FB-41FD spanning y=70..870 at x=-118..32), 20-wide end tabs (41E9/41ED/41EE and 41EF-41F1), and diagonal projection lines (41F3: (0,870)->(-100,890); 41F5) - a 90-degree-rotated sibling of the def 8/9 cabinet strips.",
+      "rule": "The FUR-KIT/FUR-FIX thin-band-with-diagonals template is a kitchen cabinet regardless of orientation; rotation does not change role.",
+      "counterfactual": "Wall-layer membership of the band edges or wall-scale thickness with openings would flip this to plan fragment.",
+      "uncertainty": "The 8 LWPOLYLINE shapes are hidden; whether this is an upper cabinet or tall unit cannot be determined from plan geometry alone."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-a-c5aa0109c-316",
+    "def": "X-평면도(기본형)$0$A$C5AA0109C",
+    "role": "심볼",
+    "wall_likelihood": 0.0,
+    "wall_line_handles": [],
+    "notes": "Plumbing symbol on PIPE layer: concentric circles r=37.5/45/62.5 with crosshair axes and a stub of paired pipe lines.",
+    "rationale": {
+      "evidence": "All 9 entities are on layer X-평면도(기본형)$0$PIPE. Concentric CIRCLEs (1E30/1E34/1E31, r=37.5/45/62.5) centered near (-75,-75) with crosshair LINEs through the center (1E32/1E33) form a drain/riser symbol, and the paired parallel lines 45 apart (1E37/1E38) are a pipe run stub.",
+      "rule": "Small blocks on MEP layers built from concentric circles plus centerline crosshairs are annotation symbols for pipes/drains, never furniture or plan fragments.",
+      "counterfactual": "If the circles carried furniture layers or the block contained appliance outline geometry, I would reclassify as 가구 (e.g. a stool or table read top-down).",
+      "uncertainty": "The two LWPOLYLINEs are opaque (possibly arrows or hatching boundaries); the exact fitting type (floor drain vs riser) is not determinable from radii alone."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-a-c5c7666b6-317",
+    "def": "X-평면도(기본형)$0$A$C5C7666B6",
+    "role": "가구",
+    "wall_likelihood": 0.0,
+    "wall_line_handles": [],
+    "notes": "Densely detailed appliance/fixture illustration on FUR layer: 865 entities (364 LINE, 362 SPLINE) packed into ~600x284.",
+    "rationale": {
+      "evidence": "All 865 entities are on layer FUR. The sample shows sub-millimeter-scale line segments (e.g. 6528: length 0.108) arranged in repeating small motifs around x=-15..0, y=103..148, and the histogram is heavy in SPLINEs (362) - characteristic of a vendor-detailed appliance or equipment drawing imported into a furniture layer.",
+      "rule": "Very high entity counts with micro-scale segments and spline dominance on a FUR layer indicate an illustrative manufactured-object block (appliance/equipment), which classifies as furniture in plan-role terms.",
+      "counterfactual": "If the dense geometry sat on an annotation layer or included TEXT/DIMENSION entities, I would consider 기타 or 치수캐시 instead.",
+      "uncertainty": "Only 30 of 865 entities are visible, all from one corner cluster; the object's identity (gas range, AV equipment, control panel) cannot be resolved from this fragment."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-a-c5fea68fe-318",
+    "def": "X-평면도(기본형)$0$A$C5FEA68FE",
+    "role": "가구",
+    "wall_likelihood": 0.0,
+    "wall_line_handles": [],
+    "notes": "Small detailed fixture on FUR layer (~167x78): 402 entities with 166 SPLINEs; likely a faucet/appliance drawn at high detail.",
+    "rationale": {
+      "evidence": "All 402 entities are on layer FUR within a small 167x78 bbox. Many tiny LINE segments (e.g. 6973: length ~0.02) and symmetric coordinates about y=0 (696B/696C mirrored at y=+/-29) plus heavy SPLINE content (166) indicate a detailed manufactured object with bilateral symmetry, such as a faucet or small appliance.",
+      "rule": "Compact, symmetric, spline-heavy micro-detail on a FUR layer is a product illustration block - classify as furniture/fixture, with no wall content.",
+      "counterfactual": "If this geometry appeared on a symbol/annotation layer at drawing-symbol scale conventions (schematic, not illustrative), I would classify it as 심볼.",
+      "uncertainty": "372 entities are unsampled and curve data is hidden; the specific product cannot be identified, and its host (counter vs wall-mounted) is unknown block-locally."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-a-c60d55377-319",
+    "def": "X-평면도(기본형)$0$A$C60D55377",
+    "role": "가구",
+    "wall_likelihood": 0.15,
+    "wall_line_handles": [
+      {"handle": "5650", "reason": "1890-long baseline, plausibly counter back along a wall"},
+      {"handle": "5653", "reason": "long top edge at y=980, possibly wall-adjacent"}
+    ],
+    "notes": "L-shaped counter run 1890x980 on I-FL-FUR(S) with faucet glyphs (arc+paired-line clusters) and panel strips.",
+    "rationale": {
+      "evidence": "All 146 entities are on I-FL-FUR(S). Long orthogonal boundary lines (5650: (0,0)->(1890,0); 5653/5654 forming the return) outline an L-shaped counter, and the sampled clusters repeat the faucet glyph vocabulary (paired short lines 565D/565E with arcs 5657/5659-565B, 14-wide strips 5662-5667).",
+      "rule": "FUR(S) blocks with an L-shaped outline and repeated fixture glyphs are counter furniture; long single boundary lines on furniture layers are counter edges, though they often coincide with wall faces.",
+      "counterfactual": "If 5650/5653 were doubled at wall thickness or layered as walls, wall_likelihood would rise sharply and the role would shift toward 평면 부분도.",
+      "uncertainty": "116 entities are unsampled; whether the long edges trace actual wall faces in model space cannot be decided from block-local coordinates."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-a-c610442a9-320",
+    "def": "X-평면도(기본형)$0$A$C610442A9",
+    "role": "가구",
+    "wall_likelihood": 0.15,
+    "wall_line_handles": [
+      {"handle": "42E9", "reason": "1270-long baseline, plausibly counter back along a wall"},
+      {"handle": "42FC", "reason": "400-long edge paired 14 from 42FE/42FD strip"}
+    ],
+    "notes": "Large L/U counter run 1270x2485 on I-FL-FUR(S): counter edges, 18-wide panel strips, and repeated faucet glyph clusters.",
+    "rationale": {
+      "evidence": "All 136 entities are on I-FL-FUR(S). Orthogonal boundary lines (42E9: (0,0)->(1270,0); 42EA/42FC at x=1270/1247) with 14-23-wide strip pairs (42FD/42FE at x=1261) and the standard faucet glyph clusters (paired lines 4300/4301, arcs 4303/4305, 18-strip 42F3/42F4) repeat the FUR(S) counter vocabulary of defs 3, 7, 11, 19.",
+      "rule": "Membership in the FUR(S) counter family (long orthogonal outline + panel strips + fixture glyphs, single furniture layer) determines the 가구 role; scale of the run does not change it.",
+      "counterfactual": "Wall-layer duplication of the long edges, or inclusion of door/window symbols along them, would reclassify this as a plan fragment with real walls.",
+      "uncertainty": "106 entities are unsampled; the z-extent 37.154 in the bbox hints at stray 3D data whose role is unclear, and wall adjacency of the long edges is not block-locally verifiable."
+    }
+  }
+]

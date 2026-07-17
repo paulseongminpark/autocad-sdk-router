@@ -1,0 +1,282 @@
+[
+ {
+  "unit_id": "defannot-d375-81",
+  "def": "*D375",
+  "role": "치수캐시",
+  "wall_likelihood": 0.0,
+  "wall_line_handles": [],
+  "notes": "DIM/DEFPOINTS만 있는 *D 치수 분해 블록(325)",
+  "rationale": {
+   "evidence": "이름 *D375와 DIM 레이어 LINE 3개·DIMDOT INSERT 2개·MTEXT '325'·DEFPOINTS POINT 3개 구성이 전형적인 치수 분해 정의다. 벽/가구/평면 기하로 볼 수 있는 WALL·A-WALL 등 레이어나 닫힌 폴리라인은 없다.",
+   "rule": "익명 *D* 정의가 DIM·DEFPOINTS만 쓰고 DIMDOT·수치 MTEXT·연장/치수선을 포함하면 치수캐시로 분류한다. 벽선 후보는 구조 레이어의 연속 평행선이 있을 때만 고른다.",
+   "counterfactual": "동일 핸들에 WALL 레이어 이중선이나 도어/창 심볼 INSERT가 추가되면 평면 부분도나 심볼로 뒤집힌다. DIMDOT·수치 MTEXT가 없고 일반 기하만 있으면 치수캐시 판정이 깨진다.",
+   "uncertainty": "투영만으로는 원본 DIMENSION 연관·측정 대상 실체(벽·개구부 등)를 확인할 수 없다. 도면 좌표계에서 이 치수가 어느 구간에 붙는지도 알 수 없다."
+  }
+ },
+ {
+  "unit_id": "defannot-d376-82",
+  "def": "*D376",
+  "role": "치수캐시",
+  "wall_likelihood": 0.0,
+  "wall_line_handles": [],
+  "notes": "DIM 레이어 치수 분해(*D376, 3320)",
+  "rationale": {
+   "evidence": "ENTITY가 LINE(연장 2+치수선 1)·DIMDOT INSERT 2·MTEXT '3320'·DEFPOINTS POINT 3뿐이며 전부 DIM/DEFPOINTS다. bbox가 가로로 길고 수치는 거리 표기 형태다.",
+   "rule": "*D 접두·DIMDOT·DEFPOINTS·치수 수치 MTEXT가 함께면 치수캐시다. 벽 가능성은 구조 레이어 평행 복선이 없을 때 0에 둔다.",
+   "counterfactual": "MTEXT가 방이름/재료 라벨이고 LINE이 A-WALL에 있으면 역할이 바뀐다. 가구 블록 INSERT가 섞이면 가구로 재분류한다.",
+   "uncertainty": "3320이 mm인지 다른 단위인지, 수평 치수인지 여부는 이 정의 투영만으로 단정할 수 없다."
+  }
+ },
+ {
+  "unit_id": "defannot-d377-83",
+  "def": "*D377",
+  "role": "치수캐시",
+  "wall_likelihood": 0.0,
+  "wall_line_handles": [],
+  "notes": "표준 치수 캐시 블록(*D377, 725)",
+  "rationale": {
+   "evidence": "8E56–8E58 LINE은 DIM 레이어의 수직 연장선·수평 치수선 패턴이고, DIMDOT와 MTEXT '725'가 치수 표기를 완성한다. DEFPOINTS POINT만 보조로 있다.",
+   "rule": "치수 그래픽만 담긴 익명 정의는 치수캐시로 두고 wall_line_handles는 비운다.",
+   "counterfactual": "동일 좌표에 벽 두께를 나타내는 이중 LINE이 WALL 레이어로 추가되면 wall_likelihood가 올라간다. 심볼성 CIRCLE/ARC·속성 텍스트가 지배하면 심볼로 본다.",
+   "uncertainty": "주변 평면 엔티티와의 스냅/연관은 정의 내부에 없어 측정 대상 유형을 알 수 없다."
+  }
+ },
+ {
+  "unit_id": "defannot-d378-84",
+  "def": "*D378",
+  "role": "치수캐시",
+  "wall_likelihood": 0.0,
+  "wall_line_handles": [],
+  "notes": "DIMDOT+수치 MTEXT 치수캐시(725)",
+  "rationale": {
+   "evidence": "히스토그램 INSERT=2,LINE=3,MTEXT=1,POINT=3와 레이어 DEFPOINTS/DIM만으로 *D378은 치수 분해체다. MTEXT '\\A1;725'는 치수 값 서식이다.",
+   "rule": "DIM 전용 레이어 조합과 DIMDOT·치수 서식 MTEXT가 있으면 치수캐시로 판정한다.",
+   "counterfactual": "POINT/LINE이 가구 외곽을 이루고 레이어가 FURN이면 가구로 바뀐다. 치수 요소가 사라지고 평면 해치/폴리라인만 남으면 평면 부분도다.",
+   "uncertainty": "이 블록이 associative dimension인지 exploded 잔여인지는 투영에 메타데이터가 없어 불명이다."
+  }
+ },
+ {
+  "unit_id": "defannot-d379-85",
+  "def": "*D379",
+  "role": "치수캐시",
+  "wall_likelihood": 0.0,
+  "wall_line_handles": [],
+  "notes": "가로 치수 캐시(*D379, 1620)",
+  "rationale": {
+   "evidence": "수직 LINE 두 개와 하단 수평 LINE, DIMDOT 쌍, MTEXT '1620'이 전형적인 선형 치수 분해다. 벽선으로 오인할 연속 복선·중심선 패턴은 없다.",
+   "rule": "치수선·연장선·화살표(DIMDOT)·수치만 있으면 치수캐시이며 그 LINE은 벽이 아니다.",
+   "counterfactual": "수평 LINE이 긴 벽 중심선이고 옆에 평행 오프셋 벽선이 WALL 레이어로 있으면 판정이 달라진다.",
+   "uncertainty": "1620이 실측 구간 폭인지는 참조 기하 없이 확정할 수 없다."
+  }
+ },
+ {
+  "unit_id": "defannot-d380-86",
+  "def": "*D380",
+  "role": "치수캐시",
+  "wall_likelihood": 0.0,
+  "wall_line_handles": [],
+  "notes": "DIM/DEFPOINTS 치수 정의(*D380, 775)",
+  "rationale": {
+   "evidence": "샘플 전 엔티티가 DIM 또는 DEFPOINTS이고 DIMDOT INSERT와 수치 MTEXT '775'가 있다. *D380 명명도 AutoCAD 치수 익명 블록 관례와 일치한다.",
+   "rule": "*D + DIM/DEFPOINTS + DIMDOT + 숫자 MTEXT 패턴은 치수캐시로 고정한다.",
+   "counterfactual": "정의 안에 문/창 블록이나 해치된 실내 윤곽이 추가되면 심볼·평면 부분도로 재평가한다.",
+   "uncertainty": "레이어 이름만으로 회사 표준상 DIM이 다른 용도인지는 이 shard에서 검증할 수 없다."
+  }
+ },
+ {
+  "unit_id": "defannot-d381-87",
+  "def": "*D381",
+  "role": "치수캐시",
+  "wall_likelihood": 0.0,
+  "wall_line_handles": [],
+  "notes": "치수 분해 캐시(*D381, 710)",
+  "rationale": {
+   "evidence": "8E7A/8E7B 수직 LINE과 8E7C 수평 LINE, DIMDOT, MTEXT '710', DEFPOINTS POINT 구성이 앞선 *D 치수들과 동일 계열이다. 가구·심볼 기하 신호가 없다.",
+   "rule": "동일 스키마의 *D 치수 분해는 일괄 치수캐시로 분류하고 벽 핸들은 비운다.",
+   "counterfactual": "MTEXT가 비수치 라벨이거나 LINE이 닫힌 방 윤곽을 만들면 역할이 바뀐다.",
+   "uncertainty": "인접 *D 정의들과의 연쇄(한 축의 분절 치수)는 정의 단독 투영으로 재구성할 수 없다."
+  }
+ },
+ {
+  "unit_id": "defannot-d382-88",
+  "def": "*D382",
+  "role": "치수캐시",
+  "wall_likelihood": 0.0,
+  "wall_line_handles": [],
+  "notes": "선형 치수캐시(*D382, 1620)",
+  "rationale": {
+   "evidence": "bbox가 가로로 넓고 LINE 3+DIMDOT 2+MTEXT '1620'+DEFPOINTS 3만 존재한다. 전부 DIM/DEFPOINTS 레이어라 벽선 후보가 없다.",
+   "rule": "치수 그래픽 전용 엔티티 집합이면 role=치수캐시, wall_likelihood≈0이다.",
+   "counterfactual": "WALL 레이어 평행 복선이 치수선과 겹쳐 보이면 벽 후보를 넣을 수 있다. 가구 블록명이 보이면 가구로 간다.",
+   "uncertainty": "실제 도면에서 숨김/동결된 참조 엔티티는 이 투영에 없어 완전성을 보장할 수 없다."
+  }
+ },
+ {
+  "unit_id": "defannot-d383-89",
+  "def": "*D383",
+  "role": "치수캐시",
+  "wall_likelihood": 0.0,
+  "wall_line_handles": [],
+  "notes": "DIMDOT 치수캐시(*D383, 760)",
+  "rationale": {
+   "evidence": "8E8C–8E8E LINE과 DIMDOT·MTEXT '760'·DEFPOINTS POINT만으로 구성되며 평면 부분도·심볼·가구의 전형적 엔티티 혼합이 없다.",
+   "rule": "DIM 레이어 치수 분해 정의는 치수캐시로 두고 LINE을 벽으로 해석하지 않는다.",
+   "counterfactual": "ARROW/틱 대신 건축 심볼 INSERT와 ATTDEF가 지배하면 심볼로 재분류한다.",
+   "uncertainty": "치수 스타일(화살표 vs 점) 외 의미론적 카테고리는 투영 밖 컨텍스트가 필요하다."
+  }
+ },
+ {
+  "unit_id": "defannot-d384-90",
+  "def": "*D384",
+  "role": "치수캐시",
+  "wall_likelihood": 0.0,
+  "wall_line_handles": [],
+  "notes": "치수캐시 블록(*D384, 900)",
+  "rationale": {
+   "evidence": "*D384는 DIM 레이어 연장/치수 LINE, DIMDOT INSERT, MTEXT '900', DEFPOINTS POINT만 포함한다. 벽·가구·평면 디테일 신호가 없다.",
+   "rule": "숫자 MTEXT+DIMDOT+DIM/DEFPOINTS만 있으면 치수캐시다.",
+   "counterfactual": "수평 LINE이 두껍게 쌍을 이루고 사이 해치가 있으면 벽/슬래브 부분도로 볼 수 있다.",
+   "uncertainty": "핸들 단위로 원본 DIMENSION object id를 알 수 없어 캐시/폭파 여부를 구분할 수 없다."
+  }
+ },
+ {
+  "unit_id": "defannot-d385-91",
+  "def": "*D385",
+  "role": "치수캐시",
+  "wall_likelihood": 0.0,
+  "wall_line_handles": [],
+  "notes": "상부 밴드 치수캐시(*D385, 820)",
+  "rationale": {
+   "evidence": "Y≈36200–36840 구간의 DIM LINE 3·DIMDOT 2·MTEXT '820'·DEFPOINTS 3로, 하단 밴드 *D375–*D384와 동일 스키마다. 벽 레이어/복선 없음.",
+   "rule": "위치 밴드가 달라도 *D+DIM/DEFPOINTS+DIMDOT+수치면 치수캐시로 동일 적용한다.",
+   "counterfactual": "같은 bbox에 벽 폴리라인이나 창 심볼이 추가되면 역할이 바뀐다.",
+   "uncertainty": "이 밴드가 평면의 어느 실/축에 해당하는지는 정의 단독으로 알 수 없다."
+  }
+ },
+ {
+  "unit_id": "defannot-d386-92",
+  "def": "*D386",
+  "role": "치수캐시",
+  "wall_likelihood": 0.0,
+  "wall_line_handles": [],
+  "notes": "DIM 치수 분해(*D386, 1280)",
+  "rationale": {
+   "evidence": "8EA7–8EA9 LINE과 DIMDOT, MTEXT '1280', DEFPOINTS만 있으며 레이어 히스토그램이 DEFPOINTS=3, DIM=6이다. 구조 기하 없음.",
+   "rule": "치수 전용 레이어·엔티티 조합은 치수캐시; 벽선 핸들은 구조 증거가 있을 때만 채운다.",
+   "counterfactual": "MTEXT가 없고 INSERT가 문/가구 블록이면 심볼/가구로 바꾼다.",
+   "uncertainty": "1280 값과 LINE 길이의 스케일 일치 여부는 단위/치수스타일 없이 확정 불가하다."
+  }
+ },
+ {
+  "unit_id": "defannot-d387-93",
+  "def": "*D387",
+  "role": "치수캐시",
+  "wall_likelihood": 0.0,
+  "wall_line_handles": [],
+  "notes": "짧은 구간 치수캐시(*D387, 350)",
+  "rationale": {
+   "evidence": "좁은 bbox와 MTEXT '350', 표준 치수 분해 엔티티 집합이 *D 치수캐시임을 지지한다. LINE은 연장/치수선 역할로만 보인다.",
+   "rule": "짧은 치수도 동일 스키마면 치수캐시이며 짧은 수직 LINE을 벽 두께로 오인하지 않는다.",
+   "counterfactual": "350이 두께 주석이고 옆에 평행 벽 중심선 쌍이 WALL에 있으면 wall_likelihood를 올린다.",
+   "uncertainty": "짧은 치수가 개구 폭인지 여백인지는 인접 기하 없이 판단 불가하다."
+  }
+ },
+ {
+  "unit_id": "defannot-d388-94",
+  "def": "*D388",
+  "role": "치수캐시",
+  "wall_likelihood": 0.0,
+  "wall_line_handles": [],
+  "notes": "치수캐시(*D388, 1020)",
+  "rationale": {
+   "evidence": "DIM LINE·DIMDOT·MTEXT '1020'·DEFPOINTS POINT만 있고 *D388 명명과 일치한다. 평면/가구/심볼 패턴이 없다.",
+   "rule": "익명 치수 정의의 표준 엔티티 서명은 치수캐시로 분류한다.",
+   "counterfactual": "DEFPOINTS 외 시공 해치나 다중 LWPOLYLINE 실내 윤곽이 있으면 평면 부분도 후보가 된다.",
+   "uncertainty": "투영에 INSERT 속성·확장데이터가 없어 사용자 정의 의미가 숨겨졌는지 모른다."
+  }
+ },
+ {
+  "unit_id": "defannot-d389-95",
+  "def": "*D389",
+  "role": "치수캐시",
+  "wall_likelihood": 0.0,
+  "wall_line_handles": [],
+  "notes": "DIM/DEFPOINTS 치수캐시(*D389, 710)",
+  "rationale": {
+   "evidence": "8EC2–8EC4 LINE, DIMDOT, MTEXT '710', DEFPOINTS로만 구성되며 벽선으로 볼 근거가 없다.",
+   "rule": "DIMDOT+수치 MTEXT+DIM 레이어 LINE만 있으면 치수캐시, wall_line_handles=[].",
+   "counterfactual": "치수선 대신 벽 중심선 레이어의 긴 수평 러닝이 지배하면 재분류한다.",
+   "uncertainty": "다른 정의와 공유하는 측정 기준점 관계는 이 블록만으로 복원 불가하다."
+  }
+ },
+ {
+  "unit_id": "defannot-d390-96",
+  "def": "*D390",
+  "role": "치수캐시",
+  "wall_likelihood": 0.0,
+  "wall_line_handles": [],
+  "notes": "협소 치수캐시(*D390, 320)",
+  "rationale": {
+   "evidence": "좁은 X 범위와 MTEXT '320', 동일 치수 분해 히스토그램(INSERT2/LINE3/MTEXT1/POINT3)이 치수캐시를 가리킨다.",
+   "rule": "스키마가 치수 분해와 일치하면 폭과 무관하게 치수캐시다.",
+   "counterfactual": "320 라벨이 가구 폭이고 의자/책상 외곽 INSERT가 있으면 가구로 본다.",
+   "uncertainty": "실제 화살표 블록(DIMDOT) 도형 내용은 샘플에 없어 심볼성 오인 여지를 완전히 배제하긴 어렵다."
+  }
+ },
+ {
+  "unit_id": "defannot-d391-97",
+  "def": "*D391",
+  "role": "치수캐시",
+  "wall_likelihood": 0.0,
+  "wall_line_handles": [],
+  "notes": "긴 가로 치수캐시(*D391, 1820)",
+  "rationale": {
+   "evidence": "가로로 긴 bbox와 MTEXT '1820', DIM 연장/치수 LINE·DIMDOT·DEFPOINTS만 존재한다. 벽 복선·개구 심볼 없음.",
+   "rule": "긴 치수선도 벽선이 아니며 DIM/DEFPOINTS 전용이면 치수캐시다.",
+   "counterfactual": "동일 구간에 A-WALL 평행선 쌍이 추가되면 wall_likelihood와 핸들 목록이 생긴다.",
+   "uncertainty": "1820이 실 전체 폭인지 분절합인지는 연쇄 치수 없이는 알 수 없다."
+  }
+ },
+ {
+  "unit_id": "defannot-d392-98",
+  "def": "*D392",
+  "role": "치수캐시",
+  "wall_likelihood": 0.0,
+  "wall_line_handles": [],
+  "notes": "치수 분해 캐시(*D392, 1125)",
+  "rationale": {
+   "evidence": "8EDD–8EDF LINE, DIMDOT, MTEXT '1125', DEFPOINTS POINT 구성이 전형적인 *D 치수캐시다. 기타 역할 신호가 없다.",
+   "rule": "치수 전용 엔티티·레이어면 role=치수캐시로 판정한다.",
+   "counterfactual": "숫자 대신 심볼 문자와 원/삼각형 기하가 중심이면 심볼로 바꾼다.",
+   "uncertainty": "도면 단위·치수 라운딩 규칙은 투영에 없어 값 해석에 잔여 불확실성이 있다."
+  }
+ },
+ {
+  "unit_id": "defannot-d393-99",
+  "def": "*D393",
+  "role": "치수캐시",
+  "wall_likelihood": 0.0,
+  "wall_line_handles": [],
+  "notes": "DIM 치수캐시(*D393, 1220)",
+  "rationale": {
+   "evidence": "*D393은 DIM/DEFPOINTS만 사용하고 DIMDOT·MTEXT '1220'·치수 LINE 패턴이 명확하다. 벽·가구·평면 부분도 증거가 없다.",
+   "rule": "*D 익명 치수 정의의 DIMDOT+수치+DEFPOINTS 서명은 치수캐시다.",
+   "counterfactual": "LINE이 방을 닫는 폴리라인으로 바뀌고 해치가 있으면 평면 부분도다.",
+   "uncertainty": "부모 치수가 수평/정렬/회전 치수인지는 각도 메타 없이 단정하기 어렵다."
+  }
+ },
+ {
+  "unit_id": "defannot-d394-100",
+  "def": "*D394",
+  "role": "치수캐시",
+  "wall_likelihood": 0.0,
+  "wall_line_handles": [],
+  "notes": "치수캐시 블록(*D394, 985)",
+  "rationale": {
+   "evidence": "마지막 정의도 LINE3·DIMDOT2·MTEXT '985'·DEFPOINTS3, 레이어 DIM/DEFPOINTS만으로 치수 분해체다. 벽선 핸들 후보 없음.",
+   "rule": "동일 투영 스키마의 *D 블록은 일관되게 치수캐시·wall_likelihood=0으로 둔다.",
+   "counterfactual": "WALL 레이어 복선이나 가구 INSERT가 섞이면 판정을 뒤집는다.",
+   "uncertainty": "이 캐시가 현재 도면에서 가시/참조되는지는 삽입 인스턴스 정보가 없어 알 수 없다."
+  }
+ }
+]

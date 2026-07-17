@@ -1,0 +1,290 @@
+[
+  {
+    "unit_id": "defannot-x-0-dw1600-341",
+    "def": "X-평면도(기본형)$0$dw1600",
+    "role": "심볼",
+    "wall_likelihood": 0.2,
+    "wall_line_handles": [
+      {"handle": "1D32", "reason": "full-width boundary line at y=0 spanning 45..1555, could be wall face at opening"},
+      {"handle": "1D35", "reason": "long parallel offset line resembling wall/opening edge"}
+    ],
+    "notes": "Plan-view window/sliding-unit component 'dw1600' (~1510 wide) drawn with paired parallel frame lines on a WID layer.",
+    "rationale": {
+      "evidence": "All 53 entities sit on a single layer X-평면도(기본형)$0$WID, and the geometry is dominated by long horizontal line pairs at small vertical offsets (e.g. y=-165/-195 and y=-178/-182 for a 4-unit-thick track, repeated at y=-85/-115 and -98/-102) plus small 4/8/12-vertex polylines that read as frame sections. The name suffix dw1600 matches the ~1510 horizontal extent of the bbox [45..1555], and sibling defs dw2100/DW2700v repeat the identical structure at other widths.",
+      "rule": "A single-layer block whose name encodes a width and whose geometry is thin, long parallel line pairs with small frame polylines is a parameterized window/door-track component symbol, not a plan fragment or dimension cache.",
+      "counterfactual": "If the layer histogram mixed WALL/CON layers with hatch or column polylines, or if the name lacked a width code, I would reconsider it as a 평면 부분도; presence of DIMENSION entities would flip it toward 치수캐시.",
+      "uncertainty": "Without linetype, color, or the parent insert context I cannot confirm whether the y=0 and y=-245 boundary lines are wall faces or the unit's own casing, so the wall_likelihood stays low but nonzero."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-dw2100-342",
+    "def": "X-평면도(기본형)$0$dw2100",
+    "role": "심볼",
+    "wall_likelihood": 0.2,
+    "wall_line_handles": [
+      {"handle": "53BC", "reason": "full-width boundary line at y=0 spanning 45..2055, possible wall face at opening"},
+      {"handle": "53BF", "reason": "long parallel offset line resembling wall/opening edge"}
+    ],
+    "notes": "Width-2100 variant of the same plan-view window/sliding-unit component family on a WID layer.",
+    "rationale": {
+      "evidence": "Entity mix (LINE=27, LWPOLYLINE=26, all on the $0$WID layer) and the offset pattern (line pairs at y=-165/-195, -178/-182, -85/-115, -98/-102) are byte-for-byte structurally identical to dw1600, only stretched: bbox x runs 45..2055 matching the 2100 name code. Handles 53C4-53D6 are the same small 4/8-vertex frame polylines seen in the 1600 variant.",
+      "rule": "When several blocks share one layer, one histogram shape, and names differing only in a numeric width code, they form a parametric component-symbol family; classify all members alike.",
+      "counterfactual": "Divergence from the family template - added text, dimensions, or multi-layer content - would break the family inference and force individual reassessment as 평면 부분도 or 치수캐시.",
+      "uncertainty": "The projection samples only 30 of 53 entities, so unseen entities could include atypical geometry; linetypes and the host wall context are also invisible here."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-dw2700v-343",
+    "def": "X-평면도(기본형)$0$DW2700v",
+    "role": "심볼",
+    "wall_likelihood": 0.2,
+    "wall_line_handles": [
+      {"handle": "3F24", "reason": "full-width line at y=-245 spanning 45..2655, possible wall face bounding the unit"}
+    ],
+    "notes": "Width-2700 (v-variant) member of the dw window/sliding-unit component family, same WID-layer paired-line construction.",
+    "rationale": {
+      "evidence": "Identical histogram to dw1600/dw2100 (LINE=27, LWPOLYLINE=26, single $0$WID layer) with the same thin parallel-pair motif (y=-50/-80 with -63/-67 rails, y=-130/-160 with -143/-147 rails) mirrored into two runs, and bbox x extent 45..2655 matching the 2700 code. The 'v' suffix suggests a variant orientation or vent version of the same product.",
+      "rule": "Numeric-coded siblings with identical entity histograms and layer signatures are the same parametric symbol; the classification transfers across the family.",
+      "counterfactual": "If this block contained wall-layer lines or hatches absent in its siblings, or its extent contradicted the name code, I would treat it as an independent plan fragment instead.",
+      "uncertainty": "Only 30/53 entities are sampled and the meaning of the 'v' suffix is unverifiable from geometry alone; the y=0/-245 boundary lines' role (casing vs wall face) is undetermined."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-esp-344",
+    "def": "X-평면도(기본형)$0$esp",
+    "role": "심볼",
+    "wall_likelihood": 0.0,
+    "wall_line_handles": [],
+    "notes": "Escape-hatch/evacuation marker: X-crossed rectangles on 피난구 and FUR layers (esp = escape).",
+    "rationale": {
+      "evidence": "Six of eleven entities sit on layer X-평면도(기본형)$0$피난구 (escape opening) and form two X patterns (e.g. 1D70/1D71 crossing (125,550)-(725,1150) and (125,1150)-(725,550)) inside rectangle polylines; the FUR-layer pair 1D6E/1D6F forms a third X. The name 'esp' aligns with escape, and X-in-box is the standard Korean drawing convention for 피난구 (emergency egress hatch).",
+      "rule": "Small blocks made of a rectangle with corner-to-corner diagonals on an egress/equipment layer are annotation symbols marking a feature, not physical building geometry.",
+      "counterfactual": "If the diagonals were absent and the rectangles carried wall-adjacent parallel offsets, this could be furniture or a slab opening outline; TEXT with a room name would push toward 평면 부분도.",
+      "uncertainty": "Whether the MC-layer polyline (1D6C) represents a separate object (e.g. multipurpose closet) or the hatch frame cannot be resolved; layer semantics are inferred from names only."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-ev13k-345",
+    "def": "X-평면도(기본형)$0$ev13k",
+    "role": "심볼",
+    "wall_likelihood": 0.1,
+    "wall_line_handles": [],
+    "notes": "13-person evacuation elevator plan symbol (TEXT '13인승(피난용)') on an ELEV layer: car, rails and centerline.",
+    "rationale": {
+      "evidence": "45 of 47 entities are on layer $0$ELEV and the TEXT entity 7FCE reads '13인승(피난용)' (13-person, evacuation use). Geometry is a symmetric car outline about x=0 (paired verticals at ±780 for the car, ±830/±912 for the shaft-side rails, 18-vertex polylines 7FE8/7FEA that read as counterweight/door detail) plus a centerline 7FD2 running the full height.",
+      "rule": "A block on an elevator layer with embedded capacity text and mirror-symmetric car/rail geometry is an equipment symbol; its lines depict the lift unit, not the building walls.",
+      "counterfactual": "If the outer ±1080 lines formed a closed thick-wall rectangle on a wall/CON layer, the block would contain real shaft walls and wall_likelihood would rise sharply.",
+      "uncertainty": "Whether the outermost lines (e.g. 7FE9 at y=1052.5 spanning ±1080) are shaft wall faces or clearance/annotation lines cannot be settled without linetype and the host plan context."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-ev16k-346",
+    "def": "X-평면도(기본형)$0$ev16k",
+    "role": "심볼",
+    "wall_likelihood": 0.1,
+    "wall_line_handles": [],
+    "notes": "16-person elevator plan symbol (TEXT '16인승'), same ELEV-layer car/rail template as ev13k at larger size.",
+    "rationale": {
+      "evidence": "Identical histogram to ev13k (LINE=34, LWPOLYLINE=12, TEXT=1; ELEV=45) with TEXT 8002 '16인승'. The geometry is the same symmetric template scaled up: car verticals at ±880 (vs ±780), rails at ±930/±1012 (vs ±830/±912), centerline 8006 over the full 2610 height, and the two 18-vertex detail polylines 801C/801D.",
+      "rule": "Same-template, same-layer blocks whose names and text differ only by capacity code are members of one equipment-symbol family and share a classification.",
+      "counterfactual": "Wall-layer entities, hatches, or dimension entities inside the block would break the pure-equipment reading and suggest a plan fragment or dimension cache.",
+      "uncertainty": "17 entities are unsampled; the DEFPOINTS-1 polyline's purpose (likely a non-plotting placement frame) is inferred, not observed."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-ev16x2k-347",
+    "def": "X-평면도(기본형)$0$ev16x2k",
+    "role": "심볼",
+    "wall_likelihood": 0.1,
+    "wall_line_handles": [],
+    "notes": "Twin 16-person emergency elevator symbol (TEXT '16인승(비상용)', x2 in name; 94 entities = two car templates side by side).",
+    "rationale": {
+      "evidence": "Entity count 94 is almost exactly double ev16k's 47, with TEXT=2 and ELEV=91; the sampled half repeats ev16k's geometry verbatim (car at ±880, rails at ±930/±1012, centerline 803A), while the bbox extends to x=3575, leaving room for a second car around x≈2400-3500. The 'x2' in the name plus TEXT 8036 '16인승(비상용)' confirms a two-car emergency elevator bank.",
+      "rule": "A block whose entity count, text count, and bbox are integer multiples of a known single-unit sibling is a composed multi-unit version of the same equipment symbol.",
+      "counterfactual": "If the extra 47 entities were on wall or hatch layers rather than repeating the ELEV template, this would instead be a shaft plan fragment (평면 부분도) containing walls.",
+      "uncertainty": "The second car's entities are entirely outside the 30-entity sample, so its assumed mirror-copy structure is an inference from counts and bbox, not observed geometry."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-fsd1120-348",
+    "def": "X-평면도(기본형)$0$FSD1120",
+    "role": "심볼",
+    "wall_likelihood": 0.0,
+    "wall_line_handles": [],
+    "notes": "Fire shutter/steel door 1120 plan symbol on a DOOR layer: leaf lines, frame polylines and one swing ARC.",
+    "rationale": {
+      "evidence": "All 7 entities are on $0$DOOR; the name FSD1120 (fire steel door, 1120 opening) matches the 1140 bbox width. Lines 7E45/7E49/7E4A form the leaf/frame at y=100/60/0, the three 5-6 vertex polylines read as jamb sections, and the single ARC 7E4B is the classic door-swing indicator.",
+      "rule": "A tiny single-layer DOOR block combining straight leaf/frame lines with one swing arc is a door symbol; the numeric suffix is the opening width.",
+      "counterfactual": "Absence of the ARC and presence of thick paired lines on a wall layer would suggest a wall opening fragment instead; DIMENSION entities would suggest 치수캐시.",
+      "uncertainty": "Fire-shutter vs hinged-steel-door distinction rests on the FSD naming convention alone; linetype and the arc's radius/sweep are not in the projection."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-fsd1500-2-349",
+    "def": "X-평면도(기본형)$0$FSD1500-2",
+    "role": "심볼",
+    "wall_likelihood": 0.0,
+    "wall_line_handles": [],
+    "notes": "Double-leaf fire/steel door 1500 plan symbol on an A-DOOR layer (two swing ARCs, mirrored into negative-x space).",
+    "rationale": {
+      "evidence": "All 9 entities are on $0$A-DOOR; the -2 suffix and the two ARCs (79FD/79FE) indicate a double-leaf door, and the frame lines 79F8/79F9/79FA at y=0/-40/-100 span the 1440 opening matching the 1500 name code. The 5-7 vertex polylines are jamb/leaf sections like in FSD1120.",
+      "rule": "DOOR-layer blocks with leaf lines plus N swing arcs are N-leaf door symbols; name codes give nominal opening width.",
+      "counterfactual": "If the parallel lines at y=0 and y=-100 were on a wall layer and no arcs existed, the block would read as a wall segment; text or dimensions would change the role.",
+      "uncertainty": "Which line is the wall face versus the door frame cannot be determined; the A-DOOR vs DOOR layer split (possibly a different discipline prefix) is unexplained by the projection."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-fsdfsdf321-350",
+    "def": "X-평면도(기본형)$0$FSDFSDF321",
+    "role": "심볼",
+    "wall_likelihood": 0.0,
+    "wall_line_handles": [],
+    "notes": "Small MEP fixture symbol (~100x33 with r=50 circle) on layer A06-시설물-설비; keyboard-mash name suggests an ad-hoc user block.",
+    "rationale": {
+      "evidence": "All 5 entities sit on $0$A06-시설물-설비 (facilities-equipment): a CIRCLE of radius 50 (6959), two short parallel lines 33 units apart (6958/695A at y=-58.6/-91.4), and two small polylines. The tiny 100x33 line extent with an overlapping circle reads as a valve/meter/outlet style plan fixture, and 'FSDFSDF321' is a typical throwaway keyboard-mash block name.",
+      "rule": "Sub-meter-scale blocks on an equipment/설비 layer composed of a circle plus a few short lines are MEP fixture symbols regardless of how meaningless the block name is.",
+      "counterfactual": "If the circle carried TEXT (a tag number) it might be an annotation bubble; long wall-scale lines would move it toward a plan fragment.",
+      "uncertainty": "The specific fixture type (gas valve, damper, sensor) is indeterminable; layer naming is the only semantic anchor and the name itself carries no information."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-fu1-351",
+    "def": "X-평면도(기본형)$0$FU1",
+    "role": "가구",
+    "wall_likelihood": 0.0,
+    "wall_line_handles": [],
+    "notes": "Small decorative furniture/plant object on FUR layer: 115 arcs/ellipses/splines around a 530-long stem line (~49 wide).",
+    "rationale": {
+      "evidence": "All 115 entities are on $0$FUR and the histogram is overwhelmingly curved geometry (ARC=31, ELLIPSE=23, SPLINE=45) with only 16 lines; the one sampled line 5852 is a vertical stem (0,-20)->(0,-550) and the bbox is a narrow 49x530 strip. The name FU1 matches the FUR (furniture) layer prefix. Dense freeform curves at this scale read as a plant/decor item in plan or elevation.",
+      "rule": "Blocks confined to a FUR layer whose geometry is dominated by splines/arcs/ellipses rather than orthogonal lines are furniture or decor symbols.",
+      "counterfactual": "If the curves were replaced by orthogonal line pairs at wall thickness, or the layer were structural, the furniture reading would collapse.",
+      "uncertainty": "The exact object (plant, coat stand, lamp) is not identifiable from entity types alone, and the nonzero z in the bbox hints at 3D-ish content the projection flattens."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-hd1050-352",
+    "def": "X-평면도(기본형)$0$hd1050",
+    "role": "심볼",
+    "wall_likelihood": 0.0,
+    "wall_line_handles": [],
+    "notes": "Hinged door 1050 plan symbol on DOOR layer; 210 short parallel LINEs form manual hatching on the leaf plus ellipse swing detail.",
+    "rationale": {
+      "evidence": "All 244 entities are on $0$DOOR; the name hd1050 matches the ~1010 bbox width. The sampled LINEs (1C12-1C2D) are dozens of sub-10-unit diagonal segments clustered around (995-1005, -60..-49) - classic exploded hatch strokes marking the leaf - while 28 ELLIPSEs and an ARC supply the swing/handle detail, with a 38-vertex polyline outlining the leaf.",
+      "rule": "A door-layer block whose line count is inflated by dense clusters of very short parallel diagonals is a door symbol with exploded hatching; hatch strokes are decoration, never wall lines.",
+      "counterfactual": "If the short diagonals instead spanned wall-thickness offsets in one long band on a wall layer, they could be a poché wall hatch and the block would be a wall fragment.",
+      "uncertainty": "Only the hatch cluster was sampled, so the overall leaf/frame layout (and whether a swing arc like FSD1120's exists) is inferred from the histogram, not seen."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-hobgas19-353",
+    "def": "X-평면도(기본형)$0$HOBGAS19",
+    "role": "가구",
+    "wall_likelihood": 0.0,
+    "wall_line_handles": [],
+    "notes": "Gas hob/cooktop plan symbol (590x490) on KIT layer: 12 concentric burner circles in a rectangular body.",
+    "rationale": {
+      "evidence": "All 30 entities are on $0$KIT (kitchen); the name HOBGAS says gas hob. Geometry is a 590x490 body (lines 1DCD/1DCE at y=49/539) filled with circle groups of repeating radii (82.6/52/37.4/31.6 sets = burners, r=15.4 triplets = knobs) and 4-vertex polylines as grates - the standard cooktop plan graphic.",
+      "rule": "KIT-layer blocks of a rectangle containing repeated concentric circle clusters are kitchen appliance (hob/sink) symbols; classify appliances with fixtures/furnishings (가구) rather than building fabric.",
+      "counterfactual": "If the circles were single large radii with center crosses on a structural layer they might be columns, which would flip the role to 평면 부분도 with wall relevance.",
+      "uncertainty": "Whether this experiment's taxonomy wants appliances under 가구 or 기타 is a labeling-convention question the projection cannot answer; I chose 가구 by the fixtures-and-furnishings reading."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-ic708-354",
+    "def": "X-평면도(기본형)$0$IC708",
+    "role": "가구",
+    "wall_likelihood": 0.0,
+    "wall_line_handles": [],
+    "notes": "Furniture item ~808x437 on FUR layer (arc/spline-heavy, world coords ~284k/50k), likely an upholstered chair/sofa unit 'IC708'.",
+    "rationale": {
+      "evidence": "All 100 entities are on $0$FUR with a curve-heavy histogram (ARC=32, SPLINE=14) plus orthogonal lines forming an ~808x437 body (e.g. 5F8D spanning 284038->284840 at y=50455.956). Small detail pairs like 5FA5/5FA6 (8.4-unit spacing) read as stitching/armrest details. The model-number style name IC708 fits catalog furniture blocks.",
+      "rule": "FUR-layer blocks with model-number names and mixed arc/spline detail at sub-meter scale are catalog furniture symbols; absolute world coordinates merely mean the block base point is far from the geometry.",
+      "counterfactual": "If the outline were a plain rectangle with wall-thickness double lines or the layer were WAL/CON, this could be a room fragment instead of furniture.",
+      "uncertainty": "The far-from-origin coordinates imply an unnormalized base point, so how this block lands when inserted is unknown; the actual furniture type (chair vs appliance) is not decidable."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-iw990-355",
+    "def": "X-평면도(기본형)$0$IW990",
+    "role": "가구",
+    "wall_likelihood": 0.0,
+    "wall_line_handles": [],
+    "notes": "Highly detailed furniture/fixture group ~748x479 (451 entities, 133 splines) on FUR layer with 2 F-BATH entities; likely a vanity/wash-stand unit 'IW990'.",
+    "rationale": {
+      "evidence": "449 of 451 entities are on $0$FUR (plus 2 on $0$F-BATH), with SPLINE=133/ARC=97/ELLIPSE=8 dominating - freeform product detailing, not building fabric. Sampled lines are sub-unit-length fragments (e.g. 5FFB moving 0.076 units), the signature of an exploded/imported manufacturer model. The 990 code and F-BATH crossover suggest a 990-wide bathroom-adjacent fixture.",
+      "rule": "Blocks with hundreds of tiny splines/arcs on furniture layers are imported manufacturer product symbols; entity density signals detail level, not architectural scope.",
+      "counterfactual": "A meaningful share of entities on wall/structure layers, or long orthogonal double lines, would reclassify this as a partial plan containing fixtures.",
+      "uncertainty": "Only 30 of 451 entities are visible, and the 2 F-BATH entities' geometry is unsampled, so whether this is one product or a small furniture arrangement cannot be confirmed."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-jjbl-356",
+    "def": "X-평면도(기본형)$0$jjbl",
+    "role": "기타",
+    "wall_likelihood": 0.0,
+    "wall_line_handles": [],
+    "notes": "Tile/finish pattern element on TILE layer: 36 identical r=10 circles plus one boundary polyline (dot-pattern floor finish).",
+    "rationale": {
+      "evidence": "All 37 entities are on $0$TILE and 36 of them are CIRCLEs of exactly radius 10 with a single 4-vertex LWPOLYLINE as boundary - a uniform dot array, i.e. a floor-finish/anti-slip tile pattern swatch. No lines exist at all (bbox not derivable from LINEs). The name jjbl is a shorthand (possibly 줄눈/점자블록) rather than an object name.",
+      "rule": "Single-layer blocks consisting of one boundary polyline plus a uniform array of identical small circles are surface-pattern/finish symbols, which fall outside the plan-fragment/symbol-object/furniture buckets - hence 기타. Note: if 점자블록 (tactile paving), it is a finish element, still 기타.",
+      "counterfactual": "If the circles had varied radii or were grouped with fixture lines, an equipment reading (e.g. sprinkler array) on a services layer would beat the pattern reading.",
+      "uncertainty": "Whether the dot array represents tactile paving, tile texture, or perforation cannot be resolved; circle centers are not given, so the array's regularity is assumed from identical radii."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-kh-530s-1-top-357",
+    "def": "X-평면도(기본형)$0$KH-530S-1 TOP",
+    "role": "가구",
+    "wall_likelihood": 0.0,
+    "wall_line_handles": [],
+    "notes": "Top view of catalog product KH-530S-1 (~550x80 line extent) on FUR layer - model-number kitchen/sanitary hardware, e.g. a sink or hood top.",
+    "rationale": {
+      "evidence": "All 132 entities are on $0$FUR; the name embeds a manufacturer model code (KH-530S-1) and the literal word TOP, i.e. a product top view. Geometry mixes an 18- and a 25-vertex outline polyline with many sub-unit paired lines (e.g. 59EF/59F2 484-long rails 0.17 apart, 0.5-unit end ticks) typical of imported vendor linework; SPLINE=38 adds freeform detail.",
+      "rule": "Blocks named with a model code plus a view keyword (TOP/SIDE/FRONT) on furniture layers are vendor product symbols in that view; the view word alone rules out plan-fragment roles.",
+      "counterfactual": "If the layer were KIT/EQP with burner-circle clusters I would call it an appliance; wall-layer content or room-scale extents would force reconsideration as a plan fragment.",
+      "uncertainty": "The product category (sink, hood, handle rail) is not decidable from the sampled linework, and the far-from-origin base point means insertion behavior is unknown."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-l933-top-358",
+    "def": "X-평면도(기본형)$0$L933 TOP",
+    "role": "가구",
+    "wall_likelihood": 0.0,
+    "wall_line_handles": [],
+    "notes": "Top view of catalog product L933 (~505x490) on FUR layer, spline-dominated (139/191) - likely a basin, chair or similar vendor model.",
+    "rationale": {
+      "evidence": "All 191 entities are on $0$FUR, SPLINEs dominate (139) with degenerate zero-length sampled LINEs (e.g. 6377/6378 start==end) - hallmarks of an exploded manufacturer 3D-to-2D export. The name pairs a model code L933 with the view keyword TOP like the neighboring KH-530S-1 TOP block, and the ~505x490 extent is furniture-scale. The bbox carries small nonzero z values, confirming imported 3D-origin geometry.",
+      "rule": "Model-code + TOP naming on a furniture layer with spline-dominated, partially degenerate linework identifies an imported vendor product top view; classify as furniture regardless of unresolvable product type.",
+      "counterfactual": "Room-scale extents, wall layers, or orthogonal double-line geometry would defeat the product reading and suggest a plan fragment.",
+      "uncertainty": "Only 4 of 34 LINEs were sampled and all were degenerate, so the real outline shape is unseen; whether L933 is sanitary ware or seating cannot be determined."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-ng-359",
+    "def": "X-평면도(기본형)$0$ng",
+    "role": "심볼",
+    "wall_likelihood": 0.05,
+    "wall_line_handles": [],
+    "notes": "Flagpole-holder detail symbol (~1040x126): layer-0 bracket outline with 2 WIPEOUTs and a nested 국기계양대 (flagpole mount) INSERT.",
+    "rationale": {
+      "evidence": "The block nests INSERT 3D62 of X-평면도(기본형)$0$국기계양대 (flagpole hoisting stand), which fixes the semantic anchor. The 20 layer-0 LINEs trace a symmetric bracket profile about x=0 (posts at ±498-±520, rail band y=-3..-53, tabs to y=70), and the two WIPEOUTs (3D60/3D61) mask background - a masking behavior typical of overlay symbols, not building fabric.",
+      "rule": "A block that nests a semantically named component INSERT and uses WIPEOUTs to mask what is underneath is an overlay detail symbol; layer 0 content inherits properties from the insert context, reinforcing symbol usage.",
+      "counterfactual": "If the horizontal band lines continued beyond the bracket at building scale, or sat on a wall layer, they could be a railing/parapet wall fragment and the likelihood would rise.",
+      "uncertainty": "The 'ng' abbreviation is opaque and the nested block's own geometry is invisible here, so the exact mounting context (balcony wall vs frame) is unknown."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-pd900-360",
+    "def": "X-평면도(기본형)$0$pd900",
+    "role": "심볼",
+    "wall_likelihood": 0.0,
+    "wall_line_handles": [],
+    "notes": "900-wide door plan symbol on DOOR layer (pd = 목문/plastic or pocket door): X-marked leaf, frame lines and one swing ARC.",
+    "rationale": {
+      "evidence": "All 19 entities are on $0$DOOR and the bbox is exactly 900 wide matching the name code. Lines 1BF9/1BFA form the X across the 40..860 leaf, 1BFB/1BFC are the leaf faces at y=140/100, the small X pairs at both ends (1C00/1C01 and 1C05/1C06 across 23-unit jambs) mark the jamb blocks, and ARC 1C0A is the swing indicator.",
+      "rule": "DOOR-layer blocks whose width equals the numeric name code and which combine leaf lines, jamb marks, and a swing arc are door symbols; X marks denote the leaf or jamb material, not egress.",
+      "counterfactual": "Without the ARC and with the X-boxes at room scale on a 피난구 layer this would read as an escape-hatch marker; wall-layer parallel pairs would suggest an opening fragment.",
+      "uncertainty": "The 'pd' prefix's exact door type (pocket/plastic/panel door) is a naming convention I cannot verify, and linetypes distinguishing frame from wall face are absent from the projection."
+    }
+  }
+]

@@ -1,0 +1,282 @@
+[
+ {
+  "unit_id": "defannot-d395-101",
+  "def": "*D395",
+  "role": "치수캐시",
+  "wall_likelihood": 0.0,
+  "wall_line_handles": [],
+  "notes": "700 길이를 표시하는 자동 생성 치수 블록이다.",
+  "rationale": {
+   "evidence": "DIM 레이어의 LINE 3개(8EF8~8EFA)가 두 보조선과 하나의 치수선을 구성한다. DIMDOT 삽입 2개, 값 700의 MTEXT, DEFPOINTS의 POINT 3개가 전형적인 치수 캐시 구성이다.",
+   "rule": "치수선·보조선, 양끝 표식, 측정값 문자와 DEFPOINTS가 함께 있으면 벽체가 아니라 치수 캐시로 판정한다.",
+   "counterfactual": "DIM 요소가 없고 건축 레이어에 일정 간격의 긴 평행선이 있었다면 벽 가능성이 높아졌을 것이다.",
+   "uncertainty": "상위 도면에서 이 치수가 어떤 부재를 측정하는지는 정의 투영만으로 알 수 없다."
+  }
+ },
+ {
+  "unit_id": "defannot-d396-102",
+  "def": "*D396",
+  "role": "치수캐시",
+  "wall_likelihood": 0.0,
+  "wall_line_handles": [],
+  "notes": "1170 길이를 표시하는 수평 치수 캐시다.",
+  "rationale": {
+   "evidence": "DIM 레이어 LINE 8F01과 8F02는 보조선이고 8F03은 그 사이의 치수선이다. DIMDOT 2개와 값 1170의 MTEXT 및 DEFPOINTS 3개가 포함된다.",
+   "rule": "평행 보조선 사이의 치수선, 양끝 표식 및 숫자 문자는 AutoCAD 치수 블록의 강한 지표다.",
+   "counterfactual": "숫자 문자와 치수 표식이 없고 선들이 실제 평면 형상과 연결되었다면 벽선 판정이 가능했을 것이다.",
+   "uncertainty": "치수 대상의 실제 형상과 문맥은 이 블록 정의 밖에 있어 확인할 수 없다."
+  }
+ },
+ {
+  "unit_id": "defannot-d397-103",
+  "def": "*D397",
+  "role": "치수캐시",
+  "wall_likelihood": 0.0,
+  "wall_line_handles": [],
+  "notes": "1805 길이를 표시하는 수평 치수 캐시다.",
+  "rationale": {
+   "evidence": "DIM 레이어의 8F0A~8F0C가 두 보조선과 중앙 치수선을 이룬다. DIMDOT 삽입 두 개, 값 1805의 MTEXT, DEFPOINTS 세 개도 함께 존재한다.",
+   "rule": "치수 전용 레이어에서 선·표식·측정값·정의점이 완결된 세트를 이루면 치수캐시로 분류한다.",
+   "counterfactual": "건축 벽 레이어의 장거리 이중선과 교차부 또는 개구부가 관찰되면 벽 가능성이 높아질 것이다.",
+   "uncertainty": "상위 삽입의 회전과 축척 및 치수가 참조하는 객체는 알 수 없다."
+  }
+ },
+ {
+  "unit_id": "defannot-d398-104",
+  "def": "*D398",
+  "role": "치수캐시",
+  "wall_likelihood": 0.0,
+  "wall_line_handles": [],
+  "notes": "910 길이를 표시하는 수평 치수 캐시다.",
+  "rationale": {
+   "evidence": "LINE 8F13과 8F14는 수직 보조선이며 8F15는 값 910을 표시하는 수평 치수선이다. 모든 표시 요소가 DIM 레이어에 있고 DIMDOT 두 개와 DEFPOINTS 세 개가 있다.",
+   "rule": "측정값 문자와 끝점 표식을 가진 보조선-치수선 조합은 벽 형상이 아닌 치수 표현이다.",
+   "counterfactual": "치수 문자와 표식이 사라지고 동일 간격의 선들이 주변 건축선과 연속되면 벽으로 재평가할 수 있다.",
+   "uncertainty": "투영에는 블록의 외부 연결 관계가 없어 치수 대상은 식별할 수 없다."
+  }
+ },
+ {
+  "unit_id": "defannot-d399-105",
+  "def": "*D399",
+  "role": "치수캐시",
+  "wall_likelihood": 0.0,
+  "wall_line_handles": [],
+  "notes": "760 높이를 표시하는 수직 치수 캐시다.",
+  "rationale": {
+   "evidence": "DIM 레이어 LINE 8F1C와 8F1D가 수평 보조선이고 8F1E가 수직 치수선이다. DIMDOT 두 개와 값 760의 MTEXT, DEFPOINTS 세 개가 전형적인 치수 구성이다.",
+   "rule": "방향과 무관하게 두 보조선 사이에 표식과 숫자를 가진 선이 있으면 치수캐시로 본다.",
+   "counterfactual": "문자와 DIMDOT 없이 긴 수직 평행 경계가 건축 레이어에 존재했다면 벽 후보가 될 수 있다.",
+   "uncertainty": "이 치수가 문, 창 또는 벽 구간 중 무엇을 측정하는지는 알 수 없다."
+  }
+ },
+ {
+  "unit_id": "defannot-d400-106",
+  "def": "*D400",
+  "role": "치수캐시",
+  "wall_likelihood": 0.0,
+  "wall_line_handles": [],
+  "notes": "1145 높이를 표시하는 수직 치수 캐시다.",
+  "rationale": {
+   "evidence": "8F25와 8F26은 치수 보조선이고 8F27은 두 점 사이의 수직 치수선이다. DIM 레이어의 DIMDOT 두 개와 값 1145의 MTEXT, DEFPOINTS 세 개가 이를 뒷받침한다.",
+   "rule": "치수 전용 레이어의 보조선, 치수선, 끝점 기호와 측정값은 치수캐시의 식별 패턴이다.",
+   "counterfactual": "실제 벽 레이어에서 연속적인 이중 경계선과 코너가 확인되면 벽 판정으로 바뀔 수 있다.",
+   "uncertainty": "정의만으로는 상위 도면에서의 치수 대상과 배치 의미를 확인할 수 없다."
+  }
+ },
+ {
+  "unit_id": "defannot-d401-107",
+  "def": "*D401",
+  "role": "치수캐시",
+  "wall_likelihood": 0.0,
+  "wall_line_handles": [],
+  "notes": "470 길이를 표시하는 짧은 수평 치수 캐시다.",
+  "rationale": {
+   "evidence": "DIM 레이어의 수직선 8F2E와 8F2F 사이에 수평 치수선 8F30이 놓여 있다. DIMDOT 두 개, 값 470의 MTEXT와 DEFPOINTS 세 개가 포함된다.",
+   "rule": "짧은 선이라도 측정값과 양끝 치수 표식 및 정의점을 동반하면 벽선이 아니라 치수 요소다.",
+   "counterfactual": "치수 부속 요소가 없고 선들이 폐합된 실 배치나 평행 벽 경계를 형성하면 판정이 달라질 것이다.",
+   "uncertainty": "470이라는 값이 어떤 건축 요소의 폭을 뜻하는지는 이 투영에서 알 수 없다."
+  }
+ },
+ {
+  "unit_id": "defannot-d402-108",
+  "def": "*D402",
+  "role": "치수캐시",
+  "wall_likelihood": 0.0,
+  "wall_line_handles": [],
+  "notes": "1020 높이를 표시하는 수직 치수 캐시다.",
+  "rationale": {
+   "evidence": "8F37과 8F38은 수평 보조선이고 8F39는 이들을 연결하는 수직 치수선이다. DIMDOT 두 개와 값 1020의 MTEXT 및 DEFPOINTS가 모두 치수 전용 레이어 구성과 일치한다.",
+   "rule": "보조선 두 개와 그 사이의 치수선, 끝점 표식, 숫자 문자의 결합은 치수캐시로 분류한다.",
+   "counterfactual": "INSUL 또는 WALL 같은 건축 레이어의 실제 경계선과 연결되는 평행선이 있었다면 벽 가능성이 생겼을 것이다.",
+   "uncertainty": "블록 외부의 피치수 객체는 제공되지 않아 치수의 건축적 의미는 불명확하다."
+  }
+ },
+ {
+  "unit_id": "defannot-d403-109",
+  "def": "*D403",
+  "role": "치수캐시",
+  "wall_likelihood": 0.0,
+  "wall_line_handles": [],
+  "notes": "1620 높이를 표시하는 수직 치수 캐시다.",
+  "rationale": {
+   "evidence": "DIM 레이어 LINE 8F40과 8F41이 보조선, 8F42가 수직 치수선 역할을 한다. DIMDOT 두 개, 값 1620의 MTEXT와 DEFPOINTS 세 개가 함께 있다.",
+   "rule": "측정값과 치수 표식이 결합된 직교 선 세트는 실제 벽체 선이 아니라 생성된 치수 블록이다.",
+   "counterfactual": "치수 요소 대신 건축 레이어의 연속된 이중선과 접합부가 나타나면 벽 판정으로 전환할 수 있다.",
+   "uncertainty": "상위 도면에서 이 치수가 어느 방향과 객체에 적용되는지는 확정할 수 없다."
+  }
+ },
+ {
+  "unit_id": "defannot-d404-110",
+  "def": "*D404",
+  "role": "치수캐시",
+  "wall_likelihood": 0.0,
+  "wall_line_handles": [],
+  "notes": "580 길이를 표시하는 수평 치수 캐시다.",
+  "rationale": {
+   "evidence": "수직 LINE 8F49와 8F4A 사이에 수평 LINE 8F4B가 배치되어 보조선-치수선 구조를 이룬다. DIMDOT 두 개와 값 580의 MTEXT, DEFPOINTS 세 개가 DIM 레이어에 있다.",
+   "rule": "DIM 레이어의 선 세트가 양끝 표식과 숫자 값을 가지면 치수캐시로 판단한다.",
+   "counterfactual": "숫자와 표식 없이 선들이 실제 공간 경계를 따라 길게 이어졌다면 벽선일 가능성이 높아진다.",
+   "uncertainty": "580이 나타내는 대상의 종류는 외부 참조 정보 없이 판단할 수 없다."
+  }
+ },
+ {
+  "unit_id": "defannot-d405-111",
+  "def": "*D405",
+  "role": "치수캐시",
+  "wall_likelihood": 0.0,
+  "wall_line_handles": [],
+  "notes": "1100 높이를 표시하는 수직 치수 캐시다.",
+  "rationale": {
+   "evidence": "8F52와 8F53은 수평 보조선이고 8F54는 그 사이의 수직 치수선이다. DIMDOT 두 개와 값 1100의 MTEXT, 세 개의 DEFPOINTS가 치수 블록임을 명확히 한다.",
+   "rule": "치수선과 보조선에 측정 문자, 끝점 기호 및 정의점이 동반되면 벽선 후보에서 제외한다.",
+   "counterfactual": "건축 레이어의 평행 장선과 벽 코너 또는 개구부가 관찰되면 벽 가능성이 높아질 것이다.",
+   "uncertainty": "이 정의가 측정하는 실제 객체와 상위 삽입 위치는 확인할 수 없다."
+  }
+ },
+ {
+  "unit_id": "defannot-d406-112",
+  "def": "*D406",
+  "role": "치수캐시",
+  "wall_likelihood": 0.0,
+  "wall_line_handles": [],
+  "notes": "215 길이의 좁은 구간을 표시하는 치수 캐시다.",
+  "rationale": {
+   "evidence": "DIM 레이어의 8F5B와 8F5C가 보조선이고 8F5D~8F5F가 짧은 치수선과 외측 연장 구간을 구성한다. DIMDOT 두 개, 값 215의 MTEXT 및 DEFPOINTS 세 개가 존재한다.",
+   "rule": "좁은 치수에서 문자 공간 확보를 위해 치수선이 분할되거나 외측으로 연장되어도 치수 표식과 값이 있으면 치수캐시다.",
+   "counterfactual": "DIMDOT와 숫자가 없고 다섯 선이 건축 경계와 연속된 형상을 이루면 벽 또는 평면 형상으로 재판정할 수 있다.",
+   "uncertainty": "선 분할의 정확한 표시 방식과 상위 도면의 치수 대상은 투영만으로 확인할 수 없다."
+  }
+ },
+ {
+  "unit_id": "defannot-d407-113",
+  "def": "*D407",
+  "role": "치수캐시",
+  "wall_likelihood": 0.0,
+  "wall_line_handles": [],
+  "notes": "950 길이를 표시하는 수평 치수 캐시다.",
+  "rationale": {
+   "evidence": "DIM 레이어 LINE 8F66과 8F67은 수직 보조선이며 8F68은 두 보조선 사이의 치수선이다. DIMDOT 두 개, 값 950의 MTEXT와 DEFPOINTS 세 개가 포함된다.",
+   "rule": "치수 전용 레이어의 직교 선 구조와 양끝 표식, 측정값, 정의점 조합은 치수캐시를 뜻한다.",
+   "counterfactual": "이 부속 요소들이 없고 선들이 벽 레이어에서 평행 경계를 형성했다면 벽 가능성이 커졌을 것이다.",
+   "uncertainty": "950 길이가 적용되는 실제 평면 요소는 블록 외부 문맥 없이는 알 수 없다."
+  }
+ },
+ {
+  "unit_id": "defannot-u103-114",
+  "def": "*U103",
+  "role": "평면 부분도",
+  "wall_likelihood": 0.3,
+  "wall_line_handles": [],
+  "notes": "평면도의 단열재 패턴을 익명 블록으로 묶은 부분도다.",
+  "rationale": {
+   "evidence": "159개 엔티티가 모두 X-평면도(기본형)$0$INSUL 레이어의 5정점 LWPOLYLINE이다. 반복되는 동일 형식과 INSUL 레이어는 벽 경계선보다 단열재 채움 또는 패턴 조각을 가리킨다.",
+   "rule": "평면도 계열 INSUL 레이어의 다수 소형 폐합 폴리라인은 건축 평면의 단열 표현으로 보되 개별 폴리라인을 벽선으로 선택하지 않는다.",
+   "counterfactual": "단열 패턴을 감싸는 긴 평행 LINE 또는 LWPOLYLINE 경계가 WALL 계열 레이어에 있었다면 벽 가능성과 벽선 후보가 크게 증가했을 것이다.",
+   "uncertainty": "정점 좌표와 전체 배치가 없어 이 패턴이 실제 벽 내부인지 다른 단열 부재인지 확정할 수 없다."
+  }
+ },
+ {
+  "unit_id": "defannot-u104-115",
+  "def": "*U104",
+  "role": "평면 부분도",
+  "wall_likelihood": 0.3,
+  "wall_line_handles": [],
+  "notes": "25개의 폴리라인으로 구성된 단열재 평면 표현이다.",
+  "rationale": {
+   "evidence": "25개 엔티티가 모두 X-평면도(기본형)$0$INSUL 레이어의 5정점 LWPOLYLINE이다. 단일 레이어에 반복되는 균일한 폴리라인은 구조 경계보다 단열 패턴의 일부라는 해석을 지지한다.",
+   "rule": "INSUL 레이어의 반복 소형 폴리라인은 평면 부분도로 분류하되 벽 중심선이나 벽면선으로 직접 간주하지 않는다.",
+   "counterfactual": "일정 간격으로 길게 이어지는 이중 경계선과 코너 접합이 함께 나타나면 벽 포함 판정으로 바뀔 수 있다.",
+   "uncertainty": "좌표와 범위가 제공되지 않아 폴리라인의 크기, 폐합 여부 및 벽과의 공간 관계를 확인할 수 없다."
+  }
+ },
+ {
+  "unit_id": "defannot-u105-116",
+  "def": "*U105",
+  "role": "평면 부분도",
+  "wall_likelihood": 0.3,
+  "wall_line_handles": [],
+  "notes": "38개의 반복 폴리라인으로 된 단열재 평면 부분도다.",
+  "rationale": {
+   "evidence": "전체 38개 엔티티가 X-평면도(기본형)$0$INSUL 레이어에 있으며 모두 5정점 LWPOLYLINE이다. 문자, 가구 형상, 치수 요소 없이 반복 패턴만 있어 단열재 그래픽으로 판단된다.",
+   "rule": "평면도 INSUL 레이어에 반복되는 동일 형식 폴리라인은 단열 표현이며, 긴 연속 경계가 아닌 한 벽선 핸들로 지정하지 않는다.",
+   "counterfactual": "패턴 외곽에 연속적인 평행 벽 경계가 포함되어 있었다면 wall_likelihood가 높아졌을 것이다.",
+   "uncertainty": "샘플에는 정점 좌표가 없어 패턴의 방향과 실제 외곽 형상을 복원할 수 없다."
+  }
+ },
+ {
+  "unit_id": "defannot-u106-117",
+  "def": "*U106",
+  "role": "평면 부분도",
+  "wall_likelihood": 0.3,
+  "wall_line_handles": [],
+  "notes": "24개의 단열 패턴 폴리라인을 담은 평면 부분도다.",
+  "rationale": {
+   "evidence": "24개 엔티티가 예외 없이 X-평면도(기본형)$0$INSUL 레이어의 5정점 LWPOLYLINE으로 구성된다. 이 균질한 반복은 벽 경계선 세트보다 단열재 기호 패턴에 가깝다.",
+   "rule": "단열 레이어의 반복 폐합형 폴리라인은 벽과 연관될 수 있지만 그 자체는 벽면선으로 채택하지 않는다.",
+   "counterfactual": "건축 벽 레이어의 장거리 평행선이 단열 폴리라인을 사이에 두고 배치되었다면 벽 정의로 판정할 근거가 충분해진다.",
+   "uncertainty": "좌표 및 상위 삽입 문맥이 없어 이 단열 표현이 벽, 지붕 또는 다른 부재에 속하는지 확정할 수 없다."
+  }
+ },
+ {
+  "unit_id": "defannot-u107-118",
+  "def": "*U107",
+  "role": "평면 부분도",
+  "wall_likelihood": 0.3,
+  "wall_line_handles": [],
+  "notes": "74개의 폴리라인으로 구성된 비교적 큰 단열재 패턴 부분도다.",
+  "rationale": {
+   "evidence": "74개 엔티티가 모두 X-평면도(기본형)$0$INSUL 레이어의 5정점 LWPOLYLINE이며 표본도 같은 형식을 반복한다. INSUL 명칭과 반복성은 실제 벽 경계가 아닌 단열 채움 표현을 시사한다.",
+   "rule": "단일 단열 레이어에 집중된 반복 소형 형상은 건축 평면 일부로 분류하되 명시적 장선이 없으면 벽선 후보를 비워 둔다.",
+   "counterfactual": "폴리라인 중 일부가 큰 외곽을 이루거나 WALL 레이어의 평행 경계가 함께 존재했다면 벽 가능성을 높였을 것이다.",
+   "uncertainty": "30개 표본 밖의 나머지 형상과 모든 정점 좌표가 생략되어 전체 공간 구조는 판단할 수 없다."
+  }
+ },
+ {
+  "unit_id": "defannot-u108-119",
+  "def": "*U108",
+  "role": "평면 부분도",
+  "wall_likelihood": 0.3,
+  "wall_line_handles": [],
+  "notes": "15개의 소형 폴리라인으로 된 단열재 평면 표현이다.",
+  "rationale": {
+   "evidence": "15개 엔티티 전부가 X-평면도(기본형)$0$INSUL 레이어의 5정점 LWPOLYLINE이다. 다른 레이어나 선형 경계 없이 동일 형상만 반복되어 단열 패턴 조각으로 해석된다.",
+   "rule": "INSUL 레이어의 반복 폴리라인은 벽체와 연관된 평면 표현일 수 있으나 명시적인 벽 경계선이 아니면 벽선으로 지정하지 않는다.",
+   "counterfactual": "반복 패턴 대신 긴 이중선, 코너 및 개구부가 포함되면 벽을 포함한 평면 부분도로 판정할 수 있다.",
+   "uncertainty": "정점 위치와 블록 삽입 위치가 없어 실제 벽 내부에 배치되는지 확인할 수 없다."
+  }
+ },
+ {
+  "unit_id": "defannot-u109-120",
+  "def": "*U109",
+  "role": "평면 부분도",
+  "wall_likelihood": 0.3,
+  "wall_line_handles": [],
+  "notes": "13개의 반복 폴리라인으로 구성된 단열재 평면 부분도다.",
+  "rationale": {
+   "evidence": "13개 엔티티 모두 X-평면도(기본형)$0$INSUL 레이어에 있고 각각 5정점 LWPOLYLINE이다. 반복되는 단열 레이어 형상 외에 치수, 가구 또는 벽 경계를 나타낼 요소는 없다.",
+   "rule": "평면도 단열 레이어의 균질한 소형 폴리라인 집합은 단열 패턴으로 분류하며 벽선은 별도의 연속 경계 증거가 있을 때만 선택한다.",
+   "counterfactual": "단열 형상을 둘러싼 긴 평행 경계선이나 벽 접합부가 있었다면 wall_likelihood를 높이고 해당 핸들을 선택했을 것이다.",
+   "uncertainty": "좌표와 외부 도면 문맥이 생략되어 단열 패턴의 실제 대상과 규모는 확정할 수 없다."
+  }
+ }
+]

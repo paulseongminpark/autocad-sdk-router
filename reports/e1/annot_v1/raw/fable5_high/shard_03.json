@@ -1,0 +1,282 @@
+[
+  {
+    "unit_id": "defannot-d335-41",
+    "def": "*D335",
+    "role": "치수캐시",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "Anonymous *D dimension-cache block: DIM-layer extension/dimension lines + _ArchTick arrows + MTEXT '80' + DEFPOINTS points; no wall geometry.",
+    "rationale": {
+      "evidence": "All linework sits on layer DIM and the three POINT entities sit on DEFPOINTS, the layer AutoCAD reserves for dimension definition points. Extension lines 8CCC/8CCD and dimension line 8CD1 form a standard vertical ext lines, horizontal dim line layout, terminated by two _ArchTick INSERTs, with a single MTEXT '80' as the measurement text. The block name '*D335' is an anonymous *D-prefixed name, which AutoCAD generates only for associative-dimension geometry caches; two short outside-extension segments 8CCE/8CCF flank the 80-unit gap.",
+      "rule": "An anonymous *D### block whose contents are exclusively DIM-layer lines, arrowhead inserts (_ArchTick), one numeric MTEXT, and DEFPOINTS points is the internal geometry cache of a DIMENSION entity, not drawn model content. This signature transfers to any DWG regardless of discipline or scale.",
+      "counterfactual": "If the block contained geometry on wall/architectural layers (e.g. WALL, A-WALL), closed parallel line pairs at wall-thickness offsets, hatches, or a non-numeric name, the judgment would flip toward 평면 부분도 or 기타. Absence of the DEFPOINTS points or of the *D name pattern would also weaken the 치수캐시 call.",
+      "uncertainty": "The projection cannot show which model entity this dimension measures or whether the parent DIMENSION is still associative, so what the '80' value refers to (wall, opening, furniture, grid) is unknown. Only a max-30 entity sample is given, though here entity_count matches the sample so truncation risk is nil."
+    }
+  },
+  {
+    "unit_id": "defannot-d336-42",
+    "def": "*D336",
+    "role": "치수캐시",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "Anonymous *D dimension-cache block: DIM-layer extension/dimension lines + _ArchTick arrows + MTEXT '2500' + DEFPOINTS points; no wall geometry.",
+    "rationale": {
+      "evidence": "All linework sits on layer DIM and the three POINT entities sit on DEFPOINTS, the layer AutoCAD reserves for dimension definition points. Extension lines 8CD7/8CD8 and dimension line 8CD9 form a standard vertical ext lines, horizontal dim line layout, terminated by two _ArchTick INSERTs, with a single MTEXT '2500' as the measurement text. The block name '*D336' is an anonymous *D-prefixed name, which AutoCAD generates only for associative-dimension geometry caches; single continuous dim line spans the 2500-unit measurement.",
+      "rule": "An anonymous *D### block whose contents are exclusively DIM-layer lines, arrowhead inserts (_ArchTick), one numeric MTEXT, and DEFPOINTS points is the internal geometry cache of a DIMENSION entity, not drawn model content. This signature transfers to any DWG regardless of discipline or scale.",
+      "counterfactual": "If the block contained geometry on wall/architectural layers (e.g. WALL, A-WALL), closed parallel line pairs at wall-thickness offsets, hatches, or a non-numeric name, the judgment would flip toward 평면 부분도 or 기타. Absence of the DEFPOINTS points or of the *D name pattern would also weaken the 치수캐시 call.",
+      "uncertainty": "The projection cannot show which model entity this dimension measures or whether the parent DIMENSION is still associative, so what the '2500' value refers to (wall, opening, furniture, grid) is unknown. Only a max-30 entity sample is given, though here entity_count matches the sample so truncation risk is nil."
+    }
+  },
+  {
+    "unit_id": "defannot-d337-43",
+    "def": "*D337",
+    "role": "치수캐시",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "Anonymous *D dimension-cache block: DIM-layer extension/dimension lines + _ArchTick arrows + MTEXT '135' + DEFPOINTS points; no wall geometry.",
+    "rationale": {
+      "evidence": "All linework sits on layer DIM and the three POINT entities sit on DEFPOINTS, the layer AutoCAD reserves for dimension definition points. Extension lines 8CE0/8CE1 and dimension line 8CE4 form a standard vertical ext lines, horizontal dim line layout, terminated by two _ArchTick INSERTs, with a single MTEXT '135' as the measurement text. The block name '*D337' is an anonymous *D-prefixed name, which AutoCAD generates only for associative-dimension geometry caches; outside-extension stubs 8CE2/8CE3 mark a tight 135-unit gap.",
+      "rule": "An anonymous *D### block whose contents are exclusively DIM-layer lines, arrowhead inserts (_ArchTick), one numeric MTEXT, and DEFPOINTS points is the internal geometry cache of a DIMENSION entity, not drawn model content. This signature transfers to any DWG regardless of discipline or scale.",
+      "counterfactual": "If the block contained geometry on wall/architectural layers (e.g. WALL, A-WALL), closed parallel line pairs at wall-thickness offsets, hatches, or a non-numeric name, the judgment would flip toward 평면 부분도 or 기타. Absence of the DEFPOINTS points or of the *D name pattern would also weaken the 치수캐시 call.",
+      "uncertainty": "The projection cannot show which model entity this dimension measures or whether the parent DIMENSION is still associative, so what the '135' value refers to (wall, opening, furniture, grid) is unknown. Only a max-30 entity sample is given, though here entity_count matches the sample so truncation risk is nil."
+    }
+  },
+  {
+    "unit_id": "defannot-d338-44",
+    "def": "*D338",
+    "role": "치수캐시",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "Anonymous *D dimension-cache block: DIM-layer extension/dimension lines + _ArchTick arrows + MTEXT '320' + DEFPOINTS points; no wall geometry.",
+    "rationale": {
+      "evidence": "All linework sits on layer DIM and the three POINT entities sit on DEFPOINTS, the layer AutoCAD reserves for dimension definition points. Extension lines 8CEB/8CEC and dimension line 8CEF form a standard vertical ext lines, horizontal dim line layout, terminated by two _ArchTick INSERTs, with a single MTEXT '320' as the measurement text. The block name '*D338' is an anonymous *D-prefixed name, which AutoCAD generates only for associative-dimension geometry caches; outside-extension stubs 8CED/8CEE flank the 320-unit gap.",
+      "rule": "An anonymous *D### block whose contents are exclusively DIM-layer lines, arrowhead inserts (_ArchTick), one numeric MTEXT, and DEFPOINTS points is the internal geometry cache of a DIMENSION entity, not drawn model content. This signature transfers to any DWG regardless of discipline or scale.",
+      "counterfactual": "If the block contained geometry on wall/architectural layers (e.g. WALL, A-WALL), closed parallel line pairs at wall-thickness offsets, hatches, or a non-numeric name, the judgment would flip toward 평면 부분도 or 기타. Absence of the DEFPOINTS points or of the *D name pattern would also weaken the 치수캐시 call.",
+      "uncertainty": "The projection cannot show which model entity this dimension measures or whether the parent DIMENSION is still associative, so what the '320' value refers to (wall, opening, furniture, grid) is unknown. Only a max-30 entity sample is given, though here entity_count matches the sample so truncation risk is nil."
+    }
+  },
+  {
+    "unit_id": "defannot-d339-45",
+    "def": "*D339",
+    "role": "치수캐시",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "Anonymous *D dimension-cache block: DIM-layer extension/dimension lines + _ArchTick arrows + MTEXT '6060' + DEFPOINTS points; no wall geometry.",
+    "rationale": {
+      "evidence": "All linework sits on layer DIM and the three POINT entities sit on DEFPOINTS, the layer AutoCAD reserves for dimension definition points. Extension lines 8CF6/8CF7 and dimension line 8CF8 form a standard vertical ext lines, horizontal dim line layout, terminated by two _ArchTick INSERTs, with a single MTEXT '6060' as the measurement text. The block name '*D339' is an anonymous *D-prefixed name, which AutoCAD generates only for associative-dimension geometry caches; long 6060-unit span with a single continuous dim line.",
+      "rule": "An anonymous *D### block whose contents are exclusively DIM-layer lines, arrowhead inserts (_ArchTick), one numeric MTEXT, and DEFPOINTS points is the internal geometry cache of a DIMENSION entity, not drawn model content. This signature transfers to any DWG regardless of discipline or scale.",
+      "counterfactual": "If the block contained geometry on wall/architectural layers (e.g. WALL, A-WALL), closed parallel line pairs at wall-thickness offsets, hatches, or a non-numeric name, the judgment would flip toward 평면 부분도 or 기타. Absence of the DEFPOINTS points or of the *D name pattern would also weaken the 치수캐시 call.",
+      "uncertainty": "The projection cannot show which model entity this dimension measures or whether the parent DIMENSION is still associative, so what the '6060' value refers to (wall, opening, furniture, grid) is unknown. Only a max-30 entity sample is given, though here entity_count matches the sample so truncation risk is nil."
+    }
+  },
+  {
+    "unit_id": "defannot-d340-46",
+    "def": "*D340",
+    "role": "치수캐시",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "Anonymous *D dimension-cache block: DIM-layer extension/dimension lines + _ArchTick arrows + MTEXT '150' + DEFPOINTS points; no wall geometry.",
+    "rationale": {
+      "evidence": "All linework sits on layer DIM and the three POINT entities sit on DEFPOINTS, the layer AutoCAD reserves for dimension definition points. Extension lines 8CFF/8D00 and dimension line 8D01 form a standard vertical ext lines, horizontal dim line layout, terminated by two _ArchTick INSERTs, with a single MTEXT '150' as the measurement text. The block name '*D340' is an anonymous *D-prefixed name, which AutoCAD generates only for associative-dimension geometry caches; 150-unit gap between the two extension lines.",
+      "rule": "An anonymous *D### block whose contents are exclusively DIM-layer lines, arrowhead inserts (_ArchTick), one numeric MTEXT, and DEFPOINTS points is the internal geometry cache of a DIMENSION entity, not drawn model content. This signature transfers to any DWG regardless of discipline or scale.",
+      "counterfactual": "If the block contained geometry on wall/architectural layers (e.g. WALL, A-WALL), closed parallel line pairs at wall-thickness offsets, hatches, or a non-numeric name, the judgment would flip toward 평면 부분도 or 기타. Absence of the DEFPOINTS points or of the *D name pattern would also weaken the 치수캐시 call.",
+      "uncertainty": "The projection cannot show which model entity this dimension measures or whether the parent DIMENSION is still associative, so what the '150' value refers to (wall, opening, furniture, grid) is unknown. Only a max-30 entity sample is given, though here entity_count matches the sample so truncation risk is nil."
+    }
+  },
+  {
+    "unit_id": "defannot-d341-47",
+    "def": "*D341",
+    "role": "치수캐시",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "Anonymous *D dimension-cache block: DIM-layer extension/dimension lines + _ArchTick arrows + MTEXT '150' + DEFPOINTS points; no wall geometry.",
+    "rationale": {
+      "evidence": "All linework sits on layer DIM and the three POINT entities sit on DEFPOINTS, the layer AutoCAD reserves for dimension definition points. Extension lines 8D08/8D09 and dimension line 8D0A form a standard vertical ext lines, horizontal dim line layout, terminated by two _ArchTick INSERTs, with a single MTEXT '150' as the measurement text. The block name '*D341' is an anonymous *D-prefixed name, which AutoCAD generates only for associative-dimension geometry caches; 150-unit gap; geometry mirrors the adjacent *D340 cell.",
+      "rule": "An anonymous *D### block whose contents are exclusively DIM-layer lines, arrowhead inserts (_ArchTick), one numeric MTEXT, and DEFPOINTS points is the internal geometry cache of a DIMENSION entity, not drawn model content. This signature transfers to any DWG regardless of discipline or scale.",
+      "counterfactual": "If the block contained geometry on wall/architectural layers (e.g. WALL, A-WALL), closed parallel line pairs at wall-thickness offsets, hatches, or a non-numeric name, the judgment would flip toward 평면 부분도 or 기타. Absence of the DEFPOINTS points or of the *D name pattern would also weaken the 치수캐시 call.",
+      "uncertainty": "The projection cannot show which model entity this dimension measures or whether the parent DIMENSION is still associative, so what the '150' value refers to (wall, opening, furniture, grid) is unknown. Only a max-30 entity sample is given, though here entity_count matches the sample so truncation risk is nil."
+    }
+  },
+  {
+    "unit_id": "defannot-d342-48",
+    "def": "*D342",
+    "role": "치수캐시",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "Anonymous *D dimension-cache block: DIM-layer extension/dimension lines + _ArchTick arrows + MTEXT '1700' + DEFPOINTS points; no wall geometry.",
+    "rationale": {
+      "evidence": "All linework sits on layer DIM and the three POINT entities sit on DEFPOINTS, the layer AutoCAD reserves for dimension definition points. Extension lines 8D11/8D12 and dimension line 8D13 form a standard vertical ext lines, horizontal dim line layout, terminated by two _ArchTick INSERTs, with a single MTEXT '1700' as the measurement text. The block name '*D342' is an anonymous *D-prefixed name, which AutoCAD generates only for associative-dimension geometry caches; 1700-unit span in the same 37200-38180 dimension band as its neighbors.",
+      "rule": "An anonymous *D### block whose contents are exclusively DIM-layer lines, arrowhead inserts (_ArchTick), one numeric MTEXT, and DEFPOINTS points is the internal geometry cache of a DIMENSION entity, not drawn model content. This signature transfers to any DWG regardless of discipline or scale.",
+      "counterfactual": "If the block contained geometry on wall/architectural layers (e.g. WALL, A-WALL), closed parallel line pairs at wall-thickness offsets, hatches, or a non-numeric name, the judgment would flip toward 평면 부분도 or 기타. Absence of the DEFPOINTS points or of the *D name pattern would also weaken the 치수캐시 call.",
+      "uncertainty": "The projection cannot show which model entity this dimension measures or whether the parent DIMENSION is still associative, so what the '1700' value refers to (wall, opening, furniture, grid) is unknown. Only a max-30 entity sample is given, though here entity_count matches the sample so truncation risk is nil."
+    }
+  },
+  {
+    "unit_id": "defannot-d343-49",
+    "def": "*D343",
+    "role": "치수캐시",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "Anonymous *D dimension-cache block: DIM-layer extension/dimension lines + _ArchTick arrows + MTEXT '130' + DEFPOINTS points; no wall geometry.",
+    "rationale": {
+      "evidence": "All linework sits on layer DIM and the three POINT entities sit on DEFPOINTS, the layer AutoCAD reserves for dimension definition points. Extension lines 8D1A/8D1B and dimension line 8D1C form a standard vertical ext lines, horizontal dim line layout, terminated by two _ArchTick INSERTs, with a single MTEXT '130' as the measurement text. The block name '*D343' is an anonymous *D-prefixed name, which AutoCAD generates only for associative-dimension geometry caches; 130-unit gap between extension lines.",
+      "rule": "An anonymous *D### block whose contents are exclusively DIM-layer lines, arrowhead inserts (_ArchTick), one numeric MTEXT, and DEFPOINTS points is the internal geometry cache of a DIMENSION entity, not drawn model content. This signature transfers to any DWG regardless of discipline or scale.",
+      "counterfactual": "If the block contained geometry on wall/architectural layers (e.g. WALL, A-WALL), closed parallel line pairs at wall-thickness offsets, hatches, or a non-numeric name, the judgment would flip toward 평면 부분도 or 기타. Absence of the DEFPOINTS points or of the *D name pattern would also weaken the 치수캐시 call.",
+      "uncertainty": "The projection cannot show which model entity this dimension measures or whether the parent DIMENSION is still associative, so what the '130' value refers to (wall, opening, furniture, grid) is unknown. Only a max-30 entity sample is given, though here entity_count matches the sample so truncation risk is nil."
+    }
+  },
+  {
+    "unit_id": "defannot-d344-50",
+    "def": "*D344",
+    "role": "치수캐시",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "Anonymous *D dimension-cache block: DIM-layer extension/dimension lines + _ArchTick arrows + MTEXT '130' + DEFPOINTS points; no wall geometry.",
+    "rationale": {
+      "evidence": "All linework sits on layer DIM and the three POINT entities sit on DEFPOINTS, the layer AutoCAD reserves for dimension definition points. Extension lines 8D23/8D24 and dimension line 8D25 form a standard vertical ext lines, horizontal dim line layout, terminated by two _ArchTick INSERTs, with a single MTEXT '130' as the measurement text. The block name '*D344' is an anonymous *D-prefixed name, which AutoCAD generates only for associative-dimension geometry caches; 130-unit gap; twin of the neighboring *D343 cell.",
+      "rule": "An anonymous *D### block whose contents are exclusively DIM-layer lines, arrowhead inserts (_ArchTick), one numeric MTEXT, and DEFPOINTS points is the internal geometry cache of a DIMENSION entity, not drawn model content. This signature transfers to any DWG regardless of discipline or scale.",
+      "counterfactual": "If the block contained geometry on wall/architectural layers (e.g. WALL, A-WALL), closed parallel line pairs at wall-thickness offsets, hatches, or a non-numeric name, the judgment would flip toward 평면 부분도 or 기타. Absence of the DEFPOINTS points or of the *D name pattern would also weaken the 치수캐시 call.",
+      "uncertainty": "The projection cannot show which model entity this dimension measures or whether the parent DIMENSION is still associative, so what the '130' value refers to (wall, opening, furniture, grid) is unknown. Only a max-30 entity sample is given, though here entity_count matches the sample so truncation risk is nil."
+    }
+  },
+  {
+    "unit_id": "defannot-d345-51",
+    "def": "*D345",
+    "role": "치수캐시",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "Anonymous *D dimension-cache block: DIM-layer extension/dimension lines + _ArchTick arrows + MTEXT '1500' + DEFPOINTS points; no wall geometry.",
+    "rationale": {
+      "evidence": "All linework sits on layer DIM and the three POINT entities sit on DEFPOINTS, the layer AutoCAD reserves for dimension definition points. Extension lines 8D2C/8D2D and dimension line 8D2E form a standard vertical ext lines, horizontal dim line layout, terminated by two _ArchTick INSERTs, with a single MTEXT '1500' as the measurement text. The block name '*D345' is an anonymous *D-prefixed name, which AutoCAD generates only for associative-dimension geometry caches; 1500-unit span closing out the horizontal dimension chain.",
+      "rule": "An anonymous *D### block whose contents are exclusively DIM-layer lines, arrowhead inserts (_ArchTick), one numeric MTEXT, and DEFPOINTS points is the internal geometry cache of a DIMENSION entity, not drawn model content. This signature transfers to any DWG regardless of discipline or scale.",
+      "counterfactual": "If the block contained geometry on wall/architectural layers (e.g. WALL, A-WALL), closed parallel line pairs at wall-thickness offsets, hatches, or a non-numeric name, the judgment would flip toward 평면 부분도 or 기타. Absence of the DEFPOINTS points or of the *D name pattern would also weaken the 치수캐시 call.",
+      "uncertainty": "The projection cannot show which model entity this dimension measures or whether the parent DIMENSION is still associative, so what the '1500' value refers to (wall, opening, furniture, grid) is unknown. Only a max-30 entity sample is given, though here entity_count matches the sample so truncation risk is nil."
+    }
+  },
+  {
+    "unit_id": "defannot-d346-52",
+    "def": "*D346",
+    "role": "치수캐시",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "Anonymous *D dimension-cache block: DIM-layer extension/dimension lines + _ArchTick arrows + MTEXT '210' + DEFPOINTS points; no wall geometry.",
+    "rationale": {
+      "evidence": "All linework sits on layer DIM and the three POINT entities sit on DEFPOINTS, the layer AutoCAD reserves for dimension definition points. Extension lines 8D35/8D36 and dimension line 8D39 form a standard vertical ext lines, horizontal dim line layout, terminated by two _ArchTick INSERTs, with a single MTEXT '210' as the measurement text. The block name '*D346' is an anonymous *D-prefixed name, which AutoCAD generates only for associative-dimension geometry caches; outside-extension stubs 8D37/8D38 flank the 210-unit gap.",
+      "rule": "An anonymous *D### block whose contents are exclusively DIM-layer lines, arrowhead inserts (_ArchTick), one numeric MTEXT, and DEFPOINTS points is the internal geometry cache of a DIMENSION entity, not drawn model content. This signature transfers to any DWG regardless of discipline or scale.",
+      "counterfactual": "If the block contained geometry on wall/architectural layers (e.g. WALL, A-WALL), closed parallel line pairs at wall-thickness offsets, hatches, or a non-numeric name, the judgment would flip toward 평면 부분도 or 기타. Absence of the DEFPOINTS points or of the *D name pattern would also weaken the 치수캐시 call.",
+      "uncertainty": "The projection cannot show which model entity this dimension measures or whether the parent DIMENSION is still associative, so what the '210' value refers to (wall, opening, furniture, grid) is unknown. Only a max-30 entity sample is given, though here entity_count matches the sample so truncation risk is nil."
+    }
+  },
+  {
+    "unit_id": "defannot-d347-53",
+    "def": "*D347",
+    "role": "치수캐시",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "Anonymous *D dimension-cache block: DIM-layer extension/dimension lines + DIMDOT arrows + MTEXT '1735' + DEFPOINTS points; no wall geometry.",
+    "rationale": {
+      "evidence": "All linework sits on layer DIM and the three POINT entities sit on DEFPOINTS, the layer AutoCAD reserves for dimension definition points. Extension lines 8D40/8D41 and dimension line 8D42 form a standard horizontal ext lines, vertical dim line layout, terminated by two DIMDOT INSERTs, with a single MTEXT '1735' as the measurement text. The block name '*D347' is an anonymous *D-prefixed name, which AutoCAD generates only for associative-dimension geometry caches; vertical dim line 8D42 measures a 1735-unit height between two horizontal extension lines.",
+      "rule": "An anonymous *D### block whose contents are exclusively DIM-layer lines, arrowhead inserts (DIMDOT), one numeric MTEXT, and DEFPOINTS points is the internal geometry cache of a DIMENSION entity, not drawn model content. This signature transfers to any DWG regardless of discipline or scale.",
+      "counterfactual": "If the block contained geometry on wall/architectural layers (e.g. WALL, A-WALL), closed parallel line pairs at wall-thickness offsets, hatches, or a non-numeric name, the judgment would flip toward 평면 부분도 or 기타. Absence of the DEFPOINTS points or of the *D name pattern would also weaken the 치수캐시 call.",
+      "uncertainty": "The projection cannot show which model entity this dimension measures or whether the parent DIMENSION is still associative, so what the '1735' value refers to (wall, opening, furniture, grid) is unknown. Only a max-30 entity sample is given, though here entity_count matches the sample so truncation risk is nil."
+    }
+  },
+  {
+    "unit_id": "defannot-d348-54",
+    "def": "*D348",
+    "role": "치수캐시",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "Anonymous *D dimension-cache block: DIM-layer extension/dimension lines + _ArchTick arrows + MTEXT '375' + DEFPOINTS points; no wall geometry.",
+    "rationale": {
+      "evidence": "All linework sits on layer DIM and the three POINT entities sit on DEFPOINTS, the layer AutoCAD reserves for dimension definition points. Extension lines 8D49/8D4A and dimension line 8D4B form a standard horizontal ext lines, vertical dim line layout, terminated by two _ArchTick INSERTs, with a single MTEXT '375' as the measurement text. The block name '*D348' is an anonymous *D-prefixed name, which AutoCAD generates only for associative-dimension geometry caches; vertical dim line 8D4B measures a 375-unit height.",
+      "rule": "An anonymous *D### block whose contents are exclusively DIM-layer lines, arrowhead inserts (_ArchTick), one numeric MTEXT, and DEFPOINTS points is the internal geometry cache of a DIMENSION entity, not drawn model content. This signature transfers to any DWG regardless of discipline or scale.",
+      "counterfactual": "If the block contained geometry on wall/architectural layers (e.g. WALL, A-WALL), closed parallel line pairs at wall-thickness offsets, hatches, or a non-numeric name, the judgment would flip toward 평면 부분도 or 기타. Absence of the DEFPOINTS points or of the *D name pattern would also weaken the 치수캐시 call.",
+      "uncertainty": "The projection cannot show which model entity this dimension measures or whether the parent DIMENSION is still associative, so what the '375' value refers to (wall, opening, furniture, grid) is unknown. Only a max-30 entity sample is given, though here entity_count matches the sample so truncation risk is nil."
+    }
+  },
+  {
+    "unit_id": "defannot-d349-55",
+    "def": "*D349",
+    "role": "치수캐시",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "Anonymous *D dimension-cache block: DIM-layer extension/dimension lines + DIMDOT arrows + MTEXT '5470' + DEFPOINTS points; no wall geometry.",
+    "rationale": {
+      "evidence": "All linework sits on layer DIM and the three POINT entities sit on DEFPOINTS, the layer AutoCAD reserves for dimension definition points. Extension lines 8D52/8D53 and dimension line 8D54 form a standard vertical ext lines, horizontal dim line layout, terminated by two DIMDOT INSERTs, with a single MTEXT '5470' as the measurement text. The block name '*D349' is an anonymous *D-prefixed name, which AutoCAD generates only for associative-dimension geometry caches; 5470-unit horizontal span with DIMDOT terminators instead of arch ticks.",
+      "rule": "An anonymous *D### block whose contents are exclusively DIM-layer lines, arrowhead inserts (DIMDOT), one numeric MTEXT, and DEFPOINTS points is the internal geometry cache of a DIMENSION entity, not drawn model content. This signature transfers to any DWG regardless of discipline or scale.",
+      "counterfactual": "If the block contained geometry on wall/architectural layers (e.g. WALL, A-WALL), closed parallel line pairs at wall-thickness offsets, hatches, or a non-numeric name, the judgment would flip toward 평면 부분도 or 기타. Absence of the DEFPOINTS points or of the *D name pattern would also weaken the 치수캐시 call.",
+      "uncertainty": "The projection cannot show which model entity this dimension measures or whether the parent DIMENSION is still associative, so what the '5470' value refers to (wall, opening, furniture, grid) is unknown. Only a max-30 entity sample is given, though here entity_count matches the sample so truncation risk is nil."
+    }
+  },
+  {
+    "unit_id": "defannot-d350-56",
+    "def": "*D350",
+    "role": "치수캐시",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "Anonymous *D dimension-cache block: DIM-layer extension/dimension lines + DIMDOT arrows + MTEXT '1645' + DEFPOINTS points; no wall geometry.",
+    "rationale": {
+      "evidence": "All linework sits on layer DIM and the three POINT entities sit on DEFPOINTS, the layer AutoCAD reserves for dimension definition points. Extension lines 8D5B/8D5C and dimension line 8D5D form a standard vertical ext lines, horizontal dim line layout, terminated by two DIMDOT INSERTs, with a single MTEXT '1645' as the measurement text. The block name '*D350' is an anonymous *D-prefixed name, which AutoCAD generates only for associative-dimension geometry caches; 1645-unit span continuing the DIMDOT chain from *D349.",
+      "rule": "An anonymous *D### block whose contents are exclusively DIM-layer lines, arrowhead inserts (DIMDOT), one numeric MTEXT, and DEFPOINTS points is the internal geometry cache of a DIMENSION entity, not drawn model content. This signature transfers to any DWG regardless of discipline or scale.",
+      "counterfactual": "If the block contained geometry on wall/architectural layers (e.g. WALL, A-WALL), closed parallel line pairs at wall-thickness offsets, hatches, or a non-numeric name, the judgment would flip toward 평면 부분도 or 기타. Absence of the DEFPOINTS points or of the *D name pattern would also weaken the 치수캐시 call.",
+      "uncertainty": "The projection cannot show which model entity this dimension measures or whether the parent DIMENSION is still associative, so what the '1645' value refers to (wall, opening, furniture, grid) is unknown. Only a max-30 entity sample is given, though here entity_count matches the sample so truncation risk is nil."
+    }
+  },
+  {
+    "unit_id": "defannot-d351-57",
+    "def": "*D351",
+    "role": "치수캐시",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "Anonymous *D dimension-cache block: DIM-layer extension/dimension lines + DIMDOT arrows + MTEXT '1165' + DEFPOINTS points; no wall geometry.",
+    "rationale": {
+      "evidence": "All linework sits on layer DIM and the three POINT entities sit on DEFPOINTS, the layer AutoCAD reserves for dimension definition points. Extension lines 8D64/8D65 and dimension line 8D66 form a standard vertical ext lines, horizontal dim line layout, terminated by two DIMDOT INSERTs, with a single MTEXT '1165' as the measurement text. The block name '*D351' is an anonymous *D-prefixed name, which AutoCAD generates only for associative-dimension geometry caches; 1165-unit span ending the DIMDOT chain at x=57278.",
+      "rule": "An anonymous *D### block whose contents are exclusively DIM-layer lines, arrowhead inserts (DIMDOT), one numeric MTEXT, and DEFPOINTS points is the internal geometry cache of a DIMENSION entity, not drawn model content. This signature transfers to any DWG regardless of discipline or scale.",
+      "counterfactual": "If the block contained geometry on wall/architectural layers (e.g. WALL, A-WALL), closed parallel line pairs at wall-thickness offsets, hatches, or a non-numeric name, the judgment would flip toward 평면 부분도 or 기타. Absence of the DEFPOINTS points or of the *D name pattern would also weaken the 치수캐시 call.",
+      "uncertainty": "The projection cannot show which model entity this dimension measures or whether the parent DIMENSION is still associative, so what the '1165' value refers to (wall, opening, furniture, grid) is unknown. Only a max-30 entity sample is given, though here entity_count matches the sample so truncation risk is nil."
+    }
+  },
+  {
+    "unit_id": "defannot-d352-58",
+    "def": "*D352",
+    "role": "치수캐시",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "Anonymous *D dimension-cache block: DIM-layer extension/dimension lines + DIMDOT arrows + MTEXT '630' + DEFPOINTS points; no wall geometry.",
+    "rationale": {
+      "evidence": "All linework sits on layer DIM and the three POINT entities sit on DEFPOINTS, the layer AutoCAD reserves for dimension definition points. Extension lines 8D6D/8D6E and dimension line 8D6F form a standard horizontal ext lines, vertical dim line layout, terminated by two DIMDOT INSERTs, with a single MTEXT '630' as the measurement text. The block name '*D352' is an anonymous *D-prefixed name, which AutoCAD generates only for associative-dimension geometry caches; vertical dim line 8D6F measures a 630-unit height.",
+      "rule": "An anonymous *D### block whose contents are exclusively DIM-layer lines, arrowhead inserts (DIMDOT), one numeric MTEXT, and DEFPOINTS points is the internal geometry cache of a DIMENSION entity, not drawn model content. This signature transfers to any DWG regardless of discipline or scale.",
+      "counterfactual": "If the block contained geometry on wall/architectural layers (e.g. WALL, A-WALL), closed parallel line pairs at wall-thickness offsets, hatches, or a non-numeric name, the judgment would flip toward 평면 부분도 or 기타. Absence of the DEFPOINTS points or of the *D name pattern would also weaken the 치수캐시 call.",
+      "uncertainty": "The projection cannot show which model entity this dimension measures or whether the parent DIMENSION is still associative, so what the '630' value refers to (wall, opening, furniture, grid) is unknown. Only a max-30 entity sample is given, though here entity_count matches the sample so truncation risk is nil."
+    }
+  },
+  {
+    "unit_id": "defannot-d353-59",
+    "def": "*D353",
+    "role": "치수캐시",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "Anonymous *D dimension-cache block: DIM-layer extension/dimension lines + DIMDOT arrows + MTEXT '2640' + DEFPOINTS points; no wall geometry.",
+    "rationale": {
+      "evidence": "All linework sits on layer DIM and the three POINT entities sit on DEFPOINTS, the layer AutoCAD reserves for dimension definition points. Extension lines 8D76/8D77 and dimension line 8D78 form a standard horizontal ext lines, vertical dim line layout, terminated by two DIMDOT INSERTs, with a single MTEXT '2640' as the measurement text. The block name '*D353' is an anonymous *D-prefixed name, which AutoCAD generates only for associative-dimension geometry caches; vertical dim line 8D78 measures a 2640-unit height, stacked below *D352.",
+      "rule": "An anonymous *D### block whose contents are exclusively DIM-layer lines, arrowhead inserts (DIMDOT), one numeric MTEXT, and DEFPOINTS points is the internal geometry cache of a DIMENSION entity, not drawn model content. This signature transfers to any DWG regardless of discipline or scale.",
+      "counterfactual": "If the block contained geometry on wall/architectural layers (e.g. WALL, A-WALL), closed parallel line pairs at wall-thickness offsets, hatches, or a non-numeric name, the judgment would flip toward 평면 부분도 or 기타. Absence of the DEFPOINTS points or of the *D name pattern would also weaken the 치수캐시 call.",
+      "uncertainty": "The projection cannot show which model entity this dimension measures or whether the parent DIMENSION is still associative, so what the '2640' value refers to (wall, opening, furniture, grid) is unknown. Only a max-30 entity sample is given, though here entity_count matches the sample so truncation risk is nil."
+    }
+  },
+  {
+    "unit_id": "defannot-d354-60",
+    "def": "*D354",
+    "role": "치수캐시",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "Anonymous *D dimension-cache block: DIM-layer extension/dimension lines + DIMDOT arrows + MTEXT '3905' + DEFPOINTS points; no wall geometry.",
+    "rationale": {
+      "evidence": "All linework sits on layer DIM and the three POINT entities sit on DEFPOINTS, the layer AutoCAD reserves for dimension definition points. Extension lines 8D7F/8D80 and dimension line 8D81 form a standard horizontal ext lines, vertical dim line layout, terminated by two DIMDOT INSERTs, with a single MTEXT '3905' as the measurement text. The block name '*D354' is an anonymous *D-prefixed name, which AutoCAD generates only for associative-dimension geometry caches; vertical dim line 8D81 measures a 3905-unit height, bottom cell of the vertical chain.",
+      "rule": "An anonymous *D### block whose contents are exclusively DIM-layer lines, arrowhead inserts (DIMDOT), one numeric MTEXT, and DEFPOINTS points is the internal geometry cache of a DIMENSION entity, not drawn model content. This signature transfers to any DWG regardless of discipline or scale.",
+      "counterfactual": "If the block contained geometry on wall/architectural layers (e.g. WALL, A-WALL), closed parallel line pairs at wall-thickness offsets, hatches, or a non-numeric name, the judgment would flip toward 평면 부분도 or 기타. Absence of the DEFPOINTS points or of the *D name pattern would also weaken the 치수캐시 call.",
+      "uncertainty": "The projection cannot show which model entity this dimension measures or whether the parent DIMENSION is still associative, so what the '3905' value refers to (wall, opening, furniture, grid) is unknown. Only a max-30 entity sample is given, though here entity_count matches the sample so truncation risk is nil."
+    }
+  }
+]

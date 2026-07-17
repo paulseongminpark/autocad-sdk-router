@@ -1,0 +1,282 @@
+[
+ {
+  "unit_id": "defannot-d355-61",
+  "def": "*D355",
+  "role": "치수캐시",
+  "wall_likelihood": 0.0,
+  "wall_line_handles": [],
+  "notes": "10400 길이를 표시하는 선형 치수 캐시 블록이다.",
+  "rationale": {
+   "evidence": "모든 선이 DIM 레이어에 있고, 8D88~8D8A는 두 보조선과 하나의 치수선 형태를 이룬다. DIMDOT 삽입 2개, 치수문자 10400, DEFPOINTS 점 3개가 전형적인 연관 치수 구성이다.",
+   "rule": "DIM 레이어의 보조선·치수선과 양단 마커, 측정값 문자, DEFPOINTS가 함께 있으면 벽체가 아니라 치수 캐시로 판정한다.",
+   "counterfactual": "치수 마커와 측정 문자가 없고 건축 레이어의 평행선이 공간 경계를 이루었다면 평면 부분도 또는 벽선으로 판단했을 것이다.",
+   "uncertainty": "투영에는 블록 참조 맥락이 없어 이 치수가 실제로 어떤 객체를 측정하는지는 알 수 없다."
+  }
+ },
+ {
+  "unit_id": "defannot-d356-62",
+  "def": "*D356",
+  "role": "치수캐시",
+  "wall_likelihood": 0.0,
+  "wall_line_handles": [],
+  "notes": "1700 길이를 표시하는 선형 치수 캐시 블록이다.",
+  "rationale": {
+   "evidence": "8D91~8D93이 모두 DIM 레이어에 있으며 수평 보조선 두 개와 수직 치수선 하나를 구성한다. DIMDOT 2개와 MTEXT 값 1700, DEFPOINTS 3개가 치수 객체의 캐시 패턴을 완성한다.",
+   "rule": "치수 전용 레이어에서 선, 양단 표식, 숫자 문자와 정의점이 묶이면 선 자체의 형상과 무관하게 치수 캐시로 본다.",
+   "counterfactual": "숫자와 DIMDOT가 없고 동일 간격의 선들이 실제 건물 외곽이나 실 경계를 연결했다면 벽 가능성이 높아진다.",
+   "uncertainty": "원본 연관 치수나 참조 대상은 이 블록 정의만으로 확인할 수 없다."
+  }
+ },
+ {
+  "unit_id": "defannot-d357-63",
+  "def": "*D357",
+  "role": "치수캐시",
+  "wall_likelihood": 0.0,
+  "wall_line_handles": [],
+  "notes": "865 길이의 선형 치수를 보존한 캐시 블록이다.",
+  "rationale": {
+   "evidence": "DIM 레이어의 8D9A~8D9C는 두 연장선과 그 사이 치수선 배치이다. DIMDOT 삽입 두 개, MTEXT 865, DEFPOINTS 세 개가 포함되어 독립 건축 형상이 아닌 치수 표현임을 보여준다.",
+   "rule": "연장선과 치수선에 양단 표식 및 측정값이 결합된 익명 블록은 치수 캐시로 분류한다.",
+   "counterfactual": "치수 구성요소가 사라지고 선들이 다른 평면 객체와 접속해 폐합 경계를 만들었다면 평면 부분도로 재분류할 수 있다.",
+   "uncertainty": "치수 스타일과 실제 측정 대상의 종류는 제공된 엔티티 투영만으로 알 수 없다."
+  }
+ },
+ {
+  "unit_id": "defannot-d358-64",
+  "def": "*D358",
+  "role": "치수캐시",
+  "wall_likelihood": 0.0,
+  "wall_line_handles": [],
+  "notes": "건축 눈금 표식으로 2300을 나타내는 치수 캐시이다.",
+  "rationale": {
+   "evidence": "8DA3~8DA5는 DIM 레이어의 연장선과 치수선이고, 양단에 _ArchTick 삽입이 있다. MTEXT 값 2300과 DEFPOINTS 세 개도 포함되어 건축식 선형 치수의 전형적인 내부 구성이다.",
+   "rule": "DIM 레이어 선들과 _ArchTick 같은 치수 종단 표식, 측정값, 정의점의 조합은 치수 캐시로 판단한다.",
+   "counterfactual": "눈금 표식과 측정값이 없고 선들이 벽 레이어에서 연속적인 이중 경계를 만들었다면 벽선 후보가 된다.",
+   "uncertainty": "이 투영만으로는 2300이 측정하는 실제 요소나 치수의 배치 위치를 확정할 수 없다."
+  }
+ },
+ {
+  "unit_id": "defannot-d359-65",
+  "def": "*D359",
+  "role": "치수캐시",
+  "wall_likelihood": 0.0,
+  "wall_line_handles": [],
+  "notes": "150 간격을 나타내는 건축식 선형 치수 캐시이다.",
+  "rationale": {
+   "evidence": "DIM 레이어의 8DAC~8DAE가 짧은 간격의 연장선 두 개와 치수선 하나를 형성한다. _ArchTick 두 개, MTEXT 150, DEFPOINTS 세 개가 있어 치수 객체임이 명확하다.",
+   "rule": "간격이 벽 두께와 비슷하더라도 치수 레이어, 양단 표식, 숫자 및 정의점이 함께 있으면 치수 그래픽으로 본다.",
+   "counterfactual": "치수 문자와 _ArchTick가 없고 두 수평선이 벽체 레이어에서 평면 전체로 이어졌다면 벽 가능성이 크게 상승한다.",
+   "uncertainty": "표시값 150이 벽 두께인지 다른 부재 간격인지는 이 정의만으로 판단할 수 없다."
+  }
+ },
+ {
+  "unit_id": "defannot-d360-66",
+  "def": "*D360",
+  "role": "치수캐시",
+  "wall_likelihood": 0.0,
+  "wall_line_handles": [],
+  "notes": "150 간격의 연속 치수 구간을 표현하는 캐시이다.",
+  "rationale": {
+   "evidence": "8DB5~8DB7은 모두 DIM 레이어에 있으며 두 보조선과 하나의 치수선을 이룬다. _ArchTick 양단 표식, MTEXT 150 및 DEFPOINTS 세 개가 치수 캐시 패턴과 일치한다.",
+   "rule": "측정값을 가진 DIM 레이어 선 묶음에 치수 종단 블록과 정의점이 있으면 실제 모델 선이 아니라 치수 캐시로 분류한다.",
+   "counterfactual": "이 구성요소들이 없고 선들이 건축 레이어에서 문이나 코너와 접합했다면 평면 벽체의 일부일 수 있다.",
+   "uncertainty": "인접 치수와의 연속 관계 및 측정 대상은 블록 정의 투영만으로 확인되지 않는다."
+  }
+ },
+ {
+  "unit_id": "defannot-d361-67",
+  "def": "*D361",
+  "role": "치수캐시",
+  "wall_likelihood": 0.0,
+  "wall_line_handles": [],
+  "notes": "3600 길이를 표시하는 건축식 치수 캐시 블록이다.",
+  "rationale": {
+   "evidence": "DIM 레이어의 8DBE~8DC0은 두 수평 연장선과 긴 수직 치수선으로 배치되어 있다. _ArchTick 두 개와 MTEXT 3600, DEFPOINTS 세 개가 함께 있어 선형 치수의 캐시임을 나타낸다.",
+   "rule": "보조선과 치수선, 양단 눈금, 측정 문자 및 정의점이 하나의 익명 정의에 모이면 치수 캐시로 본다.",
+   "counterfactual": "눈금과 숫자가 없고 긴 선들이 다른 건축선과 연결되어 공간을 분할했다면 벽 또는 평면 부분도 가능성을 고려한다.",
+   "uncertainty": "3600이 방 폭, 개구부 또는 다른 객체 중 무엇을 재는지는 주어진 정보로 알 수 없다."
+  }
+ },
+ {
+  "unit_id": "defannot-d362-68",
+  "def": "*D362",
+  "role": "치수캐시",
+  "wall_likelihood": 0.0,
+  "wall_line_handles": [],
+  "notes": "155 간격을 양방향 연장선과 함께 표시하는 치수 캐시이다.",
+  "rationale": {
+   "evidence": "8DC7~8DCB는 전부 DIM 레이어이며 연장된 수평 보조선들과 분절된 수직 치수선으로 구성된다. _ArchTick 두 개, MTEXT 155, DEFPOINTS 세 개가 명시적인 치수 구조를 이룬다.",
+   "rule": "여러 선분으로 분할되었더라도 DIM 레이어에서 종단 표식과 숫자, 정의점을 공유하면 치수 캐시로 판정한다.",
+   "counterfactual": "155 간격의 평행선이 벽 레이어에 있고 치수 표식 없이 주변 벽 코너로 이어졌다면 벽 두께 표현으로 볼 수 있다.",
+   "uncertainty": "분절선의 표시 방식이 특정 치수 스타일에서 비롯되었는지는 투영만으로 확정할 수 없다."
+  }
+ },
+ {
+  "unit_id": "defannot-d363-69",
+  "def": "*D363",
+  "role": "치수캐시",
+  "wall_likelihood": 0.0,
+  "wall_line_handles": [],
+  "notes": "190 간격을 나타내는 건축식 선형 치수 캐시이다.",
+  "rationale": {
+   "evidence": "DIM 레이어의 8DD2~8DD6은 보조선과 분절된 수직 치수선을 구성한다. 양단 _ArchTick, MTEXT 190 및 DEFPOINTS 세 개가 있어 실제 벽 형상이 아니라 치수 그래픽이다.",
+   "rule": "치수 레이어의 선 집합에 일치하는 두 종단 표식과 측정 숫자, 정의점이 있으면 치수 캐시로 분류한다.",
+   "counterfactual": "치수 관련 삽입과 문자가 없고 190 폭의 평행선이 건축 평면 경계에 통합되어 있다면 벽체로 판단할 수 있다.",
+   "uncertainty": "190이 벽 두께를 측정하는 값인지 여부는 대상 객체가 없어 판별되지 않는다."
+  }
+ },
+ {
+  "unit_id": "defannot-d364-70",
+  "def": "*D364",
+  "role": "치수캐시",
+  "wall_likelihood": 0.0,
+  "wall_line_handles": [],
+  "notes": "215 수평 간격을 표시하는 점 표식형 치수 캐시이다.",
+  "rationale": {
+   "evidence": "8DDD~8DE1은 DIM 레이어의 두 수직 보조선과 분절된 수평 치수선이다. DIMDOT 두 개, MTEXT 215, DEFPOINTS 세 개가 결합되어 선형 치수 캐시의 구조를 보인다.",
+   "rule": "서로 직교하는 보조선과 치수선에 양단 DIMDOT 및 측정값이 있으면 벽선이 아니라 치수 표현이다.",
+   "counterfactual": "DIMDOT와 숫자가 빠지고 두 수직선이 다른 벽선과 접속해 연속적인 이중선을 만들었다면 벽 가능성이 생긴다.",
+   "uncertainty": "치수의 실제 방향과 참조 객체는 블록이 삽입된 상위 문맥 없이 완전히 검증할 수 없다."
+  }
+ },
+ {
+  "unit_id": "defannot-d365-71",
+  "def": "*D365",
+  "role": "치수캐시",
+  "wall_likelihood": 0.0,
+  "wall_line_handles": [],
+  "notes": "275 수직 간격을 표시하는 점 표식형 치수 캐시이다.",
+  "rationale": {
+   "evidence": "DIM 레이어의 8DE8~8DEC은 두 수평 보조선과 분할된 수직 치수선 형태이다. DIMDOT 두 개와 MTEXT 275, DEFPOINTS 세 개가 치수 캐시임을 직접 뒷받침한다.",
+   "rule": "DIM 레이어에서 보조선·치수선·양단 표식·측정값·정의점이 함께 나타나면 치수 캐시로 판정한다.",
+   "counterfactual": "치수 요소가 없고 275 간격의 선들이 건축 레이어에서 실이나 벽체 윤곽을 구성했다면 평면 부분도로 볼 수 있다.",
+   "uncertainty": "275라는 값이 어떤 부재의 폭 또는 간격인지 이 투영만으로는 알 수 없다."
+  }
+ },
+ {
+  "unit_id": "defannot-d366-72",
+  "def": "*D366",
+  "role": "치수캐시",
+  "wall_likelihood": 0.0,
+  "wall_line_handles": [],
+  "notes": "7175 길이를 표시하는 긴 선형 치수 캐시이다.",
+  "rationale": {
+   "evidence": "8DF3~8DF5는 DIM 레이어에서 두 수평 연장선과 긴 수직 치수선을 형성한다. DIMDOT 두 개, MTEXT 7175, DEFPOINTS 세 개가 전형적인 연관 치수 캐시 구성이다.",
+   "rule": "선의 길이가 크더라도 치수 전용 레이어와 종단점 표식, 측정 문자, 정의점이 있으면 벽이 아닌 치수 캐시로 본다.",
+   "counterfactual": "측정 문자와 DIMDOT가 없고 긴 평행선들이 건축 평면의 공간 경계로 연결되었다면 벽체 가능성을 고려한다.",
+   "uncertainty": "7175가 전체 공간 길이인지 부분 구간인지 상위 도면 문맥 없이는 판단할 수 없다."
+  }
+ },
+ {
+  "unit_id": "defannot-d367-73",
+  "def": "*D367",
+  "role": "치수캐시",
+  "wall_likelihood": 0.0,
+  "wall_line_handles": [],
+  "notes": "4750 수평 길이를 표시하는 선형 치수 캐시이다.",
+  "rationale": {
+   "evidence": "DIM 레이어의 8DFC와 8DFD는 수직 보조선이고 8DFE는 그 사이의 수평 치수선이다. 양단 DIMDOT, MTEXT 4750 및 DEFPOINTS 세 개가 치수 객체의 내부 그래픽임을 보여준다.",
+   "rule": "양쪽 보조선 사이에 종단 표식과 숫자를 가진 치수선이 있으면 해당 선 묶음은 치수 캐시로 분류한다.",
+   "counterfactual": "DIMDOT와 숫자가 사라지고 수직선들이 다른 건축선과 이어져 폐합된 경계를 만들었다면 평면 부분도 가능성이 높아진다.",
+   "uncertainty": "4750이 측정하는 구체적인 건축 요소는 블록 참조 주변을 보지 않고는 알 수 없다."
+  }
+ },
+ {
+  "unit_id": "defannot-d368-74",
+  "def": "*D368",
+  "role": "치수캐시",
+  "wall_likelihood": 0.0,
+  "wall_line_handles": [],
+  "notes": "10350 수평 길이를 나타내는 장거리 치수 캐시이다.",
+  "rationale": {
+   "evidence": "8E05와 8E06은 DIM 레이어의 긴 수직 보조선이고 8E07은 두 선 사이의 수평 치수선이다. DIMDOT 두 개, MTEXT 10350, DEFPOINTS 세 개가 명확한 치수 캐시 패턴이다.",
+   "rule": "DIM 레이어의 보조선과 치수선이 두 종단 마커, 측정값 및 정의점을 동반하면 치수 캐시로 판단한다.",
+   "counterfactual": "치수 마커와 문자가 없고 긴 선들이 벽 레이어에서 건물 윤곽을 직접 형성했다면 벽 또는 평면 부분도로 분류했을 것이다.",
+   "uncertainty": "큰 측정값이 건물 전체 폭인지 다른 기준선 간 거리인지는 이 정의로 확정할 수 없다."
+  }
+ },
+ {
+  "unit_id": "defannot-d369-75",
+  "def": "*D369",
+  "role": "치수캐시",
+  "wall_likelihood": 0.0,
+  "wall_line_handles": [],
+  "notes": "660 길이를 표시하는 점 표식형 선형 치수 캐시이다.",
+  "rationale": {
+   "evidence": "DIM 레이어의 8E0E~8E10은 두 수평 연장선과 하나의 수직 치수선을 구성한다. DIMDOT 두 개와 MTEXT 660, DEFPOINTS 세 개가 있어 독립적인 벽 형상이 아닌 치수 캐시이다.",
+   "rule": "치수 전용 레이어에서 선, 양단점 표식, 숫자 문자와 정의점이 한 블록에 모이면 치수 캐시로 본다.",
+   "counterfactual": "DIMDOT와 숫자가 없고 선들이 건축 레이어의 벽 코너나 개구부에 연속 접속했다면 평면 부분도 가능성이 있다.",
+   "uncertainty": "660이 개구부나 부재 중 무엇의 크기인지는 주변 모델 객체 없이 확인할 수 없다."
+  }
+ },
+ {
+  "unit_id": "defannot-d370-76",
+  "def": "*D370",
+  "role": "치수캐시",
+  "wall_likelihood": 0.0,
+  "wall_line_handles": [],
+  "notes": "2070 수평 길이를 나타내는 선형 치수 캐시이다.",
+  "rationale": {
+   "evidence": "8E17과 8E18은 DIM 레이어의 수직 보조선이고 8E19는 그 사이의 수평 치수선이다. DIMDOT 두 개, MTEXT 2070 및 DEFPOINTS 세 개가 연관 치수의 캐시 구조를 이룬다.",
+   "rule": "보조선 사이의 치수선에 두 종단 표식과 측정값, 정의점이 포함되면 실제 건축선이 아닌 치수 캐시로 판정한다.",
+   "counterfactual": "측정값과 종단 표식이 없고 두 수직선이 다른 평면 선들과 연결되었다면 벽선 후보가 될 수 있다.",
+   "uncertainty": "표시된 2070의 참조점과 측정 대상은 상위 삽입 문맥이 없어 알 수 없다."
+  }
+ },
+ {
+  "unit_id": "defannot-d371-77",
+  "def": "*D371",
+  "role": "치수캐시",
+  "wall_likelihood": 0.0,
+  "wall_line_handles": [],
+  "notes": "920 수평 간격을 표시하는 선형 치수 캐시이다.",
+  "rationale": {
+   "evidence": "DIM 레이어의 8E20과 8E21은 두 수직 보조선이며 8E22는 이들 사이의 수평 치수선이다. DIMDOT 두 개, MTEXT 920, DEFPOINTS 세 개가 치수 캐시임을 명확히 한다.",
+   "rule": "평행 보조선 사이에 양단 치수 표식과 숫자를 가진 직교선이 있으면 치수 그래픽으로 분류한다.",
+   "counterfactual": "DIMDOT와 측정 문자가 없고 평행선들이 다른 건축선과 접속하여 벽 윤곽을 형성했다면 벽 가능성이 높아진다.",
+   "uncertainty": "920이 문 폭이나 다른 객체 간격인지 제공된 정의만으로는 식별할 수 없다."
+  }
+ },
+ {
+  "unit_id": "defannot-d372-78",
+  "def": "*D372",
+  "role": "치수캐시",
+  "wall_likelihood": 0.0,
+  "wall_line_handles": [],
+  "notes": "585 수평 간격을 나타내는 점 표식형 치수 캐시이다.",
+  "rationale": {
+   "evidence": "8E29와 8E2A는 DIM 레이어의 수직 보조선이고 8E2B는 두 선 사이의 수평 치수선이다. DIMDOT 두 개와 MTEXT 585, DEFPOINTS 세 개가 전형적인 선형 치수 구성을 보인다.",
+   "rule": "DIM 레이어의 직교 선 배치가 양단 표식, 측정값 및 정의점과 결합되면 치수 캐시로 판단한다.",
+   "counterfactual": "숫자와 DIMDOT가 사라지고 선들이 건축 레이어에서 주변 평면 형상과 연속되었다면 벽 또는 부분도일 수 있다.",
+   "uncertainty": "585가 나타내는 실제 객체나 설계 의미는 주변 도면 없이 판별할 수 없다."
+  }
+ },
+ {
+  "unit_id": "defannot-d373-79",
+  "def": "*D373",
+  "role": "치수캐시",
+  "wall_likelihood": 0.0,
+  "wall_line_handles": [],
+  "notes": "495 수평 간격을 표시하는 선형 치수 캐시이다.",
+  "rationale": {
+   "evidence": "DIM 레이어의 8E32와 8E33은 평행한 수직 보조선이고 8E34는 그 사이의 수평 치수선이다. DIMDOT 삽입 두 개, MTEXT 495와 DEFPOINTS 세 개가 치수 객체임을 입증한다.",
+   "rule": "두 보조선과 이를 잇는 치수선에 양단 마커와 숫자, 정의점이 있으면 치수 캐시로 분류한다.",
+   "counterfactual": "치수 관련 표식과 문자가 없고 두 선이 벽 레이어의 연속 경계를 이뤘다면 벽선으로 볼 여지가 있다.",
+   "uncertainty": "495가 특정 부재 폭인지 기준점 간 거리인지는 투영된 엔티티만으로 알 수 없다."
+  }
+ },
+ {
+  "unit_id": "defannot-d374-80",
+  "def": "*D374",
+  "role": "치수캐시",
+  "wall_likelihood": 0.0,
+  "wall_line_handles": [],
+  "notes": "1620 수평 길이를 표시하는 선형 치수 캐시이다.",
+  "rationale": {
+   "evidence": "8E3B와 8E3C는 DIM 레이어의 두 수직 보조선이며 8E3D는 이들 사이의 수평 치수선이다. DIMDOT 두 개, MTEXT 1620 및 DEFPOINTS 세 개가 완전한 치수 캐시 패턴을 이룬다.",
+   "rule": "치수 전용 레이어의 보조선과 치수선에 두 종단 표식, 측정 문자 및 정의점이 포함되면 치수 캐시로 본다.",
+   "counterfactual": "DIMDOT와 측정값이 없고 선들이 건축 레이어에서 다른 평면 경계와 연결되었다면 벽 또는 평면 부분도 가능성이 생긴다.",
+   "uncertainty": "1620의 실제 측정 대상과 블록의 도면 내 위치 관계는 이 정의만으로 확정할 수 없다."
+  }
+ }
+]

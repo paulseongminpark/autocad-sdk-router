@@ -1,0 +1,390 @@
+[
+  {
+    "unit_id": "defannot-x-0-104co2-281",
+    "def": "X-평면도(기본형)$0$104co2",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.9,
+    "wall_line_handles": [
+      {"handle": "8115", "reason": "8m vertical W1 wall run"},
+      {"handle": "8117", "reason": "4.8m vertical W1 line"},
+      {"handle": "8118", "reason": "2.8m horizontal W1 line paired near CEN 8119"},
+      {"handle": "811A", "reason": "4.25m W1 line parallel to CEN grid"},
+      {"handle": "811B", "reason": "W1 line closing wall corner at (-4950,3030)"},
+      {"handle": "811D", "reason": "2.8m W1 line paired with 811F at 250 offset"},
+      {"handle": "811F", "reason": "W1 line 250 offset from 811D (wall thickness pair)"},
+      {"handle": "8116", "reason": "2.2m vertical W1 wall segment"},
+      {"handle": "8121", "reason": "W1 jamb-length segment on wall alignment x=-450"},
+      {"handle": "8124", "reason": "W1 segment on facing alignment x=-200 (250 pair)"}
+    ],
+    "notes": "Small unit-type plan (104-type core unit): W1 wall lines (54) with CEN grid, doors, STL and 설비OPEN shaft hatches — a partial floor plan.",
+    "rationale": {
+      "evidence": "54 of 102 entities are LINEs on layer ...$0$W1 and 16 on ...$0$CEN; sampled W1 pairs such as 811D/811F and 8121/8124 sit 250 apart, a typical wall thickness. A-DOOR inserts, STL entities, DEFTXT label and 설비OPEN DASH hatches (plumbing openings) complete a floor-plan vocabulary, and the ~10m x 11.5m bbox matches a dwelling unit footprint.",
+      "rule": "A definition dominated by W-prefixed wall-layer lines plus centerline (CEN) grid, door blocks and service-opening hatches at building scale is a partial floor plan; parallel line pairs at 100-300 offset on wall layers are wall lines.",
+      "counterfactual": "If the W1 lines were absent and only CEN/DEFTXT remained, or if the bbox were centimeter-scale, the judgment would flip toward 치수캐시/심볼; if FUR layers dominated it would flip to 가구.",
+      "uncertainty": "Only 30 of 102 entities are sampled, so some listed W1 handles could be openings or trim rather than full wall runs; the 'co2' suffix meaning (core type 2?) cannot be confirmed from this projection alone."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-105co2-282",
+    "def": "X-평면도(기본형)$0$105co2",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.9,
+    "wall_line_handles": [
+      {"handle": "817E", "reason": "3.2m vertical W1 wall run"},
+      {"handle": "817F", "reason": "4.8m vertical W1 line continuing 817E across a gap"},
+      {"handle": "8185", "reason": "3.8m vertical W1 wall run"},
+      {"handle": "8189", "reason": "2.4m horizontal W1 line paired with 818A at 250 offset"},
+      {"handle": "818A", "reason": "W1 line 250 above 8189 (wall thickness pair)"},
+      {"handle": "817B", "reason": "W1 line just off CEN 817C (250 offset)"},
+      {"handle": "817D", "reason": "W1 line parallel to 817B at 500 spacing"},
+      {"handle": "8182", "reason": "1.45m vertical W1 wall segment"},
+      {"handle": "8183", "reason": "1.4m horizontal W1 wall segment"},
+      {"handle": "8184", "reason": "1.4m vertical W1 wall segment"}
+    ],
+    "notes": "Unit-type plan (105-type): 59 W1 wall lines, 16 CEN gridlines, doors, STL, 설비OPEN hatches over a ~13m x 20m footprint — partial floor plan.",
+    "rationale": {
+      "evidence": "Layer histogram is wall-dominated (W1=59, CEN=16) with A-DOOR=4, STL=10, 설비OPEN=8 and one DEFTXT label; sampled W1 lines form corner-connected chains (8181->8182->8183) and 250-offset pairs (8189/818A), i.e. double-line wall drawing. Structure mirrors sibling definition 104co2.",
+      "rule": "Same principle as other unit-type members of a $0$<unit-code> family: wall-layer double lines plus centerlines, doors and shaft openings at multi-meter scale identify a partial floor plan.",
+      "counterfactual": "Absence of the W1 double-line pairs or a sub-meter bbox would flip toward 심볼; if the content were only DIMENSION entities cached under an anonymous name it would be 치수캐시.",
+      "uncertainty": "26% of entities are unsampled, so INSERT contents (11 blocks) are unknown; whether '105co2' denotes a unit type or a core variant cannot be verified from this projection."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-111a-283",
+    "def": "X-평면도(기본형)$0$111a",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.95,
+    "wall_line_handles": [
+      {"handle": "2BBA", "reason": "7.7m vertical INS line at wall face x=18085"},
+      {"handle": "2BBB", "reason": "7.2m INS line 115 inside 2BBA (wall assembly pair)"},
+      {"handle": "2BB8", "reason": "1.9m INS line paired with 2BB9 at 115 offset"},
+      {"handle": "2BB9", "reason": "INS line 115 above 2BB8 along same wall run"},
+      {"handle": "2B76", "reason": "3.4m vertical INS line tracing a wall face"},
+      {"handle": "2BB7", "reason": "2.45m horizontal INS line closing the same wall corner"}
+    ],
+    "notes": "Full 111A unit floor plan: W1=129/W2=105 wall lines, GYP/INS/INSUL wall build-up, doors, kitchen, tile hatches — rich partial plan.",
+    "rationale": {
+      "evidence": "639 entities with W1=129, W2=105, 4GYP=44, 7GYP=52, INS=66, INSUL=28 — a multi-layer wall assembly vocabulary — plus DOOR, KITC, FUR-K, TIL hatches, 수전(faucet) and 설비OPEN layers. Sampled INS lines run in 115-offset parallel pairs (2BB8/2BB9, 2BBA/2BBB) hugging long straight runs, exactly how insulated wall sections are drawn. Bbox ~19.8m x 12.6m fits an apartment unit.",
+      "rule": "When wall layers (W1/W2) plus finish/insulation layers (GYP/INS/INSUL) together dominate and door/kitchen/fixture blocks are present at unit scale, the block is a detailed partial floor plan; the long parallel INS/GYP pairs trace the wall faces.",
+      "counterfactual": "If W1/W2/GYP/INS counts collapsed and only FUR remained, it would flip to 가구; if the sample showed the same geometry as another RF-suffixed sibling with only CEN+outline it would flip to a roof overlay (평면 부분도 with near-zero walls).",
+      "uncertainty": "The 30-entity sample contains no W1/W2 lines directly, so the specific wall-line handles are inferred from INS lines at wall faces; actual W1/W2 handles are unsampled and the *U INSUL block contents are unknown."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-111arf-284",
+    "def": "X-평면도(기본형)$0$111ARF",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.1,
+    "wall_line_handles": [],
+    "notes": "111A roof plan overlay: CEN grid matching the 111a footprint, 7RF roof outlines, rain leaders (우수관) and roof ventilators — no wall lines.",
+    "rationale": {
+      "evidence": "Only 21 entities: CEN=8 gridlines whose extents (0..19495, -9055..3515) exactly match sibling 111a's bbox, two 7RF LWPOLYLINE roof outlines, TEXT '111ARF', 우수관_100A (100A rain leader) inserts on M_2 pads and 무동력휀300 (ventilator) inserts. No W1/W2 LINE geometry at all — the two W1 entries are ventilator INSERTs.",
+      "rule": "An RF-suffixed sibling of a unit plan that carries only centerlines, a roof outline polyline and roof accessories is a roof-level partial plan; it inherits the unit grid but contains no wall lines.",
+      "counterfactual": "If W1/W2 LINE pairs appeared along the outline, wall likelihood would rise sharply; if even the CEN grid were absent and only the accessory blocks remained, it would flip to 심볼.",
+      "uncertainty": "Whether the 7RF polylines trace parapet (wall-like) edges or just the roof slab edge cannot be distinguished from vertex counts alone; drawn linetype/color is not in the projection."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-111arf2-285",
+    "def": "X-평면도(기본형)$0$111ARF2",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.05,
+    "wall_line_handles": [],
+    "notes": "111A upper-roof variant: identical CEN grid to 111ARF plus two 8RF outline polylines and a label — a minimal roof-plan overlay.",
+    "rationale": {
+      "evidence": "11 entities only: the same 8 CEN gridlines as 111ARF (same coordinates, e.g. (14005,-9055)->(14005,-7215)), TEXT '111ARF2', and two LWPOLYLINEs on 8RF instead of 7RF. No wall, door, or fixture layers exist.",
+      "rule": "A near-empty sibling differing from a roof plan only by outline layer (7RF vs 8RF) is another roof-level overlay of the same unit; zero wall-layer geometry means near-zero wall likelihood.",
+      "counterfactual": "Presence of any W1/W2 or GYP/INS paired lines would flip wall likelihood; if the CEN grid were absent it would be judged 기타/심볼 rather than a plan overlay.",
+      "uncertainty": "The height level that '8RF' encodes (e.g. penthouse or elevator machine roof) is not determinable from the projection; the polylines' actual shapes are unknown beyond 7 vertices each."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-111b-286",
+    "def": "X-평면도(기본형)$0$111b",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.95,
+    "wall_line_handles": [
+      {"handle": "2F5A", "reason": "W2 line 5 outside INS 2F59 (wall face pair)"},
+      {"handle": "2F5C", "reason": "vertical W2 wall-face line paired with INS 2F5B"},
+      {"handle": "2F59", "reason": "INS line at wall face y=-1175"},
+      {"handle": "2F5B", "reason": "vertical INS line tracing wall at x=9425"},
+      {"handle": "2F5D", "reason": "INS line continuing wall run down to y=-2020"},
+      {"handle": "2F56", "reason": "7.4m MC line bounding wall zone with CEN 2F57"},
+      {"handle": "2F58", "reason": "7.4m MC line 160 below CEN (wall zone pair)"}
+    ],
+    "notes": "Full 111B unit floor plan: W1=122/W2=77 walls with GYP/INS/INSUL build-up, doors, kitchen, faucets, tile — detailed partial plan.",
+    "rationale": {
+      "evidence": "546 entities; wall vocabulary dominates (W1=122, W2=77, 4GYP=37, 7GYP=51, INS=44, INSUL=21) with DOOR=5, KITC, 수전=5, TIL hatches and 설비OPEN openings. Sampled W2/INS pairs sit 5-10 apart (2F5A vs 2F59), the finish-face vs insulation-face drawing convention, and MC/CEN triplets (2F56/2F57/2F58) frame a 7.4m corridor wall zone. Bbox ~14.3m x 18m is unit-scale.",
+      "rule": "Wall-layer dominance plus finish/insulation double lines, doors and wet-area fixtures at unit scale identify a detailed partial floor plan; near-coincident parallel lines on W*/INS/GYP layers are wall-face lines.",
+      "counterfactual": "If wall layers thinned to a couple of entities and FUR took over, it would flip to 가구; a centimeter-scale bbox would flip to 심볼.",
+      "uncertainty": "Sample covers ~5% of entities, so listed handles are representative rather than exhaustive; whether MC-layer lines are wall faces or finish/molding lines cannot be fully resolved from the projection."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-111brf-287",
+    "def": "X-평면도(기본형)$0$111BRF",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.1,
+    "wall_line_handles": [],
+    "notes": "111B roof plan overlay: CEN grid matching 111b footprint, 7RF roof outlines, rain leaders and roof ventilators — no wall lines.",
+    "rationale": {
+      "evidence": "24 entities: CEN=11 gridlines spanning the 111b bbox (-460..13975, -10565..7490), two 9-vertex 7RF outlines, TEXT '111BRF', 우수관_100A rain-leader inserts with M_2 pads and 무동력휀300 ventilators on layer W1 (as INSERTs, not lines). No wall-line geometry.",
+      "rule": "RF-suffixed sibling carrying only grid + roof outline + roof accessories is a roof-level partial plan with near-zero wall content.",
+      "counterfactual": "Paired W1/W2 lines along the outline would raise wall likelihood; without the CEN grid the block would read as a mere accessory symbol group.",
+      "uncertainty": "Parapet-vs-slab-edge nature of the 7RF outlines is unknown; the NON-layer polylines' purpose (non-plot guides?) cannot be confirmed."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-111brf2-288",
+    "def": "X-평면도(기본형)$0$111BRF2",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.05,
+    "wall_line_handles": [],
+    "notes": "111B upper-roof variant: same CEN grid as 111BRF plus two 8RF outline polylines and a label — minimal roof-plan overlay.",
+    "rationale": {
+      "evidence": "14 entities: the identical 11 CEN gridlines as 111BRF (same coordinates), TEXT '111BRF2', and two 9-vertex LWPOLYLINEs on 8RF instead of 7RF. No wall, door or fixture layers at all.",
+      "rule": "A sibling that differs from a roof overlay only by roof-outline layer is another roof-level plan overlay; zero wall-layer geometry implies near-zero wall likelihood.",
+      "counterfactual": "Any W-layer paired lines would flip wall likelihood upward; losing the CEN grid would flip the role toward 기타.",
+      "uncertainty": "The level encoded by 8RF and the outline shape beyond vertex count are indeterminable from this projection."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-130a-289",
+    "def": "X-평면도(기본형)$0$130a",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.95,
+    "wall_line_handles": [
+      {"handle": "6FF2", "reason": "W2 wall-face line paired with INS 6FEF at 5 offset"},
+      {"handle": "6FF3", "reason": "3.7m W2 wall-face line along y=330"},
+      {"handle": "6FF4", "reason": "W2 wall-face line continuing same run"},
+      {"handle": "6FF5", "reason": "vertical W2 wall segment at x=13130"},
+      {"handle": "6FFA", "reason": "vertical W2 line paired with INS 6FF9 (wall corner)"},
+      {"handle": "6FFB", "reason": "W2 wall line spanning door gap at y=-50"},
+      {"handle": "6FFC", "reason": "W2 wall line continuing across opening"},
+      {"handle": "7003", "reason": "W2 wall-face line paired with INS 7001"}
+    ],
+    "notes": "Full 130A unit floor plan: W1=113/W2=103 walls, GYP/INS/INSUL build-up, 153 FUR furniture entities, doors, kitchen, tile — detailed partial plan.",
+    "rationale": {
+      "evidence": "784 entities; the sample shows classic wall build-up stacks: 4GYP pairs at 10 offset (6FE6/6FE9), INS lines at 210/325, and W2 faces at 330 — five parallel lines drawing one wall section. W1=113, W2=103, plus DOOR=10, FUR=153, KITC, 수전, TIL=36 hatches over an 19m x 13.8m bbox.",
+      "rule": "Stacked parallel lines across GYP/INS/W2 layers at millimeter offsets are wall assemblies; combined with doors, furniture and wet-area fixtures at unit scale, the block is a detailed partial floor plan.",
+      "counterfactual": "If the GYP/INS/W2 stacks disappeared leaving only FUR arcs and lines, it would flip to 가구; if only DIMENSION entities existed it would be 치수캐시.",
+      "uncertainty": "Only 30/784 entities sampled, so wall-handle coverage is very partial; how much of the 153-entity FUR content is built-in vs loose furniture cannot be determined."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-130a1-290",
+    "def": "X-평면도(기본형)$0$130a1",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.95,
+    "wall_line_handles": [
+      {"handle": "49C2", "reason": "2.3m horizontal W1 wall line at y=945"},
+      {"handle": "49E6", "reason": "2.5m vertical W1 wall line at x=4670"},
+      {"handle": "49E5", "reason": "W2 wall-face stub adjoining 49C2 run"},
+      {"handle": "49E7", "reason": "MC line paired 160 from CEN 49E8 (wall zone)"}
+    ],
+    "notes": "130A variant unit plan (130a1): near-identical layer profile to 130a with W1=114/W2=103 walls, furniture, doors, kitchen — detailed partial plan.",
+    "rationale": {
+      "evidence": "780 entities with a layer histogram nearly identical to 130a (W1=114, W2=103, 4GYP=41, 7GYP=56, FUR=152, DOOR=10, TIL=35). Sample includes explicit W1 wall lines (49C2, 49E6), W2 stub 49E5, KITC and I-CL-FUR block inserts, 설비OPEN DASH hatches and long CEN gridlines spanning the 20.4m bbox.",
+      "rule": "A numbered sibling (a1) sharing the wall/finish/furniture layer profile and bbox family of a known unit plan is a variant of that partial floor plan.",
+      "counterfactual": "If the a1 variant had dropped the W1/W2 layers relative to 130a, it would have flipped to an overlay (roof/dimension) role; a drastic entity-count drop to tens would suggest 심볼.",
+      "uncertainty": "What distinguishes 130a1 from 130a (mirroring? core orientation?) is not visible in histograms; unsampled INSERT contents (65 blocks) remain unknown."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-130b-291",
+    "def": "X-평면도(기본형)$0$130b",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.95,
+    "wall_line_handles": [
+      {"handle": "34A9", "reason": "1.6m vertical 4GYP wall-face line at x=11750"},
+      {"handle": "34AA", "reason": "4GYP wall-face segment continuing across opening"},
+      {"handle": "34AB", "reason": "4GYP wall-face line at x=11815"},
+      {"handle": "34AD", "reason": "3.9m vertical 4GYP wall-face line at x=12080"},
+      {"handle": "34AE", "reason": "7.7m MC line paired 160 from CEN 34AF (wall zone)"}
+    ],
+    "notes": "Full 130B unit floor plan: W1=104/W2=83 walls, heavy 7GYP=83 finish, 171 FUR furniture entities, doors, kitchen, window — detailed partial plan.",
+    "rationale": {
+      "evidence": "776 entities; W1=104, W2=83, 4GYP=40, 7GYP=83, INS=48, INSUL=22 wall vocabulary plus DOOR=10, FUR=171, KITC, WIN, 수전=5 and 설비OPEN. Sampled 4GYP lines (34A9-34AD) run vertically in interrupted segments — wall faces broken by openings — and MC/CEN pair 34AE/34AF frames a 7.7m wall zone. A '0체크사항' (check-items) layer entity indicates a working plan.",
+      "rule": "Interrupted collinear segments on gypsum/wall layers with door blocks at the gaps are wall faces with openings; the overall wall+furniture+fixture profile at 16m scale marks a detailed partial floor plan.",
+      "counterfactual": "If the vertical 4GYP segment chains had no W1/W2 backing and the block were centimeter-scale, the lines would read as furniture edges and the role would flip to 가구.",
+      "uncertainty": "The exact W1/W2 handles are unsampled, so wall lines are cited from 4GYP/MC proxies; the single WIN entity's location and the 체크사항 note content are unknown."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-84a-292",
+    "def": "X-평면도(기본형)$0$84a",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.95,
+    "wall_line_handles": [
+      {"handle": "1F0C", "reason": "vertical W2 wall-face line at x=13030"},
+      {"handle": "1F0D", "reason": "W2 line 210 from 1F0C (wall thickness pair)"},
+      {"handle": "1F11", "reason": "W2 wall return line at y=1560"},
+      {"handle": "1F12", "reason": "horizontal W2 wall-face line at y=1350"},
+      {"handle": "1F0E", "reason": "4GYP wall-face line paired with 1F0F at 10 offset"},
+      {"handle": "1F0F", "reason": "4GYP twin of 1F0E (gypsum board faces)"},
+      {"handle": "1F13", "reason": "4GYP wall-face line paired with 1F14"},
+      {"handle": "1F14", "reason": "4GYP twin at 10 offset (wall finish faces)"},
+      {"handle": "1F10", "reason": "INS line 10 inside 4GYP pair (wall assembly)"},
+      {"handle": "1F15", "reason": "INS line completing the same wall stack"}
+    ],
+    "notes": "Full 84A unit floor plan: W1=112/W2=87 walls with masonry layer (벽체-조적), GYP/INS build-up, doors, faucets — detailed partial plan.",
+    "rationale": {
+      "evidence": "527 entities; sample shows textbook wall stacks — W2 at x=13030/13240 (210 apart), 4GYP twins at 10 offsets (1F0E/1F0F, 1F13/1F14) with INS lines 10 further in (1F10, 1F15). Layers include A02-벽체-조적 (masonry wall), DOOR=7, 수전=5, 설비OPEN=8 and a 16.4m x 12.4m bbox.",
+      "rule": "Multi-layer parallel stacks (W2 + gypsum twins + insulation) at masonry offsets are wall sections; their dominance plus doors and plumbing fixtures at unit scale defines a detailed partial floor plan.",
+      "counterfactual": "Collapse of the W/GYP/INS stacks to a single outline would suggest a roof/area overlay; dominance of FUR arcs would flip to 가구.",
+      "uncertainty": "The 조적(masonry) layer has only 2 entities, so masonry extent is unclear; 55 INSERT contents including *U blocks are unsampled."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-84a1-293",
+    "def": "X-평면도(기본형)$0$84a1",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.95,
+    "wall_line_handles": [
+      {"handle": "27FB", "reason": "1.3m vertical W1 wall line at x=15045"},
+      {"handle": "27FC", "reason": "7.8m vertical W1 wall run continuing 27FB"},
+      {"handle": "2800", "reason": "9.7m vertical W1 wall run at x=15445"},
+      {"handle": "280A", "reason": "horizontal W1 wall line at y=-7490"},
+      {"handle": "280B", "reason": "W1 wall segment across opening at y=-7490"},
+      {"handle": "280C", "reason": "W1 wall segment continuing same run"},
+      {"handle": "280D", "reason": "W1 return wall line at y=-7240"},
+      {"handle": "280E", "reason": "W1 wall segment paired 250 from 280B"},
+      {"handle": "27FE", "reason": "6.9m 4GYP wall-face line paired with 27FF"},
+      {"handle": "27FF", "reason": "4GYP twin of 27FE at 10 offset"}
+    ],
+    "notes": "84A variant unit plan (84a1): same layer profile as 84a; sampled long W1 wall runs and interrupted wall segments with openings — detailed partial plan.",
+    "rationale": {
+      "evidence": "533 entities, histogram nearly identical to 84a (W1=109, W2=89, 4GYP=41, 7GYP=42, A02-벽체-조적=2, DOOR=7, 수전=5). Sample directly contains long W1 wall runs (27FC 7.8m, 2800 9.7m), interrupted W1 segments at y=-7490/-7240 forming a wall with openings, 4GYP twins and MC/CEN corridor pairs; same 16.4m x 12.4m bbox as 84a.",
+      "rule": "A numbered sibling preserving the wall/finish layer profile and bbox of a known unit plan is a variant partial floor plan; long W-layer runs broken at door positions are wall lines.",
+      "counterfactual": "A wholesale layer-profile change (e.g. only CEN+RF) would flip it to a roof overlay; sub-meter geometry would flip to 심볼/가구.",
+      "uncertainty": "The design difference between 84a and 84a1 is not derivable from histograms; W2-layer handle examples are absent from this sample."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-84b-294",
+    "def": "X-평면도(기본형)$0$84b",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.95,
+    "wall_line_handles": [
+      {"handle": "21F2", "reason": "2.4m INS line at wall face y=-210"},
+      {"handle": "21F3", "reason": "INS line 80 below 21F2 (wall assembly pair)"},
+      {"handle": "21F4", "reason": "1.8m INS line at wall face y=-5780"},
+      {"handle": "21F5", "reason": "INS line 115 above 21F4 along same wall"},
+      {"handle": "2209", "reason": "2m INS line tracing wall run at y=820"},
+      {"handle": "220A", "reason": "INS line 115 from 2209 (wall pair)"},
+      {"handle": "2200", "reason": "1.3m vertical INS line at wall face x=15000"},
+      {"handle": "2201", "reason": "INS line 80 inside 2200 (wall assembly)"}
+    ],
+    "notes": "Full 84B unit floor plan: W1=115/W2=89 walls, GYP/INS build-up, doors, faucets, 설비OPEN openings — detailed partial plan (sample dominated by INS wall pairs).",
+    "rationale": {
+      "evidence": "525 entities with W1=115, W2=89, 4GYP=36, 7GYP=36, INS=45, DOOR=5, 수전=5, 설비OPEN=11 over a 15.1m x 12.4m bbox. The sample is mostly INS lines in 80-115 offset parallel pairs tracing long runs (21F2/21F3, 21F4/21F5) — insulation faces of walls — plus 'is'/'is2' inserts on W1 (likely insulation symbols placed on walls).",
+      "rule": "Insulation-layer parallel pairs at consistent millimeter offsets follow wall assemblies; with W-layer dominance, doors and fixtures at unit scale, the block is a detailed partial floor plan.",
+      "counterfactual": "If INS pairs existed without any W1/W2 backing layers, the block could be an insulation-only overlay; furniture-layer dominance would flip to 가구.",
+      "uncertainty": "No W1/W2 LINE appears in the sample, so cited wall lines are INS proxies at the wall faces; the 'is'/'is2' block contents are unknown."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-84b1-295",
+    "def": "X-평면도(기본형)$0$84b1",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.95,
+    "wall_line_handles": [
+      {"handle": "6D25", "reason": "2.4m INS line at wall face y=-210"},
+      {"handle": "6D26", "reason": "INS line 80 below 6D25 (wall assembly pair)"},
+      {"handle": "6D27", "reason": "1.9m INS line at wall face y=-5780"},
+      {"handle": "6D28", "reason": "INS line 115 above 6D27 along same wall"},
+      {"handle": "6D10", "reason": "12.4m MC line 210 from CEN 6D0F (wall zone edge)"},
+      {"handle": "6D0B", "reason": "6.1m MC line paired 130 from CEN 6D0A"},
+      {"handle": "6D0D", "reason": "6.1m MC line twin of 6D0B (wall zone pair)"}
+    ],
+    "notes": "84B variant unit plan (84b1): layer profile matches 84b (W1=111/W2=93 walls, GYP/INS, doors, faucets) with long MC/CEN wall-zone pairs — detailed partial plan.",
+    "rationale": {
+      "evidence": "527 entities, histogram nearly identical to 84b (W1=111, W2=93, 4GYP=36, 7GYP=36, INS=44, DOOR=5, 수전=5, DEFTXT=2). Sample shows full-height MC/CEN parallel pairs (6D0B/6D0A at 130 offset, 6D10/6D0F at 210) spanning the 12.4m bbox height plus the same INS wall pairs seen in 84b, and a pd900 door insert.",
+      "rule": "Same variant principle: a numbered sibling with an unchanged wall/finish profile and bbox is a variant of the unit's partial floor plan; long paired lines offset 100-250 from centerlines bound wall zones.",
+      "counterfactual": "If MC/CEN pairs stood alone without W/INS/GYP layers, the block would read as a grid/zoning overlay instead; furniture dominance would flip to 가구.",
+      "uncertainty": "MC layer semantics (masonry center vs finish line) are not certain from the projection; W1/W2 handles are again unsampled."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-84c-296",
+    "def": "X-평면도(기본형)$0$84c",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.95,
+    "wall_line_handles": [
+      {"handle": "254E", "reason": "INS line at wall face y=-6700"},
+      {"handle": "254F", "reason": "INS line 115 above 254E (wall assembly pair)"},
+      {"handle": "2550", "reason": "1.9m INS line at wall face y=-240"},
+      {"handle": "2551", "reason": "INS line 115 below 2550 along same wall"},
+      {"handle": "2552", "reason": "vertical INS wall stub at x=65"},
+      {"handle": "2553", "reason": "INS line 115 from 2552 (wall pair)"}
+    ],
+    "notes": "Full 84C unit floor plan: W1=105/W2=92 walls, GYP/INS/INSUL build-up, doors, kitchen, bath fixtures, faucets — detailed partial plan.",
+    "rationale": {
+      "evidence": "571 entities with W1=105, W2=92, 4GYP=46, 7GYP=51, INS=53, INSUL=27, DOOR=6, KITC=2, DS-F-BATH, I-FL-FUR(B/S), 수전=5 and TIL hatches over a 16.4m x 12.9m bbox. Sample shows INS parallel pairs at 115 offsets (254E/254F, 2550/2551) tracing wall runs and many *U INSUL block inserts along walls.",
+      "rule": "The unit-plan signature — wall+insulation double lines, doors, kitchen/bath fixtures, tile hatches at apartment scale — identifies a detailed partial floor plan.",
+      "counterfactual": "Removing the W/GYP/INS layers and keeping only the bath/kitchen fixtures would flip it toward 가구/심볼 grouping; a DIMENSION-only content would flip to 치수캐시.",
+      "uncertainty": "Direct W1/W2 line handles are unsampled (INS proxies cited); the role of the single FUR/FUR-K entities cannot be located within the plan."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-84c1-297",
+    "def": "X-평면도(기본형)$0$84c1",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.95,
+    "wall_line_handles": [
+      {"handle": "7402", "reason": "3.5m INS line at wall face y=-290"},
+      {"handle": "740D", "reason": "3.6m MC line paired 80 from CEN 740C (wall zone)"},
+      {"handle": "740E", "reason": "MC line at x=1900 bounding same wall zone"},
+      {"handle": "7411", "reason": "MC line paired 70 from CEN 7410 (wall stub)"}
+    ],
+    "notes": "84C variant unit plan (84c1): same profile as 84c (W1=106/W2=92 walls, GYP/INS, doors, bath) with faucet symbols and bath/door inserts — detailed partial plan.",
+    "rationale": {
+      "evidence": "577 entities, histogram nearly identical to 84c (W1=106, W2=92, 4GYP=46, 7GYP=51, INS=57, DOOR=6, 수전=5). Sample includes a 3.5m INS wall-face line (7402), MC/CEN pairs at 70-80 offsets around x=1820-1910, wd170750 window/door and ba18601500 bathtub inserts, four 수전-1 faucet inserts and TIL hatches.",
+      "rule": "Variant principle again: unchanged wall/finish/fixture profile and bbox relative to a sibling unit plan means a variant partial floor plan; INS/MC lines paired with centerlines trace the wall zones.",
+      "counterfactual": "A layer profile collapse to CEN+outline would flip it to an overlay; fixture-only content would flip to 심볼.",
+      "uncertainty": "W1/W2 handles absent from the sample, so wall citations rely on INS/MC proxies; the a/c1 variant difference is not observable in the projection."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-a-c019c01bd-298",
+    "def": "X-평면도(기본형)$0$A$C019C01BD",
+    "role": "가구",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "Anonymous furniture block: 117 entities all on FUR layer, ~0.52m x 1.2m footprint with arcs and SOLID hatches — a single furniture/fixture item (door-leaf or chair-like object).",
+    "rationale": {
+      "evidence": "Every one of the 117 entities sits on layer ...$0$FUR; the bbox is 192 x 1200 units (sub-1.2m), with 43 ARCs, SOLID hatches and dense short lines including diagonal strokes (e.g. 62E7: (498,33)->(333,600)) — detail linework of one object, not building fabric. The A$C-prefixed anonymous name indicates a copied/derived block.",
+      "rule": "A single-layer FUR block at sub-meter scale with arc-heavy detail linework is a furniture/fixture symbol; wall lines never live on a furniture layer at that scale.",
+      "counterfactual": "If the same geometry sat on W1/GYP layers or the bbox spanned several meters with 100-250 offset line pairs, it would flip to 평면 부분도 content with wall lines.",
+      "uncertainty": "The exact object type (swing-door leaf, lounge chair, sanitary item) cannot be identified from handles and coordinates alone; only 30 of 117 entities are visible."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-a-c01a306ae-299",
+    "def": "X-평면도(기본형)$0$A$C01A306AE",
+    "role": "가구",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "Anonymous furniture block: 22 entities on FUR layer, 500 x 104 footprint with 4 arcs — a small fixture (towel bar / shelf / radiator-like item).",
+    "rationale": {
+      "evidence": "All 22 entities are on layer ...$0$FUR; bbox is 500 x 104 units, i.e. a 0.5m-wide shallow object. Symmetric end details at x=0-32 and x=468-500 with ARCs at the corners and twin rails (y=17/27) read as a manufactured item's front/plan view.",
+      "rule": "Single-layer FUR content at sub-meter scale with symmetric end detailing is a furniture/fixture symbol, not building geometry.",
+      "counterfactual": "If these lines were meters long and paired at wall-thickness offsets on W/GYP layers, they would be wall lines and the block a plan fragment.",
+      "uncertainty": "The specific product type cannot be determined from the projection; insertion context (which rooms use it) is not visible."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-a-c04b05b29-300",
+    "def": "X-평면도(기본형)$0$A$C04B05B29",
+    "role": "가구",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "Anonymous kitchen-fixture block: 24 entities on FUR-FIX/FUR-KIT layers, 920 x 152 footprint — a fixed kitchen counter/appliance strip element.",
+    "rationale": {
+      "evidence": "21 entities on FUR-FIX (fixed furniture) and 3 on FUR-KIT (kitchen) layers; bbox is 920 x 152 units. The FUR-KIT lines form the outer boundary (-820..-20 x -132..18) while FUR-FIX lines/polylines draw internal bracket-like details, including angled legs (42D8: (-20,-100)->(0,0)).",
+      "rule": "Blocks whose layers are exclusively furniture-family (FUR-FIX/FUR-KIT) at sub-meter scale are furniture/fixture symbols; layer semantics outrank geometry ambiguity here.",
+      "counterfactual": "If the boundary lines sat on W1/W2 with a 100-250 parallel pair structure at building scale, the judgment would flip to wall geometry within a plan fragment.",
+      "uncertainty": "Whether it depicts a sink unit, hood, or counter section is indeterminable; the 8 LWPOLYLINE shapes are known only by vertex count."
+    }
+  }
+]

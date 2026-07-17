@@ -1,0 +1,651 @@
+[
+  {
+    "unit_id": "defannot-x-0-104co2-281",
+    "def": "X-평면도(기본형)$0$104co2",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.9,
+    "wall_line_handles": [
+      {
+        "handle": "8115",
+        "reason": "W1 8000mm 수직 벽선"
+      },
+      {
+        "handle": "8117",
+        "reason": "W1 4800mm 수직 벽선"
+      },
+      {
+        "handle": "8118",
+        "reason": "W1 2800mm 수평 벽선"
+      },
+      {
+        "handle": "811A",
+        "reason": "W1 4250mm 수평 벽선"
+      },
+      {
+        "handle": "8116",
+        "reason": "W1 2230mm 수직 벽선"
+      },
+      {
+        "handle": "811B",
+        "reason": "W1 1200mm 수평 벽선"
+      },
+      {
+        "handle": "811D",
+        "reason": "W1 수평 벽선(811F와 250mm 평행쌍)"
+      },
+      {
+        "handle": "811F",
+        "reason": "W1 수평 벽선(811D와 벽두께쌍)"
+      },
+      {
+        "handle": "8114",
+        "reason": "W1 짧은 수직 벽선(개구부 문설주)"
+      },
+      {
+        "handle": "8113",
+        "reason": "W1 짧은 수직 벽선(개구부 문설주)"
+      }
+    ],
+    "notes": "104 소형 유닛 평면 부분도 — W1 벽 54개, CEN 중심선 16, A-DOOR, 설비OPEN 해치로 구성된 완결 평면",
+    "rationale": {
+      "evidence": "entity 102개 중 LINE 85개가 대부분 W1(54)·CEN(16) 레이어에 놓이고 A-DOOR 3, 설비OPEN 6(DASH 해치+폴리라인), STL 10이 섞인다. 8113~8125 핸들이 모두 W1 레이어의 직교 선분(예: 8115 (-3750,3030)->(-3750,11030))으로 방 경계를 이룬다. bbox 약 10400x11530mm로 주거 한 세대 규모다.",
+      "rule": "직교 LINE이 W1/CEN 레이어에 다수 모여 닫힌 방 경계를 만들고 문·설비 요소가 섞이면 주거 유닛의 평면 부분도로 판정한다.",
+      "counterfactual": "W1 선분이 없고 FUR 계열 레이어만 있거나 bbox가 수백 mm 규모였다면 가구/심볼로 뒤집힌다.",
+      "uncertainty": "샘플 30개만 노출되어 나머지 72개 entity 배치와 W2 유무는 확인 불가하며, 좌표만으로 벽 평행쌍 완전 매칭은 단정 못 한다."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-105co2-282",
+    "def": "X-평면도(기본형)$0$105co2",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.9,
+    "wall_line_handles": [
+      {
+        "handle": "817F",
+        "reason": "W1 4800mm 수직 벽선"
+      },
+      {
+        "handle": "817E",
+        "reason": "W1 3180mm 수직 벽선(817F와 동일 x벽)"
+      },
+      {
+        "handle": "8185",
+        "reason": "W1 3790mm 수직 벽선"
+      },
+      {
+        "handle": "8189",
+        "reason": "W1 2400mm 수평 벽선"
+      },
+      {
+        "handle": "818A",
+        "reason": "W1 수평 벽선(8189와 250mm 벽두께쌍)"
+      },
+      {
+        "handle": "817B",
+        "reason": "W1 1410mm 수평 벽선"
+      },
+      {
+        "handle": "8180",
+        "reason": "W1 1585mm 수평 벽선"
+      },
+      {
+        "handle": "8184",
+        "reason": "W1 1435mm 수직 벽선"
+      },
+      {
+        "handle": "8183",
+        "reason": "W1 1425mm 수평 벽선"
+      },
+      {
+        "handle": "817D",
+        "reason": "W1 1675mm 수평 벽선"
+      }
+    ],
+    "notes": "105 소형 유닛 평면 부분도 — W1 벽 59개, CEN 16, A-DOOR 4, 설비OPEN 8, STL 10으로 구성된 완결 평면",
+    "rationale": {
+      "evidence": "LINE 90개가 W1(59)·CEN(16)에 집중되고 A-DOOR 4, 설비OPEN 8(DASH 해치)가 붙는다. 817B~8190 핸들이 W1 레이어 직교 선분으로 방을 둘러싸고(예: 817F (-4750,-2170)->(-4750,2630)) 8189/818A는 250mm 간격 평행쌍으로 벽두께를 이룬다. bbox 약 12965x20605mm.",
+      "rule": "W1 레이어 직교 선분이 평행쌍(벽두께)을 이루며 방 경계를 닫고 문·설비가 섞이면 평면 부분도다.",
+      "counterfactual": "W1 선분이 사라지고 단일 FUR 레이어 소형 형상만 남으면 가구로 바뀐다.",
+      "uncertainty": "샘플 외 나머지 84개 entity와 40HAT·AA-CUTL7 레이어의 역할은 투영만으로 확정 불가하다."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-111a-283",
+    "def": "X-평면도(기본형)$0$111a",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.96,
+    "wall_line_handles": [
+      {
+        "handle": "2BBA",
+        "reason": "INS 7690mm 수직 벽면 경계선"
+      },
+      {
+        "handle": "2BBB",
+        "reason": "INS 벽면선(2BBA와 115mm 벽두께쌍)"
+      },
+      {
+        "handle": "2B76",
+        "reason": "INS 3380mm 수직 벽면선"
+      },
+      {
+        "handle": "2BB7",
+        "reason": "INS 2455mm 수평 벽면선"
+      },
+      {
+        "handle": "2BB8",
+        "reason": "INS 1940mm 수평 벽면선"
+      },
+      {
+        "handle": "2BB9",
+        "reason": "INS 수평 벽면선(2BB8과 115mm 평행쌍)"
+      }
+    ],
+    "notes": "111a 대형 유닛 완결 평면 — W1 129, W2 105, INS/INSUL 단열, 4GYP/7GYP 석고, TIL 타일, DOOR 등 마감 포함",
+    "rationale": {
+      "evidence": "layer 히스토그램에 W1 129, W2 105로 벽선이 압도적이고 INS 66, INSUL 28, 4GYP 44, 7GYP 52, MC 47의 마감/단열층이 두껍다. 샘플에는 W1/W2 핸들이 안 잡혀 INS 장대 직교선(예: 2BBA (18085,1345)->(18085,-6345))과 115mm 평행쌍을 벽면 근사로 인용했다. bbox 약 19830x12570mm로 대형 세대다.",
+      "rule": "W1/W2 카운트가 수십~수백이고 INS·GYP·TIL 마감층이 벽을 따라 겹겹이 쌓이면 완결 평면 부분도다.",
+      "counterfactual": "W1/W2·마감 레이어가 사라지고 FUR 단일 레이어만 남으면 가구, 지붕층 7RF만 남으면 지붕평면 성격으로 뒤집힌다.",
+      "uncertainty": "샘플에 W1/W2 실선 핸들이 노출되지 않아 인용 핸들은 INS(벽면 라이닝) 근사이며, 실제 벽 중심선 핸들은 투영 밖이라 특정 불가하다."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-111arf-284",
+    "def": "X-평면도(기본형)$0$111ARF",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.15,
+    "wall_line_handles": [],
+    "notes": "111A 지붕평면도(RF) — 유닛 외곽 CEN 참조선 + 7RF 지붕선, 우수관·무동력휀 인서트. 벽체 실선 없음",
+    "rationale": {
+      "evidence": "entity 21개로 CEN 8(외곽 참조선), 7RF 2(지붕 폴리라인), M_2 4, NON 2, INSERT 4로 구성된다. INSERT는 우수관_100A(우수 배수관)와 무동력휀300(무동력 환기휀)이며, W1 레이어의 2개(7BF8/7BF9)도 실선이 아니라 휀 블록 인서트다. bbox는 111a와 동일 footprint(약 19830x12570mm)로 같은 세대의 지붕층 평면이다.",
+      "rule": "유닛 footprint를 공유하는 평면 투영이되 CEN 외곽선과 7RF/8RF 지붕선·우수관·환기휀만 있고 벽 실선이 없으면 지붕층 평면 부분도로 본다.",
+      "counterfactual": "이 도면 자체 네임스페이스가 평면도(기본형)가 아니거나 지붕 요소 대신 벽·마감 실선이 있었다면 각각 기타 또는 일반 평면으로 갈렸다.",
+      "uncertainty": "지붕평면은 엄밀히는 바닥 평면과 다른 하위 유형이라 평면 부분도/기타 경계가 모호하며, W1 카운트가 실벽인지 휀 인서트인지는 샘플로만 확인해 전량 검증은 불가하다."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-111arf2-285",
+    "def": "X-평면도(기본형)$0$111ARF2",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.08,
+    "wall_line_handles": [],
+    "notes": "111A 지붕평면도 변형(RF2) — CEN 외곽선 8 + 8RF 지붕 폴리라인 2 + 라벨. 극소 entity(11), 벽체 없음",
+    "rationale": {
+      "evidence": "entity 11개로 LINE 8(전부 CEN 외곽/참조선), LWPOLYLINE 2(8RF 지붕선 7정점), TEXT 1('111ARF2')뿐이다. 7C05 (18150,3515)->(18150,-9055) 등 CEN 선이 세대 외곽을 그리고 8RF가 상부 지붕 형상을 덮는다. bbox는 111a와 동일 footprint로 같은 세대의 상부 지붕층이다.",
+      "rule": "footprint를 공유하는 평면 투영에 CEN 외곽선과 8RF 지붕 폴리라인만 있으면 지붕층 평면 부분도(초소형 변형)로 본다.",
+      "counterfactual": "8RF 지붕 폴리라인 대신 W1/W2 벽 실선 군집이 있었다면 일반 평면 부분도로, 아무 건축요소 없이 마커 1개뿐이었다면 심볼로 바뀐다.",
+      "uncertainty": "entity가 11개로 극소여서 8RF 폴리라인이 지붕 외곽인지 파라펫/드립인지 구분이 어렵고, 지붕평면의 평면/기타 분류는 판정자 관례에 의존한다."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-111b-286",
+    "def": "X-평면도(기본형)$0$111b",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.96,
+    "wall_line_handles": [
+      {
+        "handle": "2F56",
+        "reason": "MC 7365mm 수평 벽면선(CEN 2F57 협재)"
+      },
+      {
+        "handle": "2F58",
+        "reason": "MC 7365mm 수평 벽면선(2F56과 320mm 벽쌍)"
+      },
+      {
+        "handle": "2F5A",
+        "reason": "W2 330mm 개구부 벽선"
+      },
+      {
+        "handle": "2F5C",
+        "reason": "W2 760mm 수직 개구부 벽선"
+      },
+      {
+        "handle": "2F59",
+        "reason": "INS 덕트/개구부 경계선"
+      },
+      {
+        "handle": "2F5B",
+        "reason": "INS 수직 경계선"
+      }
+    ],
+    "notes": "111b 대형 유닛 완결 평면 — W1 122, W2 77, MC 벽면선(CEN 중심선 협재), 단열/석고/타일 마감 포함",
+    "rationale": {
+      "evidence": "W1 122, W2 77로 벽선이 지배적이고 MC 38, INS 44, INSUL 21, 4GYP 37, 7GYP 51 마감층이 겹친다. 샘플의 MC 2F56/2F58(y=-1000/-1320)이 CEN 2F57(y=-1160)을 가운데 두고 320mm 벽두께를 이룬다. bbox 약 14285x18055mm 대형 세대다.",
+      "rule": "MC/W2 실선이 CEN 중심선을 사이에 두고 평행쌍을 이루며 방을 닫고 마감층이 부착되면 완결 평면 부분도다.",
+      "counterfactual": "벽·마감 레이어가 없고 FUR만 있으면 가구, 7RF 지붕선만 있으면 지붕층으로 뒤집힌다.",
+      "uncertainty": "샘플에 노출된 W2 핸들은 개구부 주변 짧은 선뿐이라 주벽 실선 핸들은 특정 못 하며, MC의 정확한 의미(벽면 vs 몰딩)는 좌표 패턴으로 추정한 것이다."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-111brf-287",
+    "def": "X-평면도(기본형)$0$111BRF",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.15,
+    "wall_line_handles": [],
+    "notes": "111B 지붕평면도(RF) — CEN 외곽 참조선 11 + 7RF 지붕선, 우수관·무동력휀. 벽체 실선 없음",
+    "rationale": {
+      "evidence": "entity 24개로 CEN 11(외곽/참조선), 7RF 2(지붕 폴리라인 9정점), M_2 4, NON 2, INSERT 4(우수관_100A·무동력휀300)로 구성된다. W1 2개(7C26/7C27)는 휀 블록 인서트이지 벽 실선이 아니다. bbox는 111b와 동일 footprint로 같은 세대 지붕층이다.",
+      "rule": "footprint 공유 평면 투영에 지붕선·우수관·환기휀만 있고 벽 실선이 없으면 지붕층 평면 부분도다.",
+      "counterfactual": "지붕 요소 대신 W1/W2 벽 군집과 마감층이 있었다면 일반 평면 부분도로 이동한다.",
+      "uncertainty": "지붕평면의 평면/기타 경계가 모호하고, W1 인서트가 실벽 기여를 하는지는 전량 확인 불가하다."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-111brf2-288",
+    "def": "X-평면도(기본형)$0$111BRF2",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.08,
+    "wall_line_handles": [],
+    "notes": "111B 지붕평면도 변형(RF2) — CEN 외곽 11 + 8RF 지붕 폴리라인 2 + 라벨. 극소 entity(14), 벽체 없음",
+    "rationale": {
+      "evidence": "entity 14개로 LINE 11(전부 CEN 외곽/참조선), LWPOLYLINE 2(8RF 지붕선 9정점), TEXT 1('111BRF2')뿐이다. CEN 선들이 세대 외곽을 그리고 8RF가 상부 지붕을 덮는다. bbox는 111b와 동일 footprint다.",
+      "rule": "CEN 외곽선과 8RF 지붕 폴리라인만으로 구성된 footprint 공유 평면은 지붕층 평면 부분도(초소형 변형)다.",
+      "counterfactual": "8RF 대신 W1/W2 벽 군집이 있었다면 일반 평면, 건축요소 없이 마커뿐이면 심볼로 바뀐다.",
+      "uncertainty": "entity 극소로 8RF 폴리라인의 지붕 부위 특정이 어렵고, 지붕평면 분류는 판정자 관례에 의존한다."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-130a-289",
+    "def": "X-평면도(기본형)$0$130a",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.95,
+    "wall_line_handles": [
+      {
+        "handle": "6FF3",
+        "reason": "W2 3670mm 수평 벽면선"
+      },
+      {
+        "handle": "6FF2",
+        "reason": "W2 1450mm 수평 벽면선"
+      },
+      {
+        "handle": "6FF4",
+        "reason": "W2 690mm 수평 벽면선"
+      },
+      {
+        "handle": "6FFA",
+        "reason": "W2 590mm 수직 벽면선"
+      },
+      {
+        "handle": "6FF5",
+        "reason": "W2 590mm 수직 벽면선"
+      },
+      {
+        "handle": "6FFB",
+        "reason": "W2 550mm 수평 벽면선"
+      },
+      {
+        "handle": "7003",
+        "reason": "W2 760mm 수평 벽면선"
+      },
+      {
+        "handle": "6FFC",
+        "reason": "W2 600mm 수평 벽면선"
+      }
+    ],
+    "notes": "130a 대형 유닛 완결 평면 — W1 113, W2 103, FUR 153(가구 다수), 4GYP/INS/W2 다층 벽구성, ARC 49 곡선요소",
+    "rationale": {
+      "evidence": "W1 113, W2 103 벽선에 FUR 153, INS 58, MC 46, TIL 36 등 마감·가구가 대량이다. 샘플에서 4GYP(y=190/200)·INS(210/325)·W2(330) 선이 평행 적층되어 마감을 두른 벽 단면을 이룬다(예: W2 6FF3 (7040,330)->(10710,330)). bbox 약 18990x13820mm.",
+      "rule": "W2 실선이 4GYP·INS 마감선과 평행 적층으로 벽 단면을 이루고 방을 닫으면 완결 평면 부분도다.",
+      "counterfactual": "벽·마감 적층이 없고 FUR 단일 레이어 소형 형상만 남으면 가구로 바뀐다.",
+      "uncertainty": "FUR 153으로 가구가 많지만 블록 전체 역할은 벽이 지배하는 평면이며, 개별 ARC 49가 문 스윙인지 가구 곡선인지는 투영만으로 완전 분리 불가하다."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-130a1-290",
+    "def": "X-평면도(기본형)$0$130a1",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.95,
+    "wall_line_handles": [
+      {
+        "handle": "49E6",
+        "reason": "W1 2500mm 수직 벽선"
+      },
+      {
+        "handle": "49C2",
+        "reason": "W1 2340mm 수평 벽선"
+      },
+      {
+        "handle": "49E7",
+        "reason": "MC 2665mm 수직 벽면선(W1 49E6에 인접)"
+      },
+      {
+        "handle": "49E5",
+        "reason": "W2 110mm 개구부 벽선"
+      }
+    ],
+    "notes": "130a1 대형 유닛 완결 평면(130a 변형) — W1 114, W2 103, FUR 152, CEN 중심선+W1/MC 벽면쌍, 설비OPEN 다수",
+    "rationale": {
+      "evidence": "W1 114, W2 103 벽선에 FUR 152, INS 56, MC 46, TIL 35 마감·가구가 얹힌다. 샘플에서 CEN 49E8(x=4520)·W1 49E6(4670)·MC 49E7(4680)이 나란히 배열되어 중심선+벽면 구성을 보인다. bbox 약 20415x13820mm로 130a와 거의 동일한 세대 변형이다.",
+      "rule": "CEN 중심선을 축으로 W1 실선과 MC 벽면선이 근접 배열되어 방 경계를 이루면 완결 평면 부분도다.",
+      "counterfactual": "W1/MC 벽 배열이 없고 지붕선(7RF)만 있었다면 지붕층으로, FUR만 있었다면 가구로 뒤집힌다.",
+      "uncertainty": "샘플의 W2 핸들이 110mm 초단선이라 주벽 실선은 특정 못 하며, 130a와의 미세 차이는 투영만으로 규명 불가하다."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-130b-291",
+    "def": "X-평면도(기본형)$0$130b",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.95,
+    "wall_line_handles": [
+      {
+        "handle": "34AE",
+        "reason": "MC 7695mm 수평 벽면선(CEN 34AF 협재)"
+      },
+      {
+        "handle": "34AD",
+        "reason": "4GYP 3920mm 수직 벽마감선"
+      },
+      {
+        "handle": "34A9",
+        "reason": "4GYP 1590mm 수직 벽마감선"
+      },
+      {
+        "handle": "34AA",
+        "reason": "4GYP 1060mm 수직 벽마감선"
+      },
+      {
+        "handle": "34AB",
+        "reason": "4GYP 840mm 수직 벽마감선"
+      }
+    ],
+    "notes": "130b 대형 유닛 완결 평면 — W1 104, W2 83, FUR 171(가구 최다), MC 벽면선+CEN, 4GYP 석고 벽마감",
+    "rationale": {
+      "evidence": "W1 104, W2 83 벽선에 FUR 171, 7GYP 83, INS 48, MC 49 마감·가구가 대량이다. 샘플에서 MC 34AE (8470,1370)->(16165,1370)가 CEN 34AF(y=1530)와 평행 벽면을 이루고 4GYP 34AD·34A9·34AA가 수직 벽마감선을 형성한다. bbox 약 16165x19510mm.",
+      "rule": "MC 벽면선이 CEN과 평행 배열되고 4GYP/7GYP 석고선이 벽마감을 이루면 완결 평면 부분도다.",
+      "counterfactual": "벽·석고 마감선이 없고 FUR 단일 레이어만 남으면 가구, 지붕선만 있으면 지붕층으로 바뀐다.",
+      "uncertainty": "샘플에 W1/W2 실선 핸들이 안 잡혀 인용 핸들은 MC·4GYP 벽면/마감 근사이며, 벽 중심 실선은 투영 밖이다."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-84a-292",
+    "def": "X-평면도(기본형)$0$84a",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.95,
+    "wall_line_handles": [
+      {
+        "handle": "1F0C",
+        "reason": "W2 625mm 수직 벽선"
+      },
+      {
+        "handle": "1F0D",
+        "reason": "W2 525mm 수직 벽선"
+      },
+      {
+        "handle": "1F11",
+        "reason": "W2 495mm 수평 벽선"
+      },
+      {
+        "handle": "1F12",
+        "reason": "W2 600mm 수평 벽선"
+      },
+      {
+        "handle": "1F0E",
+        "reason": "4GYP 515mm 수직 벽마감선"
+      },
+      {
+        "handle": "1F0F",
+        "reason": "4GYP 벽마감선(1F0E와 10mm 평행쌍)"
+      }
+    ],
+    "notes": "84a 유닛 완결 평면 — W1 112, W2 87, 4GYP/INS 창호부 벽마감, A02-벽체-조적(조적벽) 2, 단열/타일 포함",
+    "rationale": {
+      "evidence": "W1 112, W2 87에 더해 A02-벽체-조적(조적벽) 2 레이어가 명시적 벽체임을 확증한다. 샘플의 W2 1F0C~1F12와 4GYP 1F0E/1F0F가 창호 개구부 주변 벽·마감선을 이루고 INS 44, INSUL 20 단열이 붙는다. bbox 약 16445x12400mm.",
+      "rule": "W1/W2에 더해 '벽체-조적' 같은 명시 벽 레이어가 존재하면 벽 판정이 강하게 확정되는 완결 평면 부분도다.",
+      "counterfactual": "벽체 레이어와 W1/W2가 없고 FUR만 있으면 가구로 뒤집힌다.",
+      "uncertainty": "샘플 W2 핸들이 창호부 짧은 선이라 주벽 실선은 특정 못 하며, 4ELE 선이 전기/입면 보조선인지는 투영만으로 불명확하다."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-84a1-293",
+    "def": "X-평면도(기본형)$0$84a1",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.95,
+    "wall_line_handles": [
+      {
+        "handle": "2800",
+        "reason": "W1 9740mm 수직 벽선(전고급)"
+      },
+      {
+        "handle": "27FC",
+        "reason": "W1 7790mm 수직 벽선"
+      },
+      {
+        "handle": "27F8",
+        "reason": "MC 6605mm 수직 벽면선"
+      },
+      {
+        "handle": "27F5",
+        "reason": "MC 6710mm 수평 벽면선"
+      },
+      {
+        "handle": "27F2",
+        "reason": "MC 5610mm 수직 벽면선"
+      },
+      {
+        "handle": "27F3",
+        "reason": "MC 수직 벽면선(27F2와 140mm 벽두께쌍)"
+      },
+      {
+        "handle": "27F6",
+        "reason": "MC 5610mm 수직 벽면선"
+      },
+      {
+        "handle": "27F4",
+        "reason": "MC 4890mm 수평 벽면선"
+      },
+      {
+        "handle": "27F9",
+        "reason": "MC 수직 벽면선(27F8과 270mm 벽쌍)"
+      },
+      {
+        "handle": "27FB",
+        "reason": "W1 1300mm 수직 벽선"
+      }
+    ],
+    "notes": "84a1 유닛 완결 평면(84a 변형) — W1 109, W2 89, MC 장대 벽면 평행쌍(27F2/27F3), CEN 중심선, 조적벽 레이어 포함",
+    "rationale": {
+      "evidence": "W1 109, W2 89, A02-벽체-조적 2로 벽이 지배적이며 MC 36, INS 48, INSUL 22 마감이 붙는다. 샘플에 W1 2800(9740mm)·27FC(7790mm) 장대 수직 벽선과 MC 27F2/27F3(140mm 평행쌍), 27F8/27F9(270mm 쌍)가 벽두께를 이룬다. bbox 약 16445x12400mm.",
+      "rule": "장대 W1 실선과 MC 평행쌍이 벽두께를 형성하고 CEN 중심선을 동반하면 완결 평면 부분도다.",
+      "counterfactual": "벽 실선·평행쌍이 없고 소형 FUR 형상만 남으면 가구로 바뀐다.",
+      "uncertainty": "MC가 벽면인지 여타 구성선인지는 좌표 평행성으로 추정한 것이며, 84a와의 정확한 차분은 투영만으로 특정 불가하다."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-84b-294",
+    "def": "X-평면도(기본형)$0$84b",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.95,
+    "wall_line_handles": [
+      {
+        "handle": "21F2",
+        "reason": "INS 2420mm 수평 벽면선"
+      },
+      {
+        "handle": "21F3",
+        "reason": "INS 벽면선(21F2와 80mm 평행쌍)"
+      },
+      {
+        "handle": "21F4",
+        "reason": "INS 1810mm 수평 벽면선"
+      },
+      {
+        "handle": "21F5",
+        "reason": "INS 벽면선(21F4와 115mm 평행쌍)"
+      },
+      {
+        "handle": "2209",
+        "reason": "INS 1980mm 수평 벽면선"
+      },
+      {
+        "handle": "220A",
+        "reason": "INS 벽면선(2209와 115mm 평행쌍)"
+      },
+      {
+        "handle": "2200",
+        "reason": "INS 1285mm 수직 벽면선"
+      },
+      {
+        "handle": "2201",
+        "reason": "INS 수직 벽면선(2200과 평행쌍)"
+      }
+    ],
+    "notes": "84b 유닛 완결 평면 — W1 115, W2 89, INS 벽면 라이닝 평행쌍(21F2/21F3), INSUL 단열블록, 조적벽 레이어",
+    "rationale": {
+      "evidence": "W1 115, W2 89, A02-벽체-조적 1로 벽 레이어가 명시적이며 INS 45, INSUL 20 단열이 벽을 따라 붙는다. 샘플은 W1/W2 실선 대신 INS 평행쌍(21F2/21F3=80mm, 21F4/21F5=115mm)이 벽면 라이닝을 이루고 W1 레이어 인서트(block=is)는 단열심볼이다. bbox 약 15100x12400mm.",
+      "rule": "W1/W2 카운트가 높고 INS 평행쌍이 벽면을 따라 라이닝을 이루면 완결 평면 부분도다.",
+      "counterfactual": "벽·단열 레이어가 없고 FUR만 있으면 가구, 지붕선만 있으면 지붕층으로 뒤집힌다.",
+      "uncertainty": "샘플에 W1/W2 실선 핸들이 노출되지 않아 인용 핸들은 INS(벽면 라이닝) 근사이며, is 인서트가 벽 자체인지 단열 표현인지는 블록 내부까지 열어야 확정된다."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-84b1-295",
+    "def": "X-평면도(기본형)$0$84b1",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.95,
+    "wall_line_handles": [
+      {
+        "handle": "6D10",
+        "reason": "MC 12400mm 수직 벽면선(전고급)"
+      },
+      {
+        "handle": "6D0C",
+        "reason": "MC 5795mm 수직 벽면선(CEN 6D09 협재)"
+      },
+      {
+        "handle": "6D0E",
+        "reason": "MC 수직 벽면선(6D0C와 300mm 벽쌍)"
+      },
+      {
+        "handle": "6D0B",
+        "reason": "MC 6135mm 수직 벽면선(CEN 6D0A 협재)"
+      },
+      {
+        "handle": "6D0D",
+        "reason": "MC 6135mm 수직 벽면선(6D0B와 벽쌍)"
+      }
+    ],
+    "notes": "84b1 유닛 완결 평면(84b 변형) — W1 111, W2 93, MC 벽면선이 CEN 중심선을 협재(6D0C/6D0E∥6D09), 설비OPEN/단열/문",
+    "rationale": {
+      "evidence": "W1 111, W2 93 벽선에 MC 37, INS 44, INSUL 20 마감이 붙는다. 샘플에서 MC 6D0C(x=11430)·6D0E(11130)가 CEN 6D09(11280)를 가운데 두고 300mm 벽두께를 이루고, 6D10은 12400mm 전고 벽면선이다. bbox 약 15100x12400mm로 84b 변형이다.",
+      "rule": "MC 벽면선 쌍이 CEN 중심선을 협재하여 벽두께를 형성하고 전고 벽면선을 동반하면 완결 평면 부분도다.",
+      "counterfactual": "MC/CEN 벽 구성이 없고 FUR 소형 형상만 남으면 가구로 바뀐다.",
+      "uncertainty": "샘플에 W1/W2 실선 핸들이 안 잡혀 인용은 MC(벽면) 근사이며, 84b와의 정확한 차분은 투영만으로 규명 불가하다."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-84c-296",
+    "def": "X-평면도(기본형)$0$84c",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.95,
+    "wall_line_handles": [
+      {
+        "handle": "2550",
+        "reason": "INS 1910mm 수평 벽면선"
+      },
+      {
+        "handle": "2551",
+        "reason": "INS 벽면선(2550과 115mm 평행쌍)"
+      },
+      {
+        "handle": "254E",
+        "reason": "INS 880mm 수평 벽면선"
+      },
+      {
+        "handle": "254F",
+        "reason": "INS 벽면선(254E와 115mm 평행쌍)"
+      },
+      {
+        "handle": "2552",
+        "reason": "INS 590mm 수직 벽면선"
+      },
+      {
+        "handle": "2553",
+        "reason": "INS 수직 벽면선(2552와 115mm 평행쌍)"
+      }
+    ],
+    "notes": "84c 유닛 완결 평면 — W1 105, W2 92, INS 벽면 라이닝 평행쌍(2550/2551), INSUL 단열블록 다수, TIL 타일 해치",
+    "rationale": {
+      "evidence": "W1 105, W2 92 벽선에 INS 53, INSUL 27, MC 44, TIL 8, 4GYP 46, 7GYP 51 마감이 두껍다. 샘플은 W1/W2 대신 INS 평행쌍(2550/2551, 254E/254F, 2552/2553 모두 115mm 간격)이 벽면 라이닝을 형성한다. bbox 약 16445x12850mm.",
+      "rule": "높은 W1/W2 카운트와 115mm 규칙 간격 INS 평행쌍(벽면 라이닝)이 결합하면 완결 평면 부분도다.",
+      "counterfactual": "벽·단열·타일 마감층이 없고 FUR 단일 레이어만 남으면 가구로 뒤집힌다.",
+      "uncertainty": "인용 핸들은 INS 벽면 라이닝 근사이며 실제 W1/W2 실선 핸들은 투영 밖이라 특정 불가하다."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-84c1-297",
+    "def": "X-평면도(기본형)$0$84c1",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.95,
+    "wall_line_handles": [
+      {
+        "handle": "740D",
+        "reason": "MC 3560mm 수직 벽면선(CEN 740C 협재)"
+      },
+      {
+        "handle": "740E",
+        "reason": "MC 2080mm 수직 벽면선(740D와 벽쌍)"
+      },
+      {
+        "handle": "7411",
+        "reason": "MC 980mm 수직 벽면선"
+      },
+      {
+        "handle": "740A",
+        "reason": "MC 2010mm 수평 벽면선"
+      },
+      {
+        "handle": "7402",
+        "reason": "INS 3520mm 수평 벽면 라이닝선"
+      }
+    ],
+    "notes": "84c1 유닛 완결 평면(84c 변형) — W1 106, W2 92, MC 벽면선이 CEN 협재(740D∥740C), 수전 인서트, 단열/타일 마감",
+    "rationale": {
+      "evidence": "W1 106, W2 92 벽선에 INS 57, INSUL 27, MC 44 마감이 붙고 수전(급수전) 인서트가 있다. 샘플에서 MC 740D(x=1740)·740E/7411(1900/1910)이 CEN 740C(1820)를 협재하여 벽두께를 이루고 INS 7402가 3520mm 수평 벽면 라이닝을 이룬다. bbox 약 16445x12850mm로 84c 변형이다.",
+      "rule": "MC 벽면선이 CEN 중심선을 축으로 배열되고 INS 라이닝이 벽면을 따르면 완결 평면 부분도다.",
+      "counterfactual": "MC/CEN 벽 배열이 없고 소형 FUR 형상만 남으면 가구로 바뀐다.",
+      "uncertainty": "샘플에 W1/W2 실선 핸들이 없어 인용은 MC·INS 벽면 근사이며, 84c와의 차분은 투영만으로 특정 불가하다."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-a-c019c01bd-298",
+    "def": "X-평면도(기본형)$0$A$C019C01BD",
+    "role": "가구",
+    "wall_likelihood": 0.03,
+    "wall_line_handles": [],
+    "notes": "가구 블록 — 전 entity가 FUR 레이어, ARC 43+SOLID 해치로 곡선 형상, bbox 약 192x1200mm 세장형 집기",
+    "rationale": {
+      "evidence": "entity 117개가 전부 FUR(가구) 단일 레이어이며 ARC 43, HATCH 2(SOLID), LINE 67, LWPOLYLINE 4로 곡선 위주 형상이다. bbox [331.2,-0.003 ~ 523.1,1200.3]로 약 192x1200mm 물체 스케일이라 방이 아니라 단일 집기다. W1/W2/CEN 등 벽·중심선 레이어가 전무하다.",
+      "rule": "전 entity가 FUR 계열 단일 레이어에 있고 bbox가 물체(수백 mm) 스케일이며 벽/중심선 레이어가 없으면 가구다.",
+      "counterfactual": "동일 형상이 W1/CEN 방 경계를 동반하거나 bbox가 세대 규모(수 m)였다면 평면 부분도로 뒤집힌다.",
+      "uncertainty": "레이어와 bbox만으로는 구체 품목(소파/화분/기둥형 집기 등)을 확정할 수 없고, 이 블록이 상위 평면에 몇 번 삽입되는지는 정의만으로 알 수 없다."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-a-c01a306ae-299",
+    "def": "X-평면도(기본형)$0$A$C01A306AE",
+    "role": "가구",
+    "wall_likelihood": 0.03,
+    "wall_line_handles": [],
+    "notes": "가구 블록 — 전 entity FUR 레이어, LINE 18+모서리 ARC 4, bbox 약 500x104mm 납작한 집기(벤치/선반류)",
+    "rationale": {
+      "evidence": "entity 22개가 전부 FUR 레이어이며 LINE 18, ARC 4(모서리 라운드)로 단순 형상이다. bbox [0,0 ~ 500,104.2]로 약 500x104mm 납작한 물체 스케일이다. 벽(W1/W2)·중심선(CEN)·마감 레이어가 전혀 없다.",
+      "rule": "FUR 단일 레이어에 소수 LINE+모서리 ARC로 물체 스케일 윤곽만 있으면 가구다.",
+      "counterfactual": "벽·중심선 레이어와 방 경계가 있었거나 bbox가 세대 규모였다면 평면 부분도가 된다.",
+      "uncertainty": "형상만으로 벤치/선반/가전 중 무엇인지 특정 불가하며, 실제 삽입 위치·회전은 정의 밖 정보다."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-a-c04b05b29-300",
+    "def": "X-평면도(기본형)$0$A$C04B05B29",
+    "role": "가구",
+    "wall_likelihood": 0.03,
+    "wall_line_handles": [],
+    "notes": "가구 블록 — FUR-FIX 21/FUR-KIT 3 레이어, bbox 약 920x152mm 주방 붙박이 집기(싱크/카운터류)",
+    "rationale": {
+      "evidence": "entity 24개가 FUR-FIX(붙박이 가구) 21, FUR-KIT(주방 가구) 3 레이어에만 있고 LINE 16, LWPOLYLINE 8로 구성된다. bbox [-880,-132 ~ 40,20]로 약 920x152mm 주방 붙박이 스케일이다. 벽·중심선·마감 레이어가 없다.",
+      "rule": "FUR-FIX/FUR-KIT 등 가구 계열 레이어에만 있고 물체 스케일 윤곽이면 가구(붙박이/주방 집기)다.",
+      "counterfactual": "W1/CEN 방 경계나 세대 규모 bbox가 있었다면 평면 부분도로 이동한다.",
+      "uncertainty": "싱크·상부장·카운터 중 정확한 품목은 레이어/bbox만으로 확정 불가하며, 삽입 개수는 정의 밖이다."
+    }
+  }
+]

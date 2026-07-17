@@ -1,0 +1,282 @@
+[
+  {
+    "unit_id": "defannot-d375-81",
+    "def": "*D375",
+    "role": "치수캐시",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "Anonymous *D dimension-cache block: linear dimension reading '325' on layer DIM with DIMDOT arrow inserts and DEFPOINTS definition points.",
+    "rationale": {
+      "evidence": "The block name '*D375' is an anonymous dimension block, and all 9 entities match the dimension-graphics signature: two parallel vertical extension LINEs (8E44, 8E45) plus one horizontal dimension LINE (8E46) on layer DIM, two INSERTs of the arrowhead block DIMDOT, one MTEXT (8E49) containing only the measurement '\\A1;325', and three POINTs on layer DEFPOINTS. Additionally, the measured x-span between the two vertical extension lines is 325, consistent with the dimension text '325'.",
+      "rule": "A block whose name starts with '*D' and whose contents are exclusively extension/dimension lines, arrowhead inserts, a single numeric MTEXT, and DEFPOINTS points is the internal geometry cache of a DIMENSION entity, not model geometry; its LINEs are dimension graphics, never walls.",
+      "counterfactual": "If the block contained thick paired parallel lines on an architectural layer (e.g. WALL/A-WALL), hatches, or non-numeric annotation text - or lacked the DEFPOINTS points and DIMDOT arrows - the dimension-cache reading would flip toward 평면 부분도 or 기타.",
+      "uncertainty": "The projection does not show which model entity this dimension measures or whether the dimension is still associative, so what building element (wall, opening, furniture) the value '325' refers to cannot be determined from this block alone."
+    }
+  },
+  {
+    "unit_id": "defannot-d376-82",
+    "def": "*D376",
+    "role": "치수캐시",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "Anonymous *D dimension-cache block: linear dimension reading '3320' on layer DIM with DIMDOT arrow inserts and DEFPOINTS definition points.",
+    "rationale": {
+      "evidence": "The block name '*D376' is an anonymous dimension block, and all 9 entities match the dimension-graphics signature: two parallel vertical extension LINEs (8E4D, 8E4E) plus one horizontal dimension LINE (8E4F) on layer DIM, two INSERTs of the arrowhead block DIMDOT, one MTEXT (8E52) containing only the measurement '\\A1;3320', and three POINTs on layer DEFPOINTS. Additionally, the measured x-span between the two vertical extension lines is 3320, consistent with the dimension text '3320'.",
+      "rule": "A block whose name starts with '*D' and whose contents are exclusively extension/dimension lines, arrowhead inserts, a single numeric MTEXT, and DEFPOINTS points is the internal geometry cache of a DIMENSION entity, not model geometry; its LINEs are dimension graphics, never walls.",
+      "counterfactual": "If the block contained thick paired parallel lines on an architectural layer (e.g. WALL/A-WALL), hatches, or non-numeric annotation text - or lacked the DEFPOINTS points and DIMDOT arrows - the dimension-cache reading would flip toward 평면 부분도 or 기타.",
+      "uncertainty": "The projection does not show which model entity this dimension measures or whether the dimension is still associative, so what building element (wall, opening, furniture) the value '3320' refers to cannot be determined from this block alone."
+    }
+  },
+  {
+    "unit_id": "defannot-d377-83",
+    "def": "*D377",
+    "role": "치수캐시",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "Anonymous *D dimension-cache block: linear dimension reading '725' on layer DIM with DIMDOT arrow inserts and DEFPOINTS definition points.",
+    "rationale": {
+      "evidence": "The block name '*D377' is an anonymous dimension block, and all 9 entities match the dimension-graphics signature: two parallel vertical extension LINEs (8E56, 8E57) plus one horizontal dimension LINE (8E58) on layer DIM, two INSERTs of the arrowhead block DIMDOT, one MTEXT (8E5B) containing only the measurement '\\A1;725', and three POINTs on layer DEFPOINTS. Additionally, the measured x-span between the two vertical extension lines is 725, consistent with the dimension text '725'.",
+      "rule": "A block whose name starts with '*D' and whose contents are exclusively extension/dimension lines, arrowhead inserts, a single numeric MTEXT, and DEFPOINTS points is the internal geometry cache of a DIMENSION entity, not model geometry; its LINEs are dimension graphics, never walls.",
+      "counterfactual": "If the block contained thick paired parallel lines on an architectural layer (e.g. WALL/A-WALL), hatches, or non-numeric annotation text - or lacked the DEFPOINTS points and DIMDOT arrows - the dimension-cache reading would flip toward 평면 부분도 or 기타.",
+      "uncertainty": "The projection does not show which model entity this dimension measures or whether the dimension is still associative, so what building element (wall, opening, furniture) the value '725' refers to cannot be determined from this block alone."
+    }
+  },
+  {
+    "unit_id": "defannot-d378-84",
+    "def": "*D378",
+    "role": "치수캐시",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "Anonymous *D dimension-cache block: linear dimension reading '725' on layer DIM with DIMDOT arrow inserts and DEFPOINTS definition points.",
+    "rationale": {
+      "evidence": "The block name '*D378' is an anonymous dimension block, and all 9 entities match the dimension-graphics signature: two parallel vertical extension LINEs (8E5F, 8E60) plus one horizontal dimension LINE (8E61) on layer DIM, two INSERTs of the arrowhead block DIMDOT, one MTEXT (8E64) containing only the measurement '\\A1;725', and three POINTs on layer DEFPOINTS. Additionally, the measured x-span between the two vertical extension lines is 725, consistent with the dimension text '725'.",
+      "rule": "A block whose name starts with '*D' and whose contents are exclusively extension/dimension lines, arrowhead inserts, a single numeric MTEXT, and DEFPOINTS points is the internal geometry cache of a DIMENSION entity, not model geometry; its LINEs are dimension graphics, never walls.",
+      "counterfactual": "If the block contained thick paired parallel lines on an architectural layer (e.g. WALL/A-WALL), hatches, or non-numeric annotation text - or lacked the DEFPOINTS points and DIMDOT arrows - the dimension-cache reading would flip toward 평면 부분도 or 기타.",
+      "uncertainty": "The projection does not show which model entity this dimension measures or whether the dimension is still associative, so what building element (wall, opening, furniture) the value '725' refers to cannot be determined from this block alone."
+    }
+  },
+  {
+    "unit_id": "defannot-d379-85",
+    "def": "*D379",
+    "role": "치수캐시",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "Anonymous *D dimension-cache block: linear dimension reading '1620' on layer DIM with DIMDOT arrow inserts and DEFPOINTS definition points.",
+    "rationale": {
+      "evidence": "The block name '*D379' is an anonymous dimension block, and all 9 entities match the dimension-graphics signature: two parallel vertical extension LINEs (8E68, 8E69) plus one horizontal dimension LINE (8E6A) on layer DIM, two INSERTs of the arrowhead block DIMDOT, one MTEXT (8E6D) containing only the measurement '\\A1;1620', and three POINTs on layer DEFPOINTS. Additionally, the measured x-span between the two vertical extension lines is 1620, consistent with the dimension text '1620'.",
+      "rule": "A block whose name starts with '*D' and whose contents are exclusively extension/dimension lines, arrowhead inserts, a single numeric MTEXT, and DEFPOINTS points is the internal geometry cache of a DIMENSION entity, not model geometry; its LINEs are dimension graphics, never walls.",
+      "counterfactual": "If the block contained thick paired parallel lines on an architectural layer (e.g. WALL/A-WALL), hatches, or non-numeric annotation text - or lacked the DEFPOINTS points and DIMDOT arrows - the dimension-cache reading would flip toward 평면 부분도 or 기타.",
+      "uncertainty": "The projection does not show which model entity this dimension measures or whether the dimension is still associative, so what building element (wall, opening, furniture) the value '1620' refers to cannot be determined from this block alone."
+    }
+  },
+  {
+    "unit_id": "defannot-d380-86",
+    "def": "*D380",
+    "role": "치수캐시",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "Anonymous *D dimension-cache block: linear dimension reading '775' on layer DIM with DIMDOT arrow inserts and DEFPOINTS definition points.",
+    "rationale": {
+      "evidence": "The block name '*D380' is an anonymous dimension block, and all 9 entities match the dimension-graphics signature: two parallel vertical extension LINEs (8E71, 8E72) plus one horizontal dimension LINE (8E73) on layer DIM, two INSERTs of the arrowhead block DIMDOT, one MTEXT (8E76) containing only the measurement '\\A1;775', and three POINTs on layer DEFPOINTS. Additionally, the measured x-span between the two vertical extension lines is 775, consistent with the dimension text '775'.",
+      "rule": "A block whose name starts with '*D' and whose contents are exclusively extension/dimension lines, arrowhead inserts, a single numeric MTEXT, and DEFPOINTS points is the internal geometry cache of a DIMENSION entity, not model geometry; its LINEs are dimension graphics, never walls.",
+      "counterfactual": "If the block contained thick paired parallel lines on an architectural layer (e.g. WALL/A-WALL), hatches, or non-numeric annotation text - or lacked the DEFPOINTS points and DIMDOT arrows - the dimension-cache reading would flip toward 평면 부분도 or 기타.",
+      "uncertainty": "The projection does not show which model entity this dimension measures or whether the dimension is still associative, so what building element (wall, opening, furniture) the value '775' refers to cannot be determined from this block alone."
+    }
+  },
+  {
+    "unit_id": "defannot-d381-87",
+    "def": "*D381",
+    "role": "치수캐시",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "Anonymous *D dimension-cache block: linear dimension reading '710' on layer DIM with DIMDOT arrow inserts and DEFPOINTS definition points.",
+    "rationale": {
+      "evidence": "The block name '*D381' is an anonymous dimension block, and all 9 entities match the dimension-graphics signature: two parallel vertical extension LINEs (8E7A, 8E7B) plus one horizontal dimension LINE (8E7C) on layer DIM, two INSERTs of the arrowhead block DIMDOT, one MTEXT (8E7F) containing only the measurement '\\A1;710', and three POINTs on layer DEFPOINTS. Additionally, the measured x-span between the two vertical extension lines is 710, consistent with the dimension text '710'.",
+      "rule": "A block whose name starts with '*D' and whose contents are exclusively extension/dimension lines, arrowhead inserts, a single numeric MTEXT, and DEFPOINTS points is the internal geometry cache of a DIMENSION entity, not model geometry; its LINEs are dimension graphics, never walls.",
+      "counterfactual": "If the block contained thick paired parallel lines on an architectural layer (e.g. WALL/A-WALL), hatches, or non-numeric annotation text - or lacked the DEFPOINTS points and DIMDOT arrows - the dimension-cache reading would flip toward 평면 부분도 or 기타.",
+      "uncertainty": "The projection does not show which model entity this dimension measures or whether the dimension is still associative, so what building element (wall, opening, furniture) the value '710' refers to cannot be determined from this block alone."
+    }
+  },
+  {
+    "unit_id": "defannot-d382-88",
+    "def": "*D382",
+    "role": "치수캐시",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "Anonymous *D dimension-cache block: linear dimension reading '1620' on layer DIM with DIMDOT arrow inserts and DEFPOINTS definition points.",
+    "rationale": {
+      "evidence": "The block name '*D382' is an anonymous dimension block, and all 9 entities match the dimension-graphics signature: two parallel vertical extension LINEs (8E83, 8E84) plus one horizontal dimension LINE (8E85) on layer DIM, two INSERTs of the arrowhead block DIMDOT, one MTEXT (8E88) containing only the measurement '\\A1;1620', and three POINTs on layer DEFPOINTS. Additionally, the measured x-span between the two vertical extension lines is 1620, consistent with the dimension text '1620'.",
+      "rule": "A block whose name starts with '*D' and whose contents are exclusively extension/dimension lines, arrowhead inserts, a single numeric MTEXT, and DEFPOINTS points is the internal geometry cache of a DIMENSION entity, not model geometry; its LINEs are dimension graphics, never walls.",
+      "counterfactual": "If the block contained thick paired parallel lines on an architectural layer (e.g. WALL/A-WALL), hatches, or non-numeric annotation text - or lacked the DEFPOINTS points and DIMDOT arrows - the dimension-cache reading would flip toward 평면 부분도 or 기타.",
+      "uncertainty": "The projection does not show which model entity this dimension measures or whether the dimension is still associative, so what building element (wall, opening, furniture) the value '1620' refers to cannot be determined from this block alone."
+    }
+  },
+  {
+    "unit_id": "defannot-d383-89",
+    "def": "*D383",
+    "role": "치수캐시",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "Anonymous *D dimension-cache block: linear dimension reading '760' on layer DIM with DIMDOT arrow inserts and DEFPOINTS definition points.",
+    "rationale": {
+      "evidence": "The block name '*D383' is an anonymous dimension block, and all 9 entities match the dimension-graphics signature: two parallel vertical extension LINEs (8E8C, 8E8D) plus one horizontal dimension LINE (8E8E) on layer DIM, two INSERTs of the arrowhead block DIMDOT, one MTEXT (8E91) containing only the measurement '\\A1;760', and three POINTs on layer DEFPOINTS. Additionally, the measured x-span between the two vertical extension lines is 760, consistent with the dimension text '760'.",
+      "rule": "A block whose name starts with '*D' and whose contents are exclusively extension/dimension lines, arrowhead inserts, a single numeric MTEXT, and DEFPOINTS points is the internal geometry cache of a DIMENSION entity, not model geometry; its LINEs are dimension graphics, never walls.",
+      "counterfactual": "If the block contained thick paired parallel lines on an architectural layer (e.g. WALL/A-WALL), hatches, or non-numeric annotation text - or lacked the DEFPOINTS points and DIMDOT arrows - the dimension-cache reading would flip toward 평면 부분도 or 기타.",
+      "uncertainty": "The projection does not show which model entity this dimension measures or whether the dimension is still associative, so what building element (wall, opening, furniture) the value '760' refers to cannot be determined from this block alone."
+    }
+  },
+  {
+    "unit_id": "defannot-d384-90",
+    "def": "*D384",
+    "role": "치수캐시",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "Anonymous *D dimension-cache block: linear dimension reading '900' on layer DIM with DIMDOT arrow inserts and DEFPOINTS definition points.",
+    "rationale": {
+      "evidence": "The block name '*D384' is an anonymous dimension block, and all 9 entities match the dimension-graphics signature: two parallel vertical extension LINEs (8E95, 8E96) plus one horizontal dimension LINE (8E97) on layer DIM, two INSERTs of the arrowhead block DIMDOT, one MTEXT (8E9A) containing only the measurement '\\A1;900', and three POINTs on layer DEFPOINTS. Additionally, the measured x-span between the two vertical extension lines is 900, consistent with the dimension text '900'.",
+      "rule": "A block whose name starts with '*D' and whose contents are exclusively extension/dimension lines, arrowhead inserts, a single numeric MTEXT, and DEFPOINTS points is the internal geometry cache of a DIMENSION entity, not model geometry; its LINEs are dimension graphics, never walls.",
+      "counterfactual": "If the block contained thick paired parallel lines on an architectural layer (e.g. WALL/A-WALL), hatches, or non-numeric annotation text - or lacked the DEFPOINTS points and DIMDOT arrows - the dimension-cache reading would flip toward 평면 부분도 or 기타.",
+      "uncertainty": "The projection does not show which model entity this dimension measures or whether the dimension is still associative, so what building element (wall, opening, furniture) the value '900' refers to cannot be determined from this block alone."
+    }
+  },
+  {
+    "unit_id": "defannot-d385-91",
+    "def": "*D385",
+    "role": "치수캐시",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "Anonymous *D dimension-cache block: linear dimension reading '820' on layer DIM with DIMDOT arrow inserts and DEFPOINTS definition points.",
+    "rationale": {
+      "evidence": "The block name '*D385' is an anonymous dimension block, and all 9 entities match the dimension-graphics signature: two parallel vertical extension LINEs (8E9E, 8E9F) plus one horizontal dimension LINE (8EA0) on layer DIM, two INSERTs of the arrowhead block DIMDOT, one MTEXT (8EA3) containing only the measurement '\\A1;820', and three POINTs on layer DEFPOINTS. Additionally, the measured x-span between the two vertical extension lines is 820, consistent with the dimension text '820'.",
+      "rule": "A block whose name starts with '*D' and whose contents are exclusively extension/dimension lines, arrowhead inserts, a single numeric MTEXT, and DEFPOINTS points is the internal geometry cache of a DIMENSION entity, not model geometry; its LINEs are dimension graphics, never walls.",
+      "counterfactual": "If the block contained thick paired parallel lines on an architectural layer (e.g. WALL/A-WALL), hatches, or non-numeric annotation text - or lacked the DEFPOINTS points and DIMDOT arrows - the dimension-cache reading would flip toward 평면 부분도 or 기타.",
+      "uncertainty": "The projection does not show which model entity this dimension measures or whether the dimension is still associative, so what building element (wall, opening, furniture) the value '820' refers to cannot be determined from this block alone."
+    }
+  },
+  {
+    "unit_id": "defannot-d386-92",
+    "def": "*D386",
+    "role": "치수캐시",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "Anonymous *D dimension-cache block: linear dimension reading '1280' on layer DIM with DIMDOT arrow inserts and DEFPOINTS definition points.",
+    "rationale": {
+      "evidence": "The block name '*D386' is an anonymous dimension block, and all 9 entities match the dimension-graphics signature: two parallel vertical extension LINEs (8EA7, 8EA8) plus one horizontal dimension LINE (8EA9) on layer DIM, two INSERTs of the arrowhead block DIMDOT, one MTEXT (8EAC) containing only the measurement '\\A1;1280', and three POINTs on layer DEFPOINTS. Additionally, the measured x-span between the two vertical extension lines is 1280, consistent with the dimension text '1280'.",
+      "rule": "A block whose name starts with '*D' and whose contents are exclusively extension/dimension lines, arrowhead inserts, a single numeric MTEXT, and DEFPOINTS points is the internal geometry cache of a DIMENSION entity, not model geometry; its LINEs are dimension graphics, never walls.",
+      "counterfactual": "If the block contained thick paired parallel lines on an architectural layer (e.g. WALL/A-WALL), hatches, or non-numeric annotation text - or lacked the DEFPOINTS points and DIMDOT arrows - the dimension-cache reading would flip toward 평면 부분도 or 기타.",
+      "uncertainty": "The projection does not show which model entity this dimension measures or whether the dimension is still associative, so what building element (wall, opening, furniture) the value '1280' refers to cannot be determined from this block alone."
+    }
+  },
+  {
+    "unit_id": "defannot-d387-93",
+    "def": "*D387",
+    "role": "치수캐시",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "Anonymous *D dimension-cache block: linear dimension reading '350' on layer DIM with DIMDOT arrow inserts and DEFPOINTS definition points.",
+    "rationale": {
+      "evidence": "The block name '*D387' is an anonymous dimension block, and all 9 entities match the dimension-graphics signature: two parallel vertical extension LINEs (8EB0, 8EB1) plus one horizontal dimension LINE (8EB2) on layer DIM, two INSERTs of the arrowhead block DIMDOT, one MTEXT (8EB5) containing only the measurement '\\A1;350', and three POINTs on layer DEFPOINTS. Additionally, the measured x-span between the two vertical extension lines is 350, consistent with the dimension text '350'.",
+      "rule": "A block whose name starts with '*D' and whose contents are exclusively extension/dimension lines, arrowhead inserts, a single numeric MTEXT, and DEFPOINTS points is the internal geometry cache of a DIMENSION entity, not model geometry; its LINEs are dimension graphics, never walls.",
+      "counterfactual": "If the block contained thick paired parallel lines on an architectural layer (e.g. WALL/A-WALL), hatches, or non-numeric annotation text - or lacked the DEFPOINTS points and DIMDOT arrows - the dimension-cache reading would flip toward 평면 부분도 or 기타.",
+      "uncertainty": "The projection does not show which model entity this dimension measures or whether the dimension is still associative, so what building element (wall, opening, furniture) the value '350' refers to cannot be determined from this block alone."
+    }
+  },
+  {
+    "unit_id": "defannot-d388-94",
+    "def": "*D388",
+    "role": "치수캐시",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "Anonymous *D dimension-cache block: linear dimension reading '1020' on layer DIM with DIMDOT arrow inserts and DEFPOINTS definition points.",
+    "rationale": {
+      "evidence": "The block name '*D388' is an anonymous dimension block, and all 9 entities match the dimension-graphics signature: two parallel vertical extension LINEs (8EB9, 8EBA) plus one horizontal dimension LINE (8EBB) on layer DIM, two INSERTs of the arrowhead block DIMDOT, one MTEXT (8EBE) containing only the measurement '\\A1;1020', and three POINTs on layer DEFPOINTS. Additionally, the measured x-span between the two vertical extension lines is 1020, consistent with the dimension text '1020'.",
+      "rule": "A block whose name starts with '*D' and whose contents are exclusively extension/dimension lines, arrowhead inserts, a single numeric MTEXT, and DEFPOINTS points is the internal geometry cache of a DIMENSION entity, not model geometry; its LINEs are dimension graphics, never walls.",
+      "counterfactual": "If the block contained thick paired parallel lines on an architectural layer (e.g. WALL/A-WALL), hatches, or non-numeric annotation text - or lacked the DEFPOINTS points and DIMDOT arrows - the dimension-cache reading would flip toward 평면 부분도 or 기타.",
+      "uncertainty": "The projection does not show which model entity this dimension measures or whether the dimension is still associative, so what building element (wall, opening, furniture) the value '1020' refers to cannot be determined from this block alone."
+    }
+  },
+  {
+    "unit_id": "defannot-d389-95",
+    "def": "*D389",
+    "role": "치수캐시",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "Anonymous *D dimension-cache block: linear dimension reading '710' on layer DIM with DIMDOT arrow inserts and DEFPOINTS definition points.",
+    "rationale": {
+      "evidence": "The block name '*D389' is an anonymous dimension block, and all 9 entities match the dimension-graphics signature: two parallel vertical extension LINEs (8EC2, 8EC3) plus one horizontal dimension LINE (8EC4) on layer DIM, two INSERTs of the arrowhead block DIMDOT, one MTEXT (8EC7) containing only the measurement '\\A1;710', and three POINTs on layer DEFPOINTS. Additionally, the measured x-span between the two vertical extension lines is 710, consistent with the dimension text '710'.",
+      "rule": "A block whose name starts with '*D' and whose contents are exclusively extension/dimension lines, arrowhead inserts, a single numeric MTEXT, and DEFPOINTS points is the internal geometry cache of a DIMENSION entity, not model geometry; its LINEs are dimension graphics, never walls.",
+      "counterfactual": "If the block contained thick paired parallel lines on an architectural layer (e.g. WALL/A-WALL), hatches, or non-numeric annotation text - or lacked the DEFPOINTS points and DIMDOT arrows - the dimension-cache reading would flip toward 평면 부분도 or 기타.",
+      "uncertainty": "The projection does not show which model entity this dimension measures or whether the dimension is still associative, so what building element (wall, opening, furniture) the value '710' refers to cannot be determined from this block alone."
+    }
+  },
+  {
+    "unit_id": "defannot-d390-96",
+    "def": "*D390",
+    "role": "치수캐시",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "Anonymous *D dimension-cache block: linear dimension reading '320' on layer DIM with DIMDOT arrow inserts and DEFPOINTS definition points.",
+    "rationale": {
+      "evidence": "The block name '*D390' is an anonymous dimension block, and all 9 entities match the dimension-graphics signature: two parallel vertical extension LINEs (8ECB, 8ECC) plus one horizontal dimension LINE (8ECD) on layer DIM, two INSERTs of the arrowhead block DIMDOT, one MTEXT (8ED0) containing only the measurement '\\A1;320', and three POINTs on layer DEFPOINTS. Additionally, the measured x-span between the two vertical extension lines is 320, consistent with the dimension text '320'.",
+      "rule": "A block whose name starts with '*D' and whose contents are exclusively extension/dimension lines, arrowhead inserts, a single numeric MTEXT, and DEFPOINTS points is the internal geometry cache of a DIMENSION entity, not model geometry; its LINEs are dimension graphics, never walls.",
+      "counterfactual": "If the block contained thick paired parallel lines on an architectural layer (e.g. WALL/A-WALL), hatches, or non-numeric annotation text - or lacked the DEFPOINTS points and DIMDOT arrows - the dimension-cache reading would flip toward 평면 부분도 or 기타.",
+      "uncertainty": "The projection does not show which model entity this dimension measures or whether the dimension is still associative, so what building element (wall, opening, furniture) the value '320' refers to cannot be determined from this block alone."
+    }
+  },
+  {
+    "unit_id": "defannot-d391-97",
+    "def": "*D391",
+    "role": "치수캐시",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "Anonymous *D dimension-cache block: linear dimension reading '1820' on layer DIM with DIMDOT arrow inserts and DEFPOINTS definition points.",
+    "rationale": {
+      "evidence": "The block name '*D391' is an anonymous dimension block, and all 9 entities match the dimension-graphics signature: two parallel vertical extension LINEs (8ED4, 8ED5) plus one horizontal dimension LINE (8ED6) on layer DIM, two INSERTs of the arrowhead block DIMDOT, one MTEXT (8ED9) containing only the measurement '\\A1;1820', and three POINTs on layer DEFPOINTS. Additionally, the measured x-span between the two vertical extension lines is 1820, consistent with the dimension text '1820'.",
+      "rule": "A block whose name starts with '*D' and whose contents are exclusively extension/dimension lines, arrowhead inserts, a single numeric MTEXT, and DEFPOINTS points is the internal geometry cache of a DIMENSION entity, not model geometry; its LINEs are dimension graphics, never walls.",
+      "counterfactual": "If the block contained thick paired parallel lines on an architectural layer (e.g. WALL/A-WALL), hatches, or non-numeric annotation text - or lacked the DEFPOINTS points and DIMDOT arrows - the dimension-cache reading would flip toward 평면 부분도 or 기타.",
+      "uncertainty": "The projection does not show which model entity this dimension measures or whether the dimension is still associative, so what building element (wall, opening, furniture) the value '1820' refers to cannot be determined from this block alone."
+    }
+  },
+  {
+    "unit_id": "defannot-d392-98",
+    "def": "*D392",
+    "role": "치수캐시",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "Anonymous *D dimension-cache block: linear dimension reading '1125' on layer DIM with DIMDOT arrow inserts and DEFPOINTS definition points.",
+    "rationale": {
+      "evidence": "The block name '*D392' is an anonymous dimension block, and all 9 entities match the dimension-graphics signature: two parallel vertical extension LINEs (8EDD, 8EDE) plus one horizontal dimension LINE (8EDF) on layer DIM, two INSERTs of the arrowhead block DIMDOT, one MTEXT (8EE2) containing only the measurement '\\A1;1125', and three POINTs on layer DEFPOINTS. Additionally, the measured x-span between the two vertical extension lines is 1125, consistent with the dimension text '1125'.",
+      "rule": "A block whose name starts with '*D' and whose contents are exclusively extension/dimension lines, arrowhead inserts, a single numeric MTEXT, and DEFPOINTS points is the internal geometry cache of a DIMENSION entity, not model geometry; its LINEs are dimension graphics, never walls.",
+      "counterfactual": "If the block contained thick paired parallel lines on an architectural layer (e.g. WALL/A-WALL), hatches, or non-numeric annotation text - or lacked the DEFPOINTS points and DIMDOT arrows - the dimension-cache reading would flip toward 평면 부분도 or 기타.",
+      "uncertainty": "The projection does not show which model entity this dimension measures or whether the dimension is still associative, so what building element (wall, opening, furniture) the value '1125' refers to cannot be determined from this block alone."
+    }
+  },
+  {
+    "unit_id": "defannot-d393-99",
+    "def": "*D393",
+    "role": "치수캐시",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "Anonymous *D dimension-cache block: linear dimension reading '1220' on layer DIM with DIMDOT arrow inserts and DEFPOINTS definition points.",
+    "rationale": {
+      "evidence": "The block name '*D393' is an anonymous dimension block, and all 9 entities match the dimension-graphics signature: two parallel vertical extension LINEs (8EE6, 8EE7) plus one horizontal dimension LINE (8EE8) on layer DIM, two INSERTs of the arrowhead block DIMDOT, one MTEXT (8EEB) containing only the measurement '\\A1;1220', and three POINTs on layer DEFPOINTS. Additionally, the measured x-span between the two vertical extension lines is 1220, consistent with the dimension text '1220'.",
+      "rule": "A block whose name starts with '*D' and whose contents are exclusively extension/dimension lines, arrowhead inserts, a single numeric MTEXT, and DEFPOINTS points is the internal geometry cache of a DIMENSION entity, not model geometry; its LINEs are dimension graphics, never walls.",
+      "counterfactual": "If the block contained thick paired parallel lines on an architectural layer (e.g. WALL/A-WALL), hatches, or non-numeric annotation text - or lacked the DEFPOINTS points and DIMDOT arrows - the dimension-cache reading would flip toward 평면 부분도 or 기타.",
+      "uncertainty": "The projection does not show which model entity this dimension measures or whether the dimension is still associative, so what building element (wall, opening, furniture) the value '1220' refers to cannot be determined from this block alone."
+    }
+  },
+  {
+    "unit_id": "defannot-d394-100",
+    "def": "*D394",
+    "role": "치수캐시",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "Anonymous *D dimension-cache block: linear dimension reading '985' on layer DIM with DIMDOT arrow inserts and DEFPOINTS definition points.",
+    "rationale": {
+      "evidence": "The block name '*D394' is an anonymous dimension block, and all 9 entities match the dimension-graphics signature: two parallel vertical extension LINEs (8EEF, 8EF0) plus one horizontal dimension LINE (8EF1) on layer DIM, two INSERTs of the arrowhead block DIMDOT, one MTEXT (8EF4) containing only the measurement '\\A1;985', and three POINTs on layer DEFPOINTS. Additionally, the measured x-span between the two vertical extension lines is 985, consistent with the dimension text '985'.",
+      "rule": "A block whose name starts with '*D' and whose contents are exclusively extension/dimension lines, arrowhead inserts, a single numeric MTEXT, and DEFPOINTS points is the internal geometry cache of a DIMENSION entity, not model geometry; its LINEs are dimension graphics, never walls.",
+      "counterfactual": "If the block contained thick paired parallel lines on an architectural layer (e.g. WALL/A-WALL), hatches, or non-numeric annotation text - or lacked the DEFPOINTS points and DIMDOT arrows - the dimension-cache reading would flip toward 평면 부분도 or 기타.",
+      "uncertainty": "The projection does not show which model entity this dimension measures or whether the dimension is still associative, so what building element (wall, opening, furniture) the value '985' refers to cannot be determined from this block alone."
+    }
+  }
+]

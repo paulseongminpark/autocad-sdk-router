@@ -1,0 +1,282 @@
+[
+ {
+  "unit_id": "defannot-u197-201",
+  "def": "*U197",
+  "role": "심볼",
+  "wall_likelihood": 0.03,
+  "wall_line_handles": [],
+  "notes": "국기계양대 삽입과 가림 영역을 포함한 선형 심볼로 판단된다.",
+  "rationale": {
+   "evidence": "20개의 LINE은 좁고 대칭적인 장방형 외곽을 이루며 WIPEOUT 2개가 함께 있다. 중첩 INSERT의 레이어와 블록명이 모두 국기계양대를 명시한다.",
+   "rule": "명시적인 설비·시설물 블록명과 가림 객체가 결합된 독립 형상은 벽보다 심볼로 분류한다.",
+   "counterfactual": "국기계양대 INSERT와 WIPEOUT이 없고 평면의 다른 벽 경계로 연속되는 평행선이었다면 평면 부분도와 벽선으로 판단할 수 있다.",
+   "uncertainty": "삽입 위치와 주변 평면이 없어 이 선들이 국기계양대 기초인지 다른 세부 부재인지는 확정할 수 없다."
+  }
+ },
+ {
+  "unit_id": "defannot-u199-202",
+  "def": "*U199",
+  "role": "기타",
+  "wall_likelihood": 0.08,
+  "wall_line_handles": [],
+  "notes": "INSUL 레이어의 반복 단열 표현만 담은 보조 정의이다.",
+  "rationale": {
+   "evidence": "17개 엔티티가 모두 INSUL 레이어의 5정점 LWPOLYLINE이다. 벽 경계를 나타낼 LINE이나 다른 평면 구성요소는 없다.",
+   "rule": "단열 전용 레이어에 반복된 작은 폴리라인만 있으면 벽 자체가 아니라 재료 표현 또는 채움 보조 형상으로 본다.",
+   "counterfactual": "평행한 장거리 경계선과 개구부·접합부가 함께 나타났다면 벽을 포함한 평면 부분도로 판단할 수 있다.",
+   "uncertainty": "정점 좌표와 삽입 문맥이 없어 단열 형상이 어느 건축 부재에 속하는지는 알 수 없다."
+  }
+ },
+ {
+  "unit_id": "defannot-u200-203",
+  "def": "*U200",
+  "role": "기타",
+  "wall_likelihood": 0.08,
+  "wall_line_handles": [],
+  "notes": "INSUL 레이어의 반복 단열 표현만 담은 보조 정의이다.",
+  "rationale": {
+   "evidence": "11개 엔티티가 모두 INSUL 레이어의 5정점 LWPOLYLINE이다. 선형 벽 경계나 문·창호 같은 평면 단서는 제시되지 않는다.",
+   "rule": "단열 전용 레이어의 반복 폴리라인 집합은 벽선이 아니라 재료 패턴으로 분류한다.",
+   "counterfactual": "단열 패턴을 둘러싼 연속 평행 벽선이나 벽 접합 형상이 있었다면 평면 부분도 판정이 가능하다.",
+   "uncertainty": "폴리라인 좌표가 없어 각 형상의 크기와 배열 방향은 확인할 수 없다."
+  }
+ },
+ {
+  "unit_id": "defannot-u201-204",
+  "def": "*U201",
+  "role": "기타",
+  "wall_likelihood": 0.07,
+  "wall_line_handles": [],
+  "notes": "소수의 INSUL 폴리라인으로 구성된 단열 패턴 조각이다.",
+  "rationale": {
+   "evidence": "7개 엔티티 전부가 INSUL 레이어의 5정점 LWPOLYLINE이다. 벽의 길고 평행한 경계선을 직접 나타내는 엔티티는 없다.",
+   "rule": "재료명 레이어에 동일 구조의 폐합 폴리라인만 반복되면 건축 경계보다 채움 패턴으로 해석한다.",
+   "counterfactual": "벽 중심선이나 양면 경계가 패턴과 함께 포함되었다면 벽 가능성이 높아진다.",
+   "uncertainty": "좌표와 폐합 여부의 상세값이 없어 실제 패턴 모양은 판별할 수 없다."
+  }
+ },
+ {
+  "unit_id": "defannot-u202-205",
+  "def": "*U202",
+  "role": "기타",
+  "wall_likelihood": 0.08,
+  "wall_line_handles": [],
+  "notes": "INSUL 전용 폴리라인들로 이루어진 재료 표현 블록이다.",
+  "rationale": {
+   "evidence": "12개 엔티티가 모두 INSUL 레이어에 있으며 각각 5정점 LWPOLYLINE이다. 다른 레이어나 벽 경계형 LINE은 포함되지 않는다.",
+   "rule": "단일 단열 레이어의 균질한 반복 형상은 벽 객체가 아니라 단열 그래픽으로 본다.",
+   "counterfactual": "연속적인 이중 경계선과 코너 또는 개구부가 확인되면 평면 벽 일부로 재분류할 수 있다.",
+   "uncertainty": "공간 좌표와 외부 참조가 없어 단열 대상이 벽인지 지붕인지 바닥인지 알 수 없다."
+  }
+ },
+ {
+  "unit_id": "defannot-u232-206",
+  "def": "*U232",
+  "role": "기타",
+  "wall_likelihood": 0.09,
+  "wall_line_handles": [],
+  "notes": "27개의 반복 폴리라인으로 구성된 단열재 표현이다.",
+  "rationale": {
+   "evidence": "모든 27개 엔티티가 INSUL 레이어의 5정점 LWPOLYLINE으로 동일하다. 벽 외곽선이나 평면 구성요소를 구분할 다른 엔티티 유형은 없다.",
+   "rule": "동일한 단열용 폐합 형상이 반복되면 벽선보다 재료 해치 또는 패턴 요소로 판정한다.",
+   "counterfactual": "패턴 양쪽에 일정 간격의 장거리 벽 경계가 존재했다면 벽 관련 평면 부분도로 볼 수 있다.",
+   "uncertainty": "정점 좌표가 생략되어 반복 형상의 배치와 전체 범위를 확인할 수 없다."
+  }
+ },
+ {
+  "unit_id": "defannot-u236-207",
+  "def": "*U236",
+  "role": "기타",
+  "wall_likelihood": 0.1,
+  "wall_line_handles": [],
+  "notes": "다수의 INSUL 폴리라인으로 만든 대규모 단열 패턴 정의이다.",
+  "rationale": {
+   "evidence": "61개 엔티티 전체가 INSUL 레이어의 5정점 LWPOLYLINE이다. 표본에도 벽 경계용 LINE, 호, 삽입 또는 개구부 표현이 없다.",
+   "rule": "엔티티 수가 많더라도 단열 전용 레이어의 균일한 반복 패턴만 있으면 벽 자체로 간주하지 않는다.",
+   "counterfactual": "반복 패턴과 함께 방 윤곽이나 연결된 이중 벽선이 포함되었다면 평면 부분도 가능성이 높아진다.",
+   "uncertainty": "31개 이후 엔티티는 표본에 없고 좌표도 없어 전체 형상의 연속성은 알 수 없다."
+  }
+ },
+ {
+  "unit_id": "defannot-u237-208",
+  "def": "*U237",
+  "role": "기타",
+  "wall_likelihood": 0.08,
+  "wall_line_handles": [],
+  "notes": "INSUL 레이어에 한정된 단열 패턴 조각이다.",
+  "rationale": {
+   "evidence": "23개 엔티티가 모두 동일 레이어의 5정점 LWPOLYLINE이다. 벽체의 양면을 직접 표현하는 직선 엔티티는 보이지 않는다.",
+   "rule": "단열 레이어의 반복 폐합 폴리라인은 벽 경계가 아니라 재료 표기로 취급한다.",
+   "counterfactual": "긴 평행선이나 벽 코너가 패턴의 경계를 형성했다면 벽 가능성을 높일 수 있다.",
+   "uncertainty": "폴리라인 정점 위치가 제공되지 않아 실제로 길게 정렬된 패턴인지는 확인할 수 없다."
+  }
+ },
+ {
+  "unit_id": "defannot-u238-209",
+  "def": "*U238",
+  "role": "기타",
+  "wall_likelihood": 0.1,
+  "wall_line_handles": [],
+  "notes": "214개의 요소를 가진 대형 단열재 패턴 블록이다.",
+  "rationale": {
+   "evidence": "214개 엔티티가 전부 INSUL 레이어의 5정점 LWPOLYLINE으로 기록되어 있다. 표본 30개에서도 벽 경계선이나 다른 건축 객체 유형이 나타나지 않는다.",
+   "rule": "대량의 균질한 재료 레이어 형상은 평면 벽선보다 해치 또는 단열 그래픽으로 분류한다.",
+   "counterfactual": "전체 집합에 연속 이중선과 벽 접합부가 포함되어 있음이 확인되면 평면 부분도로 판단할 수 있다.",
+   "uncertainty": "표본 밖 184개 엔티티와 좌표가 보이지 않아 전체 배치 형태는 확정할 수 없다."
+  }
+ },
+ {
+  "unit_id": "defannot-u239-210",
+  "def": "*U239",
+  "role": "기타",
+  "wall_likelihood": 0.1,
+  "wall_line_handles": [],
+  "notes": "159개의 반복 형상으로 이루어진 단열 표현 정의이다.",
+  "rationale": {
+   "evidence": "전체 159개가 INSUL 레이어의 5정점 LWPOLYLINE이며 표본도 완전히 균질하다. 벽의 외곽이나 공간 윤곽을 식별할 LINE은 없다.",
+   "rule": "단일 재료 레이어에 반복되는 동일 폴리라인만 있으면 구조 경계가 아닌 재료 패턴으로 본다.",
+   "counterfactual": "단열 형상을 감싸는 긴 평행 벽선과 코너 연결이 제시되면 벽 가능성이 크게 상승한다.",
+   "uncertainty": "30개 표본만 제공되어 나머지 엔티티의 세부 형상은 검증할 수 없다."
+  }
+ },
+ {
+  "unit_id": "defannot-u240-211",
+  "def": "*U240",
+  "role": "기타",
+  "wall_likelihood": 0.1,
+  "wall_line_handles": [],
+  "notes": "INSUL 폴리라인 106개로 구성된 재료 패턴 블록이다.",
+  "rationale": {
+   "evidence": "106개 엔티티 모두 INSUL 레이어의 5정점 LWPOLYLINE이다. 표본에는 벽선, 문, 창 또는 치수 요소가 전혀 없다.",
+   "rule": "건축 재료 전용 레이어의 균질한 반복 형상은 독립 벽 정의가 아니라 보조 그래픽으로 분류한다.",
+   "counterfactual": "문·창 개구와 연결된 이중 경계가 함께 있었다면 평면 벽 조각으로 볼 수 있다.",
+   "uncertainty": "좌표와 전체 표본이 없어 이 패턴이 어떤 부재를 채우는지는 알 수 없다."
+  }
+ },
+ {
+  "unit_id": "defannot-u241-212",
+  "def": "*U241",
+  "role": "기타",
+  "wall_likelihood": 0.08,
+  "wall_line_handles": [],
+  "notes": "19개의 INSUL 폴리라인으로 된 단열 패턴 조각이다.",
+  "rationale": {
+   "evidence": "19개 엔티티가 모두 INSUL 레이어의 5정점 LWPOLYLINE으로 구성된다. 벽 경계에 해당할 별도 선이나 복합 평면 요소는 없다.",
+   "rule": "단열 표시만 독립적으로 묶인 정의는 벽이나 가구보다 기타 재료 표현으로 본다.",
+   "counterfactual": "일정 두께를 만드는 연속 평행 경계가 추가되면 벽 포함 가능성을 높일 수 있다.",
+   "uncertainty": "정점 좌표가 없어 폴리라인들이 폐합된 작은 셀인지 긴 띠인지 확정할 수 없다."
+  }
+ },
+ {
+  "unit_id": "defannot-u272-213",
+  "def": "*U272",
+  "role": "기타",
+  "wall_likelihood": 0.09,
+  "wall_line_handles": [],
+  "notes": "45개의 동일 계열 폴리라인으로 만든 단열재 표현이다.",
+  "rationale": {
+   "evidence": "45개 엔티티 전체가 INSUL 레이어의 5정점 LWPOLYLINE이다. 표본에는 벽체 윤곽을 직접 나타낼 LINE이나 다른 레이어가 없다.",
+   "rule": "단열 레이어에 국한된 반복 폴리라인은 벽선이 아니라 채움 또는 재료 기호로 해석한다.",
+   "counterfactual": "평행한 외곽 경계와 벽 교차부가 함께 확인되면 평면 부분도 판정으로 바뀔 수 있다.",
+   "uncertainty": "표본 밖 엔티티와 좌표가 없어 패턴의 전체 폭과 방향은 판단할 수 없다."
+  }
+ },
+ {
+  "unit_id": "defannot-u273-214",
+  "def": "*U273",
+  "role": "기타",
+  "wall_likelihood": 0.08,
+  "wall_line_handles": [],
+  "notes": "INSUL 레이어의 반복 단열 형상만 포함한다.",
+  "rationale": {
+   "evidence": "17개 엔티티 모두 INSUL 레이어에 배치된 5정점 LWPOLYLINE이다. 벽선 또는 평면 윤곽으로 볼 수 있는 별도 직선 집합은 없다.",
+   "rule": "동일 재료 레이어의 반복 폐합 형상은 구조적 벽 경계보다 단열 패턴으로 분류한다.",
+   "counterfactual": "긴 이중선과 개구부 단절 패턴이 존재했다면 벽 관련 정의로 볼 수 있다.",
+   "uncertainty": "좌표가 없으므로 형상 간 간격과 정렬 상태는 확인할 수 없다."
+  }
+ },
+ {
+  "unit_id": "defannot-u274-215",
+  "def": "*U274",
+  "role": "기타",
+  "wall_likelihood": 0.07,
+  "wall_line_handles": [],
+  "notes": "7개의 INSUL 폴리라인으로 된 소규모 단열 패턴이다.",
+  "rationale": {
+   "evidence": "7개 엔티티 전부가 INSUL 레이어의 5정점 LWPOLYLINE이다. 벽을 구성하는 장거리 선이나 연결 관계는 제시되지 않는다.",
+   "rule": "소수의 반복 단열 형상만 있는 블록은 벽보다 재료 표현으로 판단한다.",
+   "counterfactual": "단열 요소를 둘러싼 벽 양면 경계가 포함되면 벽 가능성이 높아진다.",
+   "uncertainty": "폴리라인의 실제 좌표와 크기가 없어 형상의 용도를 더 세분할 수 없다."
+  }
+ },
+ {
+  "unit_id": "defannot-u275-216",
+  "def": "*U275",
+  "role": "기타",
+  "wall_likelihood": 0.08,
+  "wall_line_handles": [],
+  "notes": "18개의 동일한 단열용 폴리라인을 포함한 보조 정의이다.",
+  "rationale": {
+   "evidence": "18개 엔티티가 모두 INSUL 레이어의 5정점 LWPOLYLINE이다. 벽의 양쪽 면이나 코너를 나타낼 다른 선형 엔티티는 없다.",
+   "rule": "단열 전용 레이어의 균질한 폴리라인 집합은 벽 객체가 아닌 재료 패턴으로 본다.",
+   "counterfactual": "연속적인 벽 경계와 구조적 접합 형상이 함께 존재했다면 평면 부분도로 재분류할 수 있다.",
+   "uncertainty": "삽입 문맥과 좌표가 없어서 이 단열 패턴이 적용되는 부재는 확인할 수 없다."
+  }
+ },
+ {
+  "unit_id": "defannot-u278-217",
+  "def": "*U278",
+  "role": "기타",
+  "wall_likelihood": 0.1,
+  "wall_line_handles": [],
+  "notes": "79개의 반복 폴리라인으로 구성된 단열재 패턴이다.",
+  "rationale": {
+   "evidence": "79개 엔티티 모두 INSUL 레이어의 5정점 LWPOLYLINE으로 집계된다. 제공된 30개 표본에는 벽 경계나 다른 평면 객체가 없다.",
+   "rule": "다수의 동일 단열 형상이 반복되어도 경계선이 없으면 벽이 아닌 재료 그래픽으로 분류한다.",
+   "counterfactual": "표본 밖에 방 윤곽을 이루는 이중선이나 벽 교차부가 있다면 판정이 달라질 수 있다.",
+   "uncertainty": "49개 엔티티가 표본에 없고 좌표도 없어 전체 정의의 공간 구조는 알 수 없다."
+  }
+ },
+ {
+  "unit_id": "defannot-u279-218",
+  "def": "*U279",
+  "role": "기타",
+  "wall_likelihood": 0.09,
+  "wall_line_handles": [],
+  "notes": "42개의 INSUL 폴리라인을 묶은 단열 표현 블록이다.",
+  "rationale": {
+   "evidence": "42개 엔티티 전체가 INSUL 레이어의 5정점 LWPOLYLINE이다. 표본에는 벽 양면을 나타낼 LINE이나 개구부 형상이 없다.",
+   "rule": "단열 전용 레이어의 반복 폐합 도형은 평면 벽 경계가 아니라 채움 패턴으로 취급한다.",
+   "counterfactual": "장거리 평행 경계선과 벽 끝단이 포함되어 있다면 벽 가능성이 높아진다.",
+   "uncertainty": "좌표와 나머지 표본이 없어 폴리라인 배열이 벽 방향을 따르는지는 확인할 수 없다."
+  }
+ },
+ {
+  "unit_id": "defannot-u280-219",
+  "def": "*U280",
+  "role": "기타",
+  "wall_likelihood": 0.1,
+  "wall_line_handles": [],
+  "notes": "95개의 반복 요소를 가진 단열재 그래픽 정의이다.",
+  "rationale": {
+   "evidence": "95개 엔티티가 모두 INSUL 레이어의 5정점 LWPOLYLINE이다. 제공된 표본은 균질하며 벽선, 문, 창 또는 치수 객체를 포함하지 않는다.",
+   "rule": "단일 재료 레이어에 반복되는 동일 폴리라인만 있으면 평면 부분도보다 재료 패턴으로 분류한다.",
+   "counterfactual": "전체 정의에서 연결된 이중 벽선과 공간 경계가 확인되면 평면 부분도로 판단할 수 있다.",
+   "uncertainty": "65개 엔티티가 표본에 없고 위치 정보도 없어 전체 형상은 확정할 수 없다."
+  }
+ },
+ {
+  "unit_id": "defannot-u281-220",
+  "def": "*U281",
+  "role": "기타",
+  "wall_likelihood": 0.08,
+  "wall_line_handles": [],
+  "notes": "23개의 INSUL 폴리라인으로 된 단열 패턴 조각이다.",
+  "rationale": {
+   "evidence": "23개 엔티티 전부가 INSUL 레이어의 5정점 LWPOLYLINE이다. 벽 경계를 직접 표현하는 LINE이나 다른 건축 요소는 제시되지 않는다.",
+   "rule": "단열 레이어만으로 구성된 반복 형상은 벽선이 아니라 재료 표현으로 판단한다.",
+   "counterfactual": "단열 패턴 양측에 연속 평행선과 벽 접합부가 존재했다면 벽 관련 평면 부분도로 볼 수 있다.",
+   "uncertainty": "정점 좌표와 외부 삽입 관계가 없어 단열 대상과 실제 배치 형태는 알 수 없다."
+  }
+ }
+]

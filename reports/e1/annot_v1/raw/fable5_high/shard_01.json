@@ -1,0 +1,282 @@
+[
+  {
+    "unit_id": "defannot-d295-1",
+    "def": "*D295",
+    "role": "치수캐시",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "Anonymous *D block: horizontal linear dimension reading 3280 on layer DIM with DIMDOT arrows and DEFPOINTS points.",
+    "rationale": {
+      "evidence": "The block is anonymous (*D295) and contains exactly the anonymous-dimension anatomy: two vertical extension LINEs (8B52, 8B53) dropping from y=24580 to y=22920, one horizontal dimension LINE (8B54) at y=23000, two INSERTs of arrow block DIMDOT (8B55, 8B56), one MTEXT '3280' (8B57), and three POINTs on layer DEFPOINTS (8B58-8B5A). All graphic entities sit on layer DIM. DEFPOINTS points are the definition points AutoCAD writes only for DIMENSION entities.",
+      "rule": "An anonymous block named *D<number> whose contents are extension lines + a dimension line + arrowhead inserts + one measurement text + DEFPOINTS points is the exploded graphics cache of a DIMENSION entity, never building geometry. Its lines annotate positions; they are not the drawn objects themselves.",
+      "counterfactual": "If the lines sat on a wall layer (e.g. WALL, A-WALL), the DEFPOINTS points were absent, or the block name were a user name rather than *D-prefixed, the judgment would flip toward 평면 부분도 or 기타.",
+      "uncertainty": "From this projection alone I cannot tell what the 3280 mm span measures (it could be a wall segment, an opening, or room width) nor confirm the block is referenced by a live DIMENSION entity rather than orphaned; that requires the owner entity and surrounding model-space context."
+    }
+  },
+  {
+    "unit_id": "defannot-d296-2",
+    "def": "*D296",
+    "role": "치수캐시",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "Anonymous *D block: horizontal linear dimension reading 3105, same DIM-layer/DIMDOT/DEFPOINTS pattern as *D295, adjacent span to its right.",
+    "rationale": {
+      "evidence": "Identical composition to *D295: extension LINEs 8B5B/8B5C at x=47528.83 and x=50633.83, dimension LINE 8B5D at y=23000, two DIMDOT INSERTs, MTEXT '3105', three DEFPOINTS POINTs. Its left extension line x-coordinate (47528.83) equals *D295's right one, so this is the next segment in a chained dimension string.",
+      "rule": "Runs of consecutive anonymous *D blocks sharing a dimension line elevation and abutting extension-line x-coordinates are segments of one chained dimension string; each is a dimension graphics cache, not geometry.",
+      "counterfactual": "Absence of the DEFPOINTS points and the measurement MTEXT, or lines placed on an architectural layer with wall-like double-line offsets (~100-300 units apart running the full length), would flip this to a geometry-bearing role.",
+      "uncertainty": "The projection does not reveal what building element the 3105 span dimensions, nor the dimension style or whether the parent DIMENSION is associative; only the cached graphics are visible."
+    }
+  },
+  {
+    "unit_id": "defannot-d297-3",
+    "def": "*D297",
+    "role": "치수캐시",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "Anonymous *D block: horizontal linear dimension reading 4770, third segment of the same chained dimension string on layer DIM.",
+    "rationale": {
+      "evidence": "Same 9-entity signature: extension LINEs 8B64/8B65 (x=50633.83 to x=55403.83, matching span 4770), dimension LINE 8B66 at y=23000, DIMDOT INSERTs 8B67/8B68, MTEXT '4770' (8B69), three DEFPOINTS POINTs. The left extension line continues exactly where *D296 ended, confirming the chain.",
+      "rule": "When the horizontal distance between the two extension lines numerically equals the MTEXT value, the block is self-consistently a linear dimension cache; the lines exist to point at geometry, not to be geometry.",
+      "counterfactual": "If the extension-line spacing disagreed with the text value, or additional non-annotation entities (hatches, arcs, furniture-scale polylines) appeared inside, I would reconsider toward 기타 or a partial-plan fragment.",
+      "uncertainty": "Whether 4770 measures a wall run, a room, or a grid bay cannot be determined without the model-space geometry the dimension attaches to; the projection shows only the annotation."
+    }
+  },
+  {
+    "unit_id": "defannot-d298-4",
+    "def": "*D298",
+    "role": "치수캐시",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "Anonymous *D block: horizontal linear dimension reading 3945, fourth chained segment on layer DIM with DIMDOT arrows.",
+    "rationale": {
+      "evidence": "Extension LINEs 8B6D/8B6E at x=55403.83 and x=59348.83 (span 3945 matches MTEXT '3945' at 8B72), dimension LINE 8B6F at y=23000, two DIMDOT INSERTs, three DEFPOINTS POINTs. The 9-entity histogram (INSERT=2, LINE=3, MTEXT=1, POINT=3) is the canonical unbroken linear-dimension cache.",
+      "rule": "The exact histogram INSERT=2/LINE=3/MTEXT=1/POINT=3 with all graphics on a dimension layer plus DEFPOINTS is a fingerprint of a simple linear DIMENSION's anonymous block and can be classified as 치수캐시 without further geometry inspection.",
+      "counterfactual": "A different histogram (many LINEs/LWPOLYLINEs, ARCs, or hatches), or graphic entities on non-annotation layers, would break the fingerprint and force re-evaluation as a plan fragment or symbol.",
+      "uncertainty": "The dimensioned object and the dimension style (arrow choice DIMDOT vs tick suggests style variation across this drawing) are outside the projection; associativity to real geometry cannot be verified here."
+    }
+  },
+  {
+    "unit_id": "defannot-d299-5",
+    "def": "*D299",
+    "role": "치수캐시",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "Anonymous *D block: overall horizontal dimension reading 15100 spanning the full run of the *D295-*D298 chain, drawn one row below it.",
+    "rationale": {
+      "evidence": "Extension LINEs 8B76/8B77 at x=59348.83 and x=44248.83 — exactly the outer ends of the *D295-*D298 chain — with span 15100 matching MTEXT '15100' (8B7B); dimension LINE 8B78 sits lower at y=22680, i.e. a second dimension row. DIMDOT INSERTs and three DEFPOINTS POINTs complete the standard cache anatomy. Note 3280+3105+4770+3945=15100, an arithmetic checksum tying it to the chain above.",
+      "rule": "An outer dimension whose value equals the sum of an adjacent chain of segment dimensions is the overall-dimension row of a dimension string — annotation by construction, with zero chance of being building geometry.",
+      "counterfactual": "If the segment values did not sum to this value or the extension lines did not align with the chain's outer extension lines, it could be an unrelated dimension of a different object, though still a dimension cache; only non-annotation content would change the role itself.",
+      "uncertainty": "Which building extent (unit width, core-to-core, grid-to-grid) the 15100 overall measures is not determinable from the block contents alone; the referenced model geometry is not in the projection."
+    }
+  },
+  {
+    "unit_id": "defannot-d300-6",
+    "def": "*D300",
+    "role": "치수캐시",
+    "wall_likelihood": 0.03,
+    "wall_line_handles": [],
+    "notes": "Anonymous *D block: narrow 70-unit dimension on layer AA-AXIS-DIM7 with _ArchTick arrows and outside-jog extension lines, likely a wall-face offset dim.",
+    "rationale": {
+      "evidence": "Eleven entities: two long vertical extension LINEs 8B7F/8B80 only 70 apart (x=47528.83 vs 47458.83, matching MTEXT '70' at 8B83), plus short jog LINEs 8B81/8B82/8B84 at y=23320 — the arrows-outside layout AutoCAD emits when the measured gap is too small. _ArchTick INSERTs and three DEFPOINTS POINTs. Layer AA-AXIS-DIM7 is an axis/dimension layer, not a geometry layer.",
+      "rule": "Extra short LINEs flanking a tiny measured gap (histogram LINE=5 instead of 3) are the text/arrow-outside variant of a linear dimension cache; a small value like 70 on an axis-dim layer typically measures a face offset or thin element, but the lines remain annotation.",
+      "counterfactual": "If the paired 70-apart lines ran on a wall layer without DEFPOINTS, arrow inserts, or measurement text, they would themselves read as a thin wall's two faces and the judgment would flip toward wall geometry.",
+      "uncertainty": "Whether the 70 mm gap being dimensioned is a wall-face offset, a mullion, or a finish thickness cannot be resolved from the annotation alone; the AA-AXIS-DIM7 naming convention's exact meaning in this office standard is also unverified."
+    }
+  },
+  {
+    "unit_id": "defannot-d301-7",
+    "def": "*D301",
+    "role": "치수캐시",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "Anonymous *D block: horizontal dimension reading 3000 on layer AA-AXIS-DIM7 with _ArchTick arrows, likely an axis/grid distance.",
+    "rationale": {
+      "evidence": "Standard 9-entity cache: extension LINEs 8B8A/8B8B at x=44458.83 and x=47458.83 (span exactly 3000, matching MTEXT '3000'), dimension LINE 8B8C at y=23320, two _ArchTick INSERTs, three DEFPOINTS POINTs. The AA-AXIS-DIM7 layer and the round 3000 value suggest a structural axis spacing dimension.",
+      "rule": "Round modular values (3000, 3600, 4500) on an axis-dimension layer with tick arrows are grid/axis dimensions; regardless of what they measure, the *D anonymous block holding them is a dimension graphics cache.",
+      "counterfactual": "Presence of centerline geometry (long dashed axis lines) or bubble symbols inside the block would push toward 기타/symbol; absence of DEFPOINTS and measurement text would remove the dimension reading entirely.",
+      "uncertainty": "I cannot confirm from the projection that AA-AXIS-DIM7 hosts structural grid dims in this office convention, nor which two axes the 3000 spans; the parent DIMENSION entity and nearby grid lines are not shown."
+    }
+  },
+  {
+    "unit_id": "defannot-d302-8",
+    "def": "*D302",
+    "role": "치수캐시",
+    "wall_likelihood": 0.03,
+    "wall_line_handles": [],
+    "notes": "Anonymous *D block: small 210-unit dimension on AA-AXIS-DIM7 with arrows-outside jogs and _ArchTick, plausibly a wall-thickness dimension.",
+    "rationale": {
+      "evidence": "Eleven entities with the arrows-outside variant: long extension LINEs 8B93/8B94 spaced 210 apart (44458.83-44248.83, matching MTEXT '210'), jog LINEs 8B95/8B96 plus inner dimension LINE 8B97, two _ArchTick INSERTs, three DEFPOINTS POINTs. All graphics on AA-AXIS-DIM7, none on a geometry layer.",
+      "rule": "A 100-300-unit measured value in a millimeter architectural drawing frequently dimensions a wall thickness, but the entities carrying it in a *D block are annotation; wall_likelihood stays near zero for the block's own lines.",
+      "counterfactual": "If the two 210-apart lines extended well beyond the dimension row and lacked arrow inserts/DEFPOINTS, they would read as the two faces of a 210 wall and the judgment would flip to wall geometry.",
+      "uncertainty": "Whether 210 is a wall thickness, a column face offset, or a shaft gap cannot be determined without the model geometry the dimension points at; only the annotation cache is visible."
+    }
+  },
+  {
+    "unit_id": "defannot-d303-9",
+    "def": "*D303",
+    "role": "치수캐시",
+    "wall_likelihood": 0.03,
+    "wall_line_handles": [],
+    "notes": "Anonymous *D block: 70-unit arrows-outside dimension on layer DIM with _ArchTick, geometric twin of *D300 shifted to the DIM layer.",
+    "rationale": {
+      "evidence": "Eleven entities mirroring *D300's anatomy: extension LINEs 8B9E/8B9F spaced 70 apart (47528.83/47598.83, matching MTEXT '70'), outside jog LINEs 8BA0/8BA1 and inner dimension LINE 8BA3 at y=23320, two _ArchTick INSERTs, three DEFPOINTS POINTs. Layer is DIM rather than AA-AXIS-DIM7, showing the same dim style family used on both layers.",
+      "rule": "The arrows-outside 5-LINE variant plus DEFPOINTS is a dimension cache regardless of which annotation layer hosts it; layer changes between sibling *D blocks reflect dimensioning passes, not role changes.",
+      "counterfactual": "Non-annotation content (hatch, door arc, fixture polylines) or lines on architectural geometry layers would flip the role; matching extension-line spacing to the text value failing would also prompt re-inspection.",
+      "uncertainty": "What thin element the 70 gap measures and why this dim sits on DIM while its twin *D300 sits on AA-AXIS-DIM7 (different dimensioning passes or authors) is not determinable from the projection."
+    }
+  },
+  {
+    "unit_id": "defannot-d304-10",
+    "def": "*D304",
+    "role": "치수캐시",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "Anonymous *D block: horizontal dimension reading 2900 on layer DIM with _ArchTick arrows, segment of a second dimension row at y=23320.",
+    "rationale": {
+      "evidence": "Canonical 9-entity cache: extension LINEs 8BA9/8BAA at x=47598.83 and x=50498.83 (span 2900 = MTEXT '2900'), dimension LINE 8BAB at y=23320, two _ArchTick INSERTs, three DEFPOINTS POINTs, everything on DIM/DEFPOINTS layers. Its dimension-row elevation matches *D300-*D303's, placing it in the same inner detail string.",
+      "rule": "Sibling *D blocks sharing one dimension-line elevation form one dimension row; each element with the INSERT=2/LINE=3/MTEXT=1/POINT=3 fingerprint is an individual linear dimension cache.",
+      "counterfactual": "If the span between extension lines had not equaled 2900, or wall-layer geometry appeared among the entities, the classification would need revisiting toward 기타 or plan fragment.",
+      "uncertainty": "The projection cannot show what the 2900 measures (likely a room or bay interior width given the finer row) nor the dimension's associativity to model geometry."
+    }
+  },
+  {
+    "unit_id": "defannot-d305-11",
+    "def": "*D305",
+    "role": "치수캐시",
+    "wall_likelihood": 0.03,
+    "wall_line_handles": [],
+    "notes": "Anonymous *D block: 135-unit dimension on layer DIM, one of several identical 135 dims in this row — a recurring wall-thickness-scale measurement.",
+    "rationale": {
+      "evidence": "Nine entities: extension LINEs 8BB2/8BB3 spaced 135 apart (50498.83/50633.83, matching MTEXT '135'), dimension LINE 8BB4 slightly overshooting both sides (50438.83-50693.83, the text/arrow-outside rendering), _ArchTick INSERTs, three DEFPOINTS POINTs. All graphics on layer DIM.",
+      "rule": "Small repeated values like 135 in a chained row typically dimension recurring thin elements (partition thickness, reveals); the *D block that caches such a dimension remains annotation with no wall lines of its own.",
+      "counterfactual": "If these 135-apart verticals continued far beyond the dimension band and carried no MTEXT/DEFPOINTS, they would be candidate faces of a 135 partition and the role would flip to geometry.",
+      "uncertainty": "Whether 135 is a partition thickness, half-wall offset, or finish zone cannot be resolved from the annotation alone; the repeated occurrences (*D306, *D308, *D309) suggest a systematic element but its identity is outside this projection."
+    }
+  },
+  {
+    "unit_id": "defannot-d306-12",
+    "def": "*D306",
+    "role": "치수캐시",
+    "wall_likelihood": 0.03,
+    "wall_line_handles": [],
+    "notes": "Anonymous *D block: second 135-unit dimension on layer DIM, immediately right of *D305 in the same chained row.",
+    "rationale": {
+      "evidence": "Same 9-entity anatomy as *D305: extension LINEs 8BBB/8BBC spaced 135 apart (50633.83/50768.83 = MTEXT '135'), overshooting dimension LINE 8BBD, two _ArchTick INSERTs, three DEFPOINTS POINTs. Its left extension line coincides with *D305's right one, continuing the chain.",
+      "rule": "Two adjacent equal small dimensions flanking a larger span is the classic wall-wall-room-wall-wall rhythm of an interior dimension string; every segment's *D block is a dimension cache.",
+      "counterfactual": "Divergence of extension-line spacing from the stated 135, or appearance of geometry-layer entities inside the block, would break the dimension-cache reading.",
+      "uncertainty": "The physical element behind this second 135 (likely the same partition type as *D305's) is not observable here; the projection carries no link to the dimensioned model objects."
+    }
+  },
+  {
+    "unit_id": "defannot-d307-13",
+    "def": "*D307",
+    "role": "치수캐시",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "Anonymous *D block: horizontal dimension reading 4500 on layer DIM with _ArchTick arrows, a room/bay-scale segment of the inner dimension row.",
+    "rationale": {
+      "evidence": "Standard 9-entity cache: extension LINEs 8BC4/8BC5 at x=50768.83 and x=55268.83 (span exactly 4500 = MTEXT '4500'), dimension LINE 8BC6 at y=23320, two _ArchTick INSERTs, three DEFPOINTS POINTs. Continues the chain from *D306's right extension line.",
+      "rule": "A room-scale round value (4500) bracketed by thin 135 dims on both sides reads as a clear interior width in a dimension string; the caching *D block is annotation by definition.",
+      "counterfactual": "Only non-annotation entities inside the block, or a broken value-to-geometry match, would alter the role; a different value would not.",
+      "uncertainty": "Whether 4500 is a clear room width or an axis distance cannot be confirmed without the surrounding plan geometry; the projection shows the annotation only."
+    }
+  },
+  {
+    "unit_id": "defannot-d308-14",
+    "def": "*D308",
+    "role": "치수캐시",
+    "wall_likelihood": 0.03,
+    "wall_line_handles": [],
+    "notes": "Anonymous *D block: third 135-unit dimension on layer DIM, right side of the 4500 span, same overshoot rendering as *D305/*D306.",
+    "rationale": {
+      "evidence": "Nine entities: extension LINEs 8BCD/8BCE spaced 135 apart (55268.83/55403.83 = MTEXT '135'), overshooting dimension LINE 8BCF (55208.83-55463.83), two _ArchTick INSERTs, three DEFPOINTS POINTs, all graphics on layer DIM at the shared y=23320 row.",
+      "rule": "Identical small dims recurring at partition boundaries along one row are thickness callouts in a chained interior string; each *D cache is annotation, and its lines must not be harvested as wall geometry.",
+      "counterfactual": "If DEFPOINTS points and the MTEXT were absent while the paired 135-apart lines ran the height of a room, the same coordinates would instead suggest a partition's two faces.",
+      "uncertainty": "The projection cannot identify the dimensioned element nor verify that the same 135 partition type repeats; that inference rests only on the pattern across sibling blocks."
+    }
+  },
+  {
+    "unit_id": "defannot-d309-15",
+    "def": "*D309",
+    "role": "치수캐시",
+    "wall_likelihood": 0.03,
+    "wall_line_handles": [],
+    "notes": "Anonymous *D block: fourth 135-unit dimension on layer DIM, immediately right of *D308, continuing the chained row.",
+    "rationale": {
+      "evidence": "Same signature: extension LINEs 8BD6/8BD7 spaced 135 apart (55403.83/55538.83 = MTEXT '135'), overshooting dimension LINE 8BD8, two _ArchTick INSERTs, three DEFPOINTS POINTs on layer DIM/DEFPOINTS. Left extension line abuts *D308's right one at x=55403.83.",
+      "rule": "Back-to-back equal thin dims (135+135) around a shared boundary often measure two layers/leaves at a junction; regardless, the anonymous *D container is a dimension graphics cache.",
+      "counterfactual": "Non-annotation geometry inside the block or a value/spacing mismatch would flip the reading; otherwise no plausible alternative role exists for this anatomy.",
+      "uncertainty": "Why two consecutive 135 dims appear here (double partition, furring plus wall, or symmetric reveals) is not determinable from the annotation projection alone."
+    }
+  },
+  {
+    "unit_id": "defannot-d310-16",
+    "def": "*D310",
+    "role": "치수캐시",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "Anonymous *D block: horizontal dimension reading 3600 on layer DIM with _ArchTick arrows, another room-scale segment of the inner row.",
+    "rationale": {
+      "evidence": "Canonical 9-entity cache: extension LINEs 8BDF/8BE0 at x=55538.83 and x=59138.83 (span exactly 3600 = MTEXT '3600'), dimension LINE 8BE1 at y=23320, two _ArchTick INSERTs, three DEFPOINTS POINTs, graphics all on layer DIM.",
+      "rule": "The INSERT=2/LINE=3/MTEXT=1/POINT=3 fingerprint with extension-line spacing equal to the text value conclusively identifies a linear dimension cache; room-scale round values reinforce the interior-string reading.",
+      "counterfactual": "Only the appearance of non-annotation entities or lines on geometry layers would change the role; the value itself is immaterial to classification.",
+      "uncertainty": "What space the 3600 clear width belongs to and whether the dimension is associative cannot be seen in this projection; the model-space context is absent."
+    }
+  },
+  {
+    "unit_id": "defannot-d311-17",
+    "def": "*D311",
+    "role": "치수캐시",
+    "wall_likelihood": 0.03,
+    "wall_line_handles": [],
+    "notes": "Anonymous *D block: 210-unit arrows-outside dimension on layer DIM closing the inner row at its right end, twin of *D302 by value.",
+    "rationale": {
+      "evidence": "Eleven entities in the arrows-outside variant: extension LINEs 8BE8/8BE9 spaced 210 apart (59138.83/59348.83 = MTEXT '210'), outside jog LINEs 8BEA/8BEB plus inner dimension LINE 8BEC at y=23320, two _ArchTick INSERTs, three DEFPOINTS POINTs, all on DIM/DEFPOINTS. Its right extension line (59348.83) matches the chain's outer boundary seen in *D299.",
+      "rule": "End-of-row thickness dims (210 at both extremes, cf. *D302) bracket a dimension string at the perimeter walls; the *D block itself is annotation cache and its lines are not wall geometry.",
+      "counterfactual": "If the 210-apart verticals extended the height of the plan without arrow inserts, MTEXT, and DEFPOINTS, they would read as a 210 wall's faces and flip the judgment.",
+      "uncertainty": "Whether 210 here is an exterior/party wall thickness matching *D302's cannot be verified; the dimensioned wall itself lies outside this block's projection."
+    }
+  },
+  {
+    "unit_id": "defannot-d312-18",
+    "def": "*D312",
+    "role": "치수캐시",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "Anonymous *D block: vertical linear dimension reading 2665 on layer DIM with DIMDOT arrows, first of a vertical chain in a different plan region.",
+    "rationale": {
+      "evidence": "Rotated variant of the standard cache: two horizontal extension LINEs 8BF3/8BF4 at y=27375.207 and y=30040.207 (span 2665 = MTEXT '2665'), vertical dimension LINE 8BF5 at x=41688.83, two DIMDOT INSERTs, three DEFPOINTS POINTs. Location (x~41.6-42.9k) is a different area from definitions 1-17, indicating a vertical dimension string on the plan's left side.",
+      "rule": "The dimension-cache fingerprint is orientation-invariant: swap the roles of the extension and dimension lines between axes and the same INSERT=2/LINE=3/MTEXT=1/POINT=3 anatomy still identifies a linear DIMENSION's anonymous block.",
+      "counterfactual": "Wall-layer placement, missing DEFPOINTS/MTEXT, or entity mix beyond the fingerprint would flip the judgment; orientation or location changes would not.",
+      "uncertainty": "Which vertical extent (room depth, bay, corridor) the 2665 measures is not observable; the block's relation to the horizontal strings elsewhere in the drawing is inferred only from coordinates."
+    }
+  },
+  {
+    "unit_id": "defannot-d313-19",
+    "def": "*D313",
+    "role": "치수캐시",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "Anonymous *D block: vertical linear dimension reading 2350 on layer DIM, chained directly above *D312 sharing the y=30040 boundary.",
+    "rationale": {
+      "evidence": "Same rotated 9-entity anatomy: horizontal extension LINEs 8BFC/8BFD at y=30040.207 and y=32390.207 (span 2350 = MTEXT '2350'), vertical dimension LINE 8BFE at x=41688.83, two DIMDOT INSERTs, three DEFPOINTS POINTs. Its lower extension line coincides with *D312's upper one, confirming a chained vertical string.",
+      "rule": "Chained vertical dimensions sharing extension-line boundaries and one dimension-line x-position form a single dimension string; each *D segment is a dimension cache and contributes no geometry.",
+      "counterfactual": "A mismatch between the 2350 text and the extension-line spacing, or non-annotation entities inside, would force reclassification; neither occurs here.",
+      "uncertainty": "The projection does not show what the 2350 vertical span measures nor whether further chain segments exist beyond the shard; only the adjacent *D312/*D314 boundaries are inferable."
+    }
+  },
+  {
+    "unit_id": "defannot-d314-20",
+    "def": "*D314",
+    "role": "치수캐시",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "Anonymous *D block: vertical linear dimension reading 780 on layer DIM, topmost chained segment above *D313.",
+    "rationale": {
+      "evidence": "Identical rotated cache: horizontal extension LINEs 8C05/8C06 at y=32390.207 and y=33170.207 (span 780 = MTEXT '780'), vertical dimension LINE 8C07 at x=41688.83, two DIMDOT INSERTs, three DEFPOINTS POINTs on DIM/DEFPOINTS layers. Lower boundary coincides with *D313's upper extension line at y=32390.207.",
+      "rule": "A sub-metre segment (780) at the end of a vertical chain typically dimensions a small element such as a duct zone, closet, or wall return, but its *D container is unambiguously a dimension graphics cache by anatomy.",
+      "counterfactual": "Only entities outside the dimension anatomy (geometry-layer lines, hatches, fixtures) or a value/spacing mismatch would change the role; a smaller or larger value alone would not.",
+      "uncertainty": "What the 780 span corresponds to physically, and whether this chain sums into an overall dimension like *D299 did for the horizontal row, cannot be determined from this shard's projection."
+    }
+  }
+]

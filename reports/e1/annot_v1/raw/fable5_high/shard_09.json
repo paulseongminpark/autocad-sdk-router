@@ -1,0 +1,316 @@
+[
+  {
+    "unit_id": "defannot-u151-161",
+    "def": "*U151",
+    "role": "기타",
+    "wall_likelihood": 0.15,
+    "wall_line_handles": [],
+    "notes": "Anonymous group of 24 identical 5-vertex LWPOLYLINEs on the INSUL layer - a mid-size insulation-batt hatch cluster, not wall boundary geometry.",
+    "rationale": {
+      "evidence": "All 24 entities are LWPOLYLINEs with exactly 5 vertices on the single layer 'X-평면도(기본형)$0$INSUL' (handles 4F0D..4F24 in a contiguous run). A homogeneous run of small fixed-vertex polylines on an INSUL layer is the classic repeated zigzag/batt module used to hatch wall-cavity insulation in Korean apartment plans. There are no LINEs, arcs, text, or dimension entities that would indicate wall faces, symbols, or annotation.",
+      "rule": "When an anonymous block contains only many identical low-vertex polylines on an insulation (INSUL) layer, treat it as an insulation hatch cluster (기타), not a plan fragment or wall geometry; layer semantics plus entity homogeneity outrank block size.",
+      "counterfactual": "If the group also contained long parallel LINE pairs on a wall/WALL or 벽 layer, or the layer name referenced walls rather than INSUL, I would reclassify toward 평면 부분도 and raise wall_likelihood; if the polylines had many vertices forming furniture outlines, 가구 would apply.",
+      "uncertainty": "Vertex coordinates are not projected, so I cannot geometrically confirm the zigzag batt shape or the wall axis the insulation follows; the count of modules only implies the length of the insulated wall run, which is unverifiable here."
+    }
+  },
+  {
+    "unit_id": "defannot-u152-162",
+    "def": "*U152",
+    "role": "기타",
+    "wall_likelihood": 0.15,
+    "wall_line_handles": [],
+    "notes": "Anonymous group of 21 identical 5-vertex LWPOLYLINEs on the INSUL layer - a mid-size insulation-batt hatch cluster, not wall boundary geometry.",
+    "rationale": {
+      "evidence": "All 21 entities are LWPOLYLINEs with exactly 5 vertices on the single layer 'X-평면도(기본형)$0$INSUL' (handles 4F2A..4F3E in a contiguous run). A homogeneous run of small fixed-vertex polylines on an INSUL layer is the classic repeated zigzag/batt module used to hatch wall-cavity insulation in Korean apartment plans. There are no LINEs, arcs, text, or dimension entities that would indicate wall faces, symbols, or annotation.",
+      "rule": "When an anonymous block contains only many identical low-vertex polylines on an insulation (INSUL) layer, treat it as an insulation hatch cluster (기타), not a plan fragment or wall geometry; layer semantics plus entity homogeneity outrank block size.",
+      "counterfactual": "If the group also contained long parallel LINE pairs on a wall/WALL or 벽 layer, or the layer name referenced walls rather than INSUL, I would reclassify toward 평면 부분도 and raise wall_likelihood; if the polylines had many vertices forming furniture outlines, 가구 would apply.",
+      "uncertainty": "Vertex coordinates are not projected, so I cannot geometrically confirm the zigzag batt shape or the wall axis the insulation follows; the count of modules only implies the length of the insulated wall run, which is unverifiable here."
+    }
+  },
+  {
+    "unit_id": "defannot-u156-163",
+    "def": "*U156",
+    "role": "기타",
+    "wall_likelihood": 0.15,
+    "wall_line_handles": [],
+    "notes": "Anonymous group of 92 identical 5-vertex LWPOLYLINEs on the INSUL layer - a large insulation-batt hatch cluster, not wall boundary geometry.",
+    "rationale": {
+      "evidence": "All 92 entities are LWPOLYLINEs with exactly 5 vertices on the single layer 'X-평면도(기본형)$0$INSUL' (handles 4F98..4FB5 in a contiguous run). A homogeneous run of small fixed-vertex polylines on an INSUL layer is the classic repeated zigzag/batt module used to hatch wall-cavity insulation in Korean apartment plans. There are no LINEs, arcs, text, or dimension entities that would indicate wall faces, symbols, or annotation.",
+      "rule": "When an anonymous block contains only many identical low-vertex polylines on an insulation (INSUL) layer, treat it as an insulation hatch cluster (기타), not a plan fragment or wall geometry; layer semantics plus entity homogeneity outrank block size.",
+      "counterfactual": "If the group also contained long parallel LINE pairs on a wall/WALL or 벽 layer, or the layer name referenced walls rather than INSUL, I would reclassify toward 평면 부분도 and raise wall_likelihood; if the polylines had many vertices forming furniture outlines, 가구 would apply.",
+      "uncertainty": "Vertex coordinates are not projected, so I cannot geometrically confirm the zigzag batt shape or the wall axis the insulation follows; the count of modules only implies the length of the insulated wall run, which is unverifiable here."
+    }
+  },
+  {
+    "unit_id": "defannot-u157-164",
+    "def": "*U157",
+    "role": "기타",
+    "wall_likelihood": 0.15,
+    "wall_line_handles": [],
+    "notes": "Anonymous group of 8 identical 5-vertex LWPOLYLINEs on the INSUL layer - a small insulation-batt hatch cluster, not wall boundary geometry.",
+    "rationale": {
+      "evidence": "All 8 entities are LWPOLYLINEs with exactly 5 vertices on the single layer 'X-평면도(기본형)$0$INSUL' (handles 4FF9..5000 in a contiguous run). A homogeneous run of small fixed-vertex polylines on an INSUL layer is the classic repeated zigzag/batt module used to hatch wall-cavity insulation in Korean apartment plans. There are no LINEs, arcs, text, or dimension entities that would indicate wall faces, symbols, or annotation.",
+      "rule": "When an anonymous block contains only many identical low-vertex polylines on an insulation (INSUL) layer, treat it as an insulation hatch cluster (기타), not a plan fragment or wall geometry; layer semantics plus entity homogeneity outrank block size.",
+      "counterfactual": "If the group also contained long parallel LINE pairs on a wall/WALL or 벽 layer, or the layer name referenced walls rather than INSUL, I would reclassify toward 평면 부분도 and raise wall_likelihood; if the polylines had many vertices forming furniture outlines, 가구 would apply.",
+      "uncertainty": "Vertex coordinates are not projected, so I cannot geometrically confirm the zigzag batt shape or the wall axis the insulation follows; the count of modules only implies the length of the insulated wall run, which is unverifiable here."
+    }
+  },
+  {
+    "unit_id": "defannot-u158-165",
+    "def": "*U158",
+    "role": "기타",
+    "wall_likelihood": 0.15,
+    "wall_line_handles": [],
+    "notes": "Anonymous group of 17 identical 5-vertex LWPOLYLINEs on the INSUL layer - a mid-size insulation-batt hatch cluster, not wall boundary geometry.",
+    "rationale": {
+      "evidence": "All 17 entities are LWPOLYLINEs with exactly 5 vertices on the single layer 'X-평면도(기본형)$0$INSUL' (handles 5006..5016 in a contiguous run). A homogeneous run of small fixed-vertex polylines on an INSUL layer is the classic repeated zigzag/batt module used to hatch wall-cavity insulation in Korean apartment plans. There are no LINEs, arcs, text, or dimension entities that would indicate wall faces, symbols, or annotation.",
+      "rule": "When an anonymous block contains only many identical low-vertex polylines on an insulation (INSUL) layer, treat it as an insulation hatch cluster (기타), not a plan fragment or wall geometry; layer semantics plus entity homogeneity outrank block size.",
+      "counterfactual": "If the group also contained long parallel LINE pairs on a wall/WALL or 벽 layer, or the layer name referenced walls rather than INSUL, I would reclassify toward 평면 부분도 and raise wall_likelihood; if the polylines had many vertices forming furniture outlines, 가구 would apply.",
+      "uncertainty": "Vertex coordinates are not projected, so I cannot geometrically confirm the zigzag batt shape or the wall axis the insulation follows; the count of modules only implies the length of the insulated wall run, which is unverifiable here."
+    }
+  },
+  {
+    "unit_id": "defannot-u159-166",
+    "def": "*U159",
+    "role": "기타",
+    "wall_likelihood": 0.15,
+    "wall_line_handles": [],
+    "notes": "Anonymous group of 18 identical 5-vertex LWPOLYLINEs on the INSUL layer - a mid-size insulation-batt hatch cluster, not wall boundary geometry.",
+    "rationale": {
+      "evidence": "All 18 entities are LWPOLYLINEs with exactly 5 vertices on the single layer 'X-평면도(기본형)$0$INSUL' (handles 501C..502D in a contiguous run). A homogeneous run of small fixed-vertex polylines on an INSUL layer is the classic repeated zigzag/batt module used to hatch wall-cavity insulation in Korean apartment plans. There are no LINEs, arcs, text, or dimension entities that would indicate wall faces, symbols, or annotation.",
+      "rule": "When an anonymous block contains only many identical low-vertex polylines on an insulation (INSUL) layer, treat it as an insulation hatch cluster (기타), not a plan fragment or wall geometry; layer semantics plus entity homogeneity outrank block size.",
+      "counterfactual": "If the group also contained long parallel LINE pairs on a wall/WALL or 벽 layer, or the layer name referenced walls rather than INSUL, I would reclassify toward 평면 부분도 and raise wall_likelihood; if the polylines had many vertices forming furniture outlines, 가구 would apply.",
+      "uncertainty": "Vertex coordinates are not projected, so I cannot geometrically confirm the zigzag batt shape or the wall axis the insulation follows; the count of modules only implies the length of the insulated wall run, which is unverifiable here."
+    }
+  },
+  {
+    "unit_id": "defannot-u160-167",
+    "def": "*U160",
+    "role": "기타",
+    "wall_likelihood": 0.15,
+    "wall_line_handles": [],
+    "notes": "Anonymous group of 87 identical 5-vertex LWPOLYLINEs on the INSUL layer - a large insulation-batt hatch cluster, not wall boundary geometry.",
+    "rationale": {
+      "evidence": "All 87 entities are LWPOLYLINEs with exactly 5 vertices on the single layer 'X-평면도(기본형)$0$INSUL' (handles 5033..5050 in a contiguous run). A homogeneous run of small fixed-vertex polylines on an INSUL layer is the classic repeated zigzag/batt module used to hatch wall-cavity insulation in Korean apartment plans. There are no LINEs, arcs, text, or dimension entities that would indicate wall faces, symbols, or annotation.",
+      "rule": "When an anonymous block contains only many identical low-vertex polylines on an insulation (INSUL) layer, treat it as an insulation hatch cluster (기타), not a plan fragment or wall geometry; layer semantics plus entity homogeneity outrank block size.",
+      "counterfactual": "If the group also contained long parallel LINE pairs on a wall/WALL or 벽 layer, or the layer name referenced walls rather than INSUL, I would reclassify toward 평면 부분도 and raise wall_likelihood; if the polylines had many vertices forming furniture outlines, 가구 would apply.",
+      "uncertainty": "Vertex coordinates are not projected, so I cannot geometrically confirm the zigzag batt shape or the wall axis the insulation follows; the count of modules only implies the length of the insulated wall run, which is unverifiable here."
+    }
+  },
+  {
+    "unit_id": "defannot-u161-168",
+    "def": "*U161",
+    "role": "기타",
+    "wall_likelihood": 0.15,
+    "wall_line_handles": [],
+    "notes": "Anonymous group of 90 identical 5-vertex LWPOLYLINEs on the INSUL layer - a large insulation-batt hatch cluster, not wall boundary geometry.",
+    "rationale": {
+      "evidence": "All 90 entities are LWPOLYLINEs with exactly 5 vertices on the single layer 'X-평면도(기본형)$0$INSUL' (handles 508F..50AC in a contiguous run). A homogeneous run of small fixed-vertex polylines on an INSUL layer is the classic repeated zigzag/batt module used to hatch wall-cavity insulation in Korean apartment plans. There are no LINEs, arcs, text, or dimension entities that would indicate wall faces, symbols, or annotation.",
+      "rule": "When an anonymous block contains only many identical low-vertex polylines on an insulation (INSUL) layer, treat it as an insulation hatch cluster (기타), not a plan fragment or wall geometry; layer semantics plus entity homogeneity outrank block size.",
+      "counterfactual": "If the group also contained long parallel LINE pairs on a wall/WALL or 벽 layer, or the layer name referenced walls rather than INSUL, I would reclassify toward 평면 부분도 and raise wall_likelihood; if the polylines had many vertices forming furniture outlines, 가구 would apply.",
+      "uncertainty": "Vertex coordinates are not projected, so I cannot geometrically confirm the zigzag batt shape or the wall axis the insulation follows; the count of modules only implies the length of the insulated wall run, which is unverifiable here."
+    }
+  },
+  {
+    "unit_id": "defannot-u162-169",
+    "def": "*U162",
+    "role": "기타",
+    "wall_likelihood": 0.15,
+    "wall_line_handles": [],
+    "notes": "Anonymous group of 81 identical 5-vertex LWPOLYLINEs on the INSUL layer - a large insulation-batt hatch cluster, not wall boundary geometry.",
+    "rationale": {
+      "evidence": "All 81 entities are LWPOLYLINEs with exactly 5 vertices on the single layer 'X-평면도(기본형)$0$INSUL' (handles 50EE..510B in a contiguous run). A homogeneous run of small fixed-vertex polylines on an INSUL layer is the classic repeated zigzag/batt module used to hatch wall-cavity insulation in Korean apartment plans. There are no LINEs, arcs, text, or dimension entities that would indicate wall faces, symbols, or annotation.",
+      "rule": "When an anonymous block contains only many identical low-vertex polylines on an insulation (INSUL) layer, treat it as an insulation hatch cluster (기타), not a plan fragment or wall geometry; layer semantics plus entity homogeneity outrank block size.",
+      "counterfactual": "If the group also contained long parallel LINE pairs on a wall/WALL or 벽 layer, or the layer name referenced walls rather than INSUL, I would reclassify toward 평면 부분도 and raise wall_likelihood; if the polylines had many vertices forming furniture outlines, 가구 would apply.",
+      "uncertainty": "Vertex coordinates are not projected, so I cannot geometrically confirm the zigzag batt shape or the wall axis the insulation follows; the count of modules only implies the length of the insulated wall run, which is unverifiable here."
+    }
+  },
+  {
+    "unit_id": "defannot-u163-170",
+    "def": "*U163",
+    "role": "기타",
+    "wall_likelihood": 0.15,
+    "wall_line_handles": [],
+    "notes": "Anonymous group of 75 identical 5-vertex LWPOLYLINEs on the INSUL layer - a large insulation-batt hatch cluster, not wall boundary geometry.",
+    "rationale": {
+      "evidence": "All 75 entities are LWPOLYLINEs with exactly 5 vertices on the single layer 'X-평면도(기본형)$0$INSUL' (handles 5144..5161 in a contiguous run). A homogeneous run of small fixed-vertex polylines on an INSUL layer is the classic repeated zigzag/batt module used to hatch wall-cavity insulation in Korean apartment plans. There are no LINEs, arcs, text, or dimension entities that would indicate wall faces, symbols, or annotation.",
+      "rule": "When an anonymous block contains only many identical low-vertex polylines on an insulation (INSUL) layer, treat it as an insulation hatch cluster (기타), not a plan fragment or wall geometry; layer semantics plus entity homogeneity outrank block size.",
+      "counterfactual": "If the group also contained long parallel LINE pairs on a wall/WALL or 벽 layer, or the layer name referenced walls rather than INSUL, I would reclassify toward 평면 부분도 and raise wall_likelihood; if the polylines had many vertices forming furniture outlines, 가구 would apply.",
+      "uncertainty": "Vertex coordinates are not projected, so I cannot geometrically confirm the zigzag batt shape or the wall axis the insulation follows; the count of modules only implies the length of the insulated wall run, which is unverifiable here."
+    }
+  },
+  {
+    "unit_id": "defannot-u164-171",
+    "def": "*U164",
+    "role": "기타",
+    "wall_likelihood": 0.15,
+    "wall_line_handles": [],
+    "notes": "Anonymous group of 37 identical 5-vertex LWPOLYLINEs on the INSUL layer - a mid-size insulation-batt hatch cluster, not wall boundary geometry.",
+    "rationale": {
+      "evidence": "All 37 entities are LWPOLYLINEs with exactly 5 vertices on the single layer 'X-평면도(기본형)$0$INSUL' (handles 5194..51B1 in a contiguous run). A homogeneous run of small fixed-vertex polylines on an INSUL layer is the classic repeated zigzag/batt module used to hatch wall-cavity insulation in Korean apartment plans. There are no LINEs, arcs, text, or dimension entities that would indicate wall faces, symbols, or annotation.",
+      "rule": "When an anonymous block contains only many identical low-vertex polylines on an insulation (INSUL) layer, treat it as an insulation hatch cluster (기타), not a plan fragment or wall geometry; layer semantics plus entity homogeneity outrank block size.",
+      "counterfactual": "If the group also contained long parallel LINE pairs on a wall/WALL or 벽 layer, or the layer name referenced walls rather than INSUL, I would reclassify toward 평면 부분도 and raise wall_likelihood; if the polylines had many vertices forming furniture outlines, 가구 would apply.",
+      "uncertainty": "Vertex coordinates are not projected, so I cannot geometrically confirm the zigzag batt shape or the wall axis the insulation follows; the count of modules only implies the length of the insulated wall run, which is unverifiable here."
+    }
+  },
+  {
+    "unit_id": "defannot-u165-172",
+    "def": "*U165",
+    "role": "기타",
+    "wall_likelihood": 0.15,
+    "wall_line_handles": [],
+    "notes": "Anonymous group of 36 identical 5-vertex LWPOLYLINEs on the INSUL layer - a mid-size insulation-batt hatch cluster, not wall boundary geometry.",
+    "rationale": {
+      "evidence": "All 36 entities are LWPOLYLINEs with exactly 5 vertices on the single layer 'X-평면도(기본형)$0$INSUL' (handles 51BE..51DB in a contiguous run). A homogeneous run of small fixed-vertex polylines on an INSUL layer is the classic repeated zigzag/batt module used to hatch wall-cavity insulation in Korean apartment plans. There are no LINEs, arcs, text, or dimension entities that would indicate wall faces, symbols, or annotation.",
+      "rule": "When an anonymous block contains only many identical low-vertex polylines on an insulation (INSUL) layer, treat it as an insulation hatch cluster (기타), not a plan fragment or wall geometry; layer semantics plus entity homogeneity outrank block size.",
+      "counterfactual": "If the group also contained long parallel LINE pairs on a wall/WALL or 벽 layer, or the layer name referenced walls rather than INSUL, I would reclassify toward 평면 부분도 and raise wall_likelihood; if the polylines had many vertices forming furniture outlines, 가구 would apply.",
+      "uncertainty": "Vertex coordinates are not projected, so I cannot geometrically confirm the zigzag batt shape or the wall axis the insulation follows; the count of modules only implies the length of the insulated wall run, which is unverifiable here."
+    }
+  },
+  {
+    "unit_id": "defannot-u166-173",
+    "def": "*U166",
+    "role": "기타",
+    "wall_likelihood": 0.15,
+    "wall_line_handles": [],
+    "notes": "Anonymous group of 13 identical 5-vertex LWPOLYLINEs on the INSUL layer - a small insulation-batt hatch cluster, not wall boundary geometry.",
+    "rationale": {
+      "evidence": "All 13 entities are LWPOLYLINEs with exactly 5 vertices on the single layer 'X-평면도(기본형)$0$INSUL' (handles 51E7..51F3 in a contiguous run). A homogeneous run of small fixed-vertex polylines on an INSUL layer is the classic repeated zigzag/batt module used to hatch wall-cavity insulation in Korean apartment plans. There are no LINEs, arcs, text, or dimension entities that would indicate wall faces, symbols, or annotation.",
+      "rule": "When an anonymous block contains only many identical low-vertex polylines on an insulation (INSUL) layer, treat it as an insulation hatch cluster (기타), not a plan fragment or wall geometry; layer semantics plus entity homogeneity outrank block size.",
+      "counterfactual": "If the group also contained long parallel LINE pairs on a wall/WALL or 벽 layer, or the layer name referenced walls rather than INSUL, I would reclassify toward 평면 부분도 and raise wall_likelihood; if the polylines had many vertices forming furniture outlines, 가구 would apply.",
+      "uncertainty": "Vertex coordinates are not projected, so I cannot geometrically confirm the zigzag batt shape or the wall axis the insulation follows; the count of modules only implies the length of the insulated wall run, which is unverifiable here."
+    }
+  },
+  {
+    "unit_id": "defannot-u167-174",
+    "def": "*U167",
+    "role": "기타",
+    "wall_likelihood": 0.15,
+    "wall_line_handles": [],
+    "notes": "Anonymous group of 30 identical 5-vertex LWPOLYLINEs on the INSUL layer - a mid-size insulation-batt hatch cluster, not wall boundary geometry.",
+    "rationale": {
+      "evidence": "All 30 entities are LWPOLYLINEs with exactly 5 vertices on the single layer 'X-평면도(기본형)$0$INSUL' (handles 51F9..5216 in a contiguous run). A homogeneous run of small fixed-vertex polylines on an INSUL layer is the classic repeated zigzag/batt module used to hatch wall-cavity insulation in Korean apartment plans. There are no LINEs, arcs, text, or dimension entities that would indicate wall faces, symbols, or annotation.",
+      "rule": "When an anonymous block contains only many identical low-vertex polylines on an insulation (INSUL) layer, treat it as an insulation hatch cluster (기타), not a plan fragment or wall geometry; layer semantics plus entity homogeneity outrank block size.",
+      "counterfactual": "If the group also contained long parallel LINE pairs on a wall/WALL or 벽 layer, or the layer name referenced walls rather than INSUL, I would reclassify toward 평면 부분도 and raise wall_likelihood; if the polylines had many vertices forming furniture outlines, 가구 would apply.",
+      "uncertainty": "Vertex coordinates are not projected, so I cannot geometrically confirm the zigzag batt shape or the wall axis the insulation follows; the count of modules only implies the length of the insulated wall run, which is unverifiable here."
+    }
+  },
+  {
+    "unit_id": "defannot-u168-175",
+    "def": "*U168",
+    "role": "기타",
+    "wall_likelihood": 0.15,
+    "wall_line_handles": [],
+    "notes": "Anonymous group of 14 identical 5-vertex LWPOLYLINEs on the INSUL layer - a small insulation-batt hatch cluster, not wall boundary geometry.",
+    "rationale": {
+      "evidence": "All 14 entities are LWPOLYLINEs with exactly 5 vertices on the single layer 'X-평면도(기본형)$0$INSUL' (handles 521C..5229 in a contiguous run). A homogeneous run of small fixed-vertex polylines on an INSUL layer is the classic repeated zigzag/batt module used to hatch wall-cavity insulation in Korean apartment plans. There are no LINEs, arcs, text, or dimension entities that would indicate wall faces, symbols, or annotation.",
+      "rule": "When an anonymous block contains only many identical low-vertex polylines on an insulation (INSUL) layer, treat it as an insulation hatch cluster (기타), not a plan fragment or wall geometry; layer semantics plus entity homogeneity outrank block size.",
+      "counterfactual": "If the group also contained long parallel LINE pairs on a wall/WALL or 벽 layer, or the layer name referenced walls rather than INSUL, I would reclassify toward 평면 부분도 and raise wall_likelihood; if the polylines had many vertices forming furniture outlines, 가구 would apply.",
+      "uncertainty": "Vertex coordinates are not projected, so I cannot geometrically confirm the zigzag batt shape or the wall axis the insulation follows; the count of modules only implies the length of the insulated wall run, which is unverifiable here."
+    }
+  },
+  {
+    "unit_id": "defannot-u169-176",
+    "def": "*U169",
+    "role": "기타",
+    "wall_likelihood": 0.15,
+    "wall_line_handles": [],
+    "notes": "Anonymous group of 106 identical 5-vertex LWPOLYLINEs on the INSUL layer - a large insulation-batt hatch cluster, not wall boundary geometry.",
+    "rationale": {
+      "evidence": "All 106 entities are LWPOLYLINEs with exactly 5 vertices on the single layer 'X-평면도(기본형)$0$INSUL' (handles 522F..524C in a contiguous run). A homogeneous run of small fixed-vertex polylines on an INSUL layer is the classic repeated zigzag/batt module used to hatch wall-cavity insulation in Korean apartment plans. There are no LINEs, arcs, text, or dimension entities that would indicate wall faces, symbols, or annotation.",
+      "rule": "When an anonymous block contains only many identical low-vertex polylines on an insulation (INSUL) layer, treat it as an insulation hatch cluster (기타), not a plan fragment or wall geometry; layer semantics plus entity homogeneity outrank block size.",
+      "counterfactual": "If the group also contained long parallel LINE pairs on a wall/WALL or 벽 layer, or the layer name referenced walls rather than INSUL, I would reclassify toward 평면 부분도 and raise wall_likelihood; if the polylines had many vertices forming furniture outlines, 가구 would apply.",
+      "uncertainty": "Vertex coordinates are not projected, so I cannot geometrically confirm the zigzag batt shape or the wall axis the insulation follows; the count of modules only implies the length of the insulated wall run, which is unverifiable here."
+    }
+  },
+  {
+    "unit_id": "defannot-u170-177",
+    "def": "*U170",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.35,
+    "wall_line_handles": [
+      {
+        "handle": "52A1",
+        "reason": "long horizontal face line of 50-unit-thick band"
+      },
+      {
+        "handle": "52B1",
+        "reason": "parallel return of same long band"
+      },
+      {
+        "handle": "52A3",
+        "reason": "second long face line 50 units below"
+      },
+      {
+        "handle": "52A4",
+        "reason": "closing vertical of long band end"
+      }
+    ],
+    "notes": "Anonymous plan fragment ~1220 units wide: a 50-thick double-line band with end jambs, two WIPEOUTs and a nested 국기계양대 (flag-pole holder) block - reads as a railing/parapet or opening strip on an exterior wall, not pure symbol art.",
+    "rationale": {
+      "evidence": "20 LINEs on layer 0 form a long narrow band: two full-width horizontal lines at y=-50.5 and y=-100.5 (e.g. handles 52A1, 52A3) spanning x=±588, closed by short verticals, plus 22-unit end lugs out to ±610 - a plan-view strip about 1220x126 units. One INSERT of the named block 'X-평면도(기본형)$0$국기계양대' (flag-pole holder) and two WIPEOUTs sit on it, which is composed drawing content rather than a standalone legend symbol.",
+      "rule": "A mixed anonymous block combining raw LINE geometry at building scale with wipeouts and nested named symbols is a grouped fragment of the floor plan (평면 부분도); the long parallel double lines are candidate wall/railing faces, so wall likelihood is moderate rather than zero.",
+      "counterfactual": "If the double band were 100-200 units thick on a wall-named layer I would raise wall_likelihood sharply; if the geometry were tiny or centered on the origin at uniform symbol scale with no nested inserts, I would flip to 심볼.",
+      "uncertainty": "A 50-unit band is thin for a structural wall, so it may be a balcony railing, parapet coping, or window frame in plan - the projection gives no layer semantics (all layer 0) or linetype/width to distinguish these; the nested flag-pole block's own contents are also not visible."
+    }
+  },
+  {
+    "unit_id": "defannot-u171-178",
+    "def": "*U171",
+    "role": "기타",
+    "wall_likelihood": 0.15,
+    "wall_line_handles": [],
+    "notes": "Anonymous group of 29 identical 5-vertex LWPOLYLINEs on the INSUL layer - a mid-size insulation-batt hatch cluster, not wall boundary geometry.",
+    "rationale": {
+      "evidence": "All 29 entities are LWPOLYLINEs with exactly 5 vertices on the single layer 'X-평면도(기본형)$0$INSUL' (handles 52BA..52D6 in a contiguous run). A homogeneous run of small fixed-vertex polylines on an INSUL layer is the classic repeated zigzag/batt module used to hatch wall-cavity insulation in Korean apartment plans. There are no LINEs, arcs, text, or dimension entities that would indicate wall faces, symbols, or annotation.",
+      "rule": "When an anonymous block contains only many identical low-vertex polylines on an insulation (INSUL) layer, treat it as an insulation hatch cluster (기타), not a plan fragment or wall geometry; layer semantics plus entity homogeneity outrank block size.",
+      "counterfactual": "If the group also contained long parallel LINE pairs on a wall/WALL or 벽 layer, or the layer name referenced walls rather than INSUL, I would reclassify toward 평면 부분도 and raise wall_likelihood; if the polylines had many vertices forming furniture outlines, 가구 would apply.",
+      "uncertainty": "Vertex coordinates are not projected, so I cannot geometrically confirm the zigzag batt shape or the wall axis the insulation follows; the count of modules only implies the length of the insulated wall run, which is unverifiable here."
+    }
+  },
+  {
+    "unit_id": "defannot-u172-179",
+    "def": "*U172",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.35,
+    "wall_line_handles": [
+      {
+        "handle": "52DF",
+        "reason": "long horizontal face line of 50-unit-thick band"
+      },
+      {
+        "handle": "52EF",
+        "reason": "parallel return of same long band"
+      },
+      {
+        "handle": "52E1",
+        "reason": "second long face line 50 units below"
+      },
+      {
+        "handle": "52E2",
+        "reason": "closing vertical of long band end"
+      }
+    ],
+    "notes": "Anonymous plan fragment ~1620 units wide: a 50-thick double-line band with end jambs, two WIPEOUTs and a nested 국기계양대 (flag-pole holder) block - reads as a railing/parapet or opening strip on an exterior wall, not pure symbol art.",
+    "rationale": {
+      "evidence": "20 LINEs on layer 0 form a long narrow band: two full-width horizontal lines at y=-50.5 and y=-100.5 (e.g. handles 52DF, 52E1) spanning x=±788, closed by short verticals, plus 22-unit end lugs out to ±810 - a plan-view strip about 1620x126 units. One INSERT of the named block 'X-평면도(기본형)$0$국기계양대' (flag-pole holder) and two WIPEOUTs sit on it, which is composed drawing content rather than a standalone legend symbol.",
+      "rule": "A mixed anonymous block combining raw LINE geometry at building scale with wipeouts and nested named symbols is a grouped fragment of the floor plan (평면 부분도); the long parallel double lines are candidate wall/railing faces, so wall likelihood is moderate rather than zero.",
+      "counterfactual": "If the double band were 100-200 units thick on a wall-named layer I would raise wall_likelihood sharply; if the geometry were tiny or centered on the origin at uniform symbol scale with no nested inserts, I would flip to 심볼.",
+      "uncertainty": "A 50-unit band is thin for a structural wall, so it may be a balcony railing, parapet coping, or window frame in plan - the projection gives no layer semantics (all layer 0) or linetype/width to distinguish these; the nested flag-pole block's own contents are also not visible."
+    }
+  },
+  {
+    "unit_id": "defannot-u173-180",
+    "def": "*U173",
+    "role": "기타",
+    "wall_likelihood": 0.15,
+    "wall_line_handles": [],
+    "notes": "Anonymous group of 18 identical 5-vertex LWPOLYLINEs on the INSUL layer - a mid-size insulation-batt hatch cluster, not wall boundary geometry.",
+    "rationale": {
+      "evidence": "All 18 entities are LWPOLYLINEs with exactly 5 vertices on the single layer 'X-평면도(기본형)$0$INSUL' (handles 52F8..5309 in a contiguous run). A homogeneous run of small fixed-vertex polylines on an INSUL layer is the classic repeated zigzag/batt module used to hatch wall-cavity insulation in Korean apartment plans. There are no LINEs, arcs, text, or dimension entities that would indicate wall faces, symbols, or annotation.",
+      "rule": "When an anonymous block contains only many identical low-vertex polylines on an insulation (INSUL) layer, treat it as an insulation hatch cluster (기타), not a plan fragment or wall geometry; layer semantics plus entity homogeneity outrank block size.",
+      "counterfactual": "If the group also contained long parallel LINE pairs on a wall/WALL or 벽 layer, or the layer name referenced walls rather than INSUL, I would reclassify toward 평면 부분도 and raise wall_likelihood; if the polylines had many vertices forming furniture outlines, 가구 would apply.",
+      "uncertainty": "Vertex coordinates are not projected, so I cannot geometrically confirm the zigzag batt shape or the wall axis the insulation follows; the count of modules only implies the length of the insulated wall run, which is unverifiable here."
+    }
+  }
+]
