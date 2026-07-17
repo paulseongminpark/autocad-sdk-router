@@ -1,0 +1,184 @@
+{
+ "schema": "ariadne.e15_calibration.v1",
+ "prereg": "reports/e1/annot_v1/prereg_e15.json",
+ "judges_present": [
+  "fable5_high",
+  "grok45_xhigh",
+  "opus48_max",
+  "ornith35b_v0",
+  "sol56_xhigh",
+  "sonnet5_xhigh"
+ ],
+ "validity": {
+  "opus48_max": {
+   "shards": 20,
+   "answers": 384,
+   "valid": 384,
+   "errors": [],
+   "valid_rate": 1.0,
+   "B3_valid": true
+  },
+  "fable5_high": {
+   "shards": 20,
+   "answers": 384,
+   "valid": 384,
+   "errors": [],
+   "valid_rate": 1.0,
+   "B3_valid": true
+  },
+  "sol56_xhigh": {
+   "shards": 20,
+   "answers": 384,
+   "valid": 384,
+   "errors": [],
+   "valid_rate": 1.0,
+   "B3_valid": true
+  },
+  "sonnet5_xhigh": {
+   "shards": 20,
+   "answers": 384,
+   "valid": 384,
+   "errors": [],
+   "valid_rate": 1.0,
+   "B3_valid": true
+  },
+  "grok45_xhigh": {
+   "shards": 20,
+   "answers": 384,
+   "valid": 384,
+   "errors": [],
+   "valid_rate": 1.0,
+   "B3_valid": true
+  }
+ },
+ "pairwise": {
+  "fable5_high|grok45_xhigh": {
+   "n_common": 384,
+   "role_agreement": 0.7447916666666666,
+   "likelihood_pearson": 0.8378026445421456,
+   "bucket_agreement": 0.8046875,
+   "handle_jaccard_mean": 0.33979215229215226,
+   "handle_jaccard_n": 76
+  },
+  "fable5_high|opus48_max": {
+   "n_common": 384,
+   "role_agreement": 0.65625,
+   "likelihood_pearson": 0.8094678600174956,
+   "bucket_agreement": 0.7057291666666666,
+   "handle_jaccard_mean": 0.3170635247105835,
+   "handle_jaccard_n": 80
+  },
+  "fable5_high|ornith35b_v0": {
+   "n_common": 377,
+   "role_agreement": 0.5411140583554377,
+   "likelihood_pearson": 0.4545321708211481,
+   "bucket_agreement": 0.6631299734748011,
+   "handle_jaccard_mean": 0.06776187560085865,
+   "handle_jaccard_n": 236
+  },
+  "fable5_high|sol56_xhigh": {
+   "n_common": 384,
+   "role_agreement": 0.9427083333333334,
+   "likelihood_pearson": 0.880032541907183,
+   "bucket_agreement": 0.9270833333333334,
+   "handle_jaccard_mean": 0.27267670601003935,
+   "handle_jaccard_n": 54
+  },
+  "fable5_high|sonnet5_xhigh": {
+   "n_common": 384,
+   "role_agreement": 0.6796875,
+   "likelihood_pearson": 0.8504471991084387,
+   "bucket_agreement": 0.9010416666666666,
+   "handle_jaccard_mean": 0.26457542457542454,
+   "handle_jaccard_n": 80
+  },
+  "grok45_xhigh|opus48_max": {
+   "n_common": 384,
+   "role_agreement": 0.8723958333333334,
+   "likelihood_pearson": 0.8185098094742015,
+   "bucket_agreement": 0.8854166666666666,
+   "handle_jaccard_mean": 0.5130359201437633,
+   "handle_jaccard_n": 72
+  },
+  "grok45_xhigh|ornith35b_v0": {
+   "n_common": 377,
+   "role_agreement": 0.5809018567639257,
+   "likelihood_pearson": 0.4860638408413184,
+   "bucket_agreement": 0.5941644562334217,
+   "handle_jaccard_mean": 0.09035403363668569,
+   "handle_jaccard_n": 236
+  },
+  "grok45_xhigh|sol56_xhigh": {
+   "n_common": 384,
+   "role_agreement": 0.7473958333333334,
+   "likelihood_pearson": 0.8127527656670748,
+   "bucket_agreement": 0.8645833333333334,
+   "handle_jaccard_mean": 0.26492223623371164,
+   "handle_jaccard_n": 61
+  },
+  "grok45_xhigh|sonnet5_xhigh": {
+   "n_common": 384,
+   "role_agreement": 0.8619791666666666,
+   "likelihood_pearson": 0.7471607804879786,
+   "bucket_agreement": 0.7526041666666666,
+   "handle_jaccard_mean": 0.271209860098749,
+   "handle_jaccard_n": 81
+  },
+  "opus48_max|ornith35b_v0": {
+   "n_common": 377,
+   "role_agreement": 0.5915119363395226,
+   "likelihood_pearson": 0.4398172043956656,
+   "bucket_agreement": 0.519893899204244,
+   "handle_jaccard_mean": 0.09549145182056575,
+   "handle_jaccard_n": 237
+  },
+  "opus48_max|sol56_xhigh": {
+   "n_common": 384,
+   "role_agreement": 0.6614583333333334,
+   "likelihood_pearson": 0.7650269985815806,
+   "bucket_agreement": 0.765625,
+   "handle_jaccard_mean": 0.18707881861728015,
+   "handle_jaccard_n": 65
+  },
+  "opus48_max|sonnet5_xhigh": {
+   "n_common": 384,
+   "role_agreement": 0.8723958333333334,
+   "likelihood_pearson": 0.8413804490881663,
+   "bucket_agreement": 0.7578125,
+   "handle_jaccard_mean": 0.28961494854352,
+   "handle_jaccard_n": 84
+  },
+  "ornith35b_v0|sol56_xhigh": {
+   "n_common": 377,
+   "role_agreement": 0.5517241379310345,
+   "likelihood_pearson": 0.38623004404636563,
+   "bucket_agreement": 0.6392572944297082,
+   "handle_jaccard_mean": 0.04681726283728787,
+   "handle_jaccard_n": 235
+  },
+  "ornith35b_v0|sonnet5_xhigh": {
+   "n_common": 377,
+   "role_agreement": 0.5649867374005305,
+   "likelihood_pearson": 0.43626978585547205,
+   "bucket_agreement": 0.6419098143236074,
+   "handle_jaccard_mean": 0.08929102046256858,
+   "handle_jaccard_n": 239
+  },
+  "sol56_xhigh|sonnet5_xhigh": {
+   "n_common": 384,
+   "role_agreement": 0.6927083333333334,
+   "likelihood_pearson": 0.7705736487150553,
+   "bucket_agreement": 0.8854166666666666,
+   "handle_jaccard_mean": 0.1604755538579068,
+   "handle_jaccard_n": 68
+  }
+ },
+ "fleiss_kappa_role_live": 0.7032530164095232,
+ "top_tier_mean_role_agreement": 0.7534722222222223,
+ "top_tier_mean_likelihood_pearson": 0.8181758001687531,
+ "verdicts": {
+  "B1_task_well_posed": "well_posed",
+  "B2_ladder_visible": true,
+  "B4_likelihood_usable": "silver_ok"
+ }
+}

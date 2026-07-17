@@ -30,3 +30,16 @@ Incident: first 60-packet call REFUSED the agentic packets (INV-14 default-close
 2. On Workflow completion: validate raw/opus48_max + raw/fable5_high file counts (20 each).
 3. `python tools/e15_collect.py` → calibration_v1.{json,md} + e15_evidence.xlsx → report with prereg verdicts.
 4. LYKEION panel 20260717_wall-detector-methodology: Phase A claude seats may start anytime; codex/grok seats AFTER E1.5 lanes drain (starvation guard).
+
+
+## TERMINAL (2026-07-17)
+
+- Fold: **success** (all 5 live judges 20/20 shards, validity 1.0 each; ornith v0 baseline joined).
+- Prereg verdicts (calibration_v1.json, bands sealed at a78eeaa BEFORE any binding run):
+  - B1 task well-posedness: **well_posed** (top-tier mean role agreement 0.7535 >= 0.70)
+  - B2 ladder visible: **true** (+0.2044 over the 0.5491 v0 ornith x sonnet baseline)
+  - B3 validity gate: all judges 1.0 (>= 0.95)
+  - B4 likelihood-as-silver: **silver_ok** (top-tier mean pearson 0.8182 >= 0.70)
+- Fleiss kappa (5 live judges, role): 0.7033.
+- Incidents (all recovered, zero data loss): repo-dirt sentinel quarantined 9 Workflow-written files + 17 sonnet files (batch-write x worktree-run collision, precedent re-confirmed); MCP idle-timeout aborted the sonnet client call while the kernel kept running; s17/s19 workers escaped the worktree via absolute paths (sentinel worked as designed).
+- Evidence: e15_evidence.xlsx / calibration_v1.{json,md}.
