@@ -1,0 +1,39 @@
+// m08i_bulk_from_ir.inc.draft -- write.database.from_ir skeleton (Plan C).
+//
+// *** DRAFT: NOT included in any .vcxproj / not compiled. ***
+// Rename to m08i_handlers.inc + wire per docs/PLAN_BULK_FROM_IR.md when the
+// implementation starts. Until then the op MUST NOT appear in
+// config/operations.v2.json (no-fake-success: nothing is registered that
+// cannot actually run).
+//
+// Design (see docs/PLAN_BULK_FROM_IR.md for the full contract):
+//   * one ARIADNE_NATIVE_JOB invocation regenerates an ENTIRE drawing from a
+//     dwg_graph_ir.json into the currently-open (staged) database, in place,
+//     with the same _QSAVE-persist + marker + timeout-kill lifetime rules as
+//     the #39 write-batch lane;
+//   * entities[] / block_definitions[] are read with a STREAMING parser (the
+//     Jukjeon IR is 3.1 GB -- the job-args DOM path must not be used);
+//   * per-kind entity creation reuses the m08g/m08h builders (factor them into
+//     shared helpers rather than duplicating);
+//   * draw order is restored by writing AcDbSortentsTable on the model-space
+//     BTR from the IR's sortents section (#38 -- extractor must emit it);
+//   * INSERT attributes[] -> appendAttribute(AcDbAttribute), wipeouts ->
+//     the existing native AcDbWipeout builder, xclip -> AcDbSpatialFilter.
+//
+// static std::string m08iDispatch(AcDbDatabase* pDb, const std::string& op,
+//                                 const JobArgs& args) {
+//     if (op == "write.database.from_ir") {
+//         // 1. open streaming reader on args.ir_path
+//         // 2. pass 1: symbol tables (layers/linetypes/textstyles/dimstyles)
+//         // 3. pass 2: block definitions (defs first, then def_entities;
+//         //            anonymous *U/*D/*X included -- see #66/#68 extractor fix)
+//         // 4. pass 3: model-space entities in IR order; QSAVE checkpoint
+//         //            every args.checkpoint_every entities; progress.jsonl
+//         // 5. sortents: AcDbSortentsTable::setRelativeDrawOrder from IR
+//         // 6. attributes / wipeouts / xclip as flagged in args
+//         // 7. emit {status:"ok", created:{...}, skipped:{...}, checkpoints:N}
+//         return notImplementedResult(op, "write.database.from_ir is a draft; "
+//                                     "see docs/PLAN_BULK_FROM_IR.md");
+//     }
+//     return "";  // not this family's op
+// }
