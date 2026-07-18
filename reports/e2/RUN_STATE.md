@@ -154,6 +154,13 @@ Remaining sol findings → tickets: B1 population/params mismatch (8), split art
 FP-rewarding coverage metric + v0 comparator apples-to-oranges (12/13), version pinning (15),
 B4 recall floor in-runner (6) & arm governance (7). B3/B5 re-measure (max-agg, dual-arm) running as real_defs_v3.
 
+**B4 re-measure on repaired pipeline (battery_S_v3, b4_fold_v2)**: rotate/translate/mirror/units
+mean invariance 1.0; **scale 0.7624** (was 0.8795 — with the 0-offset clone gone, thickness relies
+on true partners, so ×2 scale's band exit shows honestly). sentinel_all 100/100 (pack composition),
+sentinel_zero 0, errors 0. **Strict-contract verdict: FAIL on all banded arms** (sealed
+any-sentinel-trip rule; v1 arm-PASSes withdrawn). Battery redesign (mixed pack, scoped sentinel)
+→ W2 prereg amendment.
+
 ## Assets
 
 - CubiCasa5k canonical (Zenodo 2613548): `_ariadne\alm\datasets\cubicasa5k.zip` 5,469,495,706 bytes,
