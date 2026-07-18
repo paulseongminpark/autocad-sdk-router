@@ -1,0 +1,179 @@
+{
+  "counterexample_execution_transcript": [
+    "{\"counterexample_input\": {\"minimum_fraction\": 0.6, \"scale_high_coverage\": {\"0.001\": 0.599}}, \"counterexample_input_annotation\": \"At any sealed scale, HIGH coverage=0.599 must return false.\", \"counterexample_return_value\": false, \"expected_counterexample_result_false\": true, \"observed_counterexample_result_false\": true, \"observed_input_fields\": [\"scale_high_coverage\", \"minimum_fraction\"], \"predicate_expression\": \"all(scale_high_coverage >= 0.6)\", \"predicate_id\": \"high_coverage_per_scale\"}",
+    "{\"counterexample_input\": {\"accuracy\": 0.949, \"relative_errors\": [0.0, 0.051]}, \"counterexample_input_annotation\": \"Within unit_status=HIGH, accuracy=0.949 or any relative error>0.05 must return false.\", \"counterexample_return_value\": false, \"expected_counterexample_result_false\": true, \"observed_counterexample_result_false\": true, \"observed_input_fields\": [\"accuracy\", \"relative_errors\", \"minimum_fraction\", \"maximum_error\"], \"predicate_expression\": \"accuracy >= 0.95 and all(relative_error <= 0.05)\", \"predicate_id\": \"high_accuracy\"}",
+    "{\"counterexample_input\": {\"coverage_losses\": 0, \"status_downgrades\": 1}, \"counterexample_input_annotation\": \"One O1 or O2 status downgrade or one coverage loss must return false.\", \"counterexample_return_value\": false, \"expected_counterexample_result_false\": true, \"observed_counterexample_result_false\": true, \"observed_input_fields\": [\"status_downgrades\", \"coverage_losses\"], \"predicate_expression\": \"status_downgrades == 0 and coverage_losses == 0\", \"predicate_id\": \"legitimate_scene_no_loss\"}",
+    "{\"counterexample_input\": {\"expected_rows\": 10, \"observed_rows\": 9, \"zero_rows_included\": false}, \"counterexample_input_annotation\": \"Omitting one scene-field delta row, including a zero-delta row, must return false.\", \"counterexample_return_value\": false, \"expected_counterexample_result_false\": true, \"observed_counterexample_result_false\": true, \"observed_input_fields\": [\"expected_rows\", \"observed_rows\", \"zero_rows_included\"], \"predicate_expression\": \"expected_rows == observed_rows and zero_rows_included\", \"predicate_id\": \"cohort_replay_delta_disclosure\"}",
+    "{\"counterexample_input\": {\"classified_field_events\": 1, \"upward_field_events\": 1, \"violations\": 1}, \"counterexample_input_annotation\": \"A CE-B2-style increase with a surviving ratio outlier and no observation-equivalent honest witness must return false.\", \"counterexample_return_value\": false, \"expected_counterexample_result_false\": true, \"observed_counterexample_result_false\": true, \"observed_input_fields\": [\"upward_field_events\", \"classified_field_events\", \"violations\"], \"predicate_expression\": \"upward_field_events == classified_field_events and violations == 0\", \"predicate_id\": \"monotonicity_violation_count\"}",
+    "{\"counterexample_input\": {\"handles\": [\"H1\", \"H1\"], \"required\": 2}, \"counterexample_input_annotation\": \"Multiple records sharing one handle must count as one independent source and must fail any predicate requiring two or more independent handles.\", \"counterexample_return_value\": false, \"expected_counterexample_result_false\": true, \"observed_counterexample_result_false\": true, \"observed_input_fields\": [\"handles\", \"required\"], \"predicate_expression\": \"len(set(handles)) >= required\", \"predicate_id\": \"unique_handle_independence\"}",
+    "{\"counterexample_input\": {\"eligible_handles\": [\"ONLY\"], \"status\": \"NONE\"}, \"counterexample_input_annotation\": \"An empty eligible set or a singleton suspicious clone must produce NONE and must fail a non-NONE success predicate.\", \"counterexample_return_value\": false, \"expected_counterexample_result_false\": true, \"observed_counterexample_result_false\": true, \"observed_input_fields\": [\"eligible_handles\", \"status\"], \"predicate_expression\": \"len(set(eligible_handles)) >= 2 and status != NONE\", \"predicate_id\": \"eligible_support_non_none\"}",
+    "{\"counterexample_input\": {\"epsilon\": 1e-06, \"score_above\": 0.0, \"score_below\": 1.0}, \"counterexample_input_annotation\": \"A fixture implementing a finite 1-to-0 jump at tau plus or minus epsilon must return false.\", \"counterexample_return_value\": false, \"expected_counterexample_result_false\": true, \"observed_counterexample_result_false\": true, \"observed_input_fields\": [\"score_below\", \"score_above\", \"epsilon\"], \"predicate_expression\": \"abs(score_below-score_above) <= epsilon\", \"predicate_id\": \"continuous_tau_attenuation\"}",
+    "{\"counterexample_input\": {\"expected_sha256\": \"EF1E98025EF3CF46CC829085F6F112E8E3CF2068756E0112043686215D743C86\", \"observed_sha256\": \"6E9FFA945875318B2F16E36DECACFF520ED53633CEB3E6248BA4AB41075BB820\"}, \"counterexample_input_annotation\": \"Changing any byte of prereg.json while retaining the recorded digest must return false.\", \"counterexample_return_value\": false, \"expected_counterexample_result_false\": true, \"observed_counterexample_result_false\": true, \"observed_input_fields\": [\"observed_sha256\", \"expected_sha256\"], \"predicate_expression\": \"observed_sha256 == expected_sha256\", \"predicate_id\": \"seal_content_match\"}"
+  ],
+  "predicate_count": 9,
+  "registry": [
+    {
+      "counterexample_input": {
+        "minimum_fraction": 0.6,
+        "scale_high_coverage": {
+          "0.001": 0.599
+        }
+      },
+      "counterexample_input_annotation": "At any sealed scale, HIGH coverage=0.599 must return false.",
+      "counterexample_return_value": false,
+      "expected_counterexample_result_false": true,
+      "observed_counterexample_result_false": true,
+      "observed_input_fields": [
+        "scale_high_coverage",
+        "minimum_fraction"
+      ],
+      "predicate_expression": "all(scale_high_coverage >= 0.6)",
+      "predicate_id": "high_coverage_per_scale"
+    },
+    {
+      "counterexample_input": {
+        "accuracy": 0.949,
+        "relative_errors": [
+          0.0,
+          0.051
+        ]
+      },
+      "counterexample_input_annotation": "Within unit_status=HIGH, accuracy=0.949 or any relative error>0.05 must return false.",
+      "counterexample_return_value": false,
+      "expected_counterexample_result_false": true,
+      "observed_counterexample_result_false": true,
+      "observed_input_fields": [
+        "accuracy",
+        "relative_errors",
+        "minimum_fraction",
+        "maximum_error"
+      ],
+      "predicate_expression": "accuracy >= 0.95 and all(relative_error <= 0.05)",
+      "predicate_id": "high_accuracy"
+    },
+    {
+      "counterexample_input": {
+        "coverage_losses": 0,
+        "status_downgrades": 1
+      },
+      "counterexample_input_annotation": "One O1 or O2 status downgrade or one coverage loss must return false.",
+      "counterexample_return_value": false,
+      "expected_counterexample_result_false": true,
+      "observed_counterexample_result_false": true,
+      "observed_input_fields": [
+        "status_downgrades",
+        "coverage_losses"
+      ],
+      "predicate_expression": "status_downgrades == 0 and coverage_losses == 0",
+      "predicate_id": "legitimate_scene_no_loss"
+    },
+    {
+      "counterexample_input": {
+        "expected_rows": 10,
+        "observed_rows": 9,
+        "zero_rows_included": false
+      },
+      "counterexample_input_annotation": "Omitting one scene-field delta row, including a zero-delta row, must return false.",
+      "counterexample_return_value": false,
+      "expected_counterexample_result_false": true,
+      "observed_counterexample_result_false": true,
+      "observed_input_fields": [
+        "expected_rows",
+        "observed_rows",
+        "zero_rows_included"
+      ],
+      "predicate_expression": "expected_rows == observed_rows and zero_rows_included",
+      "predicate_id": "cohort_replay_delta_disclosure"
+    },
+    {
+      "counterexample_input": {
+        "classified_field_events": 1,
+        "upward_field_events": 1,
+        "violations": 1
+      },
+      "counterexample_input_annotation": "A CE-B2-style increase with a surviving ratio outlier and no observation-equivalent honest witness must return false.",
+      "counterexample_return_value": false,
+      "expected_counterexample_result_false": true,
+      "observed_counterexample_result_false": true,
+      "observed_input_fields": [
+        "upward_field_events",
+        "classified_field_events",
+        "violations"
+      ],
+      "predicate_expression": "upward_field_events == classified_field_events and violations == 0",
+      "predicate_id": "monotonicity_violation_count"
+    },
+    {
+      "counterexample_input": {
+        "handles": [
+          "H1",
+          "H1"
+        ],
+        "required": 2
+      },
+      "counterexample_input_annotation": "Multiple records sharing one handle must count as one independent source and must fail any predicate requiring two or more independent handles.",
+      "counterexample_return_value": false,
+      "expected_counterexample_result_false": true,
+      "observed_counterexample_result_false": true,
+      "observed_input_fields": [
+        "handles",
+        "required"
+      ],
+      "predicate_expression": "len(set(handles)) >= required",
+      "predicate_id": "unique_handle_independence"
+    },
+    {
+      "counterexample_input": {
+        "eligible_handles": [
+          "ONLY"
+        ],
+        "status": "NONE"
+      },
+      "counterexample_input_annotation": "An empty eligible set or a singleton suspicious clone must produce NONE and must fail a non-NONE success predicate.",
+      "counterexample_return_value": false,
+      "expected_counterexample_result_false": true,
+      "observed_counterexample_result_false": true,
+      "observed_input_fields": [
+        "eligible_handles",
+        "status"
+      ],
+      "predicate_expression": "len(set(eligible_handles)) >= 2 and status != NONE",
+      "predicate_id": "eligible_support_non_none"
+    },
+    {
+      "counterexample_input": {
+        "epsilon": 1e-06,
+        "score_above": 0.0,
+        "score_below": 1.0
+      },
+      "counterexample_input_annotation": "A fixture implementing a finite 1-to-0 jump at tau plus or minus epsilon must return false.",
+      "counterexample_return_value": false,
+      "expected_counterexample_result_false": true,
+      "observed_counterexample_result_false": true,
+      "observed_input_fields": [
+        "score_below",
+        "score_above",
+        "epsilon"
+      ],
+      "predicate_expression": "abs(score_below-score_above) <= epsilon",
+      "predicate_id": "continuous_tau_attenuation"
+    },
+    {
+      "counterexample_input": {
+        "expected_sha256": "EF1E98025EF3CF46CC829085F6F112E8E3CF2068756E0112043686215D743C86",
+        "observed_sha256": "6E9FFA945875318B2F16E36DECACFF520ED53633CEB3E6248BA4AB41075BB820"
+      },
+      "counterexample_input_annotation": "Changing any byte of prereg.json while retaining the recorded digest must return false.",
+      "counterexample_return_value": false,
+      "expected_counterexample_result_false": true,
+      "observed_counterexample_result_false": true,
+      "observed_input_fields": [
+        "observed_sha256",
+        "expected_sha256"
+      ],
+      "predicate_expression": "observed_sha256 == expected_sha256",
+      "predicate_id": "seal_content_match"
+    }
+  ],
+  "schema": "ariadne.e2.loop_l1e.predicate_registry.v1"
+}
