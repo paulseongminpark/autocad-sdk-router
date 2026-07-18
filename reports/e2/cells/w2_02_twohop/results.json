@@ -1,0 +1,1150 @@
+{
+  "schema": "e2.w2_02.twohop.results.v1",
+  "completion_state": "COMPLETE",
+  "created_at": "2026-07-19T03:56:33+09:00",
+  "judgment": "not_emitted_numeric_only",
+  "dual_seal": {
+    "prereg_sha256": "6c7db98abe8eb08edd05f09ef1b52d68aa849b9cc2aa803c033e66d01dff747d",
+    "evidence_prereg_sha256": "be2511e7bd5825ea9488997e9a7b075ec0da41519f4b8f0432fa1faf62f6af9f",
+    "prereg_sheet_digest": "aae57eb4cb4895f1ef1ee8a320940c57a07d00ca80c86335668f04712894f68e",
+    "content_hash": "afb7b7f476289e9d3b0ef7d6ef8a74229139a27706dd0b864d4d2085dec8d95c"
+  },
+  "preflight": {
+    "checked_at": "2026-07-19T03:30:59+09:00",
+    "input_hashes": {
+      "packet_w2_02": "e0967dd15619491d8e23ee5d4dc1020f7fc64702c944dcdc9e11e8bb0c4ff6ef",
+      "prereg_r2_v1": "fc93dad9232cfd877802c1d53996357eccc710daff8cfb2cf7c865bf7f78bcd2",
+      "amendment1": "30f752db803f7f589d1a8d1f1a2d8557364ae2d624f76a639533161f552b8283",
+      "amendment2": "6e29bbd5f8c502a1bc36277a535521c117408b2460e80511907d610321dd442a",
+      "wave2_joint_design": "a41d4442438b99215af6f38ec362e929499c1e3962dad082c3ce35482dbb82e9",
+      "w2_09_valb_py": "85481aa49f6cf62307588e73ea502160079f1172de8f5f927a1a7c23bb5ef1de",
+      "split_manifest": "8aad64eeda77df55296fc711c21d7befdeada7fe379aeafec81fd1691aea044f",
+      "clean_incumbent": "a0f37c1ab89d64773a7adbea871425a7f1bcc945e0b83ccea969e15d54ea1dcc",
+      "clean_incumbent_manifest": "7f5ee863dc0de5a657442df4970253b735dac920eabcbf85f47908e2bace7263",
+      "cml_ctx": "ac0ef389ca971a87645763bd4153cf4f564731d17f8689331bc9de04a67e1b98",
+      "cubicasa_ml": "e9baf9f361ca9cfc1a113e084bf5c34be33cf9b6c14615c2ed080f771cd3b466",
+      "baseline_extraction_meta": "1198d41cc98c8424fdf8a2dc3b09548a836ffcbf8a39ec2f47ce0932419e97f0",
+      "train_npz": "8f72d8931c6e08927bf027ee87f1bc5362ab1a85217862e09a0cddd6b0b0d5aa"
+    },
+    "split_manifest_content_hash": "5e16541d7191ad01c57a9cee72172f63112ed68590dd371aff5bf0aaaab8e07b",
+    "clean_incumbent_manifest_content_hash": "fbe7ed716f81165d1017ae695f2b142a0e89412494df5db846c0431395eddc84",
+    "clean_incumbent_fit_universe": "train + val-A",
+    "clean_incumbent_parameters_except_seed": {
+      "categorical_features": "from_dtype",
+      "class_weight": null,
+      "early_stopping": "auto",
+      "interaction_cst": null,
+      "l2_regularization": 0.0,
+      "learning_rate": 0.1,
+      "loss": "log_loss",
+      "max_bins": 255,
+      "max_depth": null,
+      "max_features": 1.0,
+      "max_iter": 100,
+      "max_leaf_nodes": 31,
+      "min_samples_leaf": 20,
+      "monotonic_cst": null,
+      "n_iter_no_change": 10,
+      "scoring": "loss",
+      "tol": 1e-07,
+      "validation_fraction": 0.1,
+      "verbose": 0,
+      "warm_start": false
+    },
+    "val_A_drawings": 198,
+    "val_A_rows": 167556,
+    "val_A_families": 198,
+    "test_split_reads": 0,
+    "val_B_drawing_reads": 0,
+    "subagents_used": 0,
+    "packet_literal_ir_root": "D:\\runs\\e2_ext_cubicasa\\ir",
+    "packet_literal_ir_root_exists": 0,
+    "resolved_w2_09_ir_root": "D:\\dev\\99_tools\\autocad-sdk-router\\runs\\e2_ext_cubicasa\\ir",
+    "path_resolution_basis": "W2-09 source and its earlier packet resolve repo-relative runs/e2_ext_cubicasa; the newer packet's D:/runs spelling is absent",
+    "w2_01_results_present": 0
+  },
+  "features": {
+    "base": [
+      "parallel",
+      "thickness",
+      "junction",
+      "log10_len",
+      "sin2t",
+      "cos2t"
+    ],
+    "context": [
+      "parallel_band_neighbor_count",
+      "nearest_parallel_gap_px",
+      "junction_degree",
+      "drawing_length_percentile",
+      "radius_density_r20_per_px2",
+      "neighbor_angle_entropy_r20"
+    ],
+    "twohop": [
+      "junction_neighbor_degree_sum",
+      "junction_neighbor_degree_max",
+      "junction_neighbor_degree_variance",
+      "twohop_parallel_count",
+      "twohop_parallel_gap_min_px",
+      "twohop_parallel_gap_mean_px",
+      "twohop_parallel_gap_std_px",
+      "twohop_parallel_gap_max_px",
+      "junction_component_size",
+      "junction_component_thickness_rate",
+      "twohop_ring_count",
+      "twohop_length_mean_px",
+      "twohop_length_std_px",
+      "twohop_length_max_px",
+      "twohop_angle_alignment_mean",
+      "twohop_angle_alignment_std",
+      "twohop_angle_aligned_fraction_2deg",
+      "collinear_extension_chain_length_px_le2"
+    ],
+    "twohop_definitions": [
+      {
+        "family": "junction_of_junction",
+        "name": "junction_neighbor_degree_sum",
+        "definition": "sum of exact W2-09 junction degrees over the focal segment's exact junction neighbors",
+        "empty_value": 0.0
+      },
+      {
+        "family": "junction_of_junction",
+        "name": "junction_neighbor_degree_max",
+        "definition": "maximum exact W2-09 junction degree among exact junction neighbors",
+        "empty_value": 0.0
+      },
+      {
+        "family": "junction_of_junction",
+        "name": "junction_neighbor_degree_variance",
+        "definition": "population variance of exact W2-09 junction degrees among exact junction neighbors",
+        "empty_value": 0.0
+      },
+      {
+        "family": "second_ring_parallel",
+        "name": "twohop_parallel_count",
+        "definition": "count in exact midpoint-radius graph distance-2 ring meeting W2-09 angle, overlap, and frozen thickness-band gap conditions relative to self",
+        "empty_value": 0.0
+      },
+      {
+        "family": "second_ring_parallel",
+        "name": "twohop_parallel_gap_min_px",
+        "definition": "minimum perpendicular gap among qualifying second-ring parallel segments",
+        "empty_value": "NaN"
+      },
+      {
+        "family": "second_ring_parallel",
+        "name": "twohop_parallel_gap_mean_px",
+        "definition": "mean perpendicular gap among qualifying second-ring parallel segments",
+        "empty_value": "NaN"
+      },
+      {
+        "family": "second_ring_parallel",
+        "name": "twohop_parallel_gap_std_px",
+        "definition": "population standard deviation of perpendicular gaps among qualifying second-ring parallel segments",
+        "empty_value": "NaN"
+      },
+      {
+        "family": "second_ring_parallel",
+        "name": "twohop_parallel_gap_max_px",
+        "definition": "maximum perpendicular gap among qualifying second-ring parallel segments",
+        "empty_value": "NaN"
+      },
+      {
+        "family": "connected_component",
+        "name": "junction_component_size",
+        "definition": "number of segments in the focal segment's undirected exact-junction connected component",
+        "empty_value": 1.0
+      },
+      {
+        "family": "connected_component",
+        "name": "junction_component_thickness_rate",
+        "definition": "fraction of component segments with frozen base thickness evidence greater than zero",
+        "empty_value": 0.0
+      },
+      {
+        "family": "twohop_context_aggregate",
+        "name": "twohop_ring_count",
+        "definition": "number of segments at exact graph distance two in the 20px midpoint-radius graph",
+        "empty_value": 0.0
+      },
+      {
+        "family": "twohop_context_aggregate",
+        "name": "twohop_length_mean_px",
+        "definition": "mean segment length in the exact distance-2 ring",
+        "empty_value": "NaN"
+      },
+      {
+        "family": "twohop_context_aggregate",
+        "name": "twohop_length_std_px",
+        "definition": "population standard deviation of segment length in the exact distance-2 ring",
+        "empty_value": "NaN"
+      },
+      {
+        "family": "twohop_context_aggregate",
+        "name": "twohop_length_max_px",
+        "definition": "maximum segment length in the exact distance-2 ring",
+        "empty_value": "NaN"
+      },
+      {
+        "family": "twohop_context_aggregate",
+        "name": "twohop_angle_alignment_mean",
+        "definition": "mean cosine of undirected angle difference to self over the exact distance-2 ring",
+        "empty_value": "NaN"
+      },
+      {
+        "family": "twohop_context_aggregate",
+        "name": "twohop_angle_alignment_std",
+        "definition": "population standard deviation of cosine angle alignment over the exact distance-2 ring",
+        "empty_value": "NaN"
+      },
+      {
+        "family": "twohop_context_aggregate",
+        "name": "twohop_angle_aligned_fraction_2deg",
+        "definition": "fraction of exact distance-2 ring segments with undirected angle difference at most 2 degrees",
+        "empty_value": "NaN"
+      },
+      {
+        "family": "path_signal",
+        "name": "collinear_extension_chain_length_px_le2",
+        "definition": "maximum projected span of a simple collinear-extension path starting at self with at most two edges; each edge has angle difference at most 2 degrees, support-line offset at most frozen snap tolerance, and endpoint distance at most 20px",
+        "empty_value": "self segment length"
+      }
+    ],
+    "full_feature_count": 30
+  },
+  "protocol": {
+    "estimator": "sklearn HistGradientBoostingClassifier defaults except random_state",
+    "fit_universe": "train only",
+    "evaluation_universe": "val-A only",
+    "seeds": [
+      17,
+      29,
+      43
+    ],
+    "threshold": 0.5,
+    "primary_metric": "average_precision_score",
+    "reported_metrics": [
+      "AUPRC",
+      "F1"
+    ],
+    "seed_aggregation": "arithmetic mean of the three per-seed metrics"
+  },
+  "data": {
+    "train": {
+      "drawings": 4200,
+      "rows": 3862317,
+      "seconds": 1458.9837285000103,
+      "ir_aggregate_sha256": "104179a194d977ac3433a7b0e91342bacf75e509dd676f5217e693c7f34570bf",
+      "graph_totals": {
+        "junction_directed_edges": 32893076,
+        "junction_components": 18844,
+        "radius_edges": 11295978,
+        "second_ring_memberships": 7644002,
+        "extension_edges": 2705565,
+        "junction_degree_mismatches": 0
+      }
+    },
+    "val_A": {
+      "drawings": 198,
+      "rows": 167556,
+      "families": 198,
+      "seconds": 74.15435090000392,
+      "ir_subset_aggregate_sha256": "1db9634138e715b29fa19d2387fbb878150770234b60b764f66a765c61c53cbb",
+      "graph_totals": {
+        "junction_directed_edges": 1417380,
+        "junction_components": 819,
+        "radius_edges": 488372,
+        "second_ring_memberships": 324232,
+        "extension_edges": 116212,
+        "junction_degree_mismatches": 0
+      }
+    },
+    "read_counters": {
+      "train_ir_reads": 4200,
+      "train_truth_reads": 0,
+      "val_A_ir_reads": 198,
+      "val_A_truth_reads": 198,
+      "val_B_drawing_reads": 0,
+      "test_reads": 0,
+      "forbidden_attempts_blocked": 0
+    }
+  },
+  "selftest": {
+    "passed": true,
+    "checks": {
+      "fixture": "colorful_10052.segir.json",
+      "rows": 617,
+      "features": 30,
+      "double_calculation_equal": 1,
+      "numeric_meta_equal_excluding_volatile": 1,
+      "determinism_claim": "휘발 필드(runtime·타임스탬프) 제외 수치 전 필드 동일",
+      "label_shuffle_changed_labels": 1,
+      "label_shuffle_feature_invariant": 1,
+      "val_B_probe_blocked": 1,
+      "test_probe_blocked": 1,
+      "val_B_drawing_reads": 0,
+      "test_reads": 0,
+      "identifier_name_layer_feature_count": 0,
+      "shape_ok": 1,
+      "finite_policy_ok": 1,
+      "junction_degree_mismatches": 0,
+      "prereg_sha256": "6c7db98abe8eb08edd05f09ef1b52d68aa849b9cc2aa803c033e66d01dff747d",
+      "evidence_prereg_sha256": "be2511e7bd5825ea9488997e9a7b075ec0da41519f4b8f0432fa1faf62f6af9f",
+      "subagents_used": 0
+    },
+    "output": "SELFTEST_BEGIN\nfixture=colorful_10052.segir.json\nrows=617\nfeatures=30\ndouble_calculation_equal=1\nnumeric_meta_equal_excluding_volatile=1\ndeterminism_claim=휘발 필드(runtime·타임스탬프) 제외 수치 전 필드 동일\nlabel_shuffle_changed_labels=1\nlabel_shuffle_feature_invariant=1\nval_B_probe_blocked=1\ntest_probe_blocked=1\nval_B_drawing_reads=0\ntest_reads=0\nidentifier_name_layer_feature_count=0\njunction_degree_mismatches=0\nsubagents_used=0\nhonest_verdict=PASS\nSELFTEST_END",
+    "feature_sha256": "eab9b7b44786a1310e8cf5f138dd474ca8dc89bb9541f390594c39630af83a74",
+    "read_counters": {
+      "train_ir_reads": 1,
+      "train_truth_reads": 1,
+      "val_A_ir_reads": 0,
+      "val_A_truth_reads": 0,
+      "val_B_drawing_reads": 0,
+      "test_reads": 0,
+      "forbidden_attempts_blocked": 2
+    },
+    "preflight_test_reads": 0
+  },
+  "metrics": {
+    "seed_metrics": {
+      "twohop_removed": [
+        {
+          "seed": 17,
+          "primary_auprc": 0.8333724345719922,
+          "f1": 0.708630796912183,
+          "tp": 12209,
+          "fp": 2665,
+          "fn": 7375,
+          "precision": 0.8208282909775447,
+          "recall": 0.6234170751633987,
+          "threshold": 0.5,
+          "fit_seconds": 8.164066700002877,
+          "n_iter": 100,
+          "warning_count": 0,
+          "warnings": []
+        },
+        {
+          "seed": 29,
+          "primary_auprc": 0.8335640000151792,
+          "f1": 0.7082896728373502,
+          "tp": 12167,
+          "fp": 2605,
+          "fn": 7417,
+          "precision": 0.823652856756025,
+          "recall": 0.6212724673202614,
+          "threshold": 0.5,
+          "fit_seconds": 7.583251799995196,
+          "n_iter": 100,
+          "warning_count": 0,
+          "warnings": []
+        },
+        {
+          "seed": 43,
+          "primary_auprc": 0.8318183610282396,
+          "f1": 0.7061100035182363,
+          "tp": 12042,
+          "fp": 2482,
+          "fn": 7542,
+          "precision": 0.8291104378958964,
+          "recall": 0.6148897058823529,
+          "threshold": 0.5,
+          "fit_seconds": 8.139595899992855,
+          "n_iter": 100,
+          "warning_count": 0,
+          "warnings": []
+        }
+      ],
+      "full": [
+        {
+          "seed": 17,
+          "primary_auprc": 0.8739887419907585,
+          "f1": 0.7603982300884955,
+          "tp": 13748,
+          "fp": 2828,
+          "fn": 5836,
+          "precision": 0.8293918918918919,
+          "recall": 0.702001633986928,
+          "threshold": 0.5,
+          "fit_seconds": 12.065760500001488,
+          "n_iter": 100,
+          "warning_count": 0,
+          "warnings": []
+        },
+        {
+          "seed": 29,
+          "primary_auprc": 0.873880635704231,
+          "f1": 0.7597783933518005,
+          "tp": 13714,
+          "fp": 2802,
+          "fn": 5870,
+          "precision": 0.8303463308307096,
+          "recall": 0.700265522875817,
+          "threshold": 0.5,
+          "fit_seconds": 13.279138800004148,
+          "n_iter": 100,
+          "warning_count": 0,
+          "warnings": []
+        },
+        {
+          "seed": 43,
+          "primary_auprc": 0.8743776250343334,
+          "f1": 0.761767796891421,
+          "tp": 13772,
+          "fp": 2802,
+          "fn": 5812,
+          "precision": 0.8309400265476047,
+          "recall": 0.7032271241830066,
+          "threshold": 0.5,
+          "fit_seconds": 12.948836800002027,
+          "n_iter": 100,
+          "warning_count": 0,
+          "warnings": []
+        }
+      ]
+    },
+    "summaries": {
+      "twohop_removed": {
+        "seed_count": 3,
+        "primary_auprc": {
+          "mean": 0.8329182652051369,
+          "std_population": 0.0007816718102985418,
+          "min": 0.8318183610282396,
+          "max": 0.8335640000151792
+        },
+        "f1": {
+          "mean": 0.7076768244225898,
+          "std_population": 0.00111662802470865,
+          "min": 0.7061100035182363,
+          "max": 0.708630796912183
+        }
+      },
+      "full": {
+        "seed_count": 3,
+        "primary_auprc": {
+          "mean": 0.8740823342431078,
+          "std_population": 0.00021341544904048972,
+          "min": 0.873880635704231,
+          "max": 0.8743776250343334
+        },
+        "f1": {
+          "mean": 0.7606481401105724,
+          "std_population": 0.0008311730165713601,
+          "min": 0.7597783933518005,
+          "max": 0.761767796891421
+        }
+      }
+    },
+    "comparison_target": "protocol-matched clean incumbent: frozen context12 configuration retrained on train only"
+  },
+  "bootstrap": {
+    "unit": "val-A geometry family cluster",
+    "family_count": 198,
+    "replicates": 10000,
+    "rng_seed": 43,
+    "paired": 1,
+    "resampling": "identical multinomial family multiplicities for both arms and all seeds",
+    "seed_aggregation": "per-replicate arithmetic mean of the three per-seed metrics",
+    "full_minus_protocol_matched_clean_incumbent": {
+      "point_three_seed_mean": {
+        "primary_auprc": 0.041164069037970874,
+        "f1": 0.05297131568798252
+      },
+      "primary_auprc_delta": {
+        "replicates": 10000,
+        "mean": 0.04118461044637854,
+        "standard_error": 0.002267967175197657,
+        "ci_percentile_2_5": 0.036893078164544776,
+        "ci_percentile_97_5": 0.04568742029440051
+      },
+      "f1_delta": {
+        "replicates": 10000,
+        "mean": 0.053007665571819323,
+        "standard_error": 0.0031298529754847622,
+        "ci_percentile_2_5": 0.047121762878241436,
+        "ci_percentile_97_5": 0.05936635793643651
+      }
+    },
+    "arm_bootstrap": {
+      "full": {
+        "primary_auprc": {
+          "replicates": 10000,
+          "mean": 0.8741525544726754,
+          "standard_error": 0.0031428807402309193,
+          "ci_percentile_2_5": 0.8679710417846253,
+          "ci_percentile_97_5": 0.8802446312282691
+        },
+        "f1": {
+          "replicates": 10000,
+          "mean": 0.7607253265526731,
+          "standard_error": 0.004092368444601303,
+          "ci_percentile_2_5": 0.7528122024953392,
+          "ci_percentile_97_5": 0.7685875653994372
+        }
+      },
+      "twohop_removed": {
+        "primary_auprc": {
+          "replicates": 10000,
+          "mean": 0.8329679440262967,
+          "standard_error": 0.003746861928295857,
+          "ci_percentile_2_5": 0.8254654860270247,
+          "ci_percentile_97_5": 0.8402135146664054
+        },
+        "f1": {
+          "replicates": 10000,
+          "mean": 0.7077176609808539,
+          "standard_error": 0.004636136844333794,
+          "ci_percentile_2_5": 0.6984712573818929,
+          "ci_percentile_97_5": 0.7167633403183776
+        }
+      }
+    }
+  },
+  "feature_importance": {
+    "kind": "positive internal-node gain",
+    "aggregate": "raw gain summed over three full-arm seed models",
+    "total_gain": 25951360.91717595,
+    "top_20": [
+      {
+        "rank": 1,
+        "feature": "nearest_parallel_gap_px",
+        "raw_gain_sum_three_seeds": 6327743.094492501,
+        "gain_fraction": 0.2438308771045789,
+        "gain_by_seed": {
+          "17": 2119848.260536985,
+          "29": 2118128.040187251,
+          "43": 2089766.793768264
+        }
+      },
+      {
+        "rank": 2,
+        "feature": "junction_degree",
+        "raw_gain_sum_three_seeds": 2735739.9466963653,
+        "gain_fraction": 0.10541797616809034,
+        "gain_by_seed": {
+          "17": 910910.7054972347,
+          "29": 888777.0467342897,
+          "43": 936052.194464841
+        }
+      },
+      {
+        "rank": 3,
+        "feature": "log10_len",
+        "raw_gain_sum_three_seeds": 2675240.81219538,
+        "gain_fraction": 0.10308672522930264,
+        "gain_by_seed": {
+          "17": 892077.763706296,
+          "29": 908153.2105166664,
+          "43": 875009.8379724177
+        }
+      },
+      {
+        "rank": 4,
+        "feature": "collinear_extension_chain_length_px_le2",
+        "raw_gain_sum_three_seeds": 2626362.8835505177,
+        "gain_fraction": 0.10120328147462414,
+        "gain_by_seed": {
+          "17": 902927.8545813791,
+          "29": 872811.9941685708,
+          "43": 850623.0348005677
+        }
+      },
+      {
+        "rank": 5,
+        "feature": "radius_density_r20_per_px2",
+        "raw_gain_sum_three_seeds": 2566174.9352329806,
+        "gain_fraction": 0.09888402166741682,
+        "gain_by_seed": {
+          "17": 861194.4629114158,
+          "29": 834466.4030712184,
+          "43": 870514.0692503464
+        }
+      },
+      {
+        "rank": 6,
+        "feature": "sin2t",
+        "raw_gain_sum_three_seeds": 2245489.9649694553,
+        "gain_fraction": 0.08652686740151937,
+        "gain_by_seed": {
+          "17": 718758.7072271267,
+          "29": 764432.1518029292,
+          "43": 762299.1059393992
+        }
+      },
+      {
+        "rank": 7,
+        "feature": "drawing_length_percentile",
+        "raw_gain_sum_three_seeds": 1509776.0016260035,
+        "gain_fraction": 0.05817714170923329,
+        "gain_by_seed": {
+          "17": 487502.62820326746,
+          "29": 517106.98644686205,
+          "43": 505166.3869758739
+        }
+      },
+      {
+        "rank": 8,
+        "feature": "junction_neighbor_degree_sum",
+        "raw_gain_sum_three_seeds": 1044227.0170412065,
+        "gain_fraction": 0.04023785189431369,
+        "gain_by_seed": {
+          "17": 333379.5957067644,
+          "29": 365235.79443688353,
+          "43": 345611.62689755857
+        }
+      },
+      {
+        "rank": 9,
+        "feature": "neighbor_angle_entropy_r20",
+        "raw_gain_sum_three_seeds": 959132.6337268401,
+        "gain_fraction": 0.036958856870278306,
+        "gain_by_seed": {
+          "17": 320475.5511581049,
+          "29": 320571.1258502543,
+          "43": 318085.95671848085
+        }
+      },
+      {
+        "rank": 10,
+        "feature": "junction_neighbor_degree_variance",
+        "raw_gain_sum_three_seeds": 708857.1534947112,
+        "gain_fraction": 0.02731483546304321,
+        "gain_by_seed": {
+          "17": 236201.71302068725,
+          "29": 235431.7441889699,
+          "43": 237223.69628505397
+        }
+      },
+      {
+        "rank": 11,
+        "feature": "parallel_band_neighbor_count",
+        "raw_gain_sum_three_seeds": 646970.245773479,
+        "gain_fraction": 0.024930108591926705,
+        "gain_by_seed": {
+          "17": 206312.25653961737,
+          "29": 236912.68262080694,
+          "43": 203745.30661305468
+        }
+      },
+      {
+        "rank": 12,
+        "feature": "parallel",
+        "raw_gain_sum_three_seeds": 469728.36592443316,
+        "gain_fraction": 0.018100336526611315,
+        "gain_by_seed": {
+          "17": 169204.0954510662,
+          "29": 155889.89787130334,
+          "43": 144634.37260206364
+        }
+      },
+      {
+        "rank": 13,
+        "feature": "junction_neighbor_degree_max",
+        "raw_gain_sum_three_seeds": 463625.76138171577,
+        "gain_fraction": 0.017865181053948673,
+        "gain_by_seed": {
+          "17": 146377.99116293018,
+          "29": 148528.7534972041,
+          "43": 168719.01672158143
+        }
+      },
+      {
+        "rank": 14,
+        "feature": "thickness",
+        "raw_gain_sum_three_seeds": 195268.96183830057,
+        "gain_fraction": 0.007524420875710665,
+        "gain_by_seed": {
+          "17": 42470.63863696009,
+          "29": 75856.92231897463,
+          "43": 76941.40088236585
+        }
+      },
+      {
+        "rank": 15,
+        "feature": "twohop_length_max_px",
+        "raw_gain_sum_three_seeds": 151060.01630495908,
+        "gain_fraction": 0.005820889963615733,
+        "gain_by_seed": {
+          "17": 55058.08192803305,
+          "29": 45707.41038616984,
+          "43": 50294.52399075618
+        }
+      },
+      {
+        "rank": 16,
+        "feature": "cos2t",
+        "raw_gain_sum_three_seeds": 108180.06325048879,
+        "gain_fraction": 0.004168569948826447,
+        "gain_by_seed": {
+          "17": 52039.08106186455,
+          "29": 29327.95802657578,
+          "43": 26813.024162048463
+        }
+      },
+      {
+        "rank": 17,
+        "feature": "junction_component_size",
+        "raw_gain_sum_three_seeds": 100115.25108119301,
+        "gain_fraction": 0.00385780350405175,
+        "gain_by_seed": {
+          "17": 34043.292419252364,
+          "29": 32542.85461283921,
+          "43": 33529.104049101436
+        }
+      },
+      {
+        "rank": 18,
+        "feature": "twohop_parallel_gap_max_px",
+        "raw_gain_sum_three_seeds": 97231.93756242056,
+        "gain_fraction": 0.003746698983253223,
+        "gain_by_seed": {
+          "17": 34707.268042169766,
+          "29": 32196.890822843427,
+          "43": 30327.77869740737
+        }
+      },
+      {
+        "rank": 19,
+        "feature": "twohop_parallel_gap_min_px",
+        "raw_gain_sum_three_seeds": 95804.9948272788,
+        "gain_fraction": 0.003691713707540868,
+        "gain_by_seed": {
+          "17": 33670.589809873745,
+          "29": 31812.97505465774,
+          "43": 30321.429962747312
+        }
+      },
+      {
+        "rank": 20,
+        "feature": "twohop_length_mean_px",
+        "raw_gain_sum_three_seeds": 86788.4806844605,
+        "gain_fraction": 0.0033442747361668965,
+        "gain_by_seed": {
+          "17": 24619.412205622688,
+          "29": 34356.1718316172,
+          "43": 27812.896647220627
+        }
+      }
+    ],
+    "all": [
+      {
+        "rank": 1,
+        "feature": "nearest_parallel_gap_px",
+        "raw_gain_sum_three_seeds": 6327743.094492501,
+        "gain_fraction": 0.2438308771045789,
+        "gain_by_seed": {
+          "17": 2119848.260536985,
+          "29": 2118128.040187251,
+          "43": 2089766.793768264
+        }
+      },
+      {
+        "rank": 2,
+        "feature": "junction_degree",
+        "raw_gain_sum_three_seeds": 2735739.9466963653,
+        "gain_fraction": 0.10541797616809034,
+        "gain_by_seed": {
+          "17": 910910.7054972347,
+          "29": 888777.0467342897,
+          "43": 936052.194464841
+        }
+      },
+      {
+        "rank": 3,
+        "feature": "log10_len",
+        "raw_gain_sum_three_seeds": 2675240.81219538,
+        "gain_fraction": 0.10308672522930264,
+        "gain_by_seed": {
+          "17": 892077.763706296,
+          "29": 908153.2105166664,
+          "43": 875009.8379724177
+        }
+      },
+      {
+        "rank": 4,
+        "feature": "collinear_extension_chain_length_px_le2",
+        "raw_gain_sum_three_seeds": 2626362.8835505177,
+        "gain_fraction": 0.10120328147462414,
+        "gain_by_seed": {
+          "17": 902927.8545813791,
+          "29": 872811.9941685708,
+          "43": 850623.0348005677
+        }
+      },
+      {
+        "rank": 5,
+        "feature": "radius_density_r20_per_px2",
+        "raw_gain_sum_three_seeds": 2566174.9352329806,
+        "gain_fraction": 0.09888402166741682,
+        "gain_by_seed": {
+          "17": 861194.4629114158,
+          "29": 834466.4030712184,
+          "43": 870514.0692503464
+        }
+      },
+      {
+        "rank": 6,
+        "feature": "sin2t",
+        "raw_gain_sum_three_seeds": 2245489.9649694553,
+        "gain_fraction": 0.08652686740151937,
+        "gain_by_seed": {
+          "17": 718758.7072271267,
+          "29": 764432.1518029292,
+          "43": 762299.1059393992
+        }
+      },
+      {
+        "rank": 7,
+        "feature": "drawing_length_percentile",
+        "raw_gain_sum_three_seeds": 1509776.0016260035,
+        "gain_fraction": 0.05817714170923329,
+        "gain_by_seed": {
+          "17": 487502.62820326746,
+          "29": 517106.98644686205,
+          "43": 505166.3869758739
+        }
+      },
+      {
+        "rank": 8,
+        "feature": "junction_neighbor_degree_sum",
+        "raw_gain_sum_three_seeds": 1044227.0170412065,
+        "gain_fraction": 0.04023785189431369,
+        "gain_by_seed": {
+          "17": 333379.5957067644,
+          "29": 365235.79443688353,
+          "43": 345611.62689755857
+        }
+      },
+      {
+        "rank": 9,
+        "feature": "neighbor_angle_entropy_r20",
+        "raw_gain_sum_three_seeds": 959132.6337268401,
+        "gain_fraction": 0.036958856870278306,
+        "gain_by_seed": {
+          "17": 320475.5511581049,
+          "29": 320571.1258502543,
+          "43": 318085.95671848085
+        }
+      },
+      {
+        "rank": 10,
+        "feature": "junction_neighbor_degree_variance",
+        "raw_gain_sum_three_seeds": 708857.1534947112,
+        "gain_fraction": 0.02731483546304321,
+        "gain_by_seed": {
+          "17": 236201.71302068725,
+          "29": 235431.7441889699,
+          "43": 237223.69628505397
+        }
+      },
+      {
+        "rank": 11,
+        "feature": "parallel_band_neighbor_count",
+        "raw_gain_sum_three_seeds": 646970.245773479,
+        "gain_fraction": 0.024930108591926705,
+        "gain_by_seed": {
+          "17": 206312.25653961737,
+          "29": 236912.68262080694,
+          "43": 203745.30661305468
+        }
+      },
+      {
+        "rank": 12,
+        "feature": "parallel",
+        "raw_gain_sum_three_seeds": 469728.36592443316,
+        "gain_fraction": 0.018100336526611315,
+        "gain_by_seed": {
+          "17": 169204.0954510662,
+          "29": 155889.89787130334,
+          "43": 144634.37260206364
+        }
+      },
+      {
+        "rank": 13,
+        "feature": "junction_neighbor_degree_max",
+        "raw_gain_sum_three_seeds": 463625.76138171577,
+        "gain_fraction": 0.017865181053948673,
+        "gain_by_seed": {
+          "17": 146377.99116293018,
+          "29": 148528.7534972041,
+          "43": 168719.01672158143
+        }
+      },
+      {
+        "rank": 14,
+        "feature": "thickness",
+        "raw_gain_sum_three_seeds": 195268.96183830057,
+        "gain_fraction": 0.007524420875710665,
+        "gain_by_seed": {
+          "17": 42470.63863696009,
+          "29": 75856.92231897463,
+          "43": 76941.40088236585
+        }
+      },
+      {
+        "rank": 15,
+        "feature": "twohop_length_max_px",
+        "raw_gain_sum_three_seeds": 151060.01630495908,
+        "gain_fraction": 0.005820889963615733,
+        "gain_by_seed": {
+          "17": 55058.08192803305,
+          "29": 45707.41038616984,
+          "43": 50294.52399075618
+        }
+      },
+      {
+        "rank": 16,
+        "feature": "cos2t",
+        "raw_gain_sum_three_seeds": 108180.06325048879,
+        "gain_fraction": 0.004168569948826447,
+        "gain_by_seed": {
+          "17": 52039.08106186455,
+          "29": 29327.95802657578,
+          "43": 26813.024162048463
+        }
+      },
+      {
+        "rank": 17,
+        "feature": "junction_component_size",
+        "raw_gain_sum_three_seeds": 100115.25108119301,
+        "gain_fraction": 0.00385780350405175,
+        "gain_by_seed": {
+          "17": 34043.292419252364,
+          "29": 32542.85461283921,
+          "43": 33529.104049101436
+        }
+      },
+      {
+        "rank": 18,
+        "feature": "twohop_parallel_gap_max_px",
+        "raw_gain_sum_three_seeds": 97231.93756242056,
+        "gain_fraction": 0.003746698983253223,
+        "gain_by_seed": {
+          "17": 34707.268042169766,
+          "29": 32196.890822843427,
+          "43": 30327.77869740737
+        }
+      },
+      {
+        "rank": 19,
+        "feature": "twohop_parallel_gap_min_px",
+        "raw_gain_sum_three_seeds": 95804.9948272788,
+        "gain_fraction": 0.003691713707540868,
+        "gain_by_seed": {
+          "17": 33670.589809873745,
+          "29": 31812.97505465774,
+          "43": 30321.429962747312
+        }
+      },
+      {
+        "rank": 20,
+        "feature": "twohop_length_mean_px",
+        "raw_gain_sum_three_seeds": 86788.4806844605,
+        "gain_fraction": 0.0033442747361668965,
+        "gain_by_seed": {
+          "17": 24619.412205622688,
+          "29": 34356.1718316172,
+          "43": 27812.896647220627
+        }
+      },
+      {
+        "rank": 21,
+        "feature": "twohop_parallel_gap_mean_px",
+        "raw_gain_sum_three_seeds": 36000.71297979665,
+        "gain_fraction": 0.0013872379600705072,
+        "gain_by_seed": {
+          "17": 12156.983485403913,
+          "29": 8220.560770597007,
+          "43": 15623.168723795734
+        }
+      },
+      {
+        "rank": 22,
+        "feature": "twohop_ring_count",
+        "raw_gain_sum_three_seeds": 28004.0127596338,
+        "gain_fraction": 0.0010790961155759389,
+        "gain_by_seed": {
+          "17": 9706.675293429036,
+          "29": 9519.137004672912,
+          "43": 8778.20046153185
+        }
+      },
+      {
+        "rank": 23,
+        "feature": "twohop_angle_alignment_mean",
+        "raw_gain_sum_three_seeds": 20863.945111063393,
+        "gain_fraction": 0.0008039634290336797,
+        "gain_by_seed": {
+          "17": 8546.885208867636,
+          "29": 5562.384053420379,
+          "43": 6754.675848775377
+        }
+      },
+      {
+        "rank": 24,
+        "feature": "twohop_length_std_px",
+        "raw_gain_sum_three_seeds": 20502.907418778304,
+        "gain_fraction": 0.0007900513381249468,
+        "gain_by_seed": {
+          "17": 7489.75800833785,
+          "29": 5765.013068607853,
+          "43": 7248.136341832603
+        }
+      },
+      {
+        "rank": 25,
+        "feature": "junction_component_thickness_rate",
+        "raw_gain_sum_three_seeds": 9593.178807071035,
+        "gain_fraction": 0.00036965995107878045,
+        "gain_by_seed": {
+          "17": 2588.86972844232,
+          "29": 3765.192302134305,
+          "43": 3239.11677649441
+        }
+      },
+      {
+        "rank": 26,
+        "feature": "twohop_parallel_count",
+        "raw_gain_sum_three_seeds": 6540.691382206214,
+        "gain_fraction": 0.0002520365464871342,
+        "gain_by_seed": {
+          "17": 1241.5044515346513,
+          "29": 4022.8330446753343,
+          "43": 1276.3538859962277
+        }
+      },
+      {
+        "rank": 27,
+        "feature": "twohop_angle_alignment_std",
+        "raw_gain_sum_three_seeds": 6327.418836454646,
+        "gain_fraction": 0.0002438183822670677,
+        "gain_by_seed": {
+          "17": 1771.1533721821206,
+          "29": 2012.9139256764188,
+          "43": 2543.3515385961073
+        }
+      },
+      {
+        "rank": 28,
+        "feature": "twohop_parallel_gap_std_px",
+        "raw_gain_sum_three_seeds": 6077.981151408877,
+        "gain_fraction": 0.0002342066441450535,
+        "gain_by_seed": {
+          "17": 2384.7062077960245,
+          "29": 1954.62748402096,
+          "43": 1738.6474595918926
+        }
+      },
+      {
+        "rank": 29,
+        "feature": "twohop_angle_aligned_fraction_2deg",
+        "raw_gain_sum_three_seeds": 3931.5470748442735,
+        "gain_fraction": 0.00015149675916387772,
+        "gain_by_seed": {
+          "17": 2054.413263760797,
+          "29": 1058.678780447124,
+          "43": 818.4550306363531
+        }
+      },
+      {
+        "rank": 30,
+        "feature": "junction",
+        "raw_gain_sum_three_seeds": 0.0,
+        "gain_fraction": 0.0,
+        "gain_by_seed": {
+          "17": 0.0,
+          "29": 0.0,
+          "43": 0.0
+        }
+      }
+    ]
+  },
+  "models": [
+    {
+      "arm": "twohop_removed",
+      "seed": 17,
+      "path": "D:\\runs\\e2_program\\cells\\w2_02_twohop\\models\\twohop_removed_seed_17.joblib",
+      "sha256": "12d8792f138dd0e4acc9a8a5fa3354aec54c5c4c6607c27282b42e0a1b49c99b",
+      "fit_seconds": 8.164066700002877,
+      "n_iter": 100
+    },
+    {
+      "arm": "full",
+      "seed": 17,
+      "path": "D:\\runs\\e2_program\\cells\\w2_02_twohop\\models\\full_seed_17.joblib",
+      "sha256": "10c17dfd86aac602cf7857ac774e04095acb844c1bd6e59eff382b155ccde546",
+      "fit_seconds": 12.065760500001488,
+      "n_iter": 100
+    },
+    {
+      "arm": "twohop_removed",
+      "seed": 29,
+      "path": "D:\\runs\\e2_program\\cells\\w2_02_twohop\\models\\twohop_removed_seed_29.joblib",
+      "sha256": "da4129f916679e89025d52a09615b567f4e66e5ca25a7635179f6fb34de9de34",
+      "fit_seconds": 7.583251799995196,
+      "n_iter": 100
+    },
+    {
+      "arm": "full",
+      "seed": 29,
+      "path": "D:\\runs\\e2_program\\cells\\w2_02_twohop\\models\\full_seed_29.joblib",
+      "sha256": "0ba894befffae5e22bfc0926b9d9fdd3e0a050c2df403e5c1a1dd7a48256387b",
+      "fit_seconds": 13.279138800004148,
+      "n_iter": 100
+    },
+    {
+      "arm": "twohop_removed",
+      "seed": 43,
+      "path": "D:\\runs\\e2_program\\cells\\w2_02_twohop\\models\\twohop_removed_seed_43.joblib",
+      "sha256": "d673c8bf0ce34872f48674398480539a66cf855308ae2e5b8a7d747876de35ca",
+      "fit_seconds": 8.139595899992855,
+      "n_iter": 100
+    },
+    {
+      "arm": "full",
+      "seed": 43,
+      "path": "D:\\runs\\e2_program\\cells\\w2_02_twohop\\models\\full_seed_43.joblib",
+      "sha256": "1df4c400401dfc41a230cacfaa54b694b39cc2bca648b9aef73825182cf1f586",
+      "fit_seconds": 12.948836800002027,
+      "n_iter": 100
+    }
+  ],
+  "w2_01": {
+    "available": 1,
+    "path": "D:\\runs\\e2_program\\cells\\w2_01_autopsy\\autopsy_results.json",
+    "note": "Unavailable: D:\\runs\\e2_program\\cells\\w2_01_autopsy\\autopsy_results.json was absent; no lowest-family delta was computed."
+  },
+  "run": {
+    "cpu_hours": 0.7351128472222223,
+    "wall_seconds": 1534.1040496999922,
+    "peak_rss_gib": 1.0073776245117188,
+    "cpu_cap_hours": 48.0,
+    "ram_cap_gib": 48.0,
+    "threads": 8,
+    "subagents_used": 0,
+    "test_reads": 0,
+    "val_B_drawing_reads": 0,
+    "original_CAD_reads": 0
+  },
+  "evidence": {
+    "final_sha256": "c05fcdd4bbf1a506dddc031bf599d348cace70cfb27e163bbdb90102985b3194",
+    "prereg_sheet_digest": "aae57eb4cb4895f1ef1ee8a320940c57a07d00ca80c86335668f04712894f68e",
+    "sheets": [
+      "PREREG",
+      "SUMMARY",
+      "SEED_METRICS",
+      "BOOTSTRAP",
+      "GAIN_TOP20",
+      "FEATURES",
+      "MODELS",
+      "GUARDS",
+      "SELFTEST",
+      "INPUTS",
+      "RUN"
+    ]
+  },
+  "artifacts": {
+    "w2_02_twohop_py_sha256": "ae81bf8c5311fc19c8ad38f7feca5d1c15bf39a71d41a1fb925775d6e63aafe6",
+    "prereg_sha256": "6c7db98abe8eb08edd05f09ef1b52d68aa849b9cc2aa803c033e66d01dff747d",
+    "evidence_final_sha256": "c05fcdd4bbf1a506dddc031bf599d348cace70cfb27e163bbdb90102985b3194"
+  }
+}
