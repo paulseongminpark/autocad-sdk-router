@@ -1,0 +1,555 @@
+{
+  "anchor_richness": {
+    "anchor_count_rule": "5 + (uint32_seed mod 4)",
+    "base_anchor_count_distribution": {
+      "5": 14,
+      "6": 12,
+      "7": 8,
+      "8": 16
+    },
+    "base_anchor_count_max": 8,
+    "base_anchor_count_mean": 6.52,
+    "base_anchor_count_median": 6.0,
+    "base_anchor_count_min": 5,
+    "base_anchor_count_rule_mismatch_scene_count": 0,
+    "base_canonical_anchor_count_distribution": {
+      "5": 14,
+      "6": 12,
+      "7": 8,
+      "8": 16
+    },
+    "base_canonical_anchor_count_mismatch_scene_count": 0,
+    "base_distinct_span_count_distribution": {
+      "5": 14,
+      "6": 12,
+      "7": 8,
+      "8": 16
+    },
+    "base_distinct_span_mismatch_scene_count": 0,
+    "base_minimum_adjacent_log_span_separation": 0.0679873409849328,
+    "base_non_dim_text_ratio_anchor_count": 0,
+    "base_reference_status_counts": {
+      "LOW": 50
+    },
+    "base_spatial_bin_below_3_scene_count": 0,
+    "base_spatial_bin_count_distribution": {
+      "5": 14,
+      "6": 12,
+      "7": 8,
+      "8": 16
+    },
+    "base_spatial_bin_count_min": 5,
+    "base_unit_confidence_score": {
+      "count": 50,
+      "max": 1.0,
+      "mean": 1.0,
+      "median": 1.0,
+      "min": 1.0,
+      "p05": 1.0,
+      "p25": 1.0,
+      "p75": 1.0,
+      "p95": 1.0
+    },
+    "base_unit_status_counts": {
+      "HIGH": 50
+    },
+    "c1_ransac_log_tolerance": 0.04879016416943204,
+    "ir_anchor_count_distribution": {
+      "5": 56,
+      "6": 48,
+      "7": 32,
+      "8": 64
+    },
+    "ir_display_raw_truth_ratio_mismatch_count": 0
+  },
+  "build_numbers": {
+    "entity_profile_filler_count": 5100,
+    "entity_profile_target_total": 8000,
+    "fidelity_gap_sample_target": 1200
+  },
+  "contract": {
+    "c0_import": "D:\\dev\\99_tools\\autocad-sdk-router\\tools\\e2\\cells\\feyerabend_c0.py",
+    "c1_import": "D:\\dev\\99_tools\\autocad-sdk-router\\tools\\e2\\cells\\feyerabend_c1.py",
+    "gate_verdict_emitted": false,
+    "random_search_count": 0,
+    "source_cad_access_count": 0,
+    "source_dossier": "D:\\dev\\99_tools\\autocad-sdk-router\\reports\\e2\\dossiers\\feyerabend_P2.md",
+    "source_packet": "D:\\runs\\e2_program\\build\\PACKET_loop_L1_anchor_rich.md",
+    "test_split_access_count": 0,
+    "write_root": "D:\\runs\\e2_program\\cells\\loop_l1"
+  },
+  "determinism_and_scale_numbers": {
+    "four_scale_normalized_geometry_mismatch_base_scene_count": 0,
+    "four_scale_source_handle_mismatch_base_scene_count": 0,
+    "four_scale_topology_mismatch_base_scene_count": 0,
+    "seed_collision_count": 0,
+    "unique_seed_count": 50
+  },
+  "fidelity_numbers_kappa_1": {
+    "entity_mix_tv": 0.00021191458340744963,
+    "histogram_bin_count": 25,
+    "histogram_edges": [
+      0,
+      1,
+      2,
+      5,
+      10,
+      25,
+      50,
+      75,
+      100,
+      125,
+      150,
+      175,
+      200,
+      250,
+      300,
+      400,
+      500,
+      750,
+      1000,
+      1500,
+      2500,
+      5000,
+      10000,
+      20000,
+      50000,
+      300000
+    ],
+    "reference_entity_mix": {
+      "3DFACE": 34,
+      "ARC": 2198,
+      "CIRCLE": 141,
+      "ELLIPSE": 201,
+      "HATCH": 264,
+      "INSERT": 1158,
+      "LINE": 12110,
+      "LWPOLYLINE": 7400,
+      "MTEXT": 113,
+      "POINT": 341,
+      "POLYLINE": 1,
+      "SPLINE": 3973,
+      "TEXT": 154,
+      "WIPEOUT": 33
+    },
+    "reference_entity_total": 28121,
+    "reference_parallel_pair_offset_count": 4877,
+    "reference_thickness_histogram_counts": [
+      39,
+      75,
+      144,
+      140,
+      535,
+      226,
+      318,
+      193,
+      155,
+      208,
+      97,
+      77,
+      88,
+      183,
+      233,
+      146,
+      298,
+      347,
+      316,
+      264,
+      289,
+      298,
+      178,
+      9,
+      21
+    ],
+    "synthetic_entity_mix": {
+      "3DFACE": 10,
+      "ARC": 625,
+      "CIRCLE": 40,
+      "ELLIPSE": 57,
+      "HATCH": 75,
+      "INSERT": 330,
+      "LINE": 3445,
+      "LWPOLYLINE": 2105,
+      "MTEXT": 32,
+      "POINT": 97,
+      "SPLINE": 1130,
+      "TEXT": 44,
+      "WIPEOUT": 10
+    },
+    "synthetic_entity_total": 8000,
+    "synthetic_parallel_pair_offset_count": 1333,
+    "synthetic_parallel_pair_offsets_in_histogram_count": 1333,
+    "synthetic_thickness_histogram_counts": [
+      10,
+      19,
+      35,
+      34,
+      132,
+      56,
+      78,
+      51,
+      65,
+      71,
+      43,
+      37,
+      35,
+      65,
+      62,
+      36,
+      73,
+      85,
+      78,
+      73,
+      71,
+      73,
+      44,
+      2,
+      5
+    ],
+    "thickness_histogram_ks": 0.040287855437306064
+  },
+  "mutation_family_coverage": {
+    "all_wall_sentinel": {
+      "scene_count": 1,
+      "scene_ratio": 0.02
+    },
+    "arc_spline_adjacent_or_distractor": {
+      "scene_count": 50,
+      "scene_ratio": 1.0
+    },
+    "door_window_dimension_long_parallel_distractor": {
+      "scene_count": 49,
+      "scene_ratio": 0.98
+    },
+    "hatch_boundary_distractor": {
+      "scene_count": 50,
+      "scene_ratio": 1.0
+    },
+    "lwpolyline_segmentation": {
+      "scene_count": 25,
+      "scene_ratio": 0.5
+    },
+    "multiple_reference_span_regions": {
+      "scene_count": 50,
+      "scene_ratio": 1.0
+    },
+    "nested_insert_nonuniform_accumulated_transform": {
+      "scene_count": 50,
+      "scene_ratio": 1.0
+    },
+    "partial_overlap_near_parallel_fragment": {
+      "scene_count": 50,
+      "scene_ratio": 1.0
+    },
+    "pure_line_parallel_pair": {
+      "scene_count": 21,
+      "scene_ratio": 0.42
+    },
+    "single_reference_span_region": {
+      "scene_count": 0,
+      "scene_ratio": 0.0
+    },
+    "zero_wall_sentinel": {
+      "scene_count": 1,
+      "scene_ratio": 0.02
+    }
+  },
+  "phenomenon_coverage": {
+    "ARC": {
+      "scene_count": 50,
+      "scene_ratio": 1.0
+    },
+    "HATCH": {
+      "scene_count": 50,
+      "scene_ratio": 1.0
+    },
+    "SPLINE": {
+      "scene_count": 50,
+      "scene_ratio": 1.0
+    },
+    "nested_block": {
+      "scene_count": 50,
+      "scene_ratio": 1.0
+    },
+    "nonparallel_fragment": {
+      "scene_count": 50,
+      "scene_ratio": 1.0
+    }
+  },
+  "reference_sha256": {
+    "entity_mix_json": "cc95a55852932cc41eb5dfdc5fc9df560f6ada94625969e9284c581e809608ea",
+    "fidelity_histogram_json": "afec84ebf141d8bc29ef6b0ee8fe615c7e6c2bf19b1e4df10c64d11951691ae3",
+    "fidelity_stats_py": "00acec150c65d05a82641d1ab0ac0466cd68e4a424670dd849c3211b2f3c96df",
+    "gen2_py": "a8c2468b696b9271610e38bd87cec1402e9153bc464a5d9cf1429595f26dab55"
+  },
+  "scene_counts": {
+    "base_scene_count": 50,
+    "ir_scene_count": 200,
+    "kappa_1_scene_count": 50,
+    "positive_base_scene_count": 49,
+    "positive_ir_scene_count": 196,
+    "scale_count": 4
+  },
+  "schema": "ariadne.e2.loop_l1.c0v2_numbers.v1",
+  "selftest": {
+    "passed": 17,
+    "sealed_c1": {
+      "passed": 6,
+      "tests": [
+        {
+          "detail": "estimate=2.5 expected=2.5 unit_status=HIGH",
+          "name": "exact_anchor_exact_scale",
+          "passed": true
+        },
+        {
+          "detail": "unit_status=HIGH confidence=1",
+          "name": "exact_anchor_high_confidence",
+          "passed": true
+        },
+        {
+          "detail": "estimate=None unit_status=NONE status=NONE",
+          "name": "no_anchor_honest_no_estimate",
+          "passed": true
+        },
+        {
+          "detail": "duplicate=b7eafb24bff4 stale_override=4587fb707ef7 suffix_removal=d5721ef40250 single_outlier=802397c8b4a3",
+          "name": "corruption_reproducibility",
+          "passed": true
+        },
+        {
+          "detail": "estimate=2.5 unit_status=HIGH",
+          "name": "single_outlier_mode_or_downgrade",
+          "passed": true
+        },
+        {
+          "detail": "accessed_keys=['anchors']",
+          "name": "truth_key_access_guard",
+          "passed": true
+        }
+      ],
+      "total": 6
+    },
+    "tests": [
+      {
+        "detail": "j=7 seed=1680878578 expected=1680878578",
+        "name": "c0_seed_rule_unchanged",
+        "passed": true
+      },
+      {
+        "detail": "j=7 sha256=a461d1d5c3b20b0f8f23f591befb5e7c24ee463233fbf7633556aab3233d061a",
+        "name": "same_j_same_sha",
+        "passed": true
+      },
+      {
+        "detail": "observed=7 expected=7",
+        "name": "fixture_anchor_count_rule",
+        "passed": true
+      },
+      {
+        "detail": "span_count=7 distinct=7",
+        "name": "fixture_independent_distinct_spans",
+        "passed": true
+      },
+      {
+        "detail": "input=7 canonical=7 duplicates=0",
+        "name": "fixture_canonical_independence",
+        "passed": true
+      },
+      {
+        "detail": "n_spatial_bins=7",
+        "name": "fixture_spatial_bins",
+        "passed": true
+      },
+      {
+        "detail": "estimate=1.0 unit_status=HIGH confidence=1",
+        "name": "fixture_ratio_estimate",
+        "passed": true
+      },
+      {
+        "detail": "unique_topology_sha=1",
+        "name": "same_j_four_scale_topology",
+        "passed": true
+      },
+      {
+        "detail": "unique_normalized_geometry_sha=1",
+        "name": "same_j_four_scale_normalized_geometry",
+        "passed": true
+      },
+      {
+        "detail": "scene_count=4 error_count=0",
+        "name": "truth_validator_positive_cases",
+        "passed": true
+      },
+      {
+        "detail": "error_count=4",
+        "name": "truth_validator_negative_case_honest_fail",
+        "passed": true
+      },
+      {
+        "detail": "accessed_keys=['anchors']",
+        "name": "truth_key_access_guard",
+        "passed": true
+      },
+      {
+        "detail": "distribution={5: 14, 6: 12, 7: 8, 8: 16} rule_mismatches=0",
+        "name": "anchor_count_distribution",
+        "passed": true
+      },
+      {
+        "detail": "below_3_scene_count=0",
+        "name": "all_base_spatial_bins_ge_3",
+        "passed": true
+      },
+      {
+        "detail": "distinct_span_mismatch_scene_count=0",
+        "name": "all_base_spans_distinct",
+        "passed": true
+      },
+      {
+        "detail": "wall_records=2 entity_types=['ARC', 'CIRCLE', 'HATCH', 'LINE', 'LWPOLYLINE', 'MTEXT', 'SPLINE', 'TEXT']",
+        "name": "permitted_gen2_synthetic_fixture",
+        "passed": true
+      },
+      {
+        "detail": "passed=6 total=6",
+        "name": "sealed_c1_selftests",
+        "passed": true
+      }
+    ],
+    "total": 17,
+    "transcript": "=== loop_l1 anchor-rich selftest ===\nSELFTEST c0_seed_rule_unchanged: PASS | j=7 seed=1680878578 expected=1680878578\nSELFTEST same_j_same_sha: PASS | j=7 sha256=a461d1d5c3b20b0f8f23f591befb5e7c24ee463233fbf7633556aab3233d061a\nSELFTEST fixture_anchor_count_rule: PASS | observed=7 expected=7\nSELFTEST fixture_independent_distinct_spans: PASS | span_count=7 distinct=7\nSELFTEST fixture_canonical_independence: PASS | input=7 canonical=7 duplicates=0\nSELFTEST fixture_spatial_bins: PASS | n_spatial_bins=7\nSELFTEST fixture_ratio_estimate: PASS | estimate=1.0 unit_status=HIGH confidence=1\nSELFTEST same_j_four_scale_topology: PASS | unique_topology_sha=1\nSELFTEST same_j_four_scale_normalized_geometry: PASS | unique_normalized_geometry_sha=1\nSELFTEST truth_validator_positive_cases: PASS | scene_count=4 error_count=0\nSELFTEST truth_validator_negative_case_honest_fail: PASS | error_count=4\nSELFTEST truth_key_access_guard: PASS | accessed_keys=['anchors']\nSELFTEST anchor_count_distribution: PASS | distribution={5: 14, 6: 12, 7: 8, 8: 16} rule_mismatches=0\nSELFTEST all_base_spatial_bins_ge_3: PASS | below_3_scene_count=0\nSELFTEST all_base_spans_distinct: PASS | distinct_span_mismatch_scene_count=0\nSELFTEST permitted_gen2_synthetic_fixture: PASS | wall_records=2 entity_types=['ARC', 'CIRCLE', 'HATCH', 'LINE', 'LWPOLYLINE', 'MTEXT', 'SPLINE', 'TEXT']\n=== imported sealed C1 selftests ===\nSELFTEST exact_anchor_exact_scale: PASS | estimate=2.5 expected=2.5 unit_status=HIGH\nSELFTEST exact_anchor_high_confidence: PASS | unit_status=HIGH confidence=1\nSELFTEST no_anchor_honest_no_estimate: PASS | estimate=None unit_status=NONE status=NONE\nSELFTEST corruption_reproducibility: PASS | duplicate=b7eafb24bff4 stale_override=4587fb707ef7 suffix_removal=d5721ef40250 single_outlier=802397c8b4a3\nSELFTEST single_outlier_mode_or_downgrade: PASS | estimate=2.5 unit_status=HIGH\nSELFTEST truth_key_access_guard: PASS | accessed_keys=['anchors']\nSELFTEST SUMMARY: 6/6 passed\nSELFTEST sealed_c1_selftests: PASS | passed=6 total=6\nSELFTEST SUMMARY: 17/17 passed\nSELFTEST_RESULT: PASS\n"
+  },
+  "sentinel_truth_integrity": {
+    "all_wall_candidate_pair_count": 3,
+    "all_wall_candidate_truth_coverage_ratio": 1.0,
+    "all_wall_candidate_truth_intersection_count": 3,
+    "all_wall_scene_count": 1,
+    "all_wall_truth_pair_count": 3,
+    "all_wall_validation_error_count": 0,
+    "zero_wall_candidate_pair_count": 2,
+    "zero_wall_scene_count": 1,
+    "zero_wall_truth_pair_count": 0,
+    "zero_wall_validation_error_count": 0,
+    "zero_wall_wall_face_handle_count": 0
+  },
+  "truth_pair_numbers": {
+    "base_scene_truth_pair_ratio": 0.98,
+    "base_scenes_with_truth_pair_count": 49,
+    "base_truth_pair_count": 51,
+    "ir_scene_truth_pair_ratio": 0.98,
+    "ir_scenes_with_truth_pair_count": 196,
+    "ir_truth_pair_count": 204,
+    "positive_base_scene_truth_pair_ratio": 1.0,
+    "positive_base_scenes_with_truth_pair_count": 49,
+    "positive_ir_scene_truth_pair_ratio": 1.0,
+    "positive_ir_scenes_with_truth_pair_count": 196
+  },
+  "truth_validator": {
+    "error_count": 0,
+    "validated_ir_scene_count": 200
+  },
+  "v1_baseline": {
+    "bytes": 5867,
+    "path": "D:\\dev\\99_tools\\autocad-sdk-router\\reports\\e2\\cells\\feyerabend_c0\\coverage_numbers.json",
+    "schema": "ariadne.e2.feyerabend_c0.coverage_numbers.v1",
+    "sha256": "f5c17b6094d741bffb64a35c17f35a58243c23720ad3446e86c962299b183723"
+  },
+  "v1_comparison_rows": [
+    {
+      "delta": 0.0,
+      "metric": "scene_counts.base_scene_count",
+      "v1": 50,
+      "v2": 50
+    },
+    {
+      "delta": 0.0,
+      "metric": "scene_counts.ir_scene_count",
+      "v1": 200,
+      "v2": 200
+    },
+    {
+      "delta": 0.0,
+      "metric": "truth_pair_numbers.ir_truth_pair_count",
+      "v1": 204,
+      "v2": 204
+    },
+    {
+      "delta": 0.0,
+      "metric": "truth_validator.error_count",
+      "v1": 0,
+      "v2": 0
+    },
+    {
+      "delta": 0.0,
+      "metric": "fidelity_numbers_kappa_1.entity_mix_tv",
+      "v1": 0.00021191458340744963,
+      "v2": 0.00021191458340744963
+    },
+    {
+      "delta": 0.0,
+      "metric": "fidelity_numbers_kappa_1.thickness_histogram_ks",
+      "v1": 0.040287855437306064,
+      "v2": 0.040287855437306064
+    },
+    {
+      "delta": -25.0,
+      "metric": "mutation_family_coverage.single_reference_span_region.scene_count",
+      "v1": 25,
+      "v2": 0
+    },
+    {
+      "delta": 25.0,
+      "metric": "mutation_family_coverage.multiple_reference_span_regions.scene_count",
+      "v1": 25,
+      "v2": 50
+    },
+    {
+      "delta": 0.0,
+      "metric": "determinism_and_scale_numbers.four_scale_topology_mismatch_base_scene_count",
+      "v1": 0,
+      "v2": 0
+    },
+    {
+      "delta": 0.0,
+      "metric": "determinism_and_scale_numbers.four_scale_normalized_geometry_mismatch_base_scene_count",
+      "v1": 0,
+      "v2": 0
+    },
+    {
+      "delta": 0.0,
+      "metric": "determinism_and_scale_numbers.four_scale_source_handle_mismatch_base_scene_count",
+      "v1": 0,
+      "v2": 0
+    },
+    {
+      "delta": 2.0,
+      "metric": "ratio_anchor_count_per_scene.min",
+      "v1": 3,
+      "v2": 5
+    },
+    {
+      "delta": 3.5199999999999996,
+      "metric": "ratio_anchor_count_per_scene.mean",
+      "v1": 3,
+      "v2": 6.52
+    },
+    {
+      "delta": 5.0,
+      "metric": "ratio_anchor_count_per_scene.max",
+      "v1": 3,
+      "v2": 8
+    },
+    {
+      "delta": 2.0,
+      "metric": "spatial_bin_count_per_scene.min",
+      "v1": 3,
+      "v2": 5
+    },
+    {
+      "delta": null,
+      "metric": "distinct_span_mismatch_scene_count",
+      "v1": null,
+      "v2": 0
+    }
+  ]
+}
