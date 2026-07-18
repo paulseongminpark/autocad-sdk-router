@@ -1,0 +1,16 @@
+{
+  "schema": "e2.prereg.r2.v1.amendment1",
+  "sealed_utc": "2026-07-18T17:40:00Z",
+  "parent": "reports/e2/prereg_r2_v1.json @31494b6",
+  "amendment_rule_compliance": "하향·강등·미정값 확정만 포함 — 신규 arm/band/route 없음",
+  "w2_00_input": "reports/e2/cells/w2_00_preflight/ @ea386de (오케스트레이터 로컬 재현 2% 이내)",
+  "dgx_routing_final": {
+    "verdict": "DGX_MEMORY_BOUND_ONLY (봉인 2× 규칙 발동 — GNN 0.23×, U-Net 0.32×)",
+    "dgx_queue_eligible": ["full-graph 무샘플링 팔 (412,775 seg — 로컬 16GB 물리 불가)", "Qwen2.5-VL-3B 학습 팔 (G7)", "대배치 SSL/DAPT 필러 (G8/W2-06, 128GB 활용 형상 한정)"],
+    "local_rtx_queue": ["GNN sampled SSL/formal (G5 — 로컬이 4.3× 빠름)", "raster U-Net (G6 — 로컬 peak 2.3GB)"],
+    "re_promotion": "이번 웨이브 불가 — 차기 웨이브 프리레그에서 대형 형상 재자격 시에만"
+  },
+  "equivalence_bands_sealed": { "rule": "abs≤max(1e-4, 5×p99_within) ∧ rel≤max(1e-3, 5×p99_within)", "gnn": "PASS (max abs 2.4e-7)", "unet": "PASS (max rel 0.031)", "cross_device_promotion": "ALLOWED_FOR_MATCHING_HASHED_CONFIG" },
+  "gb10_caps_final_h": { "G5_full_graph_arm": 36, "G7_qwen_arms": 72, "G8_filler_dapt_ssl": 48, "note": "합동 설계 D6의 봉투 구속 유지. GNN sampled/formal은 RTX 큐로 이관되어 GB10 캡 불요 — 원 144h 배정 중 sampled/formal 108h 몫은 RTX-h 캡으로 전환(G5 RTX 총 132h = 기존 24 + 이관 108). 이관은 캡 증액이 아니라 장치 재배정." ,
+  "checkpoint_preemption": { "measured_save_restore_ms": "5–12", "filler_yield_latency_bound": "체크포인트 간격" }
+}
