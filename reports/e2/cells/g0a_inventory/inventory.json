@@ -1,0 +1,5117 @@
+{
+  "authorities": [
+    {
+      "bytes": 41676,
+      "path": "D:\\dev\\99_tools\\autocad-sdk-router\\reports\\e2\\duo\\REVISED_sol.md",
+      "sha256": "ed39a8751033fc74ec647ba7c9c8f4d3e539e61a72798a4b3ef36d5d575538ec",
+      "status": "FOUND"
+    },
+    {
+      "bytes": 7111,
+      "path": "D:\\dev\\99_tools\\autocad-sdk-router\\reports\\e2\\duo\\WAVE2_JOINT_DESIGN.md",
+      "sha256": "a41d4442438b99215af6f38ec362e929499c1e3962dad082c3ce35482dbb82e9",
+      "status": "FOUND"
+    },
+    {
+      "bytes": 2803,
+      "path": "D:\\runs\\e2_program\\build\\PACKET_g0a_inventory.md",
+      "sha256": "6eb0e7ec34996150ef06b9e62245c59f1e2e652549e65c867311ad49b4a86635",
+      "status": "FOUND"
+    }
+  ],
+  "code_landing_inventory": {
+    "classification_basis": "relative filename lexical match only; file contents not used",
+    "file_count": 69,
+    "files": [
+      {
+        "bytes": 35572,
+        "relative_path": "__pycache__/w1_real_defs.cpython-312.pyc",
+        "sha256": "9b9ad5258598c9f3a4f895387ae2b1a3da982b925b5c192af7530382f59fc215"
+      },
+      {
+        "bytes": 52228,
+        "relative_path": "cells/baseline_freeze.py",
+        "sha256": "631abe6ab2ebf9f805882e269eb139dd15788fb5e6ea6cdca949377479db9f3c"
+      },
+      {
+        "bytes": 53668,
+        "relative_path": "cells/bstar_repair.py",
+        "sha256": "235ff4bea7fdb78bbf1776d16f3dfe361ab46cd79657aab61b939ec31455a0ca"
+      },
+      {
+        "bytes": 34736,
+        "relative_path": "cells/cml_ctx.py",
+        "sha256": "ac0ef389ca971a87645763bd4153cf4f564731d17f8689331bc9de04a67e1b98"
+      },
+      {
+        "bytes": 65232,
+        "relative_path": "cells/feyerabend_c0.py",
+        "sha256": "dfc8957fc4f56fffd2262faa0f9dd14a1132b3365d0f9735366d44ec00215c80"
+      },
+      {
+        "bytes": 67267,
+        "relative_path": "cells/feyerabend_c1.py",
+        "sha256": "633c5ee154eb3b869dba8361de2cbee9808627e0f192f8c2d29a4b05df2c4d51"
+      },
+      {
+        "bytes": 46051,
+        "relative_path": "cells/fidelity_full_run_cell.py",
+        "sha256": "d19564e053fe9c665301b209d400cd051859ab6e4d5c20945c1e572297346940"
+      },
+      {
+        "bytes": 60409,
+        "relative_path": "cells/loop_l1.py",
+        "sha256": "61eafb479c714a12e2ddec1e67d164f7bf3f2eb72d44d9881d102e99c673e24f"
+      },
+      {
+        "bytes": 55489,
+        "relative_path": "cells/loop_l1b.py",
+        "sha256": "ac8a9c0aa1dc477db2badec22b42268941ad0c9d40a4e8c2a9ee9e7a3b489e00"
+      },
+      {
+        "bytes": 79562,
+        "relative_path": "cells/pu_ladder.py",
+        "sha256": "25f96944688eb026d6df1d4093135965279c5314234242e02be3a4e6fd29a677"
+      },
+      {
+        "bytes": 23873,
+        "relative_path": "detect/__pycache__/evidence_grid.cpython-312.pyc",
+        "sha256": "e510902161e9bc2ddf5254b563680456f584087299b81c01d98f4fad9dcd204c"
+      },
+      {
+        "bytes": 22965,
+        "relative_path": "detect/__pycache__/insert_expand.cpython-312.pyc",
+        "sha256": "98662c07e0dd72ad5a5690342dc3535c2a9059ab1f2d84db75a8f414c2d8b040"
+      },
+      {
+        "bytes": 22782,
+        "relative_path": "detect/__pycache__/normalize.cpython-312.pyc",
+        "sha256": "8907fd572cfbdf9e2577240e04e4f5f371e5abbbe6313293073988914de09bb7"
+      },
+      {
+        "bytes": 22238,
+        "relative_path": "detect/__pycache__/unit_anchor.cpython-312.pyc",
+        "sha256": "255b9b7e5b51195f6ab5f80544824c3da6d3bc37fa5f38343ba73e0f7f895de4"
+      },
+      {
+        "bytes": 24540,
+        "relative_path": "detect/cli.py",
+        "sha256": "f27017d96bc2973ea72220632205a2508fd168a26859f6af6f41eed535603bdd"
+      },
+      {
+        "bytes": 20152,
+        "relative_path": "detect/evidence_grid.py",
+        "sha256": "918c6754c0b3d5608613c189240629dc419d94a42e167ef6ce0d298a08660b6a"
+      },
+      {
+        "bytes": 18917,
+        "relative_path": "detect/insert_expand.py",
+        "sha256": "5e450d29026d9dcb78a702cb6859a6beed3a3ec07b984ec741c96be6e897e732"
+      },
+      {
+        "bytes": 17412,
+        "relative_path": "detect/normalize.py",
+        "sha256": "fbc4c86e88aca06e6be465ba131bbe839de1570b20582941a6162ff08549c1be"
+      },
+      {
+        "bytes": 18293,
+        "relative_path": "detect/unit_anchor.py",
+        "sha256": "bc6ffd6f9ce11d9152b279f91a413cd879c08135ff63eb078b33dd6293c78237"
+      },
+      {
+        "bytes": 10041,
+        "relative_path": "dossier/build_packets.py",
+        "sha256": "8eaf0c504e73c6d399377b81be0efefd300a6fbe34d6645fb978b1ef1da35178"
+      },
+      {
+        "bytes": 2631,
+        "relative_path": "dossier/extract_cells.py",
+        "sha256": "6532f35962d881a837db340ca173addb84abeada2baff63d7c9070c5439ea8ea"
+      },
+      {
+        "bytes": 11482,
+        "relative_path": "ext/__pycache__/cubicasa_eval.cpython-312.pyc",
+        "sha256": "8d25d7bf8413ec10f8bf82b7b95dadb3652d2013f01105497fe32544a01c4566"
+      },
+      {
+        "bytes": 12813,
+        "relative_path": "ext/__pycache__/cubicasa_ir.cpython-312.pyc",
+        "sha256": "256210f7753941bd4a3054bb68e1fdbc5d38cf156587f2de7e2672fd90a5970c"
+      },
+      {
+        "bytes": 4658,
+        "relative_path": "ext/cubicasa_audit.py",
+        "sha256": "14f25cc986fe6901a9e56ce6de3bf6dc3d4a4e128f0d9303ac73bfdd09ca613d"
+      },
+      {
+        "bytes": 7263,
+        "relative_path": "ext/cubicasa_eval.py",
+        "sha256": "8c0c9e93674e04ade17517840e5ccfce91953208ec2e6377d4af6eb976cfb7c8"
+      },
+      {
+        "bytes": 7496,
+        "relative_path": "ext/cubicasa_ir.py",
+        "sha256": "6b79d8d80932f2d5304c9a75d580f73214dec678fbb9a28cbd7431cc3ea2fc21"
+      },
+      {
+        "bytes": 6610,
+        "relative_path": "ext/cubicasa_ml.py",
+        "sha256": "e9baf9f361ca9cfc1a113e084bf5c34be33cf9b6c14615c2ed080f771cd3b466"
+      },
+      {
+        "bytes": 4239,
+        "relative_path": "extset/cubicasa_parse.py",
+        "sha256": "b72e6b20204f10a2a68db30a8270cdca0cb38a6f2b24a2feff589e60186c3a50"
+      },
+      {
+        "bytes": 10915,
+        "relative_path": "extset/features.py",
+        "sha256": "9c9677552613d45d6b3b2c90486146a4e50c6b88f77d1b3a04f5b5f9f71be709"
+      },
+      {
+        "bytes": 17323,
+        "relative_path": "extset/fetch.py",
+        "sha256": "1dbda19ef850ff3b1d10e2089b3ac08db4d14892cbec4fbc79b2e5a31e50e13c"
+      },
+      {
+        "bytes": 374,
+        "relative_path": "extset/fixtures_cubicasa.svg",
+        "sha256": "0b6e8c4583429372b71049e31c53df4fa5c8add73622e92b97b37d16d839debf"
+      },
+      {
+        "bytes": 632,
+        "relative_path": "extset/fixtures_fpc.svg",
+        "sha256": "712766df802995fe671911c39f8a5e547d0c060046dee48c486b8c49d69f0f9f"
+      },
+      {
+        "bytes": 5044,
+        "relative_path": "extset/fpc_parse.py",
+        "sha256": "0f4f0059d9a43e13519591e9808174341fb6f0a7b1a7c2c0e5c52943d27c4280"
+      },
+      {
+        "bytes": 6738,
+        "relative_path": "extset/label_map.py",
+        "sha256": "7f392ac86fcfeec6113373d7c3222a8c2bc1edb6d396273b6507b676dae970ed"
+      },
+      {
+        "bytes": 13353,
+        "relative_path": "gen2/__pycache__/fidelity_stats.cpython-312.pyc",
+        "sha256": "a44f9d2ec3194b8b9faa1a04d620aeaba9c2fcb75300b6c813ae8ca27fc59248"
+      },
+      {
+        "bytes": 42273,
+        "relative_path": "gen2/__pycache__/gen2.cpython-312.pyc",
+        "sha256": "3c6b79cbfaaaa50ca04a6668b1723e6a2e58404ce7d8673e54c7253ae386524c"
+      },
+      {
+        "bytes": 8924,
+        "relative_path": "gen2/fidelity_stats.py",
+        "sha256": "00acec150c65d05a82641d1ab0ac0466cd68e4a424670dd849c3211b2f3c96df"
+      },
+      {
+        "bytes": 31836,
+        "relative_path": "gen2/gen2.py",
+        "sha256": "a8c2468b696b9271610e38bd87cec1402e9153bc464a5d9cf1429595f26dab55"
+      },
+      {
+        "bytes": 50842,
+        "relative_path": "instruments/crs_bridge.py",
+        "sha256": "b7c0ac84e501c5895949f1db23f9ead0d6e70691271a0a1d176d9378cd8fdd5b"
+      },
+      {
+        "bytes": 41687,
+        "relative_path": "instruments/verifier.py",
+        "sha256": "72e33ab0e87e96defd00f74c5a22ae6c5cb001c69b740e627edeedaf2a80b690"
+      },
+      {
+        "bytes": 53730,
+        "relative_path": "instruments/worldir_oracle.py",
+        "sha256": "f49417843726413667ead2be2b1e249100ddbce961d67a4d6f3600de78550a18"
+      },
+      {
+        "bytes": 14305,
+        "relative_path": "meta/__pycache__/invariance.cpython-312.pyc",
+        "sha256": "7bce657cd85506be8382fd106a120abf4782bddded695a265168ee1400941a49"
+      },
+      {
+        "bytes": 23942,
+        "relative_path": "meta/__pycache__/transforms_rigid.cpython-312.pyc",
+        "sha256": "f78a12ce60d7f32bd2d55e2ddd91fe7dd9d7707834bd4284f4d8a6a691eed818"
+      },
+      {
+        "bytes": 22512,
+        "relative_path": "meta/__pycache__/transforms_struct.cpython-312.pyc",
+        "sha256": "eef0fc83b4c32f8375f154d00608092e2d05db00f541871da6a68cc319561d70"
+      },
+      {
+        "bytes": 24139,
+        "relative_path": "meta/battery_cli.py",
+        "sha256": "0db3fe6dec864875961e2eda0197c9f10cbed764b34d68c9e8fd0131906d9364"
+      },
+      {
+        "bytes": 11989,
+        "relative_path": "meta/invariance.py",
+        "sha256": "937644c63626ed420ace98a6bad9b25a6e5b3605c3c9fea63a8ffb2c0ccc9a7e"
+      },
+      {
+        "bytes": 17738,
+        "relative_path": "meta/transforms_rigid.py",
+        "sha256": "fc754ce09359bcaa555e2aa6fc09d9a8c9ca17d442a4a520bf60dbdd2ee62bad"
+      },
+      {
+        "bytes": 15666,
+        "relative_path": "meta/transforms_struct.py",
+        "sha256": "e59acbbe301776a33ce96b5cf8d1a2d5fbf7fa986f5fb211c01653fb9395d54b"
+      },
+      {
+        "bytes": 53345,
+        "relative_path": "s1_bbox_units.py",
+        "sha256": "70c3c8788eb605a563385848a9e49b3890884e255ebb20f7ff951b45993c0869"
+      },
+      {
+        "bytes": 34214,
+        "relative_path": "s1_censoring.py",
+        "sha256": "dbd5aa781ad78efde50c91ec0d5a4e496ef9ef8abe7d954f532ed1665d26f210"
+      },
+      {
+        "bytes": 47810,
+        "relative_path": "s1_entity_census.py",
+        "sha256": "6566b81b3bb58a9aedd4ddbd557d9697310dd55dd604bd849686b65f604ab31c"
+      },
+      {
+        "bytes": 51706,
+        "relative_path": "s1_handle_audit.py",
+        "sha256": "57b992699b189b12dc3f9c3d47cc2628d6a556af90463f1b59d6934d2367b3f4"
+      },
+      {
+        "bytes": 62511,
+        "relative_path": "s1_sortkey_probe.py",
+        "sha256": "8ee579257c20838f0a65bfeae142389ae9032569102fb9e5d3f2f8fecc69f9b7"
+      },
+      {
+        "bytes": 26343,
+        "relative_path": "s2_fidelity.py",
+        "sha256": "837004188ae234bdf9f35457a3216cbcbaa4ce2f787948e610f69e99d10afac8"
+      },
+      {
+        "bytes": 26129,
+        "relative_path": "s2_pack_cli.py",
+        "sha256": "aa0f6bada6fd8b90446ab5a5e8e3a6d8d8870a8d4956a6bda345a2a179194eec"
+      },
+      {
+        "bytes": 31803,
+        "relative_path": "s2_real_stats.py",
+        "sha256": "efbdc94989504c23d0ab0afdc1e936ac03ef4b55158cc36df4f5245975c533b2"
+      },
+      {
+        "bytes": 8575,
+        "relative_path": "s6_classical.py",
+        "sha256": "190748a72a4442ac942ff4f901aaa4d0d8322c836d77fc481dafc7afeade9894"
+      },
+      {
+        "bytes": 22866,
+        "relative_path": "synth/__pycache__/grammar.cpython-312.pyc",
+        "sha256": "eb7c95a24c85bf06b54aac9fc072fe2d2efd9866c3bc57d57bd313560359f06c"
+      },
+      {
+        "bytes": 24895,
+        "relative_path": "synth/__pycache__/noise.cpython-312.pyc",
+        "sha256": "42bf075ca3bcd64cb96b06ae721d872862741bf54dc3ea307fd1d3602e847378"
+      },
+      {
+        "bytes": 22095,
+        "relative_path": "synth/__pycache__/openings.cpython-312.pyc",
+        "sha256": "5997e2b4d2f39d88437315b31a568ec2977f397da4df883d46440a4be78eec12"
+      },
+      {
+        "bytes": 18363,
+        "relative_path": "synth/grammar.py",
+        "sha256": "68c435a20fa352333ce8038ba612353f2a85efff368290cec8b04d5048f8ad54"
+      },
+      {
+        "bytes": 19695,
+        "relative_path": "synth/noise.py",
+        "sha256": "9d8c2daccbd16a121272bb6488093d44318f7a0d12a9bf03cdacfb1220f2e6b2"
+      },
+      {
+        "bytes": 19056,
+        "relative_path": "synth/openings.py",
+        "sha256": "e6b86a01af47b2bb5ee4a768521a4317e8f066804306f283c46f4b087f89fa4c"
+      },
+      {
+        "bytes": 5013,
+        "relative_path": "w1_eval_driver.py",
+        "sha256": "8d449475c719055d8572c5ad4400f31be41c46db1c36b3b0e30acbf7766a9bee"
+      },
+      {
+        "bytes": 2867,
+        "relative_path": "w1_eval_fold_v2.py",
+        "sha256": "9a1497bcb7cb7aef4fd32224d3649bbbfec8427b036265d28e4cfa85fe59fdcc"
+      },
+      {
+        "bytes": 2984,
+        "relative_path": "w1_eval_fold_v3.py",
+        "sha256": "339edc1c93fb375c74fd4041c29676b962ac55c27dfbb707a1885d8ff7d05faf"
+      },
+      {
+        "bytes": 24157,
+        "relative_path": "w1_real_defs.py",
+        "sha256": "5cf700d55522242560ef720392cc837178ec895885d85ddf0989bbd5bd23ac97"
+      },
+      {
+        "bytes": 2973,
+        "relative_path": "w2_freeze.py",
+        "sha256": "e59f3a46e1b393bcedac0c50bc43018f0213562d689b628b9e48cc9d98b9995f"
+      },
+      {
+        "bytes": 6713,
+        "relative_path": "w2_independence_audit.py",
+        "sha256": "55295df825ea6f2b71bc0fb4b3bb7a94dcdb20629cd549b05fbe3db1d3b021a9"
+      }
+    ],
+    "path": "D:\\dev\\99_tools\\autocad-sdk-router\\tools\\e2",
+    "status": "FOUND",
+    "trainer_and_harness_presence": {
+      "gnn_trainer": {
+        "matching_files": [],
+        "present": false,
+        "status": "ABSENT"
+      },
+      "qwen_trainer": {
+        "matching_files": [],
+        "present": false,
+        "status": "ABSENT"
+      },
+      "raster_trainer": {
+        "matching_files": [],
+        "present": false,
+        "status": "ABSENT"
+      },
+      "rl_harness": {
+        "matching_files": [],
+        "present": false,
+        "status": "ABSENT"
+      }
+    },
+    "walk_errors": []
+  },
+  "data_inventory": {
+    "cubicasa_ir": {
+      "root": "D:\\dev\\99_tools\\autocad-sdk-router\\runs\\e2_ext_cubicasa\\ir",
+      "splits": {
+        "test": {
+          "content_parsed": false,
+          "drawing_id_derivation": "filename with terminal .segir.json removed",
+          "drawing_id_list_hash_encoding": "canonical JSON UTF-8, sorted filenames",
+          "drawing_id_list_sha256": "0b955b7b98955fd48f4fa0b39dcc0064f856691b07ac9e942bfcf5714d13558e",
+          "file_count": 400,
+          "filename_pattern": "*.segir.json",
+          "path": "D:\\dev\\99_tools\\autocad-sdk-router\\runs\\e2_ext_cubicasa\\ir\\test",
+          "status": "FOUND",
+          "total_bytes": 31691693
+        },
+        "train": {
+          "content_parsed": false,
+          "drawing_id_derivation": "filename with terminal .segir.json removed",
+          "drawing_id_list_hash_encoding": "canonical JSON UTF-8, sorted filenames",
+          "drawing_id_list_sha256": "7d4a0662a9e10f6570b8188a18bb464c16992b0ae875770f41e0c64c51e8ccfc",
+          "file_count": 4200,
+          "filename_pattern": "*.segir.json",
+          "path": "D:\\dev\\99_tools\\autocad-sdk-router\\runs\\e2_ext_cubicasa\\ir\\train",
+          "status": "FOUND",
+          "total_bytes": 326558595
+        },
+        "val": {
+          "content_parsed": false,
+          "drawing_id_derivation": "filename with terminal .segir.json removed",
+          "drawing_id_list_hash_encoding": "canonical JSON UTF-8, sorted filenames",
+          "drawing_id_list_sha256": "b38e6078cc37e17b58a83e18b78ba49a350c0083055e1d3be1e3011e85538dd6",
+          "file_count": 400,
+          "filename_pattern": "*.segir.json",
+          "path": "D:\\dev\\99_tools\\autocad-sdk-router\\runs\\e2_ext_cubicasa\\ir\\val",
+          "status": "FOUND",
+          "total_bytes": 29907030
+        }
+      }
+    },
+    "gen2_full_pack": {
+      "artifact_content_parsed": false,
+      "declared_artifact_hashes_checked": 300,
+      "drawing_count": 150,
+      "drawing_id_list_sha256": "74c33e6a610342803300ddde453d70224125f7537baa36d46d5b692188214e20",
+      "expected_150_match": true,
+      "manifest_bundle_sha256": "a9f0741ea89613c0a135de7baa44fb0308f67e2fed9f0fd1ed40bd22a2e0276e",
+      "manifest_hashes": [
+        {
+          "relative_path": "F/manifest.json",
+          "sha256": "06c2e50a669c7880b341e644337fdd9f4edce2f26bce880dcd72b3a1e0ec811b"
+        },
+        {
+          "relative_path": "M/manifest.json",
+          "sha256": "9ba90c593c5a9bc6657ba42177ca81d157a24267cb993bdd8758cbd71facb1b8"
+        },
+        {
+          "relative_path": "manifest.json",
+          "sha256": "115fe18acaba7c474319cca86b004a7b90e5ba6d0e4dc03ec9eae44c25241c28"
+        },
+        {
+          "relative_path": "S/manifest.json",
+          "sha256": "6aef92fc301e001383ca5d92181d5daf6963c049a2ecf6fbc49f460e8bf42d63"
+        }
+      ],
+      "manifest_or_artifact_mismatch_count": 0,
+      "mismatches": [],
+      "path": "D:\\runs\\e2_program\\cells\\fidelity_full\\packs",
+      "root_manifest_sha256": "115fe18acaba7c474319cca86b004a7b90e5ba6d0e4dc03ec9eae44c25241c28",
+      "status": "FOUND",
+      "tiers": [
+        {
+          "declared_n_in_root": 50,
+          "entry_count": 50,
+          "manifest_path": "D:\\runs\\e2_program\\cells\\fidelity_full\\packs\\F\\manifest.json",
+          "manifest_sha256": "06c2e50a669c7880b341e644337fdd9f4edce2f26bce880dcd72b3a1e0ec811b",
+          "tier": "F"
+        },
+        {
+          "declared_n_in_root": 50,
+          "entry_count": 50,
+          "manifest_path": "D:\\runs\\e2_program\\cells\\fidelity_full\\packs\\M\\manifest.json",
+          "manifest_sha256": "9ba90c593c5a9bc6657ba42177ca81d157a24267cb993bdd8758cbd71facb1b8",
+          "tier": "M"
+        },
+        {
+          "declared_n_in_root": 50,
+          "entry_count": 50,
+          "manifest_path": "D:\\runs\\e2_program\\cells\\fidelity_full\\packs\\S\\manifest.json",
+          "manifest_sha256": "6aef92fc301e001383ca5d92181d5daf6963c049a2ecf6fbc49f460e8bf42d63",
+          "tier": "S"
+        }
+      ]
+    },
+    "scene_counts": {
+      "C0": {
+        "content_parsed": false,
+        "file_count": 200,
+        "filename_pattern": "scene_*.json",
+        "path": "D:\\runs\\e2_program\\cells\\feyerabend_c0\\scenes",
+        "status": "FOUND",
+        "total_bytes": 14942202
+      },
+      "L1": {
+        "content_parsed": false,
+        "file_count": 200,
+        "filename_pattern": "scene_*.json",
+        "path": "D:\\runs\\e2_program\\cells\\loop_l1\\scenes_v2",
+        "status": "FOUND",
+        "total_bytes": 14668510
+      }
+    }
+  },
+  "environment_inventory": {
+    "dgx_ssh": {
+      "command": "ssh -i %USERPROFILE%\\.ssh\\dgx_edgexpert sunapse@172.30.1.1 hostname",
+      "key_exists": true,
+      "key_path": "C:\\Users\\PAUL\\.ssh\\dgx_edgexpert",
+      "probe": {
+        "elapsed_seconds": 0.576734,
+        "returncode": 0,
+        "stderr": "",
+        "stdout": "edgexpert-f2d3"
+      },
+      "reachable": true
+    },
+    "docker": {
+      "image_count": 9,
+      "images": [
+        {
+          "Containers": "0",
+          "CreatedAt": "2026-04-16 05:01:40 +0900 KST",
+          "CreatedSince": "3 months ago",
+          "Digest": "<none>",
+          "ID": "sha256:5b10f432ef3da1b8d4c7eb6c487f2f5a8f096bc91145e68878dd4a5019afde11",
+          "Repository": "alpine",
+          "SharedSize": "N/A",
+          "Size": "13.1MB",
+          "Tag": "latest",
+          "UniqueSize": "N/A"
+        },
+        {
+          "Containers": "2",
+          "CreatedAt": "2026-05-05 10:49:45 +0900 KST",
+          "CreatedSince": "2 months ago",
+          "Digest": "<none>",
+          "ID": "sha256:1e0b73a187a28757c572acba508c46f48c9e8b0acaf5c20e6d95cdedce1acdf6",
+          "Repository": "chromadb/chroma",
+          "SharedSize": "N/A",
+          "Size": "826MB",
+          "Tag": "latest",
+          "UniqueSize": "N/A"
+        },
+        {
+          "Containers": "2",
+          "CreatedAt": "2026-06-10 21:50:48 +0900 KST",
+          "CreatedSince": "5 weeks ago",
+          "Digest": "<none>",
+          "ID": "sha256:0d793d4b249a9cf0837faa9f30fea1b86fb50086fc8aa21e9447078a07f995bc",
+          "Repository": "falkordb/falkordb",
+          "SharedSize": "N/A",
+          "Size": "600MB",
+          "Tag": "latest",
+          "UniqueSize": "N/A"
+        },
+        {
+          "Containers": "2",
+          "CreatedAt": "2026-05-12 06:54:22 +0900 KST",
+          "CreatedSince": "2 months ago",
+          "Digest": "<none>",
+          "ID": "sha256:f27aaa05476f3e7be0c7cf03988c60c97c4e95b80a2fb3c79a6b39a813e1065c",
+          "Repository": "neo4j",
+          "SharedSize": "N/A",
+          "Size": "958MB",
+          "Tag": "5",
+          "UniqueSize": "N/A"
+        },
+        {
+          "Containers": "1",
+          "CreatedAt": "2026-05-15 04:02:53 +0900 KST",
+          "CreatedSince": "2 months ago",
+          "Digest": "<none>",
+          "ID": "sha256:ff23cdce56cac62ada6f66013e1a50864c0abbe79d132d40b6e05bd80f378a70",
+          "Repository": "postgres",
+          "SharedSize": "N/A",
+          "Size": "642MB",
+          "Tag": "16",
+          "UniqueSize": "N/A"
+        },
+        {
+          "Containers": "1",
+          "CreatedAt": "2026-05-15 04:03:47 +0900 KST",
+          "CreatedSince": "2 months ago",
+          "Digest": "<none>",
+          "ID": "sha256:16bc17c64a573ef34162af9298258d1aec548232985b33ed7b1eac33ba35c229",
+          "Repository": "postgres",
+          "SharedSize": "N/A",
+          "Size": "396MB",
+          "Tag": "16-alpine",
+          "UniqueSize": "N/A"
+        },
+        {
+          "Containers": "0",
+          "CreatedAt": "2026-05-20 12:01:24 +0900 KST",
+          "CreatedSince": "8 weeks ago",
+          "Digest": "<none>",
+          "ID": "sha256:5b4cd1450900015d505c9801bf953922bc4cf607bfb22ee3c347a348ccccf16d",
+          "Repository": "python",
+          "SharedSize": "N/A",
+          "Size": "1.62GB",
+          "Tag": "3.12",
+          "UniqueSize": "N/A"
+        },
+        {
+          "Containers": "1",
+          "CreatedAt": "2026-05-20 10:37:22 +0900 KST",
+          "CreatedSince": "8 weeks ago",
+          "Digest": "<none>",
+          "ID": "sha256:786a8b558f7be160c6c8c4a54f9a57274f3b4fb1491cf65146521ae77ff1dc54",
+          "Repository": "ubuntu",
+          "SharedSize": "N/A",
+          "Size": "119MB",
+          "Tag": "24.04",
+          "UniqueSize": "N/A"
+        },
+        {
+          "Containers": "0",
+          "CreatedAt": "2026-05-13 07:36:09 +0900 KST",
+          "CreatedSince": "2 months ago",
+          "Digest": "<none>",
+          "ID": "sha256:912f6ea95693158a36b15f0e626e57cf1d2e962cb5bb700ca51a06e8798e7e62",
+          "Repository": "us-docker.pkg.dev/gemini-code-dev/gemini-cli/sandbox",
+          "SharedSize": "N/A",
+          "Size": "1.81GB",
+          "Tag": "0.42.0",
+          "UniqueSize": "N/A"
+        }
+      ],
+      "parse_errors": [],
+      "probe": {
+        "elapsed_seconds": 0.175301,
+        "returncode": 0,
+        "stderr": ""
+      }
+    },
+    "gpu": {
+      "gpus": [
+        {
+          "driver_version": "591.86",
+          "memory_total_mib": "16303",
+          "name": "NVIDIA GeForce RTX 5070 Ti",
+          "uuid": "GPU-b538d656-de3c-0d43-5bf0-afa9d0e63599"
+        }
+      ],
+      "nvidia_smi_probe": {
+        "elapsed_seconds": 0.096328,
+        "returncode": 0,
+        "stderr": "",
+        "stdout": "NVIDIA GeForce RTX 5070 Ti, GPU-b538d656-de3c-0d43-5bf0-afa9d0e63599, 591.86, 16303"
+      },
+      "rtx_5070_ti_recognized": true
+    },
+    "python": {
+      "executable": "C:\\Users\\PAUL\\AppData\\Local\\Programs\\Python\\Python312\\python.exe",
+      "implementation": "CPython",
+      "version": "3.12.10"
+    },
+    "torch": {
+      "import_attempted": true,
+      "import_elapsed_seconds": 1.417394,
+      "import_ok": true,
+      "module_spec_present": true,
+      "version": "2.11.0+cu128"
+    }
+  },
+  "execution": {
+    "collection_elapsed_seconds": 35.094313,
+    "collection_errors": [],
+    "content_boundaries": {
+      "cubicasa_payloads_parsed": false,
+      "gen2_truth_payloads_parsed": false,
+      "model_executed": false,
+      "score_bearing_result_objects_parsed_wholesale": false
+    },
+    "git_commands_used_by_collector": false,
+    "output_directory": "D:\\runs\\e2_program\\cells\\g0a_inventory",
+    "protocol_breaches": [
+      "Discovery search exposed snippets from synthetic gen2 truth JSON before collector execution; no model score, threshold, or label statistic was computed, and no collected value depends on those snippets."
+    ],
+    "protocol_status": "INVALID_PROTOCOL_BREACH",
+    "repository_writes_by_collector": false,
+    "snapshot_utc": "2026-07-18T17:13:48+00:00"
+  },
+  "family_manifests": {
+    "baseline_freeze": {
+      "extraction": "only the named family_audit JSON value was decoded",
+      "family_audit": {
+        "drawing_id_collision_count": 0,
+        "drawing_id_collision_examples": [],
+        "family_collision_count": 4,
+        "family_definition": "drawing_id OR SHA-256 of endpoint-order-invariant segment geometry normalized for translation, global scale, rotation, and reflection; coordinates quantized to 1/1000 max-bbox span",
+        "geometry_cross_fold_drawing_pair_count": 4,
+        "geometry_family_collision_count": 4,
+        "geometry_family_collision_examples": [
+          {
+            "family_fingerprint": "006fb2efe92d10b62641a861353c0ace658240c78c7c931c14a0a7faad9d364d",
+            "train_drawing_ids": [
+              "high_quality_architectural_1216"
+            ],
+            "val_drawing_ids": [
+              "high_quality_architectural_1186"
+            ]
+          },
+          {
+            "family_fingerprint": "11ec5147b24b7cfbd5ed13893efda9abaf2708859f372b2882ce9a074d2ef8d2",
+            "train_drawing_ids": [
+              "high_quality_architectural_1860"
+            ],
+            "val_drawing_ids": [
+              "high_quality_architectural_642"
+            ]
+          },
+          {
+            "family_fingerprint": "1f89e7784c3937f1cbc94e2d985f7203b15bb68be122c3fddc1bf75b34038113",
+            "train_drawing_ids": [
+              "high_quality_architectural_194"
+            ],
+            "val_drawing_ids": [
+              "high_quality_architectural_575"
+            ]
+          },
+          {
+            "family_fingerprint": "34aba6e680c2b74b4d826e28b15282f4347a53a671c8ffdf624386b7c31abb09",
+            "train_drawing_ids": [
+              "high_quality_4011"
+            ],
+            "val_drawing_ids": [
+              "high_quality_3750"
+            ]
+          }
+        ],
+        "within_train_duplicate_family_count": 10,
+        "within_val_duplicate_family_count": 0
+      },
+      "source_path": "D:\\runs\\e2_program\\cells\\baseline_freeze\\results.json",
+      "source_sha256": "7a696ff08c0a78c8b9db5f85ef5b5ece4dcc5ded40a664efe6564af36d65eab7",
+      "status": "FOUND"
+    },
+    "bstar_repair": {
+      "extraction": "only the named repaired_split_hash JSON value was decoded",
+      "repaired_split_hash": "7e34d7301d888c822861cf1dfa1c5ee13e95b451824175cae563fd2a7c215db5",
+      "source_path": "D:\\runs\\e2_program\\cells\\bstar_repair\\bstar_manifest_v2.json",
+      "source_sha256": "eb7446537d9477aca636815ab9a4add660c487af772455cb355143bff8eae312",
+      "status": "FOUND"
+    }
+  },
+  "in_flight_ledger": {
+    "cells": [
+      {
+        "cell": "baseline_freeze",
+        "completion_marker_present": true,
+        "elapsed_records": [],
+        "file_count": 20,
+        "outputs": [
+          {
+            "bytes": 92695736,
+            "relative_path": "_work/context6_train.npy"
+          },
+          {
+            "bytes": 8495000,
+            "relative_path": "_work/context6_val.npy"
+          },
+          {
+            "bytes": 968007,
+            "relative_path": "_work/extraction_meta.json"
+          },
+          {
+            "bytes": 30898664,
+            "relative_path": "_work/layer_name2_train.npy"
+          },
+          {
+            "bytes": 2831752,
+            "relative_path": "_work/layer_name2_val.npy"
+          },
+          {
+            "bytes": 216289880,
+            "relative_path": "_work/leaky_design_train.npy"
+          },
+          {
+            "bytes": 19821496,
+            "relative_path": "_work/leaky_design_val.npy"
+          },
+          {
+            "bytes": 185391344,
+            "relative_path": "_work/p2b_design_train.npy"
+          },
+          {
+            "bytes": 16989872,
+            "relative_path": "_work/p2b_design_val.npy"
+          },
+          {
+            "bytes": 52228,
+            "relative_path": "baseline_freeze.py"
+          },
+          {
+            "bytes": 5731,
+            "relative_path": "bstar_manifest.json"
+          },
+          {
+            "bytes": 496895,
+            "relative_path": "bstar_model.joblib"
+          },
+          {
+            "bytes": 17982,
+            "relative_path": "evidence.xlsx"
+          },
+          {
+            "bytes": 45628,
+            "relative_path": "evidence_rows.json"
+          },
+          {
+            "bytes": 0,
+            "relative_path": "extract.stderr.log"
+          },
+          {
+            "bytes": 1455,
+            "relative_path": "extract.stdout.log"
+          },
+          {
+            "bytes": 0,
+            "relative_path": "model.stderr.log"
+          },
+          {
+            "bytes": 1294,
+            "relative_path": "model.stdout.log"
+          },
+          {
+            "bytes": 2273,
+            "relative_path": "REPORT.md"
+          },
+          {
+            "bytes": 49908,
+            "relative_path": "results.json"
+          }
+        ],
+        "report_exists": true,
+        "report_status_markers": [
+          {
+            "line": 54,
+            "marker": "CELL_COMPLETE",
+            "value": "baseline_freeze"
+          }
+        ],
+        "standalone_marker_files": [],
+        "total_bytes": 575055145,
+        "walk_errors": []
+      },
+      {
+        "cell": "bstar_repair",
+        "completion_marker_present": true,
+        "elapsed_records": [],
+        "file_count": 4,
+        "outputs": [
+          {
+            "bytes": 6492,
+            "relative_path": "bstar_manifest_v2.json"
+          },
+          {
+            "bytes": 53668,
+            "relative_path": "bstar_repair.py"
+          },
+          {
+            "bytes": 3924,
+            "relative_path": "REPORT.md"
+          },
+          {
+            "bytes": 117162,
+            "relative_path": "results_v2.json"
+          }
+        ],
+        "report_exists": true,
+        "report_status_markers": [
+          {
+            "line": 96,
+            "marker": "CELL_COMPLETE",
+            "value": "bstar_repair"
+          }
+        ],
+        "standalone_marker_files": [],
+        "total_bytes": 181246,
+        "walk_errors": []
+      },
+      {
+        "cell": "cml_ctx",
+        "completion_marker_present": false,
+        "elapsed_records": [],
+        "file_count": 4,
+        "outputs": [
+          {
+            "bytes": 34736,
+            "relative_path": "cml_ctx.py"
+          },
+          {
+            "bytes": 6869,
+            "relative_path": "evidence.xlsx"
+          },
+          {
+            "bytes": 3187,
+            "relative_path": "REPORT.md"
+          },
+          {
+            "bytes": 16899,
+            "relative_path": "results.json"
+          }
+        ],
+        "report_exists": true,
+        "report_status_markers": [],
+        "standalone_marker_files": [],
+        "total_bytes": 61691,
+        "walk_errors": []
+      },
+      {
+        "cell": "feyerabend_c0",
+        "completion_marker_present": true,
+        "elapsed_records": [],
+        "file_count": 203,
+        "outputs": [
+          {
+            "bytes": 5867,
+            "relative_path": "coverage_numbers.json"
+          },
+          {
+            "bytes": 65232,
+            "relative_path": "feyerabend_c0.py"
+          },
+          {
+            "bytes": 9007,
+            "relative_path": "REPORT.md"
+          },
+          {
+            "bytes": 73918,
+            "relative_path": "scenes/scene_000_k0p001.json"
+          },
+          {
+            "bytes": 73862,
+            "relative_path": "scenes/scene_000_k0p01.json"
+          },
+          {
+            "bytes": 73908,
+            "relative_path": "scenes/scene_000_k1.json"
+          },
+          {
+            "bytes": 76018,
+            "relative_path": "scenes/scene_000_k1000.json"
+          },
+          {
+            "bytes": 74896,
+            "relative_path": "scenes/scene_001_k0p001.json"
+          },
+          {
+            "bytes": 76142,
+            "relative_path": "scenes/scene_001_k0p01.json"
+          },
+          {
+            "bytes": 75731,
+            "relative_path": "scenes/scene_001_k1.json"
+          },
+          {
+            "bytes": 77846,
+            "relative_path": "scenes/scene_001_k1000.json"
+          },
+          {
+            "bytes": 73069,
+            "relative_path": "scenes/scene_002_k0p001.json"
+          },
+          {
+            "bytes": 73370,
+            "relative_path": "scenes/scene_002_k0p01.json"
+          },
+          {
+            "bytes": 74112,
+            "relative_path": "scenes/scene_002_k1.json"
+          },
+          {
+            "bytes": 76224,
+            "relative_path": "scenes/scene_002_k1000.json"
+          },
+          {
+            "bytes": 72652,
+            "relative_path": "scenes/scene_003_k0p001.json"
+          },
+          {
+            "bytes": 73089,
+            "relative_path": "scenes/scene_003_k0p01.json"
+          },
+          {
+            "bytes": 73010,
+            "relative_path": "scenes/scene_003_k1.json"
+          },
+          {
+            "bytes": 75057,
+            "relative_path": "scenes/scene_003_k1000.json"
+          },
+          {
+            "bytes": 72768,
+            "relative_path": "scenes/scene_004_k0p001.json"
+          },
+          {
+            "bytes": 72806,
+            "relative_path": "scenes/scene_004_k0p01.json"
+          },
+          {
+            "bytes": 73232,
+            "relative_path": "scenes/scene_004_k1.json"
+          },
+          {
+            "bytes": 75282,
+            "relative_path": "scenes/scene_004_k1000.json"
+          },
+          {
+            "bytes": 73021,
+            "relative_path": "scenes/scene_005_k0p001.json"
+          },
+          {
+            "bytes": 73555,
+            "relative_path": "scenes/scene_005_k0p01.json"
+          },
+          {
+            "bytes": 73528,
+            "relative_path": "scenes/scene_005_k1.json"
+          },
+          {
+            "bytes": 75589,
+            "relative_path": "scenes/scene_005_k1000.json"
+          },
+          {
+            "bytes": 73808,
+            "relative_path": "scenes/scene_006_k0p001.json"
+          },
+          {
+            "bytes": 74843,
+            "relative_path": "scenes/scene_006_k0p01.json"
+          },
+          {
+            "bytes": 74390,
+            "relative_path": "scenes/scene_006_k1.json"
+          },
+          {
+            "bytes": 76494,
+            "relative_path": "scenes/scene_006_k1000.json"
+          },
+          {
+            "bytes": 72901,
+            "relative_path": "scenes/scene_007_k0p001.json"
+          },
+          {
+            "bytes": 72688,
+            "relative_path": "scenes/scene_007_k0p01.json"
+          },
+          {
+            "bytes": 73444,
+            "relative_path": "scenes/scene_007_k1.json"
+          },
+          {
+            "bytes": 75513,
+            "relative_path": "scenes/scene_007_k1000.json"
+          },
+          {
+            "bytes": 73745,
+            "relative_path": "scenes/scene_008_k0p001.json"
+          },
+          {
+            "bytes": 74475,
+            "relative_path": "scenes/scene_008_k0p01.json"
+          },
+          {
+            "bytes": 74426,
+            "relative_path": "scenes/scene_008_k1.json"
+          },
+          {
+            "bytes": 76524,
+            "relative_path": "scenes/scene_008_k1000.json"
+          },
+          {
+            "bytes": 72621,
+            "relative_path": "scenes/scene_009_k0p001.json"
+          },
+          {
+            "bytes": 73262,
+            "relative_path": "scenes/scene_009_k0p01.json"
+          },
+          {
+            "bytes": 73556,
+            "relative_path": "scenes/scene_009_k1.json"
+          },
+          {
+            "bytes": 75625,
+            "relative_path": "scenes/scene_009_k1000.json"
+          },
+          {
+            "bytes": 73918,
+            "relative_path": "scenes/scene_010_k0p001.json"
+          },
+          {
+            "bytes": 74726,
+            "relative_path": "scenes/scene_010_k0p01.json"
+          },
+          {
+            "bytes": 74610,
+            "relative_path": "scenes/scene_010_k1.json"
+          },
+          {
+            "bytes": 76740,
+            "relative_path": "scenes/scene_010_k1000.json"
+          },
+          {
+            "bytes": 75825,
+            "relative_path": "scenes/scene_011_k0p001.json"
+          },
+          {
+            "bytes": 75996,
+            "relative_path": "scenes/scene_011_k0p01.json"
+          },
+          {
+            "bytes": 75388,
+            "relative_path": "scenes/scene_011_k1.json"
+          },
+          {
+            "bytes": 77518,
+            "relative_path": "scenes/scene_011_k1000.json"
+          },
+          {
+            "bytes": 75684,
+            "relative_path": "scenes/scene_012_k0p001.json"
+          },
+          {
+            "bytes": 75575,
+            "relative_path": "scenes/scene_012_k0p01.json"
+          },
+          {
+            "bytes": 76172,
+            "relative_path": "scenes/scene_012_k1.json"
+          },
+          {
+            "bytes": 78343,
+            "relative_path": "scenes/scene_012_k1000.json"
+          },
+          {
+            "bytes": 74659,
+            "relative_path": "scenes/scene_013_k0p001.json"
+          },
+          {
+            "bytes": 75120,
+            "relative_path": "scenes/scene_013_k0p01.json"
+          },
+          {
+            "bytes": 75040,
+            "relative_path": "scenes/scene_013_k1.json"
+          },
+          {
+            "bytes": 77146,
+            "relative_path": "scenes/scene_013_k1000.json"
+          },
+          {
+            "bytes": 75223,
+            "relative_path": "scenes/scene_014_k0p001.json"
+          },
+          {
+            "bytes": 74818,
+            "relative_path": "scenes/scene_014_k0p01.json"
+          },
+          {
+            "bytes": 75122,
+            "relative_path": "scenes/scene_014_k1.json"
+          },
+          {
+            "bytes": 77244,
+            "relative_path": "scenes/scene_014_k1000.json"
+          },
+          {
+            "bytes": 72834,
+            "relative_path": "scenes/scene_015_k0p001.json"
+          },
+          {
+            "bytes": 73375,
+            "relative_path": "scenes/scene_015_k0p01.json"
+          },
+          {
+            "bytes": 73236,
+            "relative_path": "scenes/scene_015_k1.json"
+          },
+          {
+            "bytes": 75288,
+            "relative_path": "scenes/scene_015_k1000.json"
+          },
+          {
+            "bytes": 73884,
+            "relative_path": "scenes/scene_016_k0p001.json"
+          },
+          {
+            "bytes": 74909,
+            "relative_path": "scenes/scene_016_k0p01.json"
+          },
+          {
+            "bytes": 74483,
+            "relative_path": "scenes/scene_016_k1.json"
+          },
+          {
+            "bytes": 76580,
+            "relative_path": "scenes/scene_016_k1000.json"
+          },
+          {
+            "bytes": 73700,
+            "relative_path": "scenes/scene_017_k0p001.json"
+          },
+          {
+            "bytes": 73751,
+            "relative_path": "scenes/scene_017_k0p01.json"
+          },
+          {
+            "bytes": 74426,
+            "relative_path": "scenes/scene_017_k1.json"
+          },
+          {
+            "bytes": 76527,
+            "relative_path": "scenes/scene_017_k1000.json"
+          },
+          {
+            "bytes": 74259,
+            "relative_path": "scenes/scene_018_k0p001.json"
+          },
+          {
+            "bytes": 74804,
+            "relative_path": "scenes/scene_018_k0p01.json"
+          },
+          {
+            "bytes": 74809,
+            "relative_path": "scenes/scene_018_k1.json"
+          },
+          {
+            "bytes": 76941,
+            "relative_path": "scenes/scene_018_k1000.json"
+          },
+          {
+            "bytes": 72292,
+            "relative_path": "scenes/scene_019_k0p001.json"
+          },
+          {
+            "bytes": 72719,
+            "relative_path": "scenes/scene_019_k0p01.json"
+          },
+          {
+            "bytes": 73071,
+            "relative_path": "scenes/scene_019_k1.json"
+          },
+          {
+            "bytes": 75122,
+            "relative_path": "scenes/scene_019_k1000.json"
+          },
+          {
+            "bytes": 73309,
+            "relative_path": "scenes/scene_020_k0p001.json"
+          },
+          {
+            "bytes": 72696,
+            "relative_path": "scenes/scene_020_k0p01.json"
+          },
+          {
+            "bytes": 72727,
+            "relative_path": "scenes/scene_020_k1.json"
+          },
+          {
+            "bytes": 74775,
+            "relative_path": "scenes/scene_020_k1000.json"
+          },
+          {
+            "bytes": 72885,
+            "relative_path": "scenes/scene_021_k0p001.json"
+          },
+          {
+            "bytes": 72310,
+            "relative_path": "scenes/scene_021_k0p01.json"
+          },
+          {
+            "bytes": 71860,
+            "relative_path": "scenes/scene_021_k1.json"
+          },
+          {
+            "bytes": 73905,
+            "relative_path": "scenes/scene_021_k1000.json"
+          },
+          {
+            "bytes": 75868,
+            "relative_path": "scenes/scene_022_k0p001.json"
+          },
+          {
+            "bytes": 73482,
+            "relative_path": "scenes/scene_022_k0p01.json"
+          },
+          {
+            "bytes": 74251,
+            "relative_path": "scenes/scene_022_k1.json"
+          },
+          {
+            "bytes": 76353,
+            "relative_path": "scenes/scene_022_k1000.json"
+          },
+          {
+            "bytes": 74247,
+            "relative_path": "scenes/scene_023_k0p001.json"
+          },
+          {
+            "bytes": 73800,
+            "relative_path": "scenes/scene_023_k0p01.json"
+          },
+          {
+            "bytes": 73588,
+            "relative_path": "scenes/scene_023_k1.json"
+          },
+          {
+            "bytes": 75669,
+            "relative_path": "scenes/scene_023_k1000.json"
+          },
+          {
+            "bytes": 75152,
+            "relative_path": "scenes/scene_024_k0p001.json"
+          },
+          {
+            "bytes": 73849,
+            "relative_path": "scenes/scene_024_k0p01.json"
+          },
+          {
+            "bytes": 74246,
+            "relative_path": "scenes/scene_024_k1.json"
+          },
+          {
+            "bytes": 76354,
+            "relative_path": "scenes/scene_024_k1000.json"
+          },
+          {
+            "bytes": 73932,
+            "relative_path": "scenes/scene_025_k0p001.json"
+          },
+          {
+            "bytes": 73869,
+            "relative_path": "scenes/scene_025_k0p01.json"
+          },
+          {
+            "bytes": 73854,
+            "relative_path": "scenes/scene_025_k1.json"
+          },
+          {
+            "bytes": 75927,
+            "relative_path": "scenes/scene_025_k1000.json"
+          },
+          {
+            "bytes": 73400,
+            "relative_path": "scenes/scene_026_k0p001.json"
+          },
+          {
+            "bytes": 74729,
+            "relative_path": "scenes/scene_026_k0p01.json"
+          },
+          {
+            "bytes": 74280,
+            "relative_path": "scenes/scene_026_k1.json"
+          },
+          {
+            "bytes": 76382,
+            "relative_path": "scenes/scene_026_k1000.json"
+          },
+          {
+            "bytes": 73134,
+            "relative_path": "scenes/scene_027_k0p001.json"
+          },
+          {
+            "bytes": 73384,
+            "relative_path": "scenes/scene_027_k0p01.json"
+          },
+          {
+            "bytes": 74090,
+            "relative_path": "scenes/scene_027_k1.json"
+          },
+          {
+            "bytes": 76185,
+            "relative_path": "scenes/scene_027_k1000.json"
+          },
+          {
+            "bytes": 75881,
+            "relative_path": "scenes/scene_028_k0p001.json"
+          },
+          {
+            "bytes": 76367,
+            "relative_path": "scenes/scene_028_k0p01.json"
+          },
+          {
+            "bytes": 76327,
+            "relative_path": "scenes/scene_028_k1.json"
+          },
+          {
+            "bytes": 78492,
+            "relative_path": "scenes/scene_028_k1000.json"
+          },
+          {
+            "bytes": 74714,
+            "relative_path": "scenes/scene_029_k0p001.json"
+          },
+          {
+            "bytes": 74731,
+            "relative_path": "scenes/scene_029_k0p01.json"
+          },
+          {
+            "bytes": 75125,
+            "relative_path": "scenes/scene_029_k1.json"
+          },
+          {
+            "bytes": 77249,
+            "relative_path": "scenes/scene_029_k1000.json"
+          },
+          {
+            "bytes": 74786,
+            "relative_path": "scenes/scene_030_k0p001.json"
+          },
+          {
+            "bytes": 75329,
+            "relative_path": "scenes/scene_030_k0p01.json"
+          },
+          {
+            "bytes": 75365,
+            "relative_path": "scenes/scene_030_k1.json"
+          },
+          {
+            "bytes": 77511,
+            "relative_path": "scenes/scene_030_k1000.json"
+          },
+          {
+            "bytes": 73548,
+            "relative_path": "scenes/scene_031_k0p001.json"
+          },
+          {
+            "bytes": 74625,
+            "relative_path": "scenes/scene_031_k0p01.json"
+          },
+          {
+            "bytes": 74113,
+            "relative_path": "scenes/scene_031_k1.json"
+          },
+          {
+            "bytes": 76180,
+            "relative_path": "scenes/scene_031_k1000.json"
+          },
+          {
+            "bytes": 73360,
+            "relative_path": "scenes/scene_032_k0p001.json"
+          },
+          {
+            "bytes": 73051,
+            "relative_path": "scenes/scene_032_k0p01.json"
+          },
+          {
+            "bytes": 73816,
+            "relative_path": "scenes/scene_032_k1.json"
+          },
+          {
+            "bytes": 75906,
+            "relative_path": "scenes/scene_032_k1000.json"
+          },
+          {
+            "bytes": 73190,
+            "relative_path": "scenes/scene_033_k0p001.json"
+          },
+          {
+            "bytes": 73624,
+            "relative_path": "scenes/scene_033_k0p01.json"
+          },
+          {
+            "bytes": 73604,
+            "relative_path": "scenes/scene_033_k1.json"
+          },
+          {
+            "bytes": 75671,
+            "relative_path": "scenes/scene_033_k1000.json"
+          },
+          {
+            "bytes": 74031,
+            "relative_path": "scenes/scene_034_k0p001.json"
+          },
+          {
+            "bytes": 74602,
+            "relative_path": "scenes/scene_034_k0p01.json"
+          },
+          {
+            "bytes": 74951,
+            "relative_path": "scenes/scene_034_k1.json"
+          },
+          {
+            "bytes": 77083,
+            "relative_path": "scenes/scene_034_k1000.json"
+          },
+          {
+            "bytes": 73784,
+            "relative_path": "scenes/scene_035_k0p001.json"
+          },
+          {
+            "bytes": 74550,
+            "relative_path": "scenes/scene_035_k0p01.json"
+          },
+          {
+            "bytes": 74426,
+            "relative_path": "scenes/scene_035_k1.json"
+          },
+          {
+            "bytes": 76530,
+            "relative_path": "scenes/scene_035_k1000.json"
+          },
+          {
+            "bytes": 73447,
+            "relative_path": "scenes/scene_036_k0p001.json"
+          },
+          {
+            "bytes": 73593,
+            "relative_path": "scenes/scene_036_k0p01.json"
+          },
+          {
+            "bytes": 73027,
+            "relative_path": "scenes/scene_036_k1.json"
+          },
+          {
+            "bytes": 75115,
+            "relative_path": "scenes/scene_036_k1000.json"
+          },
+          {
+            "bytes": 71780,
+            "relative_path": "scenes/scene_037_k0p001.json"
+          },
+          {
+            "bytes": 71660,
+            "relative_path": "scenes/scene_037_k0p01.json"
+          },
+          {
+            "bytes": 72269,
+            "relative_path": "scenes/scene_037_k1.json"
+          },
+          {
+            "bytes": 74288,
+            "relative_path": "scenes/scene_037_k1000.json"
+          },
+          {
+            "bytes": 73429,
+            "relative_path": "scenes/scene_038_k0p001.json"
+          },
+          {
+            "bytes": 73990,
+            "relative_path": "scenes/scene_038_k0p01.json"
+          },
+          {
+            "bytes": 73917,
+            "relative_path": "scenes/scene_038_k1.json"
+          },
+          {
+            "bytes": 76004,
+            "relative_path": "scenes/scene_038_k1000.json"
+          },
+          {
+            "bytes": 73915,
+            "relative_path": "scenes/scene_039_k0p001.json"
+          },
+          {
+            "bytes": 73429,
+            "relative_path": "scenes/scene_039_k0p01.json"
+          },
+          {
+            "bytes": 73827,
+            "relative_path": "scenes/scene_039_k1.json"
+          },
+          {
+            "bytes": 75898,
+            "relative_path": "scenes/scene_039_k1000.json"
+          },
+          {
+            "bytes": 73443,
+            "relative_path": "scenes/scene_040_k0p001.json"
+          },
+          {
+            "bytes": 73867,
+            "relative_path": "scenes/scene_040_k0p01.json"
+          },
+          {
+            "bytes": 73887,
+            "relative_path": "scenes/scene_040_k1.json"
+          },
+          {
+            "bytes": 75983,
+            "relative_path": "scenes/scene_040_k1000.json"
+          },
+          {
+            "bytes": 73225,
+            "relative_path": "scenes/scene_041_k0p001.json"
+          },
+          {
+            "bytes": 74323,
+            "relative_path": "scenes/scene_041_k0p01.json"
+          },
+          {
+            "bytes": 73861,
+            "relative_path": "scenes/scene_041_k1.json"
+          },
+          {
+            "bytes": 75924,
+            "relative_path": "scenes/scene_041_k1000.json"
+          },
+          {
+            "bytes": 73892,
+            "relative_path": "scenes/scene_042_k0p001.json"
+          },
+          {
+            "bytes": 73750,
+            "relative_path": "scenes/scene_042_k0p01.json"
+          },
+          {
+            "bytes": 74523,
+            "relative_path": "scenes/scene_042_k1.json"
+          },
+          {
+            "bytes": 76619,
+            "relative_path": "scenes/scene_042_k1000.json"
+          },
+          {
+            "bytes": 73897,
+            "relative_path": "scenes/scene_043_k0p001.json"
+          },
+          {
+            "bytes": 74352,
+            "relative_path": "scenes/scene_043_k0p01.json"
+          },
+          {
+            "bytes": 74294,
+            "relative_path": "scenes/scene_043_k1.json"
+          },
+          {
+            "bytes": 76379,
+            "relative_path": "scenes/scene_043_k1000.json"
+          },
+          {
+            "bytes": 75323,
+            "relative_path": "scenes/scene_044_k0p001.json"
+          },
+          {
+            "bytes": 75788,
+            "relative_path": "scenes/scene_044_k0p01.json"
+          },
+          {
+            "bytes": 76113,
+            "relative_path": "scenes/scene_044_k1.json"
+          },
+          {
+            "bytes": 78261,
+            "relative_path": "scenes/scene_044_k1000.json"
+          },
+          {
+            "bytes": 75956,
+            "relative_path": "scenes/scene_045_k0p001.json"
+          },
+          {
+            "bytes": 75405,
+            "relative_path": "scenes/scene_045_k0p01.json"
+          },
+          {
+            "bytes": 75349,
+            "relative_path": "scenes/scene_045_k1.json"
+          },
+          {
+            "bytes": 77480,
+            "relative_path": "scenes/scene_045_k1000.json"
+          },
+          {
+            "bytes": 77437,
+            "relative_path": "scenes/scene_046_k0p001.json"
+          },
+          {
+            "bytes": 76759,
+            "relative_path": "scenes/scene_046_k0p01.json"
+          },
+          {
+            "bytes": 76333,
+            "relative_path": "scenes/scene_046_k1.json"
+          },
+          {
+            "bytes": 78490,
+            "relative_path": "scenes/scene_046_k1000.json"
+          },
+          {
+            "bytes": 76444,
+            "relative_path": "scenes/scene_047_k0p001.json"
+          },
+          {
+            "bytes": 74087,
+            "relative_path": "scenes/scene_047_k0p01.json"
+          },
+          {
+            "bytes": 74836,
+            "relative_path": "scenes/scene_047_k1.json"
+          },
+          {
+            "bytes": 76941,
+            "relative_path": "scenes/scene_047_k1000.json"
+          },
+          {
+            "bytes": 75618,
+            "relative_path": "scenes/scene_048_k0p001.json"
+          },
+          {
+            "bytes": 75067,
+            "relative_path": "scenes/scene_048_k0p01.json"
+          },
+          {
+            "bytes": 75042,
+            "relative_path": "scenes/scene_048_k1.json"
+          },
+          {
+            "bytes": 77132,
+            "relative_path": "scenes/scene_048_k1000.json"
+          },
+          {
+            "bytes": 74388,
+            "relative_path": "scenes/scene_049_k0p001.json"
+          },
+          {
+            "bytes": 73154,
+            "relative_path": "scenes/scene_049_k0p01.json"
+          },
+          {
+            "bytes": 73517,
+            "relative_path": "scenes/scene_049_k1.json"
+          },
+          {
+            "bytes": 75584,
+            "relative_path": "scenes/scene_049_k1000.json"
+          }
+        ],
+        "report_exists": true,
+        "report_status_markers": [
+          {
+            "line": 290,
+            "marker": "CELL_COMPLETE",
+            "value": "feyerabend_c0"
+          }
+        ],
+        "standalone_marker_files": [],
+        "total_bytes": 15022308,
+        "walk_errors": []
+      },
+      {
+        "cell": "feyerabend_c1",
+        "completion_marker_present": true,
+        "elapsed_records": [
+          {
+            "key": "elapsed_cpu_seconds",
+            "line": 35,
+            "unit": "seconds",
+            "value": "0.953125"
+          },
+          {
+            "key": "elapsed_wall_seconds",
+            "line": 36,
+            "unit": "seconds",
+            "value": "0.990569200003"
+          }
+        ],
+        "file_count": 4,
+        "outputs": [
+          {
+            "bytes": 11609,
+            "relative_path": "evidence.xlsx"
+          },
+          {
+            "bytes": 67267,
+            "relative_path": "feyerabend_c1.py"
+          },
+          {
+            "bytes": 8860,
+            "relative_path": "REPORT.md"
+          },
+          {
+            "bytes": 1314502,
+            "relative_path": "results.json"
+          }
+        ],
+        "report_exists": true,
+        "report_status_markers": [
+          {
+            "line": 146,
+            "marker": "CELL_COMPLETE",
+            "value": "feyerabend_c1"
+          }
+        ],
+        "standalone_marker_files": [],
+        "total_bytes": 1402238,
+        "walk_errors": []
+      },
+      {
+        "cell": "fidelity_full",
+        "completion_marker_present": true,
+        "elapsed_records": [],
+        "file_count": 310,
+        "outputs": [
+          {
+            "bytes": 2677,
+            "relative_path": "_throughput_sample.json"
+          },
+          {
+            "bytes": 12297,
+            "relative_path": "fidelity_numbers.json"
+          },
+          {
+            "bytes": 572756,
+            "relative_path": "packs/F/0000.dxf"
+          },
+          {
+            "bytes": 7008,
+            "relative_path": "packs/F/0000.truth.json"
+          },
+          {
+            "bytes": 572774,
+            "relative_path": "packs/F/0001.dxf"
+          },
+          {
+            "bytes": 7008,
+            "relative_path": "packs/F/0001.truth.json"
+          },
+          {
+            "bytes": 572782,
+            "relative_path": "packs/F/0002.dxf"
+          },
+          {
+            "bytes": 7008,
+            "relative_path": "packs/F/0002.truth.json"
+          },
+          {
+            "bytes": 572752,
+            "relative_path": "packs/F/0003.dxf"
+          },
+          {
+            "bytes": 7008,
+            "relative_path": "packs/F/0003.truth.json"
+          },
+          {
+            "bytes": 572726,
+            "relative_path": "packs/F/0004.dxf"
+          },
+          {
+            "bytes": 7008,
+            "relative_path": "packs/F/0004.truth.json"
+          },
+          {
+            "bytes": 572806,
+            "relative_path": "packs/F/0005.dxf"
+          },
+          {
+            "bytes": 7008,
+            "relative_path": "packs/F/0005.truth.json"
+          },
+          {
+            "bytes": 572768,
+            "relative_path": "packs/F/0006.dxf"
+          },
+          {
+            "bytes": 7008,
+            "relative_path": "packs/F/0006.truth.json"
+          },
+          {
+            "bytes": 572848,
+            "relative_path": "packs/F/0007.dxf"
+          },
+          {
+            "bytes": 7008,
+            "relative_path": "packs/F/0007.truth.json"
+          },
+          {
+            "bytes": 572756,
+            "relative_path": "packs/F/0008.dxf"
+          },
+          {
+            "bytes": 7008,
+            "relative_path": "packs/F/0008.truth.json"
+          },
+          {
+            "bytes": 572796,
+            "relative_path": "packs/F/0009.dxf"
+          },
+          {
+            "bytes": 7008,
+            "relative_path": "packs/F/0009.truth.json"
+          },
+          {
+            "bytes": 572750,
+            "relative_path": "packs/F/0010.dxf"
+          },
+          {
+            "bytes": 7008,
+            "relative_path": "packs/F/0010.truth.json"
+          },
+          {
+            "bytes": 572738,
+            "relative_path": "packs/F/0011.dxf"
+          },
+          {
+            "bytes": 7008,
+            "relative_path": "packs/F/0011.truth.json"
+          },
+          {
+            "bytes": 572764,
+            "relative_path": "packs/F/0012.dxf"
+          },
+          {
+            "bytes": 7008,
+            "relative_path": "packs/F/0012.truth.json"
+          },
+          {
+            "bytes": 572792,
+            "relative_path": "packs/F/0013.dxf"
+          },
+          {
+            "bytes": 7008,
+            "relative_path": "packs/F/0013.truth.json"
+          },
+          {
+            "bytes": 572766,
+            "relative_path": "packs/F/0014.dxf"
+          },
+          {
+            "bytes": 7008,
+            "relative_path": "packs/F/0014.truth.json"
+          },
+          {
+            "bytes": 572802,
+            "relative_path": "packs/F/0015.dxf"
+          },
+          {
+            "bytes": 7008,
+            "relative_path": "packs/F/0015.truth.json"
+          },
+          {
+            "bytes": 572732,
+            "relative_path": "packs/F/0016.dxf"
+          },
+          {
+            "bytes": 7008,
+            "relative_path": "packs/F/0016.truth.json"
+          },
+          {
+            "bytes": 572754,
+            "relative_path": "packs/F/0017.dxf"
+          },
+          {
+            "bytes": 7008,
+            "relative_path": "packs/F/0017.truth.json"
+          },
+          {
+            "bytes": 572744,
+            "relative_path": "packs/F/0018.dxf"
+          },
+          {
+            "bytes": 7008,
+            "relative_path": "packs/F/0018.truth.json"
+          },
+          {
+            "bytes": 572742,
+            "relative_path": "packs/F/0019.dxf"
+          },
+          {
+            "bytes": 7008,
+            "relative_path": "packs/F/0019.truth.json"
+          },
+          {
+            "bytes": 572758,
+            "relative_path": "packs/F/0020.dxf"
+          },
+          {
+            "bytes": 7008,
+            "relative_path": "packs/F/0020.truth.json"
+          },
+          {
+            "bytes": 572796,
+            "relative_path": "packs/F/0021.dxf"
+          },
+          {
+            "bytes": 7008,
+            "relative_path": "packs/F/0021.truth.json"
+          },
+          {
+            "bytes": 572750,
+            "relative_path": "packs/F/0022.dxf"
+          },
+          {
+            "bytes": 7008,
+            "relative_path": "packs/F/0022.truth.json"
+          },
+          {
+            "bytes": 572778,
+            "relative_path": "packs/F/0023.dxf"
+          },
+          {
+            "bytes": 7008,
+            "relative_path": "packs/F/0023.truth.json"
+          },
+          {
+            "bytes": 572770,
+            "relative_path": "packs/F/0024.dxf"
+          },
+          {
+            "bytes": 7008,
+            "relative_path": "packs/F/0024.truth.json"
+          },
+          {
+            "bytes": 572756,
+            "relative_path": "packs/F/0025.dxf"
+          },
+          {
+            "bytes": 7008,
+            "relative_path": "packs/F/0025.truth.json"
+          },
+          {
+            "bytes": 572754,
+            "relative_path": "packs/F/0026.dxf"
+          },
+          {
+            "bytes": 7008,
+            "relative_path": "packs/F/0026.truth.json"
+          },
+          {
+            "bytes": 572778,
+            "relative_path": "packs/F/0027.dxf"
+          },
+          {
+            "bytes": 7008,
+            "relative_path": "packs/F/0027.truth.json"
+          },
+          {
+            "bytes": 572730,
+            "relative_path": "packs/F/0028.dxf"
+          },
+          {
+            "bytes": 7008,
+            "relative_path": "packs/F/0028.truth.json"
+          },
+          {
+            "bytes": 572744,
+            "relative_path": "packs/F/0029.dxf"
+          },
+          {
+            "bytes": 7008,
+            "relative_path": "packs/F/0029.truth.json"
+          },
+          {
+            "bytes": 572730,
+            "relative_path": "packs/F/0030.dxf"
+          },
+          {
+            "bytes": 7008,
+            "relative_path": "packs/F/0030.truth.json"
+          },
+          {
+            "bytes": 572746,
+            "relative_path": "packs/F/0031.dxf"
+          },
+          {
+            "bytes": 7008,
+            "relative_path": "packs/F/0031.truth.json"
+          },
+          {
+            "bytes": 572764,
+            "relative_path": "packs/F/0032.dxf"
+          },
+          {
+            "bytes": 7008,
+            "relative_path": "packs/F/0032.truth.json"
+          },
+          {
+            "bytes": 572768,
+            "relative_path": "packs/F/0033.dxf"
+          },
+          {
+            "bytes": 7008,
+            "relative_path": "packs/F/0033.truth.json"
+          },
+          {
+            "bytes": 572746,
+            "relative_path": "packs/F/0034.dxf"
+          },
+          {
+            "bytes": 7008,
+            "relative_path": "packs/F/0034.truth.json"
+          },
+          {
+            "bytes": 572790,
+            "relative_path": "packs/F/0035.dxf"
+          },
+          {
+            "bytes": 7008,
+            "relative_path": "packs/F/0035.truth.json"
+          },
+          {
+            "bytes": 572732,
+            "relative_path": "packs/F/0036.dxf"
+          },
+          {
+            "bytes": 7008,
+            "relative_path": "packs/F/0036.truth.json"
+          },
+          {
+            "bytes": 572762,
+            "relative_path": "packs/F/0037.dxf"
+          },
+          {
+            "bytes": 7008,
+            "relative_path": "packs/F/0037.truth.json"
+          },
+          {
+            "bytes": 572764,
+            "relative_path": "packs/F/0038.dxf"
+          },
+          {
+            "bytes": 7008,
+            "relative_path": "packs/F/0038.truth.json"
+          },
+          {
+            "bytes": 572802,
+            "relative_path": "packs/F/0039.dxf"
+          },
+          {
+            "bytes": 7008,
+            "relative_path": "packs/F/0039.truth.json"
+          },
+          {
+            "bytes": 572810,
+            "relative_path": "packs/F/0040.dxf"
+          },
+          {
+            "bytes": 7008,
+            "relative_path": "packs/F/0040.truth.json"
+          },
+          {
+            "bytes": 572792,
+            "relative_path": "packs/F/0041.dxf"
+          },
+          {
+            "bytes": 7008,
+            "relative_path": "packs/F/0041.truth.json"
+          },
+          {
+            "bytes": 572736,
+            "relative_path": "packs/F/0042.dxf"
+          },
+          {
+            "bytes": 7008,
+            "relative_path": "packs/F/0042.truth.json"
+          },
+          {
+            "bytes": 572736,
+            "relative_path": "packs/F/0043.dxf"
+          },
+          {
+            "bytes": 7008,
+            "relative_path": "packs/F/0043.truth.json"
+          },
+          {
+            "bytes": 572746,
+            "relative_path": "packs/F/0044.dxf"
+          },
+          {
+            "bytes": 7008,
+            "relative_path": "packs/F/0044.truth.json"
+          },
+          {
+            "bytes": 572734,
+            "relative_path": "packs/F/0045.dxf"
+          },
+          {
+            "bytes": 7008,
+            "relative_path": "packs/F/0045.truth.json"
+          },
+          {
+            "bytes": 572722,
+            "relative_path": "packs/F/0046.dxf"
+          },
+          {
+            "bytes": 7008,
+            "relative_path": "packs/F/0046.truth.json"
+          },
+          {
+            "bytes": 572774,
+            "relative_path": "packs/F/0047.dxf"
+          },
+          {
+            "bytes": 7008,
+            "relative_path": "packs/F/0047.truth.json"
+          },
+          {
+            "bytes": 572772,
+            "relative_path": "packs/F/0048.dxf"
+          },
+          {
+            "bytes": 7008,
+            "relative_path": "packs/F/0048.truth.json"
+          },
+          {
+            "bytes": 572758,
+            "relative_path": "packs/F/0049.dxf"
+          },
+          {
+            "bytes": 7008,
+            "relative_path": "packs/F/0049.truth.json"
+          },
+          {
+            "bytes": 17131,
+            "relative_path": "packs/F/manifest.json"
+          },
+          {
+            "bytes": 572990,
+            "relative_path": "packs/M/0000.dxf"
+          },
+          {
+            "bytes": 7776,
+            "relative_path": "packs/M/0000.truth.json"
+          },
+          {
+            "bytes": 572978,
+            "relative_path": "packs/M/0001.dxf"
+          },
+          {
+            "bytes": 7776,
+            "relative_path": "packs/M/0001.truth.json"
+          },
+          {
+            "bytes": 572928,
+            "relative_path": "packs/M/0002.dxf"
+          },
+          {
+            "bytes": 7776,
+            "relative_path": "packs/M/0002.truth.json"
+          },
+          {
+            "bytes": 572920,
+            "relative_path": "packs/M/0003.dxf"
+          },
+          {
+            "bytes": 7776,
+            "relative_path": "packs/M/0003.truth.json"
+          },
+          {
+            "bytes": 572936,
+            "relative_path": "packs/M/0004.dxf"
+          },
+          {
+            "bytes": 7776,
+            "relative_path": "packs/M/0004.truth.json"
+          },
+          {
+            "bytes": 572928,
+            "relative_path": "packs/M/0005.dxf"
+          },
+          {
+            "bytes": 7776,
+            "relative_path": "packs/M/0005.truth.json"
+          },
+          {
+            "bytes": 572958,
+            "relative_path": "packs/M/0006.dxf"
+          },
+          {
+            "bytes": 7776,
+            "relative_path": "packs/M/0006.truth.json"
+          },
+          {
+            "bytes": 572958,
+            "relative_path": "packs/M/0007.dxf"
+          },
+          {
+            "bytes": 7776,
+            "relative_path": "packs/M/0007.truth.json"
+          },
+          {
+            "bytes": 572994,
+            "relative_path": "packs/M/0008.dxf"
+          },
+          {
+            "bytes": 7776,
+            "relative_path": "packs/M/0008.truth.json"
+          },
+          {
+            "bytes": 572934,
+            "relative_path": "packs/M/0009.dxf"
+          },
+          {
+            "bytes": 7776,
+            "relative_path": "packs/M/0009.truth.json"
+          },
+          {
+            "bytes": 572918,
+            "relative_path": "packs/M/0010.dxf"
+          },
+          {
+            "bytes": 7776,
+            "relative_path": "packs/M/0010.truth.json"
+          },
+          {
+            "bytes": 573026,
+            "relative_path": "packs/M/0011.dxf"
+          },
+          {
+            "bytes": 7776,
+            "relative_path": "packs/M/0011.truth.json"
+          },
+          {
+            "bytes": 572952,
+            "relative_path": "packs/M/0012.dxf"
+          },
+          {
+            "bytes": 7776,
+            "relative_path": "packs/M/0012.truth.json"
+          },
+          {
+            "bytes": 572972,
+            "relative_path": "packs/M/0013.dxf"
+          },
+          {
+            "bytes": 7776,
+            "relative_path": "packs/M/0013.truth.json"
+          },
+          {
+            "bytes": 572966,
+            "relative_path": "packs/M/0014.dxf"
+          },
+          {
+            "bytes": 7776,
+            "relative_path": "packs/M/0014.truth.json"
+          },
+          {
+            "bytes": 572952,
+            "relative_path": "packs/M/0015.dxf"
+          },
+          {
+            "bytes": 7776,
+            "relative_path": "packs/M/0015.truth.json"
+          },
+          {
+            "bytes": 572966,
+            "relative_path": "packs/M/0016.dxf"
+          },
+          {
+            "bytes": 7776,
+            "relative_path": "packs/M/0016.truth.json"
+          },
+          {
+            "bytes": 572992,
+            "relative_path": "packs/M/0017.dxf"
+          },
+          {
+            "bytes": 7776,
+            "relative_path": "packs/M/0017.truth.json"
+          },
+          {
+            "bytes": 572942,
+            "relative_path": "packs/M/0018.dxf"
+          },
+          {
+            "bytes": 7776,
+            "relative_path": "packs/M/0018.truth.json"
+          },
+          {
+            "bytes": 572974,
+            "relative_path": "packs/M/0019.dxf"
+          },
+          {
+            "bytes": 7776,
+            "relative_path": "packs/M/0019.truth.json"
+          },
+          {
+            "bytes": 572944,
+            "relative_path": "packs/M/0020.dxf"
+          },
+          {
+            "bytes": 7776,
+            "relative_path": "packs/M/0020.truth.json"
+          },
+          {
+            "bytes": 572972,
+            "relative_path": "packs/M/0021.dxf"
+          },
+          {
+            "bytes": 7776,
+            "relative_path": "packs/M/0021.truth.json"
+          },
+          {
+            "bytes": 572936,
+            "relative_path": "packs/M/0022.dxf"
+          },
+          {
+            "bytes": 7776,
+            "relative_path": "packs/M/0022.truth.json"
+          },
+          {
+            "bytes": 572966,
+            "relative_path": "packs/M/0023.dxf"
+          },
+          {
+            "bytes": 7776,
+            "relative_path": "packs/M/0023.truth.json"
+          },
+          {
+            "bytes": 572958,
+            "relative_path": "packs/M/0024.dxf"
+          },
+          {
+            "bytes": 7776,
+            "relative_path": "packs/M/0024.truth.json"
+          },
+          {
+            "bytes": 572960,
+            "relative_path": "packs/M/0025.dxf"
+          },
+          {
+            "bytes": 7776,
+            "relative_path": "packs/M/0025.truth.json"
+          },
+          {
+            "bytes": 572964,
+            "relative_path": "packs/M/0026.dxf"
+          },
+          {
+            "bytes": 7776,
+            "relative_path": "packs/M/0026.truth.json"
+          },
+          {
+            "bytes": 572950,
+            "relative_path": "packs/M/0027.dxf"
+          },
+          {
+            "bytes": 7776,
+            "relative_path": "packs/M/0027.truth.json"
+          },
+          {
+            "bytes": 572964,
+            "relative_path": "packs/M/0028.dxf"
+          },
+          {
+            "bytes": 7776,
+            "relative_path": "packs/M/0028.truth.json"
+          },
+          {
+            "bytes": 572962,
+            "relative_path": "packs/M/0029.dxf"
+          },
+          {
+            "bytes": 7776,
+            "relative_path": "packs/M/0029.truth.json"
+          },
+          {
+            "bytes": 572986,
+            "relative_path": "packs/M/0030.dxf"
+          },
+          {
+            "bytes": 7776,
+            "relative_path": "packs/M/0030.truth.json"
+          },
+          {
+            "bytes": 572962,
+            "relative_path": "packs/M/0031.dxf"
+          },
+          {
+            "bytes": 7776,
+            "relative_path": "packs/M/0031.truth.json"
+          },
+          {
+            "bytes": 572942,
+            "relative_path": "packs/M/0032.dxf"
+          },
+          {
+            "bytes": 7776,
+            "relative_path": "packs/M/0032.truth.json"
+          },
+          {
+            "bytes": 572948,
+            "relative_path": "packs/M/0033.dxf"
+          },
+          {
+            "bytes": 7776,
+            "relative_path": "packs/M/0033.truth.json"
+          },
+          {
+            "bytes": 572956,
+            "relative_path": "packs/M/0034.dxf"
+          },
+          {
+            "bytes": 7776,
+            "relative_path": "packs/M/0034.truth.json"
+          },
+          {
+            "bytes": 573000,
+            "relative_path": "packs/M/0035.dxf"
+          },
+          {
+            "bytes": 7776,
+            "relative_path": "packs/M/0035.truth.json"
+          },
+          {
+            "bytes": 572904,
+            "relative_path": "packs/M/0036.dxf"
+          },
+          {
+            "bytes": 7776,
+            "relative_path": "packs/M/0036.truth.json"
+          },
+          {
+            "bytes": 572952,
+            "relative_path": "packs/M/0037.dxf"
+          },
+          {
+            "bytes": 7776,
+            "relative_path": "packs/M/0037.truth.json"
+          },
+          {
+            "bytes": 572928,
+            "relative_path": "packs/M/0038.dxf"
+          },
+          {
+            "bytes": 7776,
+            "relative_path": "packs/M/0038.truth.json"
+          },
+          {
+            "bytes": 572954,
+            "relative_path": "packs/M/0039.dxf"
+          },
+          {
+            "bytes": 7776,
+            "relative_path": "packs/M/0039.truth.json"
+          },
+          {
+            "bytes": 572948,
+            "relative_path": "packs/M/0040.dxf"
+          },
+          {
+            "bytes": 7776,
+            "relative_path": "packs/M/0040.truth.json"
+          },
+          {
+            "bytes": 572938,
+            "relative_path": "packs/M/0041.dxf"
+          },
+          {
+            "bytes": 7776,
+            "relative_path": "packs/M/0041.truth.json"
+          },
+          {
+            "bytes": 572922,
+            "relative_path": "packs/M/0042.dxf"
+          },
+          {
+            "bytes": 7776,
+            "relative_path": "packs/M/0042.truth.json"
+          },
+          {
+            "bytes": 572976,
+            "relative_path": "packs/M/0043.dxf"
+          },
+          {
+            "bytes": 7776,
+            "relative_path": "packs/M/0043.truth.json"
+          },
+          {
+            "bytes": 572930,
+            "relative_path": "packs/M/0044.dxf"
+          },
+          {
+            "bytes": 7776,
+            "relative_path": "packs/M/0044.truth.json"
+          },
+          {
+            "bytes": 572928,
+            "relative_path": "packs/M/0045.dxf"
+          },
+          {
+            "bytes": 7776,
+            "relative_path": "packs/M/0045.truth.json"
+          },
+          {
+            "bytes": 572966,
+            "relative_path": "packs/M/0046.dxf"
+          },
+          {
+            "bytes": 7776,
+            "relative_path": "packs/M/0046.truth.json"
+          },
+          {
+            "bytes": 572998,
+            "relative_path": "packs/M/0047.dxf"
+          },
+          {
+            "bytes": 7776,
+            "relative_path": "packs/M/0047.truth.json"
+          },
+          {
+            "bytes": 572944,
+            "relative_path": "packs/M/0048.dxf"
+          },
+          {
+            "bytes": 7776,
+            "relative_path": "packs/M/0048.truth.json"
+          },
+          {
+            "bytes": 572956,
+            "relative_path": "packs/M/0049.dxf"
+          },
+          {
+            "bytes": 7776,
+            "relative_path": "packs/M/0049.truth.json"
+          },
+          {
+            "bytes": 17128,
+            "relative_path": "packs/M/manifest.json"
+          },
+          {
+            "bytes": 3270,
+            "relative_path": "packs/manifest.json"
+          },
+          {
+            "bytes": 572752,
+            "relative_path": "packs/S/0000.dxf"
+          },
+          {
+            "bytes": 6001,
+            "relative_path": "packs/S/0000.truth.json"
+          },
+          {
+            "bytes": 572844,
+            "relative_path": "packs/S/0001.dxf"
+          },
+          {
+            "bytes": 6001,
+            "relative_path": "packs/S/0001.truth.json"
+          },
+          {
+            "bytes": 572832,
+            "relative_path": "packs/S/0002.dxf"
+          },
+          {
+            "bytes": 6001,
+            "relative_path": "packs/S/0002.truth.json"
+          },
+          {
+            "bytes": 572834,
+            "relative_path": "packs/S/0003.dxf"
+          },
+          {
+            "bytes": 6001,
+            "relative_path": "packs/S/0003.truth.json"
+          },
+          {
+            "bytes": 572846,
+            "relative_path": "packs/S/0004.dxf"
+          },
+          {
+            "bytes": 6001,
+            "relative_path": "packs/S/0004.truth.json"
+          },
+          {
+            "bytes": 572874,
+            "relative_path": "packs/S/0005.dxf"
+          },
+          {
+            "bytes": 6001,
+            "relative_path": "packs/S/0005.truth.json"
+          },
+          {
+            "bytes": 572838,
+            "relative_path": "packs/S/0006.dxf"
+          },
+          {
+            "bytes": 6001,
+            "relative_path": "packs/S/0006.truth.json"
+          },
+          {
+            "bytes": 572802,
+            "relative_path": "packs/S/0007.dxf"
+          },
+          {
+            "bytes": 6001,
+            "relative_path": "packs/S/0007.truth.json"
+          },
+          {
+            "bytes": 572912,
+            "relative_path": "packs/S/0008.dxf"
+          },
+          {
+            "bytes": 6001,
+            "relative_path": "packs/S/0008.truth.json"
+          },
+          {
+            "bytes": 572828,
+            "relative_path": "packs/S/0009.dxf"
+          },
+          {
+            "bytes": 6001,
+            "relative_path": "packs/S/0009.truth.json"
+          },
+          {
+            "bytes": 572852,
+            "relative_path": "packs/S/0010.dxf"
+          },
+          {
+            "bytes": 6001,
+            "relative_path": "packs/S/0010.truth.json"
+          },
+          {
+            "bytes": 572860,
+            "relative_path": "packs/S/0011.dxf"
+          },
+          {
+            "bytes": 6001,
+            "relative_path": "packs/S/0011.truth.json"
+          },
+          {
+            "bytes": 572808,
+            "relative_path": "packs/S/0012.dxf"
+          },
+          {
+            "bytes": 6001,
+            "relative_path": "packs/S/0012.truth.json"
+          },
+          {
+            "bytes": 572816,
+            "relative_path": "packs/S/0013.dxf"
+          },
+          {
+            "bytes": 6001,
+            "relative_path": "packs/S/0013.truth.json"
+          },
+          {
+            "bytes": 572830,
+            "relative_path": "packs/S/0014.dxf"
+          },
+          {
+            "bytes": 6001,
+            "relative_path": "packs/S/0014.truth.json"
+          },
+          {
+            "bytes": 572858,
+            "relative_path": "packs/S/0015.dxf"
+          },
+          {
+            "bytes": 6001,
+            "relative_path": "packs/S/0015.truth.json"
+          },
+          {
+            "bytes": 572784,
+            "relative_path": "packs/S/0016.dxf"
+          },
+          {
+            "bytes": 6001,
+            "relative_path": "packs/S/0016.truth.json"
+          },
+          {
+            "bytes": 572836,
+            "relative_path": "packs/S/0017.dxf"
+          },
+          {
+            "bytes": 6001,
+            "relative_path": "packs/S/0017.truth.json"
+          },
+          {
+            "bytes": 572846,
+            "relative_path": "packs/S/0018.dxf"
+          },
+          {
+            "bytes": 6001,
+            "relative_path": "packs/S/0018.truth.json"
+          },
+          {
+            "bytes": 572786,
+            "relative_path": "packs/S/0019.dxf"
+          },
+          {
+            "bytes": 6001,
+            "relative_path": "packs/S/0019.truth.json"
+          },
+          {
+            "bytes": 572804,
+            "relative_path": "packs/S/0020.dxf"
+          },
+          {
+            "bytes": 6001,
+            "relative_path": "packs/S/0020.truth.json"
+          },
+          {
+            "bytes": 572798,
+            "relative_path": "packs/S/0021.dxf"
+          },
+          {
+            "bytes": 6001,
+            "relative_path": "packs/S/0021.truth.json"
+          },
+          {
+            "bytes": 572804,
+            "relative_path": "packs/S/0022.dxf"
+          },
+          {
+            "bytes": 6001,
+            "relative_path": "packs/S/0022.truth.json"
+          },
+          {
+            "bytes": 572836,
+            "relative_path": "packs/S/0023.dxf"
+          },
+          {
+            "bytes": 6001,
+            "relative_path": "packs/S/0023.truth.json"
+          },
+          {
+            "bytes": 572772,
+            "relative_path": "packs/S/0024.dxf"
+          },
+          {
+            "bytes": 6001,
+            "relative_path": "packs/S/0024.truth.json"
+          },
+          {
+            "bytes": 572874,
+            "relative_path": "packs/S/0025.dxf"
+          },
+          {
+            "bytes": 6001,
+            "relative_path": "packs/S/0025.truth.json"
+          },
+          {
+            "bytes": 572836,
+            "relative_path": "packs/S/0026.dxf"
+          },
+          {
+            "bytes": 6001,
+            "relative_path": "packs/S/0026.truth.json"
+          },
+          {
+            "bytes": 572804,
+            "relative_path": "packs/S/0027.dxf"
+          },
+          {
+            "bytes": 6001,
+            "relative_path": "packs/S/0027.truth.json"
+          },
+          {
+            "bytes": 572818,
+            "relative_path": "packs/S/0028.dxf"
+          },
+          {
+            "bytes": 6001,
+            "relative_path": "packs/S/0028.truth.json"
+          },
+          {
+            "bytes": 572790,
+            "relative_path": "packs/S/0029.dxf"
+          },
+          {
+            "bytes": 6001,
+            "relative_path": "packs/S/0029.truth.json"
+          },
+          {
+            "bytes": 572826,
+            "relative_path": "packs/S/0030.dxf"
+          },
+          {
+            "bytes": 6001,
+            "relative_path": "packs/S/0030.truth.json"
+          },
+          {
+            "bytes": 572844,
+            "relative_path": "packs/S/0031.dxf"
+          },
+          {
+            "bytes": 6001,
+            "relative_path": "packs/S/0031.truth.json"
+          },
+          {
+            "bytes": 572842,
+            "relative_path": "packs/S/0032.dxf"
+          },
+          {
+            "bytes": 6001,
+            "relative_path": "packs/S/0032.truth.json"
+          },
+          {
+            "bytes": 572814,
+            "relative_path": "packs/S/0033.dxf"
+          },
+          {
+            "bytes": 6001,
+            "relative_path": "packs/S/0033.truth.json"
+          },
+          {
+            "bytes": 572772,
+            "relative_path": "packs/S/0034.dxf"
+          },
+          {
+            "bytes": 6001,
+            "relative_path": "packs/S/0034.truth.json"
+          },
+          {
+            "bytes": 572806,
+            "relative_path": "packs/S/0035.dxf"
+          },
+          {
+            "bytes": 6001,
+            "relative_path": "packs/S/0035.truth.json"
+          },
+          {
+            "bytes": 572870,
+            "relative_path": "packs/S/0036.dxf"
+          },
+          {
+            "bytes": 6001,
+            "relative_path": "packs/S/0036.truth.json"
+          },
+          {
+            "bytes": 572796,
+            "relative_path": "packs/S/0037.dxf"
+          },
+          {
+            "bytes": 6001,
+            "relative_path": "packs/S/0037.truth.json"
+          },
+          {
+            "bytes": 572778,
+            "relative_path": "packs/S/0038.dxf"
+          },
+          {
+            "bytes": 6001,
+            "relative_path": "packs/S/0038.truth.json"
+          },
+          {
+            "bytes": 572830,
+            "relative_path": "packs/S/0039.dxf"
+          },
+          {
+            "bytes": 6001,
+            "relative_path": "packs/S/0039.truth.json"
+          },
+          {
+            "bytes": 572792,
+            "relative_path": "packs/S/0040.dxf"
+          },
+          {
+            "bytes": 6001,
+            "relative_path": "packs/S/0040.truth.json"
+          },
+          {
+            "bytes": 572862,
+            "relative_path": "packs/S/0041.dxf"
+          },
+          {
+            "bytes": 6001,
+            "relative_path": "packs/S/0041.truth.json"
+          },
+          {
+            "bytes": 572844,
+            "relative_path": "packs/S/0042.dxf"
+          },
+          {
+            "bytes": 6001,
+            "relative_path": "packs/S/0042.truth.json"
+          },
+          {
+            "bytes": 572812,
+            "relative_path": "packs/S/0043.dxf"
+          },
+          {
+            "bytes": 6001,
+            "relative_path": "packs/S/0043.truth.json"
+          },
+          {
+            "bytes": 572844,
+            "relative_path": "packs/S/0044.dxf"
+          },
+          {
+            "bytes": 6001,
+            "relative_path": "packs/S/0044.truth.json"
+          },
+          {
+            "bytes": 572822,
+            "relative_path": "packs/S/0045.dxf"
+          },
+          {
+            "bytes": 6001,
+            "relative_path": "packs/S/0045.truth.json"
+          },
+          {
+            "bytes": 572830,
+            "relative_path": "packs/S/0046.dxf"
+          },
+          {
+            "bytes": 6001,
+            "relative_path": "packs/S/0046.truth.json"
+          },
+          {
+            "bytes": 572840,
+            "relative_path": "packs/S/0047.dxf"
+          },
+          {
+            "bytes": 6001,
+            "relative_path": "packs/S/0047.truth.json"
+          },
+          {
+            "bytes": 572850,
+            "relative_path": "packs/S/0048.dxf"
+          },
+          {
+            "bytes": 6001,
+            "relative_path": "packs/S/0048.truth.json"
+          },
+          {
+            "bytes": 572826,
+            "relative_path": "packs/S/0049.dxf"
+          },
+          {
+            "bytes": 6001,
+            "relative_path": "packs/S/0049.truth.json"
+          },
+          {
+            "bytes": 17131,
+            "relative_path": "packs/S/manifest.json"
+          },
+          {
+            "bytes": 6485,
+            "relative_path": "REPORT.md"
+          },
+          {
+            "bytes": 46051,
+            "relative_path": "run_cell.py"
+          },
+          {
+            "bytes": 4778,
+            "relative_path": "seed_manifest.json"
+          },
+          {
+            "bytes": 7721,
+            "relative_path": "verifier_far_frr_full.json"
+          }
+        ],
+        "report_exists": true,
+        "report_status_markers": [
+          {
+            "line": 131,
+            "marker": "CELL_COMPLETE",
+            "value": "fidelity_full"
+          }
+        ],
+        "standalone_marker_files": [],
+        "total_bytes": 87101137,
+        "walk_errors": []
+      },
+      {
+        "cell": "g0a_inventory",
+        "completion_marker_present": false,
+        "elapsed_records": [
+          {
+            "key": "elapsed",
+            "line": 5,
+            "unit": "seconds",
+            "value": "35.094313"
+          }
+        ],
+        "file_count": 3,
+        "outputs": [
+          {
+            "bytes": 48284,
+            "relative_path": "g0a_inventory.py"
+          },
+          {
+            "bytes": 146813,
+            "relative_path": "inventory.json"
+          },
+          {
+            "bytes": 2699,
+            "relative_path": "REPORT.md"
+          }
+        ],
+        "report_exists": true,
+        "report_status_markers": [
+          {
+            "line": 63,
+            "marker": "CELL_INVALID",
+            "value": "g0a"
+          }
+        ],
+        "standalone_marker_files": [],
+        "total_bytes": 197796,
+        "walk_errors": []
+      },
+      {
+        "cell": "graph_builder",
+        "completion_marker_present": true,
+        "elapsed_records": [
+          {
+            "key": "elapsed_seconds",
+            "line": 104,
+            "unit": "seconds",
+            "value": "7.2356664999970235"
+          },
+          {
+            "key": "elapsed_seconds",
+            "line": 566,
+            "unit": "seconds",
+            "value": "13.926932199989096"
+          }
+        ],
+        "file_count": 21,
+        "outputs": [
+          {
+            "bytes": 116459,
+            "relative_path": "__pycache__/graph_builder.cpython-312.pyc"
+          },
+          {
+            "bytes": 5175,
+            "relative_path": "_smoke.json"
+          },
+          {
+            "bytes": 129838,
+            "relative_path": "_smoke.npz"
+          },
+          {
+            "bytes": 150313,
+            "relative_path": "envelope_numbers.json"
+          },
+          {
+            "bytes": 91610,
+            "relative_path": "graph_builder.py"
+          },
+          {
+            "bytes": 5175,
+            "relative_path": "graphs_sample/cubicasa_val_sample_001.json"
+          },
+          {
+            "bytes": 137104,
+            "relative_path": "graphs_sample/cubicasa_val_sample_001.npz"
+          },
+          {
+            "bytes": 5175,
+            "relative_path": "graphs_sample/cubicasa_val_sample_002.json"
+          },
+          {
+            "bytes": 211333,
+            "relative_path": "graphs_sample/cubicasa_val_sample_002.npz"
+          },
+          {
+            "bytes": 5171,
+            "relative_path": "graphs_sample/cubicasa_val_sample_003.json"
+          },
+          {
+            "bytes": 370344,
+            "relative_path": "graphs_sample/cubicasa_val_sample_003.npz"
+          },
+          {
+            "bytes": 5251,
+            "relative_path": "graphs_sample/gen2_f_sample.json"
+          },
+          {
+            "bytes": 287730,
+            "relative_path": "graphs_sample/gen2_f_sample.npz"
+          },
+          {
+            "bytes": 5252,
+            "relative_path": "graphs_sample/gen2_m_sample.json"
+          },
+          {
+            "bytes": 288169,
+            "relative_path": "graphs_sample/gen2_m_sample.npz"
+          },
+          {
+            "bytes": 5251,
+            "relative_path": "graphs_sample/gen2_s_sample.json"
+          },
+          {
+            "bytes": 287418,
+            "relative_path": "graphs_sample/gen2_s_sample.npz"
+          },
+          {
+            "bytes": 16695,
+            "relative_path": "recall_numbers.json"
+          },
+          {
+            "bytes": 19156,
+            "relative_path": "REPORT.md"
+          },
+          {
+            "bytes": 0,
+            "relative_path": "run_stderr.log"
+          },
+          {
+            "bytes": 1315,
+            "relative_path": "run_stdout.log"
+          }
+        ],
+        "report_exists": true,
+        "report_status_markers": [
+          {
+            "line": 610,
+            "marker": "CELL_COMPLETE",
+            "value": "graph_builder"
+          }
+        ],
+        "standalone_marker_files": [],
+        "total_bytes": 2143934,
+        "walk_errors": []
+      },
+      {
+        "cell": "loop_l1",
+        "completion_marker_present": false,
+        "elapsed_records": [],
+        "file_count": 205,
+        "outputs": [
+          {
+            "bytes": 15964,
+            "relative_path": "c0v2_numbers.json"
+          },
+          {
+            "bytes": 1386090,
+            "relative_path": "c1v2_results.json"
+          },
+          {
+            "bytes": 18491,
+            "relative_path": "evidence.xlsx"
+          },
+          {
+            "bytes": 60409,
+            "relative_path": "loop_l1.py"
+          },
+          {
+            "bytes": 77371,
+            "relative_path": "REPORT.md"
+          },
+          {
+            "bytes": 72800,
+            "relative_path": "scenes_v2/scene_000_k0p001.json"
+          },
+          {
+            "bytes": 72720,
+            "relative_path": "scenes_v2/scene_000_k0p01.json"
+          },
+          {
+            "bytes": 72646,
+            "relative_path": "scenes_v2/scene_000_k1.json"
+          },
+          {
+            "bytes": 74801,
+            "relative_path": "scenes_v2/scene_000_k1000.json"
+          },
+          {
+            "bytes": 74666,
+            "relative_path": "scenes_v2/scene_001_k0p001.json"
+          },
+          {
+            "bytes": 75897,
+            "relative_path": "scenes_v2/scene_001_k0p01.json"
+          },
+          {
+            "bytes": 75450,
+            "relative_path": "scenes_v2/scene_001_k1.json"
+          },
+          {
+            "bytes": 77655,
+            "relative_path": "scenes_v2/scene_001_k1000.json"
+          },
+          {
+            "bytes": 70493,
+            "relative_path": "scenes_v2/scene_002_k0p001.json"
+          },
+          {
+            "bytes": 70827,
+            "relative_path": "scenes_v2/scene_002_k0p01.json"
+          },
+          {
+            "bytes": 71475,
+            "relative_path": "scenes_v2/scene_002_k1.json"
+          },
+          {
+            "bytes": 73578,
+            "relative_path": "scenes_v2/scene_002_k1000.json"
+          },
+          {
+            "bytes": 72606,
+            "relative_path": "scenes_v2/scene_003_k0p001.json"
+          },
+          {
+            "bytes": 73025,
+            "relative_path": "scenes_v2/scene_003_k0p01.json"
+          },
+          {
+            "bytes": 72848,
+            "relative_path": "scenes_v2/scene_003_k1.json"
+          },
+          {
+            "bytes": 74985,
+            "relative_path": "scenes_v2/scene_003_k1000.json"
+          },
+          {
+            "bytes": 70746,
+            "relative_path": "scenes_v2/scene_004_k0p001.json"
+          },
+          {
+            "bytes": 70709,
+            "relative_path": "scenes_v2/scene_004_k0p01.json"
+          },
+          {
+            "bytes": 71097,
+            "relative_path": "scenes_v2/scene_004_k1.json"
+          },
+          {
+            "bytes": 73156,
+            "relative_path": "scenes_v2/scene_004_k1000.json"
+          },
+          {
+            "bytes": 72006,
+            "relative_path": "scenes_v2/scene_005_k0p001.json"
+          },
+          {
+            "bytes": 72510,
+            "relative_path": "scenes_v2/scene_005_k0p01.json"
+          },
+          {
+            "bytes": 72437,
+            "relative_path": "scenes_v2/scene_005_k1.json"
+          },
+          {
+            "bytes": 74552,
+            "relative_path": "scenes_v2/scene_005_k1000.json"
+          },
+          {
+            "bytes": 71265,
+            "relative_path": "scenes_v2/scene_006_k0p001.json"
+          },
+          {
+            "bytes": 72277,
+            "relative_path": "scenes_v2/scene_006_k0p01.json"
+          },
+          {
+            "bytes": 71746,
+            "relative_path": "scenes_v2/scene_006_k1.json"
+          },
+          {
+            "bytes": 73841,
+            "relative_path": "scenes_v2/scene_006_k1000.json"
+          },
+          {
+            "bytes": 72374,
+            "relative_path": "scenes_v2/scene_007_k0p001.json"
+          },
+          {
+            "bytes": 72081,
+            "relative_path": "scenes_v2/scene_007_k0p01.json"
+          },
+          {
+            "bytes": 72811,
+            "relative_path": "scenes_v2/scene_007_k1.json"
+          },
+          {
+            "bytes": 74952,
+            "relative_path": "scenes_v2/scene_007_k1000.json"
+          },
+          {
+            "bytes": 72585,
+            "relative_path": "scenes_v2/scene_008_k0p001.json"
+          },
+          {
+            "bytes": 73284,
+            "relative_path": "scenes_v2/scene_008_k0p01.json"
+          },
+          {
+            "bytes": 73151,
+            "relative_path": "scenes_v2/scene_008_k1.json"
+          },
+          {
+            "bytes": 75294,
+            "relative_path": "scenes_v2/scene_008_k1000.json"
+          },
+          {
+            "bytes": 72064,
+            "relative_path": "scenes_v2/scene_009_k0p001.json"
+          },
+          {
+            "bytes": 72680,
+            "relative_path": "scenes_v2/scene_009_k0p01.json"
+          },
+          {
+            "bytes": 72917,
+            "relative_path": "scenes_v2/scene_009_k1.json"
+          },
+          {
+            "bytes": 75058,
+            "relative_path": "scenes_v2/scene_009_k1000.json"
+          },
+          {
+            "bytes": 71357,
+            "relative_path": "scenes_v2/scene_010_k0p001.json"
+          },
+          {
+            "bytes": 72126,
+            "relative_path": "scenes_v2/scene_010_k0p01.json"
+          },
+          {
+            "bytes": 71958,
+            "relative_path": "scenes_v2/scene_010_k1.json"
+          },
+          {
+            "bytes": 74079,
+            "relative_path": "scenes_v2/scene_010_k1000.json"
+          },
+          {
+            "bytes": 74240,
+            "relative_path": "scenes_v2/scene_011_k0p001.json"
+          },
+          {
+            "bytes": 74420,
+            "relative_path": "scenes_v2/scene_011_k0p01.json"
+          },
+          {
+            "bytes": 73754,
+            "relative_path": "scenes_v2/scene_011_k1.json"
+          },
+          {
+            "bytes": 75920,
+            "relative_path": "scenes_v2/scene_011_k1000.json"
+          },
+          {
+            "bytes": 73465,
+            "relative_path": "scenes_v2/scene_012_k0p001.json"
+          },
+          {
+            "bytes": 73352,
+            "relative_path": "scenes_v2/scene_012_k0p01.json"
+          },
+          {
+            "bytes": 73902,
+            "relative_path": "scenes_v2/scene_012_k1.json"
+          },
+          {
+            "bytes": 76082,
+            "relative_path": "scenes_v2/scene_012_k1000.json"
+          },
+          {
+            "bytes": 74516,
+            "relative_path": "scenes_v2/scene_013_k0p001.json"
+          },
+          {
+            "bytes": 74927,
+            "relative_path": "scenes_v2/scene_013_k0p01.json"
+          },
+          {
+            "bytes": 74792,
+            "relative_path": "scenes_v2/scene_013_k1.json"
+          },
+          {
+            "bytes": 76988,
+            "relative_path": "scenes_v2/scene_013_k1000.json"
+          },
+          {
+            "bytes": 72625,
+            "relative_path": "scenes_v2/scene_014_k0p001.json"
+          },
+          {
+            "bytes": 72219,
+            "relative_path": "scenes_v2/scene_014_k0p01.json"
+          },
+          {
+            "bytes": 72446,
+            "relative_path": "scenes_v2/scene_014_k1.json"
+          },
+          {
+            "bytes": 74559,
+            "relative_path": "scenes_v2/scene_014_k1000.json"
+          },
+          {
+            "bytes": 72736,
+            "relative_path": "scenes_v2/scene_015_k0p001.json"
+          },
+          {
+            "bytes": 73294,
+            "relative_path": "scenes_v2/scene_015_k0p01.json"
+          },
+          {
+            "bytes": 73068,
+            "relative_path": "scenes_v2/scene_015_k1.json"
+          },
+          {
+            "bytes": 75210,
+            "relative_path": "scenes_v2/scene_015_k1000.json"
+          },
+          {
+            "bytes": 71782,
+            "relative_path": "scenes_v2/scene_016_k0p001.json"
+          },
+          {
+            "bytes": 72798,
+            "relative_path": "scenes_v2/scene_016_k0p01.json"
+          },
+          {
+            "bytes": 72290,
+            "relative_path": "scenes_v2/scene_016_k1.json"
+          },
+          {
+            "bytes": 74396,
+            "relative_path": "scenes_v2/scene_016_k1000.json"
+          },
+          {
+            "bytes": 73114,
+            "relative_path": "scenes_v2/scene_017_k0p001.json"
+          },
+          {
+            "bytes": 73114,
+            "relative_path": "scenes_v2/scene_017_k0p01.json"
+          },
+          {
+            "bytes": 73743,
+            "relative_path": "scenes_v2/scene_017_k1.json"
+          },
+          {
+            "bytes": 75916,
+            "relative_path": "scenes_v2/scene_017_k1000.json"
+          },
+          {
+            "bytes": 73059,
+            "relative_path": "scenes_v2/scene_018_k0p001.json"
+          },
+          {
+            "bytes": 73592,
+            "relative_path": "scenes_v2/scene_018_k0p01.json"
+          },
+          {
+            "bytes": 73508,
+            "relative_path": "scenes_v2/scene_018_k1.json"
+          },
+          {
+            "bytes": 75685,
+            "relative_path": "scenes_v2/scene_018_k1000.json"
+          },
+          {
+            "bytes": 71310,
+            "relative_path": "scenes_v2/scene_019_k0p001.json"
+          },
+          {
+            "bytes": 71666,
+            "relative_path": "scenes_v2/scene_019_k0p01.json"
+          },
+          {
+            "bytes": 71995,
+            "relative_path": "scenes_v2/scene_019_k1.json"
+          },
+          {
+            "bytes": 74100,
+            "relative_path": "scenes_v2/scene_019_k1000.json"
+          },
+          {
+            "bytes": 70812,
+            "relative_path": "scenes_v2/scene_020_k0p001.json"
+          },
+          {
+            "bytes": 70221,
+            "relative_path": "scenes_v2/scene_020_k0p01.json"
+          },
+          {
+            "bytes": 70162,
+            "relative_path": "scenes_v2/scene_020_k1.json"
+          },
+          {
+            "bytes": 72201,
+            "relative_path": "scenes_v2/scene_020_k1000.json"
+          },
+          {
+            "bytes": 72902,
+            "relative_path": "scenes_v2/scene_021_k0p001.json"
+          },
+          {
+            "bytes": 72275,
+            "relative_path": "scenes_v2/scene_021_k0p01.json"
+          },
+          {
+            "bytes": 71750,
+            "relative_path": "scenes_v2/scene_021_k1.json"
+          },
+          {
+            "bytes": 73885,
+            "relative_path": "scenes_v2/scene_021_k1000.json"
+          },
+          {
+            "bytes": 74254,
+            "relative_path": "scenes_v2/scene_022_k0p001.json"
+          },
+          {
+            "bytes": 71842,
+            "relative_path": "scenes_v2/scene_022_k0p01.json"
+          },
+          {
+            "bytes": 72525,
+            "relative_path": "scenes_v2/scene_022_k1.json"
+          },
+          {
+            "bytes": 74654,
+            "relative_path": "scenes_v2/scene_022_k1000.json"
+          },
+          {
+            "bytes": 72730,
+            "relative_path": "scenes_v2/scene_023_k0p001.json"
+          },
+          {
+            "bytes": 72289,
+            "relative_path": "scenes_v2/scene_023_k0p01.json"
+          },
+          {
+            "bytes": 72037,
+            "relative_path": "scenes_v2/scene_023_k1.json"
+          },
+          {
+            "bytes": 74154,
+            "relative_path": "scenes_v2/scene_023_k1000.json"
+          },
+          {
+            "bytes": 73039,
+            "relative_path": "scenes_v2/scene_024_k0p001.json"
+          },
+          {
+            "bytes": 71720,
+            "relative_path": "scenes_v2/scene_024_k0p01.json"
+          },
+          {
+            "bytes": 72065,
+            "relative_path": "scenes_v2/scene_024_k1.json"
+          },
+          {
+            "bytes": 74182,
+            "relative_path": "scenes_v2/scene_024_k1000.json"
+          },
+          {
+            "bytes": 72898,
+            "relative_path": "scenes_v2/scene_025_k0p001.json"
+          },
+          {
+            "bytes": 72775,
+            "relative_path": "scenes_v2/scene_025_k0p01.json"
+          },
+          {
+            "bytes": 72748,
+            "relative_path": "scenes_v2/scene_025_k1.json"
+          },
+          {
+            "bytes": 74875,
+            "relative_path": "scenes_v2/scene_025_k1000.json"
+          },
+          {
+            "bytes": 72183,
+            "relative_path": "scenes_v2/scene_026_k0p001.json"
+          },
+          {
+            "bytes": 73585,
+            "relative_path": "scenes_v2/scene_026_k0p01.json"
+          },
+          {
+            "bytes": 73011,
+            "relative_path": "scenes_v2/scene_026_k1.json"
+          },
+          {
+            "bytes": 75158,
+            "relative_path": "scenes_v2/scene_026_k1000.json"
+          },
+          {
+            "bytes": 72062,
+            "relative_path": "scenes_v2/scene_027_k0p001.json"
+          },
+          {
+            "bytes": 72300,
+            "relative_path": "scenes_v2/scene_027_k0p01.json"
+          },
+          {
+            "bytes": 72970,
+            "relative_path": "scenes_v2/scene_027_k1.json"
+          },
+          {
+            "bytes": 75119,
+            "relative_path": "scenes_v2/scene_027_k1000.json"
+          },
+          {
+            "bytes": 73284,
+            "relative_path": "scenes_v2/scene_028_k0p001.json"
+          },
+          {
+            "bytes": 73729,
+            "relative_path": "scenes_v2/scene_028_k0p01.json"
+          },
+          {
+            "bytes": 73594,
+            "relative_path": "scenes_v2/scene_028_k1.json"
+          },
+          {
+            "bytes": 75750,
+            "relative_path": "scenes_v2/scene_028_k1000.json"
+          },
+          {
+            "bytes": 73159,
+            "relative_path": "scenes_v2/scene_029_k0p001.json"
+          },
+          {
+            "bytes": 73135,
+            "relative_path": "scenes_v2/scene_029_k0p01.json"
+          },
+          {
+            "bytes": 73503,
+            "relative_path": "scenes_v2/scene_029_k1.json"
+          },
+          {
+            "bytes": 75663,
+            "relative_path": "scenes_v2/scene_029_k1000.json"
+          },
+          {
+            "bytes": 73078,
+            "relative_path": "scenes_v2/scene_030_k0p001.json"
+          },
+          {
+            "bytes": 73675,
+            "relative_path": "scenes_v2/scene_030_k0p01.json"
+          },
+          {
+            "bytes": 73592,
+            "relative_path": "scenes_v2/scene_030_k1.json"
+          },
+          {
+            "bytes": 75765,
+            "relative_path": "scenes_v2/scene_030_k1000.json"
+          },
+          {
+            "bytes": 73460,
+            "relative_path": "scenes_v2/scene_031_k0p001.json"
+          },
+          {
+            "bytes": 74486,
+            "relative_path": "scenes_v2/scene_031_k0p01.json"
+          },
+          {
+            "bytes": 73909,
+            "relative_path": "scenes_v2/scene_031_k1.json"
+          },
+          {
+            "bytes": 76066,
+            "relative_path": "scenes_v2/scene_031_k1000.json"
+          },
+          {
+            "bytes": 71264,
+            "relative_path": "scenes_v2/scene_032_k0p001.json"
+          },
+          {
+            "bytes": 70963,
+            "relative_path": "scenes_v2/scene_032_k0p01.json"
+          },
+          {
+            "bytes": 71655,
+            "relative_path": "scenes_v2/scene_032_k1.json"
+          },
+          {
+            "bytes": 73754,
+            "relative_path": "scenes_v2/scene_032_k1000.json"
+          },
+          {
+            "bytes": 72153,
+            "relative_path": "scenes_v2/scene_033_k0p001.json"
+          },
+          {
+            "bytes": 72606,
+            "relative_path": "scenes_v2/scene_033_k0p01.json"
+          },
+          {
+            "bytes": 72504,
+            "relative_path": "scenes_v2/scene_033_k1.json"
+          },
+          {
+            "bytes": 74625,
+            "relative_path": "scenes_v2/scene_033_k1000.json"
+          },
+          {
+            "bytes": 71465,
+            "relative_path": "scenes_v2/scene_034_k0p001.json"
+          },
+          {
+            "bytes": 72019,
+            "relative_path": "scenes_v2/scene_034_k0p01.json"
+          },
+          {
+            "bytes": 72275,
+            "relative_path": "scenes_v2/scene_034_k1.json"
+          },
+          {
+            "bytes": 74398,
+            "relative_path": "scenes_v2/scene_034_k1000.json"
+          },
+          {
+            "bytes": 73654,
+            "relative_path": "scenes_v2/scene_035_k0p001.json"
+          },
+          {
+            "bytes": 74399,
+            "relative_path": "scenes_v2/scene_035_k0p01.json"
+          },
+          {
+            "bytes": 74200,
+            "relative_path": "scenes_v2/scene_035_k1.json"
+          },
+          {
+            "bytes": 76394,
+            "relative_path": "scenes_v2/scene_035_k1000.json"
+          },
+          {
+            "bytes": 72369,
+            "relative_path": "scenes_v2/scene_036_k0p001.json"
+          },
+          {
+            "bytes": 72443,
+            "relative_path": "scenes_v2/scene_036_k0p01.json"
+          },
+          {
+            "bytes": 71808,
+            "relative_path": "scenes_v2/scene_036_k1.json"
+          },
+          {
+            "bytes": 73941,
+            "relative_path": "scenes_v2/scene_036_k1000.json"
+          },
+          {
+            "bytes": 70384,
+            "relative_path": "scenes_v2/scene_037_k0p001.json"
+          },
+          {
+            "bytes": 70249,
+            "relative_path": "scenes_v2/scene_037_k0p01.json"
+          },
+          {
+            "bytes": 70776,
+            "relative_path": "scenes_v2/scene_037_k1.json"
+          },
+          {
+            "bytes": 72831,
+            "relative_path": "scenes_v2/scene_037_k1000.json"
+          },
+          {
+            "bytes": 70938,
+            "relative_path": "scenes_v2/scene_038_k0p001.json"
+          },
+          {
+            "bytes": 71412,
+            "relative_path": "scenes_v2/scene_038_k0p01.json"
+          },
+          {
+            "bytes": 71293,
+            "relative_path": "scenes_v2/scene_038_k1.json"
+          },
+          {
+            "bytes": 73371,
+            "relative_path": "scenes_v2/scene_038_k1000.json"
+          },
+          {
+            "bytes": 72413,
+            "relative_path": "scenes_v2/scene_039_k0p001.json"
+          },
+          {
+            "bytes": 71946,
+            "relative_path": "scenes_v2/scene_039_k0p01.json"
+          },
+          {
+            "bytes": 72264,
+            "relative_path": "scenes_v2/scene_039_k1.json"
+          },
+          {
+            "bytes": 74371,
+            "relative_path": "scenes_v2/scene_039_k1000.json"
+          },
+          {
+            "bytes": 72293,
+            "relative_path": "scenes_v2/scene_040_k0p001.json"
+          },
+          {
+            "bytes": 72704,
+            "relative_path": "scenes_v2/scene_040_k0p01.json"
+          },
+          {
+            "bytes": 72639,
+            "relative_path": "scenes_v2/scene_040_k1.json"
+          },
+          {
+            "bytes": 74780,
+            "relative_path": "scenes_v2/scene_040_k1000.json"
+          },
+          {
+            "bytes": 72630,
+            "relative_path": "scenes_v2/scene_041_k0p001.json"
+          },
+          {
+            "bytes": 73750,
+            "relative_path": "scenes_v2/scene_041_k0p01.json"
+          },
+          {
+            "bytes": 73210,
+            "relative_path": "scenes_v2/scene_041_k1.json"
+          },
+          {
+            "bytes": 75345,
+            "relative_path": "scenes_v2/scene_041_k1000.json"
+          },
+          {
+            "bytes": 71791,
+            "relative_path": "scenes_v2/scene_042_k0p001.json"
+          },
+          {
+            "bytes": 71635,
+            "relative_path": "scenes_v2/scene_042_k0p01.json"
+          },
+          {
+            "bytes": 72330,
+            "relative_path": "scenes_v2/scene_042_k1.json"
+          },
+          {
+            "bytes": 74435,
+            "relative_path": "scenes_v2/scene_042_k1000.json"
+          },
+          {
+            "bytes": 73328,
+            "relative_path": "scenes_v2/scene_043_k0p001.json"
+          },
+          {
+            "bytes": 73736,
+            "relative_path": "scenes_v2/scene_043_k0p01.json"
+          },
+          {
+            "bytes": 73620,
+            "relative_path": "scenes_v2/scene_043_k1.json"
+          },
+          {
+            "bytes": 75777,
+            "relative_path": "scenes_v2/scene_043_k1000.json"
+          },
+          {
+            "bytes": 74063,
+            "relative_path": "scenes_v2/scene_044_k0p001.json"
+          },
+          {
+            "bytes": 74537,
+            "relative_path": "scenes_v2/scene_044_k0p01.json"
+          },
+          {
+            "bytes": 74759,
+            "relative_path": "scenes_v2/scene_044_k1.json"
+          },
+          {
+            "bytes": 76952,
+            "relative_path": "scenes_v2/scene_044_k1000.json"
+          },
+          {
+            "bytes": 74377,
+            "relative_path": "scenes_v2/scene_045_k0p001.json"
+          },
+          {
+            "bytes": 73826,
+            "relative_path": "scenes_v2/scene_045_k0p01.json"
+          },
+          {
+            "bytes": 73715,
+            "relative_path": "scenes_v2/scene_045_k1.json"
+          },
+          {
+            "bytes": 75882,
+            "relative_path": "scenes_v2/scene_045_k1000.json"
+          },
+          {
+            "bytes": 76177,
+            "relative_path": "scenes_v2/scene_046_k0p001.json"
+          },
+          {
+            "bytes": 75480,
+            "relative_path": "scenes_v2/scene_046_k0p01.json"
+          },
+          {
+            "bytes": 74969,
+            "relative_path": "scenes_v2/scene_046_k1.json"
+          },
+          {
+            "bytes": 77171,
+            "relative_path": "scenes_v2/scene_046_k1000.json"
+          },
+          {
+            "bytes": 76334,
+            "relative_path": "scenes_v2/scene_047_k0p001.json"
+          },
+          {
+            "bytes": 73929,
+            "relative_path": "scenes_v2/scene_047_k0p01.json"
+          },
+          {
+            "bytes": 74598,
+            "relative_path": "scenes_v2/scene_047_k1.json"
+          },
+          {
+            "bytes": 76793,
+            "relative_path": "scenes_v2/scene_047_k1000.json"
+          },
+          {
+            "bytes": 73482,
+            "relative_path": "scenes_v2/scene_048_k0p001.json"
+          },
+          {
+            "bytes": 72894,
+            "relative_path": "scenes_v2/scene_048_k0p01.json"
+          },
+          {
+            "bytes": 72828,
+            "relative_path": "scenes_v2/scene_048_k1.json"
+          },
+          {
+            "bytes": 74927,
+            "relative_path": "scenes_v2/scene_048_k1000.json"
+          },
+          {
+            "bytes": 73809,
+            "relative_path": "scenes_v2/scene_049_k0p001.json"
+          },
+          {
+            "bytes": 72572,
+            "relative_path": "scenes_v2/scene_049_k0p01.json"
+          },
+          {
+            "bytes": 72879,
+            "relative_path": "scenes_v2/scene_049_k1.json"
+          },
+          {
+            "bytes": 75018,
+            "relative_path": "scenes_v2/scene_049_k1000.json"
+          }
+        ],
+        "report_exists": true,
+        "report_status_markers": [],
+        "standalone_marker_files": [],
+        "total_bytes": 16226835,
+        "walk_errors": []
+      },
+      {
+        "cell": "loop_l1b",
+        "completion_marker_present": false,
+        "elapsed_records": [],
+        "file_count": 205,
+        "outputs": [
+          {
+            "bytes": 49544,
+            "relative_path": "c0v3_numbers.json"
+          },
+          {
+            "bytes": 1380198,
+            "relative_path": "c1v3_results.json"
+          },
+          {
+            "bytes": 29961,
+            "relative_path": "evidence.xlsx"
+          },
+          {
+            "bytes": 55489,
+            "relative_path": "loop_l1b.py"
+          },
+          {
+            "bytes": 117835,
+            "relative_path": "REPORT.md"
+          },
+          {
+            "bytes": 70207,
+            "relative_path": "scenes_v3/scene_000_k0p001.json"
+          },
+          {
+            "bytes": 70159,
+            "relative_path": "scenes_v3/scene_000_k0p01.json"
+          },
+          {
+            "bytes": 70163,
+            "relative_path": "scenes_v3/scene_000_k1.json"
+          },
+          {
+            "bytes": 72210,
+            "relative_path": "scenes_v3/scene_000_k1000.json"
+          },
+          {
+            "bytes": 75154,
+            "relative_path": "scenes_v3/scene_001_k0p001.json"
+          },
+          {
+            "bytes": 76385,
+            "relative_path": "scenes_v3/scene_001_k0p01.json"
+          },
+          {
+            "bytes": 75938,
+            "relative_path": "scenes_v3/scene_001_k1.json"
+          },
+          {
+            "bytes": 78143,
+            "relative_path": "scenes_v3/scene_001_k1000.json"
+          },
+          {
+            "bytes": 69352,
+            "relative_path": "scenes_v3/scene_002_k0p001.json"
+          },
+          {
+            "bytes": 69661,
+            "relative_path": "scenes_v3/scene_002_k0p01.json"
+          },
+          {
+            "bytes": 70361,
+            "relative_path": "scenes_v3/scene_002_k1.json"
+          },
+          {
+            "bytes": 72410,
+            "relative_path": "scenes_v3/scene_002_k1000.json"
+          },
+          {
+            "bytes": 73094,
+            "relative_path": "scenes_v3/scene_003_k0p001.json"
+          },
+          {
+            "bytes": 73513,
+            "relative_path": "scenes_v3/scene_003_k0p01.json"
+          },
+          {
+            "bytes": 73336,
+            "relative_path": "scenes_v3/scene_003_k1.json"
+          },
+          {
+            "bytes": 75473,
+            "relative_path": "scenes_v3/scene_003_k1000.json"
+          },
+          {
+            "bytes": 71206,
+            "relative_path": "scenes_v3/scene_004_k0p001.json"
+          },
+          {
+            "bytes": 71169,
+            "relative_path": "scenes_v3/scene_004_k0p01.json"
+          },
+          {
+            "bytes": 71557,
+            "relative_path": "scenes_v3/scene_004_k1.json"
+          },
+          {
+            "bytes": 73616,
+            "relative_path": "scenes_v3/scene_004_k1000.json"
+          },
+          {
+            "bytes": 72466,
+            "relative_path": "scenes_v3/scene_005_k0p001.json"
+          },
+          {
+            "bytes": 72970,
+            "relative_path": "scenes_v3/scene_005_k0p01.json"
+          },
+          {
+            "bytes": 72897,
+            "relative_path": "scenes_v3/scene_005_k1.json"
+          },
+          {
+            "bytes": 75012,
+            "relative_path": "scenes_v3/scene_005_k1000.json"
+          },
+          {
+            "bytes": 71711,
+            "relative_path": "scenes_v3/scene_006_k0p001.json"
+          },
+          {
+            "bytes": 72723,
+            "relative_path": "scenes_v3/scene_006_k0p01.json"
+          },
+          {
+            "bytes": 72192,
+            "relative_path": "scenes_v3/scene_006_k1.json"
+          },
+          {
+            "bytes": 74287,
+            "relative_path": "scenes_v3/scene_006_k1000.json"
+          },
+          {
+            "bytes": 70259,
+            "relative_path": "scenes_v3/scene_007_k0p001.json"
+          },
+          {
+            "bytes": 70041,
+            "relative_path": "scenes_v3/scene_007_k0p01.json"
+          },
+          {
+            "bytes": 70785,
+            "relative_path": "scenes_v3/scene_007_k1.json"
+          },
+          {
+            "bytes": 72836,
+            "relative_path": "scenes_v3/scene_007_k1000.json"
+          },
+          {
+            "bytes": 73073,
+            "relative_path": "scenes_v3/scene_008_k0p001.json"
+          },
+          {
+            "bytes": 73772,
+            "relative_path": "scenes_v3/scene_008_k0p01.json"
+          },
+          {
+            "bytes": 73639,
+            "relative_path": "scenes_v3/scene_008_k1.json"
+          },
+          {
+            "bytes": 75782,
+            "relative_path": "scenes_v3/scene_008_k1000.json"
+          },
+          {
+            "bytes": 72538,
+            "relative_path": "scenes_v3/scene_009_k0p001.json"
+          },
+          {
+            "bytes": 73154,
+            "relative_path": "scenes_v3/scene_009_k0p01.json"
+          },
+          {
+            "bytes": 73391,
+            "relative_path": "scenes_v3/scene_009_k1.json"
+          },
+          {
+            "bytes": 75532,
+            "relative_path": "scenes_v3/scene_009_k1000.json"
+          },
+          {
+            "bytes": 71803,
+            "relative_path": "scenes_v3/scene_010_k0p001.json"
+          },
+          {
+            "bytes": 72572,
+            "relative_path": "scenes_v3/scene_010_k0p01.json"
+          },
+          {
+            "bytes": 72404,
+            "relative_path": "scenes_v3/scene_010_k1.json"
+          },
+          {
+            "bytes": 74525,
+            "relative_path": "scenes_v3/scene_010_k1000.json"
+          },
+          {
+            "bytes": 74686,
+            "relative_path": "scenes_v3/scene_011_k0p001.json"
+          },
+          {
+            "bytes": 74866,
+            "relative_path": "scenes_v3/scene_011_k0p01.json"
+          },
+          {
+            "bytes": 74200,
+            "relative_path": "scenes_v3/scene_011_k1.json"
+          },
+          {
+            "bytes": 76366,
+            "relative_path": "scenes_v3/scene_011_k1000.json"
+          },
+          {
+            "bytes": 73925,
+            "relative_path": "scenes_v3/scene_012_k0p001.json"
+          },
+          {
+            "bytes": 73812,
+            "relative_path": "scenes_v3/scene_012_k0p01.json"
+          },
+          {
+            "bytes": 74362,
+            "relative_path": "scenes_v3/scene_012_k1.json"
+          },
+          {
+            "bytes": 76542,
+            "relative_path": "scenes_v3/scene_012_k1000.json"
+          },
+          {
+            "bytes": 75004,
+            "relative_path": "scenes_v3/scene_013_k0p001.json"
+          },
+          {
+            "bytes": 75415,
+            "relative_path": "scenes_v3/scene_013_k0p01.json"
+          },
+          {
+            "bytes": 75280,
+            "relative_path": "scenes_v3/scene_013_k1.json"
+          },
+          {
+            "bytes": 77476,
+            "relative_path": "scenes_v3/scene_013_k1000.json"
+          },
+          {
+            "bytes": 73071,
+            "relative_path": "scenes_v3/scene_014_k0p001.json"
+          },
+          {
+            "bytes": 72665,
+            "relative_path": "scenes_v3/scene_014_k0p01.json"
+          },
+          {
+            "bytes": 72892,
+            "relative_path": "scenes_v3/scene_014_k1.json"
+          },
+          {
+            "bytes": 75005,
+            "relative_path": "scenes_v3/scene_014_k1000.json"
+          },
+          {
+            "bytes": 73224,
+            "relative_path": "scenes_v3/scene_015_k0p001.json"
+          },
+          {
+            "bytes": 73782,
+            "relative_path": "scenes_v3/scene_015_k0p01.json"
+          },
+          {
+            "bytes": 73556,
+            "relative_path": "scenes_v3/scene_015_k1.json"
+          },
+          {
+            "bytes": 75698,
+            "relative_path": "scenes_v3/scene_015_k1000.json"
+          },
+          {
+            "bytes": 72242,
+            "relative_path": "scenes_v3/scene_016_k0p001.json"
+          },
+          {
+            "bytes": 73258,
+            "relative_path": "scenes_v3/scene_016_k0p01.json"
+          },
+          {
+            "bytes": 72750,
+            "relative_path": "scenes_v3/scene_016_k1.json"
+          },
+          {
+            "bytes": 74856,
+            "relative_path": "scenes_v3/scene_016_k1000.json"
+          },
+          {
+            "bytes": 73588,
+            "relative_path": "scenes_v3/scene_017_k0p001.json"
+          },
+          {
+            "bytes": 73588,
+            "relative_path": "scenes_v3/scene_017_k0p01.json"
+          },
+          {
+            "bytes": 74217,
+            "relative_path": "scenes_v3/scene_017_k1.json"
+          },
+          {
+            "bytes": 76390,
+            "relative_path": "scenes_v3/scene_017_k1000.json"
+          },
+          {
+            "bytes": 73547,
+            "relative_path": "scenes_v3/scene_018_k0p001.json"
+          },
+          {
+            "bytes": 74080,
+            "relative_path": "scenes_v3/scene_018_k0p01.json"
+          },
+          {
+            "bytes": 73996,
+            "relative_path": "scenes_v3/scene_018_k1.json"
+          },
+          {
+            "bytes": 76173,
+            "relative_path": "scenes_v3/scene_018_k1000.json"
+          },
+          {
+            "bytes": 69662,
+            "relative_path": "scenes_v3/scene_019_k0p001.json"
+          },
+          {
+            "bytes": 70084,
+            "relative_path": "scenes_v3/scene_019_k0p01.json"
+          },
+          {
+            "bytes": 70424,
+            "relative_path": "scenes_v3/scene_019_k1.json"
+          },
+          {
+            "bytes": 72457,
+            "relative_path": "scenes_v3/scene_019_k1000.json"
+          },
+          {
+            "bytes": 71258,
+            "relative_path": "scenes_v3/scene_020_k0p001.json"
+          },
+          {
+            "bytes": 70667,
+            "relative_path": "scenes_v3/scene_020_k0p01.json"
+          },
+          {
+            "bytes": 70608,
+            "relative_path": "scenes_v3/scene_020_k1.json"
+          },
+          {
+            "bytes": 72647,
+            "relative_path": "scenes_v3/scene_020_k1000.json"
+          },
+          {
+            "bytes": 70309,
+            "relative_path": "scenes_v3/scene_021_k0p001.json"
+          },
+          {
+            "bytes": 69729,
+            "relative_path": "scenes_v3/scene_021_k0p01.json"
+          },
+          {
+            "bytes": 69267,
+            "relative_path": "scenes_v3/scene_021_k1.json"
+          },
+          {
+            "bytes": 71294,
+            "relative_path": "scenes_v3/scene_021_k1000.json"
+          },
+          {
+            "bytes": 74728,
+            "relative_path": "scenes_v3/scene_022_k0p001.json"
+          },
+          {
+            "bytes": 72316,
+            "relative_path": "scenes_v3/scene_022_k0p01.json"
+          },
+          {
+            "bytes": 72999,
+            "relative_path": "scenes_v3/scene_022_k1.json"
+          },
+          {
+            "bytes": 75128,
+            "relative_path": "scenes_v3/scene_022_k1000.json"
+          },
+          {
+            "bytes": 71599,
+            "relative_path": "scenes_v3/scene_023_k0p001.json"
+          },
+          {
+            "bytes": 71147,
+            "relative_path": "scenes_v3/scene_023_k0p01.json"
+          },
+          {
+            "bytes": 70923,
+            "relative_path": "scenes_v3/scene_023_k1.json"
+          },
+          {
+            "bytes": 72986,
+            "relative_path": "scenes_v3/scene_023_k1000.json"
+          },
+          {
+            "bytes": 73499,
+            "relative_path": "scenes_v3/scene_024_k0p001.json"
+          },
+          {
+            "bytes": 72180,
+            "relative_path": "scenes_v3/scene_024_k0p01.json"
+          },
+          {
+            "bytes": 72525,
+            "relative_path": "scenes_v3/scene_024_k1.json"
+          },
+          {
+            "bytes": 74642,
+            "relative_path": "scenes_v3/scene_024_k1000.json"
+          },
+          {
+            "bytes": 73358,
+            "relative_path": "scenes_v3/scene_025_k0p001.json"
+          },
+          {
+            "bytes": 73235,
+            "relative_path": "scenes_v3/scene_025_k0p01.json"
+          },
+          {
+            "bytes": 73208,
+            "relative_path": "scenes_v3/scene_025_k1.json"
+          },
+          {
+            "bytes": 75335,
+            "relative_path": "scenes_v3/scene_025_k1000.json"
+          },
+          {
+            "bytes": 72671,
+            "relative_path": "scenes_v3/scene_026_k0p001.json"
+          },
+          {
+            "bytes": 74073,
+            "relative_path": "scenes_v3/scene_026_k0p01.json"
+          },
+          {
+            "bytes": 73499,
+            "relative_path": "scenes_v3/scene_026_k1.json"
+          },
+          {
+            "bytes": 75646,
+            "relative_path": "scenes_v3/scene_026_k1000.json"
+          },
+          {
+            "bytes": 72522,
+            "relative_path": "scenes_v3/scene_027_k0p001.json"
+          },
+          {
+            "bytes": 72760,
+            "relative_path": "scenes_v3/scene_027_k0p01.json"
+          },
+          {
+            "bytes": 73430,
+            "relative_path": "scenes_v3/scene_027_k1.json"
+          },
+          {
+            "bytes": 75579,
+            "relative_path": "scenes_v3/scene_027_k1000.json"
+          },
+          {
+            "bytes": 73730,
+            "relative_path": "scenes_v3/scene_028_k0p001.json"
+          },
+          {
+            "bytes": 74175,
+            "relative_path": "scenes_v3/scene_028_k0p01.json"
+          },
+          {
+            "bytes": 74040,
+            "relative_path": "scenes_v3/scene_028_k1.json"
+          },
+          {
+            "bytes": 76196,
+            "relative_path": "scenes_v3/scene_028_k1000.json"
+          },
+          {
+            "bytes": 73605,
+            "relative_path": "scenes_v3/scene_029_k0p001.json"
+          },
+          {
+            "bytes": 73581,
+            "relative_path": "scenes_v3/scene_029_k0p01.json"
+          },
+          {
+            "bytes": 73949,
+            "relative_path": "scenes_v3/scene_029_k1.json"
+          },
+          {
+            "bytes": 76109,
+            "relative_path": "scenes_v3/scene_029_k1000.json"
+          },
+          {
+            "bytes": 71021,
+            "relative_path": "scenes_v3/scene_030_k0p001.json"
+          },
+          {
+            "bytes": 71572,
+            "relative_path": "scenes_v3/scene_030_k0p01.json"
+          },
+          {
+            "bytes": 71566,
+            "relative_path": "scenes_v3/scene_030_k1.json"
+          },
+          {
+            "bytes": 73649,
+            "relative_path": "scenes_v3/scene_030_k1000.json"
+          },
+          {
+            "bytes": 73948,
+            "relative_path": "scenes_v3/scene_031_k0p001.json"
+          },
+          {
+            "bytes": 74974,
+            "relative_path": "scenes_v3/scene_031_k0p01.json"
+          },
+          {
+            "bytes": 74397,
+            "relative_path": "scenes_v3/scene_031_k1.json"
+          },
+          {
+            "bytes": 76554,
+            "relative_path": "scenes_v3/scene_031_k1000.json"
+          },
+          {
+            "bytes": 71724,
+            "relative_path": "scenes_v3/scene_032_k0p001.json"
+          },
+          {
+            "bytes": 71423,
+            "relative_path": "scenes_v3/scene_032_k0p01.json"
+          },
+          {
+            "bytes": 72115,
+            "relative_path": "scenes_v3/scene_032_k1.json"
+          },
+          {
+            "bytes": 74214,
+            "relative_path": "scenes_v3/scene_032_k1000.json"
+          },
+          {
+            "bytes": 72613,
+            "relative_path": "scenes_v3/scene_033_k0p001.json"
+          },
+          {
+            "bytes": 73066,
+            "relative_path": "scenes_v3/scene_033_k0p01.json"
+          },
+          {
+            "bytes": 72964,
+            "relative_path": "scenes_v3/scene_033_k1.json"
+          },
+          {
+            "bytes": 75085,
+            "relative_path": "scenes_v3/scene_033_k1000.json"
+          },
+          {
+            "bytes": 71911,
+            "relative_path": "scenes_v3/scene_034_k0p001.json"
+          },
+          {
+            "bytes": 72465,
+            "relative_path": "scenes_v3/scene_034_k0p01.json"
+          },
+          {
+            "bytes": 72721,
+            "relative_path": "scenes_v3/scene_034_k1.json"
+          },
+          {
+            "bytes": 74844,
+            "relative_path": "scenes_v3/scene_034_k1000.json"
+          },
+          {
+            "bytes": 71092,
+            "relative_path": "scenes_v3/scene_035_k0p001.json"
+          },
+          {
+            "bytes": 71853,
+            "relative_path": "scenes_v3/scene_035_k0p01.json"
+          },
+          {
+            "bytes": 71717,
+            "relative_path": "scenes_v3/scene_035_k1.json"
+          },
+          {
+            "bytes": 73803,
+            "relative_path": "scenes_v3/scene_035_k1000.json"
+          },
+          {
+            "bytes": 69779,
+            "relative_path": "scenes_v3/scene_036_k0p001.json"
+          },
+          {
+            "bytes": 69933,
+            "relative_path": "scenes_v3/scene_036_k0p01.json"
+          },
+          {
+            "bytes": 69325,
+            "relative_path": "scenes_v3/scene_036_k1.json"
+          },
+          {
+            "bytes": 71350,
+            "relative_path": "scenes_v3/scene_036_k1000.json"
+          },
+          {
+            "bytes": 70830,
+            "relative_path": "scenes_v3/scene_037_k0p001.json"
+          },
+          {
+            "bytes": 70695,
+            "relative_path": "scenes_v3/scene_037_k0p01.json"
+          },
+          {
+            "bytes": 71222,
+            "relative_path": "scenes_v3/scene_037_k1.json"
+          },
+          {
+            "bytes": 73277,
+            "relative_path": "scenes_v3/scene_037_k1000.json"
+          },
+          {
+            "bytes": 71384,
+            "relative_path": "scenes_v3/scene_038_k0p001.json"
+          },
+          {
+            "bytes": 71858,
+            "relative_path": "scenes_v3/scene_038_k0p01.json"
+          },
+          {
+            "bytes": 71739,
+            "relative_path": "scenes_v3/scene_038_k1.json"
+          },
+          {
+            "bytes": 73817,
+            "relative_path": "scenes_v3/scene_038_k1000.json"
+          },
+          {
+            "bytes": 72859,
+            "relative_path": "scenes_v3/scene_039_k0p001.json"
+          },
+          {
+            "bytes": 72392,
+            "relative_path": "scenes_v3/scene_039_k0p01.json"
+          },
+          {
+            "bytes": 72710,
+            "relative_path": "scenes_v3/scene_039_k1.json"
+          },
+          {
+            "bytes": 74817,
+            "relative_path": "scenes_v3/scene_039_k1000.json"
+          },
+          {
+            "bytes": 72781,
+            "relative_path": "scenes_v3/scene_040_k0p001.json"
+          },
+          {
+            "bytes": 73192,
+            "relative_path": "scenes_v3/scene_040_k0p01.json"
+          },
+          {
+            "bytes": 73127,
+            "relative_path": "scenes_v3/scene_040_k1.json"
+          },
+          {
+            "bytes": 75268,
+            "relative_path": "scenes_v3/scene_040_k1000.json"
+          },
+          {
+            "bytes": 70565,
+            "relative_path": "scenes_v3/scene_041_k0p001.json"
+          },
+          {
+            "bytes": 71658,
+            "relative_path": "scenes_v3/scene_041_k0p01.json"
+          },
+          {
+            "bytes": 71184,
+            "relative_path": "scenes_v3/scene_041_k1.json"
+          },
+          {
+            "bytes": 73229,
+            "relative_path": "scenes_v3/scene_041_k1000.json"
+          },
+          {
+            "bytes": 72251,
+            "relative_path": "scenes_v3/scene_042_k0p001.json"
+          },
+          {
+            "bytes": 72095,
+            "relative_path": "scenes_v3/scene_042_k0p01.json"
+          },
+          {
+            "bytes": 72790,
+            "relative_path": "scenes_v3/scene_042_k1.json"
+          },
+          {
+            "bytes": 74895,
+            "relative_path": "scenes_v3/scene_042_k1000.json"
+          },
+          {
+            "bytes": 73802,
+            "relative_path": "scenes_v3/scene_043_k0p001.json"
+          },
+          {
+            "bytes": 74210,
+            "relative_path": "scenes_v3/scene_043_k0p01.json"
+          },
+          {
+            "bytes": 74094,
+            "relative_path": "scenes_v3/scene_043_k1.json"
+          },
+          {
+            "bytes": 76251,
+            "relative_path": "scenes_v3/scene_043_k1000.json"
+          },
+          {
+            "bytes": 74551,
+            "relative_path": "scenes_v3/scene_044_k0p001.json"
+          },
+          {
+            "bytes": 75025,
+            "relative_path": "scenes_v3/scene_044_k0p01.json"
+          },
+          {
+            "bytes": 75247,
+            "relative_path": "scenes_v3/scene_044_k1.json"
+          },
+          {
+            "bytes": 77440,
+            "relative_path": "scenes_v3/scene_044_k1000.json"
+          },
+          {
+            "bytes": 74823,
+            "relative_path": "scenes_v3/scene_045_k0p001.json"
+          },
+          {
+            "bytes": 74272,
+            "relative_path": "scenes_v3/scene_045_k0p01.json"
+          },
+          {
+            "bytes": 74161,
+            "relative_path": "scenes_v3/scene_045_k1.json"
+          },
+          {
+            "bytes": 76328,
+            "relative_path": "scenes_v3/scene_045_k1000.json"
+          },
+          {
+            "bytes": 76665,
+            "relative_path": "scenes_v3/scene_046_k0p001.json"
+          },
+          {
+            "bytes": 75968,
+            "relative_path": "scenes_v3/scene_046_k0p01.json"
+          },
+          {
+            "bytes": 75457,
+            "relative_path": "scenes_v3/scene_046_k1.json"
+          },
+          {
+            "bytes": 77659,
+            "relative_path": "scenes_v3/scene_046_k1000.json"
+          },
+          {
+            "bytes": 76822,
+            "relative_path": "scenes_v3/scene_047_k0p001.json"
+          },
+          {
+            "bytes": 74417,
+            "relative_path": "scenes_v3/scene_047_k0p01.json"
+          },
+          {
+            "bytes": 75086,
+            "relative_path": "scenes_v3/scene_047_k1.json"
+          },
+          {
+            "bytes": 77281,
+            "relative_path": "scenes_v3/scene_047_k1000.json"
+          },
+          {
+            "bytes": 73942,
+            "relative_path": "scenes_v3/scene_048_k0p001.json"
+          },
+          {
+            "bytes": 73354,
+            "relative_path": "scenes_v3/scene_048_k0p01.json"
+          },
+          {
+            "bytes": 73288,
+            "relative_path": "scenes_v3/scene_048_k1.json"
+          },
+          {
+            "bytes": 75387,
+            "relative_path": "scenes_v3/scene_048_k1000.json"
+          },
+          {
+            "bytes": 74283,
+            "relative_path": "scenes_v3/scene_049_k0p001.json"
+          },
+          {
+            "bytes": 73046,
+            "relative_path": "scenes_v3/scene_049_k0p01.json"
+          },
+          {
+            "bytes": 73353,
+            "relative_path": "scenes_v3/scene_049_k1.json"
+          },
+          {
+            "bytes": 75492,
+            "relative_path": "scenes_v3/scene_049_k1000.json"
+          }
+        ],
+        "report_exists": true,
+        "report_status_markers": [],
+        "standalone_marker_files": [],
+        "total_bytes": 16294806,
+        "walk_errors": []
+      },
+      {
+        "cell": "pu_ladder",
+        "completion_marker_present": true,
+        "elapsed_records": [],
+        "file_count": 4,
+        "outputs": [
+          {
+            "bytes": 37832,
+            "relative_path": "evidence.xlsx"
+          },
+          {
+            "bytes": 79562,
+            "relative_path": "pu_ladder.py"
+          },
+          {
+            "bytes": 19941,
+            "relative_path": "REPORT.md"
+          },
+          {
+            "bytes": 249843,
+            "relative_path": "results.json"
+          }
+        ],
+        "report_exists": true,
+        "report_status_markers": [
+          {
+            "line": 164,
+            "marker": "CELL_COMPLETE",
+            "value": "pu_ladder"
+          }
+        ],
+        "standalone_marker_files": [],
+        "total_bytes": 387178,
+        "walk_errors": []
+      },
+      {
+        "cell": "runs",
+        "completion_marker_present": false,
+        "elapsed_records": [],
+        "file_count": 2,
+        "outputs": [
+          {
+            "bytes": 45625,
+            "relative_path": "e2_program/cells/fidelity_full/run_cell.py"
+          },
+          {
+            "bytes": 64834,
+            "relative_path": "e2_program/cells/pu_ladder/pu_ladder.py"
+          }
+        ],
+        "report_exists": false,
+        "report_status_markers": [],
+        "standalone_marker_files": [],
+        "total_bytes": 110459,
+        "walk_errors": []
+      },
+      {
+        "cell": "w2_00_preflight",
+        "completion_marker_present": false,
+        "elapsed_records": [],
+        "file_count": 4,
+        "outputs": [
+          {
+            "bytes": 85157,
+            "relative_path": "__pycache__/preflight.cpython-312.pyc"
+          },
+          {
+            "bytes": 8993,
+            "relative_path": "_smoke_local.json"
+          },
+          {
+            "bytes": 63534,
+            "relative_path": "preflight.py"
+          },
+          {
+            "bytes": 1554,
+            "relative_path": "remote_preflight.sh"
+          }
+        ],
+        "report_exists": false,
+        "report_status_markers": [],
+        "standalone_marker_files": [],
+        "total_bytes": 159238,
+        "walk_errors": []
+      }
+    ],
+    "path": "D:\\runs\\e2_program\\cells",
+    "snapshot_semantics": "recursive filename and byte-size snapshot; REPORT parsing limited to elapsed and status marker lines",
+    "status": "FOUND"
+  },
+  "not_found": [],
+  "schema": "e2.g0a_inventory.v1",
+  "unlabeled_corpus_census": {
+    "content_parsed": false,
+    "corpora": {
+      "ArchCAD": {
+        "candidate_paths": [
+          "D:\\datasets\\ArchCAD",
+          "C:\\datasets\\ArchCAD"
+        ],
+        "extension_distribution": {
+          ".json": 82194,
+          ".md": 4,
+          ".metadata": 11,
+          ".npy": 41097,
+          ".png": 41098,
+          ".svg": 41097,
+          ".tag": 1,
+          "<none>": 2
+        },
+        "file_count": 205504,
+        "instances": [
+          {
+            "access_errors": [],
+            "extension_distribution": {
+              ".json": 82194,
+              ".md": 4,
+              ".metadata": 11,
+              ".npy": 41097,
+              ".png": 41098,
+              ".svg": 41097,
+              ".tag": 1,
+              "<none>": 2
+            },
+            "file_count": 205504,
+            "path": "D:\\dev\\_ariadne\\alm\\datasets\\ArchCAD",
+            "total_bytes": 9874167331
+          }
+        ],
+        "status": "FOUND",
+        "total_bytes": 9874167331
+      },
+      "FloorPlanCAD": {
+        "candidate_paths": [
+          "D:\\datasets\\FloorPlanCAD",
+          "C:\\datasets\\FloorPlanCAD"
+        ],
+        "extension_distribution": {
+          ".gif": 1,
+          ".json": 2,
+          ".md": 1,
+          ".metadata": 5314,
+          ".png": 5308,
+          ".tag": 1,
+          ".yml": 1,
+          "<none>": 2
+        },
+        "file_count": 10630,
+        "instances": [
+          {
+            "access_errors": [],
+            "extension_distribution": {
+              ".gif": 1,
+              ".json": 2,
+              ".md": 1,
+              ".metadata": 5314,
+              ".png": 5308,
+              ".tag": 1,
+              ".yml": 1,
+              "<none>": 2
+            },
+            "file_count": 10630,
+            "path": "D:\\dev\\_ariadne\\alm\\datasets\\FloorPlanCAD",
+            "total_bytes": 454847042
+          }
+        ],
+        "status": "FOUND",
+        "total_bytes": 454847042
+      },
+      "Zenodo10K": {
+        "candidate_paths": [
+          "D:\\datasets\\Zenodo10K",
+          "D:\\datasets\\Zenodo-10K",
+          "C:\\datasets\\Zenodo10K"
+        ],
+        "extension_distribution": {
+          ".md": 1,
+          ".metadata": 826,
+          ".parquet": 1,
+          ".pptx": 823,
+          ".tag": 1,
+          "<none>": 2
+        },
+        "file_count": 1654,
+        "instances": [
+          {
+            "access_errors": [],
+            "extension_distribution": {
+              ".md": 1,
+              ".metadata": 826,
+              ".parquet": 1,
+              ".pptx": 823,
+              ".tag": 1,
+              "<none>": 2
+            },
+            "file_count": 1654,
+            "path": "D:\\dev\\_ariadne\\alm\\datasets\\Zenodo10K",
+            "total_bytes": 14260986093
+          }
+        ],
+        "status": "FOUND",
+        "total_bytes": 14260986093
+      },
+      "pseudo-12k": {
+        "candidate_paths": [
+          "D:\\datasets\\pseudo-floor-plan-12k",
+          "D:\\datasets\\pseudo-12k",
+          "C:\\datasets\\pseudo-floor-plan-12k"
+        ],
+        "extension_distribution": {
+          ".md": 1,
+          ".metadata": 10,
+          ".parquet": 8,
+          ".tag": 1,
+          "<none>": 2
+        },
+        "file_count": 22,
+        "instances": [
+          {
+            "access_errors": [],
+            "extension_distribution": {
+              ".md": 1,
+              ".metadata": 10,
+              ".parquet": 8,
+              ".tag": 1,
+              "<none>": 2
+            },
+            "file_count": 22,
+            "path": "D:\\dev\\_ariadne\\alm\\datasets\\pseudo-floor-plan-12k",
+            "total_bytes": 3922945924
+          }
+        ],
+        "status": "FOUND",
+        "total_bytes": 3922945924
+      }
+    },
+    "discovery_method": "exact metadata-only candidate paths on local C: and D: drives"
+  },
+  "unresolved": [
+    "protocol breach: Discovery search exposed snippets from synthetic gen2 truth JSON before collector execution; no model score, threshold, or label statistic was computed, and no collected value depends on those snippets."
+  ]
+}
