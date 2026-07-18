@@ -1,0 +1,208 @@
+{
+  "schema": "e2.baseline_freeze.bstar_manifest.v1",
+  "created_at": "2026-07-19T01:17:52+09:00",
+  "frozen": {
+    "bstar": {
+      "arm": "hist_gbdt_context12_p2b",
+      "selection_rule": "maximum three-seed mean val AUPRC; tie mean F1; tie preregistered arm order",
+      "auprc_mean": 0.8311985694315286,
+      "auprc_std_population": 0.0007339139493892996,
+      "f1_mean": 0.7063773451957219,
+      "f1_std_population": 0.0009322307535556797
+    },
+    "model_artifact": {
+      "path": "D:\\runs\\e2_program\\cells\\baseline_freeze\\bstar_model.joblib",
+      "sha256": "04c0515f0253b1d1979b5a5ca4a1f6ad6801c8e6b17a74734978f14717749f21",
+      "type": "three_seed_sklearn_bundle"
+    },
+    "split_hash": "f667686bec339f0253bbc39936131041c59af4a7e67363dc2287393b5ccc18c9",
+    "exclusion_contract": {
+      "included": "first unique, valid, non-zero-length segment record per handle",
+      "excluded": [
+        "segment records with fewer than two points",
+        "zero-length segment records",
+        "later duplicate valid records for an already-seen handle"
+      ],
+      "additional_arm_specific_exclusions": 0,
+      "row_universe_source": "frozen train.npz/val.npz X,y,gid arrays"
+    },
+    "feature_allowlist": {
+      "primary": {
+        "fast_score_p1": [
+          "parallel",
+          "thickness",
+          "junction"
+        ],
+        "logistic_local6": [
+          "parallel",
+          "thickness",
+          "junction",
+          "log10_len",
+          "sin2t",
+          "cos2t"
+        ],
+        "hist_gbdt_local6_p2a": [
+          "parallel",
+          "thickness",
+          "junction",
+          "log10_len",
+          "sin2t",
+          "cos2t"
+        ],
+        "hist_gbdt_context12_p2b": [
+          "parallel",
+          "thickness",
+          "junction",
+          "log10_len",
+          "sin2t",
+          "cos2t",
+          "parallel_band_neighbor_count",
+          "nearest_parallel_gap_px",
+          "junction_degree",
+          "drawing_length_percentile",
+          "radius_density_r20_per_px2",
+          "neighbor_angle_entropy_r20"
+        ]
+      },
+      "diagnostic": {
+        "hist_gbdt_context_layer_name_diagnostic": [
+          "parallel",
+          "thickness",
+          "junction",
+          "log10_len",
+          "sin2t",
+          "cos2t",
+          "parallel_band_neighbor_count",
+          "nearest_parallel_gap_px",
+          "junction_degree",
+          "drawing_length_percentile",
+          "radius_density_r20_per_px2",
+          "neighbor_angle_entropy_r20",
+          "layer_name_wallish",
+          "layer_name_hash16"
+        ]
+      },
+      "forbidden_fragments": [
+        "handle",
+        "filename",
+        "file_path",
+        "filepath",
+        "block_name",
+        "layer_name",
+        "text_content",
+        "drawing_id",
+        "family_id",
+        "sequence_index",
+        "source_id",
+        "class_name",
+        "label"
+      ],
+      "primary_identifier_or_name_feature_count": 0,
+      "primary_forbidden_hits": {},
+      "diagnostic_name_feature_count": 2,
+      "diagnostic_forbidden_hits": {
+        "hist_gbdt_context_layer_name_diagnostic": [
+          {
+            "feature": "layer_name_wallish",
+            "forbidden_fragment": "layer_name"
+          },
+          {
+            "feature": "layer_name_hash16",
+            "forbidden_fragment": "layer_name"
+          }
+        ]
+      },
+      "allowlist_sha256": "02b5f7b64c0c04d829001fb8e236deca6aef15580c548e7385b86c23397e2dfd"
+    },
+    "model_seeds": [
+      17,
+      29,
+      43
+    ],
+    "permutation_seed_list": [
+      1001,
+      1002,
+      1003,
+      1004,
+      1005,
+      1006,
+      1007,
+      1008,
+      1009,
+      1010,
+      1011,
+      1012,
+      1013,
+      1014,
+      1015,
+      1016,
+      1017,
+      1018,
+      1019,
+      1020,
+      1021,
+      1022,
+      1023,
+      1024,
+      1025,
+      1026,
+      1027,
+      1028,
+      1029,
+      1030,
+      1031,
+      1032,
+      1033,
+      1034,
+      1035,
+      1036,
+      1037,
+      1038,
+      1039,
+      1040,
+      1041,
+      1042,
+      1043,
+      1044,
+      1045,
+      1046,
+      1047,
+      1048,
+      1049,
+      1050,
+      1051,
+      1052,
+      1053,
+      1054,
+      1055,
+      1056,
+      1057,
+      1058,
+      1059,
+      1060,
+      1061,
+      1062,
+      1063,
+      1064
+    ],
+    "permutation_seed_list_sha256": "8371ebe6e6ef73369f926df78db2f57a6df1c3dbe084b75f8802709b1713ff9d",
+    "input_hashes": {
+      "packet": "9c5f9e6998570c1298b94e1fe0d25527e7553db8624e80863b98d92ec4f9e9db",
+      "calibration_P3": "6641dd63044ad22b94d6c2a61baf85f86ca4c9191745659171e8a806864c294d",
+      "cubicasa_ml": "e9baf9f361ca9cfc1a113e084bf5c34be33cf9b6c14615c2ed080f771cd3b466",
+      "w1_real_defs": "5cf700d55522242560ef720392cc837178ec895885d85ddf0989bbd5bd23ac97",
+      "cml_ctx": "ac0ef389ca971a87645763bd4153cf4f564731d17f8689331bc9de04a67e1b98",
+      "cml_ctx_results": "03fd688796459629ee41b78c41bbcd0ca4167e332d62fde1ff1de264c73370e9",
+      "train_npz": "8f72d8931c6e08927bf027ee87f1bc5362ab1a85217862e09a0cddd6b0b0d5aa",
+      "val_npz": "5f15eefada2103a55f602473b7a467b72aa0390d84a2ed204a03f65b4a3dacef",
+      "baseline_freeze_py": "631abe6ab2ebf9f805882e269eb139dd15788fb5e6ea6cdca949377479db9f3c"
+    },
+    "versions": {
+      "python": "3.12.10",
+      "numpy": "1.26.4",
+      "scikit_learn": "1.9.0",
+      "joblib": "1.5.3"
+    }
+  },
+  "content_hash": "e3d80d4646952c653740fb5a68743f42b0ace2040b3c858bcd8e6c18942177ad"
+}
