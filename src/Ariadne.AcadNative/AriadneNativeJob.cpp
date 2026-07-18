@@ -3282,15 +3282,16 @@ static std::string blockTableRecordsJson(AcDbDatabase* pDb, int& btrCount,
             const bool isAnon = pBTR->isAnonymous();
             const bool isXref = pBTR->isFromExternalReference();
             const bool isUserBlock = !isLayout && !isAnon && !isXref;
-            // #66: anonymous *D### dimension blocks hold the actual rendered
-            // dimension geometry (extension lines, arrows, the dimension text in
-            // its real style/font). Collecting their def_entities lets a consumer
-            // reproduce a dimension EXACTLY, instead of re-deriving it from
-            // defpoints + a partial dimstyle. Other anonymous blocks (*U###/*X###
-            // dynamic-block reps etc.) stay deferred.
-            const bool isDimBlock = isAnon && name.size() >= 2 &&
-                                    name[0] == '*' && (name[1] == 'D' || name[1] == 'd');
-            const bool collectDefs = isUserBlock || isDimBlock;
+            // #66/#68: anonymous blocks hold real referenced geometry --
+            // *D### dimension blocks (rendered dimension geometry), and
+            // *U###/*X###/*T### dynamic-block/array/table representations that
+            // model-space INSERTs point at. Deferring the *U/*X/etc. defs made
+            // the builder unable to resolve those inserts, dropping large amounts
+            // of real content (repeated symbols, detail callouts inside sheets).
+            // Collect ALL anonymous block defs (layouts + xref contents are still
+            // excluded: isUserBlock already gates those out, and isAnon is false
+            // for *Model_Space/*Paper_Space which are walked separately).
+            const bool collectDefs = isUserBlock || isAnon;
             int entityCount = 0;
             std::string defEntitiesJson = "[]";
             if (collectDefs) {

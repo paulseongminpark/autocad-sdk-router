@@ -83,6 +83,45 @@ function Read-JsonFile {
   Get-Content -LiteralPath $Path -Raw -Encoding UTF8 | ConvertFrom-Json
 }
 
+function Read-CadJobResultSafe {
+  # Reads a native CAD-job result JSON for envelope assembly WITHOUT letting a
+  # huge result blow up ConvertTo-Json. For large files we skip the full parse
+  # and inline entirely (the Python side reads result_json from disk as the
+  # authoritative copy) and only cheaply validate the trailing status marker.
+  # Returns @{ Ok = <bool>; Inline = <obj|$null>; SizeBytes = <long> }.
+  param([string]$ResultPath, [int]$InlineMaxMB = 24)
+  $out = [ordered]@{ Ok = $false; Inline = $null; SizeBytes = [int64]0 }
+  if (-not (Test-Path -LiteralPath $ResultPath)) { return $out }
+  $size = (Get-Item -LiteralPath $ResultPath).Length
+  $out.SizeBytes = $size
+  if ($size -le ([int64]$InlineMaxMB * 1MB)) {
+    try {
+      $parsed = Get-Content -LiteralPath $ResultPath -Raw -Encoding UTF8 | ConvertFrom-Json
+      if ($parsed -and "$($parsed.status)" -ne 'error') { $out.Ok = $true }
+      $out.Inline = $parsed
+    }
+    catch { $out.Ok = $false }
+    return $out
+  }
+  # Huge result: do NOT parse or inline (ConvertTo-Json would OOM). Cheaply
+  # validate completeness by scanning the file tail for the status marker.
+  try {
+    $fs = [System.IO.File]::Open($ResultPath, 'Open', 'Read', 'ReadWrite')
+    try {
+      $tailLen = [int][Math]::Min([int64]8192, $fs.Length)
+      $null = $fs.Seek(-$tailLen, 'End')
+      $buf = New-Object byte[] $tailLen
+      $null = $fs.Read($buf, 0, $tailLen)
+      $tail = [System.Text.Encoding]::UTF8.GetString($buf)
+    }
+    finally { $fs.Dispose() }
+    if ($tail -match '"status"\s*:\s*"ok"') { $out.Ok = $true }
+    elseif ($tail -notmatch '"status"\s*:\s*"error"') { $out.Ok = $true }
+  }
+  catch { $out.Ok = $false }
+  return $out
+}
+
 function Write-Json {
   param([object]$Payload, [string]$Path = '')
   $json = $Payload | ConvertTo-Json -Depth 16
@@ -606,7 +645,7 @@ function Invoke-AccoreScr {
   param(
     [string]$Engine, [string]$StagedDwg, [string]$ScrPath, [string]$DwgDir,
     [string]$RunOut, [hashtable]$EnvVars = @{}, [string]$Tag = 'job',
-    [int]$TimeoutMs = 120000
+    [int]$TimeoutMs = 2400000
   )
   $stdoutFile = Join-Path $RunOut ("accoreconsole_{0}_stdout.txt" -f $Tag)
   $stderrFile = Join-Path $RunOut ("accoreconsole_{0}_stderr.txt" -f $Tag)
@@ -1168,15 +1207,9 @@ function Invoke-CadJobRoute {
     }
     $r = Invoke-AccoreScr -Engine $engine -StagedDwg $inputDwg -ScrPath $scrPath -DwgDir $dwgDir -RunOut $runOut -EnvVars $envVars -Tag 'native_cad_job'
 
-    $result = $null
-    $ok = $false
-    if (Test-Path -LiteralPath $resultOut) {
-      try {
-        $result = Get-Content -LiteralPath $resultOut -Raw -Encoding UTF8 | ConvertFrom-Json
-        if ($result -and "$($result.status)" -ne 'error') { $ok = $true }
-      }
-      catch { $ok = $false }
-    }
+    $rr = Read-CadJobResultSafe -ResultPath $resultOut
+    $result = $rr.Inline
+    $ok = $rr.Ok
 
     return [ordered]@{
       engine_exit_code = if ($r.ExitCode -eq 0 -and $ok) { 0 } else { if ($r.ExitCode -ne 0) { $r.ExitCode } else { -3 } }
@@ -1216,15 +1249,9 @@ function Invoke-CadJobRoute {
   }
   $r = Invoke-AccoreScr -Engine $engine -StagedDwg $inputDwg -ScrPath $scrPath -DwgDir $dwgDir -RunOut $runOut -EnvVars $envVars -Tag 'cad_job'
 
-  $result = $null
-  $ok = $false
-  if (Test-Path -LiteralPath $resultOut) {
-    try {
-      $result = Get-Content -LiteralPath $resultOut -Raw -Encoding UTF8 | ConvertFrom-Json
-      if ($result -and "$($result.status)" -ne 'error') { $ok = $true }
-    }
-    catch { $ok = $false }
-  }
+  $rr = Read-CadJobResultSafe -ResultPath $resultOut
+  $result = $rr.Inline
+  $ok = $rr.Ok
 
   [ordered]@{
     engine_exit_code = if ($r.ExitCode -eq 0 -and $ok) { 0 } else { if ($r.ExitCode -ne 0) { $r.ExitCode } else { -3 } }

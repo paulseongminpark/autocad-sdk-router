@@ -165,7 +165,7 @@ def build_cad_job_command(staged_dwg: str, operation: str, *,
 
 def run_router_cad_job(staged_dwg: str, run_dir: str, operation: str, *,
                        intent: str = "dwg", write_mode: str = "read",
-                       job_path: str | None = None, timeout: int = 600) -> dict:
+                       job_path: str | None = None, timeout: int = 2400) -> dict:
     """Invoke the router NATIVE cad-job lane; capture stdout/stderr/exit + result.
 
     Returns:
