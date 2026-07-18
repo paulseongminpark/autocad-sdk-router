@@ -304,6 +304,8 @@ def fast_score(seg_ir, params=None) -> Dict[str, Any]:
         )
 
     per_handle: Dict[str, Any] = {}
+    nb_weights = dict(weights)
+    nb_weights["layer"] = 0.0
     for k in range(n):
         parallel_score = float(best_ov[k])
         thickness_score = (
@@ -320,7 +322,12 @@ def fast_score(seg_ir, params=None) -> Dict[str, Any]:
         }
         wsum = sum(w for w in weights.values() if w > 0)
         agg = 0.0 if wsum <= 0 else sum(weights[c] * channels[c] for c in channels) / wsum
-        per_handle[recs[k][0]] = {"score": round(agg, 6), "evidence": channels}
+        # name-blind twin from the SAME channels (layer weight zeroed, renormalised)
+        nb_sum = sum(w for w in nb_weights.values() if w > 0)
+        agg_nb = 0.0 if nb_sum <= 0 else sum(
+            nb_weights[c] * channels[c] for c in channels) / nb_sum
+        per_handle[recs[k][0]] = {"score": round(agg, 6), "score_nb": round(agg_nb, 6),
+                                  "evidence": channels}
     return {"per_handle": per_handle, "walls": []}
 
 
@@ -334,17 +341,31 @@ def score_def(doc, units: str, block_name: str) -> Dict[str, Any]:
         else:
             res = evidence_grid.score(ir)
         per = res.get("per_handle") or {}
-        scores = [float(v.get("score", 0.0)) for v in per.values()]
+        scores = []
+        scores_nb = []
+        for v in per.values():
+            scores.append(float(v.get("score", 0.0)))
+            if "score_nb" in v:
+                scores_nb.append(float(v["score_nb"]))
+            else:
+                ev = v.get("evidence") or {}
+                scores_nb.append(round(
+                    (0.35 * ev.get("parallel", 0.0) + 0.25 * ev.get("thickness", 0.0)
+                     + 0.20 * ev.get("junction", 0.0)) / 0.80, 6))
         n_wall = sum(1 for s in scores if s >= WALL_THRESHOLD)
+        n_wall_nb = sum(1 for s in scores_nb if s >= WALL_THRESHOLD)
         max_score = max(scores) if scores else 0.0
+        max_score_nb = max(scores_nb) if scores_nb else 0.0
     else:
-        per, n_wall, max_score = {}, 0, 0.0
+        per, n_wall, n_wall_nb, max_score, max_score_nb = {}, 0, 0, 0.0, 0.0
     return {
         "def": block_name,
         "n_segments": len(segs),
         "n_scored": len(per),
         "n_wall": n_wall,
+        "n_wall_nb": n_wall_nb,
         "max_score": round(max_score, 6),
+        "max_score_nb": round(max_score_nb, 6),
         "warnings": warnings[:4],
     }
 
@@ -448,13 +469,14 @@ def main(argv=None) -> int:
         if d not in doc.blocks:
             missing.append(d)
             rows.append({"def": d, "n_segments": 0, "n_scored": 0, "n_wall": 0,
-                         "max_score": 0.0, "warnings": ["def-not-in-dxf"]})
+                         "n_wall_nb": 0, "max_score": 0.0, "max_score_nb": 0.0,
+                         "warnings": ["def-not-in-dxf"]})
         else:
             try:
                 rows.append(score_def(doc, units, d))
             except Exception as exc:  # noqa: BLE001 - isolate poison defs, keep the sweep
                 rows.append({"def": d, "n_segments": 0, "n_scored": 0, "n_wall": 0,
-                             "max_score": 0.0,
+                             "n_wall_nb": 0, "max_score": 0.0, "max_score_nb": 0.0,
                              "warnings": [f"score-error {type(exc).__name__}: {exc}"[:200]]})
         if (i + 1) % 16 == 0:
             print(f"  scored {i + 1}/{len(defs)} (last {d}: "
@@ -475,6 +497,8 @@ def main(argv=None) -> int:
     nz = [(r["max_score"], r["silver_mean_wall_likelihood"])
           for r in rows if r["n_segments"] > 0]
     r_nonempty = pearson([a for a, _ in nz], [b for _, b in nz]) if nz else None
+    r_nb_all = pearson([r["max_score_nb"] for r in rows], ys)
+    r_full_vs_nb = pearson(xs, [r["max_score_nb"] for r in rows])
 
     verdict = "PASS" if (zero_frac_v1 is not None and zero_frac_v1 <= BAND_ZERO_FRAC) else "FAIL"
     summary = {
@@ -496,6 +520,8 @@ def main(argv=None) -> int:
         "B5": {
             "pearson_all_defs": round(r_all, 4) if r_all is not None else None,
             "pearson_nonempty_defs": round(r_nonempty, 4) if r_nonempty is not None else None,
+            "pearson_nameblind_all_defs": round(r_nb_all, 4) if r_nb_all is not None else None,
+            "pearson_full_vs_nameblind": round(r_full_vs_nb, 4) if r_full_vs_nb is not None else None,
             "n_nonempty": len(nz),
             "top_tier": TOP_TIER,
             "verdict": "REPORT_ONLY",
@@ -511,13 +537,13 @@ def main(argv=None) -> int:
     wb = openpyxl.Workbook()
     ws = wb.active
     ws.title = "per_def"
-    headers = ["def", "n_segments", "n_scored", "n_wall", "max_score",
-               "silver_mean_wall_likelihood", "warnings"]
+    headers = ["def", "n_segments", "n_scored", "n_wall", "n_wall_nb", "max_score",
+               "max_score_nb", "silver_mean_wall_likelihood", "warnings"]
     ws.append(headers)
     for r in rows:
         ws.append([r["def"], r["n_segments"], r["n_scored"], r["n_wall"],
-                   r["max_score"], r["silver_mean_wall_likelihood"],
-                   "; ".join(r["warnings"])])
+                   r["n_wall_nb"], r["max_score"], r["max_score_nb"],
+                   r["silver_mean_wall_likelihood"], "; ".join(r["warnings"])])
     ws2 = wb.create_sheet("summary")
     for k, v in [("n_defs", n), ("n_missing_in_dxf", len(missing)),
                  ("zero_frac_v1", summary["B3"]["zero_frac_v1"]),

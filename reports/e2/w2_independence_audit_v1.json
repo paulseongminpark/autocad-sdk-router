@@ -1,0 +1,122 @@
+{
+ "schema": "ariadne.e2_independence_audit.v1",
+ "gate": "G2 (PROGRAM_PLAN_v1); red-team T1 대리 한통속 sev 0.75",
+ "surrogates": {
+  "A_silver_internal": {
+   "fleiss_kappa_role": 0.7032530164095232,
+   "top_tier_mean_likelihood_pearson": 0.8181758001687531,
+   "likelihood_pearson_within_cluster": [
+    [
+     "fable5_high|sol56_xhigh",
+     0.88
+    ],
+    [
+     "grok45_xhigh|opus48_max",
+     0.8185
+    ],
+    [
+     "grok45_xhigh|sonnet5_xhigh",
+     0.7472
+    ],
+    [
+     "opus48_max|sonnet5_xhigh",
+     0.8414
+    ]
+   ],
+   "likelihood_pearson_across_cluster": [
+    [
+     "fable5_high|grok45_xhigh",
+     0.8378
+    ],
+    [
+     "fable5_high|opus48_max",
+     0.8095
+    ],
+    [
+     "fable5_high|ornith35b_v0",
+     0.4545
+    ],
+    [
+     "fable5_high|sonnet5_xhigh",
+     0.8504
+    ],
+    [
+     "grok45_xhigh|ornith35b_v0",
+     0.4861
+    ],
+    [
+     "grok45_xhigh|sol56_xhigh",
+     0.8128
+    ],
+    [
+     "opus48_max|ornith35b_v0",
+     0.4398
+    ],
+    [
+     "opus48_max|sol56_xhigh",
+     0.765
+    ],
+    [
+     "ornith35b_v0|sol56_xhigh",
+     0.3862
+    ],
+    [
+     "ornith35b_v0|sonnet5_xhigh",
+     0.4363
+    ],
+    [
+     "sol56_xhigh|sonnet5_xhigh",
+     0.7706
+    ]
+   ],
+   "cluster_finding": "E1.5 judges split into two vocabulary families (fable+sol vs opus+sonnet+grok) on one confusion cell; merged-vocab pairwise agreement 0.93-0.98 (cluster_probe_v1). 5 judges are NOT 5 independent measurements — treat consensus as ~2 families.",
+   "verdict": "NOT_INDEPENDENT_WITHIN_FAMILIES"
+  },
+  "B_detector_vs_silver": {
+   "pearson_full": 0.2991,
+   "pearson_nameblind": null,
+   "pearson_full_vs_nameblind": null,
+   "source": "real_defs_v1.json",
+   "status": "PARTIAL_PENDING_NAMEBLIND",
+   "note": "Low r (~0.3) means detector max-score and judge wall_likelihood measure different things on real defs -> they are LARGELY INDEPENDENT evidence axes. If pearson_nameblind ~= pearson_full, the correlation that does exist is NOT driven by both sides reading layer names (decontaminated)."
+  },
+  "C_detector_vs_synth": {
+   "S": "see eval file",
+   "F": "see eval file",
+   "M": "see eval file",
+   "note": "Synthetic truth is generator-defined (constructional), fully independent of layer names, judges, and the metamorphic battery; fidelity to real stats is the weak axis (B1 FAIL: KS 0.5792, TV 0.265 - M-tier PROVISIONAL)."
+  },
+  "D_detector_vs_metamorphic": {
+   "per_transform": {
+    "rotate": {
+     "mean_invariance": 1.0,
+     "verdict": "PASS"
+    },
+    "translate": {
+     "mean_invariance": 1.0,
+     "verdict": "PASS"
+    },
+    "mirror": {
+     "mean_invariance": 1.0,
+     "verdict": "PASS"
+    },
+    "scale": {
+     "mean_invariance": 0.8795,
+     "verdict": "FAIL"
+    },
+    "units": {
+     "mean_invariance": 1.0,
+     "verdict": "REPORT_ONLY"
+    }
+   },
+   "note": "Invariance is a self-consistency axis (no external labels). Its scale arm FAIL is a transform-design artifact, not detector pathology (b4_fold_v1)."
+  }
+ },
+ "interpretation_weights": {
+  "silver_consensus": "count as ~2 independent families, not 5 judges",
+  "synth_truth": "independent of names/judges; weakened by B1 fidelity FAIL",
+  "metamorphic": "independent of all labels; scale arm excluded (design flaw)",
+  "joint_pass_rule": "A claim passing synth + metamorphic + silver counts as 3 quasi-independent confirmations ONLY where name-blind decontamination holds (see B)."
+ },
+ "status": "PARTIAL (name-blind arm pending)"
+}
