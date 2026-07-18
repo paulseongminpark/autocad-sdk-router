@@ -64,3 +64,42 @@ Lanes: sonnet_b/c=opus x3each (sunapse/sunapse-kdw) · sonnet_d/e=opus x5each (j
   the vector (SVG line-label) variant is the only non-local artifact — acquisition decision = Paul.
 - `D:\datasets` junction dangles (pre-Catalog target `_ariadne\harness\runs\alm\datasets`) — repair
   pending approval (drive-root change).
+
+# E2 Wave 1 run state (2026-07-17, prereg e2.wave1.v1 sealed @fcbe0c7)
+
+## Band results (evidence in reports/e2/{s2,s4,s5})
+
+- **B1 fidelity: FAIL** — thickness KS 0.5792 (band ≤0.20) AND entity-mix TV 0.265 (band ≤0.25,
+  fidelity_M_v1_tv.json; NO_DATA resolved). Real mix has SPLINE 3,973 / ARC 2,198 / HATCH 264 etc.;
+  M pack emits only LINE/LWPOLYLINE/INSERT. Generator revision ticket open; M-tier PROVISIONAL.
+- **B2 detector functional: PASS** — S pack per-handle P 1.0 / R 1.0 (threshold 0.5) after two root-cause
+  repairs (unit-anchor conf gate ≥0.5 kills INSUNITS-only scale=1000 poisoning; name-blind wired to
+  use_layer=False). Report-only: F 0.9315/1.0 · M 0.8669/1.0. Name-blind twin alongside (eval_* dirs).
+- **B4 invariance: FAIL (scale arm)** — rotate 1.0 · translate 1.0 · mirror 1.0 PASS; scale 0.8795 FAIL
+  (banded ≥0.90). Forensics: scale ×2 keeps INSUNITS so physical wall thickness genuinely doubles —
+  not semantics-preserving under a physical thickness prior; recorded as measured, no post-hoc band
+  move (redesign ticket for W2: unit-compensated scale). units 1.0 report-only. recall-floor 0.5 never
+  breached. sentinel_zero 0/100; sentinel_all vacuous on S pack (truth wall_frac 1.0 on 20/20 —
+  composition artifact, documented in s5/b4_fold_v1.json). v1 xlsx rotate rows were a harness key
+  mismatch (angle_deg vs angle) — battery_cli repaired, v2 re-run.
+- **B3 real coverage: PASS** — zero_frac_v1 **0.2161** (band ≤0.40; v0 baseline 0.682). 384/384 defs
+  found in staged DXF (missing 0), zero-scoreable defs 2 (0.52%). Evidence: s4/real_defs_v1.{json,xlsx}.
+- **B5 silver alignment (exploratory, no band)**: Pearson(per-def max-score, top-tier mean
+  wall_likelihood) = **0.2991** all-defs / 0.2954 nonempty (n=382). Weak — metric-mapping mismatch
+  (max-score = "any wall-ish segment" vs likelihood = "def is substantially wall") is the W2 hypothesis;
+  feeds the surrogate-independence audit.
+- **B3/B5 substrate**: staged DXF via cad_run_operation transform.database.dxf_out (write_copy;
+  original sha unchanged 14eb65eb…). Driver tools/e2/w1_real_defs.py.
+- **Scorer scale incident (07-18)**: `X-평면도(기본형)` expands to 412,775 segments → reference
+  O(n²) Python scorer = measured 0.55M pairs/s → 86 h for that one def; two duplicate runs burned
+  ~12 h each before ETA was measured (guard-loop false negative "process exited" caused the duplicate
+  relaunch). Repair: NumPy-vectorized + 10-worker MP fast path in the driver (reference module
+  untouched; defs ≤4,000 segs still use it). Equivalence proven twice: ref-vs-fast 8 defs max_dev
+  0.00e+00; seq-vs-MP 20k-sample max_dev 0.00e+00. Wall clock 86 h → 2 h 40 m (memory-bandwidth
+  bound at 10 workers — 35-min ideal-scaling ETA was wrong; see ETA discipline memory).
+
+## Assets
+
+- CubiCasa5k canonical (Zenodo 2613548): `_ariadne\alm\datasets\cubicasa5k.zip` 5,469,495,706 bytes,
+  22,349 entries, full-CRC testzip clean. Extracting to `_ariadne\huggingface\datasets\cubicasa5k\`.
+  Contains F1_original.png + model.svg (vector labels) per plan + train/val/test splits.

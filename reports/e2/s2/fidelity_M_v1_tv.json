@@ -1,0 +1,41 @@
+{
+ "schema": "ariadne.e2_fidelity_tv.v1",
+ "prereg": "e2.wave1.v1 B1 (entity-mix TV component; KS recorded in fidelity_M_v1.json)",
+ "real_total": 28121,
+ "pack_total": 377,
+ "real_mix": {
+  "3DFACE": 34,
+  "ARC": 2198,
+  "CIRCLE": 141,
+  "ELLIPSE": 201,
+  "HATCH": 264,
+  "INSERT": 1158,
+  "LINE": 12110,
+  "LWPOLYLINE": 7400,
+  "MTEXT": 113,
+  "POINT": 341,
+  "POLYLINE": 1,
+  "SPLINE": 3973,
+  "TEXT": 154,
+  "WIPEOUT": 33
+ },
+ "pack_mix": {
+  "3DFACE": 0,
+  "ARC": 0,
+  "CIRCLE": 0,
+  "ELLIPSE": 0,
+  "HATCH": 0,
+  "INSERT": 20,
+  "LINE": 217,
+  "LWPOLYLINE": 140,
+  "MTEXT": 0,
+  "POINT": 0,
+  "POLYLINE": 0,
+  "SPLINE": 0,
+  "TEXT": 0,
+  "WIPEOUT": 0
+ },
+ "tv": 0.265,
+ "band": "<= 0.25",
+ "verdict": "FAIL"
+}
