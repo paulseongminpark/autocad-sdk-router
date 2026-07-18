@@ -1,0 +1,70 @@
+{
+  "schema": "ariadne.e2.loop_l1c.prereg.v1",
+  "cell": "loop_l1c",
+  "estimator_version": "C1v4",
+  "repair_governance": {
+    "mode": "eval-repair",
+    "improvement_credit": false,
+    "seal_before_repair": true,
+    "threshold_substitution_after_observation": false
+  },
+  "sealed_bands": {
+    "high_coverage_per_scale": {
+      "status_field": "unit_status",
+      "status_value": "HIGH",
+      "minimum_fraction": 0.6,
+      "scales": [
+        0.001,
+        0.01,
+        1.0,
+        1000.0
+      ]
+    },
+    "high_accuracy": {
+      "subset": "unit_status=HIGH",
+      "relative_error_maximum": 0.05,
+      "minimum_fraction": 0.95
+    },
+    "perturbation_monotonicity": {
+      "scope": "any perturbation",
+      "allowed_upward_transition_count": 0,
+      "fields": [
+        "confidence_score",
+        "status",
+        "unit_status"
+      ],
+      "status_order": {
+        "NONE": 0,
+        "LOW": 1,
+        "HIGH": 2
+      }
+    }
+  },
+  "required_selftest": {
+    "existing_loop_l1b_tests": 17,
+    "live_counterexample_regressions": 1,
+    "seeded_random_perturbations": 300,
+    "seed": 20260719,
+    "allowed_confidence_increases": 0,
+    "allowed_status_increases": 0,
+    "allowed_unit_status_increases": 0
+  },
+  "replay_cohorts": {
+    "l1b": {
+      "scene_count": 200,
+      "label": "C1v4"
+    },
+    "c1_v1": {
+      "scene_count": 200,
+      "label": "original C1 scenes"
+    }
+  },
+  "sources": {
+    "dossier_clause": "feyerabend_P2.md:738-740",
+    "design_clauses": [
+      "feyerabend_P2.md:194-229",
+      "feyerabend_P2.md:231-247"
+    ],
+    "counterexample": "chainverify_L1b/lens2_stats.md:41-54"
+  }
+}
