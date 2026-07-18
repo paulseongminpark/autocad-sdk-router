@@ -892,7 +892,220 @@ def _result_envelope(status: str, *, patch_id, out_dir, journal_path,
     return env
 
 
-def apply_staged(patch: Dict[str, Any], dwg_path: str, out_dir: str) -> Dict[str, Any]:
+def _normalize_batch_options(batch_options: Optional[Dict[str, Any]]) -> Dict[str, Any]:
+    """Validate/default the apply_staged ``batch_options`` dict (#39).
+
+    {enabled: bool, max_ops_per_batch: int>0, pre_inspect|post_inspect:
+     'skip'|'full', resume: bool, batch_timeout_ms: int}. Batch mode defaults
+    BOTH inspects to 'skip': on the large drawings batch mode exists for, a
+    full pre/post inspect.database.graph is an 800MB+ result each (OOM/time
+    risk). The skips are recorded as journal steps -- never silent.
+    """
+    cfg = {"enabled": False, "max_ops_per_batch": None, "pre_inspect": "skip",
+           "post_inspect": "skip", "resume": True, "batch_timeout_ms": 0}
+    if not isinstance(batch_options, dict):
+        return cfg
+    cfg["enabled"] = bool(batch_options.get("enabled"))
+    mopb = batch_options.get("max_ops_per_batch")
+    if isinstance(mopb, int) and mopb > 0:
+        cfg["max_ops_per_batch"] = mopb
+    for k in ("pre_inspect", "post_inspect"):
+        v = batch_options.get(k)
+        if v in ("skip", "full"):
+            cfg[k] = v
+    cfg["resume"] = bool(batch_options.get("resume", True))
+    bt = batch_options.get("batch_timeout_ms")
+    if isinstance(bt, int) and bt > 0:
+        cfg["batch_timeout_ms"] = bt
+    return cfg
+
+
+def _apply_staged_batched(*, patch_id, out_dir, journal, _step, _finish,
+                          artifacts, staged_path, original_path,
+                          _original_unchanged, applied_records, deferred_ops,
+                          ir_builder, run_job, batch_cfg,
+                          patch_json_path) -> Dict[str, Any]:
+    """Batched apply lane (#39): plan -> per-batch native write sessions.
+
+    Differences from the per-op lane, all recorded in the journal:
+      * ops run against the staged copy IN PLACE (one _QSAVE per batch), so
+        there is no per-op staged_step.dwg chain; staged_pre.dwg preserves the
+        pre-mutation state and staged_output.dwg the final state.
+      * pre/post inspect (and therefore diff + validation) are OPTIONAL --
+        'skip' writes a truthful 'skipped_by_option' journal step. 'ok' from
+        this lane means: every batch PASSed with a _QSAVE proof AND the
+        original is byte-identical; it does NOT claim a diff/validation that
+        was skipped.
+    """
+    pbe, pbe_err = _import_optional("patch_batch_executor")
+    if pbe is None or not hasattr(pbe, "execute_write_batches"):
+        _step("import_patch_batch_executor", "not_implemented", reason=pbe_err)
+        return _finish(_result_envelope(
+            "not_implemented", patch_id=patch_id, out_dir=out_dir,
+            journal_path=os.path.join(out_dir, "journal.json"), artifacts=artifacts,
+            original_unchanged=None,
+            reason="patch_batch_executor unavailable: %s" % pbe_err))
+    journal_path = os.path.join(out_dir, "journal.json")
+
+    # preserve the pre-mutation state once (batches mutate staged_path in place)
+    staged_pre = os.path.join(out_dir, "staged_pre.dwg")
+    try:
+        shutil.copy2(staged_path, staged_pre)
+        artifacts.append({"kind": "dwg_staged", "ref": staged_pre})
+        _step("stage_pre_snapshot", "pass", staged_pre=staged_pre)
+    except OSError as exc:
+        _step("stage_pre_snapshot", "blocked", reason=str(exc))
+        return _finish(_result_envelope(
+            "blocked", patch_id=patch_id, out_dir=out_dir,
+            journal_path=journal_path, artifacts=artifacts,
+            original_unchanged=_original_unchanged(),
+            reason="failed to snapshot staged pre-state: %s" % exc))
+
+    # optional pre-inspect ----------------------------------------------------
+    pre = None
+    if batch_cfg["pre_inspect"] == "full":
+        pre_dir = os.path.join(out_dir, "pre")
+        pre_run = run_job.run_router_cad_job(
+            staged_path, pre_dir, "inspect.database.graph", write_mode="read")
+        pre = _native_full_ir(ir_builder, pre_run, staged_path, original_path,
+                              os.path.join(pre_dir, "dwg_graph_ir.json"), "pre")
+        _step("pre_inspect", "pass" if pre["ok"] else "partial",
+              ir_path=pre.get("ir_path"), entity_count=pre.get("entity_count"),
+              reason=pre.get("reason"))
+        if pre["ok"]:
+            artifacts.append({"kind": "ir", "ref": pre["ir_path"]})
+    else:
+        _step("pre_inspect", "skipped_by_option",
+              reason="batch_options.pre_inspect=skip (large-drawing batch mode)")
+
+    # batched apply -----------------------------------------------------------
+    kwargs: Dict[str, Any] = {
+        "resume": batch_cfg["resume"],
+        "step_cb": lambda rec: journal["steps"].append(
+            dict(rec, at=_now_iso())),
+        "batch_timeout_ms": batch_cfg["batch_timeout_ms"],
+    }
+    if batch_cfg["max_ops_per_batch"]:
+        kwargs["max_ops_per_batch"] = batch_cfg["max_ops_per_batch"]
+    batches_dir = os.path.join(out_dir, "apply_batches")
+    exec_res = pbe.execute_write_batches(applied_records, staged_path,
+                                         batches_dir, **kwargs)
+    batch_summary = {k: exec_res.get(k) for k in
+                     ("ops_total", "ops_ok", "stopped_at_batch", "reason")}
+    _step("apply_batched", exec_res.get("status") or "unavailable",
+          **batch_summary)
+
+    if exec_res.get("status") != "ok":
+        status = "partial" if exec_res.get("status") == "partial" else "blocked"
+        return _finish(_result_envelope(
+            status, patch_id=patch_id, out_dir=out_dir,
+            journal_path=journal_path, artifacts=artifacts,
+            original_unchanged=_original_unchanged(),
+            reason=exec_res.get("reason") or "batched apply did not complete",
+            deferred_ops=deferred_ops, extra={"batch": exec_res}))
+
+    staged_output = os.path.join(out_dir, "staged_output.dwg")
+    shutil.copy2(staged_path, staged_output)
+    artifacts.append({"kind": "dwg_staged", "ref": staged_output})
+
+    # optional post-inspect + diff + validation -------------------------------
+    post = None
+    if batch_cfg["post_inspect"] == "full":
+        post_dir = os.path.join(out_dir, "post")
+        post_run = run_job.run_router_cad_job(
+            staged_output, post_dir, "inspect.database.graph", write_mode="read")
+        post = _native_full_ir(ir_builder, post_run, staged_output, original_path,
+                               os.path.join(post_dir, "dwg_graph_ir.json"), "post")
+        _step("post_inspect", "pass" if post["ok"] else "partial",
+              ir_path=post.get("ir_path"), entity_count=post.get("entity_count"),
+              reason=post.get("reason"))
+        if post["ok"]:
+            artifacts.append({"kind": "ir", "ref": post["ir_path"]})
+    else:
+        _step("post_inspect", "skipped_by_option",
+              reason="batch_options.post_inspect=skip (large-drawing batch mode)")
+
+    diff_summary = None
+    diff_path = None
+    if pre and pre.get("ok") and post and post.get("ok"):
+        cad_diff_mod, diff_err = _import_optional("cad_diff")
+        if cad_diff_mod is not None and hasattr(cad_diff_mod, "compute_diff"):
+            try:
+                diff = cad_diff_mod.compute_diff(_load_json_bom(pre["ir_path"]),
+                                                 _load_json_bom(post["ir_path"]))
+                diff_path = os.path.join(out_dir, "cad_diff.json")
+                _write_json(diff_path, diff)
+                diff_summary = (diff or {}).get("summary")
+                artifacts.append({"kind": "diff", "ref": diff_path})
+                _step("compute_diff", "pass", diff_path=diff_path,
+                      summary=diff_summary)
+            except Exception as exc:
+                _step("compute_diff", "partial",
+                      reason="compute_diff failed: %s: %s" % (type(exc).__name__, exc))
+        else:
+            _step("compute_diff", "not_implemented", reason=diff_err)
+    else:
+        _step("compute_diff", "skipped_by_option",
+              reason="pre/post IR not both available (inspects skipped or partial)")
+
+    _oc = _original_unchanged()
+    journal["original_unchanged"] = _oc
+    journal["original"] = {"original_path": _oc.get("original_path"),
+                           "sha256_before": _oc.get("sha256_before"),
+                           "sha256_after": _oc.get("sha256_after")}
+    _write_json(journal_path, journal)
+
+    validation_status = None
+    if post and post.get("ok"):
+        validator_mod, val_err = _import_optional("validator")
+        if validator_mod is not None and hasattr(validator_mod, "validate_target"):
+            val = _call_validator(validator_mod, diff_path, out_dir,
+                                  patch_json_path, ir_path=post["ir_path"])
+            if val["ok"]:
+                report = val["report"]
+                validation_status = (report or {}).get("status")
+                report_path = os.path.join(out_dir, "validation_report.json")
+                _write_json(report_path, report)
+                artifacts.append({"kind": "validation_report", "ref": report_path})
+                _step("validate", "pass", report=report_path,
+                      validation_status=validation_status)
+            else:
+                _step("validate", "partial", reason=val.get("reason"))
+        else:
+            _step("validate", "not_implemented", reason=val_err)
+    else:
+        _step("validate", "skipped_by_option",
+              reason="no post IR (post_inspect skipped or partial)")
+
+    orig_proof = _original_unchanged()
+    if not orig_proof["unchanged"]:
+        _step("original_unchanged_proof", "fail", proof=orig_proof)
+        return _finish(_result_envelope(
+            "blocked", patch_id=patch_id, out_dir=out_dir,
+            journal_path=journal_path, artifacts=artifacts,
+            original_unchanged=orig_proof,
+            reason="original DWG changed during batched apply (sha256 before != "
+                   "after) -- READ-ONLY invariant violated",
+            extra={"batch": exec_res}))
+    _step("original_unchanged_proof", "pass", proof=orig_proof)
+
+    return _finish(_result_envelope(
+        "ok", patch_id=patch_id, out_dir=out_dir,
+        journal_path=journal_path, artifacts=artifacts,
+        original_unchanged=orig_proof, diff_summary=diff_summary,
+        validation_status=validation_status, deferred_ops=deferred_ops,
+        extra={"staged_output": staged_output,
+               "staged_pre": staged_pre,
+               "batch": exec_res,
+               "op_count_applied": exec_res.get("ops_ok"),
+               "inspects": {"pre": batch_cfg["pre_inspect"],
+                            "post": batch_cfg["post_inspect"]},
+               "entity_count_before": (pre or {}).get("entity_count"),
+               "entity_count_after": (post or {}).get("entity_count")}))
+
+
+def apply_staged(patch: Dict[str, Any], dwg_path: str, out_dir: str, *,
+                 batch_options: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
     """Apply a patch to a STAGED COPY of ``dwg_path`` and return a result envelope.
 
     REAL staged-write lifecycle (the original is never touched):
@@ -1063,6 +1276,24 @@ def apply_staged(patch: Dict[str, Any], dwg_path: str, out_dir: str) -> Dict[str
         return {"original_path": original_path,
                 "sha256_before": original_sha_before, "sha256_after": after,
                 "unchanged": (original_sha_before is not None and after == original_sha_before)}
+
+    # 5-alt. batched lane (#39): opt-in via batch_options={"enabled": True, ...}.
+    # One accoreconsole session per PLANNED BATCH of ops instead of one process
+    # per op -- the only viable path for patches with thousands of ops. The
+    # legacy per-op lane below stays byte-for-byte identical when batch_options
+    # is None/disabled.
+    batch_cfg = _normalize_batch_options(batch_options)
+    if batch_cfg["enabled"]:
+        _step("batch_mode", "pass", options=batch_cfg,
+              op_count=len(applied_records))
+        return _apply_staged_batched(
+            patch_id=patch_id, out_dir=out_dir, journal=journal, _step=_step,
+            _finish=_finish, artifacts=artifacts, staged_path=staged_path,
+            original_path=original_path,
+            _original_unchanged=_original_unchanged,
+            applied_records=applied_records, deferred_ops=deferred_ops,
+            ir_builder=ir_builder, run_job=run_job, batch_cfg=batch_cfg,
+            patch_json_path=patch_json_path)
 
     # 5. pre-inspect: native_full IR of the staged copy ------------------------
     pre_dir = os.path.join(out_dir, "pre")

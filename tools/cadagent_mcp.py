@@ -290,7 +290,22 @@ def _tool_patch_apply_staged(args: Dict[str, Any]) -> Dict[str, Any]:
         return _err("missing required arg: dwg_path")
     if not out_dir:
         return _err("missing required arg: out_dir")
+    # #39: optional batched lane -- batch={"enabled": true, "max_ops_per_batch":
+    # 500, "pre_inspect": "skip"|"full", "post_inspect": "skip"|"full",
+    # "resume": true, "batch_timeout_ms": 0}. Forwarded only when the loaded
+    # patch_engine supports it (older shells degrade to the per-op lane).
+    batch = args.get("batch")
     try:
+        if isinstance(batch, dict):
+            try:
+                return {"ok": True,
+                        "result": apply_fn(patch, dwg_path, out_dir,
+                                           batch_options=batch)}
+            except TypeError:
+                return _err("loaded patch_engine.apply_staged does not accept "
+                            "batch_options (older shell); re-run without 'batch' "
+                            "or update patch_engine",
+                            delegate="patch_engine.apply_staged")
         return {"ok": True, "result": apply_fn(patch, dwg_path, out_dir)}
     except Exception as exc:  # noqa: BLE001
         return _err("patch_engine.apply_staged failed: %r" % exc)
@@ -626,7 +641,9 @@ _TOOLS: List[Dict[str, Any]] = [
         "name": "cad.patch_apply_staged",
         "description": "Apply a cad_patch.v1 on a STAGED copy (never the original) via "
                        "patch_engine.apply_staged. Degrades to not_implemented if the peer "
-                       "lane's apply_staged is not present.",
+                       "lane's apply_staged is not present. Optional 'batch' switches to the "
+                       "#39 batched lane: ONE accoreconsole session per planned batch of ops "
+                       "(vs one process per op) -- required for patches with 100s-1000s of ops.",
         "delegates_to": "patch_engine.apply_staged",
         "inputSchema": {
             "type": "object",
@@ -634,6 +651,15 @@ _TOOLS: List[Dict[str, Any]] = [
                 "patch": {"type": "object", "description": "An ariadne.cad_patch.v1 object."},
                 "dwg_path": {"type": "string", "description": "DWG to copy+mutate (original stays read-only)."},
                 "out_dir": {"type": "string", "description": "Run output directory."},
+                "batch": {
+                    "type": "object",
+                    "description": "#39 batched lane options. {enabled: bool, "
+                                   "max_ops_per_batch: int (default 500), pre_inspect: "
+                                   "'skip'|'full' (default skip), post_inspect: 'skip'|'full' "
+                                   "(default skip), resume: bool (default true), "
+                                   "batch_timeout_ms: int (0=auto)}. Skipped inspects are "
+                                   "journaled as skipped_by_option, never silent.",
+                },
             },
             "required": ["patch", "dwg_path", "out_dir"],
             "additionalProperties": False,

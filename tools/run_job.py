@@ -238,6 +238,101 @@ def run_router_cad_job(staged_dwg: str, run_dir: str, operation: str, *,
             "staged_used": staged_used, "timed_out": timed_out, "error": error}
 
 
+def build_write_batch_command(staged_dwg: str, job_list_path: str, *,
+                              out_dir: str | None = None,
+                              batch_timeout_ms: int = 0) -> list[str]:
+    """Router invocation for a NATIVE write BATCH (#39).
+
+    Runs:  powershell -File <router> -Action run-native-write-batch
+           -InputPath <staged_dwg> -JobListPath <jobs.json> [-Out <run_out>]
+
+    One accoreconsole session runs EVERY job in the list against ``staged_dwg``
+    IN PLACE and _QSAVEs once at the end. ``staged_dwg`` MUST be an engine-owned
+    staged copy -- the route never stages and never touches an original (that
+    guarantee is the caller's lifecycle, e.g. patch_engine.apply_staged).
+    """
+    ps = _powershell_exe()
+    cmd = [
+        ps, "-NoProfile", "-NonInteractive", "-ExecutionPolicy", "Bypass",
+        "-File", str(ROUTER_PS1),
+        "-Action", "run-native-write-batch",
+        "-InputPath", str(staged_dwg),
+        "-JobListPath", str(job_list_path),
+    ]
+    if out_dir:
+        cmd += ["-Out", str(out_dir)]
+    if batch_timeout_ms and batch_timeout_ms > 0:
+        cmd += ["-BatchTimeoutMs", str(int(batch_timeout_ms))]
+    return cmd
+
+
+def run_router_write_batch(staged_dwg: str, run_dir: str, job_list_path: str, *,
+                           timeout: int = 3600,
+                           batch_timeout_ms: int = 0) -> dict:
+    """Invoke the router native write-batch lane; capture everything.
+
+    Returns:
+      {command, exit_code, stdout_path, stderr_path, envelope (parsed
+       write_batch_result|None), timed_out, error}.
+    Never raises on a router failure. The authoritative envelope is read from
+    <run_dir>/write_batch_result.json (written by the route before it returns);
+    stdout parsing is only the fallback. ``envelope.qsave_done`` is the
+    batch-persisted proof; ``envelope.results`` is the per-op status list.
+    """
+    run_dir_p = Path(run_dir)
+    run_dir_p.mkdir(parents=True, exist_ok=True)
+    stdout_path = run_dir_p / "stdout.txt"
+    stderr_path = run_dir_p / "stderr.txt"
+
+    if not ROUTER_PS1.exists():
+        msg = f"router entrypoint missing: {ROUTER_PS1}"
+        stderr_path.write_text(msg + "\n", encoding="utf-8")
+        stdout_path.write_text("", encoding="utf-8")
+        return {"command": None, "exit_code": None, "stdout_path": str(stdout_path),
+                "stderr_path": str(stderr_path), "envelope": None,
+                "timed_out": False, "error": msg}
+
+    cmd = build_write_batch_command(staged_dwg, job_list_path, out_dir=run_dir,
+                                    batch_timeout_ms=batch_timeout_ms)
+    timed_out = False
+    error = None
+    stdout_text = ""
+    stderr_text = ""
+    code = None
+    try:
+        proc = subprocess.run(
+            cmd, cwd=str(ROUTER_HOME), capture_output=True, text=True,
+            encoding="utf-8", errors="replace", timeout=timeout,
+        )
+        stdout_text = proc.stdout or ""
+        stderr_text = proc.stderr or ""
+        code = proc.returncode
+    except subprocess.TimeoutExpired as exc:
+        timed_out = True
+        error = f"router write batch timed out after {timeout}s"
+        stdout_text = (exc.stdout or "") if isinstance(exc.stdout, str) else ""
+        stderr_text = (exc.stderr or "") if isinstance(exc.stderr, str) else ""
+    except OSError as exc:
+        error = f"failed to launch router: {exc}"
+
+    stdout_path.write_text(stdout_text, encoding="utf-8")
+    stderr_path.write_text(stderr_text, encoding="utf-8")
+
+    envelope = None
+    result_file = run_dir_p / "write_batch_result.json"
+    if result_file.exists():
+        try:
+            envelope = json.loads(result_file.read_text(encoding="utf-8-sig"))
+        except (ValueError, OSError):
+            envelope = None
+    if envelope is None and stdout_text.strip():
+        envelope = _parse_first_json_object(stdout_text)
+
+    return {"command": cmd, "exit_code": code, "stdout_path": str(stdout_path),
+            "stderr_path": str(stderr_path), "envelope": envelope,
+            "timed_out": timed_out, "error": error}
+
+
 def _parse_first_json_object(text: str) -> dict | None:
     """Best-effort: parse the router's JSON envelope from stdout.
 

@@ -1,5 +1,5 @@
 param(
-  [ValidateSet('status', 'select', 'run', 'explain', 'run-native-batch')]
+  [ValidateSet('status', 'select', 'run', 'explain', 'run-native-batch', 'run-native-write-batch')]
   [string]$Action = 'status',
   [string]$Intent = 'auto',
   [string]$Route = '',
@@ -16,6 +16,8 @@ param(
   [string]$HostMode = 'auto',
   [string]$Operation = '',
   [string]$OpListPath = '',
+  [string]$JobListPath = '',
+  [int]$BatchTimeoutMs = 0,
   [string]$RouterHome = '',
   [string]$ConfigPath = '',
   [string]$PythonExe = ''
@@ -1397,6 +1399,152 @@ function Invoke-CadNativeBatchRoute {
   }
 }
 
+function Invoke-CadNativeWriteBatchRoute {
+  # Staged WRITE batch in ONE accoreconsole session (#39). Loads .dbx/.crx ONCE,
+  # then for each {job_file, result_file} entry in -JobListPath runs
+  # ARIADNE_NATIVE_JOB with per-op job/result env vars, then a single _QSAVE
+  # persists every mutation into -InputPath IN PLACE.
+  #
+  # CONTRACT: -InputPath MUST already be an engine-owned STAGED copy (e.g.
+  # patch_engine apply_staged's staged_input.dwg). This route never stages and
+  # never sees the caller's original -- the no-original-write guarantee lives in
+  # the caller's lifecycle. Running in place is what lets consecutive batches
+  # chain without a full DWG copy per op.
+  #
+  # Each op writes its own result JSON immediately, so a mid-session kill still
+  # yields partial results + the exact stop point. qsave_done.txt is written
+  # AFTER _QSAVE: its presence == "this batch's mutations are persisted on
+  # disk". A QUIT hang after that is killed by the Invoke-AccoreScr timeout
+  # without losing anything (results + DWG are already saved).
+  param([object]$Capabilities, [int]$TimeoutMs = 0)
+  $cap = @($Capabilities.routes | Where-Object { $_.id -eq 'dwg_truth_autocad' }) | Select-Object -First 1
+  $engine = Resolve-AcadEnginePath -Default $cap.engine_path
+  if (-not (Test-Path -LiteralPath $engine)) {
+    return [ordered]@{ status = 'UNAVAILABLE'; detail = "accoreconsole not found at $engine" }
+  }
+  if ([string]::IsNullOrWhiteSpace($InputPath) -or -not (Test-Path -LiteralPath $InputPath)) {
+    return [ordered]@{ status = 'ERROR'; detail = 'run-native-write-batch requires -InputPath <staged.dwg> (an engine-owned staged copy; NEVER an original).' }
+  }
+  if ([string]::IsNullOrWhiteSpace($JobListPath) -or -not (Test-Path -LiteralPath $JobListPath)) {
+    return [ordered]@{ status = 'ERROR'; detail = "run-native-write-batch requires -JobListPath <jobs.json> (JSON array of {index, operation, job_file, result_file}). Got: '$JobListPath'" }
+  }
+  # WinPS 5.1: ConvertFrom-Json emits a JSON array as ONE un-enumerated object;
+  # ForEach-Object forces real element enumeration.
+  $jobListRaw = Get-Content -LiteralPath $JobListPath -Raw -Encoding UTF8 | ConvertFrom-Json
+  $jobList = @($jobListRaw | ForEach-Object { $_ })
+  if ($jobList.Count -eq 0) {
+    return [ordered]@{ status = 'ERROR'; detail = "job list is empty: $JobListPath" }
+  }
+
+  $stamp = Get-Date -Format 'yyyyMMdd_HHmmss'
+  $runOut = if (-not [string]::IsNullOrWhiteSpace($Out)) { $Out } else { Join-Path $RunsDir "native_write_batch_$stamp" }
+  New-Item -ItemType Directory -Force -Path $runOut | Out-Null
+  $dwgDir = Split-Path -Parent $InputPath
+
+  $dbx = Resolve-NativeAcadModule -LeafName 'Ariadne.AcadNativeDbx.dbx'
+  $crx = Resolve-NativeAcadModule -LeafName 'Ariadne.AcadNative.crx'
+  $dbxFwd = $dbx.Replace('\', '/')
+  $crxFwd = $crx.Replace('\', '/')
+  $trusted = (Split-Path -Parent $crx).Replace('\', '\\')
+
+  $scrLines = [System.Collections.Generic.List[string]]::new()
+  $scrLines.Add('(setvar "SECURELOAD" 0)')
+  $scrLines.Add('(setvar "FILEDIA" 0)')
+  $scrLines.Add('(setvar "CMDECHO" 0)')
+  $scrLines.Add(("(setvar `"TRUSTEDPATHS`" `"$trusted`")"))
+  $scrLines.Add(("(arxload `"$dbxFwd`")"))
+  $scrLines.Add(("(arxload `"$crxFwd`")"))
+
+  $manifest = [System.Collections.Generic.List[object]]::new()
+  foreach ($entry in $jobList) {
+    $jobFile = [string]$entry.job_file
+    $resFile = [string]$entry.result_file
+    if ([string]::IsNullOrWhiteSpace($jobFile) -or -not (Test-Path -LiteralPath $jobFile)) {
+      return [ordered]@{ status = 'ERROR'; detail = "job_file missing on disk: '$jobFile' (index $($entry.index))" }
+    }
+    if ([string]::IsNullOrWhiteSpace($resFile)) {
+      return [ordered]@{ status = 'ERROR'; detail = "result_file not set for job index $($entry.index)" }
+    }
+    $jobFwd = $jobFile.Replace('\', '/')
+    $resFwd = $resFile.Replace('\', '/')
+    $scrLines.Add(('(setenv "ARIADNE_CAD_JOB_IN" "{0}")' -f $jobFwd))
+    $scrLines.Add(('(setenv "ARIADNE_CAD_JOB_OUT" "{0}")' -f $resFwd))
+    $scrLines.Add('(setenv "ARIADNE_CAD_JOB_HOST_MODE" "coreconsole")')
+    $scrLines.Add('ARIADNE_NATIVE_JOB')
+    $manifest.Add([ordered]@{ index = $entry.index; operation = "$($entry.operation)"; result_file = $resFile })
+  }
+  $scrLines.Add('_QSAVE')
+  $qsaveMarker = Join-Path $runOut 'qsave_done.txt'
+  $qsaveFwd = $qsaveMarker.Replace('\', '/')
+  $scrLines.Add(('(progn (setq ariadne-wb-mf (open "{0}" "w")) (write-line "ok" ariadne-wb-mf) (close ariadne-wb-mf))' -f $qsaveFwd))
+  $scrLines.Add('QUIT')
+  $scrLines.Add('')
+  $scrPath = Join-Path $runOut 'native_write_batch.scr'
+  # Unicode (UTF-16LE): job/staged paths may contain non-ASCII characters; the
+  # native cad-job lane already feeds accoreconsole UTF-16 .scr files.
+  Set-Content -LiteralPath $scrPath -Value $scrLines -Encoding Unicode
+  Remove-Item -LiteralPath $qsaveMarker -Force -ErrorAction SilentlyContinue
+
+  if ($TimeoutMs -le 0) {
+    $TimeoutMs = [Math]::Max(600000, 120000 + 500 * $jobList.Count)
+  }
+  $r = Invoke-AccoreScr -Engine $engine -StagedDwg $InputPath -ScrPath $scrPath -DwgDir $dwgDir -RunOut $runOut -EnvVars @{} -Tag 'native_write_batch' -TimeoutMs $TimeoutMs
+
+  # Collect per-op results (files written incrementally; survive a timeout kill).
+  $results = [System.Collections.Generic.List[object]]::new()
+  $counts = @{}
+  foreach ($m in $manifest) {
+    $st = 'no_result'; $eng = ''; $code = ''
+    if (Test-Path -LiteralPath $m.result_file) {
+      try {
+        $j = Get-Content -LiteralPath $m.result_file -Raw -Encoding UTF8 | ConvertFrom-Json
+        $eng = "$($j.engine)"
+        $st = "$($j.status)"
+        if ($j.PSObject.Properties.Name -contains 'error' -and $null -ne $j.error) {
+          $code = "$($j.error.code)"
+        }
+        if ([string]::IsNullOrWhiteSpace($code) -and $j.PSObject.Properties.Name -contains 'reason') { $code = "$($j.reason)" }
+      }
+      catch { $st = 'unparseable_result' }
+    }
+    $bucket = $st
+    if ($st -eq 'error' -and -not [string]::IsNullOrWhiteSpace($code)) { $bucket = "error:$code" }
+    if ($counts.ContainsKey($bucket)) { $counts[$bucket]++ } else { $counts[$bucket] = 1 }
+    $results.Add([ordered]@{ index = $m.index; operation = $m.operation; status = $st; engine = $eng; error_code = $code; result_file = $m.result_file })
+  }
+
+  $okCount = @($results | Where-Object { $_.status -eq 'ok' }).Count
+  $noResult = @($results | Where-Object { $_.status -eq 'no_result' }).Count
+  $qsaveDone = Test-Path -LiteralPath $qsaveMarker
+
+  # Truthful status: PASS only when EVERY op returned ok AND the _QSAVE marker
+  # proves persistence. A killed QUIT hang after the marker is still PASS (the
+  # exit code is recorded but everything that matters is on disk).
+  $status = if ($okCount -eq $manifest.Count -and $qsaveDone) { 'PASS' }
+            elseif ($qsaveDone -or $okCount -gt 0) { 'PARTIAL' }
+            else { 'FAILED' }
+
+  $envelope = [ordered]@{
+    schema           = 'ariadne.autocad_native_write_batch.v1'
+    status           = $status
+    engine_exit_code = $r.ExitCode
+    ops_total        = $manifest.Count
+    ops_ok           = $okCount
+    no_result        = $noResult
+    qsave_done       = $qsaveDone
+    staged_dwg       = $InputPath
+    run_out          = $runOut
+    scr              = $scrPath
+    bucket_counts    = ([ordered]@{} + $counts)
+    process_hygiene  = $r.Hygiene
+    results          = $results
+  }
+  # Persist the envelope next to the run artifacts so Python callers read a
+  # file instead of parsing stdout.
+  Write-Json -Payload $envelope -Path (Join-Path $runOut 'write_batch_result.json') | Out-Null
+  $envelope
+}
+
 function Invoke-AutoCadRoute {
   # DWG ground-truth via accoreconsole. Priority chain (most authoritative first):
   #   ObjectARX (active document) -> ObjectDBX (side database) -> AutoLISP (ssget count).
@@ -1633,6 +1781,10 @@ switch ($Action) {
   'run-native-batch' {
     $status = Get-Status -Capabilities $capabilities
     $batch = Invoke-CadNativeBatchRoute -Capabilities $capabilities
+    Write-Json -Payload $batch
+  }
+  'run-native-write-batch' {
+    $batch = Invoke-CadNativeWriteBatchRoute -Capabilities $capabilities -TimeoutMs $BatchTimeoutMs
     Write-Json -Payload $batch
   }
   'explain' {
