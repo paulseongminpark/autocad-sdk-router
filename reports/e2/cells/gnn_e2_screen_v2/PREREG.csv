@@ -1,0 +1,56 @@
+section,key,value
+seal,schema,e2.gnn_e2_screen_v2.prereg.v1
+seal,cell,gnn_e2_screen_v2
+seal,sealed_at,2026-07-19T04:27:40+09:00
+seal,sealed_before_model_execution,true
+seal,packet_sha256,2133da2abb514a88200a9f0b1ce1ccc54cdc0e259fbe5c3c8fac332a9212561c
+seal,amendment2_sha256,6e29bbd5f8c502a1bc36277a535521c117408b2460e80511907d610321dd442a
+seal,spreadsheet_runtime,"unavailable: load_workspace_dependencies is not exposed in this executor"
+seal,fallback,"packet-authorized PREREG.csv; no alternate spreadsheet library"
+split,assignment_sha256,d51463fcfeb7dadf68f34ba69d0e4a56ef5d991a581b04017ceae933ec95acbb
+split,manifest_sha256,2bafcb4c167248a1641e976513c409abda22da75c90c02504d26e09937815306
+split,train_families,F01|F02|F03|F04|F05|F06
+split,development_families,F07|F08
+split,train_drawings,150
+split,development_drawings,50
+split,family_overlap_required,0
+split,tier_cardinality,S=67|F=67|M=66
+split,drawing_id_split_allowed,false
+split,development_only_scoring,true
+arm,A,no pretraining then joint node/pair fine-tuning
+arm,B,masked-feature plus contrastive SSL on unlabeled CubiCasa train then identical joint node/pair fine-tuning
+arm,B_no_message,Arm B inference with all message passing disabled
+arm,B_edge_type_shuffle,Arm B inference with edge-type labels deterministically shuffled
+model,seed,17
+model,architecture,17-feature geometry-only projection plus exactly two typed message-passing layers
+model,hidden_dim,64
+model,dropout,0.1
+model,learning_rate,0.003
+model,weight_decay,0.0001
+model,ssl_pretrain_epochs,20
+model,fine_tune_epochs,16
+model,train_graph_batch_size,4
+model,ssl_graph_batch_size,5
+model,minimum_graph_batch_size,1
+metric,development,node_auprc|node_f1_at_0.5|pair_auprc|pair_f1_at_0.5
+metric,deltas,B_minus_A|full_B_minus_NoMessage|full_B_minus_edge_type_shuffle
+metric,bootstrap,10000 paired family-cluster replicates seed 170017 95% percentile CI
+metric,resources,peak GPU|peak RAM|elapsed RTX hours|actual OOM events
+metric,graph_recheck,typed relation recall|wall handle recall|wall pair candidate recall|unresolved refs
+reference,frozen_bstar_source_auprc,0.8311985694
+reference,w2_02_twohop_val_A_auprc,0.87408233
+reference,authority,read-only reference only; screen truth table remains orchestrator-only
+cap,rtx_total_hours,24
+cap,prior_charged_hours,0.2679669444444452
+cap,v2_remaining_hours,23.732033055555555
+cap,ram_gib,48
+cap,oom_policy,halve graph batch to 1 and record actual events; persistent OOM blocks without cap increase
+boundary,cubicasa,train SEG-IR unlabeled only; val/test reads 0
+boundary,original_cad_reads,0
+boundary,write_scope,D:\runs\e2_program\cells\gnn_e2_screen_v2 only
+boundary,repository_modification,false
+boundary,existing_artifact_modification,false
+boundary,git_operations,false
+boundary,subagents,0
+boundary,screen_pass_or_kill_output,false
+boundary,single_seed_formal_claim,false

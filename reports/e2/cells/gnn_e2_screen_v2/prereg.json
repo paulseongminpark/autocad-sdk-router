@@ -1,0 +1,152 @@
+{
+  "schema": "e2.gnn_e2_screen_v2.prereg.v1",
+  "cell": "gnn_e2_screen_v2",
+  "sealed_at": "2026-07-19T04:27:40+09:00",
+  "sealed_before_model_execution": true,
+  "packet": {
+    "path": "D:\\runs\\e2_program\\build\\PACKET_gnn_e2_screen_v2.md",
+    "sha256": "2133da2abb514a88200a9f0b1ce1ccc54cdc0e259fbe5c3c8fac332a9212561c"
+  },
+  "governance": {
+    "base_prereg_path": "D:\\dev\\99_tools\\autocad-sdk-router\\reports\\e2\\prereg_r2_v1.json",
+    "base_prereg_sha256": "fc93dad9232cfd877802c1d53996357eccc710daff8cfb2cf7c865bf7f78bcd2",
+    "amendment1_path": "D:\\dev\\99_tools\\autocad-sdk-router\\reports\\e2\\prereg_r2_v1_amendment1.json",
+    "amendment1_sha256": "30f752db803f7f589d1a8d1f1a2d8557364ae2d624f76a639533161f552b8283",
+    "amendment2_path": "D:\\dev\\99_tools\\autocad-sdk-router\\reports\\e2\\prereg_r2_v1_amendment2.json",
+    "amendment2_sha256": "6e29bbd5f8c502a1bc36277a535521c117408b2460e80511907d610321dd442a",
+    "spreadsheet_runtime": "unavailable: load_workspace_dependencies is not exposed in this executor",
+    "dual_seal_fallback": "packet-authorized PREREG.csv; no alternate spreadsheet library",
+    "screen_truth_table_authority": "orchestrator only",
+    "screen_pass_or_kill_output": false,
+    "single_seed_formal_claim": false
+  },
+  "split": {
+    "source_manifest": "D:\\runs\\e2_program\\cells\\gen2_families\\split_example_manifest.json",
+    "source_manifest_sha256": "2bafcb4c167248a1641e976513c409abda22da75c90c02504d26e09937815306",
+    "assignment_sha256": "d51463fcfeb7dadf68f34ba69d0e4a56ef5d991a581b04017ceae933ec95acbb",
+    "assignment_hash_payload": "ordered rows [drawing_id,family_id,tier,fold], canonical JSON sort_keys/separators",
+    "train_families": ["F01", "F02", "F03", "F04", "F05", "F06"],
+    "development_families": ["F07", "F08"],
+    "train_drawings": 150,
+    "development_drawings": 50,
+    "family_overlap_required": 0,
+    "tier_cardinality": {"S": 67, "F": 67, "M": 66},
+    "drawing_id_split_allowed": false,
+    "development_only_scoring": true
+  },
+  "data": {
+    "synthetic_pack_root": "D:\\runs\\e2_program\\cells\\gen2_families\\packs",
+    "synthetic_drawings": 200,
+    "cubicasa_ssl_root": "D:\\dev\\99_tools\\autocad-sdk-router\\runs\\e2_ext_cubicasa\\ir\\train",
+    "cubicasa_ssl_graph_count": 20,
+    "cubicasa_selection": "seed-17 filename-hash order; first 20 unique normalized geometry fingerprints",
+    "cubicasa_labels_allowed": false,
+    "cubicasa_val_reads_allowed": false,
+    "cubicasa_test_reads_allowed": false,
+    "original_cad_reads_allowed": false
+  },
+  "graph": {
+    "builder_path": "D:\\dev\\99_tools\\autocad-sdk-router\\tools\\e2\\cells\\graph_builder.py",
+    "builder_sha256": "c95d4a30d30e0db157fe56102053a7884902b7749464f7f4cb8852c0819321f6",
+    "frozen_config_sha256": "56911f4633979a3fe00fd56be2d0a39ac06757ed255ed49ed18ca20ba9d4ac49",
+    "feature_count": 17,
+    "features": [
+      "log1p_length_norm",
+      "midpoint_x_drawing_norm",
+      "midpoint_y_drawing_norm",
+      "bbox_width_norm",
+      "bbox_height_norm",
+      "sin_2theta",
+      "cos_2theta",
+      "sagitta_norm",
+      "closed_geometry",
+      "kind_line",
+      "kind_poly_edge",
+      "kind_arc_chord",
+      "log1p_endpoint_degree",
+      "log1p_junction_count",
+      "log1p_parallel_count",
+      "log1p_collinear_count",
+      "block_depth_norm"
+    ],
+    "identifier_name_label_features_allowed": false,
+    "minimum_supported_relation_recall_required": 0.98,
+    "unresolved_required_references_required": 0
+  },
+  "model": {
+    "seed": 17,
+    "architecture": "geometry-only input projection plus exactly two typed message-passing layers with joint node and pair heads",
+    "hidden_dim": 64,
+    "message_passing_layers": 2,
+    "input_projection_layers": 1,
+    "dropout": 0.1,
+    "learning_rate": 0.003,
+    "weight_decay": 0.0001,
+    "fine_tune_epochs": 16,
+    "ssl_pretrain_epochs": 20,
+    "train_graph_batch_size": 4,
+    "ssl_graph_batch_size": 5,
+    "minimum_graph_batch_size": 1,
+    "mask_probability": 0.15,
+    "edge_keep_probability": 0.85,
+    "contrastive_temperature": 0.2,
+    "masked_loss_weight": 1.0,
+    "contrastive_loss_weight": 1.0,
+    "node_loss_weight": 1.0,
+    "pair_loss_weight": 1.0,
+    "gradient_clip_norm": 5.0
+  },
+  "arms": {
+    "A": "no pretraining then joint node/pair fine-tuning",
+    "B": "masked-feature plus contrastive SSL on unlabeled CubiCasa train graphs then identical joint node/pair fine-tuning",
+    "B_no_message": "Arm B checkpoint inference with all message passing disabled",
+    "B_edge_type_shuffle": "Arm B checkpoint inference with edge-type labels deterministically shuffled and endpoints/type counts preserved"
+  },
+  "metrics": {
+    "development": ["node_auprc", "node_f1_at_0.5", "pair_auprc", "pair_f1_at_0.5"],
+    "deltas": ["B_minus_A for all four metrics", "full_B_minus_NoMessage node and pair AUPRC", "full_B_minus_edge_type_shuffle node and pair AUPRC"],
+    "ablation_ci": "95% paired family-cluster bootstrap on development families",
+    "bootstrap_replicates": 10000,
+    "bootstrap_seed": 170017,
+    "resource": ["peak_cuda_allocated", "peak_cuda_reserved", "peak_process_tree_rss", "elapsed_rtx_hours", "actual_oom_events"],
+    "graph_recheck": ["typed relation recall by type", "minimum supported typed recall", "wall-handle recall", "wall-pair candidate recall", "unresolved reference count"]
+  },
+  "reference_comparisons": {
+    "frozen_bstar": {
+      "report": "D:\\dev\\99_tools\\autocad-sdk-router\\reports\\e2\\cells\\baseline_freeze\\REPORT.md",
+      "source_mean_val_auprc": 0.8311985694,
+      "source_mean_val_f1": 0.7063773452,
+      "note": "read-only reference; source universe differs from synthetic development inference"
+    },
+    "w2_02_twohop": {
+      "report": "D:\\dev\\99_tools\\autocad-sdk-router\\reports\\e2\\cells\\w2_02_twohop\\REPORT.md",
+      "val_A_mean_auprc": 0.87408233,
+      "display_reference": 0.8741,
+      "note": "reference only; excluded from screen truth-table adjudication"
+    }
+  },
+  "caps": {
+    "rtx_total_cap_hours": 24.0,
+    "prior_gnn_e2_screen_charged_seconds": 964.6810000000027,
+    "prior_gnn_e2_screen_charged_hours": 0.2679669444444452,
+    "v2_remaining_rtx_seconds": 85435.319,
+    "v2_remaining_rtx_hours": 23.732033055555555,
+    "cap_increase_allowed": false,
+    "ram_cap_gib": 48.0,
+    "oom_policy": "halve graph batch size down to 1, record each actual OOM; persistent OOM at 1 is blocked and does not increase cap"
+  },
+  "selftest": [
+    "one optimization step reproducibility",
+    "17-feature allowlist and label/name rejection",
+    "all 200 assignment rows match the sealed 6/2 family split with train/development family intersection 0",
+    "CubiCasa train-root containment rejects val/test paths",
+    "simulated OOM downgrade path plus separate honest actual-event log"
+  ],
+  "write_scope": {
+    "only": "D:\\runs\\e2_program\\cells\\gnn_e2_screen_v2",
+    "repository_modification_allowed": false,
+    "existing_artifact_modification_allowed": false,
+    "git_operation_allowed": false,
+    "subagents_allowed": false
+  }
+}
