@@ -1,0 +1,299 @@
+{
+  "schema": "ariadne.e2.loop_l1e.prereg.v1",
+  "cell": "loop_l1e",
+  "phase": "A_seal_only",
+  "estimator_state": "not_implemented_in_phase_a",
+  "seal_governance": {
+    "seal_before_estimator": true,
+    "external_witness_procedure": [
+      "Phase A executor emits only prereg.json, the sealed tabular artifact, and SEAL_MANIFEST.txt, then stops.",
+      "The orchestrator commits the Phase A seal after this executor stops; that append-only commit and its SHA are the external prior witness.",
+      "A separately launched Phase B executor must cite the committed seal SHA before writing estimator code or running the estimator, replay, or tests."
+    ],
+    "phase_a_prohibitions": [
+      "estimator implementation or repair",
+      "replay execution",
+      "test execution",
+      "git execution",
+      "repository mutation",
+      "modification of existing artifacts"
+    ],
+    "repo_mutation_allowed": false,
+    "cad_access_allowed": false,
+    "test_access_allowed": false,
+    "gate_verdict_emitted": false,
+    "sealed_tabular_artifact": {
+      "preferred": "evidence_sealed.xlsx#PREREG",
+      "actual": "PREREG_SEALED.csv",
+      "fallback_authorized": true,
+      "fallback_reason": "Spreadsheet artifact runtime unavailable: load_workspace_dependencies/@oai/artifact-tool is not exposed in this session; packet-authorized CSV fallback used.",
+      "content_equivalence": "The CSV contains this complete preregistration as one canonical JSON record, plus exactly one runtime-reason record."
+    }
+  },
+  "sealed_bands": {
+    "high_coverage_per_scale": {
+      "status_field": "unit_status",
+      "status_value": "HIGH",
+      "minimum_fraction": 0.6,
+      "scales": [
+        0.001,
+        0.01,
+        1.0,
+        1000.0
+      ],
+      "gate": true
+    },
+    "high_accuracy": {
+      "subset": "unit_status=HIGH",
+      "relative_error_maximum": 0.05,
+      "minimum_fraction": 0.95,
+      "gate": true
+    },
+    "legitimate_scene_no_loss": {
+      "scene_ids": [
+        "O1",
+        "O2"
+      ],
+      "allowed_status_downgrade_count": 0,
+      "allowed_coverage_loss_count": 0,
+      "gate": true
+    },
+    "cohort_replay_delta_disclosure": {
+      "cohorts": {
+        "l1b": {
+          "scene_count": 200
+        },
+        "c1_original": {
+          "scene_count": 200
+        }
+      },
+      "publication_required": true,
+      "publication_form": "full_unabridged_per_scene_per_field_delta_transcript",
+      "zero_delta_rows_must_be_included": true,
+      "summary_only_publication_forbidden": true,
+      "required_fields": "all estimator outputs, status fields, truth/estimate/error values, input counts, physical units, and provenance needed to reproduce each delta",
+      "gate": true
+    },
+    "perturbation_monotonicity": {
+      "scope": {
+        "designated_9_families": [
+          "outlier_clone",
+          "stale_override",
+          "suffix_removal",
+          "exact_duplicate",
+          "geometry_ratio_break",
+          "reference_support_drop",
+          "display_removal",
+          "handle_collision",
+          "type_to_grid"
+        ],
+        "third_fleet_discovered_classes": [
+          "CE-A",
+          "CE-B",
+          "CE-B2",
+          "CE-C",
+          "CE-D",
+          "CE-E",
+          "CE-F",
+          "D1",
+          "D2",
+          "D3",
+          "D4"
+        ]
+      },
+      "tracked_fields": [
+        "confidence_score",
+        "reference_confidence_score",
+        "status",
+        "unit_status",
+        "reference_status"
+      ],
+      "status_order": {
+        "NONE": 0,
+        "LOW": 1,
+        "HIGH": 2
+      },
+      "normative_clause_ko": "상승 허용 ⇔ 교란 후 장면과 관측-동치이며 그 상태를 도시에 의미론상 정당하게 받는 정직 증인 장면을 제시할 수 있다. 증인 불가능한 상승(의심 신호 잔존: CE-B2·CE-D류) = 위반.",
+      "observation_equivalence": {
+        "definition": "The post-perturbation scene and the honest witness scene are equivalent only when every field on the estimator input surface is identical.",
+        "exactness": "Equality covers field presence/absence, type, value, record multiplicity, and ordering wherever ordering is part of the estimator input surface; no comparison surface may be omitted or normalized beyond the estimator's actual input contract."
+      },
+      "honest_witness": {
+        "definition": "An independently specified honest scene, not justified by hidden perturbation history, for which the city would semantically and legitimately accept the observed estimator state.",
+        "required_evidence": [
+          "witness scene identifier and complete estimator-input-surface serialization",
+          "post-perturbation scene complete estimator-input-surface serialization",
+          "exact all-field equality result and digest for both serializations",
+          "city-semantic legitimacy rationale",
+          "automated classification result"
+        ]
+      },
+      "witness_adjudication_procedure": [
+        "Detect every upward transition in any tracked numeric field or in the NONE<LOW<HIGH status order.",
+        "Freeze the complete post-perturbation estimator input surface before classification.",
+        "Require an independently specified honest witness scene and freeze its complete estimator input surface.",
+        "Compare every estimator-input-surface field exactly under the observation-equivalence definition.",
+        "If exact equivalence and city-semantic legitimacy are both established, classify the increase as information_limit_record; this classification is disclosed and is not a gate violation.",
+        "If either exact equivalence or city-semantic legitimacy is not established, classify the increase as violation; residual ratio outliers, handle collisions, mixed-space traces, or other surviving suspicious signals are explicit violation evidence.",
+        "Treat missing, ambiguous, manually suppressed, or unclassified witness results as violations."
+      ],
+      "classification": {
+        "information_limit_record": {
+          "gate": false,
+          "disclosure_required": true
+        },
+        "violation": {
+          "gate": true,
+          "allowed_count": 0
+        }
+      }
+    }
+  },
+  "semantic_repairs": {
+    "CE-B2": {
+      "title": "persistent continuous attenuation for residual suspicion",
+      "requirement": "While a visible suspicious signal such as a residual ratio outlier remains, reference confidence must retain continuous attenuation; retyping or display deletion must not erase that attenuation or restore HIGH through a path that hides the ratio-bearing evidence.",
+      "gate": true
+    },
+    "CE-D": {
+      "title": "empty or singleton eligible support remains NONE",
+      "eligible_empty_result": "NONE",
+      "eligible_singleton_result": "NONE",
+      "minimum_distinct_source_handles_for_non_none": 2,
+      "minimum_distinct_source_handles_for_high": 3,
+      "suspicious_evidence_role": "denominator_only_never_numerator_or_estimate",
+      "gate": true
+    },
+    "D1": {
+      "title": "handle-set subset judgment",
+      "requirement": "All subset, completeness, inlier, and independence judgments use sets of source handles rather than record counts; repeated honest labels on one handle cannot manufacture a mismatch or independent support.",
+      "gate": true
+    },
+    "D3": {
+      "title": "continuous attenuation without a binary cliff",
+      "requirement": "Replace the strict-coherence binary 1-to-0 cliff with a continuous attenuation rule. Infinitesimal movement across τ must not cause a finite 1↔0 discontinuity, and the Phase B formula and boundary behavior must be disclosed before results are interpreted.",
+      "gate": true
+    }
+  },
+  "property_test_contract": {
+    "seed": 20260719,
+    "seed_locked": true,
+    "minimum_total_cases": 600,
+    "required_pool_strata": [
+      {
+        "id": "zero_cliff_start",
+        "definition": "scenes beginning at strict-coherence confidence 0",
+        "minimum_count": 1
+      },
+      {
+        "id": "ratio_outlier",
+        "definition": "scenes with at least one visible ratio outlier",
+        "minimum_count": 1
+      },
+      {
+        "id": "mixed_space",
+        "definition": "scenes containing mixed estimator ratio spaces such as z_mm and z_raw",
+        "minimum_count": 1
+      },
+      {
+        "id": "handle_collision",
+        "definition": "scenes with conflicting records sharing source handles, including eligible-empty boundaries",
+        "minimum_count": 1
+      },
+      {
+        "id": "near_tau_spread",
+        "definition": "scenes on both sides of and arbitrarily close to the τ boundary",
+        "minimum_count": 1
+      }
+    ],
+    "all_required_strata_must_be_nonempty": true,
+    "designated_9_family_coverage_required": true,
+    "third_fleet_class_regression_required": true,
+    "upward_transition_witness_classification": {
+      "automated": true,
+      "applies_to_every_increase": true,
+      "allowed_output_labels": [
+        "information_limit_record",
+        "violation"
+      ],
+      "manual_drop_or_unclassified_output_forbidden": true
+    },
+    "case_manifest_and_digest_publication_required": true
+  },
+  "selftest_predicate_integrity": {
+    "tautological_success_predicates_forbidden": true,
+    "rule": "Every predicate that contributes a success result must be capable of returning false on a concrete counterexample input, and that counterexample must be annotated beside the predicate definition.",
+    "predicate_registry_required_fields": [
+      "predicate_id",
+      "predicate_expression",
+      "observed_input_fields",
+      "counterexample_input_annotation",
+      "expected_counterexample_result_false",
+      "observed_counterexample_result_false"
+    ],
+    "forbidden_patterns": [
+      "literal or constant success values",
+      "success expressions made true solely by adding a positive constant to the same quantity being compared",
+      "partition identities presented as independence checks",
+      "predicates that never execute their annotated counterexample",
+      "success inferred from report labels rather than observed values"
+    ],
+    "mandatory_counterexample_annotations": [
+      {
+        "predicate_id": "high_coverage_per_scale",
+        "counterexample_input_annotation": "At any sealed scale, HIGH coverage=0.599 must return false."
+      },
+      {
+        "predicate_id": "high_accuracy",
+        "counterexample_input_annotation": "Within unit_status=HIGH, accuracy=0.949 or any relative error>0.05 must return false."
+      },
+      {
+        "predicate_id": "legitimate_scene_no_loss",
+        "counterexample_input_annotation": "One O1 or O2 status downgrade or one coverage loss must return false."
+      },
+      {
+        "predicate_id": "cohort_replay_delta_disclosure",
+        "counterexample_input_annotation": "Omitting one scene-field delta row, including a zero-delta row, must return false."
+      },
+      {
+        "predicate_id": "monotonicity_violation_count",
+        "counterexample_input_annotation": "A CE-B2-style increase with a surviving ratio outlier and no observation-equivalent honest witness must return false."
+      },
+      {
+        "predicate_id": "unique_handle_independence",
+        "counterexample_input_annotation": "Multiple records sharing one handle must count as one independent source and must fail any predicate requiring two or more independent handles."
+      },
+      {
+        "predicate_id": "eligible_support_non_none",
+        "counterexample_input_annotation": "An empty eligible set or a singleton suspicious clone must produce NONE and must fail a non-NONE success predicate."
+      },
+      {
+        "predicate_id": "continuous_tau_attenuation",
+        "counterexample_input_annotation": "A fixture implementing a finite 1↔0 jump at τ±ε must return false."
+      },
+      {
+        "predicate_id": "seal_content_match",
+        "counterexample_input_annotation": "Changing any byte of prereg.json while retaining the recorded digest must return false."
+      }
+    ],
+    "unique_handle_independence_specific_ban": "The L1d form n_candidate_handles < len(ratio_inlier_handles)+len(ratio_outlier_handles)+2 is forbidden because the partition identity makes it structurally true."
+  },
+  "sources": {
+    "packet": {
+      "path": "D:\\runs\\e2_program\\build\\PACKET_loop_L1e_sealA.md",
+      "sha256": "9AE55432C1029587A034A1B5B9422829C75E9A3263A476C45A359F47B2787AA8"
+    },
+    "synthesis": {
+      "path": "D:\\runs\\e2_program\\chainverify_L1d\\SYNTHESIS.md",
+      "sha256": "A9572FA3A48D923DB6ED271E168AA80BE469D95041B0D3C4D3C9702647770FD0"
+    },
+    "lens1_saturation": {
+      "path": "D:\\runs\\e2_program\\chainverify_L1d\\lens1_saturation.md",
+      "sha256": "292E69BC8629C4C99F6F8F313504A0065F4C3C0139A6A299561433236DF26FC8"
+    },
+    "seat4_sol": {
+      "path": "D:\\runs\\e2_program\\chainverify_L1d\\seat4_sol.md",
+      "sha256": "A0273F6A7208C48EFF71E42985375E39BEDA14D5A51D5AEF36449A77CA3750E2"
+    }
+  }
+}
