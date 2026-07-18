@@ -1,0 +1,153 @@
+{
+  "schema": "e2.g1-verifier-families.prereg.v1",
+  "cell": "g1_verifier_families",
+  "sealed_utc": "2026-07-18T23:11:27.552Z",
+  "scope": "Requalification of the unchanged wall-claim verifier only within metadata-bearing synthetic packs; no domain expansion claim is permitted.",
+  "inputs": {
+    "packet": {
+      "path": "D:\\runs\\e2_program\\build\\PACKET_g1_verifier_families.md",
+      "sha256": "04041d202c7f892e73b2c07e0959996d329d93568445ff4c25436d061cff8cff"
+    },
+    "verifier": {
+      "path": "D:\\dev\\99_tools\\autocad-sdk-router\\tools\\e2\\instruments\\verifier.py",
+      "sha256": "72e33ab0e87e96defd00f74c5a22ae6c5cb001c69b740e627edeedaf2a80b690",
+      "mutation": "forbidden"
+    },
+    "base_prereg": {
+      "path": "D:\\dev\\99_tools\\autocad-sdk-router\\reports\\e2\\prereg_r2_v1.json",
+      "sha256": "fc93dad9232cfd877802c1d53996357eccc710daff8cfb2cf7c865bf7f78bcd2"
+    },
+    "amendment1": {
+      "path": "D:\\dev\\99_tools\\autocad-sdk-router\\reports\\e2\\prereg_r2_v1_amendment1.json",
+      "sha256": "30f752db803f7f589d1a8d1f1a2d8557364ae2d624f76a639533161f552b8283"
+    },
+    "amendment2": {
+      "path": "D:\\dev\\99_tools\\autocad-sdk-router\\reports\\e2\\prereg_r2_v1_amendment2.json",
+      "sha256": "6e29bbd5f8c502a1bc36277a535521c117408b2460e80511907d610321dd442a"
+    },
+    "gen2_family_pack": {
+      "root": "D:\\runs\\e2_program\\cells\\gen2_families",
+      "report_sha256": "24d28438c231b69dd057bd5b5460f0f3cdcad6a0008375f745c611e76b44ba1e",
+      "source_prereg_sha256": "9fcf561fda3bc20f8aa68862fc013d3d8e1f91ba9511b2c13f82a2f0a9da7535",
+      "source_prereg_csv_sha256": "65c356d2c84cdccdec454e1fa48830894f43a52ce27af9621549a10857958b84",
+      "manifest_sha256": {
+        "S": "3380f8437b60902e5709986d246241ce00ec1a5c81959a7be6ec5cf5a43dfe2c",
+        "F": "600b47772bbbfb49d6b1fdbe08dce8e5f5d20ce2668267a3f05affb742731988",
+        "M": "f8a81ddf2280e28b28557ae20e483ed8d3638ab137cc839dad4c924fc4718fcf"
+      },
+      "inventory_file_count": 404,
+      "inventory_sha256": "14ffd7bc07f52552824d59f723c22cce7ff1c0ad54cf58bbdb6cf72771dc3aea"
+    }
+  },
+  "read_boundary": {
+    "allowed": [
+      "the exact verifier.py path above",
+      "D:\\runs\\e2_program\\cells\\gen2_families recursively",
+      "this cell output directory recursively"
+    ],
+    "forbidden": [
+      "original CAD",
+      "repository tests",
+      "CubiCasa test",
+      "CubiCasa val-B and every val-B cell/artifact"
+    ],
+    "enforcement": "canonical absolute-path allowlist checked before every harness read; forbidden-path probes are rejection-only and never opened"
+  },
+  "seed": 20260719,
+  "family_firewall": {
+    "ranking_rule": "ascending SHA-256 of UTF-8 g1_verifier_families|20260719|family_id|family_template_sha256; first five reward, last three hidden",
+    "reward_families": ["F03", "F04", "F06", "F07", "F08"],
+    "hidden_families": ["F01", "F02", "F05"],
+    "split_canonical_json": "{\"seed\":20260719,\"reward_families\":[\"F03\",\"F04\",\"F06\",\"F07\",\"F08\"],\"hidden_families\":[\"F01\",\"F02\",\"F05\"]}",
+    "split_sha256": "0c06b83b44bdf8b3aa5123b910a6a47f4d9ddfbd725523eff5fea132ed814b6d",
+    "hidden_open_rule": "No hidden truth or DXF is parsed and no hidden verifier outcome is computed until the immutable configuration-freeze event is recorded after the reward phase. Hash-only source-integrity reads are allowed before freeze."
+  },
+  "verifier_configuration": {
+    "angle_tol_deg": 5.0,
+    "overlap_min": 0.65,
+    "thickness_band_mm": [50.0, 400.0],
+    "selection": "current verifier defaults, no sweep, tuning, calibration, or outcome-dependent fallback",
+    "canonical_json": "{\"angle_tol_deg\":5.0,\"overlap_min\":0.65,\"thickness_band_mm\":[50.0,400.0],\"selection\":\"current_verifier_defaults_no_tuning\"}",
+    "sha256": "bf9e4d5c9e7facba3bebf7865bd188b7566f4b319bf1007ab13932bced7d3a07"
+  },
+  "bands": {
+    "wording": "FAR <= 0.01 AND FRR <= 0.05, with reward-family/hidden-family firewall, family-hash separation, and the band maintained on hidden families",
+    "far_max": 0.01,
+    "frr_max": 0.05,
+    "verdict_authority": "orchestrator only; cell outputs numeric measurements and no PASS/FAIL qualification verdict"
+  },
+  "battery": {
+    "drawings": 200,
+    "families": 8,
+    "entity_types": ["3DFACE", "ARC", "CIRCLE", "ELLIPSE", "HATCH", "INSERT", "LINE", "LWPOLYLINE", "MTEXT", "POINT", "SPLINE", "TEXT", "WIPEOUT"],
+    "compact_ir_rule": "Per drawing, include DXF-derived geometry for every truth-ledger handle and one deterministic non-wall, non-wallish-layer representative of each of the 13 raw entity types. The verifier receives geometry/layer/kind only and never receives truth labels.",
+    "geometry_policy": {
+      "LINE": "exact segment",
+      "LWPOLYLINE": "successive edges plus closing edge when closed",
+      "ARC": "chords at no more than 7.5 degrees",
+      "CIRCLE": "32 chords",
+      "3DFACE": "nondegenerate perimeter edges",
+      "ELLIPSE": "48 equal-parameter chords over its span",
+      "HATCH": "ordered boundary vertices when present; otherwise a deterministic 1-unit marker at the first available point",
+      "INSERT": "deterministic 1-unit orientation marker at insertion point; block contents are not expanded",
+      "MTEXT": "baseline marker from insertion, height, and direction/rotation",
+      "POINT": "deterministic 1-unit horizontal marker",
+      "SPLINE": "successive control points, else fit-point chain, else deterministic marker",
+      "TEXT": "baseline marker from insertion, height, and rotation",
+      "WIPEOUT": "successive clip-boundary edges plus closing edge; otherwise deterministic marker"
+    },
+    "positive_claim_rules": [
+      "13 true_exact entity-context cases per drawing: exact truth wall handle set, one case ID per entity type",
+      "1 label_poisoned_true case per drawing: invert every SEG-IR label relative to truth while keeping the exact truth claim"
+    ],
+    "false_claim_rules": [
+      "13 entity_add cases per drawing: exact truth set plus the deterministic representative handle of that entity type",
+      "wall_remove_single: remove one seed-ranked truth handle",
+      "wall_remove_pair: remove every handle of one seed-ranked truth wall",
+      "lure_add: add the seed-ranked negative handle with maximal qualifying-pair support",
+      "neighbor_swap: replace the selected truth handle with the nearest negative handle by centroid",
+      "pair_swap: replace the selected truth wall pair with a seed-ranked qualifying negative pair; if none exists, use the seed-ranked two-negative fallback and record the fallback",
+      "orphan_add: add a seed-ranked negative handle with zero qualifying support; if none exists, use minimum-support fallback and record the fallback",
+      "empty_claim",
+      "whole_universe_claim",
+      "duplicate_true_handle",
+      "unknown_handle_add"
+    ],
+    "expected_counts": {
+      "positive": 2800,
+      "false": 4600,
+      "total": 7400,
+      "per_family_positive": 350,
+      "per_family_false": 575,
+      "per_family_total": 925
+    },
+    "rate_definitions": {
+      "FAR": "false claims accepted / false claims",
+      "FRR": "true claims rejected / true claims"
+    },
+    "failure_ledger": "exhaustive: every accepted false claim and rejected true claim records case_id, family, drawing, tier, entity/perturbation, verifier reason codes, and harness cause"
+  },
+  "budget": {
+    "resource": "CPU-h",
+    "cap_h": 24.0,
+    "cap_seconds": 86400.0,
+    "accounting": "time.process_time across selftest and measurement invocations recorded separately and summed in results",
+    "kill_rule": "stop before the next case once cumulative measured CPU exceeds the cap and record BUDGET_KILL without a qualification verdict"
+  },
+  "execution_order": [
+    "validate both seals and all input hashes",
+    "run deterministic/path-boundary selftest",
+    "evaluate reward families only",
+    "record immutable configuration freeze SHA and reward completion event",
+    "open and evaluate hidden families",
+    "revalidate input hashes and emit numeric artifacts"
+  ],
+  "dependencies": ["Python standard library", "openpyxl only for evidence.xlsx as explicitly permitted by the packet"],
+  "output_policy": {
+    "root": "D:\\runs\\e2_program\\cells\\g1_verifier_families",
+    "required": ["prereg.json", "PREREG.csv", "g1_verifier_families.py", "results.json", "evidence.xlsx", "REPORT.md"],
+    "qualification_verdict_forbidden": true,
+    "report_last_line": "CELL_COMPLETE: g1_verifier_families"
+  },
+  "reproducibility_claim_wording": "휘발 필드 제외 수치 전 필드 동일"
+}

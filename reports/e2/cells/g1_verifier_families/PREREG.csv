@@ -1,0 +1,59 @@
+section,key,value
+identity,schema,e2.g1-verifier-families.prereg.v1
+identity,cell,g1_verifier_families
+identity,sealed_utc,2026-07-18T23:11:27.552Z
+scope,domain,"metadata-bearing synthetic packs only; no domain expansion"
+input,packet_sha256,04041d202c7f892e73b2c07e0959996d329d93568445ff4c25436d061cff8cff
+input,verifier_sha256,72e33ab0e87e96defd00f74c5a22ae6c5cb001c69b740e627edeedaf2a80b690
+input,base_prereg_sha256,fc93dad9232cfd877802c1d53996357eccc710daff8cfb2cf7c865bf7f78bcd2
+input,amendment1_sha256,30f752db803f7f589d1a8d1f1a2d8557364ae2d624f76a639533161f552b8283
+input,amendment2_sha256,6e29bbd5f8c502a1bc36277a535521c117408b2460e80511907d610321dd442a
+input,gen2_report_sha256,24d28438c231b69dd057bd5b5460f0f3cdcad6a0008375f745c611e76b44ba1e
+input,gen2_source_prereg_sha256,9fcf561fda3bc20f8aa68862fc013d3d8e1f91ba9511b2c13f82a2f0a9da7535
+input,gen2_source_prereg_csv_sha256,65c356d2c84cdccdec454e1fa48830894f43a52ce27af9621549a10857958b84
+input,manifest_S_sha256,3380f8437b60902e5709986d246241ce00ec1a5c81959a7be6ec5cf5a43dfe2c
+input,manifest_F_sha256,600b47772bbbfb49d6b1fdbe08dce8e5f5d20ce2668267a3f05affb742731988
+input,manifest_M_sha256,f8a81ddf2280e28b28557ae20e483ed8d3638ab137cc839dad4c924fc4718fcf
+input,pack_inventory_file_count,404
+input,pack_inventory_sha256,14ffd7bc07f52552824d59f723c22cce7ff1c0ad54cf58bbdb6cf72771dc3aea
+boundary,allowed_reads,"exact verifier.py; gen2_families recursively; this cell recursively"
+boundary,forbidden_reads,"original CAD; repository tests; CubiCasa test; CubiCasa val-B; val-B cells/artifacts"
+boundary,enforcement,"canonical absolute-path allowlist before every harness read"
+seed,battery_seed,20260719
+family_firewall,ranking_rule,"ascending SHA-256(g1_verifier_families|20260719|family_id|family_template_sha256); first 5 reward; last 3 hidden"
+family_firewall,reward_families,"F03;F04;F06;F07;F08"
+family_firewall,hidden_families,"F01;F02;F05"
+family_firewall,split_sha256,0c06b83b44bdf8b3aa5123b910a6a47f4d9ddfbd725523eff5fea132ed814b6d
+family_firewall,hidden_open_rule,"hidden DXF/truth parsing and verifier outcomes only after reward completion and immutable configuration freeze; pre-freeze hash-only reads allowed"
+configuration,angle_tol_deg,5.0
+configuration,overlap_min,0.65
+configuration,thickness_band_mm,"50.0;400.0"
+configuration,selection,"current verifier defaults; no sweep/tuning/calibration/outcome-dependent fallback"
+configuration,sha256,bf9e4d5c9e7facba3bebf7865bd188b7566f4b319bf1007ab13932bced7d3a07
+band,wording,"FAR <= 0.01 AND FRR <= 0.05 with reward/hidden family firewall and band maintained on hidden families"
+band,far_max,0.01
+band,frr_max,0.05
+band,verdict_authority,"orchestrator only; cell emits numbers and no qualification PASS/FAIL"
+battery,drawings,200
+battery,families,8
+battery,entity_types,"3DFACE;ARC;CIRCLE;ELLIPSE;HATCH;INSERT;LINE;LWPOLYLINE;MTEXT;POINT;SPLINE;TEXT;WIPEOUT"
+battery,positive_rules,"13 true_exact entity contexts per drawing; 1 label_poisoned_true per drawing"
+battery,false_rules,"13 entity_add per drawing; wall_remove_single; wall_remove_pair; lure_add; neighbor_swap; pair_swap; orphan_add; empty; whole_universe; duplicate; unknown"
+battery,expected_positive,2800
+battery,expected_false,4600
+battery,expected_total,7400
+battery,expected_per_family_positive,350
+battery,expected_per_family_false,575
+battery,expected_per_family_total,925
+battery,FAR_definition,"false claims accepted / false claims"
+battery,FRR_definition,"true claims rejected / true claims"
+budget,resource,CPU-h
+budget,cap_h,24.0
+budget,cap_seconds,86400.0
+budget,kill_rule,"stop before next case after cap and record BUDGET_KILL without qualification verdict"
+execution,order,"validate seals/hashes; selftest; reward measurement; config freeze; hidden measurement; hash revalidation; numeric artifacts"
+dependency,allowed,"stdlib; openpyxl only for evidence.xlsx"
+output,root,D:\runs\e2_program\cells\g1_verifier_families
+output,qualification_verdict_forbidden,true
+output,report_last_line,CELL_COMPLETE: g1_verifier_families
+reproducibility,claim_wording,휘발 필드 제외 수치 전 필드 동일
