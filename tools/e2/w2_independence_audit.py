@@ -35,9 +35,10 @@ def main() -> int:
     cal = _load(r"reports/e1/annot_v1/calibration_v1.json")
     cluster = _load(r"reports/e1/annot_v1/cluster_probe_v1.json")
     b4 = _load(r"reports/e2/s5/b4_fold_v1.json")
+    real3 = _load(r"reports/e2/s4/real_defs_v3.json")
     real2 = _load(r"reports/e2/s4/real_defs_v2.json")
     real1 = _load(r"reports/e2/s4/real_defs_v1.json")
-    real = real2 or real1
+    real = real3 or real2 or real1
 
     evals = {}
     for tier in ("S", "F", "M"):
@@ -77,8 +78,9 @@ def main() -> int:
         "pearson_full": b5.get("pearson_all_defs"),
         "pearson_nameblind": b5.get("pearson_nameblind_all_defs"),
         "pearson_full_vs_nameblind": b5.get("pearson_full_vs_nameblind"),
-        "source": "real_defs_v2.json" if real2 else "real_defs_v1.json",
-        "status": "COMPLETE" if real2 else "PARTIAL_PENDING_NAMEBLIND",
+        "source": ("real_defs_v3.json" if real3 else
+                   "real_defs_v2.json" if real2 else "real_defs_v1.json"),
+        "status": "COMPLETE" if (real3 or real2) else "PARTIAL_PENDING_NAMEBLIND",
         "note": (
             "Low r (~0.3) means detector max-score and judge wall_likelihood measure "
             "different things on real defs -> they are LARGELY INDEPENDENT evidence axes. "
@@ -131,7 +133,7 @@ def main() -> int:
                 "confirmations ONLY where name-blind decontamination holds (see B)."
             ),
         },
-        "status": "COMPLETE" if real2 else "PARTIAL (name-blind arm pending)",
+        "status": "COMPLETE" if (real3 or real2) else "PARTIAL (name-blind arm pending)",
     }
     out = os.path.join(ROOT, "reports", "e2", "w2_independence_audit_v1.json")
     json.dump(audit, open(out, "w", encoding="utf-8"), indent=1, ensure_ascii=False)

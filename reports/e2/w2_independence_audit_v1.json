@@ -73,11 +73,11 @@
    "verdict": "NOT_INDEPENDENT_WITHIN_FAMILIES"
   },
   "B_detector_vs_silver": {
-   "pearson_full": 0.2991,
-   "pearson_nameblind": null,
-   "pearson_full_vs_nameblind": null,
-   "source": "real_defs_v1.json",
-   "status": "PARTIAL_PENDING_NAMEBLIND",
+   "pearson_full": 0.2911,
+   "pearson_nameblind": 0.2911,
+   "pearson_full_vs_nameblind": 1.0,
+   "source": "real_defs_v3.json",
+   "status": "COMPLETE",
    "note": "Low r (~0.3) means detector max-score and judge wall_likelihood measure different things on real defs -> they are LARGELY INDEPENDENT evidence axes. If pearson_nameblind ~= pearson_full, the correlation that does exist is NOT driven by both sides reading layer names (decontaminated)."
   },
   "C_detector_vs_synth": {
@@ -118,5 +118,5 @@
   "metamorphic": "independent of all labels; scale arm excluded (design flaw)",
   "joint_pass_rule": "A claim passing synth + metamorphic + silver counts as 3 quasi-independent confirmations ONLY where name-blind decontamination holds (see B)."
  },
- "status": "PARTIAL (name-blind arm pending)"
+ "status": "COMPLETE"
 }
