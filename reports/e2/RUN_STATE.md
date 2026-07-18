@@ -123,6 +123,37 @@ Independent adversarial recompute of every banded number from raw committed arti
 - Blind cross-check: gpt-5.6-sol effort=ultra launched in worktree @de72da4 (pre-correction
   state, no access to the corrections above) → report lands at reports/e2/verify/.
 
+### Joint adjudication (self × sol56-ultra, 2026-07-18 — reports/e2/verify/sol56_wave1_verify.md)
+
+Sol independently re-derived every number, re-found VERIFY-1 (M 0.9091 vs 0.8669), CONFIRMED
+B3/B5 exactly, and found what self-verification missed:
+
+- **Finding 10 (fixed)**: per-handle store was traversal-order dependent (shared handles
+  overwritten). Repair: max-aggregation in evidence_grid + fast path; selftests + equivalence
+  re-proven (max_dev 0.00e+00).
+- **Finding 11 (fixed)**: run_detect merged parse_modelspace with insert_expand, which ALREADY
+  emits top-level entities → every top-level segment duplicated. The 0-offset clone hijacked the
+  thickness channel — root cause of the long-open fixed-0.714286 anomaly — and inflated junction
+  counts. Repair: geometry from insert_expand alone (units from header parse).
+- **Sentinel letter (accepted)**: sealed B4 text says any sentinel trip = automatic FAIL; all 100
+  rows trip sentinel_all (S scored universe is 100% wall). The v1 fold's 3 arm-PASS labels were a
+  post-hoc waiver → **B4 strict-contract verdict: FAIL on all banded arms**. The composition
+  analysis stands as diagnosis only; battery redesign (mixed-content pack, scoped sentinel) goes
+  through W2 prereg, not retroactive waiver.
+- Also logged from sol: my fold_v2's name-blind numbers were themselves wrong (read the eval
+  ablation block = unweighted channel mean, not the weighted arm) — superseded by fold v3.
+
+**B2 final (repaired pipeline @eval2_*, sealed per-handle metric, fold v3):**
+S full 1.0/1.0 **PASS** · nb 1.0/1.0 — F full P 0.9315 / nb 0.9252 — M full P 0.8669 / nb 0.8615
+(all recalls 1.0). Note: fixing the duplication LOWERED M precision vs the buggy pipeline's 0.9091 —
+true in-band neighbours now win the thickness channel for near-wall opening/noise segments; the
+numeric equality of M full 0.8669 with the old walls-fold value is coincidence (verified 280/43/0
+by independent recount). S6-1 re-run on eval2 (classical_v2): W2-B1 still PASS (GBDT 1.0 vs
+detector 0.967/0.9263), name-blind gap 0.0, anti-perm AUC 0.2322/0.4156 PASS.
+Remaining sol findings → tickets: B1 population/params mismatch (8), split artifacts (9), B3
+FP-rewarding coverage metric + v0 comparator apples-to-oranges (12/13), version pinning (15),
+B4 recall floor in-runner (6) & arm governance (7). B3/B5 re-measure (max-agg, dual-arm) running as real_defs_v3.
+
 ## Assets
 
 - CubiCasa5k canonical (Zenodo 2613548): `_ariadne\alm\datasets\cubicasa5k.zip` 5,469,495,706 bytes,

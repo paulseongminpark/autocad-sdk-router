@@ -1,0 +1,112 @@
+{
+  "drawing_id": "0010",
+  "threshold": 0.5,
+  "n_handles_scored": 29,
+  "baseline": {
+    "tp": 18,
+    "fp": 1,
+    "fn": 0,
+    "precision": 0.947368,
+    "recall": 1.0,
+    "f1": 0.972973,
+    "source": "walls",
+    "predicted": [
+      "32",
+      "37",
+      "38",
+      "39",
+      "3A",
+      "3D",
+      "40",
+      "41",
+      "42",
+      "50",
+      "51",
+      "52",
+      "53",
+      "54",
+      "55",
+      "56",
+      "57",
+      "58",
+      "5D"
+    ],
+    "truth": [
+      "32",
+      "37",
+      "38",
+      "39",
+      "3A",
+      "3D",
+      "40",
+      "41",
+      "42",
+      "50",
+      "51",
+      "52",
+      "53",
+      "54",
+      "55",
+      "56",
+      "57",
+      "58"
+    ]
+  },
+  "ablation": [
+    {
+      "channel_removed": "none",
+      "n_predicted": 19,
+      "tp": 18,
+      "fp": 1,
+      "fn": 0,
+      "precision": 0.947368,
+      "recall": 1.0,
+      "f1": 0.972973,
+      "delta_f1": 0.0
+    },
+    {
+      "channel_removed": "parallel",
+      "n_predicted": 18,
+      "tp": 17,
+      "fp": 1,
+      "fn": 1,
+      "precision": 0.944444,
+      "recall": 0.944444,
+      "f1": 0.944444,
+      "delta_f1": 0.028529
+    },
+    {
+      "channel_removed": "thickness",
+      "n_predicted": 18,
+      "tp": 17,
+      "fp": 1,
+      "fn": 1,
+      "precision": 0.944444,
+      "recall": 0.944444,
+      "f1": 0.944444,
+      "delta_f1": 0.028529
+    },
+    {
+      "channel_removed": "junction",
+      "n_predicted": 19,
+      "tp": 18,
+      "fp": 1,
+      "fn": 0,
+      "precision": 0.947368,
+      "recall": 1.0,
+      "f1": 0.972973,
+      "delta_f1": 0.0
+    },
+    {
+      "channel_removed": "layer",
+      "n_predicted": 19,
+      "tp": 18,
+      "fp": 1,
+      "fn": 0,
+      "precision": 0.947368,
+      "recall": 1.0,
+      "f1": 0.972973,
+      "delta_f1": 0.0
+    }
+  ]
+}

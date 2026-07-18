@@ -1,0 +1,41 @@
+{
+  "driver": "w1_eval.v1",
+  "pack": "D:\\dev\\99_tools\\autocad-sdk-router\\reports\\e2\\s2\\packs\\M",
+  "tier": "M",
+  "threshold": 0.5,
+  "arms": {
+    "full": {
+      "n_drawings": 20,
+      "n_with_counts": 20,
+      "micro": {
+        "tp": 280,
+        "fp": 43,
+        "fn": 0,
+        "precision": 0.8668730650154799,
+        "recall": 1.0,
+        "f1": 0.9286898839137645
+      },
+      "macro": {
+        "precision": 0.87065375,
+        "recall": 1.0
+      }
+    },
+    "name_blind": {
+      "n_drawings": 20,
+      "n_with_counts": 20,
+      "micro": {
+        "tp": 280,
+        "fp": 43,
+        "fn": 0,
+        "precision": 0.8668730650154799,
+        "recall": 1.0,
+        "f1": 0.9286898839137645
+      },
+      "macro": {
+        "precision": 0.87065375,
+        "recall": 1.0
+      }
+    }
+  },
+  "failures": []
+}

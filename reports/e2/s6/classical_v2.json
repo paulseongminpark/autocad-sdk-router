@@ -1,0 +1,189 @@
+{
+ "schema": "ariadne.e2_s6_classical.v1",
+ "prereg": "e2.wave2.v1",
+ "eval_source": "eval2_",
+ "seed": 7,
+ "split": "per tier sorted ids, first 70% train / last 30% test",
+ "tiers": {
+  "S": {
+   "n_drawings": {
+    "train": 14,
+    "test": 6
+   },
+   "n_handles": {
+    "train": 190,
+    "test": 82
+   },
+   "wall_rate_test": 1.0,
+   "detector_baseline": {
+    "tp": 82,
+    "fp": 0,
+    "fn": 0,
+    "precision": 1.0,
+    "recall": 1.0,
+    "f1": 1.0
+   },
+   "arms": {
+    "full": {
+     "logistic": "DEGENERATE_TRAIN_LABELS",
+     "gbdt": "DEGENERATE_TRAIN_LABELS"
+    },
+    "name_blind": {
+     "logistic": "DEGENERATE_TRAIN_LABELS",
+     "gbdt": "DEGENERATE_TRAIN_LABELS"
+    }
+   }
+  },
+  "F": {
+   "n_drawings": {
+    "train": 14,
+    "test": 6
+   },
+   "n_handles": {
+    "train": 276,
+    "test": 132
+   },
+   "wall_rate_test": 0.6667,
+   "detector_baseline": {
+    "tp": 88,
+    "fp": 6,
+    "fn": 0,
+    "precision": 0.9362,
+    "recall": 1.0,
+    "f1": 0.967
+   },
+   "arms": {
+    "full": {
+     "logistic": {
+      "tp": 88,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0
+     },
+     "gbdt": {
+      "tp": 88,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0
+     }
+    },
+    "name_blind": {
+     "logistic": {
+      "tp": 88,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0
+     },
+     "gbdt": {
+      "tp": 88,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0
+     }
+    }
+   },
+   "anti_permutation_auc": 0.2322
+  },
+  "M": {
+   "n_drawings": {
+    "train": 14,
+    "test": 6
+   },
+   "n_handles": {
+    "train": 316,
+    "test": 144
+   },
+   "wall_rate_test": 0.6111,
+   "detector_baseline": {
+    "tp": 88,
+    "fp": 14,
+    "fn": 0,
+    "precision": 0.8627,
+    "recall": 1.0,
+    "f1": 0.9263
+   },
+   "arms": {
+    "full": {
+     "logistic": {
+      "tp": 88,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0
+     },
+     "gbdt": {
+      "tp": 88,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0
+     }
+    },
+    "name_blind": {
+     "logistic": {
+      "tp": 88,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0
+     },
+     "gbdt": {
+      "tp": 88,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0
+     }
+    }
+   },
+   "anti_permutation_auc": 0.4156
+  }
+ },
+ "verdicts": {
+  "W2-B1": {
+   "parts": {
+    "F": {
+     "gbdt_f1": 1.0,
+     "detector_f1": 0.967,
+     "pass": true
+    },
+    "M": {
+     "gbdt_f1": 1.0,
+     "detector_f1": 0.9263,
+     "pass": true
+    }
+   },
+   "verdict": "PASS"
+  },
+  "W2-B2": {
+   "S": {
+    "gap_f1": null
+   },
+   "F": {
+    "gap_f1": 0.0
+   },
+   "M": {
+    "gap_f1": 0.0
+   }
+  },
+  "W2-B3": {
+   "aucs": {
+    "F": 0.2322,
+    "M": 0.4156
+   },
+   "verdict": "PASS"
+  }
+ }
+}

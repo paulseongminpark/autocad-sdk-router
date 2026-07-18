@@ -159,17 +159,23 @@ def run_detect(dxf_path, no_layer_channel, mods):
 
     drawing_id = os.path.splitext(os.path.basename(dxf_path))[0]
 
-    # 1) modelspace (inserts NOT expanded here) ...
+    # 1) units come from the modelspace parse (header-aware) ...
     base_ir = normalize.parse_modelspace(dxf_path, expand_inserts=False)
     if not isinstance(base_ir, dict):
         base_ir = seg_ir_skeleton(drawing_id)
 
-    # 2) ... plus the INSERT tree, expanded via the INJECTED converter.
+    # 2) ... but GEOMETRY comes from insert_expand ALONE: expand() already
+    # converts top-level non-INSERT entities plus the whole INSERT tree.
+    # (VERIFY finding 11, 2026-07-18: merging both sources duplicated every
+    # top-level segment; the 0-offset clone hijacked the thickness channel
+    # -- the fixed 0.714286 anomaly -- and inflated junction counts.)
     insert_ir = insert_expand.expand(dxf_path, normalize.entity_to_segments)
     if not isinstance(insert_ir, dict):
         insert_ir = seg_ir_skeleton(drawing_id)
 
-    seg_ir = merge_seg_ir(base_ir, insert_ir)
+    seg_ir = insert_ir
+    if base_ir.get("units") and base_ir["units"] != "unknown":
+        seg_ir["units"] = base_ir["units"]
     if not seg_ir.get("drawing_id") or seg_ir["drawing_id"] == "unknown":
         seg_ir["drawing_id"] = drawing_id
 

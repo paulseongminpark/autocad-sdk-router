@@ -33,10 +33,14 @@ def _layer_is_wallish(layer: str) -> bool:
     return any(t in up for t in ("WALL", "WA", "BEARING", "벽"))
 
 
+EVAL_PREFIX = "eval_"  # overridden by --eval-prefix
+OUT_TAG = "v1"
+
+
 def load_tier(tier: str):
     """Return list of (drawing_id, X_full, X_nb, y, det_scores) per drawing."""
     pack = os.path.join(ROOT, "reports", "e2", "s2", "packs", tier)
-    evald = os.path.join(ROOT, "reports", "e2", "s4", f"eval_{tier}")
+    evald = os.path.join(ROOT, "reports", "e2", "s4", f"{EVAL_PREFIX}{tier}")
     out = []
     for pred_path in sorted(glob.glob(os.path.join(evald, "*.full.pred.json"))):
         did = os.path.basename(pred_path).split(".")[0]
@@ -84,11 +88,21 @@ def prf(y_true, y_pred):
 
 
 def main() -> int:
+    import argparse
+    global EVAL_PREFIX, OUT_TAG
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--eval-prefix", default="eval_")
+    ap.add_argument("--out-tag", default="v1")
+    a = ap.parse_args()
+    EVAL_PREFIX = a.eval_prefix
+    OUT_TAG = a.out_tag
+
     from sklearn.ensemble import GradientBoostingClassifier
     from sklearn.linear_model import LogisticRegression
     from sklearn.metrics import roc_auc_score
 
     results = {"schema": "ariadne.e2_s6_classical.v1", "prereg": "e2.wave2.v1",
+               "eval_source": EVAL_PREFIX,
                "seed": SEED, "split": "per tier sorted ids, first 70% train / last 30% test",
                "tiers": {}}
     rng = np.random.default_rng(SEED)
@@ -167,7 +181,7 @@ def main() -> int:
 
     outdir = os.path.join(ROOT, "reports", "e2", "s6")
     os.makedirs(outdir, exist_ok=True)
-    out = os.path.join(outdir, "classical_v1.json")
+    out = os.path.join(outdir, f"classical_{OUT_TAG}.json")
     json.dump(results, open(out, "w", encoding="utf-8"), indent=1)
 
     import openpyxl
@@ -183,7 +197,7 @@ def main() -> int:
                     ws.append([tier, arm, mname, rec["precision"], rec["recall"],
                                rec["f1"], tr["detector_baseline"]["f1"],
                                tr.get("anti_permutation_auc")])
-    wb.save(os.path.join(outdir, "classical_v1.xlsx"))
+    wb.save(os.path.join(outdir, f"classical_{OUT_TAG}.xlsx"))
 
     print(json.dumps(results["verdicts"], indent=1))
     for t in TIERS:

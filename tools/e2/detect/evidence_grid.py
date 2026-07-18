@@ -281,7 +281,13 @@ def score(seg_ir, params=None):
             agg = 0.0
         else:
             agg = sum(weights[c] * channels[c] for c in channels) / wsum
-        per_handle[a["key"]] = {"score": round(agg, 6), "evidence": channels}
+        # Max-aggregate when several segments share one handle (INSERT
+        # expansion duplicates a source entity's handle per instance).
+        # Overwrite semantics made per_handle traversal-order dependent
+        # (VERIFY finding 10, 2026-07-18); keep the highest-scoring record.
+        prev = per_handle.get(a["key"])
+        if prev is None or round(agg, 6) > prev["score"]:
+            per_handle[a["key"]] = {"score": round(agg, 6), "evidence": channels}
 
         # Emit a wall record for each unique valid parallel pair.
         if best_parallel is not None:

@@ -326,8 +326,13 @@ def fast_score(seg_ir, params=None) -> Dict[str, Any]:
         nb_sum = sum(w for w in nb_weights.values() if w > 0)
         agg_nb = 0.0 if nb_sum <= 0 else sum(
             nb_weights[c] * channels[c] for c in channels) / nb_sum
-        per_handle[recs[k][0]] = {"score": round(agg, 6), "score_nb": round(agg_nb, 6),
-                                  "evidence": channels}
+        # Max-aggregate shared handles (same rule as evidence_grid: keep the
+        # record with the highest full-arm score; VERIFY finding 10).
+        prev = per_handle.get(recs[k][0])
+        if prev is None or round(agg, 6) > prev["score"]:
+            per_handle[recs[k][0]] = {"score": round(agg, 6),
+                                      "score_nb": round(agg_nb, 6),
+                                      "evidence": channels}
     return {"per_handle": per_handle, "walls": []}
 
 
