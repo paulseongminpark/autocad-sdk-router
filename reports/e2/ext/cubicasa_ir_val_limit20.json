@@ -1,0 +1,133 @@
+{
+ "schema": "ariadne.e2_ext_cubicasa_ir_summary.v1",
+ "split": "val",
+ "n_requested": 20,
+ "n_ok": 20,
+ "n_fail": 0,
+ "total_segments": 19469,
+ "total_wall_segments": 2220,
+ "wall_frac_mean": 0.1177,
+ "out_dir": "D:\\dev\\99_tools\\autocad-sdk-router\\runs\\e2_ext_cubicasa\\ir\\val",
+ "samples": [
+  {
+   "id": "high_quality_architectural_333",
+   "n_segments": 649,
+   "n_wall": 76,
+   "wall_frac": 0.1171
+  },
+  {
+   "id": "high_quality_architectural_1654",
+   "n_segments": 422,
+   "n_wall": 56,
+   "wall_frac": 0.1327
+  },
+  {
+   "id": "high_quality_architectural_5559",
+   "n_segments": 893,
+   "n_wall": 124,
+   "wall_frac": 0.1389
+  },
+  {
+   "id": "high_quality_architectural_3015",
+   "n_segments": 1648,
+   "n_wall": 148,
+   "wall_frac": 0.0898
+  },
+  {
+   "id": "high_quality_architectural_5748",
+   "n_segments": 1178,
+   "n_wall": 128,
+   "wall_frac": 0.1087
+  },
+  {
+   "id": "high_quality_architectural_6244",
+   "n_segments": 769,
+   "n_wall": 96,
+   "wall_frac": 0.1248
+  },
+  {
+   "id": "high_quality_architectural_7842",
+   "n_segments": 520,
+   "n_wall": 52,
+   "wall_frac": 0.1
+  },
+  {
+   "id": "high_quality_architectural_555",
+   "n_segments": 1115,
+   "n_wall": 148,
+   "wall_frac": 0.1327
+  },
+  {
+   "id": "high_quality_architectural_9885",
+   "n_segments": 2478,
+   "n_wall": 296,
+   "wall_frac": 0.1195
+  },
+  {
+   "id": "high_quality_architectural_6136",
+   "n_segments": 1752,
+   "n_wall": 184,
+   "wall_frac": 0.105
+  },
+  {
+   "id": "high_quality_architectural_1611",
+   "n_segments": 371,
+   "n_wall": 44,
+   "wall_frac": 0.1186
+  },
+  {
+   "id": "high_quality_architectural_8154",
+   "n_segments": 622,
+   "n_wall": 88,
+   "wall_frac": 0.1415
+  },
+  {
+   "id": "high_quality_architectural_6257",
+   "n_segments": 595,
+   "n_wall": 64,
+   "wall_frac": 0.1076
+  },
+  {
+   "id": "high_quality_architectural_6339",
+   "n_segments": 720,
+   "n_wall": 144,
+   "wall_frac": 0.2
+  },
+  {
+   "id": "high_quality_architectural_1241",
+   "n_segments": 704,
+   "n_wall": 76,
+   "wall_frac": 0.108
+  },
+  {
+   "id": "high_quality_architectural_3164",
+   "n_segments": 1243,
+   "n_wall": 88,
+   "wall_frac": 0.0708
+  },
+  {
+   "id": "high_quality_architectural_5566",
+   "n_segments": 917,
+   "n_wall": 76,
+   "wall_frac": 0.0829
+  },
+  {
+   "id": "high_quality_architectural_6675",
+   "n_segments": 1258,
+   "n_wall": 124,
+   "wall_frac": 0.0986
+  },
+  {
+   "id": "high_quality_architectural_6302",
+   "n_segments": 747,
+   "n_wall": 96,
+   "wall_frac": 0.1285
+  },
+  {
+   "id": "high_quality_architectural_6272",
+   "n_segments": 868,
+   "n_wall": 112,
+   "wall_frac": 0.129
+  }
+ ]
+}

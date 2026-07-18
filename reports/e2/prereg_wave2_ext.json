@@ -1,0 +1,54 @@
+{
+ "schema": "ariadne.e2_prereg.v1",
+ "prereg_id": "e2.wave2.ext.v1",
+ "sealed_at": "2026-07-18T16:30:00+09:00",
+ "amends": "e2.wave2.v1",
+ "purpose": "External labeled-set evaluation track (vector). Third-party drawings with third-party human labels — generator/detector circularity structurally removed; scored universe contains real labeled negatives (S-pack vacuous-precision defect closed).",
+ "dataset": {
+  "name": "CubiCasa5k",
+  "local_root": "D:\\dev\\_ariadne\\huggingface\\datasets\\cubicasa5k\\cubicasa5k",
+  "splits": {"train": 4200, "val": 400, "test": 400},
+  "audit": "reports/e2/ext/cubicasa_audit_full.json (5000/5000 parse ok, 371100 wall polygons, thickness px p50=22)",
+  "substrate": "tools/e2/ext/cubicasa_ir.py — every polygon/polyline/line edge under the SVG Model group becomes one scored segment with SVG affine transforms accumulated; truth = elements whose nearest classed ancestor has first class token 'Wall'; layer field neutralized to '0' (name-blind by construction, zero label leakage into IR)."
+ },
+ "protocol": {
+  "calibration_split": "val — scale-estimation strategy, detector threshold, and model hyperparameters may be tuned here.",
+  "evaluation_split": "test — single-shot per method rung. No re-evaluation after seeing test results; any pipeline fix discovered post-test requires a new prereg amendment and is reported as a re-run, never silently substituted.",
+  "train_split_use": "learning rungs only (classical ML, PU, GNN).",
+  "scale_note": "detector v1 thickness prior is physical mm [50,400]; CubiCasa units are px with per-drawing unknown scale. Scale strategies must not consult truth labels of the drawing being scored. Global constant scale calibrated on val is the baseline strategy; dimension-text-derived per-drawing scale is an allowed refinement.",
+  "metrics": "per-handle precision/recall/F1 vs truth at the declared threshold, micro over the split; per-drawing macro-F1 reported alongside.",
+  "sentinel": "any drawing yielding zero scored segments counts as an error; error rate > 5% of split invalidates the run."
+ },
+ "bands": {
+  "EXT-B1": {
+   "name": "detector v1 transfer",
+   "rule": "detector v1 (calibrated on val, frozen) micro-F1 on test >= 0.60",
+   "rationale": "transfer is nontrivial if the physical-prior detector holds most of its signal on third-party real drawings; below 0.60 is an honest transfer FAIL with full report."
+  },
+  "EXT-B2": {
+   "name": "ladder ordering (learning beats geometry)",
+   "rule": "GBDT on detector evidence-channel features, trained on train split, micro-F1 on test >= detector v1 micro-F1 on test",
+   "rationale": "same shape as W2-B1: each ladder rung must not lose to the rung below."
+  },
+  "EXT-B3": {
+   "name": "anti-permutation control",
+   "rule": "GBDT trained on permuted train labels yields test ROC-AUC <= 0.55",
+   "rationale": "guards against leakage through the feature pipeline."
+  },
+  "EXT-B4": {
+   "name": "name-blind gap",
+   "rule": "N/A by construction — IR carries no layer/class names; recorded as design note, no separate arm.",
+   "rationale": "the layer channel is neutralized at conversion time, so full arm == name-blind arm on this track."
+  }
+ },
+ "report_only": [
+  "per-drawing macro-F1 distribution",
+  "scale-strategy comparison (global constant vs dimension-text-derived)",
+  "error taxonomy of false positives by source class (Door, DimensionMark, BoundaryPolygon, furniture...)"
+ ],
+ "future_rungs": "PU learning, GNN, raster-track (FloorPlanCAD masks, qwen2.5-VL local, DGX SFT/GRPO) each get their own band amendment sealed before first test-split contact.",
+ "constraints": [
+  "dataset files are read-only inputs; all derived IR goes to runs/e2_ext_cubicasa/ (regenerable, not committed)",
+  "no test-split scoring of any kind before this file is committed (sealed)"
+ ]
+}

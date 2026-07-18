@@ -1,0 +1,80 @@
+{
+ "schema": "ariadne.e2_ext_cubicasa_audit.v1",
+ "data_root": "D:\\dev\\_ariadne\\huggingface\\datasets\\cubicasa5k\\cubicasa5k",
+ "splits": {
+  "train": {
+   "n_listed": 4200,
+   "n_audited": 4200,
+   "n_ok": 4200,
+   "n_wall_zero": 0
+  },
+  "val": {
+   "n_listed": 400,
+   "n_audited": 400,
+   "n_ok": 400,
+   "n_wall_zero": 0
+  },
+  "test": {
+   "n_listed": 400,
+   "n_audited": 400,
+   "n_ok": 400,
+   "n_wall_zero": 0
+  }
+ },
+ "parse": {
+  "ok": 5000,
+  "fail": 0,
+  "fail_examples": []
+ },
+ "wall_polygons_total": 371100,
+ "wall_thickness_px_quantiles": {
+  "p05": 9.0,
+  "p25": 13.0,
+  "p50": 22.0,
+  "p75": 32.0,
+  "p95": 45.0
+ },
+ "class_histogram_top40": {
+  "DimensionMark": 245576,
+  "BoundaryPolygon": 141593,
+  "Name": 118929,
+  "Direction": 113120,
+  "Wall": 79734,
+  "Dimension": 61394,
+  "Visual": 61394,
+  "SpaceDimensionsLabel": 61394,
+  "TextLabel NameLabel": 61394,
+  "TextLabel DimensionMeasureLabel": 61394,
+  "PanelArea": 51667,
+  "Wall External": 51327,
+  "Threshold": 49945,
+  "Glass": 44009,
+  "Panel": 44009,
+  "Window Regular": 43960,
+  "Door Swing Beside": 43030,
+  "FixedFurniture Closet": 31819,
+  "InnerPolygon": 26549,
+  "electricitySign": 19041,
+  "FixedFurniture BaseCabinet": 17325,
+  "Railing": 15663,
+  "Panel Left Negative": 14167,
+  "OuterDrain": 13160,
+  "InnerDrain": 13160,
+  "Faucet": 13160,
+  "Panel Right Negative": 12635,
+  "Panel Left Positive": 12227,
+  "FixedFurniture CoatCloset": 12179,
+  "Hanger": 12179,
+  "Panel Right Positive": 11630,
+  "Space Undefined": 11005,
+  "FixedFurnitureSet": 10945,
+  "Bench": 10875,
+  "Column Rectangle": 9910,
+  "FixedFurniture WallCabinet": 9503,
+  "ResizeNControl": 8706,
+  "ResizeEControl": 8706,
+  "ResizeSControl": 8706,
+  "ResizeWControl": 8706
+ },
+ "n_classes_distinct": 237
+}
