@@ -1,0 +1,62 @@
+{
+  "schema": "e2.prereg.r2.v1",
+  "sealed_utc": "2026-07-18T17:20:00Z",
+  "sealed_by": "orchestrator (Fable) — 듀오 합동 설계 adjudication 권한",
+  "parent_seals": {
+    "e2.program.v1": "e285be1",
+    "e2.wave2.ext.v1": "b2241f3"
+  },
+  "inputs": {
+    "joint_design": "reports/e2/duo/WAVE2_JOINT_DESIGN.md @4f3ebb2",
+    "g0a_inventory": "reports/e2/cells/g0a_inventory/inventory.json @c16d7b0",
+    "g0a_breach_adjudication": "기술적 위반(합성 gen2 truth 스니펫 노출) — 반순환 목적에 실질 무해 판정, 영구 기록 후 수락. 근거=커밋 c16d7b0 메시지."
+  },
+  "val_states": {
+    "LEGACY_SEEN": "기존 전체 val 400도면 — 0.705/B* 적응에 사용됨. 스코어보드에 LEGACY-SEEN 주석 의무. 소급 무결 주장 금지.",
+    "DEV": "family-hash 결정적 분할의 개발면 (val-A, ~200도면) — inner 루프 유일 가시면.",
+    "ADJ": "격리면 (val-B, ~200도면) — score-only 인터페이스, 웨이브당 frozen-cohort 단발 batch 개봉 1회, 질의 장부 절대상한 12(예외 거버넌스용, 건별 기록). ADJ 통과=전향 생존이지 최종 무편향 일반화 증명 아님.",
+    "split_procedure": "W2-09에서 family-hash로 결정적 생성, 매니페스트 해시를 본 문서 amendment로 봉인. 회고 팔(청정 재적합 incumbent)이 이후 채택 비교의 기준선."
+  },
+  "evaluator_constitution_immutable": [
+    "split·분할 해시", "primary metric=common-handle AUPRC", "handle 포함 규칙", "threshold 선택 데이터",
+    "bootstrap 단위(도면/family paired cluster, 10k)", "가드 집합(셔플·name-blind·family·센티널)",
+    "예산 회계 규칙", "method ID=모델/데이터/분할/하네스/리졸버/보정/평가자 해시 튜플", "ADJ/test ACL"
+  ],
+  "test_policy": { "wave_test_contact": 0, "note": "방법당 단발 비가역 자원. RL/RSI 보상·밴드이동·수리에 사용 금지. 개방은 차기 웨이브 별도 심사." },
+  "adoption_gates": {
+    "cell_pass": "ΔAUPRC(DEV) ≥ +0.01 ∧ family-paired CI 하한 > 0 ∧ 전 가드 PASS",
+    "occam_kill": "2-hop classical이 B*+0.10 달성 시 production GNN Occam-KILL",
+    "gnn_formal_band": "B*(수리분할 0.8315) + 0.05 AUPRC ∧ S-node F1≥0.92 ∧ S-pair F1≥0.80 ∧ style-OOD drop≤0.10 ∧ REL≤0.03 ∧ RES≥0.03",
+    "outer_harness": "동일 ex-ante 캡 벡터 replay ∧ DEV ΔAUPRC ≥ max(+0.005, 2×SE_boot(val-B)) ∧ val-B 비열화 ∧ ADJ 단발 확인",
+    "rsi_status_layers": "CELL_PASS ≠ RSI_ADOPT ≠ EFFICIENCY_PASS — 3층 분리(합동 설계 §sol 3.1)"
+  },
+  "budget": {
+    "unit_rule": "비융통 벡터 (CPU-h, RTX-h, GB10-h, peak RAM, val-B 질의, test권, frontier 호출=0). 환산 금지·잔여 이월 금지·실패/debug run 합산.",
+    "cpu_cell_caps_h": { "G1_verifier_families": 24, "W2-01_error_autopsy": 8, "W2-02_2hop": 48, "G4_pu_miner": 72, "G9_rl_diag": 72, "W2-09_valB": 24 },
+    "gb10_caps": "W2-00 처리율 실측 착지 후 amendment로 수치 봉인 — G0 결과는 캡을 늘릴 수 없고 강등/BLOCK만 가능(합동 설계 D3·D6). 봉투는 셀 캡 합의 의도적 초과예약 허용, 봉투가 구속.",
+    "dgx_routing_rule_sealed": "W2-00 실측 처리율 < 2×(RTX 대비) → DGX=메모리-바운드 잡 전용 큐로 강등"
+  },
+  "code_landing_gate": {
+    "rule": "트레이너 코드 미착지 셀은 OPEN(≠READY) — 발사 금지",
+    "g0a_status": { "gnn_trainer": "ABSENT", "raster_trainer": "ABSENT", "qwen_trainer": "ABSENT", "rl_harness": "ABSENT" }
+  },
+  "rl_policy": { "wave_training": "금지", "ladder": "G9/A63 exact/beam 열거 진단 → 갭≥0.01 시에만 W2-07b bandit 프로브 → 둘 다 생존 시 차기 프리레그로 RLVR 제안", "verifier_reward_domain": "메타데이터 보유 합성 팩 한정 (name-blind FRR 1.0 실측 @32e0550) — name-blind verifier-reward 학습 전 트랙 폐쇄" },
+  "rights_gates": { "floorplancad_dependent": "R50 권리/출처 게이트 통과 전 BLOCKED(≠FAIL)", "qwen_checkpoints": "training-data manifest·holdout 접촉 확인 전 QUARANTINED/UNSCORABLE" },
+  "quarantine_statistics": {
+    "population": "동세대+직전세대 후보", "rule": "N≥8이면 z/P99, N<8이면 전수 검역",
+    "absolute_sentinels": "val AUC>0.995 또는 F1>0.95 자동 검역",
+    "planted_leak_qualification": "심은 ID누출·family중복·verifier-exploit 노드를 검역기가 전부 격리해야 '3층 방어 READY' (G0-C)"
+  },
+  "bet_register": {
+    "rule": "반증가능 사전 베팅 장부 — 게이트·밴드로 사용 금지, 셀 설계자 비노출(오케스트레이터 전용). 연속 2회 밴드 밖 빗나감 시 베팅 제도 재심.",
+    "bets": [ { "id": "BET-1", "owner": "duo:fable", "claim": "고정 반경 스칼라 집계+GBDT 가족의 val F1 천장 = 0.75±0.03 (설계된 베팅, 도출 CI 아님)", "kill": "REVISED_fable.md §1.3 조문" } ]
+  },
+  "resolved_stale_items": { "A61_adoption_band": "e2.program.v1 D1에서 엄격안 30%/0.02로 결재 완료(가역) — fable의 '봉인 대기'는 구정보" },
+  "operator_discipline": [
+    "draft≠knob sweep · improve=단일 메커니즘+ablation · 증거 불완전=점수 무관 INVALID",
+    "DGX 큐 = Q0 자격 > Q1 게이트-보유 > Q2 선점형 필러(체크포인트 경계 양보) · READY 없는 유휴=정직 유휴",
+    "eval 결함=거버넌스 인터럽트(개선 크레딧 없음, 전 코호트 replay)",
+    "루프 목표 도달 주장 = 사슬 검증단(fable×3 시야분리+sol ultra) 확인 후에만 종결"
+  ],
+  "amendment_rule": "본 봉인 이후 outcome을 본 뒤 arm·band·metric·budget·route 추가 금지. amendment는 캡 하향·강등·BLOCK·미정값(GB10 캡, val-B 매니페스트) 확정만 가능."
+}
