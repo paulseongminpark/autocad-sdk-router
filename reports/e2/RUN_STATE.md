@@ -98,6 +98,31 @@ Lanes: sonnet_b/c=opus x3each (sunapse/sunapse-kdw) · sonnet_d/e=opus x5each (j
   0.00e+00; seq-vs-MP 20k-sample max_dev 0.00e+00. Wall clock 86 h → 2 h 40 m (memory-bandwidth
   bound at 10 workers — 35-min ideal-scaling ETA was wrong; see ETA discipline memory).
 
+## Wave-1 verification (2026-07-18, Paul-ordered; self + blind sol56-ultra cross-check)
+
+Independent adversarial recompute of every banded number from raw committed artifacts
+(scratchpad w1_verify.py; fresh code, no fold-logic reuse):
+
+- **CONFIRMED**: B2 S 1.0/1.0 (PASS stands) · B4 all five arms to 4 decimals (rotate/translate/
+  mirror/units 1.0, scale 0.8795) · B3 zero_frac 0.2161 (83/384; spot checks semantic: *D295
+  dimension cache 0 walls, X-평면도(기본형) 16,816 walls; 0 defs with silver wl≥0.8 scored zero)
+  · B5 Pearson 0.2991 · B1 TV 0.265 · fast-scorer equivalence re-proven on 6 FRESH defs (dev 0.0).
+- **VERIFY-1 (defect found, corrected)**: the v1 B2 tier summaries (eval_{S,F,M}.json) folded the
+  per-drawing `baseline` block whose predicted set is WALL-PAIR membership (`source:"walls"`), not
+  the sealed per-handle≥0.5 metric; and since walls records ignore the layer channel, the
+  name-blind summary was a vacuous duplicate of full on every tier. Corrected fold
+  (w1_eval_fold_v2.py → eval_fold_v2.json) from `ablation[channel_removed=none]` per arm:
+  S 1.0/1.0 · F P 0.9315/R 1.0 · **M P 0.9091/R 1.0** (v1-quoted 0.8669 was the walls-pair
+  artifact; correction is upward). Name-blind arm decisions identical to full at threshold 0.5 on
+  all three tiers (now a real measurement). Band verdicts unchanged (B2 banded only on S).
+- **VERIFY-2 (reproducibility gap, closed)**: committed fidelity_M_v1.json carried an empty real
+  side; KS 0.5792 was quoted but not reproducible from it. Re-ran s2_fidelity with real_stats →
+  fidelity_M_v2.json reproduces **KS 0.5792 FAIL_DRAFT** (B1 verdict unchanged; real_summary.source
+  display field still null — cosmetic ticket; entity-mix NO_DATA remains supplemented by
+  fidelity_M_v1_tv.json TV 0.265).
+- Blind cross-check: gpt-5.6-sol effort=ultra launched in worktree @de72da4 (pre-correction
+  state, no access to the corrections above) → report lands at reports/e2/verify/.
+
 ## Assets
 
 - CubiCasa5k canonical (Zenodo 2613548): `_ariadne\alm\datasets\cubicasa5k.zip` 5,469,495,706 bytes,

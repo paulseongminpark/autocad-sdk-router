@@ -1,0 +1,90 @@
+{
+ "driver": "w1_eval_fold.v2",
+ "correction": "VERIFY-1: v1 folded baseline(source=walls); v2 folds ablation.full (prereg-faithful per-handle metric); name_blind arm now meaningful",
+ "tiers": {
+  "S": {
+   "tier": "S",
+   "metric": "per-handle score >= 0.5 (eval.json ablation.full)",
+   "arms": {
+    "full": {
+     "n_drawings": 20,
+     "micro": {
+      "tp": 272,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0
+     }
+    },
+    "name_blind": {
+     "n_drawings": 20,
+     "micro": {
+      "tp": 272,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0
+     }
+    }
+   }
+  },
+  "F": {
+   "tier": "F",
+   "metric": "per-handle score >= 0.5 (eval.json ablation.full)",
+   "arms": {
+    "full": {
+     "n_drawings": 20,
+     "micro": {
+      "tp": 272,
+      "fp": 20,
+      "fn": 0,
+      "precision": 0.9315,
+      "recall": 1.0,
+      "f1": 0.9645
+     }
+    },
+    "name_blind": {
+     "n_drawings": 20,
+     "micro": {
+      "tp": 272,
+      "fp": 20,
+      "fn": 0,
+      "precision": 0.9315,
+      "recall": 1.0,
+      "f1": 0.9645
+     }
+    }
+   }
+  },
+  "M": {
+   "tier": "M",
+   "metric": "per-handle score >= 0.5 (eval.json ablation.full)",
+   "arms": {
+    "full": {
+     "n_drawings": 20,
+     "micro": {
+      "tp": 280,
+      "fp": 28,
+      "fn": 0,
+      "precision": 0.9091,
+      "recall": 1.0,
+      "f1": 0.9524
+     }
+    },
+    "name_blind": {
+     "n_drawings": 20,
+     "micro": {
+      "tp": 280,
+      "fp": 28,
+      "fn": 0,
+      "precision": 0.9091,
+      "recall": 1.0,
+      "f1": 0.9524
+     }
+    }
+   }
+  }
+ }
+}
