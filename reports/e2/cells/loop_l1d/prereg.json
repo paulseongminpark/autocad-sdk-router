@@ -1,0 +1,150 @@
+{
+  "schema": "ariadne.e2.loop_l1d.prereg.v1",
+  "cell": "loop_l1d",
+  "estimator_version": "C1v5",
+  "repair_governance": {
+    "mode": "eval-repair",
+    "improvement_credit": false,
+    "seal_before_estimator": true,
+    "immutable_sealed_workbook": "evidence_sealed.xlsx",
+    "final_evidence_workbook": "evidence.xlsx",
+    "threshold_substitution_after_observation": false,
+    "gate_verdict_emitted": false,
+    "repo_mutation_allowed": false,
+    "cad_access_allowed": false,
+    "test_access_allowed": false,
+    "reproducibility_statement": "휘발 필드 제외 수치 전 필드 동일"
+  },
+  "sealed_bands": {
+    "high_coverage_per_scale": {
+      "status_field": "unit_status",
+      "status_value": "HIGH",
+      "minimum_fraction": 0.6,
+      "scales": [
+        0.001,
+        0.01,
+        1.0,
+        1000.0
+      ]
+    },
+    "high_accuracy": {
+      "subset": "unit_status=HIGH",
+      "relative_error_maximum": 0.05,
+      "minimum_fraction": 0.95
+    },
+    "perturbation_monotonicity": {
+      "scope": "designated mutation families 6 plus fleet-discovered classes",
+      "designated_mutation_families": [
+        "outlier_clone",
+        "stale_override",
+        "suffix_removal",
+        "exact_duplicate",
+        "geometry_ratio_break",
+        "reference_support_drop"
+      ],
+      "fleet_discovered_classes": [
+        "display_removal",
+        "handle_collision",
+        "type_to_grid",
+        "denominator_cleanup_sweep",
+        "suffix_stale_variants"
+      ],
+      "property_mutation_grammar": [
+        "outlier_clone",
+        "stale_override",
+        "suffix_removal",
+        "exact_duplicate",
+        "geometry_ratio_break",
+        "reference_support_drop",
+        "display_removal",
+        "handle_collision",
+        "type_to_grid"
+      ],
+      "allowed_upward_transition_count": 0,
+      "fields": [
+        "confidence_score",
+        "reference_confidence_score",
+        "status",
+        "unit_status",
+        "reference_status"
+      ],
+      "status_order": {
+        "NONE": 0,
+        "LOW": 1,
+        "HIGH": 2
+      },
+      "ratio_consistent_complete_forgery_b4": {
+        "gate": false,
+        "measurement_required": true,
+        "reason": "information-theoretic limit of support-count estimation"
+      }
+    },
+    "no_overblocking": {
+      "baseline": "original C1 estimator",
+      "legitimate_scenes": [
+        "O1_honest_mixed_unit",
+        "O2_stale_label"
+      ],
+      "allowed_status_downgrade_count": 0,
+      "allowed_coverage_loss_count": 0
+    }
+  },
+  "required_selftest": {
+    "first_fleet_live_counterexample_count": 1,
+    "lens1_probe_ids": [
+      "B1",
+      "B2",
+      "B3",
+      "B4"
+    ],
+    "seat4_denominator_cleanup_sweep_count": 54,
+    "legitimate_regression_ids": [
+      "O1",
+      "O2"
+    ],
+    "seeded_property_perturbations": 600,
+    "seed": 20260719,
+    "allowed_upward_transition_count": 0
+  },
+  "estimator_structure": {
+    "ratio_mode_space": "z_mm before mode selection when suffix is known; raw z otherwise",
+    "independence_key": "unique source handle",
+    "reference_span_evidence": "label-free",
+    "suspicious_evidence_role": "denominator only",
+    "candidate_denominator": "all candidate records, never path-filtered",
+    "checker_flags": "observed values only; no constant success flags"
+  },
+  "replay_cohorts": {
+    "l1b": {
+      "scene_count": 200,
+      "comparators": [
+        "v1",
+        "v2",
+        "v3"
+      ]
+    },
+    "c1_original": {
+      "scene_count": 200,
+      "comparators": [
+        "v1",
+        "v2",
+        "v3"
+      ]
+    }
+  },
+  "sources": {
+    "packet": "D:\\runs\\e2_program\\build\\PACKET_loop_L1d_consensus_redesign.md",
+    "synthesis": "D:\\runs\\e2_program\\chainverify_L1c\\SYNTHESIS.md",
+    "lens1_report": "D:\\runs\\e2_program\\chainverify_L1c\\lens1_guard.md",
+    "seat4_report": "D:\\runs\\e2_program\\chainverify_L1c\\seat4_sol.md",
+    "lens1_probe": "D:\\runs\\e2_program\\chainverify_L1c\\lens1_work\\probe_guard.py",
+    "seat4_probe": "D:\\runs\\e2_program\\chainverify_L1c\\seat4_work\\seat4_audit.py",
+    "dossier_clauses": [
+      "feyerabend_P2.md:190-192",
+      "feyerabend_P2.md:194-229",
+      "feyerabend_P2.md:231-247",
+      "feyerabend_P2.md:738-740",
+      "feyerabend_P2.md:770-798"
+    ]
+  }
+}
