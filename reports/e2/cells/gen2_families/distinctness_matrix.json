@@ -1,0 +1,582 @@
+{
+  "all_families_internally_invariant": true,
+  "all_off_diagonal_different": true,
+  "attempts_used": 1,
+  "design_attempts": [
+    {
+      "attempt": 1,
+      "collision_groups": [],
+      "core_signatures": {
+        "F01": "d3d5bd6df0ea46694fa465b3f92ed31e56f0918799450009ce442728f9529484",
+        "F02": "a57117153370565691d4389947b3319d34063db7924d3789044699b7d700b74c",
+        "F03": "0ae8cdc0733fd9543f76af8cd0b5b8ea6cc94a660222d0f8764669c7d4ae5e9f",
+        "F04": "d65f4d91b58ac829d0f4d8e444174349f77548ce7b3e00738941b7d9cca26bf1",
+        "F05": "4f1ea66293f5848b5cc849f7e6374d7955644550de08e0485903539eae0db77c",
+        "F06": "db6e9a9a7c0472ad96e3723ecd4b36cae6c12fd3995c689a613ce45e40eedf4d",
+        "F07": "3aa6a782098552d688cfa8e0c1f16e43b35ddfe44476b8e1d5d93792e701215b",
+        "F08": "1312d6d761e04d5456c33470500742aafafafe15345dc4e1e09287e8f9a1b070"
+      },
+      "retry_indices": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    }
+  ],
+  "different_matrix": [
+    [
+      false,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true
+    ],
+    [
+      true,
+      false,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true
+    ],
+    [
+      true,
+      true,
+      false,
+      true,
+      true,
+      true,
+      true,
+      true
+    ],
+    [
+      true,
+      true,
+      true,
+      false,
+      true,
+      true,
+      true,
+      true
+    ],
+    [
+      true,
+      true,
+      true,
+      true,
+      false,
+      true,
+      true,
+      true
+    ],
+    [
+      true,
+      true,
+      true,
+      true,
+      true,
+      false,
+      true,
+      true
+    ],
+    [
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      false,
+      true
+    ],
+    [
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      false
+    ]
+  ],
+  "family_core_signatures": {
+    "F01": "d3d5bd6df0ea46694fa465b3f92ed31e56f0918799450009ce442728f9529484",
+    "F02": "a57117153370565691d4389947b3319d34063db7924d3789044699b7d700b74c",
+    "F03": "0ae8cdc0733fd9543f76af8cd0b5b8ea6cc94a660222d0f8764669c7d4ae5e9f",
+    "F04": "d65f4d91b58ac829d0f4d8e444174349f77548ce7b3e00738941b7d9cca26bf1",
+    "F05": "4f1ea66293f5848b5cc849f7e6374d7955644550de08e0485903539eae0db77c",
+    "F06": "db6e9a9a7c0472ad96e3723ecd4b36cae6c12fd3995c689a613ce45e40eedf4d",
+    "F07": "3aa6a782098552d688cfa8e0c1f16e43b35ddfe44476b8e1d5d93792e701215b",
+    "F08": "1312d6d761e04d5456c33470500742aafafafe15345dc4e1e09287e8f9a1b070"
+  },
+  "family_order": [
+    "F01",
+    "F02",
+    "F03",
+    "F04",
+    "F05",
+    "F06",
+    "F07",
+    "F08"
+  ],
+  "method": {
+    "authority": "same canonical core truth signature as blocked gnn_e2_screen",
+    "canonicalization": "json sort_keys=true separators=(',', ':') ensure_ascii=false then SHA-256",
+    "core_wall_ids": [
+      "w01",
+      "w02",
+      "w03",
+      "w04",
+      "w05",
+      "w06",
+      "w07",
+      "w08"
+    ],
+    "fields": [
+      "id",
+      "axis",
+      "geometry_kind",
+      "thickness",
+      "thickness_range",
+      "variant"
+    ]
+  },
+  "off_diagonal_different_count": 28,
+  "off_diagonal_pair_count": 28,
+  "pairwise": [
+    {
+      "different": true,
+      "left_core_signature": "d3d5bd6df0ea46694fa465b3f92ed31e56f0918799450009ce442728f9529484",
+      "left_family": "F01",
+      "right_core_signature": "a57117153370565691d4389947b3319d34063db7924d3789044699b7d700b74c",
+      "right_family": "F02"
+    },
+    {
+      "different": true,
+      "left_core_signature": "d3d5bd6df0ea46694fa465b3f92ed31e56f0918799450009ce442728f9529484",
+      "left_family": "F01",
+      "right_core_signature": "0ae8cdc0733fd9543f76af8cd0b5b8ea6cc94a660222d0f8764669c7d4ae5e9f",
+      "right_family": "F03"
+    },
+    {
+      "different": true,
+      "left_core_signature": "d3d5bd6df0ea46694fa465b3f92ed31e56f0918799450009ce442728f9529484",
+      "left_family": "F01",
+      "right_core_signature": "d65f4d91b58ac829d0f4d8e444174349f77548ce7b3e00738941b7d9cca26bf1",
+      "right_family": "F04"
+    },
+    {
+      "different": true,
+      "left_core_signature": "d3d5bd6df0ea46694fa465b3f92ed31e56f0918799450009ce442728f9529484",
+      "left_family": "F01",
+      "right_core_signature": "4f1ea66293f5848b5cc849f7e6374d7955644550de08e0485903539eae0db77c",
+      "right_family": "F05"
+    },
+    {
+      "different": true,
+      "left_core_signature": "d3d5bd6df0ea46694fa465b3f92ed31e56f0918799450009ce442728f9529484",
+      "left_family": "F01",
+      "right_core_signature": "db6e9a9a7c0472ad96e3723ecd4b36cae6c12fd3995c689a613ce45e40eedf4d",
+      "right_family": "F06"
+    },
+    {
+      "different": true,
+      "left_core_signature": "d3d5bd6df0ea46694fa465b3f92ed31e56f0918799450009ce442728f9529484",
+      "left_family": "F01",
+      "right_core_signature": "3aa6a782098552d688cfa8e0c1f16e43b35ddfe44476b8e1d5d93792e701215b",
+      "right_family": "F07"
+    },
+    {
+      "different": true,
+      "left_core_signature": "d3d5bd6df0ea46694fa465b3f92ed31e56f0918799450009ce442728f9529484",
+      "left_family": "F01",
+      "right_core_signature": "1312d6d761e04d5456c33470500742aafafafe15345dc4e1e09287e8f9a1b070",
+      "right_family": "F08"
+    },
+    {
+      "different": true,
+      "left_core_signature": "a57117153370565691d4389947b3319d34063db7924d3789044699b7d700b74c",
+      "left_family": "F02",
+      "right_core_signature": "0ae8cdc0733fd9543f76af8cd0b5b8ea6cc94a660222d0f8764669c7d4ae5e9f",
+      "right_family": "F03"
+    },
+    {
+      "different": true,
+      "left_core_signature": "a57117153370565691d4389947b3319d34063db7924d3789044699b7d700b74c",
+      "left_family": "F02",
+      "right_core_signature": "d65f4d91b58ac829d0f4d8e444174349f77548ce7b3e00738941b7d9cca26bf1",
+      "right_family": "F04"
+    },
+    {
+      "different": true,
+      "left_core_signature": "a57117153370565691d4389947b3319d34063db7924d3789044699b7d700b74c",
+      "left_family": "F02",
+      "right_core_signature": "4f1ea66293f5848b5cc849f7e6374d7955644550de08e0485903539eae0db77c",
+      "right_family": "F05"
+    },
+    {
+      "different": true,
+      "left_core_signature": "a57117153370565691d4389947b3319d34063db7924d3789044699b7d700b74c",
+      "left_family": "F02",
+      "right_core_signature": "db6e9a9a7c0472ad96e3723ecd4b36cae6c12fd3995c689a613ce45e40eedf4d",
+      "right_family": "F06"
+    },
+    {
+      "different": true,
+      "left_core_signature": "a57117153370565691d4389947b3319d34063db7924d3789044699b7d700b74c",
+      "left_family": "F02",
+      "right_core_signature": "3aa6a782098552d688cfa8e0c1f16e43b35ddfe44476b8e1d5d93792e701215b",
+      "right_family": "F07"
+    },
+    {
+      "different": true,
+      "left_core_signature": "a57117153370565691d4389947b3319d34063db7924d3789044699b7d700b74c",
+      "left_family": "F02",
+      "right_core_signature": "1312d6d761e04d5456c33470500742aafafafe15345dc4e1e09287e8f9a1b070",
+      "right_family": "F08"
+    },
+    {
+      "different": true,
+      "left_core_signature": "0ae8cdc0733fd9543f76af8cd0b5b8ea6cc94a660222d0f8764669c7d4ae5e9f",
+      "left_family": "F03",
+      "right_core_signature": "d65f4d91b58ac829d0f4d8e444174349f77548ce7b3e00738941b7d9cca26bf1",
+      "right_family": "F04"
+    },
+    {
+      "different": true,
+      "left_core_signature": "0ae8cdc0733fd9543f76af8cd0b5b8ea6cc94a660222d0f8764669c7d4ae5e9f",
+      "left_family": "F03",
+      "right_core_signature": "4f1ea66293f5848b5cc849f7e6374d7955644550de08e0485903539eae0db77c",
+      "right_family": "F05"
+    },
+    {
+      "different": true,
+      "left_core_signature": "0ae8cdc0733fd9543f76af8cd0b5b8ea6cc94a660222d0f8764669c7d4ae5e9f",
+      "left_family": "F03",
+      "right_core_signature": "db6e9a9a7c0472ad96e3723ecd4b36cae6c12fd3995c689a613ce45e40eedf4d",
+      "right_family": "F06"
+    },
+    {
+      "different": true,
+      "left_core_signature": "0ae8cdc0733fd9543f76af8cd0b5b8ea6cc94a660222d0f8764669c7d4ae5e9f",
+      "left_family": "F03",
+      "right_core_signature": "3aa6a782098552d688cfa8e0c1f16e43b35ddfe44476b8e1d5d93792e701215b",
+      "right_family": "F07"
+    },
+    {
+      "different": true,
+      "left_core_signature": "0ae8cdc0733fd9543f76af8cd0b5b8ea6cc94a660222d0f8764669c7d4ae5e9f",
+      "left_family": "F03",
+      "right_core_signature": "1312d6d761e04d5456c33470500742aafafafe15345dc4e1e09287e8f9a1b070",
+      "right_family": "F08"
+    },
+    {
+      "different": true,
+      "left_core_signature": "d65f4d91b58ac829d0f4d8e444174349f77548ce7b3e00738941b7d9cca26bf1",
+      "left_family": "F04",
+      "right_core_signature": "4f1ea66293f5848b5cc849f7e6374d7955644550de08e0485903539eae0db77c",
+      "right_family": "F05"
+    },
+    {
+      "different": true,
+      "left_core_signature": "d65f4d91b58ac829d0f4d8e444174349f77548ce7b3e00738941b7d9cca26bf1",
+      "left_family": "F04",
+      "right_core_signature": "db6e9a9a7c0472ad96e3723ecd4b36cae6c12fd3995c689a613ce45e40eedf4d",
+      "right_family": "F06"
+    },
+    {
+      "different": true,
+      "left_core_signature": "d65f4d91b58ac829d0f4d8e444174349f77548ce7b3e00738941b7d9cca26bf1",
+      "left_family": "F04",
+      "right_core_signature": "3aa6a782098552d688cfa8e0c1f16e43b35ddfe44476b8e1d5d93792e701215b",
+      "right_family": "F07"
+    },
+    {
+      "different": true,
+      "left_core_signature": "d65f4d91b58ac829d0f4d8e444174349f77548ce7b3e00738941b7d9cca26bf1",
+      "left_family": "F04",
+      "right_core_signature": "1312d6d761e04d5456c33470500742aafafafe15345dc4e1e09287e8f9a1b070",
+      "right_family": "F08"
+    },
+    {
+      "different": true,
+      "left_core_signature": "4f1ea66293f5848b5cc849f7e6374d7955644550de08e0485903539eae0db77c",
+      "left_family": "F05",
+      "right_core_signature": "db6e9a9a7c0472ad96e3723ecd4b36cae6c12fd3995c689a613ce45e40eedf4d",
+      "right_family": "F06"
+    },
+    {
+      "different": true,
+      "left_core_signature": "4f1ea66293f5848b5cc849f7e6374d7955644550de08e0485903539eae0db77c",
+      "left_family": "F05",
+      "right_core_signature": "3aa6a782098552d688cfa8e0c1f16e43b35ddfe44476b8e1d5d93792e701215b",
+      "right_family": "F07"
+    },
+    {
+      "different": true,
+      "left_core_signature": "4f1ea66293f5848b5cc849f7e6374d7955644550de08e0485903539eae0db77c",
+      "left_family": "F05",
+      "right_core_signature": "1312d6d761e04d5456c33470500742aafafafe15345dc4e1e09287e8f9a1b070",
+      "right_family": "F08"
+    },
+    {
+      "different": true,
+      "left_core_signature": "db6e9a9a7c0472ad96e3723ecd4b36cae6c12fd3995c689a613ce45e40eedf4d",
+      "left_family": "F06",
+      "right_core_signature": "3aa6a782098552d688cfa8e0c1f16e43b35ddfe44476b8e1d5d93792e701215b",
+      "right_family": "F07"
+    },
+    {
+      "different": true,
+      "left_core_signature": "db6e9a9a7c0472ad96e3723ecd4b36cae6c12fd3995c689a613ce45e40eedf4d",
+      "left_family": "F06",
+      "right_core_signature": "1312d6d761e04d5456c33470500742aafafafe15345dc4e1e09287e8f9a1b070",
+      "right_family": "F08"
+    },
+    {
+      "different": true,
+      "left_core_signature": "3aa6a782098552d688cfa8e0c1f16e43b35ddfe44476b8e1d5d93792e701215b",
+      "left_family": "F07",
+      "right_core_signature": "1312d6d761e04d5456c33470500742aafafafe15345dc4e1e09287e8f9a1b070",
+      "right_family": "F08"
+    }
+  ],
+  "schema": "e2.gen2-families.distinctness.v1",
+  "topology_descriptors": {
+    "F01": {
+      "base_wall_count": 8,
+      "connected_component_count": 1,
+      "cycle_rank": 5,
+      "declared_room_count": 5,
+      "degree_histogram": {
+        "2": 4,
+        "3": 8
+      },
+      "intersection_graph_edge_count": 16,
+      "intersection_graph_node_count": 12,
+      "oblique_partition_count": 0,
+      "opening_attachment_wall_ids": [
+        "w05"
+      ],
+      "thickness_levels_mm": [
+        120.0,
+        160.0,
+        200.0,
+        260.0
+      ],
+      "topology_signature": "0c9402a1685b045a214667e3cb38fdc4c8c1072c18b91e4966eee1d08ec3ae62"
+    },
+    "F02": {
+      "base_wall_count": 9,
+      "connected_component_count": 1,
+      "cycle_rank": 5,
+      "declared_room_count": 6,
+      "degree_histogram": {
+        "1": 2,
+        "2": 4,
+        "3": 8,
+        "4": 1
+      },
+      "intersection_graph_edge_count": 19,
+      "intersection_graph_node_count": 15,
+      "oblique_partition_count": 1,
+      "opening_attachment_wall_ids": [
+        "w06",
+        "w03"
+      ],
+      "thickness_levels_mm": [
+        100.0,
+        180.0,
+        220.0,
+        300.0
+      ],
+      "topology_signature": "555065554683a6553cbb92ecd94c9e28690d61cd8fc6ba8d9990232bb8be2eb1"
+    },
+    "F03": {
+      "base_wall_count": 10,
+      "connected_component_count": 1,
+      "cycle_rank": 5,
+      "declared_room_count": 7,
+      "degree_histogram": {
+        "1": 3,
+        "2": 4,
+        "3": 9,
+        "4": 1
+      },
+      "intersection_graph_edge_count": 21,
+      "intersection_graph_node_count": 17,
+      "oblique_partition_count": 2,
+      "opening_attachment_wall_ids": [
+        "w05",
+        "w08"
+      ],
+      "thickness_levels_mm": [
+        110.0,
+        170.0,
+        240.0,
+        280.0
+      ],
+      "topology_signature": "1624e9f0f3d0da0ea9d30459c6e88460d312ccf73752bb8ae897a12a5a3d3d8f"
+    },
+    "F04": {
+      "base_wall_count": 11,
+      "connected_component_count": 1,
+      "cycle_rank": 8,
+      "declared_room_count": 8,
+      "degree_histogram": {
+        "2": 4,
+        "3": 14
+      },
+      "intersection_graph_edge_count": 25,
+      "intersection_graph_node_count": 18,
+      "oblique_partition_count": 0,
+      "opening_attachment_wall_ids": [
+        "w07",
+        "w09",
+        "w02"
+      ],
+      "thickness_levels_mm": [
+        120.0,
+        150.0,
+        210.0,
+        250.0,
+        320.0
+      ],
+      "topology_signature": "dbf694f690931012705806819bc8540c205774563e5b70be46ecf787bf970b85"
+    },
+    "F05": {
+      "base_wall_count": 12,
+      "connected_component_count": 1,
+      "cycle_rank": 8,
+      "declared_room_count": 9,
+      "degree_histogram": {
+        "1": 1,
+        "2": 4,
+        "3": 15
+      },
+      "intersection_graph_edge_count": 27,
+      "intersection_graph_node_count": 20,
+      "oblique_partition_count": 1,
+      "opening_attachment_wall_ids": [
+        "w05",
+        "w10"
+      ],
+      "thickness_levels_mm": [
+        100.0,
+        140.0,
+        190.0,
+        230.0,
+        340.0
+      ],
+      "topology_signature": "919c6127c9c97aeaae90e7bee46b5ce78845e7c513aaa9e9283f6a01b23e12e7"
+    },
+    "F06": {
+      "base_wall_count": 13,
+      "connected_component_count": 1,
+      "cycle_rank": 9,
+      "declared_room_count": 10,
+      "degree_histogram": {
+        "1": 3,
+        "2": 4,
+        "3": 15,
+        "4": 2
+      },
+      "intersection_graph_edge_count": 32,
+      "intersection_graph_node_count": 24,
+      "oblique_partition_count": 2,
+      "opening_attachment_wall_ids": [
+        "w06",
+        "w11",
+        "w04"
+      ],
+      "thickness_levels_mm": [
+        110.0,
+        160.0,
+        200.0,
+        260.0,
+        360.0
+      ],
+      "topology_signature": "bc41a15033c15afb88b0da2af71ca7262e189374fc5112436194febcad559ccf"
+    },
+    "F07": {
+      "base_wall_count": 14,
+      "connected_component_count": 1,
+      "cycle_rank": 9,
+      "declared_room_count": 11,
+      "degree_histogram": {
+        "1": 5,
+        "2": 4,
+        "3": 15,
+        "4": 3
+      },
+      "intersection_graph_edge_count": 35,
+      "intersection_graph_node_count": 27,
+      "oblique_partition_count": 3,
+      "opening_attachment_wall_ids": [
+        "w05",
+        "w09",
+        "w12"
+      ],
+      "thickness_levels_mm": [
+        120.0,
+        170.0,
+        220.0,
+        280.0,
+        380.0
+      ],
+      "topology_signature": "1f6f7daa03cb8356c622742ad05c1570d18520bb006c5e3f175acc5f5017689d"
+    },
+    "F08": {
+      "base_wall_count": 15,
+      "connected_component_count": 1,
+      "cycle_rank": 10,
+      "declared_room_count": 12,
+      "degree_histogram": {
+        "1": 3,
+        "2": 4,
+        "3": 19,
+        "4": 1
+      },
+      "intersection_graph_edge_count": 36,
+      "intersection_graph_node_count": 27,
+      "oblique_partition_count": 4,
+      "opening_attachment_wall_ids": [
+        "w06",
+        "w10",
+        "w13",
+        "w03"
+      ],
+      "thickness_levels_mm": [
+        100.0,
+        150.0,
+        210.0,
+        270.0,
+        310.0,
+        400.0
+      ],
+      "topology_signature": "7b4db8c07578a88724b0547e29f5a07eb1a56149a017a64a642428e6e2a5b05a"
+    }
+  },
+  "verdict_scope": "distinctness criterion only; no fidelity or model gate adjudication",
+  "within_family_core_signature_counts": {
+    "F01": 1,
+    "F02": 1,
+    "F03": 1,
+    "F04": 1,
+    "F05": 1,
+    "F06": 1,
+    "F07": 1,
+    "F08": 1
+  }
+}

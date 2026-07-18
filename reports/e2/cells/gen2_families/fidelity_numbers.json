@@ -1,0 +1,166 @@
+{
+  "existing_pack_manifest_sha256": "115fe18acaba7c474319cca86b004a7b90e5ba6d0e4dc03ec9eae44c25241c28",
+  "existing_single_family_vs_real": {
+    "entity_mix_tv": 0.0008332487822938152,
+    "n_drawings": 150,
+    "n_entities": 428450,
+    "n_parallel_pair_offsets": 110450,
+    "read_errors": 0,
+    "thickness_ks": 0.06265902171230281
+  },
+  "method": {
+    "band_adjudication": false,
+    "gate_verdict_emitted": false,
+    "metrics": [
+      "parallel-pair-offset histogram KS",
+      "entity-type TV"
+    ],
+    "source": "D:\\dev\\99_tools\\autocad-sdk-router\\tools\\e2\\gen2\\fidelity_stats.py",
+    "source_sha256": "00acec150c65d05a82641d1ab0ac0466cd68e4a424670dd849c3211b2f3c96df"
+  },
+  "new_vs_existing_single_family": {
+    "entity_mix_tv": 0.0006065569465261863,
+    "existing_drawings": 150,
+    "existing_parallel_pair_offsets": 110450,
+    "new_drawings": 200,
+    "new_parallel_pair_offsets": 155554,
+    "thickness_ks": 0.032474863001233034
+  },
+  "per_family_vs_real": {
+    "F01": {
+      "entity_mix_tv": 0.0006621720024359318,
+      "n_drawings": 25,
+      "n_entities": 71532,
+      "n_parallel_pair_offsets": 18733,
+      "read_errors": 0,
+      "thickness_ks": 0.06750769730764627,
+      "versus_existing_single_family": {
+        "entity_mix_tv": 0.0003258756638394478,
+        "thickness_ks": 0.01803872420606878
+      }
+    },
+    "F02": {
+      "entity_mix_tv": 0.0006621720024359318,
+      "n_drawings": 25,
+      "n_entities": 71532,
+      "n_parallel_pair_offsets": 18858,
+      "read_errors": 0,
+      "thickness_ks": 0.06932997382007394,
+      "versus_existing_single_family": {
+        "entity_mix_tv": 0.0003258756638394478,
+        "thickness_ks": 0.015187870214028898
+      }
+    },
+    "F03": {
+      "entity_mix_tv": 0.000649195936043079,
+      "n_drawings": 25,
+      "n_entities": 71536,
+      "n_parallel_pair_offsets": 18938,
+      "read_errors": 0,
+      "thickness_ks": 0.07048360629344369,
+      "versus_existing_single_family": {
+        "entity_mix_tv": 0.0003345133465888928,
+        "thickness_ks": 0.01595757828038713
+      }
+    },
+    "F04": {
+      "entity_mix_tv": 0.0005797083732875451,
+      "n_drawings": 25,
+      "n_entities": 71899,
+      "n_parallel_pair_offsets": 19708,
+      "read_errors": 0,
+      "thickness_ks": 0.08339825841122939,
+      "versus_existing_single_family": {
+        "entity_mix_tv": 0.0007839798989561152,
+        "thickness_ks": 0.04169374451418062
+      }
+    },
+    "F05": {
+      "entity_mix_tv": 0.0005797083732875451,
+      "n_drawings": 25,
+      "n_entities": 71899,
+      "n_parallel_pair_offsets": 19733,
+      "read_errors": 0,
+      "thickness_ks": 0.08293541206935451,
+      "versus_existing_single_family": {
+        "entity_mix_tv": 0.0007839798989561152,
+        "thickness_ks": 0.03893168915937695
+      }
+    },
+    "F06": {
+      "entity_mix_tv": 0.0005712928070029405,
+      "n_drawings": 25,
+      "n_entities": 71902,
+      "n_parallel_pair_offsets": 19877,
+      "read_errors": 0,
+      "thickness_ks": 0.08622859373335479,
+      "versus_existing_single_family": {
+        "entity_mix_tv": 0.0007802369220415077,
+        "thickness_ks": 0.04764352829657936
+      }
+    },
+    "F07": {
+      "entity_mix_tv": 0.0005797083732875451,
+      "n_drawings": 25,
+      "n_entities": 71899,
+      "n_parallel_pair_offsets": 19683,
+      "read_errors": 0,
+      "thickness_ks": 0.08077651443828388,
+      "versus_existing_single_family": {
+        "entity_mix_tv": 0.0007839798989561152,
+        "thickness_ks": 0.03571688216125091
+      }
+    },
+    "F08": {
+      "entity_mix_tv": 0.0005797083732875451,
+      "n_drawings": 25,
+      "n_entities": 71899,
+      "n_parallel_pair_offsets": 20024,
+      "read_errors": 0,
+      "thickness_ks": 0.08841995715455175,
+      "versus_existing_single_family": {
+        "entity_mix_tv": 0.0007839798989561152,
+        "thickness_ks": 0.05033348845125096
+      }
+    }
+  },
+  "per_tier_vs_real": {
+    "F": {
+      "entity_mix_tv": 0.0005672758475599091,
+      "n_drawings": 67,
+      "n_entities": 192250,
+      "n_parallel_pair_offsets": 52071,
+      "read_errors": 0,
+      "thickness_ks": 0.07736245459430835
+    },
+    "M": {
+      "entity_mix_tv": 0.0006268957703936707,
+      "n_drawings": 66,
+      "n_entities": 189598,
+      "n_parallel_pair_offsets": 51431,
+      "read_errors": 0,
+      "thickness_ks": 0.07806943780385317
+    },
+    "S": {
+      "entity_mix_tv": 0.0005672758475599091,
+      "n_drawings": 67,
+      "n_entities": 192250,
+      "n_parallel_pair_offsets": 52052,
+      "read_errors": 0,
+      "thickness_ks": 0.07726570207445904
+    }
+  },
+  "pooled_vs_real": {
+    "entity_mix_tv": 0.0004873651958941208,
+    "n_drawings": 200,
+    "n_entities": 574098,
+    "n_parallel_pair_offsets": 155554,
+    "read_errors": 0,
+    "thickness_ks": 0.07756382962347441
+  },
+  "reference_sha256": {
+    "entity_mix_json": "cc95a55852932cc41eb5dfdc5fc9df560f6ada94625969e9284c581e809608ea",
+    "fidelity_histogram_json": "afec84ebf141d8bc29ef6b0ee8fe615c7e6c2bf19b1e4df10c64d11951691ae3"
+  },
+  "schema": "e2.gen2-families.fidelity-numbers.v1"
+}

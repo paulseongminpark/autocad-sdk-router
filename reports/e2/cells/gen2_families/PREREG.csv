@@ -1,0 +1,40 @@
+section,key,sealed_value,notes
+identity,schema,e2.gen2-families.prereg.v1,Cell-local preregistration seal
+identity,sealed_utc,2026-07-18T18:28:37.8836210Z,Sealed before any drawing generation or fidelity calculation
+identity,packet_sha256,b44be950a1237dfc4cb863021ac5a26bb6472c4fe82d718738ad86f7f00d5c06,D:\runs\e2_program\build\PACKET_gen2_families.md
+design,family_count_k,8,Fixed
+design,drawings_per_family,25,Fixed
+design,total_drawings,200,Fixed
+design,tiers,S|F|M,Rotating allocation within every family
+design,tier_allocation,"tier=[S,F,M][(family_ordinal+local_ordinal) mod 3]",Each family contains all three tiers
+design,base_seed,20260719,Fixed
+design,seed_rule,"base_seed + family_ordinal*1000000 + tier_offset + local_ordinal",tier offsets come from read-only gen2.py
+design,entity_target_count,1400,Matches fidelity_full convention
+design,reference_parallel_pairs,600,Matches fidelity_full convention
+family,F01,"compact_five_room_spine; grammar_seed=101; rooms=5; extent=7600x5400; outer=260; inner=120|160|200; oblique=none; openings=w05",Grammar-derived fixed template
+family,F02,"six_room_offset_cross; grammar_seed=211; rooms=6; extent=8400x6200; outer=300; inner=100|180|220; oblique=2; openings=w06|w03",Grammar-derived fixed template
+family,F03,"seven_room_diagonal_branch; grammar_seed=307; rooms=7; extent=9200x6500; outer=280; inner=110|170|240; oblique=1|3; openings=w05|w08",Grammar-derived fixed template
+family,F04,"eight_room_longitudinal_bays; grammar_seed=419; rooms=8; extent=10400x5800; outer=320; inner=120|150|210|250; oblique=none; openings=w07|w09|w02",Grammar-derived fixed template
+family,F05,"nine_room_single_slant_court; grammar_seed=523; rooms=9; extent=9800x7600; outer=340; inner=100|140|190|230; oblique=4; openings=w05|w10",Grammar-derived fixed template
+family,F06,"ten_room_double_slant_grid; grammar_seed=631; rooms=10; extent=11200x7200; outer=360; inner=110|160|200|260; oblique=2|5; openings=w06|w11|w04",Grammar-derived fixed template
+family,F07,"eleven_room_fan_branch; grammar_seed=743; rooms=11; extent=11800x8200; outer=380; inner=120|170|220|280; oblique=1|4|7; openings=w05|w09|w12",Grammar-derived fixed template
+family,F08,"twelve_room_mixed_angle_mesh; grammar_seed=857; rooms=12; extent=12600x8800; outer=400; inner=100|150|210|270|310; oblique=2|5|7|8; openings=w06|w10|w13|w03",Grammar-derived fixed template
+distinctness,core_signature,"canonical SHA-256 of ordered w01-w08 rows: id|axis|geometry_kind|thickness|thickness_range|variant",Exactly matches blocked GNN screen audit method
+distinctness,criterion,"one invariant signature per family and all 28 off-diagonal family pairs different",No band or model outcome involved
+distinctness,retry_policy,"increment later colliding grammar_seed by 10000*attempt; maximum 3 attempts",Record all attempts and residual collisions
+split,example,6 train families | 2 development families | overlap 0,All variants of a family remain in one fold
+fidelity,metrics,parallel-pair-offset KS | entity-type TV,Numeric output only
+fidelity,scopes,pooled | per-family | new-versus-existing-single-family | existing-versus-real,No band adjudication
+fidelity,band_adjudication,false,Orchestrator authority retained
+selftest,determinism,"all nonvolatile truth-ledger fields identical after same-seed regeneration",Runtime and timestamp fields excluded
+selftest,family_id_integrity,all 200 manifest-to-ledger mappings,Full census
+selftest,graph_builder,one drawing per family with frozen config digest 56911f4633979a3fe00fd56be2d0a39ac06757ed255ed49ed18ca20ba9d4ac49,Eight samples
+cap,cpu_hours,8,Hard cap
+cap,peak_ram_gb,48,Hard cap
+scope,repository_modification,false,Read-only imports only
+scope,git_operations,false,Forbidden
+scope,original_cad_contact,false,Forbidden
+scope,cubicasa_val_test_contact,false,Forbidden
+scope,subagents,false,Forbidden by packet
+evidence,evidence_xlsx,false,Required artifact-tool dependency loader is unavailable
+evidence,fallback,PREREG.csv,Packet-authorized fallback; no alternate spreadsheet library used

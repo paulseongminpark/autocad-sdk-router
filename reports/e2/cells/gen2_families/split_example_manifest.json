@@ -1,0 +1,1626 @@
+{
+  "assignment_sha256": "d51463fcfeb7dadf68f34ba69d0e4a56ef5d991a581b04017ceae933ec95acbb",
+  "assignments": [
+    {
+      "drawing_id": "f01_000",
+      "dxf": "packs/S/f01_000.dxf",
+      "family_id": "F01",
+      "fold": "train",
+      "tier": "S",
+      "truth": "packs/S/f01_000.truth.json"
+    },
+    {
+      "drawing_id": "f01_001",
+      "dxf": "packs/F/f01_001.dxf",
+      "family_id": "F01",
+      "fold": "train",
+      "tier": "F",
+      "truth": "packs/F/f01_001.truth.json"
+    },
+    {
+      "drawing_id": "f01_002",
+      "dxf": "packs/M/f01_002.dxf",
+      "family_id": "F01",
+      "fold": "train",
+      "tier": "M",
+      "truth": "packs/M/f01_002.truth.json"
+    },
+    {
+      "drawing_id": "f01_003",
+      "dxf": "packs/S/f01_003.dxf",
+      "family_id": "F01",
+      "fold": "train",
+      "tier": "S",
+      "truth": "packs/S/f01_003.truth.json"
+    },
+    {
+      "drawing_id": "f01_004",
+      "dxf": "packs/F/f01_004.dxf",
+      "family_id": "F01",
+      "fold": "train",
+      "tier": "F",
+      "truth": "packs/F/f01_004.truth.json"
+    },
+    {
+      "drawing_id": "f01_005",
+      "dxf": "packs/M/f01_005.dxf",
+      "family_id": "F01",
+      "fold": "train",
+      "tier": "M",
+      "truth": "packs/M/f01_005.truth.json"
+    },
+    {
+      "drawing_id": "f01_006",
+      "dxf": "packs/S/f01_006.dxf",
+      "family_id": "F01",
+      "fold": "train",
+      "tier": "S",
+      "truth": "packs/S/f01_006.truth.json"
+    },
+    {
+      "drawing_id": "f01_007",
+      "dxf": "packs/F/f01_007.dxf",
+      "family_id": "F01",
+      "fold": "train",
+      "tier": "F",
+      "truth": "packs/F/f01_007.truth.json"
+    },
+    {
+      "drawing_id": "f01_008",
+      "dxf": "packs/M/f01_008.dxf",
+      "family_id": "F01",
+      "fold": "train",
+      "tier": "M",
+      "truth": "packs/M/f01_008.truth.json"
+    },
+    {
+      "drawing_id": "f01_009",
+      "dxf": "packs/S/f01_009.dxf",
+      "family_id": "F01",
+      "fold": "train",
+      "tier": "S",
+      "truth": "packs/S/f01_009.truth.json"
+    },
+    {
+      "drawing_id": "f01_010",
+      "dxf": "packs/F/f01_010.dxf",
+      "family_id": "F01",
+      "fold": "train",
+      "tier": "F",
+      "truth": "packs/F/f01_010.truth.json"
+    },
+    {
+      "drawing_id": "f01_011",
+      "dxf": "packs/M/f01_011.dxf",
+      "family_id": "F01",
+      "fold": "train",
+      "tier": "M",
+      "truth": "packs/M/f01_011.truth.json"
+    },
+    {
+      "drawing_id": "f01_012",
+      "dxf": "packs/S/f01_012.dxf",
+      "family_id": "F01",
+      "fold": "train",
+      "tier": "S",
+      "truth": "packs/S/f01_012.truth.json"
+    },
+    {
+      "drawing_id": "f01_013",
+      "dxf": "packs/F/f01_013.dxf",
+      "family_id": "F01",
+      "fold": "train",
+      "tier": "F",
+      "truth": "packs/F/f01_013.truth.json"
+    },
+    {
+      "drawing_id": "f01_014",
+      "dxf": "packs/M/f01_014.dxf",
+      "family_id": "F01",
+      "fold": "train",
+      "tier": "M",
+      "truth": "packs/M/f01_014.truth.json"
+    },
+    {
+      "drawing_id": "f01_015",
+      "dxf": "packs/S/f01_015.dxf",
+      "family_id": "F01",
+      "fold": "train",
+      "tier": "S",
+      "truth": "packs/S/f01_015.truth.json"
+    },
+    {
+      "drawing_id": "f01_016",
+      "dxf": "packs/F/f01_016.dxf",
+      "family_id": "F01",
+      "fold": "train",
+      "tier": "F",
+      "truth": "packs/F/f01_016.truth.json"
+    },
+    {
+      "drawing_id": "f01_017",
+      "dxf": "packs/M/f01_017.dxf",
+      "family_id": "F01",
+      "fold": "train",
+      "tier": "M",
+      "truth": "packs/M/f01_017.truth.json"
+    },
+    {
+      "drawing_id": "f01_018",
+      "dxf": "packs/S/f01_018.dxf",
+      "family_id": "F01",
+      "fold": "train",
+      "tier": "S",
+      "truth": "packs/S/f01_018.truth.json"
+    },
+    {
+      "drawing_id": "f01_019",
+      "dxf": "packs/F/f01_019.dxf",
+      "family_id": "F01",
+      "fold": "train",
+      "tier": "F",
+      "truth": "packs/F/f01_019.truth.json"
+    },
+    {
+      "drawing_id": "f01_020",
+      "dxf": "packs/M/f01_020.dxf",
+      "family_id": "F01",
+      "fold": "train",
+      "tier": "M",
+      "truth": "packs/M/f01_020.truth.json"
+    },
+    {
+      "drawing_id": "f01_021",
+      "dxf": "packs/S/f01_021.dxf",
+      "family_id": "F01",
+      "fold": "train",
+      "tier": "S",
+      "truth": "packs/S/f01_021.truth.json"
+    },
+    {
+      "drawing_id": "f01_022",
+      "dxf": "packs/F/f01_022.dxf",
+      "family_id": "F01",
+      "fold": "train",
+      "tier": "F",
+      "truth": "packs/F/f01_022.truth.json"
+    },
+    {
+      "drawing_id": "f01_023",
+      "dxf": "packs/M/f01_023.dxf",
+      "family_id": "F01",
+      "fold": "train",
+      "tier": "M",
+      "truth": "packs/M/f01_023.truth.json"
+    },
+    {
+      "drawing_id": "f01_024",
+      "dxf": "packs/S/f01_024.dxf",
+      "family_id": "F01",
+      "fold": "train",
+      "tier": "S",
+      "truth": "packs/S/f01_024.truth.json"
+    },
+    {
+      "drawing_id": "f02_000",
+      "dxf": "packs/F/f02_000.dxf",
+      "family_id": "F02",
+      "fold": "train",
+      "tier": "F",
+      "truth": "packs/F/f02_000.truth.json"
+    },
+    {
+      "drawing_id": "f02_001",
+      "dxf": "packs/M/f02_001.dxf",
+      "family_id": "F02",
+      "fold": "train",
+      "tier": "M",
+      "truth": "packs/M/f02_001.truth.json"
+    },
+    {
+      "drawing_id": "f02_002",
+      "dxf": "packs/S/f02_002.dxf",
+      "family_id": "F02",
+      "fold": "train",
+      "tier": "S",
+      "truth": "packs/S/f02_002.truth.json"
+    },
+    {
+      "drawing_id": "f02_003",
+      "dxf": "packs/F/f02_003.dxf",
+      "family_id": "F02",
+      "fold": "train",
+      "tier": "F",
+      "truth": "packs/F/f02_003.truth.json"
+    },
+    {
+      "drawing_id": "f02_004",
+      "dxf": "packs/M/f02_004.dxf",
+      "family_id": "F02",
+      "fold": "train",
+      "tier": "M",
+      "truth": "packs/M/f02_004.truth.json"
+    },
+    {
+      "drawing_id": "f02_005",
+      "dxf": "packs/S/f02_005.dxf",
+      "family_id": "F02",
+      "fold": "train",
+      "tier": "S",
+      "truth": "packs/S/f02_005.truth.json"
+    },
+    {
+      "drawing_id": "f02_006",
+      "dxf": "packs/F/f02_006.dxf",
+      "family_id": "F02",
+      "fold": "train",
+      "tier": "F",
+      "truth": "packs/F/f02_006.truth.json"
+    },
+    {
+      "drawing_id": "f02_007",
+      "dxf": "packs/M/f02_007.dxf",
+      "family_id": "F02",
+      "fold": "train",
+      "tier": "M",
+      "truth": "packs/M/f02_007.truth.json"
+    },
+    {
+      "drawing_id": "f02_008",
+      "dxf": "packs/S/f02_008.dxf",
+      "family_id": "F02",
+      "fold": "train",
+      "tier": "S",
+      "truth": "packs/S/f02_008.truth.json"
+    },
+    {
+      "drawing_id": "f02_009",
+      "dxf": "packs/F/f02_009.dxf",
+      "family_id": "F02",
+      "fold": "train",
+      "tier": "F",
+      "truth": "packs/F/f02_009.truth.json"
+    },
+    {
+      "drawing_id": "f02_010",
+      "dxf": "packs/M/f02_010.dxf",
+      "family_id": "F02",
+      "fold": "train",
+      "tier": "M",
+      "truth": "packs/M/f02_010.truth.json"
+    },
+    {
+      "drawing_id": "f02_011",
+      "dxf": "packs/S/f02_011.dxf",
+      "family_id": "F02",
+      "fold": "train",
+      "tier": "S",
+      "truth": "packs/S/f02_011.truth.json"
+    },
+    {
+      "drawing_id": "f02_012",
+      "dxf": "packs/F/f02_012.dxf",
+      "family_id": "F02",
+      "fold": "train",
+      "tier": "F",
+      "truth": "packs/F/f02_012.truth.json"
+    },
+    {
+      "drawing_id": "f02_013",
+      "dxf": "packs/M/f02_013.dxf",
+      "family_id": "F02",
+      "fold": "train",
+      "tier": "M",
+      "truth": "packs/M/f02_013.truth.json"
+    },
+    {
+      "drawing_id": "f02_014",
+      "dxf": "packs/S/f02_014.dxf",
+      "family_id": "F02",
+      "fold": "train",
+      "tier": "S",
+      "truth": "packs/S/f02_014.truth.json"
+    },
+    {
+      "drawing_id": "f02_015",
+      "dxf": "packs/F/f02_015.dxf",
+      "family_id": "F02",
+      "fold": "train",
+      "tier": "F",
+      "truth": "packs/F/f02_015.truth.json"
+    },
+    {
+      "drawing_id": "f02_016",
+      "dxf": "packs/M/f02_016.dxf",
+      "family_id": "F02",
+      "fold": "train",
+      "tier": "M",
+      "truth": "packs/M/f02_016.truth.json"
+    },
+    {
+      "drawing_id": "f02_017",
+      "dxf": "packs/S/f02_017.dxf",
+      "family_id": "F02",
+      "fold": "train",
+      "tier": "S",
+      "truth": "packs/S/f02_017.truth.json"
+    },
+    {
+      "drawing_id": "f02_018",
+      "dxf": "packs/F/f02_018.dxf",
+      "family_id": "F02",
+      "fold": "train",
+      "tier": "F",
+      "truth": "packs/F/f02_018.truth.json"
+    },
+    {
+      "drawing_id": "f02_019",
+      "dxf": "packs/M/f02_019.dxf",
+      "family_id": "F02",
+      "fold": "train",
+      "tier": "M",
+      "truth": "packs/M/f02_019.truth.json"
+    },
+    {
+      "drawing_id": "f02_020",
+      "dxf": "packs/S/f02_020.dxf",
+      "family_id": "F02",
+      "fold": "train",
+      "tier": "S",
+      "truth": "packs/S/f02_020.truth.json"
+    },
+    {
+      "drawing_id": "f02_021",
+      "dxf": "packs/F/f02_021.dxf",
+      "family_id": "F02",
+      "fold": "train",
+      "tier": "F",
+      "truth": "packs/F/f02_021.truth.json"
+    },
+    {
+      "drawing_id": "f02_022",
+      "dxf": "packs/M/f02_022.dxf",
+      "family_id": "F02",
+      "fold": "train",
+      "tier": "M",
+      "truth": "packs/M/f02_022.truth.json"
+    },
+    {
+      "drawing_id": "f02_023",
+      "dxf": "packs/S/f02_023.dxf",
+      "family_id": "F02",
+      "fold": "train",
+      "tier": "S",
+      "truth": "packs/S/f02_023.truth.json"
+    },
+    {
+      "drawing_id": "f02_024",
+      "dxf": "packs/F/f02_024.dxf",
+      "family_id": "F02",
+      "fold": "train",
+      "tier": "F",
+      "truth": "packs/F/f02_024.truth.json"
+    },
+    {
+      "drawing_id": "f03_000",
+      "dxf": "packs/M/f03_000.dxf",
+      "family_id": "F03",
+      "fold": "train",
+      "tier": "M",
+      "truth": "packs/M/f03_000.truth.json"
+    },
+    {
+      "drawing_id": "f03_001",
+      "dxf": "packs/S/f03_001.dxf",
+      "family_id": "F03",
+      "fold": "train",
+      "tier": "S",
+      "truth": "packs/S/f03_001.truth.json"
+    },
+    {
+      "drawing_id": "f03_002",
+      "dxf": "packs/F/f03_002.dxf",
+      "family_id": "F03",
+      "fold": "train",
+      "tier": "F",
+      "truth": "packs/F/f03_002.truth.json"
+    },
+    {
+      "drawing_id": "f03_003",
+      "dxf": "packs/M/f03_003.dxf",
+      "family_id": "F03",
+      "fold": "train",
+      "tier": "M",
+      "truth": "packs/M/f03_003.truth.json"
+    },
+    {
+      "drawing_id": "f03_004",
+      "dxf": "packs/S/f03_004.dxf",
+      "family_id": "F03",
+      "fold": "train",
+      "tier": "S",
+      "truth": "packs/S/f03_004.truth.json"
+    },
+    {
+      "drawing_id": "f03_005",
+      "dxf": "packs/F/f03_005.dxf",
+      "family_id": "F03",
+      "fold": "train",
+      "tier": "F",
+      "truth": "packs/F/f03_005.truth.json"
+    },
+    {
+      "drawing_id": "f03_006",
+      "dxf": "packs/M/f03_006.dxf",
+      "family_id": "F03",
+      "fold": "train",
+      "tier": "M",
+      "truth": "packs/M/f03_006.truth.json"
+    },
+    {
+      "drawing_id": "f03_007",
+      "dxf": "packs/S/f03_007.dxf",
+      "family_id": "F03",
+      "fold": "train",
+      "tier": "S",
+      "truth": "packs/S/f03_007.truth.json"
+    },
+    {
+      "drawing_id": "f03_008",
+      "dxf": "packs/F/f03_008.dxf",
+      "family_id": "F03",
+      "fold": "train",
+      "tier": "F",
+      "truth": "packs/F/f03_008.truth.json"
+    },
+    {
+      "drawing_id": "f03_009",
+      "dxf": "packs/M/f03_009.dxf",
+      "family_id": "F03",
+      "fold": "train",
+      "tier": "M",
+      "truth": "packs/M/f03_009.truth.json"
+    },
+    {
+      "drawing_id": "f03_010",
+      "dxf": "packs/S/f03_010.dxf",
+      "family_id": "F03",
+      "fold": "train",
+      "tier": "S",
+      "truth": "packs/S/f03_010.truth.json"
+    },
+    {
+      "drawing_id": "f03_011",
+      "dxf": "packs/F/f03_011.dxf",
+      "family_id": "F03",
+      "fold": "train",
+      "tier": "F",
+      "truth": "packs/F/f03_011.truth.json"
+    },
+    {
+      "drawing_id": "f03_012",
+      "dxf": "packs/M/f03_012.dxf",
+      "family_id": "F03",
+      "fold": "train",
+      "tier": "M",
+      "truth": "packs/M/f03_012.truth.json"
+    },
+    {
+      "drawing_id": "f03_013",
+      "dxf": "packs/S/f03_013.dxf",
+      "family_id": "F03",
+      "fold": "train",
+      "tier": "S",
+      "truth": "packs/S/f03_013.truth.json"
+    },
+    {
+      "drawing_id": "f03_014",
+      "dxf": "packs/F/f03_014.dxf",
+      "family_id": "F03",
+      "fold": "train",
+      "tier": "F",
+      "truth": "packs/F/f03_014.truth.json"
+    },
+    {
+      "drawing_id": "f03_015",
+      "dxf": "packs/M/f03_015.dxf",
+      "family_id": "F03",
+      "fold": "train",
+      "tier": "M",
+      "truth": "packs/M/f03_015.truth.json"
+    },
+    {
+      "drawing_id": "f03_016",
+      "dxf": "packs/S/f03_016.dxf",
+      "family_id": "F03",
+      "fold": "train",
+      "tier": "S",
+      "truth": "packs/S/f03_016.truth.json"
+    },
+    {
+      "drawing_id": "f03_017",
+      "dxf": "packs/F/f03_017.dxf",
+      "family_id": "F03",
+      "fold": "train",
+      "tier": "F",
+      "truth": "packs/F/f03_017.truth.json"
+    },
+    {
+      "drawing_id": "f03_018",
+      "dxf": "packs/M/f03_018.dxf",
+      "family_id": "F03",
+      "fold": "train",
+      "tier": "M",
+      "truth": "packs/M/f03_018.truth.json"
+    },
+    {
+      "drawing_id": "f03_019",
+      "dxf": "packs/S/f03_019.dxf",
+      "family_id": "F03",
+      "fold": "train",
+      "tier": "S",
+      "truth": "packs/S/f03_019.truth.json"
+    },
+    {
+      "drawing_id": "f03_020",
+      "dxf": "packs/F/f03_020.dxf",
+      "family_id": "F03",
+      "fold": "train",
+      "tier": "F",
+      "truth": "packs/F/f03_020.truth.json"
+    },
+    {
+      "drawing_id": "f03_021",
+      "dxf": "packs/M/f03_021.dxf",
+      "family_id": "F03",
+      "fold": "train",
+      "tier": "M",
+      "truth": "packs/M/f03_021.truth.json"
+    },
+    {
+      "drawing_id": "f03_022",
+      "dxf": "packs/S/f03_022.dxf",
+      "family_id": "F03",
+      "fold": "train",
+      "tier": "S",
+      "truth": "packs/S/f03_022.truth.json"
+    },
+    {
+      "drawing_id": "f03_023",
+      "dxf": "packs/F/f03_023.dxf",
+      "family_id": "F03",
+      "fold": "train",
+      "tier": "F",
+      "truth": "packs/F/f03_023.truth.json"
+    },
+    {
+      "drawing_id": "f03_024",
+      "dxf": "packs/M/f03_024.dxf",
+      "family_id": "F03",
+      "fold": "train",
+      "tier": "M",
+      "truth": "packs/M/f03_024.truth.json"
+    },
+    {
+      "drawing_id": "f04_000",
+      "dxf": "packs/S/f04_000.dxf",
+      "family_id": "F04",
+      "fold": "train",
+      "tier": "S",
+      "truth": "packs/S/f04_000.truth.json"
+    },
+    {
+      "drawing_id": "f04_001",
+      "dxf": "packs/F/f04_001.dxf",
+      "family_id": "F04",
+      "fold": "train",
+      "tier": "F",
+      "truth": "packs/F/f04_001.truth.json"
+    },
+    {
+      "drawing_id": "f04_002",
+      "dxf": "packs/M/f04_002.dxf",
+      "family_id": "F04",
+      "fold": "train",
+      "tier": "M",
+      "truth": "packs/M/f04_002.truth.json"
+    },
+    {
+      "drawing_id": "f04_003",
+      "dxf": "packs/S/f04_003.dxf",
+      "family_id": "F04",
+      "fold": "train",
+      "tier": "S",
+      "truth": "packs/S/f04_003.truth.json"
+    },
+    {
+      "drawing_id": "f04_004",
+      "dxf": "packs/F/f04_004.dxf",
+      "family_id": "F04",
+      "fold": "train",
+      "tier": "F",
+      "truth": "packs/F/f04_004.truth.json"
+    },
+    {
+      "drawing_id": "f04_005",
+      "dxf": "packs/M/f04_005.dxf",
+      "family_id": "F04",
+      "fold": "train",
+      "tier": "M",
+      "truth": "packs/M/f04_005.truth.json"
+    },
+    {
+      "drawing_id": "f04_006",
+      "dxf": "packs/S/f04_006.dxf",
+      "family_id": "F04",
+      "fold": "train",
+      "tier": "S",
+      "truth": "packs/S/f04_006.truth.json"
+    },
+    {
+      "drawing_id": "f04_007",
+      "dxf": "packs/F/f04_007.dxf",
+      "family_id": "F04",
+      "fold": "train",
+      "tier": "F",
+      "truth": "packs/F/f04_007.truth.json"
+    },
+    {
+      "drawing_id": "f04_008",
+      "dxf": "packs/M/f04_008.dxf",
+      "family_id": "F04",
+      "fold": "train",
+      "tier": "M",
+      "truth": "packs/M/f04_008.truth.json"
+    },
+    {
+      "drawing_id": "f04_009",
+      "dxf": "packs/S/f04_009.dxf",
+      "family_id": "F04",
+      "fold": "train",
+      "tier": "S",
+      "truth": "packs/S/f04_009.truth.json"
+    },
+    {
+      "drawing_id": "f04_010",
+      "dxf": "packs/F/f04_010.dxf",
+      "family_id": "F04",
+      "fold": "train",
+      "tier": "F",
+      "truth": "packs/F/f04_010.truth.json"
+    },
+    {
+      "drawing_id": "f04_011",
+      "dxf": "packs/M/f04_011.dxf",
+      "family_id": "F04",
+      "fold": "train",
+      "tier": "M",
+      "truth": "packs/M/f04_011.truth.json"
+    },
+    {
+      "drawing_id": "f04_012",
+      "dxf": "packs/S/f04_012.dxf",
+      "family_id": "F04",
+      "fold": "train",
+      "tier": "S",
+      "truth": "packs/S/f04_012.truth.json"
+    },
+    {
+      "drawing_id": "f04_013",
+      "dxf": "packs/F/f04_013.dxf",
+      "family_id": "F04",
+      "fold": "train",
+      "tier": "F",
+      "truth": "packs/F/f04_013.truth.json"
+    },
+    {
+      "drawing_id": "f04_014",
+      "dxf": "packs/M/f04_014.dxf",
+      "family_id": "F04",
+      "fold": "train",
+      "tier": "M",
+      "truth": "packs/M/f04_014.truth.json"
+    },
+    {
+      "drawing_id": "f04_015",
+      "dxf": "packs/S/f04_015.dxf",
+      "family_id": "F04",
+      "fold": "train",
+      "tier": "S",
+      "truth": "packs/S/f04_015.truth.json"
+    },
+    {
+      "drawing_id": "f04_016",
+      "dxf": "packs/F/f04_016.dxf",
+      "family_id": "F04",
+      "fold": "train",
+      "tier": "F",
+      "truth": "packs/F/f04_016.truth.json"
+    },
+    {
+      "drawing_id": "f04_017",
+      "dxf": "packs/M/f04_017.dxf",
+      "family_id": "F04",
+      "fold": "train",
+      "tier": "M",
+      "truth": "packs/M/f04_017.truth.json"
+    },
+    {
+      "drawing_id": "f04_018",
+      "dxf": "packs/S/f04_018.dxf",
+      "family_id": "F04",
+      "fold": "train",
+      "tier": "S",
+      "truth": "packs/S/f04_018.truth.json"
+    },
+    {
+      "drawing_id": "f04_019",
+      "dxf": "packs/F/f04_019.dxf",
+      "family_id": "F04",
+      "fold": "train",
+      "tier": "F",
+      "truth": "packs/F/f04_019.truth.json"
+    },
+    {
+      "drawing_id": "f04_020",
+      "dxf": "packs/M/f04_020.dxf",
+      "family_id": "F04",
+      "fold": "train",
+      "tier": "M",
+      "truth": "packs/M/f04_020.truth.json"
+    },
+    {
+      "drawing_id": "f04_021",
+      "dxf": "packs/S/f04_021.dxf",
+      "family_id": "F04",
+      "fold": "train",
+      "tier": "S",
+      "truth": "packs/S/f04_021.truth.json"
+    },
+    {
+      "drawing_id": "f04_022",
+      "dxf": "packs/F/f04_022.dxf",
+      "family_id": "F04",
+      "fold": "train",
+      "tier": "F",
+      "truth": "packs/F/f04_022.truth.json"
+    },
+    {
+      "drawing_id": "f04_023",
+      "dxf": "packs/M/f04_023.dxf",
+      "family_id": "F04",
+      "fold": "train",
+      "tier": "M",
+      "truth": "packs/M/f04_023.truth.json"
+    },
+    {
+      "drawing_id": "f04_024",
+      "dxf": "packs/S/f04_024.dxf",
+      "family_id": "F04",
+      "fold": "train",
+      "tier": "S",
+      "truth": "packs/S/f04_024.truth.json"
+    },
+    {
+      "drawing_id": "f05_000",
+      "dxf": "packs/F/f05_000.dxf",
+      "family_id": "F05",
+      "fold": "train",
+      "tier": "F",
+      "truth": "packs/F/f05_000.truth.json"
+    },
+    {
+      "drawing_id": "f05_001",
+      "dxf": "packs/M/f05_001.dxf",
+      "family_id": "F05",
+      "fold": "train",
+      "tier": "M",
+      "truth": "packs/M/f05_001.truth.json"
+    },
+    {
+      "drawing_id": "f05_002",
+      "dxf": "packs/S/f05_002.dxf",
+      "family_id": "F05",
+      "fold": "train",
+      "tier": "S",
+      "truth": "packs/S/f05_002.truth.json"
+    },
+    {
+      "drawing_id": "f05_003",
+      "dxf": "packs/F/f05_003.dxf",
+      "family_id": "F05",
+      "fold": "train",
+      "tier": "F",
+      "truth": "packs/F/f05_003.truth.json"
+    },
+    {
+      "drawing_id": "f05_004",
+      "dxf": "packs/M/f05_004.dxf",
+      "family_id": "F05",
+      "fold": "train",
+      "tier": "M",
+      "truth": "packs/M/f05_004.truth.json"
+    },
+    {
+      "drawing_id": "f05_005",
+      "dxf": "packs/S/f05_005.dxf",
+      "family_id": "F05",
+      "fold": "train",
+      "tier": "S",
+      "truth": "packs/S/f05_005.truth.json"
+    },
+    {
+      "drawing_id": "f05_006",
+      "dxf": "packs/F/f05_006.dxf",
+      "family_id": "F05",
+      "fold": "train",
+      "tier": "F",
+      "truth": "packs/F/f05_006.truth.json"
+    },
+    {
+      "drawing_id": "f05_007",
+      "dxf": "packs/M/f05_007.dxf",
+      "family_id": "F05",
+      "fold": "train",
+      "tier": "M",
+      "truth": "packs/M/f05_007.truth.json"
+    },
+    {
+      "drawing_id": "f05_008",
+      "dxf": "packs/S/f05_008.dxf",
+      "family_id": "F05",
+      "fold": "train",
+      "tier": "S",
+      "truth": "packs/S/f05_008.truth.json"
+    },
+    {
+      "drawing_id": "f05_009",
+      "dxf": "packs/F/f05_009.dxf",
+      "family_id": "F05",
+      "fold": "train",
+      "tier": "F",
+      "truth": "packs/F/f05_009.truth.json"
+    },
+    {
+      "drawing_id": "f05_010",
+      "dxf": "packs/M/f05_010.dxf",
+      "family_id": "F05",
+      "fold": "train",
+      "tier": "M",
+      "truth": "packs/M/f05_010.truth.json"
+    },
+    {
+      "drawing_id": "f05_011",
+      "dxf": "packs/S/f05_011.dxf",
+      "family_id": "F05",
+      "fold": "train",
+      "tier": "S",
+      "truth": "packs/S/f05_011.truth.json"
+    },
+    {
+      "drawing_id": "f05_012",
+      "dxf": "packs/F/f05_012.dxf",
+      "family_id": "F05",
+      "fold": "train",
+      "tier": "F",
+      "truth": "packs/F/f05_012.truth.json"
+    },
+    {
+      "drawing_id": "f05_013",
+      "dxf": "packs/M/f05_013.dxf",
+      "family_id": "F05",
+      "fold": "train",
+      "tier": "M",
+      "truth": "packs/M/f05_013.truth.json"
+    },
+    {
+      "drawing_id": "f05_014",
+      "dxf": "packs/S/f05_014.dxf",
+      "family_id": "F05",
+      "fold": "train",
+      "tier": "S",
+      "truth": "packs/S/f05_014.truth.json"
+    },
+    {
+      "drawing_id": "f05_015",
+      "dxf": "packs/F/f05_015.dxf",
+      "family_id": "F05",
+      "fold": "train",
+      "tier": "F",
+      "truth": "packs/F/f05_015.truth.json"
+    },
+    {
+      "drawing_id": "f05_016",
+      "dxf": "packs/M/f05_016.dxf",
+      "family_id": "F05",
+      "fold": "train",
+      "tier": "M",
+      "truth": "packs/M/f05_016.truth.json"
+    },
+    {
+      "drawing_id": "f05_017",
+      "dxf": "packs/S/f05_017.dxf",
+      "family_id": "F05",
+      "fold": "train",
+      "tier": "S",
+      "truth": "packs/S/f05_017.truth.json"
+    },
+    {
+      "drawing_id": "f05_018",
+      "dxf": "packs/F/f05_018.dxf",
+      "family_id": "F05",
+      "fold": "train",
+      "tier": "F",
+      "truth": "packs/F/f05_018.truth.json"
+    },
+    {
+      "drawing_id": "f05_019",
+      "dxf": "packs/M/f05_019.dxf",
+      "family_id": "F05",
+      "fold": "train",
+      "tier": "M",
+      "truth": "packs/M/f05_019.truth.json"
+    },
+    {
+      "drawing_id": "f05_020",
+      "dxf": "packs/S/f05_020.dxf",
+      "family_id": "F05",
+      "fold": "train",
+      "tier": "S",
+      "truth": "packs/S/f05_020.truth.json"
+    },
+    {
+      "drawing_id": "f05_021",
+      "dxf": "packs/F/f05_021.dxf",
+      "family_id": "F05",
+      "fold": "train",
+      "tier": "F",
+      "truth": "packs/F/f05_021.truth.json"
+    },
+    {
+      "drawing_id": "f05_022",
+      "dxf": "packs/M/f05_022.dxf",
+      "family_id": "F05",
+      "fold": "train",
+      "tier": "M",
+      "truth": "packs/M/f05_022.truth.json"
+    },
+    {
+      "drawing_id": "f05_023",
+      "dxf": "packs/S/f05_023.dxf",
+      "family_id": "F05",
+      "fold": "train",
+      "tier": "S",
+      "truth": "packs/S/f05_023.truth.json"
+    },
+    {
+      "drawing_id": "f05_024",
+      "dxf": "packs/F/f05_024.dxf",
+      "family_id": "F05",
+      "fold": "train",
+      "tier": "F",
+      "truth": "packs/F/f05_024.truth.json"
+    },
+    {
+      "drawing_id": "f06_000",
+      "dxf": "packs/M/f06_000.dxf",
+      "family_id": "F06",
+      "fold": "train",
+      "tier": "M",
+      "truth": "packs/M/f06_000.truth.json"
+    },
+    {
+      "drawing_id": "f06_001",
+      "dxf": "packs/S/f06_001.dxf",
+      "family_id": "F06",
+      "fold": "train",
+      "tier": "S",
+      "truth": "packs/S/f06_001.truth.json"
+    },
+    {
+      "drawing_id": "f06_002",
+      "dxf": "packs/F/f06_002.dxf",
+      "family_id": "F06",
+      "fold": "train",
+      "tier": "F",
+      "truth": "packs/F/f06_002.truth.json"
+    },
+    {
+      "drawing_id": "f06_003",
+      "dxf": "packs/M/f06_003.dxf",
+      "family_id": "F06",
+      "fold": "train",
+      "tier": "M",
+      "truth": "packs/M/f06_003.truth.json"
+    },
+    {
+      "drawing_id": "f06_004",
+      "dxf": "packs/S/f06_004.dxf",
+      "family_id": "F06",
+      "fold": "train",
+      "tier": "S",
+      "truth": "packs/S/f06_004.truth.json"
+    },
+    {
+      "drawing_id": "f06_005",
+      "dxf": "packs/F/f06_005.dxf",
+      "family_id": "F06",
+      "fold": "train",
+      "tier": "F",
+      "truth": "packs/F/f06_005.truth.json"
+    },
+    {
+      "drawing_id": "f06_006",
+      "dxf": "packs/M/f06_006.dxf",
+      "family_id": "F06",
+      "fold": "train",
+      "tier": "M",
+      "truth": "packs/M/f06_006.truth.json"
+    },
+    {
+      "drawing_id": "f06_007",
+      "dxf": "packs/S/f06_007.dxf",
+      "family_id": "F06",
+      "fold": "train",
+      "tier": "S",
+      "truth": "packs/S/f06_007.truth.json"
+    },
+    {
+      "drawing_id": "f06_008",
+      "dxf": "packs/F/f06_008.dxf",
+      "family_id": "F06",
+      "fold": "train",
+      "tier": "F",
+      "truth": "packs/F/f06_008.truth.json"
+    },
+    {
+      "drawing_id": "f06_009",
+      "dxf": "packs/M/f06_009.dxf",
+      "family_id": "F06",
+      "fold": "train",
+      "tier": "M",
+      "truth": "packs/M/f06_009.truth.json"
+    },
+    {
+      "drawing_id": "f06_010",
+      "dxf": "packs/S/f06_010.dxf",
+      "family_id": "F06",
+      "fold": "train",
+      "tier": "S",
+      "truth": "packs/S/f06_010.truth.json"
+    },
+    {
+      "drawing_id": "f06_011",
+      "dxf": "packs/F/f06_011.dxf",
+      "family_id": "F06",
+      "fold": "train",
+      "tier": "F",
+      "truth": "packs/F/f06_011.truth.json"
+    },
+    {
+      "drawing_id": "f06_012",
+      "dxf": "packs/M/f06_012.dxf",
+      "family_id": "F06",
+      "fold": "train",
+      "tier": "M",
+      "truth": "packs/M/f06_012.truth.json"
+    },
+    {
+      "drawing_id": "f06_013",
+      "dxf": "packs/S/f06_013.dxf",
+      "family_id": "F06",
+      "fold": "train",
+      "tier": "S",
+      "truth": "packs/S/f06_013.truth.json"
+    },
+    {
+      "drawing_id": "f06_014",
+      "dxf": "packs/F/f06_014.dxf",
+      "family_id": "F06",
+      "fold": "train",
+      "tier": "F",
+      "truth": "packs/F/f06_014.truth.json"
+    },
+    {
+      "drawing_id": "f06_015",
+      "dxf": "packs/M/f06_015.dxf",
+      "family_id": "F06",
+      "fold": "train",
+      "tier": "M",
+      "truth": "packs/M/f06_015.truth.json"
+    },
+    {
+      "drawing_id": "f06_016",
+      "dxf": "packs/S/f06_016.dxf",
+      "family_id": "F06",
+      "fold": "train",
+      "tier": "S",
+      "truth": "packs/S/f06_016.truth.json"
+    },
+    {
+      "drawing_id": "f06_017",
+      "dxf": "packs/F/f06_017.dxf",
+      "family_id": "F06",
+      "fold": "train",
+      "tier": "F",
+      "truth": "packs/F/f06_017.truth.json"
+    },
+    {
+      "drawing_id": "f06_018",
+      "dxf": "packs/M/f06_018.dxf",
+      "family_id": "F06",
+      "fold": "train",
+      "tier": "M",
+      "truth": "packs/M/f06_018.truth.json"
+    },
+    {
+      "drawing_id": "f06_019",
+      "dxf": "packs/S/f06_019.dxf",
+      "family_id": "F06",
+      "fold": "train",
+      "tier": "S",
+      "truth": "packs/S/f06_019.truth.json"
+    },
+    {
+      "drawing_id": "f06_020",
+      "dxf": "packs/F/f06_020.dxf",
+      "family_id": "F06",
+      "fold": "train",
+      "tier": "F",
+      "truth": "packs/F/f06_020.truth.json"
+    },
+    {
+      "drawing_id": "f06_021",
+      "dxf": "packs/M/f06_021.dxf",
+      "family_id": "F06",
+      "fold": "train",
+      "tier": "M",
+      "truth": "packs/M/f06_021.truth.json"
+    },
+    {
+      "drawing_id": "f06_022",
+      "dxf": "packs/S/f06_022.dxf",
+      "family_id": "F06",
+      "fold": "train",
+      "tier": "S",
+      "truth": "packs/S/f06_022.truth.json"
+    },
+    {
+      "drawing_id": "f06_023",
+      "dxf": "packs/F/f06_023.dxf",
+      "family_id": "F06",
+      "fold": "train",
+      "tier": "F",
+      "truth": "packs/F/f06_023.truth.json"
+    },
+    {
+      "drawing_id": "f06_024",
+      "dxf": "packs/M/f06_024.dxf",
+      "family_id": "F06",
+      "fold": "train",
+      "tier": "M",
+      "truth": "packs/M/f06_024.truth.json"
+    },
+    {
+      "drawing_id": "f07_000",
+      "dxf": "packs/S/f07_000.dxf",
+      "family_id": "F07",
+      "fold": "development",
+      "tier": "S",
+      "truth": "packs/S/f07_000.truth.json"
+    },
+    {
+      "drawing_id": "f07_001",
+      "dxf": "packs/F/f07_001.dxf",
+      "family_id": "F07",
+      "fold": "development",
+      "tier": "F",
+      "truth": "packs/F/f07_001.truth.json"
+    },
+    {
+      "drawing_id": "f07_002",
+      "dxf": "packs/M/f07_002.dxf",
+      "family_id": "F07",
+      "fold": "development",
+      "tier": "M",
+      "truth": "packs/M/f07_002.truth.json"
+    },
+    {
+      "drawing_id": "f07_003",
+      "dxf": "packs/S/f07_003.dxf",
+      "family_id": "F07",
+      "fold": "development",
+      "tier": "S",
+      "truth": "packs/S/f07_003.truth.json"
+    },
+    {
+      "drawing_id": "f07_004",
+      "dxf": "packs/F/f07_004.dxf",
+      "family_id": "F07",
+      "fold": "development",
+      "tier": "F",
+      "truth": "packs/F/f07_004.truth.json"
+    },
+    {
+      "drawing_id": "f07_005",
+      "dxf": "packs/M/f07_005.dxf",
+      "family_id": "F07",
+      "fold": "development",
+      "tier": "M",
+      "truth": "packs/M/f07_005.truth.json"
+    },
+    {
+      "drawing_id": "f07_006",
+      "dxf": "packs/S/f07_006.dxf",
+      "family_id": "F07",
+      "fold": "development",
+      "tier": "S",
+      "truth": "packs/S/f07_006.truth.json"
+    },
+    {
+      "drawing_id": "f07_007",
+      "dxf": "packs/F/f07_007.dxf",
+      "family_id": "F07",
+      "fold": "development",
+      "tier": "F",
+      "truth": "packs/F/f07_007.truth.json"
+    },
+    {
+      "drawing_id": "f07_008",
+      "dxf": "packs/M/f07_008.dxf",
+      "family_id": "F07",
+      "fold": "development",
+      "tier": "M",
+      "truth": "packs/M/f07_008.truth.json"
+    },
+    {
+      "drawing_id": "f07_009",
+      "dxf": "packs/S/f07_009.dxf",
+      "family_id": "F07",
+      "fold": "development",
+      "tier": "S",
+      "truth": "packs/S/f07_009.truth.json"
+    },
+    {
+      "drawing_id": "f07_010",
+      "dxf": "packs/F/f07_010.dxf",
+      "family_id": "F07",
+      "fold": "development",
+      "tier": "F",
+      "truth": "packs/F/f07_010.truth.json"
+    },
+    {
+      "drawing_id": "f07_011",
+      "dxf": "packs/M/f07_011.dxf",
+      "family_id": "F07",
+      "fold": "development",
+      "tier": "M",
+      "truth": "packs/M/f07_011.truth.json"
+    },
+    {
+      "drawing_id": "f07_012",
+      "dxf": "packs/S/f07_012.dxf",
+      "family_id": "F07",
+      "fold": "development",
+      "tier": "S",
+      "truth": "packs/S/f07_012.truth.json"
+    },
+    {
+      "drawing_id": "f07_013",
+      "dxf": "packs/F/f07_013.dxf",
+      "family_id": "F07",
+      "fold": "development",
+      "tier": "F",
+      "truth": "packs/F/f07_013.truth.json"
+    },
+    {
+      "drawing_id": "f07_014",
+      "dxf": "packs/M/f07_014.dxf",
+      "family_id": "F07",
+      "fold": "development",
+      "tier": "M",
+      "truth": "packs/M/f07_014.truth.json"
+    },
+    {
+      "drawing_id": "f07_015",
+      "dxf": "packs/S/f07_015.dxf",
+      "family_id": "F07",
+      "fold": "development",
+      "tier": "S",
+      "truth": "packs/S/f07_015.truth.json"
+    },
+    {
+      "drawing_id": "f07_016",
+      "dxf": "packs/F/f07_016.dxf",
+      "family_id": "F07",
+      "fold": "development",
+      "tier": "F",
+      "truth": "packs/F/f07_016.truth.json"
+    },
+    {
+      "drawing_id": "f07_017",
+      "dxf": "packs/M/f07_017.dxf",
+      "family_id": "F07",
+      "fold": "development",
+      "tier": "M",
+      "truth": "packs/M/f07_017.truth.json"
+    },
+    {
+      "drawing_id": "f07_018",
+      "dxf": "packs/S/f07_018.dxf",
+      "family_id": "F07",
+      "fold": "development",
+      "tier": "S",
+      "truth": "packs/S/f07_018.truth.json"
+    },
+    {
+      "drawing_id": "f07_019",
+      "dxf": "packs/F/f07_019.dxf",
+      "family_id": "F07",
+      "fold": "development",
+      "tier": "F",
+      "truth": "packs/F/f07_019.truth.json"
+    },
+    {
+      "drawing_id": "f07_020",
+      "dxf": "packs/M/f07_020.dxf",
+      "family_id": "F07",
+      "fold": "development",
+      "tier": "M",
+      "truth": "packs/M/f07_020.truth.json"
+    },
+    {
+      "drawing_id": "f07_021",
+      "dxf": "packs/S/f07_021.dxf",
+      "family_id": "F07",
+      "fold": "development",
+      "tier": "S",
+      "truth": "packs/S/f07_021.truth.json"
+    },
+    {
+      "drawing_id": "f07_022",
+      "dxf": "packs/F/f07_022.dxf",
+      "family_id": "F07",
+      "fold": "development",
+      "tier": "F",
+      "truth": "packs/F/f07_022.truth.json"
+    },
+    {
+      "drawing_id": "f07_023",
+      "dxf": "packs/M/f07_023.dxf",
+      "family_id": "F07",
+      "fold": "development",
+      "tier": "M",
+      "truth": "packs/M/f07_023.truth.json"
+    },
+    {
+      "drawing_id": "f07_024",
+      "dxf": "packs/S/f07_024.dxf",
+      "family_id": "F07",
+      "fold": "development",
+      "tier": "S",
+      "truth": "packs/S/f07_024.truth.json"
+    },
+    {
+      "drawing_id": "f08_000",
+      "dxf": "packs/F/f08_000.dxf",
+      "family_id": "F08",
+      "fold": "development",
+      "tier": "F",
+      "truth": "packs/F/f08_000.truth.json"
+    },
+    {
+      "drawing_id": "f08_001",
+      "dxf": "packs/M/f08_001.dxf",
+      "family_id": "F08",
+      "fold": "development",
+      "tier": "M",
+      "truth": "packs/M/f08_001.truth.json"
+    },
+    {
+      "drawing_id": "f08_002",
+      "dxf": "packs/S/f08_002.dxf",
+      "family_id": "F08",
+      "fold": "development",
+      "tier": "S",
+      "truth": "packs/S/f08_002.truth.json"
+    },
+    {
+      "drawing_id": "f08_003",
+      "dxf": "packs/F/f08_003.dxf",
+      "family_id": "F08",
+      "fold": "development",
+      "tier": "F",
+      "truth": "packs/F/f08_003.truth.json"
+    },
+    {
+      "drawing_id": "f08_004",
+      "dxf": "packs/M/f08_004.dxf",
+      "family_id": "F08",
+      "fold": "development",
+      "tier": "M",
+      "truth": "packs/M/f08_004.truth.json"
+    },
+    {
+      "drawing_id": "f08_005",
+      "dxf": "packs/S/f08_005.dxf",
+      "family_id": "F08",
+      "fold": "development",
+      "tier": "S",
+      "truth": "packs/S/f08_005.truth.json"
+    },
+    {
+      "drawing_id": "f08_006",
+      "dxf": "packs/F/f08_006.dxf",
+      "family_id": "F08",
+      "fold": "development",
+      "tier": "F",
+      "truth": "packs/F/f08_006.truth.json"
+    },
+    {
+      "drawing_id": "f08_007",
+      "dxf": "packs/M/f08_007.dxf",
+      "family_id": "F08",
+      "fold": "development",
+      "tier": "M",
+      "truth": "packs/M/f08_007.truth.json"
+    },
+    {
+      "drawing_id": "f08_008",
+      "dxf": "packs/S/f08_008.dxf",
+      "family_id": "F08",
+      "fold": "development",
+      "tier": "S",
+      "truth": "packs/S/f08_008.truth.json"
+    },
+    {
+      "drawing_id": "f08_009",
+      "dxf": "packs/F/f08_009.dxf",
+      "family_id": "F08",
+      "fold": "development",
+      "tier": "F",
+      "truth": "packs/F/f08_009.truth.json"
+    },
+    {
+      "drawing_id": "f08_010",
+      "dxf": "packs/M/f08_010.dxf",
+      "family_id": "F08",
+      "fold": "development",
+      "tier": "M",
+      "truth": "packs/M/f08_010.truth.json"
+    },
+    {
+      "drawing_id": "f08_011",
+      "dxf": "packs/S/f08_011.dxf",
+      "family_id": "F08",
+      "fold": "development",
+      "tier": "S",
+      "truth": "packs/S/f08_011.truth.json"
+    },
+    {
+      "drawing_id": "f08_012",
+      "dxf": "packs/F/f08_012.dxf",
+      "family_id": "F08",
+      "fold": "development",
+      "tier": "F",
+      "truth": "packs/F/f08_012.truth.json"
+    },
+    {
+      "drawing_id": "f08_013",
+      "dxf": "packs/M/f08_013.dxf",
+      "family_id": "F08",
+      "fold": "development",
+      "tier": "M",
+      "truth": "packs/M/f08_013.truth.json"
+    },
+    {
+      "drawing_id": "f08_014",
+      "dxf": "packs/S/f08_014.dxf",
+      "family_id": "F08",
+      "fold": "development",
+      "tier": "S",
+      "truth": "packs/S/f08_014.truth.json"
+    },
+    {
+      "drawing_id": "f08_015",
+      "dxf": "packs/F/f08_015.dxf",
+      "family_id": "F08",
+      "fold": "development",
+      "tier": "F",
+      "truth": "packs/F/f08_015.truth.json"
+    },
+    {
+      "drawing_id": "f08_016",
+      "dxf": "packs/M/f08_016.dxf",
+      "family_id": "F08",
+      "fold": "development",
+      "tier": "M",
+      "truth": "packs/M/f08_016.truth.json"
+    },
+    {
+      "drawing_id": "f08_017",
+      "dxf": "packs/S/f08_017.dxf",
+      "family_id": "F08",
+      "fold": "development",
+      "tier": "S",
+      "truth": "packs/S/f08_017.truth.json"
+    },
+    {
+      "drawing_id": "f08_018",
+      "dxf": "packs/F/f08_018.dxf",
+      "family_id": "F08",
+      "fold": "development",
+      "tier": "F",
+      "truth": "packs/F/f08_018.truth.json"
+    },
+    {
+      "drawing_id": "f08_019",
+      "dxf": "packs/M/f08_019.dxf",
+      "family_id": "F08",
+      "fold": "development",
+      "tier": "M",
+      "truth": "packs/M/f08_019.truth.json"
+    },
+    {
+      "drawing_id": "f08_020",
+      "dxf": "packs/S/f08_020.dxf",
+      "family_id": "F08",
+      "fold": "development",
+      "tier": "S",
+      "truth": "packs/S/f08_020.truth.json"
+    },
+    {
+      "drawing_id": "f08_021",
+      "dxf": "packs/F/f08_021.dxf",
+      "family_id": "F08",
+      "fold": "development",
+      "tier": "F",
+      "truth": "packs/F/f08_021.truth.json"
+    },
+    {
+      "drawing_id": "f08_022",
+      "dxf": "packs/M/f08_022.dxf",
+      "family_id": "F08",
+      "fold": "development",
+      "tier": "M",
+      "truth": "packs/M/f08_022.truth.json"
+    },
+    {
+      "drawing_id": "f08_023",
+      "dxf": "packs/S/f08_023.dxf",
+      "family_id": "F08",
+      "fold": "development",
+      "tier": "S",
+      "truth": "packs/S/f08_023.truth.json"
+    },
+    {
+      "drawing_id": "f08_024",
+      "dxf": "packs/F/f08_024.dxf",
+      "family_id": "F08",
+      "fold": "development",
+      "tier": "F",
+      "truth": "packs/F/f08_024.truth.json"
+    }
+  ],
+  "claim_scope": "constructibility example only; not a model-screen result",
+  "development_drawing_count": 50,
+  "development_families": [
+    "F07",
+    "F08"
+  ],
+  "development_family_count": 2,
+  "family_disjoint": true,
+  "family_overlap": [],
+  "governing_rule": "calibration_P3 section 6.1: every template and parameter variant stays in one fold",
+  "schema": "e2.gen2-families.split-example.v1",
+  "train_drawing_count": 150,
+  "train_families": [
+    "F01",
+    "F02",
+    "F03",
+    "F04",
+    "F05",
+    "F06"
+  ],
+  "train_family_count": 6
+}
