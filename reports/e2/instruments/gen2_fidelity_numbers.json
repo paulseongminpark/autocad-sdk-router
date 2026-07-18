@@ -1,0 +1,47 @@
+{
+  "metrics": {
+    "entity_mix_tv": 0.0008332487822938152,
+    "thickness_ks": 0.06265902171230281
+  },
+  "per_tier": {
+    "F": {
+      "entity_mix_tv": 0.000822052799641249,
+      "n_drawings": 1,
+      "n_entities": 2856,
+      "n_parallel_pair_offsets": 736,
+      "read_errors": 0,
+      "thickness_ks": 0.0625323167307058
+    },
+    "M": {
+      "entity_mix_tv": 0.0008556329100193184,
+      "n_drawings": 1,
+      "n_entities": 2857,
+      "n_parallel_pair_offsets": 737,
+      "read_errors": 0,
+      "thickness_ks": 0.06291208783565533
+    },
+    "S": {
+      "entity_mix_tv": 0.000822052799641249,
+      "n_drawings": 1,
+      "n_entities": 2856,
+      "n_parallel_pair_offsets": 736,
+      "read_errors": 0,
+      "thickness_ks": 0.0625323167307058
+    }
+  },
+  "reference_counts": {
+    "entity_total": 28121,
+    "parallel_pair_offsets": 4877
+  },
+  "reference_sha256": {
+    "entity_mix_json": "cc95a55852932cc41eb5dfdc5fc9df560f6ada94625969e9284c581e809608ea",
+    "fidelity_histogram_json": "afec84ebf141d8bc29ef6b0ee8fe615c7e6c2bf19b1e4df10c64d11951691ae3"
+  },
+  "sample_counts": {
+    "n_drawings": 3,
+    "n_entities": 8569,
+    "n_parallel_pair_offsets": 2209,
+    "read_errors": 0
+  },
+  "schema": "ariadne.e2.gen2.fidelity_numbers.v1"
+}
