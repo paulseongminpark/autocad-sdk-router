@@ -1,0 +1,403 @@
+{
+  "consumer_views": {
+    "calibration_P1": {
+      "categorical_tv": {
+        "entity_type": 0.0008332487822938152
+      },
+      "continuous_ks": {
+        "parallel_pair_offset_mm": 0.06265902171230281
+      }
+    },
+    "feyerabend_P1": {
+      "face_consumer_diagnostics": {
+        "endpoint_gap_normalized": {
+          "definition": "nearest endpoint distance between distinct expected-pair axes / drawing median chord length",
+          "pairwise_tier_ks": {
+            "F_vs_M": 0.09444444444444444,
+            "S_vs_F": 0.08333333333333337,
+            "S_vs_M": 0.15000000000000002
+          },
+          "summary_by_tier": {
+            "F": {
+              "max": 2040.459447511464,
+              "min": 0.0,
+              "n": 900,
+              "p05": 0.0,
+              "p50": 255.057430938933,
+              "p95": 2040.459447511464
+            },
+            "M": {
+              "max": 1763.6349927783026,
+              "min": 0.0,
+              "n": 1000,
+              "p05": 0.0,
+              "p50": 366.6450569747162,
+              "p95": 1593.182174494428
+            },
+            "S": {
+              "max": 2040.459447544858,
+              "min": 0.0,
+              "n": 800,
+              "p05": 0.0,
+              "p50": 127.52871547155362,
+              "p95": 2040.459447544858
+            }
+          }
+        },
+        "external_reference_limitation": "The permitted aggregate reference JSON publishes entity mix and parallel-offset histograms, but no real-corpus normalized-length, face-degree, or endpoint-gap samples. External KS/TV for those three face diagnostics is therefore not fabricated; cross-tier statistics are reported.",
+        "face_bridge_proxy_degree": {
+          "counts_by_tier": {
+            "F": {
+              "0": 50,
+              "1": 250,
+              "2": 100,
+              "3": 50
+            },
+            "M": {
+              "0": 50,
+              "1": 250,
+              "2": 150,
+              "3": 50
+            },
+            "S": {
+              "1": 250,
+              "2": 100,
+              "3": 50
+            }
+          },
+          "definition": "degree of verifier expected-pair axis nodes under its junction snap",
+          "pairwise_tier_tv": {
+            "F_vs_M": 0.07777777777777778,
+            "S_vs_F": 0.1111111111111111,
+            "S_vs_M": 0.15
+          }
+        },
+        "normalization": "each SEG-IR chord length divided by that drawing's median chord length",
+        "normalized_primitive_length": {
+          "pairwise_tier_ks": {
+            "F_vs_M": 0.002160361823490553,
+            "S_vs_F": 0.18648860083739383,
+            "S_vs_M": 0.18488509990388546
+          },
+          "summary_by_tier": {
+            "F": {
+              "max": 5738.792196125993,
+              "min": 0.9638731695974586,
+              "n": 404700,
+              "p05": 0.9638731696181041,
+              "p50": 1.0,
+              "p95": 765.1722928167991
+            },
+            "M": {
+              "max": 5738.792196125993,
+              "min": 0.9638731695974586,
+              "n": 404450,
+              "p05": 0.9638731696181041,
+              "p50": 1.0,
+              "p95": 765.1722928167991
+            },
+            "S": {
+              "max": 5738.792196219913,
+              "min": 0.9638731696132332,
+              "n": 404800,
+              "p05": 0.9638731696338787,
+              "p50": 1.0,
+              "p95": 765.1722928293218
+            }
+          }
+        }
+      },
+      "reference_based": {
+        "entity_type_tv": 0.0008332487822938152,
+        "parallel_pair_offset_ks": 0.06265902171230281
+      }
+    }
+  },
+  "measured_utc": "2026-07-18T16:32:00.221659+00:00",
+  "metrics": {
+    "entity_mix_tv": 0.0008332487822938152,
+    "thickness_ks": 0.06265902171230281
+  },
+  "pack_achieved": {
+    "class_counts": {
+      "dimension_helper": 450,
+      "dimension_text": 300,
+      "direction_arrow": 150,
+      "direction_symbol": 150,
+      "door_frame": 600,
+      "door_hardware": 100,
+      "door_swing": 150,
+      "furniture_bed": 450,
+      "furniture_curve": 150,
+      "furniture_desk": 450,
+      "furniture_storage": 450,
+      "messy_fragment": 50,
+      "room_boundary": 300,
+      "stair_tread": 1350,
+      "wall": 2700
+    },
+    "entity_counts": {
+      "3DFACE": 450,
+      "ARC": 33450,
+      "CIRCLE": 2100,
+      "ELLIPSE": 3000,
+      "HATCH": 4050,
+      "INSERT": 17700,
+      "LINE": 184550,
+      "LWPOLYLINE": 112800,
+      "MTEXT": 1650,
+      "POINT": 5250,
+      "SPLINE": 60600,
+      "TEXT": 2400,
+      "WIPEOUT": 450
+    },
+    "entity_ratios": {
+      "3DFACE": 0.0010502975843155562,
+      "ARC": 0.078072120434123,
+      "CIRCLE": 0.004901388726805928,
+      "ELLIPSE": 0.00700198389543704,
+      "HATCH": 0.009452678258840004,
+      "INSERT": 0.04131170498307854,
+      "LINE": 0.4307387093009686,
+      "LWPOLYLINE": 0.2632745944684327,
+      "MTEXT": 0.0038510911424903724,
+      "POINT": 0.01225347181701482,
+      "SPLINE": 0.1414400746878282,
+      "TEXT": 0.005601587116349632,
+      "WIPEOUT": 0.0010502975843155562
+    },
+    "entity_types_observed": [
+      "3DFACE",
+      "ARC",
+      "CIRCLE",
+      "ELLIPSE",
+      "HATCH",
+      "INSERT",
+      "LINE",
+      "LWPOLYLINE",
+      "MTEXT",
+      "POINT",
+      "SPLINE",
+      "TEXT",
+      "WIPEOUT"
+    ],
+    "labeled_handles": 7800,
+    "n_drawings": 150,
+    "n_entity_types_observed": 13,
+    "negative_class_counts": {
+      "dimension_helper": 450,
+      "dimension_text": 300,
+      "direction_arrow": 150,
+      "direction_symbol": 150,
+      "door_frame": 600,
+      "door_hardware": 100,
+      "door_swing": 150,
+      "furniture_bed": 450,
+      "furniture_curve": 150,
+      "furniture_desk": 450,
+      "furniture_storage": 450,
+      "messy_fragment": 50,
+      "room_boundary": 300,
+      "stair_tread": 1350
+    },
+    "per_tier": {
+      "F": {
+        "entity_counts": {
+          "3DFACE": 150,
+          "ARC": 11150,
+          "CIRCLE": 700,
+          "ELLIPSE": 1000,
+          "HATCH": 1350,
+          "INSERT": 5900,
+          "LINE": 61500,
+          "LWPOLYLINE": 37600,
+          "MTEXT": 550,
+          "POINT": 1750,
+          "SPLINE": 20200,
+          "TEXT": 800,
+          "WIPEOUT": 150
+        },
+        "entity_ratios": {
+          "3DFACE": 0.0010504201680672268,
+          "ARC": 0.0780812324929972,
+          "CIRCLE": 0.004901960784313725,
+          "ELLIPSE": 0.0070028011204481795,
+          "HATCH": 0.009453781512605041,
+          "INSERT": 0.04131652661064426,
+          "LINE": 0.43067226890756305,
+          "LWPOLYLINE": 0.26330532212885155,
+          "MTEXT": 0.003851540616246499,
+          "POINT": 0.012254901960784314,
+          "SPLINE": 0.14145658263305322,
+          "TEXT": 0.0056022408963585435,
+          "WIPEOUT": 0.0010504201680672268
+        },
+        "labeled_handles": 2600,
+        "n_drawings": 50,
+        "negative_class_counts": {
+          "dimension_helper": 150,
+          "dimension_text": 100,
+          "direction_arrow": 50,
+          "direction_symbol": 50,
+          "door_frame": 200,
+          "door_hardware": 50,
+          "door_swing": 50,
+          "furniture_bed": 150,
+          "furniture_curve": 50,
+          "furniture_desk": 150,
+          "furniture_storage": 150,
+          "room_boundary": 100,
+          "stair_tread": 450
+        },
+        "wall_frac": 0.34615384615384615,
+        "wall_handles": 900
+      },
+      "M": {
+        "entity_counts": {
+          "3DFACE": 150,
+          "ARC": 11150,
+          "CIRCLE": 700,
+          "ELLIPSE": 1000,
+          "HATCH": 1350,
+          "INSERT": 5900,
+          "LINE": 61550,
+          "LWPOLYLINE": 37600,
+          "MTEXT": 550,
+          "POINT": 1750,
+          "SPLINE": 20200,
+          "TEXT": 800,
+          "WIPEOUT": 150
+        },
+        "entity_ratios": {
+          "3DFACE": 0.0010500525026251313,
+          "ARC": 0.07805390269513476,
+          "CIRCLE": 0.004900245012250612,
+          "ELLIPSE": 0.007000350017500875,
+          "HATCH": 0.009450472523626182,
+          "INSERT": 0.04130206510325516,
+          "LINE": 0.4308715435771789,
+          "LWPOLYLINE": 0.2632131606580329,
+          "MTEXT": 0.0038501925096254812,
+          "POINT": 0.012250612530626532,
+          "SPLINE": 0.14140707035351768,
+          "TEXT": 0.0056002800140007,
+          "WIPEOUT": 0.0010500525026251313
+        },
+        "labeled_handles": 2800,
+        "n_drawings": 50,
+        "negative_class_counts": {
+          "dimension_helper": 150,
+          "dimension_text": 100,
+          "direction_arrow": 50,
+          "direction_symbol": 50,
+          "door_frame": 200,
+          "door_hardware": 50,
+          "door_swing": 100,
+          "furniture_bed": 150,
+          "furniture_curve": 50,
+          "furniture_desk": 150,
+          "furniture_storage": 150,
+          "messy_fragment": 50,
+          "room_boundary": 100,
+          "stair_tread": 450
+        },
+        "wall_frac": 0.35714285714285715,
+        "wall_handles": 1000
+      },
+      "S": {
+        "entity_counts": {
+          "3DFACE": 150,
+          "ARC": 11150,
+          "CIRCLE": 700,
+          "ELLIPSE": 1000,
+          "HATCH": 1350,
+          "INSERT": 5900,
+          "LINE": 61500,
+          "LWPOLYLINE": 37600,
+          "MTEXT": 550,
+          "POINT": 1750,
+          "SPLINE": 20200,
+          "TEXT": 800,
+          "WIPEOUT": 150
+        },
+        "entity_ratios": {
+          "3DFACE": 0.0010504201680672268,
+          "ARC": 0.0780812324929972,
+          "CIRCLE": 0.004901960784313725,
+          "ELLIPSE": 0.0070028011204481795,
+          "HATCH": 0.009453781512605041,
+          "INSERT": 0.04131652661064426,
+          "LINE": 0.43067226890756305,
+          "LWPOLYLINE": 0.26330532212885155,
+          "MTEXT": 0.003851540616246499,
+          "POINT": 0.012254901960784314,
+          "SPLINE": 0.14145658263305322,
+          "TEXT": 0.0056022408963585435,
+          "WIPEOUT": 0.0010504201680672268
+        },
+        "labeled_handles": 2400,
+        "n_drawings": 50,
+        "negative_class_counts": {
+          "dimension_helper": 150,
+          "dimension_text": 100,
+          "direction_arrow": 50,
+          "direction_symbol": 50,
+          "door_frame": 200,
+          "furniture_bed": 150,
+          "furniture_curve": 50,
+          "furniture_desk": 150,
+          "furniture_storage": 150,
+          "room_boundary": 100,
+          "stair_tread": 450
+        },
+        "wall_frac": 0.3333333333333333,
+        "wall_handles": 800
+      }
+    },
+    "wall_frac": 0.34615384615384615,
+    "wall_handles": 2700
+  },
+  "pack_path": "D:\\runs\\e2_program\\cells\\fidelity_full\\packs",
+  "per_tier": {
+    "F": {
+      "entity_mix_tv": 0.000822052799641249,
+      "n_drawings": 50,
+      "n_entities": 142800,
+      "n_parallel_pair_offsets": 36800,
+      "read_errors": 0,
+      "thickness_ks": 0.0625323167307058
+    },
+    "M": {
+      "entity_mix_tv": 0.0008556329100193184,
+      "n_drawings": 50,
+      "n_entities": 142850,
+      "n_parallel_pair_offsets": 36850,
+      "read_errors": 0,
+      "thickness_ks": 0.06291208783565533
+    },
+    "S": {
+      "entity_mix_tv": 0.000822052799641249,
+      "n_drawings": 50,
+      "n_entities": 142800,
+      "n_parallel_pair_offsets": 36800,
+      "read_errors": 0,
+      "thickness_ks": 0.0625323167307058
+    }
+  },
+  "reference_counts": {
+    "entity_total": 28121,
+    "parallel_pair_offsets": 4877
+  },
+  "reference_sha256": {
+    "entity_mix_json": "cc95a55852932cc41eb5dfdc5fc9df560f6ada94625969e9284c581e809608ea",
+    "fidelity_histogram_json": "afec84ebf141d8bc29ef6b0ee8fe615c7e6c2bf19b1e4df10c64d11951691ae3"
+  },
+  "runtime_seconds": 207.890507,
+  "sample_counts": {
+    "n_drawings": 150,
+    "n_entities": 428450,
+    "n_parallel_pair_offsets": 110450,
+    "read_errors": 0
+  },
+  "schema": "ariadne.e2.gen2.fidelity_numbers.v1"
+}

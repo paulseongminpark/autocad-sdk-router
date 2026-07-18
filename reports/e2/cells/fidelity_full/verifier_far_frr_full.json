@@ -1,0 +1,308 @@
+{
+  "by_tier": {
+    "F": {
+      "false_claims": {
+        "accepted": 0,
+        "by_perturbation": {
+          "lure_add": {
+            "accepted": 0,
+            "far": 0.0,
+            "n": 200,
+            "rejected": 200
+          },
+          "neighbor_swap": {
+            "accepted": 0,
+            "far": 0.0,
+            "n": 200,
+            "rejected": 200
+          },
+          "orphan_add": {
+            "accepted": 0,
+            "far": 0.0,
+            "n": 200,
+            "rejected": 200
+          },
+          "pair_swap": {
+            "accepted": 0,
+            "far": 0.0,
+            "n": 200,
+            "rejected": 200
+          },
+          "wall_remove_pair": {
+            "accepted": 0,
+            "far": 0.0,
+            "n": 200,
+            "rejected": 200
+          },
+          "wall_remove_single": {
+            "accepted": 0,
+            "far": 0.0,
+            "n": 200,
+            "rejected": 200
+          }
+        },
+        "far": 0.0,
+        "n": 1200,
+        "rejected": 1200
+      },
+      "name_blind_true_claims": {
+        "accepted": 0,
+        "frr": 1.0,
+        "n": 200,
+        "rejected": 200
+      },
+      "true_claims": {
+        "accepted": 200,
+        "frr": 0.0,
+        "n": 200,
+        "rejected": 0
+      },
+      "unique_drawings": 50
+    },
+    "M": {
+      "false_claims": {
+        "accepted": 0,
+        "by_perturbation": {
+          "lure_add": {
+            "accepted": 0,
+            "far": 0.0,
+            "n": 200,
+            "rejected": 200
+          },
+          "neighbor_swap": {
+            "accepted": 0,
+            "far": 0.0,
+            "n": 200,
+            "rejected": 200
+          },
+          "orphan_add": {
+            "accepted": 0,
+            "far": 0.0,
+            "n": 200,
+            "rejected": 200
+          },
+          "pair_swap": {
+            "accepted": 0,
+            "far": 0.0,
+            "n": 200,
+            "rejected": 200
+          },
+          "wall_remove_pair": {
+            "accepted": 0,
+            "far": 0.0,
+            "n": 200,
+            "rejected": 200
+          },
+          "wall_remove_single": {
+            "accepted": 0,
+            "far": 0.0,
+            "n": 200,
+            "rejected": 200
+          }
+        },
+        "far": 0.0,
+        "n": 1200,
+        "rejected": 1200
+      },
+      "name_blind_true_claims": {
+        "accepted": 0,
+        "frr": 1.0,
+        "n": 200,
+        "rejected": 200
+      },
+      "true_claims": {
+        "accepted": 200,
+        "frr": 0.0,
+        "n": 200,
+        "rejected": 0
+      },
+      "unique_drawings": 50
+    },
+    "S": {
+      "false_claims": {
+        "accepted": 0,
+        "by_perturbation": {
+          "lure_add": {
+            "accepted": 0,
+            "far": 0.0,
+            "n": 200,
+            "rejected": 200
+          },
+          "neighbor_swap": {
+            "accepted": 0,
+            "far": 0.0,
+            "n": 200,
+            "rejected": 200
+          },
+          "orphan_add": {
+            "accepted": 0,
+            "far": 0.0,
+            "n": 200,
+            "rejected": 200
+          },
+          "pair_swap": {
+            "accepted": 0,
+            "far": 0.0,
+            "n": 200,
+            "rejected": 200
+          },
+          "wall_remove_pair": {
+            "accepted": 0,
+            "far": 0.0,
+            "n": 200,
+            "rejected": 200
+          },
+          "wall_remove_single": {
+            "accepted": 0,
+            "far": 0.0,
+            "n": 200,
+            "rejected": 200
+          }
+        },
+        "far": 0.0,
+        "n": 1200,
+        "rejected": 1200
+      },
+      "name_blind_true_claims": {
+        "accepted": 0,
+        "frr": 1.0,
+        "n": 200,
+        "rejected": 200
+      },
+      "true_claims": {
+        "accepted": 200,
+        "frr": 0.0,
+        "n": 200,
+        "rejected": 0
+      },
+      "unique_drawings": 50
+    }
+  },
+  "conversion_totals": {
+    "emitted_segments": 1213950,
+    "segments_from_3DFACE": 0,
+    "segments_from_ARC": 601900,
+    "segments_from_CIRCLE": 67200,
+    "segments_from_ELLIPSE": 0,
+    "segments_from_HATCH": 0,
+    "segments_from_INSERT": 0,
+    "segments_from_LINE": 184550,
+    "segments_from_LWPOLYLINE": 117900,
+    "segments_from_MTEXT": 0,
+    "segments_from_POINT": 0,
+    "segments_from_SPLINE": 242400,
+    "segments_from_TEXT": 0,
+    "segments_from_WIPEOUT": 0,
+    "source_entities": 428450
+  },
+  "false_claims": {
+    "accepted": 0,
+    "by_perturbation": {
+      "lure_add": {
+        "accepted": 0,
+        "far": 0.0,
+        "n": 600,
+        "rejected": 600
+      },
+      "neighbor_swap": {
+        "accepted": 0,
+        "far": 0.0,
+        "n": 600,
+        "rejected": 600
+      },
+      "orphan_add": {
+        "accepted": 0,
+        "far": 0.0,
+        "n": 600,
+        "rejected": 600
+      },
+      "pair_swap": {
+        "accepted": 0,
+        "far": 0.0,
+        "n": 600,
+        "rejected": 600
+      },
+      "wall_remove_pair": {
+        "accepted": 0,
+        "far": 0.0,
+        "n": 600,
+        "rejected": 600
+      },
+      "wall_remove_single": {
+        "accepted": 0,
+        "far": 0.0,
+        "n": 600,
+        "rejected": 600
+      }
+    },
+    "far": 0.0,
+    "n": 3600,
+    "rejected": 3600
+  },
+  "measured_utc": "2026-07-18T16:31:59.880446+00:00",
+  "name_blind": {
+    "frr_delta_vs_full_metadata": 1.0,
+    "transform": "remove layer metadata from every SEG-IR segment",
+    "true_claims": {
+      "accepted": 0,
+      "frr": 1.0,
+      "n": 600,
+      "rejected": 600
+    }
+  },
+  "pack": {
+    "calibration_pairs": 600,
+    "entity_ratios": "gen2.DEFAULT_ENTITY_RATIOS",
+    "entity_target_count": 1400,
+    "path": "D:\\runs\\e2_program\\cells\\fidelity_full\\packs",
+    "unique_drawings": 150
+  },
+  "rate_definitions": {
+    "far": "false complete-set claims accepted / false complete-set claims",
+    "frr": "true complete-set claims rejected / true complete-set claims"
+  },
+  "runtime_seconds": 2246.207737,
+  "sample_anomalies": [],
+  "schema": "e2.wall-claim-verifier.full-diversity-audit.v1",
+  "seg_ir_policy": {
+    "arc": "uniform angular chords, maximum step 7.5 degrees",
+    "circle": "32 uniform angular chords",
+    "included": [
+      "LINE",
+      "LWPOLYLINE",
+      "POLYLINE",
+      "ARC",
+      "CIRCLE",
+      "SPLINE"
+    ],
+    "omitted_nonsegment_types": [
+      "3DFACE",
+      "ELLIPSE",
+      "HATCH",
+      "INSERT",
+      "MTEXT",
+      "POINT",
+      "TEXT",
+      "WIPEOUT"
+    ],
+    "spline": "4 equal-parameter chords from ezdxf BSpline.approximate"
+  },
+  "source": {
+    "generator_path": "D:\\dev\\99_tools\\autocad-sdk-router\\tools\\e2\\gen2\\gen2.py",
+    "generator_sha256": "a8c2468b696b9271610e38bd87cec1402e9153bc464a5d9cf1429595f26dab55",
+    "verifier_path": "D:\\dev\\99_tools\\autocad-sdk-router\\tools\\e2\\instruments\\verifier.py",
+    "verifier_sha256": "72e33ab0e87e96defd00f74c5a22ae6c5cb001c69b740e627edeedaf2a80b690"
+  },
+  "trial_design": {
+    "claim_replicates_per_drawing": 4,
+    "claims_per_perturbation_per_unique_drawing": 4,
+    "dependence_note": "Replicate claims share one drawing and one geometric analysis; perturbation ordinal varies. Counts are claim evaluations, not independent drawing topologies.",
+    "true_claims_per_unique_drawing": 4
+  },
+  "true_claims": {
+    "accepted": 600,
+    "frr": 0.0,
+    "n": 600,
+    "rejected": 0
+  }
+}
