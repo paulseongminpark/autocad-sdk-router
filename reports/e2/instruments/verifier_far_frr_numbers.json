@@ -1,0 +1,80 @@
+{
+  "false_claims": {
+    "accepted": 0,
+    "by_perturbation": {
+      "lure_add": {
+        "accepted": 0,
+        "far": 0.0,
+        "n": 504,
+        "rejected": 504
+      },
+      "neighbor_swap": {
+        "accepted": 0,
+        "far": 0.0,
+        "n": 504,
+        "rejected": 504
+      },
+      "orphan_add": {
+        "accepted": 0,
+        "far": 0.0,
+        "n": 504,
+        "rejected": 504
+      },
+      "pair_swap": {
+        "accepted": 0,
+        "far": 0.0,
+        "n": 504,
+        "rejected": 504
+      },
+      "wall_remove_pair": {
+        "accepted": 0,
+        "far": 0.0,
+        "n": 504,
+        "rejected": 504
+      },
+      "wall_remove_single": {
+        "accepted": 0,
+        "far": 0.0,
+        "n": 504,
+        "rejected": 504
+      }
+    },
+    "far": 0.0,
+    "n": 3024,
+    "rejected": 3024
+  },
+  "generator": {
+    "base_seed": 20260718,
+    "calibration_pairs": 8,
+    "entity_count": 96,
+    "entity_ratios": {
+      "LINE": 1.0
+    },
+    "evaluated_by_tier": {
+      "F": 168,
+      "M": 168,
+      "S": 168
+    },
+    "evaluated_drawings": 504,
+    "generated_drawings": 504,
+    "n_per_tier_generated": 168,
+    "path": "D:\\dev\\99_tools\\autocad-sdk-router\\tools\\e2\\gen2\\gen2.py",
+    "schema": "ariadne.e2.gen2.v2",
+    "sha256": "a8c2468b696b9271610e38bd87cec1402e9153bc464a5d9cf1429595f26dab55"
+  },
+  "measured_utc": "2026-07-18T15:08:30.721049+00:00",
+  "rate_definitions": {
+    "far": "false claims accepted / false claims",
+    "frr": "true claims rejected / true claims"
+  },
+  "runtime_seconds": 15.688654,
+  "sample_failures": [],
+  "schema": "e2.wall-claim-verifier.audit.v1",
+  "true_claims": {
+    "accepted": 504,
+    "frr": 0.0,
+    "n": 504,
+    "rejected": 0
+  },
+  "verifier_sha256": "72e33ab0e87e96defd00f74c5a22ae6c5cb001c69b740e627edeedaf2a80b690"
+}
