@@ -1,0 +1,95 @@
+path,value
+content_hash,d09980cdefc891c779866f1ae002a62f91d021c1348d22aa921f0edfe49916ba
+bootstrap.ci,"""percentile 2.5 and 97.5"""
+bootstrap.replicates,10000
+bootstrap.resampling,"""sample three hidden family IDs with replacement; retain all 25 drawings for each sampled family and average drawing-level paired deltas"""
+bootstrap.rng_seed,20260719
+bootstrap.unit,"""hidden family cluster"""
+budget.cap_h,72.0
+budget.cap_seconds,259200.0
+budget.overrun_status,"""BUDGET_KILL"""
+budget.resource,"""CPU-h"""
+cell,"""g9_rl_diag"""
+dependencies,"[""Python standard library"",""numpy"",""sklearn"",""openpyxl""]"
+family_split.firewall,"""reward DXF/truth content only until scorer fit and fingerprint freeze; hidden files permit hash-only reads before that event"""
+family_split.hidden_families,"[""F01"",""F02"",""F05""]"
+family_split.reward_families,"[""F03"",""F04"",""F06"",""F07"",""F08""]"
+family_split.split_sha256,"""0c06b83b44bdf8b3aa5123b910a6a47f4d9ddfbd725523eff5fea132ed814b6d"""
+input_hashes.files.amendment1,"""30f752db803f7f589d1a8d1f1a2d8557364ae2d624f76a639533161f552b8283"""
+input_hashes.files.amendment2,"""6e29bbd5f8c502a1bc36277a535521c117408b2460e80511907d610321dd442a"""
+input_hashes.files.final_program_plan,"""53efc08a96d8b0a770b5f0b5eaf9ae2d9ca8b5ce7db6422dce64e86afb75fda0"""
+input_hashes.files.g1_prereg,"""2fb296255a2430a106dfed306090dacb5f372fd9217a24528e874b59510d3ce1"""
+input_hashes.files.g1_prereg_csv,"""2a43583d34e582914f8a67c7874be92d58f17f013a1eb0bbdb57102dfc7482e1"""
+input_hashes.files.g1_report,"""88234aebcb23a45cd938aecd363f55ff6d11d585e3c0dae09ab410dcc510fbb8"""
+input_hashes.files.g9_script,"""254840b11b28867d05dae038f699e5724572375a34ab6e7318cfefa38285ad4f"""
+input_hashes.files.packet,"""b02760dd0289d6face6985dea04c31eb08bf1bca951c00fe9a183b678292ab6f"""
+input_hashes.files.prereg_r2_v1,"""fc93dad9232cfd877802c1d53996357eccc710daff8cfb2cf7c865bf7f78bcd2"""
+input_hashes.files.verifier,"""72e33ab0e87e96defd00f74c5a22ae6c5cb001c69b740e627edeedaf2a80b690"""
+input_hashes.files.w2_02_prereg,"""6c7db98abe8eb08edd05f09ef1b52d68aa849b9cc2aa803c033e66d01dff747d"""
+input_hashes.files.w2_02_report,"""fb40b501ae603bd3ca67460c3445f0e4b5c9ed07891be3cda53ab7c968786751"""
+input_hashes.files.w2_02_results,"""391aedddf26c0b44116de89bcb27b1b3a6fed07aa1ae8b9dcae9d8b71995bbfb"""
+input_hashes.files.w2_02_script,"""ae81bf8c5311fc19c8ad38f7feca5d1c15bf39a71d41a1fb925775d6e63aafe6"""
+input_hashes.pack_inventory.canonical_line_count,404
+input_hashes.pack_inventory.file_count,404
+input_hashes.pack_inventory.sha256,"""14ffd7bc07f52552824d59f723c22cce7ff1c0ad54cf58bbdb6cf72771dc3aea"""
+metrics.beam_minus_greedy,"""beam64 drawing F1 minus greedy drawing F1"""
+metrics.cpu,"""time.process_time cumulative across selftest and measurement invocation"""
+metrics.exact_or_bound_minus_beam,"""certified exact incumbent drawing F1, otherwise admissible F1 upper bound 1.0, minus beam64 drawing F1"""
+metrics.greedy_exact_match,"""canonical selected-set equality only on drawings with certified optimum"""
+metrics.hidden_only_primary,true
+metrics.judgment_output,"""forbidden; numeric measurements only"""
+metrics.per_policy,"[""drawing set-F1"",""family pooled set-F1"",""hidden pooled set-F1"",""verifier acceptance rate""]"
+metrics.primary_delta_estimand,"""arithmetic mean of drawing-level set-F1 differences across 75 hidden drawings"""
+output_policy.report_last_line,"""CELL_COMPLETE: g9_rl_diag"""
+output_policy.required,"[""prereg.json"",""PREREG.csv"",""g9_rl_diag.py"",""results.json"",""evidence.xlsx"",""REPORT.md""]"
+output_policy.root,"""D:\\runs\\e2_program\\cells\\g9_rl_diag"""
+policies.beam,"""widths 4,16,64; traverse the same sorted include/exclude decision tree; at each equal-depth frontier retain highest cumulative frozen Bernoulli log-likelihood, then canonical bitmask; at completion choose highest terminal objective, then log-likelihood, then canonical set"""
+policies.beam_widths,"[4,16,64]"
+policies.bnb_cpu_seconds_per_drawing,8.0
+policies.bnb_node_cap,100000
+policies.exact,"""if handle_count<=18, exhaustively enumerate all 2^n terminal subsets subject to 262144 subsets and 8 CPU-seconds per drawing"""
+policies.exact_cpu_seconds_per_drawing,8.0
+policies.exact_max_handles,18
+policies.exact_max_subsets,262144
+policies.greedy,"""sort handles by descending frozen ensemble probability with natural handle tie-break; include the prefix while p>=0.5 and stop at the first p<0.5"""
+policies.primary_beam_width,64
+policies.upper_bound_replacement,"""otherwise use deterministic best-bound branch-and-bound; admissible F1 bound includes every remaining true handle and no remaining false handle, verifier bonus remains possible only while processed decisions match the verifier-expected set; branch order follows frozen p>=0.5; cap 100000 nodes and 8 CPU-seconds; report incumbent, bound, gap, and certification per drawing"""
+read_boundary.allowed,"[""D:\\runs\\e2_program\\cells\\gen2_families"",""D:\\dev\\99_tools\\autocad-sdk-router\\tools\\e2\\instruments\\verifier.py"",""sealed G1/W2-02/prereg/plan reference files"",""D:\\runs\\e2_program\\cells\\g9_rl_diag""]"
+read_boundary.forbidden,"[""original CAD"",""repository tests"",""test"",""val-B"",""CubiCasa""]"
+reproducibility_claim_wording,"""휘발 필드 제외 수치 전 필드 동일"""
+schema,"""e2.g9-rl-diag.prereg.v1"""
+scope,"""zero-learning set-assembly enumeration diagnostic within the sealed metadata-bearing gen2 synthetic family pack only"""
+scorer.GNN,"""forbidden"""
+scorer.coordinate_mapping,"""synthetic millimetres divided by 12.0 mm/pseudo-px so frozen W2-02 20px radius, 6mm snap, and 50-400mm band retain physical meaning"""
+scorer.ensemble,"""arithmetic mean of three predict_proba wall probabilities"""
+scorer.estimator,"""sklearn HistGradientBoostingClassifier defaults except random_state"""
+scorer.feature_names,"[""parallel"",""thickness"",""junction"",""log10_len"",""sin2t"",""cos2t"",""parallel_band_neighbor_count"",""nearest_parallel_gap_px"",""junction_degree"",""drawing_length_percentile"",""radius_density_r20_per_px2"",""neighbor_angle_entropy_r20"",""junction_neighbor_degree_sum"",""junction_neighbor_degree_max"",""junction_neighbor_degree_variance"",""twohop_parallel_count"",""twohop_parallel_gap_min_px"",""twohop_parallel_gap_mean_px"",""twohop_parallel_gap_std_px"",""twohop_parallel_gap_max_px"",""junction_component_size"",""junction_component_thickness_rate"",""twohop_ring_count"",""twohop_length_mean_px"",""twohop_length_std_px"",""twohop_length_max_px"",""twohop_angle_alignment_mean"",""twohop_angle_alignment_std"",""twohop_angle_aligned_fraction_2deg"",""collinear_extension_chain_length_px_le2""]"
+scorer.fit_rows,"""reward-family candidate-handle rows only"""
+scorer.freeze_fingerprint,"""SHA-256 of protocol-5 estimator pickle for each seed plus train matrix/label hashes and ordered feature schema; ensemble fingerprint is canonical SHA-256 over those fields"""
+scorer.labels,"""synthetic wall_handles_flat membership only"""
+scorer.post_fit_mutation,"""forbidden"""
+scorer.protocol,"""W2-02 full 30-column two-hop classical feature protocol"""
+scorer.seeds,"[17,29,43]"
+scorer.threshold,0.5
+selftest.boundary_denials,"[""original CAD"",""repository tests"",""val-B"",""CubiCasa""]"
+selftest.scorer_freeze,"""fit the actual reward matrix twice and require identical estimator and prediction fingerprints"""
+selftest.search_determinism,"""repeat fixture greedy/beam/B&B and compare canonical signatures"""
+terminal_objective.formula,"""0.5 * set_F1(candidate_subset, synthetic_truth) + 0.5 * verifier_accepted"""
+terminal_objective.range,"[0.0,1.0]"
+terminal_objective.set_F1_empty_rule,"""0.0, including empty-empty (not present in this pack)"""
+terminal_objective.use,"""completed-state comparison only; partial beam states are ranked by frozen scorer Bernoulli log-likelihood"""
+universe.candidate_universe,"""every unique valid handle in the G1 compact SEG-IR adapter: all truth-ledger class handles plus one deterministic non-wall representative for each of 13 raw entity types"""
+universe.drawings,200
+universe.families,"[""F01"",""F02"",""F03"",""F04"",""F05"",""F06"",""F07"",""F08""]"
+universe.feature_row_adapter,"""one first-valid segment per candidate handle in natural-handle order; duplicate chord/edge records are collapsed only for scorer features while the full G1 compact IR is retained for verifier calls"""
+universe.pack_inventory_file_count,404
+universe.pack_inventory_sha256,"""14ffd7bc07f52552824d59f723c22cce7ff1c0ad54cf58bbdb6cf72771dc3aea"""
+universe.root,"""D:\\runs\\e2_program\\cells\\gen2_families"""
+verifier.configuration.angle_tol_deg,5.0
+verifier.configuration.overlap_min,0.65
+verifier.configuration.selection,"""current_verifier_defaults_no_tuning"""
+verifier.configuration.thickness_band_mm,"[50.0,400.0]"
+verifier.configuration_sha256,"""bf9e4d5c9e7facba3bebf7865bd188b7566f4b319bf1007ab13932bced7d3a07"""
+verifier.path,"""D:\\dev\\99_tools\\autocad-sdk-router\\tools\\e2\\instruments\\verifier.py"""
+verifier.sha256,"""72e33ab0e87e96defd00f74c5a22ae6c5cb001c69b740e627edeedaf2a80b690"""
+verifier.truth_label_usage,"""none inside verifier"""
