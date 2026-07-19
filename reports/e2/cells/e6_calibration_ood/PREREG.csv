@@ -1,0 +1,108 @@
+section,key,value
+identity,schema,e2.e6_calibration_ood.prereg.v1
+identity,cell,e6_calibration_ood
+identity,sealed_at_utc,2026-07-19T00:21:18.5586105Z
+scope,execution_surface,local NVIDIA RTX; frozen-model inference only
+scope,write_root,D:\runs\e2_program\cells\e6_calibration_ood
+scope,repository_mutation,forbidden
+scope,subagents,forbidden
+scope,git,forbidden
+scope,GNN_training_or_refit,forbidden
+scope,threshold_search,forbidden
+scope,threshold,0.5
+scope,temperature_fit_exception,one scalar T per arm and model seed on cal-fit only
+scope,classical_fit_exception,sealed W2-02 two-hop HistGradientBoosting protocol; train-only
+scope,RTX_cap_hours,8.0
+scope,judgment_output,forbidden; numeric measurements and unresolved items only
+access,GNN_evaluation,only W2-09 manifest-listed val-A 198 drawings and matching truth
+access,classical_fit,sealed train labels and W2-02 train design only
+access,val_B,reject before filesystem path construction or read
+access,test,reject before filesystem path construction or read
+access,original_CAD,forbidden
+universe,name,CubiCasa W2-09 val-A
+universe,drawing_count,198
+universe,row_count,167556
+universe,family_count,198
+universe,family_crossing_count,0
+universe,high_quality_architectural_drawings,119
+universe,high_quality_drawings,54
+universe,colorful_drawings,25
+split,seed,43
+split,namespace,e6.calibration.ood.v1
+split,family_hash,SHA-256 of UTF-8 string e6.calibration.ood.v1|43|{family_id}
+split,rule,sort by family_hash then family_id then drawing_id; first 99 cal-fit and remaining 99 cal-eval
+split,assignment_serialization,"drawing_id,family_id,split ordered by drawing_id; LF terminated"
+split,assignment_sha256,a3f40d2c61eddc83a434ace020b2bd52c2d448051db78b65ef005aa6b23fa96e
+split,cal_fit_drawings,99
+split,cal_fit_rows,85421
+split,cal_fit_ids_sha256,8606195f96ba2b8df7a9ebe8c5a6065fc7ded30f226ad038bc22a3e84f6d20b7
+split,cal_fit_high_quality_architectural_drawings,61
+split,cal_fit_high_quality_drawings,27
+split,cal_fit_colorful_drawings,11
+split,cal_eval_drawings,99
+split,cal_eval_rows,82135
+split,cal_eval_ids_sha256,a9f1f02e051e9f3eecca2b7966daf96a9a888df5189c0c4c556d786b868e067b
+split,cal_eval_high_quality_architectural_drawings,58
+split,cal_eval_high_quality_drawings,27
+split,cal_eval_colorful_drawings,14
+split,required_family_intersection_count,0
+arm,GNN_A_no_pretrain,load frozen seed 17|29|43 checkpoints and run full-graph val-A inference only
+arm,control_twohop_GBDT_full,fresh sealed W2-02 30-feature HistGradientBoosting fit on train-only then val-A inference
+temperature,unit,one positive scalar T per arm and model seed
+temperature,fit_universe,cal-fit rows only
+temperature,reported_metric_universe,cal-eval rows only
+temperature,probability_clip,1e-12
+temperature,parameterization,log_T
+temperature,optimizer,scipy.optimize.minimize_scalar bounded
+temperature,log_T_bounds,-4.0|4.0
+temperature,xatol,1e-12
+temperature,maxiter,1000
+temperature,objective,binary NLL on cal-fit
+temperature,threshold_after_scaling,0.5
+temperature,optimizer_seed,none; deterministic
+metric,ECE,10 equal-width bins; weighted absolute confidence-positive-rate gap
+metric,Brier,mean squared probability error
+metric,Brier_REL,sum n_bin/N * (mean_probability-positive_rate)^2
+metric,Brier_RES,sum n_bin/N * (positive_rate-overall_positive_rate)^2
+metric,Brier_UNC,overall_positive_rate * (1-overall_positive_rate)
+metric,Brier_decomposition_residual,Brier - (REL - RES + UNC)
+metric,NLL,mean binary NLL with probability clip 1e-12
+metric,classification,precision recall F1 and confusion counts at threshold 0.5
+metric,style_slices,cal-eval pooled and 3 source categories AUPRC F1 drawing count and pooled-minus-category gaps
+metric,seed_aggregation,per seed plus arithmetic mean and population SD
+metric,reliability_table,bin confidence accuracy count signed gap absolute gap
+metric,direction_numeric_profile,recall@0.5 plus signed calibration gap masses and row fractions
+band,text_1,temperature 전후 REL≤0.03 ∧ RES≥0.03
+band,text_2,style drop≤0.10
+band,text_3,calibration 실패를 threshold 재탐색으로 덮지 않는다
+band,adjudication,do not emit any band verdict
+limit,style,This is IID source-category slice measurement of frozen models; not held-out-style retraining OOD; true OOD is future preregistration
+selftest,1,split determinism
+selftest,2,cal-fit/cal-eval family intersection equals zero
+selftest,3,all frozen GNN-A checkpoint SHA-256 values unchanged
+selftest,4,val-B blocked before filesystem path construction/read
+selftest,5,test blocked before filesystem path construction/read
+selftest,6,fixed threshold equals 0.5
+selftest,7,temperature fit uses cal-fit only and reported metrics use cal-eval only
+evidence,preferred,evidence.xlsx
+evidence,fallback,single row-complete evidence.csv plus reason in REPORT.md
+evidence,current_environment,@oai/artifact-tool workspace dependency loader unavailable
+output,reproducibility_claim,휘발 필드 제외 수치 전 필드 동일
+output,report_last_line,CELL_COMPLETE: e6_calibration_ood
+input_hash,packet,a9ea210148cde7ad6488a0c97ba384b7fd453247925649adb976f3911db2cfc2
+input_hash,calibration_dossier,6641dd63044ad22b94d6c2a61baf85f86ca4c9191745659171e8a806864c294d
+input_hash,split_manifest,8aad64eeda77df55296fc711c21d7befdeada7fe379aeafec81fd1691aea044f
+input_hash,formal_runner,0413f1035de76ab8a175c37c291c3fca634a2f1effb8135b5371aa357d5a94c0
+input_hash,graph_builder,c95d4a30d30e0db157fe56102053a7884902b7749464f7f4cb8852c0819321f6
+input_hash,screen_v2,895249f0b6c77ac8f8a7cfb73e859a0882681ad6bba6e337480b55db269ce120
+input_hash,W2_02_source,ae81bf8c5311fc19c8ad38f7feca5d1c15bf39a71d41a1fb925775d6e63aafe6
+input_hash,train_labels,8f72d8931c6e08927bf027ee87f1bc5362ab1a85217862e09a0cddd6b0b0d5aa
+input_hash,baseline_design_train,8e2ca80cc52ab9ebcbb9f8f60fb1d4177186cd1e7fafcfee486cfcbc40335a11
+input_hash,baseline_context_val_A,b568bb4c3dffce46629355bf7670cf00f6c86ecbfe14b5feb87f4e6103449a91
+input_hash,baseline_twohop_val_A,ef0febd1d6da09a2a129c26dcc19028828e80bb4fa19c9db2b3eb5b423cef1df
+input_hash,GNN_A_seed_17,612e4bf954ff5967853f7a08e66195b79dfa15250d6e9d42f88a877c92a3952c
+input_hash,GNN_A_seed_29,1b4bbd004491609cfe8cfc217d18b0ec5ff344f8fee43c67b392a4c37dbc6877
+input_hash,GNN_A_seed_43,ab37cf25894e8ed7f2e96ca287a21da961c68d37bcf2bd9633ae1cb9b663e2a3
+input_hash,formal_control_seed_17,7de0cddb8a6d5f8690ecacbd24a1c3a39f4594ffdb5fe2145edbf785189f09df
+input_hash,formal_control_seed_29,3e868c986a68f5a4a97ed481a825ec7b648338b5697bc5d62ccaf0e5253437aa
+input_hash,formal_control_seed_43,797dd0fce30489fa44de585a3b20ef63df3e38038728db5a92addb44d017ad58
