@@ -72,3 +72,27 @@ self improvement 개념을 적용하는 알고리즘들. https://www.weco.ai/blo
 - 두 항목 사양 = `reports\e2\W4_ITEMS_DRAFT.md`. W3 봉인 로스터 불변 — 본 결정은 W4 편성이다.
 - 실패-학습 결부: "프리레그가 기준선만 적고 조작적 정의 미봉인" = Failure Ledger 거버넌스 교훈
   1행 (root_class=underspecified_band). P1 원장에 등재.
+
+## D8. 온톨로지 귀납 + n차 RSI 재귀 개선 발주
+
+원문: "온톨로지 실물을 더 낫게 하려면 GNN을 합성하면 되지 않나. 온톨로지 규약을 만드는 도구로서
+GNN 같은 ML/DL/RL 모델을 사용하는 것. 그렇게 만든 n차 온톨로지 모델링을 또 한 번 RSI로 재귀
+검증·improve." (2026-07-20)
+- 채택: 손 규칙(M-14, 0.28·GNN과 혼동 공유) → **모델 귀납 온톨로지**로 승격. GNN/GBDT/ILP/RL을
+  분류기가 아니라 **규칙 발굴기**로 사용. n차 재귀 = RSI 플라이휠의 온톨로지 판(세대별 SHA 봉인·
+  누적 개선).
+- **오케스트레이터 핵심 판단(pushback)**: 순진한 "GNN으로 규칙 만들고 GNN 잔차로 채점" =
+  순환 보상 해킹(규칙이 GNN 암기). 방어 = **채점 truth는 지상 truth, GNN은 표적 정의 전용·라벨
+  금지**. 목적함수 3항 = 단독 AUPRC + **FN-가중 상보성**(GNN이 놓친 것 우선) + 해석성 예산.
+- 편성 = W4-onto-induct (C-3 하네스 재사용, M-13 봉인 목적 불변이라 특화 목적은 신규 봉인).
+- 설계 SoT = `reports\e2\RSI_ONTOLOGY_INDUCTION.md`.
+
+## D9. 데이터셋 불완전 추출본 전수 감사 — sol high
+
+원문: "hf 조사에서 archcad floorplan cad 같은 불완전 추출본이면, 다른 데이터셋들도 혹시 hf와
+같은 저장소에서 불완전본 있는지 확인해줘. 조사는 gpt 5.6 sol high 발사해줘." (2026-07-20)
+- 발주: 로컬 인벤토리 전 데이터셋(CubiCasa5k·pseudo-floor-plan-12k·Text2CAD 등)이 HF/업스트림
+  정본 대비 불완전 추출본인지 전수 감사. 근거 = M-8/M-12 둘 다 "공식 분할 없음"(원장 L058/L059
+  동일 root_class).
+- 실행 = **gpt-5.6-sol high** 워커 (Paul 지정 — 다이얼 명시). 기존 hf-dataset-recon(Claude,
+  ArchCAD/FloorPlanCAD 공식분할+놓친셋)과 병행·비중복.
