@@ -1,0 +1,7 @@
+C71 evidence.xlsx was not generated.
+
+Reason: the required load_workspace_dependencies / @oai/artifact-tool runtime is not exposed in this session. The Spreadsheets skill prohibits substituting openpyxl, xlsxwriter, pandas.ExcelWriter, or another XLSX library. The measurement packet explicitly allows CSV plus a reason when XLSX is unavailable.
+
+Fallback: D:\dev\99_tools\autocad-sdk-router\reports\e2\cells\c71_stk_hybrid\evidence.csv
+Raw row evidence: D:\runs\e2_program\cells\c71_stk_hybrid\correlation_rows.csv
+Raw shuffle evidence: D:\runs\e2_program\cells\c71_stk_hybrid\shuffle_distribution.csv
