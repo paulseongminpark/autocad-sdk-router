@@ -1,0 +1,183 @@
+{
+  "schema": "ariadne.e2.m5_f04_fill.prereg.local.v1",
+  "sealed_utc": "2026-07-20T08:01:40Z",
+  "sealed_before_measurement": true,
+  "sealed_before_model_prediction_calls": true,
+  "post_outcome_edits_forbidden": true,
+  "packet": {
+    "path": "D:/runs/e2_program/build/PACKET_w3_m5_f04_fill.md",
+    "sha256": "3310e475216edd0d4951ad0055559da8b89cbb83e0602982a8579a2c4625319c"
+  },
+  "w3_boundary_verbatim": "본 보고의 탐지기 사다리·모든 val-A/val-B 수치의 유효 범위는 CubiCasa SEG-IR 우주 한정이다. E1 실무 도면 전이는 미검증이다.",
+  "scope_and_prohibitions": {
+    "owned_cells": ["F08", "F09", "F10", "F11", "F12", "F13", "F14"],
+    "out_of_scope": ["F01-F07", "F15-F28"],
+    "model_refit": "FORBIDDEN",
+    "device": "CPU_ONLY",
+    "gpu": "FORBIDDEN",
+    "validation_b_contact": "FORBIDDEN",
+    "test_contact": "FORBIDDEN",
+    "git_commands": "FORBIDDEN",
+    "subagents": "FORBIDDEN",
+    "all_io_paths": "ABSOLUTE_ONLY",
+    "cpu_wall_cap_seconds": 28800
+  },
+  "input_hashes": [
+    {"path": "D:/dev/99_tools/autocad-sdk-router/reports/e2/instruments/f04_REPORT.md", "sha256": "3ca4cb66dfae2cb78b443f0947a4393821beb0cf5bbd19c0559aacecc12ad0f7", "role": "F04 cell map and method admissibility"},
+    {"path": "D:/dev/99_tools/autocad-sdk-router/reports/e2/cells/f04_artifact_freeze/REPORT.md", "sha256": "ae70ac3bf0e6f3409798e255702318786cef5a1450c9f08e27a9f68fe26dafd1", "role": "resolved frozen classical artifact and bands"},
+    {"path": "D:/dev/99_tools/autocad-sdk-router/reports/e2/cells/f04_artifact_freeze/evidence.csv", "sha256": "80d52a36769f36e3e760cda5a1692951434bebd3ad63d11a369de3c2cacb4f38", "role": "per-cell relation and validity-gate evidence"},
+    {"path": "D:/dev/99_tools/autocad-sdk-router/reports/e2/cells/f04_canonical_fill/REPORT.md", "sha256": "aee956e469277a7fb947dd17930cb10c6d81412329ec74d0223a0eaf74226941", "role": "prior BLOCKED_INPUT record and transform population"},
+    {"path": "D:/dev/99_tools/autocad-sdk-router/reports/e2/cells/f04_canonical_fill/evidence.csv", "sha256": "00b1d04a6f03ed371812f7e669e5179679f91a26d146ce47b51e5585be4ee5e9", "role": "prior F08-F14 BLOCKED_INPUT rows"},
+    {"path": "D:/dev/99_tools/autocad-sdk-router/reports/e2/cells/f04_completion/PREREG_local.json", "sha256": "444fa333d0ba816d723e9fc2b0125714a1ad31940710da7a79932b425d7587c0", "role": "sealed relation registry and drawing-macro metric"},
+    {"path": "D:/dev/99_tools/autocad-sdk-router/reports/e2/dossiers/doe_P5.md", "sha256": "4a55c843c7224a2e5800f116e360dfe327e13d1fc04e78e882099cfe96f32fc3", "role": "exact LID, per-variant violation and drawing-macro aggregation definitions"},
+    {"path": "D:/dev/99_tools/autocad-sdk-router/tools/e2/instruments/f04_common_judge.py", "sha256": "dbfb9fea57aed2c56df02801b3ef42a4eaae7007ae4f046845d5d881a1ee1970", "role": "sealed R-META band judge"},
+    {"path": "D:/dev/99_tools/autocad-sdk-router/tools/e2/meta/invariance.py", "sha256": "937644c63626ed420ace98a6bad9b25a6e5b3605c3c9fea63a8ffb2c0ccc9a7e", "role": "binary per-handle flip comparator and sentinel semantics"},
+    {"path": "D:/dev/99_tools/autocad-sdk-router/tools/e2/meta/battery_cli.py", "sha256": "0db3fe6dec864875961e2eda0197c9f10cbed764b34d68c9e8fd0131906d9364", "role": "per-transform arithmetic mean invariance lineage"},
+    {"path": "D:/dev/99_tools/autocad-sdk-router/tools/e2/ext/cubicasa_ml.py", "sha256": "e9baf9f361ca9cfc1a113e084bf5c34be33cf9b6c14615c2ed080f771cd3b466", "role": "mandatory six-feature reference"},
+    {"path": "D:/dev/99_tools/autocad-sdk-router/tools/e2/w1_real_defs.py", "sha256": "5cf700d55522242560ef720392cc837178ec895885d85ddf0989bbd5bd23ac97", "role": "frozen evidence-channel implementation"},
+    {"path": "D:/dev/99_tools/autocad-sdk-router/tools/e2/detect/evidence_grid.py", "sha256": "918c6754c0b3d5608613c189240629dc419d94a42e167ef6ce0d298a08660b6a", "role": "frozen evidence parameters and band membership"},
+    {"path": "D:/runs/e2_program/cells/feyerabend_c0/feyerabend_c0.py", "sha256": "dfc8957fc4f56fffd2262faa0f9dd14a1132b3365d0f9735366d44ec00215c80", "role": "synthetic scene generator and schema"},
+    {"path": "D:/runs/e2_program/cells/feyerabend_c0/coverage_numbers.json", "sha256": "f5c17b6094d741bffb64a35c17f35a58243c23720ad3446e86c962299b183723", "role": "synthetic population coverage"},
+    {"path": "D:/runs/e2_program/cells/f04_artifact_freeze/hist_gbdt_local6_p2a.joblib", "sha256": "ccc52d2066cc44502b2a8ccb0412b6c77d8caca4c37cfbf919bb95e46f16c754", "role": "frozen no-refit model"},
+    {"path": "D:/runs/e2_program/cells/f04_artifact_freeze/model_manifest_local6.json", "sha256": "ade4b15bb3da868cae69aabf54345c96f2b5daeb33b6a7876cde7ec02f2e86f1", "role": "model identity, threshold and inference rule"},
+    {"path": "D:/runs/e2_program/cells/f04_artifact_freeze/training_manifest_local6.json", "sha256": "bf08b962592cc8f2cb8e3e27b470f088c97177eaa995cd676778badc0cd469b0", "role": "six-feature schema and train-only recipe"},
+    {"path": "D:/runs/e2_program/cells/f04_canonical_fill/PREREG_local.json", "sha256": "f8e681331c6eb4000801d44e353d5888b74d432c7dd06b1a6a70704e2f5a4ea4", "role": "fixed transform parameter population and prior zero-eligible stop"}
+  ],
+  "instrument_definition_discovery": {
+    "status": "DISCOVERED_7_OF_7",
+    "missing_definition_cells": [],
+    "common_metric_source_quote": "metric: R-META drawing-macro violation rate = 1 - invariance",
+    "common_aggregation_source_quote": "셀의 주 반응 `R-META_{k,b}`는 도면별 위반율을 먼저 parameter 표본에 대해 동일 가중 평균하고, 다시 40개 도면에 동일 가중 평균한 **drawing-macro violation rate**다.",
+    "current_population_adaptation": "the packet-sealed synthetic population has 50 drawings, so the discovered equal-weight drawing-macro formula is applied to all 50 rather than the dossier proposal's 40-drawing archive population",
+    "band_source_quote": "PASS `R-META <= 0.02` / INCONCLUSIVE `0.02 < R-META <= 0.10` / FAIL `R-META > 0.10` / UNKNOWN = no admissible numeric measurement (never coerced).",
+    "cells": [
+      {
+        "cell_id": "F08",
+        "family": "classical_ml",
+        "relation": "translate",
+        "definition_status": "DISCOVERED",
+        "what_is_measured": "occurrence-level LID binary wall-label violation under translation for the frozen classical six-feature HGBDT",
+        "instrument_source_path": "D:/dev/99_tools/autocad-sdk-router/reports/e2/instruments/f04_REPORT.md",
+        "instrument_source_quote": "| `translate` | UNKNOWN (F01) | UNKNOWN (F08) | UNKNOWN (F15) | UNKNOWN (F22) |",
+        "validity_gate": "inverse transform restores endpoints and topology"
+      },
+      {
+        "cell_id": "F09",
+        "family": "classical_ml",
+        "relation": "rotate",
+        "definition_status": "DISCOVERED",
+        "what_is_measured": "occurrence-level LID binary wall-label violation under rotation for the frozen classical six-feature HGBDT",
+        "instrument_source_path": "D:/dev/99_tools/autocad-sdk-router/reports/e2/instruments/f04_REPORT.md",
+        "instrument_source_quote": "| `rotate` | UNKNOWN (F02) | UNKNOWN (F09) | UNKNOWN (F16) | UNKNOWN (F23) |",
+        "validity_gate": "inverse rotation restores endpoints and topology"
+      },
+      {
+        "cell_id": "F10",
+        "family": "classical_ml",
+        "relation": "uniform-scale",
+        "definition_status": "DISCOVERED",
+        "what_is_measured": "occurrence-level LID binary wall-label violation under positive uniform scale for the frozen classical six-feature HGBDT",
+        "instrument_source_path": "D:/dev/99_tools/autocad-sdk-router/reports/e2/instruments/f04_REPORT.md",
+        "instrument_source_quote": "| `uniform-scale` | UNKNOWN (F03) | UNKNOWN (F10) | UNKNOWN (F17) | UNKNOWN (F24) |",
+        "validity_gate": "factor is positive and inverse scaling restores geometry"
+      },
+      {
+        "cell_id": "F11",
+        "family": "classical_ml",
+        "relation": "unit-change",
+        "definition_status": "DISCOVERED",
+        "what_is_measured": "occurrence-level LID binary wall-label violation after physically equivalent mm/m unit re-encoding for the frozen classical six-feature HGBDT",
+        "instrument_source_path": "D:/dev/99_tools/autocad-sdk-router/reports/e2/instruments/f04_REPORT.md",
+        "instrument_source_quote": "| `unit-change` | UNKNOWN (F04) | UNKNOWN (F11) | UNKNOWN (F18) | UNKNOWN (F25) |",
+        "validity_gate": "coordinates, $INSUNITS, and scale_mm_per_unit encode the same physical quantities"
+      },
+      {
+        "cell_id": "F12",
+        "family": "classical_ml",
+        "relation": "block-explode",
+        "definition_status": "DISCOVERED",
+        "what_is_measured": "occurrence-level LID binary wall-label violation after recursive block explode for the frozen classical six-feature HGBDT",
+        "instrument_source_path": "D:/dev/99_tools/autocad-sdk-router/reports/e2/instruments/f04_REPORT.md",
+        "instrument_source_quote": "| `block-explode` | UNKNOWN (F05) | UNKNOWN (F12) | UNKNOWN (F19) | UNKNOWN (F26) |",
+        "validity_gate": "no remaining INSERT; occurrence mapping bijective; world topology unchanged"
+      },
+      {
+        "cell_id": "F13",
+        "family": "classical_ml",
+        "relation": "layer-rename",
+        "definition_status": "DISCOVERED",
+        "what_is_measured": "occurrence-level LID binary wall-label violation under bijective layer renaming for the frozen classical six-feature HGBDT",
+        "instrument_source_path": "D:/dev/99_tools/autocad-sdk-router/reports/e2/instruments/f04_REPORT.md",
+        "instrument_source_quote": "| `layer-rename` | UNKNOWN (F06) | UNKNOWN (F13) | UNKNOWN (F20) | UNKNOWN (F27) |",
+        "validity_gate": "layer map bijective and geometry hash unchanged"
+      },
+      {
+        "cell_id": "F14",
+        "family": "classical_ml",
+        "relation": "coord-jitter",
+        "definition_status": "DISCOVERED",
+        "what_is_measured": "occurrence-level LID binary wall-label violation under certified deterministic bounded coordinate jitter for the frozen classical six-feature HGBDT",
+        "instrument_source_path": "D:/dev/99_tools/autocad-sdk-router/reports/e2/instruments/f04_REPORT.md",
+        "instrument_source_quote": "| `coord-jitter` | UNKNOWN (F07) | UNKNOWN (F14) | UNKNOWN (F21) | UNKNOWN (F28) |",
+        "validity_gate": "nonzero segments, unchanged incidence/topology, certified parallel-band margin, and input-only decision-margin certificate"
+      }
+    ]
+  },
+  "frozen_classical_model": {
+    "status": "FROZEN_NO_REFIT",
+    "model_id": "hist_gbdt_local6_p2a",
+    "model_path": "D:/runs/e2_program/cells/f04_artifact_freeze/hist_gbdt_local6_p2a.joblib",
+    "model_sha256": "ccc52d2066cc44502b2a8ccb0412b6c77d8caca4c37cfbf919bb95e46f16c754",
+    "feature_order": ["parallel", "thickness", "junction", "log10_len", "sin2t", "cos2t"],
+    "decision_threshold": 0.5,
+    "random_seeds": [17, 29, 43],
+    "inference_rule": "arithmetic mean of the three positive-class predict_proba values; wall iff mean probability >= 0.5"
+  },
+  "synthetic_population": {
+    "root": "D:/runs/e2_program/cells/feyerabend_c0/scenes",
+    "selector": "scene_*_k1.json",
+    "count": 50,
+    "manifest_aggregate_sha256": "7ba8943db3f8224dd28288cbdc08f55a077a531b88dda7d8bc0e5d15703abd89",
+    "positive_drawings": 49,
+    "zero_wall_sentinel_drawings": 1,
+    "all_wall_sentinel_drawings": 1
+  },
+  "extractor_spec": {
+    "path": "D:/runs/e2_program/cells/m5_f04_fill/extractor_spec.json",
+    "sha256": "a1ef92a42a8e0117c7b0da5f90cf5a654c5bc09ad24e22cced8f48ad6627a9c4",
+    "mandatory_cubicasa_ml_fixture_parity": "EXACT_FLOAT32_ARRAY_EQUALITY_REQUIRED_BEFORE_MEASUREMENT"
+  },
+  "primary_metric": {
+    "per_variant": "v[d,k,p] = flips over base occurrence-level LIDs divided by base LID count; missing mapped LIDs count as flips",
+    "per_drawing": "equal-weight arithmetic mean over the preregistered parameters of relation k",
+    "cell": "equal-weight arithmetic mean over all 50 drawings",
+    "r_meta": "cell drawing-macro violation rate",
+    "mean_invariance": "1 - r_meta",
+    "bands": {
+      "PASS": "R-META <= 0.02",
+      "INCONCLUSIVE": "0.02 < R-META <= 0.10",
+      "FAIL": "R-META > 0.10",
+      "BLOCKED_INPUT": "definition, input, artifact, parity, qualification, certificate or eligible population unavailable"
+    }
+  },
+  "common_admissibility": [
+    "all fixed input SHA-256 values match",
+    "frozen model bundle identity, six-feature order, threshold, seeds and training-manifest hash match",
+    "mandatory cubicasa_ml same-fixture exact parity passes",
+    "all 50 base drawings produce a nonempty unique LID population",
+    "all preregistered drawing-parameter transform certificates pass",
+    "after prediction LID schema is complete and bijective",
+    "repeat normalized-prediction checksums match on the first five sorted base scenes",
+    "complete-base-population constant-zero and near-all flags are false",
+    "truth-bearing positive entity recall is at least 0.20"
+  ],
+  "zero_eligible_stop": "if a cell has zero eligible drawing-parameter pairs, emit BLOCKED_INPUT and no R-META number",
+  "planned_outputs": {
+    "prereg_json": "D:/runs/e2_program/cells/m5_f04_fill/PREREG_local.json",
+    "prereg_csv": "D:/runs/e2_program/cells/m5_f04_fill/PREREG.csv",
+    "extractor_code": "D:/runs/e2_program/cells/m5_f04_fill/m5_f04_fill.py",
+    "measurement": "D:/runs/e2_program/cells/m5_f04_fill/measurement.json",
+    "evidence": "D:/runs/e2_program/cells/m5_f04_fill/evidence.csv",
+    "report": "D:/runs/e2_program/cells/m5_f04_fill/REPORT.md"
+  }
+}
