@@ -1,0 +1,77 @@
+{
+  "artifacts": [
+    {
+      "bytes": 9473,
+      "path": "D:\\dev\\99_tools\\autocad-sdk-router\\reports\\e2\\cells\\f04_completion\\PREREG_local.json",
+      "sha256": "444fa333d0ba816d723e9fc2b0125714a1ad31940710da7a79932b425d7587c0"
+    },
+    {
+      "bytes": 39722,
+      "path": "D:\\dev\\99_tools\\autocad-sdk-router\\tools\\e2\\instruments\\f04_common_judge.py",
+      "sha256": "dbfb9fea57aed2c56df02801b3ef42a4eaae7007ae4f046845d5d881a1ee1970"
+    },
+    {
+      "bytes": 6978,
+      "path": "D:\\dev\\99_tools\\autocad-sdk-router\\tools\\e2\\instruments\\f04_common_judge_selftest.py",
+      "sha256": "8e8521de154ca5440f8f45bddae106a88268436de85242b3dcfc2f4abfde3a59"
+    },
+    {
+      "bytes": 53511,
+      "path": "D:\\runs\\e2_program\\cells\\f04_completion\\judge_result.json",
+      "sha256": "504503f4eca9332f9d6e0c8d60e9402d9a939d0d4bfbf59cbff2e9eb26f30b34"
+    },
+    {
+      "bytes": 3911,
+      "path": "D:\\runs\\e2_program\\cells\\f04_completion\\transform_by_family.csv",
+      "sha256": "232e5007caa6bf8794b180348216cc906c0af6ab5efe917e03df42e6b056b7dc"
+    },
+    {
+      "bytes": 1932,
+      "path": "D:\\runs\\e2_program\\cells\\f04_completion\\legacy_observations.csv",
+      "sha256": "870a1346ae581dd222d187a9f5e51a83f683c4ebf1ed75d18cdef2a9d8077a72"
+    },
+    {
+      "bytes": 739,
+      "path": "D:\\runs\\e2_program\\cells\\f04_completion\\selftest_result.json",
+      "sha256": "81b9e8592b92916909e633e88cf5093c27b2ba472087cc0d837061fa3c7f802a"
+    },
+    {
+      "bytes": 53511,
+      "path": "D:\\dev\\99_tools\\autocad-sdk-router\\reports\\e2\\cells\\f04_completion\\evidence.json",
+      "sha256": "504503f4eca9332f9d6e0c8d60e9402d9a939d0d4bfbf59cbff2e9eb26f30b34"
+    },
+    {
+      "bytes": 3911,
+      "path": "D:\\dev\\99_tools\\autocad-sdk-router\\reports\\e2\\cells\\f04_completion\\transform_by_family.csv",
+      "sha256": "232e5007caa6bf8794b180348216cc906c0af6ab5efe917e03df42e6b056b7dc"
+    },
+    {
+      "bytes": 1729,
+      "path": "D:\\dev\\99_tools\\autocad-sdk-router\\reports\\e2\\cells\\f04_completion\\transform_by_family.md",
+      "sha256": "e86eee8123caa1c2696099879c2dd76803f8c477db2b3700953895a2d866c7ca"
+    },
+    {
+      "bytes": 1932,
+      "path": "D:\\dev\\99_tools\\autocad-sdk-router\\reports\\e2\\cells\\f04_completion\\legacy_observations.csv",
+      "sha256": "870a1346ae581dd222d187a9f5e51a83f683c4ebf1ed75d18cdef2a9d8077a72"
+    },
+    {
+      "bytes": 1435,
+      "path": "D:\\dev\\99_tools\\autocad-sdk-router\\reports\\e2\\cells\\f04_completion\\VALIDATION.md",
+      "sha256": "593cb0a7cdd61b1c16d9cacf6679f33d8178304d2acc8b450c75e4306bb20134"
+    },
+    {
+      "bytes": 1402,
+      "path": "D:\\dev\\99_tools\\autocad-sdk-router\\reports\\e2\\cells\\f04_completion\\FILES_CHANGED.md",
+      "sha256": "c8681b69a75f23fd790f8f4fa37c734c2ffac1b5b0e3673bccb3f4ef4793e09f"
+    },
+    {
+      "bytes": 6574,
+      "path": "D:\\dev\\99_tools\\autocad-sdk-router\\reports\\e2\\instruments\\f04_REPORT.md",
+      "sha256": "3ca4cb66dfae2cb78b443f0947a4393821beb0cf5bbd19c0559aacecc12ad0f7"
+    }
+  ],
+  "axis_measurement_status": "AXIS_MEASUREMENT_COMPLETE",
+  "prereg_sha256": "444fa333d0ba816d723e9fc2b0125714a1ad31940710da7a79932b425d7587c0",
+  "schema": "ariadne.e2.f04_common_judge.output_manifest.v1"
+}

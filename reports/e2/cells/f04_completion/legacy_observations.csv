@@ -1,0 +1,11 @@
+﻿observation_id,source_id,source_path,source_pointer,source_transform,registry_relation,mean_invariance_exact,derived_r_meta_exact,diagnostic_band_from_r_meta,source_verdict,admissibility,canonical_cell_promoted
+w2_independence_audit_v1:rotate,w2_independence_audit_v1,reports/e2/w2_independence_audit_v1.json,/surrogates/D_detector_vs_metamorphic/per_transform/rotate,rotate,rotate,1,0,PASS,PASS,INADMISSIBLE,False
+w2_independence_audit_v1:translate,w2_independence_audit_v1,reports/e2/w2_independence_audit_v1.json,/surrogates/D_detector_vs_metamorphic/per_transform/translate,translate,translate,1,0,PASS,PASS,INADMISSIBLE,False
+w2_independence_audit_v1:mirror,w2_independence_audit_v1,reports/e2/w2_independence_audit_v1.json,/surrogates/D_detector_vs_metamorphic/per_transform/mirror,mirror,,1,0,PASS,PASS,OUT_OF_CATALOG,False
+w2_independence_audit_v1:scale,w2_independence_audit_v1,reports/e2/w2_independence_audit_v1.json,/surrogates/D_detector_vs_metamorphic/per_transform/scale,scale,uniform-scale,0.8795,0.1205,FAIL,FAIL,INADMISSIBLE,False
+w2_independence_audit_v1:units,w2_independence_audit_v1,reports/e2/w2_independence_audit_v1.json,/surrogates/D_detector_vs_metamorphic/per_transform/units,units,unit-change,1,0,PASS,REPORT_ONLY,INADMISSIBLE,False
+b4_fold_v2:rotate,b4_fold_v2,reports/e2/s5/b4_fold_v2.json,/transforms/rotate,rotate,rotate,1,0,PASS,FAIL,INADMISSIBLE,False
+b4_fold_v2:translate,b4_fold_v2,reports/e2/s5/b4_fold_v2.json,/transforms/translate,translate,translate,1,0,PASS,FAIL,INADMISSIBLE,False
+b4_fold_v2:mirror,b4_fold_v2,reports/e2/s5/b4_fold_v2.json,/transforms/mirror,mirror,,1,0,PASS,FAIL,OUT_OF_CATALOG,False
+b4_fold_v2:scale,b4_fold_v2,reports/e2/s5/b4_fold_v2.json,/transforms/scale,scale,uniform-scale,0.7624,0.2376,FAIL,FAIL,INADMISSIBLE,False
+b4_fold_v2:units,b4_fold_v2,reports/e2/s5/b4_fold_v2.json,/transforms/units,units,unit-change,1,0,PASS,REPORT_ONLY,INADMISSIBLE,False
