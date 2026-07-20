@@ -1,0 +1,80 @@
+{
+  "schema": "e2.w3.onto_constraint_real_v1.prereg_local.v1",
+  "cell": "e2.w3.onto_real1",
+  "method": "onto_constraint_real_v1",
+  "report_only": true,
+  "created_at": "2026-07-20",
+  "sealed_before_dev_measurement": true,
+  "w3_boundary": "본 보고의 탐지기 사다리·모든 val-A/val-B 수치의 유효 범위는 CubiCasa SEG-IR 우주 한정이다. E1 실무 도면 전이는 미검증이다.",
+  "objective": "Compile a domain-axiom (ontology-constraint) rule library over real CubiCasa SEG-IR that flags wall-consistent handles, then measure its standalone precision (AUPRC) and its overlap with a GNN-A detector's residual errors on val-A DEV. REPORT_ONLY: no band, no adoption verdict. The frozen library SHA is the search-space input for the M-13 RSI loop.",
+  "truth": {
+    "namespace": "CubiCasa development (SEG-IR)",
+    "positive_label": "handle in truth.wall_handles_flat (classes Wall + Wall External)",
+    "labels_identical_to_sealed_evaluator": "truth wall_handles_flat is the same per-handle label the sealed W2-09 evaluator (w2_09_valb.py SHA 85481aa4...) uses; the common-handle universe is a permutation of all prepared graph nodes, so set-level AUPRC and residual sets are order-invariant."
+  },
+  "split_lineage": {
+    "split_manifest": "D:\\runs\\e2_program\\cells\\w2_09_valb\\split_manifest.json",
+    "content_hash": "5e16541d7191ad01c57a9cee72172f63112ed68590dd371aff5bf0aaaab8e07b",
+    "measured_split": "val-A (DEV)",
+    "val_A_drawings": 198,
+    "val_A_rows": 167556,
+    "forbidden": ["val-B (ADJ)", "test", "F02/F03/F04 synthetic packs"]
+  },
+  "rule_schema": {
+    "input": "graph_builder.build_graph(ir, GraphConfig(), collect_edges=True) result: 17-dim node feature matrix (geometry + typed-edge fan-out) + directed typed edges (parallel_band, intersection_junction, proximity, collinearity, containment, instancing) + prepared node records (per-handle).",
+    "output": "per-handle integer flag per axiom (1 = wall axiom antecedent holds) and weighted-sum score (every rule weight = 1, fixed, no learning).",
+    "graph_config_hash": "56911f4633979a3fe00fd56be2d0a39ac06757ed255ed49ed18ca20ba9d4ac49",
+    "categories": ["wall_topology", "connectivity", "spatial_closure", "opening_relations"],
+    "stop_condition": ">=3 rules per category and <=40 rules total; realized = 16 rules (4 per category)."
+  },
+  "compilation_procedure": {
+    "reference_data": "ir/train (4200 drawings) + train truth only. val-A DEV was never inspected during compilation; DEV is first touched at the measurement step.",
+    "method": "For each candidate axiom, thresholds were set at discriminative operating points read from train feature distributions (wall vs non-wall percentiles) and per-axiom precision lift over ~250 train drawings. No DEV numbers, no learned weights.",
+    "freeze": "rules_library.py frozen and SHA-256 sealed BEFORE any DEV read; revision requires a new prereg."
+  },
+  "rules_library": {
+    "path": "D:\\runs\\e2_program\\cells\\onto_real1\\rules_library.py",
+    "library_id": "onto_constraint_real_v1",
+    "sha256": "0b51586b69a7b677f5c1476b48acef07dc52fefbe60350c6e800cd0c81a22f5d",
+    "n_rules": 16,
+    "weight_per_rule": 1,
+    "rules": [
+      {"id": "A1_length_tier_1", "category": "wall_topology", "threshold": "log1p_length_norm>=1.0", "train_lift": 1.28},
+      {"id": "A2_length_tier_2", "category": "wall_topology", "threshold": "log1p_length_norm>=1.5", "train_lift": 1.67},
+      {"id": "A3_length_tier_3", "category": "wall_topology", "threshold": "log1p_length_norm>=2.0", "train_lift": 2.45},
+      {"id": "A4_length_tier_4", "category": "wall_topology", "threshold": "log1p_length_norm>=3.0", "train_lift": 4.79},
+      {"id": "B1_junction_hub_1", "category": "connectivity", "threshold": "intersection_junction_fanout>=6", "train_lift": 1.47},
+      {"id": "B2_junction_hub_2", "category": "connectivity", "threshold": "intersection_junction_fanout>=14", "train_lift": 2.87},
+      {"id": "B3_endpoint_degree_1", "category": "connectivity", "threshold": "endpoint_degree>=3", "train_lift": 1.68},
+      {"id": "B4_endpoint_degree_2", "category": "connectivity", "threshold": "endpoint_degree>=8", "train_lift": 2.10},
+      {"id": "C1_anchored_both_ends", "category": "spatial_closure", "threshold": "endpoint_degree>=4", "train_lift": 1.70},
+      {"id": "C2_continuous_run", "category": "spatial_closure", "threshold": "collinear_fanout>=2 AND endpoint_degree>=3", "train_lift": 1.31},
+      {"id": "C3_enclosing_hub", "category": "spatial_closure", "threshold": "intersection_junction_fanout>=10", "train_lift": 1.69},
+      {"id": "C4_long_anchored_spine", "category": "spatial_closure", "threshold": "log1p_length_norm>=2.0 AND endpoint_degree>=4", "train_lift": 2.87},
+      {"id": "D1_opening_host_collinear", "category": "opening_relations", "threshold": "has collinear neighbour with length<0.6x", "train_lift": 1.59},
+      {"id": "D2_long_opening_host", "category": "opening_relations", "threshold": "D1 AND log1p_length_norm>=1.5", "train_lift": 2.14},
+      {"id": "D3_double_line_face", "category": "opening_relations", "threshold": "parallel_band_fanout>=6", "train_lift": 1.74},
+      {"id": "D4_long_parallel_face", "category": "opening_relations", "threshold": "has parallel neighbour in 0.5x-2.0x length AND log1p_length_norm>=1.5", "train_lift": 1.56}
+    ]
+  },
+  "measurement_plan": {
+    "standalone_auprc": "average_precision_score(truth wall label, rule weighted-sum score) over all val-A DEV handles. This is the same average-precision metric the sealed evaluator (w2_09_valb.py, sklearn.metrics.average_precision_score) reports as primary_auprc.",
+    "gnn_a_reproduction": {
+      "arm": "GNN_A_no_pretrain",
+      "checkpoints": ["GNN_A_no_pretrain_seed_17.pt", "GNN_A_no_pretrain_seed_29.pt", "GNN_A_no_pretrain_seed_43.pt"],
+      "code": "gnn_formal.NodeGNN(screen, len(builder.EDGE_TYPES)=6, FormalConfig()); load state_dict; predict_node_model on torch CPU; message_mode=full.",
+      "pool": "arithmetic mean of the 3 seed sigmoid probabilities (matches gnn_formal ensemble rule)",
+      "device": "cpu (GPU forbidden; CUDA_VISIBLE_DEVICES=-1)",
+      "threshold": 0.5,
+      "residual": "FP union FN at threshold 0.5 vs truth wall label"
+    },
+    "residual_capture": {
+      "definition": "|{rule-flagged handles} intersect residual| / |residual|",
+      "headline_operating_point": "score>=8 (majority of the 16 axioms fire)",
+      "reported_operating_points": [1, 4, 8, 12],
+      "per_rule_decomposition": "for each of the 16 rules, |{rule fires} intersect residual| / |residual|; also split residual into FP and FN."
+    }
+  },
+  "telemetry_contract": "W3-TELEM {wall_seconds, peak_rss_bytes, peak_vram_bytes=N/A(no_GPU), device, budget_charge} dual-recorded in measurement.json and REPORT.md. CPU cap 10h.",
+  "constraints": ["GPU forbidden (M-2 owns the serial GPU queue)", "no val-B / test contact", "no synthetic-pack input", "no git", "no subagents", "absolute paths only"]
+}

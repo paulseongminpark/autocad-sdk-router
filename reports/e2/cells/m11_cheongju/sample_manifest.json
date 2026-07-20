@@ -1,0 +1,275 @@
+[
+  {
+    "idx": 0,
+    "rel": "01 건축(사업승인)/건축/A20-001 실내재료마감표(아파트).dwg",
+    "staged_name": "S00.dwg",
+    "staged_path": "D:\\runs\\e2_program\\cells\\m11_cheongju\\staging\\S00.dwg",
+    "size": 163559
+  },
+  {
+    "idx": 1,
+    "rel": "01 건축(사업승인)/건축/A20-002 실내재료마감표(오피스텔).dwg",
+    "staged_name": "S01.dwg",
+    "staged_path": "D:\\runs\\e2_program\\cells\\m11_cheongju\\staging\\S01.dwg",
+    "size": 165636
+  },
+  {
+    "idx": 2,
+    "rel": "01 건축(사업승인)/건축/A20-011~015 형별성능관계내역(아파트).dwg",
+    "staged_name": "S02.dwg",
+    "staged_path": "D:\\runs\\e2_program\\cells\\m11_cheongju\\staging\\S02.dwg",
+    "size": 772656
+  },
+  {
+    "idx": 3,
+    "rel": "01 건축(사업승인)/건축/A20-021~024 형별성능관계내역(오피스텔).dwg",
+    "staged_name": "S03.dwg",
+    "staged_path": "D:\\runs\\e2_program\\cells\\m11_cheongju\\staging\\S03.dwg",
+    "size": 1187859
+  },
+  {
+    "idx": 4,
+    "rel": "01 건축(사업승인)/건축/A30-001~013 단위세대 평면도(기본형).dwg",
+    "staged_name": "S04.dwg",
+    "staged_path": "D:\\runs\\e2_program\\cells\\m11_cheongju\\staging\\S04.dwg",
+    "size": 2333679
+  },
+  {
+    "idx": 5,
+    "rel": "01 건축(사업승인)/건축/A30-002~016 단위세대 평면도(확장형),오피스텔 단위 평면도.dwg",
+    "staged_name": "S05.dwg",
+    "staged_path": "D:\\runs\\e2_program\\cells\\m11_cheongju\\staging\\S05.dwg",
+    "size": 5443305
+  },
+  {
+    "idx": 6,
+    "rel": "01 건축(사업승인)/건축/A30-101~116 주단면도(확장형).dwg",
+    "staged_name": "S06.dwg",
+    "staged_path": "D:\\runs\\e2_program\\cells\\m11_cheongju\\staging\\S06.dwg",
+    "size": 5471184
+  },
+  {
+    "idx": 7,
+    "rel": "01 건축(사업승인)/건축/A40-001~082 101~108동 평면도(지하층).dwg",
+    "staged_name": "S07.dwg",
+    "staged_path": "D:\\runs\\e2_program\\cells\\m11_cheongju\\staging\\S07.dwg",
+    "size": 2705141
+  },
+  {
+    "idx": 8,
+    "rel": "01 건축(사업승인)/건축/A40-003~087 101~108동 평면도.dwg",
+    "staged_name": "S08.dwg",
+    "staged_path": "D:\\runs\\e2_program\\cells\\m11_cheongju\\staging\\S08.dwg",
+    "size": 5685455
+  },
+  {
+    "idx": 9,
+    "rel": "01 건축(사업승인)/건축/A40-011~089 101~108동 입면도.dwg",
+    "staged_name": "S09.dwg",
+    "staged_path": "D:\\runs\\e2_program\\cells\\m11_cheongju\\staging\\S09.dwg",
+    "size": 3754153
+  },
+  {
+    "idx": 10,
+    "rel": "01 건축(사업승인)/건축/A40-201~215 101동 코아확대 평면도.dwg",
+    "staged_name": "S10.dwg",
+    "staged_path": "D:\\runs\\e2_program\\cells\\m11_cheongju\\staging\\S10.dwg",
+    "size": 7464302
+  },
+  {
+    "idx": 11,
+    "rel": "01 건축(사업승인)/건축/A40-205~357 101동~108동 코아단면도.dwg",
+    "staged_name": "S11.dwg",
+    "staged_path": "D:\\runs\\e2_program\\cells\\m11_cheongju\\staging\\S11.dwg",
+    "size": 9233786
+  },
+  {
+    "idx": 12,
+    "rel": "01 건축(사업승인)/건축/A40-221~235 102동 코아확대 평면도.dwg",
+    "staged_name": "S12.dwg",
+    "staged_path": "D:\\runs\\e2_program\\cells\\m11_cheongju\\staging\\S12.dwg",
+    "size": 7262319
+  },
+  {
+    "idx": 13,
+    "rel": "01 건축(사업승인)/건축/A40-241~253 103동 코아확대 평면도.dwg",
+    "staged_name": "S13.dwg",
+    "staged_path": "D:\\runs\\e2_program\\cells\\m11_cheongju\\staging\\S13.dwg",
+    "size": 7215453
+  },
+  {
+    "idx": 14,
+    "rel": "01 건축(사업승인)/건축/A40-261~275 104동 코아확대 평면도.dwg",
+    "staged_name": "S14.dwg",
+    "staged_path": "D:\\runs\\e2_program\\cells\\m11_cheongju\\staging\\S14.dwg",
+    "size": 7287178
+  },
+  {
+    "idx": 15,
+    "rel": "01 건축(사업승인)/건축/A40-281~294 105동 코아확대 평면도.dwg",
+    "staged_name": "S15.dwg",
+    "staged_path": "D:\\runs\\e2_program\\cells\\m11_cheongju\\staging\\S15.dwg",
+    "size": 7233282
+  },
+  {
+    "idx": 16,
+    "rel": "01 건축(사업승인)/건축/A40-301~314 106동 코아확대 평면도.dwg",
+    "staged_name": "S16.dwg",
+    "staged_path": "D:\\runs\\e2_program\\cells\\m11_cheongju\\staging\\S16.dwg",
+    "size": 7237950
+  },
+  {
+    "idx": 17,
+    "rel": "01 건축(사업승인)/건축/A40-321~337 107동 코아확대 평면도.dwg",
+    "staged_name": "S17.dwg",
+    "staged_path": "D:\\runs\\e2_program\\cells\\m11_cheongju\\staging\\S17.dwg",
+    "size": 7310279
+  },
+  {
+    "idx": 18,
+    "rel": "01 건축(사업승인)/건축/A40-341~355 108동 코아확대 평면도.dwg",
+    "staged_name": "S18.dwg",
+    "staged_path": "D:\\runs\\e2_program\\cells\\m11_cheongju\\staging\\S18.dwg",
+    "size": 7408173
+  },
+  {
+    "idx": 19,
+    "rel": "01 건축(사업승인)/건축/A60-001~016 방수,단열,결로방지 평면도.dwg",
+    "staged_name": "S19.dwg",
+    "staged_path": "D:\\runs\\e2_program\\cells\\m11_cheongju\\staging\\S19.dwg",
+    "size": 6377729
+  },
+  {
+    "idx": 20,
+    "rel": "01 건축(사업승인)/건축/A60-101~125 단위세대 창호일람표.dwg",
+    "staged_name": "S20.dwg",
+    "staged_path": "D:\\runs\\e2_program\\cells\\m11_cheongju\\staging\\S20.dwg",
+    "size": 1768639
+  },
+  {
+    "idx": 21,
+    "rel": "01 건축(사업승인)/건축/A60-201~204 공통 창호일람표.dwg",
+    "staged_name": "S21.dwg",
+    "staged_path": "D:\\runs\\e2_program\\cells\\m11_cheongju\\staging\\S21.dwg",
+    "size": 1527987
+  },
+  {
+    "idx": 22,
+    "rel": "01 건축(사업승인)/건축/A70-001~002 실내재료마감표(부대복리시설).dwg",
+    "staged_name": "S22.dwg",
+    "staged_path": "D:\\runs\\e2_program\\cells\\m11_cheongju\\staging\\S22.dwg",
+    "size": 197487
+  },
+  {
+    "idx": 23,
+    "rel": "01 건축(사업승인)/건축/A70-011~015 형별성능관계내역(공동주택부대시설).dwg",
+    "staged_name": "S23.dwg",
+    "staged_path": "D:\\runs\\e2_program\\cells\\m11_cheongju\\staging\\S23.dwg",
+    "size": 442905
+  },
+  {
+    "idx": 24,
+    "rel": "01 건축(사업승인)/건축/A80-101~106 지하주차장 램프 평면,단면도.dwg",
+    "staged_name": "S24.dwg",
+    "staged_path": "D:\\runs\\e2_program\\cells\\m11_cheongju\\staging\\S24.dwg",
+    "size": 4206791
+  },
+  {
+    "idx": 25,
+    "rel": "01 건축(사업승인)/표제부/A00-011 조감도.dwg",
+    "staged_name": "S25.dwg",
+    "staged_path": "D:\\runs\\e2_program\\cells\\m11_cheongju\\staging\\S25.dwg",
+    "size": 64447548
+  },
+  {
+    "idx": 26,
+    "rel": "01 건축(사업승인)/표제부/A00-013 대지구적도.dwg",
+    "staged_name": "S26.dwg",
+    "staged_path": "D:\\runs\\e2_program\\cells\\m11_cheongju\\staging\\S26.dwg",
+    "size": 148682
+  },
+  {
+    "idx": 27,
+    "rel": "01 건축(사업승인)/표제부/A00-014 지구단위계획.dwg",
+    "staged_name": "S27.dwg",
+    "staged_path": "D:\\runs\\e2_program\\cells\\m11_cheongju\\staging\\S27.dwg",
+    "size": 1293533
+  },
+  {
+    "idx": 28,
+    "rel": "01 건축(사업승인)/표제부/A00-020 인동거리배치도.dwg",
+    "staged_name": "S28.dwg",
+    "staged_path": "D:\\runs\\e2_program\\cells\\m11_cheongju\\staging\\S28.dwg",
+    "size": 3654139
+  },
+  {
+    "idx": 29,
+    "rel": "01 건축(사업승인)/표제부/A00-021~023 대지종횡단면도.dwg",
+    "staged_name": "S29.dwg",
+    "staged_path": "D:\\runs\\e2_program\\cells\\m11_cheongju\\staging\\S29.dwg",
+    "size": 444685
+  },
+  {
+    "idx": 30,
+    "rel": "01 건축(사업승인)/표제부/A00-045~046 기준층 및 지상1층 방화구획평면도.dwg",
+    "staged_name": "S30.dwg",
+    "staged_path": "D:\\runs\\e2_program\\cells\\m11_cheongju\\staging\\S30.dwg",
+    "size": 7048520
+  },
+  {
+    "idx": 31,
+    "rel": "01 건축(사업승인)/표제부/A10-001~009 단위세대면적산출표.dwg",
+    "staged_name": "S31.dwg",
+    "staged_path": "D:\\runs\\e2_program\\cells\\m11_cheongju\\staging\\S31.dwg",
+    "size": 1880825
+  },
+  {
+    "idx": 32,
+    "rel": "01 건축(사업승인)/표제부/A10-101~108 코어면적산출표.dwg",
+    "staged_name": "S32.dwg",
+    "staged_path": "D:\\runs\\e2_program\\cells\\m11_cheongju\\staging\\S32.dwg",
+    "size": 2899000
+  },
+  {
+    "idx": 33,
+    "rel": "01 건축(사업승인)/표제부/A10-301~302 지하층면적산출표.dwg",
+    "staged_name": "S33.dwg",
+    "staged_path": "D:\\runs\\e2_program\\cells\\m11_cheongju\\staging\\S33.dwg",
+    "size": 2239799
+  },
+  {
+    "idx": 34,
+    "rel": "01_건축(실시설계)/01.DWG/00.표제부/A00-013 대지구적도.dwg",
+    "staged_name": "S34.dwg",
+    "staged_path": "D:\\runs\\e2_program\\cells\\m11_cheongju\\staging\\S34.dwg",
+    "size": 192577
+  },
+  {
+    "idx": 35,
+    "rel": "01_건축(실시설계)/01.DWG/00.표제부/A00-018 단지배치도.dwg",
+    "staged_name": "S35.dwg",
+    "staged_path": "D:\\runs\\e2_program\\cells\\m11_cheongju\\staging\\S35.dwg",
+    "size": 4361389
+  },
+  {
+    "idx": 36,
+    "rel": "01_건축(실시설계)/01.DWG/00.표제부/A00-020 인동거리배치도.dwg",
+    "staged_name": "S36.dwg",
+    "staged_path": "D:\\runs\\e2_program\\cells\\m11_cheongju\\staging\\S36.dwg",
+    "size": 3393096
+  },
+  {
+    "idx": 37,
+    "rel": "01_건축(실시설계)/01.DWG/00.표제부/A00-021~023 대지종횡단면도.dwg",
+    "staged_name": "S37.dwg",
+    "staged_path": "D:\\runs\\e2_program\\cells\\m11_cheongju\\staging\\S37.dwg",
+    "size": 3282326
+  },
+  {
+    "idx": 38,
+    "rel": "01_건축(실시설계)/01.DWG/00.표제부/A00-025~026 지하교통체계도.dwg",
+    "staged_name": "S38.dwg",
+    "staged_path": "D:\\runs\\e2_program\\cells\\m11_cheongju\\staging\\S38.dwg",
+    "size": 2227123
+  }
+]

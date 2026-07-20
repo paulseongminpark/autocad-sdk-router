@@ -1,0 +1,534 @@
+{
+  "schema": "e2.m11.prereg_local.v1",
+  "cell": "m11_cheongju",
+  "generated_at": "2026-07-20T15:54:22.599301+09:00",
+  "parent_prereg_sha_prefix": "1348c40b",
+  "archive_root": "D:\\dev\\_ariadne\\alm\\build\\실시도면 자료",
+  "archive_dwg_population": 144,
+  "read_only_invariant": "originals never modified; analysis only on ASCII-named staged copies",
+  "identity_key": {
+    "definition": "relative path from archive_root, POSIX '/', NFC-normalized, UTF-8 bytes",
+    "rationale": "archive contains duplicate basenames across subdirectories; basename-only sort/hash would be non-deterministic, so full rel_path is the canonical file identity for BOTH ordering and hashing."
+  },
+  "sample_rule": {
+    "set_A": "first 24 files by identity-key ascending (ordinal)",
+    "set_B": "files whose SHA-256(identity_key)[first hex nibble] in {0,2,4,6,8}; take first 24 by identity-key ascending",
+    "sample": "union(A,B) deduplicated, ordered by identity-key; expected <= 48",
+    "hash_algo": "sha256 over identity_key UTF-8 bytes"
+  },
+  "sample_size": 39,
+  "set_A_count": 24,
+  "set_B_pool_count": 51,
+  "set_B_count": 24,
+  "extraction_plan": {
+    "engine": "cad.* MCP cad_inspect_drawing (native ObjectARX/ObjectDBX first) with router fallback (same engine)",
+    "mode": "rich (include_rich=true) to obtain symbol tables: layer names, block defs, text styles, plus per-entity handle/owner",
+    "handparse": "forbidden"
+  },
+  "axis_lexicon": {
+    "wall": [
+      "벽",
+      "wall",
+      "내력벽",
+      "조적",
+      "벽체",
+      "cw",
+      "brick"
+    ],
+    "column": [
+      "기둥",
+      "column",
+      "col",
+      "pillar"
+    ],
+    "opening": [
+      "문",
+      "창",
+      "창호",
+      "개구부",
+      "door",
+      "window",
+      "win",
+      "출입구",
+      "sash",
+      "sd",
+      "wd"
+    ],
+    "dimension": [
+      "치수",
+      "dim",
+      "dimension"
+    ],
+    "text_note": [
+      "문자",
+      "텍스트",
+      "text",
+      "txt",
+      "주기",
+      "note",
+      "leader"
+    ],
+    "slab_floor": [
+      "슬래브",
+      "slab",
+      "바닥",
+      "flr",
+      "floor"
+    ],
+    "stair": [
+      "계단",
+      "stair",
+      "str"
+    ],
+    "finish_hatch": [
+      "마감",
+      "finish",
+      "fin",
+      "해치",
+      "hatch"
+    ],
+    "grid_axis": [
+      "그리드",
+      "grid",
+      "axis",
+      "통구",
+      "열",
+      "축선"
+    ],
+    "room_space": [
+      "실",
+      "room",
+      "면적",
+      "area",
+      "공간"
+    ]
+  },
+  "axis_thresholds": {
+    "axis1_definition_vocabulary": {
+      "M1a": "fraction of extracted sheets with >=1 layer OR block name matching lexicon (case-insensitive substring)",
+      "M1b": "count of DISTINCT semantic categories (of 10) matched across the sample",
+      "PASS": "M1a >= 0.50 AND M1b >= 5",
+      "FAIL": "M1a < 0.20",
+      "INCONCLUSIVE": "otherwise, or extraction_coverage < 0.60"
+    },
+    "axis2_handle_system": {
+      "M2a": "fraction of extracted sheets where every extracted entity has a non-empty handle",
+      "M2b": "fraction of extracted sheets with no duplicate handle among extracted entities",
+      "M2c": "fraction of extracted sheets where entities carry a resolvable owner (layout/space non-null)",
+      "PASS": "M2a >= 0.95 AND M2b >= 0.95 AND M2c >= 0.95",
+      "FAIL": "M2a < 0.80",
+      "INCONCLUSIVE": "otherwise"
+    },
+    "axis3_annotation_feasibility": {
+      "wall_candidates": "LINE + LWPOLYLINE + POLYLINE (+ ARC) counts per sheet",
+      "text_count": "TEXT + MTEXT per sheet",
+      "M3a": "median n_entities over extracted sheets",
+      "M3b": "fraction of sheets with wall_candidates >= 20",
+      "M3c": "fraction of sheets with text_count >= 1",
+      "PASS": "M3a >= 100 AND M3b >= 0.60 AND M3c >= 0.80",
+      "FAIL": "M3a < 30 OR M3c < 0.30",
+      "INCONCLUSIVE": "otherwise"
+    }
+  },
+  "overall_rule": {
+    "QUALIFIED": "all 3 axes PASS",
+    "NOT_QUALIFIED": ">=1 axis FAIL",
+    "PARTIAL": "no FAIL but not all PASS (mix of PASS/INCONCLUSIVE)"
+  },
+  "lineage_crossref": {
+    "ee_census_features_csv": "C:\\Users\\PAUL\\Desktop\\0713_research\\experiments\\PROGRAM_20260717\\E-E_census\\census_features.csv",
+    "note": "prior full-144 census of same archive (PROGRAM campaign, not this cell); used only as corroborating cross-reference for geometry-density axis, NOT as substitute for fresh handle/vocabulary extraction"
+  },
+  "selected_files": [
+    {
+      "idx": 0,
+      "rel": "01 건축(사업승인)/건축/A20-001 실내재료마감표(아파트).dwg",
+      "sha256_name": "4f53e444bde5530fe46521be85066fdb409f254f9bd1999db0e8cb230260a69b",
+      "in_A": true,
+      "in_B": true,
+      "size": 163559,
+      "staged_name": "S00.dwg",
+      "staged_sha256": "702eb0a657f00a37d5c71152b84b460b34d45e3d2fb107d143ef2f3a6d029879"
+    },
+    {
+      "idx": 1,
+      "rel": "01 건축(사업승인)/건축/A20-002 실내재료마감표(오피스텔).dwg",
+      "sha256_name": "5ec71b5cce0ccef502eab3cc3ec3a5820cce32ddf2a656df48534766bc4f1683",
+      "in_A": true,
+      "in_B": false,
+      "size": 165636,
+      "staged_name": "S01.dwg",
+      "staged_sha256": "9ac4eef2d4eadf7f295fd2a787ef8e14c25b0dab9ec94e9d4313abfdfacc8eb6"
+    },
+    {
+      "idx": 2,
+      "rel": "01 건축(사업승인)/건축/A20-011~015 형별성능관계내역(아파트).dwg",
+      "sha256_name": "0373787d4a6cfec4edee8e5fe15d42713a54d15d6af7854d98aac3dce9671d6f",
+      "in_A": true,
+      "in_B": true,
+      "size": 772656,
+      "staged_name": "S02.dwg",
+      "staged_sha256": "584f480ebdc968c970b5de294bdcaf897a8b0bb6c66f2789939a8dd3cda655c8"
+    },
+    {
+      "idx": 3,
+      "rel": "01 건축(사업승인)/건축/A20-021~024 형별성능관계내역(오피스텔).dwg",
+      "sha256_name": "bd76e6d686757b2c3c3e49f044ba8db866d15052d24f8841dd67bade419888c7",
+      "in_A": true,
+      "in_B": false,
+      "size": 1187859,
+      "staged_name": "S03.dwg",
+      "staged_sha256": "74cd648d945bfa7a6f9e6ee404d3c80ac5131159d38e9426fd2685e37c08f633"
+    },
+    {
+      "idx": 4,
+      "rel": "01 건축(사업승인)/건축/A30-001~013 단위세대 평면도(기본형).dwg",
+      "sha256_name": "5081d6b013b6ce9de60dfe0d6f62d406e9a52398b695ebc0b514bc847287968c",
+      "in_A": true,
+      "in_B": false,
+      "size": 2333679,
+      "staged_name": "S04.dwg",
+      "staged_sha256": "26cf4997fd4eae37a5f73fa7c0b1f60d8d823c348d6c140670bf026a68e01163"
+    },
+    {
+      "idx": 5,
+      "rel": "01 건축(사업승인)/건축/A30-002~016 단위세대 평면도(확장형),오피스텔 단위 평면도.dwg",
+      "sha256_name": "d7af07eabd8cd122dfac46de4f26653b10ccf9de005637f105e70e9089c003c8",
+      "in_A": true,
+      "in_B": false,
+      "size": 5443305,
+      "staged_name": "S05.dwg",
+      "staged_sha256": "154917e050c720a602a5cc1391c04aaf1e5ce70781e222402f024d4bf72e0142"
+    },
+    {
+      "idx": 6,
+      "rel": "01 건축(사업승인)/건축/A30-101~116 주단면도(확장형).dwg",
+      "sha256_name": "ae6c49a83d962d4d4648d5bec6b0b20bf73cd2cdabce2d101331bd4ca8decc4c",
+      "in_A": true,
+      "in_B": false,
+      "size": 5471184,
+      "staged_name": "S06.dwg",
+      "staged_sha256": "cc1bd52c4e2b9435413d76bcebd7821921b8c4eb4de5e18ea420b507591fc73c"
+    },
+    {
+      "idx": 7,
+      "rel": "01 건축(사업승인)/건축/A40-001~082 101~108동 평면도(지하층).dwg",
+      "sha256_name": "47a5e4f9750ba7ed54e9918c61f89d10c026a01052946cee5bd358c2d15551cd",
+      "in_A": true,
+      "in_B": true,
+      "size": 2705141,
+      "staged_name": "S07.dwg",
+      "staged_sha256": "d7eb62c2b393a04f94a2605a1459e7823e0020e16c7a250be72fde242ec453bf"
+    },
+    {
+      "idx": 8,
+      "rel": "01 건축(사업승인)/건축/A40-003~087 101~108동 평면도.dwg",
+      "sha256_name": "d57ddc3d653fe5fc3622802a668fed1a5c51c33f6a409e188b26fa1005cceb9d",
+      "in_A": true,
+      "in_B": false,
+      "size": 5685455,
+      "staged_name": "S08.dwg",
+      "staged_sha256": "1560dad9d093456df1b25ce2ef03ba557de37aa218ee384573e91bd533301977"
+    },
+    {
+      "idx": 9,
+      "rel": "01 건축(사업승인)/건축/A40-011~089 101~108동 입면도.dwg",
+      "sha256_name": "632d2168d675cc7b2cdbb0baeadd0cefb10f443f6bc18293cd4650f4803af853",
+      "in_A": true,
+      "in_B": true,
+      "size": 3754153,
+      "staged_name": "S09.dwg",
+      "staged_sha256": "b6cdc4d4b5cb210ceaf104ee99fc79b3c1ef46eeff3307db5047ce24f48a266c"
+    },
+    {
+      "idx": 10,
+      "rel": "01 건축(사업승인)/건축/A40-201~215 101동 코아확대 평면도.dwg",
+      "sha256_name": "8f9eeb977014b24964b4e8e06bbb7ca65e328fdc1a004ce9a149d6e3c6c197e9",
+      "in_A": true,
+      "in_B": true,
+      "size": 7464302,
+      "staged_name": "S10.dwg",
+      "staged_sha256": "b9b9cbaec61224e3402f7c64b5a9d95820278f265eed3d13a157c6f8362055e0"
+    },
+    {
+      "idx": 11,
+      "rel": "01 건축(사업승인)/건축/A40-205~357 101동~108동 코아단면도.dwg",
+      "sha256_name": "6f6c70d737ca030aa28b2d62a0a9e578d1a6d1f4fe59b17cd7f7c052adf346a5",
+      "in_A": true,
+      "in_B": true,
+      "size": 9233786,
+      "staged_name": "S11.dwg",
+      "staged_sha256": "ff22d575903f5fd1e775a4647dbe15ccc2de528d892eed13e15df534d4793fac"
+    },
+    {
+      "idx": 12,
+      "rel": "01 건축(사업승인)/건축/A40-221~235 102동 코아확대 평면도.dwg",
+      "sha256_name": "1c500276c26e2460f504cee794fa113fc4dd425eb37f6a1c496ce674a52e27cd",
+      "in_A": true,
+      "in_B": false,
+      "size": 7262319,
+      "staged_name": "S12.dwg",
+      "staged_sha256": "1b61caba3d9e6fb25c8164529694c3c2191235586132594d09d17a8dd562c56a"
+    },
+    {
+      "idx": 13,
+      "rel": "01 건축(사업승인)/건축/A40-241~253 103동 코아확대 평면도.dwg",
+      "sha256_name": "6fa91bd49da47c1e522df54672525e6f3c49d315a2a789e1e768b68dbe96a2a7",
+      "in_A": true,
+      "in_B": true,
+      "size": 7215453,
+      "staged_name": "S13.dwg",
+      "staged_sha256": "9c2ba7026b151f24f2bcd18fe5528b696ff6e9ae3f71af0e786e0b79b8509c63"
+    },
+    {
+      "idx": 14,
+      "rel": "01 건축(사업승인)/건축/A40-261~275 104동 코아확대 평면도.dwg",
+      "sha256_name": "306c84767d39e944264dab8f7d8e098a56ed7cbe3de0ae4edce41a608544eeaf",
+      "in_A": true,
+      "in_B": false,
+      "size": 7287178,
+      "staged_name": "S14.dwg",
+      "staged_sha256": "6dab17afbeb1d3b3bb25eafba13983922eb5d486056105efb0150a90f4466548"
+    },
+    {
+      "idx": 15,
+      "rel": "01 건축(사업승인)/건축/A40-281~294 105동 코아확대 평면도.dwg",
+      "sha256_name": "47a78f5562c41e867a8f06b010e72450e0a3d706b962ba61409668d41302556f",
+      "in_A": true,
+      "in_B": true,
+      "size": 7233282,
+      "staged_name": "S15.dwg",
+      "staged_sha256": "15ae0e5f0f9afcb15097efff559000f000df0d3f94d0715b8c065100c74aba57"
+    },
+    {
+      "idx": 16,
+      "rel": "01 건축(사업승인)/건축/A40-301~314 106동 코아확대 평면도.dwg",
+      "sha256_name": "10100ab9445ae5c06f6e1207937f4add37240272884e33cf98dcc5576a74645c",
+      "in_A": true,
+      "in_B": false,
+      "size": 7237950,
+      "staged_name": "S16.dwg",
+      "staged_sha256": "05d95d9a3fe29b846044d35535fb17f78cb13a0f6df697dd56a1ccff991d3c3f"
+    },
+    {
+      "idx": 17,
+      "rel": "01 건축(사업승인)/건축/A40-321~337 107동 코아확대 평면도.dwg",
+      "sha256_name": "966bf31011f7e065327d4495ac4828e286e4dbb4c92ba287a1eb54e155c7c3ff",
+      "in_A": true,
+      "in_B": false,
+      "size": 7310279,
+      "staged_name": "S17.dwg",
+      "staged_sha256": "411ff706cf19410d459f42cb32d76f1ebfc6db837b56afb738e8ed4b416c26e7"
+    },
+    {
+      "idx": 18,
+      "rel": "01 건축(사업승인)/건축/A40-341~355 108동 코아확대 평면도.dwg",
+      "sha256_name": "ffd322d743b0ca0ab560335c70256566ee34f97dce06539b4f68ba6cb24378ed",
+      "in_A": true,
+      "in_B": false,
+      "size": 7408173,
+      "staged_name": "S18.dwg",
+      "staged_sha256": "f5dafb2bb78017908f52b7f0d06bdedb63d48280f6b9d98ae49a062a4c0dba3e"
+    },
+    {
+      "idx": 19,
+      "rel": "01 건축(사업승인)/건축/A60-001~016 방수,단열,결로방지 평면도.dwg",
+      "sha256_name": "b9871d648d018f015f83742630f2c5136aec6851b01f3240da97a3d12f29d791",
+      "in_A": true,
+      "in_B": false,
+      "size": 6377729,
+      "staged_name": "S19.dwg",
+      "staged_sha256": "3ea957aaaa0def6162732c1d30383324c54b475076898059de8ede88ef9a1dc5"
+    },
+    {
+      "idx": 20,
+      "rel": "01 건축(사업승인)/건축/A60-101~125 단위세대 창호일람표.dwg",
+      "sha256_name": "e70222dc194bff8a67eb1c078e215bd2e428e72c81c2c82a498f559e5f525af2",
+      "in_A": true,
+      "in_B": false,
+      "size": 1768639,
+      "staged_name": "S20.dwg",
+      "staged_sha256": "8907e568113edc32692d4ed4c1aaec2486f4bbbd6827d7efb11c2737c30ec9c4"
+    },
+    {
+      "idx": 21,
+      "rel": "01 건축(사업승인)/건축/A60-201~204 공통 창호일람표.dwg",
+      "sha256_name": "fee4201d92b7af97408239c9579fb38eba8c0f27f432b04cdf8dc072c1dcd30b",
+      "in_A": true,
+      "in_B": false,
+      "size": 1527987,
+      "staged_name": "S21.dwg",
+      "staged_sha256": "fd792c1837e8df894e050b15982f367b0bc26e32eb143d820f7b0e8c05a6af34"
+    },
+    {
+      "idx": 22,
+      "rel": "01 건축(사업승인)/건축/A70-001~002 실내재료마감표(부대복리시설).dwg",
+      "sha256_name": "cf2d22b26cd6d1e448a06fcc3d759874e1c44b7fde2723fe17efee0275fb95b8",
+      "in_A": true,
+      "in_B": false,
+      "size": 197487,
+      "staged_name": "S22.dwg",
+      "staged_sha256": "88e99c184107711beb274bcd5f124cf723453b03b758f0753d1cee39fd26e1c8"
+    },
+    {
+      "idx": 23,
+      "rel": "01 건축(사업승인)/건축/A70-011~015 형별성능관계내역(공동주택부대시설).dwg",
+      "sha256_name": "081c44e8a23f08f9d13f91abeca225a76eef68d8fbaa7b4f394be4b8733bb272",
+      "in_A": true,
+      "in_B": true,
+      "size": 442905,
+      "staged_name": "S23.dwg",
+      "staged_sha256": "2cf0edd30ace01c5eaaf2ada457ed8a8e4eaaaf831c4ff7930424c927cc423b0"
+    },
+    {
+      "idx": 24,
+      "rel": "01 건축(사업승인)/건축/A80-101~106 지하주차장 램프 평면,단면도.dwg",
+      "sha256_name": "06dafadc1a5e8932422a017ae8d6612700eb4ada544e4ed286b397acc7179968",
+      "in_A": false,
+      "in_B": true,
+      "size": 4206791,
+      "staged_name": "S24.dwg",
+      "staged_sha256": "84c3c3eb7bc9189ad784f5e55fa0eb388d4382b7ea3c5d80e3540d0440a6831b"
+    },
+    {
+      "idx": 25,
+      "rel": "01 건축(사업승인)/표제부/A00-011 조감도.dwg",
+      "sha256_name": "8471fade69c62cb13e3fd411136c42cfbc7b22f111ed860572d0cfff7a99b3e3",
+      "in_A": false,
+      "in_B": true,
+      "size": 64447548,
+      "staged_name": "S25.dwg",
+      "staged_sha256": "28c817e39b3929000eecc4fcf59fbd456f7d272cc95133cdb7390c9e81dc186c"
+    },
+    {
+      "idx": 26,
+      "rel": "01 건축(사업승인)/표제부/A00-013 대지구적도.dwg",
+      "sha256_name": "82cb7a7a1e22971729d549def8d0ed4f997b39e4d7057985acc1be273b585ca1",
+      "in_A": false,
+      "in_B": true,
+      "size": 148682,
+      "staged_name": "S26.dwg",
+      "staged_sha256": "28f2d5d48da70ab724120f69cbff93135c6a3b7b4827c45cca01959260dc0ecf"
+    },
+    {
+      "idx": 27,
+      "rel": "01 건축(사업승인)/표제부/A00-014 지구단위계획.dwg",
+      "sha256_name": "64c4f39eb8cc255c6730022a4ce9d600e54ce550b73194c9e4a40599fb7db8ce",
+      "in_A": false,
+      "in_B": true,
+      "size": 1293533,
+      "staged_name": "S27.dwg",
+      "staged_sha256": "76d6eeb0a1f65ec1cc470e31bfc1375b363c8de74eedeba775754a9fc18efa8d"
+    },
+    {
+      "idx": 28,
+      "rel": "01 건축(사업승인)/표제부/A00-020 인동거리배치도.dwg",
+      "sha256_name": "8ae265101633e761ebe8546bb6ecb7ae855b5f2588899ef98b42c3fe5bf562f5",
+      "in_A": false,
+      "in_B": true,
+      "size": 3654139,
+      "staged_name": "S28.dwg",
+      "staged_sha256": "b2fba7096859a44a8829ca8d942f2b82fedd1e26d49ff83c10be333c5afaedcb"
+    },
+    {
+      "idx": 29,
+      "rel": "01 건축(사업승인)/표제부/A00-021~023 대지종횡단면도.dwg",
+      "sha256_name": "2782db2bb8ee19981933f15e510652660a53852e66facce80666344f4abd5337",
+      "in_A": false,
+      "in_B": true,
+      "size": 444685,
+      "staged_name": "S29.dwg",
+      "staged_sha256": "4822a64a786c5f59952fae74ffb1a65b9474a141ca5f5b9c8155b0fb7576e6a1"
+    },
+    {
+      "idx": 30,
+      "rel": "01 건축(사업승인)/표제부/A00-045~046 기준층 및 지상1층 방화구획평면도.dwg",
+      "sha256_name": "24a16c5c1992615c3bda3e681b73a54df7e56115abca2c558630c5de6aa677ef",
+      "in_A": false,
+      "in_B": true,
+      "size": 7048520,
+      "staged_name": "S30.dwg",
+      "staged_sha256": "3418b51d92ebd1c49763abb639afa45a896322a5c792ac32bd31d1a57b4a964c"
+    },
+    {
+      "idx": 31,
+      "rel": "01 건축(사업승인)/표제부/A10-001~009 단위세대면적산출표.dwg",
+      "sha256_name": "00718746d3ad3d66e54d444936049c65e3fa3fdf37a3cb89e57e956e5cfb52fd",
+      "in_A": false,
+      "in_B": true,
+      "size": 1880825,
+      "staged_name": "S31.dwg",
+      "staged_sha256": "157617b28735cfc546ad01508c4d37f644b8acf01733c746f3ef4b02832594c5"
+    },
+    {
+      "idx": 32,
+      "rel": "01 건축(사업승인)/표제부/A10-101~108 코어면적산출표.dwg",
+      "sha256_name": "416e3aad368bb24d783e67db77107db3ac08f209102848d12cab3c4ccdded14b",
+      "in_A": false,
+      "in_B": true,
+      "size": 2899000,
+      "staged_name": "S32.dwg",
+      "staged_sha256": "dfa0239b32f4c0caa2b25dadef4da2c7ad3540d554e30c622f501e9ec7a10f39"
+    },
+    {
+      "idx": 33,
+      "rel": "01 건축(사업승인)/표제부/A10-301~302 지하층면적산출표.dwg",
+      "sha256_name": "816ca999bc3f9b1f79d454f6605a887459ab069951e17b9f39d4f24533060888",
+      "in_A": false,
+      "in_B": true,
+      "size": 2239799,
+      "staged_name": "S33.dwg",
+      "staged_sha256": "d54af8915b3cf667d0c221615710976a38b33d8309e6ee4e16da0742b2010e13"
+    },
+    {
+      "idx": 34,
+      "rel": "01_건축(실시설계)/01.DWG/00.표제부/A00-013 대지구적도.dwg",
+      "sha256_name": "4e44d4ccbfe6c42ac419893a79dac6734dc337905b43e6dc5768b5ad4acdd565",
+      "in_A": false,
+      "in_B": true,
+      "size": 192577,
+      "staged_name": "S34.dwg",
+      "staged_sha256": "99bf04683519b3ee43cf5f393712c1152c5bd62a4be85cf1e0330e5f4e0be3e0"
+    },
+    {
+      "idx": 35,
+      "rel": "01_건축(실시설계)/01.DWG/00.표제부/A00-018 단지배치도.dwg",
+      "sha256_name": "63b1a6a7f77f93728ebea98caa11c75560fd5f100edd87c48189c166b5d4ef27",
+      "in_A": false,
+      "in_B": true,
+      "size": 4361389,
+      "staged_name": "S35.dwg",
+      "staged_sha256": "e588b86667fa0eae9a0534d959f13e38d8099d82f2c583ae361c94d2b20179b3"
+    },
+    {
+      "idx": 36,
+      "rel": "01_건축(실시설계)/01.DWG/00.표제부/A00-020 인동거리배치도.dwg",
+      "sha256_name": "6c4636a28baf3f60d90b1547275804e1e46154364561977f506e11ee0449d14c",
+      "in_A": false,
+      "in_B": true,
+      "size": 3393096,
+      "staged_name": "S36.dwg",
+      "staged_sha256": "520d5eec5a3ef9a8826cc93edeca79aab137cbfd4523a6db1ef063d3ce66c37e"
+    },
+    {
+      "idx": 37,
+      "rel": "01_건축(실시설계)/01.DWG/00.표제부/A00-021~023 대지종횡단면도.dwg",
+      "sha256_name": "02c0dbd7b81cd8ad87150b37ba8ee761239ea0b189598864db8d30a18441094f",
+      "in_A": false,
+      "in_B": true,
+      "size": 3282326,
+      "staged_name": "S37.dwg",
+      "staged_sha256": "b71a66043cb1d7b41e2e70c29282b79cdfd94d160bb27edebd30e9142cd4d552"
+    },
+    {
+      "idx": 38,
+      "rel": "01_건축(실시설계)/01.DWG/00.표제부/A00-025~026 지하교통체계도.dwg",
+      "sha256_name": "8aff70e021b99804c2977fdc8c774c62ae6230d236a9513f3a1e03e19cbeb100",
+      "in_A": false,
+      "in_B": true,
+      "size": 2227123,
+      "staged_name": "S38.dwg",
+      "staged_sha256": "ea9c2e5053937ae3c28abfeb71c3c4774b99a7c0cd30ae54580a6427cf9b7ef9"
+    }
+  ]
+}
