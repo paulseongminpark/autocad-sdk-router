@@ -1,0 +1,153 @@
+{
+  "schema": "e2.w3.m2_gnn_andgate.prereg_local.v1",
+  "cell": "e2.w3.m2_gnn_andgate",
+  "sealed_at_utc": "2026-07-20T06:51:45.2348198Z",
+  "sealed_before_numeric_measurement": true,
+  "packet": {
+    "path": "D:\\runs\\e2_program\\build\\PACKET_w3_m2_gnn_andgate.md",
+    "sha256": "5027d82633cc52683c833cfd7776946c5943c6b3f74493ef2e3b2a27ccdcfcf3"
+  },
+  "boundary_quote": "본 보고의 탐지기 사다리·모든 val-A/val-B 수치의 유효 범위는 CubiCasa SEG-IR 우주 한정이다. E1 실무 도면 전이는 미검증이다.",
+  "scope": {
+    "evaluation_surface": "val-A/DEV only",
+    "model_arm": "GNN_A_no_pretrain",
+    "seeds": [17, 29, 43],
+    "device_authorization": "local RTX 5070 Ti, exclusive serial queue, 8 RTX-hour cap",
+    "training_or_refit": "forbidden",
+    "threshold_research": "forbidden",
+    "val_B_drawing_list_read": "forbidden",
+    "test_read": "forbidden",
+    "git": "forbidden",
+    "subagents": "forbidden",
+    "write_root": "D:\\runs\\e2_program\\cells\\w3_m2_gnn_andgate",
+    "all_IO_paths": "absolute"
+  },
+  "sealed_band_text_quote": {
+    "source_path": "D:\\dev\\99_tools\\autocad-sdk-router\\reports\\e2\\prereg_r2_v1.json",
+    "source_sha256": "fc93dad9232cfd877802c1d53996357eccc710daff8cfb2cf7c865bf7f78bcd2",
+    "json_locator": "$.adoption_gates.gnn_formal_band",
+    "quote": "B*(수리분할 0.8315) + 0.05 AUPRC ∧ S-node F1≥0.92 ∧ S-pair F1≥0.80 ∧ style-OOD drop≤0.10 ∧ REL≤0.03 ∧ RES≥0.03"
+  },
+  "bands": {
+    "S-node_F1": {
+      "operational_definition_status": "DISCOVERED",
+      "threshold": 0.92,
+      "comparison": ">=",
+      "operational_definition": "For each frozen GNN-A seed checkpoint, score every common-handle segment node in the sealed val-A drawings using full-graph inference. A positive truth label is handle membership in truth.wall_handles_flat. Predict positive when sigmoid probability >= 0.5; pool TP/FP/FN over all val-A common-handle nodes, compute F1 = 2*precision*recall/(precision+recall), then use the arithmetic mean of the three seed F1 point estimates as the band statistic.",
+      "verbatim_sources": [
+        {
+          "path": "D:\\dev\\99_tools\\autocad-sdk-router\\reports\\e2\\cells\\gnn_formal\\prereg.json",
+          "sha256": "53d10948a0e56f98cab77dfb962d8db5b6ccdbc639a962ff7327bbe4878bcaca",
+          "locator": "$.frozen.universe.evaluation_universe",
+          "quote": "val-A only"
+        },
+        {
+          "path": "D:\\dev\\99_tools\\autocad-sdk-router\\reports\\e2\\cells\\gnn_formal\\prereg.json",
+          "sha256": "53d10948a0e56f98cab77dfb962d8db5b6ccdbc639a962ff7327bbe4878bcaca",
+          "locator": "$.frozen.graph.topology",
+          "quote": "one graph per drawing; segment nodes; frozen typed directed edges"
+        },
+        {
+          "path": "D:\\dev\\99_tools\\autocad-sdk-router\\reports\\e2\\cells\\gnn_formal\\prereg.json",
+          "sha256": "53d10948a0e56f98cab77dfb962d8db5b6ccdbc639a962ff7327bbe4878bcaca",
+          "locator": "$.frozen.arms.GNN_A_no_pretrain.architecture",
+          "quote": "17 -> 64 projection; 2 typed message-passing layers; node binary head"
+        },
+        {
+          "path": "D:\\dev\\99_tools\\autocad-sdk-router\\reports\\e2\\cells\\gnn_formal\\prereg.json",
+          "sha256": "53d10948a0e56f98cab77dfb962d8db5b6ccdbc639a962ff7327bbe4878bcaca",
+          "locator": "$.frozen.metrics.primary",
+          "quote": "val-A pooled per-handle AUPRC; val-A F1 at threshold 0.5"
+        },
+        {
+          "path": "D:\\dev\\99_tools\\autocad-sdk-router\\reports\\e2\\cells\\gnn_formal\\prereg.json",
+          "sha256": "53d10948a0e56f98cab77dfb962d8db5b6ccdbc639a962ff7327bbe4878bcaca",
+          "locator": "$.frozen.metrics.seed_aggregation",
+          "quote": "three seed point estimates plus arithmetic mean and population SD"
+        },
+        {
+          "path": "D:\\dev\\99_tools\\autocad-sdk-router\\reports\\e2\\cells\\gnn_formal\\gnn_formal.py",
+          "sha256": "0413f1035de76ab8a175c37c291c3fca634a2f1effb8135b5371aa357d5a94c0",
+          "locator": "build_datasets lines 1119-1163; point_metrics lines 868-894; metric_summary lines 929-939",
+          "quote": "wall_handles = {str(value) for value in truth[\"wall_handles_flat\"]}; labels = np.asarray([handle in wall_handles for handle in handles], dtype=np.int8); predicted = probability >= THRESHOLD; f1 = 2.0 * precision * recall / (precision + recall); values.mean(); values.std(ddof=0)"
+        }
+      ]
+    },
+    "S-pair_F1": {
+      "operational_definition_status": "BLOCKED_INPUT",
+      "threshold": 0.80,
+      "comparison": ">=",
+      "reason": "The authorized sources preserve the threshold text but disclose no candidate-pair universe, pair truth-label rule, pair scorer or probability construction, fixed decision threshold, pooling unit, or three-seed aggregation rule. No pair-level numeric value will be created.",
+      "threshold_only_sources": [
+        {
+          "path": "D:\\dev\\99_tools\\autocad-sdk-router\\reports\\e2\\prereg_r2_v1.json",
+          "sha256": "fc93dad9232cfd877802c1d53996357eccc710daff8cfb2cf7c865bf7f78bcd2",
+          "quote": "S-pair F1≥0.80"
+        },
+        {
+          "path": "D:\\dev\\99_tools\\autocad-sdk-router\\reports\\e2\\synthesis\\FINAL_PROGRAM_PLAN.md",
+          "sha256": "53efc08a96d8b0a770b5f0b5eaf9ae2d9ca8b5ce7db6422dce64e86afb75fda0",
+          "quote": "node `≥0.92`/pair `≥0.80`"
+        }
+      ]
+    },
+    "true_style-OOD_drop": {
+      "operational_definition_status": "BLOCKED_INPUT",
+      "threshold": 0.10,
+      "comparison": "<=",
+      "reason": "The authorized calibration source explicitly limits its available style measurement to IID source-category slices and states that true OOD requires a future preregistration. No held-out-style population/split, reference metric, drop direction, or aggregation rule is sealed here, so no true style-OOD number will be created.",
+      "verbatim_sources": [
+        {
+          "path": "D:\\dev\\99_tools\\autocad-sdk-router\\reports\\e2\\cells\\e6_calibration_ood\\prereg.json",
+          "sha256": "7cc9492512980396ca0062a23d75a2a4f77cfb8ad65416f1fbefdc5e280d6083",
+          "locator": "$.metrics.style_slices",
+          "quote": "per source category and pooled cal-eval AUPRC/F1/drawing count, with pooled-minus-category gaps"
+        },
+        {
+          "path": "D:\\dev\\99_tools\\autocad-sdk-router\\reports\\e2\\cells\\e6_calibration_ood\\prereg.json",
+          "sha256": "7cc9492512980396ca0062a23d75a2a4f77cfb8ad65416f1fbefdc5e280d6083",
+          "locator": "$.style_limit",
+          "quote": "This is IID source-category slice measurement of frozen models, not held-out-style retraining OOD; a true OOD arm belongs to a future preregistration."
+        }
+      ]
+    }
+  },
+  "measurement_protocol": {
+    "checkpoint_paths": [
+      "D:\\runs\\e2_program\\cells\\gnn_formal\\ckpt\\GNN_A_no_pretrain_seed_17.pt",
+      "D:\\runs\\e2_program\\cells\\gnn_formal\\ckpt\\GNN_A_no_pretrain_seed_29.pt",
+      "D:\\runs\\e2_program\\cells\\gnn_formal\\ckpt\\GNN_A_no_pretrain_seed_43.pt"
+    ],
+    "lineage_required": {
+      "gnn_formal.py": "0413f1035de76ab8a175c37c291c3fca634a2f1effb8135b5371aa357d5a94c0",
+      "graph_builder.py": "c95d4a30d30e0db157fe56102053a7884902b7749464f7f4cb8852c0819321f6",
+      "GraphConfig_digest": "56911f4633979a3fe00fd56be2d0a39ac06757ed255ed49ed18ca20ba9d4ac49",
+      "split_manifest_content_sha256": "5e16541d7191ad01c57a9cee72172f63112ed68590dd371aff5bf0aaaab8e07b",
+      "split_manifest_file_sha256": "8aad64eeda77df55296fc711c21d7befdeada7fe379aeafec81fd1691aea044f"
+    },
+    "split_boundary": "Hash the split manifest as an opaque byte stream for mandatory lineage comparison. For semantics, parse only the frozen val-A/A section with a prefix-bounded reader that stops before the val-B/B section; do not deserialize, enumerate, log, hash separately, or otherwise inspect the val-B drawing list.",
+    "node_inference": "Frozen checkpoint load and full-graph val-A inference only; no training, refit, calibration, threshold search, or alternate metric.",
+    "blocked_bands": "Do not run numeric substitutes for S-pair or true style-OOD. Emit null values and BLOCKED_INPUT evidence rows."
+  },
+  "adjudication": {
+    "per_band": "DISCOVERED bands: PASS iff the sealed comparison to the sealed threshold is true, otherwise FAIL. Missing operational definitions: BLOCKED_INPUT.",
+    "three_band_AND": "FAIL if any band is FAIL; otherwise BLOCKED_INPUT if any band is BLOCKED_INPUT; otherwise PASS.",
+    "unknown_policy": "Preserve UNKNOWN/BLOCKED_INPUT; invention and threshold relaxation are forbidden."
+  },
+  "telemetry": {
+    "required_keys": ["wall_seconds", "peak_rss_bytes", "peak_vram_bytes", "device", "budget_charge"],
+    "budget_charge_definition": {
+      "unit": "RTX-hour",
+      "value": "wall_seconds / 3600 while this exclusive serial-queue cell owns the device",
+      "cap": 8.0
+    },
+    "failure_runs_included": true
+  },
+  "output_paths": {
+    "prereg_json": "D:\\runs\\e2_program\\cells\\w3_m2_gnn_andgate\\PREREG_local.json",
+    "prereg_csv": "D:\\runs\\e2_program\\cells\\w3_m2_gnn_andgate\\PREREG.csv",
+    "measurement_json": "D:\\runs\\e2_program\\cells\\w3_m2_gnn_andgate\\measurement.json",
+    "evidence_csv": "D:\\runs\\e2_program\\cells\\w3_m2_gnn_andgate\\evidence.csv",
+    "report_md": "D:\\runs\\e2_program\\cells\\w3_m2_gnn_andgate\\REPORT.md"
+  }
+}
