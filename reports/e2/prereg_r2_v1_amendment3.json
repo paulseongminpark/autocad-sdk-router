@@ -1,0 +1,122 @@
+{
+  "accounting": {
+    "backstop_total": 12,
+    "normal_per_wave": 1,
+    "rows_before_this_batch": 1,
+    "this_batch_row_total": 2
+  },
+  "adjudication": {
+    "G1": "gnn_minus_clean CI95 low > 0 (pooled AUPRC delta, BOOTSTRAP_SEED 43)",
+    "G2": "gnn_minus_twohop CI95 low > 0 (pooled AUPRC delta, BOOTSTRAP_SEED 43)",
+    "domain_boundary": "CubiCasa SEG-IR universe only; E1 working-drawing transfer UNVERIFIED",
+    "pass_rule": "ADJ-PASS iff G1 AND G2; any inversion adjudicated per-arm; report-only otherwise"
+  },
+  "arm_roster": {
+    "excluded": [
+      "deterministic_v0(RETIRED)",
+      "SSL(G8 killed)",
+      "RL(A64/A65 killed)",
+      "PU ladder(no val-B qualification)",
+      "convention C70/C71(reference only)",
+      "rsi_inner_v1(next-wave candidate only, prereg M-13)"
+    ],
+    "included": [
+      "clean(bundle,3-seed ensemble)",
+      "twohop(seeds 17/29/43)",
+      "gnn(seeds 17/29/43)"
+    ],
+    "series_count": 9
+  },
+  "canonical_ledger_pre_hash": "955337d9ec48329e4f55a2ef949700fb5b8d868734d48227a368df25a324443a",
+  "execution_approval": {
+    "authority": "PAUL_D1 2026-07-20 (PAUL_DECISIONS_20260720.md sha 1acf0e262c029a3073a8869041f5aba8ca9190ba4cf726c4896d7122d8906aad)",
+    "clause": "normal single batch, 1 event, immediately after W3 prereg seal"
+  },
+  "parent_prereg_r2_path": "D:\\dev\\99_tools\\autocad-sdk-router\\reports\\e2\\prereg_r2_v1.json",
+  "parent_prereg_r2_sha256": "fc93dad9232cfd877802c1d53996357eccc710daff8cfb2cf7c865bf7f78bcd2",
+  "repair_evidence": {
+    "rehearsal_vala": "PASS 8/8 reproduction, tolerance 1e-6",
+    "repair_report": "D:\\dev\\99_tools\\autocad-sdk-router\\reports\\e2\\cells\\valb_batch_prep\\REPAIR_REPORT.md",
+    "selftest": "PASS exit 0"
+  },
+  "schema": "e2.valb_batch.amendment3.v1",
+  "valb_batch_launcher": {
+    "canonical_ledger_path": "D:\\runs\\e2_program\\cells\\w2_09_valb\\valb_ledger.jsonl",
+    "cohort_manifest_sha256": "18d1a63c23000650501d0f751beabea23ce0c888b921ed096b05600551cf3ab6",
+    "evaluator_sha256": "85481aa49f6cf62307588e73ea502160079f1172de8f5f927a1a7c23bb5ef1de",
+    "method_ids": {
+      "clean": {
+        "calibration_sha256": "none",
+        "common_row_resolver_sha256": "e9edba8b20ed772633f1afa5ecbfc811b28167782795a7611398bf85646b12e9",
+        "config_sha256": "7f5ee863dc0de5a657442df4970253b735dac920eabcbf85f47908e2bace7263",
+        "environment_lock_sha256": "76d8f3c3566212c3eb02ff738894a32f587a83c392b0c2ec666207bd15d30b1e",
+        "evaluator_sha256": "85481aa49f6cf62307588e73ea502160079f1172de8f5f927a1a7c23bb5ef1de",
+        "feature_or_graph_builder_sha256": "ae81bf8c5311fc19c8ad38f7feca5d1c15bf39a71d41a1fb925775d6e63aafe6",
+        "inference_adapter_sha256": "ae81bf8c5311fc19c8ad38f7feca5d1c15bf39a71d41a1fb925775d6e63aafe6",
+        "model_artifact_sha256": [
+          "a0f37c1ab89d64773a7adbea871425a7f1bcc945e0b83ccea969e15d54ea1dcc"
+        ],
+        "output_schema_sha256": "f7a7395649971ed10b5cf4ea4d2483188d1cde0b305e9623c8b0f2c77ea2a9b0",
+        "seed_aggregation_rule": "probability_ensemble",
+        "split_manifest_content_sha256": "5e16541d7191ad01c57a9cee72172f63112ed68590dd371aff5bf0aaaab8e07b",
+        "split_manifest_file_sha256": "8aad64eeda77df55296fc711c21d7befdeada7fe379aeafec81fd1691aea044f",
+        "train_data_sha256": "5e16541d7191ad01c57a9cee72172f63112ed68590dd371aff5bf0aaaab8e07b"
+      },
+      "gnn": {
+        "calibration_sha256": "none",
+        "common_row_resolver_sha256": "e9edba8b20ed772633f1afa5ecbfc811b28167782795a7611398bf85646b12e9",
+        "config_sha256": "56911f4633979a3fe00fd56be2d0a39ac06757ed255ed49ed18ca20ba9d4ac49",
+        "environment_lock_sha256": "76d8f3c3566212c3eb02ff738894a32f587a83c392b0c2ec666207bd15d30b1e",
+        "evaluator_sha256": "85481aa49f6cf62307588e73ea502160079f1172de8f5f927a1a7c23bb5ef1de",
+        "feature_or_graph_builder_sha256": "c95d4a30d30e0db157fe56102053a7884902b7749464f7f4cb8852c0819321f6",
+        "inference_adapter_sha256": "0413f1035de76ab8a175c37c291c3fca634a2f1effb8135b5371aa357d5a94c0",
+        "model_artifact_sha256": [
+          "612e4bf954ff5967853f7a08e66195b79dfa15250d6e9d42f88a877c92a3952c",
+          "1b4bbd004491609cfe8cfc217d18b0ec5ff344f8fee43c67b392a4c37dbc6877",
+          "ab37cf25894e8ed7f2e96ca287a21da961c68d37bcf2bd9633ae1cb9b663e2a3"
+        ],
+        "output_schema_sha256": "f7a7395649971ed10b5cf4ea4d2483188d1cde0b305e9623c8b0f2c77ea2a9b0",
+        "seed_aggregation_rule": "metric_mean",
+        "split_manifest_content_sha256": "5e16541d7191ad01c57a9cee72172f63112ed68590dd371aff5bf0aaaab8e07b",
+        "split_manifest_file_sha256": "8aad64eeda77df55296fc711c21d7befdeada7fe379aeafec81fd1691aea044f",
+        "train_data_sha256": "5e16541d7191ad01c57a9cee72172f63112ed68590dd371aff5bf0aaaab8e07b"
+      },
+      "twohop": {
+        "calibration_sha256": "none",
+        "common_row_resolver_sha256": "e9edba8b20ed772633f1afa5ecbfc811b28167782795a7611398bf85646b12e9",
+        "config_sha256": "ae81bf8c5311fc19c8ad38f7feca5d1c15bf39a71d41a1fb925775d6e63aafe6",
+        "environment_lock_sha256": "76d8f3c3566212c3eb02ff738894a32f587a83c392b0c2ec666207bd15d30b1e",
+        "evaluator_sha256": "85481aa49f6cf62307588e73ea502160079f1172de8f5f927a1a7c23bb5ef1de",
+        "feature_or_graph_builder_sha256": "ae81bf8c5311fc19c8ad38f7feca5d1c15bf39a71d41a1fb925775d6e63aafe6",
+        "inference_adapter_sha256": "ae81bf8c5311fc19c8ad38f7feca5d1c15bf39a71d41a1fb925775d6e63aafe6",
+        "model_artifact_sha256": [
+          "7de0cddb8a6d5f8690ecacbd24a1c3a39f4594ffdb5fe2145edbf785189f09df",
+          "3e868c986a68f5a4a97ed481a825ec7b648338b5697bc5d62ccaf0e5253437aa",
+          "797dd0fce30489fa44de585a3b20ef63df3e38038728db5a92addb44d017ad58"
+        ],
+        "output_schema_sha256": "f7a7395649971ed10b5cf4ea4d2483188d1cde0b305e9623c8b0f2c77ea2a9b0",
+        "seed_aggregation_rule": "metric_mean",
+        "split_manifest_content_sha256": "5e16541d7191ad01c57a9cee72172f63112ed68590dd371aff5bf0aaaab8e07b",
+        "split_manifest_file_sha256": "8aad64eeda77df55296fc711c21d7befdeada7fe379aeafec81fd1691aea044f",
+        "train_data_sha256": "5e16541d7191ad01c57a9cee72172f63112ed68590dd371aff5bf0aaaab8e07b"
+      }
+    },
+    "method_manifest_path": "D:\\runs\\e2_program\\cells\\w2_09_valb\\valb_method_manifest.json",
+    "method_manifest_sha256": "0070e290c1953b7268e60ebd8196e91178d7760297ab990518443667518d8d4a",
+    "one_shot_nonce_sha256": "73d9f4f076c2bb9ddd4d3461b4a65b51754a52bafa195281f2dd0a2b4dbf50bb",
+    "ordinary_batch_count": 0,
+    "output_schema_sha256": "f7a7395649971ed10b5cf4ea4d2483188d1cde0b305e9623c8b0f2c77ea2a9b0",
+    "previous_ledger_sha256": "955337d9ec48329e4f55a2ef949700fb5b8d868734d48227a368df25a324443a",
+    "runner_sha256": "e9edba8b20ed772633f1afa5ecbfc811b28167782795a7611398bf85646b12e9",
+    "schema": "e2.valb_batch.launch_binding.v1",
+    "series_count": 9,
+    "wave_id": "e2.w3"
+  },
+  "w3_prereg": {
+    "prose_path": "D:\\dev\\99_tools\\autocad-sdk-router\\reports\\e2\\prereg_w3_v1.md",
+    "prose_sha256": "1348c40b2e95755478cd8a9f68df5f91fcc9290a5e51e2c68285d780bc16457a",
+    "roster_path": "D:\\dev\\99_tools\\autocad-sdk-router\\reports\\e2\\prereg_w3_v1.json",
+    "roster_sha256": "ad66606a239b56441ffbdead949e0b50e62f3105a931cad4421f36e3a963fde4"
+  },
+  "wave_id": "e2.w3"
+}
