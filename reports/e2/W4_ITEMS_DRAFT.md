@@ -23,13 +23,28 @@
     IID 대비 하락 측정 규칙. E6 캘리브레이션 노트가 "참 OOD=차기 프리레그"로 미룬 항목 승계.
 - 게이트: 정의 소스 발굴 → 선봉인 → 측정. FAIL이어도 완화 금지.
 
+## W4-M8-floorplancad — FloorPlanCAD 공식본 확보 (M-8 후속, HF 조사로 해소 경로 확정)
+- 발생: M-8 NOT_QUALIFIED (분할 격리 FAIL). HF 조사(RECON_REPORT.md @1c9ad6c) 결론: **로컬본은
+  Voxel51 test-split-only 미러**. 공식 floorplancad.github.io는 프로젝트-격리 train/val/test
+  제공(60 프로젝트 train / 800 val / 나머지 test) + **완전 35클래스**(class 33=wall, 34=curtain
+  wall — 벽 라벨 2종; 31=row chairs·32=parking·35=railing). URL 출처: CADTransformer
+  anno_config.py num_class=35.
+- 사양: 공식 배포본(프로젝트-격리 분할 + 35클래스 매핑) 확보 → M-8 4축 재측정. 갭이 데이터
+  결함이 아니라 추출본 문제였음이 확정 — 재측정 시 QUALIFIED 전환 가능성 높음.
+- 성격: 데이터 조달(공식 릴리스 다운로드). Paul PR-3(연구용 GO) 관할.
+
 ## W4-M12-split — ArchCAD 공식 분할 확보 (M-12 후속)
 - 발생: M-12 TRACK_BLOCKED (@커밋대기) — 스키마 PASS(31클래스·wall=semantic:20)·어댑터 타당성
   PASS(설계)이나 **분할 격리 FAIL**(공식 project/drawing grouping 0건 — 무작위 split=누수
   위험)·좌표 INCONCLUSIVE(물리 단위 미확정).
+- HF 조사(@1c9ad6c): 논문이 **공식 drawing-격리 7:1:2 분할**(289,144/41,306/82,612) + 14m×14m
+  청크 스케일 정의. 그러나 **공개 HF 릴리스가 GATED**(비상업 약관 수락 필요) — 공개 40K subset에
+  분할 매니페스트·mm/pixel이 포함되는지는 약관 수락 전 UNKNOWN.
 - 사양: 원 배포자 제공 project/drawing grouping + 공식 split manifest 확보·해시 봉인 → 좌표
   물리 단위 machine-readable 근거 확보. 둘 다 확보 전 학습 투입 영구 금지(eligible_for_training
   =false 고정). 코드·학습보다 이 조달이 선행.
+- **결정 필요(Paul)**: HF gated 약관(비상업 연구용) 수락 여부 — PR-3(연구용 GO)와 정합하나
+  약관 수락은 외부 행위라 명시 결재 권장. 수락 시 공개 subset의 분할 포함 여부 확인 가능.
 - 성격: 데이터 조달 조사(보유 인프라 우선 — 외부 조달 제안 아님, 로컬 복제본의 메타데이터
   재확인 우선).
 
