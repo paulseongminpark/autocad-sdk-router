@@ -1,0 +1,215 @@
+{
+  "schema": "ariadne.e2.w3.det_v1_relegislate.prereg.local.v1",
+  "sealed_before_numeric_computation": true,
+  "method_id": "deterministic_v1",
+  "cell_id": "e2.w3.det_v1_relegislate",
+  "wave": "e2.w3",
+  "w3_boundary": "The detector ladder and all val-A/val-B numbers are valid only within the CubiCasa SEG-IR universe. E1 real-drawing transfer is UNVERIFIED. (prereg_w3_v1 sec 0.5)",
+  "v0_isolation": "deterministic_v0 is RETIRED (G-1). This cell is an independent new measurement under the deterministic_v1 name. No v0 number is compared or backfilled.",
+  "inherited_sources": {
+    "metric_and_band": "doe_P5.md sec 2.3 + reports/e2/cells/f04_completion/PREREG_local.json verdict_band (sha256 444fa333d0ba816d723e9fc2b0125714a1ad31940710da7a79932b425d7587c0)",
+    "transform_catalog": "doe_P5.md sec 2.2 (T-META v1) + F04 PREREG relation_registry",
+    "cell_definition": "prereg_w3_v1.md M-15 (lines 149-154); FINAL_PROGRAM_PLAN.md line 156 (doe_P5 F01-F14->F04)",
+    "population": "w2_09 split_manifest.json (content hash 5e16541d..., file 8aad64ee...)"
+  },
+  "spec_sha256": "3c0c755fb5fce7ce5fc9389788aa56e16fd0c12f5700099f5affdf410eddab12",
+  "rule_specification": {
+    "method_id": "deterministic_v1",
+    "cell_id": "e2.w3.det_v1_relegislate",
+    "measurement_scope": "F01-F07 under deterministic_v1 name (independent new measurement; v0 isolated)",
+    "rules": {
+      "method_id": "deterministic_v1",
+      "detector_class": "rule_based_geometric_wall_detector",
+      "input": "SEG-IR line segments (schema ariadne.e2_ext_segir.v1); endpoints = pts[0], pts[-1]; units px",
+      "scale_mm_per_px_reference": 12.0,
+      "predicate": "wall(l) := R1_parallel_band_pairing(l) AND R2_length_gate(l)",
+      "R1_parallel_band_pairing": {
+        "text": "exists segment m != l s.t. (a) undirected angular difference <= angle_tol_deg, (b) perpendicular gap between the two infinite lines in [gap_min_px, gap_max_px], (c) projected overlap along l's direction >= overlap_min_frac * min(len(l), len(m)). Pairing is marked symmetrically on both l and m.",
+        "angle_tol_deg": 12.0,
+        "gap_min_px": 3.0,
+        "gap_max_px": 55.0,
+        "overlap_min_frac": 0.25
+      },
+      "R2_length_gate": {
+        "text": "len(l) >= len_min_px",
+        "len_min_px": 8.0
+      },
+      "threshold_rationale": "domain prior only (wall thickness 36-660 mm at 12 mm/px = 3-55 px gap; 12 deg parallel tolerance for vector noise; 0.25 overlap for co-extensive wall faces; 8 px ~= 96 mm minimum wall length). No value tuned to val-A DEV outcomes.",
+      "no_layer_hint_reason": "SEG-IR carries a single constant layer '0' (distinct=1 across all segments); a layer-hint rule is inert on this population and is therefore not part of deterministic_v1."
+    },
+    "lid_definition": {
+      "formula": "LID = sha256(drawing_id + NUL + handle + NUL + insert_path + NUL + edge_index + NUL + occurrence_index)",
+      "cubicasa_binding": "insert_path='', edge_index='0', occurrence_index='0' (flat raster-derived segments; no INSERT). Equivalent to (drawing_id, handle) since handle is unique per drawing.",
+      "source": "doe_P5.md sec 2.1"
+    },
+    "metric": {
+      "unit": "occurrence-level LID segment (doe_P5 T6/attack E)",
+      "per_drawing_param_violation": "v_{d,k,p} = (1/|L_d|) * sum_{l in L_d} 1[ yhat(before,l) != yhat(after, m(l)) ]; a mapped LID that disappears after transform counts as violation 1",
+      "invalid_drawing_rule": "drawings with |L_d| == 0 valid segments are isolated as invalid (NOT vacuous pass)",
+      "cell_aggregation": "R-META_k = mean_over_drawings( mean_over_params( v_{d,k,p} ) )  [equal-weight params first, then drawing-macro]",
+      "source": "doe_P5.md sec 2.3"
+    },
+    "verdict_band": {
+      "metric": "R-META drawing-macro violation rate = 1 - invariance",
+      "PASS": "R-META <= 0.02",
+      "INCONCLUSIVE": "0.02 < R-META <= 0.10",
+      "FAIL": "R-META > 0.10",
+      "UNKNOWN": "no admissible numeric measurement; never coerce to zero or PASS",
+      "BLOCKED_INPUT": "required transform substrate absent from population; no admissible measurement (never vacuous-pass)",
+      "source": [
+        "doe_P5.md sec 2.3 (drawing-macro violation rate; PASS<=0.02, INC<=0.10, FAIL>0.10)",
+        "reports/e2/cells/f04_completion/PREREG_local.json verdict_band (sha256 444fa333d0ba816d723e9fc2b0125714a1ad31940710da7a79932b425d7587c0)"
+      ]
+    },
+    "family_verdict_rule": "after sentinel qualification: all measurable cells PASS => family PASS; any FAIL => FAIL; else any INCONCLUSIVE => INCONCLUSIVE; any BLOCKED_INPUT/UNKNOWN/INADMISSIBLE prevents a complete family verdict.",
+    "transforms": {
+      "F01": {
+        "transform": "translate",
+        "params": [
+          {
+            "dx_over_D": 0.1,
+            "dy_over_D": -0.2
+          },
+          {
+            "dx_over_D": 10.0,
+            "dy_over_D": 10.0
+          },
+          {
+            "dx_over_D": -10.0,
+            "dy_over_D": 3.0
+          }
+        ],
+        "measurability": "MEASURABLE",
+        "reason": "pure translation of px coordinates; LID preserved"
+      },
+      "F02": {
+        "transform": "rotate",
+        "params": [
+          {
+            "deg": 17.0
+          },
+          {
+            "deg": 90.0
+          },
+          {
+            "deg": 173.0
+          }
+        ],
+        "center": "bbox_centroid",
+        "measurability": "MEASURABLE",
+        "reason": "rotation about centroid; LID preserved"
+      },
+      "F03": {
+        "transform": "uniform-scale",
+        "params": [
+          {
+            "factor": 0.5
+          },
+          {
+            "factor": 2.0
+          },
+          {
+            "factor": 10.0
+          }
+        ],
+        "center": "bbox_centroid",
+        "measurability": "MEASURABLE",
+        "reason": "isotropic scale about centroid; LID preserved"
+      },
+      "F04": {
+        "transform": "unit-change",
+        "params": [
+          {
+            "from": "mm",
+            "to": "m",
+            "coordinate_factor": 0.001
+          },
+          {
+            "from": "m",
+            "to": "mm",
+            "coordinate_factor": 1000.0
+          }
+        ],
+        "measurability": "BLOCKED_INPUT",
+        "reason": "CubiCasa SEG-IR is units='px' with NO $INSUNITS / scale_mm_per_unit metadata; the transform validity certificate ('coordinates, $INSUNITS, scale_mm_per_unit encode the same physical quantities') cannot be certified. doe_P5 sec 3.2 states unit-change is NOT CubiCasa's test-sheet; sec 6.2 rules unit-unknown drawings BLOCKED_DATA. Assigning an arbitrary unit is forbidden (invention)."
+      },
+      "F05": {
+        "transform": "block-explode",
+        "params": [
+          {
+            "mode": "full_recursive_to_fixpoint"
+          }
+        ],
+        "measurability": "BLOCKED_INPUT",
+        "reason": "CubiCasa SEG-IR segments carry only {handle, layer, pts}; there is NO INSERT / block / occurrence structure to explode. The transform is a vacuous no-op (no remaining INSERT trivially satisfied), which doe_P5 sec 2.3 forbids treating as a pass. doe_P5 sec 3.2 marks block-explode 'NA' for CubiCasa."
+      },
+      "F06": {
+        "transform": "layer-rename",
+        "params": [
+          {
+            "scheme": "anonymize"
+          },
+          {
+            "scheme": "bijective_shuffle",
+            "seed": 11
+          },
+          {
+            "scheme": "bijective_shuffle",
+            "seed": 47
+          }
+        ],
+        "measurability": "BLOCKED_INPUT",
+        "reason": "every segment has the single constant layer '0' (distinct=1); a bijective shuffle over a singleton is identity and the detector uses no layer feature, so the relation is a vacuous no-op with no truth-bearing substrate. doe_P5 sec 3.2: CubiCasa layers are neutral and NOT the test-sheet for meaningful layer-rename."
+      },
+      "F07": {
+        "transform": "coord-jitter",
+        "params": [
+          {
+            "q_over_D": 1e-09,
+            "seed": 101
+          },
+          {
+            "q_over_D": 1e-07,
+            "seed": 211
+          },
+          {
+            "q_over_D": 1e-05,
+            "seed": 307
+          }
+        ],
+        "measurability": "MEASURABLE",
+        "reason": "deterministic bounded dither of shared logical vertices on px coordinates; INVALID_TRANSFORM pairs (zero-length / changed incidence) excluded from denominator per doe_P5 sec 2.2"
+      },
+      "source": "doe_P5.md sec 2.2 (T-META v1); F04 PREREG relation_registry"
+    },
+    "sentinel_qualification": {
+      "positive_recall_floor": 0.2,
+      "floor_source": "doe_P5.md sec 2.3 / sec 6.1 Q1 (recall>=0.20, set below classical-ML 0.370 as a hygiene floor, not an accuracy bar)",
+      "zero_detector_rule": "a constant-0 predictor yields recall 0 -> family ineligible for ranking",
+      "all_detector_rule": "a constant-1 (near-all) predictor with mean prediction rate >= near_all_thresh flagged and ineligible",
+      "near_all_thresh": 0.95,
+      "consequence_if_floor_unmet": "all measured cells -> INADMISSIBLE (recorded honestly; no threshold re-search)"
+    },
+    "population": {
+      "name": "val-A DEV",
+      "split": "A",
+      "state": "DEV",
+      "drawing_count": 198,
+      "split_content_hash": "5e16541d7191ad01c57a9cee72172f63112ed68590dd371aff5bf0aaaab8e07b",
+      "split_manifest_file_sha256": "8aad64eeda77df55296fc711c21d7befdeada7fe379aeafec81fd1691aea044f",
+      "manifest_path": "D:/runs/e2_program/cells/w2_09_valb/split_manifest.json",
+      "ir_root": "D:/dev/99_tools/autocad-sdk-router/runs/e2_ext_cubicasa/ir/val",
+      "forbidden": "val-B (split B, state ADJ) and test are NOT touched"
+    },
+    "prohibitions": [
+      "no v0 manifest/number consulted as input, comparison, or backfill (v0 isolation)",
+      "no threshold re-search: a band miss is recorded as-is, thresholds are not adjusted",
+      "no GPU; CPU cap 4h",
+      "no invention: an F-cell whose transform substrate is absent is BLOCKED_INPUT, never vacuous-passed"
+    ]
+  },
+  "terminal_markers": {
+    "success": "AXIS_MEASUREMENT_COMPLETE_V1",
+    "missing_required_input": "BLOCKED_INPUT"
+  }
+}
