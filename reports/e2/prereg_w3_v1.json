@@ -1,0 +1,108 @@
+{
+  "schema": "e2.w3.prereg_roster.v1",
+  "wave_id": "e2.w3",
+  "sealed_utc": "2026-07-20",
+  "prose_sot": {
+    "path": "D:\\dev\\99_tools\\autocad-sdk-router\\reports\\e2\\prereg_w3_v1.md",
+    "sha256": "1348c40b2e95755478cd8a9f68df5f91fcc9290a5e51e2c68285d780bc16457a",
+    "revision": "v3.3"
+  },
+  "confirm_chain": [
+    {"seat": "grok-4.5-xhigh", "verdict": "SEAL_OK", "record": "D:\\dev\\99_tools\\autocad-sdk-router\\reports\\e2\\w3_plan_review_staging\\grok_confirm_v31.md"},
+    {"seat": "gpt-5.6-sol-ultra", "verdict": "SEAL_OK", "record": "D:\\runs\\e2_program\\w3_plan_review\\sol_confirm_v33.md"}
+  ],
+  "parents": {
+    "prereg_r2_v1.json": "fc93dad9232cfd877802c1d53996357eccc710daff8cfb2cf7c865bf7f78bcd2",
+    "prereg_r2_v1_amendment1.json": "30f752db803f7f589d1a8d1f1a2d8557364ae2d624f76a639533161f552b8283",
+    "prereg_r2_v1_amendment2.json": "6e29bbd5f8c502a1bc36277a535521c117408b2460e80511907d610321dd442a",
+    "W2_CLOSEOUT_LEDGER.md_file": "6991cc42d55442e43c241fb660725a1f6187336579869f29ea429417c4341222",
+    "W2_CLOSEOUT_LEDGER_self_sha": "66b1bed11f8d34ddeb04458e924716219e0fec1d0008e5ad6b3990cc754cb922",
+    "PAUL_DECISIONS_20260720.md": "1acf0e262c029a3073a8869041f5aba8ca9190ba4cf726c4896d7122d8906aad",
+    "L1_DEMOTION_RECORD.md": "23a0dd1a98231f9aeaec2732341c9a507e838d619b4d5185f2e971ac8dcb3af9",
+    "DATASET_INVENTORY.md": "95c7186c0bca94a8565924b5a2fa98dff6f298ff5e012d088f522df106cec5f0",
+    "valb_batch_runner.py": "e9edba8b20ed772633f1afa5ecbfc811b28167782795a7611398bf85646b12e9",
+    "valb_output_schema": "f7a7395649971ed10b5cf4ea4d2483188d1cde0b305e9623c8b0f2c77ea2a9b0",
+    "sealed_evaluator": "85481aa49f6cf62307588e73ea502160079f1172de8f5f927a1a7c23bb5ef1de",
+    "canonical_ledger_pre_hash": "955337d9ec48329e4f55a2ef949700fb5b8d868734d48227a368df25a324443a",
+    "split_content_hash": "5e16541d7191ad01c57a9cee72172f63112ed68590dd371aff5bf0aaaab8e07b",
+    "split_manifest_file": "8aad64eeda77df55296fc711c21d7befdeada7fe379aeafec81fd1691aea044f",
+    "frozen_classical_model": "ccc52d2066cc44502b2a8ccb0412b6c77d8caca4c37cfbf919bb95e46f16c754",
+    "gnn_formal_code": "0413f1035de76ab8a175c37c291c3fca634a2f1effb8135b5371aa357d5a94c0",
+    "graph_builder": "c95d4a30d30e0db157fe56102053a7884902b7749464f7f4cb8852c0819321f6",
+    "graph_config": "56911f4633979a3fe00fd56be2d0a39ac06757ed255ed49ed18ca20ba9d4ac49",
+    "frozen_w2_02_config": "ae81bf8c5311fc19c8ad38f7feca5d1c15bf39a71d41a1fb925775d6e63aafe6"
+  },
+  "domain_boundary": "CubiCasa SEG-IR universe only; E1 working-drawing transfer UNVERIFIED; every REPORT must quote this boundary",
+  "governance": [
+    {"id": "G-1", "title": "deterministic_v0 retirement", "disposition": "RETIRED_TERMINAL"},
+    {"id": "G-2", "title": "D14 PARKED", "reopen_gate": "G6_CLOSURE_OK AND M16_COMPLETE_F15_F21_NUMERIC AND M7_F02PRIME_PASS AND F03_REMEASURE_PASS"},
+    {"id": "G-3", "title": "A0 gate seal", "disposition": "EXECUTE_IN_W3"},
+    {"id": "G-4", "title": "bet_register adjudication", "disposition": "ORCHESTRATOR_ONLY"},
+    {"id": "G-5", "title": "license relitigation ban", "authority": "PAUL_PR3_AND_D2"},
+    {"id": "G-6", "title": "F04 closure adjudication", "adjudication_id": "e2.w3.adj_f04_closure", "state_machine": {"scope": "F01-F28", "cell_states": ["NUMERIC", "PERMANENT_UNKNOWN", "READY_FOR_GPU", "PARKED", "PENDING"], "closure_ok_iff": "F08-F14 all NUMERIC AND F01-F07 all PERMANENT_UNKNOWN AND F22-F28 all PARKED AND F15-F21 all READY_FOR_GPU"}},
+    {"id": "G-7", "title": "autopsy reserve", "cell_id": "e2.w3.autopsy_valb", "type": "REPORT_ONLY", "cap": "CPU 4h", "terminal_states": ["AUTOPSY_COMPLETE", "AUTOPSY_BLOCKED"], "note": "sole exception to art3.5 STOP"},
+    {"id": "G-8", "title": "gen3 direction record", "decision": "PAUL_D3", "target": "E1 working-drawing face stats (+Cheongju if M-11 PASS)", "usage_cap": "instrument calibration only", "ordering": "M-6 adapter first; execution prereg sealed separately"}
+  ],
+  "measurement": [
+    {"id": "M-1", "title": "val-B single batch", "phase": "0C", "cap": "RTX 0.5h, 1 query", "gate": "amendment3 double-sealed + launcher physical verification", "notes": "first irreversible outcome; failure after contact = GOVERNANCE_STOP then G-7"},
+    {"id": "M-2", "title": "GNN AND-gate completion", "phase": "1", "cap": "RTX 8h", "bands": {"s_node_f1": ">=0.92", "s_pair_f1": ">=0.80", "true_style_ood_drop": "<=0.10"}},
+    {"id": "M-3", "title": "M30 to E1 predictions", "phase": "1", "cap_with": "M-4", "cap": "CPU 4h (M-3+M-4)"},
+    {"id": "M-4", "title": "C71 STK remeasure", "phase": "1", "gate": "M-3 SHA registered in authorized-input"},
+    {"id": "M-5", "title": "F04 classical canonical fill", "phase": "1", "cap": "CPU 8h", "scope": "F08-F14 only", "then": "G-6"},
+    {"id": "M-6", "title": "verifier adapter expansion", "phase": "2", "start_gate": "val-B run complete", "cap_with": "M-7", "cap": "CPU 12h (M-6+M-7)"},
+    {"id": "M-7", "title": "F02-prime remeasure", "phase": "2", "gate": "M-6 PASS AND gen3 execution prereg own-gate PASS", "bands_unchanged": "0.30/0.20"},
+    {"id": "M-8", "title": "R50 semantic-axis qualification", "phase": "1", "cap": "CPU 6h"},
+    {"id": "M-9", "title": "R51 measurement", "phase": "2", "gate": "M-8 PASS AND C-1 PASS", "cap_with": "C-1", "cap": "RTX 12h (C-1+M-9)", "device": "local RTX only"},
+    {"id": "M-10", "title": "G5 local feasibility requal", "phase": "2", "cap": "RTX 2h", "gate": "GPU idle only", "bands": "none - telemetry only"},
+    {"id": "M-11", "title": "second-project qualification (Cheongju S1BL 144 DWG)", "phase": "1", "cap": "CPU 6h", "decision": "PAUL_D4", "constraint": "originals READ-ONLY, staging only"},
+    {"id": "M-12", "title": "ArchCAD track-open investigation + adapter feasibility", "phase": "1", "cap": "CPU 8h", "decision": "PAUL_D4"},
+    {"id": "M-13", "title": "RSI inner loop run 1", "method_id": "rsi_inner_v1", "cell_id": "e2.w3.rsi_run1", "phase": "2", "gate": "C-3 selftest PASS AND M-14 library SHA sealed AND proposer template SHA + fixed settings sealed", "cap": "RTX 16h + CPU 24h, iterations <=30, per-candidate RTX <=20min or CPU <=120min (1 RTX-min = 6 CPU-min), final re-eval RTX <=1h included", "search_signal": "RSI-public only, min delta 0.002, tie keeps incumbent", "seeds": "train 1000+k, reverify 6000+k", "anomaly_jump": "public gain >=0.02 forces reverify tolerance 0.005, fail = discard", "winner_selection": "top-5 public then single private evaluation; winner private <= GNN-A baseline = NO_IMPROVEMENT", "proposer": "LLM with sealed prompt template SHA; fixed model ID + decoding params sealed at C-3 landing, identical across all iterations, mismatch = run invalid; commit-then-evaluate; inputs = public ledger + current best code + sealed search space only", "valb_entry": "FORBIDDEN this wave (series=9 sealed); next-wave reveal candidate only"},
+    {"id": "M-14", "title": "ontology constraint real track", "method_id": "onto_constraint_real_v1", "cell_id": "e2.w3.onto_real1", "phase": "1", "type": "REPORT_ONLY", "cap": "CPU 10h", "procedure": "schema+process pre-seal, compile rules, freeze library + SHA seal, then measure; post-measure edits forbidden", "population": "val-A DEV full (split content hash 5e16541d...)", "scoring": "rule violation flags, weight 1 fixed, AUPRC via sealed evaluator", "residual": "GNN-A 3-seed pooled predictions threshold 0.5 FP union FN; capture rate = flagged residuals / all residuals", "independence": "no F02/F03/F04 synthetic chain dependency; D14 stays PARKED"},
+    {"id": "M-15", "title": "deterministic_v1 relegislation", "method_id": "deterministic_v1", "cell_id": "e2.w3.det_v1_relegislate", "phase": "1", "cap": "CPU 4h", "scope": "F01-F07 v1 only", "bands": "inherit original F01-F07 wording", "kill": "numbers before spec seal = INVALID; no v0 comparison/backfill"},
+    {"id": "M-16", "title": "F04G GPU judge", "cell_id": "e2.w3.f04g_gpu_judge", "phase": "2", "gate": "G-6=CLOSURE_OK AND M-1 ADJ survival", "cap": "RTX 6h total, per-cell <=50min, no post-hoc transfer", "cells": 7},
+    {"id": "M-17", "title": "image jury", "cell_id": "e2.w3.image_jury", "phase": "4", "surface": "cursor grok 4.5 subscription, frontier API = 0", "gate": "after M-1 adjudication AND exposure whitelist sealed", "cap": "images <=120, queries <=240, money 0", "exclusion": "val-B drawings unconditionally excluded"}
+  ],
+  "code_landing": [
+    {"id": "C-1", "title": "R51 raster trainer", "phase": "2", "gate": "M-8 PASS", "ready_rule": "OPEN != READY; build + selftest + SHA seal before M-9"},
+    {"id": "C-2", "title": "xlsx runtime repair", "phase": "1", "cap": "CPU 2h", "note": "CSV canonical until repair verified"},
+    {"id": "C-3", "title": "RSI harness landing", "phase": "1", "cap": "CPU 8h", "split_contract": "drawing-level SHA-256(drawing_id + ':e2.w3.rsi_split.v1') first 8 hex as int, mod 10 in {0,1,2} = RSI-private (30%), else RSI-public (70%); manifest SHA sealed; private < 40 drawings = selftest FAIL", "permission_split": "private labels readable by sealed-evaluator process only; optimizer/candidates path-guarded fail-closed (val-B, test, RSI-private)", "ledgers": "public ledger (optimizer-visible) + private ledger (harness-only, disclosed after run) both append-only JSONL", "selftest": "mock candidate proves all 3 guards block + split determinism + private minimum size", "deliverables": "proposer prompt template SHA + fixed model/decoding settings seal"}
+  ],
+  "disposition_only": [
+    {"id": "R52", "disposition": "CONDITIONAL_FRONTIER", "rule": "next-prereg candidate only if M-9 PASS; no W3 execution"},
+    {"id": "F04V", "disposition": "PARKED"},
+    {"id": "C70_C71_XP_axis", "disposition": "PARKED", "rule": "M-11 PASS alone does not unlock; unlock = next prereg"}
+  ],
+  "phases": {
+    "0A": "roster JSON seal (json.loads round-trip)",
+    "0B": "amendment3 double-seal",
+    "0C": "M-1 val-B",
+    "1": ["M-2", "M-3->M-4", "M-5->G-6", "M-8", "M-11", "M-12", "M-14", "M-15", "C-2", "C-3", "G-3", "G-4"],
+    "2": ["C-1(M-8 PASS)->M-9(C-1 PASS)", "M-6->gen3-exec-prereg->M-7", "M-13(C-3 AND M-14 lib SHA AND proposer seal)", "M-16(G-6=CLOSURE_OK AND M-1 ADJ)", "M-10(GPU idle)"],
+    "3": ["T20/M31/M32 F-axis if dependency AND satisfied"],
+    "4": ["M-17 image jury"]
+  },
+  "gpu_serial_queue": ["M-1", "M-2", "M-16", "M-9", "M-13-gpu", "M-10-idle"],
+  "cpu_parallel": "write-ownership disjoint + RAM watchdog + concurrency cap 6",
+  "kill_rules": [
+    "amendment3 round-trip fail or hash mismatch -> zero reveals",
+    "sentinel mismatch -> halt + G-7 autopsy",
+    "G1 AND G2 unmet -> ADJ-FAIL (DEV history preserved, RSI_ADOPT forbidden, G-7 autopsy)",
+    "F08-F14 numbers without extractor prereg -> INVALID",
+    "M-16 fired without G-6=CLOSURE_OK -> void",
+    "M-9 fired without M-8/C-1 precedence -> void",
+    "DGX GPU number band move -> governance interrupt",
+    "jury exposure of val-B drawings -> violation",
+    "RSI private label access trace -> entire run invalid + halt",
+    "RSI anomaly-jump reverify fail -> candidate discarded",
+    "RSI attempt ledger discontinuity -> halt",
+    "RSI private score exposure mid-loop -> entire run invalid",
+    "RSI proposer settings mismatch vs sealed value -> run invalid",
+    "M-15 numbers before spec seal -> INVALID",
+    "M-14 rule change after library seal -> measurement void",
+    "new defect class -> halt + escalate"
+  ],
+  "anomaly_stop": "new defect class, ledger mismatch, hash drift, dependency interpretation conflict, val-B failure: no alternative interpretation, no retry, no silent repair - STOP, freeze, escalate to Paul; sole exception = G-7 read-only autopsy",
+  "common_clauses": ["W3-TELEM", "W3-PATH", "W3-SEAL", "W3-BOUNDARY", "UNKNOWN preservation", "no invention", "worker tier calibration", "no git", "no subagents", "disk-first reporting"],
+  "non_goals": ["G7 Qwen", "G8 SSL (killed)", "A64/A65 (killed)", "A-prime/6th fleet/C2 (after A0)", "D10/D13 (L1 demotion stands)", "F06 frozen-test (no contact)", "val-B second batch or arm additions", "F04V (explicit parking)", "C70/C71 XP axis (explicit parking)", "R52 (conditional frontier, no W3 execution)", "RSI outer loop (W4 decision)", "gen3 training-augmentation usage (D3)", "gen3 execution before separate prereg", "Text2CAD/pseudo-12k/Zenodo before usage definition", "license relitigation"],
+  "totals": {"rtx_hours_max": 44.5, "cpu_hours_max": 96, "frontier_api_calls": 0, "test_set_contact": 0, "dgx_gpu_adjudication_numbers": 0}
+}
