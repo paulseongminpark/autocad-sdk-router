@@ -1,0 +1,73 @@
+{
+  "prereg_version": "m12_archcad_w3_local_v1",
+  "sealed_at_kst": "2026-07-20T15:49:11.7085691+09:00",
+  "sealed_before_dataset_measurement": true,
+  "packet_path": "D:\\runs\\e2_program\\build\\PACKET_w3_m12_archcad.md",
+  "inventory_path": "D:\\dev\\99_tools\\autocad-sdk-router\\reports\\e2\\DATASET_INVENTORY.md",
+  "dataset_root": "D:\\datasets\\ArchCAD",
+  "cell_root": "D:\\runs\\e2_program\\cells\\m12_archcad",
+  "constraints": {
+    "cpu_only": true,
+    "gpu_forbidden": true,
+    "wall_time_cap_seconds": 28800,
+    "git_forbidden": true,
+    "subagents_forbidden": true,
+    "source_dataset_read_only": true,
+    "all_io_paths_absolute": true,
+    "derived_outputs_only_under_cell_root": true
+  },
+  "sampling": {
+    "scope": "schema and aligned-modality content parsing; split manifests and repository metadata may be read outside the sample only for split/provenance discovery",
+    "candidate_discovery": "Recursively enumerate absolute paths below dataset_root without opening content. Exclude any path containing a .git segment or ending in .metadata. Define a modality family as (lowercase extension, absolute parent directory). Among .png families choose the family with the greatest file count, likewise .svg and .npy; among .json families choose the two families with the greatest file counts. Ties are broken by ordinal lexical absolute parent path. Candidate sample keys are basename-without-final-extension values present exactly once in each of those five selected families.",
+    "rank": "SHA256(UTF8('M12_ARCHCAD_W3|' + sample_key)); ascending hexadecimal digest, then ordinal lexical sample_key",
+    "take": "first min(500, candidate_count) keys",
+    "maximum_samples": 500,
+    "no_replacement": true,
+    "posthoc_substitution_forbidden": true,
+    "malformed_or_missing_sample_policy": "retain the selected key in denominators and record the failed modality; do not replace it"
+  },
+  "measurement_policy": {
+    "file_census": "A dataset-wide absolute-path metadata census is permitted; no dataset file is modified.",
+    "sample_content": "Open only the five files belonging to each selected sample key. PNG may be header-decoded, SVG/XML and JSON parsed, and NPY loaded with allow_pickle=false. Record parse failures as evidence.",
+    "metadata_and_split_surfaces": "README files, dataset cards, repository metadata, and explicit split manifests may be read. Claims from prose are corroborating evidence only and cannot by themselves PASS schema or coordinates.",
+    "unknown_policy": "Preserve UNKNOWN. No missing label, split, coordinate, or SEG-IR field may be invented."
+  },
+  "axis_verdicts": {
+    "schema": {
+      "pass": "At least 50 candidate keys exist; the sealed sample size equals min(500,candidate_count); at least 95% of sampled keys parse in all five selected modality families; a machine-readable class vocabulary or unambiguous label values are extracted from parsed sample content; numeric/string label-to-class interpretation is internally consistent with no more than 1% unexplained observed label values; a wall class is present and its machine-readable representation is identified; and alignment by sample key plus compatible per-sample geometry/canvas metadata is verified for at least 95% of fully parsed samples.",
+      "fail": "Any measured contradiction makes the claimed five-family alignment or class mapping unsafe: fewer than 90% of sampled keys parse in all five families, more than 1% unexplained observed label values, conflicting meanings for the same class identifier, wall absent from the measured machine-readable vocabulary/labels, or geometry/canvas alignment contradiction in more than 5% of fully parsed samples.",
+      "inconclusive": "Neither PASS nor FAIL: fewer than 50 candidates, 90% to below 95% full parse, labels or wall semantics not machine-decodable without an observed contradiction, or alignment cannot be tested from available fields."
+    },
+    "split_isolation": {
+      "pass": "An official machine-readable train/val/test assignment exists; every measured sample assignment is unique; a machine-readable project/drawing grouping key exists; and the complete manifest or complete path census shows zero project/drawing identifiers shared by different splits.",
+      "fail": "No official train/val/test assignment exists, any sample has multiple split assignments, any project/drawing identifier crosses splits, or the official assignment is demonstrably random/sample-level while multiple samples from the same project/drawing cross splits.",
+      "inconclusive": "An official assignment exists but no reliable project/drawing grouping key can be extracted, or only a partial manifest is available and no leakage is observed in the available evidence."
+    },
+    "coordinates": {
+      "pass": "At least 50 selected samples yield numeric coordinate-bearing data; at least 95% parse successfully; unit, origin, axis order/directions, and scale are established from machine-readable fields plus measured values; p05/median/p95 span or scale statistics are reported; and a single explicit ArchCAD-to-SEG-IR normalization transform covers at least 95% of coordinate-parsed samples with cross-modal extent residual no greater than 5% of the larger span.",
+      "fail": "Measured coordinate conventions conflict without a deterministic discriminator, at least 10% of parsed aligned samples require mutually incompatible transforms, non-finite/degenerate coordinates occur in more than 5% of coordinate-bearing sampled files, or cross-modal extent residual exceeds 5% in more than 10% of comparable samples.",
+      "inconclusive": "Neither PASS nor FAIL: fewer than 50 coordinate-bearing samples, below 95% coordinate parse, physical unit or axis direction cannot be established from machine-readable evidence, or a required cross-modal transform cannot be evaluated."
+    },
+    "adapter_feasibility": {
+      "pass": "A deterministic source-to-SEG-IR field/geometry mapping is specified for all source semantics evidenced by the sample; every required SEG-IR core field has a source rule, derived rule, or explicit UNKNOWN representation; coordinate normalization is executable from the measured parameters; all information-loss points and unsupported fields are enumerated; and no unresolved item can silently corrupt geometry, class identity, instance identity, wall topology, or split provenance.",
+      "fail": "A required SEG-IR geometry/class/instance/wall-topology field is contradicted or cannot be represented without silent corruption, or the measured coordinate convention admits no deterministic normalization.",
+      "inconclusive": "A mapping design can be drafted but one or more blocking target-schema, source-semantic, coordinate, topology, or provenance requirements remain UNKNOWN without a measured contradiction."
+    }
+  },
+  "overall_verdict": {
+    "TRACK_OPEN": "all four axes PASS",
+    "TRACK_BLOCKED": "one or more axes FAIL",
+    "PARTIAL": "no axis FAIL and one or more axes INCONCLUSIVE"
+  },
+  "telemetry": {
+    "required": [
+      "wall_seconds",
+      "peak_rss_bytes",
+      "peak_vram_bytes",
+      "device",
+      "budget_charge"
+    ],
+    "peak_vram_bytes": "N/A(no_GPU)",
+    "device": "CPU"
+  }
+}
