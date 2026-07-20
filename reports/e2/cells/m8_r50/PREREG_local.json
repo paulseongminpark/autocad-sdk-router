@@ -1,0 +1,79 @@
+{
+  "cell": "M-8 R50 FloorPlanCAD semantic-axis qualification",
+  "sealed_at_utc": "2026-07-20T07:20:58.2757078Z",
+  "packet_path": "D:\\runs\\e2_program\\build\\PACKET_w3_m8_r50.md",
+  "inventory_path": "D:\\dev\\99_tools\\autocad-sdk-router\\reports\\e2\\DATASET_INVENTORY.md",
+  "dataset_root": "D:\\datasets\\FloorPlanCAD",
+  "output_root": "D:\\runs\\e2_program\\cells\\m8_r50",
+  "execution_constraints": {
+    "original_data": "read_only",
+    "device": "CPU",
+    "gpu_forbidden": true,
+    "git_forbidden": true,
+    "subagents_forbidden": true,
+    "all_io_paths_absolute": true,
+    "wall_time_cap_seconds": 21600
+  },
+  "w3_boundary": "본 보고의 탐지기 사다리·모든 val-A/val-B 수치의 유효 범위는 CubiCasa SEG-IR 우주 한정이다. E1 실무 도면 전이는 미검증이다.",
+  "sample_rule": {
+    "unit": "every file with case-insensitive .png extension recursively below the dataset root",
+    "key": "dataset-root-relative path with backslashes converted to forward slashes; original case retained",
+    "ordering": "ordinal Unicode string order",
+    "lexical_arm": "take the first 300 keys in ordering",
+    "hash_arm": "from keys not in the lexical arm, compute lowercase SHA-256 hex of the UTF-8 key; retain keys whose final hex nibble is one of 0,2,4,6,8,a,c,e; order by hash then key and take the first 300",
+    "maximum_sample_drawings": 600,
+    "shortfall_rule": "do not replace unavailable candidates; use the resulting total below 600"
+  },
+  "axes": {
+    "label_schema": {
+      "measure": [
+        "dataset-declared label list and identifiers",
+        "distinct labels observed in sampled annotations",
+        "deterministic SEG-IR projection for wall, opening, and other"
+      ],
+      "pass": "A stable enumerated schema is locally evidenced; wall is an explicit class; opening, door, or window is explicit; wall and at least one opening class are observed in sampled annotations; and every declared class maps without ambiguity to exactly one of wall/opening/other.",
+      "fail": "Wall is absent, opening/door/window semantics are absent, or the declared/observed representation cannot be deterministically projected to wall/opening/other.",
+      "inconclusive": "Schema sources conflict, sampled annotation labels cannot be decoded, or declared labels cannot be reconciled with observed identifiers."
+    },
+    "mask_alignment": {
+      "measure": [
+        "native image and raster-mask dimensions",
+        "validity of normalized or vector coordinates",
+        "mask-derived bounding box versus supplied box/vector envelope IoU",
+        "normalized centroid distance"
+      ],
+      "paired_object": "an annotated object with both a decodable nonempty raster mask and independently supplied bbox or vector-coordinate envelope",
+      "aligned_object": "mask-envelope IoU >= 0.90 and centroid distance <= 0.02 of image diagonal",
+      "pass": "At least 100 paired objects from at least 30 sampled drawings are evaluable; image/mask dimension agreement >= 99%; coordinate validity >= 99%; and aligned-object rate >= 95%.",
+      "fail": "With the minimum paired evidence available, dimension agreement < 95%, coordinate validity < 95%, aligned-object rate < 90%, or a consistent axis/scale/origin mismatch affects >= 10% of evaluable drawings.",
+      "inconclusive": "Paired evidence is below 100 objects or 30 drawings, or results lie only in the preregistered gray bands."
+    },
+    "split_isolation": {
+      "measure": [
+        "dataset-supplied official split names and assignments",
+        "project/drawing group identifiers",
+        "cross-split group overlap",
+        "cross-split exact PNG SHA-256 duplicates"
+      ],
+      "pass": "At least two official named splits exist including train and a held-out val or test split; a stable project/drawing group identifier permits grouping; cross-split group overlap is zero; and cross-split exact-image duplicate overlap is zero.",
+      "fail": "Only one split is supplied, no official per-sample split assignment exists, any project/drawing group crosses splits, or any exact PNG duplicate crosses splits.",
+      "inconclusive": "Multiple official split assignments exist and exact duplicates are absent, but a stable project/drawing grouping key is unavailable or undecodable."
+    },
+    "semantic_density": {
+      "measure": [
+        "wall-positive drawing rate",
+        "union wall-mask pixel fraction per drawing",
+        "wall instance count per drawing"
+      ],
+      "pass": "At least 500 sampled drawings have decodable annotations and dimensions; wall-positive rate >= 90%; median wall pixel fraction is from 1% through 40%; at least 90% of drawings have wall fraction from 0.1% through 60%; and median wall-instance count >= 1.",
+      "fail": "At least 100 drawings are evaluable and wall-positive rate < 75%, median wall pixel fraction < 0.5% or > 60%, or median wall-instance count is zero.",
+      "inconclusive": "Fewer than 100 drawings are evaluable, required pixel masks/instances are unavailable, or results fall between PASS and FAIL criteria."
+    }
+  },
+  "overall_rule": {
+    "QUALIFIED": "all four axes PASS",
+    "NOT_QUALIFIED": "one or more axes FAIL; split isolation is a hard blocker",
+    "PARTIAL": "no axis FAIL and one or more axes INCONCLUSIVE"
+  },
+  "unknown_policy": "Preserve UNKNOWN and do not infer missing evidence."
+}
